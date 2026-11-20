@@ -79,7 +79,7 @@ jobs:
           grep -E "WARN|ERROR" server.log | grep -i "rtshop" | grep -v -E "mods folder locator|is missing mods.toml|JarSelector|fml.toml" | cut -c1-400 | head -30 || true
           echo "==== last log lines"
           grep -v "^\s*at \|^\t\t" server.log | tail -8 | cut -c1-260
-      - name: Client with the whole pack
+      - name: Client with the whole pack and Distant Horizons
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
@@ -87,6 +87,16 @@ jobs:
           mkdir -p client/mods client/saves
           cp packcache/*.jar client/mods/
           cp build/libs/*.jar client/mods/
+          python3 - <<'PY'
+          import json, urllib.request, urllib.parse
+          q = urllib.parse.urlencode({'loaders': '["forge"]', 'game_versions': '["1.20.1"]'})
+          req = urllib.request.Request('https://api.modrinth.com/v2/project/distanthorizons/version?' + q, headers={'User-Agent': 'rtshop-ci (github.com/IRAGEAD/rtshop)'})
+          versions = json.load(urllib.request.urlopen(req, timeout=60))
+          pick = next((v for v in versions if v.get('version_type') == 'release'), versions[0])
+          f = next((x for x in pick['files'] if x.get('primary')), pick['files'][0])
+          print('Distant Horizons', pick['version_number'], f['filename'])
+          urllib.request.urlretrieve(f['url'], 'client/mods/' + f['filename'])
+          PY
           cp -r server/world client/saves/rtshoptest
           rm -f client/saves/rtshoptest/session.lock
           cat > client/options.txt <<'EOF'
@@ -110,6 +120,9 @@ jobs:
           (timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:1.20.1-47.4.28 -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
           echo "==== client result"
           cat client/rtshop-clienttest.txt 2>/dev/null | cut -c1-300 || echo "no client result"
+          echo "==== Distant Horizons log lines"
+          grep -h -i -E "distant ?horizons|DistantHorizons|\[DH" client/logs/latest.log 2>/dev/null | grep -i -E "error|warn|incompat|fail|exception|version|chunky|wwoo|oculus|farsight" | cut -c1-300 | awk '!seen[substr($0,12)]++' | head -n 30 || true
+          ls client/hs_err*.log 2>/dev/null || true
           echo "==== client-test log lines"
           grep -h "rtshop-clienttest" client/logs/latest.log 2>/dev/null | grep -v "PASS" | cut -c1-260 | tail -n 25 || true
           echo "==== crash reports"
