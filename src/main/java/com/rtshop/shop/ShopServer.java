@@ -3,21 +3,30 @@ package com.rtshop.shop;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.rtshop.RtShop;
 import com.rtshop.economy.Economy;
 import com.rtshop.economy.EconomyConfig;
+import com.rtshop.farm.FarmConfig;
+import com.rtshop.farm.FarmEvents;
+import com.rtshop.item.ModItems;
+import com.rtshop.land.LandConfig;
+import com.rtshop.land.LandManager;
 import com.rtshop.net.OpenBankPacket;
+import com.rtshop.net.OpenHudEditorPacket;
 import com.rtshop.net.OpenShopPacket;
 import com.rtshop.net.ResultPacket;
 import com.rtshop.net.ShopNet;
+import com.rtshop.test.SelfTest;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -33,6 +42,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -56,25 +66,52 @@ public final class ShopServer {
     public static final String SHOP_TAG_PREFIX = "rtshop_shop_";
     public static final String BANK_TAG = "rtshop_bank";
     private static final String BANK = "bank";
+    private static final int MAX_AMOUNT = 36 * InvUtil.MAX_STACK_CAP;
 
     private record Session(boolean bank, String shopId, int npcId) {
     }
 
-    private static volatile Map<String, ShopData> shops = new LinkedHashMap<>();
+    private static volatile ShopLoader.Loaded loaded = new ShopLoader.Loaded();
     private static final Map<UUID, Session> SESSIONS = new HashMap<>();
 
-    public static synchronized Map<String, ShopData> reload() {
+    public static Map<String, ShopData> shops() {
+        return loaded.shops;
+    }
+
+    public static ShopLoader.Loaded loaded() {
+        return loaded;
+    }
+
+    public static synchronized ShopLoader.Loaded reload(MinecraftServer server) {
         EconomyConfig.reload();
-        shops = ShopLoader.loadAll();
+        PricingConfig.reload();
+        FarmConfig.reload();
+        FarmEvents.clearCache();
+        LandConfig.reload();
+        loaded = ShopLoader.loadAll(server);
         SESSIONS.clear();
-        return shops;
+        return loaded;
+    }
+
+    public static boolean isNpc(Entity e) {
+        for (String tag : e.getTags()) {
+            if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ------------------------------------------------------------------ 이벤트
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        reload();
+        reload(event.getServer());
+    }
+
+    @SubscribeEvent
+    public static void onServerStarted(ServerStartedEvent event) {
+        SelfTest.onServerStarted(event.getServer());
     }
 
     @SubscribeEvent
@@ -119,9 +156,9 @@ public final class ShopServer {
     // ------------------------------------------------------------------ 명령어
 
     private static final SuggestionProvider<CommandSourceStack> SHOP_IDS =
-            (ctx, b) -> SharedSuggestionProvider.suggest(shops.keySet(), b);
+            (ctx, b) -> SharedSuggestionProvider.suggest(loaded.shops.keySet(), b);
     private static final SuggestionProvider<CommandSourceStack> NPC_IDS = (ctx, b) -> {
-        List<String> all = new ArrayList<>(shops.keySet());
+        List<String> all = new ArrayList<>(loaded.shops.keySet());
         all.add(BANK);
         return SharedSuggestionProvider.suggest(all, b);
     };
@@ -129,17 +166,33 @@ public final class ShopServer {
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> d = event.getDispatcher();
-        d.register(Commands.literal("rtshop")
+        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("rtshop")
                 .then(Commands.literal("balance").executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                     p.sendSystemMessage(Component.translatable("rtshop.msg.balance",
                             num(Economy.wallet(p)), num(Economy.bank(p))));
                     return 1;
                 }))
-                .then(Commands.literal("pay")
-                        .then(Commands.argument("player", EntityArgument.player())
-                                .then(Commands.argument("amount", LongArgumentType.longArg(1))
-                                        .executes(ShopServer::cmdPay))))
+                .then(Commands.literal("check")
+                        .then(Commands.argument("amount", LongArgumentType.longArg(1))
+                                .executes(ctx -> Economy.issueCheck(ctx.getSource().getPlayerOrException(),
+                                        LongArgumentType.getLong(ctx, "amount")) ? 1 : 0)))
+                .then(Commands.literal("hud").executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new OpenHudEditorPacket());
+                    return 1;
+                }))
+                .then(Commands.literal("land")
+                        .executes(ctx -> {
+                            LandManager.openScreen(ctx.getSource().getPlayerOrException());
+                            return 1;
+                        })
+                        .then(Commands.literal("bypass").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                            ServerPlayer p = ctx.getSource().getPlayerOrException();
+                            boolean on = LandManager.toggleBypass(p);
+                            p.sendSystemMessage(Component.translatable(on ? "rtshop.land.bypass_on" : "rtshop.land.bypass_off"));
+                            return 1;
+                        })))
                 .then(Commands.literal("reload").requires(src -> src.hasPermission(2))
                         .executes(ShopServer::cmdReload))
                 .then(Commands.literal("export").requires(src -> src.hasPermission(2))
@@ -164,11 +217,17 @@ public final class ShopServer {
                                     feedback(ctx.getSource(), Component.translatable("rtshop.msg.balance_other",
                                             t.getDisplayName(), num(Economy.wallet(t)), num(Economy.bank(t))));
                                     return 1;
-                                }))))
-        );
+                                }))));
+        if (SelfTest.enabled()) {
+            root.then(Commands.literal("selftest").requires(src -> src.hasPermission(4)).executes(ctx -> {
+                SelfTest.run(ctx.getSource().getServer());
+                return 1;
+            }));
+        }
+        d.register(root);
     }
 
-    private static com.mojang.brigadier.builder.RequiredArgumentBuilder<CommandSourceStack, ?> goldArgs(int mode) {
+    private static RequiredArgumentBuilder<CommandSourceStack, ?> goldArgs(int mode) {
         return Commands.argument("player", EntityArgument.player())
                 .then(Commands.argument("amount", LongArgumentType.longArg(0)).executes(ctx -> {
                     ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
@@ -195,37 +254,19 @@ public final class ShopServer {
         }
     }
 
-    private static int cmdPay(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        ServerPlayer from = ctx.getSource().getPlayerOrException();
-        ServerPlayer to = EntityArgument.getPlayer(ctx, "player");
-        long amount = LongArgumentType.getLong(ctx, "amount");
-        if (from == to) {
-            return 0;
-        }
-        if (Economy.wallet(from) < amount) {
-            from.sendSystemMessage(Component.translatable("rtshop.msg.no_money"));
-            return 0;
-        }
-        Economy.addWallet(from, -amount);
-        Economy.addWallet(to, amount);
-        from.sendSystemMessage(Component.translatable("rtshop.msg.pay_sent", to.getDisplayName(), num(amount)));
-        to.sendSystemMessage(Component.translatable("rtshop.msg.pay_received", from.getDisplayName(), num(amount)));
-        return 1;
-    }
-
     private static int cmdReload(CommandContext<CommandSourceStack> ctx) {
-        Map<String, ShopData> m = reload();
+        ShopLoader.Loaded l = reload(ctx.getSource().getServer());
         int items = 0;
-        for (ShopData d : m.values()) {
+        for (ShopData d : l.shops.values()) {
             items += d.entries.size();
         }
-        feedback(ctx.getSource(), Component.translatable("rtshop.msg.reloaded", m.size(), items));
+        feedback(ctx.getSource(), Component.translatable("rtshop.msg.reloaded", l.shops.size(), items));
         return 1;
     }
 
     private static int cmdExport(CommandContext<CommandSourceStack> ctx) {
         try {
-            int n = ShopLoader.export(shops);
+            int n = ShopLoader.export(loaded);
             feedback(ctx.getSource(), Component.translatable("rtshop.msg.exported", n));
             return 1;
         } catch (Exception ex) {
@@ -269,6 +310,17 @@ public final class ShopServer {
     private static int cmdSpawnNpc(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack src = ctx.getSource();
         String type = StringArgumentType.getString(ctx, "type");
+        Villager v = spawnNpc(src.getLevel(), src.getPosition(), src.getRotation().y, type);
+        if (v == null) {
+            feedback(src, Component.translatable("rtshop.msg.unknown_shop", type));
+            return 0;
+        }
+        feedback(src, Component.translatable("rtshop.msg.npc_spawned", v.getCustomName()));
+        return 1;
+    }
+
+    /** 상인(또는 은행원) NPC 를 소환한다. 알 수 없는 종류면 null. */
+    public static Villager spawnNpc(ServerLevel level, Vec3 pos, float yaw, String type) {
         String name;
         String tag;
         VillagerProfession prof;
@@ -277,22 +329,19 @@ public final class ShopServer {
             tag = BANK_TAG;
             prof = VillagerProfession.CLERIC;
         } else {
-            ShopData d = shops.get(type);
+            ShopData d = loaded.shops.get(type);
             if (d == null) {
-                feedback(src, Component.translatable("rtshop.msg.unknown_shop", type));
-                return 0;
+                return null;
             }
             name = d.npcName;
             tag = SHOP_TAG_PREFIX + d.id;
             prof = profession(d.profession);
         }
-        ServerLevel level = src.getLevel();
         Villager v = EntityType.VILLAGER.create(level);
         if (v == null) {
-            return 0;
+            return null;
         }
-        Vec3 pos = src.getPosition();
-        v.moveTo(pos.x, pos.y, pos.z, src.getRotation().y, 0.0F);
+        v.moveTo(pos.x, pos.y, pos.z, yaw, 0.0F);
         v.setNoAi(true);
         v.setInvulnerable(true);
         v.setSilent(true);
@@ -302,8 +351,7 @@ public final class ShopServer {
         v.setCustomNameVisible(true);
         v.setVillagerData(new VillagerData(VillagerType.PLAINS, prof, 5));
         level.addFreshEntity(v);
-        feedback(src, Component.translatable("rtshop.msg.npc_spawned", name));
-        return 1;
+        return v;
     }
 
     // ------------------------------------------------------------------ 열기/닫기
@@ -313,7 +361,7 @@ public final class ShopServer {
     }
 
     public static void openShop(ServerPlayer player, String shopId, int npcId) {
-        ShopData d = shops.get(shopId);
+        ShopData d = loaded.shops.get(shopId);
         if (d == null) {
             player.sendSystemMessage(Component.translatable("rtshop.msg.unknown_shop", shopId));
             return;
@@ -345,35 +393,91 @@ public final class ShopServer {
         return e != null && e.isAlive() && e.distanceToSqr(player) <= r * r;
     }
 
-    // ------------------------------------------------------------------ 상점 거래
-
-    public static void handleTransaction(ServerPlayer player, String shopId, int version, int index, boolean sell, int amount) {
+    /** 요청이 유효하면 상점 데이터를, 아니면 null (결과 메시지는 직접 보냄). */
+    private static ShopData validate(ServerPlayer player, String shopId, int version) {
         Session s = SESSIONS.get(player.getUUID());
         if (s == null || s.bank() || !s.shopId().equals(shopId)) {
             sendResult(player, Component.translatable("rtshop.msg.no_session"), false);
-            return;
+            return null;
         }
         if (!nearNpc(player, s)) {
             sendResult(player, Component.translatable("rtshop.msg.too_far"), false);
+            return null;
+        }
+        ShopData d = loaded.shops.get(shopId);
+        if (d == null || version != d.version) {
+            sendResult(player, Component.translatable("rtshop.msg.stale"), false);
+            return null;
+        }
+        return d;
+    }
+
+    // ------------------------------------------------------------------ 상점 거래
+
+    public static void handleTransaction(ServerPlayer player, String shopId, int version, int index, boolean sell,
+                                         int amount, long variantKey) {
+        ShopData d = validate(player, shopId, version);
+        if (d == null) {
             return;
         }
-        ShopData d = shops.get(shopId);
-        if (d == null || version != d.version || index < 0 || index >= d.entries.size()) {
+        if (index < 0 || index >= d.entries.size()) {
             sendResult(player, Component.translatable("rtshop.msg.stale"), false);
             return;
         }
-        if (amount < 1 || amount > 36 * InvUtil.MAX_STACK_CAP) {
+        if (amount < 1 || amount > MAX_AMOUNT) {
             return;
         }
         ShopData.Entry entry = d.entries.get(index);
         if (sell) {
-            sell(player, d, entry, amount);
+            long[] r = sellVariant(player, d, index, variantKey, amount);
+            if (r[0] == 0) {
+                sendResult(player, Component.translatable("rtshop.msg.no_item"), false);
+            } else if (r[1] <= 0) {
+                sendResult(player, Component.translatable("rtshop.msg.sell_zero"), false);
+            } else {
+                sendResult(player, Component.translatable("rtshop.msg.sold",
+                        entry.stack.getHoverName(), r[0], num(r[1])), true);
+            }
         } else {
             buy(player, entry, amount);
         }
     }
 
+    public static void handleSellAll(ServerPlayer player, String shopId, int version, int[] indexes, long[] keys) {
+        ShopData d = validate(player, shopId, version);
+        if (d == null) {
+            return;
+        }
+        long count = 0;
+        long revenue = 0;
+        int n = Math.min(indexes.length, keys.length);
+        for (int i = 0; i < n; i++) {
+            if (indexes[i] < 0 || indexes[i] >= d.entries.size()) {
+                continue;
+            }
+            long[] r = sellVariant(player, d, indexes[i], keys[i], MAX_AMOUNT);
+            if (r[1] > 0) {
+                count += r[0];
+                revenue += r[1];
+            }
+        }
+        if (count <= 0) {
+            sendResult(player, Component.translatable("rtshop.msg.no_item"), false);
+        } else {
+            sendResult(player, Component.translatable("rtshop.msg.sold_all", count, num(revenue)), true);
+        }
+    }
+
     private static void buy(ServerPlayer player, ShopData.Entry entry, int amount) {
+        if (!entry.buyable) {
+            sendResult(player, Component.translatable("rtshop.msg.not_buyable"), false);
+            return;
+        }
+        boolean firstDeed = entry.stack.is(ModItems.FIRST_LAND_DEED.get());
+        if (firstDeed && (amount != 1 || LandManager.firstDeedUsed(player))) {
+            sendResult(player, Component.translatable("rtshop.msg.first_deed_once"), false);
+            return;
+        }
         long total = (long) entry.price * amount;
         if (Economy.wallet(player) < total) {
             sendResult(player, Component.translatable("rtshop.msg.no_money"), false);
@@ -387,28 +491,52 @@ public final class ShopServer {
         }
         InvUtil.apply(player.getInventory(), sim);
         Economy.addWallet(player, -total);
+        if (firstDeed) {
+            LandManager.markFirstDeed(player);
+        }
         sendResult(player, Component.translatable("rtshop.msg.bought",
                 entry.stack.getHoverName(), amount, num(total)), true);
     }
 
-    private static void sell(ServerPlayer player, ShopData d, ShopData.Entry entry, int amount) {
-        List<ItemStack> sim = InvUtil.copyMain(player.getInventory());
-        long owned = InvUtil.count(sim, entry::matches);
+    /**
+     * 인벤토리에서 이 품목·이 품질(variantKey)에 해당하는 아이템을 amount 개까지 판다.
+     * @return {판 개수, 받은 Gold}. 받을 금액이 0이면 팔지 않고 {가진 개수, 0} 을 돌려준다.
+     */
+    private static long[] sellVariant(ServerPlayer player, ShopData d, int index, long variantKey, int amount) {
+        ShopData.Entry entry = d.entries.get(index);
+        if (!entry.sellable) {
+            return new long[]{0, 0};
+        }
+        List<ItemStack> items = player.getInventory().items;
+        long owned = 0;
+        for (ItemStack s : items) {
+            if (!s.isEmpty() && d.findSellEntry(s) == index && d.variantKey(entry, s) == variantKey) {
+                owned += s.getCount();
+            }
+        }
         if (owned <= 0) {
-            sendResult(player, Component.translatable("rtshop.msg.no_item"), false);
-            return;
+            return new long[]{0, 0};
         }
-        int sellAmount = (int) Math.min((long) amount, owned);
-        long revenue = d.sellRevenue(entry.price, sellAmount);
+        long sellAmount = Math.min(amount, owned);
+        long revenue = ShopData.revenue(variantKey / 100.0, sellAmount);
         if (revenue <= 0) {
-            sendResult(player, Component.translatable("rtshop.msg.sell_zero"), false);
-            return;
+            return new long[]{owned, 0};
         }
-        InvUtil.remove(sim, entry::matches, sellAmount);
-        InvUtil.apply(player.getInventory(), sim);
+        long left = sellAmount;
+        for (int i = 0; i < items.size() && left > 0; i++) {
+            ItemStack s = items.get(i);
+            if (!s.isEmpty() && d.findSellEntry(s) == index && d.variantKey(entry, s) == variantKey) {
+                int take = (int) Math.min((long) s.getCount(), left);
+                s.shrink(take);
+                left -= take;
+                if (s.isEmpty()) {
+                    items.set(i, ItemStack.EMPTY);
+                }
+            }
+        }
+        player.getInventory().setChanged();
         Economy.addWallet(player, revenue);
-        sendResult(player, Component.translatable("rtshop.msg.sold",
-                entry.stack.getHoverName(), sellAmount, num(revenue)), true);
+        return new long[]{sellAmount, revenue};
     }
 
     // ------------------------------------------------------------------ 은행

@@ -1,16 +1,21 @@
 {
  "_설명": [
   "파일 이름이 상점 ID 입니다 (예: farmer.json -> /rtshop npc farmer). 가격 단위는 Gold(G).",
-  "items: 가격을 직접 정한 아이템 / auto: 태그·모드·종류로 자동 수집하고 공식으로 가격을 매기는 규칙",
-  "auto.match: mod(s)=모드ID, tag(s)=아이템 태그, class(es)=weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear",
-  "auto.formula: fixed(price 그대로) | gear(능력치 기반) | food(포만감 기반) | auto(장비/음식이면 공식, 아니면 price×희귀도)",
-  "looseSell: true 면 판매할 때 NBT(크기·무게 등)를 무시. exclude: 제외할 아이템ID 또는 '모드ID:*'",
-  "한 아이템은 전체 상점 중 한 곳에서만 취급됩니다(먼저 등록된 쪽 우선). 수정 후 /rtshop reload, 결과 확인은 /rtshop export"
+  "가격은 전 상점 공통입니다. 같은 아이템이 여러 상점에 있으면 먼저 읽힌 값 하나만 쓰입니다 (상점 사이의 차익 거래 방지).",
+  "items: 가격을 직접 정한 품목. item, price(상점 판매가), category 외에 아래 옵션을 쓸 수 있습니다.",
+  "  sellPrice: 매입가를 직접 지정 (없으면 price 의 50%) · buy/sell: false 면 이 상점에서 팔지 않음/사지 않음",
+  "  seed: true 면 '심을 수 있는 상점 씨앗'으로 판매 · fish: true 면 물고기(무게 보정) · dynamic: true 면 레시피 원가로 가격 결정",
+  "auto: 태그·모드·종류로 아이템을 모으는 규칙. match{mod(s), tag(s), notTag(s), class(es), recipeType(s)}",
+  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto · multiplier: 공식 가격에 곱하는 값",
+  "만들 수 있는 물건은 여기 적힌 값과 상관없이 '재료 원가(+조리 수고비)'에 매입하고, 판매가는 그 2배 이상이 됩니다 (config/rtshop/pricing.json).",
+  "수정 후 /rtshop reload · 실제 적용된 가격과 점검 결과는 /rtshop export (config/rtshop/export)",
+  "건축 자재와 잡다한 재료를 다루는 상점입니다. 몹 농장으로 쉽게 쌓이는 재료는 값을 낮게 잡았습니다.",
+  "흙·돌·모래·판자·상자 같은 건축 자재는 팔기만 하고 매입하지 않습니다 (맨손이나 자동 농장으로 무한히 얻을 수 있기 때문).",
+  "빈 양동이는 팔지 않습니다 (철 주괴 3개로 만들거나, 물·우유 양동이를 사서 쓰세요). 빈 양동이는 450G 에 매입합니다."
  ],
  "title": "잡화점",
  "npcName": "잡화 상인",
  "profession": "cartographer",
- "sellRatio": 0.5,
  "categories": [
   {
    "id": "building",
@@ -19,334 +24,421 @@
   },
   {
    "id": "material",
-   "name": "광물/재료",
-   "icon": "minecraft:iron_ingot"
-  },
-  {
-   "id": "tool",
-   "name": "도구",
-   "icon": "minecraft:iron_pickaxe"
-  },
-  {
-   "id": "food",
-   "name": "음식",
-   "icon": "minecraft:bread"
+   "name": "재료",
+   "icon": "minecraft:string"
   },
   {
    "id": "misc",
    "name": "기타",
-   "icon": "minecraft:ender_pearl"
+   "icon": "minecraft:compass"
   }
  ],
  "items": [
   {
    "item": "minecraft:oak_log",
-   "price": 8,
+   "price": 20,
    "category": "building"
   },
   {
    "item": "minecraft:spruce_log",
-   "price": 8,
+   "price": 20,
    "category": "building"
   },
   {
    "item": "minecraft:birch_log",
-   "price": 8,
+   "price": 20,
    "category": "building"
   },
   {
-   "item": "minecraft:oak_planks",
-   "price": 2,
+   "item": "minecraft:jungle_log",
+   "price": 20,
    "category": "building"
   },
   {
-   "item": "minecraft:cobblestone",
-   "price": 2,
+   "item": "minecraft:acacia_log",
+   "price": 20,
    "category": "building"
   },
   {
-   "item": "minecraft:stone",
-   "price": 3,
+   "item": "minecraft:dark_oak_log",
+   "price": 20,
    "category": "building"
   },
   {
-   "item": "minecraft:stone_bricks",
-   "price": 4,
+   "item": "minecraft:mangrove_log",
+   "price": 20,
    "category": "building"
   },
   {
-   "item": "minecraft:bricks",
-   "price": 12,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:sand",
-   "price": 2,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:gravel",
-   "price": 2,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:glass",
-   "price": 4,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:clay_ball",
-   "price": 3,
+   "item": "minecraft:cherry_log",
+   "price": 20,
    "category": "building"
   },
   {
    "item": "minecraft:torch",
-   "price": 3,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:lantern",
-   "price": 12,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:ladder",
-   "price": 3,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:chest",
-   "price": 18,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:crafting_table",
-   "price": 10,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:furnace",
-   "price": 18,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:bookshelf",
-   "price": 90,
-   "category": "building"
-  },
-  {
-   "item": "minecraft:glowstone",
    "price": 30,
    "category": "building"
   },
   {
-   "item": "minecraft:stick",
+   "item": "minecraft:lantern",
+   "price": 300,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:glowstone",
+   "price": 80,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:ladder",
+   "price": 5,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:chest",
+   "price": 40,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:crafting_table",
+   "price": 20,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:furnace",
+   "price": 10,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:bookshelf",
+   "price": 150,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:white_bed",
+   "price": 80,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:glass",
+   "price": 2,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:bricks",
+   "price": 10,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:stone_bricks",
+   "price": 2,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:cobblestone",
+   "price": 1,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:stone",
+   "price": 2,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:sand",
+   "price": 1,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:gravel",
+   "price": 1,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:dirt",
+   "price": 1,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:clay_ball",
+   "price": 1,
+   "category": "building",
+   "sell": false
+  },
+  {
+   "item": "minecraft:bone",
+   "price": 5,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:string",
    "price": 1,
    "category": "material"
   },
   {
-   "item": "minecraft:coal",
-   "price": 10,
+   "item": "minecraft:gunpowder",
+   "price": 20,
+   "category": "material",
+   "sellPrice": 2
+  },
+  {
+   "item": "minecraft:slime_ball",
+   "price": 4,
    "category": "material"
   },
   {
-   "item": "minecraft:charcoal",
-   "price": 8,
+   "item": "minecraft:spider_eye",
+   "price": 2,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:leather",
+   "price": 1,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:feather",
+   "price": 4,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:paper",
+   "price": 2,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:book",
+   "price": 30,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:ender_pearl",
+   "price": 20,
+   "category": "material",
+   "sellPrice": 1
+  },
+  {
+   "item": "minecraft:blaze_rod",
+   "price": 100,
    "category": "material"
   },
   {
    "item": "minecraft:flint",
-   "price": 4,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:copper_ingot",
-   "price": 12,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:iron_ingot",
-   "price": 40,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:gold_ingot",
-   "price": 80,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:redstone",
    "price": 10,
+   "category": "material",
+   "sellPrice": 1
+  },
+  {
+   "item": "minecraft:coal",
+   "price": 50,
    "category": "material"
-  },
-  {
-   "item": "minecraft:lapis_lazuli",
-   "price": 15,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:quartz",
-   "price": 15,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:amethyst_shard",
-   "price": 20,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:emerald",
-   "price": 120,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:diamond",
-   "price": 300,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:bone",
-   "price": 6,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:gunpowder",
-   "price": 15,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:slime_ball",
-   "price": 20,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:blaze_rod",
-   "price": 60,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:obsidian",
-   "price": 40,
-   "category": "material"
-  },
-  {
-   "item": "minecraft:bread",
-   "price": 20,
-   "category": "food"
-  },
-  {
-   "item": "minecraft:baked_potato",
-   "price": 9,
-   "category": "food"
-  },
-  {
-   "item": "minecraft:sugar",
-   "price": 5,
-   "category": "food"
-  },
-  {
-   "item": "minecraft:golden_carrot",
-   "price": 80,
-   "category": "food"
-  },
-  {
-   "item": "minecraft:golden_apple",
-   "price": 700,
-   "category": "food"
-  },
-  {
-   "item": "minecraft:cake",
-   "price": 90,
-   "category": "food"
-  },
-  {
-   "item": "minecraft:paper",
-   "price": 4,
-   "category": "misc"
-  },
-  {
-   "item": "minecraft:book",
-   "price": 25,
-   "category": "misc"
   },
   {
    "item": "minecraft:glass_bottle",
-   "price": 5,
-   "category": "misc"
+   "price": 1,
+   "category": "material",
+   "sell": false
+  },
+  {
+   "item": "minecraft:stick",
+   "price": 1,
+   "category": "material",
+   "sell": false
+  },
+  {
+   "item": "minecraft:bowl",
+   "price": 1,
+   "category": "material",
+   "sell": false
+  },
+  {
+   "item": "minecraft:ice",
+   "price": 2,
+   "category": "material",
+   "sell": false
+  },
+  {
+   "item": "minecraft:snowball",
+   "price": 1,
+   "category": "material",
+   "sell": false
+  },
+  {
+   "item": "minecraft:cod_bucket",
+   "price": 571,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:salmon_bucket",
+   "price": 571,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:pufferfish_bucket",
+   "price": 671,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:tropical_fish_bucket",
+   "price": 851,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "farmersdelight:tree_bark",
+   "price": 1,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:potion",
+   "price": 1,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:netherrack",
+   "price": 1,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:carved_pumpkin",
+   "price": 4,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:rotten_flesh",
+   "price": 1,
+   "category": "material",
+   "buy": false
   },
   {
    "item": "minecraft:compass",
-   "price": 180,
+   "price": 1300,
    "category": "misc"
   },
   {
    "item": "minecraft:clock",
-   "price": 340,
+   "price": 2500,
    "category": "misc"
   },
   {
    "item": "minecraft:spyglass",
-   "price": 60,
-   "category": "misc"
-  },
-  {
-   "item": "minecraft:name_tag",
    "price": 150,
    "category": "misc"
   },
   {
-   "item": "minecraft:saddle",
-   "price": 250,
+   "item": "minecraft:name_tag",
+   "price": 1000,
    "category": "misc"
+  },
+  {
+   "item": "minecraft:saddle",
+   "price": 1500,
+   "category": "misc",
+   "sellPrice": 150
+  },
+  {
+   "item": "minecraft:lead",
+   "price": 20,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:shears",
+   "price": 600,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:lava_bucket",
+   "price": 600,
+   "category": "misc",
+   "sellPrice": 525
   },
   {
    "item": "minecraft:experience_bottle",
-   "price": 60,
-   "category": "misc"
+   "price": 300,
+   "category": "misc",
+   "sellPrice": 20
   },
   {
-   "item": "minecraft:ender_pearl",
-   "price": 80,
-   "category": "misc"
+   "item": "minecraft:composter",
+   "price": 20,
+   "category": "misc",
+   "sell": false
   },
   {
-   "item": "minecraft:white_bed",
-   "price": 50,
-   "category": "misc"
+   "item": "minecraft:oak_boat",
+   "price": 30,
+   "category": "misc",
+   "sell": false
+  },
+  {
+   "item": "minecraft:bucket",
+   "price": 900,
+   "category": "misc",
+   "sellPrice": 450,
+   "buy": false
   }
  ],
  "auto": [
   {
    "match": {
-    "class": "tool"
+    "mod": "minecraft",
+    "tags": [
+     "minecraft:planks"
+    ]
    },
-   "category": "tool",
-   "formula": "gear"
+   "category": "building",
+   "price": 2,
+   "sell": false
   },
   {
    "match": {
-    "mods": [
-     "minecraft",
-     "farmersdelight",
-     "farm_and_charm",
-     "kaleidoscope_cookery",
-     "kaleidoscope_tavern",
-     "handsondelight",
-     "hands_on_delight"
-    ],
-    "class": "food"
+    "mod": "minecraft",
+    "tags": [
+     "minecraft:wool"
+    ]
    },
-   "category": "food",
-   "formula": "food",
-   "multiplier": 0.6
+   "category": "material",
+   "price": 3
+  },
+  {
+   "match": {
+    "mod": "minecraft",
+    "tags": [
+     "forge:dyes"
+    ]
+   },
+   "category": "material",
+   "price": 4
   }
  ],
- "exclude": [
-  "minecraft:enchanted_golden_apple",
-  "minecraft:rotten_flesh",
-  "minecraft:spider_eye",
-  "minecraft:poisonous_potato",
-  "minecraft:chorus_fruit",
-  "minecraft:suspicious_stew"
- ]
+ "exclude": []
 }

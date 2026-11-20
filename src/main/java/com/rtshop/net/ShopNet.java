@@ -10,7 +10,7 @@ public final class ShopNet {
     private ShopNet() {
     }
 
-    private static final String PROTOCOL = "2";
+    private static final String PROTOCOL = "3";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(RtShop.MODID, "main"),
@@ -28,5 +28,12 @@ public final class ShopNet {
         CHANNEL.registerMessage(id++, BankPacket.class, BankPacket::encode, BankPacket::decode, BankPacket::handle);
         CHANNEL.registerMessage(id++, TransactionPacket.class, TransactionPacket::encode, TransactionPacket::decode, TransactionPacket::handle);
         CHANNEL.registerMessage(id++, ClosePacket.class, ClosePacket::encode, ClosePacket::decode, ClosePacket::handle);
+        CHANNEL.registerMessage(id++, SellAllPacket.class, SellAllPacket::encode, SellAllPacket::decode, SellAllPacket::handle);
+        CHANNEL.registerMessage(id++, OpenHudEditorPacket.class, OpenHudEditorPacket::encode, OpenHudEditorPacket::decode, OpenHudEditorPacket::handle);
+        CHANNEL.registerMessage(id++, LandInfoPacket.class, LandInfoPacket::encode, LandInfoPacket::decode, LandInfoPacket::handle);
+        CHANNEL.registerMessage(id++, LandActionPacket.class, LandActionPacket::encode, LandActionPacket::decode, LandActionPacket::handle);
+        CHANNEL.registerMessage(id++, ContainerInfoPacket.class, ContainerInfoPacket::encode, ContainerInfoPacket::decode, ContainerInfoPacket::handle);
+        CHANNEL.registerMessage(id++, PinPromptPacket.class, PinPromptPacket::encode, PinPromptPacket::decode, PinPromptPacket::handle);
+        CHANNEL.registerMessage(id++, PinActionPacket.class, PinActionPacket::encode, PinActionPacket::decode, PinActionPacket::handle);
     }
 }

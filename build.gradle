@@ -5,7 +5,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
-version = '2.1.1'
+version = '3.0.0'
 group = 'com.rtshop'
 
 base {
@@ -23,9 +23,18 @@ minecraft {
             workingDirectory project.file('run')
         }
         client {
+            // ./gradlew runClient -PrtshopClientTest : 화면을 차례로 열어 사진을 찍고 끈다 (빌드 검증용)
+            if (project.hasProperty('rtshopClientTest')) {
+                property 'rtshop.clienttest', 'true'
+                args '--quickPlaySingleplayer', 'rtshoptest', '--width', '1280', '--height', '720'
+            }
         }
         server {
             args '--nogui'
+            // ./gradlew runServer -PrtshopSelfTest : 서버를 띄워 자체 점검을 돌리고 끈다 (빌드 검증용)
+            if (project.hasProperty('rtshopSelfTest')) {
+                property 'rtshop.selftest', 'true'
+            }
         }
     }
 }
