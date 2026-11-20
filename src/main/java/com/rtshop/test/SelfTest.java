@@ -348,6 +348,29 @@ public final class SelfTest {
         check("farmer sells planting-only carrots, separate from the crop", carrotSeedIdx >= 0
                 && findEntry(farmer, e -> e.stack.is(Items.CARROT) && !e.stack.hasTag()) >= 0);
         check("farmer buys wheat", wheatIdx >= 0);
+        // 씨앗은 상점에서만 구할 수 있다. 심을 수 있는 아이템이 어느 상점에도 없으면 그 작물은 키울 수 없게 된다.
+        List<String> unsold = new ArrayList<>();
+        int plantable = 0;
+        for (Item item : ForgeRegistries.ITEMS.getValues()) {
+            ItemStack plain = new ItemStack(item);
+            String id = String.valueOf(ForgeRegistries.ITEMS.getKey(item));
+            if (!SeedRules.isPlantable(plain) || id.startsWith("tacz:") || id.startsWith("kubejs:")) {
+                continue;
+            }
+            plantable++;
+            boolean sold = false;
+            for (ShopData d : shops.values()) {
+                if (findEntry(d, e -> e.buyable && e.stack.is(item) && SeedRules.isLicensed(e.stack)) >= 0) {
+                    sold = true;
+                    break;
+                }
+            }
+            if (!sold) {
+                unsold.add(id);
+            }
+        }
+        check("every seed and plantable crop in the game is sold as a shop seed", unsold.isEmpty(),
+                plantable + " plantable items" + (unsold.isEmpty() ? "" : "; not sold: " + unsold));
         if (seedIdx < 0 || wheatIdx < 0) {
             return;
         }

@@ -1,0 +1,67 @@
+name: fullpack
+
+on:
+  push:
+    branches: [ci-fullpack]
+
+permissions:
+  contents: read
+
+env:
+  # client-only mods that cannot start on a dedicated server (found by running this job)
+  SKIP_MODS: ""
+
+jobs:
+  fullpack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - name: Build
+        run: chmod +x gradlew && ./gradlew build --no-daemon -q
+      - uses: actions/cache@v4
+        with:
+          path: packcache
+          key: pack-${{ hashFiles('.github/scripts/pack_files.json') }}-v1
+      - name: Download the pack's mods
+        run: python3 .github/scripts/fullpack.py .github/scripts/pack_files.json packcache server/mods "$SKIP_MODS"
+      - name: Install Forge server
+        run: |
+          cd server
+          for v in 47.4.28 47.4.10 47.4.0; do
+            if curl -fsSL -o installer.jar "https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-$v/forge-1.20.1-$v-installer.jar"; then echo "forge $v"; break; fi
+          done
+          java -jar installer.jar --installServer > installer.log 2>&1 || (tail -30 installer.log; exit 1)
+          cp ../build/libs/*.jar mods/
+          echo "eula=true" > eula.txt
+          printf 'online-mode=false\nspawn-protection=0\nlevel-type=minecraft\\:flat\nmax-tick-time=-1\nview-distance=4\nsimulation-distance=4\n' > server.properties
+          echo "-Xmx10G -Drtshop.selftest=true" > user_jvm_args.txt
+      - name: Run the server with the whole pack
+        run: |
+          cd server
+          timeout 2400 bash run.sh nogui > server.log 2>&1 || true
+          echo "==== result"
+          grep -E "^(FAIL|RESULT)" rtshop-selftest.txt || echo "no self-test result"
+          echo "==== checks: $(grep -c '^PASS' rtshop-selftest.txt 2>/dev/null) pass"
+          echo "==== info"
+          grep -E "^(INFO|  )" rtshop-selftest.txt | cut -c1-600 | head -60 || true
+          echo "==== crash reports"
+          ls crash-reports 2>/dev/null || true
+          for f in crash-reports/*.txt; do [ -f "$f" ] && sed -n 1,45p "$f" | cut -c1-300; done
+          echo "==== missing dependencies / load errors"
+          grep -n -i -E "Missing or unsupported|mandatory dependenc|requires .* but|Failed to load|client side only|invalid dist|Attempted to load class .* for invalid dist" server.log | cut -c1-400 | head -40 || true
+          echo "==== rtshop log lines"
+          grep -n "rtshop" server.log | grep -v -E "상점 '.*' 로드|PASS" | cut -c1-500 | head -80 || true
+          echo "==== last log lines"
+          tail -25 server.log | cut -c1-300
+      - name: Price report
+        if: always()
+        run: |
+          cd server
+          ls config/rtshop/export 2>/dev/null || true
+          sed -n 1,80p config/rtshop/export/audit.txt 2>/dev/null | cut -c1-400 || true

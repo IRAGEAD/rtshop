@@ -226,6 +226,11 @@ public final class ShopLoader {
         for (Raw r : raws) {
             parseAuto(r, prices, allItems, outputTypes);
         }
+        try {
+            addMissingSeeds(raws, prices, allItems, out.notes);
+        } catch (Throwable t) {
+            RtShop.LOGGER.error("[rtshop] 빠진 씨앗을 상점에 올리는 중 오류", t);
+        }
         for (Raw r : raws) {
             for (Ref ref : r.refs) {
                 if (ref.buy) {
@@ -269,6 +274,84 @@ public final class ShopLoader {
             RtShop.LOGGER.info("[rtshop] 상점 '{}' 로드: 품목 {}개", r.id, entries.size());
         }
         return out;
+    }
+
+    /**
+     * 씨앗은 상점에서만 구할 수 있으므로, 어느 상점도 '심을 수 있는 형태'로 팔지 않는 씨앗이 있으면
+     * 그 작물은 아예 키울 수 없게 된다. 가격표에 없는 모드 작물이 그렇게 되지 않도록,
+     * 빠진 씨앗과 '작물 겸 씨앗'의 심기 전용 품목을 씨앗을 파는 상점에 자동으로 올린다.
+     */
+    private static void addMissingSeeds(List<Raw> raws, Map<String, Price> prices, List<Item> allItems, List<String> notes) {
+        FarmConfig fc = FarmConfig.get();
+        if (!fc.requireShopSeeds || !fc.autoListMissingSeeds) {
+            return;
+        }
+        Raw target = null;
+        String category = "";
+        int best = 0;
+        Set<String> sold = new HashSet<>();
+        for (Raw r : raws) {
+            Map<String, Integer> cats = new HashMap<>();
+            int n = 0;
+            for (Ref ref : r.refs) {
+                Price p = prices.get(ref.key);
+                if (p != null && ref.buy && SeedRules.isLicensed(p.stack)) {
+                    n++;
+                    sold.add(itemId(p.stack));
+                    cats.merge(ref.category, 1, Integer::sum);
+                }
+            }
+            if (n > best) {
+                best = n;
+                target = r;
+                category = cats.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse("");
+            }
+        }
+        if (target == null) {
+            return; // 씨앗을 파는 상점이 하나도 없다: 관리자가 일부러 없앤 것으로 본다
+        }
+        List<String> added = new ArrayList<>();
+        for (Item item : allItems) {
+            ItemStack plain = new ItemStack(item);
+            String id = itemId(plain);
+            if (sold.contains(id) || !SeedRules.isPlantable(plain)) {
+                continue;
+            }
+            int colon = id.indexOf(':');
+            if (target.excludeIds.contains(id) || (colon > 0 && target.excludeNamespaces.contains(id.substring(0, colon)))) {
+                continue;
+            }
+            ItemStack stack = SeedRules.license(plain);
+            String key = key(stack);
+            if (!target.keys.add(key)) {
+                continue;
+            }
+            Price p = prices.get(key);
+            if (p == null) {
+                p = new Price();
+                p.stack = stack;
+                int price = fc.autoSeedPrice;
+                if (SeedRules.isDual(plain)) {
+                    Price crop = prices.get(id);
+                    int cropPrice = crop != null ? crop.price : fc.autoSeedPrice;
+                    price = (int) Math.ceil(cropPrice * fc.autoDualSeedFactor - 1e-9);
+                }
+                p.price = Math.max(1, price);
+                prices.put(key, p);
+            }
+            Ref ref = new Ref();
+            ref.key = key;
+            ref.category = category;
+            ref.buy = true;
+            ref.sell = true;
+            target.refs.add(ref);
+            added.add(id + "=" + p.price);
+        }
+        if (!added.isEmpty()) {
+            RtShop.LOGGER.info("[rtshop] 가격표에 없던 씨앗 {}종을 상점 '{}' 에 자동으로 올렸습니다: {}", added.size(), target.id, added);
+            notes.add("가격표에 없던 씨앗 " + added.size() + "종을 상점 '" + target.id + "' 에 자동으로 올렸습니다 (farming.json 의 autoListMissingSeeds): "
+                    + String.join(", ", added));
+        }
     }
 
     // ------------------------------------------------------------------ 레시피 원가
