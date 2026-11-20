@@ -3,6 +3,7 @@ package com.rtshop.client;
 import com.rtshop.RtShop;
 import com.rtshop.economy.Economy;
 import com.rtshop.economy.EconomyData;
+import com.rtshop.farm.CropData;
 import com.rtshop.farm.SeedRules;
 import com.rtshop.item.DeedItem;
 import com.rtshop.item.ModItems;
@@ -21,12 +22,19 @@ import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -64,7 +72,9 @@ public final class ClientSelfTest {
     private static volatile boolean serverPin = false;
     private static long before = 0;
     private static long expected = 0;
-    private static final int LAST = 35;
+    private static volatile BlockPos cropPos = null;
+    private static volatile String harvest = null;
+    private static final int LAST = 38;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -459,7 +469,36 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 wait = 10;
             }
+            // ---- 실제 클라이언트의 우클릭으로 작물 수확 (클라이언트 예측 -> 서버 처리 -> 다시 심기)
+            case 35 -> {
+                onServer(mc, sp -> {
+                    BlockPos crop = sp.blockPosition().relative(sp.getDirection().getOpposite(), 2);
+                    sp.serverLevel().setBlock(crop.below(), Blocks.FARMLAND.defaultBlockState().setValue(FarmBlock.MOISTURE, 7), 3);
+                    sp.serverLevel().setBlock(crop, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 7), 3);
+                    CropData.get(sp.serverLevel()).mark(CropData.dim(sp.serverLevel()), crop);
+                    cropPos = crop;
+                });
+                wait = 20;
+            }
+            case 36 -> {
+                if (cropPos != null && mc.player != null && mc.gameMode != null) {
+                    mc.player.getInventory().selected = 8;
+                    mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND,
+                            new BlockHitResult(Vec3.atCenterOf(cropPos), Direction.UP, cropPos, false));
+                }
+                wait = 20;
+            }
+            case 37 -> {
+                onServer(mc, sp -> {
+                    BlockState st = sp.serverLevel().getBlockState(cropPos);
+                    boolean replanted = st.is(Blocks.WHEAT) && st.getValue(CropBlock.AGE) == 0
+                            && CropData.get(sp.serverLevel()).isMarked(CropData.dim(sp.serverLevel()), cropPos);
+                    harvest = replanted ? "ok" : "block after harvest: " + st;
+                });
+                wait = 10;
+            }
             case LAST -> {
+                check("right-clicking a ripe crop from a real client harvests and replants it", "ok".equals(harvest), harvest);
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);
             }
