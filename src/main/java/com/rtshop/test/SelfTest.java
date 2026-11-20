@@ -948,6 +948,9 @@ public final class SelfTest {
         section("pricing");
         ShopLoader.Loaded l = ShopServer.loaded();
         check("recipe costs were calculated", l.solved != null);
+        info("price table: " + l.prices.size() + " prices, " + (l.scan == null ? 0 : l.scan.recipes.size()) + " recipes, built in "
+                + l.loadMillis + " ms (recipe pricing " + l.pricingMillis + " ms)");
+        check("the price table is built quickly enough not to stall the server", l.loadMillis < 30_000, l.loadMillis + " ms");
         int deficits = 0;
         int loops = 0;
         int craftLoops = 0;

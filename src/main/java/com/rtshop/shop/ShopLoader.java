@@ -115,6 +115,8 @@ public final class ShopLoader {
         public final List<String> notes = new ArrayList<>();
         public RecipeSolver.Result solved;
         public RecipeScan.Scan scan;
+        public long loadMillis;
+        public long pricingMillis;
     }
 
     /**
@@ -164,6 +166,7 @@ public final class ShopLoader {
     }
 
     public static synchronized Loaded loadAll(MinecraftServer server) {
+        long startedAt = System.nanoTime();
         Loaded out = new Loaded();
         List<Raw> raws = new ArrayList<>();
         try {
@@ -243,6 +246,7 @@ public final class ShopLoader {
         }
 
         // 3단계: 레시피 원가 계산
+        long pricingAt = System.nanoTime();
         if (scan != null) {
             try {
                 applyRecipePricing(scan, pc, out);
@@ -273,6 +277,11 @@ public final class ShopLoader {
                     pc.fishNoInfoMultiplier));
             RtShop.LOGGER.info("[rtshop] 상점 '{}' 로드: 품목 {}개", r.id, entries.size());
         }
+        long now = System.nanoTime();
+        out.loadMillis = (now - startedAt) / 1_000_000L;
+        out.pricingMillis = (now - pricingAt) / 1_000_000L;
+        RtShop.LOGGER.info("[rtshop] 가격표 준비 {} ms (레시피 {}개, 원가 계산 {} ms)", out.loadMillis,
+                scan == null ? 0 : scan.recipes.size(), out.pricingMillis);
         return out;
     }
 
