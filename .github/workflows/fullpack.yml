@@ -5,7 +5,7 @@ on:
     branches: [ci-fullpack]
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   # client-only mods that cannot start on a dedicated server (found by running this job)
@@ -14,7 +14,7 @@ env:
 jobs:
   fullpack:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -79,14 +79,63 @@ jobs:
           grep -E "WARN|ERROR" server.log | grep -i "rtshop" | grep -v -E "mods folder locator|is missing mods.toml|JarSelector|fml.toml" | cut -c1-400 | head -30 || true
           echo "==== last log lines"
           grep -v "^\s*at \|^\t\t" server.log | tail -8 | cut -c1-260
+      - name: Client with the whole pack
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
+          python3 -m pip install -q "portablemc<5"
+          mkdir -p client/mods client/saves
+          cp packcache/*.jar client/mods/
+          cp build/libs/*.jar client/mods/
+          cp -r server/world client/saves/rtshoptest
+          rm -f client/saves/rtshoptest/session.lock
+          cat > client/options.txt <<'EOF'
+          onboardAccessibility:false
+          tutorialStep:none
+          skipMultiplayerWarning:true
+          joinedFirstServer:true
+          pauseOnLostFocus:false
+          guiScale:3
+          renderDistance:2
+          simulationDistance:5
+          maxFps:30
+          graphicsMode:0
+          ao:false
+          renderClouds:"false"
+          narrator:0
+          soundCategory_master:0.0
+          lang:ko_kr
+          EOF
+          ls client/mods | wc -l
+          (timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:1.20.1-47.4.28 -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
+          echo "==== client result"
+          cat client/rtshop-clienttest.txt 2>/dev/null | cut -c1-300 || echo "no client result"
+          echo "==== client-test log lines"
+          grep -h "rtshop-clienttest" client/logs/latest.log 2>/dev/null | grep -v "PASS" | cut -c1-260 | tail -n 25 || true
+          echo "==== crash reports"
+          ls client/crash-reports 2>/dev/null || true
+          for f in client/crash-reports/*.txt; do [ -f "$f" ] && grep -E "^Description:|^java\.|^net\.|^Caused by|Suspected Mods|Mod File:|Failure message:|Exception message:|^\tat " "$f" | cut -c1-240 | head -n 30; done
+          echo "==== launcher output (tail)"
+          tail -n 12 client.log | cut -c1-300
+          echo "==== game log (tail)"
+          tail -n 12 client/logs/latest.log 2>/dev/null | cut -c1-300 || true
+      - name: Publish client screenshots to a branch
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p /tmp/shots && cp -r client/screenshots/. /tmp/shots/ 2>/dev/null || true
+          cp client/rtshop-clienttest.txt /tmp/shots/ 2>/dev/null || true
+          cp client/logs/latest.log /tmp/shots/client-latest.log 2>/dev/null || true
+          cp client.log /tmp/shots/launcher.log 2>/dev/null || true
+          cp client/crash-reports/*.txt /tmp/shots/ 2>/dev/null || true
+          cd /tmp/shots
+          git init -q -b ci-screenshots
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Full-pack client run ${{ github.run_id }}" || exit 0
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-screenshots
       - name: Price report
         if: always()
         run: |
-          cd server/config/rtshop/export
-          grep -E "적자|자동으로 올렸|가격표에 없던|레시피 파일" audit.txt | cut -c1-600 | head -12 || true
-          echo "==== cheaper to make than to buy"
-          grep -B8 "해당 품목" audit.txt | cut -c1-200 | head -12 || true
-          echo "==== recipe types that were not read"
-          sed -n '/해석하지 못한 레시피 종류/,$p' audit.txt | tr '\n' ';' | cut -c1-3000; echo
-          echo "==== estimated ingredients"
-          sed -n '/추정가를 쓴 재료/,/해석하지 못한/p' audit.txt | cut -c1-90 | tr '\n' ';' | cut -c1-6000; echo
+          grep -E "적자|자동으로 올렸|레시피 파일|해당 품목" server/config/rtshop/export/audit.txt | cut -c1-300 | head -n 6 || true
