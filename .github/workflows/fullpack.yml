@@ -111,6 +111,8 @@ jobs:
           PY
           # Distant Horizons 3.3.3 crashes on world load when Chunky is installed ("Chunky is not loaded."): test without Chunky
           rm -f client/mods/Chunky-*.jar
+          # the recommended set-up also adds "Better chunk loading" (CurseForge project 899487, file 6210180)
+          curl -fsSL -A "rtshop-ci (github.com/IRAGEAD/rtshop)" -o client/mods/betterchunkloading-1.20.1-5.4.jar "https://www.curseforge.com/api/v1/mods/899487/files/6210180/download" && ls -la client/mods/betterchunkloading-1.20.1-5.4.jar | cut -c1-120 || echo "Better chunk loading not downloaded"
           cp -r server/world client/saves/rtshoptest
           rm -f client/saves/rtshoptest/session.lock
           cat > client/options.txt <<'EOF'
@@ -138,6 +140,8 @@ jobs:
           echo "==== Distant Horizons log lines"
           grep -h -i -E "distant ?horizons|DistantHorizons|\[DH" client/logs/latest.log 2>/dev/null | grep -i -E "error|warn|incompat|fail|exception|version|chunky|wwoo|oculus|farsight" | cut -c1-300 | awk '!seen[substr($0,12)]++' | head -n 30 || true
           ls client/hs_err*.log 2>/dev/null || true
+          echo "==== Better chunk loading log lines"
+          grep -h -i "betterchunkloading\|better chunk" client/logs/latest.log 2>/dev/null | grep -v "^\s*at \|\.jar  " | cut -c1-240 | awk '!seen[substr($0,12)]++' | head -n 8 || true
           echo "==== client-test log lines"
           grep -h "rtshop-clienttest" client/logs/latest.log 2>/dev/null | grep -v "PASS" | cut -c1-260 | tail -n 12 || true
           echo "==== crash reports"
