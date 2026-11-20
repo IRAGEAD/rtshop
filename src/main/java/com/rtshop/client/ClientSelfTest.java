@@ -6,7 +6,14 @@ import com.rtshop.economy.EconomyData;
 import com.rtshop.farm.SeedRules;
 import com.rtshop.item.DeedItem;
 import com.rtshop.item.ModItems;
+import com.rtshop.land.LandData;
 import com.rtshop.land.LandManager;
+import com.rtshop.net.BankPacket;
+import com.rtshop.net.LandActionPacket;
+import com.rtshop.net.PinActionPacket;
+import com.rtshop.net.SellAllPacket;
+import com.rtshop.net.ShopNet;
+import com.rtshop.net.TransactionPacket;
 import com.rtshop.shop.ShopData;
 import com.rtshop.shop.ShopServer;
 import net.minecraft.client.Minecraft;
@@ -52,6 +59,12 @@ public final class ClientSelfTest {
     private static boolean done = false;
     private static volatile String serverError = null;
     private static volatile BlockPos chestPos = null;
+    private static volatile int landId = -1;
+    private static volatile int serverPerms = -1;
+    private static volatile boolean serverPin = false;
+    private static long before = 0;
+    private static long expected = 0;
+    private static final int LAST = 35;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -260,6 +273,8 @@ public final class ClientSelfTest {
                 onServer(mc, sp -> {
                     ItemStack deed = new ItemStack(ModItems.LAND_DEED.get(), 1);
                     LandManager.useDeed(sp, deed, DeedItem.Type.NORMAL);
+                    LandData.Land land = LandManager.landAt(sp.serverLevel(), sp.blockPosition());
+                    landId = land == null ? -1 : land.id;
                     LandManager.openScreen(sp);
                 });
                 wait = 40;
@@ -300,18 +315,172 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 wait = 10;
             }
+            // ---- 여기부터는 실제 패킷을 보내 서버까지 왕복시켜 본다 (구매, 판매, 입금, 토지 권한, PIN, 명령어)
             case 19 -> {
+                onServer(mc, sp -> ShopServer.openShop(sp, "farmer", -1));
+                wait = 40;
+            }
+            case 20 -> {
+                ShopScreen screen = shop(mc);
+                check("the farmer shop opens again", screen != null);
+                if (screen != null) {
+                    ShopData d = screen.debugData();
+                    int idx = find(d, Items.WHEAT_SEEDS, true);
+                    before = ClientEconomy.wallet;
+                    expected = idx < 0 ? -1 : before - 3L * d.entries.get(idx).price;
+                    if (idx >= 0) {
+                        ShopNet.CHANNEL.sendToServer(new TransactionPacket(d.id, d.version, idx, false, 3, 0));
+                    }
+                }
+                wait = 20;
+            }
+            case 21 -> {
+                check("buying through the shop screen charges the listed price", expected >= 0 && ClientEconomy.wallet == expected,
+                        ClientEconomy.wallet + " (expected " + expected + ")");
+                ShopScreen screen = shop(mc);
+                expected = -1;
+                if (screen != null && mc.player != null) {
+                    ShopData d = screen.debugData();
+                    int idx = find(d, Items.WHEAT, false);
+                    ItemStack best = ItemStack.EMPTY;
+                    for (ItemStack st : mc.player.getInventory().items) {
+                        if (st.is(Items.WHEAT) && SeedRules.star(st) == 3) {
+                            best = st;
+                        }
+                    }
+                    if (idx >= 0 && !best.isEmpty()) {
+                        ShopData.Entry e = d.entries.get(idx);
+                        long key = d.variantKey(e, best);
+                        before = ClientEconomy.wallet;
+                        expected = before + ShopData.revenue(key / 100.0, 2);
+                        ShopNet.CHANNEL.sendToServer(new TransactionPacket(d.id, d.version, idx, true, 2, key));
+                    }
+                }
+                wait = 20;
+            }
+            case 22 -> {
+                check("selling 3-star wheat pays the 3-star price", expected >= 0 && ClientEconomy.wallet == expected,
+                        ClientEconomy.wallet + " (expected " + expected + ")");
+                ShopScreen screen = shop(mc);
+                expected = -1;
+                if (screen != null && mc.player != null) {
+                    ShopData d = screen.debugData();
+                    int idx = find(d, Items.WHEAT, false);
+                    ItemStack plainWheat = new ItemStack(Items.WHEAT);
+                    long owned = 0;
+                    for (ItemStack st : mc.player.getInventory().items) {
+                        if (st.is(Items.WHEAT) && SeedRules.star(st) == 0) {
+                            owned += st.getCount();
+                        }
+                    }
+                    if (idx >= 0 && owned > 0) {
+                        ShopData.Entry e = d.entries.get(idx);
+                        before = ClientEconomy.wallet;
+                        expected = before + ShopData.revenue(d.variantKey(e, plainWheat) / 100.0, owned);
+                        ShopNet.CHANNEL.sendToServer(new SellAllPacket(d.id, d.version, new int[]{idx}, new long[]{d.variantKey(e, plainWheat)}));
+                    }
+                }
+                wait = 20;
+            }
+            case 23 -> {
+                check("'sell all' sells the listed rows", expected >= 0 && ClientEconomy.wallet == expected,
+                        ClientEconomy.wallet + " (expected " + expected + ")");
+                mc.setScreen(null);
+                wait = 10; // 화면을 닫았다는 알림이 서버에 먼저 도착하도록 잠시 기다린다
+            }
+            case 24 -> {
+                onServer(mc, sp -> ShopServer.openBank(sp, -1));
+                wait = 40;
+            }
+            case 25 -> {
+                check("the bank opens again", mc.screen instanceof BankScreen);
+                before = ClientEconomy.bank;
+                ShopNet.CHANNEL.sendToServer(new BankPacket(true, 1_000));
+                wait = 20;
+            }
+            case 26 -> {
+                check("a deposit moves gold into the bank", ClientEconomy.bank == before + 1_000, ClientEconomy.bank);
+                mc.setScreen(null);
+                if (mc.player != null) {
+                    mc.player.connection.sendCommand("rtshop land");
+                }
+                wait = 40;
+            }
+            case 27 -> {
+                check("/rtshop land opens the land settings", mc.screen instanceof LandScreen, mc.screen);
+                ShopNet.CHANNEL.sendToServer(new LandActionPacket(landId, LandManager.ACT_SET_DEFAULT, "", LandData.CONTAINER | LandData.USE));
+                wait = 20;
+            }
+            case 28 -> {
+                onServer(mc, sp -> {
+                    LandData.Land land = LandManager.landAt(sp.serverLevel(), sp.blockPosition());
+                    serverPerms = land == null ? -2 : land.defaultPerms;
+                });
+                wait = 10;
+            }
+            case 29 -> {
+                check("changing permissions on the screen reaches the server", serverPerms == (LandData.CONTAINER | LandData.USE), serverPerms);
+                shot(mc, "17_land_settings_changed");
+                mc.setScreen(null);
+                if (chestPos != null) {
+                    ShopNet.CHANNEL.sendToServer(new PinActionPacket(chestPos, PinActionPacket.SET, "2468"));
+                }
+                wait = 20;
+            }
+            case 30 -> {
+                onServer(mc, sp -> serverPin = chestPos != null && LandManager.hasPin(sp.serverLevel(), chestPos));
+                wait = 10;
+            }
+            case 31 -> {
+                check("setting a PIN from the client locks the chest on the server", serverPin);
+                if (mc.player != null) {
+                    mc.player.connection.sendCommand("rtshop hud");
+                }
+                wait = 20;
+            }
+            case 32 -> {
+                check("/rtshop hud opens the position editor", mc.screen instanceof HudEditScreen, mc.screen);
+                mc.setScreen(null);
+                before = ClientEconomy.wallet;
+                if (mc.player != null) {
+                    mc.player.connection.sendCommand("rtshop check 300");
+                }
+                wait = 20;
+            }
+            case 33 -> {
+                check("/rtshop check turns carried gold into a check", ClientEconomy.wallet == before - 300, ClientEconomy.wallet);
+                if (mc.player != null) {
+                    mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+                }
+                wait = 20;
+            }
+            case 34 -> {
+                shot(mc, "18_inventory_marks");
+                mc.setScreen(null);
+                wait = 10;
+            }
+            case LAST -> {
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);
             }
             default -> {
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > 19 + 60) {
+                if (step > LAST + 60) {
                     done = true;
                     mc.stop();
                 }
             }
         }
+    }
+
+    private static int find(ShopData d, Item item, boolean seed) {
+        for (int i = 0; i < d.entries.size(); i++) {
+            ShopData.Entry e = d.entries.get(i);
+            if (e.stack.is(item) && SeedRules.isLicensed(e.stack) == seed && (seed ? e.buyable : e.sellable)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static void finish(Minecraft mc) {
@@ -326,8 +495,8 @@ public final class ClientSelfTest {
             RtShop.LOGGER.error("[rtshop-clienttest] could not write the result file", t);
         }
         RtShop.LOGGER.info("[rtshop-clienttest] {}", out.get(out.size() - 1));
-        if (step < 19) {
-            step = 19; // 월드에 못 들어간 경우에도 종료 절차로 넘어간다
+        if (step < LAST) {
+            step = LAST; // 월드에 못 들어간 경우에도 종료 절차로 넘어간다
             done = true;
             mc.stop();
         }
