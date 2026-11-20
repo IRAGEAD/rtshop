@@ -445,6 +445,9 @@ public final class FarmEvents {
      * Kaleidoscope Cookery 의 낫: 넓은 범위의 작물을 수확하고 공짜로 다시 심는다.
      * 그 모드가 설치돼 있으면 낫의 수확 이벤트를 받아서 (1) 남의 토지에서는 막고 (2) 우리 규칙대로 수확·재파종한다.
      */
+    /** Kaleidoscope Cookery 의 낫 수확 이벤트에 연결되었는가 (자체 점검용). */
+    public static volatile boolean sickleCompat = false;
+
     public static void registerCompat() {
         try {
             Class<?> cls = Class.forName("com.github.ysbbbbbb.kaleidoscopecookery.api.event.SickleHarvestEvent");
@@ -458,6 +461,7 @@ public final class FarmEvents {
             @SuppressWarnings({"unchecked", "rawtypes"})
             Class<Event> type = (Class) cls;
             MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, type, e -> onSickle(e, getPos, getState, getSickle, setCost));
+            sickleCompat = true;
             RtShop.LOGGER.info("[rtshop] Kaleidoscope Cookery 낫 연동을 켰습니다.");
         } catch (ClassNotFoundException | NoSuchMethodException ex) {
             // 그 모드가 없거나 버전이 달라 이벤트가 없음: 연동 없이 동작

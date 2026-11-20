@@ -23,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,10 +39,12 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -50,7 +53,9 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -212,6 +217,11 @@ public final class SelfTest {
             farming(level, a, new BlockPos(gx + 20, y, gz + 20));
         } catch (Throwable t) {
             crash("farming", t);
+        }
+        try {
+            otherMods(level, a, new BlockPos(gx + 24, y, gz + 24));
+        } catch (Throwable t) {
+            crash("other mods", t);
         }
         try {
             land(server, level, a, b, gx, y, gz);
@@ -609,6 +619,110 @@ public final class SelfTest {
         level.setBlock(soil, Blocks.AIR.defaultBlockState(), 2);
         takeDrops(level, crop);
         clear(a);
+    }
+
+    // ------------------------------------------------------------------ 다른 모드와 함께 쓸 때
+
+    private static final String[] COOK_MODS = {"farmersdelight", "kaleidoscope_cookery", "kaleidoscope_tavern", "handson_delight",
+            "farm_and_charm", "starcatcher", "better_farming_plus"};
+    private static final String[] MOD_CROPS = {"kaleidoscope_cookery:tomato_crop", "kaleidoscope_cookery:chili_crop",
+            "kaleidoscope_cookery:lettuce_crop", "farmersdelight:cabbages", "farmersdelight:onions", "farmersdelight:tomatoes",
+            "farm_and_charm:barley_crop", "farm_and_charm:oat_crop", "farm_and_charm:corn_crop", "farm_and_charm:strawberry_crop",
+            "farm_and_charm:tomato_crop", "farm_and_charm:lettuce_crop", "farm_and_charm:onion_crop"};
+
+    /** 요리·농사 모드가 함께 설치된 서버에서만 의미가 있는 점검 (모드가 없으면 건너뜀). */
+    private static void otherMods(ServerLevel level, FakePlayer a, BlockPos soil) {
+        StringBuilder loaded = new StringBuilder();
+        for (String m : COOK_MODS) {
+            if (ModList.get().isLoaded(m)) {
+                loaded.append(' ').append(m);
+            }
+        }
+        if (loaded.length() == 0) {
+            return;
+        }
+        section("other mods");
+        info("installed:" + loaded);
+        FarmConfig cfg = FarmConfig.get();
+        CropData data = CropData.get(level);
+        String dim = CropData.dim(level);
+        if (ModList.get().isLoaded("kaleidoscope_cookery")) {
+            check("the Kaleidoscope sickle is hooked (no free replanting)", FarmEvents.sickleCompat);
+        }
+        if (ModList.get().isLoaded("starcatcher")) {
+            ShopData fisher = ShopServer.shops().get("fisher");
+            int fish = 0;
+            if (fisher != null) {
+                for (ShopData.Entry e : fisher.entries) {
+                    if (e.fish && e.sellable) {
+                        fish++;
+                    }
+                }
+            }
+            check("Starcatcher fish are listed at the fisher by rarity", fish > 20, fish + " fish");
+        }
+        BlockPos crop = soil.above();
+        a.setPos(crop.getX() + 0.5, crop.getY(), crop.getZ() + 2.5);
+        for (String id : MOD_CROPS) {
+            ResourceLocation rl = ResourceLocation.tryParse(id);
+            Block block = rl == null ? null : ForgeRegistries.BLOCKS.getValue(rl);
+            if (block == null || block == Blocks.AIR) {
+                continue;
+            }
+            BlockState st = block.defaultBlockState();
+            IntegerProperty age = FarmEvents.ageProperty(st);
+            if (age == null) {
+                info(id + ": no age property, skipped");
+                continue;
+            }
+            int max = 0;
+            for (int v : age.getPossibleValues()) {
+                max = Math.max(max, v);
+            }
+            st = st.setValue(age, max);
+            level.setBlock(soil, Blocks.FARMLAND.defaultBlockState().setValue(FarmBlock.MOISTURE, 7), 2);
+            level.setBlock(crop, st, 2);
+            if (!level.getBlockState(crop).is(block)) {
+                info(id + ": does not stay on farmland, skipped");
+                continue;
+            }
+            data.mark(dim, crop);
+            clear(a);
+            takeDrops(level, crop);
+            a.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            boolean byClick = cfg.rightClickHarvest && FarmEvents.harvestable(st);
+            if (byClick) {
+                a.gameMode.useItemOn(a, level, ItemStack.EMPTY, InteractionHand.MAIN_HAND, hitTop(crop));
+            } else {
+                a.gameMode.destroyBlock(crop);
+            }
+            FarmEvents.flushPending();
+            List<ItemStack> got = takeDrops(level, crop);
+            for (ItemStack s : a.getInventory().items) {
+                if (!s.isEmpty()) {
+                    got.add(s.copy());
+                }
+            }
+            boolean seed = false;
+            boolean star = false;
+            int produce = 0;
+            for (ItemStack s : got) {
+                if (SeedRules.isPureSeed(s)) {
+                    seed = true;
+                } else {
+                    produce += s.getCount();
+                    star |= SeedRules.star(s) > 0;
+                }
+            }
+            BlockState after = level.getBlockState(crop);
+            check(id + ": " + (byClick ? "right-click" : "breaking") + " gives graded produce, no seeds, and no free replant",
+                    !seed && star && produce >= 1 && !after.is(block), got + " -> " + after);
+            data.unmark(dim, crop);
+            level.setBlock(crop, Blocks.AIR.defaultBlockState(), 2);
+            level.setBlock(soil, Blocks.AIR.defaultBlockState(), 2);
+            takeDrops(level, crop);
+            clear(a);
+        }
     }
 
     // ------------------------------------------------------------------ 토지
