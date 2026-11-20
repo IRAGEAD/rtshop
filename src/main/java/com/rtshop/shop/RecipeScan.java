@@ -36,6 +36,8 @@ public final class RecipeScan {
         public RecipeSolver.Env env;
         public int files;
         public int parsed;
+        /** 해석하지 못한 레시피의 종류별 개수 (점검 보고서용). */
+        public final Map<String, Integer> unparsedTypes = new java.util.TreeMap<>();
 
         /** 레시피 ID 로 찾기 (가격 근거 표시용). */
         public RecipeSolver.Recipe byId(String id) {
@@ -76,6 +78,9 @@ public final class RecipeScan {
                     if (!rs.isEmpty()) {
                         scan.parsed++;
                         recipes.addAll(rs);
+                    } else {
+                        String type = json.has("type") && json.get("type").isJsonPrimitive() ? json.get("type").getAsString() : "?";
+                        scan.unparsedTypes.merge(type, 1, Integer::sum);
                     }
                 } catch (Throwable ignored) {
                     // 읽을 수 없는 파일은 건너뜀
