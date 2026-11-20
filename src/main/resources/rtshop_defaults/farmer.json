@@ -617,7 +617,7 @@
   },
   {
    "item": "minecraft:leather",
-   "price": 2,
+   "price": 1,
    "category": "animal"
   },
   {
@@ -637,7 +637,7 @@
   },
   {
    "item": "minecraft:white_wool",
-   "price": 2,
+   "price": 3,
    "category": "animal"
   },
   {
