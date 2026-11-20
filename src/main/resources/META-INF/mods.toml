@@ -4,7 +4,7 @@ license="MIT"
 
 [[mods]]
 modId="rtshop"
-version="2.1.0"
+version="2.1.1"
 displayName="RT Shop"
 description='''
 중세 분위기의 NPC 상점 시스템.

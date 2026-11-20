@@ -14,7 +14,8 @@ import net.minecraft.sounds.SoundEvents;
 /** 은행 화면: 이자 없는 단순 보관. 은행 NPC 를 우클릭했을 때만 열립니다. */
 public class BankScreen extends Screen {
     private static final int W = 236;
-    private static final int H = 176;
+    private static final int H = 197;
+    private static final int BTN_W = 104;
     private static final long[] QUICK = {100, 1_000, 10_000};
 
     private final double lossMin;
@@ -94,12 +95,13 @@ public class BankScreen extends Screen {
         return fy + 102;
     }
 
-    private int btnY() {
-        return fy + 122;
+    // 거래 버튼 4개: 2열 × 2줄 (윗줄 = 입력한 금액, 아랫줄 = 전부)
+    private int btnY(int i) {
+        return fy + 122 + (i / 2) * 21;
     }
 
     private int btnX(int i) {
-        return fx + 12 + i * 54;
+        return fx + 12 + (i % 2) * (BTN_W + 4);
     }
 
     @Override
@@ -132,8 +134,8 @@ public class BankScreen extends Screen {
 
         String[] labels = {"rtshop.bank.deposit", "rtshop.bank.withdraw", "rtshop.bank.deposit_all", "rtshop.bank.withdraw_all"};
         for (int i = 0; i < 4; i++) {
-            Ui.button(g, this.font, btnX(i), btnY(), 50, 18, Component.translatable(labels[i]).getString(),
-                    Ui.inside(mx, my, btnX(i), btnY(), 50, 18), true);
+            Ui.button(g, this.font, btnX(i), btnY(i), BTN_W, 18, Component.translatable(labels[i]).getString(),
+                    Ui.inside(mx, my, btnX(i), btnY(i), BTN_W, 18), true);
         }
 
         // 안내/결과
@@ -187,7 +189,7 @@ public class BankScreen extends Screen {
                 return true;
             }
             for (int i = 0; i < 4; i++) {
-                if (Ui.inside(mx, my, btnX(i), btnY(), 50, 18)) {
+                if (Ui.inside(mx, my, btnX(i), btnY(i), BTN_W, 18)) {
                     click();
                     switch (i) {
                         case 0 -> send(true, amount());
