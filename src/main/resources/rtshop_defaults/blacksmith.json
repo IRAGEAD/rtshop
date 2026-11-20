@@ -1,0 +1,94 @@
+{
+ "_설명": [
+  "파일 이름이 상점 ID 입니다 (예: farmer.json -> /rtshop npc farmer). 가격 단위는 Gold(G).",
+  "items: 가격을 직접 정한 아이템 / auto: 태그·모드·종류로 자동 수집하고 공식으로 가격을 매기는 규칙",
+  "auto.match: mod(s)=모드ID, tag(s)=아이템 태그, class(es)=weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear",
+  "auto.formula: fixed(price 그대로) | gear(능력치 기반) | food(포만감 기반) | auto(장비/음식이면 공식, 아니면 price×희귀도)",
+  "looseSell: true 면 판매할 때 NBT(크기·무게 등)를 무시. exclude: 제외할 아이템ID 또는 '모드ID:*'",
+  "한 아이템은 전체 상점 중 한 곳에서만 취급됩니다(먼저 등록된 쪽 우선). 수정 후 /rtshop reload, 결과 확인은 /rtshop export"
+ ],
+ "title": "장비 상점",
+ "npcName": "장비 상인",
+ "profession": "weaponsmith",
+ "sellRatio": 0.5,
+ "categories": [
+  {
+   "id": "weapon",
+   "name": "근접 무기",
+   "icon": "minecraft:iron_sword"
+  },
+  {
+   "id": "ranged",
+   "name": "원거리 무기",
+   "icon": "minecraft:bow"
+  },
+  {
+   "id": "armor",
+   "name": "방어구",
+   "icon": "minecraft:iron_chestplate"
+  },
+  {
+   "id": "shield",
+   "name": "방패",
+   "icon": "minecraft:shield"
+  },
+  {
+   "id": "ammo",
+   "name": "소모품",
+   "icon": "minecraft:arrow"
+  }
+ ],
+ "items": [
+  {
+   "item": "minecraft:arrow",
+   "price": 4,
+   "category": "ammo"
+  },
+  {
+   "item": "minecraft:spectral_arrow",
+   "price": 12,
+   "category": "ammo"
+  },
+  {
+   "item": "minecraft:firework_rocket",
+   "price": 15,
+   "category": "ammo"
+  }
+ ],
+ "auto": [
+  {
+   "match": {
+    "class": "armor"
+   },
+   "category": "armor",
+   "formula": "gear"
+  },
+  {
+   "match": {
+    "class": "shield"
+   },
+   "category": "shield",
+   "formula": "gear"
+  },
+  {
+   "match": {
+    "class": "ranged"
+   },
+   "category": "ranged",
+   "formula": "gear"
+  },
+  {
+   "match": {
+    "class": "weapon"
+   },
+   "category": "weapon",
+   "formula": "gear"
+  }
+ ],
+ "exclude": [
+  "tacz:*",
+  "artifacts:*",
+  "relics:*",
+  "kubejs:*"
+ ]
+}

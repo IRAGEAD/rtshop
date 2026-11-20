@@ -1,0 +1,393 @@
+{
+ "_설명": [
+  "파일 이름이 상점 ID 입니다 (예: farmer.json -> /rtshop npc farmer). 가격 단위는 Gold(G).",
+  "items: 가격을 직접 정한 아이템 / auto: 태그·모드·종류로 자동 수집하고 공식으로 가격을 매기는 규칙",
+  "auto.match: mod(s)=모드ID, tag(s)=아이템 태그, class(es)=weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear",
+  "auto.formula: fixed(price 그대로) | gear(능력치 기반) | food(포만감 기반) | auto(장비/음식이면 공식, 아니면 price×희귀도)",
+  "looseSell: true 면 판매할 때 NBT(크기·무게 등)를 무시. exclude: 제외할 아이템ID 또는 '모드ID:*'",
+  "한 아이템은 전체 상점 중 한 곳에서만 취급됩니다(먼저 등록된 쪽 우선). 수정 후 /rtshop reload, 결과 확인은 /rtshop export"
+ ],
+ "title": "농작물 상점",
+ "npcName": "농작물 상인",
+ "profession": "farmer",
+ "sellRatio": 0.5,
+ "categories": [
+  {
+   "id": "crops",
+   "name": "농작물",
+   "icon": "minecraft:wheat"
+  },
+  {
+   "id": "seeds",
+   "name": "씨앗/묘목",
+   "icon": "minecraft:wheat_seeds"
+  },
+  {
+   "id": "tools",
+   "name": "농기구",
+   "icon": "minecraft:iron_hoe"
+  },
+  {
+   "id": "supplies",
+   "name": "농사 용품",
+   "icon": "minecraft:bone_meal"
+  },
+  {
+   "id": "animal",
+   "name": "축산물",
+   "icon": "minecraft:egg"
+  }
+ ],
+ "items": [
+  {
+   "item": "minecraft:wheat",
+   "price": 6,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:carrot",
+   "price": 6,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:potato",
+   "price": 5,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:beetroot",
+   "price": 6,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:pumpkin",
+   "price": 15,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:melon_slice",
+   "price": 3,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:melon",
+   "price": 27,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:sugar_cane",
+   "price": 5,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:cocoa_beans",
+   "price": 8,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:sweet_berries",
+   "price": 4,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:glow_berries",
+   "price": 8,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:apple",
+   "price": 12,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:nether_wart",
+   "price": 15,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:cactus",
+   "price": 6,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:bamboo",
+   "price": 3,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:brown_mushroom",
+   "price": 8,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:red_mushroom",
+   "price": 8,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:hay_block",
+   "price": 54,
+   "category": "crops"
+  },
+  {
+   "item": "farmersdelight:cabbage",
+   "price": 10,
+   "category": "crops"
+  },
+  {
+   "item": "farmersdelight:tomato",
+   "price": 8,
+   "category": "crops"
+  },
+  {
+   "item": "farmersdelight:onion",
+   "price": 7,
+   "category": "crops"
+  },
+  {
+   "item": "farmersdelight:rice",
+   "price": 6,
+   "category": "crops"
+  },
+  {
+   "item": "farmersdelight:rice_panicle",
+   "price": 7,
+   "category": "crops"
+  },
+  {
+   "item": "minecraft:wheat_seeds",
+   "price": 2,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:beetroot_seeds",
+   "price": 4,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:pumpkin_seeds",
+   "price": 4,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:melon_seeds",
+   "price": 3,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:torchflower_seeds",
+   "price": 40,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:pitcher_pod",
+   "price": 40,
+   "category": "seeds"
+  },
+  {
+   "item": "farmersdelight:cabbage_seeds",
+   "price": 4,
+   "category": "seeds"
+  },
+  {
+   "item": "farmersdelight:tomato_seeds",
+   "price": 4,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:oak_sapling",
+   "price": 10,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:spruce_sapling",
+   "price": 10,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:birch_sapling",
+   "price": 10,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:jungle_sapling",
+   "price": 12,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:acacia_sapling",
+   "price": 12,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:dark_oak_sapling",
+   "price": 12,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:cherry_sapling",
+   "price": 20,
+   "category": "seeds"
+  },
+  {
+   "item": "minecraft:shears",
+   "price": 85,
+   "category": "tools"
+  },
+  {
+   "item": "minecraft:bucket",
+   "price": 125,
+   "category": "tools"
+  },
+  {
+   "item": "minecraft:lead",
+   "price": 30,
+   "category": "tools"
+  },
+  {
+   "item": "minecraft:bone_meal",
+   "price": 3,
+   "category": "supplies"
+  },
+  {
+   "item": "minecraft:composter",
+   "price": 15,
+   "category": "supplies"
+  },
+  {
+   "item": "minecraft:dirt",
+   "price": 2,
+   "category": "supplies"
+  },
+  {
+   "item": "farmersdelight:straw",
+   "price": 2,
+   "category": "supplies"
+  },
+  {
+   "item": "farmersdelight:canvas",
+   "price": 10,
+   "category": "supplies"
+  },
+  {
+   "item": "farmersdelight:rope",
+   "price": 3,
+   "category": "supplies"
+  },
+  {
+   "item": "farmersdelight:organic_compost",
+   "price": 20,
+   "category": "supplies"
+  },
+  {
+   "item": "farmersdelight:rich_soil",
+   "price": 30,
+   "category": "supplies"
+  },
+  {
+   "item": "farmersdelight:tree_bark",
+   "price": 2,
+   "category": "supplies"
+  },
+  {
+   "item": "minecraft:egg",
+   "price": 5,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:milk_bucket",
+   "price": 135,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:honey_bottle",
+   "price": 25,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:honeycomb",
+   "price": 20,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:leather",
+   "price": 15,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:feather",
+   "price": 5,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:white_wool",
+   "price": 12,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:beef",
+   "price": 14,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:porkchop",
+   "price": 14,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:chicken",
+   "price": 10,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:mutton",
+   "price": 12,
+   "category": "animal"
+  },
+  {
+   "item": "minecraft:rabbit",
+   "price": 12,
+   "category": "animal"
+  }
+ ],
+ "auto": [
+  {
+   "match": {
+    "class": "hoe"
+   },
+   "category": "tools",
+   "formula": "gear"
+  },
+  {
+   "match": {
+    "tags": [
+     "forge:seeds"
+    ]
+   },
+   "category": "seeds",
+   "price": 4
+  },
+  {
+   "match": {
+    "tags": [
+     "forge:crops",
+     "forge:vegetables",
+     "forge:grain"
+    ]
+   },
+   "category": "crops",
+   "price": 8
+  },
+  {
+   "match": {
+    "tags": [
+     "forge:fruits",
+     "forge:berries"
+    ]
+   },
+   "category": "crops",
+   "price": 10
+  }
+ ],
+ "exclude": []
+}

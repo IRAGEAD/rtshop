@@ -1,0 +1,185 @@
+{
+ "_설명": [
+  "파일 이름이 상점 ID 입니다 (예: farmer.json -> /rtshop npc farmer). 가격 단위는 Gold(G).",
+  "items: 가격을 직접 정한 아이템 / auto: 태그·모드·종류로 자동 수집하고 공식으로 가격을 매기는 규칙",
+  "auto.match: mod(s)=모드ID, tag(s)=아이템 태그, class(es)=weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear",
+  "auto.formula: fixed(price 그대로) | gear(능력치 기반) | food(포만감 기반) | auto(장비/음식이면 공식, 아니면 price×희귀도)",
+  "looseSell: true 면 판매할 때 NBT(크기·무게 등)를 무시. exclude: 제외할 아이템ID 또는 '모드ID:*'",
+  "한 아이템은 전체 상점 중 한 곳에서만 취급됩니다(먼저 등록된 쪽 우선). 수정 후 /rtshop reload, 결과 확인은 /rtshop export"
+ ],
+ "title": "수산물 상점",
+ "npcName": "수산물 상인",
+ "profession": "fisherman",
+ "sellRatio": 0.5,
+ "categories": [
+  {
+   "id": "fish",
+   "name": "수산물",
+   "icon": "minecraft:cod"
+  },
+  {
+   "id": "starcatcher",
+   "name": "스타캐처",
+   "icon": "minecraft:tropical_fish"
+  },
+  {
+   "id": "gear",
+   "name": "낚시 도구",
+   "icon": "minecraft:fishing_rod"
+  },
+  {
+   "id": "sea",
+   "name": "해양 자원",
+   "icon": "minecraft:prismarine_shard"
+  }
+ ],
+ "items": [
+  {
+   "item": "minecraft:cod",
+   "price": 16,
+   "category": "fish",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:salmon",
+   "price": 20,
+   "category": "fish",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:tropical_fish",
+   "price": 40,
+   "category": "fish",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:pufferfish",
+   "price": 45,
+   "category": "fish",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:cooked_cod",
+   "price": 22,
+   "category": "fish",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:cooked_salmon",
+   "price": 27,
+   "category": "fish",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:string",
+   "price": 8,
+   "category": "gear"
+  },
+  {
+   "item": "minecraft:oak_boat",
+   "price": 15,
+   "category": "gear"
+  },
+  {
+   "item": "minecraft:water_bucket",
+   "price": 130,
+   "category": "gear"
+  },
+  {
+   "item": "minecraft:lily_pad",
+   "price": 10,
+   "category": "gear"
+  },
+  {
+   "item": "minecraft:kelp",
+   "price": 4,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:dried_kelp",
+   "price": 5,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:seagrass",
+   "price": 4,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:sea_pickle",
+   "price": 15,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:ink_sac",
+   "price": 12,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:glow_ink_sac",
+   "price": 30,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:prismarine_shard",
+   "price": 20,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:prismarine_crystals",
+   "price": 30,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:scute",
+   "price": 80,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:sponge",
+   "price": 150,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:nautilus_shell",
+   "price": 400,
+   "category": "sea"
+  },
+  {
+   "item": "minecraft:heart_of_the_sea",
+   "price": 3000,
+   "category": "sea"
+  }
+ ],
+ "auto": [
+  {
+   "match": {
+    "class": "fishing_rod"
+   },
+   "category": "gear",
+   "formula": "gear"
+  },
+  {
+   "match": {
+    "mod": "starcatcher"
+   },
+   "category": "starcatcher",
+   "formula": "auto",
+   "price": 40,
+   "looseSell": true
+  },
+  {
+   "match": {
+    "tags": [
+     "minecraft:fishes",
+     "forge:raw_fishes",
+     "forge:cooked_fishes"
+    ]
+   },
+   "category": "fish",
+   "price": 20,
+   "looseSell": true
+  }
+ ],
+ "exclude": []
+}

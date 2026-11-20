@@ -1,0 +1,57 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+
+version = '2.1.0'
+group = 'com.rtshop'
+
+base {
+    archivesName = 'rtshop-forge-1.20.1'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    // Mojang 공식 매핑
+    mappings channel: 'official', version: '1.20.1'
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+        }
+        client {
+        }
+        server {
+            args '--nogui'
+        }
+    }
+}
+
+repositories {
+}
+
+dependencies {
+    // 컴파일 기준 버전. 모드팩의 포지(47.4.x)와 API 호환됩니다.
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.0'
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : 'rtshop',
+                'Specification-Vendor'    : 'rtshop',
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : 'rtshop'
+        ])
+    }
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

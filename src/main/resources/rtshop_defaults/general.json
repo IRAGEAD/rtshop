@@ -1,0 +1,352 @@
+{
+ "_설명": [
+  "파일 이름이 상점 ID 입니다 (예: farmer.json -> /rtshop npc farmer). 가격 단위는 Gold(G).",
+  "items: 가격을 직접 정한 아이템 / auto: 태그·모드·종류로 자동 수집하고 공식으로 가격을 매기는 규칙",
+  "auto.match: mod(s)=모드ID, tag(s)=아이템 태그, class(es)=weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear",
+  "auto.formula: fixed(price 그대로) | gear(능력치 기반) | food(포만감 기반) | auto(장비/음식이면 공식, 아니면 price×희귀도)",
+  "looseSell: true 면 판매할 때 NBT(크기·무게 등)를 무시. exclude: 제외할 아이템ID 또는 '모드ID:*'",
+  "한 아이템은 전체 상점 중 한 곳에서만 취급됩니다(먼저 등록된 쪽 우선). 수정 후 /rtshop reload, 결과 확인은 /rtshop export"
+ ],
+ "title": "잡화점",
+ "npcName": "잡화 상인",
+ "profession": "cartographer",
+ "sellRatio": 0.5,
+ "categories": [
+  {
+   "id": "building",
+   "name": "건축",
+   "icon": "minecraft:bricks"
+  },
+  {
+   "id": "material",
+   "name": "광물/재료",
+   "icon": "minecraft:iron_ingot"
+  },
+  {
+   "id": "tool",
+   "name": "도구",
+   "icon": "minecraft:iron_pickaxe"
+  },
+  {
+   "id": "food",
+   "name": "음식",
+   "icon": "minecraft:bread"
+  },
+  {
+   "id": "misc",
+   "name": "기타",
+   "icon": "minecraft:ender_pearl"
+  }
+ ],
+ "items": [
+  {
+   "item": "minecraft:oak_log",
+   "price": 8,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:spruce_log",
+   "price": 8,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:birch_log",
+   "price": 8,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:oak_planks",
+   "price": 2,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:cobblestone",
+   "price": 2,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:stone",
+   "price": 3,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:stone_bricks",
+   "price": 4,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:bricks",
+   "price": 12,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:sand",
+   "price": 2,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:gravel",
+   "price": 2,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:glass",
+   "price": 4,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:clay_ball",
+   "price": 3,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:torch",
+   "price": 3,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:lantern",
+   "price": 12,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:ladder",
+   "price": 3,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:chest",
+   "price": 18,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:crafting_table",
+   "price": 10,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:furnace",
+   "price": 18,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:bookshelf",
+   "price": 90,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:glowstone",
+   "price": 30,
+   "category": "building"
+  },
+  {
+   "item": "minecraft:stick",
+   "price": 1,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:coal",
+   "price": 10,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:charcoal",
+   "price": 8,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:flint",
+   "price": 4,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:copper_ingot",
+   "price": 12,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:iron_ingot",
+   "price": 40,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:gold_ingot",
+   "price": 80,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:redstone",
+   "price": 10,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:lapis_lazuli",
+   "price": 15,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:quartz",
+   "price": 15,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:amethyst_shard",
+   "price": 20,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:emerald",
+   "price": 120,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:diamond",
+   "price": 300,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:bone",
+   "price": 6,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:gunpowder",
+   "price": 15,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:slime_ball",
+   "price": 20,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:blaze_rod",
+   "price": 60,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:obsidian",
+   "price": 40,
+   "category": "material"
+  },
+  {
+   "item": "minecraft:bread",
+   "price": 20,
+   "category": "food"
+  },
+  {
+   "item": "minecraft:baked_potato",
+   "price": 9,
+   "category": "food"
+  },
+  {
+   "item": "minecraft:sugar",
+   "price": 5,
+   "category": "food"
+  },
+  {
+   "item": "minecraft:golden_carrot",
+   "price": 80,
+   "category": "food"
+  },
+  {
+   "item": "minecraft:golden_apple",
+   "price": 700,
+   "category": "food"
+  },
+  {
+   "item": "minecraft:cake",
+   "price": 90,
+   "category": "food"
+  },
+  {
+   "item": "minecraft:paper",
+   "price": 4,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:book",
+   "price": 25,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:glass_bottle",
+   "price": 5,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:compass",
+   "price": 180,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:clock",
+   "price": 340,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:spyglass",
+   "price": 60,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:name_tag",
+   "price": 150,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:saddle",
+   "price": 250,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:experience_bottle",
+   "price": 60,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:ender_pearl",
+   "price": 80,
+   "category": "misc"
+  },
+  {
+   "item": "minecraft:white_bed",
+   "price": 50,
+   "category": "misc"
+  }
+ ],
+ "auto": [
+  {
+   "match": {
+    "class": "tool"
+   },
+   "category": "tool",
+   "formula": "gear"
+  },
+  {
+   "match": {
+    "mods": [
+     "minecraft",
+     "farmersdelight",
+     "farm_and_charm",
+     "kaleidoscope_cookery",
+     "kaleidoscope_tavern",
+     "handsondelight",
+     "hands_on_delight"
+    ],
+    "class": "food"
+   },
+   "category": "food",
+   "formula": "food",
+   "multiplier": 0.6
+  }
+ ],
+ "exclude": [
+  "minecraft:enchanted_golden_apple",
+  "minecraft:rotten_flesh",
+  "minecraft:spider_eye",
+  "minecraft:poisonous_potato",
+  "minecraft:chorus_fruit",
+  "minecraft:suspicious_stew"
+ ]
+}
