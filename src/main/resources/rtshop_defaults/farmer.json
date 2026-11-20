@@ -432,6 +432,12 @@
    "seed": true
   },
   {
+   "item": "kaleidoscope_cookery:rice",
+   "price": 30,
+   "category": "seeds",
+   "seed": true
+  },
+  {
    "item": "kaleidoscope_cookery:tea_seed",
    "price": 400,
    "category": "seeds",

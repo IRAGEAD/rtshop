@@ -25,6 +25,12 @@ public final class FarmConfig {
     public boolean requireShopSeeds = true;
     /** 상점에서 산 "심기 전용" 작물(씨감자 등)은 먹을 수 없게 한다. */
     public boolean blockEatingShopSeeds = true;
+    /** 가격표에 없는 씨앗(다른 모드의 작물)을 씨앗 상점에 자동으로 올린다. 끄면 그 작물은 키울 수 없다. */
+    public boolean autoListMissingSeeds = true;
+    /** 자동으로 올리는 씨앗의 가격. */
+    public int autoSeedPrice = 20;
+    /** 자동으로 올리는 '심기 전용' 작물의 가격 = 작물 가격 x 이 값. */
+    public double autoDualSeedFactor = 2.5;
     /** 작물 자체가 씨앗 역할도 하는 아이템. 수확물은 심을 수 없고, 상점의 심기 전용 품목만 심을 수 있다. */
     public final Set<String> dualPurpose = new LinkedHashSet<>(Arrays.asList(
             "minecraft:carrot", "minecraft:potato", "minecraft:nether_wart", "minecraft:cocoa_beans",
@@ -110,6 +116,9 @@ public final class FarmConfig {
                 if (o.has("requireShopSeeds")) c.requireShopSeeds = o.get("requireShopSeeds").getAsBoolean();
                 if (o.has("blockEatingShopSeeds")) c.blockEatingShopSeeds = o.get("blockEatingShopSeeds").getAsBoolean();
                 if (o.has("starsEnabled")) c.starsEnabled = o.get("starsEnabled").getAsBoolean();
+                if (o.has("autoListMissingSeeds")) c.autoListMissingSeeds = o.get("autoListMissingSeeds").getAsBoolean();
+                if (o.has("autoSeedPrice")) c.autoSeedPrice = Math.max(1, o.get("autoSeedPrice").getAsInt());
+                if (o.has("autoDualSeedFactor")) c.autoDualSeedFactor = Math.max(0.1, o.get("autoDualSeedFactor").getAsDouble());
                 readSet(o, "dualPurpose", c.dualPurpose);
                 readSet(o, "extraSeeds", c.extraSeeds);
                 readSet(o, "notSeeds", c.notSeeds);
@@ -136,6 +145,7 @@ public final class FarmConfig {
                 help.add("removeSeedDrops: 작물·풀·상자 등에서 씨앗이 나오지 않게 함");
                 help.add("requireShopSeeds: 상점에서 산 씨앗만 심을 수 있음 (조합해서 만든 씨앗, 수확한 당근·감자 등은 심을 수 없음)");
                 help.add("dualPurpose: 작물 자체가 씨앗인 아이템. 상점의 '심기 전용' 품목만 심을 수 있음");
+                help.add("autoListMissingSeeds: 가격표에 없는 모드 씨앗을 씨앗 상점에 자동으로 올림 (autoSeedPrice G, 작물 겸 씨앗은 작물 가격 x autoDualSeedFactor)");
                 help.add("rightClickHarvest: 다 자란 작물을 우클릭하면 수확하고 인벤토리의 상점 씨앗으로 다시 심음 · harvestSweep: 괭이별 범위(1=3x3)");
                 help.add("removeUnlicensedSprouts: 다른 모드나 주민이 씨앗 없이 다시 심은 싹을 치움");
                 help.add("starChances: 1별/2별/3별 확률(%) · starMultipliers: 별 등급별 매입가 배율(기준 = 가격표 가격의 50%, 1.8 = 90%)");
@@ -143,6 +153,9 @@ public final class FarmConfig {
                 o.addProperty("removeSeedDrops", c.removeSeedDrops);
                 o.addProperty("requireShopSeeds", c.requireShopSeeds);
                 o.addProperty("blockEatingShopSeeds", c.blockEatingShopSeeds);
+                o.addProperty("autoListMissingSeeds", c.autoListMissingSeeds);
+                o.addProperty("autoSeedPrice", c.autoSeedPrice);
+                o.addProperty("autoDualSeedFactor", c.autoDualSeedFactor);
                 o.add("dualPurpose", arr(c.dualPurpose));
                 o.add("extraSeeds", arr(c.extraSeeds));
                 o.add("notSeeds", arr(c.notSeeds));
