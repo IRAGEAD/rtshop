@@ -906,6 +906,10 @@ public final class ShopLoader {
             audit.append("\n# 가격표에 없어 추정가를 쓴 재료 (상점 파일에 가격을 적으면 더 정확해집니다)\n");
             loaded.solved.estimated.forEach((k, v) -> audit.append(String.format(Locale.ROOT, "%s = %.0f%n", k, v)));
         }
+        if (loaded.scan != null && !loaded.scan.unparsedTypes.isEmpty()) {
+            audit.append("\n# 해석하지 못한 레시피 종류 (종류 = 개수). 이 조리법으로 만드는 물건은 원가 계산에 반영되지 않습니다.\n");
+            loaded.scan.unparsedTypes.forEach((k, v) -> audit.append(k).append(" = ").append(v).append('\n'));
+        }
         Files.writeString(dir.resolve("audit.txt"), audit.toString(), StandardCharsets.UTF_8);
         return total;
     }

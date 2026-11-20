@@ -86,16 +86,7 @@ jobs:
           grep -E "적자|자동으로 올렸|가격표에 없던|레시피 파일" audit.txt | cut -c1-600 | head -12 || true
           echo "==== cheaper to make than to buy"
           grep -B8 "해당 품목" audit.txt | cut -c1-200 | head -12 || true
-          echo "==== entries per mod (blacksmith)"
-          grep -E "^[a-z0-9_]+:" blacksmith.txt | cut -d: -f1 | sort | uniq -c | sort -rn | tr '\n' ';' | cut -c1-1500; echo
-          echo "==== entries per mod (food)"
-          grep -E "^[a-z0-9_]+:" food.txt | cut -d: -f1 | sort | uniq -c | sort -rn | tr '\n' ';' | cut -c1-800; echo
-          echo "==== entries per mod (farmer)"
-          grep -E "^[a-z0-9_]+:" farmer.txt | cut -d: -f1 | sort | uniq -c | sort -rn | tr '\n' ';' | cut -c1-800; echo
-          echo "==== header + 25 most expensive blacksmith goods"
-          head -6 blacksmith.txt | cut -c1-200
-          grep -E "^[a-z0-9_]+:" blacksmith.txt | sort -t'|' -k2 -n -r | head -25 | cut -c1-150
-          echo "==== cataclysm / irons_spellbooks / arsenal samples"
-          grep -E "^(cataclysm|irons_spellbooks|arsenal|jewelry|epicfight|wom):" blacksmith.txt | sort -t'|' -k2 -n -r | awk -F: '{c[$1]++; if (c[$1]<=6) print}' | cut -c1-150
-          echo "==== estimated ingredients (first 60)"
-          sed -n '/추정가를 쓴 재료/,$p' audit.txt | head -62 | cut -c1-120 | tr '\n' ';' | cut -c1-3500; echo
+          echo "==== recipe types that were not read"
+          sed -n '/해석하지 못한 레시피 종류/,$p' audit.txt | tr '\n' ';' | cut -c1-3000; echo
+          echo "==== estimated ingredients"
+          sed -n '/추정가를 쓴 재료/,/해석하지 못한/p' audit.txt | cut -c1-90 | tr '\n' ';' | cut -c1-6000; echo
