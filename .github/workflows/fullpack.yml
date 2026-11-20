@@ -9,7 +9,7 @@ permissions:
 
 env:
   # client-only mods that cannot start on a dedicated server (found by running this job)
-  SKIP_MODS: "cwb-"
+  SKIP_MODS: "cwb-,forgematica,mafglib,oculus"
 
 jobs:
   fullpack:
@@ -48,16 +48,19 @@ jobs:
           for i in $(seq 1 84); do
             sleep 10
             if grep -q "^RESULT" rtshop-selftest.txt 2>/dev/null; then echo "self-test finished after $((i*10))s"; break; fi
-            if ! pgrep -f "user_jvm_args" > /dev/null && ! pgrep -f "forge" > /dev/null; then echo "server exited after $((i*10))s"; break; fi
+            if grep -q "Failed to start the minecraft server" server.log 2>/dev/null; then echo "mod loading failed after $((i*10))s"; break; fi
+            if ! pgrep -x java > /dev/null; then echo "server exited after $((i*10))s"; break; fi
           done
           sleep 20
-          PID=$(pgrep -f "rtshop.selftest" | head -1 || true)
+          PID=$(pgrep -x java | head -1 || true)
           if [ -n "$PID" ]; then
-            echo "==== server still running (pid $PID): where is the server thread?"
-            jstack "$PID" > threads.txt 2>/dev/null || true
-            grep -A45 '"Server thread"' threads.txt | cut -c1-220 || true
-            echo "==== main thread"
-            grep -A14 '^"main"' threads.txt | cut -c1-220 || true
+            if ! grep -q "Failed to start the minecraft server" server.log && ! grep -q "^RESULT" rtshop-selftest.txt 2>/dev/null; then
+              echo "==== server still running (pid $PID): where is the server thread?"
+              jstack "$PID" > threads.txt 2>/dev/null || true
+              grep -A45 '"Server thread"' threads.txt | cut -c1-220 || true
+              echo "==== main thread"
+              grep -A14 '^"main"' threads.txt | cut -c1-220 || true
+            fi
             kill "$PID" || true
             sleep 15
             kill -9 "$PID" 2>/dev/null || true
