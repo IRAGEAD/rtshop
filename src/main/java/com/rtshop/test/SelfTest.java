@@ -881,7 +881,9 @@ public final class SelfTest {
             check("smelting does not add value", ingot.price == rawIron.price, ingot.price + " / " + rawIron.price);
             check("an iron sword sells for the value of its materials", sword.sellUnit >= 2.0 * ingot.price - 1.0e-6
                     && sword.sellUnit <= 2.0 * ingot.price + 10 && sword.price >= 2 * sword.sellUnit - 1.0e-6,
-                    sword.sellUnit + " (shop " + sword.price + ")");
+                    sword.sellUnit + " (shop " + sword.price + ") cost=" + sword.cost + " basis=" + sword.basis
+                            + " exact=" + (l.solved != null && l.solved.exact.contains("minecraft:iron_sword"))
+                            + " ingotCost=" + ingot.cost + " via=" + (l.solved == null ? null : l.solved.costRecipe.get("minecraft:iron_ingot")));
         }
         if (bucket != null && milk != null && ingot != null) {
             check("an empty bucket is bought back for three iron ingots", Math.abs(bucket.sellUnit - 3.0 * ingot.price) < 1.0e-6,

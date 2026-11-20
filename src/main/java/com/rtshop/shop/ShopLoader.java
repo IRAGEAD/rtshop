@@ -272,9 +272,18 @@ public final class ShopLoader {
         // 기준 가격: 상점에서 실제로 살 수 있는 고정 가격 품목만
         Map<String, Double> base = new HashMap<>();
         Map<String, Double> hints = new HashMap<>();
+        Set<String> craftable = new HashSet<>();
+        for (RecipeSolver.Recipe r : scan.recipes) {
+            for (RecipeSolver.Out o : r.outputs) {
+                craftable.add(o.item);
+            }
+        }
         for (Price p : prices.values()) {
             String id = itemId(p.stack);
-            if (p.buyableSomewhere && !p.dynamicFood) {
+            if (p.dynamicFood && craftable.contains(id)) {
+                continue; // 레시피 원가로 값이 정해질 품목: 상점 파일의 임시 가격을 기준표에 넣지 않는다
+            }
+            if (p.buyableSomewhere) {
                 base.merge(id, (double) p.price, Math::min);
             } else if (!p.stack.hasTag()) {
                 // 상점에서 살 수 없는 재료의 값: 매입가를 직접 정한 품목은 그 매입가(직접 길러서 쓰는 재료의 기회비용)

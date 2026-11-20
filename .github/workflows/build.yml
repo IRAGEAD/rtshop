@@ -40,6 +40,10 @@ jobs:
           tail -n 60 selftest-gradle.log
           echo "----- self-test result -----"
           cat run/rtshop-selftest.txt
+          echo "----- price audit -----"
+          cat run/config/rtshop/export/audit.txt || true
+          echo "----- exported prices -----"
+          cat run/config/rtshop/export/blacksmith.txt run/config/rtshop/export/food.txt run/config/rtshop/export/general.txt run/config/rtshop/export/farmer.txt || true
           grep -q "RESULT: ALL PASS" run/rtshop-selftest.txt
       - uses: actions/upload-artifact@v4
         if: always()
