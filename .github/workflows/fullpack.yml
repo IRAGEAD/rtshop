@@ -96,7 +96,21 @@ jobs:
           f = next((x for x in pick['files'] if x.get('primary')), pick['files'][0])
           print('Distant Horizons', pick['version_number'], f['filename'])
           urllib.request.urlretrieve(f['url'], 'client/mods/' + f['filename'])
+          # the pack's wings mod is not on CurseForge: take it from Modrinth
+          try:
+              hits = json.load(urllib.request.urlopen(urllib.request.Request('https://api.modrinth.com/v2/search?' + urllib.parse.urlencode({'query': 'Arcane Vortex'}), headers={'User-Agent': 'rtshop-ci (github.com/IRAGEAD/rtshop)'}), timeout=60))['hits']
+              hit = next(h for h in hits if h['title'].strip().lower() == 'arcane vortex')
+              req = urllib.request.Request('https://api.modrinth.com/v2/project/' + hit['project_id'] + '/version?' + q, headers={'User-Agent': 'rtshop-ci (github.com/IRAGEAD/rtshop)'})
+              versions = json.load(urllib.request.urlopen(req, timeout=60))
+              pick = next((v for v in versions if '0.7.10' in v['version_number'] or any('0.7.10' in x['filename'] for x in v['files'])), versions[0])
+              f = next((x for x in pick['files'] if x.get('primary')), pick['files'][0])
+              print('Arcane Vortex', pick['version_number'], f['filename'], 'available:', [v['version_number'] for v in versions][:8])
+              urllib.request.urlretrieve(f['url'], 'client/mods/' + f['filename'].replace(' ', '_'))
+          except Exception as ex:
+              print('Arcane Vortex not downloaded:', ex)
           PY
+          # Distant Horizons 3.3.3 crashes on world load when Chunky is installed ("Chunky is not loaded."): test without Chunky
+          rm -f client/mods/Chunky-*.jar
           cp -r server/world client/saves/rtshoptest
           rm -f client/saves/rtshoptest/session.lock
           cat > client/options.txt <<'EOF'
@@ -119,19 +133,20 @@ jobs:
           ls client/mods | wc -l
           (timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:1.20.1-47.4.28 -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
           echo "==== client result"
-          cat client/rtshop-clienttest.txt 2>/dev/null | cut -c1-300 || echo "no client result"
+          grep -E "^(FAIL|RESULT)" client/rtshop-clienttest.txt 2>/dev/null | cut -c1-300 || echo "no client result"
+          grep -E "Arcane Vortex|Distant Horizons [0-9]" client.log dl.log 2>/dev/null | head -n 4 || true
           echo "==== Distant Horizons log lines"
           grep -h -i -E "distant ?horizons|DistantHorizons|\[DH" client/logs/latest.log 2>/dev/null | grep -i -E "error|warn|incompat|fail|exception|version|chunky|wwoo|oculus|farsight" | cut -c1-300 | awk '!seen[substr($0,12)]++' | head -n 30 || true
           ls client/hs_err*.log 2>/dev/null || true
           echo "==== client-test log lines"
-          grep -h "rtshop-clienttest" client/logs/latest.log 2>/dev/null | grep -v "PASS" | cut -c1-260 | tail -n 25 || true
+          grep -h "rtshop-clienttest" client/logs/latest.log 2>/dev/null | grep -v "PASS" | cut -c1-260 | tail -n 12 || true
           echo "==== crash reports"
           ls client/crash-reports 2>/dev/null || true
           for f in client/crash-reports/*.txt; do [ -f "$f" ] && grep -E "^Description:|^java\.|^net\.|^Caused by|Suspected Mods|Mod File:|Failure message:|Exception message:|^\tat " "$f" | cut -c1-240 | head -n 30; done
-          echo "==== launcher output (tail)"
-          tail -n 12 client.log | cut -c1-300
+          echo "==== loading errors"
+          grep -A10 "Loading errors encountered\|Missing or unsupported mandatory dependencies" client/logs/latest.log 2>/dev/null | grep -v "^\s*at " | cut -c1-260 | head -n 16 || true
           echo "==== game log (tail)"
-          tail -n 12 client/logs/latest.log 2>/dev/null | cut -c1-300 || true
+          grep -v "^\s*at \|^\t\t" client/logs/latest.log 2>/dev/null | tail -n 6 | cut -c1-260 || true
       - name: Publish client screenshots to a branch
         if: always()
         continue-on-error: true
