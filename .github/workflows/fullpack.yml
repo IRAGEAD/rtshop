@@ -9,7 +9,7 @@ permissions:
 
 env:
   # client-only mods that cannot start on a dedicated server (found by running this job)
-  SKIP_MODS: ""
+  SKIP_MODS: "cwb-"
 
 jobs:
   fullpack:
@@ -46,22 +46,22 @@ jobs:
           cd server
           timeout 2400 bash run.sh nogui > server.log 2>&1 || true
           echo "==== result"
-          grep -E "^(FAIL|RESULT)" rtshop-selftest.txt || echo "no self-test result"
+          grep -E "^(FAIL|RESULT)" rtshop-selftest.txt | cut -c1-700 || echo "no self-test result"
           echo "==== checks: $(grep -c '^PASS' rtshop-selftest.txt 2>/dev/null) pass"
           echo "==== info"
-          grep -E "^(INFO|  )" rtshop-selftest.txt | cut -c1-600 | head -60 || true
+          grep -E "^INFO" rtshop-selftest.txt | cut -c1-900 | head -30 || true
           echo "==== crash reports"
-          ls crash-reports 2>/dev/null || true
-          for f in crash-reports/*.txt; do [ -f "$f" ] && sed -n 1,45p "$f" | cut -c1-300; done
-          echo "==== missing dependencies / load errors"
-          grep -n -i -E "Missing or unsupported|mandatory dependenc|requires .* but|Failed to load|client side only|invalid dist|Attempted to load class .* for invalid dist" server.log | cut -c1-400 | head -40 || true
-          echo "==== rtshop log lines"
-          grep -n "rtshop" server.log | grep -v -E "상점 '.*' 로드|PASS" | cut -c1-500 | head -80 || true
+          for f in crash-reports/*.txt; do [ -f "$f" ] && grep -E "^Description:|Mod File:|Failure message:|Exception message:|^Caused by|^\tat com\.rtshop|^java\.|^net\." "$f" | cut -c1-260 | head -24; done
+          echo "==== loading errors"
+          grep -A14 "Loading errors encountered" server.log | grep -v "^\s*at " | cut -c1-260 | head -24 || true
+          grep -c "client-side-only mods" server.log || true
+          echo "==== rtshop warnings and errors"
+          grep -E "WARN|ERROR" server.log | grep -i "rtshop" | grep -v -E "mods folder locator|is missing mods.toml|JarSelector|fml.toml" | cut -c1-400 | head -30 || true
           echo "==== last log lines"
-          tail -25 server.log | cut -c1-300
+          grep -v "^\s*at \|^\t\t" server.log | tail -8 | cut -c1-260
       - name: Price report
         if: always()
         run: |
           cd server
           ls config/rtshop/export 2>/dev/null || true
-          sed -n 1,80p config/rtshop/export/audit.txt 2>/dev/null | cut -c1-400 || true
+          grep -E "적자|해당 품목|자동으로 올렸|가격표에 없던|음식 [0-9]+|^[#=]" config/rtshop/export/audit.txt 2>/dev/null | cut -c1-900 | head -40 || true
