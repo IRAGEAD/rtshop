@@ -935,8 +935,8 @@ public final class SelfTest {
                 loops++;
                 sample.append(' ').append(ShopLoader.itemId(p.stack));
             }
-            if (p.cost < 0 || !ShopLoader.isPlain(p.stack) || p.fixedSell) {
-                continue;
+            if (p.cost < 0 || !ShopLoader.isPlain(p.stack) || p.fixedSell || !p.sellableSomewhere) {
+                continue; // 매입하지 않는 품목(건축 자재 등)은 매입가가 의미가 없다
             }
             boolean food = p.stack.isEdible() || p.dynamicFood || (l.solved != null && l.solved.processed.contains(ShopLoader.itemId(p.stack)));
             if (food) {
