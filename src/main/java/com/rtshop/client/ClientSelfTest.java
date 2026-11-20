@@ -83,8 +83,14 @@ public final class ClientSelfTest {
         }
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null || mc.getSingleplayerServer() == null) {
-            if (++idle > 20 * 300) {
-                check("entered a singleplayer world", false);
+            idle++;
+            try {
+                autoEnter(mc);
+            } catch (Throwable t) {
+                RtShop.LOGGER.error("[rtshop-clienttest] could not open the test world", t);
+            }
+            if (idle > 20 * 600) {
+                check("entered a singleplayer world", false, mc.screen == null ? "no screen" : mc.screen.getClass().getName());
                 finish(mc);
             }
             return;
@@ -102,6 +108,61 @@ public final class ClientSelfTest {
             wait = 10;
         }
         step++;
+    }
+
+    private static boolean opening = false;
+
+    /**
+     * 런처로 실행해 "빠른 시작" 인자가 없을 때: 타이틀 화면에서 시험용 세계(rtshoptest)를 직접 연다.
+     * 세계를 여는 도중에 뜨는 확인 화면(실험적 설정 경고, 백업 권유 등)은 진행 버튼을 누른다.
+     */
+    private static void autoEnter(Minecraft mc) {
+        if (idle < 100 || idle % 40 != 0 || mc.level != null) {
+            return;
+        }
+        net.minecraft.client.gui.screens.Screen s = mc.screen;
+        if (s == null) {
+            return;
+        }
+        if (s instanceof net.minecraft.client.gui.screens.TitleScreen) {
+            if (!opening) {
+                opening = true;
+                RtShop.LOGGER.info("[rtshop-clienttest] opening the test world from the title screen");
+                mc.createWorldOpenFlows().loadLevel(s, "rtshoptest");
+            }
+            return;
+        }
+        String cls = s.getClass().getName();
+        if (idle % 200 == 0) {
+            RtShop.LOGGER.info("[rtshop-clienttest] waiting on screen {}", cls);
+        }
+        boolean confirm = s instanceof net.minecraft.client.gui.screens.ConfirmScreen
+                || s instanceof net.minecraft.client.gui.screens.BackupConfirmScreen
+                || cls.contains("Confirm") || cls.contains("Warning");
+        if (!confirm) {
+            return;
+        }
+        net.minecraft.client.gui.components.AbstractButton pick = null;
+        for (net.minecraft.client.gui.components.events.GuiEventListener child : s.children()) {
+            if (!(child instanceof net.minecraft.client.gui.components.AbstractButton b) || !b.active || !b.visible) {
+                continue;
+            }
+            String key = b.getMessage().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc ? tc.getKey() : "";
+            if (key.equals("gui.cancel") || key.equals("gui.back") || key.equals("gui.no") || key.equals("selectWorld.backupJoinConfirmButton")) {
+                continue;
+            }
+            if (key.equals("selectWorld.backupJoinSkipButton") || key.equals("gui.proceed") || key.equals("gui.yes") || key.equals("gui.continue")) {
+                pick = b;
+                break;
+            }
+            if (pick == null) {
+                pick = b;
+            }
+        }
+        if (pick != null) {
+            RtShop.LOGGER.info("[rtshop-clienttest] pressing '{}' on {}", pick.getMessage().getString(), cls);
+            pick.onPress();
+        }
     }
 
     private static void check(String name, boolean ok) {
