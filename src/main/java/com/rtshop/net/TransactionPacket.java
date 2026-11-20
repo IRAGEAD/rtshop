@@ -14,13 +14,15 @@ public final class TransactionPacket {
     private final int entryIndex;
     private final boolean sell;
     private final int amount;
+    private final long variantKey;
 
-    public TransactionPacket(String shopId, int dataVersion, int entryIndex, boolean sell, int amount) {
+    public TransactionPacket(String shopId, int dataVersion, int entryIndex, boolean sell, int amount, long variantKey) {
         this.shopId = shopId;
         this.dataVersion = dataVersion;
         this.entryIndex = entryIndex;
         this.sell = sell;
         this.amount = amount;
+        this.variantKey = variantKey;
     }
 
     public static void encode(TransactionPacket msg, FriendlyByteBuf buf) {
@@ -29,6 +31,7 @@ public final class TransactionPacket {
         buf.writeVarInt(msg.entryIndex);
         buf.writeBoolean(msg.sell);
         buf.writeVarInt(msg.amount);
+        buf.writeVarLong(msg.variantKey);
     }
 
     public static TransactionPacket decode(FriendlyByteBuf buf) {
@@ -37,7 +40,8 @@ public final class TransactionPacket {
         int idx = buf.readVarInt();
         boolean sell = buf.readBoolean();
         int amount = buf.readVarInt();
-        return new TransactionPacket(sid, v, idx, sell, amount);
+        long key = buf.readVarLong();
+        return new TransactionPacket(sid, v, idx, sell, amount, key);
     }
 
     public static void handle(TransactionPacket msg, Supplier<NetworkEvent.Context> ctx) {
@@ -45,7 +49,7 @@ public final class TransactionPacket {
         c.enqueueWork(() -> {
             ServerPlayer sender = c.getSender();
             if (sender != null) {
-                ShopServer.handleTransaction(sender, msg.shopId, msg.dataVersion, msg.entryIndex, msg.sell, msg.amount);
+                ShopServer.handleTransaction(sender, msg.shopId, msg.dataVersion, msg.entryIndex, msg.sell, msg.amount, msg.variantKey);
             }
         });
         c.setPacketHandled(true);

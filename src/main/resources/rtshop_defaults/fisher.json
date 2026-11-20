@@ -1,31 +1,41 @@
 {
  "_설명": [
   "파일 이름이 상점 ID 입니다 (예: farmer.json -> /rtshop npc farmer). 가격 단위는 Gold(G).",
-  "items: 가격을 직접 정한 아이템 / auto: 태그·모드·종류로 자동 수집하고 공식으로 가격을 매기는 규칙",
-  "auto.match: mod(s)=모드ID, tag(s)=아이템 태그, class(es)=weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear",
-  "auto.formula: fixed(price 그대로) | gear(능력치 기반) | food(포만감 기반) | auto(장비/음식이면 공식, 아니면 price×희귀도)",
-  "looseSell: true 면 판매할 때 NBT(크기·무게 등)를 무시. exclude: 제외할 아이템ID 또는 '모드ID:*'",
-  "한 아이템은 전체 상점 중 한 곳에서만 취급됩니다(먼저 등록된 쪽 우선). 수정 후 /rtshop reload, 결과 확인은 /rtshop export"
+  "가격은 전 상점 공통입니다. 같은 아이템이 여러 상점에 있으면 먼저 읽힌 값 하나만 쓰입니다 (상점 사이의 차익 거래 방지).",
+  "items: 가격을 직접 정한 품목. item, price(상점 판매가), category 외에 아래 옵션을 쓸 수 있습니다.",
+  "  sellPrice: 매입가를 직접 지정 (없으면 price 의 50%) · buy/sell: false 면 이 상점에서 팔지 않음/사지 않음",
+  "  seed: true 면 '심을 수 있는 상점 씨앗'으로 판매 · fish: true 면 물고기(무게 보정) · dynamic: true 면 레시피 원가로 가격 결정",
+  "auto: 태그·모드·종류로 아이템을 모으는 규칙. match{mod(s), tag(s), notTag(s), class(es), recipeType(s)}",
+  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto",
+  "만들 수 있는 음식은 여기 적힌 값 대신 '재료 원가 + 수고비'(config/rtshop/pricing.json)로 가격이 정해집니다.",
+  "수정 후 /rtshop reload · 실제 적용된 가격과 점검 결과는 /rtshop export (config/rtshop/export)",
+  "스타캐처로 낚은 물고기는 희귀도에 따라 기준 가격이 정해지고, 무게가 무거울수록 비싸게 매입합니다.",
+  "기본 설정: 평균 무게 = 가격표 가격, 가장 가벼움 = 75%, 가장 무거움 = 125%, 황금 물고기 = 3배 (config/rtshop/pricing.json).",
+  "무게 정보가 없는 물고기(상점에서 산 것, 몹이 떨어뜨린 것)는 가격표의 50% 에 매입합니다."
  ],
  "title": "수산물 상점",
  "npcName": "수산물 상인",
  "profession": "fisherman",
- "sellRatio": 0.5,
  "categories": [
   {
    "id": "fish",
-   "name": "수산물",
+   "name": "물고기",
    "icon": "minecraft:cod"
-  },
-  {
-   "id": "starcatcher",
-   "name": "스타캐처",
-   "icon": "minecraft:tropical_fish"
   },
   {
    "id": "gear",
    "name": "낚시 도구",
    "icon": "minecraft:fishing_rod"
+  },
+  {
+   "id": "bait",
+   "name": "미끼·찌·바늘",
+   "icon": "minecraft:string"
+  },
+  {
+   "id": "treasure",
+   "name": "보물·잡동사니",
+   "icon": "minecraft:nautilus_shell"
   },
   {
    "id": "sea",
@@ -36,150 +46,317 @@
  "items": [
   {
    "item": "minecraft:cod",
-   "price": 16,
+   "price": 12,
    "category": "fish",
-   "looseSell": true
+   "fish": true
   },
   {
    "item": "minecraft:salmon",
-   "price": 20,
+   "price": 12,
    "category": "fish",
-   "looseSell": true
+   "fish": true
+  },
+  {
+   "item": "minecraft:pufferfish",
+   "price": 22,
+   "category": "fish",
+   "fish": true
   },
   {
    "item": "minecraft:tropical_fish",
    "price": 40,
    "category": "fish",
-   "looseSell": true
+   "fish": true
   },
   {
-   "item": "minecraft:pufferfish",
-   "price": 45,
-   "category": "fish",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:cooked_cod",
-   "price": 22,
-   "category": "fish",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:cooked_salmon",
-   "price": 27,
-   "category": "fish",
-   "looseSell": true
+   "item": "starcatcher:worm",
+   "price": 2,
+   "category": "bait"
   },
   {
    "item": "minecraft:string",
+   "price": 5,
+   "category": "bait",
+   "sellPrice": 1.0
+  },
+  {
+   "item": "minecraft:oak_boat",
    "price": 8,
    "category": "gear"
   },
   {
-   "item": "minecraft:oak_boat",
-   "price": 15,
+   "item": "minecraft:water_bucket",
+   "price": 85,
    "category": "gear"
   },
   {
-   "item": "minecraft:water_bucket",
-   "price": 130,
+   "item": "minecraft:bucket",
+   "price": 84,
    "category": "gear"
+  },
+  {
+   "item": "starcatcher:pearl",
+   "price": 60,
+   "category": "treasure"
+  },
+  {
+   "item": "minecraft:nautilus_shell",
+   "price": 150,
+   "category": "treasure"
+  },
+  {
+   "item": "minecraft:heart_of_the_sea",
+   "price": 1500,
+   "category": "treasure"
+  },
+  {
+   "item": "minecraft:scute",
+   "price": 40,
+   "category": "treasure"
+  },
+  {
+   "item": "minecraft:sponge",
+   "price": 80,
+   "category": "treasure"
   },
   {
    "item": "minecraft:lily_pad",
-   "price": 10,
-   "category": "gear"
-  },
-  {
-   "item": "minecraft:kelp",
    "price": 4,
-   "category": "sea"
-  },
-  {
-   "item": "minecraft:dried_kelp",
-   "price": 5,
    "category": "sea"
   },
   {
    "item": "minecraft:seagrass",
-   "price": 4,
+   "price": 1,
    "category": "sea"
   },
   {
    "item": "minecraft:sea_pickle",
-   "price": 15,
+   "price": 8,
    "category": "sea"
   },
   {
    "item": "minecraft:ink_sac",
-   "price": 12,
+   "price": 6,
    "category": "sea"
   },
   {
    "item": "minecraft:glow_ink_sac",
-   "price": 30,
+   "price": 15,
    "category": "sea"
   },
   {
    "item": "minecraft:prismarine_shard",
-   "price": 20,
-   "category": "sea"
+   "price": 6,
+   "category": "sea",
+   "sellPrice": 1.0
   },
   {
    "item": "minecraft:prismarine_crystals",
-   "price": 30,
-   "category": "sea"
+   "price": 10,
+   "category": "sea",
+   "sellPrice": 2.0
   },
   {
-   "item": "minecraft:scute",
-   "price": 80,
-   "category": "sea"
+   "item": "minecraft:kelp",
+   "price": 1,
+   "category": "sea",
+   "sellPrice": 0.05,
+   "buy": false
   },
   {
-   "item": "minecraft:sponge",
-   "price": 150,
-   "category": "sea"
-  },
-  {
-   "item": "minecraft:nautilus_shell",
-   "price": 400,
-   "category": "sea"
-  },
-  {
-   "item": "minecraft:heart_of_the_sea",
-   "price": 3000,
-   "category": "sea"
+   "item": "minecraft:dried_kelp",
+   "price": 1,
+   "category": "sea",
+   "sellPrice": 0.05,
+   "buy": false
   }
  ],
  "auto": [
   {
    "match": {
-    "class": "fishing_rod"
+    "tags": [
+     "starcatcher:legendary_fishes"
+    ]
    },
-   "category": "gear",
-   "formula": "gear"
-  },
-  {
-   "match": {
-    "mod": "starcatcher"
-   },
-   "category": "starcatcher",
-   "formula": "auto",
-   "price": 40,
-   "looseSell": true
+   "category": "fish",
+   "price": 130,
+   "fish": true,
+   "looseSell": true,
+   "buy": false
   },
   {
    "match": {
     "tags": [
-     "minecraft:fishes",
-     "forge:raw_fishes",
-     "forge:cooked_fishes"
+     "starcatcher:epic_fishes"
     ]
    },
    "category": "fish",
-   "price": 20,
-   "looseSell": true
+   "price": 75,
+   "fish": true,
+   "looseSell": true,
+   "buy": false
+  },
+  {
+   "match": {
+    "tags": [
+     "starcatcher:rare_fishes"
+    ]
+   },
+   "category": "fish",
+   "price": 40,
+   "fish": true,
+   "looseSell": true,
+   "buy": false
+  },
+  {
+   "match": {
+    "tags": [
+     "starcatcher:uncommon_fishes"
+    ]
+   },
+   "category": "fish",
+   "price": 22,
+   "fish": true,
+   "looseSell": true,
+   "buy": false
+  },
+  {
+   "match": {
+    "tags": [
+     "starcatcher:common_fishes"
+    ]
+   },
+   "category": "fish",
+   "price": 12,
+   "fish": true,
+   "looseSell": true,
+   "buy": false
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:rods"
+    ]
+   },
+   "category": "gear",
+   "formula": "gear",
+   "price": 400
+  },
+  {
+   "match": {
+    "class": "fishing_rod"
+   },
+   "category": "gear",
+   "formula": "gear",
+   "price": 130
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:tackle_boxes"
+    ]
+   },
+   "category": "gear",
+   "price": 120
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:gadgets"
+    ]
+   },
+   "category": "gear",
+   "price": 250
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:hats"
+    ]
+   },
+   "category": "gear",
+   "price": 40
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:baits"
+    ]
+   },
+   "category": "bait",
+   "price": 6
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:hooks"
+    ]
+   },
+   "category": "bait",
+   "price": 40
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:bobbers"
+    ]
+   },
+   "category": "bait",
+   "price": 30
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ],
+    "tags": [
+     "starcatcher:templates"
+    ]
+   },
+   "category": "treasure",
+   "price": 200,
+   "buy": false
+  },
+  {
+   "match": {
+    "mods": [
+     "starcatcher"
+    ]
+   },
+   "category": "treasure",
+   "formula": "auto",
+   "price": 16,
+   "buy": false
   }
  ],
- "exclude": []
+ "exclude": [
+  "starcatcher:starcatcher_guide",
+  "starcatcher:settings",
+  "starcatcher:missingno",
+  "starcatcher:unknown_fish",
+  "starcatcher:starcaught_bucket",
+  "starcatcher:starcaught_lava_bucket",
+  "starcatcher:starcaught_fish"
+ ]
 }

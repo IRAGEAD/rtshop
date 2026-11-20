@@ -1,7 +1,7 @@
 name: build
 on:
   push:
-    branches: [main]
+    branches: [main, v3]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +16,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+          cache: gradle
       - name: Build
         run: |
           chmod +x gradlew
@@ -25,6 +26,7 @@ jobs:
           name: rtshop-jar
           path: build/libs/*.jar
       - name: Publish release
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

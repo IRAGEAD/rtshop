@@ -20,6 +20,8 @@ public final class EconomyData extends SavedData {
     }
 
     private final Map<UUID, Account> accounts = new HashMap<>();
+    /** 발행되어 아직 쓰이지 않은 수표: 일련번호 -> 금액. */
+    private final Map<UUID, Long> checks = new HashMap<>();
 
     public static EconomyData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(EconomyData::load, EconomyData::new, NAME);
@@ -35,6 +37,13 @@ public final class EconomyData extends SavedData {
             a.bank = Math.max(0, c.getLong("bank"));
             d.accounts.put(c.getUUID("id"), a);
         }
+        ListTag cl = tag.getList("checks", Tag.TAG_COMPOUND);
+        for (int i = 0; i < cl.size(); i++) {
+            CompoundTag c = cl.getCompound(i);
+            if (c.hasUUID("id") && c.getLong("amount") > 0) {
+                d.checks.put(c.getUUID("id"), c.getLong("amount"));
+            }
+        }
         return d;
     }
 
@@ -49,6 +58,14 @@ public final class EconomyData extends SavedData {
             list.add(c);
         }
         tag.put("accounts", list);
+        ListTag cl = new ListTag();
+        for (Map.Entry<UUID, Long> e : checks.entrySet()) {
+            CompoundTag c = new CompoundTag();
+            c.putUUID("id", e.getKey());
+            c.putLong("amount", e.getValue());
+            cl.add(c);
+        }
+        tag.put("checks", cl);
         return tag;
     }
 
@@ -78,5 +95,27 @@ public final class EconomyData extends SavedData {
     public void setBank(UUID id, long v) {
         acc(id).bank = Math.max(0, v);
         setDirty();
+    }
+
+    /** 수표 장부. 금액이 0 이하이면 지운다. */
+    public void setCheck(UUID id, long amount) {
+        if (amount <= 0) {
+            checks.remove(id);
+        } else {
+            checks.put(id, amount);
+        }
+        setDirty();
+    }
+
+    /** 유효한 수표면 금액, 아니면 0. */
+    public long checkAmount(UUID id) {
+        Long v = checks.get(id);
+        return v == null ? 0 : v;
+    }
+
+    public void removeAccount(UUID id) {
+        if (accounts.remove(id) != null) {
+            setDirty();
+        }
     }
 }

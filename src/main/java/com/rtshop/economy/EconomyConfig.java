@@ -17,6 +17,9 @@ public final class EconomyConfig {
     public double deathLossMaxPercent = 50.0;
     public String bankNpcName = "은행원";
     public double npcRange = 10.0;
+    /** 사망 시 가지고 있던 수표의 금액도 같은 비율로 줄어드는지 여부. */
+    public boolean checkDeathLoss = true;
+    public long minCheckAmount = 1;
 
     private static EconomyConfig instance;
 
@@ -43,14 +46,18 @@ public final class EconomyConfig {
                 if (o.has("deathLossMaxPercent")) c.deathLossMaxPercent = o.get("deathLossMaxPercent").getAsDouble();
                 if (o.has("bankNpcName")) c.bankNpcName = o.get("bankNpcName").getAsString();
                 if (o.has("npcRange")) c.npcRange = o.get("npcRange").getAsDouble();
+                if (o.has("checkDeathLoss")) c.checkDeathLoss = o.get("checkDeathLoss").getAsBoolean();
+                if (o.has("minCheckAmount")) c.minCheckAmount = Math.max(1, o.get("minCheckAmount").getAsLong());
             } else {
                 JsonObject o = new JsonObject();
-                o.addProperty("_설명", "startingGold: 첫 접속 시 지급 Gold / deathLoss*: 사망 시 소지금 손실 범위(%) / npcRange: NPC와 거래 가능한 거리(블록)");
+                o.addProperty("_설명", "startingGold: 첫 접속 시 지급 Gold / deathLoss*: 사망 시 소지금 손실 범위(%) / npcRange: NPC와 거래 가능한 거리(블록) / checkDeathLoss: 사망 시 들고 있던 수표 금액도 같은 비율로 감소");
                 o.addProperty("startingGold", c.startingGold);
                 o.addProperty("deathLossMinPercent", c.deathLossMinPercent);
                 o.addProperty("deathLossMaxPercent", c.deathLossMaxPercent);
                 o.addProperty("bankNpcName", c.bankNpcName);
                 o.addProperty("npcRange", c.npcRange);
+                o.addProperty("checkDeathLoss", c.checkDeathLoss);
+                o.addProperty("minCheckAmount", c.minCheckAmount);
                 Files.createDirectories(p.getParent());
                 Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
             }
