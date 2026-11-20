@@ -145,9 +145,18 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 - 음식값은 "가장 싼 방법" 기준이라, 여러 재료 중 하나를 고르는 조리법(예: 아무 채소)에 비싼 재료를 쓰면 그만큼 덜 남습니다.
 - 가격표에 없는 다른 모드의 재료는 낮은 추정가(기본 2G)로 계산됩니다. 제값을 쳐 주려면 상점 파일에 가격을 적어 주세요 (`audit.txt` 에 목록이 나옵니다).
 - 업데이트 전에 심어 둔 작물은 그대로 자라지만 수확물에 별이 붙지 않습니다.
+- 장비 상인은 다른 모드의 무기·방어구도 공식 가격으로 팝니다 (보스 장비는 수십만 G). 팔지 않게 하려면 `shops/blacksmith.json` 의 `exclude` 에 `"cataclysm:*"` 처럼 모드 ID 를 적으세요.
 - 가격은 서버 운영 중에 조정해야 하는 값입니다. 기본값은 "생활 직업 1시간 수입 약 20,000G" 를 기준으로 잡았습니다.
 
 ## 빌드와 검증
 
-`main` 에 올라가면 GitHub Actions 가 jar 를 빌드하고, 테스트 서버를 띄워 가짜 플레이어로 경제·상점·농사·토지·PIN·가격 규칙을 자동 점검한 뒤 Releases 에 올립니다.
+`main` 에 올라가면 GitHub Actions 가 jar 를 빌드하고 아래 점검을 돌린 뒤 Releases 에 올립니다.
+
+1. **서버 자체 점검** (통과해야 배포됨): 테스트 서버를 띄워 가짜 플레이어로 경제·수표·상점·농사·토지·PIN·가격 규칙을 확인합니다.
+2. **화면 점검**: 실제 클라이언트를 띄워 HUD, 상점, 은행, 토지 관리, PIN 화면을 열어 보고, 구매·판매·입금·권한 변경·우클릭 수확을 실제 패킷으로 실행합니다.
+3. **요리·농사 모드 점검**: Farmer's Delight, Kaleidoscope Cookery/Tavern, Hands-On Delight, Farm & Charm, Starcatcher, Better Farming++ 최신판과 함께 실제 포지 서버에서 1번을 다시 돌립니다.
+4. **모드팩 전체 점검**: 모드팩 "RT1 - 2" 의 모드를 매니페스트 버전 그대로 받아 포지 47.4.28 서버에서 1번을 다시 돌립니다
+   (전용 서버에서 켜지지 않는 클라이언트 전용 모드 Oculus, Forgematica, MaFgLib, Cubes Without Borders 와 셰이더·리소스팩은 제외).
+
+`/rtshop export` 를 실행하면 `config/rtshop/export/` 에 실제 적용된 가격표와 점검 보고서(`audit.txt`)가 만들어집니다.
 직접 빌드하려면 JDK 17 에서 `./gradlew build` (결과물: `build/libs/`).
