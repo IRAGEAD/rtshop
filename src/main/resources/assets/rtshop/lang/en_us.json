@@ -189,5 +189,8 @@
   "rtshop.hud.reset": "Reset",
   "rtshop.hud.done": "Done",
   "rtshop.hud.shown": "Display: ON",
-  "rtshop.hud.hidden": "Display: OFF"
+  "rtshop.hud.hidden": "Display: OFF",
+  "rtshop.tip.recipe_head": "Buy-back price is based on (cheapest recipe, makes %s):",
+  "rtshop.tip.recipe_line": " - %s x%s",
+  "rtshop.msg.villager_blocked": "Villager trading is disabled on this server."
 }

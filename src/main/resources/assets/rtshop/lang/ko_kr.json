@@ -189,5 +189,8 @@
   "rtshop.hud.reset": "기본값",
   "rtshop.hud.done": "완료",
   "rtshop.hud.shown": "표시: 켜짐",
-  "rtshop.hud.hidden": "표시: 꺼짐"
+  "rtshop.hud.hidden": "표시: 꺼짐",
+  "rtshop.tip.recipe_head": "매입가 기준 재료 (가장 싼 조리법, 1회에 %s개):",
+  "rtshop.tip.recipe_line": " · %s ×%s",
+  "rtshop.msg.villager_blocked": "이 서버에서는 주민과 거래할 수 없습니다."
 }

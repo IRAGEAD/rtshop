@@ -33,8 +33,22 @@ public final class RecipeScan {
     public static final class Scan {
         public final List<RecipeSolver.Recipe> recipes = new ArrayList<>();
         public RecipeSolver.Result result;
+        public RecipeSolver.Env env;
         public int files;
         public int parsed;
+
+        /** 레시피 ID 로 찾기 (가격 근거 표시용). */
+        public RecipeSolver.Recipe byId(String id) {
+            if (id == null) {
+                return null;
+            }
+            for (RecipeSolver.Recipe r : recipes) {
+                if (id.equals(r.id)) {
+                    return r;
+                }
+            }
+            return null;
+        }
     }
 
     /** 1단계: 레시피 파일을 모아 해석한다. */
@@ -136,6 +150,7 @@ public final class RecipeScan {
             }
 
         };
+        scan.env = env;
         scan.result = RecipeSolver.solve(base, hints, recipes, env, cfg);
     }
 

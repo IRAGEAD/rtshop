@@ -20,10 +20,12 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,7 +43,12 @@ import java.util.stream.Stream;
  * 가격은 전 상점 공통이다: 같은 아이템은 어느 상점에서나 같은 값이므로 상점 사이의 차익 거래가 없다.
  *  1) "items": 가격을 직접 적은 품목
  *  2) "auto":  태그·모드·종류로 아이템을 모으고 공식으로 가격을 매기는 규칙
- *  3) 레시피 원가 계산: 만들 수 있는 음식은 "재료를 사서 만드는 비용 + 수고비"로 매입한다.
+ *  3) 레시피 원가 계산: 만들 수 있는 물건은 "재료를 사서 만드는 비용(+조리 수고비)"으로 매입한다.
+ *
+ * 가격 원칙
+ *  - 원재료(만들 수 없는 것)와 원가 이하로 파는 기본 재료: 상점가의 50% 에 매입.
+ *  - 만들 수 있고 상점가가 원가보다 비싼 것(완제품): 재료 원가만큼 매입하고, 상점가는 그 2배 이상으로 맞춘다.
+ *    -> 재료를 상점에서 사서 만들어 팔면 본전 이상이고, 만들어서 되파는 것만으로 돈이 불어나지도 않는다.
  *
  * items 항목: item, price, category, nbt, seed(심기 전용으로 판매), buy/sell(false 면 그 상점에서 안 팔거나 안 삼),
  *            sellPrice(매입가를 직접 지정), looseSell, fish, dynamic(레시피가 있으면 원가로 가격 결정)
@@ -53,6 +60,9 @@ public final class ShopLoader {
     }
 
     public static final String[] DEFAULTS = {"blacksmith", "farmer", "fisher", "food", "general", "land"};
+
+    /** 기본 상점 파일의 세대. 가격 체계가 바뀌면 올린다 (이전 세대의 파일은 백업 폴더로 옮기고 새 기본값을 설치). */
+    public static final int DEFAULTS_VERSION = 3;
 
     private static int versionCounter = 0;
 
@@ -70,6 +80,11 @@ public final class ShopLoader {
         public boolean buyableSomewhere;
         public String basis = "";
         public double cost = -1;
+        /** 매입가를 계산한 조리법의 재료(가장 싼 것 기준)와 1회 생산량. */
+        public List<ShopData.Part> parts = List.of();
+        public float partsOut = 1.0F;
+        /** 만들 수 있는데 상점가가 원가보다 비싼 품목(완제품)인가. */
+        public boolean finished;
     }
 
     private static final class Ref {
@@ -96,6 +111,53 @@ public final class ShopLoader {
         public final Map<String, Price> prices = new LinkedHashMap<>();
         public final List<String> notes = new ArrayList<>();
         public RecipeSolver.Result solved;
+        public RecipeScan.Scan scan;
+    }
+
+    /**
+     * 기본 상점 파일 설치. 처음 실행이거나, 이전 버전(가격 체계가 다른)의 파일만 있을 때 실행된다.
+     * 이전 파일은 지우지 않고 config/rtshop/backup/ 아래로 옮긴다.
+     */
+    private static void installDefaults(Path dir, List<String> notes) throws IOException {
+        Path root = FMLPaths.CONFIGDIR.get().resolve("rtshop");
+        Path marker = root.resolve("defaults_version.txt");
+        boolean had = Files.exists(dir);
+        int installed = 0;
+        if (Files.exists(marker)) {
+            try {
+                installed = Integer.parseInt(Files.readString(marker, StandardCharsets.UTF_8).trim());
+            } catch (Exception ignored) {
+            }
+        }
+        if (had && installed >= DEFAULTS_VERSION) {
+            return;
+        }
+        if (had) {
+            List<Path> old = new ArrayList<>();
+            try (Stream<Path> st = Files.list(dir)) {
+                st.filter(p -> p.getFileName().toString().endsWith(".json")).forEach(old::add);
+            }
+            if (!old.isEmpty()) {
+                Path backup = root.resolve("backup").resolve("shops_before_v" + DEFAULTS_VERSION + "_" + System.currentTimeMillis());
+                Files.createDirectories(backup);
+                for (Path f : old) {
+                    Files.move(f, backup.resolve(f.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                }
+                String msg = "이전 버전의 상점 파일 " + old.size() + "개를 " + backup + " 로 옮기고 새 기본 상점을 설치했습니다.";
+                notes.add(msg);
+                RtShop.LOGGER.warn("[rtshop] {}", msg);
+            }
+        }
+        Files.createDirectories(dir);
+        for (String name : DEFAULTS) {
+            try (InputStream in = ShopLoader.class.getResourceAsStream("/rtshop_defaults/" + name + ".json")) {
+                if (in != null) {
+                    Files.write(dir.resolve(name + ".json"), in.readAllBytes());
+                }
+            }
+        }
+        Files.writeString(marker, Integer.toString(DEFAULTS_VERSION), StandardCharsets.UTF_8);
+        RtShop.LOGGER.info("[rtshop] 기본 상점 설정을 생성했습니다: {}", dir);
     }
 
     public static synchronized Loaded loadAll(MinecraftServer server) {
@@ -103,17 +165,7 @@ public final class ShopLoader {
         List<Raw> raws = new ArrayList<>();
         try {
             Path dir = dir();
-            if (!Files.exists(dir)) {
-                Files.createDirectories(dir);
-                for (String name : DEFAULTS) {
-                    try (InputStream in = ShopLoader.class.getResourceAsStream("/rtshop_defaults/" + name + ".json")) {
-                        if (in != null) {
-                            Files.write(dir.resolve(name + ".json"), in.readAllBytes());
-                        }
-                    }
-                }
-                RtShop.LOGGER.info("[rtshop] 기본 상점 설정을 생성했습니다: {}", dir);
-            }
+            installDefaults(dir, out.notes);
             List<Path> files = new ArrayList<>();
             try (Stream<Path> st = Files.list(dir)) {
                 st.filter(p -> p.getFileName().toString().endsWith(".json")).forEach(files::add);
@@ -200,7 +252,8 @@ public final class ShopLoader {
             for (Ref ref : r.refs) {
                 Price p = prices.get(ref.key);
                 boolean loose = ref.loose != null ? ref.loose : defaultLoose(p.stack);
-                entries.add(new ShopData.Entry(p.stack, p.price, p.sellUnit, ref.category, loose, ref.buy, ref.sell, ref.fish));
+                entries.add(new ShopData.Entry(p.stack, p.price, p.sellUnit, ref.category, loose, ref.buy, ref.sell, ref.fish,
+                        p.parts, p.partsOut));
             }
             JsonObject o = r.json;
             out.shops.put(r.id, new ShopData(r.id, versionCounter, str(o, "title", r.id), str(o, "npcName", r.id),
@@ -229,18 +282,22 @@ public final class ShopLoader {
             }
         }
         RecipeScan.solve(scan, base, hints, pc, id -> {
+            // 가격표에 없는 말단 재료의 추정가. 공짜로 얻을 수 있는 재료일 수도 있으므로 낮게 잡는다
+            // (높게 잡으면 그 재료가 들어간 음식값이 부풀어 돈벌이 수단이 된다).
             ResourceLocation rl = ResourceLocation.tryParse(id);
             Item item = rl == null ? null : ForgeRegistries.ITEMS.getValue(rl);
             if (item != null && item != Items.AIR) {
                 int f = Pricing.food(new ItemStack(item));
                 if (f > 0) {
-                    return f;
+                    return Math.max(pc.defaultIngredientValue, f * pc.edibleEstimateFactor);
                 }
             }
             return pc.defaultIngredientValue;
         });
         RecipeSolver.Result res = scan.result;
         out.solved = res;
+        out.scan = scan;
+        double ratio = pc.sellRatio > 0 ? pc.sellRatio : 0.5;
         int adjusted = 0;
         for (Map.Entry<String, Price> e : prices.entrySet()) {
             Price p = e.getValue();
@@ -253,30 +310,74 @@ public final class ShopLoader {
             if (c != null) {
                 p.cost = c;
             }
+            if (c == null || v == null) {
+                continue; // 만들 수 없는 원재료
+            }
             boolean food = p.stack.isEdible() || res.processed.contains(id);
             if (p.dynamicFood) {
-                if (v != null) {
+                // 음식·조리 도구: 상점 파일의 가격 대신 "재료 원가 + 수고비"로 매입한다.
+                p.sellUnit = v;
+                p.price = buyPrice(v, pc.foodBuyMultiplier);
+                p.basis = String.valueOf(res.valueRecipe.get(id));
+                p.finished = true;
+                adjusted++;
+            } else if (p.price > c + 1.0e-9) {
+                // 만들 수 있는데 상점가가 원가보다 비싼 품목 = 완제품.
+                p.finished = true;
+                if (food) {
                     p.sellUnit = v;
-                    p.price = (int) Math.max(1, Math.ceil(v * pc.foodBuyMultiplier - 1.0e-9));
+                    p.price = Math.max(p.price, buyPrice(v, pc.foodBuyMultiplier));
                     p.basis = String.valueOf(res.valueRecipe.get(id));
                     adjusted++;
+                } else if (res.exact.contains(id)) {
+                    // 가격표에 있는 재료만으로 만드는 물건: 재료값 그대로 매입 (재료를 사서 만들어 팔면 본전)
+                    p.sellUnit = c;
+                    p.price = Math.max(p.price, buyPrice(c, 1.0 / ratio));
+                    p.basis = String.valueOf(res.costRecipe.get(id));
+                } else {
+                    // 가격을 추정한 재료가 섞인 물건: 추정이 틀려도 손해가 없도록 보수적으로 (상점가의 50% 와 원가 중 낮은 쪽)
+                    p.sellUnit = Math.min(p.price * ratio, c);
+                    p.basis = String.valueOf(res.costRecipe.get(id));
                 }
-            } else if (food && v != null) {
-                // 만들 수 있는 음식은 상점 파일의 가격 대신 "재료 원가 + 수고비"로 매입한다.
-                // 더 낮으면 재료를 사서 만들어 팔 때 적자가 나고, 더 높으면 만들어 되파는 것만으로 돈이 불어난다.
-                p.sellUnit = v;
-                p.price = (int) Math.max(1, Math.ceil(v * pc.foodBuyMultiplier - 1.0e-9));
-                p.basis = String.valueOf(res.valueRecipe.get(id));
-                adjusted++;
-            } else if (c != null && c < p.price * pc.sellRatio) {
-                // 음식이 아닌 조합품은 원가보다 비싸게 매입하지 않는다 (조합해서 되파는 무한 돈벌이 방지)
-                p.sellUnit = c;
-                p.basis = String.valueOf(res.costRecipe.get(id));
+            }
+            // 그 밖 = 원가 이하로 파는 기본 재료(설탕, 기름 등): 상점가의 50% 에 매입 (아래에서 채움)
+        }
+        // 가격 근거(어떤 재료 기준으로 값을 매겼는지)를 상점 화면에 보여 주기 위해 정리한다
+        for (Price p : prices.values()) {
+            if (!p.finished || p.basis.isEmpty()) {
+                continue;
+            }
+            try {
+                RecipeSolver.Recipe r = scan.byId(p.basis);
+                if (r == null) {
+                    continue;
+                }
+                String id = itemId(p.stack);
+                boolean food = p.dynamicFood || p.stack.isEdible() || res.processed.contains(id);
+                List<ShopData.Part> parts = new ArrayList<>();
+                for (RecipeSolver.Pick pick : RecipeSolver.picks(r, res, scan.env, food)) {
+                    Item item = findItem(pick.item);
+                    if (item != null) {
+                        parts.add(new ShopData.Part(item, (float) pick.count));
+                    }
+                }
+                double n = RecipeSolver.outputCount(r, id, scan.env);
+                if (!parts.isEmpty() && n > 0) {
+                    p.parts = parts;
+                    p.partsOut = (float) n;
+                }
+            } catch (Throwable ignored) {
+                // 표시용 정보이므로 실패해도 가격에는 영향이 없다
             }
         }
         out.notes.add(String.format("레시피 파일 %d개 중 %d개 해석, 계산에 쓰지 못한 레시피 %d개, 가격을 추정한 재료 %d종, 원가 기준으로 가격을 정한 음식 %d종",
                 scan.files, scan.parsed, res.recipesUnresolved, res.estimated.size(), adjusted));
         RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
+    }
+
+    /** 매입가의 multiplier 배 이상이 되는 가장 작은 정수 판매가. */
+    private static int buyPrice(double sell, double multiplier) {
+        return (int) Math.max(1, Math.min(2_000_000_000L, (long) Math.ceil(sell * multiplier - 1.0e-9)));
     }
 
     // ------------------------------------------------------------------ 도우미
@@ -633,12 +734,20 @@ public final class ShopLoader {
         }
         int deficits = 0;
         for (Price p : loaded.prices.values()) {
-            if (p.cost >= 0 && !p.stack.hasTag() && (p.stack.isEdible() || p.dynamicFood) && p.sellUnit + 1.0e-6 < p.cost) {
+            if (p.finished && p.cost >= 0 && !p.stack.hasTag() && (p.stack.isEdible() || p.dynamicFood) && p.sellUnit + 1.0e-6 < p.cost) {
                 audit.append(String.format(Locale.ROOT, "적자 가능: %s 매입가 %.2f < 원가 %.2f (%s)%n", itemId(p.stack), p.sellUnit, p.cost, p.basis));
                 deficits++;
             }
         }
         audit.append("적자 가능 음식: ").append(deficits).append("종\n");
+        // 상점에서 사는 것보다 직접 만드는 편이 싼 품목: 이것을 사서 요리 재료로 쓰면 차액만큼 손해를 본다
+        audit.append("\n# 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)\n");
+        audit.append("# 음식값은 가장 싼 방법 기준으로 매겨지므로, 아래 품목을 상점에서 사서 재료로 쓰면 차액만큼 손해입니다.\n");
+        for (Price p : loaded.prices.values()) {
+            if (p.buyableSomewhere && !p.dynamicFood && !p.stack.hasTag() && p.cost >= 0 && p.price > p.cost + 1.0e-6) {
+                audit.append(String.format(Locale.ROOT, "%s | %d | %.2f | %s%n", itemId(p.stack), p.price, p.cost, p.basis));
+            }
+        }
         if (loaded.solved != null && !loaded.solved.estimated.isEmpty()) {
             audit.append("\n# 가격표에 없어 추정가를 쓴 재료 (상점 파일에 가격을 적으면 더 정확해집니다)\n");
             loaded.solved.estimated.forEach((k, v) -> audit.append(String.format(Locale.ROOT, "%s = %.0f%n", k, v)));

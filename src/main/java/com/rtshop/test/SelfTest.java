@@ -5,6 +5,7 @@ import com.rtshop.RtShop;
 import com.rtshop.economy.Economy;
 import com.rtshop.economy.EconomyConfig;
 import com.rtshop.economy.EconomyData;
+import com.rtshop.economy.EconomyGuards;
 import com.rtshop.farm.CropData;
 import com.rtshop.farm.FarmConfig;
 import com.rtshop.farm.FarmEvents;
@@ -21,11 +22,19 @@ import com.rtshop.shop.ShopServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,15 +49,18 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * 서버 자체 점검. JVM 옵션 -Drtshop.selftest=true 로 켰을 때만 동작한다 (일반 서버에서는 아무 일도 하지 않음).
@@ -210,6 +222,16 @@ public final class SelfTest {
             pricing();
         } catch (Throwable t) {
             crash("pricing", t);
+        }
+        try {
+            guards(server, level);
+        } catch (Throwable t) {
+            crash("guards", t);
+        }
+        try {
+            upgrade(server);
+        } catch (Throwable t) {
+            crash("upgrade", t);
         }
         try {
             cleanup(server, level, a, b, gx, y, gz);
@@ -804,6 +826,9 @@ public final class SelfTest {
             }
             boolean food = p.stack.isEdible() || p.dynamicFood || (l.solved != null && l.solved.processed.contains(ShopLoader.itemId(p.stack)));
             if (food) {
+                if (!p.finished) {
+                    continue; // 원가 이하로 파는 기본 재료 (설탕·수박 조각처럼 사서 쓰는 것)
+                }
                 foods++;
                 if (p.sellUnit + 1.0e-6 < p.cost) {
                     deficits++;
@@ -818,9 +843,161 @@ public final class SelfTest {
         check("no food sells for less than its ingredients cost", deficits == 0, deficits == 0 ? null : deficits + ":" + sample);
         check("nothing sells for more than the shop charges for it", loops == 0, loops == 0 ? null : loops + ":" + sample);
         check("no crafted item sells for more than its materials", craftLoops == 0, craftLoops == 0 ? null : craftLoops + ":" + sample);
+
+        // 되팔 때 50% 를 넘는 품목은 매입가를 직접 정한 것(양동이 보증금 등)뿐이어야 한다
+        int over = 0;
+        StringBuilder overSample = new StringBuilder();
+        for (ShopLoader.Price p : l.prices.values()) {
+            if (!p.fixedSell && p.buyableSomewhere && p.sellUnit > p.price * 0.5 + 1.0e-6) {
+                over++;
+                overSample.append(' ').append(ShopLoader.itemId(p.stack));
+            }
+        }
+        check("anything bought from a merchant resells for at most 50%", over == 0, over == 0 ? null : over + ":" + overSample);
+
+        ShopLoader.Price wheat = plain(l, Items.WHEAT);
+        ShopLoader.Price bread = plain(l, Items.BREAD);
+        ShopLoader.Price ingot = plain(l, Items.IRON_INGOT);
+        ShopLoader.Price rawIron = plain(l, Items.RAW_IRON);
+        ShopLoader.Price sword = plain(l, Items.IRON_SWORD);
+        ShopLoader.Price bucket = plain(l, Items.BUCKET);
+        ShopLoader.Price milk = plain(l, Items.MILK_BUCKET);
+        ShopLoader.Price sugar = plain(l, Items.SUGAR);
+        ShopLoader.Price cane = plain(l, Items.SUGAR_CANE);
+        ShopLoader.Price beef = plain(l, Items.BEEF);
+        ShopLoader.Price steak = plain(l, Items.COOKED_BEEF);
+        check("the price table has the reference items", wheat != null && bread != null && ingot != null && rawIron != null
+                && sword != null && bucket != null && milk != null && sugar != null && cane != null && beef != null && steak != null);
+        if (wheat != null && bread != null) {
+            check("bread made from bought wheat sells for what the wheat cost", Math.abs(bread.sellUnit - 3.0 * wheat.price) < 1.0e-6,
+                    bread.sellUnit + " vs 3 x " + wheat.price);
+            check("...and costs at least twice that to buy back", bread.price >= 2 * bread.sellUnit - 1.0e-6, bread.price);
+        }
+        if (beef != null && steak != null) {
+            check("cooking bought meat is break-even (no fuel bonus that a furnace array could farm)",
+                    Math.abs(steak.sellUnit - beef.price) < 1.0e-6, steak.sellUnit + " vs " + beef.price);
+        }
+        if (ingot != null && rawIron != null && sword != null) {
+            check("smelting does not add value", ingot.price == rawIron.price, ingot.price + " / " + rawIron.price);
+            check("an iron sword sells for the value of its materials", sword.sellUnit >= 2.0 * ingot.price - 1.0e-6
+                    && sword.sellUnit <= 2.0 * ingot.price + 10 && sword.price >= 2 * sword.sellUnit - 1.0e-6,
+                    sword.sellUnit + " (shop " + sword.price + ")");
+        }
+        if (bucket != null && milk != null && ingot != null) {
+            check("an empty bucket is bought back for three iron ingots", Math.abs(bucket.sellUnit - 3.0 * ingot.price) < 1.0e-6,
+                    bucket.sellUnit);
+            check("a milk bucket costs the bucket deposit plus a little for the milk",
+                    milk.price > bucket.sellUnit && milk.price - bucket.sellUnit <= 20 && milk.sellUnit <= milk.price, milk.price);
+        }
+        if (sugar != null && cane != null) {
+            check("basic ingredients are sold at or below what they cost to make", sugar.price <= cane.price && !sugar.finished,
+                    sugar.price + " / " + cane.price);
+        }
+        ShopData food = ShopServer.shops().get("food");
+        if (food != null) {
+            int breadIdx = findEntry(food, e -> e.stack.is(Items.BREAD) && !e.stack.hasTag());
+            check("the food merchant shows which ingredients a dish is priced from", breadIdx >= 0
+                    && !food.entries.get(breadIdx).recipe.isEmpty() && food.entries.get(breadIdx).recipe.get(0).item == Items.WHEAT,
+                    breadIdx < 0 ? "no bread" : food.entries.get(breadIdx).recipe.size() + " parts");
+        }
         for (String note : l.notes) {
             info(note);
         }
+    }
+
+    private static ShopLoader.Price plain(ShopLoader.Loaded l, Item item) {
+        return l.prices.get(ShopLoader.key(new ItemStack(item)));
+    }
+
+    // ------------------------------------------------------------------ 경제 보호 장치
+
+    private static void guards(MinecraftServer server, ServerLevel level) {
+        section("guards");
+        EconomyConfig cfg = EconomyConfig.get();
+        IronGolem golem = EntityType.IRON_GOLEM.create(level);
+        if (golem != null) {
+            boolean guarded = cfg.playerKillOnlyDrops.contains("minecraft:iron_golem");
+            LivingDropsEvent farm = new LivingDropsEvent(golem, level.damageSources().lava(), new ArrayList<>(), 0, false);
+            MinecraftForge.EVENT_BUS.post(farm);
+            check("an iron golem killed by a farm drops nothing", farm.isCanceled() == guarded);
+            LivingDropsEvent hunted = new LivingDropsEvent(golem, level.damageSources().generic(), new ArrayList<>(), 0, true);
+            MinecraftForge.EVENT_BUS.post(hunted);
+            check("an iron golem killed by a player still drops iron", !hunted.isCanceled());
+            golem.discard();
+        }
+        Villager villager = EntityType.VILLAGER.create(level);
+        if (villager != null) {
+            villager.getOffers().clear();
+            villager.getOffers().add(new MerchantOffer(new ItemStack(Items.EMERALD), new ItemStack(Items.BREAD, 6), 16, 1, 0.05F));
+            villager.getOffers().add(new MerchantOffer(new ItemStack(Items.EMERALD, 9), new ItemStack(Items.IRON_CHESTPLATE), 12, 1, 0.2F));
+            villager.getOffers().add(new MerchantOffer(new ItemStack(Items.STICK, 32), new ItemStack(Items.EMERALD), 16, 2, 0.05F));
+            villager.getOffers().add(new MerchantOffer(new ItemStack(Items.EMERALD, 20),
+                    EnchantedBookItem.createForEnchantment(new EnchantmentInstance(Enchantments.MENDING, 1)), 12, 1, 0.2F));
+            int removed = EconomyGuards.filterOffers(villager);
+            boolean breadLeft = false;
+            boolean armorLeft = false;
+            boolean emeraldLeft = false;
+            boolean bookLeft = false;
+            for (MerchantOffer o : villager.getOffers()) {
+                breadLeft |= o.getResult().is(Items.BREAD);
+                armorLeft |= o.getResult().is(Items.IRON_CHESTPLATE);
+                emeraldLeft |= o.getResult().is(Items.EMERALD);
+                bookLeft |= o.getResult().is(Items.ENCHANTED_BOOK);
+            }
+            check("villager trades that hand out goods the merchants buy are removed", removed == 2 && !breadLeft && !armorLeft, removed);
+            check("villagers still buy goods for emeralds and sell enchanted books", emeraldLeft && bookLeft);
+            villager.discard();
+        }
+        // 이전 버전(물가 1/10)의 저장 데이터는 10배로 환산된다
+        UUID id = UUID.randomUUID();
+        CompoundTag old = new CompoundTag();
+        ListTag accounts = new ListTag();
+        CompoundTag acc = new CompoundTag();
+        acc.putUUID("id", id);
+        acc.putLong("wallet", 123);
+        acc.putLong("bank", 45);
+        accounts.add(acc);
+        old.put("accounts", accounts);
+        EconomyData migrated = EconomyData.load(old);
+        check("balances saved by RT Shop 2.x are converted to the new price scale (x10)",
+                migrated.wallet(id) == 1230 && migrated.bank(id) == 450, migrated.wallet(id) + " / " + migrated.bank(id));
+        EconomyData again = EconomyData.load(migrated.save(new CompoundTag()));
+        check("...and only once", again.wallet(id) == 1230 && again.bank(id) == 450);
+    }
+
+    // ------------------------------------------------------------------ 이전 버전에서 올린 경우
+
+    private static void upgrade(MinecraftServer server) throws Exception {
+        section("upgrade");
+        Path root = FMLPaths.CONFIGDIR.get().resolve("rtshop");
+        Path marker = root.resolve("defaults_version.txt");
+        Path dir = ShopLoader.dir();
+        check("the installed price table is marked with its version", Files.exists(marker)
+                && Files.readString(marker).trim().equals(Integer.toString(ShopLoader.DEFAULTS_VERSION)));
+        // RT Shop 2.x 의 상점 폴더를 흉내 낸다: 표시 파일이 없고, 예전 farmer.json 과 사용자가 만든 파일이 있다
+        Files.deleteIfExists(marker);
+        Files.deleteIfExists(dir.resolve("food.json"));
+        Files.deleteIfExists(dir.resolve("land.json"));
+        Files.writeString(dir.resolve("farmer.json"), "{\"title\":\"old\",\"items\":[{\"item\":\"minecraft:wheat\",\"price\":4}]}");
+        Files.writeString(dir.resolve("my_custom_shop.json"), "{\"title\":\"custom\",\"items\":[]}");
+        ShopServer.reload(server);
+        Map<String, ShopData> shops = ShopServer.shops();
+        boolean all = true;
+        for (String name : ShopLoader.DEFAULTS) {
+            all &= shops.containsKey(name) && !shops.get(name).entries.isEmpty();
+        }
+        check("upgrading from 2.x installs the new shops (food and land merchants included)", all, shops.keySet());
+        ShopLoader.Price wheat = plain(ShopServer.loaded(), Items.WHEAT);
+        check("...with the new price table instead of the old one", wheat != null && wheat.price > 4, wheat == null ? null : wheat.price);
+        boolean backedUp = false;
+        Path backup = root.resolve("backup");
+        if (Files.exists(backup)) {
+            try (Stream<Path> st = Files.walk(backup)) {
+                backedUp = st.anyMatch(f -> f.getFileName().toString().equals("my_custom_shop.json"));
+            }
+        }
+        check("...and keeps the old files in config/rtshop/backup", backedUp && !Files.exists(dir.resolve("my_custom_shop.json")));
+        check("the upgrade happens only once", Files.exists(marker));
     }
 
     // ------------------------------------------------------------------ 정리

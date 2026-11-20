@@ -6,12 +6,13 @@
   "  sellPrice: 매입가를 직접 지정 (없으면 price 의 50%) · buy/sell: false 면 이 상점에서 팔지 않음/사지 않음",
   "  seed: true 면 '심을 수 있는 상점 씨앗'으로 판매 · fish: true 면 물고기(무게 보정) · dynamic: true 면 레시피 원가로 가격 결정",
   "auto: 태그·모드·종류로 아이템을 모으는 규칙. match{mod(s), tag(s), notTag(s), class(es), recipeType(s)}",
-  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto",
-  "만들 수 있는 음식은 여기 적힌 값 대신 '재료 원가 + 수고비'(config/rtshop/pricing.json)로 가격이 정해집니다.",
+  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto · multiplier: 공식 가격에 곱하는 값",
+  "만들 수 있는 물건은 여기 적힌 값과 상관없이 '재료 원가(+조리 수고비)'에 매입하고, 판매가는 그 2배 이상이 됩니다 (config/rtshop/pricing.json).",
   "수정 후 /rtshop reload · 실제 적용된 가격과 점검 결과는 /rtshop export (config/rtshop/export)",
   "씨앗은 이 상점에서 산 것만 심을 수 있고, 작물을 수확해도 씨앗은 나오지 않습니다.",
   "당근·감자처럼 작물이 곧 씨앗인 것은 seed: true 인 '심기 전용' 품목을 따로 팝니다 (수확물은 심을 수 없음).",
-  "직접 수확한 작물은 별 등급(1~3별)에 따라 가격표의 90% / 110% / 140% 에 매입합니다. 별이 없는 작물은 50%."
+  "직접 수확한 작물은 별 등급(1~3별)에 따라 가격표의 90% / 110% / 140% 에 매입합니다. 별이 없는 작물은 50%.",
+  "사탕수수·선인장·수박·호박처럼 자동 농장으로 무한히 쌓이는 작물은 값을 아주 낮게 잡았고, 대나무·켈프는 매입하지 않습니다."
  ],
  "title": "농작물 상점",
  "npcName": "농작물 상인",
@@ -46,252 +47,255 @@
  "items": [
   {
    "item": "minecraft:wheat",
-   "price": 4,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:beetroot",
-   "price": 4,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:carrot",
-   "price": 2,
+   "price": 20,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:potato",
-   "price": 2,
+   "price": 20,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:nether_wart",
-   "price": 3,
+   "price": 30,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:cocoa_beans",
-   "price": 2,
+   "price": 20,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:brown_mushroom",
-   "price": 3,
+   "price": 8,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:red_mushroom",
-   "price": 3,
+   "price": 8,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:apple",
-   "price": 5,
+   "price": 50,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "minecraft:sweet_berries",
-   "price": 2,
+   "price": 6,
    "category": "crops",
-   "sellPrice": 0.25,
    "looseSell": true
   },
   {
    "item": "minecraft:glow_berries",
-   "price": 3,
-   "category": "crops",
-   "sellPrice": 0.4,
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:cabbage",
-   "price": 4,
+   "price": 8,
    "category": "crops",
    "looseSell": true
   },
   {
-   "item": "farmersdelight:tomato",
-   "price": 4,
+   "item": "minecraft:chorus_fruit",
+   "price": 6,
    "category": "crops",
    "looseSell": true
   },
   {
-   "item": "farmersdelight:onion",
-   "price": 2,
-   "category": "crops",
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:rice",
-   "price": 2,
-   "category": "crops",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:tomato",
-   "price": 4,
-   "category": "crops",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:red_chili",
-   "price": 4,
-   "category": "crops",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:green_chili",
-   "price": 4,
-   "category": "crops",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:lettuce",
-   "price": 4,
-   "category": "crops",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:rice",
+   "item": "minecraft:melon_slice",
    "price": 1,
    "category": "crops",
    "looseSell": true
   },
   {
-   "item": "kaleidoscope_cookery:wild_rice",
+   "item": "minecraft:melon",
+   "price": 9,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:pumpkin",
+   "price": 4,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:sugar_cane",
    "price": 2,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:cactus",
+   "price": 2,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:cabbage",
+   "price": 40,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:cabbage_leaf",
+   "price": 20,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:tomato",
+   "price": 40,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:onion",
+   "price": 20,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:rice",
+   "price": 4,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:tomato",
+   "price": 40,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:red_chili",
+   "price": 40,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:green_chili",
+   "price": 40,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:lettuce",
+   "price": 40,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:rice",
+   "price": 4,
+   "category": "crops",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:wild_rice",
+   "price": 20,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "kaleidoscope_cookery:fresh_tea_leaves",
-   "price": 4,
+   "price": 10,
    "category": "crops",
-   "sellPrice": 0.5,
    "looseSell": true
   },
   {
    "item": "farm_and_charm:barley",
-   "price": 4,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:oat",
-   "price": 4,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:corn",
-   "price": 4,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:strawberry",
-   "price": 4,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:tomato",
-   "price": 4,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:lettuce",
-   "price": 2,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:onion",
-   "price": 2,
+   "price": 40,
    "category": "crops",
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:grape",
-   "price": 4,
+   "price": 20,
    "category": "crops",
-   "sellPrice": 1.0,
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:green_grape",
-   "price": 5,
+   "price": 24,
    "category": "crops",
-   "sellPrice": 1.2,
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:ice_grape",
-   "price": 12,
+   "price": 60,
    "category": "crops",
-   "sellPrice": 3.0,
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:gold_grape",
-   "price": 30,
+   "price": 120,
    "category": "crops",
-   "sellPrice": 6.0,
    "looseSell": true
   },
   {
    "item": "farmersdelight:rice_panicle",
-   "price": 4,
+   "price": 8,
    "category": "crops",
    "looseSell": true,
    "buy": false
   },
   {
    "item": "kaleidoscope_cookery:rice_panicle",
-   "price": 1,
+   "price": 12,
    "category": "crops",
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:melon_slice",
-   "price": 1,
-   "category": "crops",
-   "sellPrice": 0.2,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:melon",
-   "price": 4,
-   "category": "crops",
-   "sellPrice": 1.0,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:pumpkin",
-   "price": 4,
-   "category": "crops",
-   "sellPrice": 1.0,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:sugar_cane",
-   "price": 2,
-   "category": "crops",
-   "sellPrice": 0.3,
    "looseSell": true,
    "buy": false
   },
@@ -299,248 +303,232 @@
    "item": "minecraft:bamboo",
    "price": 1,
    "category": "crops",
-   "sellPrice": 0.05,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:cactus",
-   "price": 2,
-   "category": "crops",
-   "sellPrice": 0.3,
-   "looseSell": true,
-   "buy": false
+   "sell": false
   },
   {
    "item": "minecraft:kelp",
    "price": 1,
    "category": "crops",
-   "sellPrice": 0.05,
-   "looseSell": true,
-   "buy": false
+   "sell": false
   },
   {
    "item": "minecraft:wheat_seeds",
-   "price": 2,
+   "price": 20,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "minecraft:beetroot_seeds",
-   "price": 2,
+   "price": 20,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "minecraft:carrot",
-   "price": 5,
+   "price": 50,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "minecraft:potato",
-   "price": 5,
+   "price": 50,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "minecraft:nether_wart",
-   "price": 6,
+   "price": 60,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "minecraft:cocoa_beans",
-   "price": 4,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "minecraft:sweet_berries",
-   "price": 30,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "minecraft:glow_berries",
-   "price": 30,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "minecraft:melon_seeds",
-   "price": 60,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "minecraft:pumpkin_seeds",
-   "price": 60,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "minecraft:torchflower_seeds",
-   "price": 25,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "minecraft:pitcher_pod",
-   "price": 25,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "farmersdelight:cabbage_seeds",
-   "price": 2,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "farmersdelight:tomato_seeds",
-   "price": 2,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "farmersdelight:onion",
-   "price": 5,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "farmersdelight:rice",
-   "price": 2,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "kaleidoscope_cookery:tomato_seed",
-   "price": 2,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "kaleidoscope_cookery:chili_seed",
-   "price": 2,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "kaleidoscope_cookery:lettuce_seed",
-   "price": 2,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "kaleidoscope_cookery:wild_rice",
-   "price": 3,
-   "category": "seeds",
-   "seed": true
-  },
-  {
-   "item": "kaleidoscope_cookery:tea_seed",
    "price": 40,
    "category": "seeds",
    "seed": true
   },
   {
+   "item": "minecraft:sweet_berries",
+   "price": 300,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "minecraft:glow_berries",
+   "price": 300,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "minecraft:melon_seeds",
+   "price": 600,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "minecraft:pumpkin_seeds",
+   "price": 600,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "minecraft:torchflower_seeds",
+   "price": 250,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "minecraft:pitcher_pod",
+   "price": 250,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "farmersdelight:cabbage_seeds",
+   "price": 20,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "farmersdelight:tomato_seeds",
+   "price": 20,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "farmersdelight:onion",
+   "price": 50,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "farmersdelight:rice",
+   "price": 4,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "kaleidoscope_cookery:tomato_seed",
+   "price": 20,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "kaleidoscope_cookery:chili_seed",
+   "price": 20,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "kaleidoscope_cookery:lettuce_seed",
+   "price": 20,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "kaleidoscope_cookery:wild_rice",
+   "price": 30,
+   "category": "seeds",
+   "seed": true
+  },
+  {
+   "item": "kaleidoscope_cookery:tea_seed",
+   "price": 400,
+   "category": "seeds",
+   "seed": true
+  },
+  {
    "item": "farm_and_charm:barley_seeds",
-   "price": 2,
+   "price": 20,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "farm_and_charm:oat_seeds",
-   "price": 2,
+   "price": 20,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "farm_and_charm:kernels",
-   "price": 2,
+   "price": 20,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "farm_and_charm:strawberry_seeds",
-   "price": 2,
+   "price": 20,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "farm_and_charm:tomato_seeds",
-   "price": 2,
+   "price": 20,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "farm_and_charm:lettuce_seeds",
-   "price": 4,
+   "price": 40,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "farm_and_charm:onion",
-   "price": 4,
+   "price": 40,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "minecraft:oak_sapling",
-   "price": 8,
+   "price": 20,
    "category": "seeds"
   },
   {
    "item": "minecraft:spruce_sapling",
-   "price": 8,
+   "price": 20,
    "category": "seeds"
   },
   {
    "item": "minecraft:birch_sapling",
-   "price": 8,
+   "price": 20,
    "category": "seeds"
   },
   {
    "item": "minecraft:jungle_sapling",
-   "price": 8,
+   "price": 20,
    "category": "seeds"
   },
   {
    "item": "minecraft:acacia_sapling",
-   "price": 8,
+   "price": 20,
    "category": "seeds"
   },
   {
    "item": "minecraft:dark_oak_sapling",
-   "price": 8,
+   "price": 20,
    "category": "seeds"
   },
   {
    "item": "minecraft:cherry_sapling",
-   "price": 8,
+   "price": 20,
    "category": "seeds"
   },
   {
    "item": "kaleidoscope_tavern:grapevine",
-   "price": 60,
+   "price": 600,
    "category": "seeds"
   },
   {
    "item": "minecraft:shears",
-   "price": 60,
-   "category": "tools"
-  },
-  {
-   "item": "minecraft:bucket",
-   "price": 84,
+   "price": 600,
    "category": "tools"
   },
   {
    "item": "minecraft:water_bucket",
-   "price": 85,
-   "category": "tools"
+   "price": 451,
+   "category": "tools",
+   "sellPrice": 450
   },
   {
    "item": "minecraft:lead",
@@ -549,56 +537,56 @@
   },
   {
    "item": "minecraft:composter",
-   "price": 10,
-   "category": "tools"
+   "price": 20,
+   "category": "tools",
+   "sell": false
   },
   {
    "item": "kaleidoscope_cookery:sickle",
-   "price": 150,
+   "price": 1500,
    "category": "tools",
    "dynamic": true
   },
   {
    "item": "better_farming_plus:sprinkler",
-   "price": 120,
+   "price": 1200,
    "category": "tools",
    "dynamic": true
   },
   {
    "item": "minecraft:bone_meal",
    "price": 1,
-   "category": "supplies",
-   "sellPrice": 0.1
+   "category": "supplies"
   },
   {
    "item": "minecraft:dirt",
    "price": 1,
-   "category": "supplies"
+   "category": "supplies",
+   "sell": false
   },
   {
    "item": "farmersdelight:straw",
-   "price": 1,
-   "category": "supplies",
-   "sellPrice": 0.2
+   "price": 4,
+   "category": "supplies"
   },
   {
    "item": "farmersdelight:rope",
-   "price": 3,
+   "price": 10,
    "category": "supplies"
   },
   {
    "item": "farmersdelight:canvas",
-   "price": 6,
+   "price": 40,
    "category": "supplies"
   },
   {
    "item": "farmersdelight:organic_compost",
-   "price": 12,
+   "price": 60,
    "category": "supplies"
   },
   {
    "item": "farmersdelight:rich_soil",
-   "price": 18,
+   "price": 120,
    "category": "supplies"
   },
   {
@@ -608,77 +596,87 @@
   },
   {
    "item": "minecraft:egg",
-   "price": 1,
+   "price": 6,
    "category": "animal"
   },
   {
    "item": "minecraft:milk_bucket",
-   "price": 92,
-   "category": "animal"
+   "price": 452,
+   "category": "animal",
+   "sellPrice": 451
   },
   {
    "item": "minecraft:honey_bottle",
-   "price": 12,
-   "category": "animal",
-   "sellPrice": 1.5
+   "price": 16,
+   "category": "animal"
   },
   {
    "item": "minecraft:honeycomb",
-   "price": 8,
-   "category": "animal",
-   "sellPrice": 1.0
+   "price": 6,
+   "category": "animal"
   },
   {
    "item": "minecraft:leather",
-   "price": 10,
+   "price": 2,
    "category": "animal"
   },
   {
    "item": "minecraft:rabbit_hide",
-   "price": 3,
+   "price": 20,
    "category": "animal"
   },
   {
    "item": "minecraft:rabbit_foot",
-   "price": 25,
+   "price": 200,
    "category": "animal"
   },
   {
    "item": "minecraft:feather",
-   "price": 3,
-   "category": "animal",
-   "sellPrice": 0.5
+   "price": 4,
+   "category": "animal"
   },
   {
    "item": "minecraft:white_wool",
-   "price": 6,
-   "category": "animal",
-   "sellPrice": 1.0
+   "price": 2,
+   "category": "animal"
   },
   {
    "item": "minecraft:beef",
-   "price": 10,
+   "price": 80,
    "category": "animal"
   },
   {
    "item": "minecraft:porkchop",
-   "price": 10,
+   "price": 50,
    "category": "animal"
   },
   {
    "item": "minecraft:mutton",
-   "price": 8,
+   "price": 80,
    "category": "animal"
   },
   {
    "item": "minecraft:rabbit",
-   "price": 8,
+   "price": 80,
    "category": "animal"
   },
   {
    "item": "minecraft:chicken",
-   "price": 6,
+   "price": 40,
    "category": "animal"
+  },
+  {
+   "item": "farmersdelight:ham",
+   "price": 105,
+   "category": "animal",
+   "buy": false
+  },
+  {
+   "item": "minecraft:bucket",
+   "price": 900,
+   "category": "animal",
+   "sellPrice": 450,
+   "buy": false
   }
  ],
  "auto": [
@@ -687,7 +685,8 @@
     "class": "hoe"
    },
    "category": "tools",
-   "formula": "gear"
+   "formula": "gear",
+   "multiplier": 5
   },
   {
    "match": {
@@ -696,7 +695,17 @@
     ]
    },
    "category": "seeds",
-   "price": 2
+   "price": 20
+  },
+  {
+   "match": {
+    "tags": [
+     "forge:mushrooms"
+    ]
+   },
+   "category": "crops",
+   "price": 8,
+   "looseSell": true
   },
   {
    "match": {
@@ -707,7 +716,7 @@
     ]
    },
    "category": "crops",
-   "price": 4,
+   "price": 40,
    "looseSell": true
   },
   {
@@ -718,7 +727,7 @@
     ]
    },
    "category": "crops",
-   "price": 4,
+   "price": 40,
    "looseSell": true
   }
  ],

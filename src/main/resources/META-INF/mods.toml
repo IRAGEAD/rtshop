@@ -4,11 +4,11 @@ license="MIT"
 
 [[mods]]
 modId="rtshop"
-version="2.1.1"
+version="3.0.0"
 displayName="RT Shop"
 description='''
-중세 분위기의 NPC 상점 시스템.
-Gold 화폐, 사망 손실, 은행, 상인 NPC, 검색·카테고리·정렬·격자/목록 상점 화면.
+중세 분위기의 NPC 상점과 Gold 경제 시스템.
+Gold 화폐·수표·은행, 상인 NPC(농작물·식품·수산물·장비·잡화·토지), 상점 씨앗과 작물 별 등급, 물고기 무게 가격, 토지 문서와 보관함 PIN.
 '''
 
 [[dependencies.rtshop]]

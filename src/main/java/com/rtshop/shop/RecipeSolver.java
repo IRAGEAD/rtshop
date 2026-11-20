@@ -92,6 +92,8 @@ public final class RecipeSolver {
         public final Map<String, Double> estimated = new LinkedHashMap<>();
         /** 추정가 없이, 가격표에 있는 재료만으로 원가가 계산된 아이템. */
         public final Set<String> exact = new HashSet<>();
+        /** 계산에 쓴 가격표 (상점 판매가 + 살 수는 없지만 값이 정해진 재료). */
+        public Map<String, Double> known = new HashMap<>();
         /** 각 아이템의 원가/가치를 정한 레시피에서 "만들어 쓰는" 것으로 계산된 재료 (고리 검사용). */
         public final Map<String, List<String>> costDeriv = new HashMap<>();
         public final Map<String, List<String>> valueDeriv = new HashMap<>();
@@ -374,6 +376,7 @@ public final class RecipeSolver {
      */
     public static Result solve(Map<String, Double> base, List<Recipe> recipes, Env env, Config cfg) {
         Result res = new Result();
+        res.known = base;
         Set<String> craftable = new HashSet<>();
         for (Recipe r : recipes) {
             for (Out o : r.outputs) {
@@ -450,12 +453,9 @@ public final class RecipeSolver {
     }
 
     private static boolean holds(Ing ing, String item, Env env) {
-        for (String alt : ing.alts) {
-            if (alt.equals(item) || (alt.startsWith("#") && env.tagItems(alt.substring(1)).contains(item))) {
-                return true;
-            }
-        }
-        return false;
+        // 재료가 정확히 그 아이템 하나일 때만 "되돌아오는 재료"로 본다.
+        // 태그까지 따지면 "달걀 태그 -> 달걀 프라이"처럼 결과물이 재료 태그에 들어 있는 조리법을 잘못 걸러 낸다.
+        return ing.alts.size() == 1 && ing.alts.get(0).equals(item);
     }
 
     /**
@@ -504,34 +504,54 @@ public final class RecipeSolver {
                 continue;
             }
             Ing ing = r.ingredients.get(i);
-            double best = INF;
-            String bestItem = null;
-            for (String alt : ing.alts) {
-                if (alt.startsWith("#")) {
-                    for (String item : env.tagItems(alt.substring(1))) {
-                        double w = net(item, base, est, res, env, forValue, grid);
-                        if (w < best) {
-                            best = w;
-                            bestItem = item;
-                        }
-                    }
-                } else {
-                    double w = net(alt, base, est, res, env, forValue, grid);
-                    if (w < best) {
-                        best = w;
-                        bestItem = alt;
-                    }
-                }
-            }
-            if (best >= INF || bestItem == null) {
+            String bestItem = cheapest(ing, prep, base, est, res, env, forValue, grid);
+            if (bestItem == null) {
                 return null;
             }
-            c.total += best * ing.count;
+            c.total += net(bestItem, base, est, res, env, forValue, grid) * ing.count;
             if (viaRecipe(bestItem, base, est, res, forValue)) {
                 c.via.add(bestItem);
             }
         }
         return c;
+    }
+
+    /**
+     * 재료 한 칸에 쓸 수 있는 것 중 가장 싼 아이템. 없으면 null.
+     * 이 레시피의 결과물 자신은 후보에서 뺀다 (달걀 태그에 달걀 프라이가 들어 있는 경우처럼 자기 자신을 재료로 고르지 않게).
+     * 값이 같으면 가격표에 있는(만들지 않아도 되는) 쪽을 고른다.
+     */
+    private static String cheapest(Ing ing, Prepared prep, Map<String, Double> base, Map<String, Double> est, Result res, Env env,
+                                   boolean forValue, boolean grid) {
+        double best = INF;
+        String bestItem = null;
+        boolean bestMade = false;
+        for (String alt : ing.alts) {
+            Collection<String> items = alt.startsWith("#") ? env.tagItems(alt.substring(1)) : List.of(alt);
+            for (String item : items) {
+                boolean own = false;
+                for (Out o : prep.outs) {
+                    if (o.item.equals(item)) {
+                        own = true;
+                        break;
+                    }
+                }
+                if (own) {
+                    continue;
+                }
+                double w = net(item, base, est, res, env, forValue, grid);
+                if (w >= INF) {
+                    continue;
+                }
+                boolean made = viaRecipe(item, base, est, res, forValue);
+                if (w < best - 1.0e-9 || (bestItem != null && w <= best + 1.0e-9 && bestMade && !made)) {
+                    best = w;
+                    bestItem = item;
+                    bestMade = made;
+                }
+            }
+        }
+        return bestItem;
     }
 
     /** start 의 재료들을 만드는 과정을 거슬러 올라가면 target 이 나오는가 (= target 으로 target 을 만드는 고리). */
@@ -588,9 +608,11 @@ public final class RecipeSolver {
 
                 Choice c = choose(r, prep, base, est, res, env, false);
                 if (c != null) {
-                    double per = (c.total + extra) / prep.outSum;
-                    for (Out o : prep.outs) {
-                        if (frozen.contains(o.item)) {
+                    double[] share = allocate(prep, c.total + extra, base, est);
+                    for (int oi = 0; oi < prep.outs.size(); oi++) {
+                        Out o = prep.outs.get(oi);
+                        double per = share[oi];
+                        if (Double.isNaN(per) || frozen.contains(o.item)) {
                             continue;
                         }
                         Double old = res.cost.get(o.item);
@@ -604,9 +626,11 @@ public final class RecipeSolver {
                 }
                 Choice v = choose(r, prep, base, est, res, env, true);
                 if (v != null) {
-                    double per = ((v.total + extra) * (1.0 + m) + labor) / prep.outSum;
-                    for (Out o : prep.outs) {
-                        if (frozen.contains(o.item)) {
+                    double[] share = allocate(prep, (v.total + extra) * (1.0 + m) + labor, base, est);
+                    for (int oi = 0; oi < prep.outs.size(); oi++) {
+                        Out o = prep.outs.get(oi);
+                        double per = share[oi];
+                        if (Double.isNaN(per) || frozen.contains(o.item)) {
                             continue;
                         }
                         Double old = res.value.get(o.item);
@@ -628,6 +652,100 @@ public final class RecipeSolver {
                 break;
             }
         }
+    }
+
+    /** 가격 계산에 실제로 쓰인 재료 한 가지. */
+    public static final class Pick {
+        public final String item;
+        public final double count;
+
+        public Pick(String item, double count) {
+            this.item = item;
+            this.count = count;
+        }
+    }
+
+    /**
+     * 이 레시피의 값을 매길 때 고른(가장 싼) 재료 목록. 같은 재료는 합친다. 풀 수 없는 레시피면 빈 목록.
+     * 상점 화면에서 "이 음식의 매입가는 어떤 재료 기준인가"를 보여 주는 데 쓴다.
+     */
+    public static List<Pick> picks(Recipe r, Result res, Env env, boolean forValue) {
+        Prepared prep = prepare(r, env);
+        boolean grid = r.type.startsWith("minecraft:crafting");
+        Map<String, Double> sum = new LinkedHashMap<>();
+        for (int i = 0; i < r.ingredients.size(); i++) {
+            if (prep.returned[i]) {
+                continue;
+            }
+            Ing ing = r.ingredients.get(i);
+            String bestItem = cheapest(ing, prep, res.known, res.estimated, res, env, forValue, grid);
+            if (bestItem == null) {
+                return new ArrayList<>();
+            }
+            sum.merge(bestItem, ing.count, Double::sum);
+        }
+        List<Pick> out = new ArrayList<>();
+        for (Map.Entry<String, Double> e : sum.entrySet()) {
+            out.add(new Pick(e.getKey(), e.getValue()));
+        }
+        return out;
+    }
+
+    /** 이 레시피 1회로 나오는 해당 아이템의 개수 (되돌아오는 재료 제외). */
+    public static double outputCount(Recipe r, String item, Env env) {
+        double n = 0;
+        for (Out o : prepare(r, env).outs) {
+            if (o.item.equals(item)) {
+                n += o.count;
+            }
+        }
+        return n;
+    }
+
+    /**
+     * 레시피 1회분의 비용을 결과물들에 나눈다 (1개당 값, NaN = 이 결과물에는 반영하지 않음).
+     * 결과물이 여러 종류면: 값이 이미 정해진 것(뼛가루 같은 부산물)은 그 값만큼만 가져가고, 나머지를 값이 없는 결과물이 나눈다.
+     * 예) 닭고기 50G -> 닭고기 조각 2개 + 뼛가루 1개(1G) 이면 조각 1개 = (50 - 1) / 2.
+     * 결과물 값의 합은 항상 들어간 비용과 같으므로, 나누는 방식 때문에 가치가 새로 생기지는 않는다.
+     */
+    private static double[] allocate(Prepared prep, double total, Map<String, Double> base, Map<String, Double> est) {
+        int n = prep.outs.size();
+        double[] per = new double[n];
+        if (n == 1) {
+            per[0] = total / prep.outs.get(0).count;
+            return per;
+        }
+        Double[] priced = new Double[n];
+        double knownSum = 0;
+        double unknownCount = 0;
+        for (int i = 0; i < n; i++) {
+            Out o = prep.outs.get(i);
+            Double b = base.get(o.item);
+            if (b == null) {
+                b = est.get(o.item);
+            }
+            priced[i] = b;
+            if (b != null) {
+                knownSum += b * o.count;
+            } else {
+                unknownCount += o.count;
+            }
+        }
+        if (unknownCount > 0) {
+            double rest = Math.max(0, total - knownSum) / unknownCount;
+            for (int i = 0; i < n; i++) {
+                per[i] = priced[i] == null ? rest : Double.NaN;
+            }
+        } else if (knownSum > 0) {
+            for (int i = 0; i < n; i++) {
+                per[i] = total * priced[i] / knownSum;
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+                per[i] = total / prep.outSum;
+            }
+        }
+        return per;
     }
 
     private static double ingredientSum(Recipe r, Map<String, Double> base, Map<String, Double> est, Result res, Env env, boolean forValue) {

@@ -28,8 +28,13 @@ public final class PricingConfig {
     public boolean recipePricing = true;
     /** 음식의 상점 판매가 = 매입가 × 이 값 (재판매 50% 감가 규칙과 맞추기 위해 2.0). */
     public double foodBuyMultiplier = 2.0;
-    /** 가격표에 없는 말단 재료의 추정가. */
-    public double defaultIngredientValue = 10;
+    /**
+     * 가격표에 없는 말단 재료의 추정가. 공짜로 얻을 수 있는 재료일 수도 있으므로 낮게 둔다
+     * (높으면 그 재료가 들어간 음식값이 부풀어 돈벌이 수단이 된다). 값을 제대로 쳐 주려면 상점 파일에 가격을 적는다.
+     */
+    public double defaultIngredientValue = 2;
+    /** 가격표에 없는 '먹을 수 있는' 말단 재료의 추정가 = 포만감 공식 가격 × 이 값. */
+    public double edibleEstimateFactor = 2.0;
     public final Map<String, Double> margins = new LinkedHashMap<>();
     public final Map<String, Double> labor = new LinkedHashMap<>();
     public final Map<String, Double> flatExtra = new LinkedHashMap<>();
@@ -65,22 +70,23 @@ public final class PricingConfig {
     private void defaults() {
         // 마진(%)과 수고비(G/조리 1회). 사람이 직접 손을 써야 하는 조리 단계에만 붙인다.
         // 화로·조합대처럼 자동화하거나 한꺼번에 찍어 낼 수 있는 단계에는 붙이지 않는다 (붙이면 돈이 무한히 불어난다).
+        // 수고비는 "조리 1회"에 붙는다 (한 번에 9인분을 볶아도 1회). 여러 대를 동시에 돌릴 수 있는 도구일수록 낮게 잡았다.
         for (String t : new String[]{"kaleidoscope_cookery:pot", "kaleidoscope_cookery:flex_pot"}) {
             margins.put(t, 0.05);
-            labor.put(t, 10.0);
+            labor.put(t, 80.0);
         }
         for (String t : new String[]{"kaleidoscope_cookery:stockpot", "kaleidoscope_cookery:flex_stockpot"}) {
             margins.put(t, 0.05);
-            labor.put(t, 8.0);
+            labor.put(t, 60.0);
         }
         margins.put("kaleidoscope_cookery:steamer", 0.05);
-        labor.put("kaleidoscope_cookery:steamer", 3.0);
+        labor.put("kaleidoscope_cookery:steamer", 10.0);
         margins.put("kaleidoscope_cookery:teapot", 0.05);
-        labor.put("kaleidoscope_cookery:teapot", 3.0);
+        labor.put("kaleidoscope_cookery:teapot", 20.0);
         margins.put("kaleidoscope_tavern:barrel", 0.15);
-        labor.put("kaleidoscope_tavern:barrel", 4.0);
+        labor.put("kaleidoscope_tavern:barrel", 50.0);
         margins.put("kaleidoscope_tavern:shaker", 0.05);
-        labor.put("kaleidoscope_tavern:shaker", 5.0);
+        labor.put("kaleidoscope_tavern:shaker", 40.0);
         // Farmer's Delight 의 조리 냄비는 호퍼로 재료를 넣어 자동으로 돌릴 수 있어서 기본값으로는 수고비를 주지 않는다 (본전).
         // 자동화를 막아 둔 서버라면 pricing.json 에 "farmersdelight:cooking" 을 추가해 수고비를 줄 수 있다.
         // 액체 1회 사용분을 아이템으로 환산
@@ -136,7 +142,8 @@ public final class PricingConfig {
                 if (o.has("sellRatio")) c.sellRatio = Math.max(0, Math.min(1, o.get("sellRatio").getAsDouble()));
                 if (o.has("recipePricing")) c.recipePricing = o.get("recipePricing").getAsBoolean();
                 if (o.has("foodBuyMultiplier")) c.foodBuyMultiplier = Math.max(1.0, o.get("foodBuyMultiplier").getAsDouble());
-                if (o.has("defaultIngredientValue")) c.defaultIngredientValue = Math.max(1, o.get("defaultIngredientValue").getAsDouble());
+                if (o.has("defaultIngredientValue")) c.defaultIngredientValue = Math.max(0.01, o.get("defaultIngredientValue").getAsDouble());
+                if (o.has("edibleEstimateFactor")) c.edibleEstimateFactor = Math.max(0, o.get("edibleEstimateFactor").getAsDouble());
                 if (o.has("fishBaseMultiplier")) c.fishBaseMultiplier = Math.max(0, o.get("fishBaseMultiplier").getAsDouble());
                 if (o.has("fishWeightBonus")) c.fishWeightBonus = Math.max(0, Math.min(0.9, o.get("fishWeightBonus").getAsDouble()));
                 if (o.has("fishGoldenMultiplier")) c.fishGoldenMultiplier = Math.max(1, o.get("fishGoldenMultiplier").getAsDouble());
@@ -166,6 +173,8 @@ public final class PricingConfig {
                 help.add("margins: 레시피 종류별 마진(0.05 = 5%) · labor: 조리 1회당 수고비(G) · flatExtra: 1회당 추가 원가(기본 없음)");
                 help.add("주의: 화로·조합대처럼 자동화할 수 있는 레시피 종류에 margin/labor/flatExtra 를 주면 재료를 사서 만들어 파는 것만으로 돈이 불어납니다");
                 help.add("음식 매입가 = (재료 원가 + flatExtra) × (1 + margin) + labor, 음식 판매가 = 매입가 × foodBuyMultiplier");
+                help.add("재료 원가는 '가장 싼 조리법, 가장 싼 재료' 기준입니다. 같은 음식을 더 비싼 방법으로 만들면 그만큼 덜 남습니다");
+                help.add("defaultIngredientValue: 가격표에 없는 재료의 추정가(낮게 유지 권장) · edibleEstimateFactor: 먹을 수 있는 재료의 추정가 배율");
                 help.add("fluidCosts: 레시피에 쓰이는 액체 1회분을 '아이템ID*개수'로 환산 · typeExtras: 레시피 파일에 없지만 실제로 드는 재료");
                 help.add("물고기 매입가 = 기준 매입가(상점 판매가×sellRatio) × fishBaseMultiplier × (1 ± fishWeightBonus). 무거울수록 비쌈");
                 help.add("fishGoldenMultiplier: 황금 물고기 배율 · fishNoInfoMultiplier: 무게 정보가 없는 물고기(상점에서 산 것 등) 배율");
@@ -174,6 +183,7 @@ public final class PricingConfig {
                 o.addProperty("recipePricing", c.recipePricing);
                 o.addProperty("foodBuyMultiplier", c.foodBuyMultiplier);
                 o.addProperty("defaultIngredientValue", c.defaultIngredientValue);
+                o.addProperty("edibleEstimateFactor", c.edibleEstimateFactor);
                 o.addProperty("fishBaseMultiplier", c.fishBaseMultiplier);
                 o.addProperty("fishWeightBonus", c.fishWeightBonus);
                 o.addProperty("fishGoldenMultiplier", c.fishGoldenMultiplier);

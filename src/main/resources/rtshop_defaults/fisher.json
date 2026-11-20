@@ -6,8 +6,8 @@
   "  sellPrice: 매입가를 직접 지정 (없으면 price 의 50%) · buy/sell: false 면 이 상점에서 팔지 않음/사지 않음",
   "  seed: true 면 '심을 수 있는 상점 씨앗'으로 판매 · fish: true 면 물고기(무게 보정) · dynamic: true 면 레시피 원가로 가격 결정",
   "auto: 태그·모드·종류로 아이템을 모으는 규칙. match{mod(s), tag(s), notTag(s), class(es), recipeType(s)}",
-  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto",
-  "만들 수 있는 음식은 여기 적힌 값 대신 '재료 원가 + 수고비'(config/rtshop/pricing.json)로 가격이 정해집니다.",
+  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto · multiplier: 공식 가격에 곱하는 값",
+  "만들 수 있는 물건은 여기 적힌 값과 상관없이 '재료 원가(+조리 수고비)'에 매입하고, 판매가는 그 2배 이상이 됩니다 (config/rtshop/pricing.json).",
   "수정 후 /rtshop reload · 실제 적용된 가격과 점검 결과는 /rtshop export (config/rtshop/export)",
   "스타캐처로 낚은 물고기는 희귀도에 따라 기준 가격이 정해지고, 무게가 무거울수록 비싸게 매입합니다.",
   "기본 설정: 평균 무게 = 가격표 가격, 가장 가벼움 = 75%, 가장 무거움 = 125%, 황금 물고기 = 3배 (config/rtshop/pricing.json).",
@@ -46,77 +46,81 @@
  "items": [
   {
    "item": "minecraft:cod",
-   "price": 12,
+   "price": 120,
    "category": "fish",
    "fish": true
   },
   {
    "item": "minecraft:salmon",
-   "price": 12,
+   "price": 120,
    "category": "fish",
    "fish": true
   },
   {
    "item": "minecraft:pufferfish",
-   "price": 22,
+   "price": 220,
    "category": "fish",
    "fish": true
   },
   {
    "item": "minecraft:tropical_fish",
-   "price": 40,
+   "price": 400,
    "category": "fish",
    "fish": true
   },
   {
    "item": "starcatcher:worm",
-   "price": 2,
+   "price": 20,
    "category": "bait"
   },
   {
    "item": "minecraft:string",
-   "price": 5,
-   "category": "bait",
-   "sellPrice": 1.0
+   "price": 2,
+   "category": "bait"
   },
   {
    "item": "minecraft:oak_boat",
-   "price": 8,
-   "category": "gear"
+   "price": 30,
+   "category": "gear",
+   "sell": false
   },
   {
    "item": "minecraft:water_bucket",
-   "price": 85,
-   "category": "gear"
+   "price": 451,
+   "category": "gear",
+   "sellPrice": 450
   },
   {
    "item": "minecraft:bucket",
-   "price": 84,
-   "category": "gear"
+   "price": 900,
+   "category": "gear",
+   "sellPrice": 450,
+   "buy": false
   },
   {
    "item": "starcatcher:pearl",
-   "price": 60,
+   "price": 600,
    "category": "treasure"
   },
   {
    "item": "minecraft:nautilus_shell",
-   "price": 150,
-   "category": "treasure"
+   "price": 1000,
+   "category": "treasure",
+   "sellPrice": 100
   },
   {
    "item": "minecraft:heart_of_the_sea",
-   "price": 1500,
+   "price": 10000,
    "category": "treasure"
   },
   {
    "item": "minecraft:scute",
-   "price": 40,
+   "price": 60,
    "category": "treasure"
   },
   {
    "item": "minecraft:sponge",
-   "price": 80,
+   "price": 400,
    "category": "treasure"
   },
   {
@@ -127,48 +131,45 @@
   {
    "item": "minecraft:seagrass",
    "price": 1,
-   "category": "sea"
+   "category": "sea",
+   "sell": false
   },
   {
    "item": "minecraft:sea_pickle",
-   "price": 8,
+   "price": 4,
    "category": "sea"
   },
   {
    "item": "minecraft:ink_sac",
-   "price": 6,
+   "price": 4,
    "category": "sea"
   },
   {
    "item": "minecraft:glow_ink_sac",
-   "price": 15,
+   "price": 10,
    "category": "sea"
   },
   {
    "item": "minecraft:prismarine_shard",
-   "price": 6,
-   "category": "sea",
-   "sellPrice": 1.0
+   "price": 4,
+   "category": "sea"
   },
   {
    "item": "minecraft:prismarine_crystals",
-   "price": 10,
-   "category": "sea",
-   "sellPrice": 2.0
+   "price": 8,
+   "category": "sea"
   },
   {
    "item": "minecraft:kelp",
    "price": 1,
    "category": "sea",
-   "sellPrice": 0.05,
-   "buy": false
+   "sell": false
   },
   {
    "item": "minecraft:dried_kelp",
    "price": 1,
    "category": "sea",
-   "sellPrice": 0.05,
-   "buy": false
+   "sellPrice": 0.1
   }
  ],
  "auto": [
@@ -179,7 +180,7 @@
     ]
    },
    "category": "fish",
-   "price": 130,
+   "price": 1300,
    "fish": true,
    "looseSell": true,
    "buy": false
@@ -191,7 +192,7 @@
     ]
    },
    "category": "fish",
-   "price": 75,
+   "price": 750,
    "fish": true,
    "looseSell": true,
    "buy": false
@@ -203,7 +204,7 @@
     ]
    },
    "category": "fish",
-   "price": 40,
+   "price": 400,
    "fish": true,
    "looseSell": true,
    "buy": false
@@ -215,7 +216,7 @@
     ]
    },
    "category": "fish",
-   "price": 22,
+   "price": 220,
    "fish": true,
    "looseSell": true,
    "buy": false
@@ -227,7 +228,7 @@
     ]
    },
    "category": "fish",
-   "price": 12,
+   "price": 120,
    "fish": true,
    "looseSell": true,
    "buy": false
@@ -243,7 +244,8 @@
    },
    "category": "gear",
    "formula": "gear",
-   "price": 400
+   "price": 2000,
+   "multiplier": 5
   },
   {
    "match": {
@@ -251,7 +253,8 @@
    },
    "category": "gear",
    "formula": "gear",
-   "price": 130
+   "price": 650,
+   "multiplier": 5
   },
   {
    "match": {
@@ -263,7 +266,7 @@
     ]
    },
    "category": "gear",
-   "price": 120
+   "price": 1200
   },
   {
    "match": {
@@ -275,7 +278,7 @@
     ]
    },
    "category": "gear",
-   "price": 250
+   "price": 2500
   },
   {
    "match": {
@@ -287,7 +290,7 @@
     ]
    },
    "category": "gear",
-   "price": 40
+   "price": 400
   },
   {
    "match": {
@@ -299,7 +302,7 @@
     ]
    },
    "category": "bait",
-   "price": 6
+   "price": 60
   },
   {
    "match": {
@@ -311,7 +314,7 @@
     ]
    },
    "category": "bait",
-   "price": 40
+   "price": 400
   },
   {
    "match": {
@@ -323,7 +326,7 @@
     ]
    },
    "category": "bait",
-   "price": 30
+   "price": 300
   },
   {
    "match": {
@@ -335,7 +338,7 @@
     ]
    },
    "category": "treasure",
-   "price": 200,
+   "price": 2000,
    "buy": false
   },
   {
@@ -346,7 +349,8 @@
    },
    "category": "treasure",
    "formula": "auto",
-   "price": 16,
+   "price": 160,
+   "multiplier": 10,
    "buy": false
   }
  ],

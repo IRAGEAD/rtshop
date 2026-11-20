@@ -3,7 +3,9 @@ package com.rtshop.shop;
 import com.rtshop.farm.SeedRules;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,17 @@ public final class ShopData {
         }
     }
 
+    /** 가격의 근거가 된 조리법의 재료 한 가지 (화면에 "이 재료 기준으로 값을 매겼다"를 보여 주는 용도). */
+    public static final class Part {
+        public final Item item;
+        public final float count;
+
+        public Part(Item item, float count) {
+            this.item = item;
+            this.count = count;
+        }
+    }
+
     public static final class Entry {
         public final ItemStack stack;  // 개수 1 기준 견본
         public final int price;        // 1개당 구매 가격(G)
@@ -36,9 +49,17 @@ public final class ShopData {
         public final boolean sellable;
         /** 물고기 품목(무게 정보가 없으면 낮은 배율 적용). */
         public final boolean fish;
+        /** 만들 수 있는 품목이면: 매입가를 계산한 조리법의 재료(가장 싼 것 기준)와 1회 생산량. 없으면 빈 목록. */
+        public final List<Part> recipe;
+        public final float recipeOut;
 
         public Entry(ItemStack stack, int price, double sellUnit, String category, boolean looseSell,
                      boolean buyable, boolean sellable, boolean fish) {
+            this(stack, price, sellUnit, category, looseSell, buyable, sellable, fish, List.of(), 1.0F);
+        }
+
+        public Entry(ItemStack stack, int price, double sellUnit, String category, boolean looseSell,
+                     boolean buyable, boolean sellable, boolean fish, List<Part> recipe, float recipeOut) {
             this.stack = stack;
             this.price = price;
             this.sellUnit = sellUnit;
@@ -47,6 +68,8 @@ public final class ShopData {
             this.buyable = buyable;
             this.sellable = sellable;
             this.fish = fish;
+            this.recipe = recipe;
+            this.recipeOut = recipeOut;
         }
 
         public boolean matchesExact(ItemStack s) {
@@ -169,6 +192,16 @@ public final class ShopData {
             buf.writeUtf(e.category);
             int flags = (e.looseSell ? 1 : 0) | (e.buyable ? 2 : 0) | (e.sellable ? 4 : 0) | (e.fish ? 8 : 0);
             buf.writeByte(flags);
+            int parts = Math.min(e.recipe.size(), 12);
+            buf.writeVarInt(parts);
+            if (parts > 0) {
+                buf.writeFloat(e.recipeOut);
+                for (int i = 0; i < parts; i++) {
+                    Part part = e.recipe.get(i);
+                    buf.writeVarInt(Item.getId(part.item));
+                    buf.writeFloat(part.count);
+                }
+            }
         }
     }
 
@@ -200,7 +233,22 @@ public final class ShopData {
             double sellUnit = buf.readDouble();
             String cat = buf.readUtf();
             int flags = buf.readByte();
-            ents.add(new Entry(st, price, sellUnit, cat, (flags & 1) != 0, (flags & 2) != 0, (flags & 4) != 0, (flags & 8) != 0));
+            int parts = buf.readVarInt();
+            List<Part> recipe = List.of();
+            float recipeOut = 1.0F;
+            if (parts > 0) {
+                recipeOut = buf.readFloat();
+                recipe = new ArrayList<>(parts);
+                for (int k = 0; k < parts; k++) {
+                    Item item = Item.byId(buf.readVarInt());
+                    float count = buf.readFloat();
+                    if (item != Items.AIR) {
+                        recipe.add(new Part(item, count));
+                    }
+                }
+            }
+            ents.add(new Entry(st, price, sellUnit, cat, (flags & 1) != 0, (flags & 2) != 0, (flags & 4) != 0, (flags & 8) != 0,
+                    recipe, recipeOut));
         }
         return new ShopData(id, version, title, "", "", cats, ents, star, fishBase, fishBonus, fishGolden, fishNoInfo);
     }

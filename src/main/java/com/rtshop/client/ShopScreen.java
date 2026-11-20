@@ -766,6 +766,7 @@ public class ShopScreen extends Screen {
             if (!r.sellable) {
                 tip.add(Component.translatable("rtshop.tip.sell_zero").withStyle(ChatFormatting.RED));
             }
+            appendRecipe(tip, r.entry);
             tip.add(Component.translatable("rtshop.ui.hint_sell").withStyle(ChatFormatting.DARK_GRAY));
         } else {
             tip.add(Component.translatable("rtshop.tip.price", Ui.num(r.unit), cur).withStyle(ChatFormatting.GOLD));
@@ -778,9 +779,30 @@ public class ShopScreen extends Screen {
             if (!r.fits) {
                 tip.add(Component.translatable("rtshop.msg.inv_full_buy").withStyle(ChatFormatting.RED));
             }
+            appendRecipe(tip, r.entry);
             tip.add(Component.translatable("rtshop.ui.hint_buy").withStyle(ChatFormatting.DARK_GRAY));
         }
         g.renderComponentTooltip(this.font, tip, mx, my);
+    }
+
+    /** 만들 수 있는 품목: 매입가를 어떤 재료 기준으로 계산했는지 보여 준다 (이 재료대로 만들어 팔면 손해가 없다). */
+    private static void appendRecipe(List<Component> tip, ShopData.Entry e) {
+        if (e == null || e.recipe.isEmpty()) {
+            return;
+        }
+        tip.add(Component.translatable("rtshop.tip.recipe_head", amount(e.recipeOut)).withStyle(ChatFormatting.DARK_AQUA));
+        int shown = 0;
+        for (ShopData.Part part : e.recipe) {
+            if (shown++ >= 9) {
+                break;
+            }
+            tip.add(Component.translatable("rtshop.tip.recipe_line", part.item.getDescription(), amount(part.count))
+                    .withStyle(ChatFormatting.GRAY));
+        }
+    }
+
+    private static String amount(float v) {
+        return Math.abs(v - Math.round(v)) < 0.01F ? Integer.toString(Math.round(v)) : String.format(Locale.ROOT, "%.1f", v);
     }
 
     private Component qualityLine(Row r) {

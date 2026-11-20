@@ -6,12 +6,14 @@
   "  sellPrice: 매입가를 직접 지정 (없으면 price 의 50%) · buy/sell: false 면 이 상점에서 팔지 않음/사지 않음",
   "  seed: true 면 '심을 수 있는 상점 씨앗'으로 판매 · fish: true 면 물고기(무게 보정) · dynamic: true 면 레시피 원가로 가격 결정",
   "auto: 태그·모드·종류로 아이템을 모으는 규칙. match{mod(s), tag(s), notTag(s), class(es), recipeType(s)}",
-  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto",
-  "만들 수 있는 음식은 여기 적힌 값 대신 '재료 원가 + 수고비'(config/rtshop/pricing.json)로 가격이 정해집니다.",
+  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto · multiplier: 공식 가격에 곱하는 값",
+  "만들 수 있는 물건은 여기 적힌 값과 상관없이 '재료 원가(+조리 수고비)'에 매입하고, 판매가는 그 2배 이상이 됩니다 (config/rtshop/pricing.json).",
   "수정 후 /rtshop reload · 실제 적용된 가격과 점검 결과는 /rtshop export (config/rtshop/export)",
   "요리사를 위한 상점입니다. 식재료를 사서 조리한 음식을 여기에 팔 수 있습니다.",
   "조리한 음식의 매입가 = 재료를 이 가격표대로 샀을 때의 원가 × (1 + 마진) + 수고비. 그래서 재료를 사서 만들어 팔아도 적자가 나지 않습니다.",
-  "수박·호박·사탕수수·켈프·대나무·선인장과 그 가공품(설탕, 말린 켈프), 나무 그릇은 누구나 무한히 만들 수 있어 팔지 않습니다 (직접 만들어 쓰세요)."
+  "여러 재료 중 하나를 고를 수 있는 조리법(예: '아무 채소')은 가장 싼 재료 기준으로 값을 매깁니다.",
+  "우유·물 양동이는 '양동이 값 + 내용물 값'입니다. 다 쓴 빈 양동이를 되팔면 양동이 값(450G)을 그대로 돌려받습니다.",
+  "화로 연료비는 음식값에 들어가지 않습니다. 모닥불이나 스토브처럼 연료가 들지 않는 조리 도구를 쓰면 손해가 없습니다."
  ],
  "title": "식품 상점",
  "npcName": "식품 상인",
@@ -51,252 +53,255 @@
  "items": [
   {
    "item": "minecraft:wheat",
-   "price": 4,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:beetroot",
-   "price": 4,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:carrot",
-   "price": 2,
+   "price": 20,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:potato",
-   "price": 2,
+   "price": 20,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:nether_wart",
-   "price": 3,
+   "price": 30,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:cocoa_beans",
-   "price": 2,
+   "price": 20,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:brown_mushroom",
-   "price": 3,
+   "price": 8,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:red_mushroom",
-   "price": 3,
+   "price": 8,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:apple",
-   "price": 5,
+   "price": 50,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "minecraft:sweet_berries",
-   "price": 2,
+   "price": 6,
    "category": "ingredient",
-   "sellPrice": 0.25,
    "looseSell": true
   },
   {
    "item": "minecraft:glow_berries",
-   "price": 3,
-   "category": "ingredient",
-   "sellPrice": 0.4,
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:cabbage",
-   "price": 4,
+   "price": 8,
    "category": "ingredient",
    "looseSell": true
   },
   {
-   "item": "farmersdelight:tomato",
-   "price": 4,
+   "item": "minecraft:chorus_fruit",
+   "price": 6,
    "category": "ingredient",
    "looseSell": true
   },
   {
-   "item": "farmersdelight:onion",
-   "price": 2,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:rice",
-   "price": 2,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:tomato",
-   "price": 4,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:red_chili",
-   "price": 4,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:green_chili",
-   "price": 4,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:lettuce",
-   "price": 4,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:rice",
+   "item": "minecraft:melon_slice",
    "price": 1,
    "category": "ingredient",
    "looseSell": true
   },
   {
-   "item": "kaleidoscope_cookery:wild_rice",
+   "item": "minecraft:melon",
+   "price": 9,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:pumpkin",
+   "price": 4,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:sugar_cane",
    "price": 2,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "minecraft:cactus",
+   "price": 2,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:cabbage",
+   "price": 40,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:cabbage_leaf",
+   "price": 20,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:tomato",
+   "price": 40,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:onion",
+   "price": 20,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "farmersdelight:rice",
+   "price": 4,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:tomato",
+   "price": 40,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:red_chili",
+   "price": 40,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:green_chili",
+   "price": 40,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:lettuce",
+   "price": 40,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:rice",
+   "price": 4,
+   "category": "ingredient",
+   "looseSell": true
+  },
+  {
+   "item": "kaleidoscope_cookery:wild_rice",
+   "price": 20,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "kaleidoscope_cookery:fresh_tea_leaves",
-   "price": 4,
+   "price": 10,
    "category": "ingredient",
-   "sellPrice": 0.5,
    "looseSell": true
   },
   {
    "item": "farm_and_charm:barley",
-   "price": 4,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:oat",
-   "price": 4,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:corn",
-   "price": 4,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:strawberry",
-   "price": 4,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:tomato",
-   "price": 4,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:lettuce",
-   "price": 2,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "farm_and_charm:onion",
-   "price": 2,
+   "price": 40,
    "category": "ingredient",
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:grape",
-   "price": 4,
+   "price": 20,
    "category": "ingredient",
-   "sellPrice": 1.0,
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:green_grape",
-   "price": 5,
+   "price": 24,
    "category": "ingredient",
-   "sellPrice": 1.2,
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:ice_grape",
-   "price": 12,
+   "price": 60,
    "category": "ingredient",
-   "sellPrice": 3.0,
    "looseSell": true
   },
   {
    "item": "kaleidoscope_tavern:gold_grape",
-   "price": 30,
+   "price": 120,
    "category": "ingredient",
-   "sellPrice": 6.0,
    "looseSell": true
   },
   {
    "item": "farmersdelight:rice_panicle",
-   "price": 4,
+   "price": 8,
    "category": "ingredient",
    "looseSell": true,
    "buy": false
   },
   {
    "item": "kaleidoscope_cookery:rice_panicle",
-   "price": 1,
+   "price": 12,
    "category": "ingredient",
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:melon_slice",
-   "price": 1,
-   "category": "ingredient",
-   "sellPrice": 0.2,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:melon",
-   "price": 4,
-   "category": "ingredient",
-   "sellPrice": 1.0,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:pumpkin",
-   "price": 4,
-   "category": "ingredient",
-   "sellPrice": 1.0,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:sugar_cane",
-   "price": 2,
-   "category": "ingredient",
-   "sellPrice": 0.3,
    "looseSell": true,
    "buy": false
   },
@@ -304,97 +309,95 @@
    "item": "minecraft:bamboo",
    "price": 1,
    "category": "ingredient",
-   "sellPrice": 0.05,
-   "looseSell": true,
-   "buy": false
-  },
-  {
-   "item": "minecraft:cactus",
-   "price": 2,
-   "category": "ingredient",
-   "sellPrice": 0.3,
-   "looseSell": true,
-   "buy": false
+   "sell": false
   },
   {
    "item": "minecraft:kelp",
    "price": 1,
    "category": "ingredient",
-   "sellPrice": 0.05,
-   "looseSell": true,
-   "buy": false
+   "sell": false
   },
   {
    "item": "minecraft:beef",
-   "price": 10,
+   "price": 80,
    "category": "meat"
   },
   {
    "item": "minecraft:porkchop",
-   "price": 10,
+   "price": 50,
    "category": "meat"
   },
   {
    "item": "minecraft:mutton",
-   "price": 8,
+   "price": 80,
    "category": "meat"
   },
   {
    "item": "minecraft:rabbit",
-   "price": 8,
+   "price": 80,
    "category": "meat"
   },
   {
    "item": "minecraft:chicken",
-   "price": 6,
+   "price": 40,
    "category": "meat"
   },
   {
+   "item": "farmersdelight:ham",
+   "price": 105,
+   "category": "meat",
+   "buy": false
+  },
+  {
    "item": "minecraft:cod",
-   "price": 12,
+   "price": 120,
    "category": "meat",
    "fish": true
   },
   {
    "item": "minecraft:salmon",
-   "price": 12,
+   "price": 120,
    "category": "meat",
    "fish": true
   },
   {
    "item": "minecraft:pufferfish",
-   "price": 22,
+   "price": 220,
    "category": "meat",
    "fish": true
   },
   {
    "item": "minecraft:tropical_fish",
-   "price": 40,
+   "price": 400,
    "category": "meat",
    "fish": true
   },
   {
    "item": "minecraft:egg",
-   "price": 1,
+   "price": 6,
    "category": "base"
   },
   {
    "item": "minecraft:milk_bucket",
-   "price": 92,
-   "category": "base"
+   "price": 452,
+   "category": "base",
+   "sellPrice": 451
+  },
+  {
+   "item": "minecraft:water_bucket",
+   "price": 451,
+   "category": "base",
+   "sellPrice": 450
   },
   {
    "item": "minecraft:honey_bottle",
-   "price": 12,
-   "category": "base",
-   "sellPrice": 1.5
+   "price": 16,
+   "category": "base"
   },
   {
    "item": "minecraft:sugar",
-   "price": 3,
-   "category": "base",
-   "sellPrice": 0.3,
-   "buy": false
+   "price": 2,
+   "category": "base"
   },
   {
    "item": "kaleidoscope_cookery:oil",
@@ -405,281 +408,300 @@
    "item": "minecraft:dried_kelp",
    "price": 1,
    "category": "base",
-   "sellPrice": 0.05,
-   "buy": false
+   "sellPrice": 0.1
   },
   {
    "item": "minecraft:bowl",
    "price": 1,
    "category": "base",
-   "buy": false
+   "sell": false
   },
   {
    "item": "minecraft:glass_bottle",
    "price": 1,
+   "category": "base",
+   "sell": false
+  },
+  {
+   "item": "minecraft:stick",
+   "price": 1,
+   "category": "base",
+   "sell": false
+  },
+  {
+   "item": "minecraft:paper",
+   "price": 2,
    "category": "base"
   },
   {
-   "item": "minecraft:bucket",
-   "price": 84,
-   "category": "base"
-  },
-  {
-   "item": "minecraft:water_bucket",
-   "price": 85,
-   "category": "base"
-  },
-  {
-   "item": "minecraft:ice",
+   "item": "minecraft:lily_pad",
    "price": 4,
    "category": "base"
   },
   {
+   "item": "minecraft:ice",
+   "price": 2,
+   "category": "base",
+   "sell": false
+  },
+  {
    "item": "minecraft:snowball",
    "price": 1,
-   "category": "base"
+   "category": "base",
+   "sell": false
   },
   {
    "item": "minecraft:bone",
-   "price": 1,
-   "category": "base",
-   "sellPrice": 0.3
-  },
-  {
-   "item": "minecraft:coal",
    "price": 5,
    "category": "base"
   },
   {
-   "item": "minecraft:charcoal",
-   "price": 3,
+   "item": "minecraft:bone_meal",
+   "price": 1,
    "category": "base"
   },
   {
+   "item": "minecraft:coal",
+   "price": 50,
+   "category": "base"
+  },
+  {
+   "item": "minecraft:charcoal",
+   "price": 20,
+   "category": "base"
+  },
+  {
+   "item": "minecraft:bucket",
+   "price": 900,
+   "category": "base",
+   "sellPrice": 450,
+   "buy": false
+  },
+  {
    "item": "minecraft:cake",
-   "price": 60,
+   "price": 600,
    "category": "dish",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:pot",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:stockpot",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:stockpot_lid",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:steamer",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:teapot",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:millstone",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:chopping_board",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:kitchen_shovel",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:iron_kitchen_knife",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:gold_kitchen_knife",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:diamond_kitchen_knife",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:stove",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:oil_pot",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:bamboo_tray",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:enamel_basin",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:shawarma_spit",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_cookery:kitchenware_racks",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_tavern:barrel",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_tavern:pressing_tub",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_tavern:shaker",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_tavern:tap",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_tavern:empty_bottle",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_tavern:empty_glassware",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "kaleidoscope_tavern:trellis",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:cooking_pot",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:skillet",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:stove",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:cutting_board",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:flint_knife",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:iron_knife",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:golden_knife",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farmersdelight:diamond_knife",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farm_and_charm:cooking_pot",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farm_and_charm:roaster",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farm_and_charm:stove",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farm_and_charm:mincer",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   },
   {
    "item": "farm_and_charm:crafting_bowl",
-   "price": 100,
+   "price": 1000,
    "category": "tool",
    "dynamic": true
   }
@@ -694,7 +716,7 @@
    },
    "category": "drink",
    "formula": "fixed",
-   "price": 30,
+   "price": 300,
    "dynamic": true,
    "looseSell": true
   },
@@ -719,7 +741,7 @@
    },
    "category": "dish",
    "formula": "fixed",
-   "price": 20,
+   "price": 200,
    "dynamic": true,
    "looseSell": true
   },
@@ -739,7 +761,7 @@
    },
    "category": "dish",
    "formula": "fixed",
-   "price": 30,
+   "price": 300,
    "dynamic": true,
    "looseSell": true
   },
@@ -756,7 +778,7 @@
    },
    "category": "dish",
    "formula": "food",
-   "multiplier": 0.6
+   "multiplier": 6
   },
   {
    "match": {
@@ -765,7 +787,7 @@
    },
    "category": "dish",
    "formula": "food",
-   "multiplier": 0.6
+   "multiplier": 6
   }
  ],
  "exclude": [
@@ -773,7 +795,6 @@
   "minecraft:rotten_flesh",
   "minecraft:spider_eye",
   "minecraft:poisonous_potato",
-  "minecraft:chorus_fruit",
   "minecraft:popped_chorus_fruit",
   "minecraft:suspicious_stew",
   "farmersdelight:rotten_tomato",

@@ -6,11 +6,12 @@
   "  sellPrice: 매입가를 직접 지정 (없으면 price 의 50%) · buy/sell: false 면 이 상점에서 팔지 않음/사지 않음",
   "  seed: true 면 '심을 수 있는 상점 씨앗'으로 판매 · fish: true 면 물고기(무게 보정) · dynamic: true 면 레시피 원가로 가격 결정",
   "auto: 태그·모드·종류로 아이템을 모으는 규칙. match{mod(s), tag(s), notTag(s), class(es), recipeType(s)}",
-  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto",
-  "만들 수 있는 음식은 여기 적힌 값 대신 '재료 원가 + 수고비'(config/rtshop/pricing.json)로 가격이 정해집니다.",
+  "  class: weapon|ranged|armor|shield|tool|hoe|fishing_rod|food|gear · formula: fixed|gear|food|auto · multiplier: 공식 가격에 곱하는 값",
+  "만들 수 있는 물건은 여기 적힌 값과 상관없이 '재료 원가(+조리 수고비)'에 매입하고, 판매가는 그 2배 이상이 됩니다 (config/rtshop/pricing.json).",
   "수정 후 /rtshop reload · 실제 적용된 가격과 점검 결과는 /rtshop export (config/rtshop/export)",
   "무기·방어구·도구의 가격은 공격력, 방어력, 내구도, 희귀도로 자동 계산됩니다 (formula: gear).",
-  "광부는 광물 탭에서 캔 광물을 팔 수 있습니다. 원석 블록(섬세한 손길)은 광물 1개 값으로 매입합니다."
+  "가격표에 있는 재료만으로 만드는 장비는 재료값만큼 매입합니다 (철 주괴 2개로 만든 검 = 철 주괴 2개 값).",
+  "광부는 광물 탭에서 캔 광물을 팔 수 있습니다. 원석 블록(섬세한 손길)은 맷돌에 갈았을 때 나오는 광물 개수만큼의 값입니다."
  ],
  "title": "장비 상점",
  "npcName": "장비 상인",
@@ -55,106 +56,105 @@
  "items": [
   {
    "item": "minecraft:arrow",
-   "price": 3,
-   "category": "ammo",
-   "sellPrice": 0.3
+   "price": 5,
+   "category": "ammo"
   },
   {
    "item": "minecraft:spectral_arrow",
-   "price": 8,
+   "price": 50,
    "category": "ammo"
   },
   {
    "item": "minecraft:firework_rocket",
-   "price": 8,
+   "price": 5,
    "category": "ammo"
   },
   {
    "item": "minecraft:coal",
-   "price": 5,
+   "price": 50,
    "category": "mineral"
   },
   {
    "item": "minecraft:charcoal",
-   "price": 3,
+   "price": 20,
    "category": "mineral"
   },
   {
    "item": "minecraft:raw_copper",
-   "price": 5,
+   "price": 30,
    "category": "mineral"
   },
   {
    "item": "minecraft:copper_ingot",
-   "price": 5,
+   "price": 30,
    "category": "mineral"
   },
   {
    "item": "minecraft:raw_iron",
-   "price": 28,
+   "price": 150,
    "category": "mineral"
   },
   {
    "item": "minecraft:iron_ingot",
-   "price": 28,
+   "price": 150,
    "category": "mineral"
   },
   {
    "item": "minecraft:raw_gold",
-   "price": 40,
+   "price": 300,
    "category": "mineral"
   },
   {
    "item": "minecraft:gold_ingot",
-   "price": 40,
+   "price": 300,
    "category": "mineral"
   },
   {
    "item": "minecraft:redstone",
-   "price": 4,
+   "price": 40,
    "category": "mineral"
   },
   {
    "item": "minecraft:lapis_lazuli",
-   "price": 6,
+   "price": 60,
    "category": "mineral"
   },
   {
    "item": "minecraft:quartz",
-   "price": 6,
+   "price": 20,
    "category": "mineral"
   },
   {
    "item": "minecraft:amethyst_shard",
-   "price": 8,
+   "price": 6,
    "category": "mineral"
   },
   {
-   "item": "minecraft:emerald",
-   "price": 80,
-   "category": "mineral",
-   "sellPrice": 3.0
-  },
-  {
    "item": "minecraft:diamond",
-   "price": 160,
+   "price": 1000,
    "category": "mineral"
   },
   {
    "item": "minecraft:netherite_scrap",
-   "price": 500,
+   "price": 3000,
    "category": "mineral"
   },
   {
    "item": "minecraft:netherite_ingot",
-   "price": 2200,
+   "price": 13200,
    "category": "mineral"
   },
   {
    "item": "minecraft:flint",
-   "price": 2,
+   "price": 10,
    "category": "mineral",
-   "sellPrice": 0.1
+   "sellPrice": 1
+  },
+  {
+   "item": "minecraft:gunpowder",
+   "price": 20,
+   "category": "mineral",
+   "sellPrice": 2
   },
   {
    "item": "minecraft:obsidian",
@@ -163,121 +163,130 @@
   },
   {
    "item": "minecraft:glowstone_dust",
-   "price": 5,
+   "price": 20,
    "category": "mineral"
   },
   {
+   "item": "minecraft:emerald",
+   "price": 60,
+   "category": "mineral",
+   "sellPrice": 3,
+   "buy": false
+  },
+  {
    "item": "minecraft:coal_ore",
-   "price": 5,
+   "price": 150,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:deepslate_coal_ore",
-   "price": 5,
+   "price": 150,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:copper_ore",
-   "price": 12,
+   "price": 180,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:deepslate_copper_ore",
-   "price": 12,
+   "price": 180,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:iron_ore",
-   "price": 28,
+   "price": 450,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:deepslate_iron_ore",
-   "price": 28,
+   "price": 450,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:gold_ore",
-   "price": 40,
+   "price": 900,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:deepslate_gold_ore",
-   "price": 40,
+   "price": 900,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:nether_gold_ore",
-   "price": 18,
+   "price": 300,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:redstone_ore",
-   "price": 18,
+   "price": 280,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:deepslate_redstone_ore",
-   "price": 18,
+   "price": 280,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:lapis_ore",
-   "price": 36,
+   "price": 420,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:deepslate_lapis_ore",
-   "price": 36,
+   "price": 420,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:diamond_ore",
-   "price": 160,
+   "price": 2000,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:deepslate_diamond_ore",
-   "price": 160,
-   "category": "mineral",
-   "buy": false
-  },
-  {
-   "item": "minecraft:emerald_ore",
-   "price": 80,
-   "category": "mineral",
-   "buy": false
-  },
-  {
-   "item": "minecraft:deepslate_emerald_ore",
-   "price": 80,
+   "price": 2000,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:nether_quartz_ore",
-   "price": 6,
+   "price": 60,
    "category": "mineral",
    "buy": false
   },
   {
    "item": "minecraft:ancient_debris",
-   "price": 500,
+   "price": 3000,
    "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "minecraft:emerald_ore",
+   "price": 800,
+   "category": "mineral",
+   "sellPrice": 400,
+   "buy": false
+  },
+  {
+   "item": "minecraft:deepslate_emerald_ore",
+   "price": 800,
+   "category": "mineral",
+   "sellPrice": 400,
    "buy": false
   }
  ],
@@ -293,42 +302,47 @@
     ]
    },
    "category": "mineral",
-   "price": 150
+   "price": 1500
   },
   {
    "match": {
     "class": "armor"
    },
    "category": "armor",
-   "formula": "gear"
+   "formula": "gear",
+   "multiplier": 5
   },
   {
    "match": {
     "class": "shield"
    },
    "category": "shield",
-   "formula": "gear"
+   "formula": "gear",
+   "multiplier": 5
   },
   {
    "match": {
     "class": "ranged"
    },
    "category": "ranged",
-   "formula": "gear"
+   "formula": "gear",
+   "multiplier": 5
   },
   {
    "match": {
     "class": "weapon"
    },
    "category": "weapon",
-   "formula": "gear"
+   "formula": "gear",
+   "multiplier": 5
   },
   {
    "match": {
     "class": "tool"
    },
    "category": "tool",
-   "formula": "gear"
+   "formula": "gear",
+   "multiplier": 5
   }
  ],
  "exclude": [
