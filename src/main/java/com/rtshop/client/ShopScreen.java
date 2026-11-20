@@ -387,6 +387,19 @@ public class ShopScreen extends Screen {
         scroll = Math.max(0, Math.min(scroll, maxScroll()));
     }
 
+    /** 자동 화면 점검(ClientSelfTest) 전용: 탭과 보기 방식을 바꾸고, 필요하면 첫 줄의 수량 입력 창을 연다. */
+    void debugView(boolean sell, boolean gridView, boolean dialog) {
+        setMode(sell);
+        if (this.grid != gridView) {
+            this.grid = gridView;
+            this.scroll = 0;
+            rebuild();
+        }
+        if (dialog && !rows.isEmpty()) {
+            openDialog(rows.get(0));
+        }
+    }
+
     private void setMode(boolean sell) {
         if (sellMode != sell) {
             sellMode = sell;

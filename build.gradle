@@ -23,6 +23,11 @@ minecraft {
             workingDirectory project.file('run')
         }
         client {
+            // ./gradlew runClient -PrtshopClientTest : 화면을 차례로 열어 사진을 찍고 끈다 (빌드 검증용)
+            if (project.hasProperty('rtshopClientTest')) {
+                property 'rtshop.clienttest', 'true'
+                args '--quickPlaySingleplayer', 'rtshoptest', '--width', '1280', '--height', '720'
+            }
         }
         server {
             args '--nogui'

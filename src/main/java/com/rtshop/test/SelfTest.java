@@ -821,7 +821,7 @@ public final class SelfTest {
                 loops++;
                 sample.append(' ').append(ShopLoader.itemId(p.stack));
             }
-            if (p.cost < 0 || p.stack.hasTag() || p.fixedSell) {
+            if (p.cost < 0 || !ShopLoader.isPlain(p.stack) || p.fixedSell) {
                 continue;
             }
             boolean food = p.stack.isEdible() || p.dynamicFood || (l.solved != null && l.solved.processed.contains(ShopLoader.itemId(p.stack)));
@@ -885,6 +885,9 @@ public final class SelfTest {
                             + " exact=" + (l.solved != null && l.solved.exact.contains("minecraft:iron_sword"))
                             + " ingotCost=" + ingot.cost + " via=" + (l.solved == null ? null : l.solved.costRecipe.get("minecraft:iron_ingot")));
         }
+        ShopLoader.Price stonePick = plain(l, Items.STONE_PICKAXE);
+        check("tools made from free materials are not worth crafting for sale", stonePick != null && stonePick.sellUnit <= 20,
+                stonePick == null ? null : stonePick.sellUnit + " (shop " + stonePick.price + ")");
         if (bucket != null && milk != null && ingot != null) {
             check("an empty bucket is bought back for three iron ingots", Math.abs(bucket.sellUnit - 3.0 * ingot.price) < 1.0e-6,
                     bucket.sellUnit);

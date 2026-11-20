@@ -145,6 +145,11 @@
    "category": "mineral"
   },
   {
+   "item": "minecraft:netherite_upgrade_smithing_template",
+   "price": 7000,
+   "category": "mineral"
+  },
+  {
    "item": "minecraft:flint",
    "price": 10,
    "category": "mineral",

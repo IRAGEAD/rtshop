@@ -292,6 +292,13 @@
    "sell": false
   },
   {
+   "item": "minecraft:netherrack",
+   "price": 1,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
    "item": "minecraft:rotten_flesh",
    "price": 1,
    "category": "material",

@@ -54,6 +54,52 @@ jobs:
             run/config/rtshop
             run/logs/latest.log
             selftest-gradle.log
+      - name: Client screen test
+        id: clienttest
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
+          rm -rf run/saves/rtshoptest run/screenshots run/rtshop-clienttest.txt
+          mkdir -p run/saves
+          cp -r run/world run/saves/rtshoptest
+          cat > run/options.txt <<'EOF'
+          onboardAccessibility:false
+          tutorialStep:none
+          skipMultiplayerWarning:true
+          joinedFirstServer:true
+          pauseOnLostFocus:false
+          guiScale:3
+          renderDistance:2
+          simulationDistance:5
+          maxFps:30
+          graphicsMode:0
+          ao:false
+          renderClouds:"false"
+          narrator:0
+          soundCategory_master:0.0
+          lang:ko_kr
+          EOF
+          timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClient -PrtshopClientTest --no-daemon > clienttest-gradle.log 2>&1 || true
+          grep -E "rtshop-clienttest|Exception|ERROR" clienttest-gradle.log | head -n 80 || true
+          tail -n 30 clienttest-gradle.log
+          echo "----- client test result -----"
+          cat run/rtshop-clienttest.txt
+          ls -la run/screenshots || true
+          grep -q "RESULT: ALL PASS" run/rtshop-clienttest.txt
+      - name: Publish screenshots to a branch
+        if: always() && github.ref != 'refs/heads/main'
+        continue-on-error: true
+        run: |
+          mkdir -p /tmp/shots && cp -r run/screenshots/. /tmp/shots/ 2>/dev/null || true
+          cp run/rtshop-clienttest.txt clienttest-gradle.log /tmp/shots/ 2>/dev/null || true
+          cd /tmp/shots
+          git init -q -b ci-screenshots
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Screenshots from run ${{ github.run_id }}" || exit 0
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-screenshots
       - name: Publish release
         if: github.ref == 'refs/heads/main'
         env:

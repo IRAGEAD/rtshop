@@ -285,7 +285,7 @@ public final class ShopLoader {
             }
             if (p.buyableSomewhere) {
                 base.merge(id, (double) p.price, Math::min);
-            } else if (!p.stack.hasTag()) {
+            } else if (isPlain(p.stack)) {
                 // 상점에서 살 수 없는 재료의 값: 매입가를 직접 정한 품목은 그 매입가(직접 길러서 쓰는 재료의 기회비용)
                 hints.put(id, p.fixedSell && !p.buyableSomewhere ? Math.max(0.01, p.sellUnit) : (double) p.price);
             }
@@ -310,7 +310,7 @@ public final class ShopLoader {
         int adjusted = 0;
         for (Map.Entry<String, Price> e : prices.entrySet()) {
             Price p = e.getValue();
-            if (p.stack.hasTag() || p.fixedSell) {
+            if (!isPlain(p.stack) || p.fixedSell) {
                 continue; // NBT 가 붙은 품목(상점 씨앗 등)과 매입가를 직접 적은 품목은 그대로 둔다
             }
             String id = itemId(p.stack);
@@ -429,7 +429,20 @@ public final class ShopLoader {
     }
 
     public static String key(ItemStack s) {
-        return itemId(s) + (s.hasTag() ? s.getTag().toString() : "");
+        return itemId(s) + (isPlain(s) ? "" : String.valueOf(s.getTag()));
+    }
+
+    /**
+     * 특별한 NBT 가 없는 '일반' 아이템인가.
+     * 도구·무기·방어구는 새것도 {Damage:0} 태그를 갖고 있으므로, 그 태그만 있는 경우는 일반 아이템으로 본다
+     * (그러지 않으면 장비가 "NBT 품목"으로 취급되어 재료 원가 계산에서 빠진다).
+     */
+    public static boolean isPlain(ItemStack s) {
+        if (!s.hasTag()) {
+            return true;
+        }
+        CompoundTag t = s.getTag();
+        return t != null && t.size() == 1 && t.contains("Damage") && s.getDamageValue() == 0;
     }
 
     /** 판매할 때 NBT 를 무시해도 되는 품목인가 (작물·물고기·음식처럼 별 등급이나 무게가 붙는 것). */
@@ -511,7 +524,7 @@ public final class ShopLoader {
                         p.sellUnit = Math.max(0, o.get("sellPrice").getAsDouble());
                         p.fixedSell = true;
                     }
-                    p.dynamicFood = bool(o, "dynamic", false) && !stack.hasTag() && !p.fixedSell;
+                    p.dynamicFood = bool(o, "dynamic", false) && isPlain(stack) && !p.fixedSell;
                     prices.put(key, p);
                 } else if (o.has("price") && p.price != price) {
                     notes.add(String.format("%s: 상점 '%s'의 가격 %d 대신 먼저 정해진 가격 %d 을(를) 씁니다 (가격은 전 상점 공통)", id, r.id, price, p.price));
@@ -629,7 +642,7 @@ public final class ShopLoader {
                             p.sellUnit = ruleSell;
                             p.fixedSell = true;
                         }
-                        p.dynamicFood = dynamic && !stack.hasTag() && !p.fixedSell;
+                        p.dynamicFood = dynamic && isPlain(stack) && !p.fixedSell;
                         prices.put(key, p);
                     }
                     Ref ref = new Ref();
@@ -726,7 +739,7 @@ public final class ShopLoader {
             for (ShopData.Entry e : d.entries) {
                 Price p = loaded.prices.get(key(e.stack));
                 sb.append(String.format(Locale.ROOT, "%s%s | %s | %s | %s%s | %s | %s%n",
-                        itemId(e.stack), e.stack.hasTag() ? " " + e.stack.getTag() : "",
+                        itemId(e.stack), isPlain(e.stack) ? "" : " " + e.stack.getTag(),
                         e.buyable ? Integer.toString(e.price) : "-",
                         e.sellable ? String.format(Locale.ROOT, "%.2f", e.sellUnit) : "-",
                         e.category, e.looseSell ? " (품질 반영)" : "",
@@ -743,7 +756,7 @@ public final class ShopLoader {
         }
         int deficits = 0;
         for (Price p : loaded.prices.values()) {
-            if (p.finished && p.cost >= 0 && !p.stack.hasTag() && (p.stack.isEdible() || p.dynamicFood) && p.sellUnit + 1.0e-6 < p.cost) {
+            if (p.finished && p.cost >= 0 && isPlain(p.stack) && (p.stack.isEdible() || p.dynamicFood) && p.sellUnit + 1.0e-6 < p.cost) {
                 audit.append(String.format(Locale.ROOT, "적자 가능: %s 매입가 %.2f < 원가 %.2f (%s)%n", itemId(p.stack), p.sellUnit, p.cost, p.basis));
                 deficits++;
             }
@@ -753,7 +766,7 @@ public final class ShopLoader {
         audit.append("\n# 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)\n");
         audit.append("# 음식값은 가장 싼 방법 기준으로 매겨지므로, 아래 품목을 상점에서 사서 재료로 쓰면 차액만큼 손해입니다.\n");
         for (Price p : loaded.prices.values()) {
-            if (p.buyableSomewhere && !p.dynamicFood && !p.stack.hasTag() && p.cost >= 0 && p.price > p.cost + 1.0e-6) {
+            if (p.buyableSomewhere && !p.dynamicFood && isPlain(p.stack) && p.cost >= 0 && p.price > p.cost + 1.0e-6) {
                 audit.append(String.format(Locale.ROOT, "%s | %d | %.2f | %s%n", itemId(p.stack), p.price, p.cost, p.basis));
             }
         }
