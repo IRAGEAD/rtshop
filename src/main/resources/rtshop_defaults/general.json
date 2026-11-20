@@ -278,6 +278,34 @@
    "sell": false
   },
   {
+   "item": "minecraft:cod_bucket",
+   "price": 571,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:salmon_bucket",
+   "price": 571,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:pufferfish_bucket",
+   "price": 671,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:tropical_fish_bucket",
+   "price": 851,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
    "item": "farmersdelight:tree_bark",
    "price": 1,
    "category": "material",
@@ -294,6 +322,13 @@
   {
    "item": "minecraft:netherrack",
    "price": 1,
+   "category": "material",
+   "buy": false,
+   "sell": false
+  },
+  {
+   "item": "minecraft:carved_pumpkin",
+   "price": 4,
    "category": "material",
    "buy": false,
    "sell": false

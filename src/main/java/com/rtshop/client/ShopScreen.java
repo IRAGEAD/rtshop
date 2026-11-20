@@ -687,7 +687,15 @@ public class ShopScreen extends Screen {
         if (sellMode) {
             ItemStack counted = r.shown.copy();
             counted.setCount((int) Math.min(r.owned, 9999L));
+            if (counted.getTag() != null) {
+                counted.getTag().remove(SeedRules.STAR_TAG); // 별은 아래에서 큰 글자로 따로 그린다 (아이콘의 작은 별과 겹치지 않게)
+            }
             g.renderItemDecorations(this.font, counted, x + (CELL - 16) / 2, y + 3);
+        } else {
+            // 구매 탭: '심기 전용' 표시(초록 점)만 보이도록 개수 없이 장식을 그린다
+            ItemStack one = r.shown.copy();
+            one.setCount(1);
+            g.renderItemDecorations(this.font, one, x + (CELL - 16) / 2, y + 3);
         }
         String mark = qualityMark(r);
         if (!mark.isEmpty()) {

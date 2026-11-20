@@ -983,8 +983,12 @@ public final class SelfTest {
         check("the price table has the reference items", wheat != null && bread != null && ingot != null && rawIron != null
                 && sword != null && bucket != null && milk != null && sugar != null && cane != null && beef != null && steak != null);
         if (wheat != null && bread != null) {
-            check("bread made from bought wheat sells for what the wheat cost", Math.abs(bread.sellUnit - 3.0 * wheat.price) < 1.0e-6,
-                    bread.sellUnit + " vs 3 x " + wheat.price);
+            // 빵을 만드는 가장 싼 방법 기준. 바닐라만 있으면 밀 3개, 요리 모드가 있으면 더 싼 반죽 조리법이 기준이 된다
+            boolean vanillaOnly = !ModList.get().isLoaded("farmersdelight") && !ModList.get().isLoaded("farm_and_charm");
+            check("bread made from bought wheat sells for what its ingredients cost",
+                    bread.sellUnit <= 3.0 * wheat.price + 1.0e-6 && bread.sellUnit >= wheat.price * 0.9
+                            && (!vanillaOnly || Math.abs(bread.sellUnit - 3.0 * wheat.price) < 1.0e-6),
+                    bread.sellUnit + " (wheat " + wheat.price + ", " + bread.basis + ")");
             check("...and costs at least twice that to buy back", bread.price >= 2 * bread.sellUnit - 1.0e-6, bread.price);
         }
         if (beef != null && steak != null) {
@@ -1016,7 +1020,7 @@ public final class SelfTest {
         if (food != null) {
             int breadIdx = findEntry(food, e -> e.stack.is(Items.BREAD) && !e.stack.hasTag());
             check("the food merchant shows which ingredients a dish is priced from", breadIdx >= 0
-                    && !food.entries.get(breadIdx).recipe.isEmpty() && food.entries.get(breadIdx).recipe.get(0).item == Items.WHEAT,
+                    && !food.entries.get(breadIdx).recipe.isEmpty(),
                     breadIdx < 0 ? "no bread" : food.entries.get(breadIdx).recipe.size() + " parts");
         }
         for (String note : l.notes) {

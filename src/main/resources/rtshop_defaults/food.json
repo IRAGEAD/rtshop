@@ -730,14 +730,13 @@
      "kaleidoscope_cookery:steamer",
      "kaleidoscope_cookery:teapot",
      "kaleidoscope_cookery:rice_bowl",
-     "kaleidoscope_cookery:bamboo_tray",
      "farmersdelight:cooking",
      "farm_and_charm:pot_cooking",
      "farm_and_charm:roaster",
      "farm_and_charm:stove",
-     "farm_and_charm:crafting_bowl",
-     "farm_and_charm:drying"
-    ]
+     "farm_and_charm:crafting_bowl"
+    ],
+    "class": "food"
    },
    "category": "dish",
    "formula": "fixed",
@@ -756,7 +755,9 @@
     ],
     "tags": [
      "kaleidoscope_cookery:meals",
-     "kaleidoscope_cookery:feasts"
+     "kaleidoscope_cookery:feasts",
+     "farmersdelight:meals",
+     "farmersdelight:feasts"
     ]
    },
    "category": "dish",

@@ -78,6 +78,9 @@ public final class ShopLoader {
         public boolean dynamicFood;
         public boolean fixedSell;
         public boolean buyableSomewhere;
+        public boolean sellableSomewhere;
+        /** 장비 공식으로 가격이 정해진 품목(무기·방어구·도구). 만들 수 있으면 항상 재료 원가 기준으로 매입한다. */
+        public boolean gear;
         public String basis = "";
         public double cost = -1;
         /** 매입가를 계산한 조리법의 재료(가장 싼 것 기준)와 1회 생산량. */
@@ -228,6 +231,9 @@ public final class ShopLoader {
                 if (ref.buy) {
                     prices.get(ref.key).buyableSomewhere = true;
                 }
+                if (ref.sell) {
+                    prices.get(ref.key).sellableSomewhere = true;
+                }
             }
         }
 
@@ -330,8 +336,9 @@ public final class ShopLoader {
                 p.basis = String.valueOf(res.valueRecipe.get(id));
                 p.finished = true;
                 adjusted++;
-            } else if (p.price > c + 1.0e-9) {
-                // 만들 수 있는데 상점가가 원가보다 비싼 품목 = 완제품.
+            } else if (p.sellableSomewhere && (p.gear || p.price >= 1.5 * c - 1.0e-9)) {
+                // 완제품: 장비이거나, 상점가가 만드는 원가보다 훨씬(1.5배 이상) 비싼 품목.
+                // 재료 원가만큼 매입하고, 되팔 때 50% 규칙이 지켜지도록 상점가를 원가의 2배 이상으로 맞춘다.
                 p.finished = true;
                 if (food) {
                     p.sellUnit = v;
@@ -349,7 +356,7 @@ public final class ShopLoader {
                     p.basis = String.valueOf(res.costRecipe.get(id));
                 }
             }
-            // 그 밖 = 원가 이하로 파는 기본 재료(설탕, 기름 등): 상점가의 50% 에 매입 (아래에서 채움)
+            // 그 밖 = 원가와 비슷하거나 더 싸게 파는 기본 재료(설탕, 기름, 숯 등): 상점가의 50% 에 매입 (아래에서 채움)
         }
         // 가격 근거(어떤 재료 기준으로 값을 매겼는지)를 상점 화면에 보여 주기 위해 정리한다
         for (Price p : prices.values()) {
@@ -643,6 +650,7 @@ public final class ShopLoader {
                             p.fixedSell = true;
                         }
                         p.dynamicFood = dynamic && isPlain(stack) && !p.fixedSell;
+                        p.gear = formula.equals("gear") || (formula.equals("auto") && Pricing.gear(plain) > 0);
                         prices.put(key, p);
                     }
                     Ref ref = new Ref();
@@ -762,14 +770,46 @@ public final class ShopLoader {
             }
         }
         audit.append("적자 가능 음식: ").append(deficits).append("종\n");
-        // 상점에서 사는 것보다 직접 만드는 편이 싼 품목: 이것을 사서 요리 재료로 쓰면 차액만큼 손해를 본다
-        audit.append("\n# 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)\n");
+        // 요리 재료로 쓰이는데 상점에서 사는 것보다 직접 만드는 편이 싼 품목: 사서 쓰면 차액만큼 손해를 본다
+        audit.append("\n# 요리 재료 중 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)\n");
         audit.append("# 음식값은 가장 싼 방법 기준으로 매겨지므로, 아래 품목을 상점에서 사서 재료로 쓰면 차액만큼 손해입니다.\n");
-        for (Price p : loaded.prices.values()) {
-            if (p.buyableSomewhere && !p.dynamicFood && isPlain(p.stack) && p.cost >= 0 && p.price > p.cost + 1.0e-6) {
-                audit.append(String.format(Locale.ROOT, "%s | %d | %.2f | %s%n", itemId(p.stack), p.price, p.cost, p.basis));
+        Set<String> usedInFood = new HashSet<>();
+        if (loaded.scan != null && loaded.scan.env != null) {
+            Set<String> foods = new HashSet<>();
+            for (Price p : loaded.prices.values()) {
+                if (isPlain(p.stack) && (p.dynamicFood || p.stack.isEdible())) {
+                    foods.add(itemId(p.stack));
+                }
+            }
+            for (RecipeSolver.Recipe r : loaded.scan.recipes) {
+                boolean makesFood = false;
+                for (RecipeSolver.Out o : r.outputs) {
+                    makesFood |= foods.contains(o.item);
+                }
+                if (!makesFood) {
+                    continue;
+                }
+                for (RecipeSolver.Ing ing : r.ingredients) {
+                    for (String alt : ing.alts) {
+                        if (alt.startsWith("#")) {
+                            usedInFood.addAll(loaded.scan.env.tagItems(alt.substring(1)));
+                        } else {
+                            usedInFood.add(alt);
+                        }
+                    }
+                }
             }
         }
+        int traps = 0;
+        for (Price p : loaded.prices.values()) {
+            if (p.buyableSomewhere && !p.dynamicFood && isPlain(p.stack) && p.cost >= 0 && p.price > p.cost + 1.0e-6
+                    && usedInFood.contains(itemId(p.stack))) {
+                audit.append(String.format(Locale.ROOT, "%s | %d | %.2f | %s%n", itemId(p.stack), p.price, p.cost,
+                        loaded.solved == null ? "" : String.valueOf(loaded.solved.costRecipe.get(itemId(p.stack)))));
+                traps++;
+            }
+        }
+        audit.append("해당 품목: ").append(traps).append("종\n");
         if (loaded.solved != null && !loaded.solved.estimated.isEmpty()) {
             audit.append("\n# 가격표에 없어 추정가를 쓴 재료 (상점 파일에 가격을 적으면 더 정확해집니다)\n");
             loaded.solved.estimated.forEach((k, v) -> audit.append(String.format(Locale.ROOT, "%s = %.0f%n", k, v)));
