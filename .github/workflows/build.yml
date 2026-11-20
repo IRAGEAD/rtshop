@@ -25,6 +25,31 @@ jobs:
         with:
           name: rtshop-jar
           path: build/libs/*.jar
+      - name: Server self-test
+        run: |
+          mkdir -p run
+          echo "eula=true" > run/eula.txt
+          cat > run/server.properties <<'EOF'
+          online-mode=false
+          spawn-protection=0
+          level-type=minecraft\:flat
+          max-tick-time=-1
+          view-distance=4
+          EOF
+          timeout 1500 ./gradlew runServer -PrtshopSelfTest --no-daemon > selftest-gradle.log 2>&1 || true
+          tail -n 60 selftest-gradle.log
+          echo "----- self-test result -----"
+          cat run/rtshop-selftest.txt
+          grep -q "RESULT: ALL PASS" run/rtshop-selftest.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selftest
+          path: |
+            run/rtshop-selftest.txt
+            run/config/rtshop
+            run/logs/latest.log
+            selftest-gradle.log
       - name: Publish release
         if: github.ref == 'refs/heads/main'
         env:

@@ -135,13 +135,8 @@ public final class RecipeScan {
                 return estimate.applyAsDouble(itemId);
             }
 
-            @Override
-            public double hint(String itemId) {
-                Double h = hints.get(itemId);
-                return h == null ? -1 : h;
-            }
         };
-        scan.result = RecipeSolver.solve(base, recipes, env, cfg);
+        scan.result = RecipeSolver.solve(base, hints, recipes, env, cfg);
     }
 
     private static Item item(String id) {

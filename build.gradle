@@ -26,6 +26,10 @@ minecraft {
         }
         server {
             args '--nogui'
+            // ./gradlew runServer -PrtshopSelfTest : 서버를 띄워 자체 점검을 돌리고 끈다 (빌드 검증용)
+            if (project.hasProperty('rtshopSelfTest')) {
+                property 'rtshop.selftest', 'true'
+            }
         }
     }
 }

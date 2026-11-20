@@ -37,11 +37,6 @@ public final class RecipeSolver {
 
         /** 가격표에 없는 말단 재료의 추정 가격. */
         double estimate(String itemId);
-
-        /** 상점에서 살 수는 없지만 값이 정해져 있는 재료의 값 (다른 것으로 만들 수 있는 아이템에도 적용). 없으면 0 이하. */
-        default double hint(String itemId) {
-            return -1;
-        }
     }
 
     public static final class Config {
@@ -95,6 +90,8 @@ public final class RecipeSolver {
         /** value 를 정한 레시피에 마진이 있었는지(= 조리 가공품인지). */
         public final Set<String> processed = new HashSet<>();
         public final Map<String, Double> estimated = new LinkedHashMap<>();
+        /** 추정가 없이, 가격표에 있는 재료만으로 원가가 계산된 아이템. */
+        public final Set<String> exact = new HashSet<>();
         /** 각 아이템의 원가/가치를 정한 레시피에서 "만들어 쓰는" 것으로 계산된 재료 (고리 검사용). */
         public final Map<String, List<String>> costDeriv = new HashMap<>();
         public final Map<String, List<String>> valueDeriv = new HashMap<>();
@@ -356,7 +353,24 @@ public final class RecipeSolver {
     private static final double INF = Double.MAX_VALUE;
 
     /**
-     * @param base 상점 가격표(구매가). 레시피로 만들 수 없는 원재료의 기준 가격.
+     * @param base  상점 가격표(구매가). 레시피로 만들 수 없는 원재료의 기준 가격.
+     * @param hints 상점에서 살 수는 없지만 값이 정해져 있는 재료(직접 캐거나 낚는 것)의 값. 가격표와 똑같이 취급한다.
+     */
+    public static Result solve(Map<String, Double> base, Map<String, Double> hints, List<Recipe> recipes, Env env, Config cfg) {
+        Map<String, Double> known = new HashMap<>();
+        if (hints != null) {
+            for (Map.Entry<String, Double> e : hints.entrySet()) {
+                if (e.getValue() != null && e.getValue() > 0) {
+                    known.put(e.getKey(), Math.max(0.01, e.getValue()));
+                }
+            }
+        }
+        known.putAll(base);
+        return solve(known, recipes, env, cfg);
+    }
+
+    /**
+     * @param base 값이 정해진 재료의 가격표.
      */
     public static Result solve(Map<String, Double> base, List<Recipe> recipes, Env env, Config cfg) {
         Result res = new Result();
@@ -371,6 +385,7 @@ public final class RecipeSolver {
         // 1단계: 가격표에 있는 재료만으로 계산한다. 여기서 정해진 값은 이후 단계에서 바뀌지 않는다
         // (가격을 모르는 재료의 추정가 때문에 멀쩡한 아이템이 싸게 계산되는 것을 막기 위함).
         relax(base, est, recipes, env, cfg, res, Set.of());
+        res.exact.addAll(res.cost.keySet());
         Set<String> frozen = new HashSet<>(res.cost.keySet());
         frozen.addAll(base.keySet());
 
@@ -404,11 +419,7 @@ public final class RecipeSolver {
                             if (base.containsKey(item) || est.containsKey(item) || !env.exists(item)) {
                                 continue;
                             }
-                            double hint = env.hint(item);
-                            if (hint > 0) {
-                                est.put(item, Math.max(0.01, hint));
-                                added = true;
-                            } else if (!craftable.contains(item)) {
+                            if (!craftable.contains(item)) {
                                 est.put(item, Math.max(0.01, env.estimate(item)));
                                 added = true;
                             }
