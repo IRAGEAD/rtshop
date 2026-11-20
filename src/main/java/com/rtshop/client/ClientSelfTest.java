@@ -171,7 +171,7 @@ public final class ClientSelfTest {
             }
             case 2 -> {
                 check("server-side setup worked", serverError == null, serverError);
-                check("the wallet reached the client", ClientEconomy.wallet == 128_450, ClientEconomy.wallet);
+                check("the wallet reached the client (minus the 2,500 G check)", ClientEconomy.wallet == 128_450 - 2_500, ClientEconomy.wallet);
                 shot(mc, "01_hud");
                 mc.setScreen(new HudEditScreen());
                 wait = 20;

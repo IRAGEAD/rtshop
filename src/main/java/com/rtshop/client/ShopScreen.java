@@ -671,9 +671,14 @@ public class ShopScreen extends Screen {
             return "★".repeat(star);
         }
         if (sellMode && Math.abs(r.mult - 1.0) > 0.004) {
-            return (r.mult > 1 ? "+" : "") + Math.round((r.mult - 1.0) * 100) + "%";
+            return listPercent(r);
         }
         return "";
+    }
+
+    /** 이 줄의 매입가가 상점 판매가(가격표 가격)의 몇 % 인지. */
+    private static String listPercent(Row r) {
+        return Math.round(r.unit / Math.max(1, r.entry.price) * 100.0) + "%";
     }
 
     private void drawCell(GuiGraphics g, Row r, int x, int y, boolean hov) {
@@ -820,7 +825,7 @@ public class ShopScreen extends Screen {
 
     private Component qualityLine(Row r) {
         int star = SeedRules.star(r.shown);
-        String pct = (r.mult >= 1 ? "+" : "") + Math.round((r.mult - 1.0) * 100) + "%";
+        String pct = listPercent(r);
         if (star > 0) {
             return Component.translatable("rtshop.tip.star_bonus", SeedRules.starText(star), pct).withStyle(ChatFormatting.YELLOW);
         }
