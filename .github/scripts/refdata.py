@@ -99,6 +99,49 @@ for label, spec in MODS.items():
         print("ERROR", label, ex)
     index[label] = info
 
+# source jars of the two Kaleidoscope mods (to read how rice bowls / barrels consume ingredients)
+for label in ("kaleidoscope_cookery", "kaleidoscope_tavern"):
+    try:
+        slug = index[label]["slug"]
+        loaders = urllib.parse.quote('["forge"]')
+        gvs = urllib.parse.quote('["1.20.1"]')
+        v = get_json(f"{API}/project/{slug}/version?loaders={loaders}&game_versions={gvs}")[0]
+        for f in v["files"]:
+            if f["filename"].endswith("-sources.jar"):
+                z = zipfile.ZipFile(io.BytesIO(get(f["url"])))
+                n = 0
+                for name in z.namelist():
+                    if name.endswith(".java"):
+                        dest = os.path.join(out_dir, label + "_src", name)
+                        os.makedirs(os.path.dirname(dest), exist_ok=True)
+                        with open(dest, "wb") as fh:
+                            fh.write(z.read(name))
+                        n += 1
+                print("SRC", label, n)
+    except Exception as ex:
+        print("SRCERROR", label, ex)
+
+# vanilla 1.20.1 data (recipes, item tags, crop loot tables, item names)
+try:
+    man = get_json("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json")
+    vurl = next(v["url"] for v in man["versions"] if v["id"] == "1.20.1")
+    client = get_json(vurl)["downloads"]["client"]["url"]
+    z = zipfile.ZipFile(io.BytesIO(get(client)))
+    n = 0
+    for name in z.namelist():
+        keep = (name.startswith("data/minecraft/recipes/") or name.startswith("data/minecraft/tags/items/")
+                or name.startswith("data/minecraft/tags/blocks/") or name.startswith("data/minecraft/loot_tables/blocks/")
+                or name == "assets/minecraft/lang/en_us.json")
+        if keep and not name.endswith("/"):
+            dest = os.path.join(out_dir, "minecraft", name)
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            with open(dest, "wb") as fh:
+                fh.write(z.read(name))
+            n += 1
+    print("VANILLA", n)
+except Exception as ex:
+    print("VANILLAERROR", ex)
+
 with open(os.path.join(out_dir, "index.json"), "w", encoding="utf-8") as fh:
     json.dump(index, fh, ensure_ascii=False, indent=1)
 with tarfile.open("refdata.tar.gz", "w:gz") as tar:
