@@ -41,13 +41,15 @@ public final class ChoicePopup {
         for (Option o : options) {
             widest = Math.max(widest, font.width(o.label()) + (o.icon().isEmpty() ? 14 : 26));
         }
-        this.w = widest;
+        int screenW = net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScaledWidth();
+        this.w = Math.min(widest, Math.max(anchorW, screenW - 8));
         int maxRows = Math.max(3, Math.min(options.size(), (screenH - 16) / ROW / 2));
         this.rows = Math.min(options.size(), Math.max(3, Math.min(14, maxRows)));
         int h = rows * ROW + 4;
         int below = anchorY + anchorH;
         this.y = below + h <= screenH - 4 ? below : Math.max(4, anchorY - h);
-        this.x = anchorX;
+        // 화면 오른쪽 밖으로 나가지 않게 왼쪽으로 민다
+        this.x = Math.max(4, Math.min(anchorX, screenW - 4 - this.w));
         int idx = -1;
         for (int i = 0; i < options.size(); i++) {
             if (options.get(i).value().equals(current)) {
@@ -91,7 +93,7 @@ public final class ChoicePopup {
                 g.pose().popPose();
                 tx = x + 16;
             }
-            g.drawString(font, (cur ? "✔ " : "") + o.label(), tx, ry + 2, cur ? Ui.C_GREEN : Ui.C_INK, false);
+            g.drawString(font, Ui.clip(font, (cur ? "✔ " : "") + o.label(), x + w - tx - 4), tx, ry + 2, cur ? Ui.C_GREEN : Ui.C_INK, false);
         }
         if (options.size() > rows) {
             int total = options.size();
