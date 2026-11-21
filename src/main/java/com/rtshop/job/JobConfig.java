@@ -135,6 +135,16 @@ public final class JobConfig {
 
     private void defaults() {
         weaponTypes.addAll(WeaponTypes.defaults());
+        // 이름만으로는 분류되지 않는 모드팩 무기 (편집기에서 바꿀 수 있음)
+        String[][] over = {
+                {"cataclysm:coral_bardiche", "spear"}, {"cataclysm:soul_render", "spear"}, {"cataclysm:astrape", "spear"},
+                {"cataclysm:ceraunus", "spear"}, {"cataclysm:the_incinerator", "sword"}, {"cataclysm:the_annihilator", "axe"},
+                {"cataclysm:the_immolator", "staff"}, {"cataclysm:meat_shredder", "sword"}, {"wom:gesetz", "staff"},
+                {"wom:demon_bracelet", "fist"}, {"spmovesets:pulseras_choque", "fist"}, {"irons_spellbooks:lightning_rod", "staff"},
+                {"farmersdelight:skillet", "blunt"}};
+        for (String[] o : over) {
+            weaponOverrides.put(o[0], o[1]);
+        }
         add(def("swordsman", COMBAT, "검사", "minecraft:iron_sword",
                 p("critDamage", 0.10),
                 p("sword", 0.10, 0.10, "dagger", 0, 0, "axe", -0.15, -0.10, "blunt", -0.15, -0.10, "spear", -0.15, -0.10,

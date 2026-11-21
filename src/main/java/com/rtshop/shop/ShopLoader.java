@@ -99,6 +99,8 @@ public final class ShopLoader {
         public double autoMin = -1;
         /** 손으로 만드는 요리 (재료를 사서 만들 수 있고, 화로에 바로 구워 만드는 길이 없음): 이익 하한과 요리사 보너스 대상. */
         public boolean handMade;
+        /** 요리사 판매 보너스 대상: 손으로 만드는 요리 중 화로에 바로 넣어 만드는 길이 아예 없는 것. */
+        public boolean cookable;
     }
 
     private static final class Ref {
@@ -947,9 +949,10 @@ public final class ShopLoader {
                 Need n = need(id, makers, pcost, scan.env, cfg, pc, sup);
                 // 화로에 바로 넣는 싼 길 때문에 다른 조리법이 보호받지 못하는 경우: 그 화로 재료가 '만들어 쓰는 중간 재료'(반죽 등)이면
                 // 중간 재료의 상점가를 올려 화로 길도 같은 값이 되게 한다. 고기 같은 원재료 값은 건드리지 않는다.
-                if (!n.skipped().isEmpty() && n.fullMax() > 0) {
+                double target = n.fullMax() * (1.0 + pc.handCookedMargin);
+                if (n.fullMax() > 0) {
                     for (AutoRoute route : n.autoRoutes()) {
-                        if (route.cost() + 1.0e-6 >= n.fullMax() || route.picks().size() != 1) {
+                        if (route.cost() + 1.0e-6 >= target || route.picks().size() != 1) {
                             continue;
                         }
                         RecipeSolver.Pick in = route.picks().get(0);
@@ -961,7 +964,7 @@ public final class ShopLoader {
                             continue; // 상점이 원재료(농산물·고기 등)로 파는 것은 값을 바꾸지 않는다
                         }
                         double outN = RecipeSolver.outputCount(route.recipe(), id, scan.env);
-                        int newPrice = (int) Math.ceil(n.fullMax() * outN / in.count - 1.0e-9);
+                        int newPrice = (int) Math.ceil(target * outN / in.count - 1.0e-9);
                         if (newPrice > ip.price) {
                             if (ip.sellUnit < 0) {
                                 ip.sellUnit = ip.price * ratio; // 되파는 값은 그대로 (올린 판매가로 되팔아 이익을 보지 못하게)
@@ -977,9 +980,12 @@ public final class ShopLoader {
                 if (n.value() <= 0) {
                     continue;
                 }
-                // 손으로 만드는 요리는 재료비보다 조금(handCookedMargin) 더, 화로에 바로 구울 수 있는 음식은 본전
-                p.handMade = n.autoMin() <= 0;
-                double floorV = n.value() * (p.handMade ? 1.0 + pc.handCookedMargin : 1.0);
+                // 손으로 만드는 요리는 재료비보다 조금(handCookedMargin) 더. 단 상점 재료를 화로에 바로 넣어 그보다 싸게 만들 수 있으면
+                // (화로 자동화로 돈을 찍어 낼 수 있으므로) 본전.
+                double handFloor = n.value() * (1.0 + pc.handCookedMargin);
+                p.handMade = n.autoMin() <= 0 || n.autoMin() + 1.0e-6 >= handFloor;
+                p.cookable = n.autoMin() <= 0;
+                double floorV = p.handMade ? handFloor : n.value();
                 double now = p.sellUnit >= 0 ? p.sellUnit : p.price * ratio;
                 if (now + 1.0e-6 >= floorV) {
                     continue;
@@ -1105,7 +1111,7 @@ public final class ShopLoader {
         if (p == null || loaded.solved == null || p.autoMin > 0) {
             return false;
         }
-        if (p.handMade) {
+        if (p.cookable) {
             return true;
         }
         String id = itemId(stack);

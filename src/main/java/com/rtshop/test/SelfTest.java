@@ -749,7 +749,7 @@ public final class SelfTest {
                     low.add(ShopLoader.itemId(p.stack) + " " + p.sellUnit + "<" + p.purchaseNeed * (1 + margin));
                 }
                 double cook = p.sellUnit * (1 + cfg.job("cook").param("dishSell", 0));
-                if (cook + 1e-6 < p.purchaseNeed * 1.40) {
+                if (p.cookable && cook + 1e-6 < p.purchaseNeed * 1.40) {
                     low.add(ShopLoader.itemId(p.stack) + " cook " + cook + "<" + p.purchaseNeed * 1.4);
                 }
             }
@@ -757,7 +757,11 @@ public final class SelfTest {
             check("hand-made food pays everyone 10% over the ingredients and a cook 40% or more", low.isEmpty(),
                     low.isEmpty() ? null : low.subList(0, Math.min(6, low.size())));
             ShopLoader.Price bread = ShopServer.loaded().prices.get("minecraft:bread");
-            check("bread pays at least 110% of its 3 wheat", bread != null && bread.sellUnit + 1e-6 >= 3 * 40 * (1 + margin), bread == null ? null : bread.sellUnit);
+            ShopLoader.Price wheatP = ShopServer.loaded().prices.get("minecraft:wheat");
+            check("bread pays at least 110% of its 3 wheat (also when dough can be baked)", bread != null && wheatP != null
+                    && bread.sellUnit + 1e-6 >= 3 * wheatP.price * (1 + margin), bread == null ? null : bread.sellUnit);
+            check("a cook gets the bonus on hand-made food but not on anything a furnace can make from shop goods",
+                    ShopLoader.handCooked(ShopServer.loaded(), new ItemStack(Items.BREAD)) == (bread != null && bread.cookable));
 
             // 직업 편집기 저장
             java.nio.file.Path jf = com.rtshop.job.JobConfig.path();
