@@ -132,6 +132,16 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 **맵에서 미리 찾아 둔 밭 가져오기**: `config/rtshop/plots_import.json` 을 두고 `/rtshop plot import`. 같은 이름의 구획은 건너뛰므로 여러 번 해도 안전합니다.
 (중세 도시 아모노스 맵의 성 밖 농경지 28곳을 맵 파일에서 칸 단위로 찾아 둔 파일이 모드팩에 들어 있습니다.)
 
+**나누기 (3.11)**: `/rtshop plot split <번호> [크기]` 로 판매 중인 구획을 크기×크기(기본 16) 격자로 나눕니다. 모양은 원래 밭 경계를 그대로 따르고,
+격자 넓이의 40% 가 안 되는 자투리는 옆 조각에 붙습니다. 이름은 `원래이름-1, -2…`, 가격은 넓이에 비례해 나뉩니다.
+
+**초보 농지 (3.11)**: 농부 직업을 얻으면(선행 퀘스트 → 직업 안내인) **빈 초보 농지 하나를 무료로** 받습니다. 한 사람당 한 번이며, 접속할 때도 확인하므로 이미 농부인 사람도 받습니다.
+- OP 가 `/rtshop plot starter <번호> on` 으로 구획을 초보 농지 묶음에 넣습니다 (`off` 로 해제). 초보 농지는 팔지 않고 [구매하기] 안내도 뜨지 않습니다.
+- 반환하거나 **농부를 그만두면** 돈은 없이 회수되어 다음 초보 농부에게 돌아갑니다 (블록·상자는 남지만 보호와 PIN 이 풀림). 같은 사람은 다시 받을 수 없습니다 (OP: `/rtshop plot starter reset <플레이어>` 로 다시 받게 할 수 있음).
+- 빈 초보 농지가 없으면 본인과 접속 중인 OP 에게 알리고, 자리가 생기면 다음 접속 때 받습니다.
+- `land.json`: `starterPlotJob`(기본 `farmer`, `""` = 끔) · `starterPlotGroup`(기본 `starter`) · `starterPlotReturnWhenJobLost`(기본 `true`, `false` 면 직업을 바꿔도 계속 가짐)
+- 아모노스 맵의 **드립리프밭 3** 은 16×16 정도의 초보 농지 19칸으로 나눠 `plots_import.json` 에 들어 있습니다. 예전에 통째로 가져온 "드립리프밭 3" 이 아직 판매 중이면 `/rtshop plot import` 를 다시 할 때 자동으로 바뀝니다.
+
 **플레이어**
 
 - 판매 중인 구획에 들어서면 채팅에 이름·넓이·가격과 **[구매하기]** 가 뜹니다. 누르거나 `/rtshop plot buy` 로 소지금에서 냅니다.
@@ -258,6 +268,8 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 | `/rtshop plot wand\|mode\|brush\|undo\|clear\|polygon close` | OP | 구획 지팡이와 선택 도구 |
 | `/rtshop plot create [가격\|auto] [이름]` | OP | 고른 모양으로 구획 등록 (판매 중) |
 | `/rtshop plot list\|tp\|edit\|save\|price\|rename\|give\|reset\|delete\|import` | OP | 구획 관리 · 맵 밭 목록 가져오기 |
+| `/rtshop plot split <번호> [크기]` | OP | 구획을 크기×크기(기본 16) 조각으로 나누기 |
+| `/rtshop plot starter <번호> on\|off` · `starter reset <플레이어>` | OP | 초보 농지 묶음 넣기/빼기 · 다시 받을 수 있게 |
 | `/rtshop reload` · `/rtshop export` | OP | 설정 다시 읽기 · 가격표 내보내기 |
 
 ## 알아 둘 점
