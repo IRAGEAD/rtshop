@@ -136,6 +136,8 @@ public class HudEditScreen extends Screen {
         if (!cfg.questHudEnabled) {
             hiddenMark(g, qb);
         }
+        // HUD 글자가 아래 버튼·목록 위로 비치지 않게 여기서 한 번 그려 둔다
+        g.flush();
 
         g.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFF5E6C0);
         g.drawCenteredString(this.font, Component.translatable("rtshop.hud.help1"), this.width / 2, 26, 0xFFD9C592);
