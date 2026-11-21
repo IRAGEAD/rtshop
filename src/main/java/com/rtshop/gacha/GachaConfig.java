@@ -271,6 +271,8 @@ public final class GachaConfig {
         List<Object[]> top = new ArrayList<>();
         List<Entry> out = new ArrayList<>();
         JobConfig jc = JobConfig.get();
+        // 정한 모드가 하나도 없으면 (예: Epic Fight 없이) 모든 무기에서 고른다
+        boolean anyBase = weaponMods.stream().anyMatch(m -> net.minecraftforge.fml.ModList.get().isLoaded(m));
         for (Item item : ForgeRegistries.ITEMS) {
             ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
             if (item == Items.AIR || excluded(rl)) {
@@ -295,7 +297,7 @@ public final class GachaConfig {
                     top.add(new Object[]{itemEntry(id, "epic", 10), weaponScore(s)});
                     continue;
                 }
-                if (!weaponMods.contains(rl.getNamespace())) {
+                if (anyBase && !weaponMods.contains(rl.getNamespace())) {
                     continue;
                 }
                 if (s.getRarity() == Rarity.EPIC) {
