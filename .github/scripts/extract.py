@@ -3,7 +3,7 @@ import zipfile, os, json, glob, re
 WANT = ["epic-fight-2", "epicfight-extra", "irons_spellbooks", "kaleidoscopecookery", "kaleidoscopetavern", "handson_delight",
         "starcatcher", "wizards", "archers", "paladins", "rogues", "miningmaster", "spelunkery", "letsdo-farm_and_charm",
         "better_farming", "farmersdelight", "weaponsofmiracles", "spmovesets", "skill_tree", "efs_iss", "irons_voicebound",
-        "ef_knuckles", "lrtactical"]
+        "ef_knuckles", "lrtactical", "spell_engine", "skill_tree", "puffish"]
 out = "modinfo"
 os.makedirs(out, exist_ok=True)
 for jar in sorted(glob.glob("packcache/*.jar")):
