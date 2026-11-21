@@ -391,7 +391,6 @@ public final class ClientSelfTest {
                 wait = net.minecraftforge.fml.ModList.get().isLoaded("cinematic") ? 120 : 20;
             }
             case 2 -> {
-                closeForeign(mc);
                 boolean open = mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu;
                 check("right-clicking the enhance anvil opens the enhance menu"
                         + (net.minecraftforge.fml.ModList.get().isLoaded("cinematic") ? " (through the Cinematic anvil scene)" : ""), open,
