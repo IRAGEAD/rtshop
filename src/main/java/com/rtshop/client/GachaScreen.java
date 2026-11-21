@@ -235,7 +235,15 @@ public class GachaScreen extends Screen {
         if (item == null) {
             return ItemStack.EMPTY;
         }
-        return new ItemStack(item, e.has("count") ? Math.max(1, e.get("count").getAsInt()) : 1);
+        ItemStack st = new ItemStack(item, e.has("count") ? Math.max(1, e.get("count").getAsInt()) : 1);
+        if (e.has("nbt") && !e.get("nbt").getAsString().isEmpty()) {
+            try {
+                st.setTag(net.minecraft.nbt.TagParser.parseTag(e.get("nbt").getAsString()));
+            } catch (Exception ignored) {
+                // 읽을 수 없는 데이터면 기본 모양
+            }
+        }
+        return st;
     }
 
     static String name(JsonObject e) {
