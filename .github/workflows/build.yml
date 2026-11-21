@@ -190,9 +190,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: packcache
-          key: pack-${{ hashFiles('.github/scripts/pack_files.json') }}-v1
+          key: pack-${{ hashFiles('.github/scripts/pack_files.json', '.github/scripts/pack_overrides.json') }}-v2
       - name: Download the pack's mods
-        run: python3 .github/scripts/fullpack.py .github/scripts/pack_files.json packcache server/mods "$SKIP_MODS"
+        run: python3 .github/scripts/fullpack.py .github/scripts/pack_files.json packcache server/mods "$SKIP_MODS" .github/scripts/pack_overrides.json
       - name: Install Forge server
         run: |
           cd server
@@ -230,24 +230,8 @@ jobs:
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
           python3 -m pip install -q "portablemc<5"
           mkdir -p client/mods client/saves
-          cp packcache/*.jar client/mods/
+          while IFS= read -r f; do [ -n "$f" ] && cp "packcache/$f" client/mods/; done < packcache/client_mods.txt
           cp jar/*.jar client/mods/
-          python3 - <<'PY'
-          # 모드팩 overrides 에 들어 있는 날개 모드(Arcane Vortex)는 CurseForge 에 없어 Modrinth 에서 받는다
-          import json, urllib.request, urllib.parse
-          ua = {'User-Agent': 'rtshop-ci (github.com/IRAGEAD/rtshop)'}
-          try:
-              hits = json.load(urllib.request.urlopen(urllib.request.Request('https://api.modrinth.com/v2/search?' + urllib.parse.urlencode({'query': 'Arcane Vortex'}), headers=ua), timeout=60))['hits']
-              hit = next(h for h in hits if h['title'].strip().lower() == 'arcane vortex')
-              q = urllib.parse.urlencode({'loaders': '["forge"]', 'game_versions': '["1.20.1"]'})
-              versions = json.load(urllib.request.urlopen(urllib.request.Request('https://api.modrinth.com/v2/project/' + hit['project_id'] + '/version?' + q, headers=ua), timeout=60))
-              pick = next((v for v in versions if '0.7.10' in v['version_number']), versions[0])
-              f = next((x for x in pick['files'] if x.get('primary')), pick['files'][0])
-              urllib.request.urlretrieve(f['url'], 'client/mods/' + f['filename'].replace(' ', '_'))
-              print('Arcane Vortex', pick['version_number'])
-          except Exception as ex:
-              print('Arcane Vortex not downloaded:', ex)
-          PY
           cp -r server/world client/saves/rtshoptest
           rm -f client/saves/rtshoptest/session.lock
           printf 'onboardAccessibility:false\ntutorialStep:none\nskipMultiplayerWarning:true\njoinedFirstServer:true\npauseOnLostFocus:false\nguiScale:3\nrenderDistance:2\nsimulationDistance:5\nmaxFps:30\ngraphicsMode:0\nao:false\nnarrator:0\nsoundCategory_master:0.0\nlang:ko_kr\n' > client/options.txt
@@ -274,6 +258,10 @@ jobs:
         run: |
           mkdir -p /tmp/fpshots && cp -r client/screenshots/. /tmp/fpshots/ 2>/dev/null || true
           cp client/rtshop-clienttest.txt /tmp/fpshots/ 2>/dev/null || true
+          cp server/config/rtshop/export/diag.txt server/config/rtshop/export/audit.txt /tmp/fpshots/ 2>/dev/null || true
+          cp server/rtshop-selftest.txt /tmp/fpshots/ 2>/dev/null || true
+          mkdir -p /tmp/fpshots/crash && cp client/crash-reports/*.txt /tmp/fpshots/crash/ 2>/dev/null || true
+          tail -n 400 client/logs/latest.log > /tmp/fpshots/client-tail.log 2>/dev/null || true
           cd /tmp/fpshots
           git init -q -b ci-fullpack-screenshots
           git config user.name "github-actions"

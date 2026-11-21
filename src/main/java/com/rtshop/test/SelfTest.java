@@ -276,6 +276,11 @@ public final class SelfTest {
             crash("attendance", t);
         }
         try {
+            npcGuard(level, a);
+        } catch (Throwable t) {
+            crash("npc guard", t);
+        }
+        try {
             gacha(server, level, a);
         } catch (Throwable t) {
             crash("gacha", t);
@@ -284,6 +289,11 @@ public final class SelfTest {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
+        }
+        try {
+            PackDiag.write(server);
+        } catch (Throwable t) {
+            RtShop.LOGGER.warn("[rtshop-selftest] diag failed", t);
         }
         try {
             int n = ShopLoader.export(ShopServer.loaded());
@@ -2173,6 +2183,27 @@ public final class SelfTest {
     }
 
     // ------------------------------------------------------------------ 뽑기
+
+    private static void npcGuard(ServerLevel level, FakePlayer a) {
+        section("npc guard");
+        for (String type : new String[]{"fisher", "bank", "job", "attendance", "gacha"}) {
+            net.minecraft.world.entity.npc.Villager v = ShopServer.spawnNpc(level, a.position().add(3, 0, 0), 0, type);
+            if (v == null) {
+                check(type + " NPC spawns", false);
+                continue;
+            }
+            float hp = v.getHealth();
+            v.hurt(level.damageSources().playerAttack(a), 1000);
+            v.hurt(level.damageSources().magic(), 1000);
+            v.hurt(level.damageSources().explosion(null, null), 1000);
+            v.setRemainingFireTicks(100);
+            check(type + " NPC takes no damage and does not die", v.isAlive() && v.getHealth() >= hp, v.getHealth());
+            v.setHealth(1);
+            v.hurt(level.damageSources().magic(), 5);
+            check(type + " NPC cannot be killed by damage that skips the hurt events", v.isAlive(), v.getHealth());
+            v.discard();
+        }
+    }
 
     private static void gacha(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         section("gacha");

@@ -76,6 +76,11 @@ public final class ClientSelfTest {
     private static volatile String harvest = null;
     private static final int LAST = 63;
     private static volatile int jobNpc = -1;
+    /** 상인 NPC 를 실제로 우클릭해 보는 단계 (상호작용 때 다른 모드와 부딪혀 튕기는지). */
+    private static final String[] NPCS = {"fisher", "farmer", "food", "blacksmith", "general", "land", "bank",
+            "attendance", "gacha", "job"};
+    private static final int NPC_END = LAST + 18 + NPCS.length * 3;
+    private static volatile int testNpc = -1;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -219,6 +224,54 @@ public final class ClientSelfTest {
         info.putString("rarity", rarity);
         s.getOrCreateTag().put(ShopData.FISH_INFO_TAG, info);
         return s;
+    }
+
+    private static void npcStep(Minecraft mc, int k) {
+        String type = NPCS[k / 3];
+        switch (k % 3) {
+            case 0 -> {
+                mc.setScreen(null);
+                testNpc = -1;
+                onServer(mc, sp -> {
+                    net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
+                    net.minecraft.world.phys.Vec3 at = sp.position().add(look.x * 2, 0, look.z * 2);
+                    var v = ShopServer.spawnNpc(sp.serverLevel(), at, sp.getYRot() + 180, type);
+                    testNpc = v == null ? -2 : v.getId();
+                });
+                wait = 20;
+            }
+            case 1 -> {
+                net.minecraft.world.entity.Entity e = testNpc >= 0 ? mc.level.getEntity(testNpc) : null;
+                if (e == null) {
+                    check("the " + type + " NPC can be summoned", false, "id " + testNpc);
+                    return;
+                }
+                try {
+                    net.minecraft.world.phys.EntityHitResult hit = new net.minecraft.world.phys.EntityHitResult(e, e.position().add(0, 1, 0));
+                    var r = mc.gameMode.interactAt(mc.player, e, hit, net.minecraft.world.InteractionHand.MAIN_HAND);
+                    if (!r.consumesAction()) {
+                        mc.gameMode.interact(mc.player, e, net.minecraft.world.InteractionHand.MAIN_HAND);
+                    }
+                } catch (Throwable t) {
+                    check("right-clicking the " + type + " NPC does not crash", false, t);
+                }
+                wait = 30;
+            }
+            default -> {
+                if (testNpc >= 0) {
+                    check("right-clicking the " + type + " NPC opens its window", mc.screen != null, mc.screen);
+                    shot(mc, "60_npc_" + type);
+                }
+                int id = testNpc;
+                onServer(mc, sp -> {
+                    var e = sp.serverLevel().getEntity(id);
+                    if (e != null) {
+                        e.discard();
+                    }
+                });
+                wait = 10;
+            }
+        }
     }
 
     private static ShopScreen shop(Minecraft mc) {
@@ -1037,12 +1090,20 @@ public final class ClientSelfTest {
             case LAST + 18 -> {
                 shot(mc, "50_gacha_odds_edit");
                 mc.setScreen(null);
-                check("no server-side error happened", serverError == null, serverError);
-                finish(mc);
+                wait = 5;
             }
             default -> {
+                if (step > LAST + 18 && step <= NPC_END) {
+                    npcStep(mc, step - LAST - 19);
+                    return;
+                }
+                if (step == NPC_END + 1) {
+                    check("no server-side error happened", serverError == null, serverError);
+                    finish(mc);
+                    return;
+                }
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > LAST + 60) {
+                if (step > NPC_END + 40) {
                     done = true;
                     mc.stop();
                 }
