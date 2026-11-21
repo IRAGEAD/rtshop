@@ -62,6 +62,14 @@ public final class LandConfig {
     /** 테두리를 넓힐 때 넘어가지 않는 블록 (길 등). 물·용암과 다른 토지는 항상 넘어가지 않는다. */
     public final List<String> plotRimStopBlocks = new ArrayList<>(List.of("minecraft:dirt_path", "minecraft:gravel"));
 
+    // ---- 초보 농지 (3.11)
+    /** 이 직업을 얻은 플레이어에게 초보 농지 하나를 무료로 준다 (빈 문자열 = 끔). */
+    public String starterPlotJob = "farmer";
+    /** 초보 농지로 쓰는 구획 묶음 이름. */
+    public String starterPlotGroup = "starter";
+    /** 그 직업을 그만두면 초보 농지를 회수해 다른 초보 농부에게 돌린다. */
+    public boolean starterPlotReturnWhenJobLost = true;
+
     public LandConfig() {
         rangedBlocks.put("better_farming_plus:farming_crate", 5);
     }
@@ -135,7 +143,17 @@ public final class LandConfig {
                     c.plotRimStopBlocks.clear();
                     c.plotRimStopBlocks.addAll(strings(o.get("plotRimStopBlocks")));
                 }
-                if (!o.has("plotPricePerBlock")) {
+                if (o.has("starterPlotJob")) c.starterPlotJob = o.get("starterPlotJob").getAsString().trim();
+                if (o.has("starterPlotGroup")) c.starterPlotGroup = o.get("starterPlotGroup").getAsString().trim();
+                if (o.has("starterPlotReturnWhenJobLost")) c.starterPlotReturnWhenJobLost = o.get("starterPlotReturnWhenJobLost").getAsBoolean();
+                if (!o.has("starterPlotJob")) {
+                    // 3.11 이전 파일: 값은 그대로 두고 초보 농지 설정만 덧붙인다
+                    if (!o.has("plotPricePerBlock")) {
+                        addPlotKeys(o, c);
+                    }
+                    addStarterKeys(o, c);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                } else if (!o.has("plotPricePerBlock")) {
                     // 3.9 이전 파일: 값은 그대로 두고 구획 설정만 덧붙인다
                     addPlotKeys(o, c);
                     Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -162,6 +180,7 @@ public final class LandConfig {
                 c.rangedBlocks.forEach(ranged::addProperty);
                 o.add("rangedBlocks", ranged);
                 addPlotKeys(o, c);
+                addStarterKeys(o, c);
                 Files.createDirectories(p.getParent());
                 Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
             }
@@ -169,6 +188,17 @@ public final class LandConfig {
             RtShop.LOGGER.error("[rtshop] land.json 을 읽지 못해 기본값을 사용합니다.", ex);
         }
         return c;
+    }
+
+    private static void addStarterKeys(JsonObject o, LandConfig c) {
+        JsonArray help = new JsonArray();
+        help.add("초보 농지: starterPlotJob 직업을 얻은 플레이어에게 starterPlotGroup 묶음의 빈 구획 하나를 무료로 줍니다 (한 사람당 한 번)");
+        help.add("OP 가 /rtshop plot starter <번호> on 으로 구획을 묶음에 넣습니다. starterPlotJob 을 \"\" 로 두면 끕니다");
+        help.add("starterPlotReturnWhenJobLost: true(기본) 면 그 직업을 그만둘 때 농지를 회수해 다른 초보에게 돌립니다. false 면 계속 가집니다");
+        o.add("_초보농지_설명", help);
+        o.addProperty("starterPlotJob", c.starterPlotJob);
+        o.addProperty("starterPlotGroup", c.starterPlotGroup);
+        o.addProperty("starterPlotReturnWhenJobLost", c.starterPlotReturnWhenJobLost);
     }
 
     private static void addPlotKeys(JsonObject o, LandConfig c) {

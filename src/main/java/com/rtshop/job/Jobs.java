@@ -189,6 +189,7 @@ public final class Jobs {
             data.dirty();
             applyAttributes(p);
             RtShop.LOGGER.info("[rtshop] {} 이(가) 직업 '{}' 을(를) 골랐습니다", p.getGameProfile().getName(), d.name);
+            com.rtshop.land.StarterPlots.check(p);
             return new Result(true, Component.translatable("rtshop.job.chosen", d.name));
         }
         long left = cooldownLeft(p, d.slot);
@@ -204,6 +205,7 @@ public final class Jobs {
         e.set(d.slot, jobId, now());
         data.dirty();
         applyAttributes(p);
+        com.rtshop.land.StarterPlots.check(p);
         RtShop.LOGGER.info("[rtshop] {} 이(가) 직업을 '{}' -> '{}' 로 바꿨습니다 ({} G)", p.getGameProfile().getName(),
                 old == null ? current : old.name, d.name, cost);
         return new Result(true, Component.translatable("rtshop.job.changed", old == null ? current : old.name, d.name,
@@ -216,6 +218,7 @@ public final class Jobs {
         data.of(p.getUUID()).set(slot, jobId, 0);
         data.dirty();
         applyAttributes(p);
+        com.rtshop.land.StarterPlots.check(p);
     }
 
     public static void resetCooldowns(ServerPlayer p) {

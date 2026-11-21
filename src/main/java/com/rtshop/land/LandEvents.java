@@ -77,7 +77,9 @@ public final class LandEvents {
         Long last = LAST_MSG.get(p.getUUID());
         if (last == null || now - last >= 20 || now < last) {
             LAST_MSG.put(p.getUUID(), now);
-            Component msg = land != null && land.forSale()
+            Component msg = land != null && land.forSale() && !land.group.isEmpty()
+                    ? Component.translatable("rtshop.plot.denied_starter", land.name)
+                    : land != null && land.forSale()
                     ? Component.translatable("rtshop.plot.denied_sale", land.name, String.format("%,d", land.price))
                     : Component.translatable("rtshop.land.denied", land == null ? "?" : land.ownerName);
             p.displayClientMessage(msg.copy().withStyle(ChatFormatting.RED), true);

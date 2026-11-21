@@ -40,6 +40,8 @@ public final class LandInfoPacket {
         public int defaultPerms;
         /** 구획 토지면 반환할 때 돌려받는 금액, 아니면 -1. */
         public long plotRefund = -1;
+        /** 초보 농지(무료로 받은 구획)인가. */
+        public boolean starter;
         public final List<MemberView> members = new ArrayList<>();
         public final List<ClaimView> claims = new ArrayList<>();
     }
@@ -64,6 +66,7 @@ public final class LandInfoPacket {
             v.defaultPerms = l.defaultPerms;
             if (l.plot) {
                 v.plotRefund = com.rtshop.land.PlotManager.refundOf(l);
+                v.starter = !l.group.isEmpty();
             }
             if (v.owner) {
                 for (LandData.Member m : l.members.values()) {
@@ -103,6 +106,7 @@ public final class LandInfoPacket {
             buf.writeVarInt(v.myPerms);
             buf.writeVarInt(v.defaultPerms);
             buf.writeLong(v.plotRefund);
+            buf.writeBoolean(v.starter);
             buf.writeVarInt(v.members.size());
             for (MemberView m : v.members) {
                 buf.writeUUID(m.id);
@@ -137,6 +141,7 @@ public final class LandInfoPacket {
             v.myPerms = buf.readVarInt();
             v.defaultPerms = buf.readVarInt();
             v.plotRefund = buf.readLong();
+            v.starter = buf.readBoolean();
             int mn = buf.readVarInt();
             for (int j = 0; j < mn; j++) {
                 MemberView m = new MemberView();
