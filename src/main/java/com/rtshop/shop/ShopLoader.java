@@ -814,7 +814,11 @@ public final class ShopLoader {
     }
 
     private record Need(double value, RecipeSolver.Recipe by, List<RecipeSolver.Pick> picks, double cheapest, List<RecipeSolver.Recipe> skipped,
-                        double autoMin, double fullMax, List<AutoRoute> autoRoutes) {
+                        double autoMin, double fullMax, List<AutoRoute> autoRoutes, List<RecipeCost> costs) {
+    }
+
+    /** 조리법 하나의 재료비와 쓰인 재료. */
+    private record RecipeCost(RecipeSolver.Recipe recipe, double cost, Set<String> items) {
     }
 
     /** 상점에서 산 재료를 그대로 화로에 넣어 만드는 길. */
@@ -833,10 +837,16 @@ public final class ShopLoader {
         double[] costs = new double[rs.size()];
         double fullMax = -1;
         List<AutoRoute> routes = new ArrayList<>();
+        List<RecipeCost> all = new ArrayList<>();
         for (int i = 0; i < rs.size(); i++) {
             List<RecipeSolver.Pick> used = new ArrayList<>();
             costs[i] = RecipeSolver.purchaseRequirement(rs.get(i), id, pcost, env, pure, used);
             if (costs[i] > 0) {
+                Set<String> items = new HashSet<>();
+                for (RecipeSolver.Pick u : used) {
+                    items.add(u.item);
+                }
+                all.add(new RecipeCost(rs.get(i), costs[i], items));
                 min = Math.min(min, costs[i]);
                 // 재료를 상점에서 산 그대로 화로에 넣어 만들 수 있는 경우만 '자동화 가능'으로 본다
                 boolean direct = !used.isEmpty();
@@ -871,7 +881,7 @@ public final class ShopLoader {
             RecipeSolver.purchaseRequirement(by, id, pcost, env, pure, picks);
         }
         return new Need(best, by, picks, min == Double.MAX_VALUE ? -1 : min, skipped, autoMin == Double.MAX_VALUE ? -1 : autoMin,
-                fullMax, routes);
+                fullMax, routes, all);
     }
 
     /** 다 쓰고 돌려받는 그릇(빈 양동이·병 등)을 되팔 때 받는 값. */
@@ -949,13 +959,23 @@ public final class ShopLoader {
                 Need n = need(id, makers, pcost, scan.env, cfg, pc, sup);
                 // 화로에 바로 넣는 싼 길 때문에 다른 조리법이 보호받지 못하는 경우: 그 화로 재료가 '만들어 쓰는 중간 재료'(반죽 등)이면
                 // 중간 재료의 상점가를 올려 화로 길도 같은 값이 되게 한다. 고기 같은 원재료 값은 건드리지 않는다.
-                double target = n.fullMax() * (1.0 + pc.handCookedMargin);
                 if (n.fullMax() > 0) {
                     for (AutoRoute route : n.autoRoutes()) {
-                        if (route.cost() + 1.0e-6 >= target || route.picks().size() != 1) {
+                        if (route.picks().size() != 1) {
                             continue;
                         }
                         RecipeSolver.Pick in = route.picks().get(0);
+                        // 목표 값은 이 중간 재료를 쓰지 않는 조리법들로만 정한다 (쓰는 조리법까지 넣으면 올릴수록 목표도 올라 끝없이 오른다)
+                        double others = -1;
+                        for (RecipeCost rc : n.costs()) {
+                            if (!rc.items().contains(in.item)) {
+                                others = Math.max(others, rc.cost());
+                            }
+                        }
+                        double target = others * (1.0 + pc.handCookedMargin);
+                        if (others <= 0 || route.cost() + 1.0e-6 >= target) {
+                            continue;
+                        }
                         if (!makers.containsKey(in.item) || in.count <= 0) {
                             continue; // 원재료
                         }
