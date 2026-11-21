@@ -355,7 +355,18 @@ public final class ClientSelfTest {
                 shot(mc, "13_land_settings");
                 mc.setScreen(null);
                 onServer(mc, sp -> {
+                    // 플레이어가 바라보는 방향과 상관없이 항상 토지 안쪽에 상자를 둔다
                     BlockPos pos = sp.blockPosition().relative(sp.getDirection(), 2);
+                    LandData.Land land = LandManager.landAt(sp.serverLevel(), sp.blockPosition());
+                    if (land != null && !land.claims.isEmpty()) {
+                        LandData.Claim c = land.claims.get(0);
+                        int cx = Math.max(c.x0 + 1, Math.min(c.x1 - 1, pos.getX()));
+                        int cz = Math.max(c.z0 + 1, Math.min(c.z1 - 1, pos.getZ()));
+                        pos = new BlockPos(cx, pos.getY(), cz);
+                        if (pos.equals(sp.blockPosition())) {
+                            pos = pos.offset(cx + 1 < c.x1 ? 1 : -1, 0, 0);
+                        }
+                    }
                     sp.serverLevel().setBlock(pos, Blocks.CHEST.defaultBlockState(), 3);
                     chestPos = pos;
                     LandManager.openStorage(sp, pos);
