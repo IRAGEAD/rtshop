@@ -13,7 +13,7 @@ for jar in sorted(glob.glob("packcache/*.jar")):
     d = os.path.join(out, os.path.basename(jar)[:-4])
     os.makedirs(d, exist_ok=True)
     z = zipfile.ZipFile(jar)
-    items, recipes = [], {}
+    items, recipes, full = [], {}, {}
     for e in z.namelist():
         keep = (re.match(r"assets/[^/]+/lang/(en_us|ko_kr)\.json$", e)
                 or ("patchouli_books" in e and e.endswith((".json", ".md")))
@@ -34,6 +34,8 @@ for jar in sorted(glob.glob("packcache/*.jar")):
             except Exception:
                 t = "?"
             recipes.setdefault(t, []).append(m.group(1) + ":" + m.group(2))
+            full.setdefault(m.group(1) + ":" + m.group(2), z.read(e).decode("utf-8", "replace"))
     open(os.path.join(d, "items.txt"), "w").write("\n".join(sorted(items)))
     open(os.path.join(d, "recipes.json"), "w").write(json.dumps({k: sorted(v) for k, v in recipes.items()}, indent=1))
+    open(os.path.join(d, "recipes_full.json"), "w").write(json.dumps(full, indent=0))
     print(n, len(items), "items", sum(len(v) for v in recipes.values()), "recipes")
