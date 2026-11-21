@@ -805,7 +805,11 @@ public final class ShopLoader {
     }
 
     private record Need(double value, RecipeSolver.Recipe by, List<RecipeSolver.Pick> picks, double cheapest, List<RecipeSolver.Recipe> skipped,
-                        double autoMin) {
+                        double autoMin, double fullMax, List<AutoRoute> autoRoutes) {
+    }
+
+    /** 상점에서 산 재료를 그대로 화로에 넣어 만드는 길. */
+    private record AutoRoute(RecipeSolver.Recipe recipe, List<RecipeSolver.Pick> picks, double cost) {
     }
 
     /**
@@ -818,6 +822,8 @@ public final class ShopLoader {
         double autoMin = Double.MAX_VALUE;
         double min = Double.MAX_VALUE;
         double[] costs = new double[rs.size()];
+        double fullMax = -1;
+        List<AutoRoute> routes = new ArrayList<>();
         for (int i = 0; i < rs.size(); i++) {
             List<RecipeSolver.Pick> used = new ArrayList<>();
             costs[i] = RecipeSolver.purchaseRequirement(rs.get(i), id, pcost, env, pure, used);
@@ -830,7 +836,9 @@ public final class ShopLoader {
                 }
                 if (direct && automatable(rs.get(i), pc)) {
                     autoMin = Math.min(autoMin, costs[i]);
+                    routes.add(new AutoRoute(rs.get(i), used, costs[i]));
                 }
+                fullMax = Math.max(fullMax, costs[i]);
             }
         }
         double best = -1;
@@ -853,7 +861,8 @@ public final class ShopLoader {
         if (by != null) {
             RecipeSolver.purchaseRequirement(by, id, pcost, env, pure, picks);
         }
-        return new Need(best, by, picks, min == Double.MAX_VALUE ? -1 : min, skipped, autoMin == Double.MAX_VALUE ? -1 : autoMin);
+        return new Need(best, by, picks, min == Double.MAX_VALUE ? -1 : min, skipped, autoMin == Double.MAX_VALUE ? -1 : autoMin,
+                fullMax, routes);
     }
 
     /** 다 쓰고 돌려받는 그릇(빈 양동이·병 등)을 되팔 때 받는 값. */
@@ -917,6 +926,7 @@ public final class ShopLoader {
         double ratio = pc.sellRatio > 0 ? pc.sellRatio : 0.5;
         int raised = 0;
         Set<String> raisedIds = new HashSet<>();
+        Set<String> raisedInputs = new java.util.TreeSet<>();
         for (int round = 0; round < 8; round++) {
             RecipeSolver.setRefunds(refunds(out.prices, pc));
             Map<String, Double> sup = supply(out.prices);
@@ -928,6 +938,33 @@ public final class ShopLoader {
                 }
                 String id = itemId(p.stack);
                 Need n = need(id, makers, pcost, scan.env, cfg, pc, sup);
+                // 화로에 바로 넣는 싼 길 때문에 다른 조리법이 보호받지 못하는 경우: 그 화로 재료가 '만들어 쓰는 중간 재료'(반죽 등)이면
+                // 중간 재료의 상점가를 올려 화로 길도 같은 값이 되게 한다. 고기 같은 원재료 값은 건드리지 않는다.
+                if (!n.skipped().isEmpty() && n.fullMax() > 0) {
+                    for (AutoRoute route : n.autoRoutes()) {
+                        if (route.cost() + 1.0e-6 >= n.fullMax() || route.picks().size() != 1) {
+                            continue;
+                        }
+                        RecipeSolver.Pick in = route.picks().get(0);
+                        if (!makers.containsKey(in.item) || in.count <= 0) {
+                            continue; // 원재료
+                        }
+                        Price ip = out.prices.get(in.item);
+                        if (ip == null || ip.fixedSell || !ip.buyableSomewhere) {
+                            continue;
+                        }
+                        double outN = RecipeSolver.outputCount(route.recipe(), id, scan.env);
+                        int newPrice = (int) Math.ceil(n.fullMax() * outN / in.count - 1.0e-9);
+                        if (newPrice > ip.price) {
+                            if (ip.sellUnit < 0) {
+                                ip.sellUnit = ip.price * ratio; // 되파는 값은 그대로 (올린 판매가로 되팔아 이익을 보지 못하게)
+                            }
+                            ip.price = newPrice;
+                            changed = true;
+                            raisedInputs.add(in.item + "=" + newPrice);
+                        }
+                    }
+                }
                 p.purchaseNeed = n.value();
                 if (n.value() <= 0) {
                     continue;
@@ -963,6 +1000,9 @@ public final class ShopLoader {
             }
         }
         out.notes.add("재료를 모두 상점에서 사서 만들어도 손해가 없도록 매입가를 올린 음식: " + raised + "종 (pricing.json 의 purchaseFloor)");
+        if (!raisedInputs.isEmpty()) {
+            out.notes.add("화로에 바로 넣어 싸게 만드는 길을 막으려고 판매가를 올린 중간 재료: " + String.join(", ", raisedInputs));
+        }
         RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
     }
 
