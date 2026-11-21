@@ -50,7 +50,11 @@ public final class QuestHud {
         if (list.isEmpty()) {
             return;
         }
+        // 채팅 창보다 위에 그린다 (채팅이 HUD 를 가리지 않게)
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 200);
         draw(g, sw, sh, list);
+        g.pose().popPose();
     }
 
     /** 현재 설정에 따른 HUD 영역 {x, y, w, h} (GUI 좌표). */

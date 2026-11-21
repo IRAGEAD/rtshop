@@ -28,7 +28,10 @@ public final class GoldHud {
             return;
         }
         int[] b = bounds(sw, sh);
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 200);
         draw(g, b[0], b[1], b[2], b[3], ClientEconomy.wallet);
+        g.pose().popPose();
     }
 
     public static void draw(GuiGraphics g, int x, int y, int w, int h, long amount) {
