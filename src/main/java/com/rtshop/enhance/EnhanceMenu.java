@@ -137,7 +137,8 @@ public class EnhanceMenu extends AnvilMenu {
             Enhance.setLevel(shown, after);
         }
         inputSlots.setItem(0, ItemStack.EMPTY);
-        access.execute((level, pos) -> level.levelEvent(o == Enhance.Outcome.DESTROY ? 1029 : 1030, pos, 0));
+        int event = o == Enhance.Outcome.DESTROY ? 1029 : 1030;
+        access.execute((level, pos) -> level.levelEvent(event, pos, 0));
         sp.getInventory().setChanged();
         broadcastChanges();
         Enhance.announce(sp, shown, o, guarded, cur, after < 0 ? cur : after);

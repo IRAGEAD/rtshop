@@ -255,7 +255,7 @@ public final class ShopLoader {
     }
 
     /** 상점 파일에 조각 파일(rtshop_defaults/조각.json)의 카테고리·품목 중 없는 것만 덧붙인다. */
-    static int appendItems(Path file, String frag) throws IOException {
+    public static int appendItems(Path file, String frag) throws IOException {
         if (!Files.exists(file)) {
             return 0;
         }
