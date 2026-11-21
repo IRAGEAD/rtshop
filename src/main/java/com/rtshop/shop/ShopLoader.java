@@ -549,6 +549,9 @@ public final class ShopLoader {
             return false; // 야생 작물 덤불은 채집용
         }
         ItemStack st = new ItemStack(item);
+        if (st.getMaxStackSize() <= 1 || st.getRarity() != net.minecraft.world.item.Rarity.COMMON) {
+            return false; // 하나뿐인 특별한 물건(유물·장비 등)은 팔지 않는다
+        }
         if (st.isEdible() || COOKING_MODS.contains(rl.getNamespace())) {
             return !st.isDamageableItem();
         }
