@@ -699,6 +699,9 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 onServer(mc, sp -> {
                     com.rtshop.job.JobData.get(sp.server).clear(sp.getUUID());
+                    for (String id : com.rtshop.job.JobConfig.get().jobs.keySet()) {
+                        com.rtshop.quest.QuestManager.setFlag(sp, "unlock_job_" + id, true);
+                    }
                     net.minecraft.world.entity.npc.Villager v = com.rtshop.job.Jobs.spawnNpc(sp.serverLevel(),
                             sp.position().add(sp.getLookAngle().scale(2)), 0);
                     jobNpc = v == null ? -1 : v.getId();
@@ -774,9 +777,15 @@ public final class ClientSelfTest {
                     if (e != null) {
                         e.discard();
                     }
+                    com.rtshop.quest.QuestManager.reset(sp);
+                    com.rtshop.quest.QuestManager.openDialog(sp, "job", -1);
                 });
+                wait = 20;
             }
             case LAST + 1 -> {
+                check("the job guide offers the 9 job quest lines", mc.screen instanceof QuestScreen, mc.screen);
+                shot(mc, "38_job_quests");
+                mc.setScreen(null);
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);
             }

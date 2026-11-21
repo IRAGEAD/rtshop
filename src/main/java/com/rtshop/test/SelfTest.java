@@ -266,6 +266,11 @@ public final class SelfTest {
             crash("jobs", t);
         }
         try {
+            jobQuests(server, level, a);
+        } catch (Throwable t) {
+            crash("job quests", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -570,6 +575,117 @@ public final class SelfTest {
     }
 
 
+
+    // ------------------------------------------------------------------ 직업 선행 퀘스트
+
+    private static Item deliverItem(String target) {
+        if (target.startsWith("#")) {
+            var tag = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, new ResourceLocation(target.substring(1)));
+            var tags = ForgeRegistries.ITEMS.tags();
+            if (tags == null) {
+                return null;
+            }
+            return tags.getTag(tag).stream().findFirst().orElse(null);
+        }
+        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(target));
+        return item == null || item == Items.AIR ? null : item;
+    }
+
+    private static void jobQuests(MinecraftServer server, ServerLevel level, FakePlayer a) {
+        section("job quests");
+        QuestManager.Loaded l = QuestManager.reload();
+        com.rtshop.job.JobConfig cfg = com.rtshop.job.JobConfig.get();
+        check("job quest file loads without problems", l.problems.isEmpty(), l.problems);
+        int count = 0;
+        for (String id : l.quests.keySet()) {
+            if (id.startsWith("job_")) {
+                count++;
+            }
+        }
+        check("every job has a 4-step quest line (36 quests)", count == 36, count);
+        for (String npc : new String[]{"sword_master", "war_chief", "shield_keeper", "hunter", "archmage"}) {
+            check("mentor NPC '" + npc + "' is defined", l.npcs.containsKey(npc));
+        }
+        List<String> missing = new ArrayList<>();
+        for (QuestDef q : l.quests.values()) {
+            if (!q.id.startsWith("job_")) {
+                continue;
+            }
+            for (QuestDef.Objective ob : q.objectives) {
+                if (ob.type == QuestDef.Type.DELIVER && deliverItem(ob.target) == null) {
+                    missing.add(q.id + ":" + ob.target);
+                }
+                if (ob.type == QuestDef.Type.KILL && !ob.target.equals("*") && EntityType.byString(ob.target).isEmpty()) {
+                    missing.add(q.id + ":" + ob.target);
+                }
+            }
+        }
+        check("every item and monster the job quests ask for exists in this game", missing.isEmpty(), missing);
+
+        for (com.rtshop.job.JobConfig.JobDef d : cfg.jobs.values()) {
+            QuestManager.reset(a);
+            clear(a);
+            check("job '" + d.id + "' is locked until its quest line is done", !com.rtshop.job.Jobs.unlocked(a, d));
+            boolean ok = true;
+            String fail = "";
+            for (int n = 1; n <= 4 && ok; n++) {
+                String qid = "job_" + d.id + "_" + n;
+                QuestDef q = l.quests.get(qid);
+                if (q == null) {
+                    ok = false;
+                    fail = qid + " missing";
+                    break;
+                }
+                boolean offered = false;
+                for (QuestView v : QuestManager.viewsFor(a, q.giver)) {
+                    offered |= v.id().equals(qid) && v.state() == QuestView.AVAILABLE;
+                }
+                if (!offered || !QuestManager.accept(a, qid, q.giver)) {
+                    ok = false;
+                    fail = qid + " not offered by " + q.giver;
+                    break;
+                }
+                for (QuestDef.Objective ob : q.objectives) {
+                    switch (ob.type) {
+                        case TALK -> QuestManager.onTalk(a, ob.target);
+                        case KILL -> {
+                            var type = EntityType.byString(ob.target);
+                            if (type.isPresent() && type.get().create(level) instanceof net.minecraft.world.entity.LivingEntity victim) {
+                                for (int k = 0; k < ob.count; k++) {
+                                    QuestManager.onKill(a, victim);
+                                }
+                            }
+                        }
+                        case DELIVER -> {
+                            Item item = deliverItem(ob.target);
+                            if (item != null) {
+                                int left = ob.count;
+                                while (left > 0) {
+                                    int c = Math.min(left, new ItemStack(item).getMaxStackSize());
+                                    a.getInventory().add(new ItemStack(item, c));
+                                    left -= c;
+                                }
+                            }
+                        }
+                        case PAY -> Economy.setWallet(a, Economy.wallet(a) + ob.count);
+                        default -> {
+                        }
+                    }
+                }
+                if (!QuestManager.turnIn(a, qid, q.turnInNpc(), -1)) {
+                    ok = false;
+                    fail = qid + " could not be turned in";
+                }
+                clear(a);
+            }
+            check("the " + d.name + " quest line can be played from start to end and unlocks the job",
+                    ok && QuestManager.hasFlag(a, "unlock_job_" + d.id) && com.rtshop.job.Jobs.unlocked(a, d), fail);
+        }
+        QuestManager.reset(a);
+        Economy.setWallet(a, 0);
+        clear(a);
+    }
+
     // ------------------------------------------------------------------ 직업
 
     /** 모드팩 전체에서 무기가 어떻게 분류되는지 보고서에 적는다 (무기 같은데 분류되지 않은 것 포함). */
@@ -599,6 +715,9 @@ public final class SelfTest {
         com.rtshop.job.Jobs.testClockOffset = 0;
         QuestManager.reset(a);
         clear(a);
+        for (String id : cfg.jobs.keySet()) {
+            QuestManager.setFlag(a, "unlock_job_" + id, true); // 선행 퀘스트는 아래 'job quests' 에서 따로 점검
+        }
         try {
             check("9 jobs are defined (5 combat, 4 life)", cfg.jobs.size() >= 9
                     && cfg.jobs.values().stream().filter(d -> d.slot.equals("combat")).count() == 5
@@ -629,6 +748,7 @@ public final class SelfTest {
 
             // 선행 퀘스트로 잠긴 직업
             com.rtshop.job.Jobs.resetCooldowns(a);
+            QuestManager.setFlag(a, "unlock_job_cook", false);
             QuestDef unlock = tempQuest("{\"id\":\"t_job_unlock\",\"giver\":\"job\",\"reward\":{\"flags\":[\"unlock_job_cook\"]}}");
             QuestManager.loaded().quests.put(unlock.id, unlock);
             Economy.setWallet(a, 100_000);

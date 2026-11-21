@@ -292,7 +292,7 @@ NEW = {
  "rtshop.job.passives": ("특성 (고르는 즉시 적용 · ▲ 장점 ▼ 단점)", "Traits (active at once · ▲ pro ▼ con)"),
  "rtshop.job.info_current": ("지금 이 직업입니다.", "This is your current job."),
  "rtshop.job.info_locked": ("아직 고를 수 없는 직업입니다.", "This job is not unlocked yet."),
- "rtshop.job.info_locked_quest": ("선행 퀘스트 '%s' 를 완료하면 고를 수 있습니다.", "Complete the quest '%s' to unlock this job."),
+ "rtshop.job.info_locked_quest": ("'%s' 를 끝내면 고를 수 있습니다. 직업 안내인에게 웅크리고(Shift) 말을 걸어 시작하세요.", "Finish '%s' to unlock this job. Sneak and talk to the job guide to start."),
  "rtshop.job.info_free": ("처음 고르는 직업은 무료입니다. 이후 바꿀 때는 Gold 가 듭니다.", "Your first pick is free. Changing later costs Gold."),
  "rtshop.job.info_change": ("바꾸는 비용: %s G · 바꾼 뒤 %s시간 동안 다시 바꿀 수 없습니다.", "Change cost: %s G · then locked for %s hours."),
  "rtshop.job.info_cooldown": ("다시 바꿀 수 있을 때까지: %s", "Can change again in: %s"),
@@ -307,7 +307,7 @@ NEW = {
  "rtshop.job.dur_minutes": ("%s분", "%sm"),
  "rtshop.job.unknown": ("알 수 없는 직업입니다: %s", "Unknown job: %s"),
  "rtshop.job.locked": ("'%s' 은(는) 아직 고를 수 없습니다.", "'%s' is not unlocked yet."),
- "rtshop.job.locked_quest": ("'%s' 은(는) 선행 퀘스트 '%s' 를 완료해야 고를 수 있습니다.", "Complete '%2$s' to unlock '%1$s'."),
+ "rtshop.job.locked_quest": ("'%s' 은(는) '%s' 를 끝내야 고를 수 있습니다. 직업 안내인에게 웅크리고 말을 걸어 시작하세요.", "Finish '%2$s' to unlock '%1$s'."),
  "rtshop.job.already": ("이미 %s 입니다.", "You are already a %s."),
  "rtshop.job.chosen": ("직업을 골랐습니다: %s. 패시브가 바로 적용됩니다.", "You are now a %s. Passives are active."),
  "rtshop.job.changed": ("직업을 %s 에서 %s 로 바꿨습니다 (%s G). %s 동안 이 칸은 다시 바꿀 수 없습니다.", "Changed from %s to %s (%s G). Locked for %s."),
@@ -361,6 +361,8 @@ NEW = {
  "rtshop.jobparam.shieldReflect": ("방패 막기 피해 반사", "Shield reflect"),
  "rtshop.jobparam.distanceBonus": ("거리 보너스 (최대)", "Distance bonus (max)"),
  "rtshop.jobparam.distanceFull": ("최대 보너스 거리 (칸)", "Full bonus distance (blocks)"),
+ "rtshop.quest.npc_hint": ("%s 에게 받을 수 있는 퀘스트가 있습니다. 웅크리고(Shift) 말을 걸거나 %s 를 누르세요.", "%s has quests for you. Sneak and talk to them, or click %s."),
+ "rtshop.quest.npc_hint_link": ("[퀘스트 보기]", "[Show quests]"),
 }
 ko = dict(ko_old); en = dict(en_old)
 for k, (a, b) in NEW.items():

@@ -250,6 +250,9 @@ public final class ShopServer {
                             QuestManager.openJournal(ctx.getSource().getPlayerOrException());
                             return 1;
                         })
+                        .then(Commands.literal("open").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
+                                .executes(ctx -> QuestManager.openFromLink(ctx.getSource().getPlayerOrException(),
+                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity")) ? 1 : 0)))
                         .then(Commands.literal("edit").requires(src -> src.hasPermission(2)).executes(ctx -> {
                             com.rtshop.quest.QuestEditor.open(ctx.getSource().getPlayerOrException());
                             return 1;

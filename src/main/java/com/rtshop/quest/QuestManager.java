@@ -72,7 +72,7 @@ public final class QuestManager {
      * 모드에 들어 있는 기본 퀘스트 파일. 한 번 설치한 파일은 다시는 덮어쓰지 않는다 (지워도 다시 깔지 않는다).
      * 새 기본 퀘스트는 항상 새 파일 이름으로 추가한다.
      */
-    private static final String[] DEFAULT_FILES = {"npcs.json", "tutorial.json"};
+    private static final String[] DEFAULT_FILES = {"npcs.json", "tutorial.json", "job_quests.json"};
     /** 편집 화면에서 새로 만든 퀘스트·NPC 가 들어가는 파일. */
     public static final String CUSTOM_FILE = "my_quests.json";
     private static final String INSTALLED_LIST = ".installed_defaults";
@@ -586,6 +586,19 @@ public final class QuestManager {
         sendDialog(p, npcKey);
     }
 
+    /** 채팅의 [퀘스트 보기] 를 눌렀을 때: 가까이 있는 NPC 의 퀘스트 창을 연다. */
+    public static boolean openFromLink(ServerPlayer p, int entityId) {
+        Entity e = p.level().getEntity(entityId);
+        double r = EconomyConfig.get().npcRange + 2;
+        String key = e == null ? null : npcKey(e);
+        if (key == null || !e.isAlive() || e.distanceToSqr(p) > r * r) {
+            p.sendSystemMessage(Component.translatable("rtshop.quest.too_far"));
+            return false;
+        }
+        openDialog(p, key, entityId);
+        return true;
+    }
+
     public static void openJournal(ServerPlayer p) {
         SESSIONS.put(p.getUUID(), new Session(null, -1));
         send(p, null, Component.translatable("rtshop.quest.journal").getString(), "", journalViews(p), true);
@@ -879,18 +892,26 @@ public final class QuestManager {
             return;
         }
         boolean questNpc = isQuestNpc(target);
-        // 상인·은행원은 기본 동작을 ShopServer 가 막는다. 여기서는 대화 목표만 채운다.
-        if (questNpc) {
+        // 상인·은행원·직업 안내인: 웅크리고 말을 걸면 상점 대신 퀘스트 창, 그냥 말을 걸면 원래 화면 + (퀘스트가 있으면) 채팅 안내
+        boolean crouchForQuests = !questNpc && event.getEntity().isShiftKeyDown() && event.getEntity() instanceof ServerPlayer p0
+                && !viewsFor(p0, key).isEmpty();
+        if (questNpc || crouchForQuests) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
         }
         if (event.getHand() != InteractionHand.MAIN_HAND || !(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
-        if (questNpc) {
+        if (questNpc || crouchForQuests) {
             openDialog(sp, key, target.getId());
         } else {
             onTalk(sp, key);
+            if (!viewsFor(sp, key).isEmpty()) {
+                sp.sendSystemMessage(Component.translatable("rtshop.quest.npc_hint", npcName(key),
+                        Component.translatable("rtshop.quest.npc_hint_link").withStyle(st -> st.withColor(net.minecraft.ChatFormatting.GOLD)
+                                .withUnderlined(true).withClickEvent(new net.minecraft.network.chat.ClickEvent(
+                                        net.minecraft.network.chat.ClickEvent.Action.RUN_COMMAND, "/rtshop quest open " + target.getId())))));
+            }
         }
     }
 

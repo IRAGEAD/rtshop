@@ -127,6 +127,14 @@ public final class Jobs {
         return null;
     }
 
+    /** 퀘스트 줄기 이름 ("검사 선행 퀘스트 (4/4)" -> "검사 선행 퀘스트"), 없으면 제목. */
+    public static String chainName(QuestDef q) {
+        if (q.chain == null || q.chain.isEmpty()) {
+            return q.title;
+        }
+        return q.chain.replaceAll("\\s*\\(\\d+/\\d+\\)\\s*$", "");
+    }
+
     public static boolean unlocked(ServerPlayer p, JobConfig.JobDef d) {
         if (d.unlockFlag == null || d.unlockFlag.isEmpty() || QuestManager.hasFlag(p, d.unlockFlag)) {
             return true;
@@ -168,7 +176,7 @@ public final class Jobs {
         if (!unlocked(p, d)) {
             QuestDef q = questGiving(d.unlockFlag);
             return new Result(false, q == null ? Component.translatable("rtshop.job.locked", d.name)
-                    : Component.translatable("rtshop.job.locked_quest", d.name, q.title));
+                    : Component.translatable("rtshop.job.locked_quest", d.name, chainName(q)));
         }
         JobData data = JobData.get(p.server);
         JobData.Entry e = data.of(p.getUUID());
@@ -233,7 +241,7 @@ public final class Jobs {
             String lock = "";
             if (!open) {
                 QuestDef q = questGiving(d.unlockFlag);
-                lock = q == null ? "" : q.title;
+                lock = q == null ? "" : chainName(q);
             }
             list.add(new JobOpenPacket.JobView(d.id, d.slot, d.name, d.icon, cfg.describe(d, com.rtshop.shop.PricingConfig.get().handCookedMargin), state, lock));
         }

@@ -335,7 +335,7 @@
   "rtshop.job.passives": "Traits (active at once · ▲ pro ▼ con)",
   "rtshop.job.info_current": "This is your current job.",
   "rtshop.job.info_locked": "This job is not unlocked yet.",
-  "rtshop.job.info_locked_quest": "Complete the quest '%s' to unlock this job.",
+  "rtshop.job.info_locked_quest": "Finish '%s' to unlock this job. Sneak and talk to the job guide to start.",
   "rtshop.job.info_free": "Your first pick is free. Changing later costs Gold.",
   "rtshop.job.info_change": "Change cost: %s G · then locked for %s hours.",
   "rtshop.job.info_cooldown": "Can change again in: %s",
@@ -350,7 +350,7 @@
   "rtshop.job.dur_minutes": "%sm",
   "rtshop.job.unknown": "Unknown job: %s",
   "rtshop.job.locked": "'%s' is not unlocked yet.",
-  "rtshop.job.locked_quest": "Complete '%2$s' to unlock '%1$s'.",
+  "rtshop.job.locked_quest": "Finish '%2$s' to unlock '%1$s'.",
   "rtshop.job.already": "You are already a %s.",
   "rtshop.job.chosen": "You are now a %s. Passives are active.",
   "rtshop.job.changed": "Changed from %s to %s (%s G). Locked for %s.",
@@ -403,5 +403,7 @@
   "rtshop.jobparam.shieldKnockback": "Shield knockback",
   "rtshop.jobparam.shieldReflect": "Shield reflect",
   "rtshop.jobparam.distanceBonus": "Distance bonus (max)",
-  "rtshop.jobparam.distanceFull": "Full bonus distance (blocks)"
+  "rtshop.jobparam.distanceFull": "Full bonus distance (blocks)",
+  "rtshop.quest.npc_hint": "%s has quests for you. Sneak and talk to them, or click %s.",
+  "rtshop.quest.npc_hint_link": "[Show quests]"
 }
