@@ -822,12 +822,15 @@ public final class ShopLoader {
 
     /**
      * 요리 매입가 하한: 레시피의 재료를 모두 상점에서 사서 만들어 팔아도 손해가 없게 한다.
-     * 음식마다 "재료를 상점에서 살 수 있는" 모든 조리법 중 가장 비싼 것의 (재료비 × (1+margin) + 수고비) 이상으로 매입하고,
+     * 음식마다 "재료를 상점에서 살 수 있는" 모든 조리법 중 가장 비싼 것의 재료비 이상으로 매입하고,
      * 되팔기 규칙(50%)을 지키도록 상점 판매가도 그 2배 이상으로 맞춘다.
      * 요리가 다른 요리의 재료이면 앞 요리의 상점가가 오르면서 뒤 요리도 오르므로 바뀌지 않을 때까지 몇 번 반복한다.
      */
     private static void applyPurchaseFloor(RecipeScan.Scan scan, PricingConfig pc, Loaded out) {
-        RecipeSolver.Config cfg = pc.solverConfig();
+        // 하한은 '순수 재료비'로만 잡는다 (수고비·마진 제외). 수고비가 붙은 조리법과 화로처럼 자동화되는 조리법이 같은 음식을 만들 때,
+        // 수고비까지 하한에 넣으면 화로로 만들어 팔기만 해도 돈이 불어나기 때문이다. 수고비는 원래 계산(가장 싼 방법 + 수고비)에 이미 들어 있다.
+        RecipeSolver.Config cfg = new RecipeSolver.Config();
+        cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(scan);
         List<RecipeSolver.Recipe> usable = new ArrayList<>();
         for (RecipeSolver.Recipe r : scan.recipes) {
@@ -895,6 +898,45 @@ public final class ShopLoader {
         }
         out.notes.add("재료를 모두 상점에서 사서 만들어도 손해가 없도록 매입가를 올린 음식: " + raised + "종 (pricing.json 의 purchaseFloor)");
         RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
+    }
+
+    /** 같은 음식의 조리법끼리 재료비가 30% 이상 차이 나는 경우 (싼 조리법으로 만들면 이익이 크게 남는 음식). */
+    public static List<String> purchaseSpread(Loaded loaded) {
+        List<String> out = new ArrayList<>();
+        if (loaded.scan == null || loaded.scan.env == null) {
+            return out;
+        }
+        RecipeSolver.Config cfg = new RecipeSolver.Config();
+        Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
+        List<RecipeSolver.Recipe> usable = new ArrayList<>();
+        for (RecipeSolver.Recipe r : loaded.scan.recipes) {
+            if (!storage.contains(r)) {
+                usable.add(r);
+            }
+        }
+        Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
+        Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(loaded.prices), usable, loaded.scan.env, cfg);
+        for (Price p : loaded.prices.values()) {
+            if (!floorTarget(p, loaded.solved)) {
+                continue;
+            }
+            String id = itemId(p.stack);
+            double lo = Double.MAX_VALUE;
+            double hi = 0;
+            String loBy = "";
+            for (RecipeSolver.Recipe r : makers.getOrDefault(id, List.of())) {
+                double c = RecipeSolver.purchaseRequirement(r, id, pcost, loaded.scan.env, cfg, null);
+                if (c > 0 && c < lo) {
+                    lo = c;
+                    loBy = r.id + " [" + r.type + "]";
+                }
+                hi = Math.max(hi, c);
+            }
+            if (lo < Double.MAX_VALUE && hi > lo * 1.3) {
+                out.add(String.format(Locale.ROOT, "%s | %.1f | %.1f | %s", id, p.sellUnit, lo, loBy));
+            }
+        }
+        return out;
     }
 
     /** 결과 점검: 재료를 상점에서 사서 어떤 조리법으로 만들어도 매입가가 재료비 이상인가. 손해인 경우의 설명 목록. */
@@ -1316,6 +1358,13 @@ public final class ShopLoader {
             audit.append(line).append('\n');
         }
         audit.append("재료를 사서 만들면 손해인 조리법: ").append(buyLoss.size()).append("개\n");
+        List<String> spread = purchaseSpread(loaded);
+        audit.append("\n# 같은 음식인데 조리법에 따라 재료비 차이가 큰 경우 (음식 | 매입가 | 가장 싼 조리법 재료비 | 조리법)\n");
+        audit.append("# 매입가는 가장 비싼 조리법 기준이라, 싼 조리법으로 만들면 차액만큼 남습니다.\n");
+        for (String line : spread) {
+            audit.append(line).append('\n');
+        }
+        audit.append("재료비 차이가 큰 음식: ").append(spread.size()).append("종\n");
         // 요리 재료로 쓰이는데 상점에서 사는 것보다 직접 만드는 편이 싼 품목: 사서 쓰면 차액만큼 손해를 본다
         audit.append("\n# 요리 재료 중 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)\n");
         audit.append("# 음식값은 가장 싼 방법 기준으로 매겨지므로, 아래 품목을 상점에서 사서 재료로 쓰면 차액만큼 손해입니다.\n");

@@ -220,7 +220,8 @@ jobs:
           grep -v "^PASS" rtshop-selftest.txt | cut -c1-700 || true
           echo "checks passed: $(grep -c '^PASS' rtshop-selftest.txt 2>/dev/null)"
           echo "----- price check -----"
-          grep -E "적자|자동으로 올렸|레시피 파일|해당 품목" config/rtshop/export/audit.txt | cut -c1-600 || true
+          grep -E "적자|자동으로 올렸|레시피 파일|해당 품목|손해|식품 상인|올린 음식" config/rtshop/export/audit.txt | cut -c1-3000 || true
+          sed -n '/사서 만들어 팔 때 손해인 조리법/,/재료비 차이가 큰 음식:/p' config/rtshop/export/audit.txt | head -n 120 | cut -c1-300 || true
           grep -q "RESULT: ALL PASS" rtshop-selftest.txt
       - name: Client screen test inside the whole pack
         # 모드팩의 모든 모드(클라이언트 전용 포함)와 날개 모드를 넣은 실제 클라이언트에서 화면 점검을 돌린다
