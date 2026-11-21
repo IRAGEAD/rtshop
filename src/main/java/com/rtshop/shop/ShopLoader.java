@@ -189,6 +189,8 @@ public final class ShopLoader {
     public static final String[] ADDED = {"attendance_shop", "gacha_shop"};
     /** 기본 내용이 크게 바뀐 상점: "이름@판" 이 기록에 없으면 기존 파일을 backup 으로 옮기고 새 기본 파일로 바꾼다 (한 번만). */
     public static final String[] UPGRADED = {"gacha_shop@2"};
+    /** 기존 상점 파일에 품목을 덧붙임: "상점+조각파일@판" (조각의 categories/items 중 없는 것만 추가, 한 번만). */
+    public static final String[] APPENDED = {"blacksmith+blacksmith_enhance@1"};
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");
@@ -233,9 +235,66 @@ public final class ShopLoader {
             done.add(mark);
             changed = true;
         }
+        for (String mark : APPENDED) {
+            if (done.contains(mark)) {
+                continue;
+            }
+            String target = mark.substring(0, mark.indexOf('+'));
+            String frag = mark.substring(mark.indexOf('+') + 1, mark.indexOf('@'));
+            try {
+                appendItems(dir.resolve(target + ".json"), frag);
+            } catch (Exception ex) {
+                RtShop.LOGGER.error("[rtshop] 상점 {} 에 새 품목을 덧붙이지 못했습니다: {}", target, ex.toString());
+            }
+            done.add(mark);
+            changed = true;
+        }
         if (changed) {
             Files.write(list, done, StandardCharsets.UTF_8);
         }
+    }
+
+    /** 상점 파일에 조각 파일(rtshop_defaults/조각.json)의 카테고리·품목 중 없는 것만 덧붙인다. */
+    static int appendItems(Path file, String frag) throws IOException {
+        if (!Files.exists(file)) {
+            return 0;
+        }
+        com.google.gson.JsonObject add;
+        try (InputStream in = ShopLoader.class.getResourceAsStream("/rtshop_defaults/" + frag + ".json")) {
+            if (in == null) {
+                return 0;
+            }
+            add = JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8)).getAsJsonObject();
+        }
+        com.google.gson.JsonObject shop = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+        int n = 0;
+        for (String key : new String[]{"categories", "items"}) {
+            if (!add.has(key)) {
+                continue;
+            }
+            String idKey = key.equals("categories") ? "id" : "item";
+            com.google.gson.JsonArray arr = shop.has(key) ? shop.getAsJsonArray(key) : new com.google.gson.JsonArray();
+            Set<String> have = new HashSet<>();
+            for (com.google.gson.JsonElement e : arr) {
+                if (e.isJsonObject() && e.getAsJsonObject().has(idKey)) {
+                    have.add(e.getAsJsonObject().get(idKey).getAsString());
+                }
+            }
+            for (com.google.gson.JsonElement e : add.getAsJsonArray(key)) {
+                String id = e.getAsJsonObject().get(idKey).getAsString();
+                if (have.add(id)) {
+                    arr.add(e.deepCopy());
+                    n++;
+                }
+            }
+            shop.add(key, arr);
+        }
+        if (n > 0) {
+            Files.writeString(file, new com.google.gson.GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(shop),
+                    StandardCharsets.UTF_8);
+            RtShop.LOGGER.info("[rtshop] 상점 {} 에 새 품목 {}개를 덧붙였습니다.", file.getFileName(), n);
+        }
+        return n;
     }
 
     public static synchronized Loaded loadAll(MinecraftServer server) {

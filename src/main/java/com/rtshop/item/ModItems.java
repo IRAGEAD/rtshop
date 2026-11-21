@@ -55,4 +55,26 @@ public final class ModItems {
     /** 펫 소환권 (뽑기에서 나오는 펫). */
     public static final RegistryObject<Item> PET_SUMMON = ITEMS.register("pet_summon",
             () -> new PetSummonItem(new Item.Properties().stacksTo(1)));
+
+    /** 강화 모루 (블록). */
+    public static final RegistryObject<Item> ENHANCE_ANVIL = ITEMS.register("enhance_anvil",
+            () -> new net.minecraft.world.item.BlockItem(com.rtshop.enhance.ModEnhance.ANVIL.get(),
+                    new Item.Properties().rarity(net.minecraft.world.item.Rarity.UNCOMMON)) {
+                @Override
+                public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.Level level,
+                                            java.util.List<net.minecraft.network.chat.Component> tip, net.minecraft.world.item.TooltipFlag flag) {
+                    tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.enhance_anvil.tip1").withStyle(net.minecraft.ChatFormatting.GRAY));
+                    tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.enhance_anvil.tip2").withStyle(net.minecraft.ChatFormatting.GRAY));
+                }
+            });
+    /** 강화 방지권: 강화 모루의 둘째 칸에 넣고 강화하면 한 장씩 쓴다. */
+    public static final RegistryObject<Item> GUARD_DAMAGE = ITEMS.register("enhance_guard_damage",
+            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false,
+                    "item.rtshop.enhance_guard_damage.tip", "item.rtshop.enhance_guard.tip"));
+    public static final RegistryObject<Item> GUARD_DESTROY = ITEMS.register("enhance_guard_destroy",
+            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.RARE), false,
+                    "item.rtshop.enhance_guard_destroy.tip", "item.rtshop.enhance_guard.tip"));
+    public static final RegistryObject<Item> GUARD_FULL = ITEMS.register("enhance_guard_full",
+            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.EPIC), true,
+                    "item.rtshop.enhance_guard_full.tip", "item.rtshop.enhance_guard.tip"));
 }

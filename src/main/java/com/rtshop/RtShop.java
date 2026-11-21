@@ -24,6 +24,7 @@ public class RtShop {
 
     public RtShop() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        com.rtshop.enhance.ModEnhance.register(bus);
         ModItems.ITEMS.register(bus);
         FarmLootModifier.SERIALIZERS.register(bus);
         bus.addListener(this::onCreativeTab);
@@ -51,6 +52,10 @@ public class RtShop {
             event.accept(ModItems.ACC_TICKET_MID);
             event.accept(ModItems.ACC_TICKET_HIGH);
             event.accept(ModItems.SHARD);
+            event.accept(ModItems.ENHANCE_ANVIL);
+            event.accept(ModItems.GUARD_DAMAGE);
+            event.accept(ModItems.GUARD_DESTROY);
+            event.accept(ModItems.GUARD_FULL);
         }
     }
 }

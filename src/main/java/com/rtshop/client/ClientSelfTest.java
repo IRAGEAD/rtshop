@@ -84,6 +84,9 @@ public final class ClientSelfTest {
     private static volatile int gachaNpc = -1;
     private static volatile int testNpc = -1;
     private static final int EN_STEPS = 6;
+    private static final int ENH_STEPS = 9;
+    private static final int ENH_END = NPC_END + ENH_STEPS;
+    private static volatile BlockPos anvilPos = null;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -315,6 +318,138 @@ public final class ClientSelfTest {
                 shot(mc, "58_fx_legendary_reveal");
                 check("the legendary animation plays", gs != null && gs.fxActiveForTest());
                 wait = 5;
+            }
+        }
+    }
+
+
+    private static ItemStack leveled(Item item, int lv) {
+        ItemStack s = new ItemStack(item);
+        com.rtshop.enhance.Enhance.setLevel(s, lv);
+        return s;
+    }
+
+    /** 강화 모루: 우클릭으로 열기(Cinematic 이 있으면 모루 장면), 재료·확률 패널, 성공·방지권 연출. */
+    private static void enhanceStep(Minecraft mc, int k) {
+        switch (k) {
+            case 0 -> {
+                mc.setScreen(null);
+                anvilPos = null;
+                onServer(mc, sp -> {
+                    BlockPos at = sp.blockPosition().relative(sp.getDirection(), 2);
+                    sp.serverLevel().setBlockAndUpdate(at.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                    sp.serverLevel().setBlockAndUpdate(at, com.rtshop.enhance.ModEnhance.ANVIL.get().defaultBlockState());
+                    sp.serverLevel().setBlockAndUpdate(at.above(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    com.rtshop.enhance.EnhanceConfig cfg = com.rtshop.enhance.EnhanceConfig.get();
+                    for (int lv : new int[]{5, 6}) {
+                        for (com.rtshop.enhance.Enhance.Need n : com.rtshop.enhance.Enhance.needs(cfg, cfg.level(lv), null)) {
+                            sp.getInventory().add(new ItemStack(n.items.get(0), n.need * 2));
+                        }
+                    }
+                    sp.getInventory().add(new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 3));
+                    com.rtshop.economy.Economy.setWallet(sp, 200000);
+                    anvilPos = at;
+                });
+                wait = 10;
+            }
+            case 1 -> {
+                BlockPos at = anvilPos;
+                check("the enhance anvil was placed", at != null && mc.level.getBlockState(at).is(com.rtshop.enhance.ModEnhance.ANVIL.get()));
+                if (at != null) {
+                    net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(
+                            net.minecraft.world.phys.Vec3.atCenterOf(at).add(0, 0.5, 0), net.minecraft.core.Direction.UP, at, false);
+                    try {
+                        mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+                    } catch (Throwable t) {
+                        check("right-clicking the enhance anvil does not crash", false, t);
+                    }
+                }
+                wait = net.minecraftforge.fml.ModList.get().isLoaded("cinematic") ? 120 : 20;
+            }
+            case 2 -> {
+                boolean open = mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu;
+                check("right-clicking the enhance anvil opens the enhance menu"
+                        + (net.minecraftforge.fml.ModList.get().isLoaded("cinematic") ? " (through the Cinematic anvil scene)" : ""), open,
+                        mc.screen == null ? "no screen" : mc.screen.getClass().getName());
+                if (!net.minecraftforge.fml.ModList.get().isLoaded("cinematic")) {
+                    check("without Cinematic the enhance window is shown", mc.screen instanceof EnhanceScreen, mc.screen);
+                    if (mc.screen instanceof EnhanceScreen es) {
+                        check("the enhance window fits on the screen", es.fitsForTest());
+                    }
+                }
+                shot(mc, "80_enhance_open");
+                onServer(mc, sp -> {
+                    if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
+                        m.getSlot(0).set(leveled(net.minecraft.world.item.Items.DIAMOND_SWORD, 4));
+                        m.getSlot(1).set(new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 2));
+                    }
+                    com.rtshop.enhance.Enhance.testRoll = 0.0;
+                });
+                wait = 15;
+            }
+            case 3 -> {
+                var m = mc.player.containerMenu;
+                boolean ready = m instanceof com.rtshop.enhance.EnhanceMenu && m.getSlot(2).hasItem() && m.getSlot(2).mayPickup(mc.player);
+                check("the +5 preview is ready and affordable", ready);
+                if (m.getSlot(2).hasItem()) {
+                    List<net.minecraft.network.chat.Component> tip = net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, m.getSlot(2).getItem());
+                    check("the preview tooltip shows the odds and the materials (also shown in the Cinematic scene)",
+                            tip.stream().anyMatch(c -> c.getString().contains("56%")), tip.size());
+                }
+                shot(mc, "81_enhance_ready");
+                mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
+                wait = 6;
+            }
+            case 4 -> {
+                shot(mc, "82_enhance_success");
+                check("success: +4 -> +5 with the result banner", EnhanceFx.last.startsWith("SUCCESS:4:5") && EnhanceFx.active(), EnhanceFx.last);
+                onServer(mc, sp -> {
+                    if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
+                        ItemStack got = m.getCarried();
+                        m.setCarried(ItemStack.EMPTY);
+                        m.getSlot(0).set(got.isEmpty() ? leveled(net.minecraft.world.item.Items.DIAMOND_SWORD, 5) : got);
+                    }
+                    com.rtshop.enhance.Enhance.testRoll = 0.99;
+                });
+                wait = 60;
+            }
+            case 5 -> {
+                var m = mc.player.containerMenu;
+                mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
+                wait = 6;
+            }
+            case 6 -> {
+                shot(mc, "83_enhance_guarded");
+                check("a destroy roll with a destruction guard only damages the item (+5 -> +4)",
+                        EnhanceFx.last.startsWith("DAMAGE:5:4:guarded"), EnhanceFx.last);
+                onServer(mc, sp -> {
+                    com.rtshop.enhance.Enhance.testRoll = null;
+                    if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
+                        sp.getInventory().add(m.getCarried());
+                        m.setCarried(ItemStack.EMPTY);
+                    }
+                });
+                wait = 60;
+            }
+            case 7 -> {
+                ItemStack held = ItemStack.EMPTY;
+                for (ItemStack s : mc.player.getInventory().items) {
+                    if (s.is(net.minecraft.world.item.Items.DIAMOND_SWORD)) held = s;
+                }
+                List<net.minecraft.network.chat.Component> tip = held.isEmpty() ? List.of()
+                        : net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, held);
+                check("an enhanced item shows +N in front of its name", !tip.isEmpty() && tip.get(0).getString().startsWith("+4 "),
+                        tip.isEmpty() ? "no sword" : tip.get(0).getString());
+                mc.player.closeContainer();
+                wait = 40;
+            }
+            default -> {
+                mc.setScreen(null);
+                BlockPos at = anvilPos;
+                onServer(mc, sp -> {
+                    if (at != null) sp.serverLevel().setBlockAndUpdate(at, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                });
+                wait = 10;
             }
         }
     }
@@ -1244,17 +1379,21 @@ public final class ClientSelfTest {
                     npcStep(mc, step - FX_END - 1);
                     return;
                 }
-                if (step > NPC_END && step <= NPC_END + EN_STEPS) {
-                    englishStep(mc, step - NPC_END - 1);
+                if (step > NPC_END && step <= ENH_END) {
+                    enhanceStep(mc, step - NPC_END - 1);
                     return;
                 }
-                if (step == NPC_END + EN_STEPS + 1) {
+                if (step > ENH_END && step <= ENH_END + EN_STEPS) {
+                    englishStep(mc, step - ENH_END - 1);
+                    return;
+                }
+                if (step == ENH_END + EN_STEPS + 1) {
                     check("no server-side error happened", serverError == null, serverError);
                     finish(mc);
                     return;
                 }
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > NPC_END + EN_STEPS + 40) {
+                if (step > ENH_END + EN_STEPS + 40) {
                     done = true;
                     mc.stop();
                 }

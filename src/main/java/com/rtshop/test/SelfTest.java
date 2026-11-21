@@ -288,6 +288,11 @@ public final class SelfTest {
             crash("npc guard", t);
         }
         try {
+            enhance(server, level, a);
+        } catch (Throwable t) {
+            crash("enhance", t);
+        }
+        try {
             gacha(server, level, a);
         } catch (Throwable t) {
             crash("gacha", t);
@@ -321,6 +326,230 @@ public final class SelfTest {
         return failed == 0;
     }
 
+
+    // ------------------------------------------------------------------ 강화
+
+    private static double attr(ItemStack s, net.minecraft.world.entity.EquipmentSlot slot, net.minecraft.world.entity.ai.attributes.Attribute a) {
+        double v = 0;
+        for (net.minecraft.world.entity.ai.attributes.AttributeModifier m : s.getAttributeModifiers(slot).get(a)) {
+            if (m.getOperation() == net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION) v += m.getAmount();
+        }
+        return v;
+    }
+
+    private static void giveMaterials(FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, int target, int times) {
+        for (com.rtshop.enhance.Enhance.Need n : com.rtshop.enhance.Enhance.needs(cfg, cfg.level(target), a)) {
+            a.getInventory().add(new ItemStack(n.items.get(0), n.need * times));
+        }
+    }
+
+    private static com.rtshop.enhance.EnhanceMenu enhanceMenu(ServerLevel level, BlockPos pos, FakePlayer a) {
+        net.minecraft.world.level.block.state.BlockState st = level.getBlockState(pos);
+        com.rtshop.enhance.EnhanceMenu m = (com.rtshop.enhance.EnhanceMenu) st.getMenuProvider(level, pos).createMenu(1, a.getInventory(), a);
+        a.containerMenu = m;
+        return m;
+    }
+
+    /** 장비를 올리고(단계 cur), 방지권을 넣고, 굴림값을 정해서 결과 칸을 클릭. 손에 든(또는 가방의) 결과를 돌려준다. */
+    private static ItemStack enhanceOnce(ServerLevel level, BlockPos pos, FakePlayer a, ItemStack gear, int cur, ItemStack guard, double roll,
+                                         net.minecraft.world.inventory.ClickType click) {
+        com.rtshop.enhance.EnhanceMenu m = enhanceMenu(level, pos, a);
+        ItemStack g = gear.copy();
+        com.rtshop.enhance.Enhance.setLevel(g, cur);
+        m.getSlot(0).set(g);
+        if (!guard.isEmpty()) m.getSlot(1).set(guard);
+        com.rtshop.enhance.Enhance.testRoll = roll;
+        try {
+            m.clicked(2, 0, click, a);
+        } finally {
+            com.rtshop.enhance.Enhance.testRoll = null;
+        }
+        ItemStack out = m.getCarried().copy();
+        m.setCarried(ItemStack.EMPTY);
+        return out;
+    }
+
+    private static void enhance(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("enhance");
+        com.rtshop.enhance.EnhanceConfig cfg = com.rtshop.enhance.EnhanceConfig.get();
+        boolean shape = true;
+        StringBuilder bad = new StringBuilder();
+        for (int i = 1; i <= 11; i++) {
+            com.rtshop.enhance.EnhanceConfig.Level l = cfg.level(i);
+            double sum = l.success + l.maintain + l.damage + l.destroy;
+            if (Math.abs(sum - 100) > 1e-6) { shape = false; bad.append(" sum+").append(i); }
+            if (i > 1) {
+                com.rtshop.enhance.EnhanceConfig.Level p = cfg.level(i - 1);
+                if (!(l.success < p.success && l.maintain <= p.maintain && l.damage >= p.damage && l.destroy >= p.destroy && l.gold > p.gold)) {
+                    shape = false;
+                    bad.append(" +").append(i);
+                }
+            }
+        }
+        check("11 enhancement levels: success/keep fall, damage/destroy rise, cost rises, odds add up to 100", shape, bad);
+        check("the first levels cannot destroy, high levels can", cfg.level(3).destroy == 0 && cfg.level(4).destroy > 0 && cfg.level(11).destroy > 30);
+        boolean mm = net.minecraftforge.fml.ModList.get().isLoaded("miningmaster");
+        boolean sp = net.minecraftforge.fml.ModList.get().isLoaded("spelunkery");
+        int mats1 = com.rtshop.enhance.Enhance.needs(cfg, cfg.level(1), null).size();
+        int mats11 = com.rtshop.enhance.Enhance.needs(cfg, cfg.level(11), null).size();
+        info("enhance materials: +1 needs " + mats1 + " kinds, +11 needs " + mats11 + " kinds (miningmaster " + mm + ", spelunkery " + sp + ")");
+        check("materials of uninstalled mods are skipped, installed ones are required", mats1 == (mm ? 1 : 0) + (sp ? 1 : 0)
+                && mats11 == (mm ? 2 : 0) + (sp ? 2 : 0), mats1 + " / " + mats11);
+        if (mm) {
+            check("+10 and +11 need the rarest Mining Master gems (divine beryl / air malachite)",
+                    cfg.itemsOf(cfg.level(10).materials.get(0)).contains(net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new ResourceLocation("miningmaster:divine_beryl"))));
+        }
+        // 상점: 장비 상인이 방지권을 판다, 손상 < 파괴, 보호권 = 둘의 합
+        ShopLoader.Price pd = ShopServer.loaded().prices.get("rtshop:enhance_guard_damage");
+        ShopLoader.Price px = ShopServer.loaded().prices.get("rtshop:enhance_guard_destroy");
+        ShopLoader.Price pf = ShopServer.loaded().prices.get("rtshop:enhance_guard_full");
+        ShopData bs = ShopServer.shops().get("blacksmith");
+        boolean sold = bs != null && findEntry(bs, e -> net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(e.stack.getItem()).toString().equals("rtshop:enhance_guard_full")) >= 0
+                && findEntry(bs, e -> net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(e.stack.getItem()).toString().equals("rtshop:enhance_anvil")) >= 0;
+        check("the equipment merchant sells the enhance anvil and the guard tickets", sold);
+        check("damage guard is cheaper than destruction guard; protection = both together",
+                pd != null && px != null && pf != null && pd.price < px.price && pf.price == pd.price + px.price,
+                pd == null ? "missing" : pd.price + " / " + (px == null ? "?" : px.price) + " / " + (pf == null ? "?" : pf.price));
+        // 기존 상점 파일에 한 번만 덧붙임
+        java.nio.file.Path tmp = Files.createTempFile("rtshop_bs", ".json");
+        try {
+            Files.writeString(tmp, "{\"title\":\"x\",\"categories\":[{\"id\":\"weapon\",\"name\":\"w\",\"icon\":\"minecraft:stone\"}],"
+                    + "\"items\":[{\"item\":\"rtshop:enhance_guard_damage\",\"price\":1}]}", StandardCharsets.UTF_8);
+            int n1 = ShopLoader.appendItems(tmp, "blacksmith_enhance");
+            int n2 = ShopLoader.appendItems(tmp, "blacksmith_enhance");
+            String txt = Files.readString(tmp, StandardCharsets.UTF_8);
+            check("new enhance items are added to an existing blacksmith file once, keeping edited prices",
+                    n1 > 3 && n2 == 0 && txt.contains("\"price\": 1,") == false && txt.contains("\"price\": 1") && txt.contains("enhance_guard_full")
+                            && txt.contains("\"id\": \"enhance\""), n1 + " " + n2);
+        } finally {
+            Files.deleteIfExists(tmp);
+        }
+
+        // 블록과 창
+        BlockPos pos = new BlockPos(0, 120, 4000);
+        level.setBlockAndUpdate(pos.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+        level.setBlockAndUpdate(pos, com.rtshop.enhance.ModEnhance.ANVIL.get().defaultBlockState());
+        check("the enhance anvil is an anvil (Cinematic Interactions plays its anvil scene on it)",
+                level.getBlockState(pos).is(net.minecraft.tags.BlockTags.ANVIL));
+        if (net.minecraftforge.fml.ModList.get().isLoaded("cinematic")) {
+            String kind = "?";
+            try {
+                kind = String.valueOf(Class.forName("dev.dyslexic.cinematic.station.StationKind")
+                        .getMethod("of", net.minecraft.world.level.block.state.BlockState.class).invoke(null, level.getBlockState(pos)));
+            } catch (Throwable t) {
+                kind = String.valueOf(t);
+            }
+            check("Cinematic Interactions treats the enhance anvil as an anvil station", "ANVIL".equals(kind), kind);
+        }
+        clear(a);
+        Economy.setWallet(a, 0);
+        com.rtshop.enhance.EnhanceMenu m = enhanceMenu(level, pos, a);
+        check("its menu is a vanilla anvil menu with its own type", m instanceof net.minecraft.world.inventory.AnvilMenu
+                && m.getType() == com.rtshop.enhance.ModEnhance.MENU.get() && m.stillValid(a) == (a.distanceToSqr(Vec3.atCenterOf(pos)) <= 64));
+        m.getSlot(0).set(new ItemStack(Items.STICK));
+        check("a stick cannot be enhanced (no result)", !m.getSlot(2).hasItem());
+        m.getSlot(0).set(new ItemStack(Items.IRON_SWORD));
+        ItemStack prev = m.getSlot(2).getItem();
+        check("a sword shows a +1 preview", com.rtshop.enhance.Enhance.level(prev) == 1 && com.rtshop.enhance.Enhance.isPreview(prev));
+        check("without Gold and materials it cannot be taken", !m.getSlot(2).mayPickup(a));
+        m.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        check("...and clicking does nothing", m.getCarried().isEmpty() && m.getSlot(0).hasItem());
+        m.removed(a);
+        check("closing the anvil gives the sword back", count(a, s -> s.is(Items.IRON_SWORD)) == 1);
+        clear(a);
+
+        ItemStack sword = new ItemStack(Items.IRON_SWORD);
+        Economy.setWallet(a, 1_000_000);
+        giveMaterials(a, cfg, 1, 1);
+        ItemStack r = enhanceOnce(level, pos, a, sword, 0, ItemStack.EMPTY, 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
+        boolean matsGone = com.rtshop.enhance.Enhance.needs(cfg, cfg.level(1), a).stream().allMatch(n -> n.have == 0);
+        check("success: +0 -> +1, Gold and materials are used", com.rtshop.enhance.Enhance.level(r) == 1 && !com.rtshop.enhance.Enhance.isPreview(r)
+                && Economy.wallet(a) == 1_000_000 - cfg.level(1).gold && matsGone, com.rtshop.enhance.Enhance.level(r) + " " + Economy.wallet(a));
+        giveMaterials(a, cfg, 1, 1);
+        enhanceOnce(level, pos, a, sword, 0, ItemStack.EMPTY, 0.0, net.minecraft.world.inventory.ClickType.QUICK_MOVE);
+        ItemStack inBag = first(a, s -> s.is(Items.IRON_SWORD));
+        check("shift-click works too (result goes to the bag)", com.rtshop.enhance.Enhance.level(inBag) == 1 && !com.rtshop.enhance.Enhance.isPreview(inBag));
+        clear(a);
+
+        giveMaterials(a, cfg, 7, 10);
+        ItemStack dmgGuard = new ItemStack(com.rtshop.item.ModItems.GUARD_DAMAGE.get(), 3);
+        ItemStack desGuard = new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 3);
+        ItemStack fullGuard = new ItemStack(com.rtshop.item.ModItems.GUARD_FULL.get(), 3);
+        // +6 -> +7: success 37, keep 6.5, damage 39, destroy 17.5
+        r = enhanceOnce(level, pos, a, sword, 6, ItemStack.EMPTY, 0.40, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("keep: the level stays", com.rtshop.enhance.Enhance.level(r) == 6 && r.is(Items.IRON_SWORD));
+        r = enhanceOnce(level, pos, a, sword, 6, ItemStack.EMPTY, 0.60, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("damage: the level drops by one", com.rtshop.enhance.Enhance.level(r) == 5 && r.is(Items.IRON_SWORD));
+        r = enhanceOnce(level, pos, a, sword, 6, ItemStack.EMPTY, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("destroy: the item is gone", r.isEmpty() && count(a, s -> s.is(Items.IRON_SWORD)) == 0);
+        com.rtshop.enhance.EnhanceMenu gm = enhanceMenu(level, pos, a);
+        ItemStack g6 = sword.copy();
+        com.rtshop.enhance.Enhance.setLevel(g6, 6);
+        gm.getSlot(0).set(g6);
+        gm.getSlot(1).set(dmgGuard.copy());
+        com.rtshop.enhance.Enhance.testRoll = 0.60;
+        gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        com.rtshop.enhance.Enhance.testRoll = null;
+        check("damage guard: damage becomes keep, one ticket is used", com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6
+                && gm.getSlot(1).getItem().getCount() == 2);
+        gm.setCarried(ItemStack.EMPTY);
+        gm.getSlot(0).set(g6.copy());
+        com.rtshop.enhance.Enhance.testRoll = 0.99;
+        gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        com.rtshop.enhance.Enhance.testRoll = null;
+        check("damage guard does not stop destruction", gm.getCarried().isEmpty() && gm.getSlot(1).getItem().getCount() == 1);
+        gm.getSlot(1).set(ItemStack.EMPTY);
+        r = enhanceOnce(level, pos, a, sword, 6, desGuard.copy(), 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("destruction guard: destroy becomes damage", com.rtshop.enhance.Enhance.level(r) == 5 && r.is(Items.IRON_SWORD));
+        r = enhanceOnce(level, pos, a, sword, 6, fullGuard.copy(), 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
+        ItemStack r2 = enhanceOnce(level, pos, a, sword, 6, fullGuard.copy(), 0.60, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("protection ticket: both destroy and damage become keep", com.rtshop.enhance.Enhance.level(r) == 6 && com.rtshop.enhance.Enhance.level(r2) == 6);
+        r = enhanceOnce(level, pos, a, sword, 6, fullGuard.copy(), 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("success still succeeds with a ticket", com.rtshop.enhance.Enhance.level(r) == 7);
+        giveMaterials(a, cfg, 1, 1);
+        com.rtshop.enhance.EnhanceMenu gm2 = enhanceMenu(level, pos, a);
+        gm2.getSlot(0).set(sword.copy());
+        gm2.getSlot(1).set(desGuard.copy());
+        gm2.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        check("a destruction guard is not used up where nothing can be destroyed (+1)", gm2.getSlot(1).getItem().getCount() == 3);
+        gm2.setCarried(ItemStack.EMPTY);
+        gm2.getSlot(1).set(ItemStack.EMPTY);
+        ItemStack max = sword.copy();
+        com.rtshop.enhance.Enhance.setLevel(max, 11);
+        gm2.getSlot(0).set(max);
+        check("+11 is the top: no further preview", !gm2.getSlot(2).hasItem());
+        gm2.getSlot(0).set(ItemStack.EMPTY);
+        a.containerMenu = a.inventoryMenu;
+
+        // 능력치
+        ItemStack s7 = sword.copy();
+        com.rtshop.enhance.Enhance.setLevel(s7, 7);
+        double base = attr(sword, net.minecraft.world.entity.EquipmentSlot.MAINHAND, net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+        double up = attr(s7, net.minecraft.world.entity.EquipmentSlot.MAINHAND, net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+        double want = com.rtshop.enhance.Enhance.weaponBonus(cfg, 7, base);
+        check("a +7 sword hits harder (" + String.format("%.2f", base) + " -> " + String.format("%.2f", up) + ")", Math.abs(up - base - want) < 1e-6 && up > base);
+        double offhand = attr(s7, net.minecraft.world.entity.EquipmentSlot.OFFHAND, net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+        check("...only in the main hand", offhand == 0);
+        ItemStack chest = new ItemStack(Items.IRON_CHESTPLATE);
+        ItemStack c8 = chest.copy();
+        com.rtshop.enhance.Enhance.setLevel(c8, 8);
+        double ab = attr(chest, net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
+        double au = attr(c8, net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
+        double tu = attr(c8, net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS)
+                - attr(chest, net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS);
+        check("a +8 chestplate has more armor and some toughness (" + ab + " -> " + String.format("%.2f", au) + ", +" + tu + ")",
+                au > ab && Math.abs(tu - com.rtshop.enhance.Enhance.toughnessBonus(cfg, 8)) < 1e-6 && tu > 0);
+        clear(a);
+        // 굴림 분포
+        com.rtshop.enhance.EnhanceConfig.Level l5 = cfg.level(5);
+        int[] hist = new int[4];
+        java.util.Random rnd = new java.util.Random(5);
+        int N = 200000;
+        for (int i = 0; i < N; i++) hist[com.rtshop.enhance.Enhance.roll(l5, rnd.nextDouble()).ordinal()]++;
+        check("rolls follow the configured odds (+5: " + hist[0] * 100.0 / N + "/" + hist[1] * 100.0 / N + "/" + hist[2] * 100.0 / N + "/" + hist[3] * 100.0 / N + ")",
+                Math.abs(hist[0] * 100.0 / N - l5.success) < 0.6 && Math.abs(hist[3] * 100.0 / N - l5.destroy) < 0.6);
+        level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+    }
 
     // ------------------------------------------------------------------ 퀘스트
 

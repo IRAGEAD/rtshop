@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {"layer0": "rtshop:item/enhance_guard_destroy"}
+}

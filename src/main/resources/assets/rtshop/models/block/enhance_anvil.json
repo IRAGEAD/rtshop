@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_anvil",
+  "textures": {
+    "particle": "rtshop:block/enhance_anvil_body",
+    "body": "rtshop:block/enhance_anvil_body",
+    "top": "rtshop:block/enhance_anvil_top"
+  }
+}

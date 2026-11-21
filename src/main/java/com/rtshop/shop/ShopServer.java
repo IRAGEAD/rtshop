@@ -92,6 +92,8 @@ public final class ShopServer {
         com.rtshop.job.JobConfig.reload();
         com.rtshop.attendance.AttendanceConfig.reload();
         com.rtshop.gacha.GachaConfig.reload(server);
+        com.rtshop.enhance.EnhanceConfig.reload();
+        com.rtshop.enhance.Enhance.syncAll(server);
         QuestManager.reload();
         loaded = ShopLoader.loadAll(server);
         SESSIONS.clear();
@@ -260,6 +262,20 @@ public final class ShopServer {
                                     com.rtshop.gacha.Gacha.openEditor(ctx.getSource().getPlayerOrException());
                                     return 1;
                                 })))
+                .then(Commands.literal("enhance").requires(src -> src.hasPermission(2))
+                        .then(Commands.literal("set").then(Commands.argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 11))
+                                .executes(ctx -> {
+                                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                                    net.minecraft.world.item.ItemStack held = p.getMainHandItem();
+                                    if (!com.rtshop.enhance.Enhance.enhanceable(held)) {
+                                        ctx.getSource().sendFailure(Component.translatable("rtshop.enhance.not_enhanceable"));
+                                        return 0;
+                                    }
+                                    int lv = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "level");
+                                    com.rtshop.enhance.Enhance.setLevel(held, lv);
+                                    feedback(ctx.getSource(), Component.translatable("rtshop.enhance.cmd_set", held.getHoverName(), lv));
+                                    return 1;
+                                }))))
                 .then(Commands.literal("attendance")
                         .executes(ctx -> {
                             com.rtshop.attendance.Attendance.open(ctx.getSource().getPlayerOrException(), -1);

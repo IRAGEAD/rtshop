@@ -26,6 +26,11 @@ public final class ClientModEvents {
     public static final KeyMapping QUEST_KEY = new KeyMapping("key.rtshop.quest", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
 
     @SubscribeEvent
+    public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
+        event.enqueueWork(() -> net.minecraft.client.gui.screens.MenuScreens.register(com.rtshop.enhance.ModEnhance.MENU.get(), EnhanceScreen::new));
+    }
+
+    @SubscribeEvent
     public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAboveAll("gold", (gui, graphics, partialTick, screenWidth, screenHeight) ->
                 GoldHud.render(graphics, screenWidth, screenHeight));
