@@ -217,13 +217,13 @@ public final class ShopServer {
                                                 .suggests((ctx, b) -> SharedSuggestionProvider.suggest(com.rtshop.job.JobConfig.get().jobs.keySet(), b))
                                                 .executes(ctx -> {
                                                     ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
-                                                    com.rtshop.job.JobConfig.JobDef d = com.rtshop.job.JobConfig.get().job(StringArgumentType.getString(ctx, "job"));
-                                                    if (d == null) {
+                                                    com.rtshop.job.JobConfig.JobDef jd = com.rtshop.job.JobConfig.get().job(StringArgumentType.getString(ctx, "job"));
+                                                    if (jd == null) {
                                                         feedback(ctx.getSource(), Component.translatable("rtshop.job.unknown", StringArgumentType.getString(ctx, "job")));
                                                         return 0;
                                                     }
-                                                    com.rtshop.job.Jobs.force(t, d.slot, d.id);
-                                                    feedback(ctx.getSource(), Component.translatable("rtshop.job.cmd_set", t.getDisplayName(), d.name));
+                                                    com.rtshop.job.Jobs.force(t, jd.slot, jd.id);
+                                                    feedback(ctx.getSource(), Component.translatable("rtshop.job.cmd_set", t.getDisplayName(), jd.name));
                                                     return 1;
                                                 }))))
                         .then(Commands.literal("clear").requires(src -> src.hasPermission(2))
