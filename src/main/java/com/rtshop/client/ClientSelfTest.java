@@ -148,6 +148,19 @@ public final class ClientSelfTest {
                 || s instanceof net.minecraft.client.gui.screens.BackupConfirmScreen
                 || cls.contains("Confirm") || cls.contains("Warning");
         if (!confirm) {
+            // 다른 모드가 띄운 안내 창 (예: Fantasy Mounts 의 단축키 겹침 안내): 닫고 넘어간다
+            boolean loading = s instanceof net.minecraft.client.gui.screens.LevelLoadingScreen
+                    || s instanceof net.minecraft.client.gui.screens.ProgressScreen
+                    || s instanceof net.minecraft.client.gui.screens.ReceivingLevelScreen
+                    || s instanceof net.minecraft.client.gui.screens.GenericDirtMessageScreen
+                    || cls.contains("Loading") || cls.contains("Progress");
+            if (!loading && (cls.contains("Clash") || idle % 400 == 0)) {
+                RtShop.LOGGER.info("[rtshop-clienttest] closing {}", cls);
+                s.onClose();
+                if (mc.screen == s) {
+                    mc.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
+                }
+            }
             return;
         }
         net.minecraft.client.gui.components.AbstractButton pick = null;
