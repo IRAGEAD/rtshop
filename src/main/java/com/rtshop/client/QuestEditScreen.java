@@ -784,10 +784,16 @@ public class QuestEditScreen extends Screen {
             int tw = w - 8 - typeW - 4 - helpW - 4;
             switch (od.type) {
                 case DELIVER -> iconHit(tx, y - 1, tw, 14, () -> pickLabel(itemName(od.target), od.target), () -> itemIcon(od.target),
-                        b -> openPicker(PickerScreen.Mode.ITEM, v -> od.target = v));
+                        b -> openPicker(PickerScreen.Mode.ITEM, v -> {
+                            od.target = v;
+                            od.text = "";
+                        }));
                 case KILL -> iconHit(tx, y - 1, tw, 14,
                         () -> pickLabel(od.target.equals("*") ? tr("rtshop.quest.any_monster") : entityName(od.target), od.target),
-                        () -> entityIcon(od.target), b -> openPicker(PickerScreen.Mode.ENTITY, v -> od.target = v));
+                        () -> entityIcon(od.target), b -> openPicker(PickerScreen.Mode.ENTITY, v -> {
+                            od.target = v;
+                            od.text = "";
+                        }));
                 case TALK -> hit(tx, y - 1, tw, 14, () -> "< " + npcLabel(od.target) + " >", () -> true, b -> {
                     od.target = cycleNpc(od.target, b == 1 ? -1 : 1, false);
                     markDirty();
@@ -803,7 +809,11 @@ public class QuestEditScreen extends Screen {
             };
             if (helper != null) {
                 hit(x + w - 4 - helpW, y - 1, helpW, 14, () -> tr(helper), () -> true, b -> {
+                    String before = od.target;
                     helperFor(od, b);
+                    if (!od.target.equals(before) && od.type != QuestDef.Type.VISIT) {
+                        od.text = "";
+                    }
                     markDirty();
                     rebuild();
                 });
