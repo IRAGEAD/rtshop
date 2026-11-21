@@ -1852,8 +1852,19 @@ public final class SelfTest {
                     milk.price > bucket.sellUnit && milk.price - bucket.sellUnit <= 20 && milk.sellUnit <= milk.price, milk.price);
         }
         if (sugar != null && cane != null) {
-            check("basic ingredients are sold at or below what they cost to make", sugar.price <= cane.price && !sugar.finished,
-                    sugar.price + " / " + cane.price);
+            // (Create 의 맷돌처럼 더 많이 나오는 가공법이 있으면 설탕은 그 원가로 매입한다)
+            check("basic ingredients are sold at or below what they cost to make", sugar.price <= cane.price
+                    && sugar.sellUnit <= cane.price * com.rtshop.shop.PricingConfig.get().sellRatio + 1.0e-6,
+                    sugar.price + " / " + cane.price + " sell " + sugar.sellUnit + " finished " + sugar.finished);
+        }
+        ShopLoader.Price gold = plain(l, Items.GOLD_INGOT);
+        ShopLoader.Price netherite = plain(l, Items.NETHERITE_INGOT);
+        if (ingot != null && gold != null && netherite != null) {
+            double r = com.rtshop.shop.PricingConfig.get().sellRatio;
+            check("iron, gold and netherite ingots sell back for the usual share of their price (ore processing mods don't lower it)",
+                    Math.abs(ingot.sellUnit - ingot.price * r) < 1.0e-6 && Math.abs(gold.sellUnit - gold.price * r) < 1.0e-6
+                            && Math.abs(netherite.sellUnit - netherite.price * r) < 1.0e-6,
+                    ingot.sellUnit + " / " + gold.sellUnit + " / " + netherite.sellUnit);
         }
         ShopData food = ShopServer.shops().get("food");
         if (food != null) {

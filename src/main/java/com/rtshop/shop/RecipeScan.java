@@ -95,6 +95,11 @@ public final class RecipeScan {
     /** 2단계: 기준 가격으로 원가와 판매 가치를 계산한다. */
     public static void solve(Scan scan, Map<String, Double> base, Map<String, Double> hints, PricingConfig pc,
                              ToDoubleFunction<String> estimate) {
+        solve(scan, base, hints, java.util.Set.of(), pc, estimate);
+    }
+
+    public static void solve(Scan scan, Map<String, Double> base, Map<String, Double> hints, java.util.Set<String> anchors, PricingConfig pc,
+                             ToDoubleFunction<String> estimate) {
         RecipeSolver.Config cfg = pc.solverConfig();
         List<RecipeSolver.Recipe> recipes = scan.recipes;
         final Map<String, List<String>> tagCache = new HashMap<>();
@@ -156,7 +161,7 @@ public final class RecipeScan {
 
         };
         scan.env = env;
-        scan.result = RecipeSolver.solve(base, hints, recipes, env, cfg);
+        scan.result = RecipeSolver.solve(base, hints, recipes, env, cfg, anchors);
     }
 
     private static Item item(String id) {

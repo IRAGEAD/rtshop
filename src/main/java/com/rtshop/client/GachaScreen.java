@@ -40,7 +40,7 @@ public class GachaScreen extends Screen {
 
     static final Theme[] THEMES = {
             new Theme(0xFFC8402E, 0xFF4A140E, 0xFFFFD2C4, 0xFFEFD8CC, 0xFFFBEAE2, 0xFFC49A88, "minecraft:diamond_sword"),
-            new Theme(0xFF3E9E4A, 0xFF123A18, 0xFFD2F5C8, 0xFFDDEBCB, 0xFFF0F8E4, 0xFFA2BE8E, "minecraft:wolf_spawn_egg"),
+            new Theme(0xFF3E9E4A, 0xFF123A18, 0xFFD2F5C8, 0xFFDDEBCB, 0xFFF0F8E4, 0xFFA2BE8E, "minecraft:saddle"),
             new Theme(0xFF8A5AE0, 0xFF2A1650, 0xFFE4D2FF, 0xFFE4DAF2, 0xFFF4EEFB, 0xFFAE9CCC, "minecraft:amethyst_shard")};
 
     static Theme theme(int cat) {
@@ -528,7 +528,7 @@ public class GachaScreen extends Screen {
                 g.fill(px + 4, yy + 1, px + 6, yy + 7, GachaColors.argb(GRADES[i]));
                 yy += 10;
             }
-            if (cat == 1 && any) {
+            if (cat == 1 && any && c[0] + c[1] > 0) {
                 g.drawString(this.font, Ui.clip(this.font, tr("rtshop.gacha.pet_note"), pw - 8), px + 4, yy + 1, Ui.C_INK_SOFT, false);
             }
             if (!any) {

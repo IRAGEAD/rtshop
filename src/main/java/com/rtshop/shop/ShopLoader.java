@@ -80,6 +80,11 @@ public final class ShopLoader {
         public boolean fixedSell;
         public boolean buyableSomewhere;
         public boolean sellableSomewhere;
+        /**
+         * 광물 기준가: 상점 파일에 값을 직접 적은 광물(주괴·원석·보석 등). 모드의 광석 가공(분쇄·세척으로 양 불리기, 자갈 세척 등)으로
+         * 원가를 낮춰 잡지 않고 상점 값을 그대로 기준으로 쓴다 (그렇지 않으면 철 주괴 매입가가 0 에 가깝게 떨어진다).
+         */
+        public boolean anchor;
         /** 장비 공식으로 가격이 정해진 품목(무기·방어구·도구). 만들 수 있으면 항상 재료 원가 기준으로 매입한다. */
         public boolean gear;
         public String basis = "";
@@ -466,7 +471,13 @@ public final class ShopLoader {
                 hints.put(id, p.fixedSell && !p.buyableSomewhere ? Math.max(0.01, p.sellUnit) : (double) p.price);
             }
         }
-        RecipeScan.solve(scan, base, hints, pc, id -> {
+        Set<String> anchors = new HashSet<>();
+        for (Price p : prices.values()) {
+            if (p.anchor && p.buyableSomewhere && base.containsKey(itemId(p.stack))) {
+                anchors.add(itemId(p.stack));
+            }
+        }
+        RecipeScan.solve(scan, base, hints, anchors, pc, id -> {
             // 가격표에 없는 말단 재료의 추정가. 공짜로 얻을 수 있는 재료일 수도 있으므로 낮게 잡는다
             // (높게 잡으면 그 재료가 들어간 음식값이 부풀어 돈벌이 수단이 된다).
             ResourceLocation rl = ResourceLocation.tryParse(id);
@@ -491,6 +502,10 @@ public final class ShopLoader {
                 continue; // NBT 가 붙은 품목(상점 씨앗 등)과 매입가를 직접 적은 품목은 그대로 둔다
             }
             String id = itemId(p.stack);
+            if (anchors.contains(id)) {
+                p.cost = p.price;
+                continue; // 광물 기준가: 상점가의 sellRatio 에 매입 (아래에서 채움)
+            }
             Double c = res.cost.get(id);
             Double v = res.value.get(id);
             if (c != null) {
@@ -1345,6 +1360,7 @@ public final class ShopLoader {
                         p.fixedSell = true;
                     }
                     p.dynamicFood = bool(o, "dynamic", false) && isPlain(stack) && !p.fixedSell;
+                    p.anchor = isPlain(stack) && !p.dynamicFood && (str(o, "category", "").equals("mineral") || oreProduct(stack));
                     prices.put(key, p);
                 } else if (o.has("price") && p.price != price) {
                     notes.add(String.format("%s: 상점 '%s'의 가격 %d 대신 먼저 정해진 가격 %d 을(를) 씁니다 (가격은 전 상점 공통)", id, r.id, price, p.price));
@@ -1361,6 +1377,19 @@ public final class ShopLoader {
                 RtShop.LOGGER.warn("[rtshop] ({}) 잘못된 아이템 항목을 건너뜁니다: {} ({})", r.id, el, ex.toString());
             }
         }
+    }
+
+    private static final String[] ORE_TAGS = {"forge:ingots", "forge:raw_materials", "forge:gems", "forge:nuggets", "forge:dusts"};
+
+    /** 광석에서 나오는 재료(주괴·원석·보석·조각·가루)인가. */
+    static boolean oreProduct(ItemStack s) {
+        for (String t : ORE_TAGS) {
+            ResourceLocation rl = ResourceLocation.tryParse(t);
+            if (rl != null && s.is(ItemTags.create(rl))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void parseAuto(Raw r, Map<String, Price> prices, List<Item> allItems, Map<String, Set<String>> outputTypes) {

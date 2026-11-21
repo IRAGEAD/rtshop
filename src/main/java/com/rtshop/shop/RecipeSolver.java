@@ -364,6 +364,12 @@ public final class RecipeSolver {
      * @param hints 상점에서 살 수는 없지만 값이 정해져 있는 재료(직접 캐거나 낚는 것)의 값. 가격표와 똑같이 취급한다.
      */
     public static Result solve(Map<String, Double> base, Map<String, Double> hints, List<Recipe> recipes, Env env, Config cfg) {
+        return solve(base, hints, recipes, env, cfg, Set.of());
+    }
+
+    /** @param anchors 상점 값을 그대로 원가로 쓰는 품목 (레시피로 더 싸게 잡지 않음). */
+    public static Result solve(Map<String, Double> base, Map<String, Double> hints, List<Recipe> recipes, Env env, Config cfg,
+                               Set<String> anchors) {
         Map<String, Double> known = new HashMap<>();
         if (hints != null) {
             for (Map.Entry<String, Double> e : hints.entrySet()) {
@@ -373,14 +379,27 @@ public final class RecipeSolver {
             }
         }
         known.putAll(base);
-        return solve(known, recipes, env, cfg);
+        return solve(known, recipes, env, cfg, anchors);
     }
 
     /**
      * @param base 값이 정해진 재료의 가격표.
      */
     public static Result solve(Map<String, Double> base, List<Recipe> recipes, Env env, Config cfg) {
+        return solve(base, recipes, env, cfg, Set.of());
+    }
+
+    public static Result solve(Map<String, Double> base, List<Recipe> recipes, Env env, Config cfg, Set<String> anchors) {
         Result res = new Result();
+        Set<String> pinned = new HashSet<>();
+        for (String a : anchors) {
+            Double v = base.get(a);
+            if (v != null) {
+                pinned.add(a);
+                res.cost.put(a, v);
+                res.value.put(a, v);
+            }
+        }
         res.known = base;
         Set<String> craftable = new HashSet<>();
         for (Recipe r : recipes) {
@@ -392,7 +411,7 @@ public final class RecipeSolver {
 
         // 1단계: 가격표에 있는 재료만으로 계산한다. 여기서 정해진 값은 이후 단계에서 바뀌지 않는다
         // (가격을 모르는 재료의 추정가 때문에 멀쩡한 아이템이 싸게 계산되는 것을 막기 위함).
-        relax(base, est, recipes, env, cfg, res, Set.of());
+        relax(base, est, recipes, env, cfg, res, pinned);
         res.exact.addAll(res.cost.keySet());
         Set<String> frozen = new HashSet<>(res.cost.keySet());
         frozen.addAll(base.keySet());
