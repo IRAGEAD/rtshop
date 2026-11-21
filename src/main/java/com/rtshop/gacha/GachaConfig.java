@@ -568,11 +568,11 @@ public final class GachaConfig {
         sh.add("dismantle", dm);
         JsonObject tk = new JsonObject();
         for (int c = 0; c < CATEGORIES.length; c++) {
-            JsonObject t = new JsonObject();
+            JsonObject tc = new JsonObject();
             for (int i = 0; i < TIERS.length; i++) {
-                t.addProperty(TIERS[i], ticketCost[c][i]);
+                tc.addProperty(TIERS[i], ticketCost[c][i]);
             }
-            tk.add(CATEGORIES[c], t);
+            tk.add(CATEGORIES[c], tc);
         }
         sh.add("tickets", tk);
         sh.addProperty("exchangeEnabled", exchangeEnabled);

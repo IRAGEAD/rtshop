@@ -2306,13 +2306,13 @@ public final class SelfTest {
             }
             check("hamsters and tiny dragons are epic pets", badPets.isEmpty(), badPets);
             List<String> badW = new ArrayList<>();
-            int top = 0;
+            int topN = 0;
             for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("weapon")) {
                 int gi = com.rtshop.gacha.GachaConfig.gradeIndex(e.grade);
                 String ns = e.item.substring(0, e.item.indexOf(':'));
                 boolean karambit = e.item.equals("lrtactical:melee") && e.nbt.toLowerCase(java.util.Locale.ROOT).contains("karambit");
                 if (gi >= 3) {
-                    top++;
+                    topN++;
                     if (!c.topWeaponMods.contains(ns) && !karambit) {
                         badW.add(e.item + "@" + e.grade);
                     }
@@ -2327,7 +2327,7 @@ public final class SelfTest {
                     badW.add("missing " + w.getKey());
                 }
             }
-            check("weapons: epic/legendary only from Nightfall-type mods (+ karambit), the fixed ones in place", top > 0 && badW.isEmpty(), badW);
+            check("weapons: epic/legendary only from Nightfall-type mods (+ karambit), the fixed ones in place", topN > 0 && badW.isEmpty(), badW);
             StringBuilder sb = new StringBuilder();
             for (String cat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
                 int[] g = new int[5];
