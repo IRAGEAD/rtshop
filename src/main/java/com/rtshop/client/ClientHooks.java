@@ -1,6 +1,7 @@
 package com.rtshop.client;
 
 import com.rtshop.net.LandInfoPacket;
+import com.rtshop.net.QuestEditorPacket;
 import com.rtshop.net.QuestOpenPacket;
 import com.rtshop.shop.ShopData;
 import net.minecraft.client.Minecraft;
@@ -33,6 +34,8 @@ public final class ClientHooks {
             screen.showResult(message, success);
         } else if (mc.screen instanceof BankScreen screen) {
             screen.showResult(message, success);
+        } else if (mc.screen instanceof QuestEditScreen screen) {
+            screen.showResult(message, success);
         } else if (mc.player != null) {
             mc.player.displayClientMessage(message, true);
         }
@@ -45,6 +48,16 @@ public final class ClientHooks {
             screen.update(packet);
         } else {
             mc.setScreen(new QuestScreen(packet));
+        }
+    }
+
+    /** 퀘스트 편집기를 열거나, 이미 열려 있으면 내용만 새로 고친다. */
+    public static void openQuestEditor(QuestEditorPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof QuestEditScreen screen) {
+            screen.update(packet);
+        } else {
+            mc.setScreen(new QuestEditScreen(packet));
         }
     }
 

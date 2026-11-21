@@ -97,6 +97,86 @@ public final class QuestDef {
         }
     }
 
+    private static void putStrings(JsonObject o, String key, List<String> list) {
+        if (!list.isEmpty()) {
+            JsonArray a = new JsonArray();
+            for (String s : list) {
+                a.add(s);
+            }
+            o.add(key, a);
+        }
+    }
+
+    private static void putText(JsonObject o, String key, String v) {
+        if (v != null && !v.isEmpty()) {
+            o.addProperty(key, v);
+        }
+    }
+
+    /** 파일에 쓰는 형식(parse 의 반대). 비어 있는 항목은 적지 않는다. */
+    public JsonObject toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("id", id);
+        putText(o, "chain", chain);
+        if (order != 0) {
+            o.addProperty("order", order);
+        }
+        o.addProperty("title", title);
+        o.addProperty("giver", giver);
+        putText(o, "turnIn", turnIn);
+        putStrings(o, "requires", requires);
+        putStrings(o, "requiresFlags", requiresFlags);
+        putStrings(o, "blockedByFlags", blockedByFlags);
+        putText(o, "intro", intro);
+        putText(o, "progress", progress);
+        putText(o, "done", done);
+        JsonArray objs = new JsonArray();
+        for (Objective ob : objectives) {
+            JsonObject jo = new JsonObject();
+            jo.addProperty("type", ob.type.name());
+            if (ob.type != Type.PAY) {
+                jo.addProperty("target", ob.target);
+            }
+            jo.addProperty("count", ob.count);
+            if (ob.type == Type.VISIT) {
+                jo.addProperty("x", ob.x);
+                jo.addProperty("y", ob.y);
+                jo.addProperty("z", ob.z);
+                jo.addProperty("radius", ob.radius);
+            }
+            putText(jo, "text", ob.text);
+            objs.add(jo);
+        }
+        o.add("objectives", objs);
+        JsonObject r = new JsonObject();
+        if (rewardGold > 0) {
+            r.addProperty("gold", rewardGold);
+        }
+        if (!rewardItems.isEmpty()) {
+            JsonArray items = new JsonArray();
+            for (ItemReward ir : rewardItems) {
+                JsonObject jo = new JsonObject();
+                jo.addProperty("item", ir.item);
+                jo.addProperty("count", ir.count);
+                items.add(jo);
+            }
+            r.add("items", items);
+        }
+        putStrings(r, "flags", rewardFlags);
+        o.add("reward", r);
+        if (!choices.isEmpty()) {
+            JsonArray ch = new JsonArray();
+            for (Choice c : choices) {
+                JsonObject jo = new JsonObject();
+                jo.addProperty("text", c.text);
+                putStrings(jo, "flags", c.flags);
+                ch.add(jo);
+            }
+            o.add("choices", ch);
+        }
+        return o;
+    }
+
     /** 잘못된 정의면 이유를 담아 IllegalArgumentException. */
     public static QuestDef parse(JsonObject o) {
         QuestDef q = new QuestDef();

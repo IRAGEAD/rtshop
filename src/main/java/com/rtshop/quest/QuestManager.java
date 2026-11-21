@@ -46,7 +46,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -69,9 +68,14 @@ public final class QuestManager {
 
     /** 엔티티 태그: rtshop_quest_<NPC ID> = 퀘스트 NPC */
     public static final String QUEST_TAG_PREFIX = "rtshop_quest_";
-    /** 기본 퀘스트 파일의 세대. 올리면 설치된 기본 파일이 새것으로 바뀐다 (이전 파일은 backup 으로). */
-    public static final int DEFAULTS_VERSION = 1;
+    /**
+     * 모드에 들어 있는 기본 퀘스트 파일. 한 번 설치한 파일은 다시는 덮어쓰지 않는다 (지워도 다시 깔지 않는다).
+     * 새 기본 퀘스트는 항상 새 파일 이름으로 추가한다.
+     */
     private static final String[] DEFAULT_FILES = {"npcs.json", "tutorial.json"};
+    /** 편집 화면에서 새로 만든 퀘스트·NPC 가 들어가는 파일. */
+    public static final String CUSTOM_FILE = "my_quests.json";
+    private static final String INSTALLED_LIST = ".installed_defaults";
     /** 동시에 진행할 수 있는 퀘스트 수. */
     public static final int MAX_ACTIVE = 10;
 
@@ -86,6 +90,12 @@ public final class QuestManager {
         public final Map<String, QuestDef> quests = new LinkedHashMap<>();
         public final Map<String, NpcDef> npcs = new LinkedHashMap<>();
         public final List<String> problems = new ArrayList<>();
+        /** 퀘스트 ID -> 정의된 파일 이름 */
+        public final Map<String, String> questFile = new HashMap<>();
+        /** NPC ID -> 정의된 파일 이름 */
+        public final Map<String, String> npcFile = new HashMap<>();
+        /** 문제 때문에 빠진 퀘스트 ID -> 이유 */
+        public final Map<String, String> dropped = new LinkedHashMap<>();
     }
 
     private record Session(String npcKey, int entityId) {
@@ -114,10 +124,11 @@ public final class QuestManager {
             l.problems.add("기본 퀘스트 파일 설치 실패: " + e);
         }
         List<QuestDef> all = new ArrayList<>();
+        Map<QuestDef, String> fileOf = new HashMap<>();
         try (Stream<Path> files = Files.list(dir())) {
             List<Path> list = files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList();
             for (Path f : list) {
-                readFile(f, l, all);
+                readFile(f, l, all, fileOf);
             }
         } catch (IOException e) {
             RtShop.LOGGER.error("[rtshop] 퀘스트 폴더를 읽지 못했습니다", e);
@@ -130,6 +141,7 @@ public final class QuestManager {
                 continue;
             }
             l.quests.put(q.id, q);
+            l.questFile.put(q.id, fileOf.get(q));
         }
         validate(l);
         for (String p : l.problems) {
@@ -140,7 +152,7 @@ public final class QuestManager {
         return l;
     }
 
-    private static void readFile(Path f, Loaded l, List<QuestDef> out) {
+    private static void readFile(Path f, Loaded l, List<QuestDef> out, Map<QuestDef, String> files) {
         String name = f.getFileName().toString();
         JsonObject root;
         try {
@@ -166,6 +178,7 @@ public final class QuestManager {
                         n.greeting = o.get("greeting").getAsString();
                     }
                     l.npcs.put(n.id, n);
+                    l.npcFile.put(n.id, name);
                 } catch (Exception ex) {
                     l.problems.add(name + ": NPC 정의가 잘못되었습니다 (" + ex.getMessage() + ")");
                 }
@@ -174,7 +187,9 @@ public final class QuestManager {
         if (root.has("quests") && root.get("quests").isJsonArray()) {
             for (JsonElement e : root.getAsJsonArray("quests")) {
                 try {
-                    out.add(QuestDef.parse(e.getAsJsonObject()));
+                    QuestDef q = QuestDef.parse(e.getAsJsonObject());
+                    out.add(q);
+                    files.put(q, name);
                 } catch (Exception ex) {
                     l.problems.add(name + ": 퀘스트 정의가 잘못되었습니다 (" + ex.getMessage() + ")");
                 }
@@ -189,15 +204,18 @@ public final class QuestManager {
             for (String r : q.requires) {
                 if (!l.quests.containsKey(r)) {
                     l.problems.add("퀘스트 '" + q.id + "' 의 선행 퀘스트 '" + r + "' 가 없습니다 (이 퀘스트는 쓰지 않습니다)");
+                    l.dropped.put(q.id, "선행 퀘스트 '" + r + "' 가 없습니다");
                     bad.add(q.id);
                 }
             }
             if (q.requires.contains(q.id)) {
                 l.problems.add("퀘스트 '" + q.id + "' 가 자기 자신을 선행 조건으로 가집니다");
+                l.dropped.put(q.id, "자기 자신을 선행 퀘스트로 넣었습니다");
                 bad.add(q.id);
             }
             if (!q.choices.isEmpty() && q.choices.size() > 6) {
                 l.problems.add("퀘스트 '" + q.id + "' 의 선택지가 너무 많습니다 (최대 6개)");
+                l.dropped.put(q.id, "선택지는 6개까지입니다");
                 bad.add(q.id);
             }
             for (QuestDef.ItemReward ir : q.rewardItems) {
@@ -210,6 +228,7 @@ public final class QuestManager {
         for (QuestDef q : l.quests.values()) {
             if (!bad.contains(q.id) && cyclic(l, q.id, new HashSet<>())) {
                 l.problems.add("퀘스트 '" + q.id + "' 의 선행 조건이 순환합니다 (이 퀘스트는 쓰지 않습니다)");
+                l.dropped.put(q.id, "선행 퀘스트가 돌고 돌아 자기 자신으로 이어집니다");
                 bad.add(q.id);
             }
         }
@@ -234,43 +253,44 @@ public final class QuestManager {
         return false;
     }
 
-    /** 처음 설치이거나 기본 파일 세대가 올라갔으면 기본 파일을 깐다. 내가 고친 파일은 backup 으로 옮긴다. */
+    /**
+     * 아직 설치한 적 없는 기본 파일만 깐다. 이미 있는 파일은 절대 건드리지 않는다
+     * (편집 화면이나 메모장으로 고친 내용이 업데이트 때 사라지지 않게).
+     */
     private static void installDefaults() throws IOException {
         Path d = dir();
         Files.createDirectories(d);
-        Path marker = d.resolve(".defaults_version");
-        int installed = 0;
-        if (Files.exists(marker)) {
-            try {
-                installed = Integer.parseInt(Files.readString(marker, StandardCharsets.UTF_8).trim());
-            } catch (NumberFormatException ignored) {
+        Path list = d.resolve(INSTALLED_LIST);
+        Set<String> installed = new java.util.LinkedHashSet<>();
+        if (Files.exists(list)) {
+            for (String line : Files.readAllLines(list, StandardCharsets.UTF_8)) {
+                if (!line.isBlank()) {
+                    installed.add(line.trim());
+                }
             }
         }
-        if (installed >= DEFAULTS_VERSION) {
-            return;
-        }
-        Path backup = null;
+        boolean changed = false;
         for (String name : DEFAULT_FILES) {
+            if (installed.contains(name)) {
+                continue;
+            }
             Path f = d.resolve(name);
-            if (Files.exists(f)) {
-                if (backup == null) {
-                    backup = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("backup")
-                            .resolve("quests_before_v" + DEFAULTS_VERSION + "_" + System.currentTimeMillis());
-                    Files.createDirectories(backup);
+            if (!Files.exists(f)) {
+                try (InputStream in = QuestManager.class.getResourceAsStream("/rtshop_defaults/quests/" + name)) {
+                    if (in == null) {
+                        throw new IOException("기본 퀘스트 파일이 모드 안에 없습니다: " + name);
+                    }
+                    Files.write(f, in.readAllBytes());
                 }
-                Files.move(f, backup.resolve(name), StandardCopyOption.REPLACE_EXISTING);
+                RtShop.LOGGER.info("[rtshop] 기본 퀘스트 파일 {} 을 설치했습니다.", name);
             }
-            try (InputStream in = QuestManager.class.getResourceAsStream("/rtshop_defaults/quests/" + name)) {
-                if (in == null) {
-                    throw new IOException("기본 퀘스트 파일이 모드 안에 없습니다: " + name);
-                }
-                Files.write(f, in.readAllBytes());
-            }
+            installed.add(name);
+            changed = true;
         }
-        Files.writeString(marker, Integer.toString(DEFAULTS_VERSION), StandardCharsets.UTF_8);
-        if (backup != null) {
-            RtShop.LOGGER.info("[rtshop] 이전 기본 퀘스트 파일을 {} 로 옮기고 새 기본 퀘스트를 설치했습니다.", backup);
+        if (changed) {
+            Files.write(list, installed, StandardCharsets.UTF_8);
         }
+        Files.deleteIfExists(d.resolve(".defaults_version")); // 3.1.0 의 옛 표시 파일
     }
 
     // ------------------------------------------------------------------ NPC

@@ -1,5 +1,6 @@
 package com.rtshop.test;
 
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.rtshop.RtShop;
@@ -19,6 +20,7 @@ import com.rtshop.land.LandData;
 import com.rtshop.land.LandManager;
 import com.rtshop.quest.QuestData;
 import com.rtshop.quest.QuestDef;
+import com.rtshop.quest.QuestEditor;
 import com.rtshop.quest.QuestManager;
 import com.rtshop.quest.QuestView;
 import com.rtshop.shop.ShopData;
@@ -254,6 +256,11 @@ public final class SelfTest {
             crash("quests", t);
         }
         try {
+            questEditor(server, level, a);
+        } catch (Throwable t) {
+            crash("quest editor", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -443,6 +450,118 @@ public final class SelfTest {
         Economy.setWallet(a, 0);
         clear(a);
         a.setPos(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+    }
+
+
+    private static void questEditor(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("quest editor");
+        Path dir = QuestManager.dir();
+        Path tut = dir.resolve("tutorial.json");
+        Path npcs = dir.resolve("npcs.json");
+        Path custom = dir.resolve(QuestManager.CUSTOM_FILE);
+        byte[] tutOrig = Files.readAllBytes(tut);
+        byte[] npcOrig = Files.readAllBytes(npcs);
+        Files.deleteIfExists(custom);
+        try {
+            QuestManager.reload();
+            QuestDef t1 = QuestManager.loaded().quests.get("tutorial_1");
+            QuestDef round = QuestDef.parse(t1.toJson());
+            check("a quest written back to a file reads the same",
+                    round.title.equals(t1.title) && round.objectives.size() == t1.objectives.size()
+                            && round.rewardGold == t1.rewardGold && round.giver.equals(t1.giver));
+
+            // 기존 퀘스트 고치기 -> 원래 파일에 그대로
+            JsonObject edited = t1.toJson();
+            edited.addProperty("title", "고친 제목");
+            QuestEditor.Result r = QuestEditor.saveQuest("tutorial_1", edited.toString());
+            check("editing a quest saves it in its own file and applies at once",
+                    r.ok() && "고친 제목".equals(QuestManager.loaded().quests.get("tutorial_1").title)
+                            && Files.readString(tut, StandardCharsets.UTF_8).contains("고친 제목") && !Files.exists(custom), r.message());
+            check("the rest of that file is kept (other quests, help text, order)",
+                    Files.readString(tut, StandardCharsets.UTF_8).contains("_help")
+                            && QuestManager.loaded().quests.containsKey("tutorial_4")
+                            && QuestManager.loaded().questFile.get("tutorial_4").equals("tutorial.json"));
+
+            // 업데이트(기본 파일 설치)가 고친 내용을 덮어쓰지 않는가
+            Files.deleteIfExists(dir.resolve(".installed_defaults"));
+            QuestManager.reload();
+            check("a mod update never overwrites an edited quest file",
+                    "고친 제목".equals(QuestManager.loaded().quests.get("tutorial_1").title));
+            Files.delete(npcs);
+            QuestManager.reload();
+            check("a default file the owner deleted is not put back", !Files.exists(npcs));
+            Files.write(npcs, npcOrig);
+            QuestManager.reload();
+
+            JsonObject renamed = t1.toJson();
+            renamed.addProperty("id", "tutorial_1_new");
+            check("the id of an existing quest cannot be changed",
+                    !QuestEditor.saveQuest("tutorial_1", renamed.toString()).ok());
+
+            String fresh = "{\"id\":\"ed_new\",\"title\":\"새 이야기\",\"giver\":\"quest_guide\",\"requires\":[\"tutorial_1\"],"
+                    + "\"intro\":\"첫 줄\\n둘째 줄\",\"objectives\":[{\"type\":\"KILL\",\"target\":\"minecraft:zombie\",\"count\":3}],"
+                    + "\"reward\":{\"gold\":500,\"flags\":[\"ed_flag\"]}}";
+            r = QuestEditor.saveQuest("", fresh);
+            check("a new quest goes to " + QuestManager.CUSTOM_FILE + " and is usable at once",
+                    r.ok() && Files.exists(custom) && QuestManager.loaded().quests.containsKey("ed_new")
+                            && QuestManager.CUSTOM_FILE.equals(QuestManager.loaded().questFile.get("ed_new")), r.message());
+            check("line breaks in story text survive saving",
+                    QuestManager.loaded().quests.get("ed_new").intro.equals("첫 줄\n둘째 줄"));
+            check("a second new quest with the same id is refused", !QuestEditor.saveQuest("", fresh).ok());
+            check("a quest without a giver is refused",
+                    !QuestEditor.saveQuest("", "{\"id\":\"ed_bad\",\"title\":\"x\"}").ok()
+                            && !QuestManager.loaded().questFile.containsKey("ed_bad"));
+            check("broken JSON is refused", !QuestEditor.saveQuest("", "{\"id\":").ok());
+
+            r = QuestEditor.saveQuest("", "{\"id\":\"ed_orphan\",\"giver\":\"bank\",\"requires\":[\"nope\"]}");
+            check("a quest with a missing prerequisite is saved but reported as unused",
+                    r.ok() && r.message().contains("nope") && !QuestManager.loaded().quests.containsKey("ed_orphan"), r.message());
+            boolean listed = false;
+            for (var e : QuestEditor.snapshot(server).quests) {
+                if (e.id().equals("ed_orphan") && !e.status().isEmpty()) {
+                    listed = true;
+                }
+            }
+            check("the editor still lists an unused quest with the reason, so it can be fixed", listed);
+            check("fixing it makes it usable",
+                    QuestEditor.saveQuest("ed_orphan", "{\"id\":\"ed_orphan\",\"giver\":\"bank\"}").ok()
+                            && QuestManager.loaded().quests.containsKey("ed_orphan"));
+
+            String child = "{\"id\":\"ed_child\",\"giver\":\"bank\",\"requires\":[\"ed_new\"]}";
+            check("a dependent quest is saved", QuestEditor.saveQuest("", child).ok());
+            check("a quest another quest depends on cannot be deleted", !QuestEditor.deleteQuest("ed_new").ok()
+                    && QuestManager.loaded().quests.containsKey("ed_new"));
+            check("deleting works once nothing depends on it",
+                    QuestEditor.deleteQuest("ed_child").ok() && QuestEditor.deleteQuest("ed_new").ok()
+                            && !QuestManager.loaded().quests.containsKey("ed_new"));
+
+            // NPC
+            r = QuestEditor.saveNpc(server, "", "{\"id\":\"ed_npc\",\"name\":\"편집 NPC\",\"profession\":\"farmer\",\"greeting\":\"안녕\"}");
+            check("a new NPC is saved and can be spawned", r.ok() && QuestManager.loaded().npcs.containsKey("ed_npc"), r.message());
+            BlockPos at = level.getSharedSpawnPos().above(6);
+            level.getChunkAt(at);
+            Villager v = ShopServer.spawnNpc(level, Vec3.atBottomCenterOf(at), 0, "quest_ed_npc");
+            r = QuestEditor.saveNpc(server, "ed_npc", "{\"id\":\"ed_npc\",\"name\":\"바뀐 이름\",\"profession\":\"farmer\"}");
+            check("renaming an NPC also renames the spawned one",
+                    r.ok() && v != null && "바뀐 이름".equals(v.getCustomName().getString()), r.message());
+            QuestEditor.saveQuest("", "{\"id\":\"ed_uses_npc\",\"giver\":\"quest_ed_npc\"}");
+            check("an NPC used by a quest cannot be deleted", !QuestEditor.deleteNpc("ed_npc").ok());
+            QuestEditor.deleteQuest("ed_uses_npc");
+            check("an unused NPC can be deleted", QuestEditor.deleteNpc("ed_npc").ok() && !QuestManager.loaded().npcs.containsKey("ed_npc"));
+            check("an NPC id with spaces or capitals is refused",
+                    !QuestEditor.saveNpc(server, "", "{\"id\":\"Bad Npc\",\"name\":\"x\"}").ok());
+            if (v != null) {
+                v.discard();
+            }
+            check("the editor snapshot lists quests, NPCs and every NPC to pick from",
+                    QuestEditor.snapshot(server).quests.size() >= 4 && !QuestEditor.snapshot(server).npcs.isEmpty()
+                            && QuestEditor.snapshot(server).npcKeys.size() >= 2 + ShopServer.shops().size());
+        } finally {
+            Files.write(tut, tutOrig);
+            Files.write(npcs, npcOrig);
+            Files.deleteIfExists(custom);
+            QuestManager.reload();
+        }
     }
 
     // ------------------------------------------------------------------ 경제

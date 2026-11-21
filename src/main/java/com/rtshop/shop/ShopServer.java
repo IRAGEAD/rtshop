@@ -203,6 +203,10 @@ public final class ShopServer {
                             QuestManager.openJournal(ctx.getSource().getPlayerOrException());
                             return 1;
                         })
+                        .then(Commands.literal("edit").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                            com.rtshop.quest.QuestEditor.open(ctx.getSource().getPlayerOrException());
+                            return 1;
+                        }))
                         .then(Commands.literal("reset").requires(src -> src.hasPermission(2))
                                 .then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
                                     ServerPlayer t = EntityArgument.getPlayer(ctx, "player");

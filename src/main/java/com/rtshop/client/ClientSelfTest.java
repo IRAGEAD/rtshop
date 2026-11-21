@@ -74,7 +74,7 @@ public final class ClientSelfTest {
     private static long expected = 0;
     private static volatile BlockPos cropPos = null;
     private static volatile String harvest = null;
-    private static final int LAST = 38;
+    private static final int LAST = 45;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -558,8 +558,56 @@ public final class ClientSelfTest {
                 });
                 wait = 10;
             }
-            case LAST -> {
+            case 38 -> {
                 check("right-clicking a ripe crop from a real client harvests and replants it", "ok".equals(harvest), harvest);
+                onServer(mc, sp -> {
+                    sp.server.getPlayerList().op(sp.getGameProfile());
+                    com.rtshop.quest.QuestEditor.open(sp);
+                });
+                wait = 20;
+            }
+            case 39 -> {
+                check("the quest editor opens for an operator", mc.screen instanceof QuestEditScreen, mc.screen);
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.selectForTest("tutorial_4", 0);
+                    check("a tutorial quest loads into the editor", s.hasDraftForTest());
+                }
+                wait = 5;
+            }
+            case 40 -> {
+                shot(mc, "20_qedit_basic");
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.selectForTest("tutorial_4", 1);
+                }
+                wait = 5;
+            }
+            case 41 -> {
+                shot(mc, "21_qedit_story");
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.selectForTest("tutorial_3", 2);
+                }
+                wait = 5;
+            }
+            case 42 -> {
+                shot(mc, "22_qedit_goals");
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.selectForTest("tutorial_4", 3);
+                }
+                wait = 5;
+            }
+            case 43 -> {
+                shot(mc, "23_qedit_rewards");
+                mc.setScreen(null);
+                onServer(mc, sp -> com.rtshop.quest.QuestManager.openDialog(sp, "quest_guide", -1));
+                wait = 20;
+            }
+            case 44 -> {
+                check("the quest window opens from the guide", mc.screen instanceof QuestScreen, mc.screen);
+                shot(mc, "24_quest_window");
+                mc.setScreen(null);
+                wait = 10;
+            }
+            case LAST -> {
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);
             }
