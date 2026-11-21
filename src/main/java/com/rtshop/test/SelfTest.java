@@ -2205,8 +2205,51 @@ public final class SelfTest {
         }
     }
 
+    private static boolean ownedByReflection(net.minecraft.world.entity.Entity e, FakePlayer a) {
+        try {
+            Object o = e.getClass().getMethod("ownerUuid").invoke(e);
+            return o instanceof java.util.Optional<?> op && op.isPresent() && op.get().equals(a.getUUID());
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    /** 예전 뽑기 설정(1판)을 새 규칙으로 바꾸는지: 이름·확률은 남기고 목록만 다시 만든다. */
+    private static void gachaUpgrade(MinecraftServer server) throws Exception {
+        java.nio.file.Path p = com.rtshop.gacha.GachaConfig.path();
+        String saved = Files.readString(p, StandardCharsets.UTF_8);
+        try {
+            com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString(saved).getAsJsonObject();
+            o.addProperty("configVersion", 1);
+            o.addProperty("npcName", "옛 이름");
+            o.getAsJsonObject("tiers").getAsJsonObject("mid").addProperty("epic", 2.5);
+            com.google.gson.JsonArray pets = new com.google.gson.JsonArray();
+            com.google.gson.JsonObject wolf = new com.google.gson.JsonObject();
+            wolf.addProperty("entity", "minecraft:wolf");
+            wolf.addProperty("grade", "common");
+            wolf.addProperty("weight", 10);
+            pets.add(wolf);
+            o.getAsJsonObject("pools").add("pet", pets);
+            o.getAsJsonObject("shards").remove("tickets");
+            Files.writeString(p, o.toString(), StandardCharsets.UTF_8);
+            com.rtshop.gacha.GachaConfig.reload(server);
+            com.rtshop.gacha.GachaConfig c = com.rtshop.gacha.GachaConfig.get();
+            boolean petsOk = c.pool("pet").stream().noneMatch(e -> e.entity.equals("minecraft:wolf") && e.grade.equals("common"))
+                    && c.pool("pet").stream().anyMatch(com.rtshop.gacha.Gacha::isShardEntry);
+            check("an old gacha.json is upgraded: name and odds kept, lists rebuilt with the new rules", c.version == com.rtshop.gacha.GachaConfig.CONFIG_VERSION
+                    && c.npcName.equals("옛 이름") && c.tiers.get("mid").weights[3] == 2.5 && petsOk && c.ticketCost[0][2] == 100,
+                    c.version + " " + c.npcName + " " + petsOk);
+            String now = Files.readString(p, StandardCharsets.UTF_8);
+            check("...and saved as the new version", now.contains("\"configVersion\": " + com.rtshop.gacha.GachaConfig.CONFIG_VERSION));
+        } finally {
+            Files.writeString(p, saved, StandardCharsets.UTF_8);
+            com.rtshop.gacha.GachaConfig.reload(server);
+        }
+    }
+
     private static void gacha(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         section("gacha");
+        gachaUpgrade(server);
         com.rtshop.gacha.GachaConfig c = com.rtshop.gacha.GachaConfig.get();
         int nw = c.pool("weapon").size();
         int np = c.pool("pet").size();
@@ -2224,9 +2267,67 @@ public final class SelfTest {
             }
         }
         check("boss weapons (Cataclysm etc.) are left out of the gacha", boss.isEmpty(), boss);
+        // 펫: 일반·고급은 조각, 펫은 희귀 이상
+        List<String> lowPets = new ArrayList<>();
+        int shardRows = 0;
+        for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("pet")) {
+            int gi = com.rtshop.gacha.GachaConfig.gradeIndex(e.grade);
+            if (com.rtshop.gacha.Gacha.isShardEntry(e)) {
+                shardRows++;
+                if (gi > 1) {
+                    lowPets.add("shard@" + e.grade);
+                }
+            } else if (gi < 2) {
+                lowPets.add(e.entity + "@" + e.grade);
+            }
+        }
+        check("pets are only rare or better; common/uncommon pet pulls give shards", shardRows == 2 && lowPets.isEmpty(), lowPets);
         if (fullPack) {
-            check("the full pack also fills accessories (Curios items, cosmetic hats left out)", na >= 10
-                    && c.pool("accessory").stream().noneMatch(e -> e.item.startsWith("simplehats:")), na);
+            List<String> bad = new ArrayList<>();
+            int hats = 0;
+            for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("accessory")) {
+                int gi = com.rtshop.gacha.GachaConfig.gradeIndex(e.grade);
+                if (e.item.startsWith("simplehats:")) {
+                    hats++;
+                    if (gi > 2) {
+                        bad.add(e.item);
+                    }
+                } else if (e.item.startsWith("artifacts:") ? gi < 3 : gi > 2) {
+                    bad.add(e.item + "@" + e.grade);
+                }
+            }
+            check("accessories: cosmetic hats are common..rare, Artifacts epic/legendary, others at most rare", na >= 10 && hats > 0 && bad.isEmpty(),
+                    hats + " hats, bad " + bad);
+            List<String> badPets = new ArrayList<>();
+            for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("pet")) {
+                if ((e.entity.startsWith("adorablehamsterpets:") || e.entity.startsWith("rpg_companions_tiny_dragons:")) && !e.grade.equals("epic")) {
+                    badPets.add(e.entity + "@" + e.grade);
+                }
+            }
+            check("hamsters and tiny dragons are epic pets", badPets.isEmpty(), badPets);
+            List<String> badW = new ArrayList<>();
+            int top = 0;
+            for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("weapon")) {
+                int gi = com.rtshop.gacha.GachaConfig.gradeIndex(e.grade);
+                String ns = e.item.substring(0, e.item.indexOf(':'));
+                boolean karambit = e.item.equals("lrtactical:melee") && e.nbt.toLowerCase(java.util.Locale.ROOT).contains("karambit");
+                if (gi >= 3) {
+                    top++;
+                    if (!c.topWeaponMods.contains(ns) && !karambit) {
+                        badW.add(e.item + "@" + e.grade);
+                    }
+                } else if (c.topWeaponMods.contains(ns)) {
+                    badW.add(e.item + "@" + e.grade);
+                }
+            }
+            java.util.Map<String, String> want = java.util.Map.of("efn:hf_murasama", "legendary", "efn:yamato_dmc_in_sheath", "legendary",
+                    "efn:kusabimaru", "epic", "efn:ruinsgreatsword", "epic");
+            for (var w : want.entrySet()) {
+                if (c.pool("weapon").stream().noneMatch(e -> e.item.equals(w.getKey()) && e.grade.equals(w.getValue()))) {
+                    badW.add("missing " + w.getKey());
+                }
+            }
+            check("weapons: epic/legendary only from Nightfall-type mods (+ karambit), the fixed ones in place", top > 0 && badW.isEmpty(), badW);
             StringBuilder sb = new StringBuilder();
             for (String cat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
                 int[] g = new int[5];
@@ -2347,27 +2448,46 @@ public final class SelfTest {
                 && count(a, st -> st.is(ModItems.SHARD.get())) == shards, shards);
         a.getInventory().add(new ItemStack(ModItems.SHARD.get(), 64));
         a.getInventory().add(new ItemStack(ModItems.SHARD.get(), 64));
-        int idx = -1;
-        for (int k = 0; k < c.pool("weapon").size(); k++) {
-            if (c.pool("weapon").get(k).grade.equals("rare") && com.rtshop.gacha.GachaConfig.valid(c.pool("weapon").get(k))) {
-                idx = k;
-                break;
+        long before = count(a, st -> st.is(ModItems.SHARD.get()));
+        boolean ex = com.rtshop.gacha.Gacha.exchange(a, "pet", "mid", 2, false);
+        check("shards can be traded for gacha tickets", ex && count(a, st -> st.is(ModItems.PET_TICKET_MID.get())) == 2
+                && before - count(a, st -> st.is(ModItems.SHARD.get())) == 2L * c.ticketCost[1][1], before);
+        check("...but not without enough shards", !com.rtshop.gacha.Gacha.exchange(a, "weapon", "high", 64, false));
+        clear(a);
+        // 펫 뽑기의 조각 보상은 표시 없는 조각
+        a.getInventory().add(new ItemStack(ModItems.PET_TICKET_NORMAL.get(), 10));
+        a.getInventory().add(new ItemStack(ModItems.TICKET_NORMAL.get(), 10));
+        check("a weapon ticket can't be used for the pet gacha", com.rtshop.gacha.Gacha.doPull(a, "pet", "mid", 1, false) == null);
+        var pets = com.rtshop.gacha.Gacha.doPull(a, "pet", "normal", 10, false);
+        long shardGot = count(a, st -> st.is(ModItems.SHARD.get()));
+        long expect = 0;
+        if (pets != null) {
+            for (var e : pets) {
+                if (com.rtshop.gacha.Gacha.isShardEntry(e)) {
+                    expect += e.count;
+                }
             }
         }
-        long before = count(a, st -> st.is(ModItems.SHARD.get()));
-        boolean ex = idx >= 0 && com.rtshop.gacha.Gacha.exchange(a, "weapon", idx, false);
-        check("shards can be traded for a chosen item", ex && count(a, com.rtshop.gacha.Gacha::marked) == 1
-                && before - count(a, st -> st.is(ModItems.SHARD.get())) == c.exchange[2], idx);
+        check("pet tickets pull pets; low-grade results arrive as plain shards", pets != null && pets.size() == 10 && shardGot == expect
+                && count(a, st -> st.is(ModItems.PET_TICKET_NORMAL.get())) == 0 && count(a, st -> st.is(ModItems.TICKET_NORMAL.get())) == 10,
+                shardGot + " / " + expect);
+        clear(a);
         // 펫 소환권
         BlockPos at = level.getSharedSpawnPos().above(8);
         level.getChunkAt(at);
         List<String> petFails = new ArrayList<>();
         int tested = 0;
         for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("pet")) {
+            if (com.rtshop.gacha.Gacha.isShardEntry(e)) {
+                continue;
+            }
             ItemStack st = com.rtshop.gacha.Gacha.stackOf(e, "pet");
             net.minecraft.world.entity.Entity pet = com.rtshop.item.PetSummonItem.summon(a, st, Vec3.atBottomCenterOf(at));
             tested++;
-            if (!(pet instanceof net.minecraft.world.entity.TamableAnimal ta) || !a.getUUID().equals(ta.getOwnerUUID())) {
+            boolean owned = pet instanceof net.minecraft.world.entity.TamableAnimal ta ? a.getUUID().equals(ta.getOwnerUUID())
+                    : pet instanceof net.minecraft.world.entity.animal.horse.AbstractHorse h ? h.isTamed()
+                    : pet != null && ownedByReflection(pet, a);
+            if (!owned) {
                 petFails.add(e.entity);
             }
             if (pet != null) {
@@ -2392,9 +2512,16 @@ public final class SelfTest {
             int i1 = findEntry(shop, en -> en.stack.is(ModItems.TICKET_NORMAL.get()));
             int i2 = findEntry(shop, en -> en.stack.is(ModItems.TICKET_MID.get()));
             int i3 = findEntry(shop, en -> en.stack.is(ModItems.TICKET_HIGH.get()));
-            check("tickets cost 1,000 / 5,000 / 20,000 G and can't be sold back", i1 >= 0 && i2 >= 0 && i3 >= 0
+            check("weapon tickets cost 1,000 / 5,000 / 20,000 G and can't be sold back", i1 >= 0 && i2 >= 0 && i3 >= 0
                     && shop.entries.get(i1).price == 1000 && shop.entries.get(i2).price == 5000 && shop.entries.get(i3).price == 20000
                     && !shop.entries.get(i3).sellable);
+            int p1 = findEntry(shop, en -> en.stack.is(ModItems.PET_TICKET_NORMAL.get()));
+            int p3 = findEntry(shop, en -> en.stack.is(ModItems.PET_TICKET_HIGH.get()));
+            int a1 = findEntry(shop, en -> en.stack.is(ModItems.ACC_TICKET_NORMAL.get()));
+            int a3 = findEntry(shop, en -> en.stack.is(ModItems.ACC_TICKET_HIGH.get()));
+            check("pet and accessory tickets are 25% cheaper (750 / 15,000 G)", p1 >= 0 && p3 >= 0 && a1 >= 0 && a3 >= 0
+                    && shop.entries.get(p1).price == 750 && shop.entries.get(p3).price == 15000
+                    && shop.entries.get(a1).price == 750 && shop.entries.get(a3).price == 15000);
         }
         net.minecraft.world.entity.npc.Villager v = ShopServer.spawnNpc(level, Vec3.atBottomCenterOf(at), 0, "gacha");
         check("the gacha merchant can be placed with /rtshop npc gacha", v != null && "gacha".equals(QuestManager.npcKey(v)));

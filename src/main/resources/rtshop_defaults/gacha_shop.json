@@ -10,36 +10,82 @@
     "만들 수 있는 물건은 여기 적힌 값과 상관없이 '재료 원가(+조리 수고비)'에 매입하고, 판매가는 그 2배 이상이 됩니다 (config/rtshop/pricing.json).",
     "수정 후 /rtshop reload · 실제 적용된 가격과 점검 결과는 /rtshop export (config/rtshop/export)",
     "뽑기 티켓 상점입니다. 뽑기 NPC 창의 '티켓 사기' 버튼으로 열리고, /rtshop npc gacha_shop 으로 따로 상인을 세울 수도 있습니다.",
-    "티켓은 주고받을 수 있고, 되팔 수 없습니다. 무기·펫·장신구 뽑기에 같은 단계 티켓을 씁니다.",
-    "가격 기준: 생활 직업 수입이 시간당 약 20,000G 일 때 일반 = 3분, 중급 = 15분, 고급 = 1시간 분량."
+    "티켓은 주고받을 수 있고, 되팔 수 없습니다. 무기·펫·장신구 뽑기마다 티켓이 따로 있습니다.",
+    "가격 기준: 생활 직업 수입이 시간당 약 20,000G 일 때 무기 일반 = 3분, 중급 = 15분, 고급 = 1시간 분량. 펫·장신구 티켓은 무기 티켓보다 25% 쌉니다."
   ],
   "title": "뽑기 티켓 상점",
   "npcName": "티켓 판매원",
   "profession": "cleric",
   "categories": [
     {
-      "id": "ticket",
-      "name": "뽑기 티켓",
+      "id": "weapon_ticket",
+      "name": "무기 뽑기 티켓",
       "icon": "rtshop:gacha_ticket_high"
+    },
+    {
+      "id": "pet_ticket",
+      "name": "펫 뽑기 티켓",
+      "icon": "rtshop:gacha_ticket_pet_high"
+    },
+    {
+      "id": "accessory_ticket",
+      "name": "장신구 뽑기 티켓",
+      "icon": "rtshop:gacha_ticket_accessory_high"
     }
   ],
   "items": [
     {
       "item": "rtshop:gacha_ticket_normal",
       "price": 1000,
-      "category": "ticket",
+      "category": "weapon_ticket",
       "sell": false
     },
     {
       "item": "rtshop:gacha_ticket_mid",
       "price": 5000,
-      "category": "ticket",
+      "category": "weapon_ticket",
       "sell": false
     },
     {
       "item": "rtshop:gacha_ticket_high",
       "price": 20000,
-      "category": "ticket",
+      "category": "weapon_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:gacha_ticket_pet_normal",
+      "price": 750,
+      "category": "pet_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:gacha_ticket_pet_mid",
+      "price": 3750,
+      "category": "pet_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:gacha_ticket_pet_high",
+      "price": 15000,
+      "category": "pet_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:gacha_ticket_accessory_normal",
+      "price": 750,
+      "category": "accessory_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:gacha_ticket_accessory_mid",
+      "price": 3750,
+      "category": "accessory_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:gacha_ticket_accessory_high",
+      "price": 15000,
+      "category": "accessory_ticket",
       "sell": false
     }
   ]

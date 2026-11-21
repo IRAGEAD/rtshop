@@ -34,7 +34,7 @@ final class PackDiag {
     }
 
     private static final Pattern MODS = Pattern.compile(
-            "(?i).*(nightfall|shadow|warrior|lesraisin|lrmelee|melee|artifact|simplehat|fantasy|hamster|dragon|mount|relic).*");
+            "(?i).*(nightfall|shadow|lesraisin|lrmelee|melee|artifact|fantasy|hamster|dragon|mount|avalon|abyss|efn).*");
 
     static void write(MinecraftServer server) {
         List<String> out = new ArrayList<>();
@@ -52,10 +52,29 @@ final class PackDiag {
         } catch (Throwable t) {
             out.add("prices failed: " + t);
         }
+        out.add("== lrtactical melee variants");
+        try {
+            for (ItemStack v : com.rtshop.gacha.GachaConfig.variantsForDiag("lrtactical:melee")) {
+                out.add(v.getHoverName().getString() + " | " + v.getTag());
+            }
+        } catch (Throwable t) {
+            out.add("variants failed: " + t);
+        }
+        out.add("== shadow items");
+        for (Item item : ForgeRegistries.ITEMS) {
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            try {
+                String n = new ItemStack(item).getHoverName().getString().toLowerCase(Locale.ROOT);
+                if (rl != null && (n.contains("shadow") || rl.getPath().contains("shadow"))) {
+                    out.add(rl + " | " + n + " | " + item.getClass().getName());
+                }
+            } catch (Throwable ignored) {
+            }
+        }
         out.add("== items");
         for (Item item : ForgeRegistries.ITEMS) {
             ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
-            if (rl == null || item == Items.AIR || !picked.contains(rl.getNamespace())) {
+            if (rl == null || item == Items.AIR || !picked.contains(rl.getNamespace()) || rl.getNamespace().equals("simplehats")) {
                 continue;
             }
             try {
@@ -94,10 +113,10 @@ final class PackDiag {
                 if (e == null) {
                     continue;
                 }
+                String cls = chain(e.getClass());
                 boolean tame = e instanceof net.minecraft.world.entity.TamableAnimal
                         || e instanceof net.minecraft.world.entity.OwnableEntity
-                        || e instanceof net.minecraft.world.entity.animal.horse.AbstractHorse;
-                String cls = chain(e.getClass());
+                        || e instanceof net.minecraft.world.entity.animal.horse.AbstractHorse || cls.contains("FantasyBeast");
                 e.discard();
                 if (!mine && !tame) {
                     continue;
@@ -159,7 +178,7 @@ final class PackDiag {
     private static final String[] PRICE_IDS = {"minecraft:iron_ingot", "minecraft:gold_ingot", "minecraft:netherite_ingot",
             "minecraft:copper_ingot", "minecraft:diamond", "minecraft:iron_sword", "minecraft:iron_chestplate",
             "minecraft:golden_sword", "minecraft:diamond_sword", "minecraft:netherite_sword", "minecraft:iron_pickaxe",
-            "minecraft:raw_iron", "minecraft:iron_nugget", "minecraft:iron_block", "minecraft:gold_nugget"};
+            "minecraft:raw_iron", "minecraft:iron_nugget", "minecraft:iron_block", "minecraft:gold_nugget", "spelunkery:raw_iron_nugget", "spelunkery:raw_gold_nugget", "minecraft:raw_gold"};
 
     private static void prices(List<String> out) {
         ShopLoader.Loaded l = ShopServer.loaded();

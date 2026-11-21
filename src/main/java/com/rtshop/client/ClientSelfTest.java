@@ -79,7 +79,9 @@ public final class ClientSelfTest {
     /** 상인 NPC 를 실제로 우클릭해 보는 단계 (상호작용 때 다른 모드와 부딪혀 튕기는지). */
     private static final String[] NPCS = {"fisher", "farmer", "food", "blacksmith", "general", "land", "bank",
             "attendance", "gacha", "job"};
-    private static final int NPC_END = LAST + 18 + NPCS.length * 3;
+    private static final int FX_END = LAST + 18 + 10;
+    private static final int NPC_END = FX_END + NPCS.length * 3;
+    private static volatile int gachaNpc = -1;
     private static volatile int testNpc = -1;
 
     @SubscribeEvent
@@ -224,6 +226,83 @@ public final class ClientSelfTest {
         info.putString("rarity", rarity);
         s.getOrCreateTag().put(ShopData.FISH_INFO_TAG, info);
         return s;
+    }
+
+    /** 뽑기 종류별 화면, 티켓 교환, 영웅·전설 연출의 장면들. */
+    private static void gachaStep(Minecraft mc, int k) {
+        GachaScreen gs = mc.screen instanceof GachaScreen s ? s : null;
+        switch (k) {
+            case 0 -> {
+                mc.setScreen(null);
+                onServer(mc, sp -> {
+                    sp.getInventory().add(new ItemStack(com.rtshop.item.ModItems.SHARD.get(), 64));
+                    com.rtshop.gacha.Gacha.open(sp, gachaNpc);
+                });
+                wait = 20;
+            }
+            case 1 -> {
+                check("the gacha window opens again", gs != null, mc.screen);
+                if (gs != null) {
+                    gs.showForTest(1, 0, -1);
+                }
+                wait = 12;
+            }
+            case 2 -> {
+                shot(mc, "51_gacha_pet");
+                if (gs != null) {
+                    gs.showForTest(2, 0, -1);
+                }
+                wait = 12;
+            }
+            case 3 -> {
+                shot(mc, "52_gacha_accessory");
+                if (gs != null) {
+                    gs.showForTest(2, 1, -1);
+                }
+                wait = 5;
+            }
+            case 4 -> {
+                shot(mc, "53_gacha_ticket_exchange");
+                if (gs != null) {
+                    gs.fxForTest(3, 28);
+                }
+                wait = 2;
+            }
+            case 5 -> {
+                shot(mc, "54_fx_epic_charge");
+                check("the epic animation plays", gs != null && gs.fxActiveForTest());
+                if (gs != null) {
+                    gs.fxForTest(3, 48);
+                }
+                wait = 2;
+            }
+            case 6 -> {
+                shot(mc, "55_fx_epic_reveal");
+                if (gs != null) {
+                    gs.fxForTest(4, 40);
+                }
+                wait = 2;
+            }
+            case 7 -> {
+                shot(mc, "56_fx_legendary_charge");
+                if (gs != null) {
+                    gs.fxForTest(4, 58);
+                }
+                wait = 2;
+            }
+            case 8 -> {
+                shot(mc, "57_fx_legendary_upgrade");
+                if (gs != null) {
+                    gs.fxForTest(4, 100);
+                }
+                wait = 2;
+            }
+            default -> {
+                shot(mc, "58_fx_legendary_reveal");
+                check("the legendary animation plays", gs != null && gs.fxActiveForTest());
+                wait = 5;
+            }
+        }
     }
 
     private static void npcStep(Minecraft mc, int k) {
@@ -1022,7 +1101,8 @@ public final class ClientSelfTest {
                     sp.getInventory().add(new ItemStack(com.rtshop.item.ModItems.TICKET_HIGH.get(), 10));
                     net.minecraft.world.entity.npc.Villager v = com.rtshop.shop.ShopServer.spawnNpc(sp.serverLevel(),
                             sp.position().add(sp.getLookAngle().scale(-2)), sp.getYRot(), "gacha");
-                    com.rtshop.gacha.Gacha.open(sp, v == null ? -1 : v.getId());
+                    gachaNpc = v == null ? -1 : v.getId();
+                    com.rtshop.gacha.Gacha.open(sp, gachaNpc);
                 });
                 wait = 20;
             }
@@ -1030,7 +1110,7 @@ public final class ClientSelfTest {
                 check("talking to the gacha merchant opens the gacha window", mc.screen instanceof GachaScreen, mc.screen);
                 shot(mc, "45_gacha");
                 if (mc.screen instanceof GachaScreen s) {
-                    check("the gacha window shows the tickets you carry", s.dataForTest().getAsJsonArray("tickets").get(2).getAsInt() == 10);
+                    check("the gacha window shows the tickets you carry", s.dataForTest().getAsJsonObject("tickets").getAsJsonArray("weapon").get(2).getAsInt() == 10);
                     s.pullForTest(0, 2, 10);
                 }
                 wait = 20;
@@ -1093,8 +1173,12 @@ public final class ClientSelfTest {
                 wait = 5;
             }
             default -> {
-                if (step > LAST + 18 && step <= NPC_END) {
-                    npcStep(mc, step - LAST - 19);
+                if (step > LAST + 18 && step <= FX_END) {
+                    gachaStep(mc, step - LAST - 19);
+                    return;
+                }
+                if (step > FX_END && step <= NPC_END) {
+                    npcStep(mc, step - FX_END - 1);
                     return;
                 }
                 if (step == NPC_END + 1) {

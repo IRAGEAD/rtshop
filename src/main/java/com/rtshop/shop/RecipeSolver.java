@@ -168,6 +168,11 @@ public final class RecipeSolver {
         if (r.outputs.isEmpty()) {
             return;
         }
+        for (Out o : r.outputs) {
+            if (o.count > 64) {
+                return; // 한 번에 64개를 넘게 만드는 레시피는 장난·관리자용 (예: 금 29개 → 네더라이트 233개)
+            }
+        }
 
         // --- 재료
         if (json.has("pattern") && json.has("key") && json.get("pattern").isJsonArray() && json.get("key").isJsonObject()) {
@@ -607,6 +612,9 @@ public final class RecipeSolver {
                 double m = cfg.margin(r.type);
 
                 Choice c = choose(r, prep, base, est, res, env, false);
+                if (c != null && c.total + extra <= 1.0e-9) {
+                    c = null; // 아무것도 들지 않는 레시피(재료가 모두 그대로 돌아오는 등)로는 원가를 0 으로 만들지 않는다
+                }
                 if (c != null) {
                     double[] share = allocate(prep, c.total + extra, base, est);
                     for (int oi = 0; oi < prep.outs.size(); oi++) {
@@ -625,6 +633,9 @@ public final class RecipeSolver {
                     }
                 }
                 Choice v = choose(r, prep, base, est, res, env, true);
+                if (v != null && v.total + extra <= 1.0e-9) {
+                    v = null;
+                }
                 if (v != null) {
                     double[] share = allocate(prep, (v.total + extra) * (1.0 + m) + labor, base, est);
                     for (int oi = 0; oi < prep.outs.size(); oi++) {

@@ -76,7 +76,32 @@ public class PetSummonItem extends Item {
             t.setOrderedToSit(false);
         }
         level.addFreshEntityWithPassengers(e);
+        if (!(e instanceof TamableAnimal)) {
+            tameOther(e, p);
+        }
         return e;
+    }
+
+    /** 탈것 (말 종류, Fantasy Mounts 의 FantasyBeast 등): 그 모드의 길들이기 메서드를 찾아 부른다. */
+    public static boolean tameOther(Entity e, ServerPlayer p) {
+        if (e instanceof net.minecraft.world.entity.animal.horse.AbstractHorse h) {
+            h.tameWithName(p);
+            return true;
+        }
+        for (String name : new String[]{"tameBy", "tameWithName", "setTamedBy", "tame", "giveTo"}) {
+            for (java.lang.reflect.Method m : e.getClass().getMethods()) {
+                if (m.getName().equals(name) && m.getParameterCount() == 1
+                        && m.getParameterTypes()[0].isAssignableFrom(ServerPlayer.class)) {
+                    try {
+                        m.invoke(e, p);
+                        return true;
+                    } catch (Exception ex) {
+                        com.rtshop.RtShop.LOGGER.warn("[rtshop] {} 을(를) 길들이지 못했습니다: {}", e.getType(), ex.toString());
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private static InteractionResult use(ServerPlayer p, ItemStack stack, Vec3 at) {

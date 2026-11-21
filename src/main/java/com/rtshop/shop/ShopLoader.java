@@ -182,6 +182,8 @@ public final class ShopLoader {
 
     /** 나중 버전에서 새로 생긴 기본 상점 (기존 상점 파일은 건드리지 않고, 한 번만 설치한다). */
     public static final String[] ADDED = {"attendance_shop", "gacha_shop"};
+    /** 기본 내용이 크게 바뀐 상점: "이름@판" 이 기록에 없으면 기존 파일을 backup 으로 옮기고 새 기본 파일로 바꾼다 (한 번만). */
+    public static final String[] UPGRADED = {"gacha_shop@2"};
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");
@@ -203,6 +205,27 @@ public final class ShopLoader {
             if (!done.contains(name)) {
                 done.add(name);
             }
+            changed = true;
+        }
+        for (String mark : UPGRADED) {
+            if (done.contains(mark)) {
+                continue;
+            }
+            String name = mark.substring(0, mark.indexOf('@'));
+            Path f = dir.resolve(name + ".json");
+            if (Files.exists(f) && !force) {
+                Path backup = root.resolve("backup");
+                Files.createDirectories(backup);
+                Files.move(f, backup.resolve(name + "_before_" + mark.substring(mark.indexOf('@') + 1) + "_" + System.currentTimeMillis() + ".json"),
+                        StandardCopyOption.REPLACE_EXISTING);
+            }
+            try (InputStream in = ShopLoader.class.getResourceAsStream("/rtshop_defaults/" + name + ".json")) {
+                if (in != null) {
+                    Files.write(f, in.readAllBytes());
+                    RtShop.LOGGER.info("[rtshop] 기본 상점 {} 을(를) 새 판으로 바꿨습니다 (이전 파일은 backup 폴더).", name);
+                }
+            }
+            done.add(mark);
             changed = true;
         }
         if (changed) {
@@ -461,6 +484,7 @@ public final class ShopLoader {
         out.scan = scan;
         double ratio = pc.sellRatio > 0 ? pc.sellRatio : 0.5;
         int adjusted = 0;
+        List<String> zeroCost = new ArrayList<>();
         for (Map.Entry<String, Price> e : prices.entrySet()) {
             Price p = e.getValue();
             if (!isPlain(p.stack) || p.fixedSell) {
@@ -474,6 +498,12 @@ public final class ShopLoader {
             }
             if (c == null || v == null) {
                 continue; // 만들 수 없는 원재료
+            }
+            if (c < 0.005 || v < 0.005) {
+                // 원가가 0 으로 계산됨 = 레시피 해석이 잘못된 것 (공짜로 만들 수 있는 물건은 없다): 레시피 원가를 쓰지 않는다
+                zeroCost.add(id + " (" + res.costRecipe.get(id) + ")");
+                p.cost = -1;
+                continue;
             }
             boolean food = p.stack.isEdible() || res.processed.contains(id);
             if (p.dynamicFood) {
@@ -504,6 +534,10 @@ public final class ShopLoader {
                 }
             }
             // 그 밖 = 원가와 비슷하거나 더 싸게 파는 기본 재료(설탕, 기름, 숯 등): 상점가의 50% 에 매입 (아래에서 채움)
+        }
+        if (!zeroCost.isEmpty()) {
+            out.notes.add("원가가 0 으로 계산되어 레시피 원가를 쓰지 않은 품목 " + zeroCost.size() + "종: "
+                    + String.join(", ", zeroCost.subList(0, Math.min(20, zeroCost.size()))));
         }
         if (pc.purchaseFloor) {
             applyPurchaseFloor(scan, pc, out);

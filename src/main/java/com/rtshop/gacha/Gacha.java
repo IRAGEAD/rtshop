@@ -171,12 +171,19 @@ public final class Gacha {
 
     // ------------------------------------------------------------------ 아이템
 
-    public static Item ticket(String tier) {
-        return switch (tier) {
-            case "high" -> ModItems.TICKET_HIGH.get();
-            case "mid" -> ModItems.TICKET_MID.get();
-            default -> ModItems.TICKET_NORMAL.get();
+    /** 뽑기 종류·단계별 티켓. */
+    public static Item ticket(String cat, String tier) {
+        int t = "high".equals(tier) ? 2 : "mid".equals(tier) ? 1 : 0;
+        return switch (cat) {
+            case "pet" -> (t == 2 ? ModItems.PET_TICKET_HIGH : t == 1 ? ModItems.PET_TICKET_MID : ModItems.PET_TICKET_NORMAL).get();
+            case "accessory" -> (t == 2 ? ModItems.ACC_TICKET_HIGH : t == 1 ? ModItems.ACC_TICKET_MID : ModItems.ACC_TICKET_NORMAL).get();
+            default -> (t == 2 ? ModItems.TICKET_HIGH : t == 1 ? ModItems.TICKET_MID : ModItems.TICKET_NORMAL).get();
         };
+    }
+
+    /** 조각 보상 칸 (펫 뽑기의 일반·고급 등급): 뽑기 표시 없이 그냥 조각을 준다. */
+    public static boolean isShardEntry(GachaConfig.Entry e) {
+        return e.entity.isEmpty() && (RtShop.MODID + ":gacha_shard").equals(e.item);
     }
 
     /** 뽑은 칸을 실제 아이템으로 (펫은 소환권). 뽑기 표시를 붙인다. */
@@ -199,6 +206,9 @@ public final class Gacha {
                     RtShop.LOGGER.warn("[rtshop] 뽑기 아이템 {} 의 NBT 를 읽지 못했습니다: {}", e.item, ex.getMessage());
                 }
             }
+        }
+        if (isShardEntry(e)) {
+            return s; // 조각은 표시 없이 (분해·교환에 바로 쓰도록)
         }
         CompoundTag m = new CompoundTag();
         m.putString("g", e.grade);
@@ -319,7 +329,7 @@ public final class Gacha {
             result(p, Component.translatable("rtshop.gacha.empty"), false);
             return null;
         }
-        Item t = ticket(tier);
+        Item t = ticket(cat, tier);
         if (!take(p, t, n)) {
             result(p, Component.translatable("rtshop.gacha.no_ticket", new ItemStack(t).getHoverName(), n), false);
             return null;
@@ -331,12 +341,16 @@ public final class Gacha {
         JsonArray res = new JsonArray();
         long now = System.currentTimeMillis();
         for (GachaConfig.Entry e : got) {
-            boolean fresh = pe.owned.add(e.key());
+            boolean fresh = !isShardEntry(e) && pe.owned.add(e.key());
             ItemStack s = stackOf(e, cat);
             JsonObject r = e.toJson();
             r.addProperty("new", fresh);
             res.add(r);
-            give(p, s);
+            if (isShardEntry(e)) {
+                giveShards(p, e.count);
+            } else {
+                give(p, s);
+            }
             pe.history.add(0, e.grade + "|" + cat + "|" + e.key() + "|" + now);
             if (GachaConfig.gradeIndex(e.grade) == GachaConfig.GRADES.length - 1) {
                 Component name = s.getItem() == ModItems.PET_SUMMON.get() ? petName(e.entity) : s.getHoverName();
@@ -400,29 +414,27 @@ public final class Gacha {
         return total;
     }
 
-    /** 조각으로 목록의 아이템을 산다. */
-    public static boolean exchange(ServerPlayer p, String cat, int index, boolean needNpc) {
+    /** 조각으로 뽑기 티켓을 바꾼다 (n 장). */
+    public static boolean exchange(ServerPlayer p, String cat, String tier, int n, boolean needNpc) {
         GachaConfig c = GachaConfig.get();
         if (needNpc && !nearNpc(p)) {
             result(p, Component.translatable("rtshop.gacha.need_npc", c.npcName), false);
             return false;
         }
-        List<GachaConfig.Entry> pool = c.pool(cat);
-        if (!c.exchangeEnabled || index < 0 || index >= pool.size() || !GachaConfig.valid(pool.get(index))) {
+        int ti = java.util.Arrays.asList(GachaConfig.TIERS).indexOf(tier);
+        int ci = java.util.Arrays.asList(GachaConfig.CATEGORIES).indexOf(cat);
+        if (!c.exchangeEnabled || ti < 0 || ci < 0 || n < 1 || n > 64) {
             return false;
         }
-        GachaConfig.Entry e = pool.get(index);
-        int cost = c.exchange[Math.max(0, GachaConfig.gradeIndex(e.grade))];
+        int cost = c.ticketCost[ci][ti] * n;
         if (!take(p, ModItems.SHARD.get(), cost)) {
             result(p, Component.translatable("rtshop.gacha.no_shards", cost), false);
             return false;
         }
-        ItemStack s = stackOf(e, cat);
+        ItemStack s = new ItemStack(ticket(cat, tier), n);
+        Component name = s.getHoverName();
         give(p, s);
-        GachaData d = GachaData.get(p.server);
-        d.of(p.getUUID()).owned.add(e.key());
-        d.dirty();
-        result(p, Component.translatable("rtshop.gacha.exchanged", s.getItem() == ModItems.PET_SUMMON.get() ? petName(e.entity) : s.getHoverName(), cost), true);
+        result(p, Component.translatable("rtshop.gacha.exchanged", name, n, cost), true);
         return true;
     }
 
@@ -449,7 +461,7 @@ public final class Gacha {
                 send(p, GachaPacket.VIEW, view(p));
             }
             case GachaActionPacket.EXCHANGE -> {
-                exchange(p, cat, a.has("index") ? a.get("index").getAsInt() : -1, true);
+                exchange(p, cat, a.has("tier") ? a.get("tier").getAsString() : "", a.has("n") ? a.get("n").getAsInt() : 1, true);
                 send(p, GachaPacket.VIEW, view(p));
             }
             case GachaActionPacket.SHOP -> {
@@ -536,10 +548,21 @@ public final class Gacha {
         o.addProperty("shards", count(p, ModItems.SHARD.get()));
         o.addProperty("tenGuarantee", c.tenGuarantee);
         o.addProperty("exchangeEnabled", c.exchangeEnabled);
-        JsonArray tickets = new JsonArray();
+        JsonObject tickets = new JsonObject();
+        JsonObject costs = new JsonObject();
         JsonObject chances = new JsonObject();
+        for (int ci = 0; ci < GachaConfig.CATEGORIES.length; ci++) {
+            String cat = GachaConfig.CATEGORIES[ci];
+            JsonArray tk = new JsonArray();
+            JsonArray cs = new JsonArray();
+            for (int ti = 0; ti < GachaConfig.TIERS.length; ti++) {
+                tk.add(count(p, ticket(cat, GachaConfig.TIERS[ti])));
+                cs.add(c.ticketCost[ci][ti]);
+            }
+            tickets.add(cat, tk);
+            costs.add(cat, cs);
+        }
         for (String t : GachaConfig.TIERS) {
-            tickets.add(count(p, ticket(t)));
             JsonObject byCat = new JsonObject();
             for (String cat : GachaConfig.CATEGORIES) {
                 JsonArray arr = new JsonArray();
@@ -551,15 +574,13 @@ public final class Gacha {
             chances.add(t, byCat);
         }
         o.add("tickets", tickets);
+        o.add("ticketCost", costs);
         o.add("chances", chances);
         JsonArray dm = new JsonArray();
-        JsonArray ex = new JsonArray();
         for (int i = 0; i < GachaConfig.GRADES.length; i++) {
             dm.add(c.dismantle[i]);
-            ex.add(c.exchange[i]);
         }
         o.add("dismantle", dm);
-        o.add("exchange", ex);
         GachaData.Entry pe = GachaData.get(p.server).of(p.getUUID());
         JsonObject pools = new JsonObject();
         for (String cat : GachaConfig.CATEGORIES) {

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rtshop:item/gacha_ticket_pet_mid"
+  }
+}

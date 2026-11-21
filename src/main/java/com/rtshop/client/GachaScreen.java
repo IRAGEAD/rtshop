@@ -32,6 +32,24 @@ public class GachaScreen extends Screen {
     public static final String[] TIERS = {"normal", "mid", "high"};
     public static final String[] GRADES = {"common", "uncommon", "rare", "epic", "legendary"};
     private static final int ROW = 18;
+    private static final int BANNER = 20;
+
+    /** 뽑기 종류마다 다른 색·문양·아이콘 (바꿨는지 한눈에 보이게). */
+    record Theme(int accent, int dark, int light, int panel, int panelHi, int panelShade, String icon) {
+    }
+
+    static final Theme[] THEMES = {
+            new Theme(0xFFC8402E, 0xFF4A140E, 0xFFFFD2C4, 0xFFEFD8CC, 0xFFFBEAE2, 0xFFC49A88, "minecraft:diamond_sword"),
+            new Theme(0xFF3E9E4A, 0xFF123A18, 0xFFD2F5C8, 0xFFDDEBCB, 0xFFF0F8E4, 0xFFA2BE8E, "minecraft:wolf_spawn_egg"),
+            new Theme(0xFF8A5AE0, 0xFF2A1650, 0xFFE4D2FF, 0xFFE4DAF2, 0xFFF4EEFB, 0xFFAE9CCC, "minecraft:amethyst_shard")};
+
+    static Theme theme(int cat) {
+        return THEMES[Math.max(0, Math.min(THEMES.length - 1, cat))];
+    }
+
+    private final GachaFx anim = new GachaFx();
+    private int switchTicks = 0;
+    private int animTicks = 0;
 
     private JsonObject data;
     private int cat = 0;
@@ -65,6 +83,22 @@ public class GachaScreen extends Screen {
                     cat = i;
                 }
             }
+            // 영웅·전설이 나왔으면 가장 높은 것 하나로 연출부터
+            int best = -1;
+            JsonObject bestE = null;
+            for (JsonElement el : results) {
+                JsonObject e = el.getAsJsonObject();
+                int gi = gradeIndex(e.get("grade").getAsString());
+                if (gi > best) {
+                    best = gi;
+                    bestE = e;
+                }
+            }
+            if (best >= GachaFx.EPIC && bestE != null) {
+                anim.start(best, icon(bestE), name(bestE));
+            } else {
+                anim.skip();
+            }
         }
         if (this.width > 0) {
             layout();
@@ -93,11 +127,51 @@ public class GachaScreen extends Screen {
 
     @Override
     public void tick() {
+        animTicks++;
         if (statusTicks > 0) {
             statusTicks--;
         }
+        if (switchTicks > 0) {
+            switchTicks--;
+        }
+        if (anim.active()) {
+            anim.tick();
+            return;
+        }
         if (results != null) {
             resultTicks++;
+            for (int i = 0; i < results.size(); i++) {
+                if (resultTicks == i * 3 + 4) {
+                    flipSound(gradeIndex(results.get(i).getAsJsonObject().get("grade").getAsString()));
+                }
+            }
+        }
+    }
+
+    private static void sfx(net.minecraft.sounds.SoundEvent e, float pitch, float vol) {
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(e, pitch, vol));
+    }
+
+    private static void flipSound(int gi) {
+        switch (gi) {
+            case 4 -> sfx(SoundEvents.PLAYER_LEVELUP, 1.5F, 0.7F);
+            case 3 -> sfx(SoundEvents.AMETHYST_CLUSTER_BREAK, 1.2F, 0.9F);
+            case 2 -> sfx(SoundEvents.AMETHYST_BLOCK_CHIME, 1.4F, 0.8F);
+            default -> sfx(SoundEvents.BOOK_PAGE_TURN, 1.0F + gi * 0.15F, 0.6F);
+        }
+    }
+
+    private void setCat(int c) {
+        if (c == cat) {
+            return;
+        }
+        cat = c;
+        scroll = 0;
+        switchTicks = 10;
+        switch (c) {
+            case 0 -> sfx(SoundEvents.ARMOR_EQUIP_NETHERITE, 1.0F, 0.9F);
+            case 1 -> sfx(SoundEvents.WOLF_AMBIENT, 1.3F, 0.6F);
+            default -> sfx(SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.0F);
         }
     }
 
@@ -110,7 +184,19 @@ public class GachaScreen extends Screen {
     }
 
     private int tickets(int t) {
-        return data.getAsJsonArray("tickets").get(t).getAsInt();
+        return data.getAsJsonObject("tickets").getAsJsonArray(CATS[cat]).get(t).getAsInt();
+    }
+
+    private int ticketCost(int t) {
+        return data.getAsJsonObject("ticketCost").getAsJsonArray(CATS[cat]).get(t).getAsInt();
+    }
+
+    static Item ticketItem(int cat, int t) {
+        return switch (cat) {
+            case 1 -> (t == 2 ? ModItems.PET_TICKET_HIGH : t == 1 ? ModItems.PET_TICKET_MID : ModItems.PET_TICKET_NORMAL).get();
+            case 2 -> (t == 2 ? ModItems.ACC_TICKET_HIGH : t == 1 ? ModItems.ACC_TICKET_MID : ModItems.ACC_TICKET_NORMAL).get();
+            default -> (t == 2 ? ModItems.TICKET_HIGH : t == 1 ? ModItems.TICKET_MID : ModItems.TICKET_NORMAL).get();
+        };
     }
 
     private void send(int action, JsonObject arg) {
@@ -166,11 +252,11 @@ public class GachaScreen extends Screen {
     // ------------------------------------------------------------------ 배치
 
     private int bodyY() {
-        return fy + 44;
+        return fy + 44 + BANNER + 2;
     }
 
     private int bodyH() {
-        return H - 44 - 28;
+        return H - 44 - BANNER - 2 - 28;
     }
 
     private void layout() {
@@ -187,23 +273,21 @@ public class GachaScreen extends Screen {
             }));
             return;
         }
-        String[] cats = {"rtshop.gacha.cat.weapon", "rtshop.gacha.cat.pet", "rtshop.gacha.cat.accessory"};
         int x = fx + 8;
         for (int i = 0; i < 3; i++) {
             final int c = i;
-            buttons.add(new Btn(x, fy + 24, 54, 16, tr(cats[i]), cat != i, () -> {
-                cat = c;
-                scroll = 0;
+            buttons.add(new Btn(x, fy + 23, 62, 18, "#cat" + i, true, () -> {
+                setCat(c);
                 layout();
             }));
-            x += 56;
+            x += 64;
         }
         String[] modes = {"rtshop.gacha.mode.pull", "rtshop.gacha.mode.exchange", "rtshop.gacha.mode.dismantle"};
-        int mx = fx + W - 8 - 3 * 64 - 4;
+        int mx = fx + W - 8 - 3 * 58 - 4;
         for (int i = 0; i < 3; i++) {
             final int m = i;
             boolean en = mode != i && (i != 1 || b("exchangeEnabled"));
-            buttons.add(new Btn(mx + i * 66, fy + 24, 64, 16, tr(modes[i]), en, () -> {
+            buttons.add(new Btn(mx + i * 60, fy + 24, 58, 16, tr(modes[i]), en, () -> {
                 mode = m;
                 scroll = 0;
                 layout();
@@ -225,21 +309,13 @@ public class GachaScreen extends Screen {
                 }));
             }
         } else if (mode == 1) {
-            List<JsonObject> rows = exchangeRows();
-            int rows0 = bodyH() / ROW;
-            scroll = Math.max(0, Math.min(scroll, Math.max(0, rows.size() - rows0)));
             int shards = data.get("shards").getAsInt();
-            for (int k = 0; k < rows0 && scroll + k < rows.size(); k++) {
-                JsonObject e = rows.get(scroll + k);
-                int cost = cost(e);
-                int y = bodyY() + k * ROW;
-                int idx = e.get("index").getAsInt();
-                buttons.add(new Btn(fx + W - 8 - 60, y + 1, 60, 15, tr("rtshop.gacha.exchange_btn"), at && shards >= cost, () -> {
-                    JsonObject a = new JsonObject();
-                    a.addProperty("cat", CATS[cat]);
-                    a.addProperty("index", idx);
-                    send(GachaActionPacket.EXCHANGE, a);
-                }));
+            for (int t = 0; t < 3; t++) {
+                final int tt = t;
+                int y = bodyY() + 6 + t * 30;
+                int cost = ticketCost(t);
+                buttons.add(new Btn(fx + W - 8 - 112, y + 5, 52, 16, tr("rtshop.gacha.trade1"), at && shards >= cost, () -> trade(tt, 1)));
+                buttons.add(new Btn(fx + W - 8 - 56, y + 5, 52, 16, tr("rtshop.gacha.trade5"), at && shards >= cost * 5, () -> trade(tt, 5)));
             }
         } else {
             JsonArray inv = data.getAsJsonArray("inventory");
@@ -278,26 +354,18 @@ public class GachaScreen extends Screen {
         send(GachaActionPacket.PULL, a);
     }
 
+    private void trade(int tier, int n) {
+        JsonObject a = new JsonObject();
+        a.addProperty("cat", CATS[cat]);
+        a.addProperty("tier", TIERS[tier]);
+        a.addProperty("n", n);
+        send(GachaActionPacket.EXCHANGE, a);
+    }
+
     private void dismantleAll(int max) {
         JsonObject a = new JsonObject();
         a.addProperty("max", max);
         send(GachaActionPacket.DISMANTLE_ALL, a);
-    }
-
-    private int cost(JsonObject e) {
-        return data.getAsJsonArray("exchange").get(gradeIndex(e.get("grade").getAsString())).getAsInt();
-    }
-
-    private List<JsonObject> exchangeRows() {
-        List<JsonObject> rows = new ArrayList<>();
-        for (JsonElement el : pool()) {
-            JsonObject e = el.getAsJsonObject();
-            if (e.get("valid").getAsBoolean()) {
-                rows.add(e);
-            }
-        }
-        rows.sort(Comparator.comparingInt((JsonObject e) -> -gradeIndex(e.get("grade").getAsString())).thenComparing(GachaScreen::name));
-        return rows;
     }
 
     // ------------------------------------------------------------------ 그리기
@@ -305,33 +373,40 @@ public class GachaScreen extends Screen {
     @Override
     public void render(GuiGraphics g, int mx, int my, float partial) {
         this.renderBackground(g);
+        Theme th = theme(cat);
         Ui.woodFrame(g, fx, fy, W, H);
-        g.drawString(this.font, Ui.clip(this.font, data.get("npc").getAsString() + " · " + this.title.getString(), W / 2), fx + 10, fy + 8, Ui.C_GOLD, true);
-        // 오른쪽 위: 티켓·조각
+        // 뽑기 종류 색 테두리
+        g.fill(fx + 3, fy + 3, fx + W - 3, fy + 5, th.accent());
+        g.fill(fx + 3, fy + H - 5, fx + W - 3, fy + H - 3, th.accent());
+        g.drawString(this.font, Ui.clip(this.font, data.get("npc").getAsString() + " · " + this.title.getString(), W / 2 - 40), fx + 10, fy + 9, Ui.C_GOLD, true);
+        // 오른쪽 위: 이 뽑기의 티켓과 조각
         int x = fx + W - 10;
         String sh = Integer.toString(data.get("shards").getAsInt());
         x -= this.font.width(sh);
-        g.drawString(this.font, sh, x, fy + 8, Ui.C_CREAM, false);
+        g.drawString(this.font, sh, x, fy + 9, Ui.C_CREAM, false);
         x -= 18;
-        g.renderItem(new ItemStack(ModItems.SHARD.get()), x, fy + 3);
-        Item[] tk = {ModItems.TICKET_NORMAL.get(), ModItems.TICKET_MID.get(), ModItems.TICKET_HIGH.get()};
+        g.renderItem(new ItemStack(ModItems.SHARD.get()), x, fy + 4);
         for (int t = 2; t >= 0; t--) {
             String n = Integer.toString(tickets(t));
             x -= this.font.width(n) + 6;
-            g.drawString(this.font, n, x, fy + 8, Ui.C_CREAM, false);
+            g.drawString(this.font, n, x, fy + 9, Ui.C_CREAM, false);
             x -= 18;
-            g.renderItem(new ItemStack(tk[t]), x, fy + 3);
+            g.renderItem(new ItemStack(ticketItem(cat, t)), x, fy + 4);
         }
         if (results != null) {
-            renderResults(g, mx, my);
-        } else if (probTier >= 0) {
-            renderOdds(g);
-        } else if (mode == 0) {
-            renderPull(g);
-        } else if (mode == 1) {
-            renderExchange(g);
+            renderResults(g, mx, my, partial);
         } else {
-            renderDismantle(g);
+            renderTabs(g, mx, my);
+            renderBanner(g, partial);
+            if (probTier >= 0) {
+                renderOdds(g);
+            } else if (mode == 0) {
+                renderPull(g);
+            } else if (mode == 1) {
+                renderExchange(g);
+            } else {
+                renderDismantle(g);
+            }
         }
         if (status != null && statusTicks > 0) {
             String s = Ui.clip(this.font, status.getString(), W - 200);
@@ -340,24 +415,108 @@ public class GachaScreen extends Screen {
             g.drawString(this.font, Ui.clip(this.font, tr("rtshop.gacha.view_only", data.get("npc").getAsString()), W - 200), fx + 94, fy + H - 19, Ui.C_PARCH_DARK, false);
         }
         g.flush();
-        for (Btn bt : buttons) {
-            Ui.button(g, this.font, bt.x(), bt.y(), bt.w(), bt.h(), bt.label(), Ui.inside(mx, my, bt.x(), bt.y(), bt.w(), bt.h()), bt.enabled());
+        if (!anim.active()) {
+            for (Btn bt : buttons) {
+                if (bt.label().startsWith("#cat")) {
+                    continue;
+                }
+                Ui.button(g, this.font, bt.x(), bt.y(), bt.w(), bt.h(), bt.label(), Ui.inside(mx, my, bt.x(), bt.y(), bt.w(), bt.h()), bt.enabled());
+            }
         }
         super.render(g, mx, my, partial);
+        if (anim.active()) {
+            g.flush();
+            anim.render(g, this.font, this.width, this.height, partial);
+        }
+    }
+
+    /** 종류 탭: 고른 탭은 그 종류 색으로 칠하고 아이콘을 띄운다. */
+    private void renderTabs(GuiGraphics g, int mx, int my) {
+        String[] names = {"rtshop.gacha.cat.weapon", "rtshop.gacha.cat.pet", "rtshop.gacha.cat.accessory"};
+        for (Btn bt : buttons) {
+            if (!bt.label().startsWith("#cat")) {
+                continue;
+            }
+            int i = bt.label().charAt(4) - '0';
+            Theme t = theme(i);
+            boolean sel = i == cat;
+            boolean hover = Ui.inside(mx, my, bt.x(), bt.y(), bt.w(), bt.h());
+            int fill = sel ? t.accent() : hover ? Ui.C_WOOD_HI : Ui.C_WOOD_DARK;
+            Ui.bevel(g, bt.x(), bt.y(), bt.w(), bt.h() + (sel ? 3 : 0), fill, sel ? t.light() : Ui.C_WOOD_HI, sel ? t.dark() : Ui.C_SHADOW);
+            g.pose().pushPose();
+            g.pose().translate(bt.x() + 2, bt.y() + 1, 0);
+            g.pose().scale(0.95F, 0.95F, 1);
+            g.renderItem(new ItemStack(ticketItem(i, 2)), 0, 0);
+            g.pose().popPose();
+            g.drawString(this.font, tr(names[i]), bt.x() + 20, bt.y() + 5, sel ? 0xFFFFFFFF : (hover ? Ui.C_CREAM : Ui.C_PARCH_SHADE), sel);
+        }
+    }
+
+    /** 종류 배너: 색 띠 + 빗금 무늬 + 큰 아이콘·이름·설명 + 지나가는 빛. 종류를 바꾸면 옆에서 밀려 들어온다. */
+    private void renderBanner(GuiGraphics g, float partial) {
+        Theme t = theme(cat);
+        int x0 = fx + 6;
+        int x1 = fx + W - 6;
+        int y0 = fy + 44;
+        int y1 = y0 + BANNER;
+        g.fill(x0, y0, x1, y1, t.dark());
+        g.enableScissor(x0, y0, x1, y1);
+        // 종류마다 다른 무늬
+        int stripe = 0x22000000 | (t.light() & 0xFFFFFF);
+        if (cat == 0) {
+            for (int sx = x0 - BANNER; sx < x1; sx += 10) {
+                for (int r = 0; r < BANNER; r++) {
+                    g.fill(sx + r, y0 + r, sx + r + 3, y0 + r + 1, stripe);
+                }
+            }
+        } else if (cat == 1) {
+            for (int sx = x0 + 4; sx < x1; sx += 22) {
+                int yy = y0 + ((sx / 22) % 2 == 0 ? 3 : 10);
+                g.fill(sx + 1, yy + 3, sx + 6, yy + 7, stripe);
+                g.fill(sx, yy, sx + 2, yy + 2, stripe);
+                g.fill(sx + 5, yy, sx + 7, yy + 2, stripe);
+            }
+        } else {
+            for (int sx = x0 + 6; sx < x1; sx += 18) {
+                int yy = y0 + ((sx / 18) % 3) * 5 + 3;
+                g.fill(sx + 2, yy, sx + 3, yy + 5, stripe);
+                g.fill(sx, yy + 2, sx + 5, yy + 3, stripe);
+            }
+        }
+        // 지나가는 빛
+        float sweep = ((animTicks + partial) % 80) / 80F;
+        int bx = (int) (x0 - 40 + sweep * (x1 - x0 + 80));
+        for (int r = 0; r < BANNER; r++) {
+            g.fill(bx + r / 2, y0 + r, bx + r / 2 + 14, y0 + r + 1, 0x18FFFFFF);
+        }
+        g.disableScissor();
+        float slide = switchTicks > 0 ? (switchTicks - partial) / 10F : 0;
+        int off = (int) (-60 * slide * slide);
+        g.fill(x0, y0, x1, y0 + 1, t.accent());
+        g.fill(x0, y1 - 1, x1, y1, t.accent());
+        g.renderItem(new ItemStack(ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(t.icon()))), x0 + 4 + off, y0 + 2);
+        Ui.scaledText(g, this.font, tr("rtshop.gacha.banner." + CATS[cat]), x0 + 24 + off, y0 + 5, 1.25F, 0xFF000000 | (t.light() & 0xFFFFFF), true);
+        String sub = tr("rtshop.gacha.banner_sub." + CATS[cat]);
+        g.drawString(this.font, Ui.clip(this.font, sub, W - 160), x1 - 6 - Math.min(this.font.width(sub), W - 160), y0 + 6, 0xCCFFFFFF & (0xFF000000 | t.light()), false);
+        if (switchTicks > 0) {
+            g.fill(x0, y0, x1, y1, ((int) (slide * 120) << 24) | 0xFFFFFF);
+        }
     }
 
     private void renderPull(GuiGraphics g) {
+        Theme th = theme(cat);
         int pw = (W - 16 - 8) / 3;
-        Item[] tk = {ModItems.TICKET_NORMAL.get(), ModItems.TICKET_MID.get(), ModItems.TICKET_HIGH.get()};
         for (int t = 0; t < 3; t++) {
             int px = fx + 8 + t * (pw + 4);
             int py = bodyY();
-            Ui.bevel(g, px, py, pw, bodyH(), Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
-            g.renderItem(new ItemStack(tk[t]), px + 4, py + 4);
-            g.drawString(this.font, tr("rtshop.gacha.tier." + TIERS[t]), px + 24, py + 5, Ui.C_INK, false);
-            g.drawString(this.font, tr("rtshop.gacha.have", tickets(t)), px + 24, py + 14, Ui.C_INK_SOFT, false);
+            Ui.bevel(g, px, py, pw, bodyH(), th.panel(), th.panelHi(), th.panelShade());
+            g.fill(px + 1, py + 1, px + pw - 1, py + 22, th.accent());
+            g.fill(px + 1, py + 22, px + pw - 1, py + 23, th.dark());
+            g.renderItem(new ItemStack(ticketItem(cat, t)), px + 4, py + 3);
+            g.drawString(this.font, tr("rtshop.gacha.tier." + TIERS[t]), px + 24, py + 4, 0xFFFFFFFF, true);
+            g.drawString(this.font, tr("rtshop.gacha.have", tickets(t)), px + 24, py + 13, 0xFF000000 | (th.light() & 0xFFFFFF), false);
             double[] c = chances(t);
-            int yy = py + 30;
+            int yy = py + 27;
             boolean any = false;
             for (int i = GRADES.length - 1; i >= 0; i--) {
                 if (c[i] <= 0) {
@@ -367,7 +526,10 @@ public class GachaScreen extends Screen {
                 String line = tr("rtshop.gacha.grade." + GRADES[i]) + "  " + pct(c[i]);
                 g.drawString(this.font, line, px + 8, yy, GachaColors.dark(GRADES[i]), false);
                 g.fill(px + 4, yy + 1, px + 6, yy + 7, GachaColors.argb(GRADES[i]));
-                yy += 11;
+                yy += 10;
+            }
+            if (cat == 1 && any) {
+                g.drawString(this.font, Ui.clip(this.font, tr("rtshop.gacha.pet_note"), pw - 8), px + 4, yy + 1, Ui.C_INK_SOFT, false);
             }
             if (!any) {
                 g.drawString(this.font, tr("rtshop.gacha.empty_short"), px + 8, yy, Ui.C_INK_SOFT, false);
@@ -375,7 +537,7 @@ public class GachaScreen extends Screen {
             String gu = data.get("tenGuarantee").getAsString();
             if (!gu.isEmpty() && any) {
                 String s = tr("rtshop.gacha.guarantee_short", tr("rtshop.gacha.grade." + gu));
-                g.drawString(this.font, Ui.clip(this.font, s, pw - 8), px + 4, py + bodyH() - 52, Ui.C_INK_SOFT, false);
+                g.drawString(this.font, Ui.clip(this.font, s, pw - 8), px + 4, py + bodyH() - 50, Ui.C_INK_SOFT, false);
             }
         }
     }
@@ -405,12 +567,14 @@ public class GachaScreen extends Screen {
         }
         rows.removeIf(e -> c[gradeIndex(e.get("grade").getAsString())] <= 0);
         rows.sort(Comparator.comparingInt((JsonObject e) -> -gradeIndex(e.get("grade").getAsString())).thenComparing(GachaScreen::name));
+        g.fill(fx + 6, fy + 23, fx + W - 6, fy + 41, theme(cat).dark());
         g.drawString(this.font, tr("rtshop.gacha.odds_title", tr("rtshop.gacha.cat." + CATS[cat]), tr("rtshop.gacha.tier." + TIERS[probTier])),
-                fx + 8, fy + 28, Ui.C_GOLD, false);
+                fx + 10, fy + 28, Ui.C_GOLD, false);
         int x = fx + 8;
         int y = bodyY();
         int h = bodyH();
-        Ui.bevel(g, x, y, W - 16, h, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+        Theme th = theme(cat);
+        Ui.bevel(g, x, y, W - 16, h, th.panel(), th.panelHi(), th.panelShade());
         int per = (h - 4) / 12;
         scroll = Math.max(0, Math.min(scroll, Math.max(0, rows.size() - per)));
         for (int k = 0; k < per && scroll + k < rows.size(); k++) {
@@ -428,24 +592,20 @@ public class GachaScreen extends Screen {
         }
     }
 
+    /** 조각으로 이 종류의 티켓을 바꾼다. */
     private void renderExchange(GuiGraphics g) {
-        List<JsonObject> rows = exchangeRows();
-        int per = bodyH() / ROW;
-        for (int k = 0; k < per && scroll + k < rows.size(); k++) {
-            JsonObject e = rows.get(scroll + k);
-            int gi = gradeIndex(e.get("grade").getAsString());
-            int y = bodyY() + k * ROW;
-            Ui.bevel(g, fx + 8, y, W - 16 - 64, ROW - 1, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
-            g.fill(fx + 9, y + 1, fx + 11, y + ROW - 2, GachaColors.argb(GRADES[gi]));
-            g.renderItem(icon(e), fx + 13, y);
-            String n = name(e) + (e.get("owned").getAsBoolean() ? "  ✔" : "");
-            g.drawString(this.font, Ui.clip(this.font, n, W - 220), fx + 32, y + 5, Ui.C_INK, false);
-            String c = tr("rtshop.gacha.grade." + GRADES[gi]) + " · " + tr("rtshop.gacha.cost", cost(e));
-            g.drawString(this.font, c, fx + W - 76 - this.font.width(c), y + 5, Ui.C_INK_SOFT, false);
+        Theme th = theme(cat);
+        int shards = data.get("shards").getAsInt();
+        for (int t = 0; t < 3; t++) {
+            int y = bodyY() + 6 + t * 30;
+            Ui.bevel(g, fx + 8, y, W - 16, 26, th.panel(), th.panelHi(), th.panelShade());
+            g.fill(fx + 9, y + 1, fx + 12, y + 25, th.accent());
+            g.renderItem(new ItemStack(ticketItem(cat, t)), fx + 16, y + 5);
+            g.drawString(this.font, new ItemStack(ticketItem(cat, t)).getHoverName().getString(), fx + 36, y + 4, Ui.C_INK, false);
+            g.drawString(this.font, tr("rtshop.gacha.trade_cost", ticketCost(t), tickets(t)), fx + 36, y + 15, Ui.C_INK_SOFT, false);
         }
-        if (rows.isEmpty()) {
-            g.drawString(this.font, tr("rtshop.gacha.empty_short"), fx + 12, bodyY() + 6, Ui.C_CREAM, false);
-        }
+        int y = bodyY() + 6 + 3 * 30 + 4;
+        g.drawString(this.font, Ui.clip(this.font, tr("rtshop.gacha.trade_note", shards), W - 20), fx + 10, y, Ui.C_CREAM, false);
     }
 
     private void renderDismantle(GuiGraphics g) {
@@ -456,7 +616,8 @@ public class GachaScreen extends Screen {
             JsonObject e = inv.get(scroll + k).getAsJsonObject();
             int gi = gradeIndex(e.get("grade").getAsString());
             int y = bodyY() + k * ROW;
-            Ui.bevel(g, fx + 8, y, W - 16 - 64, ROW - 1, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+            Theme th = theme(cat);
+            Ui.bevel(g, fx + 8, y, W - 16 - 64, ROW - 1, th.panel(), th.panelHi(), th.panelShade());
             g.fill(fx + 9, y + 1, fx + 11, y + ROW - 2, GachaColors.argb(GRADES[gi]));
             g.renderItem(icon(e), fx + 13, y);
             g.drawString(this.font, Ui.clip(this.font, name(e), W - 220), fx + 32, y + 5, Ui.C_INK, false);
@@ -468,9 +629,14 @@ public class GachaScreen extends Screen {
         }
     }
 
-    /** 뽑기 결과: 카드가 하나씩 뒤집힌다 (높은 등급은 빛남). */
-    private void renderResults(GuiGraphics g, int mx, int my) {
-        g.fill(fx + 4, fy + 20, fx + W - 4, fy + H - 30, 0xCC100804);
+    /** 뽑기 결과: 카드가 하나씩 뒤집힌다 (영웅은 보랏빛, 전설은 금빛 테두리가 돈다). */
+    private void renderResults(GuiGraphics g, int mx, int my, float partial) {
+        Theme th = theme(cat);
+        g.fill(fx + 4, fy + 20, fx + W - 4, fy + H - 30, 0xE0100804);
+        g.fill(fx + 4, fy + 20, fx + W - 4, fy + 22, th.accent());
+        if (anim.active()) {
+            return;
+        }
         int n = results.size();
         int cols = Math.min(5, n);
         int rows = (n + cols - 1) / cols;
@@ -478,30 +644,65 @@ public class GachaScreen extends Screen {
         int ch = 74;
         int gx = fx + (W - cols * (cw + 4)) / 2;
         int gy = fy + 26 + (H - 60 - rows * (ch + 4)) / 2;
+        float time = resultTicks + partial;
         for (int i = 0; i < n; i++) {
             JsonObject e = results.get(i).getAsJsonObject();
             int cx = gx + (i % cols) * (cw + 4);
             int cy = gy + (i / cols) * (ch + 4);
             int gi = gradeIndex(e.get("grade").getAsString());
-            boolean shown = resultTicks >= i * 3 + 4;
-            if (!shown) {
+            float since = time - (i * 3 + 4);
+            if (since < 0) {
                 Ui.bevel(g, cx, cy, cw, ch, Ui.C_WOOD, Ui.C_WOOD_HI, Ui.C_WOOD_DARK);
+                g.fill(cx + 4, cy + 4, cx + cw - 4, cy + 6, th.accent());
+                g.fill(cx + 4, cy + ch - 6, cx + cw - 4, cy + ch - 4, th.accent());
                 g.drawCenteredString(this.font, "?", cx + cw / 2, cy + ch / 2 - 4, Ui.C_GOLD);
                 continue;
             }
+            // 뒤집히는 동안 옆으로 좁아졌다 넓어진다
+            float flip = Math.min(1, since / 3F);
+            g.pose().pushPose();
+            g.pose().translate(cx + cw / 2F, cy + ch / 2F, 0);
+            g.pose().scale(Math.max(0.05F, flip), 1, 1);
+            g.pose().translate(-(cx + cw / 2F), -(cy + ch / 2F), 0);
             int col = GachaColors.argb(GRADES[gi]);
             if (gi >= 3) {
-                int pulse = (int) (40 + 30 * Math.sin((resultTicks + partialPulse()) * 0.3));
-                g.fill(cx - 2, cy - 2, cx + cw + 2, cy + ch + 2, (pulse << 24) | (col & 0xFFFFFF));
+                int pulse = (int) (60 + 40 * Math.sin(time * 0.3));
+                g.fill(cx - 3, cy - 3, cx + cw + 3, cy + ch + 3, (pulse << 24) | (col & 0xFFFFFF));
             }
             Ui.bevel(g, cx, cy, cw, ch, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+            if (gi >= 3) {
+                // 테두리를 따라 도는 빛
+                float per = 2 * (cw + ch);
+                for (int k = 0; k < (gi == 4 ? 2 : 1); k++) {
+                    float pos = ((time * (gi == 4 ? 6 : 4) + k * per / 2) % per);
+                    for (int j = 0; j < 14; j++) {
+                        float p = (pos - j * 2 + per) % per;
+                        int px, py;
+                        if (p < cw) {
+                            px = (int) p; py = 0;
+                        } else if (p < cw + ch) {
+                            px = cw - 1; py = (int) (p - cw);
+                        } else if (p < 2 * cw + ch) {
+                            px = (int) (cw - 1 - (p - cw - ch)); py = ch - 1;
+                        } else {
+                            px = 0; py = (int) (ch - 1 - (p - 2 * cw - ch));
+                        }
+                        int a = 255 - j * 16;
+                        g.fill(cx + px - 1, cy + py - 1, cx + px + 2, cy + py + 2, (a << 24) | (gi == 4 ? 0xFFF4C0 : 0xF0D8FF));
+                    }
+                }
+            }
             g.fill(cx, cy, cx + cw, cy + 3, col);
             g.fill(cx, cy + ch - 3, cx + cw, cy + ch, col);
             g.pose().pushPose();
-            g.pose().translate(cx + cw / 2 - 16, cy + 10, 0);
+            g.pose().translate(cx + cw / 2F - 16, cy + 10, 0);
             g.pose().scale(2, 2, 1);
             g.renderItem(icon(e), 0, 0);
+            g.renderItemDecorations(this.font, icon(e), 0, 0);
             g.pose().popPose();
+            g.flush();
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 300);
             String gn = tr("rtshop.gacha.grade." + GRADES[gi]);
             g.drawString(this.font, gn, cx + (cw - this.font.width(gn)) / 2, cy + 46, GachaColors.dark(GRADES[gi]), false);
             String nm = Ui.clip(this.font, name(e), cw - 6);
@@ -509,16 +710,18 @@ public class GachaScreen extends Screen {
             if (e.has("new") && e.get("new").getAsBoolean()) {
                 g.drawString(this.font, "NEW", cx + 3, cy + 5, 0xFFE03C2C, false);
             }
+            g.pose().popPose();
+            g.pose().popPose();
         }
-    }
-
-    private float partialPulse() {
-        return 0;
     }
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (button == 0) {
+            if (anim.active()) {
+                anim.skip();
+                return true;
+            }
             if (results != null && resultTicks < results.size() * 3 + 4) {
                 resultTicks = results.size() * 3 + 4; // 클릭하면 바로 모두 뒤집기
                 return true;
@@ -559,6 +762,7 @@ public class GachaScreen extends Screen {
 
     public void showForTest(int catIndex, int modeIndex, int oddsTier) {
         results = null;
+        anim.skip();
         cat = catIndex;
         mode = modeIndex;
         probTier = oddsTier;
@@ -567,9 +771,33 @@ public class GachaScreen extends Screen {
     }
 
     public void revealForTest() {
+        anim.skip();
         if (results != null) {
             resultTicks = 1000;
         }
+    }
+
+    /** 점검용: 영웅(3)·전설(4) 연출의 한 장면을 띄운다. */
+    public void fxForTest(int grade, int tick) {
+        JsonObject e = null;
+        for (JsonElement el : pool()) {
+            if (el.getAsJsonObject().get("valid").getAsBoolean()) {
+                e = el.getAsJsonObject();
+                if (gradeIndex(e.get("grade").getAsString()) >= grade) {
+                    break;
+                }
+            }
+        }
+        if (results == null) {
+            results = new JsonArray();
+        }
+        anim.start(grade, e == null ? new ItemStack(ModItems.SHARD.get()) : icon(e), e == null ? "?" : name(e));
+        anim.jumpTo(tick);
+        layout();
+    }
+
+    public boolean fxActiveForTest() {
+        return anim.active();
     }
 
     /** 점검용: 편집 버튼과 같은 요청. */

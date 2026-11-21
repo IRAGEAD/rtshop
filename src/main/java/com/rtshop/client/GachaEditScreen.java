@@ -464,9 +464,9 @@ public class GachaEditScreen extends Screen {
             markDirty();
         });
         y += 17;
-        for (String kind : new String[]{"dismantle", "exchange"}) {
-            JsonObject m = sh.getAsJsonObject(kind);
-            label(x, y + 2, tr("rtshop.gachaedit." + kind), Ui.C_CREAM);
+        {
+            JsonObject m = sh.getAsJsonObject("dismantle");
+            label(x, y + 2, tr("rtshop.gachaedit.dismantle"), Ui.C_CREAM);
             for (int i = 0; i < GRADES.length; i++) {
                 final String gname = GRADES[i];
                 box(x + 70 + i * (cw + 4), y, cw, m.has(gname) ? m.get(gname).getAsString() : "0", 7,
@@ -474,6 +474,29 @@ public class GachaEditScreen extends Screen {
             }
             y += 14;
         }
+        // 조각 → 티켓 교환 비용 (종류별 일반·중급·고급)
+        if (!sh.has("tickets")) {
+            sh.add("tickets", new JsonObject());
+        }
+        JsonObject tk = sh.getAsJsonObject("tickets");
+        label(x, y + 2, tr("rtshop.gachaedit.ticket_cost"), Ui.C_CREAM);
+        int tx = x + 70;
+        for (int c = 0; c < CATS.length; c++) {
+            final String cname = CATS[c];
+            if (!tk.has(cname)) {
+                tk.add(cname, new JsonObject());
+            }
+            JsonObject t = tk.getAsJsonObject(cname);
+            label(tx, y + 2, tr("rtshop.gacha.cat." + cname), Ui.C_PARCH_DARK);
+            int lw = this.font.width(tr("rtshop.gacha.cat." + cname)) + 3;
+            for (int i = 0; i < TIERS.length; i++) {
+                final String tname = TIERS[i];
+                box(tx + lw + i * 28, y, 26, t.has(tname) ? t.get(tname).getAsString() : "0", 4,
+                        v -> t.addProperty(tname, (int) Math.max(1, num(v, 1))));
+            }
+            tx += lw + 3 * 28 + 8;
+        }
+        y += 14;
         y += 4;
         // 모의 뽑기
         final int sy = y;
@@ -549,6 +572,9 @@ public class GachaEditScreen extends Screen {
         y += 16;
         label(x, y + 2, tr("rtshop.gachaedit.exclude_items"), Ui.C_CREAM);
         box(x + lw, y, bw, join(cfg.getAsJsonArray("excludeItems")), 8000, v -> cfg.add("excludeItems", split(v)));
+        y += 16;
+        label(x, y + 2, tr("rtshop.gachaedit.top_mods"), Ui.C_CREAM);
+        box(x + lw, y, bw, join(cfg.getAsJsonArray("topWeaponMods")), 2000, v -> cfg.add("topWeaponMods", split(v)));
         y += 18;
         label(x, y, tr("rtshop.gachaedit.settings_hint1"), Ui.C_PARCH_DARK);
         y += 11;

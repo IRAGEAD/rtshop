@@ -44,6 +44,12 @@ public class RtShop {
             event.accept(ModItems.TICKET_NORMAL);
             event.accept(ModItems.TICKET_MID);
             event.accept(ModItems.TICKET_HIGH);
+            event.accept(ModItems.PET_TICKET_NORMAL);
+            event.accept(ModItems.PET_TICKET_MID);
+            event.accept(ModItems.PET_TICKET_HIGH);
+            event.accept(ModItems.ACC_TICKET_NORMAL);
+            event.accept(ModItems.ACC_TICKET_MID);
+            event.accept(ModItems.ACC_TICKET_HIGH);
             event.accept(ModItems.SHARD);
         }
     }

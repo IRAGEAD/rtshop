@@ -118,10 +118,14 @@ public final class GachaConfig {
     public String tenGuarantee = "rare";
     public final Map<String, Tier> tiers = new LinkedHashMap<>();
     public final Map<String, List<Entry>> pools = new LinkedHashMap<>();
-    /** 분해하면 받는 조각 / 조각으로 교환할 때 드는 조각 (등급별). */
+    /** 분해하면 받는 조각 (등급별). */
     public final int[] dismantle = {1, 3, 10, 40, 150};
-    public final int[] exchange = {10, 30, 100, 400, 1500};
+    /** 조각으로 뽑기 티켓 한 장을 바꿀 때 드는 조각 [종류][단계]. 티켓값의 약 9% 를 돌려받는 셈. */
+    public final int[][] ticketCost = {{20, 40, 100}, {15, 30, 75}, {15, 30, 75}};
     public boolean exchangeEnabled = true;
+    /** 펫 뽑기의 일반·고급 등급 보상(펫 대신 조각). */
+    public static final int[] PET_SHARDS = {2, 5};
+    public static final int CONFIG_VERSION = 2;
     /** 자동 분류에서 뺄 모드·아이템 (보스 무기 등). */
     public final List<String> excludeMods = new ArrayList<>();
     public final List<String> excludeItems = new ArrayList<>();
@@ -165,7 +169,6 @@ public final class GachaConfig {
         excludeMods.clear();
         excludeMods.add("cataclysm"); // L_Ender's Cataclysm: 보스 무기·장신구
         excludeMods.add("tacz"); // 총은 데이터(NBT)로 종류가 갈려서 따로 다루어야 함
-        excludeMods.add("simplehats"); // 꾸미기 모자(성능 없음): 장신구 뽑기를 모자로 채우지 않게
         excludeItems.clear();
         for (String s : new String[]{"irons_spellbooks:dev_staff", "irons_spellbooks:necronomicon_spell_book",
                 "irons_spellbooks:dragonskin_spell_book", "irons_spellbooks:legendary_spell_book", "minecraft:debug_stick"}) {
@@ -185,15 +188,25 @@ public final class GachaConfig {
                 || rl.getNamespace().equals(RtShop.MODID);
     }
 
-    /** 점수 순으로 줄 세워 AUTO_SPLIT 비율대로 등급을 매긴다. */
     private static void grade(List<Object[]> scored, List<Entry> out) {
+        grade(scored, out, AUTO_SPLIT);
+    }
+
+    /** 점수 순으로 줄 세워 split 비율대로 등급을 매긴다 (비율 0 인 등급은 건너뜀). */
+    private static void grade(List<Object[]> scored, List<Entry> out, double[] split) {
         scored.sort(Comparator.comparingDouble((Object[] a) -> (double) a[1]).thenComparing(a -> ((Entry) a[0]).key()));
         int n = scored.size();
         int idx = 0;
         double acc = 0;
+        int lastG = 0;
         for (int g = 0; g < GRADES.length; g++) {
-            acc += AUTO_SPLIT[g];
-            int until = g == GRADES.length - 1 ? n : (int) Math.round(acc * n);
+            if (split[g] > 0) {
+                lastG = g;
+            }
+        }
+        for (int g = 0; g <= lastG; g++) {
+            acc += split[g];
+            int until = g == lastG ? n : (int) Math.round(acc * n);
             for (; idx < until && idx < n; idx++) {
                 Entry e = (Entry) scored.get(idx)[0];
                 e.grade = GRADES[g];
@@ -206,9 +219,49 @@ public final class GachaConfig {
         return r == null ? 0 : r.ordinal();
     }
 
-    /** 무기: 공격력(근접) 또는 내구도(활·석궁 등)와 아이템 희귀도로 점수를 매긴다. 보스 무기는 빼는 목록으로 거른다. */
+    /** 영웅·전설 무기를 내는 모드 (EpicFight Nightfall 등). 이 모드의 무기는 영웅·전설에만, 다른 모드의 무기는 일반~희귀에만 둔다. */
+    public final List<String> topWeaponMods = new ArrayList<>(List.of("efn", "shadowwarrior", "shadow_warrior"));
+    /** 등급을 정해 둔 무기 (아이템 ID → 등급). */
+    static final Map<String, String> FIXED_WEAPONS = new LinkedHashMap<>();
+
+    static {
+        for (String id : new String[]{"efn:hf_murasama", "efn:hf_blade", "efn:nf_dual_sword", "efn:yamato_dmc_in_sheath",
+                "efn:yamato_dmc4_in_sheath", "efn:meen_spear"}) {
+            FIXED_WEAPONS.put(id, "legendary");
+        }
+        for (String id : new String[]{"efn:nf_shortsword", "efn:nf_shortsword_2", "efn:crescent_moon", "efn:nf_claw",
+                "efn:sword_of_pioneer", "efn:kusabimaru", "efn:ruinsgreatsword", "efn:thornwheel", "efn:exsiliumgladius",
+                "efn:fire_exsiliumgladius", "efn:air_tachi", "efn:co_tachi", "efn:broadblade", "efn:crimson_moon"}) {
+            FIXED_WEAPONS.put(id, "epic");
+        }
+    }
+
+    /** LesRaisins 근접 무기(lrtactical:melee, 종류는 NBT): 이름에 이 말이 들어 있으면 그 등급. */
+    static final String[][] LR_MELEE = {{"karambit", "epic"}, {"baseball", "rare"}, {"bat", "rare"}, {"dagger", "rare"}};
+
+    private static double weaponScore(ItemStack s) {
+        double dmg = 0;
+        for (var m : s.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
+            dmg += m.getAmount();
+        }
+        double score = dmg > 0 ? dmg + 1 : Math.max(1, s.getMaxDamage() / 60.0);
+        return score + rarityRank(s.getRarity()) * 1.5;
+    }
+
+    /** 이름이 번역되지 않았거나 비어 있는 아이템 = 모드 안에서만 쓰는 형태(칼집에서 뽑은 상태 등). */
+    private static boolean internalForm(ItemStack s) {
+        String n = s.getHoverName().getString().trim();
+        return n.isEmpty() || n.equals(s.getDescriptionId()) || n.startsWith("item.");
+    }
+
+    /**
+     * 무기: 일반~희귀는 공격력(근접)·내구도(활 등)·희귀도 순서로, 영웅·전설은 topWeaponMods 의 무기로만.
+     * 정해 둔 무기(FIXED_WEAPONS)와 LesRaisins 근접 무기(LR_MELEE)는 그 등급 그대로.
+     */
     public List<Entry> autoWeapons() {
-        List<Object[]> scored = new ArrayList<>();
+        List<Object[]> low = new ArrayList<>();
+        List<Object[]> top = new ArrayList<>();
+        List<Entry> out = new ArrayList<>();
         JobConfig jc = JobConfig.get();
         for (Item item : ForgeRegistries.ITEMS) {
             ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
@@ -216,46 +269,156 @@ public final class GachaConfig {
                 continue;
             }
             try {
+                String id = rl.toString();
+                ItemStack s = new ItemStack(item);
+                String fixed = FIXED_WEAPONS.get(id);
+                if (fixed != null) {
+                    out.add(itemEntry(id, fixed, fixed.equals("legendary") ? 8 : 10));
+                    continue;
+                }
                 String type = WeaponTypes.classify(item, jc.weaponTypes, jc.weaponOverrides);
                 if (type.equals(WeaponTypes.NONE) || type.equals("tool") || type.equals("gun")) {
                     continue;
                 }
-                ItemStack s = new ItemStack(item);
+                if (internalForm(s)) {
+                    continue;
+                }
+                if (topWeaponMods.contains(rl.getNamespace())) {
+                    top.add(new Object[]{itemEntry(id, "epic", 10), weaponScore(s)});
+                    continue;
+                }
                 if (s.getRarity() == Rarity.EPIC) {
                     continue; // 보스·특수 보상 무기 (대부분 EPIC)
                 }
-                double dmg = 0;
-                for (var m : s.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) {
-                    dmg += m.getAmount();
-                }
-                double score = dmg > 0 ? dmg + 1 : Math.max(1, s.getMaxDamage() / 60.0);
-                score += rarityRank(s.getRarity()) * 1.5;
-                Entry e = new Entry();
-                e.item = rl.toString();
-                scored.add(new Object[]{e, score});
+                low.add(new Object[]{itemEntry(id, "common", 10), weaponScore(s)});
             } catch (Throwable ignored) {
                 // 이상한 아이템은 건너뛴다
             }
         }
-        List<Entry> out = new ArrayList<>();
-        grade(scored, out);
+        // LesRaisins 근접 무기: 하나의 아이템에 NBT 로 종류가 갈린다 → 창작 탭에 나오는 종류마다 한 칸
+        for (ItemStack s : variants("lrtactical:melee")) {
+            try {
+                String n = (s.getHoverName().getString() + " " + s.getTag()).toLowerCase(Locale.ROOT);
+                String g = null;
+                for (String[] r : LR_MELEE) {
+                    if (n.contains(r[0])) {
+                        g = r[1];
+                        break;
+                    }
+                }
+                Entry e = itemEntry("lrtactical:melee", g == null ? "common" : g, 10);
+                e.nbt = s.getTag() == null ? "" : s.getTag().toString();
+                if (g != null) {
+                    out.add(e);
+                } else {
+                    low.add(new Object[]{e, weaponScore(s)});
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        grade(low, out, new double[]{0.45, 0.35, 0.20, 0, 0});
+        grade(top, out, new double[]{0, 0, 0, 0.75, 0.25});
         return out;
     }
 
-    /** 장신구: Curios(또는 Accessories) 칸에 끼우는 아이템. 주문서 칸(Iron's Spells)은 뺀다. */
+    public static List<ItemStack> variantsForDiag(String itemId) {
+        return variants(itemId);
+    }
+
+    /** 창작 탭에 나오는 그 아이템의 모든 형태 (NBT 로 종류가 갈리는 아이템용). 못 구하면 빈 목록. */
+    static List<ItemStack> variants(String itemId) {
+        List<ItemStack> out = new ArrayList<>();
+        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(itemId));
+        if (item == null || item == Items.AIR) {
+            return out;
+        }
+        try {
+            var server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+            if (server == null) {
+                return out;
+            }
+            net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(server.getWorldData().enabledFeatures(), true, server.registryAccess());
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            for (net.minecraft.world.item.CreativeModeTab tab : net.minecraft.world.item.CreativeModeTabs.allTabs()) {
+                for (ItemStack s : tab.getDisplayItems()) {
+                    if (s.is(item) && s.hasTag() && seen.add(s.getTag().toString())) {
+                        out.add(s.copyWithCount(1));
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            RtShop.LOGGER.warn("[rtshop] {} 의 종류를 창작 탭에서 읽지 못했습니다: {}", itemId, t.toString());
+        }
+        return out;
+    }
+
+    /** 아이템 ID 로 정해지는 0~1 사이 값 (자동 분류를 다시 해도 같은 결과가 나오도록). */
+    private static double hash01(String id) {
+        long h = 1125899906842597L;
+        for (int i = 0; i < id.length(); i++) {
+            h = 31 * h + id.charAt(i);
+        }
+        h ^= (h >>> 33);
+        h *= 0xff51afd7ed558ccdL;
+        h ^= (h >>> 33);
+        return (h >>> 11) * 0x1.0p-53;
+    }
+
+    private static Entry itemEntry(String id, String grade, int weight) {
+        Entry e = new Entry();
+        e.item = id;
+        e.grade = grade;
+        e.weight = weight;
+        return e;
+    }
+
+    /** Artifacts 모드: 전투·생존에 크게 도움이 되는 것은 전설, 나머지는 영웅. */
+    static final java.util.Set<String> ARTIFACTS_LEGENDARY = java.util.Set.of(
+            "crystal_heart", "power_glove", "vampiric_glove", "fire_gauntlet", "chorus_totem", "cloud_in_a_bottle",
+            "feral_claws", "running_shoes", "cross_necklace", "scarf_of_invisibility");
+    /** Artifacts 모드 중 장난감·꾸미기에 가까운 것 (영웅 등급 안에서 더 자주). */
+    static final java.util.Set<String> ARTIFACTS_LIGHT = java.util.Set.of(
+            "villager_hat", "novelty_drinking_hat", "plastic_drinking_hat", "whoopee_cushion", "cowboy_hat", "anglers_hat",
+            "superstitious_hat", "umbrella", "kitty_slippers", "bunny_hoppers", "snorkel", "flippers", "lucky_scarf", "onion_ring");
+
+    /**
+     * 장신구: Curios(또는 Accessories) 칸에 끼우는 아이템. 주문서 칸(Iron's Spells)은 뺀다.
+     *  - Simple Hats 꾸미기 모자: 모자의 기본 등급(일반·고급·희귀·영웅)을 바탕으로 일반·고급·희귀에 섞어 넣는다.
+     *  - Artifacts: 영웅·전설.
+     *  - 그 밖의 장신구: 일반~희귀 (영웅·전설은 Artifacts 만).
+     */
     public List<Entry> autoAccessories() {
         List<Object[]> scored = new ArrayList<>();
+        List<Entry> out = new ArrayList<>();
         for (Item item : ForgeRegistries.ITEMS) {
             ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
             if (item == Items.AIR || excluded(rl)) {
                 continue;
             }
             try {
+                String ns = rl.getNamespace();
+                ItemStack s = new ItemStack(item);
+                if (ns.equals("simplehats")) {
+                    String p = rl.getPath();
+                    if (!item.getClass().getSimpleName().startsWith("HatItem") || p.equals("special")) {
+                        continue; // 모자만 (모자 주머니·조각·거치대는 빼고)
+                    }
+                    double r = hash01(rl.toString());
+                    int base = rarityRank(s.getRarity()); // 0 일반 1 고급 2 희귀 3 영웅
+                    String g = switch (base) {
+                        case 0 -> r < 0.75 ? "common" : "uncommon";
+                        case 1 -> r < 0.2 ? "common" : r < 0.8 ? "uncommon" : "rare";
+                        case 2 -> r < 0.25 ? "uncommon" : "rare";
+                        default -> "rare";
+                    };
+                    out.add(itemEntry(rl.toString(), g, 5));
+                    continue;
+                }
                 boolean slot = false;
                 boolean spellbook = false;
                 for (TagKey<Item> tag : item.builtInRegistryHolder().tags().toList()) {
-                    String ns = tag.location().getNamespace();
-                    if (ns.equals("curios") || ns.equals("accessories") || ns.equals("trinkets")) {
+                    String tns = tag.location().getNamespace();
+                    if (tns.equals("curios") || tns.equals("accessories") || tns.equals("trinkets")) {
                         if (tag.location().getPath().contains("spellbook")) {
                             spellbook = true;
                         } else if (!tag.location().getPath().equals("curio")) {
@@ -266,31 +429,61 @@ public final class GachaConfig {
                 if (!slot || spellbook) {
                     continue;
                 }
-                ItemStack s = new ItemStack(item);
-                if (s.getRarity() == Rarity.EPIC && excludeMods.contains("cataclysm") && rl.getNamespace().equals("cataclysm")) {
+                if (ns.equals("artifacts")) {
+                    String p = rl.getPath();
+                    if (ARTIFACTS_LEGENDARY.contains(p)) {
+                        out.add(itemEntry(rl.toString(), "legendary", 10));
+                    } else {
+                        out.add(itemEntry(rl.toString(), "epic", ARTIFACTS_LIGHT.contains(p) ? 14 : 10));
+                    }
+                    continue;
+                }
+                if (s.getRarity() == Rarity.EPIC && ns.equals("cataclysm")) {
                     continue;
                 }
                 double score = rarityRank(s.getRarity()) * 10 + Math.min(9, s.getMaxDamage() / 100.0);
-                Entry e = new Entry();
-                e.item = rl.toString();
-                scored.add(new Object[]{e, score});
+                scored.add(new Object[]{itemEntry(rl.toString(), "common", 10), score});
             } catch (Throwable ignored) {
             }
         }
-        List<Entry> out = new ArrayList<>();
-        grade(scored, out);
+        grade(scored, out, new double[]{0.40, 0.35, 0.25, 0, 0});
         return out;
     }
 
-    /** 펫: 길들일 수 있는 동물(TamableAnimal). 최대 체력으로 점수를 매긴다. */
-    public List<Entry> autoPets(MinecraftServer server) {
-        List<Object[]> scored = new ArrayList<>();
-        if (server == null) {
-            return new ArrayList<>();
+    /** Fantasy Mounts: 하늘을 나는 탈것과 불사조(부활)·하늘 고래(6인승)는 전설, 나머지는 영웅. */
+    static final java.util.Set<String> MOUNTS_LEGENDARY = java.util.Set.of(
+            "phoenix", "frost_drake", "griffin", "pegasus", "sky_whale", "emerald_dragonfly");
+
+    private static boolean isMount(Entity e) {
+        for (Class<?> c = e.getClass(); c != null; c = c.getSuperclass()) {
+            if (c.getSimpleName().equals("FantasyBeast")) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    /**
+     * 펫: 길들일 수 있는 동물(TamableAnimal)과 Fantasy Mounts 의 탈것. 펫은 희귀 등급 이상에만 둔다.
+     *  - 햄스터(Adorable Hamster Pets) · 작은 용(RPG Companions: Tiny Dragons): 영웅
+     *  - Fantasy Mounts: 성능에 따라 영웅·전설 (MOUNTS_LEGENDARY)
+     *  - 그 밖의 펫: 희귀
+     *  - 일반·고급 등급은 펫 대신 조각 (PET_SHARDS)
+     */
+    public List<Entry> autoPets(MinecraftServer server) {
+        List<Entry> out = new ArrayList<>();
+        if (server == null) {
+            return out;
+        }
+        Entry c1 = itemEntry(RtShop.MODID + ":gacha_shard", "common", 10);
+        c1.count = PET_SHARDS[0];
+        Entry c2 = itemEntry(RtShop.MODID + ":gacha_shard", "uncommon", 10);
+        c2.count = PET_SHARDS[1];
+        out.add(c1);
+        out.add(c2);
         for (EntityType<?> type : ForgeRegistries.ENTITY_TYPES) {
             ResourceLocation rl = ForgeRegistries.ENTITY_TYPES.getKey(type);
-            if (excluded(rl) || type.getCategory() == MobCategory.MONSTER || type.getCategory() == MobCategory.MISC) {
+            if (excluded(rl) || type.getCategory() == MobCategory.MISC) {
                 continue;
             }
             try {
@@ -299,24 +492,36 @@ public final class GachaConfig {
                     continue;
                 }
                 boolean tame = e instanceof TamableAnimal;
+                boolean mount = isMount(e);
                 e.discard();
-                if (!tame) {
+                if (!tame && !mount) {
                     continue;
                 }
-                double hp = 10;
+                if (!mount && type.getCategory() == MobCategory.MONSTER) {
+                    continue;
+                }
                 @SuppressWarnings("unchecked")
                 EntityType<? extends LivingEntity> lt = (EntityType<? extends LivingEntity>) type;
-                if (DefaultAttributes.hasSupplier(lt)) {
-                    hp = DefaultAttributes.getSupplier(lt).getBaseValue(Attributes.MAX_HEALTH);
+                if (DefaultAttributes.hasSupplier(lt) && DefaultAttributes.getSupplier(lt).getBaseValue(Attributes.MAX_HEALTH) > 1000) {
+                    continue; // 소환수·연출용 (체력 수억) 은 펫이 아니다
+                }
+                String ns = rl.getNamespace();
+                String grade;
+                if (mount) {
+                    grade = MOUNTS_LEGENDARY.contains(rl.getPath()) ? "legendary" : "epic";
+                } else if (ns.equals("adorablehamsterpets") || ns.equals("rpg_companions_tiny_dragons") || rl.getPath().contains("hamster")) {
+                    grade = "epic";
+                } else {
+                    grade = "rare";
                 }
                 Entry en = new Entry();
                 en.entity = rl.toString();
-                scored.add(new Object[]{en, hp + (rl.getNamespace().equals("minecraft") ? 0 : 5)});
+                en.grade = grade;
+                en.weight = 10;
+                out.add(en);
             } catch (Throwable ignored) {
             }
         }
-        List<Entry> out = new ArrayList<>();
-        grade(scored, out);
         return out;
     }
 
@@ -337,10 +542,12 @@ public final class GachaConfig {
         help.add("등급: common(일반) uncommon(고급) rare(희귀) epic(영웅) legendary(전설).");
         help.add("tiers: 뽑기 단계별 등급 확률(비율). 아이템이 하나도 없는 등급은 빼고 나머지 비율로 뽑습니다.");
         help.add("pools: 뽑기 종류별 목록 {item, count, nbt} 또는 {entity} + grade, weight(같은 등급 안에서의 비율).");
-        help.add("tenGuarantee: 10회 뽑기에서 하나는 반드시 이 등급 이상. dismantle/exchange: 등급별 분해 조각 수 / 교환에 드는 조각 수.");
+        help.add("tenGuarantee: 10회 뽑기에서 하나는 반드시 이 등급 이상. shards.dismantle: 등급별 분해 조각 수, shards.tickets: 티켓 한 장과 바꾸는 데 드는 조각 수.");
+        help.add("item 에 rtshop:gacha_shard 를 넣은 칸은 뽑기 표시 없는 조각 보상입니다 (펫 뽑기의 일반·고급 등급).");
+        help.add("topWeaponMods: 영웅·전설 무기를 내는 모드 (자동 분류에서 이 모드의 무기만 영웅·전설, 다른 무기는 희귀까지).");
         help.add("excludeMods/excludeItems: 자동 분류에서 뺄 모드·아이템 (보스 무기 등). 뽑기 티켓 가격은 config/rtshop/shops/gacha_shop.json.");
         o.add("_help", help);
-        o.addProperty("configVersion", 1);
+        o.addProperty("configVersion", CONFIG_VERSION);
         o.addProperty("npcName", npcName);
         o.addProperty("shop", shop);
         o.addProperty("tenGuarantee", tenGuarantee);
@@ -355,13 +562,19 @@ public final class GachaConfig {
         o.add("tiers", t);
         JsonObject sh = new JsonObject();
         JsonObject dm = new JsonObject();
-        JsonObject ex = new JsonObject();
         for (int i = 0; i < GRADES.length; i++) {
             dm.addProperty(GRADES[i], dismantle[i]);
-            ex.addProperty(GRADES[i], exchange[i]);
         }
         sh.add("dismantle", dm);
-        sh.add("exchange", ex);
+        JsonObject tk = new JsonObject();
+        for (int c = 0; c < CATEGORIES.length; c++) {
+            JsonObject t = new JsonObject();
+            for (int i = 0; i < TIERS.length; i++) {
+                t.addProperty(TIERS[i], ticketCost[c][i]);
+            }
+            tk.add(CATEGORIES[c], t);
+        }
+        sh.add("tickets", tk);
         sh.addProperty("exchangeEnabled", exchangeEnabled);
         o.add("shards", sh);
         JsonArray em = new JsonArray();
@@ -370,6 +583,9 @@ public final class GachaConfig {
         JsonArray ei = new JsonArray();
         excludeItems.forEach(ei::add);
         o.add("excludeItems", ei);
+        JsonArray tm = new JsonArray();
+        topWeaponMods.forEach(tm::add);
+        o.add("topWeaponMods", tm);
         JsonObject p = new JsonObject();
         for (String c : CATEGORIES) {
             JsonArray a = new JsonArray();
@@ -385,6 +601,7 @@ public final class GachaConfig {
     public static GachaConfig fromJson(JsonObject o) {
         GachaConfig c = new GachaConfig();
         c.defaults();
+        c.version = o.has("configVersion") ? o.get("configVersion").getAsInt() : 1;
         if (o.has("npcName")) c.npcName = o.get("npcName").getAsString();
         if (o.has("shop")) c.shop = o.get("shop").getAsString().trim();
         if (o.has("tenGuarantee")) c.tenGuarantee = o.get("tenGuarantee").getAsString().trim();
@@ -422,8 +639,18 @@ public final class GachaConfig {
                 if (sh.has("dismantle") && sh.getAsJsonObject("dismantle").has(GRADES[i])) {
                     c.dismantle[i] = Math.max(0, sh.getAsJsonObject("dismantle").get(GRADES[i]).getAsInt());
                 }
-                if (sh.has("exchange") && sh.getAsJsonObject("exchange").has(GRADES[i])) {
-                    c.exchange[i] = Math.max(1, sh.getAsJsonObject("exchange").get(GRADES[i]).getAsInt());
+            }
+            if (sh.has("tickets")) {
+                JsonObject tk = sh.getAsJsonObject("tickets");
+                for (int ci = 0; ci < CATEGORIES.length; ci++) {
+                    if (tk.has(CATEGORIES[ci])) {
+                        JsonObject t = tk.getAsJsonObject(CATEGORIES[ci]);
+                        for (int i = 0; i < TIERS.length; i++) {
+                            if (t.has(TIERS[i])) {
+                                c.ticketCost[ci][i] = Math.max(1, t.get(TIERS[i]).getAsInt());
+                            }
+                        }
+                    }
                 }
             }
             if (sh.has("exchangeEnabled")) c.exchangeEnabled = sh.get("exchangeEnabled").getAsBoolean();
@@ -432,6 +659,12 @@ public final class GachaConfig {
             c.excludeMods.clear();
             for (JsonElement e : o.getAsJsonArray("excludeMods")) {
                 c.excludeMods.add(e.getAsString().trim());
+            }
+        }
+        if (o.has("topWeaponMods")) {
+            c.topWeaponMods.clear();
+            for (JsonElement e : o.getAsJsonArray("topWeaponMods")) {
+                c.topWeaponMods.add(e.getAsString().trim());
             }
         }
         if (o.has("excludeItems")) {
@@ -461,12 +694,18 @@ public final class GachaConfig {
     }
 
     public String loadError;
+    /** 읽어 들인 파일의 설정 버전 (예전 버전이면 서버가 켜질 때 목록을 새 규칙으로 다시 만든다). */
+    public int version = CONFIG_VERSION;
 
     private static GachaConfig load(MinecraftServer server) {
         Path p = path();
+        GachaConfig old = null;
         try {
             if (Files.exists(p)) {
-                return fromJson(JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject());
+                old = fromJson(JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject());
+                if (old.version >= CONFIG_VERSION || server == null) {
+                    return old;
+                }
             }
         } catch (Exception e) {
             RtShop.LOGGER.error("[rtshop] gacha.json 을 읽지 못해 뽑기를 잠시 쉽니다 (파일은 그대로 둡니다): {}", e.getMessage());
@@ -480,12 +719,36 @@ public final class GachaConfig {
         if (server == null) {
             return c; // 서버가 켜지기 전: 목록은 서버가 켜질 때 만든다
         }
+        if (old != null) {
+            // 예전 버전: 이름·확률·10회 보장·분해 조각·제외 목록은 그대로 두고, 목록만 새 규칙으로 다시 만든다
+            c.npcName = old.npcName;
+            c.shop = old.shop;
+            c.tenGuarantee = old.tenGuarantee;
+            c.tiers.clear();
+            c.tiers.putAll(old.tiers);
+            System.arraycopy(old.dismantle, 0, c.dismantle, 0, c.dismantle.length);
+            c.exchangeEnabled = old.exchangeEnabled;
+            c.excludeItems.clear();
+            c.excludeItems.addAll(old.excludeItems);
+            for (String m : old.excludeMods) {
+                if (!m.equals("simplehats") && !c.excludeMods.contains(m)) {
+                    c.excludeMods.add(m);
+                }
+            }
+            try {
+                Path backup = p.getParent().resolve("backup");
+                Files.createDirectories(backup);
+                Files.copy(p, backup.resolve("gacha_v" + old.version + "_" + System.currentTimeMillis() + ".json"));
+            } catch (Exception e) {
+                RtShop.LOGGER.warn("[rtshop] 예전 gacha.json 을 백업하지 못했습니다: {}", e.getMessage());
+            }
+        }
         for (String cat : CATEGORIES) {
             c.pool(cat).addAll(c.auto(cat, server));
         }
         try {
             c.save();
-            RtShop.LOGGER.info("[rtshop] 뽑기 목록을 자동으로 만들었습니다: 무기 {} · 펫 {} · 장신구 {}",
+            RtShop.LOGGER.info("[rtshop] 뽑기 목록을 {}: 무기 {} · 펫 {} · 장신구 {}", old == null ? "자동으로 만들었습니다" : "새 규칙으로 다시 만들었습니다",
                     c.pool("weapon").size(), c.pool("pet").size(), c.pool("accessory").size());
         } catch (Exception e) {
             RtShop.LOGGER.error("[rtshop] gacha.json 을 만들지 못했습니다", e);
