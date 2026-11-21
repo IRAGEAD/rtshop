@@ -245,6 +245,7 @@ public final class CastlePlots {
             land.castleNo = t.no;
             land.castleGroup = t.group;
             land.castleGround = t.ground;
+            land.defaultPerms = LandData.USE; // 팔리기 전에는 누구나 문·버튼은 쓸 수 있다 (부수기·놓기·보관함은 안 됨)
             data.addClaim(land, c);
             made++;
         }

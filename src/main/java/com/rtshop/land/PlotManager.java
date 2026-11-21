@@ -925,7 +925,7 @@ public final class PlotManager {
         land.owner = LandData.NO_OWNER;
         land.ownerName = "";
         land.paid = 0;
-        land.defaultPerms = 0;
+        land.defaultPerms = land.castle() ? LandData.USE : 0;
         land.members.clear();
         data.touch();
     }
