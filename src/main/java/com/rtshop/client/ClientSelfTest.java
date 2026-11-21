@@ -334,6 +334,22 @@ public final class ClientSelfTest {
         return s;
     }
 
+    private static String whereSword(ServerPlayer sp) {
+        StringBuilder w = new StringBuilder();
+        w.append("carried=").append(sp.containerMenu.getCarried()).append(" menu=").append(sp.containerMenu.getClass().getSimpleName());
+        for (int i = 0; i < sp.containerMenu.slots.size(); i++) {
+            if (sp.containerMenu.slots.get(i).getItem().is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" slot").append(i);
+        }
+        for (int i = 0; i < sp.getInventory().getContainerSize(); i++) {
+            if (sp.getInventory().getItem(i).is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" inv").append(i);
+        }
+        for (net.minecraft.world.entity.item.ItemEntity ie : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                sp.getBoundingBox().inflate(16))) {
+            if (ie.getItem().is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" dropped");
+        }
+        return w.toString();
+    }
+
     /** 다른 모드가 띄운 대화창(Fantasy 의 안내 대화 등)을 닫는다. Cinematic 장면 화면은 그대로 둔다. */
     private static void closeForeign(Minecraft mc) {
         if (mc.screen != null) {
@@ -447,6 +463,7 @@ public final class ClientSelfTest {
             }
             case 6 -> {
                 swordWhere = "?";
+                onServer(mc, sp -> swordWhere = whereSword(sp));
                 onServer(mc, sp -> {
                     StringBuilder w = new StringBuilder();
                     w.append("carried=").append(sp.containerMenu.getCarried()).append(" menu=").append(sp.containerMenu.getClass().getSimpleName());
@@ -481,6 +498,8 @@ public final class ClientSelfTest {
                 wait = 60;
             }
             case 7 -> {
+                String before = swordWhere;
+                onServer(mc, sp -> swordWhere = before + " | later: " + whereSword(sp));
                 ItemStack held = ItemStack.EMPTY;
                 for (net.minecraft.world.inventory.Slot sl : mc.player.containerMenu.slots) {
                     if (sl.getItem().is(net.minecraft.world.item.Items.DIAMOND_SWORD)) held = sl.getItem();
@@ -491,11 +510,16 @@ public final class ClientSelfTest {
                 List<net.minecraft.network.chat.Component> tip = held.isEmpty() ? List.of()
                         : net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, held);
                 check("an enhanced item shows +N in front of its name", !tip.isEmpty() && tip.get(0).getString().startsWith("+4 "),
-                        tip.isEmpty() ? "no sword; server: " + swordWhere : tip.get(0).getString());
+                        tip.isEmpty() ? "no sword; server: " + swordWhere + " | client inv: " + mc.player.getInventory().items.stream()
+                                .filter(x -> !x.isEmpty()).map(x -> x.getItem().toString()).toList() : tip.get(0).getString());
+                if (tip.isEmpty()) {
+                    RtShop.LOGGER.info("[rtshop-clienttest] sword report after a moment will follow");
+                }
                 mc.player.closeContainer();
                 wait = 40;
             }
             default -> {
+                RtShop.LOGGER.info("[rtshop-clienttest] enhanced sword (late): {}", swordWhere);
                 mc.setScreen(null);
                 BlockPos at = anvilPos;
                 onServer(mc, sp -> {
