@@ -474,15 +474,30 @@ public final class PlotManager {
         apply(p, selection(p), pos, false);
     }
 
+    /** 좌클릭은 서버에서만 가로챈다 (클라이언트에서 막으면 서버로 클릭이 전달되지 않음). 블록은 canAttackBlock 이 지킨다. */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        ItemStack held = event.getItemStack();
-        if (!held.is(ModItems.PLOT_WAND.get())) {
+        if (!event.getItemStack().is(ModItems.PLOT_WAND.get()) || !(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
         event.setCanceled(true);
+        onLeftClick(sp, event.getPos());
+    }
+
+    /**
+     * 우클릭은 블록 자체의 동작(다 자란 작물 우클릭 수확, 문 열기 등)보다 먼저 가로챈다.
+     * 그래야 밭을 고르다가 작물을 수확해 버리지 않는다. OP 가 아니면 아무것도 막지 않는다.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (!event.getItemStack().is(ModItems.PLOT_WAND.get()) || event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND
+                || !event.getEntity().hasPermissions(2)) {
+            return;
+        }
+        event.setCanceled(true);
+        event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
         if (event.getEntity() instanceof ServerPlayer sp) {
-            onLeftClick(sp, event.getPos());
+            onRightClick(sp, event.getPos());
         }
     }
 
