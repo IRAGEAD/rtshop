@@ -74,7 +74,8 @@ public final class ClientSelfTest {
     private static long expected = 0;
     private static volatile BlockPos cropPos = null;
     private static volatile String harvest = null;
-    private static final int LAST = 55;
+    private static final int LAST = 58;
+    private static volatile int jobNpc = -1;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -696,9 +697,52 @@ public final class ClientSelfTest {
                 check("picking a monster fills the kill goal", t != null && t.startsWith("minecraft:skeleton"), t);
                 shot(mc, "30_qedit_after_pick");
                 mc.setScreen(null);
-                wait = 10;
+                onServer(mc, sp -> {
+                    com.rtshop.job.JobData.get(sp.server).clear(sp.getUUID());
+                    net.minecraft.world.entity.npc.Villager v = com.rtshop.job.Jobs.spawnNpc(sp.serverLevel(),
+                            sp.position().add(sp.getLookAngle().scale(2)), 0);
+                    jobNpc = v == null ? -1 : v.getId();
+                    com.rtshop.job.Jobs.open(sp, jobNpc);
+                });
+                wait = 20;
+            }
+            case 55 -> {
+                check("the job screen opens at the job guide", mc.screen instanceof JobScreen, mc.screen);
+                shot(mc, "31_jobs");
+                if (mc.screen instanceof JobScreen s) {
+                    s.selectForTest("combat", "warrior");
+                }
+                wait = 3;
+            }
+            case 56 -> {
+                shot(mc, "32_jobs_warrior");
+                if (mc.screen instanceof JobScreen s) {
+                    s.pressForTest();
+                }
+                wait = 20;
+            }
+            case 57 -> {
+                check("choosing a job from the screen works and the screen updates",
+                        mc.screen instanceof JobScreen s && "warrior".equals(s.currentForTest("combat")), mc.screen);
+                check("the warrior health bonus reaches the client", mc.player != null && Math.abs(mc.player.getMaxHealth() - 22.0F) < 1e-3,
+                        mc.player == null ? null : mc.player.getMaxHealth());
+                if (mc.screen instanceof JobScreen s) {
+                    s.selectForTest("life", "farmer");
+                }
+                wait = 3;
             }
             case LAST -> {
+                shot(mc, "33_jobs_life");
+                mc.setScreen(null);
+                onServer(mc, sp -> {
+                    com.rtshop.job.Jobs.force(sp, "combat", "");
+                    net.minecraft.world.entity.Entity e = sp.serverLevel().getEntity(jobNpc);
+                    if (e != null) {
+                        e.discard();
+                    }
+                });
+            }
+            case LAST + 1 -> {
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);
             }

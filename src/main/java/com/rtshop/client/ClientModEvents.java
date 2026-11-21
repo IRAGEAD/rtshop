@@ -22,6 +22,7 @@ public final class ClientModEvents {
     public static final KeyMapping HUD_KEY = new KeyMapping("key.rtshop.hud", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
     public static final KeyMapping LAND_KEY = new KeyMapping("key.rtshop.land", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
 
+    public static final KeyMapping JOB_KEY = new KeyMapping("key.rtshop.job", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
     public static final KeyMapping QUEST_KEY = new KeyMapping("key.rtshop.quest", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
 
     @SubscribeEvent
@@ -43,5 +44,6 @@ public final class ClientModEvents {
         event.register(HUD_KEY);
         event.register(LAND_KEY);
         event.register(QUEST_KEY);
+        event.register(JOB_KEY);
     }
 }

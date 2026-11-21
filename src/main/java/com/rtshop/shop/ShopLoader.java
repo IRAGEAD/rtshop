@@ -95,6 +95,8 @@ public final class ShopLoader {
         public boolean purchaseBasis;
         /** 재료를 모두 상점에서 사서 만들 때 가장 비싼 조리법의 1개당 필요 매입가 (없으면 -1). */
         public double purchaseNeed = -1;
+        /** 상점 재료를 화로에 바로 넣어 만드는 값 (없으면 -1). 요리사 판매 보너스를 줄지 판단하는 데 쓴다. */
+        public double autoMin = -1;
     }
 
     private static final class Ref {
@@ -969,6 +971,7 @@ public final class ShopLoader {
                     }
                 }
                 p.purchaseNeed = n.value();
+                p.autoMin = n.autoMin();
                 if (n.value() <= 0) {
                     continue;
                 }
@@ -1086,6 +1089,19 @@ public final class ShopLoader {
             }
         }
         return out;
+    }
+
+    /**
+     * 요리사 판매 보너스를 받는 '손으로 조리한 요리'인가: 수고비가 붙는 조리법으로 값이 정해졌고,
+     * 상점 재료를 화로에 바로 넣어 만드는 길이 없는 것 (있으면 화로 자동화 + 보너스로 돈을 찍어 낼 수 있음).
+     */
+    public static boolean handCooked(Loaded loaded, ItemStack stack) {
+        Price p = loaded.prices.get(key(stack));
+        if (p == null || loaded.solved == null || p.autoMin > 0) {
+            return false;
+        }
+        String id = itemId(stack);
+        return loaded.solved.processed.contains(id) || p.dynamicFood;
     }
 
     /** 매입가의 multiplier 배 이상이 되는 가장 작은 정수 판매가. */

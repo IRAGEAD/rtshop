@@ -1,6 +1,7 @@
 package com.rtshop.client;
 
 import com.rtshop.net.LandInfoPacket;
+import com.rtshop.net.JobOpenPacket;
 import com.rtshop.net.QuestEditorPacket;
 import com.rtshop.net.QuestOpenPacket;
 import com.rtshop.shop.ShopData;
@@ -36,6 +37,8 @@ public final class ClientHooks {
             screen.showResult(message, success);
         } else if (mc.screen instanceof QuestEditScreen screen) {
             screen.showResult(message, success);
+        } else if (mc.screen instanceof JobScreen screen) {
+            screen.showResult(message, success);
         } else if (mc.screen instanceof PickerScreen p && p.parent instanceof QuestEditScreen screen) {
             screen.showResult(message, success);
         } else if (mc.player != null) {
@@ -62,6 +65,16 @@ public final class ClientHooks {
             screen.update(packet);
         } else {
             mc.setScreen(new QuestEditScreen(packet));
+        }
+    }
+
+    /** 직업 화면을 열거나, 이미 열려 있으면 내용만 새로 고친다. */
+    public static void openJobs(JobOpenPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof JobScreen screen) {
+            screen.update(packet);
+        } else {
+            mc.setScreen(new JobScreen(packet));
         }
     }
 

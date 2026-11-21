@@ -261,6 +261,11 @@ public final class SelfTest {
             crash("quest editor", t);
         }
         try {
+            jobs(server, level, a);
+        } catch (Throwable t) {
+            crash("jobs", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -561,6 +566,111 @@ public final class SelfTest {
             Files.write(npcs, npcOrig);
             Files.deleteIfExists(custom);
             QuestManager.reload();
+        }
+    }
+
+
+    // ------------------------------------------------------------------ 직업
+
+    private static void jobs(MinecraftServer server, ServerLevel level, FakePlayer a) {
+        section("jobs");
+        com.rtshop.job.JobConfig cfg = com.rtshop.job.JobConfig.get();
+        com.rtshop.job.JobData data = com.rtshop.job.JobData.get(server);
+        data.clear(a.getUUID());
+        com.rtshop.job.Jobs.testClockOffset = 0;
+        QuestManager.reset(a);
+        clear(a);
+        try {
+            check("9 jobs are defined (5 combat, 4 life)", cfg.jobs.size() >= 9
+                    && cfg.jobs.values().stream().filter(d -> d.slot.equals("combat")).count() == 5
+                    && cfg.jobs.values().stream().filter(d -> d.slot.equals("life")).count() == 4);
+            Economy.setWallet(a, 20_000);
+            check("the first combat job is free", com.rtshop.job.Jobs.choose(a, "swordsman").ok()
+                    && com.rtshop.job.Jobs.has(a, "swordsman") && Economy.wallet(a) == 20_000);
+            check("choosing the same job again does nothing", !com.rtshop.job.Jobs.choose(a, "swordsman").ok() && Economy.wallet(a) == 20_000);
+            check("there is no waiting time after the first pick", com.rtshop.job.Jobs.cooldownLeft(a, "combat") == 0);
+            check("changing costs " + cfg.changeCostCombat + " G and applies at once",
+                    com.rtshop.job.Jobs.choose(a, "warrior").ok() && com.rtshop.job.Jobs.has(a, "warrior")
+                            && !com.rtshop.job.Jobs.has(a, "swordsman") && Economy.wallet(a) == 20_000 - cfg.changeCostCombat, Economy.wallet(a));
+            long left = com.rtshop.job.Jobs.cooldownLeft(a, "combat");
+            check("after a change the combat slot is locked for " + cfg.cooldownHoursCombat + " hours",
+                    left > cfg.cooldownMillis("combat") - 60_000 && left <= cfg.cooldownMillis("combat"), left);
+            check("changing again during the wait is refused and costs nothing",
+                    !com.rtshop.job.Jobs.choose(a, "tank").ok() && com.rtshop.job.Jobs.has(a, "warrior")
+                            && Economy.wallet(a) == 20_000 - cfg.changeCostCombat);
+            check("the life slot is separate (first pick free even while combat waits)",
+                    com.rtshop.job.Jobs.choose(a, "farmer").ok() && com.rtshop.job.Jobs.has(a, "farmer") && com.rtshop.job.Jobs.has(a, "warrior"));
+            com.rtshop.job.Jobs.testClockOffset = cfg.cooldownMillis("combat") + 1000;
+            check("after the wait (real time) the combat job can be changed again",
+                    com.rtshop.job.Jobs.choose(a, "tank").ok() && com.rtshop.job.Jobs.has(a, "tank"));
+            Economy.setWallet(a, cfg.changeCostLife - 1);
+            check("changing without enough Gold is refused", !com.rtshop.job.Jobs.choose(a, "miner").ok() && com.rtshop.job.Jobs.has(a, "farmer"));
+            Economy.setWallet(a, cfg.changeCostLife);
+            check("a life job change costs " + cfg.changeCostLife + " G", com.rtshop.job.Jobs.choose(a, "miner").ok() && Economy.wallet(a) == 0);
+
+            // 선행 퀘스트로 잠긴 직업
+            com.rtshop.job.Jobs.resetCooldowns(a);
+            QuestDef unlock = tempQuest("{\"id\":\"t_job_unlock\",\"giver\":\"job\",\"reward\":{\"flags\":[\"unlock_job_cook\"]}}");
+            QuestManager.loaded().quests.put(unlock.id, unlock);
+            Economy.setWallet(a, 100_000);
+            check("a job whose unlock quest exists is locked until the quest is done",
+                    !com.rtshop.job.Jobs.choose(a, "cook").ok() && com.rtshop.job.Jobs.has(a, "miner") && Economy.wallet(a) == 100_000);
+            boolean listedLocked = false;
+            for (var v : com.rtshop.job.Jobs.view(a, true).jobs) {
+                listedLocked |= v.id().equals("cook") && v.state() == com.rtshop.net.JobOpenPacket.LOCKED && !v.lockQuest().isEmpty();
+            }
+            check("the job screen shows it as locked with the quest to do", listedLocked);
+            check("finishing the quest unlocks it", QuestManager.accept(a, "t_job_unlock", "job")
+                    && QuestManager.turnIn(a, "t_job_unlock", "job", -1) && com.rtshop.job.Jobs.choose(a, "cook").ok());
+            QuestManager.reload();
+
+            // 패시브
+            com.rtshop.job.Jobs.force(a, "combat", "tank");
+            check("tank takes 6% less damage", Math.abs(com.rtshop.job.JobPassives.incoming(a) - 0.94) < 1e-6, com.rtshop.job.JobPassives.incoming(a));
+            com.rtshop.job.Jobs.applyAttributes(a);
+            check("tank has knockback resistance", a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE) >= 0.2 - 1e-6);
+            com.rtshop.job.Jobs.force(a, "combat", "warrior");
+            check("warrior has 2 more max health", Math.abs(a.getMaxHealth() - 22.0F) < 1e-3, a.getMaxHealth());
+            check("knockback resistance is removed when no longer a tank",
+                    a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE) < 1e-6);
+            check("warrior deals 8% more with an axe, not with a sword",
+                    Math.abs(com.rtshop.job.JobPassives.outgoing(a, new ItemStack(Items.IRON_AXE), false) - 1.08) < 1e-6
+                            && Math.abs(com.rtshop.job.JobPassives.outgoing(a, new ItemStack(Items.IRON_SWORD), false) - 1.0) < 1e-6);
+            com.rtshop.job.Jobs.force(a, "combat", "archer");
+            check("archer deals 10% more with projectiles", Math.abs(com.rtshop.job.JobPassives.outgoing(a, ItemStack.EMPTY, true) - 1.10) < 1e-6);
+            check("warrior health bonus is gone after leaving the job", Math.abs(a.getMaxHealth() - 20.0F) < 1e-3, a.getMaxHealth());
+            com.rtshop.job.Jobs.force(a, "combat", "swordsman");
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SWORD));
+            double base = a.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+            com.rtshop.job.Jobs.applyAttributes(a);
+            double withSword = a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            com.rtshop.job.Jobs.applyAttributes(a);
+            double bare = a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+            check("swordsman attacks faster only while holding a sword", withSword > bare + 1e-6 && Math.abs(bare - base) < 1e-6,
+                    base + " / " + withSword + " / " + bare);
+
+            ShopData fisher = ShopServer.shops().get("fisher");
+            int codIdx = fisher == null ? -1 : findEntry(fisher, e -> e.stack.is(Items.COD) && e.fish);
+            com.rtshop.job.Jobs.force(a, "life", "fisher");
+            check("fisher sells fish for 10% more", codIdx >= 0
+                    && Math.abs(ShopServer.jobSellMultiplier(a, fisher.entries.get(codIdx)) - 1.10) < 1e-6);
+            com.rtshop.job.Jobs.force(a, "life", "cook");
+            ShopData food = ShopServer.shops().get("food");
+            int steakIdx = food == null ? -1 : findEntry(food, e -> e.stack.is(Items.COOKED_BEEF));
+            check("a cook gets no bonus on furnace food (no hopper money farm)", steakIdx < 0
+                    || Math.abs(ShopServer.jobSellMultiplier(a, food.entries.get(steakIdx)) - 1.0) < 1e-6);
+            check("a fisher bonus does not apply to a cook", codIdx < 0 || Math.abs(ShopServer.jobSellMultiplier(a, fisher.entries.get(codIdx)) - 1.0) < 1e-6);
+
+            com.rtshop.job.JobData copy = com.rtshop.job.JobData.load(data.save(new CompoundTag()));
+            check("jobs survive saving and loading", "swordsman".equals(copy.of(a.getUUID()).combat) && "cook".equals(copy.of(a.getUUID()).life));
+        } finally {
+            com.rtshop.job.Jobs.testClockOffset = 0;
+            data.clear(a.getUUID());
+            com.rtshop.job.Jobs.applyAttributes(a);
+            QuestManager.reset(a);
+            Economy.setWallet(a, 0);
+            clear(a);
         }
     }
 

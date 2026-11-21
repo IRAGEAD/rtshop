@@ -55,6 +55,20 @@ public class FarmLootModifier extends LootModifier {
                 return loot;
             }
             BlockState state = ctx.getParamOrNull(LootContextParams.BLOCK_STATE);
+            if (state != null && com.rtshop.job.JobPassives.isOre(state)
+                    && ctx.getParamOrNull(LootContextParams.THIS_ENTITY) instanceof ServerPlayer miner && !miner.isCreative()) {
+                // 광부: 광석을 캘 때 일정 확률로 추가 드롭 (실크 터치로 광석 블록 그대로 캔 경우는 제외)
+                double chance = com.rtshop.job.Jobs.param(miner, "miner", "extraOre");
+                boolean silk = false;
+                for (ItemStack s : loot) {
+                    silk |= s.getItem() instanceof net.minecraft.world.item.BlockItem bi && bi.getBlock() == state.getBlock();
+                }
+                if (chance > 0 && !silk && !loot.isEmpty() && ctx.getRandom().nextDouble() < chance) {
+                    ItemStack extra = loot.get(0).copy();
+                    extra.setCount(1);
+                    loot.add(extra);
+                }
+            }
             if (state == null || !FarmEvents.isSeedCrop(state)) {
                 return loot;
             }
@@ -76,10 +90,26 @@ public class FarmLootModifier extends LootModifier {
             }
             Entity breaker = ctx.getParamOrNull(LootContextParams.THIS_ENTITY);
             if (cfg.starsEnabled && licensed && breaker instanceof ServerPlayer sp && !sp.isCreative() && SeedRules.isMatureCrop(state)) {
+                double starUp = com.rtshop.job.Jobs.param(sp, "farmer", "starUp");
+                ItemStack first = null;
                 for (ItemStack s : loot) {
                     if (!s.isEmpty() && !SeedRules.isPureSeed(s) && SeedRules.star(s) == 0) {
-                        SeedRules.setStar(s, SeedRules.rollStar(ctx.getRandom()));
+                        int star = SeedRules.rollStar(ctx.getRandom());
+                        // 농부: 일정 확률로 별 등급 한 단계 위
+                        if (star < 3 && starUp > 0 && ctx.getRandom().nextDouble() < starUp) {
+                            star++;
+                        }
+                        SeedRules.setStar(s, star);
+                        if (first == null) {
+                            first = s;
+                        }
                     }
+                }
+                double extra = com.rtshop.job.Jobs.param(sp, "farmer", "extraHarvest");
+                if (first != null && extra > 0 && ctx.getRandom().nextDouble() < extra) {
+                    ItemStack more = first.copy();
+                    more.setCount(1);
+                    loot.add(more);
                 }
             }
         } catch (Throwable t) {

@@ -307,6 +307,9 @@ public final class QuestManager {
             if (tag.startsWith(QUEST_TAG_PREFIX)) {
                 return "quest_" + tag.substring(QUEST_TAG_PREFIX.length());
             }
+            if (tag.equals(com.rtshop.job.Jobs.NPC_TAG)) {
+                return "job";
+            }
         }
         return null;
     }
@@ -324,6 +327,9 @@ public final class QuestManager {
     public static String npcName(String key) {
         if (key.equals("bank")) {
             return EconomyConfig.get().bankNpcName;
+        }
+        if (key.equals("job")) {
+            return com.rtshop.job.JobConfig.get().npcName;
         }
         if (key.startsWith("shop_")) {
             ShopData d = ShopServer.shops().get(key.substring(5));

@@ -89,6 +89,7 @@ public final class ShopServer {
         FarmConfig.reload();
         FarmEvents.clearCache();
         LandConfig.reload();
+        com.rtshop.job.JobConfig.reload();
         QuestManager.reload();
         loaded = ShopLoader.loadAll(server);
         SESSIONS.clear();
@@ -97,7 +98,8 @@ public final class ShopServer {
 
     public static boolean isNpc(Entity e) {
         for (String tag : e.getTags()) {
-            if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX) || tag.startsWith(QuestManager.QUEST_TAG_PREFIX)) {
+            if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX) || tag.startsWith(QuestManager.QUEST_TAG_PREFIX)
+                    || tag.equals(com.rtshop.job.Jobs.NPC_TAG)) {
                 return true;
             }
         }
@@ -167,6 +169,7 @@ public final class ShopServer {
     private static final SuggestionProvider<CommandSourceStack> NPC_IDS = (ctx, b) -> {
         List<String> all = new ArrayList<>(loaded.shops.keySet());
         all.add(BANK);
+        all.add("job");
         for (String id : QuestManager.loaded().npcs.keySet()) {
             all.add("quest_" + id);
         }
@@ -203,6 +206,41 @@ public final class ShopServer {
                             p.sendSystemMessage(Component.translatable(on ? "rtshop.land.bypass_on" : "rtshop.land.bypass_off"));
                             return 1;
                         })))
+                .then(Commands.literal("job")
+                        .executes(ctx -> {
+                            com.rtshop.job.Jobs.open(ctx.getSource().getPlayerOrException(), -1);
+                            return 1;
+                        })
+                        .then(Commands.literal("set").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .then(Commands.argument("job", StringArgumentType.word())
+                                                .suggests((ctx, b) -> SharedSuggestionProvider.suggest(com.rtshop.job.JobConfig.get().jobs.keySet(), b))
+                                                .executes(ctx -> {
+                                                    ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                                    com.rtshop.job.JobConfig.JobDef d = com.rtshop.job.JobConfig.get().job(StringArgumentType.getString(ctx, "job"));
+                                                    if (d == null) {
+                                                        feedback(ctx.getSource(), Component.translatable("rtshop.job.unknown", StringArgumentType.getString(ctx, "job")));
+                                                        return 0;
+                                                    }
+                                                    com.rtshop.job.Jobs.force(t, d.slot, d.id);
+                                                    feedback(ctx.getSource(), Component.translatable("rtshop.job.cmd_set", t.getDisplayName(), d.name));
+                                                    return 1;
+                                                }))))
+                        .then(Commands.literal("clear").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
+                                    ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                    com.rtshop.job.Jobs.force(t, com.rtshop.job.JobConfig.COMBAT, "");
+                                    com.rtshop.job.Jobs.force(t, com.rtshop.job.JobConfig.LIFE, "");
+                                    feedback(ctx.getSource(), Component.translatable("rtshop.job.cmd_clear", t.getDisplayName()));
+                                    return 1;
+                                })))
+                        .then(Commands.literal("cooldown").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
+                                    ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                    com.rtshop.job.Jobs.resetCooldowns(t);
+                                    feedback(ctx.getSource(), Component.translatable("rtshop.job.cmd_cooldown", t.getDisplayName()));
+                                    return 1;
+                                }))))
                 .then(Commands.literal("quest")
                         .executes(ctx -> {
                             QuestManager.openJournal(ctx.getSource().getPlayerOrException());
@@ -372,6 +410,9 @@ public final class ShopServer {
     public static Villager spawnNpc(ServerLevel level, Vec3 pos, float yaw, String type) {
         if (type.startsWith("quest_")) {
             return QuestManager.spawnNpc(level, pos, yaw, type.substring(6));
+        }
+        if (type.equals("job")) {
+            return com.rtshop.job.Jobs.spawnNpc(level, pos, yaw);
         }
         String name;
         String tag;
@@ -550,6 +591,18 @@ public final class ShopServer {
                 entry.stack.getHoverName(), amount, num(total)), true);
     }
 
+    /** 직업 판매 보너스: 어부는 수산물, 요리사는 손으로 조리한 요리. */
+    public static double jobSellMultiplier(ServerPlayer player, ShopData.Entry entry) {
+        double m = 1.0;
+        if (entry.fish) {
+            m += com.rtshop.job.Jobs.param(player, "fisher", "fishSell");
+        }
+        if (ShopLoader.handCooked(loaded, entry.stack)) {
+            m += com.rtshop.job.Jobs.param(player, "cook", "dishSell");
+        }
+        return m;
+    }
+
     /**
      * 인벤토리에서 이 품목·이 품질(variantKey)에 해당하는 아이템을 amount 개까지 판다.
      * @return {판 개수, 받은 Gold}. 받을 금액이 0이면 팔지 않고 {가진 개수, 0} 을 돌려준다.
@@ -570,7 +623,7 @@ public final class ShopServer {
             return new long[]{0, 0};
         }
         long sellAmount = Math.min(amount, owned);
-        long revenue = ShopData.revenue(variantKey / 100.0, sellAmount);
+        long revenue = ShopData.revenue(variantKey / 100.0 * jobSellMultiplier(player, entry), sellAmount);
         if (revenue <= 0) {
             return new long[]{owned, 0};
         }

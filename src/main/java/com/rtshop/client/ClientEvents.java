@@ -154,6 +154,11 @@ public final class ClientEvents {
                 mc.player.connection.sendCommand("rtshop land");
             }
         }
+        while (ClientModEvents.JOB_KEY.consumeClick()) {
+            if (mc.player != null && mc.screen == null && mc.player.connection != null) {
+                mc.player.connection.sendCommand("rtshop job");
+            }
+        }
         while (ClientModEvents.QUEST_KEY.consumeClick()) {
             if (mc.player != null && mc.screen == null && mc.player.connection != null) {
                 mc.player.connection.sendCommand("rtshop quest");
