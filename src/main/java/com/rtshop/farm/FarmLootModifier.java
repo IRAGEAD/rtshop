@@ -58,7 +58,7 @@ public class FarmLootModifier extends LootModifier {
             if (state != null && com.rtshop.job.JobPassives.isOre(state)
                     && ctx.getParamOrNull(LootContextParams.THIS_ENTITY) instanceof ServerPlayer miner && !miner.isCreative()) {
                 // 광부: 광석을 캘 때 일정 확률로 추가 드롭 (실크 터치로 광석 블록 그대로 캔 경우는 제외)
-                double chance = com.rtshop.job.Jobs.param(miner, "miner", "extraOre");
+                double chance = com.rtshop.job.Jobs.stat(miner, "extraOre");
                 boolean silk = false;
                 for (ItemStack s : loot) {
                     silk |= s.getItem() instanceof net.minecraft.world.item.BlockItem bi && bi.getBlock() == state.getBlock();
@@ -90,7 +90,7 @@ public class FarmLootModifier extends LootModifier {
             }
             Entity breaker = ctx.getParamOrNull(LootContextParams.THIS_ENTITY);
             if (cfg.starsEnabled && licensed && breaker instanceof ServerPlayer sp && !sp.isCreative() && SeedRules.isMatureCrop(state)) {
-                double starUp = com.rtshop.job.Jobs.param(sp, "farmer", "starUp");
+                double starUp = com.rtshop.job.Jobs.stat(sp, "starUp");
                 ItemStack first = null;
                 for (ItemStack s : loot) {
                     if (!s.isEmpty() && !SeedRules.isPureSeed(s) && SeedRules.star(s) == 0) {
@@ -105,7 +105,7 @@ public class FarmLootModifier extends LootModifier {
                         }
                     }
                 }
-                double extra = com.rtshop.job.Jobs.param(sp, "farmer", "extraHarvest");
+                double extra = com.rtshop.job.Jobs.stat(sp, "extraHarvest");
                 if (first != null && extra > 0 && ctx.getRandom().nextDouble() < extra) {
                     ItemStack more = first.copy();
                     more.setCount(1);

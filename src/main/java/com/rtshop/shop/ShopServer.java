@@ -211,6 +211,10 @@ public final class ShopServer {
                             com.rtshop.job.Jobs.open(ctx.getSource().getPlayerOrException(), -1);
                             return 1;
                         })
+                        .then(Commands.literal("edit").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                            com.rtshop.job.JobEditor.open(ctx.getSource().getPlayerOrException());
+                            return 1;
+                        }))
                         .then(Commands.literal("set").requires(src -> src.hasPermission(2))
                                 .then(Commands.argument("player", EntityArgument.player())
                                         .then(Commands.argument("job", StringArgumentType.word())
@@ -595,10 +599,10 @@ public final class ShopServer {
     public static double jobSellMultiplier(ServerPlayer player, ShopData.Entry entry) {
         double m = 1.0;
         if (entry.fish) {
-            m += com.rtshop.job.Jobs.param(player, "fisher", "fishSell");
+            m += com.rtshop.job.Jobs.stat(player, "fishSell");
         }
         if (ShopLoader.handCooked(loaded, entry.stack)) {
-            m += com.rtshop.job.Jobs.param(player, "cook", "dishSell");
+            m += com.rtshop.job.Jobs.stat(player, "dishSell");
         }
         return m;
     }

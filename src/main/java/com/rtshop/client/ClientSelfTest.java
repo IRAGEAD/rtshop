@@ -74,7 +74,7 @@ public final class ClientSelfTest {
     private static long expected = 0;
     private static volatile BlockPos cropPos = null;
     private static volatile String harvest = null;
-    private static final int LAST = 58;
+    private static final int LAST = 63;
     private static volatile int jobNpc = -1;
 
     @SubscribeEvent
@@ -731,8 +731,42 @@ public final class ClientSelfTest {
                 }
                 wait = 3;
             }
-            case LAST -> {
+            case 58 -> {
                 shot(mc, "33_jobs_life");
+                if (mc.screen instanceof JobScreen s) {
+                    s.selectForTest("combat", "mage");
+                }
+                wait = 3;
+            }
+            case 59 -> {
+                shot(mc, "34_jobs_mage");
+                mc.setScreen(null);
+                onServer(mc, com.rtshop.job.JobEditor::open);
+                wait = 20;
+            }
+            case 60 -> {
+                check("the job editor opens for an operator", mc.screen instanceof JobEditScreen, mc.screen);
+                if (mc.screen instanceof JobEditScreen s) {
+                    s.showForTest("swordsman", 1);
+                }
+                wait = 3;
+            }
+            case 61 -> {
+                shot(mc, "35_jedit_weapons");
+                if (mc.screen instanceof JobEditScreen s) {
+                    s.showForTest("tank", 0);
+                }
+                wait = 3;
+            }
+            case 62 -> {
+                shot(mc, "36_jedit_params");
+                if (mc.screen instanceof JobEditScreen s) {
+                    s.showForTest("#types", 0);
+                }
+                wait = 3;
+            }
+            case LAST -> {
+                shot(mc, "37_jedit_types");
                 mc.setScreen(null);
                 onServer(mc, sp -> {
                     com.rtshop.job.Jobs.force(sp, "combat", "");

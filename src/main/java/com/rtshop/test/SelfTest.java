@@ -572,7 +572,26 @@ public final class SelfTest {
 
     // ------------------------------------------------------------------ 직업
 
-    private static void jobs(MinecraftServer server, ServerLevel level, FakePlayer a) {
+    /** 모드팩 전체에서 무기가 어떻게 분류되는지 보고서에 적는다 (무기 같은데 분류되지 않은 것 포함). */
+    private static void weaponReport(com.rtshop.job.JobConfig jc) {
+        java.util.Map<String, java.util.Map<String, Integer>> byMod = new java.util.TreeMap<>();
+        List<String> unknown = new ArrayList<>();
+        for (Item item : ForgeRegistries.ITEMS) {
+            if (!com.rtshop.job.WeaponTypes.weaponLike(item)) {
+                continue;
+            }
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            String type = jc.weaponType(new ItemStack(item));
+            byMod.computeIfAbsent(rl.getNamespace(), k -> new java.util.TreeMap<>()).merge(type, 1, Integer::sum);
+            if ("none".equals(type)) {
+                unknown.add(rl.toString());
+            }
+        }
+        byMod.forEach((mod, m) -> info("weapons in " + mod + ": " + m));
+        info("weapon-like items without a type (" + unknown.size() + "): " + String.join(", ", unknown.subList(0, Math.min(80, unknown.size()))));
+    }
+
+    private static void jobs(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         section("jobs");
         com.rtshop.job.JobConfig cfg = com.rtshop.job.JobConfig.get();
         com.rtshop.job.JobData data = com.rtshop.job.JobData.get(server);
@@ -626,19 +645,46 @@ public final class SelfTest {
 
             // 패시브
             com.rtshop.job.Jobs.force(a, "combat", "tank");
-            check("tank takes 6% less damage", Math.abs(com.rtshop.job.JobPassives.incoming(a) - 0.94) < 1e-6, com.rtshop.job.JobPassives.incoming(a));
+            check("tank takes 10% less damage", Math.abs(com.rtshop.job.JobPassives.incoming(a) - 0.90) < 1e-6, com.rtshop.job.JobPassives.incoming(a));
+            check("tank has 4 more max health", Math.abs(a.getMaxHealth() - 24.0F) < 1e-3, a.getMaxHealth());
             com.rtshop.job.Jobs.applyAttributes(a);
             check("tank has knockback resistance", a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE) >= 0.2 - 1e-6);
             com.rtshop.job.Jobs.force(a, "combat", "warrior");
             check("warrior has 2 more max health", Math.abs(a.getMaxHealth() - 22.0F) < 1e-3, a.getMaxHealth());
             check("knockback resistance is removed when no longer a tank",
                     a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE) < 1e-6);
-            check("warrior deals 8% more with an axe, not with a sword",
-                    Math.abs(com.rtshop.job.JobPassives.outgoing(a, new ItemStack(Items.IRON_AXE), false) - 1.08) < 1e-6
-                            && Math.abs(com.rtshop.job.JobPassives.outgoing(a, new ItemStack(Items.IRON_SWORD), false) - 1.0) < 1e-6);
+            check("warrior deals 10% more with an axe, the same with a sword, 20% less with a bow",
+                    Math.abs(com.rtshop.job.JobPassives.outgoing(a, "axe") - 1.10) < 1e-6
+                            && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "sword") - 1.0) < 1e-6
+                            && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "bow") - 0.80) < 1e-6);
+            double baseMove = a.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+            check("warrior moves 10% faster", Math.abs(a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED) - baseMove * 1.10) < 1e-6);
             com.rtshop.job.Jobs.force(a, "combat", "archer");
-            check("archer deals 10% more with projectiles", Math.abs(com.rtshop.job.JobPassives.outgoing(a, ItemStack.EMPTY, true) - 1.10) < 1e-6);
-            check("warrior health bonus is gone after leaving the job", Math.abs(a.getMaxHealth() - 20.0F) < 1e-3, a.getMaxHealth());
+            check("archer deals 15% more with a bow and 20% less with an axe",
+                    Math.abs(com.rtshop.job.JobPassives.outgoing(a, "bow") - 1.15) < 1e-6 && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "axe") - 0.80) < 1e-6);
+            check("archer has 2 less max health (the warrior bonus is gone)", Math.abs(a.getMaxHealth() - 18.0F) < 1e-3, a.getMaxHealth());
+            check("archer moves at normal speed", Math.abs(a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED) - baseMove) < 1e-6);
+            com.rtshop.job.Jobs.force(a, "combat", "mage");
+            check("mage deals 25% less with physical weapons and loses 2 health",
+                    Math.abs(com.rtshop.job.JobPassives.outgoing(a, "sword") - 0.75) < 1e-6 && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "bow") - 0.75) < 1e-6
+                            && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "magic") - 1.0) < 1e-6 && Math.abs(a.getMaxHealth() - 18.0F) < 1e-3);
+            com.rtshop.job.Jobs.force(a, "combat", "swordsman");
+            check("swordsman: sword +10%, axe -15%, spells -15%", Math.abs(com.rtshop.job.JobPassives.outgoing(a, "sword") - 1.10) < 1e-6
+                    && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "axe") - 0.85) < 1e-6 && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "magic") - 0.85) < 1e-6);
+            com.rtshop.job.Jobs.force(a, "combat", "");
+            check("without a combat job there is no weapon bonus or penalty", Math.abs(com.rtshop.job.JobPassives.outgoing(a, "axe") - 1.0) < 1e-6
+                    && Math.abs(a.getMaxHealth() - 20.0F) < 1e-3);
+
+            com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
+            check("weapons are sorted into types (sword, axe, bow, crossbow, trident=spear, pickaxe=tool, empty hand=fist)",
+                    "sword".equals(jc.weaponType(new ItemStack(Items.IRON_SWORD))) && "axe".equals(jc.weaponType(new ItemStack(Items.IRON_AXE)))
+                            && "bow".equals(jc.weaponType(new ItemStack(Items.BOW))) && "crossbow".equals(jc.weaponType(new ItemStack(Items.CROSSBOW)))
+                            && "spear".equals(jc.weaponType(new ItemStack(Items.TRIDENT))) && "tool".equals(jc.weaponType(new ItemStack(Items.IRON_PICKAXE)))
+                            && "fist".equals(jc.weaponType(ItemStack.EMPTY)),
+                    jc.weaponType(new ItemStack(Items.TRIDENT)) + "/" + jc.weaponType(new ItemStack(Items.IRON_PICKAXE)));
+            check("non-weapons are not weapons (sugar cane is not a staff, a bowl is not a bow)",
+                    "none".equals(jc.weaponType(new ItemStack(Items.SUGAR_CANE))) && "none".equals(jc.weaponType(new ItemStack(Items.BOWL))));
+            weaponReport(jc);
             com.rtshop.job.Jobs.force(a, "combat", "swordsman");
             a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SWORD));
             double base = a.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
@@ -681,14 +727,64 @@ public final class SelfTest {
             ShopData fisher = ShopServer.shops().get("fisher");
             int codIdx = fisher == null ? -1 : findEntry(fisher, e -> e.stack.is(Items.COD) && e.fish);
             com.rtshop.job.Jobs.force(a, "life", "fisher");
-            check("fisher sells fish for 10% more", codIdx >= 0
-                    && Math.abs(ShopServer.jobSellMultiplier(a, fisher.entries.get(codIdx)) - 1.10) < 1e-6);
+            check("fisher sells fish for 20% more", codIdx >= 0
+                    && Math.abs(ShopServer.jobSellMultiplier(a, fisher.entries.get(codIdx)) - 1.20) < 1e-6);
             com.rtshop.job.Jobs.force(a, "life", "cook");
             ShopData food = ShopServer.shops().get("food");
             int steakIdx = food == null ? -1 : findEntry(food, e -> e.stack.is(Items.COOKED_BEEF));
             check("a cook gets no bonus on furnace food (no hopper money farm)", steakIdx < 0
                     || Math.abs(ShopServer.jobSellMultiplier(a, food.entries.get(steakIdx)) - 1.0) < 1e-6);
             check("a fisher bonus does not apply to a cook", codIdx < 0 || Math.abs(ShopServer.jobSellMultiplier(a, fisher.entries.get(codIdx)) - 1.0) < 1e-6);
+
+            // 요리: 손으로 만드는 요리는 누구나 재료비의 110% 이상, 요리사는 140% 이상
+            double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;
+            int hand = 0;
+            List<String> low = new ArrayList<>();
+            for (ShopLoader.Price p : ShopServer.loaded().prices.values()) {
+                if (!p.handMade || p.purchaseNeed <= 0) {
+                    continue;
+                }
+                hand++;
+                if (p.sellUnit + 1e-6 < p.purchaseNeed * (1 + margin)) {
+                    low.add(ShopLoader.itemId(p.stack) + " " + p.sellUnit + "<" + p.purchaseNeed * (1 + margin));
+                }
+                double cook = p.sellUnit * (1 + cfg.job("cook").param("dishSell", 0));
+                if (cook + 1e-6 < p.purchaseNeed * 1.40) {
+                    low.add(ShopLoader.itemId(p.stack) + " cook " + cook + "<" + p.purchaseNeed * 1.4);
+                }
+            }
+            info(hand + " hand-made foods");
+            check("hand-made food pays everyone 10% over the ingredients and a cook 40% or more", low.isEmpty(),
+                    low.isEmpty() ? null : low.subList(0, Math.min(6, low.size())));
+            ShopLoader.Price bread = ShopServer.loaded().prices.get("minecraft:bread");
+            check("bread pays at least 110% of its 3 wheat", bread != null && bread.sellUnit + 1e-6 >= 3 * 40 * (1 + margin), bread == null ? null : bread.sellUnit);
+
+            // 직업 편집기 저장
+            java.nio.file.Path jf = com.rtshop.job.JobConfig.path();
+            byte[] orig = Files.readAllBytes(jf);
+            try {
+                JsonObject edited = cfg.toJson();
+                for (var e : edited.getAsJsonArray("jobs")) {
+                    JsonObject jo = e.getAsJsonObject();
+                    if (jo.get("id").getAsString().equals("warrior")) {
+                        jo.getAsJsonObject("weapons").getAsJsonObject("axe").addProperty("damage", 0.30);
+                    }
+                }
+                edited.getAsJsonObject("weaponOverrides").addProperty("minecraft:stick", "staff");
+                check("the job editor saves and applies at once", com.rtshop.job.JobEditor.save(edited.toString()) == null
+                        && Math.abs(com.rtshop.job.JobConfig.get().job("warrior").weaponDamage("axe") - 0.30) < 1e-9
+                        && "staff".equals(com.rtshop.job.JobConfig.get().weaponType(new ItemStack(Items.STICK))));
+                check("a broken job file from the editor is refused", com.rtshop.job.JobEditor.save("{\"jobs\":[{\"id\":\"Bad Id\"}]}") != null
+                        && Math.abs(com.rtshop.job.JobConfig.get().job("warrior").weaponDamage("axe") - 0.30) < 1e-9);
+                Files.writeString(jf, "{\"changeCostCombat\": 9000, \"jobs\": [{\"id\": \"tank\", \"params\": {\"damageTaken\": 0.06}}]}");
+                com.rtshop.job.JobConfig old = com.rtshop.job.JobConfig.reload();
+                check("an old (3.4) job file is replaced by the new defaults but keeps its costs",
+                        old.changeCostCombat == 9000 && Math.abs(old.job("tank").param("damageTaken", 0) - 0.10) < 1e-9
+                                && old.job("mage").weaponDamage("sword") < 0);
+            } finally {
+                Files.write(jf, orig);
+                com.rtshop.job.JobConfig.reload();
+            }
 
             com.rtshop.job.JobData copy = com.rtshop.job.JobData.load(data.save(new CompoundTag()));
             check("jobs survive saving and loading", "swordsman".equals(copy.of(a.getUUID()).combat) && "cook".equals(copy.of(a.getUUID()).life));

@@ -8,10 +8,8 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.SpectralArrow;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SwordItem;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -29,21 +27,34 @@ public final class JobPassives {
     private JobPassives() {
     }
 
-    /** 공격자 쪽 피해 배율 (검사 제외: 검사는 치명타로). */
-    public static double outgoing(ServerPlayer attacker, ItemStack weapon, boolean projectile) {
-        double m = 1.0;
-        if (!projectile && weapon.getItem() instanceof AxeItem) {
-            m += Jobs.param(attacker, "warrior", "axeDamage");
+    /** 이 공격에 쓴 무기 종류: 주문이면 magic, 투사체면 손에 든 발사 무기(없으면 활), 아니면 주 손 무기. */
+    public static String attackType(ServerPlayer attacker, net.minecraft.world.damagesource.DamageSource source) {
+        JobConfig cfg = JobConfig.get();
+        if (WeaponTypes.isMagic(source)) {
+            return WeaponTypes.MAGIC;
         }
-        if (projectile) {
-            m += Jobs.param(attacker, "archer", "projectileDamage");
+        String main = cfg.weaponType(attacker.getMainHandItem());
+        if (source.is(DamageTypeTags.IS_PROJECTILE) && source.getDirectEntity() != attacker) {
+            if (!cfg.isMelee(main) && !WeaponTypes.NONE.equals(main)) {
+                return main;
+            }
+            String off = cfg.weaponType(attacker.getOffhandItem());
+            if (!cfg.isMelee(off) && !WeaponTypes.NONE.equals(off) && !WeaponTypes.FIST.equals(off)) {
+                return off;
+            }
+            return source.getDirectEntity() instanceof AbstractArrow ? "bow" : main;
         }
-        return m;
+        return main;
+    }
+
+    /** 공격자 쪽 피해 배율 (직업의 무기 상성). */
+    public static double outgoing(ServerPlayer attacker, String weaponType) {
+        return Math.max(0.05, 1.0 + Jobs.weapon(attacker, weaponType)[0]);
     }
 
     /** 받는 피해 배율. */
     public static double incoming(ServerPlayer victim) {
-        return Math.max(0.0, 1.0 - Jobs.param(victim, "tank", "damageTaken"));
+        return Math.max(0.0, 1.0 - Jobs.stat(victim, "damageTaken"));
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -54,8 +65,7 @@ public final class JobPassives {
         float amount = event.getAmount();
         Entity src = event.getSource().getEntity();
         if (src instanceof ServerPlayer attacker && src != event.getEntity()) {
-            boolean projectile = event.getSource().is(DamageTypeTags.IS_PROJECTILE);
-            amount *= (float) outgoing(attacker, attacker.getMainHandItem(), projectile);
+            amount *= (float) outgoing(attacker, attackType(attacker, event.getSource()));
         }
         if (event.getEntity() instanceof ServerPlayer victim) {
             amount *= (float) incoming(victim);
@@ -65,10 +75,10 @@ public final class JobPassives {
 
     @SubscribeEvent
     public static void onCrit(CriticalHitEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer sp) || !(sp.getMainHandItem().getItem() instanceof SwordItem)) {
+        if (!(event.getEntity() instanceof ServerPlayer sp) || !"sword".equals(JobConfig.get().weaponType(sp.getMainHandItem()))) {
             return;
         }
-        double bonus = Jobs.param(sp, "swordsman", "critDamage");
+        double bonus = Jobs.stat(sp, "critDamage");
         if (bonus > 0 && (event.isVanillaCritical() || event.getResult() == net.minecraftforge.eventbus.api.Event.Result.ALLOW)) {
             event.setDamageModifier(event.getDamageModifier() * (float) (1.0 + bonus));
         }
@@ -83,7 +93,7 @@ public final class JobPassives {
         if (!(arrow.getOwner() instanceof ServerPlayer sp) || arrow.pickup != AbstractArrow.Pickup.ALLOWED || sp.isCreative()) {
             return;
         }
-        double chance = Jobs.param(sp, "archer", "arrowSave");
+        double chance = Jobs.stat(sp, "arrowSave");
         if (chance <= 0 || sp.getRandom().nextDouble() >= chance) {
             return;
         }
@@ -104,7 +114,7 @@ public final class JobPassives {
     @SubscribeEvent
     public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
-            double bonus = Jobs.param(sp, "miner", "mineSpeed");
+            double bonus = Jobs.stat(sp, "mineSpeed");
             if (bonus > 0) {
                 event.setNewSpeed(event.getNewSpeed() * (float) (1.0 + bonus));
             }
@@ -124,7 +134,7 @@ public final class JobPassives {
         }
         ItemStack used = event.getItem();
         FoodProperties food = used.getFoodProperties(sp);
-        double bonus = Jobs.param(sp, "cook", "foodBonus");
+        double bonus = Jobs.stat(sp, "foodBonus");
         if (food == null || bonus <= 0) {
             return;
         }
@@ -137,7 +147,7 @@ public final class JobPassives {
         if (!(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
-        double chance = Jobs.param(sp, "fisher", "extraFish");
+        double chance = Jobs.stat(sp, "extraFish");
         if (chance <= 0 || sp.getRandom().nextDouble() >= chance) {
             return;
         }

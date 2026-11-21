@@ -108,8 +108,8 @@ public class JobScreen extends Screen {
 
     @Override
     protected void init() {
-        W = Math.min(this.width - 8, 400);
-        H = Math.min(this.height - 8, 240);
+        W = Math.min(this.width - 8, 420);
+        H = Math.min(this.height - 8, 260);
         fx = (this.width - W) / 2;
         fy = (this.height - H) / 2;
     }
@@ -274,13 +274,23 @@ public class JobScreen extends Screen {
             Ui.scaledText(g, this.font, j.name(), x + 36, top + 10, 1.4F, Ui.C_INK, false);
             int y = top + 36;
             g.drawString(this.font, Component.translatable("rtshop.job.passives"), x + 8, y, Ui.C_GOLD_DARK, false);
-            y += 12;
+            y += 11;
+            // '+' 장점(초록) / '-' 단점(빨강) / ' ' 참고
             for (String d : j.desc()) {
-                for (FormattedCharSequence line : this.font.split(Component.literal("• " + d), w - 20)) {
-                    g.drawString(this.font, line, x + 10, y, Ui.C_INK, false);
+                if (d.isEmpty()) {
+                    continue;
+                }
+                char kind = d.charAt(0);
+                String text = (kind == '+' ? "▲ " : kind == '-' ? "▼ " : "• ") + d.substring(1);
+                int col = kind == '+' ? Ui.C_GREEN : kind == '-' ? Ui.C_RED : Ui.C_INK;
+                for (FormattedCharSequence line : this.font.split(Component.literal(text), w - 20)) {
+                    if (y > btnY() - 22) {
+                        break;
+                    }
+                    g.drawString(this.font, line, x + 10, y, col, false);
                     y += 10;
                 }
-                y += 2;
+                y += 1;
             }
             y += 6;
             List<Component> info = new ArrayList<>();

@@ -97,6 +97,8 @@ public final class ShopLoader {
         public double purchaseNeed = -1;
         /** 상점 재료를 화로에 바로 넣어 만드는 값 (없으면 -1). 요리사 판매 보너스를 줄지 판단하는 데 쓴다. */
         public double autoMin = -1;
+        /** 손으로 만드는 요리 (재료를 사서 만들 수 있고, 화로에 바로 구워 만드는 길이 없음): 이익 하한과 요리사 보너스 대상. */
+        public boolean handMade;
     }
 
     private static final class Ref {
@@ -975,12 +977,15 @@ public final class ShopLoader {
                 if (n.value() <= 0) {
                     continue;
                 }
+                // 손으로 만드는 요리는 재료비보다 조금(handCookedMargin) 더, 화로에 바로 구울 수 있는 음식은 본전
+                p.handMade = n.autoMin() <= 0;
+                double floorV = n.value() * (p.handMade ? 1.0 + pc.handCookedMargin : 1.0);
                 double now = p.sellUnit >= 0 ? p.sellUnit : p.price * ratio;
-                if (now + 1.0e-6 >= n.value()) {
+                if (now + 1.0e-6 >= floorV) {
                     continue;
                 }
-                p.sellUnit = n.value();
-                p.price = Math.max(p.price, buyPrice(n.value(), Math.max(pc.foodBuyMultiplier, 1.0 / ratio)));
+                p.sellUnit = floorV;
+                p.price = Math.max(p.price, buyPrice(floorV, Math.max(pc.foodBuyMultiplier, 1.0 / ratio)));
                 p.finished = true;
                 p.basis = n.by().id;
                 p.purchaseBasis = true;
@@ -1099,6 +1104,9 @@ public final class ShopLoader {
         Price p = loaded.prices.get(key(stack));
         if (p == null || loaded.solved == null || p.autoMin > 0) {
             return false;
+        }
+        if (p.handMade) {
+            return true;
         }
         String id = itemId(stack);
         return loaded.solved.processed.contains(id) || p.dynamicFood;

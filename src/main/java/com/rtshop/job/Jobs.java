@@ -24,7 +24,6 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -70,6 +69,35 @@ public final class Jobs {
     public static boolean has(ServerPlayer p, String jobId) {
         JobData.Entry e = entry(p);
         return jobId.equals(e.combat) || jobId.equals(e.life);
+    }
+
+    /** 지금 가진 두 직업(전투·생활)의 이 패시브 수치 합. */
+    public static double stat(ServerPlayer p, String key) {
+        if (p == null) {
+            return 0;
+        }
+        JobConfig cfg = JobConfig.get();
+        JobData.Entry e = entry(p);
+        double v = 0;
+        JobConfig.JobDef c = cfg.job(e.combat);
+        if (c != null) {
+            v += c.param(key, 0);
+        }
+        JobConfig.JobDef l = cfg.job(e.life);
+        if (l != null) {
+            v += l.param(key, 0);
+        }
+        return v;
+    }
+
+    /** 전투 직업의 무기 상성: {피해 증감, 공격 속도 증감}. 전투 직업이 없으면 0. */
+    public static double[] weapon(ServerPlayer p, String type) {
+        JobConfig cfg = JobConfig.get();
+        JobConfig.JobDef c = cfg.job(entry(p).combat);
+        if (c == null) {
+            return new double[]{0, 0};
+        }
+        return new double[]{c.weaponDamage(type), c.weaponSpeed(type)};
     }
 
     /** 이 직업의 패시브 수치. 그 직업이 아니면 0. */
@@ -207,7 +235,7 @@ public final class Jobs {
                 QuestDef q = questGiving(d.unlockFlag);
                 lock = q == null ? "" : q.title;
             }
-            list.add(new JobOpenPacket.JobView(d.id, d.slot, d.name, d.icon, new ArrayList<>(d.desc), state, lock));
+            list.add(new JobOpenPacket.JobView(d.id, d.slot, d.name, d.icon, cfg.describe(d, com.rtshop.shop.PricingConfig.get().handCookedMargin), state, lock));
         }
         return new JobOpenPacket(atNpc, e.combat, e.life, cooldownLeft(p, JobConfig.COMBAT), cooldownLeft(p, JobConfig.LIFE),
                 cfg.changeCostCombat, cfg.changeCostLife, cfg.cooldownHoursCombat, cfg.cooldownHoursLife, list);
@@ -270,6 +298,7 @@ public final class Jobs {
     private static final UUID TANK_KB = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e03");
     private static final UUID MAGE_MANA = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e04");
     private static final UUID MAGE_POWER = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e05");
+    private static final UUID MOVE_SPEED = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e06");
     private static final Set<String> SPELL_SCHOOLS = Set.of("arcane", "fire", "frost", "healing", "lightning", "soul");
 
     private static void modifier(ServerPlayer p, Attribute attr, UUID id, String name, double amount, AttributeModifier.Operation op) {
@@ -301,27 +330,27 @@ public final class Jobs {
         return rl == null ? null : ForgeRegistries.ATTRIBUTES.getValue(rl);
     }
 
-    /** 직업에 따른 능력치 수정치를 맞춘다 (없는 직업의 수정치는 지운다). 1초마다, 그리고 직업을 바꿀 때 부른다. */
+    /** 직업에 따른 능력치 수정치를 맞춘다 (없는 직업의 수정치는 지운다). 0.5초마다, 그리고 직업을 바꿀 때 부른다. */
     public static void applyAttributes(ServerPlayer p) {
-        boolean sword = p.getMainHandItem().getItem() instanceof SwordItem;
-        modifier(p, Attributes.ATTACK_SPEED, SWORD_SPEED, "swordsman",
-                sword ? param(p, "swordsman", "attackSpeed") : 0, AttributeModifier.Operation.MULTIPLY_TOTAL);
-        double hp = param(p, "warrior", "maxHealth");
-        modifier(p, Attributes.MAX_HEALTH, WARRIOR_HP, "warrior", hp, AttributeModifier.Operation.ADDITION);
-        if (hp == 0 && p.getHealth() > p.getMaxHealth()) {
+        JobConfig cfg = JobConfig.get();
+        String type = cfg.weaponType(p.getMainHandItem());
+        double speed = cfg.isMelee(type) ? weapon(p, type)[1] : 0;
+        modifier(p, Attributes.ATTACK_SPEED, SWORD_SPEED, "weapon speed", speed, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        double hp = stat(p, "maxHealth");
+        modifier(p, Attributes.MAX_HEALTH, WARRIOR_HP, "max health", hp, AttributeModifier.Operation.ADDITION);
+        if (p.getHealth() > p.getMaxHealth()) {
             p.setHealth(p.getMaxHealth());
         }
-        modifier(p, Attributes.KNOCKBACK_RESISTANCE, TANK_KB, "tank", param(p, "tank", "knockbackResist"),
-                AttributeModifier.Operation.ADDITION);
-        modifier(p, attribute("irons_spellbooks:max_mana"), MAGE_MANA, "mage", param(p, "mage", "maxMana"),
-                AttributeModifier.Operation.MULTIPLY_TOTAL);
-        double power = param(p, "mage", "spellPower");
+        modifier(p, Attributes.MOVEMENT_SPEED, MOVE_SPEED, "move speed", stat(p, "moveSpeed"), AttributeModifier.Operation.MULTIPLY_TOTAL);
+        modifier(p, Attributes.KNOCKBACK_RESISTANCE, TANK_KB, "knockback", stat(p, "knockbackResist"), AttributeModifier.Operation.ADDITION);
+        modifier(p, attribute("irons_spellbooks:max_mana"), MAGE_MANA, "mage", stat(p, "maxMana"), AttributeModifier.Operation.MULTIPLY_TOTAL);
+        double power = stat(p, "spellPower");
         modifier(p, attribute("irons_spellbooks:spell_power"), MAGE_POWER, "mage", power, AttributeModifier.Operation.MULTIPLY_TOTAL);
         for (String school : SPELL_SCHOOLS) {
             modifier(p, attribute("spell_power:" + school), MAGE_POWER, "mage", power, AttributeModifier.Operation.MULTIPLY_TOTAL);
         }
         // 채굴 속도는 클라이언트도 알아야 블록이 빨리 깨진다
-        double mine = param(p, "miner", "mineSpeed");
+        double mine = stat(p, "mineSpeed");
         Double sent = SENT_MINE.get(p.getUUID());
         if (sent == null || sent != mine) {
             SENT_MINE.put(p.getUUID(), mine);
