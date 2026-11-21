@@ -1,0 +1,22 @@
+name: modinfo
+on:
+  push:
+    branches: [tools/modinfo]
+permissions:
+  contents: write
+jobs:
+  modinfo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: packcache
+          key: pack-${{ hashFiles('.github/scripts/pack_files.json') }}-v1
+      - run: python3 .github/scripts/fullpack.py .github/scripts/pack_files.json packcache mods ""
+      - run: python3 .github/scripts/extract.py && tar czf modinfo.tar.gz modinfo && ls -la modinfo.tar.gz
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete modinfo-tmp --yes -R ${{ github.repository }} || true
+          gh release create modinfo-tmp modinfo.tar.gz --draft --title "modinfo (temporary)" --notes "temporary" -R ${{ github.repository }}
