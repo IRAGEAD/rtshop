@@ -184,6 +184,18 @@ jobs:
       - name: Inspect
         run: |
           python3 .github/scripts/inspect_pack.py packcache /tmp/inspect
+          # Cinematic Interactions 의 공개 API 와 그 API 를 쓰는 곳
+          CJ=$(ls packcache/*.jar | grep -i "cinematic interaction" | head -1)
+          mkdir -p /tmp/cj && (cd /tmp/cj && unzip -q -o "$CJ")
+          cd /tmp/cj
+          for c in $(find dev/dyslexic/cinematic/api -name '*.class') dev/dyslexic/cinematic/client/MenuStation.class dev/dyslexic/cinematic/client/ClientStation.class $(find dev/dyslexic/cinematic/station -name '*.class'); do
+            echo "######## $c"; javap -p -c -constants "$c" 2>&1 | head -n 400
+          done > /tmp/inspect/cinematic-api.txt
+          grep -rl "AddonStations\|AddonScenes\|AddonMenuStation" --include=*.class . > /tmp/inspect/cinematic-users.txt || true
+          for c in $(cat /tmp/inspect/cinematic-users.txt | grep -v "/api/"); do
+            echo "######## $c"; javap -p -c -constants "$c" 2>&1 | grep -n -B3 -A25 "Addon" | head -n 300
+          done > /tmp/inspect/cinematic-uses.txt
+          cd /tmp/inspect
           cd /tmp/inspect
           git init -q -b ci-inspect
           git config user.name "github-actions"
