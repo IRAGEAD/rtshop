@@ -250,6 +250,13 @@ public final class ClientSelfTest {
                     Economy.issueCheck(sp, 2_500);
                     sp.getInventory().add(new ItemStack(ModItems.LAND_DEED.get(), 2));
                     sp.getInventory().add(new ItemStack(ModItems.LARGE_LAND_DEED.get(), 1));
+                    // 퀘스트 HUD 용: 진행 중(처치), 진행 중(대화), 완료 가능(납품) 퀘스트 하나씩
+                    com.rtshop.quest.QuestManager.forceComplete(sp, "job_swordsman_1");
+                    com.rtshop.quest.QuestManager.forceComplete(sp, "job_swordsman_2");
+                    com.rtshop.quest.QuestManager.forceComplete(sp, "job_cook_1");
+                    com.rtshop.quest.QuestManager.accept(sp, "job_swordsman_3", null);
+                    com.rtshop.quest.QuestManager.accept(sp, "job_warrior_1", null);
+                    com.rtshop.quest.QuestManager.accept(sp, "job_cook_2", null);
                 });
                 mc.setScreen(null);
                 wait = 40;
@@ -257,14 +264,34 @@ public final class ClientSelfTest {
             case 2 -> {
                 check("server-side setup worked", serverError == null, serverError);
                 check("the wallet reached the client (minus the 2,500 G check)", ClientEconomy.wallet == 128_450 - 2_500, ClientEconomy.wallet);
+                List<com.rtshop.net.QuestHudPacket.Entry> hud = ClientQuestHud.entries;
+                check("the quest HUD receives the active quests in the order they were taken", hud.size() == 3
+                        && hud.get(0).id().equals("job_swordsman_3") && hud.get(2).id().equals("job_cook_2"),
+                        hud.stream().map(com.rtshop.net.QuestHudPacket.Entry::id).toList());
+                check("the quest HUD shows a finished quest as ready to hand in", hud.size() == 3 && hud.get(2).ready() && !hud.get(0).ready());
                 shot(mc, "01_hud");
                 mc.setScreen(new HudEditScreen());
                 wait = 20;
             }
             case 3 -> {
                 check("the HUD position editor opens", mc.screen instanceof HudEditScreen);
+                if (mc.screen instanceof HudEditScreen hs) {
+                    ClientConfig cfg = ClientConfig.get();
+                    hs.select(HudEditScreen.QUEST);
+                    double before = cfg.questHudScale;
+                    hs.mouseScrolled(0, 0, 1);
+                    check("the quest HUD can be resized in the HUD editor", cfg.questHudScale > before, cfg.questHudScale);
+                    cfg.questHudScale = before;
+                    cfg.clampQuest();
+                    hs.clickRow2ForTest(1);
+                    check("the number of quests to show opens as a list", hs.popupForTest() != null && hs.popupForTest().sizeForTest() == 5);
+                }
                 shot(mc, "02_hud_edit");
+                if (mc.screen instanceof HudEditScreen hs && hs.popupForTest() != null) {
+                    hs.popupForTest().pickForTest("3");
+                }
                 mc.setScreen(null);
+                onServer(mc, com.rtshop.quest.QuestManager::reset);
                 onServer(mc, sp -> ShopServer.openShop(sp, "farmer", -1));
                 wait = 40;
             }

@@ -136,7 +136,7 @@ public class QuestScreen extends Screen {
         return new ItemStack(item).getHoverName().getString();
     }
 
-    private static String objectiveName(QuestView.ObjView o) {
+    public static String objectiveName(QuestView.ObjView o) {
         QuestDef.Type t = QuestDef.Type.values()[Math.max(0, Math.min(QuestDef.Type.values().length - 1, o.type()))];
         switch (t) {
             case DELIVER: {

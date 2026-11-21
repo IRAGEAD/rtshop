@@ -105,6 +105,7 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientLand.clear();
+        ClientQuestHud.clear();
         ClientEconomy.wallet = 0;
         ClientEconomy.bank = 0;
     }

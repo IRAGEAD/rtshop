@@ -125,6 +125,7 @@ public final class QuestManager {
 
     public static synchronized Loaded reload() {
         SESSIONS.clear();
+        HUD_SENT.clear();
         Loaded l = new Loaded();
         try {
             installDefaults();
@@ -978,11 +979,54 @@ public final class QuestManager {
         if (event.player instanceof ServerPlayer sp && sp.tickCount % 20 == 0) {
             checkVisits(sp);
         }
+        if (event.player instanceof ServerPlayer sp && sp.tickCount % 10 == 5) {
+            syncHud(sp);
+        }
+    }
+
+    // ------------------------------------------------------------------ 퀘스트 HUD
+
+    /** 플레이어마다 마지막으로 보낸 HUD 내용의 요약 (바뀌었을 때만 다시 보낸다). */
+    private static final Map<UUID, String> HUD_SENT = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** 진행 중인 퀘스트를 받은 순서대로 (HUD 용). */
+    public static List<com.rtshop.net.QuestHudPacket.Entry> hudEntries(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        List<com.rtshop.net.QuestHudPacket.Entry> out = new ArrayList<>();
+        for (Map.Entry<String, int[]> e : pr.active.entrySet()) {
+            QuestDef q = loaded.quests.get(e.getKey());
+            if (q == null) {
+                continue;
+            }
+            boolean ready = allDone(p, q, e.getValue());
+            QuestView v = view(p, q, ready ? QuestView.READY : QuestView.ACTIVE, e.getValue());
+            out.add(new com.rtshop.net.QuestHudPacket.Entry(q.id, q.title, ready, npcName(q.turnInNpc()), v.objectives()));
+        }
+        return out;
+    }
+
+    public static void syncHud(ServerPlayer p) {
+        List<com.rtshop.net.QuestHudPacket.Entry> list = hudEntries(p);
+        StringBuilder sig = new StringBuilder();
+        for (com.rtshop.net.QuestHudPacket.Entry e : list) {
+            sig.append(e.id()).append(e.ready() ? '!' : ':').append(e.title()).append('|').append(e.turnIn());
+            for (QuestView.ObjView o : e.objectives()) {
+                sig.append(',').append(o.cur()).append('/').append(o.need()).append(o.text());
+            }
+            sig.append(';');
+        }
+        String now = sig.toString();
+        if (now.equals(HUD_SENT.get(p.getUUID()))) {
+            return;
+        }
+        HUD_SENT.put(p.getUUID(), now);
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new com.rtshop.net.QuestHudPacket(list));
     }
 
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         SESSIONS.remove(event.getEntity().getUUID());
+        HUD_SENT.remove(event.getEntity().getUUID());
     }
 
     public static void closeSession(ServerPlayer p) {

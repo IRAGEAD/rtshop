@@ -29,6 +29,8 @@ public final class ClientModEvents {
     public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAboveAll("gold", (gui, graphics, partialTick, screenWidth, screenHeight) ->
                 GoldHud.render(graphics, screenWidth, screenHeight));
+        event.registerAboveAll("quests", (gui, graphics, partialTick, screenWidth, screenHeight) ->
+                QuestHud.render(graphics, screenWidth, screenHeight));
     }
 
     /** 별 등급과 '심기 전용' 표시를 모든 아이템 아이콘 위에 그릴 수 있게 등록한다 (표시할 것이 없으면 아무것도 그리지 않음). */

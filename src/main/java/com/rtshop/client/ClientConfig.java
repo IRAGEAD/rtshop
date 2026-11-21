@@ -28,6 +28,20 @@ public final class ClientConfig {
     public double hudWidth = DEF_W;
     public double hudHeight = DEF_H;
 
+    // 퀘스트 HUD (진행 중인 퀘스트와 목표). 위치는 화면 비율, 크기는 글자 배율과 너비 비율.
+    public static final double QDEF_W = 0.2;
+    public static final double QDEF_X = 1 - QDEF_W - 0.004;
+    public static final double QDEF_Y = 0.56;
+    public static final double QDEF_SCALE = 1.0;
+    public static final int QDEF_MAX = 3;
+    public boolean questHudEnabled = true;
+    public double questHudX = QDEF_X;
+    public double questHudY = QDEF_Y;
+    public double questHudWidth = QDEF_W;
+    public double questHudScale = QDEF_SCALE;
+    /** 한 번에 보일 퀘스트 수 (1~5). */
+    public int questHudMax = QDEF_MAX;
+
     private static ClientConfig instance;
 
     public static synchronized ClientConfig get() {
@@ -48,6 +62,22 @@ public final class ClientConfig {
         hudHeight = DEF_H;
     }
 
+    public void resetQuestHud() {
+        questHudX = QDEF_X;
+        questHudY = QDEF_Y;
+        questHudWidth = QDEF_W;
+        questHudScale = QDEF_SCALE;
+        questHudMax = QDEF_MAX;
+    }
+
+    public void clampQuest() {
+        questHudScale = Math.max(0.5, Math.min(2.5, questHudScale));
+        questHudWidth = Math.max(0.08, Math.min(0.6, questHudWidth));
+        questHudMax = Math.max(1, Math.min(5, questHudMax));
+        questHudX = Math.max(0, Math.min(1 - questHudWidth, questHudX));
+        questHudY = Math.max(0, Math.min(0.98, questHudY));
+    }
+
     public void clamp() {
         hudWidth = Math.max(0.05, Math.min(0.6, hudWidth));
         hudHeight = Math.max(0.03, Math.min(0.4, hudHeight));
@@ -58,13 +88,19 @@ public final class ClientConfig {
     public synchronized void save() {
         try {
             JsonObject o = new JsonObject();
-            o.addProperty("_설명", "Gold 표시 박스의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다.");
+            o.addProperty("_설명", "Gold 표시 박스와 퀘스트 HUD 의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다. questHudScale 은 글자 배율, questHudMax 는 한 번에 보일 퀘스트 수입니다.");
             o.addProperty("configVersion", CONFIG_VERSION);
             o.addProperty("hudEnabled", hudEnabled);
             o.addProperty("hudX", hudX);
             o.addProperty("hudY", hudY);
             o.addProperty("hudWidth", hudWidth);
             o.addProperty("hudHeight", hudHeight);
+            o.addProperty("questHudEnabled", questHudEnabled);
+            o.addProperty("questHudX", questHudX);
+            o.addProperty("questHudY", questHudY);
+            o.addProperty("questHudWidth", questHudWidth);
+            o.addProperty("questHudScale", questHudScale);
+            o.addProperty("questHudMax", questHudMax);
             Path p = path();
             Files.createDirectories(p.getParent());
             Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -93,6 +129,16 @@ public final class ClientConfig {
                 if (o.has("hudWidth")) c.hudWidth = o.get("hudWidth").getAsDouble();
                 if (o.has("hudHeight")) c.hudHeight = o.get("hudHeight").getAsDouble();
                 c.clamp();
+                if (o.has("questHudEnabled")) c.questHudEnabled = o.get("questHudEnabled").getAsBoolean();
+                if (o.has("questHudX")) c.questHudX = o.get("questHudX").getAsDouble();
+                if (o.has("questHudY")) c.questHudY = o.get("questHudY").getAsDouble();
+                if (o.has("questHudWidth")) c.questHudWidth = o.get("questHudWidth").getAsDouble();
+                if (o.has("questHudScale")) c.questHudScale = o.get("questHudScale").getAsDouble();
+                if (o.has("questHudMax")) c.questHudMax = o.get("questHudMax").getAsInt();
+                c.clampQuest();
+                if (!o.has("questHudEnabled")) {
+                    c.save();
+                }
             } else {
                 c.save();
             }
