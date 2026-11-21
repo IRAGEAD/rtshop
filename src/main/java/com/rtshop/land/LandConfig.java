@@ -68,7 +68,7 @@ public final class LandConfig {
     /** 초보 농지로 쓰는 구획 묶음 이름. */
     public String starterPlotGroup = "starter";
     /** 그 직업을 그만두면 초보 농지를 회수해 다른 초보 농부에게 돌린다. */
-    public boolean starterPlotReturnWhenJobLost = false;
+    public boolean starterPlotReturnWhenJobLost = true;
 
     public LandConfig() {
         rangedBlocks.put("better_farming_plus:farming_crate", 5);
@@ -194,7 +194,7 @@ public final class LandConfig {
         JsonArray help = new JsonArray();
         help.add("초보 농지: starterPlotJob 직업을 얻은 플레이어에게 starterPlotGroup 묶음의 빈 구획 하나를 무료로 줍니다 (한 사람당 한 번)");
         help.add("OP 가 /rtshop plot starter <번호> on 으로 구획을 묶음에 넣습니다. starterPlotJob 을 \"\" 로 두면 끕니다");
-        help.add("starterPlotReturnWhenJobLost: true 면 그 직업을 그만둘 때 농지를 회수해 다른 초보에게 돌립니다");
+        help.add("starterPlotReturnWhenJobLost: true(기본) 면 그 직업을 그만둘 때 농지를 회수해 다른 초보에게 돌립니다. false 면 계속 가집니다");
         o.add("_초보농지_설명", help);
         o.addProperty("starterPlotJob", c.starterPlotJob);
         o.addProperty("starterPlotGroup", c.starterPlotGroup);

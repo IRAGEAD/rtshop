@@ -1730,7 +1730,19 @@ public final class SelfTest {
         }
         check("a new farmer gets one starter field for free", owned == 1 && got1.paid == 0 && Economy.wallet(b) == 0
                 && data.starterGiven(b.getUUID()), owned);
+        com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, LandConfig.get().starterPlotJob);
+        int again = 0;
+        for (LandData.Land l : parts) {
+            if (l.owner.equals(b.getUUID())) {
+                again++;
+            }
+        }
+        check("checking again does not give a second starter field", again == 1);
+        boolean revoke = LandConfig.get().starterPlotReturnWhenJobLost;
+        LandConfig.get().starterPlotReturnWhenJobLost = true;
         com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, "");
+        check("leaving the farmer job takes the starter field back for the next farmer",
+                got1 != null && got1.forSale() && data.landsOf(b.getUUID()).stream().noneMatch(l -> l.plot));
         com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, LandConfig.get().starterPlotJob);
         int owned2 = 0;
         for (LandData.Land l : parts) {
@@ -1738,7 +1750,12 @@ public final class SelfTest {
                 owned2++;
             }
         }
-        check("only one starter field per player, ever", owned2 == 1);
+        check("only one starter field per player, ever (no new one after coming back)", owned2 == 0);
+        LandConfig.get().starterPlotReturnWhenJobLost = revoke;
+        // 반환 시험을 위해 다시 준다
+        if (got1 != null && got1.forSale()) {
+            com.rtshop.land.StarterPlots.give(data, got1, b);
+        }
         LandData.Land other = null;
         for (LandData.Land l : parts) {
             if (l.forSale()) {
