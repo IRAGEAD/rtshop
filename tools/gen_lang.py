@@ -357,6 +357,10 @@ NEW = {
  "rtshop.jobparam.extraOre": ("광석 추가 드롭 확률", "Extra ore chance"),
  "rtshop.jobparam.foodBonus": ("먹을 때 포만감", "Food bonus"),
  "rtshop.jobparam.dishSell": ("요리 판매가", "Dish sell bonus"),
+ "rtshop.jobparam.shieldKnockback": ("방패 막기 밀쳐내기", "Shield knockback"),
+ "rtshop.jobparam.shieldReflect": ("방패 막기 피해 반사", "Shield reflect"),
+ "rtshop.jobparam.distanceBonus": ("거리 보너스 (최대)", "Distance bonus (max)"),
+ "rtshop.jobparam.distanceFull": ("최대 보너스 거리 (칸)", "Full bonus distance (blocks)"),
 }
 ko = dict(ko_old); en = dict(en_old)
 for k, (a, b) in NEW.items():

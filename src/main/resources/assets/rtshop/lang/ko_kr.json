@@ -399,5 +399,9 @@
   "rtshop.jobparam.mineSpeed": "채굴 속도",
   "rtshop.jobparam.extraOre": "광석 추가 드롭 확률",
   "rtshop.jobparam.foodBonus": "먹을 때 포만감",
-  "rtshop.jobparam.dishSell": "요리 판매가"
+  "rtshop.jobparam.dishSell": "요리 판매가",
+  "rtshop.jobparam.shieldKnockback": "방패 막기 밀쳐내기",
+  "rtshop.jobparam.shieldReflect": "방패 막기 피해 반사",
+  "rtshop.jobparam.distanceBonus": "거리 보너스 (최대)",
+  "rtshop.jobparam.distanceFull": "최대 보너스 거리 (칸)"
 }

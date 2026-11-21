@@ -31,7 +31,7 @@ public final class JobConfig {
     /** 설정 파일 세대. 3.5 에서 무기 상성이 생기며 2 가 됐다 (이전 파일은 backup 으로 옮기고 새 기본값을 쓴다). */
     public static final int CONFIG_VERSION = 2;
     /** 수치가 %가 아니라 그대로의 값인 패시브 (체력 칸 수 등). */
-    public static final Set<String> FLAT_PARAMS = Set.of("maxHealth");
+    public static final Set<String> FLAT_PARAMS = Set.of("maxHealth", "distanceFull");
 
     public static final class JobDef {
         public String id;
@@ -154,11 +154,11 @@ public final class JobConfig {
                 p("axe", 0.10, 0, "blunt", 0.10, 0, "dagger", -0.10, -0.05, "bow", -0.20, 0, "crossbow", -0.20, 0, "gun", -0.20, 0,
                         "staff", -0.20, -0.10, "magic", -0.20, 0)));
         add(def("tank", COMBAT, "탱커", "minecraft:shield",
-                p("damageTaken", 0.10, "knockbackResist", 0.20, "maxHealth", 4, "moveSpeed", -0.05),
+                p("damageTaken", 0.10, "knockbackResist", 0.20, "maxHealth", 4, "shieldKnockback", 0.60, "shieldReflect", 0.05, "moveSpeed", -0.05),
                 p("sword", -0.05, 0, "axe", -0.05, 0, "dagger", -0.10, -0.10, "fist", -0.05, 0, "bow", -0.25, 0, "crossbow", -0.20, 0,
                         "gun", -0.20, 0, "staff", -0.20, -0.10, "magic", -0.15, 0)));
         add(def("archer", COMBAT, "궁수", "minecraft:bow",
-                p("arrowSave", 0.10, "maxHealth", -2),
+                p("arrowSave", 0.10, "distanceBonus", 0.15, "distanceFull", 32, "maxHealth", -2),
                 p("bow", 0.15, 0, "crossbow", 0.10, 0, "gun", 0.05, 0, "sword", -0.15, -0.10, "axe", -0.20, -0.10, "blunt", -0.20, -0.15,
                         "spear", -0.15, -0.10, "fist", -0.10, 0, "staff", -0.15, -0.10, "magic", -0.10, 0)));
         add(def("mage", COMBAT, "마법사", "minecraft:enchanted_book",
@@ -193,6 +193,10 @@ public final class JobConfig {
 
     /** 패시브 하나의 설명. 좋으면 true 를 함께 돌려준다. */
     public static String[] paramLine(String key, double v, double handMargin) {
+        return paramLine(key, v, handMargin, null);
+    }
+
+    public static String[] paramLine(String key, double v, double handMargin, JobDef d) {
         boolean good = v > 0;
         String text = switch (key) {
             case "critDamage" -> "검 치명타 피해 " + signed(v);
@@ -201,6 +205,10 @@ public final class JobConfig {
             case "damageTaken" -> "받는 피해 " + signed(-v);
             case "knockbackResist" -> "넉백 저항 " + signed(v);
             case "arrowSave" -> pct(v) + " 확률로 쏜 화살을 돌려받음";
+            case "shieldKnockback" -> "방패로 막으면 근접 공격자를 밀쳐 냄 (세기 " + pct(v) + ")";
+            case "shieldReflect" -> "방패로 막은 근접 피해의 " + pct(v) + "를 되돌려 줌";
+            case "distanceBonus" -> "멀리서 맞힐수록 투사체 피해 최대 " + signed(v) + " ("
+                    + Math.round(d == null ? 32 : d.param("distanceFull", 32)) + "칸 이상에서 최대)";
             case "maxMana" -> "최대 마나 " + signed(v) + " (Iron's Spells)";
             case "spellPower" -> "주문 위력 " + signed(v) + " (Iron's Spells · Wizards)";
             case "starUp" -> "수확한 작물의 별 등급이 " + pct(v) + " 확률로 한 단계 오름";
@@ -221,10 +229,10 @@ public final class JobConfig {
         List<String> pros = new ArrayList<>();
         List<String> cons = new ArrayList<>();
         for (Map.Entry<String, Double> e : d.params.entrySet()) {
-            if (e.getValue() == 0) {
-                continue;
+            if (e.getValue() == 0 || e.getKey().equals("distanceFull")) {
+                continue; // 최대 보너스 거리는 거리 보너스 설명 안에 함께 적는다
             }
-            String[] l = paramLine(e.getKey(), e.getValue(), handMargin);
+            String[] l = paramLine(e.getKey(), e.getValue(), handMargin, d);
             (l[0].equals("+") ? pros : cons).add(l[1]);
         }
         // 같은 수치의 무기 종류는 한 줄로 묶는다
@@ -387,8 +395,12 @@ public final class JobConfig {
             for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("params").entrySet()) {
                 d.params.put(e.getKey(), e.getValue().getAsDouble());
             }
-        } else if (base != null) {
-            d.params.putAll(base.params);
+        }
+        if (base != null) {
+            // 업데이트로 새로 생긴 특성은 기본값으로 붙인다 (파일에 이미 있는 수치는 그대로)
+            for (Map.Entry<String, Double> e : base.params.entrySet()) {
+                d.params.putIfAbsent(e.getKey(), e.getValue());
+            }
         }
         if (o.has("weapons") && o.get("weapons").isJsonObject()) {
             for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("weapons").entrySet()) {

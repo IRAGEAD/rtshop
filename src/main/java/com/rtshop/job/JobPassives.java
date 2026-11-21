@@ -4,6 +4,7 @@ import com.rtshop.RtShop;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.SpectralArrow;
@@ -52,6 +53,46 @@ public final class JobPassives {
         return Math.max(0.05, 1.0 + Jobs.weapon(attacker, weaponType)[0]);
     }
 
+    /** 궁수 거리 보너스: 5칸부터 늘어나 distanceFull 칸에서 최대(distanceBonus). */
+    public static double distanceMultiplier(ServerPlayer shooter, double distance) {
+        double max = Jobs.stat(shooter, "distanceBonus");
+        if (max <= 0) {
+            return 1.0;
+        }
+        double full = Math.max(6, Jobs.stat(shooter, "distanceFull"));
+        double t = Math.max(0, Math.min(1, (distance - 5.0) / (full - 5.0)));
+        return 1.0 + max * t;
+    }
+
+    /**
+     * 탱커 방패 막기: 근접 공격자를 밀쳐 내고, 막은 피해의 일부를 되돌려 준다.
+     * 되돌리는 피해는 가시 피해로 줘서 또 막히거나 서로 되돌려 주는 고리가 생기지 않게 한다.
+     */
+    public static void shieldResponse(ServerPlayer tank, LivingEntity attacker, float blocked) {
+        double kb = Jobs.stat(tank, "shieldKnockback");
+        if (kb > 0) {
+            attacker.knockback(kb, tank.getX() - attacker.getX(), tank.getZ() - attacker.getZ());
+            attacker.hurtMarked = true;
+        }
+        double reflect = Jobs.stat(tank, "shieldReflect");
+        if (reflect > 0 && blocked > 0) {
+            attacker.hurt(tank.damageSources().thorns(tank), (float) (blocked * reflect));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onShieldBlock(net.minecraftforge.event.entity.living.ShieldBlockEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer tank) || event.isCanceled()) {
+            return;
+        }
+        // 근접 공격만 (화살 등 투사체를 막은 경우는 쏜 사람을 밀치지 않는다)
+        if (event.getDamageSource().getDirectEntity() instanceof LivingEntity attacker && attacker != tank
+                && !event.getDamageSource().is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)
+                && !event.getDamageSource().is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)) {
+            shieldResponse(tank, attacker, event.getBlockedDamage());
+        }
+    }
+
     /** 받는 피해 배율. */
     public static double incoming(ServerPlayer victim) {
         return Math.max(0.0, 1.0 - Jobs.stat(victim, "damageTaken"));
@@ -64,8 +105,12 @@ public final class JobPassives {
         }
         float amount = event.getAmount();
         Entity src = event.getSource().getEntity();
-        if (src instanceof ServerPlayer attacker && src != event.getEntity()) {
+        boolean thorns = event.getSource().is(net.minecraft.world.damagesource.DamageTypes.THORNS);
+        if (src instanceof ServerPlayer attacker && src != event.getEntity() && !thorns) {
             amount *= (float) outgoing(attacker, attackType(attacker, event.getSource()));
+            if (event.getSource().is(DamageTypeTags.IS_PROJECTILE) && event.getSource().getDirectEntity() != attacker) {
+                amount *= (float) distanceMultiplier(attacker, attacker.distanceTo(event.getEntity()));
+            }
         }
         if (event.getEntity() instanceof ServerPlayer victim) {
             amount *= (float) incoming(victim);

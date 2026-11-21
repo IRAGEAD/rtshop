@@ -399,5 +399,9 @@
   "rtshop.jobparam.mineSpeed": "Mining speed",
   "rtshop.jobparam.extraOre": "Extra ore chance",
   "rtshop.jobparam.foodBonus": "Food bonus",
-  "rtshop.jobparam.dishSell": "Dish sell bonus"
+  "rtshop.jobparam.dishSell": "Dish sell bonus",
+  "rtshop.jobparam.shieldKnockback": "Shield knockback",
+  "rtshop.jobparam.shieldReflect": "Shield reflect",
+  "rtshop.jobparam.distanceBonus": "Distance bonus (max)",
+  "rtshop.jobparam.distanceFull": "Full bonus distance (blocks)"
 }

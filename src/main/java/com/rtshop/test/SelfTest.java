@@ -664,6 +664,28 @@ public final class SelfTest {
                     Math.abs(com.rtshop.job.JobPassives.outgoing(a, "bow") - 1.15) < 1e-6 && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "axe") - 0.80) < 1e-6);
             check("archer has 2 less max health (the warrior bonus is gone)", Math.abs(a.getMaxHealth() - 18.0F) < 1e-3, a.getMaxHealth());
             check("archer moves at normal speed", Math.abs(a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED) - baseMove) < 1e-6);
+            check("archer distance bonus: none up close, half way at mid range, +15% at 32 blocks or more",
+                    Math.abs(com.rtshop.job.JobPassives.distanceMultiplier(a, 4) - 1.0) < 1e-6
+                            && Math.abs(com.rtshop.job.JobPassives.distanceMultiplier(a, 18.5) - 1.075) < 1e-6
+                            && Math.abs(com.rtshop.job.JobPassives.distanceMultiplier(a, 50) - 1.15) < 1e-6,
+                    com.rtshop.job.JobPassives.distanceMultiplier(a, 18.5));
+            com.rtshop.job.Jobs.force(a, "combat", "tank");
+            check("a non-archer gets no distance bonus", Math.abs(com.rtshop.job.JobPassives.distanceMultiplier(a, 50) - 1.0) < 1e-6);
+            BlockPos zp = level.getSharedSpawnPos().above(3);
+            level.getChunkAt(zp);
+            net.minecraft.world.entity.monster.Zombie z = EntityType.ZOMBIE.create(level);
+            if (z != null) {
+                a.setPos(zp.getX() + 0.5, zp.getY(), zp.getZ() + 0.5);
+                z.moveTo(zp.getX() + 2.5, zp.getY(), zp.getZ() + 0.5, 0, 0);
+                z.setNoAi(true);
+                level.addFreshEntity(z);
+                float before = z.getHealth();
+                com.rtshop.job.JobPassives.shieldResponse(a, z, 10.0F);
+                check("a tank's shield block pushes the attacker away and reflects 5% of the damage",
+                        z.getDeltaMovement().x > 0.01 && Math.abs((before - z.getHealth()) - 0.5F) < 1e-3,
+                        z.getDeltaMovement().x + " / " + (before - z.getHealth()));
+                z.discard();
+            }
             com.rtshop.job.Jobs.force(a, "combat", "mage");
             check("mage deals 25% less with physical weapons and loses 2 health",
                     Math.abs(com.rtshop.job.JobPassives.outgoing(a, "sword") - 0.75) < 1e-6 && Math.abs(com.rtshop.job.JobPassives.outgoing(a, "bow") - 0.75) < 1e-6
