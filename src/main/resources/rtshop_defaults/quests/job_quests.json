@@ -1,5 +1,5 @@
 {
-  "_help": "직업별 선행 퀘스트 (직업마다 7단계). 1단계는 직업 안내인(job)에게서 받고, 2~4단계는 각 직업의 스승에게서 받습니다. 마지막 단계의 보상 표식(unlock_job_<직업>)을 얻어야 그 직업을 고를 수 있습니다. 게임 안 퀘스트 편집기(/rtshop quest edit)로 고칠 수 있고, 이 파일은 한 번 설치된 뒤에는 모드 업데이트로 덮어쓰지 않습니다. 전투 직업 스승은 /rtshop npc quest_sword_master 처럼 소환합니다.",
+  "_help": "직업별 선행 퀘스트 (직업마다 7단계). 1단계는 직업 안내인(job)에게서 받고, 2~7단계는 각 직업의 스승에게서 받습니다. 이야기 속 \"[모드ID] ...\" 줄은 그 모드가 있을 때만 보이는 도움말이고, {key:키 이름} 은 플레이어가 정한 키로 바뀝니다. 목표·보상의 mod 는 그 모드가 있을 때만(!모드ID 는 없을 때만) 쓰입니다. 마지막 단계의 보상 표식(unlock_job_<직업>)을 얻어야 그 직업을 고를 수 있습니다. 게임 안 퀘스트 편집기(/rtshop quest edit)로 고칠 수 있고, 이 파일은 한 번 설치된 뒤에는 모드 업데이트로 덮어쓰지 않습니다. 전투 직업 스승은 /rtshop npc quest_sword_master 처럼 소환합니다.",
   "npcs": [
     {
       "id": "sword_master",
@@ -62,14 +62,21 @@
       "requires": [
         "job_swordsman_1"
       ],
-      "intro": "검사는 자기 검을 스스로 마련할 줄 알아야 한다. 철검 한 자루를 만들어 가져와라. 날이 잘 섰는지 내가 직접 보겠다.",
-      "progress": "철검 한 자루를 가져와라.",
+      "intro": "검사는 자기 검을 스스로 마련할 줄 알아야 한다. 검 한 자루를 만들어 가져와라. 날이 잘 섰는지 내가 직접 보겠다.\n[epicfight] 철 태도는 작업대에서 철검 1개와 철 주괴 2개로 만든다. 장검·대검·창처럼 무기마다 쓰는 기술이 다르니 이것저것 쥐어 봐라.",
+      "progress": "목표에 적힌 검을 만들어 가져와라.\n[epicfight] 철 태도는 작업대에서 철검 1개와 철 주괴 2개로 만든다. 장검·대검·창처럼 무기마다 쓰는 기술이 다르니 이것저것 쥐어 봐라.",
       "done": "좋은 검이군. 이제 이걸 쓸 줄 아는지 보자.",
       "objectives": [
         {
           "type": "DELIVER",
+          "target": "epicfight:iron_tachi",
+          "count": 1,
+          "mod": "epicfight"
+        },
+        {
+          "type": "DELIVER",
           "target": "minecraft:iron_sword",
-          "count": 1
+          "count": 1,
+          "mod": "!epicfight"
         }
       ],
       "reward": {
@@ -85,8 +92,8 @@
       "requires": [
         "job_swordsman_2"
       ],
-      "intro": "검은 휘두른 만큼 손에 붙는다. 좀비 12마리를 상대로 기본기를 익혀라.",
-      "progress": "좀비 12마리를 처치하라.",
+      "intro": "검은 휘두른 만큼 손에 붙는다. 좀비 12마리를 상대로 기본기를 익혀라.\n[epicfight] {key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸면, 공격을 이어서 누를 때 연속 베기가 나간다. 블록을 캘 때는 같은 키로 채광 모드로 돌아가라.",
+      "progress": "좀비 12마리를 처치하라.\n[epicfight] {key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸면, 공격을 이어서 누를 때 연속 베기가 나간다. 블록을 캘 때는 같은 키로 채광 모드로 돌아가라.",
       "done": "자세가 조금 잡혔군.",
       "objectives": [
         {
@@ -108,8 +115,8 @@
       "requires": [
         "job_swordsman_3"
       ],
-      "intro": "밤에는 적이 사방에서 온다. 스켈레톤 8마리와 거미 6마리를 베어라. 화살을 피하며 파고드는 게 요령이다.",
-      "progress": "스켈레톤 8마리와 거미 6마리를 처치하라.",
+      "intro": "밤에는 적이 사방에서 온다. 스켈레톤 8마리와 거미 6마리를 베어라. 화살을 피하며 파고드는 게 요령이다.\n[epicfight] 화살이 날아오면 {key:key.epicfight.dodge} 키로 몸을 굴려 피해라. 구르기에도 기력이 드니 아껴 써라.",
+      "progress": "스켈레톤 8마리와 거미 6마리를 처치하라.\n[epicfight] 화살이 날아오면 {key:key.epicfight.dodge} 키로 몸을 굴려 피해라. 구르기에도 기력이 드니 아껴 써라.",
       "done": "살아 돌아왔군. 검이 손에 붙기 시작했을 거다.",
       "objectives": [
         {
@@ -136,8 +143,8 @@
       "requires": [
         "job_swordsman_4"
       ],
-      "intro": "검사는 검을 아낄 줄 알아야 한다. 철 주괴 8개와 숫돌 하나를 가져와라. 네 검을 함께 손질하자.",
-      "progress": "철 주괴 8개와 숫돌 하나를 가져와라.",
+      "intro": "검사는 검을 아낄 줄 알아야 한다. 철 주괴 8개와 숫돌 하나를 가져와라. 네 검을 함께 손질하자.\n[epicfight] {key:key.epicfight.skill_gui} 키를 누르면 기술 편집 창이 열린다. 스킬북을 손에 들고 쓰면 새 기술을 배우고, 이 창에서 끼워 쓸 수 있다.",
+      "progress": "철 주괴 8개와 숫돌 하나를 가져와라.\n[epicfight] {key:key.epicfight.skill_gui} 키를 누르면 기술 편집 창이 열린다. 스킬북을 손에 들고 쓰면 새 기술을 배우고, 이 창에서 끼워 쓸 수 있다.",
       "done": "날이 다시 섰다. 이제 강한 적을 상대해 보자.",
       "objectives": [
         {
@@ -164,8 +171,8 @@
       "requires": [
         "job_swordsman_5"
       ],
-      "intro": "크리퍼는 망설이면 터진다. 크리퍼 5마리와 거미 8마리를 처치해라. 빠른 판단이 검사의 무기다.",
-      "progress": "크리퍼 5마리와 거미 8마리를 처치하라.",
+      "intro": "크리퍼는 망설이면 터진다. 크리퍼 5마리와 거미 8마리를 처치해라. 빠른 판단이 검사의 무기다.\n[epicfight] 무기마다 고유 기술이 있다. 적을 몇 번 베어 기술 게이지를 채운 뒤 {key:key.epicfight.weapon_innate_skill} 키로 써 봐라.",
+      "progress": "크리퍼 5마리와 거미 8마리를 처치하라.\n[epicfight] 무기마다 고유 기술이 있다. 적을 몇 번 베어 기술 게이지를 채운 뒤 {key:key.epicfight.weapon_innate_skill} 키로 써 봐라.",
       "done": "제법 빨라졌군.",
       "objectives": [
         {
@@ -192,8 +199,8 @@
       "requires": [
         "job_swordsman_6"
       ],
-      "intro": "마지막이다. 스켈레톤 10마리를 베고, 그 뼈 16개를 증거로 가져와라. 그러면 너를 검사로 인정하마.",
-      "progress": "스켈레톤 10마리를 처치하고 뼈 16개를 가져와라.",
+      "intro": "마지막이다. 스켈레톤 10마리를 베고, 그 뼈 16개를 증거로 가져와라. 그러면 너를 검사로 인정하마.\n[epicfight] {key:key.epicfight.lock_on} 키로 눈앞의 적을 붙잡아 두면, 여럿과 싸울 때도 한 놈에게 집중할 수 있다.",
+      "progress": "스켈레톤 10마리를 처치하고 뼈 16개를 가져와라.\n[epicfight] {key:key.epicfight.lock_on} 키로 눈앞의 적을 붙잡아 두면, 여럿과 싸울 때도 한 놈에게 집중할 수 있다.",
       "done": "훌륭하다. 이제부터 너는 검사다. 직업 안내인에게 가서 검사를 고르도록.",
       "objectives": [
         {
@@ -243,14 +250,21 @@
       "requires": [
         "job_warrior_1"
       ],
-      "intro": "전사에게는 묵직한 도끼가 어울리지! 철도끼 하나를 만들어 와라.",
-      "progress": "철도끼 하나를 가져와라.",
+      "intro": "전사에게는 묵직한 도끼가 어울리지! 도끼 하나를 만들어 와라.\n[rogues] 철 양날 도끼는 철 주괴 4개와 막대기 3개로 만든다. 전사에게 딱 맞는 묵직한 무기지!",
+      "progress": "목표에 적힌 도끼를 만들어 가져와라.\n[rogues] 철 양날 도끼는 철 주괴 4개와 막대기 3개로 만든다. 전사에게 딱 맞는 묵직한 무기지!",
       "done": "오, 제법 묵직하군! 이제 휘둘러 볼 차례다.",
       "objectives": [
         {
           "type": "DELIVER",
+          "target": "rogues:iron_double_axe",
+          "count": 1,
+          "mod": "rogues"
+        },
+        {
+          "type": "DELIVER",
           "target": "minecraft:iron_axe",
-          "count": 1
+          "count": 1,
+          "mod": "!rogues"
         }
       ],
       "reward": {
@@ -266,8 +280,8 @@
       "requires": [
         "job_warrior_2"
       ],
-      "intro": "도끼는 힘으로 휘두르는 거다! 좀비 15마리를 쓰러뜨려 와라.",
-      "progress": "좀비 15마리를 처치하라.",
+      "intro": "도끼는 힘으로 휘두르는 거다! 좀비 15마리를 쓰러뜨려 와라.\n[epicfight] {key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸고 공격을 이어서 눌러 봐라. 무거운 무기일수록 한 방이 묵직하다!",
+      "progress": "좀비 15마리를 처치하라.\n[epicfight] {key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸고 공격을 이어서 눌러 봐라. 무거운 무기일수록 한 방이 묵직하다!",
       "done": "땀 좀 흘렸겠군! 좋아.",
       "objectives": [
         {
@@ -289,8 +303,8 @@
       "requires": [
         "job_warrior_3"
       ],
-      "intro": "전사는 피하지 않는다. 크리퍼 5마리와 스켈레톤 5마리를 쓰러뜨려 와라. 크리퍼는 터지기 전에 끝내는 게 요령이다!",
-      "progress": "크리퍼 5마리와 스켈레톤 5마리를 처치하라.",
+      "intro": "전사는 피하지 않는다. 크리퍼 5마리와 스켈레톤 5마리를 쓰러뜨려 와라. 크리퍼는 터지기 전에 끝내는 게 요령이다!\n[epicfight] {key:key.epicfight.guard} 키를 누르고 있으면 무기로 공격을 막는다. 막는 데도 기력이 드니 무작정 버티지는 마라!",
+      "progress": "크리퍼 5마리와 스켈레톤 5마리를 처치하라.\n[epicfight] {key:key.epicfight.guard} 키를 누르고 있으면 무기로 공격을 막는다. 막는 데도 기력이 드니 무작정 버티지는 마라!",
       "done": "몸 성히 왔군! 역시 내 눈이 틀리지 않았어.",
       "objectives": [
         {
@@ -345,8 +359,8 @@
       "requires": [
         "job_warrior_5"
       ],
-      "intro": "전장은 늘 어지럽지. 거미 8마리와 좀비 10마리를 한데 상대해 봐라!",
-      "progress": "거미 8마리와 좀비 10마리를 처치하라.",
+      "intro": "전장은 늘 어지럽지. 거미 8마리와 좀비 10마리를 한데 상대해 봐라!\n[epicfight] 둘러싸이면 {key:key.epicfight.dodge} 키로 빠져나온 뒤 다시 몰아쳐라!",
+      "progress": "거미 8마리와 좀비 10마리를 처치하라.\n[epicfight] 둘러싸이면 {key:key.epicfight.dodge} 키로 빠져나온 뒤 다시 몰아쳐라!",
       "done": "하하! 이제 진짜 전사 같구나!",
       "objectives": [
         {
@@ -424,14 +438,21 @@
       "requires": [
         "job_tank_1"
       ],
-      "intro": "수호자의 시작은 방패다. 방패 하나를 만들어 와라.",
-      "progress": "방패 하나를 가져와라.",
+      "intro": "수호자의 시작은 방패다. 방패 하나를 만들어 와라.\n[paladins] 철 카이트 방패는 철 주괴 6개와 가죽 1개로 만든다. 성기사들이 쓰는 묵직한 방패다.",
+      "progress": "목표에 적힌 방패를 만들어 가져와라.\n[paladins] 철 카이트 방패는 철 주괴 6개와 가죽 1개로 만든다. 성기사들이 쓰는 묵직한 방패다.",
       "done": "튼튼하군.",
       "objectives": [
         {
           "type": "DELIVER",
+          "target": "paladins:iron_kite_shield",
+          "count": 1,
+          "mod": "paladins"
+        },
+        {
+          "type": "DELIVER",
           "target": "minecraft:shield",
-          "count": 1
+          "count": 1,
+          "mod": "!paladins"
         }
       ],
       "reward": {
@@ -470,8 +491,8 @@
       "requires": [
         "job_tank_3"
       ],
-      "intro": "방패를 들고 좀비 12마리를 상대해라. 막고, 밀어내고, 쓰러뜨려라.",
-      "progress": "좀비 12마리를 처치하라.",
+      "intro": "방패를 들고 좀비 12마리를 상대해라. 막고, 밀어내고, 쓰러뜨려라.\n[epicfight] 전투 모드에서는 {key:key.epicfight.guard} 키로 방패를 들어 막는다. 막을 때마다 기력이 줄어드니 틈을 보아 반격해라.",
+      "progress": "좀비 12마리를 처치하라.\n[epicfight] 전투 모드에서는 {key:key.epicfight.guard} 키로 방패를 들어 막는다. 막을 때마다 기력이 줄어드니 틈을 보아 반격해라.",
       "done": "물러서지 않았군.",
       "objectives": [
         {
@@ -595,14 +616,21 @@
       "requires": [
         "job_archer_1"
       ],
-      "intro": "궁수에게 활은 몸의 일부야. 활 하나와 화살 32개를 준비해서 보여 줘.",
-      "progress": "활 하나와 화살 32개를 가져와.",
+      "intro": "궁수에게 활은 몸의 일부야. 활 하나와 화살 32개를 준비해서 보여 줘.\n[archers] 복합 장궁은 막대기 2개, 뼈 1개, 실 3개로 만들어. 시위를 끝까지 당기는 데 시간이 걸리지만 그만큼 멀리, 세게 날아가.",
+      "progress": "목표에 적힌 활과 화살 32개를 가져와.\n[archers] 복합 장궁은 막대기 2개, 뼈 1개, 실 3개로 만들어. 시위를 끝까지 당기는 데 시간이 걸리지만 그만큼 멀리, 세게 날아가.",
       "done": "좋아, 시위가 팽팽하네.",
       "objectives": [
         {
           "type": "DELIVER",
+          "target": "archers:composite_longbow",
+          "count": 1,
+          "mod": "archers"
+        },
+        {
+          "type": "DELIVER",
           "target": "minecraft:bow",
-          "count": 1
+          "count": 1,
+          "mod": "!archers"
         },
         {
           "type": "DELIVER",
@@ -725,8 +753,8 @@
       "requires": [
         "job_archer_6"
       ],
-      "intro": "마지막이야. 석궁 하나를 만들고, 스켈레톤 10마리를 더 처치해 와. 그러면 너도 궁수야.",
-      "progress": "석궁 1개를 가져오고 스켈레톤 10마리를 처치하라.",
+      "intro": "마지막이야. 석궁 하나를 만들고, 스켈레톤 10마리를 더 처치해 와. 그러면 너도 궁수야.\n[archers] 궁수 후드도 하나 줄게. 가죽 3개와 사슬 2개로 나머지 궁수 옷도 맞춰 입어 봐.",
+      "progress": "석궁 1개를 가져오고 스켈레톤 10마리를 처치하라.\n[archers] 궁수 후드도 하나 줄게. 가죽 3개와 사슬 2개로 나머지 궁수 옷도 맞춰 입어 봐.",
       "done": "이제 너도 궁수야! 직업 안내인에게 가서 궁수를 골라. 화살은 선물이야.",
       "objectives": [
         {
@@ -746,6 +774,11 @@
           {
             "item": "minecraft:arrow",
             "count": 64
+          },
+          {
+            "item": "archers:archer_armor_head",
+            "count": 1,
+            "mod": "archers"
           }
         ],
         "flags": [
@@ -782,8 +815,8 @@
       "requires": [
         "job_mage_1"
       ],
-      "intro": "마법은 매개가 있어야 다룰 수 있단다. 청금석 16개와 책 3권을 가져오렴.",
-      "progress": "청금석 16개와 책 3권을 가져와라.",
+      "intro": "마법은 매개가 있어야 다룰 수 있단다. 청금석 16개와 책 3권을 가져오렴.\n[irons_spellbooks] 두루마리는 손에 들고 쓰면 마나 없이 주문이 한 번 나가고 사라진단다. 아껴 두었다가 주문서에 새기면 몇 번이고 쓸 수 있지.",
+      "progress": "청금석 16개와 책 3권을 가져와라.\n[irons_spellbooks] 두루마리는 손에 들고 쓰면 마나 없이 주문이 한 번 나가고 사라진단다. 아껴 두었다가 주문서에 새기면 몇 번이고 쓸 수 있지.",
       "done": "이 청금석에서 마력이 느껴지는구나.",
       "objectives": [
         {
@@ -838,8 +871,8 @@
       "requires": [
         "job_mage_3"
       ],
-      "intro": "레드스톤은 마력을 흘려보내는 길이란다. 레드스톤 가루 32개를 가져오렴.",
-      "progress": "레드스톤 가루 32개를 가져와라.",
+      "intro": "레드스톤은 마력을 흘려보내는 길이란다. 레드스톤 가루 32개를 가져오렴.\n[irons_spellbooks] 끝내면 가장 쉬운 주문서를 주마. 장신구의 주문서 칸에 끼우고 {key:key.irons_spellbooks.spell_wheel} 키로 주문을 고른 뒤 {key:key.irons_spellbooks.spellbook_cast} 키로 시전하렴.",
+      "progress": "레드스톤 가루 32개를 가져와라.\n[irons_spellbooks] 끝내면 가장 쉬운 주문서를 주마. 장신구의 주문서 칸에 끼우고 {key:key.irons_spellbooks.spell_wheel} 키로 주문을 고른 뒤 {key:key.irons_spellbooks.spellbook_cast} 키로 시전하렴.",
       "done": "좋아, 마력이 잘 흐르겠구나.",
       "objectives": [
         {
@@ -849,7 +882,14 @@
         }
       ],
       "reward": {
-        "gold": 200
+        "gold": 200,
+        "items": [
+          {
+            "item": "irons_spellbooks:copper_spell_book",
+            "count": 1,
+            "mod": "irons_spellbooks"
+          }
+        ]
       }
     },
     {
@@ -861,8 +901,8 @@
       "requires": [
         "job_mage_4"
       ],
-      "intro": "불꽃과 폭발도 마법의 한 갈래란다. 크리퍼 4마리를 처치하고 화약 8개를 가져오렴.",
-      "progress": "크리퍼 4마리를 처치하고 화약 8개를 가져와라.",
+      "intro": "불꽃과 폭발도 마법의 한 갈래란다. 크리퍼 4마리를 처치하고 화약 8개를 가져오렴.\n[irons_spellbooks] 각인 테이블은 책 1권, 나무 반 블록 3개, 나무 울타리 2개로 만든단다. 주문서와 두루마리를 올려 두루마리의 주문을 주문서에 새기렴.",
+      "progress": "크리퍼 4마리를 처치하고 화약 8개를 가져와라.\n[irons_spellbooks] 각인 테이블은 책 1권, 나무 반 블록 3개, 나무 울타리 2개로 만든단다. 주문서와 두루마리를 올려 두루마리의 주문을 주문서에 새기렴.",
       "done": "위험한 재료지만 쓸모가 많단다.",
       "objectives": [
         {
@@ -889,8 +929,8 @@
       "requires": [
         "job_mage_5"
       ],
-      "intro": "엔더맨은 차원 사이를 오가는 마력 덩어리야. 엔더맨 3마리를 쓰러뜨리고 엔더 진주 4개를 가져오렴. 눈을 마주치지 않게 조심하고.",
-      "progress": "엔더맨 3마리를 처치하고 엔더 진주 4개를 가져와라.",
+      "intro": "엔더맨은 차원 사이를 오가는 마력 덩어리야. 엔더맨 3마리를 쓰러뜨리고 엔더 진주 4개를 가져오렴. 눈을 마주치지 않게 조심하고.\n[wizards] 석탄 1개와 막대기 1개로 초심자 완드를 만들 수 있단다. 주문 부여대에서 주문서를 만들고 주문을 채운 뒤, 완드나 지팡이를 들고 쓰렴.",
+      "progress": "엔더맨 3마리를 처치하고 엔더 진주 4개를 가져와라.\n[wizards] 석탄 1개와 막대기 1개로 초심자 완드를 만들 수 있단다. 주문 부여대에서 주문서를 만들고 주문을 채운 뒤, 완드나 지팡이를 들고 쓰렴.",
       "done": "대단하구나.",
       "objectives": [
         {
@@ -929,6 +969,13 @@
       ],
       "reward": {
         "gold": 500,
+        "items": [
+          {
+            "item": "wizards:wand_novice",
+            "count": 1,
+            "mod": "wizards"
+          }
+        ],
         "flags": [
           "unlock_job_mage"
         ]
@@ -1065,8 +1112,8 @@
       "requires": [
         "job_farmer_5"
       ],
-      "intro": "농부는 작물만 키우는 게 아니야. 사탕수수 32개와 달걀 8개를 가져오게.",
-      "progress": "사탕수수 32개와 달걀 8개를 가져와라.",
+      "intro": "농부는 작물만 키우는 게 아니야. 사탕수수 32개와 달걀 8개를 가져오게.\n[kaleidoscope_cookery] 밭 옆에 허수아비를 세우면 주변 농지를 지켜 준다네. 밀짚모자, 짚 묶음, 호박, 막대기로 만들 수 있지.",
+      "progress": "사탕수수 32개와 달걀 8개를 가져와라.\n[kaleidoscope_cookery] 밭 옆에 허수아비를 세우면 주변 농지를 지켜 준다네. 밀짚모자, 짚 묶음, 호박, 막대기로 만들 수 있지.",
       "done": "농장이 제법 살림살이가 됐구먼.",
       "objectives": [
         {
@@ -1139,8 +1186,8 @@
       "requires": [
         "job_fisher_1"
       ],
-      "intro": "낚시는 기다림이야. 아무 물고기나 10마리 낚아 오게.",
-      "progress": "물고기 10마리를 가져와라.",
+      "intro": "낚시는 기다림이야. 아무 물고기나 10마리 낚아 오게.\n[starcatcher] 보통 낚싯대로는 흔한 물고기만 낚인다네. 스타캐쳐의 낚싯대로 찌가 물리면 원판이 뜨는데, 돌아가는 바늘이 초록 칸(스위트스팟)에 겹칠 때 {key:key.starcatcher.minigame_hit} 키를 눌러 줄을 감게.",
+      "progress": "물고기 10마리를 가져와라.\n[starcatcher] 보통 낚싯대로는 흔한 물고기만 낚인다네. 스타캐쳐의 낚싯대로 찌가 물리면 원판이 뜨는데, 돌아가는 바늘이 초록 칸(스위트스팟)에 겹칠 때 {key:key.starcatcher.minigame_hit} 키를 눌러 줄을 감게.",
       "done": "오, 손맛을 봤구먼.",
       "objectives": [
         {
@@ -1163,8 +1210,8 @@
       "requires": [
         "job_fisher_2"
       ],
-      "intro": "물고기는 시간과 장소에 따라 달라지지. 이번엔 20마리를 낚아 오게.",
-      "progress": "물고기 20마리를 가져와라.",
+      "intro": "물고기는 시간과 장소에 따라 달라지지. 이번엔 20마리를 낚아 오게.\n[starcatcher] 끝내면 낚시 안내서를 주겠네. 손에 들고 열거나 {key:key.starcatcher.open_guide} 키로 열면, 물고기마다 잡히는 곳·시간·날씨가 적혀 있다네.",
+      "progress": "물고기 20마리를 가져와라.\n[starcatcher] 끝내면 낚시 안내서를 주겠네. 손에 들고 열거나 {key:key.starcatcher.open_guide} 키로 열면, 물고기마다 잡히는 곳·시간·날씨가 적혀 있다네.",
       "done": "꾸준하구먼. 그게 어부의 덕목이지.",
       "objectives": [
         {
@@ -1175,7 +1222,14 @@
         }
       ],
       "reward": {
-        "gold": 150
+        "gold": 150,
+        "items": [
+          {
+            "item": "starcatcher:starcatcher_guide",
+            "count": 1,
+            "mod": "starcatcher"
+          }
+        ]
       }
     },
     {
@@ -1187,14 +1241,27 @@
       "requires": [
         "job_fisher_3"
       ],
-      "intro": "어부는 도구를 아껴야 해. 낚싯대 하나와 실 8개를 가져오게. 여벌 낚싯줄을 준비해 두자고.",
-      "progress": "낚싯대 1개와 실 8개를 가져와라.",
+      "intro": "어부는 도구를 아껴야 해. 목표에 적힌 낚시 도구와 실 8개를 가져오게.\n[starcatcher] 철 낚싯바늘은 철 주괴 3개와 철 조각 1개, 낚시찌는 나무판자 4개·막대기 2개·양털 1개로 만든다네. 가져오면 스타캐쳐의 낚싯대로 만들어 주지.",
+      "progress": "목표에 적힌 낚시 도구와 실 8개를 가져와라.\n[starcatcher] 철 낚싯바늘은 철 주괴 3개와 철 조각 1개, 낚시찌는 나무판자 4개·막대기 2개·양털 1개로 만든다네. 가져오면 스타캐쳐의 낚싯대로 만들어 주지.",
       "done": "이제 줄이 끊어져도 걱정 없겠군.",
       "objectives": [
         {
           "type": "DELIVER",
+          "target": "starcatcher:hook",
+          "count": 1,
+          "mod": "starcatcher"
+        },
+        {
+          "type": "DELIVER",
+          "target": "starcatcher:bobber",
+          "count": 1,
+          "mod": "starcatcher"
+        },
+        {
+          "type": "DELIVER",
           "target": "minecraft:fishing_rod",
-          "count": 1
+          "count": 1,
+          "mod": "!starcatcher"
         },
         {
           "type": "DELIVER",
@@ -1203,7 +1270,14 @@
         }
       ],
       "reward": {
-        "gold": 200
+        "gold": 200,
+        "items": [
+          {
+            "item": "starcatcher:starcatcher_rod",
+            "count": 1,
+            "mod": "starcatcher"
+          }
+        ]
       }
     },
     {
@@ -1262,8 +1336,8 @@
       "requires": [
         "job_fisher_6"
       ],
-      "intro": "마지막이야. 물고기 40마리를 낚아 오게. 그러면 자네도 어엿한 어부일세.",
-      "progress": "물고기 40마리를 가져와라.",
+      "intro": "마지막이야. 물고기 40마리를 낚아 오게. 그러면 자네도 어엿한 어부일세.\n[starcatcher] 마지막으로 희귀한 물고기도 한 마리 보여 주게. 낚싯바늘·낚시찌·미끼를 바꿔 끼우면 까다로운 물고기도 훨씬 수월하다네.",
+      "progress": "물고기 40마리를 가져와라.\n[starcatcher] 마지막으로 희귀한 물고기도 한 마리 보여 주게. 낚싯바늘·낚시찌·미끼를 바꿔 끼우면 까다로운 물고기도 훨씬 수월하다네.",
       "done": "대단하구먼! 이제 자네는 어부야. 직업 안내인에게 가서 어부를 고르게.",
       "objectives": [
         {
@@ -1271,6 +1345,13 @@
           "target": "#minecraft:fishes",
           "count": 40,
           "text": "물고기"
+        },
+        {
+          "type": "DELIVER",
+          "target": "#starcatcher:rare_fishes",
+          "count": 1,
+          "text": "희귀 물고기",
+          "mod": "starcatcher"
         }
       ],
       "reward": {
@@ -1309,8 +1390,8 @@
       "requires": [
         "job_miner_1"
       ],
-      "intro": "광부의 시작은 석탄과 철이지. 석탄 32개와 철 원석 16개를 캐 오게.",
-      "progress": "석탄 32개와 철 원석 16개를 가져와라.",
+      "intro": "광부의 시작은 석탄과 철이지. 석탄 32개와 철 원석 16개를 캐 오게.\n[epicfight] 전투 모드에서는 곡괭이질이 불편하다네. {key:key.epicfight.switch_mode} 키로 채광 모드로 바꾸고 캐게.",
+      "progress": "석탄 32개와 철 원석 16개를 가져와라.\n[epicfight] 전투 모드에서는 곡괭이질이 불편하다네. {key:key.epicfight.switch_mode} 키로 채광 모드로 바꾸고 캐게.",
       "done": "좋아, 손에 물집 좀 잡혔겠군.",
       "objectives": [
         {
@@ -1518,8 +1599,8 @@
       "requires": [
         "job_cook_2"
       ],
-      "intro": "고기는 잘 익혀야 하지. 스테이크 8개와 구운 돼지고기 8개를 만들어 오게.",
-      "progress": "스테이크 8개와 구운 돼지고기 8개를 가져와라.",
+      "intro": "고기는 잘 익혀야 하지. 스테이크 8개와 구운 돼지고기 8개를 만들어 오게.\n[kaleidoscope_cookery] 조약돌 8개와 모닥불로 난로를, 철 주괴 7개로 프라이팬을 만들어 난로 위에 올리게. 난로는 부싯돌과 부시로 불을 붙인다네.\n[kaleidoscope_cookery] 팬에 기름을 두르고 재료를 넣은 뒤 뒤집개(철 주괴·철 조각·막대기)로 몇 번 볶아 그릇에 담으면 요리가 되지. 기름은 중식도로 돼지를 잡으면 얻을 수 있으니, 끝내면 중식도를 하나 주겠네.",
+      "progress": "스테이크 8개와 구운 돼지고기 8개를 가져와라.\n[kaleidoscope_cookery] 조약돌 8개와 모닥불로 난로를, 철 주괴 7개로 프라이팬을 만들어 난로 위에 올리게. 난로는 부싯돌과 부시로 불을 붙인다네.\n[kaleidoscope_cookery] 팬에 기름을 두르고 재료를 넣은 뒤 뒤집개(철 주괴·철 조각·막대기)로 몇 번 볶아 그릇에 담으면 요리가 되지. 기름은 중식도로 돼지를 잡으면 얻을 수 있으니, 끝내면 중식도를 하나 주겠네.",
       "done": "육즙이 살아 있구먼.",
       "objectives": [
         {
@@ -1534,7 +1615,14 @@
         }
       ],
       "reward": {
-        "gold": 150
+        "gold": 150,
+        "items": [
+          {
+            "item": "kaleidoscope_cookery:iron_kitchen_knife",
+            "count": 1,
+            "mod": "kaleidoscope_cookery"
+          }
+        ]
       }
     },
     {
@@ -1546,8 +1634,8 @@
       "requires": [
         "job_cook_3"
       ],
-      "intro": "이번엔 그릇 요리야. 버섯 스튜 4그릇과 비트 수프 2그릇을 만들어 오게.",
-      "progress": "버섯 스튜 4개와 비트 수프 2개를 가져와라.",
+      "intro": "이번엔 그릇 요리야. 버섯 스튜 4그릇과 비트 수프 2그릇을 만들어 오게.\n[farmersdelight] 조리용 냄비를 불 위(난로나 모닥불)에 올리고 재료를 넣으면 요리가 끓는다네. 소고기 스튜는 익히지 않은 소고기, 당근, 감자로 만들지.\n[handson_delight] 냄비는 따로 창이 뜨지 않고 그 자리에서 열린다네. 재료를 직접 넣고 저어서 끓이게.",
+      "progress": "버섯 스튜 4개와 비트 수프 2개를 가져와라.\n[farmersdelight] 조리용 냄비를 불 위(난로나 모닥불)에 올리고 재료를 넣으면 요리가 끓는다네. 소고기 스튜는 익히지 않은 소고기, 당근, 감자로 만들지.\n[handson_delight] 냄비는 따로 창이 뜨지 않고 그 자리에서 열린다네. 재료를 직접 넣고 저어서 끓이게.",
       "done": "든든하겠구먼.",
       "objectives": [
         {
@@ -1559,6 +1647,12 @@
           "type": "DELIVER",
           "target": "minecraft:beetroot_soup",
           "count": 2
+        },
+        {
+          "type": "DELIVER",
+          "target": "farmersdelight:beef_stew",
+          "count": 2,
+          "mod": "farmersdelight"
         }
       ],
       "reward": {
@@ -1574,8 +1668,8 @@
       "requires": [
         "job_cook_4"
       ],
-      "intro": "손님들이 간식을 찾는다네. 쿠키 16개와 꿀병 2개를 준비해 오게.",
-      "progress": "쿠키 16개와 꿀병 2개를 가져와라.",
+      "intro": "손님들이 간식을 찾는다네. 쿠키 16개와 꿀병 2개를 준비해 오게.\n[farmersdelight] 도마(막대기 2개·나무판자 4개)에 재료를 올리고 식칼로 손질하면 썬 재료가 나온다네. 끝내면 철 식칼을 하나 주겠네.\n[handson_delight] 도마 위에 그어진 선을 따라 칼을 든 채 직접 썰어야 한다네.",
+      "progress": "쿠키 16개와 꿀병 2개를 가져와라.\n[farmersdelight] 도마(막대기 2개·나무판자 4개)에 재료를 올리고 식칼로 손질하면 썬 재료가 나온다네. 끝내면 철 식칼을 하나 주겠네.\n[handson_delight] 도마 위에 그어진 선을 따라 칼을 든 채 직접 썰어야 한다네.",
       "done": "아이들이 좋아하겠구먼.",
       "objectives": [
         {
@@ -1590,7 +1684,14 @@
         }
       ],
       "reward": {
-        "gold": 250
+        "gold": 250,
+        "items": [
+          {
+            "item": "farmersdelight:iron_knife",
+            "count": 1,
+            "mod": "farmersdelight"
+          }
+        ]
       }
     },
     {
@@ -1602,8 +1703,8 @@
       "requires": [
         "job_cook_5"
       ],
-      "intro": "호박 파이 4개와 구운 감자 16개를 만들어 오게. 가을 잔치 준비라네.",
-      "progress": "호박 파이 4개와 구운 감자 16개를 가져와라.",
+      "intro": "호박 파이 4개와 구운 감자 16개를 만들어 오게. 가을 잔치 준비라네.\n[kaleidoscope_cookery] 냄비는 벽돌 2개와 철 주괴 5개로, 뚜껑은 벽돌 1개와 철 주괴 3개로 만든다네. 불 위에 올리고 물을 부은 뒤 재료를 넣고 뚜껑을 덮으면 끓기 시작하지. 뼈만 넣어도 사골국이 된다네.",
+      "progress": "호박 파이 4개와 구운 감자 16개를 가져와라.\n[kaleidoscope_cookery] 냄비는 벽돌 2개와 철 주괴 5개로, 뚜껑은 벽돌 1개와 철 주괴 3개로 만든다네. 불 위에 올리고 물을 부은 뒤 재료를 넣고 뚜껑을 덮으면 끓기 시작하지. 뼈만 넣어도 사골국이 된다네.",
       "done": "향긋하구먼.",
       "objectives": [
         {
@@ -1615,6 +1716,12 @@
           "type": "DELIVER",
           "target": "minecraft:baked_potato",
           "count": 16
+        },
+        {
+          "type": "DELIVER",
+          "target": "kaleidoscope_cookery:pork_bone_soup",
+          "count": 2,
+          "mod": "kaleidoscope_cookery"
         }
       ],
       "reward": {

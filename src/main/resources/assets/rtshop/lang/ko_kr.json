@@ -405,5 +405,10 @@
   "rtshop.jobparam.distanceBonus": "거리 보너스 (최대)",
   "rtshop.jobparam.distanceFull": "최대 보너스 거리 (칸)",
   "rtshop.quest.npc_hint": "%s 에게 받을 수 있는 퀘스트가 있습니다. 웅크리고(Shift) 말을 걸거나 %s 를 누르세요.",
-  "rtshop.quest.npc_hint_link": "[퀘스트 보기]"
+  "rtshop.quest.npc_hint_link": "[퀘스트 보기]",
+  "rtshop.qedit.cond_always": "항상",
+  "rtshop.qedit.cond_with": "%s 있을 때",
+  "rtshop.qedit.cond_without": "%s 없을 때",
+  "rtshop.qedit.insert_tip": "모드 도움말 ▼",
+  "rtshop.qedit.insert_key": "키 넣기 ▼"
 }

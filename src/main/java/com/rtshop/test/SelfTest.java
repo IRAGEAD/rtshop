@@ -632,6 +632,60 @@ public final class SelfTest {
             }
         }
         check("every item and monster the job quests ask for exists in this game", missing.isEmpty(), missing);
+        // 모드 조건 (3.6.2): 모드가 있으면 모드 목표·보상, 없으면 바닐라 목표만 남는다
+        check("mod conditions: always / with / without a mod",
+                QuestDef.modOk("") && QuestDef.modOk("minecraft") && !QuestDef.modOk("!minecraft")
+                        && !QuestDef.modOk("no_such_mod_xyz") && QuestDef.modOk("!no_such_mod_xyz"));
+        {
+            QuestDef sw = l.quests.get("job_swordsman_2");
+            boolean ef = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
+            String want = ef ? "epicfight:iron_tachi" : "minecraft:iron_sword";
+            check("the swordsman asks for the Epic Fight tachi only when Epic Fight is installed (else an iron sword)",
+                    sw != null && sw.objectives.size() == 1 && sw.objectives.get(0).target.equals(want),
+                    sw == null ? "missing" : sw.objectives.stream().map(o -> o.target).toList());
+            QuestDef fi = l.quests.get("job_fisher_4");
+            boolean sc = net.minecraftforge.fml.ModList.get().isLoaded("starcatcher");
+            check("the fisher's tool step follows Starcatcher (parts and a Starcatcher rod as reward, or a plain rod)",
+                    fi != null && fi.objectives.size() == (sc ? 3 : 2) && fi.rewardItems.size() == (sc ? 1 : 0),
+                    fi == null ? "missing" : fi.objectives.stream().map(o -> o.target).toList() + " " + fi.rewardItems.size());
+            List<String> modsUsed = new ArrayList<>();
+            try (java.io.InputStream in = QuestManager.class.getResourceAsStream("/rtshop_defaults/quests/job_quests.json")) {
+                com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(
+                        new String(in.readAllBytes(), StandardCharsets.UTF_8)).getAsJsonObject();
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\[([a-z0-9_.\\-]+)]|\"mod\":\\s*\"!?([a-z0-9_.\\-]+)\"")
+                        .matcher(root.toString());
+                while (m.find()) {
+                    String id = m.group(1) != null ? m.group(1) : m.group(2);
+                    if (!modsUsed.contains(id)) {
+                        modsUsed.add(id);
+                    }
+                }
+                // 편집기로 저장해도 조건이 그대로 남는지
+                QuestDef parsed = null;
+                for (com.google.gson.JsonElement e : root.getAsJsonArray("quests")) {
+                    if (e.getAsJsonObject().get("id").getAsString().equals("job_fisher_4")) {
+                        parsed = QuestDef.parse(e.getAsJsonObject());
+                    }
+                }
+                QuestDef again = parsed == null ? null : QuestDef.parse(parsed.toJson());
+                check("mod conditions survive saving from the editor",
+                        again != null && again.objectives.get(0).mod.equals("starcatcher") && again.objectives.get(2).mod.equals("!starcatcher")
+                                && again.rewardItems.get(0).mod.equals("starcatcher"));
+            } catch (Exception ex) {
+                check("mod conditions survive saving from the editor", false, ex);
+            }
+            check("the job quests name the mods they explain", modsUsed.containsAll(List.of("epicfight", "irons_spellbooks",
+                    "kaleidoscope_cookery", "handson_delight", "starcatcher", "farmersdelight")), modsUsed);
+            if (ef) {
+                List<String> absent = new ArrayList<>();
+                for (String id : modsUsed) {
+                    if (!net.minecraftforge.fml.ModList.get().isLoaded(id)) {
+                        absent.add(id);
+                    }
+                }
+                check("every mod the job quests explain is in the pack", absent.isEmpty(), absent);
+            }
+        }
 
         for (com.rtshop.job.JobConfig.JobDef d : cfg.jobs.values()) {
             QuestManager.reset(a);

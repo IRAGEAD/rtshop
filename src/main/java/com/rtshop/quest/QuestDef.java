@@ -40,11 +40,30 @@ public final class QuestDef {
         public int x, y, z, radius = 8;
         /** 화면에 보일 설명 (비우면 자동으로 만든다). */
         public String text = "";
+        /** 모드 조건: "" = 항상, "모드ID" = 그 모드가 있을 때만, "!모드ID" = 그 모드가 없을 때만. */
+        public String mod = "";
     }
 
     public static final class ItemReward {
         public String item;
         public int count = 1;
+        /** 모드 조건 (Objective.mod 와 같은 형식). */
+        public String mod = "";
+    }
+
+    /** 모드 조건을 만족하는지 ("" = 항상, "x" = x 가 있을 때, "!x" = x 가 없을 때). */
+    public static boolean modOk(String cond) {
+        if (cond == null || cond.isBlank()) {
+            return true;
+        }
+        String c = cond.trim();
+        boolean not = c.startsWith("!");
+        String id = not ? c.substring(1).trim() : c;
+        if (id.isEmpty()) {
+            return true;
+        }
+        boolean loaded = net.minecraftforge.fml.ModList.get() != null && net.minecraftforge.fml.ModList.get().isLoaded(id);
+        return not != loaded;
     }
 
     public static final class Choice {
@@ -145,6 +164,7 @@ public final class QuestDef {
                 jo.addProperty("radius", ob.radius);
             }
             putText(jo, "text", ob.text);
+            putText(jo, "mod", ob.mod);
             objs.add(jo);
         }
         o.add("objectives", objs);
@@ -158,6 +178,7 @@ public final class QuestDef {
                 JsonObject jo = new JsonObject();
                 jo.addProperty("item", ir.item);
                 jo.addProperty("count", ir.count);
+                putText(jo, "mod", ir.mod);
                 items.add(jo);
             }
             r.add("items", items);
@@ -213,6 +234,7 @@ public final class QuestDef {
                 ob.z = jo.has("z") ? jo.get("z").getAsInt() : 0;
                 ob.radius = Math.max(1, jo.has("radius") ? jo.get("radius").getAsInt() : 8);
                 ob.text = str(jo, "text", "");
+                ob.mod = str(jo, "mod", "").trim();
                 if (ob.type != Type.PAY && ob.type != Type.VISIT && ob.target.isEmpty()) {
                     throw new IllegalArgumentException("퀘스트 '" + q.id + "' 의 " + ob.type + " 목표에 target 이 없습니다");
                 }
@@ -231,6 +253,7 @@ public final class QuestDef {
                     ItemReward ir = new ItemReward();
                     ir.item = str(jo, "item", "");
                     ir.count = Math.max(1, jo.has("count") ? jo.get("count").getAsInt() : 1);
+                    ir.mod = str(jo, "mod", "").trim();
                     if (!ir.item.isEmpty()) {
                         q.rewardItems.add(ir);
                     }

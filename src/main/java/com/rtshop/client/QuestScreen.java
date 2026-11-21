@@ -268,9 +268,24 @@ public class QuestScreen extends Screen {
             yy += 12;
         }
         yy += 2;
-        for (FormattedCharSequence line : wrap(v.text(), w - 20)) {
-            g.drawString(this.font, line, x + 8, yy, Ui.C_INK, false);
-            yy += 11;
+        boolean prevTip = false;
+        for (QuestText.Line tl : QuestText.lines(v.text())) {
+            if (tl.tip() && !prevTip) {
+                yy += 3;
+            }
+            int indent = tl.tip() ? 4 : 0;
+            List<FormattedCharSequence> parts = this.font.split(QuestText.component(tl), Math.max(20, w - 20 - indent));
+            if (parts.isEmpty()) {
+                yy += 11;
+            }
+            for (FormattedCharSequence line : parts) {
+                if (tl.tip()) {
+                    g.fill(x + 6, yy - 1, x + 7, yy + 10, QuestText.TIP_HEAD | 0x66000000);
+                }
+                g.drawString(this.font, line, x + 8 + indent, yy, Ui.C_INK, false);
+                yy += 11;
+            }
+            prevTip = tl.tip();
         }
         yy += 6;
         if (!v.objectives().isEmpty()) {
@@ -441,5 +456,11 @@ public class QuestScreen extends Screen {
             return true;
         }
         return super.mouseScrolled(mx, my, delta);
+    }
+
+    /** 점검용: 지금 고른 퀘스트의 본문 (원문). */
+    public String currentTextForTest() {
+        QuestView v = current();
+        return v == null ? "" : v.text();
     }
 }

@@ -405,5 +405,10 @@
   "rtshop.jobparam.distanceBonus": "Distance bonus (max)",
   "rtshop.jobparam.distanceFull": "Full bonus distance (blocks)",
   "rtshop.quest.npc_hint": "%s has quests for you. Sneak and talk to them, or click %s.",
-  "rtshop.quest.npc_hint_link": "[Show quests]"
+  "rtshop.quest.npc_hint_link": "[Show quests]",
+  "rtshop.qedit.cond_always": "Always",
+  "rtshop.qedit.cond_with": "With %s",
+  "rtshop.qedit.cond_without": "Without %s",
+  "rtshop.qedit.insert_tip": "Mod tip ▼",
+  "rtshop.qedit.insert_key": "Insert key ▼"
 }

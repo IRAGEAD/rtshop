@@ -590,6 +590,15 @@ public final class ClientSelfTest {
                 shot(mc, "20_qedit_basic");
                 if (mc.screen instanceof QuestEditScreen s) {
                     s.selectForTest("tutorial_4", 1);
+                    s.openKeyPopupForTest();
+                    check("the story tab lists every control key to insert", s.popupForTest() != null && s.popupForTest().sizeForTest() > 20);
+                    if (s.popupForTest() != null) {
+                        s.popupForTest().pickForTest("key.jump");
+                    }
+                    check("picking a key inserts {key:...} into the story", s.introForTest().contains("{key:key.jump}"), s.introForTest());
+                    String shown = QuestText.keys("{key:key.jump}");
+                    check("{key:...} shows the player's own key", shown.length() > 2 && !shown.contains("key."), shown);
+                    s.openKeyPopupForTest();
                 }
                 wait = 5;
             }
@@ -793,6 +802,42 @@ public final class ClientSelfTest {
             case LAST + 1 -> {
                 check("the job guide offers the 9 job quest lines", mc.screen instanceof QuestScreen, mc.screen);
                 shot(mc, "38_job_quests");
+                mc.setScreen(null);
+                onServer(mc, sp -> {
+                    com.rtshop.quest.QuestManager.forceComplete(sp, "job_swordsman_1");
+                    com.rtshop.quest.QuestManager.forceComplete(sp, "job_swordsman_2");
+                    com.rtshop.quest.QuestManager.openDialog(sp, "quest_sword_master", -1);
+                });
+                wait = 20;
+            }
+            case LAST + 2 -> {
+                check("the sword master offers the next job quest", mc.screen instanceof QuestScreen, mc.screen);
+                boolean ef = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
+                if (mc.screen instanceof QuestScreen s) {
+                    String raw = s.currentTextForTest();
+                    long tips = QuestText.lines(raw).stream().filter(QuestText.Line::tip).count();
+                    check("mod tips appear only when that mod is installed", ef ? tips > 0 : tips == 0, tips + " " + raw);
+                    check("key names in the tips turn into the player's keys", !QuestText.lines(raw).toString().contains("{key:"), raw);
+                }
+                List<String> missing = new ArrayList<>();
+                try (java.io.InputStream in = ClientSelfTest.class.getResourceAsStream("/rtshop_defaults/quests/job_quests.json")) {
+                    com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(
+                            new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+                    for (com.google.gson.JsonElement e : root.getAsJsonArray("quests")) {
+                        com.google.gson.JsonObject o = e.getAsJsonObject();
+                        for (String f : new String[]{"intro", "progress", "done"}) {
+                            if (o.has(f)) {
+                                for (String k : QuestText.missingKeys(o.get(f).getAsString())) {
+                                    missing.add(o.get("id").getAsString() + ":" + k);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    missing.add("read failed: " + ex);
+                }
+                check("every key named in the job quest tips exists in this game", missing.isEmpty(), missing);
+                shot(mc, "39_quest_mod_tips");
                 mc.setScreen(null);
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);

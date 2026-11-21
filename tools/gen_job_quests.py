@@ -20,15 +20,20 @@ def q(id, chain, order, title, giver, intro, progress, done, objectives, gold, r
     o["reward"] = r
     return o
 
-def D(t, n, text=None):
+def D(t, n, text=None, mod=None):
     d = {"type": "DELIVER", "target": t, "count": n}
     if text: d["text"] = text
+    if mod: d["mod"] = mod
     return d
 def K(t, n, text=None):
     d = {"type": "KILL", "target": t, "count": n}
     if text: d["text"] = text
     return d
 def T(t): return {"type": "TALK", "target": t}
+def R(item, n=1, mod=None):
+    r = {"item": item, "count": n}
+    if mod: r["mod"] = mod
+    return r
 
 jobs = [
  ("swordsman", "검사", "quest_sword_master", "검술 교관 레온", 100,
@@ -171,6 +176,84 @@ jobs = [
     [D("minecraft:cake", 2), D("minecraft:golden_carrot", 4)], 500)]),
 ]
 
+
+# ---------------------------------------------------------------------------
+# 모드 사용법 안내 (3.6.2)
+#  - 단계 번호는 퀘스트 번호(2~7)
+#  - tips: "[모드ID] 내용" 줄로 이야기 끝에 붙는다. 그 모드가 있을 때만 보이고, {key:...} 는 플레이어가 정한 키로 바뀐다.
+#  - objs: 그 단계의 목표를 통째로 바꾼다 (mod 조건이 붙은 목표는 그 모드가 있을 때만 / !모드 는 없을 때만 쓰인다).
+#  - add: 목표를 더한다.  rewards: 보상 아이템을 더한다.  text: (intro, progress) 를 바꾼다.
+# ---------------------------------------------------------------------------
+EF = "epicfight"
+MODS = {
+ ("swordsman", 2): dict(
+    text=("검사는 자기 검을 스스로 마련할 줄 알아야 한다. 검 한 자루를 만들어 가져와라. 날이 잘 섰는지 내가 직접 보겠다.",
+          "목표에 적힌 검을 만들어 가져와라."),
+    objs=[D("epicfight:iron_tachi", 1, mod=EF), D("minecraft:iron_sword", 1, mod="!" + EF)],
+    tips=[(EF, "철 태도는 작업대에서 철검 1개와 철 주괴 2개로 만든다. 장검·대검·창처럼 무기마다 쓰는 기술이 다르니 이것저것 쥐어 봐라.")]),
+ ("swordsman", 3): dict(tips=[(EF, "{key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸면, 공격을 이어서 누를 때 연속 베기가 나간다. 블록을 캘 때는 같은 키로 채광 모드로 돌아가라.")]),
+ ("swordsman", 4): dict(tips=[(EF, "화살이 날아오면 {key:key.epicfight.dodge} 키로 몸을 굴려 피해라. 구르기에도 기력이 드니 아껴 써라.")]),
+ ("swordsman", 5): dict(tips=[(EF, "{key:key.epicfight.skill_gui} 키를 누르면 기술 편집 창이 열린다. 스킬북을 손에 들고 쓰면 새 기술을 배우고, 이 창에서 끼워 쓸 수 있다.")]),
+ ("swordsman", 6): dict(tips=[(EF, "무기마다 고유 기술이 있다. 적을 몇 번 베어 기술 게이지를 채운 뒤 {key:key.epicfight.weapon_innate_skill} 키로 써 봐라.")]),
+ ("swordsman", 7): dict(tips=[(EF, "{key:key.epicfight.lock_on} 키로 눈앞의 적을 붙잡아 두면, 여럿과 싸울 때도 한 놈에게 집중할 수 있다.")]),
+
+ ("warrior", 2): dict(
+    text=("전사에게는 묵직한 도끼가 어울리지! 도끼 하나를 만들어 와라.", "목표에 적힌 도끼를 만들어 가져와라."),
+    objs=[D("rogues:iron_double_axe", 1, mod="rogues"), D("minecraft:iron_axe", 1, mod="!rogues")],
+    tips=[("rogues", "철 양날 도끼는 철 주괴 4개와 막대기 3개로 만든다. 전사에게 딱 맞는 묵직한 무기지!")]),
+ ("warrior", 3): dict(tips=[(EF, "{key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸고 공격을 이어서 눌러 봐라. 무거운 무기일수록 한 방이 묵직하다!")]),
+ ("warrior", 4): dict(tips=[(EF, "{key:key.epicfight.guard} 키를 누르고 있으면 무기로 공격을 막는다. 막는 데도 기력이 드니 무작정 버티지는 마라!")]),
+ ("warrior", 6): dict(tips=[(EF, "둘러싸이면 {key:key.epicfight.dodge} 키로 빠져나온 뒤 다시 몰아쳐라!")]),
+
+ ("tank", 2): dict(
+    text=("수호자의 시작은 방패다. 방패 하나를 만들어 와라.", "목표에 적힌 방패를 만들어 가져와라."),
+    objs=[D("paladins:iron_kite_shield", 1, mod="paladins"), D("minecraft:shield", 1, mod="!paladins")],
+    tips=[("paladins", "철 카이트 방패는 철 주괴 6개와 가죽 1개로 만든다. 성기사들이 쓰는 묵직한 방패다.")]),
+ ("tank", 4): dict(tips=[(EF, "전투 모드에서는 {key:key.epicfight.guard} 키로 방패를 들어 막는다. 막을 때마다 기력이 줄어드니 틈을 보아 반격해라.")]),
+
+ ("archer", 2): dict(
+    text=("궁수에게 활은 몸의 일부야. 활 하나와 화살 32개를 준비해서 보여 줘.", "목표에 적힌 활과 화살 32개를 가져와."),
+    objs=[D("archers:composite_longbow", 1, mod="archers"), D("minecraft:bow", 1, mod="!archers"), D("minecraft:arrow", 32)],
+    tips=[("archers", "복합 장궁은 막대기 2개, 뼈 1개, 실 3개로 만들어. 시위를 끝까지 당기는 데 시간이 걸리지만 그만큼 멀리, 세게 날아가.")]),
+ ("archer", 7): dict(rewards=[R("archers:archer_armor_head", 1, mod="archers")],
+    tips=[("archers", "궁수 후드도 하나 줄게. 가죽 3개와 사슬 2개로 나머지 궁수 옷도 맞춰 입어 봐.")]),
+
+ ("mage", 2): dict(tips=[("irons_spellbooks", "두루마리는 손에 들고 쓰면 마나 없이 주문이 한 번 나가고 사라진단다. 아껴 두었다가 주문서에 새기면 몇 번이고 쓸 수 있지.")]),
+ ("mage", 4): dict(rewards=[R("irons_spellbooks:copper_spell_book", 1, mod="irons_spellbooks")],
+    tips=[("irons_spellbooks", "끝내면 가장 쉬운 주문서를 주마. 장신구의 주문서 칸에 끼우고 {key:key.irons_spellbooks.spell_wheel} 키로 주문을 고른 뒤 {key:key.irons_spellbooks.spellbook_cast} 키로 시전하렴.")]),
+ ("mage", 5): dict(tips=[("irons_spellbooks", "각인 테이블은 책 1권, 나무 반 블록 3개, 나무 울타리 2개로 만든단다. 주문서와 두루마리를 올려 두루마리의 주문을 주문서에 새기렴.")]),
+ ("mage", 6): dict(tips=[("wizards", "석탄 1개와 막대기 1개로 초심자 완드를 만들 수 있단다. 주문 부여대에서 주문서를 만들고 주문을 채운 뒤, 완드나 지팡이를 들고 쓰렴.")]),
+ ("mage", 7): dict(rewards=[R("wizards:wand_novice", 1, mod="wizards")]),
+
+ ("farmer", 6): dict(tips=[("kaleidoscope_cookery", "밭 옆에 허수아비를 세우면 주변 농지를 지켜 준다네. 밀짚모자, 짚 묶음, 호박, 막대기로 만들 수 있지.")]),
+
+ ("fisher", 2): dict(tips=[("starcatcher", "보통 낚싯대로는 흔한 물고기만 낚인다네. 스타캐쳐의 낚싯대로 찌가 물리면 원판이 뜨는데, 돌아가는 바늘이 초록 칸(스위트스팟)에 겹칠 때 {key:key.starcatcher.minigame_hit} 키를 눌러 줄을 감게.")]),
+ ("fisher", 3): dict(rewards=[R("starcatcher:starcatcher_guide", 1, mod="starcatcher")],
+    tips=[("starcatcher", "끝내면 낚시 안내서를 주겠네. 손에 들고 열거나 {key:key.starcatcher.open_guide} 키로 열면, 물고기마다 잡히는 곳·시간·날씨가 적혀 있다네.")]),
+ ("fisher", 4): dict(
+    text=("어부는 도구를 아껴야 해. 목표에 적힌 낚시 도구와 실 8개를 가져오게.", "목표에 적힌 낚시 도구와 실 8개를 가져와라."),
+    objs=[D("starcatcher:hook", 1, mod="starcatcher"), D("starcatcher:bobber", 1, mod="starcatcher"),
+          D("minecraft:fishing_rod", 1, mod="!starcatcher"), D("minecraft:string", 8)],
+    rewards=[R("starcatcher:starcatcher_rod", 1, mod="starcatcher")],
+    tips=[("starcatcher", "철 낚싯바늘은 철 주괴 3개와 철 조각 1개, 낚시찌는 나무판자 4개·막대기 2개·양털 1개로 만든다네. 가져오면 스타캐쳐의 낚싯대로 만들어 주지.")]),
+ ("fisher", 7): dict(add=[D("#starcatcher:rare_fishes", 1, "희귀 물고기", mod="starcatcher")],
+    tips=[("starcatcher", "마지막으로 희귀한 물고기도 한 마리 보여 주게. 낚싯바늘·낚시찌·미끼를 바꿔 끼우면 까다로운 물고기도 훨씬 수월하다네.")]),
+
+ ("miner", 2): dict(tips=[(EF, "전투 모드에서는 곡괭이질이 불편하다네. {key:key.epicfight.switch_mode} 키로 채광 모드로 바꾸고 캐게.")]),
+
+ ("cook", 3): dict(rewards=[R("kaleidoscope_cookery:iron_kitchen_knife", 1, mod="kaleidoscope_cookery")],
+    tips=[("kaleidoscope_cookery", "조약돌 8개와 모닥불로 난로를, 철 주괴 7개로 프라이팬을 만들어 난로 위에 올리게. 난로는 부싯돌과 부시로 불을 붙인다네."),
+          ("kaleidoscope_cookery", "팬에 기름을 두르고 재료를 넣은 뒤 뒤집개(철 주괴·철 조각·막대기)로 몇 번 볶아 그릇에 담으면 요리가 되지. 기름은 중식도로 돼지를 잡으면 얻을 수 있으니, 끝내면 중식도를 하나 주겠네.")]),
+ ("cook", 4): dict(add=[D("farmersdelight:beef_stew", 2, mod="farmersdelight")],
+    tips=[("farmersdelight", "조리용 냄비를 불 위(난로나 모닥불)에 올리고 재료를 넣으면 요리가 끓는다네. 소고기 스튜는 익히지 않은 소고기, 당근, 감자로 만들지."),
+          ("handson_delight", "냄비는 따로 창이 뜨지 않고 그 자리에서 열린다네. 재료를 직접 넣고 저어서 끓이게.")]),
+ ("cook", 5): dict(rewards=[R("farmersdelight:iron_knife", 1, mod="farmersdelight")],
+    tips=[("farmersdelight", "도마(막대기 2개·나무판자 4개)에 재료를 올리고 식칼로 손질하면 썬 재료가 나온다네. 끝내면 철 식칼을 하나 주겠네."),
+          ("handson_delight", "도마 위에 그어진 선을 따라 칼을 든 채 직접 썰어야 한다네.")]),
+ ("cook", 6): dict(add=[D("kaleidoscope_cookery:pork_bone_soup", 2, mod="kaleidoscope_cookery")],
+    tips=[("kaleidoscope_cookery", "냄비는 벽돌 2개와 철 주괴 5개로, 뚜껑은 벽돌 1개와 철 주괴 3개로 만든다네. 불 위에 올리고 물을 부은 뒤 재료를 넣고 뚜껑을 덮으면 끓기 시작하지. 뼈만 넣어도 사골국이 된다네.")]),
+}
+
 quests = []
 for jid, jname, mentor, mname, order, intro1, steps in jobs:
     chain = jname + " 선행 퀘스트"
@@ -183,13 +266,24 @@ for jid, jname, mentor, mname, order, intro1, steps in jobs:
     for i, step in enumerate(steps):
         title, intro, prog, done, objs, gold = step[:6]
         items = step[6] if len(step) > 6 else None
+        m = MODS.get((jid, i + 2), {})
+        if "text" in m:
+            intro, prog = m["text"]
+        if "objs" in m:
+            objs = m["objs"]
+        objs = list(objs) + m.get("add", [])
+        if m.get("rewards"):
+            items = (items or []) + m["rewards"]
+        for mod, tip in m.get("tips", []):
+            intro += "\n[" + mod + "] " + tip
+            prog += "\n[" + mod + "] " + tip
         last = i == len(steps) - 1
         qq = q(f"job_{jid}_{i+2}", f"{chain} ({i+2}/{total})", order + i + 1, title, mentor, intro, prog, done, objs, gold,
                requires=[prev], flags=[f"unlock_job_{jid}"] if last else None, items=items)
         quests.append(qq)
         prev = qq["id"]
 
-doc = {"_help": "직업별 선행 퀘스트 (직업마다 7단계). 1단계는 직업 안내인(job)에게서 받고, 2~4단계는 각 직업의 스승에게서 받습니다. "
+doc = {"_help": "직업별 선행 퀘스트 (직업마다 7단계). 1단계는 직업 안내인(job)에게서 받고, 2~7단계는 각 직업의 스승에게서 받습니다. 이야기 속 \"[모드ID] ...\" 줄은 그 모드가 있을 때만 보이는 도움말이고, {key:키 이름} 은 플레이어가 정한 키로 바뀝니다. 목표·보상의 mod 는 그 모드가 있을 때만(!모드ID 는 없을 때만) 쓰입니다. "
                 "마지막 단계의 보상 표식(unlock_job_<직업>)을 얻어야 그 직업을 고를 수 있습니다. 게임 안 퀘스트 편집기(/rtshop quest edit)로 고칠 수 있고, "
                 "이 파일은 한 번 설치된 뒤에는 모드 업데이트로 덮어쓰지 않습니다. 전투 직업 스승은 /rtshop npc quest_sword_master 처럼 소환합니다.",
        "npcs": npcs, "quests": quests}

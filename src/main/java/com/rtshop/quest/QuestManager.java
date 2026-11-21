@@ -78,7 +78,9 @@ public final class QuestManager {
      * 한 글자라도 고쳤으면 그대로 둔다.
      */
     private static final Map<String, Set<String>> OLD_DEFAULTS = Map.of(
-            "job_quests.json", Set.of("9a51ce61d48d98107461017071f42f94276d31641b0a88349b1b88387dc8b540"));
+            "job_quests.json", Set.of(
+                    "9a51ce61d48d98107461017071f42f94276d31641b0a88349b1b88387dc8b540", // 3.6.0
+                    "1e9b133e53648071971c057461ddfa6cf659694ae328164b0b68ed2f22655c52")); // 3.6.1
 
     /** 편집 화면에서 새로 만든 퀘스트·NPC 가 들어가는 파일. */
     public static final String CUSTOM_FILE = "my_quests.json";
@@ -195,6 +197,7 @@ public final class QuestManager {
             for (JsonElement e : root.getAsJsonArray("quests")) {
                 try {
                     QuestDef q = QuestDef.parse(e.getAsJsonObject());
+                    applyModConditions(q);
                     out.add(q);
                     files.put(q, name);
                 } catch (Exception ex) {
@@ -202,6 +205,12 @@ public final class QuestManager {
                 }
             }
         }
+    }
+
+    /** 모드 조건(mod)이 맞지 않는 목표와 보상 아이템을 뺀다 (예: Epic Fight 가 없으면 Epic Fight 무기 목표 대신 철검 목표만 남는다). */
+    public static void applyModConditions(QuestDef q) {
+        q.objectives.removeIf(ob -> !QuestDef.modOk(ob.mod));
+        q.rewardItems.removeIf(ir -> !QuestDef.modOk(ir.mod));
     }
 
     /** 참조 오류(없는 선행 퀘스트, 순환)를 찾아 문제 목록에 넣고, 못 쓰는 퀘스트는 뺀다. */

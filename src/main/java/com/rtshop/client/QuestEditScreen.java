@@ -56,11 +56,13 @@ public class QuestEditScreen extends Screen {
         String count = "1";
         String text = "";
         String dim = "minecraft:overworld";
+        String mod = "";
     }
 
     private static final class ItemDraft {
         String item = "";
         String count = "1";
+        String mod = "";
     }
 
     private static final class ChoiceDraft {
@@ -224,6 +226,7 @@ public class QuestEditScreen extends Screen {
                 od.type = ob.type;
                 od.count = Integer.toString(ob.type == QuestDef.Type.VISIT ? ob.radius : ob.count);
                 od.text = ob.text;
+                od.mod = ob.mod;
                 if (ob.type == QuestDef.Type.VISIT) {
                     od.dim = ob.target;
                     od.target = ob.x + " " + ob.y + " " + ob.z;
@@ -239,6 +242,7 @@ public class QuestEditScreen extends Screen {
                 ItemDraft id = new ItemDraft();
                 id.item = ir.item;
                 id.count = Integer.toString(ir.count);
+                id.mod = ir.mod;
                 q.items.add(id);
             }
             for (QuestDef.Choice c : d.choices) {
@@ -327,6 +331,56 @@ public class QuestEditScreen extends Screen {
         return l;
     }
 
+    /** 모드 조건 버튼에 보일 글. */
+    private static String condLabel(String cond) {
+        if (cond == null || cond.isBlank()) {
+            return tr("rtshop.qedit.cond_always");
+        }
+        boolean not = cond.startsWith("!");
+        String id = not ? cond.substring(1) : cond;
+        return tr(not ? "rtshop.qedit.cond_without" : "rtshop.qedit.cond_with", QuestText.modName(id));
+    }
+
+    /** 모드 조건 목록: 항상 / (고른 모드가 있으면) 있을 때·없을 때 / 모든 모드 (있을 때). */
+    private static List<ChoicePopup.Option> condOptions(String cur) {
+        List<ChoicePopup.Option> l = new ArrayList<>();
+        l.add(new ChoicePopup.Option("", tr("rtshop.qedit.cond_always")));
+        String id = cur == null ? "" : (cur.startsWith("!") ? cur.substring(1) : cur);
+        if (!id.isBlank()) {
+            l.add(new ChoicePopup.Option(id, condLabel(id)));
+            l.add(new ChoicePopup.Option("!" + id, condLabel("!" + id)));
+        }
+        List<net.minecraftforge.forgespi.language.IModInfo> mods = new ArrayList<>(net.minecraftforge.fml.ModList.get().getMods());
+        mods.sort(java.util.Comparator.comparing(m -> m.getDisplayName().toLowerCase(java.util.Locale.ROOT)));
+        for (net.minecraftforge.forgespi.language.IModInfo m : mods) {
+            String mid = m.getModId();
+            if (mid.equals("minecraft") || mid.equals("forge") || mid.equals(id)) {
+                continue;
+            }
+            l.add(new ChoicePopup.Option(mid, m.getDisplayName() + "  (" + mid + ")"));
+        }
+        return l;
+    }
+
+    /** 키 넣기 목록: 모든 조작 키 (이름 [지금 키]). */
+    private static List<ChoicePopup.Option> keyOptions() {
+        List<ChoicePopup.Option> l = new ArrayList<>();
+        Minecraft mc = Minecraft.getInstance();
+        net.minecraft.client.KeyMapping[] all = mc.options.keyMappings.clone();
+        java.util.Arrays.sort(all);
+        for (net.minecraft.client.KeyMapping k : all) {
+            l.add(new ChoicePopup.Option(k.getName(), net.minecraft.client.resources.language.I18n.get(k.getName()) + "  [" + k.getTranslatedKeyMessage().getString() + "]"));
+        }
+        return l;
+    }
+
+    /** 모드 도움말 줄 넣기 목록: 설치된 모드. */
+    private static List<ChoicePopup.Option> modTipOptions() {
+        List<ChoicePopup.Option> l = condOptions("");
+        l.remove(0);
+        return l;
+    }
+
     private List<ChoicePopup.Option> typeOptions() {
         List<ChoicePopup.Option> l = new ArrayList<>();
         for (QuestDef.Type t : TYPES) {
@@ -338,6 +392,17 @@ public class QuestEditScreen extends Screen {
     /** 점검용 */
     public ChoicePopup popupForTest() {
         return popup;
+    }
+
+    /** 점검용: 이야기 탭에서 "키 넣기" 목록을 연다. */
+    public void openKeyPopupForTest() {
+        int kx = rx() + rw() - 4 - 62;
+        openPopup(kx, formTop() + 1, 62, 12, keyOptions(), "", v -> insertAtCursor(0, "{key:" + v + "}"));
+    }
+
+    /** 점검용: 지금 퀘스트의 "받기 전 이야기". */
+    public String introForTest() {
+        return q == null ? "" : q.intro;
     }
 
     /** 점검용: 목표 탭에서 첫 목표의 종류 팝업을 연다. */
@@ -424,6 +489,9 @@ public class QuestEditScreen extends Screen {
             if (!od.text.isBlank()) {
                 jo.addProperty("text", od.text);
             }
+            if (!od.mod.isBlank()) {
+                jo.addProperty("mod", od.mod.trim());
+            }
             objs.add(jo);
         }
         o.add("objectives", objs);
@@ -437,6 +505,9 @@ public class QuestEditScreen extends Screen {
             JsonObject jo = new JsonObject();
             jo.addProperty("item", id.item.trim());
             jo.addProperty("count", Math.max(1, num(id.count.isBlank() ? "1" : id.count, tr("rtshop.qedit.f_items"))));
+            if (!id.mod.isBlank()) {
+                jo.addProperty("mod", id.mod.trim());
+            }
             items.add(jo);
         }
         r.add("items", items);
@@ -784,16 +855,61 @@ public class QuestEditScreen extends Screen {
         box(fxw, y, fw, q.blockFlags, 400, v -> q.blockFlags = v);
     }
 
+    private final MultiLineEditBox[] storyAreas = new MultiLineEditBox[3];
+
     private void buildStory(int x, int w) {
         int top = formTop() + 1;
         int each = (formH() - 2) / 3;
-        int bh = each - 12;
-        label(x + 4, top + 1, "rtshop.qedit.f_intro");
-        area(x + 4, top + 11, w - 8, bh, q.intro, v -> q.intro = v);
-        label(x + 4, top + each + 1, "rtshop.qedit.f_progress");
-        area(x + 4, top + each + 11, w - 8, bh, q.progress, v -> q.progress = v);
-        label(x + 4, top + 2 * each + 1, "rtshop.qedit.f_done");
-        area(x + 4, top + 2 * each + 11, w - 8, bh, q.done, v -> q.done = v);
+        int bh = each - 15;
+        String[] keys = {"rtshop.qedit.f_intro", "rtshop.qedit.f_progress", "rtshop.qedit.f_done"};
+        for (int i = 0; i < 3; i++) {
+            int ty = top + i * each;
+            final int idx = i;
+            label(x + 4, ty + 3, keys[i]);
+            int kw = 62;
+            int mw = 74;
+            int kx = x + w - 4 - kw;
+            int mx = kx - 4 - mw;
+            hit(mx, ty, mw, 12, () -> tr("rtshop.qedit.insert_tip"), () -> true, b -> openPopup(mx, ty, mw, 12, modTipOptions(), "",
+                    v -> appendTipLine(idx, v)));
+            hit(kx, ty, kw, 12, () -> tr("rtshop.qedit.insert_key"), () -> true, b -> openPopup(kx, ty, kw, 12, keyOptions(), "",
+                    v -> insertAtCursor(idx, "{key:" + v + "}")));
+            String value = i == 0 ? q.intro : i == 1 ? q.progress : q.done;
+            storyAreas[i] = area(x + 4, ty + 14, w - 8, bh, value, v -> {
+                if (idx == 0) {
+                    q.intro = v;
+                } else if (idx == 1) {
+                    q.progress = v;
+                } else {
+                    q.done = v;
+                }
+            });
+        }
+    }
+
+    /** 커서 자리에 글을 넣는다 (키 표시처럼 한 줄짜리). */
+    private void insertAtCursor(int idx, String text) {
+        MultiLineEditBox b = storyAreas[idx];
+        if (b == null) {
+            return;
+        }
+        this.setFocused(b);
+        b.setFocused(true);
+        for (char c : text.toCharArray()) {
+            b.charTyped(c, 0);
+        }
+    }
+
+    /** 글 맨 끝에 "[모드ID] " 로 시작하는 도움말 줄을 새로 붙인다 (그 모드가 있을 때만 보인다). */
+    private void appendTipLine(int idx, String mod) {
+        MultiLineEditBox b = storyAreas[idx];
+        if (b == null) {
+            return;
+        }
+        String v = b.getValue();
+        b.setValue(v + (v.isEmpty() || v.endsWith("\n") ? "" : "\n") + "[" + mod + "] ");
+        this.setFocused(b);
+        b.setFocused(true);
     }
 
     private static String typeKey(QuestDef.Type t) {
@@ -886,9 +1002,16 @@ public class QuestEditScreen extends Screen {
                 rebuild();
             });
             y += 15;
-            // 이 목표가 무엇을 뜻하는지 한 줄 안내
-            labels.add(new Label(x + 8, y + 1, Ui.clip(this.font, goalHint(od), w - 16), Ui.C_INK_SOFT));
-            y += 12;
+            // 이 목표가 무엇을 뜻하는지 한 줄 안내 + 모드 조건
+            int cw = 104;
+            labels.add(new Label(x + 8, y + 1, Ui.clip(this.font, goalHint(od), w - 16 - cw - 4), Ui.C_INK_SOFT));
+            final int cy = y;
+            hit(x + w - 4 - cw, y - 1, cw, 12, () -> Ui.clip(this.font, condLabel(od.mod), cw - 12) + "▼", () -> true,
+                    b -> openPopup(x + w - 4 - cw, cy - 1, cw, 12, condOptions(od.mod), od.mod, v -> {
+                        od.mod = v;
+                        markDirty();
+                    }));
+            y += 13;
         }
         if (q.objs.size() < MAX_OBJ) {
             hit(x + 4, y, 90, 14, tr("rtshop.qedit.add_goal"), () -> {
@@ -1021,8 +1144,16 @@ public class QuestEditScreen extends Screen {
         for (int i = 0; i < q.items.size(); i++) {
             ItemDraft id = q.items.get(i);
             final int idx = i;
-            iconHit(x + 8, y - 1, w - 8 - 4 - 36 - 4 - 24 - 4 - 18, 14, () -> pickLabel(itemName(id.item), id.item),
+            int cw = 70;
+            iconHit(x + 8, y - 1, w - 8 - 4 - 36 - 4 - 24 - 4 - 18 - cw - 4, 14, () -> pickLabel(itemName(id.item), id.item),
                     () -> itemIcon(id.item), b -> openPicker(PickerScreen.Mode.ITEM, v -> id.item = v));
+            final int cx = x + w - 18 - 4 - 24 - 4 - 36 - 4 - cw;
+            final int cy = y;
+            hit(cx, y - 1, cw, 14, () -> Ui.clip(this.font, condLabel(id.mod), cw - 12) + "▼", () -> true,
+                    b -> openPopup(cx, cy - 1, cw, 14, condOptions(id.mod), id.mod, v -> {
+                        id.mod = v;
+                        markDirty();
+                    }));
             box(x + w - 18 - 4 - 24 - 4 - 36, y, 36, id.count, 6, v -> id.count = v);
             hit(x + w - 18 - 4 - 24, y - 1, 24, 14, () -> tr("rtshop.qedit.help_hand"), () -> true, b -> {
                 Minecraft mc = Minecraft.getInstance();
