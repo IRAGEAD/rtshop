@@ -509,5 +509,6 @@
   "rtshop.attedit.hint_settings": "복구권 가격: shops/attendance_shop.json · 저장하면 바로 적용",
   "rtshop.attedit.err_gold": "Gold 칸에는 0 이상의 숫자를 넣으세요.",
   "rtshop.attedit.err_count": "%s 의 개수는 1 이상이어야 합니다.",
-  "rtshop.attedit.err_hours": "복구권 시간 칸에는 숫자를 넣으세요."
+  "rtshop.attedit.err_hours": "복구권 시간 칸에는 숫자를 넣으세요.",
+  "rtshop.att.op_only": "출석부 편집은 OP 만 할 수 있습니다."
 }

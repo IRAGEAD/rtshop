@@ -509,5 +509,6 @@
   "rtshop.attedit.hint_settings": "Ticket price: shops/attendance_shop.json · saves apply at once",
   "rtshop.attedit.err_gold": "Gold must be a number ≥ 0.",
   "rtshop.attedit.err_count": "Count of %s must be ≥ 1.",
-  "rtshop.attedit.err_hours": "Ticket hours must be numbers."
+  "rtshop.attedit.err_hours": "Ticket hours must be numbers.",
+  "rtshop.att.op_only": "Only operators can edit the attendance rewards."
 }

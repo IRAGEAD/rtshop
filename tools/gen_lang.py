@@ -190,6 +190,7 @@ NEW = {
  "rtshop.att.remind_restore": (" 초기화된 %s일차 진행도는 %s 까지 복구권으로 되돌릴 수 있습니다.", " Your reset %s-day streak can be restored until %s."),
  "rtshop.att.remind_link": ("[출석부 보기]", "[Open attendance]"),
  "rtshop.att.saved": ("출석 보상을 저장했습니다. 바로 적용됩니다.", "Attendance rewards saved and applied."),
+ "rtshop.att.op_only": ("출석부 편집은 OP 만 할 수 있습니다.", "Only operators can edit the attendance rewards."),
  "rtshop.att.cmd_set": ("%s 의 연속 출석을 %s일로 정했습니다.", "Set %s's streak to %s days."),
  "rtshop.att.cmd_reset": ("%s 의 출석 기록을 지웠습니다.", "Cleared %s's attendance."),
  "rtshop.attedit.title": ("출석 보상 편집기", "Attendance Editor"),

@@ -252,7 +252,8 @@ public final class ShopServer {
                             com.rtshop.attendance.Attendance.open(ctx.getSource().getPlayerOrException(), -1);
                             return 1;
                         })
-                        .then(Commands.literal("edit").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                        .then(Commands.literal("edit").requires(src -> src.getPlayer() == null || com.rtshop.attendance.Attendance.canEdit(src.getPlayer()))
+                                .executes(ctx -> {
                             com.rtshop.attendance.Attendance.openEditor(ctx.getSource().getPlayerOrException());
                             return 1;
                         }))

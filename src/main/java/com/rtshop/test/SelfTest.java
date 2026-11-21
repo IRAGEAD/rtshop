@@ -2138,6 +2138,16 @@ public final class SelfTest {
             clear(a);
         }
 
+        // 편집은 OP 만
+        check("players who are not OP can't edit the attendance rewards", !com.rtshop.attendance.Attendance.canEdit(a)
+                && !com.rtshop.attendance.Attendance.view(a, -1).get("canEdit").getAsBoolean());
+        {
+            com.google.gson.JsonObject hacked = com.rtshop.attendance.AttendanceConfig.get().toJson();
+            hacked.getAsJsonArray("days").get(0).getAsJsonObject().addProperty("gold", 999_999);
+            com.rtshop.attendance.Attendance.handleAction(a, com.rtshop.net.AttendanceActionPacket.SAVE, hacked.toString());
+            check("...and a save sent by a non-OP is ignored", com.rtshop.attendance.AttendanceConfig.get().days.get(0).gold != 999_999);
+        }
+
         // 출석 상점: 복구권을 높은 값에 팔고, 되사지 않는다
         ShopData shop = ShopServer.shops().get("attendance_shop");
         check("the attendance shop is installed for existing servers too", shop != null);

@@ -370,9 +370,14 @@ public final class Attendance {
 
     // ------------------------------------------------------------------ 편집 (OP)
 
+    /** 출석부 편집은 OP(서버 관리자 목록에 있는 사람, 싱글플레이에서는 치트를 켠 주인)만 할 수 있다. */
+    public static boolean canEdit(ServerPlayer p) {
+        return !(p instanceof FakePlayer) && p.server.getPlayerList().isOp(p.getGameProfile());
+    }
+
     public static void openEditor(ServerPlayer p) {
-        if (!p.hasPermissions(2)) {
-            p.sendSystemMessage(Component.translatable("rtshop.qedit.no_permission"));
+        if (!canEdit(p)) {
+            p.sendSystemMessage(Component.translatable("rtshop.att.op_only"));
             return;
         }
         if (real(p)) {
@@ -399,8 +404,8 @@ public final class Attendance {
     }
 
     private static void handleSave(ServerPlayer p, String json) {
-        if (!p.hasPermissions(2)) {
-            p.sendSystemMessage(Component.translatable("rtshop.qedit.no_permission"));
+        if (!canEdit(p)) {
+            p.sendSystemMessage(Component.translatable("rtshop.att.op_only"));
             return;
         }
         String err = save(json);
@@ -438,7 +443,7 @@ public final class Attendance {
         JsonObject o = new JsonObject();
         o.addProperty("npc", c.npcName);
         o.addProperty("atNpc", npcId >= 0);
-        o.addProperty("canEdit", p.hasPermissions(2));
+        o.addProperty("canEdit", canEdit(p));
         o.addProperty("zone", c.zone().getId());
         o.addProperty("now", now);
         o.addProperty("streak", e.streak);
