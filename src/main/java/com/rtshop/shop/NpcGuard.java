@@ -97,6 +97,20 @@ public final class NpcGuard {
         }
     }
 
+    /**
+     * 클라이언트 쪽 우클릭: 엔티티 태그는 서버에만 있어 클라이언트는 RT Shop NPC 를 모른다. 그래서 그대로 두면 클라이언트가
+     * 주민 거래 목록을 만들려다 다른 모드의 거래 수정(Mixin) 오류로 튕길 수 있다 (수산물 상인 = 어부 주민).
+     * RT Shop NPC 는 모두 AI 가 꺼진 주민이므로, 클라이언트에서는 AI 가 꺼진 주민의 기본 동작을 막는다.
+     * 상호작용 패킷은 이미 서버로 간 뒤라 서버가 창을 연다 (다른 AI 꺼진 주민도 서버가 거래창을 보내므로 그대로 쓸 수 있다).
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onClientInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract e) {
+        if (e.getLevel().isClientSide() && e.getTarget() instanceof net.minecraft.world.entity.npc.AbstractVillager v && v.isNoAi()) {
+            e.setCanceled(true);
+            e.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+        }
+    }
+
     /** 피해 이벤트를 거치지 않고 체력을 직접 깎는 모드가 있어도 매 초 체력을 되돌린다. */
     @SubscribeEvent
     public static void onTick(LivingEvent.LivingTickEvent e) {
