@@ -372,7 +372,7 @@
   "rtshop.jedit.col_speed": "Speed",
   "rtshop.jedit.magic": "Spells",
   "rtshop.jedit.hint_step": "Negative = drawback. Health: 2 = one heart.",
-  "rtshop.jedit.hint_weapons": "+ = strong with it, - = weak. Speed applies to melee only.",
+  "rtshop.jedit.hint_weapons": "+ strong · - weak · Shift 1%",
   "rtshop.jedit.preview": "Shown on the job screen",
   "rtshop.jedit.held": "Item in your hand",
   "rtshop.jedit.held_empty": "Hold an item to set its type here.",

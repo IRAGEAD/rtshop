@@ -313,7 +313,8 @@ public class JobEditScreen extends Screen {
         text(x + 16, y, () -> tr("rtshop.jedit.col_type"), Ui.C_GOLD_DARK);
         text(dmgX + 16, y, () -> tr("rtshop.jedit.col_damage"), Ui.C_GOLD_DARK);
         text(spdX + 10, y, () -> tr("rtshop.jedit.col_speed"), Ui.C_GOLD_DARK);
-        y += 11;
+        y += 10;
+        int row = Math.max(10, Math.min(ROW, (top() + bodyH() - 4 - y) / 12));
         List<String[]> rows = new ArrayList<>();
         if (cfg != null) {
             for (WeaponTypes.Type t : cfg.weaponTypes) {
@@ -327,18 +328,17 @@ public class JobEditScreen extends Screen {
             icons.add(new Icon(x, y - 2, icon(r[2])));
             text(x + 18, y + 1, () -> r[1], Ui.C_INK);
             text(dmgX + 16, y + 1, () -> pct(weaponValue(weapons, type, "damage")), Ui.C_INK);
-            hit(dmgX, y - 1, 13, 11, () -> "-", () -> true, b -> addWeapon(weapons, type, "damage", -step()));
-            hit(dmgX + 60, y - 1, 13, 11, () -> "+", () -> true, b -> addWeapon(weapons, type, "damage", step()));
+            hit(dmgX, y, 12, row - 1, () -> "-", () -> true, b -> addWeapon(weapons, type, "damage", -step()));
+            hit(dmgX + 60, y, 12, row - 1, () -> "+", () -> true, b -> addWeapon(weapons, type, "damage", step()));
             if (melee) {
                 text(spdX + 16, y + 1, () -> pct(weaponValue(weapons, type, "speed")), Ui.C_INK);
-                hit(spdX, y - 1, 13, 11, () -> "-", () -> true, b -> addWeapon(weapons, type, "speed", -step()));
-                hit(spdX + 60, y - 1, 13, 11, () -> "+", () -> true, b -> addWeapon(weapons, type, "speed", step()));
+                hit(spdX, y, 12, row - 1, () -> "-", () -> true, b -> addWeapon(weapons, type, "speed", -step()));
+                hit(spdX + 60, y, 12, row - 1, () -> "+", () -> true, b -> addWeapon(weapons, type, "speed", step()));
             } else {
                 text(spdX + 24, y + 1, () -> "—", Ui.C_INK_SOFT);
             }
-            y += ROW;
+            y += row;
         }
-        text(x, y + 2, () -> tr("rtshop.jedit.hint_weapons"), Ui.C_INK_SOFT);
         previewY = -1;
     }
 
@@ -401,7 +401,7 @@ public class JobEditScreen extends Screen {
         if (cfg == null || item == null) {
             return "?";
         }
-        return cfg.typeName(WeaponTypes.classify(item, cfg.weaponTypes, Map.of()));
+        return typeLabel(WeaponTypes.classify(item, cfg.weaponTypes, Map.of()));
     }
 
     private void buildTypes() {
@@ -418,8 +418,7 @@ public class JobEditScreen extends Screen {
         } else {
             String id = String.valueOf(ForgeRegistries.ITEMS.getKey(held.getItem()));
             icons.add(new Icon(x, y - 2, held.copy()));
-            text(x + 18, y + 2, () -> Ui.clip(this.font, held.getHoverName().getString(), w - 150) + "  →  "
-                    + typeLabel(currentType(id)), Ui.C_INK);
+            text(x + 18, y + 2, () -> Ui.clip(this.font, held.getHoverName().getString(), w - 110), Ui.C_INK);
             addCycle(rx() + rw() - 96, y, id);
         }
         y += 18;
@@ -505,7 +504,7 @@ public class JobEditScreen extends Screen {
         g.fill(fx + 5, fy + 22, fx + W - 5, fy + 23, Ui.C_GOLD_DARK);
         String t = this.title.getString() + (dirty ? " *" : "");
         g.drawString(this.font, t, fx + 10, fy + 9, Ui.C_GOLD, true);
-        String help = Ui.clip(this.font, tr("rtshop.jedit.help"), W - 30 - this.font.width(t));
+        String help = Ui.clip(this.font, tr(selected >= 0 && tab == 1 ? "rtshop.jedit.hint_weapons" : "rtshop.jedit.help"), W - 30 - this.font.width(t));
         g.drawString(this.font, help, fx + W - 10 - this.font.width(help), fy + 9, Ui.C_PARCH_SHADE, false);
         g.drawString(this.font, tr("rtshop.jedit.jobs"), fx + 8, fy + 30, Ui.C_CREAM, false);
         Ui.bevel(g, rx(), top(), rw(), bodyH(), Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
