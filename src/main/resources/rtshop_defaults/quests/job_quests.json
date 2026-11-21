@@ -1,5 +1,5 @@
 {
-  "_help": "직업별 선행 퀘스트 (직업마다 4단계). 1단계는 직업 안내인(job)에게서 받고, 2~4단계는 각 직업의 스승에게서 받습니다. 마지막 단계의 보상 표식(unlock_job_<직업>)을 얻어야 그 직업을 고를 수 있습니다. 게임 안 퀘스트 편집기(/rtshop quest edit)로 고칠 수 있고, 이 파일은 한 번 설치된 뒤에는 모드 업데이트로 덮어쓰지 않습니다. 전투 직업 스승은 /rtshop npc quest_sword_master 처럼 소환합니다.",
+  "_help": "직업별 선행 퀘스트 (직업마다 7단계). 1단계는 직업 안내인(job)에게서 받고, 2~4단계는 각 직업의 스승에게서 받습니다. 마지막 단계의 보상 표식(unlock_job_<직업>)을 얻어야 그 직업을 고를 수 있습니다. 게임 안 퀘스트 편집기(/rtshop quest edit)로 고칠 수 있고, 이 파일은 한 번 설치된 뒤에는 모드 업데이트로 덮어쓰지 않습니다. 전투 직업 스승은 /rtshop npc quest_sword_master 처럼 소환합니다.",
   "npcs": [
     {
       "id": "sword_master",
@@ -35,7 +35,7 @@
   "quests": [
     {
       "id": "job_swordsman_1",
-      "chain": "검사 선행 퀘스트 (1/4)",
+      "chain": "검사 선행 퀘스트 (1/7)",
       "order": 100,
       "title": "검사의 길",
       "giver": "job",
@@ -55,7 +55,7 @@
     },
     {
       "id": "job_swordsman_2",
-      "chain": "검사 선행 퀘스트 (2/4)",
+      "chain": "검사 선행 퀘스트 (2/7)",
       "order": 101,
       "title": "검을 쥐는 법",
       "giver": "quest_sword_master",
@@ -73,31 +73,110 @@
         }
       ],
       "reward": {
-        "gold": 200
+        "gold": 100
       }
     },
     {
       "id": "job_swordsman_3",
-      "chain": "검사 선행 퀘스트 (3/4)",
+      "chain": "검사 선행 퀘스트 (3/7)",
       "order": 102,
-      "title": "첫 실전",
+      "title": "기초 수련",
       "giver": "quest_sword_master",
       "requires": [
         "job_swordsman_2"
       ],
-      "intro": "연습은 끝났다. 밤에 나타나는 좀비와 스켈레톤을 상대해 봐라. 검사는 물러서지 않는다.",
-      "progress": "좀비 8마리와 스켈레톤 4마리를 처치하라.",
-      "done": "살아 돌아왔군. 검이 손에 붙기 시작했을 거다.",
+      "intro": "검은 휘두른 만큼 손에 붙는다. 좀비 12마리를 상대로 기본기를 익혀라.",
+      "progress": "좀비 12마리를 처치하라.",
+      "done": "자세가 조금 잡혔군.",
       "objectives": [
         {
           "type": "KILL",
           "target": "minecraft:zombie",
+          "count": 12
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_swordsman_4",
+      "chain": "검사 선행 퀘스트 (4/7)",
+      "order": 103,
+      "title": "밤의 시험",
+      "giver": "quest_sword_master",
+      "requires": [
+        "job_swordsman_3"
+      ],
+      "intro": "밤에는 적이 사방에서 온다. 스켈레톤 8마리와 거미 6마리를 베어라. 화살을 피하며 파고드는 게 요령이다.",
+      "progress": "스켈레톤 8마리와 거미 6마리를 처치하라.",
+      "done": "살아 돌아왔군. 검이 손에 붙기 시작했을 거다.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:skeleton",
           "count": 8
         },
         {
           "type": "KILL",
-          "target": "minecraft:skeleton",
-          "count": 4
+          "target": "minecraft:spider",
+          "count": 6
+        }
+      ],
+      "reward": {
+        "gold": 200
+      }
+    },
+    {
+      "id": "job_swordsman_5",
+      "chain": "검사 선행 퀘스트 (5/7)",
+      "order": 104,
+      "title": "검 손질",
+      "giver": "quest_sword_master",
+      "requires": [
+        "job_swordsman_4"
+      ],
+      "intro": "검사는 검을 아낄 줄 알아야 한다. 철 주괴 8개와 숫돌 하나를 가져와라. 네 검을 함께 손질하자.",
+      "progress": "철 주괴 8개와 숫돌 하나를 가져와라.",
+      "done": "날이 다시 섰다. 이제 강한 적을 상대해 보자.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:iron_ingot",
+          "count": 8
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:grindstone",
+          "count": 1
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_swordsman_6",
+      "chain": "검사 선행 퀘스트 (6/7)",
+      "order": 105,
+      "title": "빠르게, 정확하게",
+      "giver": "quest_sword_master",
+      "requires": [
+        "job_swordsman_5"
+      ],
+      "intro": "크리퍼는 망설이면 터진다. 크리퍼 5마리와 거미 8마리를 처치해라. 빠른 판단이 검사의 무기다.",
+      "progress": "크리퍼 5마리와 거미 8마리를 처치하라.",
+      "done": "제법 빨라졌군.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:creeper",
+          "count": 5
+        },
+        {
+          "type": "KILL",
+          "target": "minecraft:spider",
+          "count": 8
         }
       ],
       "reward": {
@@ -105,27 +184,27 @@
       }
     },
     {
-      "id": "job_swordsman_4",
-      "chain": "검사 선행 퀘스트 (4/4)",
-      "order": 103,
+      "id": "job_swordsman_7",
+      "chain": "검사 선행 퀘스트 (7/7)",
+      "order": 106,
       "title": "검사의 증표",
       "giver": "quest_sword_master",
       "requires": [
-        "job_swordsman_3"
+        "job_swordsman_6"
       ],
-      "intro": "마지막이다. 거미는 빠르고 교활하지. 거미 6마리를 베고, 그 거미줄을 증거로 가져와라. 그러면 너를 검사로 인정하마.",
-      "progress": "거미 6마리를 처치하고 실 6개를 가져와라.",
+      "intro": "마지막이다. 스켈레톤 10마리를 베고, 그 뼈 16개를 증거로 가져와라. 그러면 너를 검사로 인정하마.",
+      "progress": "스켈레톤 10마리를 처치하고 뼈 16개를 가져와라.",
       "done": "훌륭하다. 이제부터 너는 검사다. 직업 안내인에게 가서 검사를 고르도록.",
       "objectives": [
         {
           "type": "KILL",
-          "target": "minecraft:spider",
-          "count": 6
+          "target": "minecraft:skeleton",
+          "count": 10
         },
         {
           "type": "DELIVER",
-          "target": "minecraft:string",
-          "count": 6
+          "target": "minecraft:bone",
+          "count": 16
         }
       ],
       "reward": {
@@ -137,7 +216,7 @@
     },
     {
       "id": "job_warrior_1",
-      "chain": "전사 선행 퀘스트 (1/4)",
+      "chain": "전사 선행 퀘스트 (1/7)",
       "order": 110,
       "title": "전사의 길",
       "giver": "job",
@@ -157,14 +236,14 @@
     },
     {
       "id": "job_warrior_2",
-      "chain": "전사 선행 퀘스트 (2/4)",
+      "chain": "전사 선행 퀘스트 (2/7)",
       "order": 111,
       "title": "전사의 도끼",
       "giver": "quest_war_chief",
       "requires": [
         "job_warrior_1"
       ],
-      "intro": "전사에게는 묵직한 도끼가 어울리지! 철도끼 하나를 만들어 와라. 나무 패는 데 쓰던 거라도 상관없다, 하하!",
+      "intro": "전사에게는 묵직한 도끼가 어울리지! 철도끼 하나를 만들어 와라.",
       "progress": "철도끼 하나를 가져와라.",
       "done": "오, 제법 묵직하군! 이제 휘둘러 볼 차례다.",
       "objectives": [
@@ -175,31 +254,110 @@
         }
       ],
       "reward": {
-        "gold": 200
+        "gold": 100
       }
     },
     {
       "id": "job_warrior_3",
-      "chain": "전사 선행 퀘스트 (3/4)",
+      "chain": "전사 선행 퀘스트 (3/7)",
       "order": 112,
-      "title": "정면 돌파",
+      "title": "힘 자랑",
       "giver": "quest_war_chief",
       "requires": [
         "job_warrior_2"
       ],
-      "intro": "전사는 피하지 않는다. 좀비 10마리와 크리퍼 3마리를 쓰러뜨려 와라. 크리퍼는 터지기 전에 끝내는 게 요령이다!",
-      "progress": "좀비 10마리와 크리퍼 3마리를 처치하라.",
-      "done": "몸 성히 왔군! 역시 내 눈이 틀리지 않았어.",
+      "intro": "도끼는 힘으로 휘두르는 거다! 좀비 15마리를 쓰러뜨려 와라.",
+      "progress": "좀비 15마리를 처치하라.",
+      "done": "땀 좀 흘렸겠군! 좋아.",
       "objectives": [
         {
           "type": "KILL",
           "target": "minecraft:zombie",
-          "count": 10
-        },
+          "count": 15
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_warrior_4",
+      "chain": "전사 선행 퀘스트 (4/7)",
+      "order": 113,
+      "title": "정면 돌파",
+      "giver": "quest_war_chief",
+      "requires": [
+        "job_warrior_3"
+      ],
+      "intro": "전사는 피하지 않는다. 크리퍼 5마리와 스켈레톤 5마리를 쓰러뜨려 와라. 크리퍼는 터지기 전에 끝내는 게 요령이다!",
+      "progress": "크리퍼 5마리와 스켈레톤 5마리를 처치하라.",
+      "done": "몸 성히 왔군! 역시 내 눈이 틀리지 않았어.",
+      "objectives": [
         {
           "type": "KILL",
           "target": "minecraft:creeper",
-          "count": 3
+          "count": 5
+        },
+        {
+          "type": "KILL",
+          "target": "minecraft:skeleton",
+          "count": 5
+        }
+      ],
+      "reward": {
+        "gold": 200
+      }
+    },
+    {
+      "id": "job_warrior_5",
+      "chain": "전사 선행 퀘스트 (5/7)",
+      "order": 114,
+      "title": "갑옷 준비",
+      "giver": "quest_war_chief",
+      "requires": [
+        "job_warrior_4"
+      ],
+      "intro": "맞아도 버티려면 갑옷이 있어야지. 가죽 12장과 철 주괴 6개를 모아 와라.",
+      "progress": "가죽 12장과 철 주괴 6개를 가져와라.",
+      "done": "좋은 재료군! 갑옷을 만들 준비가 됐다.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:leather",
+          "count": 12
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:iron_ingot",
+          "count": 6
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_warrior_6",
+      "chain": "전사 선행 퀘스트 (6/7)",
+      "order": 115,
+      "title": "난전",
+      "giver": "quest_war_chief",
+      "requires": [
+        "job_warrior_5"
+      ],
+      "intro": "전장은 늘 어지럽지. 거미 8마리와 좀비 10마리를 한데 상대해 봐라!",
+      "progress": "거미 8마리와 좀비 10마리를 처치하라.",
+      "done": "하하! 이제 진짜 전사 같구나!",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:spider",
+          "count": 8
+        },
+        {
+          "type": "KILL",
+          "target": "minecraft:zombie",
+          "count": 10
         }
       ],
       "reward": {
@@ -207,22 +365,27 @@
       }
     },
     {
-      "id": "job_warrior_4",
-      "chain": "전사 선행 퀘스트 (4/4)",
-      "order": 113,
+      "id": "job_warrior_7",
+      "chain": "전사 선행 퀘스트 (7/7)",
+      "order": 116,
       "title": "전사의 갑주",
       "giver": "quest_war_chief",
       "requires": [
-        "job_warrior_3"
+        "job_warrior_6"
       ],
-      "intro": "진짜 전사는 맞아도 버틴다. 가죽 8장을 모아 와라. 네 갑옷을 손질해 주마. 그걸로 너는 어엿한 전사다!",
-      "progress": "가죽 8장을 가져와라.",
+      "intro": "마지막이다! 철 흉갑과 철 투구를 만들어 와라. 그걸 걸치면 너는 어엿한 전사다!",
+      "progress": "철 흉갑 1개와 철 투구 1개를 가져와라.",
       "done": "좋아, 이제 너는 전사다! 직업 안내인에게 가서 전사를 고르게.",
       "objectives": [
         {
           "type": "DELIVER",
-          "target": "minecraft:leather",
-          "count": 8
+          "target": "minecraft:iron_chestplate",
+          "count": 1
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:iron_helmet",
+          "count": 1
         }
       ],
       "reward": {
@@ -234,7 +397,7 @@
     },
     {
       "id": "job_tank_1",
-      "chain": "탱커 선행 퀘스트 (1/4)",
+      "chain": "탱커 선행 퀘스트 (1/7)",
       "order": 120,
       "title": "탱커의 길",
       "giver": "job",
@@ -254,7 +417,7 @@
     },
     {
       "id": "job_tank_2",
-      "chain": "탱커 선행 퀘스트 (2/4)",
+      "chain": "탱커 선행 퀘스트 (2/7)",
       "order": 121,
       "title": "방패를 들다",
       "giver": "quest_shield_keeper",
@@ -263,7 +426,7 @@
       ],
       "intro": "수호자의 시작은 방패다. 방패 하나를 만들어 와라.",
       "progress": "방패 하나를 가져와라.",
-      "done": "튼튼하군. 이제 그 방패 뒤에 설 몸을 단련하자.",
+      "done": "튼튼하군.",
       "objectives": [
         {
           "type": "DELIVER",
@@ -272,19 +435,19 @@
         }
       ],
       "reward": {
-        "gold": 200
+        "gold": 100
       }
     },
     {
       "id": "job_tank_3",
-      "chain": "탱커 선행 퀘스트 (3/4)",
+      "chain": "탱커 선행 퀘스트 (3/7)",
       "order": 122,
       "title": "무거운 갑옷",
       "giver": "quest_shield_keeper",
       "requires": [
         "job_tank_2"
       ],
-      "intro": "탱커는 가벼운 차림으로는 버틸 수 없다. 철 흉갑을 만들어 가져와라. 무겁겠지만 익숙해질 거다.",
+      "intro": "탱커는 가벼운 차림으로는 버틸 수 없다. 철 흉갑을 만들어 가져와라.",
       "progress": "철 흉갑 하나를 가져와라.",
       "done": "좋다. 무게는 곧 너의 힘이 된다.",
       "objectives": [
@@ -295,26 +458,105 @@
         }
       ],
       "reward": {
-        "gold": 300
+        "gold": 150
       }
     },
     {
       "id": "job_tank_4",
-      "chain": "탱커 선행 퀘스트 (4/4)",
+      "chain": "탱커 선행 퀘스트 (4/7)",
       "order": 123,
-      "title": "화살비 속에서",
+      "title": "버티기",
       "giver": "quest_shield_keeper",
       "requires": [
         "job_tank_3"
       ],
-      "intro": "마지막 시험이다. 스켈레톤의 화살을 막아 내며 8마리를 쓰러뜨려라. 물러서지 않는 자만이 수호자다.",
-      "progress": "스켈레톤 8마리를 처치하라.",
-      "done": "끝까지 버텼군. 이제 너는 탱커다. 직업 안내인에게 가서 탱커를 고르도록 해라.",
+      "intro": "방패를 들고 좀비 12마리를 상대해라. 막고, 밀어내고, 쓰러뜨려라.",
+      "progress": "좀비 12마리를 처치하라.",
+      "done": "물러서지 않았군.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:zombie",
+          "count": 12
+        }
+      ],
+      "reward": {
+        "gold": 200
+      }
+    },
+    {
+      "id": "job_tank_5",
+      "chain": "탱커 선행 퀘스트 (5/7)",
+      "order": 124,
+      "title": "완전 무장",
+      "giver": "quest_shield_keeper",
+      "requires": [
+        "job_tank_4"
+      ],
+      "intro": "다리와 발도 지켜야 한다. 철 레깅스와 철 부츠를 만들어 와라.",
+      "progress": "철 레깅스 1개와 철 부츠 1개를 가져와라.",
+      "done": "이제 온몸이 강철이군.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:iron_leggings",
+          "count": 1
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:iron_boots",
+          "count": 1
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_tank_6",
+      "chain": "탱커 선행 퀘스트 (6/7)",
+      "order": 125,
+      "title": "화살비 속에서",
+      "giver": "quest_shield_keeper",
+      "requires": [
+        "job_tank_5"
+      ],
+      "intro": "스켈레톤의 화살을 막아 내며 10마리를 쓰러뜨려라.",
+      "progress": "스켈레톤 10마리를 처치하라.",
+      "done": "화살이 두렵지 않게 됐을 거다.",
       "objectives": [
         {
           "type": "KILL",
           "target": "minecraft:skeleton",
-          "count": 8
+          "count": 10
+        }
+      ],
+      "reward": {
+        "gold": 300
+      }
+    },
+    {
+      "id": "job_tank_7",
+      "chain": "탱커 선행 퀘스트 (7/7)",
+      "order": 126,
+      "title": "수호자의 맹세",
+      "giver": "quest_shield_keeper",
+      "requires": [
+        "job_tank_6"
+      ],
+      "intro": "마지막 시험이다. 크리퍼 4마리를 쓰러뜨리고, 철 블록 2개를 가져와라. 그 철로 네 방패를 보강해 주마.",
+      "progress": "크리퍼 4마리를 처치하고 철 블록 2개를 가져와라.",
+      "done": "끝까지 버텼군. 이제 너는 탱커다. 직업 안내인에게 가서 탱커를 고르도록 해라.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:creeper",
+          "count": 4
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:iron_block",
+          "count": 2
         }
       ],
       "reward": {
@@ -326,7 +568,7 @@
     },
     {
       "id": "job_archer_1",
-      "chain": "궁수 선행 퀘스트 (1/4)",
+      "chain": "궁수 선행 퀘스트 (1/7)",
       "order": 130,
       "title": "궁수의 길",
       "giver": "job",
@@ -346,7 +588,7 @@
     },
     {
       "id": "job_archer_2",
-      "chain": "궁수 선행 퀘스트 (2/4)",
+      "chain": "궁수 선행 퀘스트 (2/7)",
       "order": 131,
       "title": "활과 화살",
       "giver": "quest_hunter",
@@ -355,7 +597,7 @@
       ],
       "intro": "궁수에게 활은 몸의 일부야. 활 하나와 화살 32개를 준비해서 보여 줘.",
       "progress": "활 하나와 화살 32개를 가져와.",
-      "done": "좋아, 시위가 팽팽하네. 화살은 다시 돌려줄게, 써야 하니까.",
+      "done": "좋아, 시위가 팽팽하네.",
       "objectives": [
         {
           "type": "DELIVER",
@@ -369,49 +611,21 @@
         }
       ],
       "reward": {
-        "gold": 200
+        "gold": 100
       }
     },
     {
       "id": "job_archer_3",
-      "chain": "궁수 선행 퀘스트 (3/4)",
+      "chain": "궁수 선행 퀘스트 (3/7)",
       "order": 132,
-      "title": "거리를 두고",
+      "title": "화살 재료",
       "giver": "quest_hunter",
       "requires": [
         "job_archer_2"
       ],
-      "intro": "궁수는 다가오기 전에 끝내는 거야. 크리퍼 4마리와 스켈레톤 6마리를 처치해 봐. 크리퍼는 절대 가까이 오게 하지 마.",
-      "progress": "크리퍼 4마리와 스켈레톤 6마리를 처치하라.",
-      "done": "깔끔한데? 감이 좋아.",
-      "objectives": [
-        {
-          "type": "KILL",
-          "target": "minecraft:creeper",
-          "count": 4
-        },
-        {
-          "type": "KILL",
-          "target": "minecraft:skeleton",
-          "count": 6
-        }
-      ],
-      "reward": {
-        "gold": 300
-      }
-    },
-    {
-      "id": "job_archer_4",
-      "chain": "궁수 선행 퀘스트 (4/4)",
-      "order": 133,
-      "title": "화살 만들기",
-      "giver": "quest_hunter",
-      "requires": [
-        "job_archer_3"
-      ],
-      "intro": "좋은 궁수는 화살도 스스로 만들지. 깃털 16개와 부싯돌 8개를 모아 와. 그걸로 네 몫의 화살을 만들어 줄게.",
+      "intro": "좋은 궁수는 화살도 스스로 만들지. 깃털 16개와 부싯돌 8개를 모아 와.",
       "progress": "깃털 16개와 부싯돌 8개를 가져와라.",
-      "done": "이제 너도 궁수야! 직업 안내인에게 가서 궁수를 골라. 화살은 선물이야.",
+      "done": "좋은 재료야.",
       "objectives": [
         {
           "type": "DELIVER",
@@ -422,6 +636,108 @@
           "type": "DELIVER",
           "target": "minecraft:flint",
           "count": 8
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_archer_4",
+      "chain": "궁수 선행 퀘스트 (4/7)",
+      "order": 133,
+      "title": "첫 사냥",
+      "giver": "quest_hunter",
+      "requires": [
+        "job_archer_3"
+      ],
+      "intro": "이제 실전이야. 스켈레톤 8마리를 맞혀 봐. 저쪽도 활을 쏘니까 조심하고.",
+      "progress": "스켈레톤 8마리를 처치하라.",
+      "done": "제법인데?",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:skeleton",
+          "count": 8
+        }
+      ],
+      "reward": {
+        "gold": 200
+      }
+    },
+    {
+      "id": "job_archer_5",
+      "chain": "궁수 선행 퀘스트 (5/7)",
+      "order": 134,
+      "title": "새 시위",
+      "giver": "quest_hunter",
+      "requires": [
+        "job_archer_4"
+      ],
+      "intro": "시위가 닳았을 거야. 거미 8마리를 잡고 실 8개를 가져와. 새 시위를 메어 줄게.",
+      "progress": "거미 8마리를 처치하고 실 8개를 가져와라.",
+      "done": "이걸로 시위가 더 팽팽해질 거야.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:spider",
+          "count": 8
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:string",
+          "count": 8
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_archer_6",
+      "chain": "궁수 선행 퀘스트 (6/7)",
+      "order": 135,
+      "title": "거리를 두고",
+      "giver": "quest_hunter",
+      "requires": [
+        "job_archer_5"
+      ],
+      "intro": "궁수는 다가오기 전에 끝내는 거야. 크리퍼 6마리를 처치해 봐. 절대 가까이 오게 하지 마.",
+      "progress": "크리퍼 6마리를 처치하라.",
+      "done": "깔끔해. 감이 좋아.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:creeper",
+          "count": 6
+        }
+      ],
+      "reward": {
+        "gold": 300
+      }
+    },
+    {
+      "id": "job_archer_7",
+      "chain": "궁수 선행 퀘스트 (7/7)",
+      "order": 136,
+      "title": "명사수",
+      "giver": "quest_hunter",
+      "requires": [
+        "job_archer_6"
+      ],
+      "intro": "마지막이야. 석궁 하나를 만들고, 스켈레톤 10마리를 더 처치해 와. 그러면 너도 궁수야.",
+      "progress": "석궁 1개를 가져오고 스켈레톤 10마리를 처치하라.",
+      "done": "이제 너도 궁수야! 직업 안내인에게 가서 궁수를 골라. 화살은 선물이야.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:crossbow",
+          "count": 1
+        },
+        {
+          "type": "KILL",
+          "target": "minecraft:skeleton",
+          "count": 10
         }
       ],
       "reward": {
@@ -439,7 +755,7 @@
     },
     {
       "id": "job_mage_1",
-      "chain": "마법사 선행 퀘스트 (1/4)",
+      "chain": "마법사 선행 퀘스트 (1/7)",
       "order": 140,
       "title": "마법사의 길",
       "giver": "job",
@@ -459,7 +775,7 @@
     },
     {
       "id": "job_mage_2",
-      "chain": "마법사 선행 퀘스트 (2/4)",
+      "chain": "마법사 선행 퀘스트 (2/7)",
       "order": 141,
       "title": "마력의 매개",
       "giver": "quest_archmage",
@@ -468,7 +784,7 @@
       ],
       "intro": "마법은 매개가 있어야 다룰 수 있단다. 청금석 16개와 책 3권을 가져오렴.",
       "progress": "청금석 16개와 책 3권을 가져와라.",
-      "done": "좋아요. 이 청금석에서 마력이 느껴지는구나.",
+      "done": "이 청금석에서 마력이 느껴지는구나.",
       "objectives": [
         {
           "type": "DELIVER",
@@ -482,31 +798,110 @@
         }
       ],
       "reward": {
-        "gold": 200
+        "gold": 100
       }
     },
     {
       "id": "job_mage_3",
-      "chain": "마법사 선행 퀘스트 (3/4)",
+      "chain": "마법사 선행 퀘스트 (3/7)",
       "order": 142,
       "title": "빛나는 결정",
       "giver": "quest_archmage",
       "requires": [
         "job_mage_2"
       ],
-      "intro": "마력은 땅속 깊은 곳에 고여 있지. 자수정 조각 8개와 발광석 가루 8개를 모아 오렴.",
-      "progress": "자수정 조각 8개와 발광석 가루 8개를 가져와라.",
-      "done": "아름답구나. 이제 마지막 시험만 남았어.",
+      "intro": "마력은 땅속 깊은 곳에 고여 있지. 자수정 조각 12개와 발광석 가루 12개를 모아 오렴.",
+      "progress": "자수정 조각 12개와 발광석 가루 12개를 가져와라.",
+      "done": "아름답구나.",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "minecraft:amethyst_shard",
-          "count": 8
+          "count": 12
         },
         {
           "type": "DELIVER",
           "target": "minecraft:glowstone_dust",
+          "count": 12
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_mage_4",
+      "chain": "마법사 선행 퀘스트 (4/7)",
+      "order": 143,
+      "title": "마력의 흐름",
+      "giver": "quest_archmage",
+      "requires": [
+        "job_mage_3"
+      ],
+      "intro": "레드스톤은 마력을 흘려보내는 길이란다. 레드스톤 가루 32개를 가져오렴.",
+      "progress": "레드스톤 가루 32개를 가져와라.",
+      "done": "좋아, 마력이 잘 흐르겠구나.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:redstone",
+          "count": 32
+        }
+      ],
+      "reward": {
+        "gold": 200
+      }
+    },
+    {
+      "id": "job_mage_5",
+      "chain": "마법사 선행 퀘스트 (5/7)",
+      "order": 144,
+      "title": "폭발의 원리",
+      "giver": "quest_archmage",
+      "requires": [
+        "job_mage_4"
+      ],
+      "intro": "불꽃과 폭발도 마법의 한 갈래란다. 크리퍼 4마리를 처치하고 화약 8개를 가져오렴.",
+      "progress": "크리퍼 4마리를 처치하고 화약 8개를 가져와라.",
+      "done": "위험한 재료지만 쓸모가 많단다.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:creeper",
+          "count": 4
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:gunpowder",
           "count": 8
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_mage_6",
+      "chain": "마법사 선행 퀘스트 (6/7)",
+      "order": 145,
+      "title": "차원의 조각",
+      "giver": "quest_archmage",
+      "requires": [
+        "job_mage_5"
+      ],
+      "intro": "엔더맨은 차원 사이를 오가는 마력 덩어리야. 엔더맨 3마리를 쓰러뜨리고 엔더 진주 4개를 가져오렴. 눈을 마주치지 않게 조심하고.",
+      "progress": "엔더맨 3마리를 처치하고 엔더 진주 4개를 가져와라.",
+      "done": "대단하구나.",
+      "objectives": [
+        {
+          "type": "KILL",
+          "target": "minecraft:enderman",
+          "count": 3
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:ender_pearl",
+          "count": 4
         }
       ],
       "reward": {
@@ -514,27 +909,22 @@
       }
     },
     {
-      "id": "job_mage_4",
-      "chain": "마법사 선행 퀘스트 (4/4)",
-      "order": 143,
-      "title": "차원의 조각",
+      "id": "job_mage_7",
+      "chain": "마법사 선행 퀘스트 (7/7)",
+      "order": 146,
+      "title": "마법사의 서재",
       "giver": "quest_archmage",
       "requires": [
-        "job_mage_3"
+        "job_mage_6"
       ],
-      "intro": "엔더맨은 차원 사이를 오가는 마력 덩어리야. 엔더맨 2마리를 쓰러뜨리고 엔더 진주 2개를 가져오렴. 눈을 마주치지 않게 조심하고.",
-      "progress": "엔더맨 2마리를 처치하고 엔더 진주 2개를 가져와라.",
+      "intro": "마지막으로 마법 부여대를 만들어 오렴. 그대만의 서재를 여는 첫걸음이 될 거야.",
+      "progress": "마법 부여대 1개를 가져와라.",
       "done": "훌륭해요. 이제 그대는 마법사란다. 직업 안내인에게 가서 마법사를 고르렴.",
       "objectives": [
         {
-          "type": "KILL",
-          "target": "minecraft:enderman",
-          "count": 2
-        },
-        {
           "type": "DELIVER",
-          "target": "minecraft:ender_pearl",
-          "count": 2
+          "target": "minecraft:enchanting_table",
+          "count": 1
         }
       ],
       "reward": {
@@ -546,7 +936,7 @@
     },
     {
       "id": "job_farmer_1",
-      "chain": "농부 선행 퀘스트 (1/4)",
+      "chain": "농부 선행 퀘스트 (1/7)",
       "order": 150,
       "title": "농부의 길",
       "giver": "job",
@@ -566,21 +956,72 @@
     },
     {
       "id": "job_farmer_2",
-      "chain": "농부 선행 퀘스트 (2/4)",
+      "chain": "농부 선행 퀘스트 (2/7)",
       "order": 151,
       "title": "첫 밭",
       "giver": "shop_farmer",
       "requires": [
         "job_farmer_1"
       ],
-      "intro": "씨앗은 내게서 사서 심어야 자란다네. 밀을 길러서 16개를 가져와 보게.",
-      "progress": "밀 16개를 가져와라.",
+      "intro": "씨앗은 내게서 사서 심어야 자란다네. 밀을 길러서 32개를 가져와 보게.",
+      "progress": "밀 32개를 가져와라.",
       "done": "잘 여물었군. 농사에 소질이 있어.",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "minecraft:wheat",
-          "count": 16
+          "count": 32
+        }
+      ],
+      "reward": {
+        "gold": 100
+      }
+    },
+    {
+      "id": "job_farmer_3",
+      "chain": "농부 선행 퀘스트 (3/7)",
+      "order": 152,
+      "title": "뿌리 작물",
+      "giver": "shop_farmer",
+      "requires": [
+        "job_farmer_2"
+      ],
+      "intro": "이번엔 땅속에서 자라는 작물이야. 당근 24개와 감자 24개를 길러 오게.",
+      "progress": "당근 24개와 감자 24개를 가져와라.",
+      "done": "좋아, 밭이 제법 넓어졌겠는걸.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:carrot",
+          "count": 24
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:potato",
+          "count": 24
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_farmer_4",
+      "chain": "농부 선행 퀘스트 (4/7)",
+      "order": 153,
+      "title": "붉은 뿌리",
+      "giver": "shop_farmer",
+      "requires": [
+        "job_farmer_3"
+      ],
+      "intro": "비트도 길러 보게. 수프 재료로 인기가 많다네. 비트 24개를 가져오게.",
+      "progress": "비트 24개를 가져와라.",
+      "done": "색이 곱구먼.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:beetroot",
+          "count": 24
         }
       ],
       "reward": {
@@ -588,27 +1029,55 @@
       }
     },
     {
-      "id": "job_farmer_3",
-      "chain": "농부 선행 퀘스트 (3/4)",
-      "order": 152,
-      "title": "뿌리 작물",
+      "id": "job_farmer_5",
+      "chain": "농부 선행 퀘스트 (5/7)",
+      "order": 154,
+      "title": "덩굴 작물",
       "giver": "shop_farmer",
       "requires": [
-        "job_farmer_2"
+        "job_farmer_4"
       ],
-      "intro": "이번엔 땅속에서 자라는 작물이야. 당근 16개와 감자 16개를 길러 오게.",
-      "progress": "당근 16개와 감자 16개를 가져와라.",
-      "done": "좋아, 밭이 제법 넓어졌겠는걸.",
+      "intro": "호박과 수박은 덩굴 옆에 열린다네. 호박 8개와 수박 조각 16개를 가져오게.",
+      "progress": "호박 8개와 수박 조각 16개를 가져와라.",
+      "done": "탐스럽게 열렸구먼.",
       "objectives": [
         {
           "type": "DELIVER",
-          "target": "minecraft:carrot",
-          "count": 16
+          "target": "minecraft:pumpkin",
+          "count": 8
         },
         {
           "type": "DELIVER",
-          "target": "minecraft:potato",
+          "target": "minecraft:melon_slice",
           "count": 16
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_farmer_6",
+      "chain": "농부 선행 퀘스트 (6/7)",
+      "order": 155,
+      "title": "농장 살림",
+      "giver": "shop_farmer",
+      "requires": [
+        "job_farmer_5"
+      ],
+      "intro": "농부는 작물만 키우는 게 아니야. 사탕수수 32개와 달걀 8개를 가져오게.",
+      "progress": "사탕수수 32개와 달걀 8개를 가져와라.",
+      "done": "농장이 제법 살림살이가 됐구먼.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:sugar_cane",
+          "count": 32
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:egg",
+          "count": 8
         }
       ],
       "reward": {
@@ -616,27 +1085,22 @@
       }
     },
     {
-      "id": "job_farmer_4",
-      "chain": "농부 선행 퀘스트 (4/4)",
-      "order": 153,
+      "id": "job_farmer_7",
+      "chain": "농부 선행 퀘스트 (7/7)",
+      "order": 156,
       "title": "수확제",
       "giver": "shop_farmer",
       "requires": [
-        "job_farmer_3"
+        "job_farmer_6"
       ],
-      "intro": "마지막으로 호박 4개와 사탕수수 16개를 가져오게. 마을 수확제에 쓸 거라네. 그러면 자네도 어엿한 농부야.",
-      "progress": "호박 4개와 사탕수수 16개를 가져와라.",
+      "intro": "마지막이야. 건초 더미 4개를 만들어 오게. 마을 수확제에 쓸 거라네. 그러면 자네도 어엿한 농부야.",
+      "progress": "건초 더미 4개를 가져와라.",
       "done": "풍성하군! 이제 자네는 농부일세. 직업 안내인에게 가서 농부를 고르게.",
       "objectives": [
         {
           "type": "DELIVER",
-          "target": "minecraft:pumpkin",
+          "target": "minecraft:hay_block",
           "count": 4
-        },
-        {
-          "type": "DELIVER",
-          "target": "minecraft:sugar_cane",
-          "count": 16
         }
       ],
       "reward": {
@@ -648,7 +1112,7 @@
     },
     {
       "id": "job_fisher_1",
-      "chain": "어부 선행 퀘스트 (1/4)",
+      "chain": "어부 선행 퀘스트 (1/7)",
       "order": 160,
       "title": "어부의 길",
       "giver": "job",
@@ -668,22 +1132,74 @@
     },
     {
       "id": "job_fisher_2",
-      "chain": "어부 선행 퀘스트 (2/4)",
+      "chain": "어부 선행 퀘스트 (2/7)",
       "order": 161,
       "title": "첫 낚시",
       "giver": "shop_fisher",
       "requires": [
         "job_fisher_1"
       ],
-      "intro": "낚시는 기다림이야. 아무 물고기나 5마리 낚아 오게.",
-      "progress": "물고기 5마리를 가져와라.",
+      "intro": "낚시는 기다림이야. 아무 물고기나 10마리 낚아 오게.",
+      "progress": "물고기 10마리를 가져와라.",
       "done": "오, 손맛을 봤구먼.",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "#minecraft:fishes",
-          "count": 5,
+          "count": 10,
           "text": "물고기"
+        }
+      ],
+      "reward": {
+        "gold": 100
+      }
+    },
+    {
+      "id": "job_fisher_3",
+      "chain": "어부 선행 퀘스트 (3/7)",
+      "order": 162,
+      "title": "물때를 읽다",
+      "giver": "shop_fisher",
+      "requires": [
+        "job_fisher_2"
+      ],
+      "intro": "물고기는 시간과 장소에 따라 달라지지. 이번엔 20마리를 낚아 오게.",
+      "progress": "물고기 20마리를 가져와라.",
+      "done": "꾸준하구먼. 그게 어부의 덕목이지.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "#minecraft:fishes",
+          "count": 20,
+          "text": "물고기"
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_fisher_4",
+      "chain": "어부 선행 퀘스트 (4/7)",
+      "order": 163,
+      "title": "낚시 도구",
+      "giver": "shop_fisher",
+      "requires": [
+        "job_fisher_3"
+      ],
+      "intro": "어부는 도구를 아껴야 해. 낚싯대 하나와 실 8개를 가져오게. 여벌 낚싯줄을 준비해 두자고.",
+      "progress": "낚싯대 1개와 실 8개를 가져와라.",
+      "done": "이제 줄이 끊어져도 걱정 없겠군.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:fishing_rod",
+          "count": 1
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:string",
+          "count": 8
         }
       ],
       "reward": {
@@ -691,23 +1207,46 @@
       }
     },
     {
-      "id": "job_fisher_3",
-      "chain": "어부 선행 퀘스트 (3/4)",
-      "order": 162,
-      "title": "물때를 읽다",
+      "id": "job_fisher_5",
+      "chain": "어부 선행 퀘스트 (5/7)",
+      "order": 164,
+      "title": "만선",
       "giver": "shop_fisher",
       "requires": [
-        "job_fisher_2"
+        "job_fisher_4"
       ],
-      "intro": "물고기는 시간과 장소에 따라 달라지지. 이번엔 물고기 12마리를 낚아 오게.",
-      "progress": "물고기 12마리를 가져와라.",
-      "done": "꾸준하구먼. 그게 어부의 덕목이지.",
+      "intro": "배가 가득 찰 만큼 낚아 오게. 물고기 30마리!",
+      "progress": "물고기 30마리를 가져와라.",
+      "done": "만선이구먼!",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "#minecraft:fishes",
-          "count": 12,
+          "count": 30,
           "text": "물고기"
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_fisher_6",
+      "chain": "어부 선행 퀘스트 (6/7)",
+      "order": 165,
+      "title": "바다의 풀",
+      "giver": "shop_fisher",
+      "requires": [
+        "job_fisher_5"
+      ],
+      "intro": "바다에는 물고기만 있는 게 아니야. 말린 켈프 16개를 가져오게. 오래 바다에 나갈 때 든든하지.",
+      "progress": "말린 켈프 16개를 가져와라.",
+      "done": "짭짤하니 좋구먼.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:dried_kelp",
+          "count": 16
         }
       ],
       "reward": {
@@ -715,28 +1254,23 @@
       }
     },
     {
-      "id": "job_fisher_4",
-      "chain": "어부 선행 퀘스트 (4/4)",
-      "order": 163,
+      "id": "job_fisher_7",
+      "chain": "어부 선행 퀘스트 (7/7)",
+      "order": 166,
       "title": "월척",
       "giver": "shop_fisher",
       "requires": [
-        "job_fisher_3"
+        "job_fisher_6"
       ],
-      "intro": "마지막이야. 물고기 20마리를 낚아 오게. 그리고 낚싯대를 하나 더 만들어 와. 어부는 여벌 낚싯대가 있어야 하거든.",
-      "progress": "물고기 20마리와 낚싯대 하나를 가져와라.",
+      "intro": "마지막이야. 물고기 40마리를 낚아 오게. 그러면 자네도 어엿한 어부일세.",
+      "progress": "물고기 40마리를 가져와라.",
       "done": "대단하구먼! 이제 자네는 어부야. 직업 안내인에게 가서 어부를 고르게.",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "#minecraft:fishes",
-          "count": 20,
+          "count": 40,
           "text": "물고기"
-        },
-        {
-          "type": "DELIVER",
-          "target": "minecraft:fishing_rod",
-          "count": 1
         }
       ],
       "reward": {
@@ -748,7 +1282,7 @@
     },
     {
       "id": "job_miner_1",
-      "chain": "광부 선행 퀘스트 (1/4)",
+      "chain": "광부 선행 퀘스트 (1/7)",
       "order": 170,
       "title": "광부의 길",
       "giver": "job",
@@ -768,25 +1302,76 @@
     },
     {
       "id": "job_miner_2",
-      "chain": "광부 선행 퀘스트 (2/4)",
+      "chain": "광부 선행 퀘스트 (2/7)",
       "order": 171,
       "title": "곡괭이질",
       "giver": "shop_blacksmith",
       "requires": [
         "job_miner_1"
       ],
-      "intro": "광부의 시작은 석탄과 철이지. 석탄 16개와 철 원석 8개를 캐 오게.",
-      "progress": "석탄 16개와 철 원석 8개를 가져와라.",
+      "intro": "광부의 시작은 석탄과 철이지. 석탄 32개와 철 원석 16개를 캐 오게.",
+      "progress": "석탄 32개와 철 원석 16개를 가져와라.",
       "done": "좋아, 손에 물집 좀 잡혔겠군.",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "minecraft:coal",
-          "count": 16
+          "count": 32
         },
         {
           "type": "DELIVER",
           "target": "minecraft:raw_iron",
+          "count": 16
+        }
+      ],
+      "reward": {
+        "gold": 100
+      }
+    },
+    {
+      "id": "job_miner_3",
+      "chain": "광부 선행 퀘스트 (3/7)",
+      "order": 172,
+      "title": "구리와 레드스톤",
+      "giver": "shop_blacksmith",
+      "requires": [
+        "job_miner_2"
+      ],
+      "intro": "구리 원석 16개와 레드스톤 가루 24개를 캐 오게.",
+      "progress": "구리 원석 16개와 레드스톤 가루 24개를 가져와라.",
+      "done": "다양하게 캐는구먼.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:raw_copper",
+          "count": 16
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:redstone",
+          "count": 24
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_miner_4",
+      "chain": "광부 선행 퀘스트 (4/7)",
+      "order": 173,
+      "title": "깊은 곳으로",
+      "giver": "shop_blacksmith",
+      "requires": [
+        "job_miner_3"
+      ],
+      "intro": "더 깊이 내려가 보게. 금 원석 8개를 가져오게. 용암 조심하고.",
+      "progress": "금 원석 8개를 가져와라.",
+      "done": "제법 깊이 들어갔군.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:raw_gold",
           "count": 8
         }
       ],
@@ -795,45 +1380,45 @@
       }
     },
     {
-      "id": "job_miner_3",
-      "chain": "광부 선행 퀘스트 (3/4)",
-      "order": 172,
-      "title": "깊은 곳으로",
+      "id": "job_miner_5",
+      "chain": "광부 선행 퀘스트 (5/7)",
+      "order": 174,
+      "title": "광부의 도구",
       "giver": "shop_blacksmith",
       "requires": [
-        "job_miner_2"
+        "job_miner_4"
       ],
-      "intro": "더 깊이 내려가 보게. 금 원석 4개와 레드스톤 가루 16개를 가져오게. 용암 조심하고.",
-      "progress": "금 원석 4개와 레드스톤 가루 16개를 가져와라.",
-      "done": "제법 깊이 들어갔군.",
+      "intro": "좋은 광부는 곡괭이를 여럿 챙기지. 철 곡괭이 하나와 청금석 16개를 가져오게.",
+      "progress": "철 곡괭이 1개와 청금석 16개를 가져와라.",
+      "done": "준비성이 좋구먼.",
       "objectives": [
         {
           "type": "DELIVER",
-          "target": "minecraft:raw_gold",
-          "count": 4
+          "target": "minecraft:iron_pickaxe",
+          "count": 1
         },
         {
           "type": "DELIVER",
-          "target": "minecraft:redstone",
+          "target": "minecraft:lapis_lazuli",
           "count": 16
         }
       ],
       "reward": {
-        "gold": 300
+        "gold": 250
       }
     },
     {
-      "id": "job_miner_4",
-      "chain": "광부 선행 퀘스트 (4/4)",
-      "order": 173,
-      "title": "빛나는 돌",
+      "id": "job_miner_6",
+      "chain": "광부 선행 퀘스트 (6/7)",
+      "order": 175,
+      "title": "단단한 돌",
       "giver": "shop_blacksmith",
       "requires": [
-        "job_miner_3"
+        "job_miner_5"
       ],
-      "intro": "광부라면 다이아몬드 하나쯤은 캐 봐야지. 다이아몬드 1개와 청금석 8개를 가져오게.",
-      "progress": "다이아몬드 1개와 청금석 8개를 가져와라.",
-      "done": "다이아몬드라! 이제 자네는 광부일세. 직업 안내인에게 가서 광부를 고르게.",
+      "intro": "흑요석은 다이아몬드 곡괭이로만 캘 수 있지. 다이아몬드 1개와 흑요석 4개를 가져오게.",
+      "progress": "다이아몬드 1개와 흑요석 4개를 가져와라.",
+      "done": "이제 웬만한 돌은 무섭지 않겠군.",
       "objectives": [
         {
           "type": "DELIVER",
@@ -842,7 +1427,35 @@
         },
         {
           "type": "DELIVER",
-          "target": "minecraft:lapis_lazuli",
+          "target": "minecraft:obsidian",
+          "count": 4
+        }
+      ],
+      "reward": {
+        "gold": 300
+      }
+    },
+    {
+      "id": "job_miner_7",
+      "chain": "광부 선행 퀘스트 (7/7)",
+      "order": 176,
+      "title": "빛나는 돌",
+      "giver": "shop_blacksmith",
+      "requires": [
+        "job_miner_6"
+      ],
+      "intro": "마지막이야. 다이아몬드 2개와 자수정 조각 8개를 가져오게.",
+      "progress": "다이아몬드 2개와 자수정 조각 8개를 가져와라.",
+      "done": "다이아몬드라! 이제 자네는 광부일세. 직업 안내인에게 가서 광부를 고르게.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:diamond",
+          "count": 2
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:amethyst_shard",
           "count": 8
         }
       ],
@@ -855,7 +1468,7 @@
     },
     {
       "id": "job_cook_1",
-      "chain": "요리사 선행 퀘스트 (1/4)",
+      "chain": "요리사 선행 퀘스트 (1/7)",
       "order": 180,
       "title": "요리사의 길",
       "giver": "job",
@@ -875,21 +1488,77 @@
     },
     {
       "id": "job_cook_2",
-      "chain": "요리사 선행 퀘스트 (2/4)",
+      "chain": "요리사 선행 퀘스트 (2/7)",
       "order": 181,
       "title": "빵 굽기",
       "giver": "shop_food",
       "requires": [
         "job_cook_1"
       ],
-      "intro": "요리의 기본은 빵이지. 빵 4개를 만들어 오게. 밀은 내게서 사도 되네.",
-      "progress": "빵 4개를 가져와라.",
+      "intro": "요리의 기본은 빵이지. 빵 8개를 만들어 오게. 밀은 내게서 사도 되네.",
+      "progress": "빵 8개를 가져와라.",
       "done": "고소한 냄새가 나는군.",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "minecraft:bread",
+          "count": 8
+        }
+      ],
+      "reward": {
+        "gold": 100
+      }
+    },
+    {
+      "id": "job_cook_3",
+      "chain": "요리사 선행 퀘스트 (3/7)",
+      "order": 182,
+      "title": "고기 굽기",
+      "giver": "shop_food",
+      "requires": [
+        "job_cook_2"
+      ],
+      "intro": "고기는 잘 익혀야 하지. 스테이크 8개와 구운 돼지고기 8개를 만들어 오게.",
+      "progress": "스테이크 8개와 구운 돼지고기 8개를 가져와라.",
+      "done": "육즙이 살아 있구먼.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:cooked_beef",
+          "count": 8
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:cooked_porkchop",
+          "count": 8
+        }
+      ],
+      "reward": {
+        "gold": 150
+      }
+    },
+    {
+      "id": "job_cook_4",
+      "chain": "요리사 선행 퀘스트 (4/7)",
+      "order": 183,
+      "title": "따뜻한 한 그릇",
+      "giver": "shop_food",
+      "requires": [
+        "job_cook_3"
+      ],
+      "intro": "이번엔 그릇 요리야. 버섯 스튜 4그릇과 비트 수프 2그릇을 만들어 오게.",
+      "progress": "버섯 스튜 4개와 비트 수프 2개를 가져와라.",
+      "done": "든든하겠구먼.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:mushroom_stew",
           "count": 4
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:beetroot_soup",
+          "count": 2
         }
       ],
       "reward": {
@@ -897,27 +1566,55 @@
       }
     },
     {
-      "id": "job_cook_3",
-      "chain": "요리사 선행 퀘스트 (3/4)",
-      "order": 182,
-      "title": "따뜻한 한 그릇",
+      "id": "job_cook_5",
+      "chain": "요리사 선행 퀘스트 (5/7)",
+      "order": 184,
+      "title": "달콤한 간식",
       "giver": "shop_food",
       "requires": [
-        "job_cook_2"
+        "job_cook_4"
       ],
-      "intro": "이번엔 그릇 요리야. 버섯 스튜 2그릇과 구운 소고기 4개를 만들어 오게.",
-      "progress": "버섯 스튜 2개와 스테이크 4개를 가져와라.",
-      "done": "든든하겠구먼.",
+      "intro": "손님들이 간식을 찾는다네. 쿠키 16개와 꿀병 2개를 준비해 오게.",
+      "progress": "쿠키 16개와 꿀병 2개를 가져와라.",
+      "done": "아이들이 좋아하겠구먼.",
       "objectives": [
         {
           "type": "DELIVER",
-          "target": "minecraft:mushroom_stew",
-          "count": 2
+          "target": "minecraft:cookie",
+          "count": 16
         },
         {
           "type": "DELIVER",
-          "target": "minecraft:cooked_beef",
+          "target": "minecraft:honey_bottle",
+          "count": 2
+        }
+      ],
+      "reward": {
+        "gold": 250
+      }
+    },
+    {
+      "id": "job_cook_6",
+      "chain": "요리사 선행 퀘스트 (6/7)",
+      "order": 185,
+      "title": "가을 식탁",
+      "giver": "shop_food",
+      "requires": [
+        "job_cook_5"
+      ],
+      "intro": "호박 파이 4개와 구운 감자 16개를 만들어 오게. 가을 잔치 준비라네.",
+      "progress": "호박 파이 4개와 구운 감자 16개를 가져와라.",
+      "done": "향긋하구먼.",
+      "objectives": [
+        {
+          "type": "DELIVER",
+          "target": "minecraft:pumpkin_pie",
           "count": 4
+        },
+        {
+          "type": "DELIVER",
+          "target": "minecraft:baked_potato",
+          "count": 16
         }
       ],
       "reward": {
@@ -925,27 +1622,27 @@
       }
     },
     {
-      "id": "job_cook_4",
-      "chain": "요리사 선행 퀘스트 (4/4)",
-      "order": 183,
+      "id": "job_cook_7",
+      "chain": "요리사 선행 퀘스트 (7/7)",
+      "order": 186,
       "title": "잔칫상",
       "giver": "shop_food",
       "requires": [
-        "job_cook_3"
+        "job_cook_6"
       ],
-      "intro": "마지막은 잔칫상이야. 케이크 1개와 호박 파이 2개를 만들어 오게. 손님들이 기다리고 있다네.",
-      "progress": "케이크 1개와 호박 파이 2개를 가져와라.",
+      "intro": "마지막은 잔칫상이야. 케이크 2개와 황금 당근 4개를 만들어 오게. 손님들이 기다리고 있다네.",
+      "progress": "케이크 2개와 황금 당근 4개를 가져와라.",
       "done": "훌륭한 솜씨야! 이제 자네는 요리사일세. 직업 안내인에게 가서 요리사를 고르게.",
       "objectives": [
         {
           "type": "DELIVER",
           "target": "minecraft:cake",
-          "count": 1
+          "count": 2
         },
         {
           "type": "DELIVER",
-          "target": "minecraft:pumpkin_pie",
-          "count": 2
+          "target": "minecraft:golden_carrot",
+          "count": 4
         }
       ],
       "reward": {

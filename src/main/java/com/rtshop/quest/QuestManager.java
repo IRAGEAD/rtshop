@@ -73,6 +73,13 @@ public final class QuestManager {
      * 새 기본 퀘스트는 항상 새 파일 이름으로 추가한다.
      */
     private static final String[] DEFAULT_FILES = {"npcs.json", "tutorial.json", "job_quests.json"};
+    /**
+     * 예전 버전의 기본 파일 내용(SHA-256). 설치된 파일이 이것과 '완전히 같으면' 아무도 고치지 않은 것이므로 새 기본 파일로 바꾼다.
+     * 한 글자라도 고쳤으면 그대로 둔다.
+     */
+    private static final Map<String, Set<String>> OLD_DEFAULTS = Map.of(
+            "job_quests.json", Set.of("9a51ce61d48d98107461017071f42f94276d31641b0a88349b1b88387dc8b540"));
+
     /** 편집 화면에서 새로 만든 퀘스트·NPC 가 들어가는 파일. */
     public static final String CUSTOM_FILE = "my_quests.json";
     private static final String INSTALLED_LIST = ".installed_defaults";
@@ -290,7 +297,36 @@ public final class QuestManager {
         if (changed) {
             Files.write(list, installed, StandardCharsets.UTF_8);
         }
+        for (Map.Entry<String, Set<String>> e : OLD_DEFAULTS.entrySet()) {
+            Path f = d.resolve(e.getKey());
+            if (!Files.exists(f) || !e.getValue().contains(sha256(Files.readAllBytes(f)))) {
+                continue;
+            }
+            Path backup = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("backup")
+                    .resolve("quests_" + System.currentTimeMillis()).resolve(e.getKey());
+            Files.createDirectories(backup.getParent());
+            Files.copy(f, backup, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            try (InputStream in = QuestManager.class.getResourceAsStream("/rtshop_defaults/quests/" + e.getKey())) {
+                if (in != null) {
+                    Files.write(f, in.readAllBytes());
+                    RtShop.LOGGER.info("[rtshop] 고치지 않은 예전 기본 퀘스트 파일 {} 을 새 버전으로 바꿨습니다 (이전 파일: {}).", e.getKey(), backup);
+                }
+            }
+        }
         Files.deleteIfExists(d.resolve(".defaults_version")); // 3.1.0 의 옛 표시 파일
+    }
+
+    public static String sha256(byte[] data) {
+        try {
+            byte[] h = java.security.MessageDigest.getInstance("SHA-256").digest(data);
+            StringBuilder sb = new StringBuilder();
+            for (byte b : h) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     // ------------------------------------------------------------------ NPC

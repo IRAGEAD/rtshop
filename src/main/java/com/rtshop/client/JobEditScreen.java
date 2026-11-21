@@ -465,13 +465,38 @@ public class JobEditScreen extends Screen {
     private void addCycle(int x, int y, String itemId) {
         hit(x, y - 1, 92, 13, () -> {
             String cur = currentType(itemId);
-            return "< " + (cur.isEmpty() ? tr("rtshop.jedit.auto_is", autoType(itemId)) : typeLabel(cur)) + " >";
-        }, () -> true, b -> {
-            List<String> cycle = typeCycle();
-            int i = cycle.indexOf(currentType(itemId));
-            String next = cycle.get(Math.floorMod((i < 0 ? 0 : i) + (b == 1 ? -1 : 1), cycle.size()));
-            setOverride(itemId, next);
+            return (cur.isEmpty() ? tr("rtshop.jedit.auto_is", autoType(itemId)) : typeLabel(cur)) + " ▼";
+        }, () -> true, b -> openTypePopup(x, y - 1, itemId));
+    }
+
+    private ChoicePopup popup;
+
+    private void openTypePopup(int x, int y, String itemId) {
+        List<ChoicePopup.Option> opts = new ArrayList<>();
+        JobConfig cfg = parsed();
+        opts.add(new ChoicePopup.Option("", tr("rtshop.jedit.auto_is", autoType(itemId))));
+        if (cfg != null) {
+            for (WeaponTypes.Type t : cfg.weaponTypes) {
+                opts.add(new ChoicePopup.Option(t.id, t.name, icon(t.icon)));
+            }
+        }
+        opts.add(new ChoicePopup.Option(WeaponTypes.NONE, tr("rtshop.jedit.not_weapon"), new ItemStack(Items.BARRIER)));
+        popup = new ChoicePopup(x, y, 92, 13, this.height, this.font, opts, currentType(itemId), v -> {
+            setOverride(itemId, v);
+            popup = null;
         });
+    }
+
+    /** 점검용: 무기 분류 화면에서 첫 예외 항목의 종류 팝업을 연다. */
+    public void openFirstTypePopupForTest() {
+        JsonObject over = obj(model, "weaponOverrides");
+        if (!over.keySet().isEmpty()) {
+            openTypePopup(rx() + rw() - 112, top() + 60, over.keySet().iterator().next());
+        }
+    }
+
+    public ChoicePopup popupForTest() {
+        return popup;
     }
 
     // ------------------------------------------------------------------ 저장
@@ -553,12 +578,21 @@ public class JobEditScreen extends Screen {
             }
         }
         super.render(g, mx, my, partial);
+        if (popup != null) {
+            popup.render(g, this.font, mx, my);
+        }
     }
 
     // ------------------------------------------------------------------ 입력
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        if (popup != null) {
+            if (popup.click(mx, my)) {
+                popup = null;
+            }
+            return true;
+        }
         if (button == 0 || button == 1) {
             for (Hit h : new ArrayList<>(hits)) {
                 if (Ui.inside(mx, my, h.x(), h.y(), h.w(), h.h()) && h.enabled().getAsBoolean()) {
@@ -573,6 +607,10 @@ public class JobEditScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
+        if (popup != null) {
+            popup.scroll(delta);
+            return true;
+        }
         if (selected == -1) {
             scroll -= (int) Math.signum(delta);
             rebuild();
@@ -585,6 +623,10 @@ public class JobEditScreen extends Screen {
 
     @Override
     public void onClose() {
+        if (popup != null) {
+            popup = null;
+            return;
+        }
         if (dirty && !confirmClose) {
             confirmClose = true;
             local("rtshop.qedit.confirm_close", false);

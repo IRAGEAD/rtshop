@@ -642,12 +642,18 @@ public final class ClientSelfTest {
             case 47 -> {
                 if (mc.screen instanceof QuestEditScreen s) {
                     s.selectForTest("tutorial_2", 2);
+                    s.openTypePopupForTest();
                 }
                 wait = 3;
             }
             case 48 -> {
-                shot(mc, "27_qedit_goal_icons");
+                shot(mc, "27_qedit_goal_popup");
                 if (mc.screen instanceof QuestEditScreen s) {
+                    check("goal types open as a popup list with all 5 choices", s.popupForTest() != null && s.popupForTest().sizeForTest() == 5);
+                    if (s.popupForTest() != null) {
+                        s.popupForTest().pickForTest("DELIVER");
+                    }
+                    check("picking from the popup closes it", s.popupForTest() == null);
                     s.openFirstGoalPickerForTest();
                 }
                 wait = 5;
@@ -765,6 +771,8 @@ public final class ClientSelfTest {
                 shot(mc, "36_jedit_params");
                 if (mc.screen instanceof JobEditScreen s) {
                     s.showForTest("#types", 0);
+                    s.openFirstTypePopupForTest();
+                    check("weapon types open as a popup list", s.popupForTest() != null && s.popupForTest().sizeForTest() >= 12);
                 }
                 wait = 3;
             }

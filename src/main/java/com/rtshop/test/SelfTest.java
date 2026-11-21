@@ -596,13 +596,24 @@ public final class SelfTest {
         QuestManager.Loaded l = QuestManager.reload();
         com.rtshop.job.JobConfig cfg = com.rtshop.job.JobConfig.get();
         check("job quest file loads without problems", l.problems.isEmpty(), l.problems);
+        try {
+            Path jq = QuestManager.dir().resolve("job_quests.json");
+            byte[] now = Files.readAllBytes(jq);
+            Files.writeString(jq, "{\"quests\":[]}");
+            QuestManager.reload();
+            check("an edited job quest file is never replaced", Files.readString(jq).equals("{\"quests\":[]}"));
+            Files.write(jq, now);
+            QuestManager.reload();
+        } catch (Exception e) {
+            check("an edited job quest file is never replaced", false, e);
+        }
         int count = 0;
         for (String id : l.quests.keySet()) {
             if (id.startsWith("job_")) {
                 count++;
             }
         }
-        check("every job has a 4-step quest line (36 quests)", count == 36, count);
+        check("every job has a 7-step quest line (63 quests)", count == 63, count);
         for (String npc : new String[]{"sword_master", "war_chief", "shield_keeper", "hunter", "archmage"}) {
             check("mentor NPC '" + npc + "' is defined", l.npcs.containsKey(npc));
         }
@@ -628,12 +639,14 @@ public final class SelfTest {
             check("job '" + d.id + "' is locked until its quest line is done", !com.rtshop.job.Jobs.unlocked(a, d));
             boolean ok = true;
             String fail = "";
-            for (int n = 1; n <= 4 && ok; n++) {
+            for (int n = 1; n <= 20 && ok; n++) {
                 String qid = "job_" + d.id + "_" + n;
                 QuestDef q = l.quests.get(qid);
                 if (q == null) {
-                    ok = false;
-                    fail = qid + " missing";
+                    if (n <= 7) {
+                        ok = false;
+                        fail = qid + " missing";
+                    }
                     break;
                 }
                 boolean offered = false;

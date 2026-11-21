@@ -307,6 +307,47 @@ public class QuestEditScreen extends Screen {
         return key;
     }
 
+    private ChoicePopup popup;
+
+    private void openPopup(int x, int y, int w, int h, List<ChoicePopup.Option> options, String current, Consumer<String> pick) {
+        popup = new ChoicePopup(x, y, w, h, this.height, this.font, options, current, v -> {
+            pick.accept(v);
+            popup = null;
+        });
+    }
+
+    private List<ChoicePopup.Option> npcOptions(boolean allowEmpty) {
+        List<ChoicePopup.Option> l = new ArrayList<>();
+        if (allowEmpty) {
+            l.add(new ChoicePopup.Option("", tr("rtshop.qedit.same_as_giver")));
+        }
+        for (String[] k : data.npcKeys) {
+            l.add(new ChoicePopup.Option(k[0], k[1]));
+        }
+        return l;
+    }
+
+    private List<ChoicePopup.Option> typeOptions() {
+        List<ChoicePopup.Option> l = new ArrayList<>();
+        for (QuestDef.Type t : TYPES) {
+            l.add(new ChoicePopup.Option(t.name(), tr(typeKey(t))));
+        }
+        return l;
+    }
+
+    /** 점검용 */
+    public ChoicePopup popupForTest() {
+        return popup;
+    }
+
+    /** 점검용: 목표 탭에서 첫 목표의 종류 팝업을 연다. */
+    public void openTypePopupForTest() {
+        if (q != null && !q.objs.isEmpty()) {
+            ObjDraft od = q.objs.get(0);
+            openPopup(rx() + 4, formTop() + 1, 46, 14, typeOptions(), od.type.name(), v -> od.type = QuestDef.Type.valueOf(v));
+        }
+    }
+
     private String cycleNpc(String key, int dir, boolean allowEmpty) {
         List<String> keys = new ArrayList<>();
         if (allowEmpty) {
@@ -718,17 +759,20 @@ public class QuestEditScreen extends Screen {
         labels.add(new Label(fxw + 56, y + 2, tr("rtshop.qedit.h_order"), Ui.C_INK_SOFT));
         y += r;
         label(x + 4, y + 2, "rtshop.qedit.f_giver");
-        hit(fxw, y - 1, fw, 14, () -> "< " + npcLabel(q.giver) + " >", () -> true, b -> {
-            q.giver = cycleNpc(q.giver, b == 1 ? -1 : 1, false);
-            markDirty();
-        });
+        final int gy = y;
+        hit(fxw, y - 1, fw, 14, () -> npcLabel(q.giver) + "  ▼", () -> true, b ->
+                openPopup(fxw, gy - 1, fw, 14, npcOptions(false), q.giver, v -> {
+                    q.giver = v;
+                    markDirty();
+                }));
         y += r;
         label(x + 4, y + 2, "rtshop.qedit.f_turnin");
-        hit(fxw, y - 1, fw, 14, () -> "< " + (q.turnIn.isEmpty() ? tr("rtshop.qedit.same_as_giver") : npcLabel(q.turnIn)) + " >",
-                () -> true, b -> {
-                    q.turnIn = cycleNpc(q.turnIn, b == 1 ? -1 : 1, true);
+        final int ty = y;
+        hit(fxw, y - 1, fw, 14, () -> (q.turnIn.isEmpty() ? tr("rtshop.qedit.same_as_giver") : npcLabel(q.turnIn)) + "  ▼",
+                () -> true, b -> openPopup(fxw, ty - 1, fw, 14, npcOptions(true), q.turnIn, v -> {
+                    q.turnIn = v;
                     markDirty();
-                });
+                }));
         y += r;
         label(x + 4, y + 2, "rtshop.qedit.f_requires");
         box(fxw, y, fw, q.requires, 400, v -> q.requires = v);
@@ -764,8 +808,14 @@ public class QuestEditScreen extends Screen {
             ObjDraft od = q.objs.get(i);
             final int idx = i;
             // 1줄: 종류 / 대상 / 도우미
-            hit(x + 4, y - 1, typeW, 14, () -> tr(typeKey(od.type)), () -> true, b -> {
-                od.type = TYPES[Math.floorMod(od.type.ordinal() + (b == 1 ? -1 : 1), TYPES.length)];
+            final int oy = y;
+            hit(x + 4, y - 1, typeW, 14, () -> tr(typeKey(od.type)) + "▼", () -> true, b -> openPopup(x + 4, oy - 1, typeW, 14, typeOptions(),
+                    od.type.name(), v -> {
+                QuestDef.Type nt = QuestDef.Type.valueOf(v);
+                if (nt == od.type) {
+                    return;
+                }
+                od.type = nt;
                 od.target = "";
                 od.count = "1";
                 if (od.type == QuestDef.Type.TALK) {
@@ -779,7 +829,7 @@ public class QuestEditScreen extends Screen {
                 }
                 markDirty();
                 rebuild();
-            });
+            }));
             int tx = x + 4 + typeW + 4;
             int tw = w - 8 - typeW - 4 - helpW - 4;
             switch (od.type) {
@@ -794,10 +844,11 @@ public class QuestEditScreen extends Screen {
                             od.target = v;
                             od.text = "";
                         }));
-                case TALK -> hit(tx, y - 1, tw, 14, () -> "< " + npcLabel(od.target) + " >", () -> true, b -> {
-                    od.target = cycleNpc(od.target, b == 1 ? -1 : 1, false);
-                    markDirty();
-                });
+                case TALK -> hit(tx, y - 1, tw, 14, () -> npcLabel(od.target) + "  ▼", () -> true, b ->
+                        openPopup(tx, oy - 1, tw, 14, npcOptions(false), od.target, v -> {
+                            od.target = v;
+                            markDirty();
+                        }));
                 case VISIT -> box(tx, y, tw, od.target, 200, v -> od.target = v);
                 default -> labels.add(new Label(tx + 2, y + 2, tr("rtshop.qedit.pay_note"), Ui.C_INK_SOFT));
             }
@@ -1041,10 +1092,16 @@ public class QuestEditScreen extends Screen {
         box(fxw, y, fw, n.name, 64, v -> n.name = v);
         y += r;
         label(x + 4, y + 2, "rtshop.qedit.f_profession");
-        hit(fxw, y - 1, fw, 14, () -> "< " + tr("entity.minecraft.villager." + n.profession) + " >", () -> true, b -> {
-            int i = Arrays.asList(PROFESSIONS).indexOf(n.profession);
-            n.profession = PROFESSIONS[Math.floorMod((i < 0 ? 0 : i) + (b == 1 ? -1 : 1), PROFESSIONS.length)];
-            markDirty();
+        final int py = y;
+        hit(fxw, y - 1, fw, 14, () -> tr("entity.minecraft.villager." + n.profession) + "  ▼", () -> true, b -> {
+            List<ChoicePopup.Option> opts = new ArrayList<>();
+            for (String pr : PROFESSIONS) {
+                opts.add(new ChoicePopup.Option(pr, tr("entity.minecraft.villager." + pr)));
+            }
+            openPopup(fxw, py - 1, fw, 14, opts, n.profession, v -> {
+                n.profession = v;
+                markDirty();
+            });
         });
         y += r;
         label(x + 4, y + 2, "rtshop.qedit.f_greeting");
@@ -1110,6 +1167,9 @@ public class QuestEditScreen extends Screen {
         }
         super.render(g, mx, my, partial);
         renderStatus(g, mx, my);
+        if (popup != null) {
+            popup.render(g, this.font, mx, my);
+        }
     }
 
     private void renderList(GuiGraphics g, int mx, int my) {
@@ -1246,6 +1306,12 @@ public class QuestEditScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        if (popup != null) {
+            if (popup.click(mx, my)) {
+                popup = null;
+            }
+            return true;
+        }
         if (button == 0 || button == 1) {
             for (Hit h : new ArrayList<>(hits)) {
                 if (Ui.inside(mx, my, h.x(), h.y(), h.w(), h.h()) && h.enabled().getAsBoolean()) {
@@ -1283,6 +1349,10 @@ public class QuestEditScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
+        if (popup != null) {
+            popup.scroll(delta);
+            return true;
+        }
         if (Ui.inside(mx, my, listX(), listY(), LIST_W, listH())) {
             listScroll -= (int) Math.signum(delta) * 2;
             return true;
@@ -1292,6 +1362,10 @@ public class QuestEditScreen extends Screen {
 
     @Override
     public void onClose() {
+        if (popup != null) {
+            popup = null;
+            return;
+        }
         if (dirty && !confirmClose) {
             confirmClose = true;
             showLocal(Component.translatable("rtshop.qedit.confirm_close"), false);
