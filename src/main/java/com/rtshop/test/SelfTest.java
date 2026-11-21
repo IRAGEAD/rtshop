@@ -1981,7 +1981,7 @@ public final class SelfTest {
         section("attendance");
         com.rtshop.attendance.AttendanceConfig c = com.rtshop.attendance.AttendanceConfig.get();
         check("attendance.json is created with a 28-day reward table and weekly tiers", c.days.size() == 28 && c.weekly.size() == 3
-                && c.timezone.equals("Asia/Seoul") && c.resetHour == 9, c.days.size() + " " + c.weekly.size());
+                && c.timezone.equals("Asia/Seoul") && c.resetHour == 6, c.days.size() + " " + c.weekly.size());
         List<String> bad = new ArrayList<>();
         for (com.rtshop.attendance.AttendanceConfig.Reward r : c.days) {
             for (com.rtshop.attendance.AttendanceConfig.Item it : r.items) {
@@ -2005,18 +2005,42 @@ public final class SelfTest {
             rejected = true;
         }
         check("a wrong attendance setting is refused with a reason", rejected);
+        // 3.7.0 이 만든 설정 파일(오전 9시, configVersion 없음)은 오전 6시로 옮겨지고 보상은 그대로
+        java.nio.file.Path ap = com.rtshop.attendance.AttendanceConfig.path();
+        byte[] apOrig = Files.readAllBytes(ap);
+        try {
+            com.google.gson.JsonObject old = c.toJson();
+            old.remove("configVersion");
+            old.addProperty("resetHour", 9);
+            old.getAsJsonArray("days").get(0).getAsJsonObject().addProperty("gold", 1234);
+            Files.writeString(ap, old.toString());
+            com.rtshop.attendance.AttendanceConfig.reload();
+            com.rtshop.attendance.AttendanceConfig m = com.rtshop.attendance.AttendanceConfig.get();
+            check("a 3.7.0 attendance file moves from 09:00 to 06:00 and keeps its rewards", m.resetHour == 6 && m.days.get(0).gold == 1234
+                    && Files.readString(ap).contains("configVersion"), m.resetHour + " " + m.days.get(0).gold);
+            com.google.gson.JsonObject chosen = m.toJson();
+            chosen.addProperty("resetHour", 9);
+            Files.writeString(ap, chosen.toString());
+            com.rtshop.attendance.AttendanceConfig.reload();
+            check("...but 09:00 chosen later in the editor is kept", com.rtshop.attendance.AttendanceConfig.get().resetHour == 9);
+        } finally {
+            Files.write(ap, apOrig);
+            com.rtshop.attendance.AttendanceConfig.reload();
+            c = com.rtshop.attendance.AttendanceConfig.get();
+        }
 
-        // 날짜: 한국 시간 오전 9시에 바뀐다
+        // 날짜: 한국 시간 오전 6시에 바뀐다
         java.time.ZoneId kst = java.time.ZoneId.of("Asia/Seoul");
-        long t0859 = java.time.ZonedDateTime.of(2026, 11, 23, 8, 59, 0, 0, kst).toInstant().toEpochMilli();
-        long t0900 = java.time.ZonedDateTime.of(2026, 11, 23, 9, 0, 0, 0, kst).toInstant().toEpochMilli();
+        long t0859 = java.time.ZonedDateTime.of(2026, 11, 23, 5, 59, 0, 0, kst).toInstant().toEpochMilli();
+        long t0900 = java.time.ZonedDateTime.of(2026, 11, 23, 6, 0, 0, 0, kst).toInstant().toEpochMilli();
         long base = com.rtshop.attendance.Attendance.dayOf(t0900, c);
-        check("the attendance day changes at 09:00 Korean time", com.rtshop.attendance.Attendance.dayOf(t0859, c) == base - 1
-                && com.rtshop.attendance.Attendance.dayStart(base, c) == t0900);
-        check("the week starts on Monday 09:00 (2026-11-23 is a Monday)", com.rtshop.attendance.Attendance.weekOf(base, c) == base
+        check("the attendance day changes at 06:00 Korean time (not at 09:00)", com.rtshop.attendance.Attendance.dayOf(t0859, c) == base - 1
+                && com.rtshop.attendance.Attendance.dayStart(base, c) == t0900
+                && com.rtshop.attendance.Attendance.dayOf(t0900 + 3 * 3_600_000L - 1, c) == base);
+        check("the week starts on Monday 06:00 (2026-11-23 is a Monday)", com.rtshop.attendance.Attendance.weekOf(base, c) == base
                 && com.rtshop.attendance.Attendance.weekOf(base + 6, c) == base && com.rtshop.attendance.Attendance.weekOf(base + 7, c) == base + 7);
         long H = 3_600_000L;
-        java.util.function.LongUnaryOperator day = n -> t0900 + n * 24 * H + 3 * H; // n 일 뒤 정오
+        java.util.function.LongUnaryOperator day = n -> t0900 + n * 24 * H + 6 * H; // n 일 뒤 정오
         com.rtshop.attendance.AttendanceData.Entry e = new com.rtshop.attendance.AttendanceData.Entry();
         var ci = com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(0), c);
         check("first check-in: day 1 reward", ci != null && ci.dayIndex() == 0 && e.streak == 1);
