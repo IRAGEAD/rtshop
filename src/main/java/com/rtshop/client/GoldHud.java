@@ -48,11 +48,18 @@ public final class GoldHud {
         Ui.coin(g, x + pad, y + (h - icon) / 2, icon);
 
         Font font = Minecraft.getInstance().font;
+        ClientConfig cfg = ClientConfig.get();
         String txt = Ui.num(amount) + " G";
+        int textW = Math.max(1, HudFonts.width(font, txt, cfg.hudFont));
         float avail = w - icon - pad * 3;
-        float scale = Math.min(avail / Math.max(1, font.width(txt)), (h * 0.5F) / 8.0F);
-        scale = Math.max(0.4F, Math.min(3.0F, scale));
-        float tw = font.width(txt) * scale;
-        Ui.scaledText(g, font, txt, x + w - pad - tw, y + (h - 8 * scale) / 2.0F + 0.5F, scale, Ui.C_GOLD, true);
+        // 글자 크기 설정(hudTextScale)을 곱하되 상자 밖으로 넘치지는 않게
+        float scale = (float) Math.min(avail / textW, (h * 0.5F) / 8.0F * cfg.hudTextScale);
+        scale = Math.max(0.3F, Math.min(3.0F, scale));
+        float tw = textW * scale;
+        g.pose().pushPose();
+        g.pose().translate(x + w - pad - tw, y + (h - 8 * scale) / 2.0F + 0.5F, 0);
+        g.pose().scale(scale, scale, 1.0F);
+        HudFonts.draw(g, font, txt, 0, 0, Ui.C_GOLD, true, cfg.hudFont);
+        g.pose().popPose();
     }
 }

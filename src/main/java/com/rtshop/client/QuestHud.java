@@ -96,7 +96,7 @@ public final class QuestHud {
                 yy += GAP;
                 g.fill(0, yy - 3, inner, yy - 2, 0x55E8B84A);
             }
-            g.drawString(font, r.text(), r.indent(), yy + 1, r.color(), true);
+            HudFonts.draw(g, font, r.text(), r.indent(), yy + 1, r.color(), true, cfg.questHudFont);
             yy += LINE;
         }
         g.pose().popPose();
@@ -110,10 +110,10 @@ public final class QuestHud {
         for (int i = 0; i < shown; i++) {
             QuestHudPacket.Entry e = list.get(i);
             String title = (e.ready() ? "✔ " : "◆ ") + e.title();
-            out.add(new Row(Ui.clip(font, title, inner), e.ready() ? DONE : Ui.C_GOLD, 0, true));
+            out.add(new Row(HudFonts.clip(font, title, inner, cfg.questHudFont), e.ready() ? DONE : Ui.C_GOLD, 0, true));
             if (e.ready()) {
                 String back = Component.translatable("rtshop.qhud.return", e.turnIn()).getString();
-                out.add(new Row(Ui.clip(font, back, inner - 8), DONE, 8, false));
+                out.add(new Row(HudFonts.clip(font, back, inner - 8, cfg.questHudFont), DONE, 8, false));
                 continue;
             }
             for (QuestView.ObjView o : e.objectives()) {
@@ -124,11 +124,11 @@ public final class QuestHud {
                 } else if (o.need() > 1) {
                     label += " " + Math.min(o.cur(), o.need()) + "/" + o.need();
                 }
-                out.add(new Row(Ui.clip(font, (done ? "✔ " : "· ") + label, inner - 8), done ? DONE : CREAM, 8, false));
+                out.add(new Row(HudFonts.clip(font, (done ? "✔ " : "· ") + label, inner - 8, cfg.questHudFont), done ? DONE : CREAM, 8, false));
             }
         }
         if (list.size() > shown) {
-            out.add(new Row(Ui.clip(font, Component.translatable("rtshop.qhud.more", list.size() - shown).getString(), inner), SOFT, 0, false));
+            out.add(new Row(HudFonts.clip(font, Component.translatable("rtshop.qhud.more", list.size() - shown).getString(), inner, cfg.questHudFont), SOFT, 0, false));
         }
         return out;
     }

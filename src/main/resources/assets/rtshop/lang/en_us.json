@@ -421,5 +421,9 @@
   "rtshop.qhud.more": "+ %s more (quest journal)",
   "rtshop.qhud.sample_title1": "(Sample) Basic training",
   "rtshop.qhud.sample_title2": "(Sample) Holding a sword",
-  "rtshop.qhud.sample_npc": "Leon the sword master"
+  "rtshop.qhud.sample_npc": "Leon the sword master",
+  "rtshop.hud.font": "Font: %s",
+  "rtshop.hud.font_default": "Default font",
+  "rtshop.hud.font_uniform": "Unifont (minecraft:uniform)",
+  "rtshop.hud.text_size": "Text size: %s%%"
 }

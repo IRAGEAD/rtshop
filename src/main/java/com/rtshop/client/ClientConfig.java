@@ -41,6 +41,11 @@ public final class ClientConfig {
     public double questHudScale = QDEF_SCALE;
     /** 한 번에 보일 퀘스트 수 (1~5). */
     public int questHudMax = QDEF_MAX;
+    /** HUD 글꼴 ("" = 게임 기본 글꼴, 예: minecraft:uniform). */
+    public String hudFont = "";
+    public String questHudFont = "";
+    /** Gold 표시의 글자 크기 배율 (상자 크기는 그대로, 0.5~1.5). 퀘스트 HUD 의 글자 크기는 questHudScale. */
+    public double hudTextScale = 1.0;
 
     private static ClientConfig instance;
 
@@ -56,6 +61,8 @@ public final class ClientConfig {
     }
 
     public void resetHud() {
+        hudFont = "";
+        hudTextScale = 1.0;
         hudX = DEF_X;
         hudY = DEF_Y;
         hudWidth = DEF_W;
@@ -68,6 +75,7 @@ public final class ClientConfig {
         questHudWidth = QDEF_W;
         questHudScale = QDEF_SCALE;
         questHudMax = QDEF_MAX;
+        questHudFont = "";
     }
 
     public void clampQuest() {
@@ -79,6 +87,7 @@ public final class ClientConfig {
     }
 
     public void clamp() {
+        hudTextScale = Math.max(0.5, Math.min(1.5, hudTextScale));
         hudWidth = Math.max(0.05, Math.min(0.6, hudWidth));
         hudHeight = Math.max(0.03, Math.min(0.4, hudHeight));
         hudX = Math.max(0, Math.min(1 - hudWidth, hudX));
@@ -88,7 +97,7 @@ public final class ClientConfig {
     public synchronized void save() {
         try {
             JsonObject o = new JsonObject();
-            o.addProperty("_설명", "Gold 표시 박스와 퀘스트 HUD 의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다. questHudScale 은 글자 배율, questHudMax 는 한 번에 보일 퀘스트 수입니다.");
+            o.addProperty("_설명", "Gold 표시 박스와 퀘스트 HUD 의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다. questHudScale 은 글자 배율, questHudMax 는 한 번에 보일 퀘스트 수, hudFont/questHudFont 는 글꼴(빈 값 = 기본), hudTextScale 은 Gold 글자 크기입니다.");
             o.addProperty("configVersion", CONFIG_VERSION);
             o.addProperty("hudEnabled", hudEnabled);
             o.addProperty("hudX", hudX);
@@ -101,6 +110,9 @@ public final class ClientConfig {
             o.addProperty("questHudWidth", questHudWidth);
             o.addProperty("questHudScale", questHudScale);
             o.addProperty("questHudMax", questHudMax);
+            o.addProperty("hudFont", hudFont);
+            o.addProperty("hudTextScale", hudTextScale);
+            o.addProperty("questHudFont", questHudFont);
             Path p = path();
             Files.createDirectories(p.getParent());
             Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -135,6 +147,10 @@ public final class ClientConfig {
                 if (o.has("questHudWidth")) c.questHudWidth = o.get("questHudWidth").getAsDouble();
                 if (o.has("questHudScale")) c.questHudScale = o.get("questHudScale").getAsDouble();
                 if (o.has("questHudMax")) c.questHudMax = o.get("questHudMax").getAsInt();
+                if (o.has("hudFont")) c.hudFont = o.get("hudFont").getAsString();
+                if (o.has("hudTextScale")) c.hudTextScale = o.get("hudTextScale").getAsDouble();
+                if (o.has("questHudFont")) c.questHudFont = o.get("questHudFont").getAsString();
+                c.clamp();
                 c.clampQuest();
                 if (!o.has("questHudEnabled")) {
                     c.save();

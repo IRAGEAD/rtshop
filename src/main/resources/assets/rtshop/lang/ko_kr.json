@@ -421,5 +421,9 @@
   "rtshop.qhud.more": "+ %s개 더 (퀘스트 수첩)",
   "rtshop.qhud.sample_title1": "(보기) 기초 수련",
   "rtshop.qhud.sample_title2": "(보기) 검을 쥐는 법",
-  "rtshop.qhud.sample_npc": "검술 교관 레온"
+  "rtshop.qhud.sample_npc": "검술 교관 레온",
+  "rtshop.hud.font": "글꼴: %s",
+  "rtshop.hud.font_default": "기본 글꼴",
+  "rtshop.hud.font_uniform": "유니폰트 (minecraft:uniform)",
+  "rtshop.hud.text_size": "글자 크기: %s%%"
 }

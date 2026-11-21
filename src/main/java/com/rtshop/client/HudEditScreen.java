@@ -23,6 +23,7 @@ public class HudEditScreen extends Screen {
 
     public HudEditScreen() {
         super(Component.translatable("rtshop.hud.title"));
+        HudFonts.refresh();
     }
 
     @Override
@@ -50,6 +51,65 @@ public class HudEditScreen extends Screen {
         int total = 120 + 4 + 96 + 4 + 50 + 4 + 50;
         int x = this.width / 2 - total / 2;
         return new int[][]{{x, 120}, {x + 124, 96}, {x + 224, 50}, {x + 278, 50}};
+    }
+
+    private int row3Y() {
+        return row2Y() - 22;
+    }
+
+    /** 세 번째 줄 버튼들 {x, w} : 글꼴, 글자 크기 (두 HUD 모두). */
+    private int[][] row3() {
+        int total = 160 + 4 + 120;
+        int x = this.width / 2 - total / 2;
+        return new int[][]{{x, 160}, {x + 164, 120}};
+    }
+
+    private String row3Label(int i) {
+        ClientConfig cfg = ClientConfig.get();
+        if (i == 0) {
+            String f = selected == GOLD ? cfg.hudFont : cfg.questHudFont;
+            return Ui.clip(this.font, Component.translatable("rtshop.hud.font", HudFonts.label(HudFonts.effective(f))).getString(), 160 - 18) + " ▼";
+        }
+        double pct = (selected == GOLD ? cfg.hudTextScale : cfg.questHudScale) * 100;
+        return Component.translatable("rtshop.hud.text_size", Math.round(pct)).getString() + " ▼";
+    }
+
+    private void row3Click(int i) {
+        ClientConfig cfg = ClientConfig.get();
+        int[][] r3 = row3();
+        List<ChoicePopup.Option> opts = new ArrayList<>();
+        if (i == 0) {
+            for (String f : HudFonts.available()) {
+                opts.add(new ChoicePopup.Option(f, HudFonts.label(f)));
+            }
+            String cur = HudFonts.effective(selected == GOLD ? cfg.hudFont : cfg.questHudFont);
+            popup = new ChoicePopup(r3[0][0], row3Y(), r3[0][1], 18, this.height, this.font, opts, cur, v -> {
+                if (selected == GOLD) {
+                    cfg.hudFont = v;
+                } else {
+                    cfg.questHudFont = v;
+                }
+            });
+            return;
+        }
+        int[] sizes = selected == GOLD ? new int[]{50, 60, 70, 80, 90, 100, 110, 120, 130, 150}
+                : new int[]{50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 250};
+        for (int n : sizes) {
+            opts.add(new ChoicePopup.Option(Integer.toString(n), n + "%"));
+        }
+        double now = (selected == GOLD ? cfg.hudTextScale : cfg.questHudScale) * 100;
+        String cur = Integer.toString((int) Math.round(now));
+        popup = new ChoicePopup(r3[1][0], row3Y(), r3[1][1], 18, this.height, this.font, opts, cur, v -> {
+            double sc = Integer.parseInt(v) / 100.0;
+            if (selected == GOLD) {
+                cfg.hudTextScale = sc;
+                cfg.clamp();
+            } else {
+                // 글자 크기만 바꾼다 (너비는 그대로)
+                cfg.questHudScale = sc;
+                cfg.clampQuest();
+            }
+        });
     }
 
     private int[] goldBounds() {
@@ -91,6 +151,10 @@ public class HudEditScreen extends Screen {
         int[][] r2 = row2();
         for (int i = 0; i < r2.length; i++) {
             Ui.button(g, this.font, r2[i][0], row2Y(), r2[i][1], 18, row2Label(i), Ui.inside(mx, my, r2[i][0], row2Y(), r2[i][1], 18), true);
+        }
+        int[][] r3 = row3();
+        for (int i = 0; i < r3.length; i++) {
+            Ui.button(g, this.font, r3[i][0], row3Y(), r3[i][1], 18, row3Label(i), Ui.inside(mx, my, r3[i][0], row3Y(), r3[i][1], 18), true);
         }
         if (popup != null) {
             popup.render(g, this.font, mx, my);
@@ -178,6 +242,13 @@ public class HudEditScreen extends Screen {
         for (int i = 0; i < r2.length; i++) {
             if (Ui.inside(mx, my, r2[i][0], row2Y(), r2[i][1], 18)) {
                 row2Click(i);
+                return true;
+            }
+        }
+        int[][] r3 = row3();
+        for (int i = 0; i < r3.length; i++) {
+            if (Ui.inside(mx, my, r3[i][0], row3Y(), r3[i][1], 18)) {
+                row3Click(i);
                 return true;
             }
         }
@@ -327,6 +398,10 @@ public class HudEditScreen extends Screen {
 
     public void clickRow2ForTest(int i) {
         row2Click(i);
+    }
+
+    public void clickRow3ForTest(int i) {
+        row3Click(i);
     }
 
     public ChoicePopup popupForTest() {

@@ -283,17 +283,45 @@ public final class ClientSelfTest {
                     cfg.questHudWidth = beforeW;
                     cfg.clampQuest();
                     hs.clickRow2ForTest(1);
+                    check("the number of quests to show opens as a list", hs.popupForTest() != null && hs.popupForTest().sizeForTest() == 5);
+                    if (hs.popupForTest() != null) {
+                        hs.popupForTest().pickForTest("3");
+                    }
+                    // 글꼴: 기본 + 게임·모드가 가진 글꼴
+                    hs.clickRow3ForTest(0);
+                    check("the HUD font opens as a list of the fonts in this game", hs.popupForTest() != null
+                            && HudFonts.available().contains("minecraft:uniform"), HudFonts.available());
+                    if (hs.popupForTest() != null) {
+                        hs.popupForTest().pickForTest("minecraft:uniform");
+                    }
+                    check("picking a font changes the quest HUD font", "minecraft:uniform".equals(cfg.questHudFont), cfg.questHudFont);
+                    // 글자 크기: 너비는 그대로
+                    double w0 = cfg.questHudWidth;
+                    hs.clickRow3ForTest(1);
+                    if (hs.popupForTest() != null) {
+                        hs.popupForTest().pickForTest("125");
+                    }
+                    check("picking a text size changes only the text size", Math.abs(cfg.questHudScale - 1.25) < 1e-6 && cfg.questHudWidth == w0,
+                            cfg.questHudScale + " " + cfg.questHudWidth);
+                    hs.select(HudEditScreen.GOLD);
+                    hs.clickRow3ForTest(1);
+                    if (hs.popupForTest() != null) {
+                        hs.popupForTest().pickForTest("80");
+                    }
+                    check("the Gold display has its own text size", Math.abs(cfg.hudTextScale - 0.8) < 1e-6, cfg.hudTextScale);
+                    cfg.hudTextScale = 1.0;
+                    hs.select(HudEditScreen.QUEST);
+                    hs.clickRow3ForTest(0);
                 }
                 wait = 20;
             }
             case 3 -> {
                 check("the HUD position editor opens", mc.screen instanceof HudEditScreen);
-                check("the number of quests to show opens as a list", mc.screen instanceof HudEditScreen hs
-                        && hs.popupForTest() != null && hs.popupForTest().sizeForTest() == 5);
                 shot(mc, "02_hud_edit");
-                if (mc.screen instanceof HudEditScreen hs && hs.popupForTest() != null) {
-                    hs.popupForTest().pickForTest("3");
-                }
+                ClientConfig hc = ClientConfig.get();
+                hc.questHudFont = "";
+                hc.questHudScale = ClientConfig.QDEF_SCALE;
+                hc.clampQuest();
                 mc.setScreen(null);
                 onServer(mc, com.rtshop.quest.QuestManager::reset);
                 onServer(mc, sp -> ShopServer.openShop(sp, "farmer", -1));
