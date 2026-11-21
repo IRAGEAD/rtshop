@@ -168,6 +168,30 @@ jobs:
           cat server/config/rtshop/export/farmer.txt || true
           grep -q "RESULT: ALL PASS" server/rtshop-selftest.txt
 
+  inspect:
+    # 테스트 가지에서만: 모드팩의 일부 모드 정보를 뽑아 ci-inspect 가지에 올린다 (강화 재료·연출 연동 설계용)
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: packcache
+          key: pack-${{ hashFiles('.github/scripts/pack_files.json', '.github/scripts/pack_overrides.json') }}-v2
+      - name: Download the pack's mods
+        run: python3 .github/scripts/fullpack.py .github/scripts/pack_files.json packcache /tmp/mods "" .github/scripts/pack_overrides.json > /dev/null
+      - name: Inspect
+        run: |
+          python3 .github/scripts/inspect_pack.py packcache /tmp/inspect
+          cd /tmp/inspect
+          git init -q -b ci-inspect
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Inspect from run ${{ github.run_id }}" || exit 0
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-inspect
+
   fullpack:
     # 모드팩 "RT1 - 2" 의 모드 전체(매니페스트에 적힌 버전 그대로)와 함께 포지 서버에서 자체 점검을 돌린다 (참고용: 실패해도 빌드는 유지)
     needs: build
