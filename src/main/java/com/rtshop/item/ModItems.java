@@ -23,6 +23,10 @@ public final class ModItems {
     public static final RegistryObject<Item> LARGE_LAND_DEED = ITEMS.register("large_land_deed",
             () -> new DeedItem(DeedItem.Type.LARGE, new Item.Properties().stacksTo(16)));
 
+    /** 구획 지팡이 (OP 전용): 칸 단위 모양의 구획 토지를 고른다. */
+    public static final RegistryObject<Item> PLOT_WAND = ITEMS.register("plot_wand",
+            () -> new PlotWandItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.EPIC)));
+
     /** 일일 출석 진행도 복구권. */
     public static final RegistryObject<Item> RESTORE_TICKET = ITEMS.register("attendance_restore_ticket",
             () -> new RestoreTicketItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.EPIC)));

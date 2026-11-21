@@ -346,8 +346,13 @@ public class LandScreen extends Screen {
             info2 = "";
         } else {
             LandInfoPacket.ClaimView c = v.claims.get(0);
-            info2 = Component.translatable("rtshop.land.info2", small, large,
-                    (c.x0 + c.x1) / 2, c.y0 + 4, (c.z0 + c.z1) / 2).getString();
+            if ("plot".equals(c.type)) {
+                info2 = Component.translatable("rtshop.plot.screen_info", c.area,
+                        (c.x0 + c.x1) / 2, c.y0 + 4, (c.z0 + c.z1) / 2).getString();
+            } else {
+                info2 = Component.translatable("rtshop.land.info2", small, large,
+                        (c.x0 + c.x1) / 2, c.y0 + 4, (c.z0 + c.z1) / 2).getString();
+            }
         }
         g.drawString(this.font, Ui.clip(this.font, info2, textMax), px + 8, py + 35, Ui.C_INK_SOFT, false);
 
@@ -429,7 +434,9 @@ public class LandScreen extends Screen {
         ab = Ui.clip(this.font, ab, 106);
         g.drawString(this.font, ab, px + pw - 6 - 112 + (112 - this.font.width(ab)) / 2, bottomY() + 4, Ui.C_CREAM, false);
         if (hovAb) {
-            tip = Component.translatable("rtshop.land.abandon_tip", v.claims.size());
+            tip = v.plotRefund >= 0
+                    ? Component.translatable("rtshop.plot.abandon_tip", String.format("%,d", v.plotRefund))
+                    : Component.translatable("rtshop.land.abandon_tip", v.claims.size());
         }
         return tip;
     }

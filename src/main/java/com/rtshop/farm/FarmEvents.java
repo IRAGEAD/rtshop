@@ -320,8 +320,8 @@ public final class FarmEvents {
             return;
         }
         Player player = event.getEntity();
-        if (player.isSpectator()) {
-            return;
+        if (player.isSpectator() || event.getItemStack().is(com.rtshop.item.ModItems.PLOT_WAND.get())) {
+            return; // 구획 지팡이로 밭을 고르는 중에는 수확하지 않는다
         }
         Level level = event.getLevel();
         BlockPos pos = event.getPos();

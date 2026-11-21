@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -28,24 +29,61 @@ public final class LandData extends SavedData {
     public static final int ENTITY = 16;
     public static final int ALL = 31;
 
-    /** 토지 한 구역(직육면체, 좌표는 양 끝 포함). */
+    /**
+     * 토지 한 구역(좌표는 양 끝 포함). 보통은 직육면체이고, 구획(plot)은 mask 로 가로·세로 모양을 칸 단위로 정한다.
+     * mask 가 있으면 (x0..x1, z0..z1) 안에서 mask 에 표시된 기둥만 구역이다 (높이는 y0..y1 그대로).
+     */
     public static final class Claim {
         public int landId;
         public String dim;
         public int x0, y0, z0, x1, y1, z1;
         public String type;
+        /** 칸 모양 (null = 직육면체 전체). 비트 번호 = (z - z0) * 너비 + (x - x0). */
+        public BitSet mask;
+
+        public int width() {
+            return x1 - x0 + 1;
+        }
+
+        /** (x, z) 기둥이 이 구역의 가로·세로 모양 안에 있는가 (높이는 보지 않음). */
+        public boolean hasColumn(int x, int z) {
+            if (x < x0 || x > x1 || z < z0 || z > z1) {
+                return false;
+            }
+            return mask == null || mask.get((z - z0) * width() + (x - x0));
+        }
 
         public boolean contains(int x, int y, int z) {
-            return x >= x0 && x <= x1 && y >= y0 && y <= y1 && z >= z0 && z <= z1;
+            return y >= y0 && y <= y1 && hasColumn(x, z);
         }
 
         public boolean intersects(int ax0, int ay0, int az0, int ax1, int ay1, int az1) {
-            return ax0 <= x1 && ax1 >= x0 && ay0 <= y1 && ay1 >= y0 && az0 <= z1 && az1 >= z0;
+            if (!(ax0 <= x1 && ax1 >= x0 && ay0 <= y1 && ay1 >= y0 && az0 <= z1 && az1 >= z0)) {
+                return false;
+            }
+            if (mask == null) {
+                return true;
+            }
+            int bx0 = Math.max(ax0, x0), bx1 = Math.min(ax1, x1), bz0 = Math.max(az0, z0), bz1 = Math.min(az1, z1);
+            int w = width();
+            for (int z = bz0; z <= bz1; z++) {
+                int row = (z - z0) * w;
+                int i = mask.nextSetBit(row + (bx0 - x0));
+                if (i >= 0 && i <= row + (bx1 - x0)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        /** 면이 맞닿아 있는가 (모서리·꼭짓점만 닿는 것은 제외). */
+        /** 가로·세로 칸 수 (바닥 넓이). */
+        public int area() {
+            return mask == null ? width() * (z1 - z0 + 1) : mask.cardinality();
+        }
+
+        /** 면이 맞닿아 있는가 (모서리·꼭짓점만 닿는 것은 제외). 칸 모양 구역은 합치지 않는다. */
         public boolean touches(Claim o) {
-            if (!dim.equals(o.dim)) {
+            if (!dim.equals(o.dim) || mask != null || o.mask != null) {
                 return false;
             }
             boolean ox = x0 <= o.x1 && x1 >= o.x0;
@@ -64,10 +102,23 @@ public final class LandData extends SavedData {
         public int perms;
     }
 
+    /** 아직 주인이 없는(판매 중인) 구획 토지의 소유자 값. */
+    public static final UUID NO_OWNER = new UUID(0L, 0L);
+
     /** 토지(맞닿은 구역들의 묶음). 권한 설정은 토지 단위. */
     public static final class Land {
         public int id;
         public UUID owner;
+        /** OP 가 칸 단위로 정해 둔 구획(농경지 등)인가. 구획은 문서로 넓히거나 다른 토지와 합칠 수 없다. */
+        public boolean plot;
+        /** 구획 판매 가격 (G). */
+        public long price;
+        /** 지금 주인이 구매할 때 낸 금액 (반환 시 환불 기준). */
+        public long paid;
+
+        public boolean forSale() {
+            return plot && NO_OWNER.equals(owner);
+        }
         public String ownerName = "";
         public String name = "";
         public int defaultPerms = 0;
@@ -211,6 +262,34 @@ public final class LandData extends SavedData {
         return l;
     }
 
+    /** 주인 없는 구획 토지를 만든다 (OP 가 등록, 플레이어가 구매). */
+    public Land createPlot(String name, long price) {
+        Land l = createLand(NO_OWNER, "");
+        l.plot = true;
+        l.price = Math.max(0, price);
+        if (name != null && !name.isBlank()) {
+            l.name = name.length() > 24 ? name.substring(0, 24) : name;
+        }
+        return l;
+    }
+
+    /** 구역 모양을 바꾼다 (색인을 다시 만든다). */
+    public void replaceClaim(Claim old, Claim fresh) {
+        Land land = lands.get(old.landId);
+        unindexClaim(old);
+        if (land != null) {
+            int i = land.claims.indexOf(old);
+            fresh.landId = land.id;
+            if (i >= 0) {
+                land.claims.set(i, fresh);
+            } else {
+                land.claims.add(fresh);
+            }
+        }
+        indexClaim(fresh);
+        setDirty();
+    }
+
     public void addClaim(Land land, Claim c) {
         c.landId = land.id;
         land.claims.add(c);
@@ -233,9 +312,17 @@ public final class LandData extends SavedData {
     }
 
     public void removeLand(Land land) {
+        clearPins(land);
         for (Claim c : land.claims) {
             unindexClaim(c);
-            // 구역 안의 PIN 도 지운다
+        }
+        lands.remove(land.id);
+        setDirty();
+    }
+
+    /** 토지 안의 보관함 PIN 을 모두 지운다. */
+    public void clearPins(Land land) {
+        for (Claim c : land.claims) {
             pins.keySet().removeIf(k -> {
                 String[] p = k.split("\\|");
                 if (p.length != 2 || !p[0].equals(c.dim)) {
@@ -249,8 +336,23 @@ public final class LandData extends SavedData {
                 }
             });
         }
-        lands.remove(land.id);
         setDirty();
+    }
+
+    /** 칸 모양 구역의 바닥 칸을 모두 돈다 (x, z). */
+    public static void forEachColumn(Claim c, java.util.function.BiConsumer<Integer, Integer> f) {
+        int w = c.width();
+        if (c.mask == null) {
+            for (int z = c.z0; z <= c.z1; z++) {
+                for (int x = c.x0; x <= c.x1; x++) {
+                    f.accept(x, z);
+                }
+            }
+            return;
+        }
+        for (int i = c.mask.nextSetBit(0); i >= 0; i = c.mask.nextSetBit(i + 1)) {
+            f.accept(c.x0 + i % w, c.z0 + i / w);
+        }
     }
 
     public void touch() {
@@ -306,6 +408,9 @@ public final class LandData extends SavedData {
             l.ownerName = lt.getString("ownerName");
             l.name = lt.getString("name");
             l.defaultPerms = lt.getInt("defaultPerms");
+            l.plot = lt.getBoolean("plot");
+            l.price = lt.getLong("price");
+            l.paid = lt.getLong("paid");
             ListTag ml = lt.getList("members", Tag.TAG_COMPOUND);
             for (int j = 0; j < ml.size(); j++) {
                 CompoundTag mt = ml.getCompound(j);
@@ -332,6 +437,12 @@ public final class LandData extends SavedData {
                 c.y1 = b[4];
                 c.z1 = b[5];
                 c.type = ct.getString("type");
+                if (ct.contains("mask", Tag.TAG_LONG_ARRAY)) {
+                    c.mask = BitSet.valueOf(ct.getLongArray("mask"));
+                    if (c.mask.isEmpty()) {
+                        continue;
+                    }
+                }
                 l.claims.add(c);
                 d.indexClaim(c);
             }
@@ -364,6 +475,11 @@ public final class LandData extends SavedData {
             lt.putString("ownerName", l.ownerName);
             lt.putString("name", l.name);
             lt.putInt("defaultPerms", l.defaultPerms);
+            if (l.plot) {
+                lt.putBoolean("plot", true);
+                lt.putLong("price", l.price);
+                lt.putLong("paid", l.paid);
+            }
             ListTag ml = new ListTag();
             for (Member m : l.members.values()) {
                 CompoundTag mt = new CompoundTag();
@@ -379,6 +495,9 @@ public final class LandData extends SavedData {
                 ct.putString("dim", c.dim);
                 ct.putIntArray("box", new int[]{c.x0, c.y0, c.z0, c.x1, c.y1, c.z1});
                 ct.putString("type", c.type == null ? "normal" : c.type);
+                if (c.mask != null) {
+                    ct.putLongArray("mask", c.mask.toLongArray());
+                }
                 cl.add(ct);
             }
             lt.put("claims", cl);
