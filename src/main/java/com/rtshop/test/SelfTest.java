@@ -1590,9 +1590,10 @@ public final class SelfTest {
         if (wheat != null && bread != null) {
             // 빵을 만드는 가장 싼 방법 기준. 바닐라만 있으면 밀 3개, 요리 모드가 있으면 더 싼 반죽 조리법이 기준이 된다
             boolean vanillaOnly = !ModList.get().isLoaded("farmersdelight") && !ModList.get().isLoaded("farm_and_charm");
-            check("bread made from bought wheat sells for what its ingredients cost",
-                    bread.sellUnit <= 3.0 * wheat.price + 1.0e-6 && bread.sellUnit >= wheat.price * 0.9
-                            && (!vanillaOnly || Math.abs(bread.sellUnit - 3.0 * wheat.price) < 1.0e-6),
+            double hm = 1.0 + com.rtshop.shop.PricingConfig.get().handCookedMargin;
+            check("bread made from bought wheat sells for its ingredients plus the hand-made margin",
+                    bread.sellUnit <= 3.0 * wheat.price * hm + 1.0e-6 && bread.sellUnit >= wheat.price * 0.9
+                            && (!vanillaOnly || Math.abs(bread.sellUnit - 3.0 * wheat.price * hm) < 1.0e-6),
                     bread.sellUnit + " (wheat " + wheat.price + ", " + bread.basis + ")");
             check("...and costs at least twice that to buy back", bread.price >= 2 * bread.sellUnit - 1.0e-6, bread.price);
         }
