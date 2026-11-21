@@ -185,7 +185,7 @@ jobs:
         run: |
           python3 .github/scripts/inspect_pack.py packcache /tmp/inspect
           # Cinematic Interactions 의 공개 API 와 그 API 를 쓰는 곳
-          CJ=$(ls packcache/*.jar | grep -i "cinematic interaction" | head -1)
+          CJ="$PWD/$(ls packcache/*.jar | grep -i "cinematic interaction" | head -1)"
           mkdir -p /tmp/cj && (cd /tmp/cj && unzip -q -o "$CJ")
           cd /tmp/cj
           for c in $(find dev/dyslexic/cinematic/api -name '*.class') dev/dyslexic/cinematic/client/MenuStation.class dev/dyslexic/cinematic/client/ClientStation.class $(find dev/dyslexic/cinematic/station -name '*.class'); do
