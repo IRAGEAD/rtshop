@@ -136,8 +136,10 @@ public class HudEditScreen extends Screen {
         if (!cfg.questHudEnabled) {
             hiddenMark(g, qb);
         }
-        // HUD 글자가 아래 버튼·목록 위로 비치지 않게 여기서 한 번 그려 둔다
+        // HUD 글자(와 게임 채팅)가 버튼·목록 위로 비치지 않게, 나머지는 더 앞(z)에 그린다
         g.flush();
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 250);
 
         g.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFF5E6C0);
         g.drawCenteredString(this.font, Component.translatable("rtshop.hud.help1"), this.width / 2, 26, 0xFFD9C592);
@@ -161,6 +163,7 @@ public class HudEditScreen extends Screen {
         if (popup != null) {
             popup.render(g, this.font, mx, my);
         }
+        g.pose().popPose();
     }
 
     private String row2Label(int i) {
