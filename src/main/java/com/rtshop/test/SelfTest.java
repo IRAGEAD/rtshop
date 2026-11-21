@@ -681,8 +681,8 @@ public final class SelfTest {
                 level.addFreshEntity(z);
                 float before = z.getHealth();
                 com.rtshop.job.JobPassives.shieldResponse(a, z, 10.0F);
-                check("a tank's shield block pushes the attacker away and reflects 5% of the damage",
-                        z.getDeltaMovement().x > 0.01 && Math.abs((before - z.getHealth()) - 0.5F) < 1e-3,
+                check("a tank's shield block pushes the attacker away and reflects 5% of the damage (less the attacker's armor)",
+                        z.getDeltaMovement().x > 0.01 && before - z.getHealth() > 0.3F && before - z.getHealth() <= 0.5F + 1e-3,
                         z.getDeltaMovement().x + " / " + (before - z.getHealth()));
                 z.discard();
             }
