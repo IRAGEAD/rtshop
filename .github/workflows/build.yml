@@ -230,7 +230,8 @@ jobs:
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
           python3 -m pip install -q "portablemc<5"
           mkdir -p client/mods client/saves
-          while IFS= read -r f; do [ -n "$f" ] && cp "packcache/$f" client/mods/; done < packcache/client_mods.txt
+          # Chunky 는 모드팩 overrides 의 dhcompat(CI 에서는 받을 수 없음) 없이 Distant Horizons 와 함께 켜면 세계를 열 때 튕긴다 → 클라이언트 시험에서는 뺀다
+          while IFS= read -r f; do case "$f" in ""|Chunky*) ;; *) cp "packcache/$f" client/mods/ ;; esac; done < packcache/client_mods.txt
           cp jar/*.jar client/mods/
           cp -r server/world client/saves/rtshoptest
           rm -f client/saves/rtshoptest/session.lock
