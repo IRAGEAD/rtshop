@@ -143,7 +143,7 @@ NEW = {
  "rtshop.hud.quest_count": ("퀘스트 %s개 보기", "Show %s quests"),
  "rtshop.hud.narrower": ("좁게", "Narrower"),
  "rtshop.hud.wider": ("넓게", "Wider"),
- "rtshop.qhud.return": ("→ %s 에게 돌아가기", "→ Return to %s"),
+ "rtshop.qhud.return": ("→ %s에게 돌아가기", "→ Return to %s"),
  "rtshop.qhud.more": ("+ %s개 더 (퀘스트 수첩)", "+ %s more (quest journal)"),
  "rtshop.qhud.sample_title1": ("(보기) 기초 수련", "(Sample) Basic training"),
  "rtshop.qhud.sample_title2": ("(보기) 검을 쥐는 법", "(Sample) Holding a sword"),

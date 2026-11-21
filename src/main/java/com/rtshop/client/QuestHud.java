@@ -24,6 +24,16 @@ public final class QuestHud {
     private static final int DONE = 0xFF8FD67A;
     private static final int LINE = 10;
     private static final int PAD = 4;
+    /** 퀘스트와 퀘스트 사이 간격 (구분선이 들어간다). */
+    private static final int GAP = 4;
+
+    private static int height(List<Row> rows) {
+        int h = 0;
+        for (int i = 0; i < rows.size(); i++) {
+            h += LINE + (rows.get(i).title() && i > 0 ? GAP : 0);
+        }
+        return h;
+    }
 
     /** 그릴 줄 하나 (글, 색, 들여쓰기). */
     private record Row(String text, int color, int indent, boolean title) {
@@ -49,7 +59,7 @@ public final class QuestHud {
         float s = (float) cfg.questHudScale;
         int w = Math.max(60, (int) Math.round(cfg.questHudWidth * sw));
         int inner = (int) ((w - PAD * 2 * s) / s);
-        int h = (int) Math.ceil((rows(Minecraft.getInstance().font, list, inner).size() * LINE + PAD * 2) * s);
+        int h = (int) Math.ceil((height(rows(Minecraft.getInstance().font, list, inner)) + PAD * 2) * s);
         int x = (int) Math.round(cfg.questHudX * sw);
         int y = (int) Math.round(cfg.questHudY * sh);
         x = Math.max(0, Math.min(sw - w, x));
@@ -79,7 +89,8 @@ public final class QuestHud {
         int yy = 0;
         for (Row r : rows) {
             if (r.title() && yy > 0) {
-                g.fill(0, yy - 2, inner, yy - 1, 0x55E8B84A);
+                yy += GAP;
+                g.fill(0, yy - 3, inner, yy - 2, 0x55E8B84A);
             }
             g.drawString(font, r.text(), r.indent(), yy + 1, r.color(), true);
             yy += LINE;
