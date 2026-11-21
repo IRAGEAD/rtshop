@@ -82,7 +82,8 @@ public class QuestEditScreen extends Screen {
         String id = "", name = "", profession = "librarian", greeting = "";
     }
 
-    private record Hit(int x, int y, int w, int h, Supplier<String> label, BooleanSupplier enabled, Consumer<Integer> action) {
+    private record Hit(int x, int y, int w, int h, Supplier<String> label, BooleanSupplier enabled, Consumer<Integer> action,
+                       Supplier<ItemStack> icon) {
     }
 
     private QuestEditorPacket data;
@@ -560,11 +561,16 @@ public class QuestEditScreen extends Screen {
     }
 
     private void hit(int x, int y, int w, int h, Supplier<String> label, BooleanSupplier enabled, Consumer<Integer> action) {
-        hits.add(new Hit(x, y, w, h, label, enabled, action));
+        hits.add(new Hit(x, y, w, h, label, enabled, action, null));
+    }
+
+    /** 아이콘이 붙은 버튼 (고른 아이템·몬스터를 보여 주고, 누르면 선택 목록을 연다). */
+    private void iconHit(int x, int y, int w, int h, Supplier<String> label, Supplier<ItemStack> icon, Consumer<Integer> action) {
+        hits.add(new Hit(x, y, w, h, label, () -> true, action, icon));
     }
 
     private void hit(int x, int y, int w, int h, String label, Runnable action) {
-        hits.add(new Hit(x, y, w, h, () -> label, () -> true, b -> action.run()));
+        hits.add(new Hit(x, y, w, h, () -> label, () -> true, b -> action.run(), null));
     }
 
     private EditBox box(int x, int y, int w, String value, int max, Consumer<String> onChange) {
@@ -776,15 +782,23 @@ public class QuestEditScreen extends Screen {
             });
             int tx = x + 4 + typeW + 4;
             int tw = w - 8 - typeW - 4 - helpW - 4;
-            EditBox target = box(tx, y, tw, od.type == QuestDef.Type.PAY ? "" : od.target, 200, v -> od.target = v);
-            if (od.type == QuestDef.Type.PAY) {
-                target.setEditable(false);
+            switch (od.type) {
+                case DELIVER -> iconHit(tx, y - 1, tw, 14, () -> pickLabel(itemName(od.target), od.target), () -> itemIcon(od.target),
+                        b -> openPicker(PickerScreen.Mode.ITEM, v -> od.target = v));
+                case KILL -> iconHit(tx, y - 1, tw, 14,
+                        () -> pickLabel(od.target.equals("*") ? tr("rtshop.quest.any_monster") : entityName(od.target), od.target),
+                        () -> entityIcon(od.target), b -> openPicker(PickerScreen.Mode.ENTITY, v -> od.target = v));
+                case TALK -> hit(tx, y - 1, tw, 14, () -> "< " + npcLabel(od.target) + " >", () -> true, b -> {
+                    od.target = cycleNpc(od.target, b == 1 ? -1 : 1, false);
+                    markDirty();
+                });
+                case VISIT -> box(tx, y, tw, od.target, 200, v -> od.target = v);
+                default -> labels.add(new Label(tx + 2, y + 2, tr("rtshop.qedit.pay_note"), Ui.C_INK_SOFT));
             }
             String helper = switch (od.type) {
                 case DELIVER -> "rtshop.qedit.help_hand";
                 case KILL -> "rtshop.qedit.help_near";
                 case VISIT -> "rtshop.qedit.help_here";
-                case TALK -> "rtshop.qedit.help_next";
                 default -> null;
             };
             if (helper != null) {
@@ -835,6 +849,40 @@ public class QuestEditScreen extends Screen {
             case TALK -> tr("rtshop.qedit.hint_talk", npcLabel(od.target));
             default -> tr("rtshop.qedit.hint_pay");
         };
+    }
+
+    /** 선택 목록 화면을 열고, 고르면 그 값을 넣은 뒤 이 화면으로 돌아온다. */
+    private void openPicker(PickerScreen.Mode mode, Consumer<String> set) {
+        if (minecraft == null) {
+            return;
+        }
+        minecraft.setScreen(new PickerScreen(this, mode, v -> {
+            set.accept(v);
+            markDirty();
+        }));
+    }
+
+    private static String pickLabel(String name, String id) {
+        return id == null || id.isBlank() ? tr("rtshop.qedit.pick") : name;
+    }
+
+    private static ItemStack itemIcon(String id) {
+        ResourceLocation rl = id == null ? null : ResourceLocation.tryParse(id.trim());
+        if (rl == null || !ForgeRegistries.ITEMS.containsKey(rl)) {
+            return ItemStack.EMPTY;
+        }
+        return new ItemStack(ForgeRegistries.ITEMS.getValue(rl));
+    }
+
+    private static ItemStack entityIcon(String id) {
+        if ("*".equals(id)) {
+            return new ItemStack(net.minecraft.world.item.Items.ZOMBIE_HEAD);
+        }
+        ResourceLocation rl = id == null ? null : ResourceLocation.tryParse(id.trim());
+        if (rl == null || !ForgeRegistries.ENTITY_TYPES.containsKey(rl)) {
+            return ItemStack.EMPTY;
+        }
+        return PickerScreen.eggFor(ForgeRegistries.ENTITY_TYPES.getValue(rl));
     }
 
     private static String itemName(String id) {
@@ -912,7 +960,8 @@ public class QuestEditScreen extends Screen {
         for (int i = 0; i < q.items.size(); i++) {
             ItemDraft id = q.items.get(i);
             final int idx = i;
-            box(x + 8, y, w - 8 - 4 - 36 - 4 - 24 - 4 - 18, id.item, 200, v -> id.item = v);
+            iconHit(x + 8, y - 1, w - 8 - 4 - 36 - 4 - 24 - 4 - 18, 14, () -> pickLabel(itemName(id.item), id.item),
+                    () -> itemIcon(id.item), b -> openPicker(PickerScreen.Mode.ITEM, v -> id.item = v));
             box(x + w - 18 - 4 - 24 - 4 - 36, y, 36, id.count, 6, v -> id.count = v);
             hit(x + w - 18 - 4 - 24, y - 1, 24, 14, () -> tr("rtshop.qedit.help_hand"), () -> true, b -> {
                 Minecraft mc = Minecraft.getInstance();
@@ -935,9 +984,10 @@ public class QuestEditScreen extends Screen {
         }
         if (q.items.size() < MAX_ITEMS) {
             hit(x + 8, y - 1, 80, 13, tr("rtshop.qedit.add_item"), () -> {
-                q.items.add(new ItemDraft());
+                ItemDraft added = new ItemDraft();
+                q.items.add(added);
                 markDirty();
-                rebuild();
+                openPicker(PickerScreen.Mode.ITEM, v -> added.item = v);
             });
             y += r;
         }
@@ -1028,8 +1078,25 @@ public class QuestEditScreen extends Screen {
             g.drawString(this.font, l.text(), l.x(), l.y(), l.color(), false);
         }
         for (Hit h : hits) {
-            Ui.button(g, this.font, h.x(), h.y(), h.w(), h.h(), h.label().get(),
-                    Ui.inside(mx, my, h.x(), h.y(), h.w(), h.h()), h.enabled().getAsBoolean());
+            boolean hov = Ui.inside(mx, my, h.x(), h.y(), h.w(), h.h());
+            if (h.icon() == null) {
+                Ui.button(g, this.font, h.x(), h.y(), h.w(), h.h(), h.label().get(), hov, h.enabled().getAsBoolean());
+                continue;
+            }
+            // 아이콘 + 이름, 왼쪽 정렬 (누르면 목록이 열린다는 걸 ▼ 로 표시)
+            Ui.bevel(g, h.x(), h.y(), h.w(), h.h(), hov ? Ui.C_PARCH_HI : Ui.C_CREAM, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+            ItemStack icon = h.icon().get();
+            int tx = h.x() + 4;
+            if (!icon.isEmpty()) {
+                g.pose().pushPose();
+                g.pose().translate(h.x() + 2, h.y() + 1, 0);
+                g.pose().scale(0.75F, 0.75F, 1.0F);
+                g.renderItem(icon, 0, 0);
+                g.pose().popPose();
+                tx = h.x() + 17;
+            }
+            g.drawString(this.font, Ui.clip(this.font, h.label().get(), h.x() + h.w() - tx - 12), tx, h.y() + (h.h() - 8) / 2, Ui.C_INK, false);
+            g.drawString(this.font, "▼", h.x() + h.w() - 10, h.y() + (h.h() - 8) / 2, Ui.C_INK_SOFT, false);
         }
         super.render(g, mx, my, partial);
         renderStatus(g, mx, my);
@@ -1243,6 +1310,18 @@ public class QuestEditScreen extends Screen {
             dirty = true;
             save();
         }
+    }
+
+    /** 클라이언트 점검: 지금 퀘스트의 첫 목표(납품/처치)의 선택 목록을 연다. */
+    public void openFirstGoalPickerForTest() {
+        if (q != null && !q.objs.isEmpty()) {
+            ObjDraft od = q.objs.get(0);
+            openPicker(od.type == QuestDef.Type.KILL ? PickerScreen.Mode.ENTITY : PickerScreen.Mode.ITEM, v -> od.target = v);
+        }
+    }
+
+    public String firstGoalTargetForTest() {
+        return q == null || q.objs.isEmpty() ? null : q.objs.get(0).target;
     }
 
     public boolean isDirtyForTest() {

@@ -312,5 +312,15 @@
   "rtshop.qedit.intro3": "표식: 퀘스트 보상이나 선택지로 얻는 이름표입니다. 다른 퀘스트의 '필요 표식'에 적으면 그 표식이 있어야 보이고, '막는 표식'에 적으면 그 표식이 있으면 숨겨집니다. 숨겨진 퀘스트와 직업 해금에 씁니다.",
   "rtshop.qedit.intro4": "빨간 항목은 지금 쓰이지 않는 퀘스트입니다. 마우스를 올리면 이유가 보입니다.",
   "rtshop.qedit.file_ok": "파일: %s · 사용 중",
-  "rtshop.qedit.file_unused": "쓰이지 않음: %s"
+  "rtshop.qedit.file_unused": "쓰이지 않음: %s",
+  "rtshop.qedit.pick": "눌러서 고르기",
+  "rtshop.qedit.pay_note": "완료할 때 아래 금액만큼 Gold 를 냅니다",
+  "rtshop.pick.title_item": "아이템 고르기",
+  "rtshop.pick.title_entity": "몬스터 고르기",
+  "rtshop.pick.hint": "검색: 이름 · ID · @모드이름",
+  "rtshop.pick.any_monster": "모든 몬스터",
+  "rtshop.pick.monsters_only": "몬스터만",
+  "rtshop.pick.all_mobs": "모든 생물",
+  "rtshop.pick.count": "%s개",
+  "rtshop.pick.enter_raw": "Enter: '%s' 그대로 넣기"
 }

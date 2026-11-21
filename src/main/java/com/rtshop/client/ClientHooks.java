@@ -36,6 +36,8 @@ public final class ClientHooks {
             screen.showResult(message, success);
         } else if (mc.screen instanceof QuestEditScreen screen) {
             screen.showResult(message, success);
+        } else if (mc.screen instanceof PickerScreen p && p.parent instanceof QuestEditScreen screen) {
+            screen.showResult(message, success);
         } else if (mc.player != null) {
             mc.player.displayClientMessage(message, true);
         }
@@ -55,6 +57,8 @@ public final class ClientHooks {
     public static void openQuestEditor(QuestEditorPacket packet) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen instanceof QuestEditScreen screen) {
+            screen.update(packet);
+        } else if (mc.screen instanceof PickerScreen p && p.parent instanceof QuestEditScreen screen) {
             screen.update(packet);
         } else {
             mc.setScreen(new QuestEditScreen(packet));

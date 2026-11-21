@@ -270,6 +270,16 @@ NEW = {
  "rtshop.qedit.intro4": ("빨간 항목은 지금 쓰이지 않는 퀘스트입니다. 마우스를 올리면 이유가 보입니다.", "Red entries are not in use; hover to see why."),
  "rtshop.qedit.file_ok": ("파일: %s · 사용 중", "File: %s - in use"),
  "rtshop.qedit.file_unused": ("쓰이지 않음: %s", "Not in use: %s"),
+ "rtshop.qedit.pick": ("눌러서 고르기", "Click to choose"),
+ "rtshop.qedit.pay_note": ("완료할 때 아래 금액만큼 Gold 를 냅니다", "Pays the amount below on completion"),
+ "rtshop.pick.title_item": ("아이템 고르기", "Choose an item"),
+ "rtshop.pick.title_entity": ("몬스터 고르기", "Choose a creature"),
+ "rtshop.pick.hint": ("검색: 이름 · ID · @모드이름", "Search: name, ID, @mod"),
+ "rtshop.pick.any_monster": ("모든 몬스터", "Any monster"),
+ "rtshop.pick.monsters_only": ("몬스터만", "Monsters"),
+ "rtshop.pick.all_mobs": ("모든 생물", "All creatures"),
+ "rtshop.pick.count": ("%s개", "%s found"),
+ "rtshop.pick.enter_raw": ("Enter: '%s' 그대로 넣기", "Enter: use '%s' as typed"),
 }
 ko = dict(ko_old); en = dict(en_old)
 for k, (a, b) in NEW.items():

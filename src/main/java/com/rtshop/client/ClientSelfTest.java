@@ -74,7 +74,7 @@ public final class ClientSelfTest {
     private static long expected = 0;
     private static volatile BlockPos cropPos = null;
     private static volatile String harvest = null;
-    private static final int LAST = 47;
+    private static final int LAST = 55;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -634,6 +634,67 @@ public final class ClientSelfTest {
                 check("after a successful save the editor is no longer marked unsaved",
                         mc.screen instanceof QuestEditScreen s && !s.isDirtyForTest());
                 shot(mc, "26_qedit_saved");
+                mc.setScreen(null);
+                onServer(mc, com.rtshop.quest.QuestEditor::open);
+                wait = 20;
+            }
+            case 47 -> {
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.selectForTest("tutorial_2", 2);
+                }
+                wait = 3;
+            }
+            case 48 -> {
+                shot(mc, "27_qedit_goal_icons");
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.openFirstGoalPickerForTest();
+                }
+                wait = 5;
+            }
+            case 49 -> {
+                check("the item picker opens from a delivery goal", mc.screen instanceof PickerScreen, mc.screen);
+                shot(mc, "28_pick_item");
+                if (mc.screen instanceof PickerScreen p) {
+                    p.searchForTest("minecraft:bread");
+                    check("searching the item picker narrows the list", p.shownForTest() == 1, p.shownForTest());
+                    p.pickFirstForTest();
+                }
+                wait = 5;
+            }
+            case 50 -> {
+                check("picking an item fills the goal and returns to the editor",
+                        mc.screen instanceof QuestEditScreen s && "minecraft:bread".equals(s.firstGoalTargetForTest()),
+                        mc.screen instanceof QuestEditScreen s2 ? s2.firstGoalTargetForTest() : mc.screen);
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.selectForTest("tutorial_3", 2);
+                }
+                wait = 3;
+            }
+            case 51 -> {
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.openFirstGoalPickerForTest();
+                }
+                wait = 5;
+            }
+            case 52 -> {
+                check("the monster picker opens from a kill goal", mc.screen instanceof PickerScreen, mc.screen);
+                shot(mc, "29_pick_entity");
+                if (mc.screen instanceof PickerScreen p) {
+                    check("the monster picker lists many monsters", p.shownForTest() > 10, p.shownForTest());
+                    p.searchForTest("minecraft:skeleton");
+                }
+                wait = 3;
+            }
+            case 53 -> {
+                if (mc.screen instanceof PickerScreen p) {
+                    p.pickFirstForTest();
+                }
+                wait = 5;
+            }
+            case 54 -> {
+                String t = mc.screen instanceof QuestEditScreen s ? s.firstGoalTargetForTest() : null;
+                check("picking a monster fills the kill goal", t != null && t.startsWith("minecraft:skeleton"), t);
+                shot(mc, "30_qedit_after_pick");
                 mc.setScreen(null);
                 wait = 10;
             }

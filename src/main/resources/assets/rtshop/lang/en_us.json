@@ -312,5 +312,15 @@
   "rtshop.qedit.intro3": "Flags are tags given by rewards or choices. Use them in Needs/Hidden by to unlock or hide quests.",
   "rtshop.qedit.intro4": "Red entries are not in use; hover to see why.",
   "rtshop.qedit.file_ok": "File: %s - in use",
-  "rtshop.qedit.file_unused": "Not in use: %s"
+  "rtshop.qedit.file_unused": "Not in use: %s",
+  "rtshop.qedit.pick": "Click to choose",
+  "rtshop.qedit.pay_note": "Pays the amount below on completion",
+  "rtshop.pick.title_item": "Choose an item",
+  "rtshop.pick.title_entity": "Choose a creature",
+  "rtshop.pick.hint": "Search: name, ID, @mod",
+  "rtshop.pick.any_monster": "Any monster",
+  "rtshop.pick.monsters_only": "Monsters",
+  "rtshop.pick.all_mobs": "All creatures",
+  "rtshop.pick.count": "%s found",
+  "rtshop.pick.enter_raw": "Enter: use '%s' as typed"
 }
