@@ -333,6 +333,17 @@ public final class ClientSelfTest {
         return s;
     }
 
+    /** 다른 모드가 띄운 대화창(Fantasy 의 안내 대화 등)을 닫는다. Cinematic 장면 화면은 그대로 둔다. */
+    private static void closeForeign(Minecraft mc) {
+        if (mc.screen != null) {
+            String cls = mc.screen.getClass().getName();
+            if (cls.contains("bonfyre") || cls.contains("fantasy")) {
+                RtShop.LOGGER.info("[rtshop-clienttest] closing {}", cls);
+                mc.screen.onClose();
+            }
+        }
+    }
+
     /** 강화 모루: 우클릭으로 열기(Cinematic 이 있으면 모루 장면), 재료·확률 패널, 성공·방지권 연출. */
     private static void enhanceStep(Minecraft mc, int k) {
         switch (k) {
@@ -365,6 +376,7 @@ public final class ClientSelfTest {
                 wait = 10;
             }
             case 1 -> {
+                closeForeign(mc);
                 BlockPos at = anvilPos;
                 check("the enhance anvil was placed", at != null && mc.level.getBlockState(at).is(com.rtshop.enhance.ModEnhance.ANVIL.get()));
                 if (at != null) {
@@ -379,6 +391,7 @@ public final class ClientSelfTest {
                 wait = net.minecraftforge.fml.ModList.get().isLoaded("cinematic") ? 120 : 20;
             }
             case 2 -> {
+                closeForeign(mc);
                 boolean open = mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu;
                 check("right-clicking the enhance anvil opens the enhance menu"
                         + (net.minecraftforge.fml.ModList.get().isLoaded("cinematic") ? " (through the Cinematic anvil scene)" : ""), open,
@@ -437,14 +450,21 @@ public final class ClientSelfTest {
                 onServer(mc, sp -> {
                     com.rtshop.enhance.Enhance.testRoll = null;
                     if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
-                        sp.getInventory().setItem(sp.getInventory().selected, m.getCarried().copy());
-                        m.setCarried(ItemStack.EMPTY);
+                        if (!m.getCarried().isEmpty()) {
+                            if (!sp.getInventory().add(m.getCarried().copy())) {
+                                sp.getInventory().setItem(sp.getInventory().selected, m.getCarried().copy());
+                            }
+                            m.setCarried(ItemStack.EMPTY);
+                        }
                     }
                 });
                 wait = 60;
             }
             case 7 -> {
                 ItemStack held = ItemStack.EMPTY;
+                for (net.minecraft.world.inventory.Slot sl : mc.player.containerMenu.slots) {
+                    if (sl.getItem().is(net.minecraft.world.item.Items.DIAMOND_SWORD)) held = sl.getItem();
+                }
                 for (ItemStack s : mc.player.getInventory().items) {
                     if (s.is(net.minecraft.world.item.Items.DIAMOND_SWORD)) held = s;
                 }
