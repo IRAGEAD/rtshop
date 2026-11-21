@@ -630,5 +630,6 @@
   "rtshop.gacha.fx.legendary": "LEGENDARY!!",
   "rtshop.gacha.fx.skip": "Click to skip",
   "rtshop.gachaedit.ticket_cost": "Ticket cost",
-  "rtshop.gachaedit.top_mods": "Epic/legendary weapon mods"
+  "rtshop.gachaedit.top_mods": "Epic/legendary weapon mods",
+  "rtshop.msg.villager_broken": "This villager's trades couldn't be made (another mod's error)."
 }

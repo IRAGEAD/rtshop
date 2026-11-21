@@ -98,16 +98,32 @@ public final class NpcGuard {
     }
 
     /**
-     * 클라이언트 쪽 우클릭: 엔티티 태그는 서버에만 있어 클라이언트는 RT Shop NPC 를 모른다. 그래서 그대로 두면 클라이언트가
-     * 주민 거래 목록을 만들려다 다른 모드의 거래 수정(Mixin) 오류로 튕길 수 있다 (수산물 상인 = 어부 주민).
-     * RT Shop NPC 는 모두 AI 가 꺼진 주민이므로, 클라이언트에서는 AI 가 꺼진 주민의 기본 동작을 막는다.
-     * 상호작용 패킷은 이미 서버로 간 뒤라 서버가 창을 연다 (다른 AI 꺼진 주민도 서버가 거래창을 보내므로 그대로 쓸 수 있다).
+     * 주민 우클릭 (클라이언트 쪽): 클라이언트는 우클릭할 때 거래 목록을 직접 만들어 보는데, 모드팩의 다른 모드가 주민 거래를
+     * 고치는 코드(Mixin)가 깨져 있으면 이때 게임이 튕긴다 (어부 주민 = 수산물 상인에서 발생). 클라이언트의 이 동작은
+     * "아기 주민이 고개를 젓는" 정도의 겉모습뿐이므로 막는다. 상호작용 패킷은 이미 서버로 갔으므로 거래창·상점 창은 서버가 연다.
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onClientInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract e) {
-        if (e.getLevel().isClientSide() && e.getTarget() instanceof net.minecraft.world.entity.npc.AbstractVillager v && v.isNoAi()) {
+        if (e.getLevel().isClientSide() && e.getTarget() instanceof net.minecraft.world.entity.npc.AbstractVillager) {
             e.setCanceled(true);
             e.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+        }
+    }
+
+    /** 서버 쪽: 일반 주민의 거래 목록을 만들다 다른 모드 오류가 나면 서버가 멈추지 않도록, 그 상호작용만 막고 알린다. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onServerVillagerInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract e) {
+        if (e.getLevel().isClientSide() || !(e.getTarget() instanceof net.minecraft.world.entity.npc.AbstractVillager v) || isNpc(v)) {
+            return;
+        }
+        try {
+            v.getOffers();
+        } catch (Throwable t) {
+            e.setCanceled(true);
+            e.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
+            RtShop.LOGGER.error("[rtshop] 주민 {} 의 거래 목록을 만들다 다른 모드에서 오류가 났습니다 (서버를 지키려고 상호작용을 막았습니다)", v, t);
+            e.getEntity().displayClientMessage(net.minecraft.network.chat.Component.translatable("rtshop.msg.villager_broken")
+                    .withStyle(net.minecraft.ChatFormatting.RED), true);
         }
     }
 

@@ -299,6 +299,7 @@ NEW = {
  "rtshop.gacha.fx.epic": ("영웅 등급!", "EPIC!"),
  "rtshop.gacha.fx.legendary": ("전설 등급!!", "LEGENDARY!!"),
  "rtshop.gacha.fx.skip": ("클릭해서 건너뛰기", "Click to skip"),
+ "rtshop.msg.villager_broken": ("이 주민의 거래 목록을 만들 수 없습니다 (다른 모드 오류).", "This villager's trades couldn't be made (another mod's error)."),
  "rtshop.gacha.dismantled": ("분해해서 조각 %s개를 받았습니다.", "Dismantled for %s shards."),
  "rtshop.gacha.nothing_to_dismantle": ("분해할 뽑기 아이템이 없습니다.", "No gacha items to dismantle."),
  "rtshop.gacha.broadcast": ("✦ %s 님이 %s에서 전설 [%s] 을(를) 뽑았습니다!", "✦ %s pulled the legendary [%3$s] from %2$s!"),
