@@ -187,6 +187,7 @@ jobs:
           # Cinematic Interactions 의 공개 API 와 그 API 를 쓰는 곳
           CJ="$PWD/$(ls packcache/*.jar | grep -i "cinematic interaction" | head -1)"
           mkdir -p /tmp/cj && (cd /tmp/cj && unzip -q -o "$CJ")
+          cp "$CJ" /tmp/inspect/cinematic-interactions.jar   # MIT 라이선스: 연동 코드를 컴파일할 때 씀
           cd /tmp/cj
           for c in $(find dev/dyslexic/cinematic/api -name '*.class') dev/dyslexic/cinematic/client/MenuStation.class dev/dyslexic/cinematic/client/ClientStation.class $(find dev/dyslexic/cinematic/station -name '*.class'); do
             echo "######## $c"; javap -p -c -constants "$c" 2>&1 | head -n 400
