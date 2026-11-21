@@ -898,6 +898,72 @@ public final class ClientSelfTest {
                 check("every key named in the job quest tips exists in this game", missing.isEmpty(), missing);
                 shot(mc, "39_quest_mod_tips");
                 mc.setScreen(null);
+                onServer(mc, sp -> {
+                    com.rtshop.attendance.Attendance.reset(sp);
+                    net.minecraft.world.entity.npc.Villager v = com.rtshop.shop.ShopServer.spawnNpc(sp.serverLevel(),
+                            sp.position().add(sp.getLookAngle().scale(2)), sp.getYRot() + 180, "attendance");
+                    com.rtshop.attendance.Attendance.open(sp, v == null ? -1 : v.getId());
+                });
+                wait = 20;
+            }
+            case LAST + 3 -> {
+                check("talking to the attendance NPC opens the attendance window", mc.screen instanceof AttendanceScreen, mc.screen);
+                if (mc.screen instanceof AttendanceScreen s) {
+                    check("the attendance window lets you check in at the NPC", s.dataForTest().get("atNpc").getAsBoolean()
+                            && !s.dataForTest().get("checkedToday").getAsBoolean() && s.dataForTest().getAsJsonArray("days").size() == 28);
+                }
+                shot(mc, "40_attendance");
+                before = ClientEconomy.wallet;
+                if (mc.screen instanceof AttendanceScreen s) {
+                    s.clickForTest(com.rtshop.net.AttendanceActionPacket.CHECK_IN);
+                }
+                wait = 20;
+            }
+            case LAST + 4 -> {
+                if (mc.screen instanceof AttendanceScreen s) {
+                    check("checking in from the window works and gives the day-1 Gold", s.dataForTest().get("checkedToday").getAsBoolean()
+                            && ClientEconomy.wallet - before == com.rtshop.attendance.AttendanceConfig.get().days.get(0).gold,
+                            ClientEconomy.wallet - before);
+                    shot(mc, "41_attendance_checked");
+                    s.clickForTest(com.rtshop.net.AttendanceActionPacket.EDIT);
+                } else {
+                    check("the attendance window stays open after checking in", false, mc.screen);
+                }
+                wait = 20;
+            }
+            case LAST + 5 -> {
+                check("the attendance editor opens for an operator", mc.screen instanceof AttendanceEditScreen, mc.screen);
+                if (mc.screen instanceof AttendanceEditScreen s) {
+                    s.selectForTest(0, 6);
+                }
+                wait = 5;
+            }
+            case LAST + 6 -> {
+                shot(mc, "42_attendance_edit");
+                if (mc.screen instanceof AttendanceEditScreen s) {
+                    s.setGoldForTest("3333");
+                    s.saveForTest();
+                }
+                wait = 20;
+            }
+            case LAST + 7 -> {
+                check("saving in the attendance editor changes the reward table", com.rtshop.attendance.AttendanceConfig.get().days.get(6).gold == 3333,
+                        com.rtshop.attendance.AttendanceConfig.get().days.get(6).gold);
+                if (mc.screen instanceof AttendanceEditScreen s) {
+                    s.selectForTest(1, 1);
+                }
+                wait = 5;
+            }
+            case LAST + 8 -> {
+                shot(mc, "43_attendance_weekly");
+                if (mc.screen instanceof AttendanceEditScreen s) {
+                    s.selectForTest(2, 0);
+                }
+                wait = 5;
+            }
+            case LAST + 9 -> {
+                shot(mc, "44_attendance_settings");
+                mc.setScreen(null);
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);
             }

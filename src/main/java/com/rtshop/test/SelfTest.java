@@ -271,6 +271,11 @@ public final class SelfTest {
             crash("job quests", t);
         }
         try {
+            attendance(server, level, a);
+        } catch (Throwable t) {
+            crash("attendance", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -1968,5 +1973,163 @@ public final class SelfTest {
             }
         }
         takeDrops(level, new BlockPos(gx + 16, y, gz + 16));
+    }
+
+    // ------------------------------------------------------------------ 출석
+
+    private static void attendance(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("attendance");
+        com.rtshop.attendance.AttendanceConfig c = com.rtshop.attendance.AttendanceConfig.get();
+        check("attendance.json is created with a 28-day reward table and weekly tiers", c.days.size() == 28 && c.weekly.size() == 3
+                && c.timezone.equals("Asia/Seoul") && c.resetHour == 9, c.days.size() + " " + c.weekly.size());
+        List<String> bad = new ArrayList<>();
+        for (com.rtshop.attendance.AttendanceConfig.Reward r : c.days) {
+            for (com.rtshop.attendance.AttendanceConfig.Item it : r.items) {
+                if (ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(it.item())) == null
+                        || ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(it.item())) == Items.AIR) {
+                    bad.add(it.item());
+                }
+            }
+        }
+        check("every default attendance reward item exists", bad.isEmpty(), bad);
+        com.rtshop.attendance.AttendanceConfig again = com.rtshop.attendance.AttendanceConfig.fromJson(c.toJson());
+        check("attendance settings survive saving", again.days.size() == c.days.size() && again.weekly.get(2).days == 7
+                && again.days.get(27).items.get(0).item().equals("rtshop:land_deed") && again.days.get(6).special);
+        boolean rejected;
+        try {
+            com.google.gson.JsonObject broken = c.toJson();
+            broken.addProperty("resetHour", 30);
+            com.rtshop.attendance.AttendanceConfig.fromJson(broken);
+            rejected = false;
+        } catch (IllegalArgumentException e) {
+            rejected = true;
+        }
+        check("a wrong attendance setting is refused with a reason", rejected);
+
+        // 날짜: 한국 시간 오전 9시에 바뀐다
+        java.time.ZoneId kst = java.time.ZoneId.of("Asia/Seoul");
+        long t0859 = java.time.ZonedDateTime.of(2026, 11, 23, 8, 59, 0, 0, kst).toInstant().toEpochMilli();
+        long t0900 = java.time.ZonedDateTime.of(2026, 11, 23, 9, 0, 0, 0, kst).toInstant().toEpochMilli();
+        long base = com.rtshop.attendance.Attendance.dayOf(t0900, c);
+        check("the attendance day changes at 09:00 Korean time", com.rtshop.attendance.Attendance.dayOf(t0859, c) == base - 1
+                && com.rtshop.attendance.Attendance.dayStart(base, c) == t0900);
+        check("the week starts on Monday 09:00 (2026-11-23 is a Monday)", com.rtshop.attendance.Attendance.weekOf(base, c) == base
+                && com.rtshop.attendance.Attendance.weekOf(base + 6, c) == base && com.rtshop.attendance.Attendance.weekOf(base + 7, c) == base + 7);
+        long H = 3_600_000L;
+        java.util.function.LongUnaryOperator day = n -> t0900 + n * 24 * H + 3 * H; // n 일 뒤 정오
+        com.rtshop.attendance.AttendanceData.Entry e = new com.rtshop.attendance.AttendanceData.Entry();
+        var ci = com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(0), c);
+        check("first check-in: day 1 reward", ci != null && ci.dayIndex() == 0 && e.streak == 1);
+        check("checking in twice on one day is refused", com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(0) + 5 * H, c) == null);
+        com.rtshop.attendance.Attendance.evaluate(e, day.applyAsLong(1), c);
+        com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(1), c);
+        ci = com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(2), c);
+        check("three days in a row → day 3 and the 3-day weekly reward", e.streak == 3 && ci != null && ci.weekly().size() == 1
+                && ci.weekly().get(0).days == 3, e.streak);
+        // 하루 빠짐 (day 3) → 처음 한 번은 유지
+        var ch = com.rtshop.attendance.Attendance.evaluate(e, day.applyAsLong(4), c);
+        check("missing one day the first time keeps the streak (with a warning)", ch == com.rtshop.attendance.Attendance.Change.GRACE
+                && e.streak == 3 && e.graceUsed);
+        com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(4), c);
+        check("...and the next check-in continues it", e.streak == 4);
+        // 또 하루 빠짐 (day 5) → 초기화
+        ch = com.rtshop.attendance.Attendance.evaluate(e, day.applyAsLong(6), c);
+        check("after that, missing a single day resets to day 0", ch == com.rtshop.attendance.Attendance.Change.RESET
+                && e.streak == 0 && e.savedStreak == 4 && e.resetAt == com.rtshop.attendance.Attendance.dayStart(base + 6, c));
+        com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(6), c);
+        var rr = com.rtshop.attendance.Attendance.restore(e, day.applyAsLong(6), c);
+        check("a restore ticket within 24 h brings the streak back (+ today's check-in)", rr == com.rtshop.attendance.Attendance.RestoreResult.OK
+                && e.streak == 5, rr + " " + e.streak);
+        check("the restored streak keeps going the next day", com.rtshop.attendance.Attendance.evaluate(e, day.applyAsLong(7), c)
+                == com.rtshop.attendance.Attendance.Change.NONE && com.rtshop.attendance.Attendance.checkIn(e, day.applyAsLong(7), c) != null && e.streak == 6);
+        // 이틀 빠짐 → 초기화, 그리고 24시간이 지나면 복구 불가
+        com.rtshop.attendance.AttendanceData.Entry f = new com.rtshop.attendance.AttendanceData.Entry();
+        for (int n = 0; n < 5; n++) {
+            com.rtshop.attendance.Attendance.evaluate(f, day.applyAsLong(n), c);
+            com.rtshop.attendance.Attendance.checkIn(f, day.applyAsLong(n), c);
+        }
+        ch = com.rtshop.attendance.Attendance.evaluate(f, day.applyAsLong(7), c);
+        check("missing two days resets at once even with the free miss unused", ch == com.rtshop.attendance.Attendance.Change.RESET
+                && f.savedStreak == 5 && f.resetAt == com.rtshop.attendance.Attendance.dayStart(base + 7, c));
+        check("the restore window closes 24 h after the reset", com.rtshop.attendance.Attendance.restore(f, f.resetAt + 24 * H, c)
+                == com.rtshop.attendance.Attendance.RestoreResult.EXPIRED);
+        com.rtshop.attendance.AttendanceData.Entry g = new com.rtshop.attendance.AttendanceData.Entry();
+        com.rtshop.attendance.Attendance.checkIn(g, day.applyAsLong(0), c);
+        com.rtshop.attendance.Attendance.checkIn(g, day.applyAsLong(1), c);
+        com.rtshop.attendance.Attendance.evaluate(g, day.applyAsLong(10), c);
+        check("coming back long after the reset cannot be restored", com.rtshop.attendance.Attendance.restore(g, day.applyAsLong(10), c)
+                == com.rtshop.attendance.Attendance.RestoreResult.EXPIRED);
+        // 쿨타임
+        com.rtshop.attendance.AttendanceData.Entry k = new com.rtshop.attendance.AttendanceData.Entry();
+        k.savedStreak = 9;
+        k.resetAt = day.applyAsLong(20);
+        k.restoreAt = day.applyAsLong(20) - 2 * H;
+        check("a ticket cannot be used again within 24 h", com.rtshop.attendance.Attendance.restore(k, day.applyAsLong(20) + H, c)
+                == com.rtshop.attendance.Attendance.RestoreResult.COOLDOWN);
+        com.rtshop.attendance.AttendanceData.Entry none = new com.rtshop.attendance.AttendanceData.Entry();
+        check("a ticket does nothing when there is nothing to restore", com.rtshop.attendance.Attendance.restore(none, day.applyAsLong(0), c)
+                == com.rtshop.attendance.Attendance.RestoreResult.NOTHING);
+        // 28일 뒤에는 1일차부터
+        check("after day 28 the rewards start again from day 1", com.rtshop.attendance.Attendance.rewardIndex(29, c) == 0
+                && com.rtshop.attendance.Attendance.rewardIndex(28, c) == 27);
+        // 새 주에는 주간 출석이 새로 시작
+        com.rtshop.attendance.AttendanceData.Entry w = new com.rtshop.attendance.AttendanceData.Entry();
+        for (int n = 0; n < 7; n++) {
+            com.rtshop.attendance.Attendance.checkIn(w, day.applyAsLong(n), c);
+        }
+        check("seven days in one week earn all three weekly rewards", Integer.bitCount(w.weekClaimed) == 3 && w.weekCount() == 7);
+        com.rtshop.attendance.Attendance.checkIn(w, day.applyAsLong(7), c);
+        check("a new week starts the weekly count again", w.weekCount() == 1 && w.weekClaimed == 0);
+
+        // 실제 플레이어: 출석(보상 지급) → 하루 건너뛰기 → 초기화 → 복구권
+        java.util.function.LongSupplier oldClock = com.rtshop.attendance.Attendance.clock;
+        try {
+            com.rtshop.attendance.Attendance.reset(a);
+            clear(a);
+            Economy.setWallet(a, 0);
+            com.rtshop.attendance.Attendance.clock = () -> day.applyAsLong(0);
+            check("players can't check in without the attendance NPC", !com.rtshop.attendance.Attendance.doCheckIn(a, true));
+            check("checking in gives the day-1 reward", com.rtshop.attendance.Attendance.doCheckIn(a, false)
+                    && Economy.wallet(a) == c.days.get(0).gold, Economy.wallet(a));
+            com.rtshop.attendance.Attendance.clock = () -> day.applyAsLong(1);
+            com.rtshop.attendance.Attendance.doCheckIn(a, false);
+            check("day 2 gives its item", count(a, s -> s.is(Items.BREAD)) == 8);
+            com.rtshop.attendance.Attendance.setStreak(a, 20); // 어제(0일째)까지 20일 연속으로 친다
+            com.rtshop.attendance.Attendance.clock = () -> day.applyAsLong(2); // 1일째를 빠짐 → 봐주기
+            check("the first missed day is forgiven for a real player too", com.rtshop.attendance.Attendance.refresh(a)
+                    == com.rtshop.attendance.Attendance.Change.GRACE);
+            com.rtshop.attendance.Attendance.clock = () -> day.applyAsLong(3); // 2일째도 빠짐 → 초기화
+            check("the reset is applied when the player shows up", com.rtshop.attendance.Attendance.refresh(a) == com.rtshop.attendance.Attendance.Change.RESET);
+            ItemStack ticket = new ItemStack(ModItems.RESTORE_TICKET.get(), 2);
+            a.setItemInHand(InteractionHand.MAIN_HAND, ticket);
+            ModItems.RESTORE_TICKET.get().use(level, a, InteractionHand.MAIN_HAND);
+            com.rtshop.attendance.AttendanceData.Entry ae = com.rtshop.attendance.AttendanceData.get(server).of(a.getUUID());
+            check("right-clicking a restore ticket restores the streak and uses one ticket", ae.streak == 20
+                    && a.getMainHandItem().getCount() == 1, ae.streak + " " + a.getMainHandItem().getCount());
+            ModItems.RESTORE_TICKET.get().use(level, a, InteractionHand.MAIN_HAND);
+            check("a ticket that can't be used is not consumed", a.getMainHandItem().getCount() == 1);
+        } finally {
+            com.rtshop.attendance.Attendance.clock = oldClock;
+            com.rtshop.attendance.Attendance.reset(a);
+            clear(a);
+        }
+
+        // 출석 상점: 복구권을 높은 값에 팔고, 되사지 않는다
+        ShopData shop = ShopServer.shops().get("attendance_shop");
+        check("the attendance shop is installed for existing servers too", shop != null);
+        if (shop != null) {
+            int idx = findEntry(shop, en -> en.stack.is(ModItems.RESTORE_TICKET.get()));
+            check("the attendance shop sells the restore ticket at a high price and never buys it back", idx >= 0
+                    && shop.entries.get(idx).price >= 20_000 && !shop.entries.get(idx).sellable, idx < 0 ? "missing" : shop.entries.get(idx).price);
+        }
+        BlockPos at = level.getSharedSpawnPos().above(6);
+        level.getChunkAt(at);
+        net.minecraft.world.entity.npc.Villager v = ShopServer.spawnNpc(level, Vec3.atBottomCenterOf(at), 0, "attendance");
+        check("the attendance NPC can be placed with /rtshop npc attendance", v != null && v.getTags().contains(com.rtshop.attendance.Attendance.NPC_TAG)
+                && v.getCustomName() != null && v.getCustomName().getString().equals(c.npcName));
+        check("the attendance NPC also takes part in quests", v != null && "attendance".equals(QuestManager.npcKey(v)));
+        if (v != null) {
+            v.discard();
+        }
     }
 }

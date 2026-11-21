@@ -22,4 +22,8 @@ public final class ModItems {
             () -> new DeedItem(DeedItem.Type.NORMAL, new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> LARGE_LAND_DEED = ITEMS.register("large_land_deed",
             () -> new DeedItem(DeedItem.Type.LARGE, new Item.Properties().stacksTo(16)));
+
+    /** 일일 출석 진행도 복구권. */
+    public static final RegistryObject<Item> RESTORE_TICKET = ITEMS.register("attendance_restore_ticket",
+            () -> new RestoreTicketItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.EPIC)));
 }

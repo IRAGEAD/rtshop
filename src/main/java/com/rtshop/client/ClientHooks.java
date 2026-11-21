@@ -46,6 +46,12 @@ public final class ClientHooks {
             screen.showResult(message, success);
         } else if (mc.screen instanceof PickerScreen p && p.parent instanceof QuestEditScreen screen) {
             screen.showResult(message, success);
+        } else if (mc.screen instanceof AttendanceScreen screen) {
+            screen.showResult(message, success);
+        } else if (mc.screen instanceof AttendanceEditScreen screen) {
+            screen.showResult(message, success);
+        } else if (mc.screen instanceof PickerScreen p && p.parent instanceof AttendanceEditScreen screen) {
+            screen.showResult(message, success);
         } else if (mc.player != null) {
             mc.player.displayClientMessage(message, true);
         }
@@ -92,6 +98,26 @@ public final class ClientHooks {
             screen.update(packet.json);
         } else {
             mc.setScreen(new JobEditScreen(packet.json));
+        }
+    }
+
+    /** 출석 창 / 출석 편집기를 열거나, 이미 열려 있으면 내용만 새로 고친다. */
+    public static void openAttendance(com.rtshop.net.AttendancePacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        if (packet.mode == com.rtshop.net.AttendancePacket.EDITOR) {
+            if (mc.screen instanceof AttendanceEditScreen screen) {
+                screen.update(packet.json);
+            } else if (mc.screen instanceof PickerScreen p && p.parent instanceof AttendanceEditScreen screen) {
+                screen.update(packet.json);
+            } else {
+                mc.setScreen(new AttendanceEditScreen(packet.json));
+            }
+            return;
+        }
+        if (mc.screen instanceof AttendanceScreen screen) {
+            screen.update(packet.json);
+        } else {
+            mc.setScreen(new AttendanceScreen(packet.json));
         }
     }
 

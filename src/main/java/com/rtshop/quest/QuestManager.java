@@ -356,6 +356,9 @@ public final class QuestManager {
             if (tag.equals(com.rtshop.job.Jobs.NPC_TAG)) {
                 return "job";
             }
+            if (tag.equals(com.rtshop.attendance.Attendance.NPC_TAG)) {
+                return "attendance";
+            }
         }
         return null;
     }
@@ -376,6 +379,9 @@ public final class QuestManager {
         }
         if (key.equals("job")) {
             return com.rtshop.job.JobConfig.get().npcName;
+        }
+        if (key.equals("attendance")) {
+            return com.rtshop.attendance.AttendanceConfig.get().npcName;
         }
         if (key.startsWith("shop_")) {
             ShopData d = ShopServer.shops().get(key.substring(5));

@@ -40,6 +40,7 @@ public class RtShop {
             event.accept(ModItems.FIRST_LAND_DEED);
             event.accept(ModItems.LAND_DEED);
             event.accept(ModItems.LARGE_LAND_DEED);
+            event.accept(ModItems.RESTORE_TICKET);
         }
     }
 }

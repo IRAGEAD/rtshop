@@ -106,6 +106,7 @@ public final class QuestEditor {
         List<String[]> keys = new ArrayList<>();
         keys.add(new String[]{"bank", EconomyConfig.get().bankNpcName});
         keys.add(new String[]{"job", com.rtshop.job.JobConfig.get().npcName});
+        keys.add(new String[]{"attendance", com.rtshop.attendance.AttendanceConfig.get().npcName});
         for (ShopData d : ShopServer.shops().values()) {
             keys.add(new String[]{"shop_" + d.id, d.npcName});
         }

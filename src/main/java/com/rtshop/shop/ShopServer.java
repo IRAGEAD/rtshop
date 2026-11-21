@@ -90,6 +90,7 @@ public final class ShopServer {
         FarmEvents.clearCache();
         LandConfig.reload();
         com.rtshop.job.JobConfig.reload();
+        com.rtshop.attendance.AttendanceConfig.reload();
         QuestManager.reload();
         loaded = ShopLoader.loadAll(server);
         SESSIONS.clear();
@@ -99,7 +100,7 @@ public final class ShopServer {
     public static boolean isNpc(Entity e) {
         for (String tag : e.getTags()) {
             if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX) || tag.startsWith(QuestManager.QUEST_TAG_PREFIX)
-                    || tag.equals(com.rtshop.job.Jobs.NPC_TAG)) {
+                    || tag.equals(com.rtshop.job.Jobs.NPC_TAG) || tag.equals(com.rtshop.attendance.Attendance.NPC_TAG)) {
                 return true;
             }
         }
@@ -170,6 +171,7 @@ public final class ShopServer {
         List<String> all = new ArrayList<>(loaded.shops.keySet());
         all.add(BANK);
         all.add("job");
+        all.add("attendance");
         for (String id : QuestManager.loaded().npcs.keySet()) {
             all.add("quest_" + id);
         }
@@ -243,6 +245,32 @@ public final class ShopServer {
                                     ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
                                     com.rtshop.job.Jobs.resetCooldowns(t);
                                     feedback(ctx.getSource(), Component.translatable("rtshop.job.cmd_cooldown", t.getDisplayName()));
+                                    return 1;
+                                }))))
+                .then(Commands.literal("attendance")
+                        .executes(ctx -> {
+                            com.rtshop.attendance.Attendance.open(ctx.getSource().getPlayerOrException(), -1);
+                            return 1;
+                        })
+                        .then(Commands.literal("edit").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                            com.rtshop.attendance.Attendance.openEditor(ctx.getSource().getPlayerOrException());
+                            return 1;
+                        }))
+                        .then(Commands.literal("set").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .then(Commands.argument("days", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 100000))
+                                                .executes(ctx -> {
+                                                    ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                                    int days = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "days");
+                                                    com.rtshop.attendance.Attendance.setStreak(t, days);
+                                                    feedback(ctx.getSource(), Component.translatable("rtshop.att.cmd_set", t.getDisplayName(), days));
+                                                    return 1;
+                                                }))))
+                        .then(Commands.literal("reset").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
+                                    ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                    com.rtshop.attendance.Attendance.reset(t);
+                                    feedback(ctx.getSource(), Component.translatable("rtshop.att.cmd_reset", t.getDisplayName()));
                                     return 1;
                                 }))))
                 .then(Commands.literal("quest")
@@ -420,6 +448,9 @@ public final class ShopServer {
         }
         if (type.equals("job")) {
             return com.rtshop.job.Jobs.spawnNpc(level, pos, yaw);
+        }
+        if (type.equals("attendance")) {
+            return com.rtshop.attendance.Attendance.spawnNpc(level, pos, yaw);
         }
         String name;
         String tag;
