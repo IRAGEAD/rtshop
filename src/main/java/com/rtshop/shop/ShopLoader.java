@@ -148,7 +148,7 @@ public final class ShopLoader {
             }
         }
         if (had && installed >= DEFAULTS_VERSION) {
-            installAdded(dir, root);
+            installAdded(dir, root, false);
             return;
         }
         if (had) {
@@ -177,18 +177,18 @@ public final class ShopLoader {
         }
         Files.writeString(marker, Integer.toString(DEFAULTS_VERSION), StandardCharsets.UTF_8);
         RtShop.LOGGER.info("[rtshop] 기본 상점 설정을 생성했습니다: {}", dir);
-        installAdded(dir, root);
+        installAdded(dir, root, true); // 기본 상점을 새로 깔았으니 나중에 생긴 상점도 함께
     }
 
     /** 나중 버전에서 새로 생긴 기본 상점 (기존 상점 파일은 건드리지 않고, 한 번만 설치한다). */
     public static final String[] ADDED = {"attendance_shop"};
 
-    private static void installAdded(Path dir, Path root) throws IOException {
+    private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");
         List<String> done = Files.exists(list) ? new ArrayList<>(Files.readAllLines(list, StandardCharsets.UTF_8)) : new ArrayList<>();
         boolean changed = false;
         for (String name : ADDED) {
-            if (done.contains(name)) {
+            if (done.contains(name) && !force) {
                 continue;
             }
             Path f = dir.resolve(name + ".json");
@@ -200,7 +200,9 @@ public final class ShopLoader {
                     }
                 }
             }
-            done.add(name);
+            if (!done.contains(name)) {
+                done.add(name);
+            }
             changed = true;
         }
         if (changed) {
