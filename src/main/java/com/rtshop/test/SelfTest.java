@@ -1072,8 +1072,12 @@ public final class SelfTest {
         }
         LandData.Land land = mine.get(0);
         LandData.Claim c = land.claims.get(0);
-        check("the land is a 16x16x16 box on the grid", c.x0 == gx && c.z0 == gz && c.x1 - c.x0 == 15 && c.y1 - c.y0 == 15
-                && c.z1 - c.z0 == 15 && c.y0 == y - cfg.depthBelowFeet, c.x0 + "," + c.y0 + "," + c.z0);
+        int topY = level.getMaxBuildHeight() - 1;
+        check("the land is 16x16 on the grid, from below the feet up to the top of the world",
+                c.x0 == gx && c.z0 == gz && c.x1 - c.x0 == 15 && c.z1 - c.z0 == 15
+                        && c.y0 == y - cfg.depthBelowFeet && c.y1 == topY, c.x0 + "," + c.y0 + "," + c.z0 + " ~ y" + c.y1);
+        check("building high above the floor of the land is still protected",
+                !LandManager.can(b, level, new BlockPos(gx + 8, topY - 2, gz + 8), LandData.PLACE));
         BlockPos inside = new BlockPos(gx + 8, y, gz + 8);
         BlockPos outside = new BlockPos(gx - 3, y, gz + 8);
         check("the owner may do everything", LandManager.can(a, level, inside, LandData.BREAK)
@@ -1169,9 +1173,13 @@ public final class SelfTest {
         LandManager.useDeed(a, deeds, DeedItem.Type.NORMAL);
         check("a deed is not wasted inside your own land", land.claims.size() == 1 && deeds.getCount() == deedsBefore);
         a.setXRot(-90.0F);
+        int beforeUp = deeds.getCount();
         LandManager.useDeed(a, deeds, DeedItem.Type.NORMAL);
-        check("looking up adds a box on top of the same land", data.landsOf(a.getUUID()).size() == 1 && land.claims.size() == 2
-                && land.claims.get(1).y0 == c.y1 + 1);
+        check("looking up does not waste a deed (the land already reaches the sky)", land.claims.size() == 1 && deeds.getCount() == beforeUp);
+        a.setXRot(90.0F);
+        LandManager.useDeed(a, deeds, DeedItem.Type.NORMAL);
+        check("looking down adds a 16-block box below the same land", data.landsOf(a.getUUID()).size() == 1 && land.claims.size() == 2
+                && land.claims.get(1).y1 == c.y0 - 1 && land.claims.get(1).y1 - land.claims.get(1).y0 == 15);
         a.setXRot(0.0F);
         a.setPos(gx + 16 + 8.5, y, gz + 8.5);
         LandManager.useDeed(a, deeds, DeedItem.Type.NORMAL);
@@ -1183,9 +1191,39 @@ public final class SelfTest {
         a.setPos(gx + 320 + 5.5, y, gz + 5.5);
         LandManager.useDeed(a, big, DeedItem.Type.LARGE);
         LandData.Land bigLand = data.landAt(dim, new BlockPos(gx + 325, y, gz + 5));
-        check("the large deed makes a 32x32x32 box", bigLand != null && bigLand.claims.size() == 1
-                && bigLand.claims.get(0).x1 - bigLand.claims.get(0).x0 == 31 && bigLand.claims.get(0).y1 - bigLand.claims.get(0).y0 == 31
+        check("the large deed makes a 32x32 land up to the sky", bigLand != null && bigLand.claims.size() == 1
+                && bigLand.claims.get(0).x1 - bigLand.claims.get(0).x0 == 31 && bigLand.claims.get(0).y1 == topY
+                && bigLand.claims.get(0).y0 == y - 2 * cfg.depthBelowFeet
                 && bigLand.claims.get(0).z1 - bigLand.claims.get(0).z0 == 31 && big.isEmpty());
+
+        // 예전(3.2 이하) 토지: 높이 16칸짜리 구역이 서버를 켤 때 위로 늘어나는지, 위에 남의 토지가 있으면 그 아래까지만인지
+        LandData.Land oldLow = data.createLand(a.getUUID(), "a");
+        LandData.Claim low = new LandData.Claim();
+        low.dim = dim;
+        low.x0 = gx + 640;
+        low.z0 = gz;
+        low.x1 = low.x0 + 15;
+        low.z1 = low.z0 + 15;
+        low.y0 = y - 4;
+        low.y1 = y + 11;
+        low.type = "normal";
+        data.addClaim(oldLow, low);
+        LandData.Land oldHigh = data.createLand(b.getUUID(), "b");
+        LandData.Claim high = new LandData.Claim();
+        high.dim = dim;
+        high.x0 = low.x0;
+        high.z0 = low.z0;
+        high.x1 = low.x1;
+        high.z1 = low.z1;
+        high.y0 = y + 40;
+        high.y1 = y + 55;
+        high.type = "normal";
+        data.addClaim(oldHigh, high);
+        LandManager.extendClaimsToSky(level.getServer());
+        check("old lands are raised to the sky, stopping under someone else's land",
+                low.y1 == y + 39 && low.y0 == y - 4 && high.y1 == topY && high.y0 == y + 40, low.y1 + " / " + high.y1);
+        data.removeLand(oldLow);
+        data.removeLand(oldHigh);
 
         b.setPos(gx + 8.5, y, gz + 8.5);
         b.setXRot(0.0F);
@@ -1280,6 +1318,16 @@ public final class SelfTest {
         check("no food sells for less than its ingredients cost", deficits == 0, deficits == 0 ? null : deficits + ":" + sample);
         check("nothing sells for more than the shop charges for it", loops == 0, loops == 0 ? null : loops + ":" + sample);
         check("no crafted item sells for more than its materials", craftLoops == 0, craftLoops == 0 ? null : craftLoops + ":" + sample);
+        List<String> buyLoss = ShopLoader.purchaseDeficits(l);
+        check("buying every ingredient from the shops and cooking never loses money, whichever recipe is used",
+                buyLoss.isEmpty(), buyLoss.isEmpty() ? null : buyLoss.size() + ": " + String.join(" / ", buyLoss.subList(0, Math.min(8, buyLoss.size()))));
+        int floored = 0;
+        for (ShopLoader.Price p : l.prices.values()) {
+            if (p.purchaseNeed > 0) {
+                floored++;
+            }
+        }
+        info(floored + " foods have at least one recipe whose ingredients can all be bought");
 
         // 되팔 때 50% 를 넘는 품목은 매입가를 직접 정한 것(양동이 보증금 등)뿐이어야 한다
         int over = 0;

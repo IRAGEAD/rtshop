@@ -68,10 +68,10 @@
   "item.rtshop.first_land_deed": "첫 토지 문서",
   "item.rtshop.land_deed": "토지 문서",
   "item.rtshop.large_land_deed": "대형 토지 문서",
-  "item.rtshop.deed.size": "크기: %s × %s × %s 블록",
+  "item.rtshop.deed.size": "크기: %s × %s 블록 · 높이: 발밑 조금 아래부터 하늘 끝까지",
   "item.rtshop.deed.tip1": "원하는 곳에 서서 우클릭하면 그 자리가 내 토지가 됩니다.",
   "item.rtshop.deed.tip2": "들고 있으면 토지가 될 범위가 입자로 보입니다. (초록 = 가능, 빨강 = 불가)",
-  "item.rtshop.deed.tip3": "내 토지 안에서 위나 아래를 보고 쓰면 위·아래로 확장됩니다.",
+  "item.rtshop.deed.tip3": "내 토지 안에서 아래를 보고 쓰면 땅속으로 16칸 더 확장됩니다.",
   "key.categories.rtshop": "RT Shop",
   "key.rtshop.hud": "Gold 표시 위치 조정",
   "key.rtshop.land": "토지 설정 열기",
@@ -322,5 +322,6 @@
   "rtshop.pick.monsters_only": "몬스터만",
   "rtshop.pick.all_mobs": "모든 생물",
   "rtshop.pick.count": "%s개",
-  "rtshop.pick.enter_raw": "Enter: '%s' 그대로 넣기"
+  "rtshop.pick.enter_raw": "Enter: '%s' 그대로 넣기",
+  "rtshop.land.err_top": "토지는 이미 하늘 끝까지 덮고 있습니다. 땅속으로 넓히려면 아래를 보고 쓰세요."
 }

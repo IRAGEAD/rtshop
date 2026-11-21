@@ -16,10 +16,10 @@ NEW = {
  "item.rtshop.first_land_deed": ("첫 토지 문서", "First Land Deed"),
  "item.rtshop.land_deed": ("토지 문서", "Land Deed"),
  "item.rtshop.large_land_deed": ("대형 토지 문서", "Large Land Deed"),
- "item.rtshop.deed.size": ("크기: %s × %s × %s 블록", "Size: %s x %s x %s blocks"),
+ "item.rtshop.deed.size": ("크기: %s × %s 블록 · 높이: 발밑 조금 아래부터 하늘 끝까지", "Size: %s x %s blocks, from just below your feet up to the sky"),
  "item.rtshop.deed.tip1": ("원하는 곳에 서서 우클릭하면 그 자리가 내 토지가 됩니다.", "Stand where you want your land and right-click."),
  "item.rtshop.deed.tip2": ("들고 있으면 토지가 될 범위가 입자로 보입니다. (초록 = 가능, 빨강 = 불가)", "While held, particles show the area (green = allowed, red = not allowed)."),
- "item.rtshop.deed.tip3": ("내 토지 안에서 위나 아래를 보고 쓰면 위·아래로 확장됩니다.", "Inside your own land, look up or down to extend it vertically."),
+ "item.rtshop.deed.tip3": ("내 토지 안에서 아래를 보고 쓰면 땅속으로 16칸 더 확장됩니다.", "Inside your own land, look down to extend it 16 blocks deeper."),
  "key.categories.rtshop": ("RT Shop", "RT Shop"),
  "key.rtshop.hud": ("Gold 표시 위치 조정", "Move the Gold display"),
  "key.rtshop.land": ("토지 설정 열기", "Open land settings"),
@@ -280,6 +280,7 @@ NEW = {
  "rtshop.pick.all_mobs": ("모든 생물", "All creatures"),
  "rtshop.pick.count": ("%s개", "%s found"),
  "rtshop.pick.enter_raw": ("Enter: '%s' 그대로 넣기", "Enter: use '%s' as typed"),
+ "rtshop.land.err_top": ("토지는 이미 하늘 끝까지 덮고 있습니다. 땅속으로 넓히려면 아래를 보고 쓰세요.", "Your land already reaches the sky. Look down to extend it deeper."),
 }
 ko = dict(ko_old); en = dict(en_old)
 for k, (a, b) in NEW.items():

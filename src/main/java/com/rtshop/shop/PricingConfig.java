@@ -35,6 +35,15 @@ public final class PricingConfig {
     public double defaultIngredientValue = 2;
     /** 가격표에 없는 '먹을 수 있는' 말단 재료의 추정가 = 포만감 공식 가격 × 이 값. */
     public double edibleEstimateFactor = 2.0;
+    /**
+     * 요리 매입가 하한: "레시피의 재료를 모두 상점에서 사서 만들어 팔아도 손해가 없게" 한다.
+     * 켜 두면 어떤 레시피로 만들든 (재료 구입비 × (1+margin) + labor) 이상으로 매입한다.
+     */
+    public boolean purchaseFloor = true;
+    /** 요리 재료인데 어느 상점에서도 팔지 않는 농산물·식재료를 식품 상인에 자동으로 올린다. */
+    public boolean autoListFoodIngredients = true;
+    /** 자동으로 올린 재료 중 값을 알 수 없는(먹을 수 없는) 것의 판매가. 먹을 수 있는 것은 포만감 공식 가격 × 2. */
+    public int autoIngredientPrice = 20;
     public final Map<String, Double> margins = new LinkedHashMap<>();
     public final Map<String, Double> labor = new LinkedHashMap<>();
     public final Map<String, Double> flatExtra = new LinkedHashMap<>();
@@ -144,6 +153,9 @@ public final class PricingConfig {
                 if (o.has("foodBuyMultiplier")) c.foodBuyMultiplier = Math.max(1.0, o.get("foodBuyMultiplier").getAsDouble());
                 if (o.has("defaultIngredientValue")) c.defaultIngredientValue = Math.max(0.01, o.get("defaultIngredientValue").getAsDouble());
                 if (o.has("edibleEstimateFactor")) c.edibleEstimateFactor = Math.max(0, o.get("edibleEstimateFactor").getAsDouble());
+                if (o.has("purchaseFloor")) c.purchaseFloor = o.get("purchaseFloor").getAsBoolean();
+                if (o.has("autoListFoodIngredients")) c.autoListFoodIngredients = o.get("autoListFoodIngredients").getAsBoolean();
+                if (o.has("autoIngredientPrice")) c.autoIngredientPrice = Math.max(1, o.get("autoIngredientPrice").getAsInt());
                 if (o.has("fishBaseMultiplier")) c.fishBaseMultiplier = Math.max(0, o.get("fishBaseMultiplier").getAsDouble());
                 if (o.has("fishWeightBonus")) c.fishWeightBonus = Math.max(0, Math.min(0.9, o.get("fishWeightBonus").getAsDouble()));
                 if (o.has("fishGoldenMultiplier")) c.fishGoldenMultiplier = Math.max(1, o.get("fishGoldenMultiplier").getAsDouble());
@@ -173,8 +185,9 @@ public final class PricingConfig {
                 help.add("margins: 레시피 종류별 마진(0.05 = 5%) · labor: 조리 1회당 수고비(G) · flatExtra: 1회당 추가 원가(기본 없음)");
                 help.add("주의: 화로·조합대처럼 자동화할 수 있는 레시피 종류에 margin/labor/flatExtra 를 주면 재료를 사서 만들어 파는 것만으로 돈이 불어납니다");
                 help.add("음식 매입가 = (재료 원가 + flatExtra) × (1 + margin) + labor, 음식 판매가 = 매입가 × foodBuyMultiplier");
-                help.add("재료 원가는 '가장 싼 조리법, 가장 싼 재료' 기준입니다. 같은 음식을 더 비싼 방법으로 만들면 그만큼 덜 남습니다");
+                help.add("purchaseFloor 가 켜져 있으면 어떤 조리법으로 만들든 재료를 상점에서 산 값 이상으로 매입합니다");
                 help.add("defaultIngredientValue: 가격표에 없는 재료의 추정가(낮게 유지 권장) · edibleEstimateFactor: 먹을 수 있는 재료의 추정가 배율");
+                help.add("purchaseFloor: 재료를 모두 상점에서 사서 만들어 팔아도 손해가 없도록 음식 매입가를 올림 · autoListFoodIngredients/autoIngredientPrice: 상점에 없는 요리 재료를 식품 상인에 자동으로 올림");
                 help.add("fluidCosts: 레시피에 쓰이는 액체 1회분을 '아이템ID*개수'로 환산 · typeExtras: 레시피 파일에 없지만 실제로 드는 재료");
                 help.add("물고기 매입가 = 기준 매입가(상점 판매가×sellRatio) × fishBaseMultiplier × (1 ± fishWeightBonus). 무거울수록 비쌈");
                 help.add("fishGoldenMultiplier: 황금 물고기 배율 · fishNoInfoMultiplier: 무게 정보가 없는 물고기(상점에서 산 것 등) 배율");
@@ -184,6 +197,9 @@ public final class PricingConfig {
                 o.addProperty("foodBuyMultiplier", c.foodBuyMultiplier);
                 o.addProperty("defaultIngredientValue", c.defaultIngredientValue);
                 o.addProperty("edibleEstimateFactor", c.edibleEstimateFactor);
+                o.addProperty("purchaseFloor", c.purchaseFloor);
+                o.addProperty("autoListFoodIngredients", c.autoListFoodIngredients);
+                o.addProperty("autoIngredientPrice", c.autoIngredientPrice);
                 o.addProperty("fishBaseMultiplier", c.fishBaseMultiplier);
                 o.addProperty("fishWeightBonus", c.fishWeightBonus);
                 o.addProperty("fishGoldenMultiplier", c.fishGoldenMultiplier);

@@ -130,11 +130,11 @@ public final class LandManager {
         c.z0 = Math.floorDiv(feet.getZ(), size) * size;
         c.x1 = c.x0 + size - 1;
         c.z1 = c.z0 + size - 1;
-        c.y0 = feet.getY() - cfg.depthBelowFeet * (size / 16);
-        c.y1 = c.y0 + size - 1;
-
         int minY = level.getMinBuildHeight();
         int maxY = level.getMaxBuildHeight() - 1;
+        // 가로·세로는 문서 크기 그대로, 아래로는 발밑 깊이만큼, 위로는 월드 꼭대기까지
+        c.y0 = Math.max(minY, feet.getY() - cfg.depthBelowFeet * (size / 16));
+        c.y1 = maxY;
 
         // 같은 자리에 내 토지가 이미 있으면 위/아래로 붙여서 확장한다
         List<Claim> column = new ArrayList<>();
@@ -160,8 +160,9 @@ public final class LandManager {
             }
             float pitch = p.getXRot();
             if (pitch <= -30.0F) {
-                c.y0 = top + 1;
-                c.y1 = c.y0 + size - 1;
+                // 토지는 이미 하늘 끝까지 덮고 있다
+                c.error = Component.translatable(top >= maxY ? "rtshop.land.err_top" : "rtshop.land.err_own");
+                return c;
             } else if (pitch >= 30.0F) {
                 c.y1 = bottom - 1;
                 c.y0 = c.y1 - size + 1;
@@ -179,12 +180,7 @@ public final class LandManager {
             c.y1 = c.y0 + size - 1;
         }
         if (c.y1 > maxY) {
-            if (overlapsOwn) {
-                c.error = Component.translatable("rtshop.land.err_height");
-                return c;
-            }
             c.y1 = maxY;
-            c.y0 = c.y1 - size + 1;
         }
 
         for (Claim o : data.claimsNear(dim, c.x0, c.y0, c.z0, c.x1, c.y1, c.z1, 0)) {
@@ -255,6 +251,48 @@ public final class LandManager {
         p.sendSystemMessage(Component.translatable(expanded ? "rtshop.land.expanded" : "rtshop.land.claimed",
                 c.x0 + "~" + c.x1, c.y0 + "~" + c.y1, c.z0 + "~" + c.z1).withStyle(ChatFormatting.GREEN));
         p.sendSystemMessage(Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
+    }
+
+    /**
+     * RT Shop 3.3 부터 토지는 위로 월드 꼭대기까지 덮는다. 예전에 만든 토지도 (가로·세로·아래쪽은 그대로) 위쪽만 늘린다.
+     * 위쪽에 다른 토지가 있으면 그 바로 아래까지만 늘린다. 서버가 켜질 때마다 해도 결과가 같다.
+     */
+    public static int extendClaimsToSky(net.minecraft.server.MinecraftServer server) {
+        LandData data = LandData.get(server);
+        int changed = 0;
+        for (Land land : data.lands()) {
+            for (Claim c : land.claims) {
+                Level level = null;
+                for (net.minecraft.server.level.ServerLevel l : server.getAllLevels()) {
+                    if (dim(l).equals(c.dim)) {
+                        level = l;
+                        break;
+                    }
+                }
+                if (level == null) {
+                    continue;
+                }
+                int maxY = level.getMaxBuildHeight() - 1;
+                if (c.y1 >= maxY) {
+                    continue;
+                }
+                int limit = maxY;
+                for (Claim o : data.claimsNear(c.dim, c.x0, c.y1 + 1, c.z0, c.x1, maxY, c.z1, 0)) {
+                    if (o != c && o.y0 > c.y1) {
+                        limit = Math.min(limit, o.y0 - 1);
+                    }
+                }
+                if (limit > c.y1) {
+                    c.y1 = limit;
+                    changed++;
+                }
+            }
+        }
+        if (changed > 0) {
+            data.setDirty();
+            RtShop.LOGGER.info("[rtshop] 예전 토지 {}구역의 높이를 월드 꼭대기까지 늘렸습니다.", changed);
+        }
+        return changed;
     }
 
     public static boolean firstDeedUsed(ServerPlayer p) {

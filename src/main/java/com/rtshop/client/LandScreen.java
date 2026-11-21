@@ -347,7 +347,7 @@ public class LandScreen extends Screen {
         } else {
             LandInfoPacket.ClaimView c = v.claims.get(0);
             info2 = Component.translatable("rtshop.land.info2", small, large,
-                    (c.x0 + c.x1) / 2, (c.y0 + c.y1) / 2, (c.z0 + c.z1) / 2).getString();
+                    (c.x0 + c.x1) / 2, c.y0 + 4, (c.z0 + c.z1) / 2).getString();
         }
         g.drawString(this.font, Ui.clip(this.font, info2, textMax), px + 8, py + 35, Ui.C_INK_SOFT, false);
 

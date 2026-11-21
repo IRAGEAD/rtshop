@@ -68,10 +68,10 @@
   "item.rtshop.first_land_deed": "First Land Deed",
   "item.rtshop.land_deed": "Land Deed",
   "item.rtshop.large_land_deed": "Large Land Deed",
-  "item.rtshop.deed.size": "Size: %s x %s x %s blocks",
+  "item.rtshop.deed.size": "Size: %s x %s blocks, from just below your feet up to the sky",
   "item.rtshop.deed.tip1": "Stand where you want your land and right-click.",
   "item.rtshop.deed.tip2": "While held, particles show the area (green = allowed, red = not allowed).",
-  "item.rtshop.deed.tip3": "Inside your own land, look up or down to extend it vertically.",
+  "item.rtshop.deed.tip3": "Inside your own land, look down to extend it 16 blocks deeper.",
   "key.categories.rtshop": "RT Shop",
   "key.rtshop.hud": "Move the Gold display",
   "key.rtshop.land": "Open land settings",
@@ -322,5 +322,6 @@
   "rtshop.pick.monsters_only": "Monsters",
   "rtshop.pick.all_mobs": "All creatures",
   "rtshop.pick.count": "%s found",
-  "rtshop.pick.enter_raw": "Enter: use '%s' as typed"
+  "rtshop.pick.enter_raw": "Enter: use '%s' as typed",
+  "rtshop.land.err_top": "Your land already reaches the sky. Look down to extend it deeper."
 }

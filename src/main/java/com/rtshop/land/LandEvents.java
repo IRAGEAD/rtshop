@@ -504,7 +504,13 @@ public final class LandEvents {
     private static void drawBox(ServerLevel level, ServerPlayer sp, int x0, int y0, int z0, int x1, int y1, int z1,
                                 Vector3f color, int step) {
         DustParticleOptions dust = new DustParticleOptions(color, 1.5F);
-        double ax = x0, ay = y0, az = z0, bx = x1 + 1.0, by = y1 + 1.0, bz = z1 + 1.0;
+        double ax = x0, az = z0, bx = x1 + 1.0, bz = z1 + 1.0;
+        // 토지가 하늘 끝까지 이어지므로 위아래는 플레이어 근처만 그린다 (입자가 너무 많아지지 않게)
+        double ay = Math.max(y0, Math.floor(sp.getY()) - 12);
+        double by = Math.min(y1 + 1.0, Math.floor(sp.getY()) + 20);
+        if (by <= ay) {
+            return;
+        }
         for (double x = ax; x <= bx + 0.01; x += step) {
             dot(level, sp, dust, x, ay, az);
             dot(level, sp, dust, x, ay, bz);

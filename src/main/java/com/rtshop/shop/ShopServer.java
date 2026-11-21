@@ -113,6 +113,11 @@ public final class ShopServer {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
+        try {
+            LandManager.extendClaimsToSky(event.getServer());
+        } catch (Throwable t) {
+            RtShop.LOGGER.error("[rtshop] 예전 토지 높이를 늘리지 못했습니다", t);
+        }
         SelfTest.onServerStarted(event.getServer());
     }
 

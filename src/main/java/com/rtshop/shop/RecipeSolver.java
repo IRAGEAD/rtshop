@@ -691,6 +691,130 @@ public final class RecipeSolver {
         return out;
     }
 
+
+    // =====================================================================================
+    // "상점에서 재료를 사서 만들 때" 원가
+    // =====================================================================================
+
+    /** 이 레시피 결과물 중 해당 아이템의 개수 (되돌아오는 재료 제외). */
+    private static double count(Prepared p, String item) {
+        double n = 0;
+        for (Out o : p.outs) {
+            if (o.item.equals(item)) {
+                n += o.count;
+            }
+        }
+        return n;
+    }
+
+    /** 레시피 1회의 재료를 모두 pc(구입 원가) 기준으로 마련하는 비용. 한 칸이라도 마련할 수 없으면 INF. */
+    private static double purchaseTotal(Recipe r, Prepared p, Map<String, Double> pc, Env env, Config cfg, List<Pick> picksOut) {
+        double total = cfg.flatExtra.getOrDefault(r.type, 0.0);
+        Map<String, Double> sum = picksOut == null ? null : new LinkedHashMap<>();
+        for (int i = 0; i < r.ingredients.size(); i++) {
+            if (p.returned[i]) {
+                continue;
+            }
+            Ing ing = r.ingredients.get(i);
+            double best = INF;
+            String bestItem = null;
+            for (String alt : ing.alts) {
+                Collection<String> items = alt.startsWith("#") ? env.tagItems(alt.substring(1)) : List.of(alt);
+                for (String item : items) {
+                    if (count(p, item) > 0) {
+                        continue; // 결과물 자신은 재료로 고르지 않는다
+                    }
+                    Double v = pc.get(item);
+                    if (v != null && v < best) {
+                        best = v;
+                        bestItem = item;
+                    }
+                }
+            }
+            if (bestItem == null) {
+                return INF;
+            }
+            total += best * ing.count;
+            if (sum != null) {
+                sum.merge(bestItem, ing.count, Double::sum);
+            }
+        }
+        if (picksOut != null) {
+            for (Map.Entry<String, Double> e : sum.entrySet()) {
+                picksOut.add(new Pick(e.getKey(), e.getValue()));
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 상점에서 살 수 있는 것(supply: 아이템 -> 상점 판매가)만으로 각 아이템을 마련하는 비용.
+     * 상점에서 파는 아이템은 그 판매가 그대로(사서 쓴다고 본다), 팔지 않는 아이템은 파는 재료로 만드는 가장 싼 값.
+     * 재료가 되돌아 늘어나는 고리(돌 -> 조약돌 2개 -> 돌)로 값이 끝없이 내려가지 않도록,
+     * 한 번 값이 정해진 아이템은 다시 낮추지 않는다 (더 비싸게 잡히는 쪽이라 요리 적자에는 안전).
+     */
+    public static Map<String, Double> purchaseCosts(Map<String, Double> supply, List<Recipe> recipes, Env env, Config cfg) {
+        Map<String, Double> pc = new HashMap<>(supply);
+        Map<Recipe, Prepared> prepared = new java.util.IdentityHashMap<>();
+        for (Recipe r : recipes) {
+            prepared.put(r, prepare(r, env));
+        }
+        for (int layer = 0; layer < 64; layer++) {
+            Map<String, Double> found = new HashMap<>();
+            for (Recipe r : recipes) {
+                Prepared p = prepared.get(r);
+                if (p.outSum <= 0) {
+                    continue;
+                }
+                boolean anyNew = false;
+                for (Out o : p.outs) {
+                    if (!pc.containsKey(o.item)) {
+                        anyNew = true;
+                        break;
+                    }
+                }
+                if (!anyNew) {
+                    continue;
+                }
+                double total = purchaseTotal(r, p, pc, env, cfg, null);
+                if (total >= INF) {
+                    continue;
+                }
+                for (Out o : p.outs) {
+                    if (pc.containsKey(o.item)) {
+                        continue;
+                    }
+                    // 결과물이 여러 가지여도 그 아이템 하나가 재료값을 다 떠안는 것으로 친다 (비싸게 잡는 쪽 = 적자에 안전)
+                    double per = total / count(p, o.item);
+                    found.merge(o.item, per, Math::min);
+                }
+            }
+            if (found.isEmpty()) {
+                break;
+            }
+            pc.putAll(found);
+        }
+        return pc;
+    }
+
+    /**
+     * 이 레시피로 item 을 만들어 팔 때 최소한 받아야 하는 1개당 매입가:
+     * (재료 구입비 + flatExtra) × (1 + margin) + labor 를 생산량으로 나눈 값. 재료를 살 수 없으면 -1.
+     */
+    public static double purchaseRequirement(Recipe r, String item, Map<String, Double> pc, Env env, Config cfg, List<Pick> picksOut) {
+        Prepared p = prepare(r, env);
+        double n = count(p, item);
+        if (n <= 0) {
+            return -1;
+        }
+        double total = purchaseTotal(r, p, pc, env, cfg, picksOut);
+        if (total >= INF) {
+            return -1;
+        }
+        return (total * (1.0 + cfg.margin(r.type)) + cfg.labor.getOrDefault(r.type, 0.0)) / n;
+    }
+
+
     /** 이 레시피 1회로 나오는 해당 아이템의 개수 (되돌아오는 재료 제외). */
     public static double outputCount(Recipe r, String item, Env env) {
         double n = 0;

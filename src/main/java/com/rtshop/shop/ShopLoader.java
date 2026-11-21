@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,6 +89,12 @@ public final class ShopLoader {
         public float partsOut = 1.0F;
         /** 만들 수 있는데 상점가가 원가보다 비싼 품목(완제품)인가. */
         public boolean finished;
+        /** 어느 상점이 '재료'(요리·음료가 아닌 구분)로 파는 품목: 사서 쓰는 원재료이므로 매입가 하한을 걸지 않는다. */
+        public boolean rawStock;
+        /** 매입가가 "재료를 상점에서 사서 만드는 값" 기준으로 정해졌다 (parts 가 이미 채워져 있음). */
+        public boolean purchaseBasis;
+        /** 재료를 모두 상점에서 사서 만들 때 가장 비싼 조리법의 1개당 필요 매입가 (없으면 -1). */
+        public double purchaseNeed = -1;
     }
 
     private static final class Ref {
@@ -234,10 +241,20 @@ public final class ShopLoader {
         } catch (Throwable t) {
             RtShop.LOGGER.error("[rtshop] 빠진 씨앗을 상점에 올리는 중 오류", t);
         }
+        if (scan != null && pc.autoListFoodIngredients) {
+            try {
+                addMissingFoodIngredients(raws, prices, scan, pc, out.notes);
+            } catch (Throwable t) {
+                RtShop.LOGGER.error("[rtshop] 빠진 요리 재료를 식품 상인에 올리는 중 오류", t);
+            }
+        }
         for (Raw r : raws) {
             for (Ref ref : r.refs) {
                 if (ref.buy) {
                     prices.get(ref.key).buyableSomewhere = true;
+                    if (!"dish".equals(ref.category) && !"drink".equals(ref.category)) {
+                        prices.get(ref.key).rawStock = true;
+                    }
                 }
                 if (ref.sell) {
                     prices.get(ref.key).sellableSomewhere = true;
@@ -450,9 +467,12 @@ public final class ShopLoader {
             }
             // 그 밖 = 원가와 비슷하거나 더 싸게 파는 기본 재료(설탕, 기름, 숯 등): 상점가의 50% 에 매입 (아래에서 채움)
         }
+        if (pc.purchaseFloor) {
+            applyPurchaseFloor(scan, pc, out);
+        }
         // 가격 근거(어떤 재료 기준으로 값을 매겼는지)를 상점 화면에 보여 주기 위해 정리한다
         for (Price p : prices.values()) {
-            if (!p.finished || p.basis.isEmpty()) {
+            if (!p.finished || p.basis.isEmpty() || p.purchaseBasis) {
                 continue;
             }
             try {
@@ -481,6 +501,434 @@ public final class ShopLoader {
         out.notes.add(String.format("레시피 파일 %d개 중 %d개 해석, 계산에 쓰지 못한 레시피 %d개, 가격을 추정한 재료 %d종, 원가 기준으로 가격을 정한 음식 %d종",
                 scan.files, scan.parsed, res.recipesUnresolved, res.estimated.size(), adjusted));
         RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
+    }
+
+
+    // ------------------------------------------------------------------ "재료를 사서 만들어 팔 때" 손해 없음
+
+    private static final Set<String> COOKING_MODS = Set.of("farmersdelight", "kaleidoscope_cookery", "kaleidoscope_tavern",
+            "farm_and_charm", "handson_delight", "brewinandchewin", "cookingforblockheads");
+    private static final String[] FOOD_TAG_PREFIXES = {"crops", "vegetables", "fruits", "grain", "mushrooms", "eggs", "milk",
+            "salad_ingredients", "raw_", "cooking_oil", "flour", "dough", "rice", "berries", "nuts", "spices", "herbs"};
+
+    private static Collection<String> slotItems(RecipeSolver.Ing ing, Map<String, List<String>> tagCache) {
+        List<String> out = new ArrayList<>();
+        for (String alt : ing.alts) {
+            if (alt.startsWith("#")) {
+                out.addAll(tagCache.computeIfAbsent(alt.substring(1), k -> {
+                    List<String> l = new ArrayList<>();
+                    try {
+                        ResourceLocation rl = ResourceLocation.tryParse(k);
+                        if (rl != null && ForgeRegistries.ITEMS.tags() != null) {
+                            ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(rl)).stream().forEach(item -> {
+                                ResourceLocation key = ForgeRegistries.ITEMS.getKey(item);
+                                if (key != null) {
+                                    l.add(key.toString());
+                                }
+                            });
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                    return l;
+                }));
+            } else {
+                out.add(alt);
+            }
+        }
+        return out;
+    }
+
+    /** 식품 상인에 올려도 되는 '식재료'인가 (먹을 수 있거나, 요리 모드의 재료이거나, 농산물·식재료 태그가 있는 것). */
+    private static boolean foodish(String id) {
+        Item item = findItem(id);
+        if (item == null) {
+            return false;
+        }
+        ResourceLocation rl = ResourceLocation.tryParse(id);
+        if (rl == null || rl.getPath().startsWith("wild_")) {
+            return false; // 야생 작물 덤불은 채집용
+        }
+        ItemStack st = new ItemStack(item);
+        if (st.isEdible() || COOKING_MODS.contains(rl.getNamespace())) {
+            return !st.isDamageableItem();
+        }
+        try {
+            return st.getTags().anyMatch(t -> {
+                if (!t.location().getNamespace().equals("forge")) {
+                    return false;
+                }
+                String path = t.location().getPath();
+                for (String pre : FOOD_TAG_PREFIXES) {
+                    if (path.startsWith(pre)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 요리 조리법인가: 결과물이 먹을 수 있는 것이거나, 수고비·마진이 붙는 조리 기구 레시피. */
+    private static boolean foodRecipe(RecipeSolver.Recipe r, PricingConfig pc) {
+        if (pc.margins.containsKey(r.type) || pc.labor.containsKey(r.type)) {
+            return true;
+        }
+        for (RecipeSolver.Out o : r.outputs) {
+            Item item = findItem(o.item);
+            if (item != null && new ItemStack(item).isEdible()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 요리 재료인데 어느 상점에서도 살 수 없는 식재료를 식품 상인에 자동으로 올린다.
+     * 그래야 "재료를 모두 상점에서 사서 요리"할 수 있고, 그 값이 요리 매입가 하한에 반영된다.
+     */
+    private static void addMissingFoodIngredients(List<Raw> raws, Map<String, Price> prices, RecipeScan.Scan scan, PricingConfig pc,
+                                                  List<String> notes) {
+        Raw food = null;
+        for (Raw r : raws) {
+            if (r.id.equals("food")) {
+                food = r;
+            }
+        }
+        if (food == null) {
+            return;
+        }
+        Map<String, List<String>> tagCache = new HashMap<>();
+        Set<String> obtainable = new HashSet<>();
+        for (Raw r : raws) {
+            for (Ref ref : r.refs) {
+                Price p = prices.get(ref.key);
+                if (ref.buy && p != null && isPlain(p.stack)) {
+                    obtainable.add(itemId(p.stack));
+                }
+            }
+        }
+        List<RecipeSolver.Recipe> foodRecipes = new ArrayList<>();
+        for (RecipeSolver.Recipe r : scan.recipes) {
+            if (foodRecipe(r, pc)) {
+                foodRecipes.add(r);
+            }
+        }
+        Set<String> craftable = new HashSet<>();
+        for (RecipeSolver.Recipe r : scan.recipes) {
+            for (RecipeSolver.Out o : r.outputs) {
+                craftable.add(o.item);
+            }
+        }
+        Map<String, Integer> added = new LinkedHashMap<>();
+        for (int round = 0; round < 6; round++) {
+            // 살 수 있는 것만으로 만들 수 있는 것까지 넓힌다
+            boolean grew = true;
+            int guard = 0;
+            while (grew && guard++ < 40) {
+                grew = false;
+                for (RecipeSolver.Recipe r : scan.recipes) {
+                    boolean newOut = false;
+                    for (RecipeSolver.Out o : r.outputs) {
+                        if (!obtainable.contains(o.item)) {
+                            newOut = true;
+                            break;
+                        }
+                    }
+                    if (!newOut) {
+                        continue;
+                    }
+                    boolean ok = true;
+                    for (RecipeSolver.Ing ing : r.ingredients) {
+                        boolean any = false;
+                        for (String it : slotItems(ing, tagCache)) {
+                            if (obtainable.contains(it)) {
+                                any = true;
+                                break;
+                            }
+                        }
+                        if (!any) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok) {
+                        for (RecipeSolver.Out o : r.outputs) {
+                            grew |= obtainable.add(o.item);
+                        }
+                    }
+                }
+            }
+            // 요리 조리법의 재료 칸 중 마련할 방법이 없는 칸: 그 칸에 들어갈 식재료 하나를 올린다 (만들 수 없는 것 우선)
+            Map<String, Integer> want = new LinkedHashMap<>();
+            for (RecipeSolver.Recipe r : foodRecipes) {
+                for (RecipeSolver.Ing ing : r.ingredients) {
+                    Collection<String> items = slotItems(ing, tagCache);
+                    boolean any = false;
+                    for (String it : items) {
+                        if (obtainable.contains(it)) {
+                            any = true;
+                            break;
+                        }
+                    }
+                    if (any) {
+                        continue;
+                    }
+                    String pick = null;
+                    for (String it : items) {
+                        if (!craftable.contains(it) && foodish(it)) {
+                            pick = it;
+                            break;
+                        }
+                    }
+                    if (pick == null) {
+                        for (String it : items) {
+                            if (foodish(it)) {
+                                pick = it;
+                                break;
+                            }
+                        }
+                    }
+                    if (pick != null) {
+                        want.merge(pick, 1, Integer::sum);
+                    }
+                }
+            }
+            if (want.isEmpty()) {
+                break;
+            }
+            for (String id : want.keySet()) {
+                int colon = id.indexOf(':');
+                if (food.excludeIds.contains(id) || (colon > 0 && food.excludeNamespaces.contains(id.substring(0, colon)))) {
+                    obtainable.add(id); // 관리자가 뺀 품목: 다시 고르지 않게만 표시
+                    continue;
+                }
+                Item item = findItem(id);
+                ItemStack stack = new ItemStack(item);
+                String key = key(stack);
+                Price p = prices.get(key);
+                if (p == null) {
+                    p = new Price();
+                    p.stack = stack;
+                    int f = Pricing.food(stack);
+                    p.price = f > 0 ? Math.max(pc.autoIngredientPrice / 2, Pricing.nice(f * 2.0)) : pc.autoIngredientPrice;
+                    prices.put(key, p);
+                }
+                boolean had = false;
+                for (Ref ref : food.refs) {
+                    if (ref.key.equals(key)) {
+                        ref.buy = true;
+                        had = true;
+                    }
+                }
+                if (!had && food.keys.add(key)) {
+                    Ref ref = new Ref();
+                    ref.key = key;
+                    ref.category = "ingredient";
+                    ref.buy = true;
+                    ref.sell = true;
+                    ref.loose = true;
+                    food.refs.add(ref);
+                }
+                obtainable.add(id);
+                added.put(id, p.price);
+            }
+        }
+        if (!added.isEmpty()) {
+            List<String> list = new ArrayList<>();
+            added.forEach((k, v) -> list.add(k + "=" + v));
+            RtShop.LOGGER.info("[rtshop] 상점에서 살 수 없던 요리 재료 {}종을 식품 상인에 올렸습니다: {}", added.size(), list);
+            notes.add("상점에서 살 수 없던 요리 재료 " + added.size() + "종을 식품 상인에 올렸습니다 (pricing.json 의 autoListFoodIngredients): "
+                    + String.join(", ", list));
+        }
+    }
+
+    /**
+     * 서로 되돌릴 수 있는 보관용 조리법(작물 상자 <-> 작물 9개, 블록 <-> 주괴 등)을 찾는다.
+     * 이런 조리법은 "요리"가 아니므로 매입가 하한 계산에서 뺀다.
+     */
+    private static Set<RecipeSolver.Recipe> storageRecipes(RecipeScan.Scan scan) {
+        Map<String, List<RecipeSolver.Recipe>> singleByIn = new HashMap<>();
+        Map<RecipeSolver.Recipe, String> inOf = new java.util.IdentityHashMap<>();
+        Map<String, List<String>> tagCache = new HashMap<>();
+        for (RecipeSolver.Recipe r : scan.recipes) {
+            if (r.ingredients.isEmpty() || r.outputs.size() != 1) {
+                continue;
+            }
+            Set<String> ins = new HashSet<>();
+            for (RecipeSolver.Ing ing : r.ingredients) {
+                Collection<String> items = slotItems(ing, tagCache);
+                if (items.size() != 1) {
+                    ins.add("?multi");
+                }
+                ins.addAll(items);
+            }
+            if (ins.size() == 1) {
+                String in = ins.iterator().next();
+                inOf.put(r, in);
+                singleByIn.computeIfAbsent(in, k -> new ArrayList<>()).add(r);
+            }
+        }
+        Set<RecipeSolver.Recipe> out = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        for (Map.Entry<RecipeSolver.Recipe, String> e : inOf.entrySet()) {
+            String in = e.getValue();
+            String outItem = e.getKey().outputs.get(0).item;
+            for (RecipeSolver.Recipe back : singleByIn.getOrDefault(outItem, List.of())) {
+                if (back.outputs.get(0).item.equals(in)) {
+                    out.add(e.getKey());
+                    out.add(back);
+                }
+            }
+        }
+        return out;
+    }
+
+    /** 매입가 하한을 걸 품목인가: 상점에서 파는(되사는) 음식·조리 가공품 중, 원재료로 파는 것이 아닌 것. */
+    private static boolean floorTarget(Price p, RecipeSolver.Result res) {
+        if (p == null || !isPlain(p.stack) || !p.sellableSomewhere || p.rawStock) {
+            return false;
+        }
+        String id = itemId(p.stack);
+        return p.dynamicFood || p.stack.isEdible() || (res != null && res.processed.contains(id));
+    }
+
+    /** 지금 가격표에서 살 수 있는 일반 아이템의 가장 싼 판매가. */
+    private static Map<String, Double> supply(Map<String, Price> prices) {
+        Map<String, Double> m = new HashMap<>();
+        for (Price p : prices.values()) {
+            if (p.buyableSomewhere && isPlain(p.stack) && p.price > 0) {
+                m.merge(itemId(p.stack), (double) p.price, Math::min);
+            }
+        }
+        return m;
+    }
+
+    private static Map<String, List<RecipeSolver.Recipe>> byOutput(RecipeScan.Scan scan, Set<RecipeSolver.Recipe> skip) {
+        Map<String, List<RecipeSolver.Recipe>> m = new HashMap<>();
+        for (RecipeSolver.Recipe r : scan.recipes) {
+            if (skip.contains(r)) {
+                continue;
+            }
+            for (RecipeSolver.Out o : r.outputs) {
+                List<RecipeSolver.Recipe> l = m.computeIfAbsent(o.item, k -> new ArrayList<>());
+                if (!l.contains(r)) {
+                    l.add(r);
+                }
+            }
+        }
+        return m;
+    }
+
+    /**
+     * 요리 매입가 하한: 레시피의 재료를 모두 상점에서 사서 만들어 팔아도 손해가 없게 한다.
+     * 음식마다 "재료를 상점에서 살 수 있는" 모든 조리법 중 가장 비싼 것의 (재료비 × (1+margin) + 수고비) 이상으로 매입하고,
+     * 되팔기 규칙(50%)을 지키도록 상점 판매가도 그 2배 이상으로 맞춘다.
+     * 요리가 다른 요리의 재료이면 앞 요리의 상점가가 오르면서 뒤 요리도 오르므로 바뀌지 않을 때까지 몇 번 반복한다.
+     */
+    private static void applyPurchaseFloor(RecipeScan.Scan scan, PricingConfig pc, Loaded out) {
+        RecipeSolver.Config cfg = pc.solverConfig();
+        Set<RecipeSolver.Recipe> storage = storageRecipes(scan);
+        List<RecipeSolver.Recipe> usable = new ArrayList<>();
+        for (RecipeSolver.Recipe r : scan.recipes) {
+            if (!storage.contains(r)) {
+                usable.add(r);
+            }
+        }
+        Map<String, List<RecipeSolver.Recipe>> makers = byOutput(scan, storage);
+        double ratio = pc.sellRatio > 0 ? pc.sellRatio : 0.5;
+        int raised = 0;
+        Set<String> raisedIds = new HashSet<>();
+        for (int round = 0; round < 8; round++) {
+            Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(out.prices), usable, scan.env, cfg);
+            boolean changed = false;
+            for (Price p : out.prices.values()) {
+                if (!floorTarget(p, out.solved)) {
+                    continue;
+                }
+                String id = itemId(p.stack);
+                double need = -1;
+                RecipeSolver.Recipe needBy = null;
+                List<RecipeSolver.Pick> needPicks = null;
+                for (RecipeSolver.Recipe r : makers.getOrDefault(id, List.of())) {
+                    List<RecipeSolver.Pick> picks = new ArrayList<>();
+                    double req = RecipeSolver.purchaseRequirement(r, id, pcost, scan.env, cfg, picks);
+                    if (req > need) {
+                        need = req;
+                        needBy = r;
+                        needPicks = picks;
+                    }
+                }
+                p.purchaseNeed = need;
+                if (need <= 0) {
+                    continue;
+                }
+                double now = p.sellUnit >= 0 ? p.sellUnit : p.price * ratio;
+                if (now + 1.0e-6 >= need) {
+                    continue;
+                }
+                p.sellUnit = need;
+                p.price = Math.max(p.price, buyPrice(need, Math.max(pc.foodBuyMultiplier, 1.0 / ratio)));
+                p.finished = true;
+                p.basis = needBy.id;
+                p.purchaseBasis = true;
+                List<ShopData.Part> parts = new ArrayList<>();
+                for (RecipeSolver.Pick pick : needPicks) {
+                    Item item = findItem(pick.item);
+                    if (item != null) {
+                        parts.add(new ShopData.Part(item, (float) pick.count));
+                    }
+                }
+                double n = RecipeSolver.outputCount(needBy, id, scan.env);
+                if (!parts.isEmpty() && n > 0) {
+                    p.parts = parts;
+                    p.partsOut = (float) n;
+                }
+                changed = true;
+                if (raisedIds.add(id)) {
+                    raised++;
+                }
+            }
+            if (!changed) {
+                break;
+            }
+        }
+        out.notes.add("재료를 모두 상점에서 사서 만들어도 손해가 없도록 매입가를 올린 음식: " + raised + "종 (pricing.json 의 purchaseFloor)");
+        RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
+    }
+
+    /** 결과 점검: 재료를 상점에서 사서 어떤 조리법으로 만들어도 매입가가 재료비 이상인가. 손해인 경우의 설명 목록. */
+    public static List<String> purchaseDeficits(Loaded loaded) {
+        List<String> out = new ArrayList<>();
+        if (loaded.scan == null || loaded.scan.env == null) {
+            return out;
+        }
+        PricingConfig pc = PricingConfig.get();
+        RecipeSolver.Config cfg = pc.solverConfig();
+        Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
+        List<RecipeSolver.Recipe> usable = new ArrayList<>();
+        for (RecipeSolver.Recipe r : loaded.scan.recipes) {
+            if (!storage.contains(r)) {
+                usable.add(r);
+            }
+        }
+        Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
+        Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(loaded.prices), usable, loaded.scan.env, cfg);
+        for (Price p : loaded.prices.values()) {
+            if (!floorTarget(p, loaded.solved)) {
+                continue;
+            }
+            String id = itemId(p.stack);
+            for (RecipeSolver.Recipe r : makers.getOrDefault(id, List.of())) {
+                // 손해 여부는 수고비·마진 없이 순수 재료비와 비교한다
+                List<RecipeSolver.Pick> picks = new ArrayList<>();
+                double cost = RecipeSolver.purchaseRequirement(r, id, pcost, loaded.scan.env, new RecipeSolver.Config(), picks);
+                if (cost > 0 && p.sellUnit + 1.0e-6 < cost) {
+                    out.add(String.format(Locale.ROOT, "%s 매입가 %.2f < 재료 구입비 %.2f (%s)", id, p.sellUnit, cost, r.id));
+                }
+            }
+        }
+        return out;
     }
 
     /** 매입가의 multiplier 배 이상이 되는 가장 작은 정수 판매가. */
@@ -862,6 +1310,12 @@ public final class ShopLoader {
             }
         }
         audit.append("적자 가능 음식: ").append(deficits).append("종\n");
+        List<String> buyLoss = purchaseDeficits(loaded);
+        audit.append("\n# 재료를 모두 상점에서 사서 만들어 팔 때 손해인 조리법\n");
+        for (String line : buyLoss) {
+            audit.append(line).append('\n');
+        }
+        audit.append("재료를 사서 만들면 손해인 조리법: ").append(buyLoss.size()).append("개\n");
         // 요리 재료로 쓰이는데 상점에서 사는 것보다 직접 만드는 편이 싼 품목: 사서 쓰면 차액만큼 손해를 본다
         audit.append("\n# 요리 재료 중 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)\n");
         audit.append("# 음식값은 가장 싼 방법 기준으로 매겨지므로, 아래 품목을 상점에서 사서 재료로 쓰면 차액만큼 손해입니다.\n");
