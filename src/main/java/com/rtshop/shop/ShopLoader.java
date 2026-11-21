@@ -236,8 +236,8 @@ public final class ShopLoader {
             changed = true;
         }
         for (String mark : APPENDED) {
-            if (done.contains(mark)) {
-                continue;
+            if (done.contains(mark) && !force) {
+                continue; // 기본 상점을 새로 깔았을 때(force)는 다시 덧붙인다 (이미 있는 품목은 건너뜀)
             }
             String target = mark.substring(0, mark.indexOf('+'));
             String frag = mark.substring(mark.indexOf('+') + 1, mark.indexOf('@'));
@@ -246,7 +246,9 @@ public final class ShopLoader {
             } catch (Exception ex) {
                 RtShop.LOGGER.error("[rtshop] 상점 {} 에 새 품목을 덧붙이지 못했습니다: {}", target, ex.toString());
             }
-            done.add(mark);
+            if (!done.contains(mark)) {
+                done.add(mark);
+            }
             changed = true;
         }
         if (changed) {
