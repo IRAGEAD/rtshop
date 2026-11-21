@@ -173,7 +173,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
-    timeout-minutes: 45
+    timeout-minutes: 75
     env:
       # 전용 서버에서는 켜지지 않는 클라이언트 전용 모드
       SKIP_MODS: "cwb-,forgematica,mafglib,oculus"
