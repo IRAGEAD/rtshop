@@ -351,6 +351,8 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 anvilPos = null;
                 onServer(mc, sp -> {
+                    // 가방이 가득 차 있으면 강화한 장비가 바닥에 떨어지므로 비우고 시작한다
+                    sp.getInventory().clearContent();
                     // 시험 세계에 돌아다니는 다른 모드의 NPC(대화창을 띄움)를 치운다
                     for (net.minecraft.world.entity.Entity e : sp.serverLevel().getEntities(sp, sp.getBoundingBox().inflate(16),
                             e -> e instanceof net.minecraft.world.entity.LivingEntity && !(e instanceof net.minecraft.world.entity.player.Player))) {
@@ -657,6 +659,10 @@ public final class ClientSelfTest {
     }
 
     private static void next(Minecraft mc) {
+        // Fantasy 의 안내 대화창이 화면을 가로채면 닫는다 (강화 모루 장면 중에는 그대로 둠)
+        if (step < NPC_END + 3 || step > ENH_END) {
+            closeForeign(mc);
+        }
         switch (step) {
             case 0 -> wait = 100; // 월드가 다 뜰 때까지
             case 1 -> {
