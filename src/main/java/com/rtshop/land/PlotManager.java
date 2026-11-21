@@ -1112,9 +1112,10 @@ public final class PlotManager {
             groups.computeIfAbsent(e.getValue(), k -> new LongOpenHashSet()).add((long) e.getKey());
         }
         List<LongOpenHashSet> out = new ArrayList<>(groups.values());
+        final int originZ = z0;
         out.sort((a, b) -> {
             double[] ca = centre(a), cb = centre(b);
-            int ra = (int) Math.floor((ca[1] - z0) / size), rb = (int) Math.floor((cb[1] - z0) / size);
+            int ra = (int) Math.floor((ca[1] - originZ) / size), rb = (int) Math.floor((cb[1] - originZ) / size);
             return ra != rb ? Integer.compare(ra, rb) : Double.compare(ca[0], cb[0]);
         });
         return out;
