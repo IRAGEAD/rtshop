@@ -91,6 +91,7 @@ public final class ClientSelfTest {
     private static volatile int plotNpc = -1;
     private static volatile int boughtLot = -1;
     private static volatile BlockPos anvilPos = null;
+    private static volatile String swordWhere = "";
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -445,6 +446,24 @@ public final class ClientSelfTest {
                 wait = 6;
             }
             case 6 -> {
+                swordWhere = "?";
+                onServer(mc, sp -> {
+                    StringBuilder w = new StringBuilder();
+                    w.append("carried=").append(sp.containerMenu.getCarried()).append(" menu=").append(sp.containerMenu.getClass().getSimpleName());
+                    for (int i = 0; i < sp.containerMenu.slots.size(); i++) {
+                        ItemStack it = sp.containerMenu.slots.get(i).getItem();
+                        if (it.is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" slot").append(i).append('=').append(it.getTag());
+                    }
+                    for (int i = 0; i < sp.getInventory().getContainerSize(); i++) {
+                        if (sp.getInventory().getItem(i).is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" inv").append(i);
+                    }
+                    for (net.minecraft.world.entity.item.ItemEntity ie : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                            sp.getBoundingBox().inflate(16))) {
+                        if (ie.getItem().is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" dropped@").append(ie.blockPosition().toShortString());
+                    }
+                    swordWhere = w.toString();
+                    RtShop.LOGGER.info("[rtshop-clienttest] enhanced sword: {}", swordWhere);
+                });
                 shot(mc, "83_enhance_guarded");
                 check("a destroy roll with a destruction guard only damages the item (+5 -> +4)",
                         EnhanceFx.last.startsWith("DAMAGE:5:4:guarded"), EnhanceFx.last);
@@ -472,7 +491,7 @@ public final class ClientSelfTest {
                 List<net.minecraft.network.chat.Component> tip = held.isEmpty() ? List.of()
                         : net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, held);
                 check("an enhanced item shows +N in front of its name", !tip.isEmpty() && tip.get(0).getString().startsWith("+4 "),
-                        tip.isEmpty() ? "no sword" : tip.get(0).getString());
+                        tip.isEmpty() ? "no sword; server: " + swordWhere : tip.get(0).getString());
                 mc.player.closeContainer();
                 wait = 40;
             }
