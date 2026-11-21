@@ -109,10 +109,10 @@ public final class EnhanceFx {
         g.pose().pushPose();
         g.pose().translate(0, 0, 900);
         int cy = (int) (h * 0.28F);
-        g.fill(0, cy - 26, w, cy + 30, (Math.min(alpha, 150) << 24));
+        g.fill(0, cy - 34, w, cy + 30, (Math.min(alpha, 150) << 24));
         if (!icon.isEmpty()) {
             g.pose().pushPose();
-            g.pose().translate(w / 2F - 8, cy - 22, 0);
+            g.pose().translate(w / 2F - 8, cy - 31, 0);
             g.renderItem(icon, 0, 0);
             g.pose().popPose();
         }

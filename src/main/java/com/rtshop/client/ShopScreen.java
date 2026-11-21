@@ -544,6 +544,28 @@ public class ShopScreen extends Screen {
 
         drawTab(g, mx, my, tabBuyX, Component.translatable("rtshop.ui.buy"), !sellMode);
         drawTab(g, mx, my, tabSellX, Component.translatable("rtshop.ui.sell"), sellMode);
+        if (landShop()) {
+            int w = plotTabW();
+            int x = tabBuyX - 6 - w;
+            boolean hov = inside(mx, my, x, tabY, w, TAB_H);
+            bevel(g, x, tabY, w, TAB_H, hov ? C_GOLD : C_GOLD_DARK, C_GOLD, C_SHADOW);
+            Component label = Component.translatable("rtshop.plotui.open_tab");
+            g.drawString(this.font, label, x + (w - this.font.width(label)) / 2, tabY + 4, C_INK, false);
+        }
+    }
+
+    /** 토지 상인: 문서 외에 구획·성 안 토지를 보는 탭이 붙는다. */
+    private boolean landShop() {
+        return "land".equals(data.id) || data.entries.stream().anyMatch(e -> e.stack.getItem() instanceof com.rtshop.item.DeedItem);
+    }
+
+    private int plotTabW() {
+        return this.font.width(Component.translatable("rtshop.plotui.open_tab")) + 14;
+    }
+
+    /** 시험용. */
+    public void openPlotsForTest() {
+        com.rtshop.net.ShopNet.CHANNEL.sendToServer(new com.rtshop.net.PlotActionPacket(com.rtshop.land.PlotBrowser.OPEN, 0));
     }
 
     private void drawTab(GuiGraphics g, int mx, int my, int x, Component label, boolean selected) {
@@ -1145,6 +1167,11 @@ public class ShopScreen extends Screen {
             if (inside(mx, my, tabSellX, tabY, TAB_W, TAB_H)) {
                 playClick();
                 setMode(true);
+                return true;
+            }
+            if (landShop() && inside(mx, my, tabBuyX - 6 - plotTabW(), tabY, plotTabW(), TAB_H)) {
+                playClick();
+                openPlotsForTest();
                 return true;
             }
             int sbx = vx + vw + 1;

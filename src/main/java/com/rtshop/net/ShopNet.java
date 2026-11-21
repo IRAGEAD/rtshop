@@ -50,5 +50,8 @@ public final class ShopNet {
         CHANNEL.registerMessage(id++, GachaPacket.class, GachaPacket::encode, GachaPacket::decode, GachaPacket::handle);
         CHANNEL.registerMessage(id++, GachaActionPacket.class, GachaActionPacket::encode, GachaActionPacket::decode, GachaActionPacket::handle);
         CHANNEL.registerMessage(id++, EnhancePacket.class, EnhancePacket::encode, EnhancePacket::decode, EnhancePacket::handle);
+        CHANNEL.registerMessage(id++, PlotListPacket.class, PlotListPacket::encode, PlotListPacket::decode, PlotListPacket::handle);
+        CHANNEL.registerMessage(id++, PlotPreviewPacket.class, PlotPreviewPacket::encode, PlotPreviewPacket::decode, PlotPreviewPacket::handle);
+        CHANNEL.registerMessage(id++, PlotActionPacket.class, PlotActionPacket::encode, PlotActionPacket::decode, PlotActionPacket::handle);
     }
 }

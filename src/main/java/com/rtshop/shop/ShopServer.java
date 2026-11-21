@@ -125,6 +125,7 @@ public final class ShopServer {
         } catch (Throwable t) {
             RtShop.LOGGER.error("[rtshop] 예전 토지 높이를 늘리지 못했습니다", t);
         }
+        com.rtshop.land.CastlePlots.autoInstall(event.getServer());
         SelfTest.onServerStarted(event.getServer());
     }
 

@@ -63,12 +63,71 @@ public final class PlotCommands {
         return PlotManager.create(ctx.getSource().getPlayerOrException(), price, name) != null ? 1 : 0;
     }
 
+    private static int castleInstall(CommandContext<CommandSourceStack> ctx, boolean force) {
+        var server = ctx.getSource().getServer();
+        if (!force && !CastlePlots.worldMatches(server)) {
+            ctx.getSource().sendFailure(Component.translatable("rtshop.castle.not_amonos",
+                    CastlePlots.spawnNear(server) ? CastlePlots.signatureMatches(server) + "/" + CastlePlots.def().signature.size() : "-"));
+            return 0;
+        }
+        int[] r = CastlePlots.install(server);
+        ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.castle.installed", r[0], r[1], r[2]), true);
+        return 1;
+    }
+
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> d = event.getDispatcher();
         d.register(Commands.literal("rtshop").then(Commands.literal("plot")
                 // ---- 누구나
                 .then(Commands.literal("buy").executes(ctx -> PlotManager.buy(ctx.getSource().getPlayerOrException()) ? 1 : 0))
+                .then(Commands.literal("browse").executes(ctx -> {
+                    PlotBrowser.handle(ctx.getSource().getPlayerOrException(), PlotBrowser.OPEN, 0);
+                    return 1;
+                }))
+                // ---- 성 안 토지 (OP)
+                .then(Commands.literal("castle").requires(src -> src.hasPermission(2))
+                        .then(Commands.literal("status").executes(ctx -> {
+                            var server = ctx.getSource().getServer();
+                            LandData data = LandData.get(server);
+                            int n = 0, sold = 0;
+                            for (Land l : data.lands()) {
+                                if (l.castle()) {
+                                    n++;
+                                    if (!l.forSale()) sold++;
+                                }
+                            }
+                            boolean near = CastlePlots.spawnNear(server);
+                            String sig = near ? CastlePlots.signatureMatches(server) + "/" + CastlePlots.def().signature.size() : "-";
+                            Component msg = Component.translatable("rtshop.castle.status", data.castleInstalled, n, sold,
+                                    CastlePlots.def().tiles.size(), sig);
+                            ctx.getSource().sendSuccess(() -> msg, false);
+                            return 1;
+                        }))
+                        .then(Commands.literal("install").executes(ctx -> castleInstall(ctx, false))
+                                .then(Commands.literal("force").executes(ctx -> castleInstall(ctx, true))))
+                        .then(Commands.literal("remove").executes(ctx -> {
+                            int[] r = CastlePlots.uninstall(ctx.getSource().getServer());
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.castle.removed", r[0], r[1]), true);
+                            return 1;
+                        }))
+                        .then(Commands.literal("restore").then(Commands.argument("no", IntegerArgumentType.integer(1))
+                                .executes(ctx -> {
+                                    int no = IntegerArgumentType.getInteger(ctx, "no");
+                                    Land l = CastlePlots.landOf(LandData.get(ctx.getSource().getServer()), no);
+                                    boolean ok = false;
+                                    try {
+                                        ok = l != null && CastlePlots.restore(ctx.getSource().getServer(), l);
+                                    } catch (Exception e) {
+                                        RtShop.LOGGER.warn("[rtshop] castle restore failed", e);
+                                    }
+                                    if (ok) {
+                                        ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.castle.restored", l.name), true);
+                                    } else {
+                                        ctx.getSource().sendFailure(Component.translatable("rtshop.castle.no_backup", no));
+                                    }
+                                    return ok ? 1 : 0;
+                                }))))
                 .then(Commands.literal("info").executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                     Land l = PlotManager.plotAt(p);

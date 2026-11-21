@@ -117,6 +117,18 @@ public final class LandData extends SavedData {
         public long paid;
         /** 구획 묶음 이름. 비어 있지 않으면 일반 판매가 아니라 그 묶음 규칙으로 나눠 준다 (예: "starter" = 초보 농부 무료 농지). */
         public String group = "";
+        /** 성 안 토지 번호 (1부터, 0 = 성 안 토지 아님). */
+        public int castleNo = 0;
+        /** 성 안 토지의 건물 묶음 번호 (-1 = 빈 땅). 같은 묶음의 건물은 처음 팔릴 때 함께 철거된다. */
+        public int castleGroup = -1;
+        /** 성 안 토지의 지면 높이. */
+        public int castleGround = 0;
+        /** 성 안 토지를 이미 평지로 만들었는가. */
+        public boolean cleared;
+
+        public boolean castle() {
+            return castleNo > 0;
+        }
 
         public boolean forSale() {
             return plot && NO_OWNER.equals(owner);
@@ -140,6 +152,8 @@ public final class LandData extends SavedData {
     /** 초보 농지를 이미 받은 플레이어. */
     private final Set<UUID> starterGiven = new HashSet<>();
     private int nextId = 1;
+    /** 성 안 토지를 설치한 판 (0 = 아직 안 함, -1 = 이 세계에는 설치하지 않음). */
+    public int castleInstalled = 0;
 
     public static LandData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(LandData::load, LandData::new, NAME);
@@ -426,6 +440,10 @@ public final class LandData extends SavedData {
             l.price = lt.getLong("price");
             l.paid = lt.getLong("paid");
             l.group = lt.getString("group");
+            l.castleNo = lt.getInt("castleNo");
+            l.castleGroup = lt.contains("castleGroup") ? lt.getInt("castleGroup") : -1;
+            l.castleGround = lt.getInt("castleGround");
+            l.cleared = lt.getBoolean("cleared");
             ListTag ml = lt.getList("members", Tag.TAG_COMPOUND);
             for (int j = 0; j < ml.size(); j++) {
                 CompoundTag mt = ml.getCompound(j);
@@ -480,6 +498,7 @@ public final class LandData extends SavedData {
         for (int i = 0; i < sl.size(); i++) {
             d.starterGiven.add(sl.getCompound(i).getUUID("id"));
         }
+        d.castleInstalled = tag.getInt("castleInstalled");
         return d;
     }
 
@@ -499,6 +518,12 @@ public final class LandData extends SavedData {
                 lt.putLong("price", l.price);
                 lt.putLong("paid", l.paid);
                 lt.putString("group", l.group == null ? "" : l.group);
+                if (l.castleNo > 0) {
+                    lt.putInt("castleNo", l.castleNo);
+                    lt.putInt("castleGroup", l.castleGroup);
+                    lt.putInt("castleGround", l.castleGround);
+                    lt.putBoolean("cleared", l.cleared);
+                }
             }
             ListTag ml = new ListTag();
             for (Member m : l.members.values()) {
@@ -547,6 +572,7 @@ public final class LandData extends SavedData {
             sl.add(st);
         }
         tag.put("starterGiven", sl);
+        tag.putInt("castleInstalled", castleInstalled);
         return tag;
     }
 }

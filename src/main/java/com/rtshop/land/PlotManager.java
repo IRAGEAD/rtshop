@@ -841,29 +841,42 @@ public final class PlotManager {
 
     /** 서 있는 구획을 산다. */
     public static boolean buy(ServerPlayer p) {
-        LandData data = LandData.get(p.server);
         Land land = plotAt(p);
         if (land == null) {
             p.sendSystemMessage(Component.translatable("rtshop.plot.not_in_plot").withStyle(ChatFormatting.RED));
             return false;
         }
+        return buyLand(p, land);
+    }
+
+    /** 사려는 사람이 이 구획을 살 수 없는 이유 (살 수 있으면 null). */
+    public static Component cannotBuy(ServerPlayer p, Land land) {
+        LandData data = LandData.get(p.server);
+        if (land == null || !land.plot) {
+            return Component.translatable("rtshop.plot.not_in_plot");
+        }
         if (land.forSale() && !land.group.isEmpty()) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.starter_only", land.name).withStyle(ChatFormatting.RED));
-            return false;
+            return Component.translatable("rtshop.plot.starter_only", land.name);
         }
         if (!land.forSale()) {
-            p.sendSystemMessage(Component.translatable(land.owner.equals(p.getUUID()) ? "rtshop.plot.already_yours" : "rtshop.plot.sold",
-                    land.name, land.ownerName).withStyle(ChatFormatting.RED));
-            return false;
+            return Component.translatable(land.owner.equals(p.getUUID()) ? "rtshop.plot.already_yours" : "rtshop.plot.sold", land.name, land.ownerName);
         }
         LandConfig cfg = LandConfig.get();
         if (cfg.plotMaxPerPlayer > 0 && plotsOwned(data, p.getUUID()) >= cfg.plotMaxPerPlayer) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.limit", cfg.plotMaxPerPlayer).withStyle(ChatFormatting.RED));
-            return false;
+            return Component.translatable("rtshop.plot.limit", cfg.plotMaxPerPlayer);
         }
         if (Economy.wallet(p) < land.price) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.no_money", money(land.price), money(Economy.wallet(p)))
-                    .withStyle(ChatFormatting.RED));
+            return Component.translatable("rtshop.plot.no_money", money(land.price), money(Economy.wallet(p)));
+        }
+        return null;
+    }
+
+    /** 구획을 산다 (서 있는 곳이든 토지 상인 창이든). 성 안 토지면 그 자리를 평지로 만든다. */
+    public static boolean buyLand(ServerPlayer p, Land land) {
+        LandData data = LandData.get(p.server);
+        Component why = cannotBuy(p, land);
+        if (why != null) {
+            p.sendSystemMessage(why.copy().withStyle(ChatFormatting.RED));
             return false;
         }
         Economy.addWallet(p, -land.price);
@@ -876,6 +889,18 @@ public final class PlotManager {
         LAST_PLOT.remove(p.getUUID());
         LandManager.SHOW_BORDER.put(p.getUUID(), new long[]{land.id, p.level().getGameTime() + 300});
         p.sendSystemMessage(Component.translatable("rtshop.plot.bought", land.name, money(land.price)).withStyle(ChatFormatting.GREEN));
+        if (land.castle() && !land.cleared) {
+            int others = CastlePlots.clearSet(data, land).size() - 1;
+            int n = CastlePlots.prepare(p.server, land);
+            p.sendSystemMessage(Component.translatable(others > 0 ? "rtshop.castle.cleared_group" : "rtshop.castle.cleared", others)
+                    .withStyle(ChatFormatting.GOLD));
+            RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 평지로 만든 블록 {} (함께 바뀐 이웃 칸 {})",
+                    p.getGameProfile().getName(), land.name, n, others);
+        }
+        Claim c = plotClaim(land);
+        if (c != null) {
+            p.sendSystemMessage(Component.translatable("rtshop.plot.where", (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2).withStyle(ChatFormatting.GRAY));
+        }
         p.sendSystemMessage(Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
         return true;
     }

@@ -70,6 +70,14 @@ public final class LandConfig {
     /** 그 직업을 그만두면 초보 농지를 회수해 다른 초보 농부에게 돌린다. */
     public boolean starterPlotReturnWhenJobLost = true;
 
+    // ---- 성 안 토지 (3.13)
+    /** 아모노스 맵이면 성 안 토지를 자동으로 등록한다. */
+    public boolean castlePlotsAuto = true;
+    /** 성 안 토지 16×16 한 칸(256칸) 가격. 길·성벽이 빠져 작은 토지는 넓이에 비례해 싸진다. */
+    public long castlePlotPrice = 50000;
+    /** 토지 상인 창에서 구획을 살 때 상인 가까이(블록) 있어야 한다. */
+    public int plotMerchantRange = 12;
+
     public LandConfig() {
         rangedBlocks.put("better_farming_plus:farming_crate", 5);
     }
@@ -146,6 +154,13 @@ public final class LandConfig {
                 if (o.has("starterPlotJob")) c.starterPlotJob = o.get("starterPlotJob").getAsString().trim();
                 if (o.has("starterPlotGroup")) c.starterPlotGroup = o.get("starterPlotGroup").getAsString().trim();
                 if (o.has("starterPlotReturnWhenJobLost")) c.starterPlotReturnWhenJobLost = o.get("starterPlotReturnWhenJobLost").getAsBoolean();
+                if (o.has("castlePlotsAuto")) c.castlePlotsAuto = o.get("castlePlotsAuto").getAsBoolean();
+                if (o.has("castlePlotPrice")) c.castlePlotPrice = Math.max(0, o.get("castlePlotPrice").getAsLong());
+                if (o.has("plotMerchantRange")) c.plotMerchantRange = Math.max(2, o.get("plotMerchantRange").getAsInt());
+                if (!o.has("castlePlotPrice")) {
+                    addCastleKeys(o, c);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                }
                 if (!o.has("starterPlotJob")) {
                     // 3.11 이전 파일: 값은 그대로 두고 초보 농지 설정만 덧붙인다
                     if (!o.has("plotPricePerBlock")) {
@@ -181,6 +196,7 @@ public final class LandConfig {
                 o.add("rangedBlocks", ranged);
                 addPlotKeys(o, c);
                 addStarterKeys(o, c);
+                addCastleKeys(o, c);
                 Files.createDirectories(p.getParent());
                 Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
             }
@@ -188,6 +204,18 @@ public final class LandConfig {
             RtShop.LOGGER.error("[rtshop] land.json 을 읽지 못해 기본값을 사용합니다.", ex);
         }
         return c;
+    }
+
+    private static void addCastleKeys(JsonObject o, LandConfig c) {
+        JsonArray help = new JsonArray();
+        help.add("성 안 토지: 아모노스 맵(MedievalCity-Amonos)이면 성벽 안쪽 바깥 둘레를 16×16 토지 34칸으로 나눠 판매합니다");
+        help.add("토지 상인 창의 [구획 토지] 에서 지도로 미리 보고 삽니다. 사면 그 자리의 건물이 철거되고 평지(풀밭)가 됩니다 (길·남의 토지는 그대로)");
+        help.add("castlePlotPrice: 16×16 한 칸 가격 (길이 빠져 작은 칸은 넓이만큼 싸짐) · castlePlotsAuto: false 면 자동 등록 안 함 (/rtshop plot castle install)");
+        help.add("plotMerchantRange: 토지 상인 창에서 구획을 살 때 상인과의 최대 거리");
+        o.add("_성안토지_설명", help);
+        o.addProperty("castlePlotsAuto", c.castlePlotsAuto);
+        o.addProperty("castlePlotPrice", c.castlePlotPrice);
+        o.addProperty("plotMerchantRange", c.plotMerchantRange);
     }
 
     private static void addStarterKeys(JsonObject o, LandConfig c) {

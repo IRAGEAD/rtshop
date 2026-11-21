@@ -86,6 +86,10 @@ public final class ClientSelfTest {
     private static final int EN_STEPS = 6;
     private static final int ENH_STEPS = 9;
     private static final int ENH_END = NPC_END + ENH_STEPS;
+    private static final int PLOT_STEPS = 8;
+    private static final int PLOT_END = ENH_END + PLOT_STEPS;
+    private static volatile int plotNpc = -1;
+    private static volatile int boughtLot = -1;
     private static volatile BlockPos anvilPos = null;
 
     @SubscribeEvent
@@ -448,6 +452,76 @@ public final class ClientSelfTest {
                 BlockPos at = anvilPos;
                 onServer(mc, sp -> {
                     if (at != null) sp.serverLevel().setBlockAndUpdate(at, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                });
+                wait = 10;
+            }
+        }
+    }
+
+
+    /** 토지 상인의 구획 토지 창: 성 지도, 미리보기(지금/구매 후), 성 안 토지 구매, 초보 농지 탭. */
+    private static void plotStep(Minecraft mc, int k) {
+        PlotBrowserScreen ps = mc.screen instanceof PlotBrowserScreen s ? s : null;
+        switch (k) {
+            case 0 -> {
+                mc.setScreen(null);
+                onServer(mc, sp -> {
+                    com.rtshop.land.CastlePlots.install(sp.server);
+                    net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
+                    var v = ShopServer.spawnNpc(sp.serverLevel(), sp.position().add(look.x * 2, 0, look.z * 2), sp.getYRot() + 180, "land");
+                    plotNpc = v == null ? -1 : v.getId();
+                    com.rtshop.economy.Economy.setWallet(sp, 500000);
+                    com.rtshop.land.PlotBrowser.handle(sp, com.rtshop.land.PlotBrowser.OPEN, 0);
+                });
+                wait = 30;
+            }
+            case 1 -> {
+                check("the land merchant's lot window opens", ps != null, mc.screen);
+                if (ps != null) {
+                    check("castle lots are listed (34) and the window fits", ps.countForTest("castle") == 34 && ps.fitsForTest(), ps.countForTest("castle"));
+                    shot(mc, "84_plots_castle_map");
+                    ps.showForTest(0, 0, 3);
+                }
+                wait = 30;
+            }
+            case 2 -> {
+                shot(mc, "85_plots_castle_selected");
+                if (ps != null) ps.showForTest(0, 1, 3);
+                wait = 30;
+            }
+            case 3 -> {
+                check("the preview map of the chosen lot arrives", ps != null && ps.previewReadyForTest());
+                shot(mc, "86_plots_preview_now");
+                if (ps != null) ps.showForTest(0, 2, 3);
+                wait = 5;
+            }
+            case 4 -> {
+                shot(mc, "87_plots_preview_after");
+                if (ps != null && ps.selectedForTest() != null) {
+                    boughtLot = ps.selectedForTest().id();
+                    ps.buyForTest(boughtLot);
+                }
+                wait = 60;
+            }
+            case 5 -> {
+                var e = ps == null ? null : ps.selectedForTest();
+                check("buying a castle lot from the window makes it yours", e != null && e.id() == boughtLot && "mine".equals(e.status()),
+                        e == null ? "none" : e.status());
+                shot(mc, "88_plots_bought");
+                if (ps != null) ps.showForTest(2, 1, 0);
+                wait = 10;
+            }
+            case 6 -> {
+                shot(mc, "89_plots_starter_tab");
+                if (ps != null) ps.showForTest(1, 1, 0);
+                wait = 10;
+            }
+            default -> {
+                mc.setScreen(null);
+                int id = plotNpc;
+                onServer(mc, sp -> {
+                    var e = sp.serverLevel().getEntity(id);
+                    if (e != null) e.discard();
                 });
                 wait = 10;
             }
@@ -1383,17 +1457,21 @@ public final class ClientSelfTest {
                     enhanceStep(mc, step - NPC_END - 1);
                     return;
                 }
-                if (step > ENH_END && step <= ENH_END + EN_STEPS) {
-                    englishStep(mc, step - ENH_END - 1);
+                if (step > ENH_END && step <= PLOT_END) {
+                    plotStep(mc, step - ENH_END - 1);
                     return;
                 }
-                if (step == ENH_END + EN_STEPS + 1) {
+                if (step > PLOT_END && step <= PLOT_END + EN_STEPS) {
+                    englishStep(mc, step - PLOT_END - 1);
+                    return;
+                }
+                if (step == PLOT_END + EN_STEPS + 1) {
                     check("no server-side error happened", serverError == null, serverError);
                     finish(mc);
                     return;
                 }
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > ENH_END + EN_STEPS + 40) {
+                if (step > PLOT_END + EN_STEPS + 40) {
                     done = true;
                     mc.stop();
                 }
