@@ -847,6 +847,10 @@ public final class PlotManager {
             p.sendSystemMessage(Component.translatable("rtshop.plot.not_in_plot").withStyle(ChatFormatting.RED));
             return false;
         }
+        if (land.forSale() && !land.group.isEmpty()) {
+            p.sendSystemMessage(Component.translatable("rtshop.plot.starter_only", land.name).withStyle(ChatFormatting.RED));
+            return false;
+        }
         if (!land.forSale()) {
             p.sendSystemMessage(Component.translatable(land.owner.equals(p.getUUID()) ? "rtshop.plot.already_yours" : "rtshop.plot.sold",
                     land.name, land.ownerName).withStyle(ChatFormatting.RED));
@@ -878,6 +882,11 @@ public final class PlotManager {
 
     /** 주인이 구획을 반환한다: 구매가의 일부를 돌려받고 구획은 다시 판매 중이 된다. */
     public static void giveBack(ServerPlayer p, Land land) {
+        if (!land.group.isEmpty()) {
+            resetToSale(LandData.get(p.server), land);
+            p.sendSystemMessage(Component.translatable("rtshop.plot.starter_returned", land.name).withStyle(ChatFormatting.YELLOW));
+            return;
+        }
         long refund = land.paid * LandConfig.get().plotRefundPercent / 100;
         resetToSale(LandData.get(p.server), land);
         if (refund > 0) {
@@ -921,6 +930,15 @@ public final class PlotManager {
         }
         LandData data = LandData.get(p.server);
         int made = 0, skipped = 0, dropped = 0;
+        if (root.has("replaces")) {
+            // 나눠 다시 만든 밭: 예전 통짜 구획이 아직 판매 중(주인 없음)이면 지우고 새 조각으로 바꾼다
+            for (JsonElement r : root.getAsJsonArray("replaces")) {
+                Land old = findByName(data, r.getAsString());
+                if (old != null && old.forSale()) {
+                    data.removeLand(old);
+                }
+            }
+        }
         for (JsonElement e : root.getAsJsonArray("plots")) {
             JsonObject o = e.getAsJsonObject();
             String name = o.has("name") ? o.get("name").getAsString() : "";
@@ -949,6 +967,9 @@ public final class PlotManager {
             Land land = data.createPlot(name, price >= 0 ? price : c.area() * LandConfig.get().plotPricePerBlock);
             if (name.isBlank()) {
                 land.name = defaultName(land.id);
+            }
+            if (o.has("group")) {
+                land.group = o.get("group").getAsString().trim();
             }
             data.addClaim(land, c);
             made++;
@@ -1001,6 +1022,172 @@ public final class PlotManager {
         return c;
     }
 
+    // ------------------------------------------------------------------ 나누기
+
+    /**
+     * 칸 묶음을 size×size 격자로 자른다. 격자 칸 안에서 떨어져 있는 조각은 따로 세고,
+     * 너무 작은 조각(격자 넓이의 40% 미만)은 가장 길게 맞닿은 이웃 조각에 붙인다. 북쪽(작은 z)부터 순서대로 돌려준다.
+     */
+    public static List<LongOpenHashSet> splitCells(LongOpenHashSet cells, int size) {
+        Map<Long, Integer> piece = new HashMap<>();
+        if (cells.isEmpty()) {
+            return new ArrayList<>();
+        }
+        int x0 = Integer.MAX_VALUE, z0 = Integer.MAX_VALUE;
+        LongIterator it = cells.iterator();
+        while (it.hasNext()) {
+            long k = it.nextLong();
+            x0 = Math.min(x0, kx(k));
+            z0 = Math.min(z0, kz(k));
+        }
+        long[] sorted = cells.toLongArray();
+        java.util.Arrays.sort(sorted);
+        int next = 0;
+        for (long start : sorted) {
+            if (piece.containsKey(start)) {
+                continue;
+            }
+            int tx = Math.floorDiv(kx(start) - x0, size), tz = Math.floorDiv(kz(start) - z0, size);
+            ArrayDeque<Long> st = new ArrayDeque<>();
+            st.push(start);
+            piece.put(start, next);
+            while (!st.isEmpty()) {
+                long c = st.pop();
+                int x = kx(c), z = kz(c);
+                long[] ns = {key(x + 1, z), key(x - 1, z), key(x, z + 1), key(x, z - 1)};
+                for (long n : ns) {
+                    if (cells.contains(n) && !piece.containsKey(n)
+                            && Math.floorDiv(kx(n) - x0, size) == tx && Math.floorDiv(kz(n) - z0, size) == tz) {
+                        piece.put(n, next);
+                        st.push(n);
+                    }
+                }
+            }
+            next++;
+        }
+        int min = Math.max(1, size * size * 2 / 5);
+        while (true) {
+            Map<Integer, Integer> sizes = new HashMap<>();
+            for (int v : piece.values()) {
+                sizes.merge(v, 1, Integer::sum);
+            }
+            int small = -1;
+            for (Map.Entry<Integer, Integer> e : sizes.entrySet()) {
+                if (e.getValue() < min && (small < 0 || e.getValue() < sizes.get(small))) {
+                    small = e.getKey();
+                }
+            }
+            if (small < 0 || sizes.size() <= 1) {
+                break;
+            }
+            Map<Integer, Integer> border = new HashMap<>();
+            for (Map.Entry<Long, Integer> e : piece.entrySet()) {
+                if (e.getValue() != small) {
+                    continue;
+                }
+                int x = kx(e.getKey()), z = kz(e.getKey());
+                long[] ns = {key(x + 1, z), key(x - 1, z), key(x, z + 1), key(x, z - 1)};
+                for (long n : ns) {
+                    Integer o = piece.get(n);
+                    if (o != null && o != small) {
+                        border.merge(o, 1, Integer::sum);
+                    }
+                }
+            }
+            if (border.isEmpty()) {
+                break; // 떨어져 있는 작은 조각: 그대로 둔다
+            }
+            int target = -1;
+            for (Map.Entry<Integer, Integer> e : border.entrySet()) {
+                if (target < 0 || e.getValue() > border.get(target)
+                        || (e.getValue().equals(border.get(target)) && sizes.get(e.getKey()) < sizes.get(target))) {
+                    target = e.getKey();
+                }
+            }
+            final int from = small, to = target;
+            piece.replaceAll((k, v) -> v == from ? to : v);
+        }
+        Map<Integer, LongOpenHashSet> groups = new HashMap<>();
+        for (Map.Entry<Long, Integer> e : piece.entrySet()) {
+            groups.computeIfAbsent(e.getValue(), k -> new LongOpenHashSet()).add((long) e.getKey());
+        }
+        List<LongOpenHashSet> out = new ArrayList<>(groups.values());
+        out.sort((a, b) -> {
+            double[] ca = centre(a), cb = centre(b);
+            int ra = (int) Math.floor((ca[1] - z0) / size), rb = (int) Math.floor((cb[1] - z0) / size);
+            return ra != rb ? Integer.compare(ra, rb) : Double.compare(ca[0], cb[0]);
+        });
+        return out;
+    }
+
+    private static double[] centre(LongOpenHashSet cells) {
+        double sx = 0, sz = 0;
+        LongIterator it = cells.iterator();
+        while (it.hasNext()) {
+            long k = it.nextLong();
+            sx += kx(k);
+            sz += kz(k);
+        }
+        return new double[]{sx / cells.size(), sz / cells.size()};
+    }
+
+    /** 판매 중인 구획을 size×size 쯤의 여러 구획으로 나눈다. 가격은 넓이에 비례해 나누고 묶음 이름은 그대로 잇는다. */
+    public static List<Land> split(LandData data, Land land, int size) {
+        Claim c = plotClaim(land);
+        List<Land> made = new ArrayList<>();
+        if (c == null || !land.forSale()) {
+            return made;
+        }
+        LongOpenHashSet cells = new LongOpenHashSet();
+        LandData.forEachColumn(c, (x, z) -> cells.add(key(x, z)));
+        List<LongOpenHashSet> parts = splitCells(cells, size);
+        if (parts.size() <= 1) {
+            return made;
+        }
+        int total = cells.size();
+        String base = land.name;
+        long price = land.price;
+        String group = land.group;
+        data.removeLand(land);
+        int i = 1;
+        for (LongOpenHashSet part : parts) {
+            Claim pc = shaped(c.dim, part, c.y0, c.y1);
+            Land l = data.createPlot(base + "-" + i, price * part.size() / total);
+            l.group = group;
+            data.addClaim(l, pc);
+            made.add(l);
+            i++;
+        }
+        return made;
+    }
+
+    /** 칸 집합으로 모양 구역을 만든다 (겹침 검사 없음: 원래 한 구획이던 칸만 넣을 것). */
+    static Claim shaped(String dim, LongOpenHashSet cells, int y0, int y1) {
+        Claim c = new Claim();
+        c.dim = dim;
+        c.type = "plot";
+        c.x0 = c.z0 = Integer.MAX_VALUE;
+        c.x1 = c.z1 = Integer.MIN_VALUE;
+        LongIterator it = cells.iterator();
+        while (it.hasNext()) {
+            long k = it.nextLong();
+            c.x0 = Math.min(c.x0, kx(k));
+            c.x1 = Math.max(c.x1, kx(k));
+            c.z0 = Math.min(c.z0, kz(k));
+            c.z1 = Math.max(c.z1, kz(k));
+        }
+        int w = c.width();
+        c.mask = new BitSet(w * (c.z1 - c.z0 + 1));
+        it = cells.iterator();
+        while (it.hasNext()) {
+            long k = it.nextLong();
+            c.mask.set((kz(k) - c.z0) * w + (kx(k) - c.x0));
+        }
+        c.y0 = y0;
+        c.y1 = y1;
+        return c;
+    }
+
     public static Land findByName(LandData data, String name) {
         for (Land l : data.lands()) {
             if (l.plot && l.name.equals(name)) {
@@ -1050,7 +1237,7 @@ public final class PlotManager {
             return true;
         }
         Land here = plotAt(p);
-        if (here == null || !here.forSale()) {
+        if (here == null || !here.forSale() || !here.group.isEmpty()) {
             LAST_PLOT.remove(p.getUUID());
             return false;
         }

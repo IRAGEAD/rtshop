@@ -165,7 +165,9 @@ public final class PlotCommands {
                         }
                         n++;
                         Claim c = PlotManager.plotClaim(l);
-                        MutableComponent line = Component.translatable(l.forSale() ? "rtshop.plot.list_sale" : "rtshop.plot.list_owned",
+                        MutableComponent line = Component.translatable(!l.group.isEmpty()
+                                        ? (l.forSale() ? "rtshop.plot.list_starter_free" : "rtshop.plot.list_starter_owned")
+                                        : l.forSale() ? "rtshop.plot.list_sale" : "rtshop.plot.list_owned",
                                 l.id, l.name, c == null ? 0 : c.area(), PlotManager.money(l.price), l.ownerName);
                         line.withStyle(Style.EMPTY.withColor(l.forSale() ? ChatFormatting.WHITE : ChatFormatting.AQUA)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rtshop plot tp " + l.id)));
@@ -283,10 +285,62 @@ public final class PlotCommands {
                                     ctx.getSource().sendSystemMessage(Component.translatable("rtshop.plot.given", l.id, l.name, l.ownerName));
                                     return 1;
                                 }))))
+                .then(Commands.literal("split").requires(s -> s.hasPermission(2))
+                        .then(Commands.argument("id", IntegerArgumentType.integer(1)).suggests(PLOT_IDS)
+                                .executes(ctx -> split(ctx, 16))
+                                .then(Commands.argument("size", IntegerArgumentType.integer(4, 64))
+                                        .executes(ctx -> split(ctx, IntegerArgumentType.getInteger(ctx, "size"))))))
+                .then(Commands.literal("starter").requires(s -> s.hasPermission(2))
+                        .then(Commands.argument("id", IntegerArgumentType.integer(1)).suggests(PLOT_IDS)
+                                .then(Commands.literal("on").executes(ctx -> starter(ctx, true)))
+                                .then(Commands.literal("off").executes(ctx -> starter(ctx, false))))
+                        .then(Commands.literal("reset").then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
+                            ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                            LandData.get(ctx.getSource().getServer()).setStarterGiven(t.getUUID(), false);
+                            ctx.getSource().sendSystemMessage(Component.translatable("rtshop.plot.starter_reset", t.getGameProfile().getName()));
+                            StarterPlots.check(t);
+                            return 1;
+                        }))))
                 .then(Commands.literal("import").requires(s -> s.hasPermission(2))
                         .executes(ctx -> importCmd(ctx, "plots_import.json"))
                         .then(Commands.argument("file", StringArgumentType.greedyString())
                                 .executes(ctx -> importCmd(ctx, StringArgumentType.getString(ctx, "file")))))));
+    }
+
+    private static int split(CommandContext<CommandSourceStack> ctx, int size) {
+        Land l = plot(ctx);
+        if (l == null) {
+            return 0;
+        }
+        if (!l.forSale()) {
+            ctx.getSource().sendFailure(Component.translatable("rtshop.plot.split_owned", l.name));
+            return 0;
+        }
+        String name = l.name;
+        List<Land> parts = PlotManager.split(LandData.get(ctx.getSource().getServer()), l, size);
+        if (parts.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable("rtshop.plot.split_small", name, size));
+            return 0;
+        }
+        StringBuilder ids = new StringBuilder();
+        for (Land p : parts) {
+            Claim c = PlotManager.plotClaim(p);
+            ids.append(ids.length() == 0 ? "" : ", ").append('#').append(p.id).append('(').append(c == null ? 0 : c.area()).append(')');
+        }
+        ctx.getSource().sendSystemMessage(Component.translatable("rtshop.plot.split_done", name, parts.size(), ids.toString())
+                .withStyle(ChatFormatting.GREEN));
+        return parts.size();
+    }
+
+    private static int starter(CommandContext<CommandSourceStack> ctx, boolean on) {
+        Land l = plot(ctx);
+        if (l == null) {
+            return 0;
+        }
+        l.group = on ? LandConfig.get().starterPlotGroup : "";
+        LandData.get(ctx.getSource().getServer()).touch();
+        ctx.getSource().sendSystemMessage(Component.translatable(on ? "rtshop.plot.starter_on" : "rtshop.plot.starter_off", l.id, l.name));
+        return 1;
     }
 
     private static int importCmd(CommandContext<CommandSourceStack> ctx, String file) throws CommandSyntaxException {

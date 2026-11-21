@@ -1690,6 +1690,90 @@ public final class SelfTest {
                 && data.landAt(dim, new BlockPos(ox + 25, y, oz + 20)) == null);
 
         data.removeLand(plot);
+
+        // 나누기 (3.11): 같은 밭을 8칸 격자로 나눈다
+        LandData.Claim whole = PlotManager.buildClaim(level, expected, -1, dropped);
+        LandData.Land big = data.createPlot("split field", 4840);
+        data.addClaim(big, whole);
+        List<LandData.Land> parts = PlotManager.split(data, big, 8);
+        int partArea = 0;
+        boolean allSale = true;
+        for (LandData.Land l : parts) {
+            partArea += l.claims.get(0).area();
+            allSale &= l.forSale();
+        }
+        check("splitting a plot makes several plots that cover exactly the same blocks",
+                parts.size() > 3 && partArea == expected.size() && allSale && data.land(big.id) == null,
+                parts.size() + " parts, " + partArea + " blocks");
+        boolean noTiny = true;
+        for (LandData.Land l : parts) {
+            noTiny &= l.claims.get(0).area() >= 8 * 8 * 2 / 5;
+        }
+        check("tiny leftover pieces are joined to a neighbour", noTiny);
+
+        // 초보 농지: 농부가 되면 묶음의 빈 구획 하나를 무료로 받는다
+        String group = LandConfig.get().starterPlotGroup;
+        for (LandData.Land l : parts) {
+            l.group = group;
+        }
+        data.setStarterGiven(b.getUUID(), false);
+        com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, "");
+        Economy.setWallet(b, 0);
+        com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, LandConfig.get().starterPlotJob);
+        LandData.Land got1 = null;
+        int owned = 0;
+        for (LandData.Land l : parts) {
+            if (l.owner.equals(b.getUUID())) {
+                got1 = l;
+                owned++;
+            }
+        }
+        check("a new farmer gets one starter field for free", owned == 1 && got1.paid == 0 && Economy.wallet(b) == 0
+                && data.starterGiven(b.getUUID()), owned);
+        com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, "");
+        com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, LandConfig.get().starterPlotJob);
+        int owned2 = 0;
+        for (LandData.Land l : parts) {
+            if (l.owner.equals(b.getUUID())) {
+                owned2++;
+            }
+        }
+        check("only one starter field per player, ever", owned2 == 1);
+        LandData.Land other = null;
+        for (LandData.Land l : parts) {
+            if (l.forSale()) {
+                other = l;
+                break;
+            }
+        }
+        if (other != null) {
+            LandData.Claim oc = other.claims.get(0);
+            int sx = oc.x0, sz = oc.z0;
+            outer:
+            for (int zz = oc.z0; zz <= oc.z1; zz++) {
+                for (int xx = oc.x0; xx <= oc.x1; xx++) {
+                    if (oc.hasColumn(xx, zz)) {
+                        sx = xx;
+                        sz = zz;
+                        break outer;
+                    }
+                }
+            }
+            a.setPos(sx + 0.5, y + 1, sz + 0.5);
+            Economy.setWallet(a, 1_000_000);
+            check("starter fields cannot be bought", !PlotManager.buy(a) && other.forSale() && Economy.wallet(a) == 1_000_000);
+        }
+        if (got1 != null) {
+            LandManager.handleAction(b, got1.id, LandManager.ACT_ABANDON, "", 0);
+            check("returning a starter field gives no Gold and puts it back for the next farmer",
+                    got1.forSale() && Economy.wallet(b) == 0 && group.equals(got1.group));
+        }
+        for (LandData.Land l : parts) {
+            data.removeLand(l);
+        }
+        data.setStarterGiven(b.getUUID(), false);
+        com.rtshop.job.Jobs.force(b, com.rtshop.job.JobConfig.LIFE, "");
+        Economy.setWallet(a, 0);
         Economy.setWallet(b, 0);
         for (int dz = 0; dz < size; dz++) {
             for (int dx = 0; dx < size; dx++) {

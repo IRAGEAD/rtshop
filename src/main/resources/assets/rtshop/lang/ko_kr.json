@@ -699,5 +699,22 @@
   "rtshop.gacha.fx.skip": "클릭해서 건너뛰기",
   "rtshop.msg.villager_broken": "이 주민의 거래 목록을 만들 수 없습니다 (다른 모드 오류).",
   "rtshop.gachaedit.ticket_cost": "티켓 교환",
-  "rtshop.gachaedit.top_mods": "영웅·전설 무기 모드"
+  "rtshop.gachaedit.top_mods": "영웅·전설 무기 모드",
+  "rtshop.plot.starter_only": "'%s' 은(는) 초보 농부에게 무료로 주는 농지라 살 수 없습니다.",
+  "rtshop.plot.denied_starter": "초보 농부용 농지 '%s' 입니다. 농부 직업을 얻으면 빈 초보 농지 하나를 무료로 받습니다.",
+  "rtshop.plot.starter_returned": "초보 농지 '%s' 을(를) 반환했습니다. 다음 초보 농부에게 돌아갑니다.",
+  "rtshop.plot.starter_abandon_tip": "무료로 받은 초보 농지를 반환합니다. 돈은 돌려받지 않고, 초보 농지는 한 사람당 한 번만 받을 수 있어 다시 받을 수 없습니다.",
+  "rtshop.plot.starter_given": "농부가 된 것을 축하합니다! 초보 농지 '%s' (%s칸) 을(를) 무료로 받았습니다. 위치: X %s, Z %s",
+  "rtshop.plot.starter_hint": "밭 안에서 /rtshop plot info 를 입력하면 경계가 보입니다. 권한은 /rtshop land 에서 설정합니다.",
+  "rtshop.plot.starter_none": "지금은 비어 있는 초보 농지가 없습니다. 자리가 나면 다음 접속 때 자동으로 받습니다.",
+  "rtshop.plot.starter_none_op": "[OP] %s 님이 농부가 됐지만 빈 초보 농지가 없습니다. /rtshop plot split 이나 /rtshop plot starter <번호> on 으로 더 만들어 주세요.",
+  "rtshop.plot.starter_revoked": "농부 직업을 그만둬서 초보 농지 '%s' 이(가) 회수되었습니다.",
+  "rtshop.plot.starter_reset": "%s 님이 초보 농지를 다시 받을 수 있게 했습니다.",
+  "rtshop.plot.starter_on": "구획 #%s '%s' 을(를) 초보 농지로 정했습니다 (판매 안 함, 농부가 되면 무료 지급).",
+  "rtshop.plot.starter_off": "구획 #%s '%s' 을(를) 일반 판매 구획으로 돌렸습니다.",
+  "rtshop.plot.split_owned": "'%s' 은(는) 주인이 있어 나눌 수 없습니다. 먼저 /rtshop plot reset 으로 비우세요.",
+  "rtshop.plot.split_small": "'%s' 은(는) %s칸 격자로 나눌 만큼 크지 않습니다.",
+  "rtshop.plot.split_done": "'%s' 을(를) %s개로 나눴습니다: %s",
+  "rtshop.plot.list_starter_free": "#%s %s · %s칸 · 초보 농지 · 비어 있음 (눌러서 이동)",
+  "rtshop.plot.list_starter_owned": "#%1$s %2$s · %3$s칸 · 초보 농지 · 주인 %5$s (눌러서 이동)"
 }

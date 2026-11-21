@@ -434,7 +434,7 @@ public class LandScreen extends Screen {
         ab = Ui.clip(this.font, ab, 106);
         g.drawString(this.font, ab, px + pw - 6 - 112 + (112 - this.font.width(ab)) / 2, bottomY() + 4, Ui.C_CREAM, false);
         if (hovAb) {
-            tip = v.plotRefund >= 0
+            tip = v.starter ? Component.translatable("rtshop.plot.starter_abandon_tip") : v.plotRefund >= 0
                     ? Component.translatable("rtshop.plot.abandon_tip", String.format("%,d", v.plotRefund))
                     : Component.translatable("rtshop.land.abandon_tip", v.claims.size());
         }

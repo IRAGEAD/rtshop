@@ -115,6 +115,8 @@ public final class LandData extends SavedData {
         public long price;
         /** 지금 주인이 구매할 때 낸 금액 (반환 시 환불 기준). */
         public long paid;
+        /** 구획 묶음 이름. 비어 있지 않으면 일반 판매가 아니라 그 묶음 규칙으로 나눠 준다 (예: "starter" = 초보 농부 무료 농지). */
+        public String group = "";
 
         public boolean forSale() {
             return plot && NO_OWNER.equals(owner);
@@ -135,6 +137,8 @@ public final class LandData extends SavedData {
     private final Map<String, Map<Long, List<Claim>>> index = new HashMap<>();
     private final Map<String, Pin> pins = new HashMap<>();
     private final Set<UUID> firstDeed = new HashSet<>();
+    /** 초보 농지를 이미 받은 플레이어. */
+    private final Set<UUID> starterGiven = new HashSet<>();
     private int nextId = 1;
 
     public static LandData get(MinecraftServer server) {
@@ -388,6 +392,16 @@ public final class LandData extends SavedData {
         }
     }
 
+    public boolean starterGiven(UUID id) {
+        return starterGiven.contains(id);
+    }
+
+    public void setStarterGiven(UUID id, boolean given) {
+        if (given ? starterGiven.add(id) : starterGiven.remove(id)) {
+            setDirty();
+        }
+    }
+
     public void clearFirstDeed(UUID id) {
         if (firstDeed.remove(id)) {
             setDirty();
@@ -411,6 +425,7 @@ public final class LandData extends SavedData {
             l.plot = lt.getBoolean("plot");
             l.price = lt.getLong("price");
             l.paid = lt.getLong("paid");
+            l.group = lt.getString("group");
             ListTag ml = lt.getList("members", Tag.TAG_COMPOUND);
             for (int j = 0; j < ml.size(); j++) {
                 CompoundTag mt = ml.getCompound(j);
@@ -461,6 +476,10 @@ public final class LandData extends SavedData {
         for (int i = 0; i < fl.size(); i++) {
             d.firstDeed.add(fl.getCompound(i).getUUID("id"));
         }
+        ListTag sl = tag.getList("starterGiven", Tag.TAG_COMPOUND);
+        for (int i = 0; i < sl.size(); i++) {
+            d.starterGiven.add(sl.getCompound(i).getUUID("id"));
+        }
         return d;
     }
 
@@ -479,6 +498,7 @@ public final class LandData extends SavedData {
                 lt.putBoolean("plot", true);
                 lt.putLong("price", l.price);
                 lt.putLong("paid", l.paid);
+                lt.putString("group", l.group == null ? "" : l.group);
             }
             ListTag ml = new ListTag();
             for (Member m : l.members.values()) {
@@ -520,6 +540,13 @@ public final class LandData extends SavedData {
             fl.add(ft);
         }
         tag.put("firstDeed", fl);
+        ListTag sl = new ListTag();
+        for (UUID id : starterGiven) {
+            CompoundTag st = new CompoundTag();
+            st.putUUID("id", id);
+            sl.add(st);
+        }
+        tag.put("starterGiven", sl);
         return tag;
     }
 }
