@@ -950,8 +950,8 @@ public final class ShopLoader {
                             continue; // 원재료
                         }
                         Price ip = out.prices.get(in.item);
-                        if (ip == null || ip.fixedSell || !ip.buyableSomewhere) {
-                            continue;
+                        if (ip == null || ip.fixedSell || !ip.buyableSomewhere || ip.rawStock) {
+                            continue; // 상점이 원재료(농산물·고기 등)로 파는 것은 값을 바꾸지 않는다
                         }
                         double outN = RecipeSolver.outputCount(route.recipe(), id, scan.env);
                         int newPrice = (int) Math.ceil(n.fullMax() * outN / in.count - 1.0e-9);
