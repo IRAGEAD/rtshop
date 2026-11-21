@@ -24,6 +24,9 @@ public final class EnhanceClient {
     private EnhanceClient() {
     }
 
+    private static final java.util.Map<String, String> DEFAULT_NAMES = java.util.Map.of(
+            "gem_common", "흔한 보석", "gem_fine", "고운 보석", "gem_nether", "네더 보석", "gem_rare", "희귀 보석");
+
     public static ChatFormatting color(int lv) {
         if (lv >= 10) return ChatFormatting.LIGHT_PURPLE;
         if (lv >= 7) return ChatFormatting.GOLD;
@@ -70,7 +73,10 @@ public final class EnhanceClient {
     public static Component materialName(EnhanceConfig cfg, Enhance.Need n) {
         if (n.material.id.startsWith("#")) {
             String g = n.material.id.substring(1);
-            return Component.translatable("rtshop.enhance.group", cfg.groupNames.getOrDefault(g, g));
+            String name = cfg.groupNames.getOrDefault(g, g);
+            Component label = cfg.groupNames.get(g) != null && cfg.groupNames.get(g).equals(DEFAULT_NAMES.get(g))
+                    ? Component.translatableWithFallback("rtshop.enhance.group_" + g, name) : Component.literal(name);
+            return Component.translatable("rtshop.enhance.group", label);
         }
         return n.items.get(0).getDescription();
     }

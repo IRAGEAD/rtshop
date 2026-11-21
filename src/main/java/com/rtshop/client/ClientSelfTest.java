@@ -340,7 +340,15 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 anvilPos = null;
                 onServer(mc, sp -> {
+                    // 시험 세계에 돌아다니는 다른 모드의 NPC(대화창을 띄움)를 치운다
+                    for (net.minecraft.world.entity.Entity e : sp.serverLevel().getEntities(sp, sp.getBoundingBox().inflate(16),
+                            e -> e instanceof net.minecraft.world.entity.LivingEntity && !(e instanceof net.minecraft.world.entity.player.Player))) {
+                        e.discard();
+                    }
                     BlockPos at = sp.blockPosition().relative(sp.getDirection(), 2);
+                    for (BlockPos q : BlockPos.betweenClosed(at.offset(-1, 0, -1), at.offset(1, 2, 1))) {
+                        sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    }
                     sp.serverLevel().setBlockAndUpdate(at.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                     sp.serverLevel().setBlockAndUpdate(at, com.rtshop.enhance.ModEnhance.ANVIL.get().defaultBlockState());
                     sp.serverLevel().setBlockAndUpdate(at.above(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
@@ -429,7 +437,7 @@ public final class ClientSelfTest {
                 onServer(mc, sp -> {
                     com.rtshop.enhance.Enhance.testRoll = null;
                     if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
-                        sp.getInventory().add(m.getCarried());
+                        sp.getInventory().setItem(sp.getInventory().selected, m.getCarried().copy());
                         m.setCarried(ItemStack.EMPTY);
                     }
                 });

@@ -252,7 +252,7 @@ public class PlotBrowserScreen extends Screen {
         g.fill(fx + 5, fy + 20, fx + fw - 5, fy + 21, Ui.C_GOLD_DARK);
         g.drawString(font, title, fx + 10, fy + 9, Ui.C_GOLD, true);
         String money = Ui.num(Math.max(wallet, ClientEconomy.wallet)) + " G";
-        Ui.coin(g, fx + fw - 18 - font.width(money), fy + 7, 11);
+        Ui.coin(g, fx + fw - 25 - font.width(money), fy + 7, 11);
         g.drawString(font, money, fx + fw - 10 - font.width(money), fy + 9, Ui.C_CREAM, false);
 
         // 탭
@@ -484,7 +484,7 @@ public class PlotBrowserScreen extends Screen {
         int textW = fw - 16 - buyW() - 66 - 14;
         if (result != null && System.currentTimeMillis() - resultAt < 6000) {
             int y = by + 4;
-            for (FormattedCharSequence l : font.split(result, textW)) {
+            for (FormattedCharSequence l : font.split(Component.literal(result.getString()), textW)) {
                 g.drawString(font, l, fx + 14, y, Ui.C_INK, false);
                 y += 10;
                 if (y > by + 26) break;

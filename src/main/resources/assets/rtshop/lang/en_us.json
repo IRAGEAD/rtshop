@@ -811,5 +811,9 @@
   "rtshop.plotui.starter_btn": "Get a starter field",
   "rtshop.plotui.starter_info": "Farmers get one free starter field. If you didn't get one, press [Get a starter field].",
   "rtshop.plotui.starter_given": "You already received a starter field (one per player).",
-  "rtshop.plotui.starter_off": "Starter fields are turned off on this server."
+  "rtshop.plotui.starter_off": "Starter fields are turned off on this server.",
+  "rtshop.enhance.group_gem_common": "Common gems",
+  "rtshop.enhance.group_gem_fine": "Fine gems",
+  "rtshop.enhance.group_gem_nether": "Nether gems",
+  "rtshop.enhance.group_gem_rare": "Rare gems"
 }

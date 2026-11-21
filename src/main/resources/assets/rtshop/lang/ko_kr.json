@@ -811,5 +811,9 @@
   "rtshop.plotui.starter_btn": "초보 농지 받기",
   "rtshop.plotui.starter_info": "농부 직업을 얻으면 빈 초보 농지 하나를 무료로 받습니다. 받지 못했다면 [초보 농지 받기] 를 누르세요.",
   "rtshop.plotui.starter_given": "이미 초보 농지를 받았습니다 (한 사람당 한 번).",
-  "rtshop.plotui.starter_off": "이 서버에서는 초보 농지를 나눠 주지 않습니다."
+  "rtshop.plotui.starter_off": "이 서버에서는 초보 농지를 나눠 주지 않습니다.",
+  "rtshop.enhance.group_gem_common": "흔한 보석",
+  "rtshop.enhance.group_gem_fine": "고운 보석",
+  "rtshop.enhance.group_gem_nether": "네더 보석",
+  "rtshop.enhance.group_gem_rare": "희귀 보석"
 }
