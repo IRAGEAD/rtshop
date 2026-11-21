@@ -415,8 +415,6 @@ public class AttendanceEditScreen extends Screen {
         y += 16;
         label(x, y + 2, tr("rtshop.attedit.shop"), Ui.C_CREAM);
         box(x + lw, y, bw, s("shop"), 64, v -> settings.addProperty("shop", v.trim()));
-        y += 18;
-        label(x, y, tr("rtshop.attedit.settings_hint"), Ui.C_PARCH_DARK);
     }
 
     private void toggle(int x, int y, int lw, int bw, String key, String field) {
