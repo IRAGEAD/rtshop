@@ -1,0 +1,68 @@
+{
+  "_help": "퀘스트 정의 예시. giver/turnIn 에는 NPC 키를 적습니다: bank(은행원), shop_farmer(농작물 상인) 같은 상인, quest_guide 같은 퀘스트 NPC. 목표 종류: DELIVER(아이템 납품), KILL(처치, * = 모든 몬스터), VISIT(장소 방문), TALK(NPC 와 대화), PAY(Gold 지불). reward.flags 와 choices[].flags 는 숨겨진 퀘스트·직업 해금 조건(requiresFlags)으로 쓰입니다. 이 파일은 모드 업데이트 때 새 기본값으로 바뀌므로 직접 만든 퀘스트는 별도 파일에 적어 주세요.",
+  "quests": [
+    {
+      "id": "tutorial_1",
+      "chain": "초보 모험가의 길 (1/4)",
+      "order": 10,
+      "title": "첫 인사",
+      "giver": "quest_guide",
+      "intro": "자네, 이곳은 처음이지? 모험을 하려면 돈을 어디에 맡길지부터 알아야 하네. 마을의 은행원을 찾아가 인사하고 오게. 죽으면 가진 돈의 일부를 잃으니, 맡겨 두는 게 안전하지.",
+      "progress": "은행원은 마을에 있는 중년의 점원이야. 말을 걸어 보게.",
+      "done": "은행원을 만났군. 이제 돈 걱정은 덜었겠지. 약소하지만 용돈일세.",
+      "objectives": [
+        {"type": "TALK", "target": "bank"}
+      ],
+      "reward": {"gold": 1000}
+    },
+    {
+      "id": "tutorial_2",
+      "chain": "초보 모험가의 길 (2/4)",
+      "order": 20,
+      "title": "첫 수확",
+      "giver": "quest_guide",
+      "requires": ["tutorial_1"],
+      "intro": "다음은 농사일세. 농작물 상인에게서 밀 씨앗을 사서 밭에 심고, 자란 밀을 거두어 내게 가져오게. 씨앗은 상점에서 산 것만 심을 수 있으니 주의하게.",
+      "progress": "밀 8개를 가져오게. 씨앗은 농작물 상인에게 있네.",
+      "done": "훌륭한 밀이군! 땀 흘려 번 돈이 제일 값진 법이지.",
+      "objectives": [
+        {"type": "DELIVER", "target": "minecraft:wheat", "count": 8}
+      ],
+      "reward": {"gold": 800}
+    },
+    {
+      "id": "tutorial_3",
+      "chain": "초보 모험가의 길 (3/4)",
+      "order": 30,
+      "title": "첫 사냥",
+      "giver": "quest_guide",
+      "requires": ["tutorial_2"],
+      "intro": "밤이 되면 몬스터가 나타나네. 무기를 챙겨서 몬스터 5마리를 처치하고 오게. 무리하지 말고, 위험하면 도망쳐도 부끄러운 게 아니야.",
+      "progress": "몬스터 5마리를 처치하게. 어떤 몬스터든 상관없네.",
+      "done": "무사히 돌아왔군. 이제 어엿한 모험가일세.",
+      "objectives": [
+        {"type": "KILL", "target": "*", "count": 5, "text": "몬스터"}
+      ],
+      "reward": {"gold": 1500, "items": [{"item": "minecraft:bread", "count": 5}]}
+    },
+    {
+      "id": "tutorial_4",
+      "chain": "초보 모험가의 길 (4/4)",
+      "order": 40,
+      "title": "내 땅을 가지다",
+      "giver": "quest_guide",
+      "requires": ["tutorial_3"],
+      "intro": "마지막으로, 자네만의 땅이 있어야 하지 않겠나? 토지 상인을 찾아가 토지 문서에 대해 물어보게. 그리고 돌아와서 자네가 어떤 길을 가고 싶은지 말해 주게.",
+      "progress": "토지 상인에게 말을 걸고 오게.",
+      "done": "땅이 있으면 마음도 든든하지. 자, 자네는 어떤 길을 걷고 싶은가?",
+      "objectives": [
+        {"type": "TALK", "target": "shop_land"}
+      ],
+      "reward": {"gold": 2000, "flags": ["tutorial_done"]},
+      "choices": [
+        {"text": "농사와 생활이 좋다. 평화롭게 살고 싶다.", "flags": ["path_life"]},
+        {"text": "전투와 모험이 좋다. 강해지고 싶다.", "flags": ["path_combat"]}
+      ]
+    }
+  ]
+}

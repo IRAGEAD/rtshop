@@ -1,5 +1,6 @@
 package com.rtshop.test;
 
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.rtshop.RtShop;
 import com.rtshop.economy.Economy;
@@ -16,6 +17,10 @@ import com.rtshop.item.ModItems;
 import com.rtshop.land.LandConfig;
 import com.rtshop.land.LandData;
 import com.rtshop.land.LandManager;
+import com.rtshop.quest.QuestData;
+import com.rtshop.quest.QuestDef;
+import com.rtshop.quest.QuestManager;
+import com.rtshop.quest.QuestView;
 import com.rtshop.shop.ShopData;
 import com.rtshop.shop.ShopLoader;
 import com.rtshop.shop.ShopServer;
@@ -244,6 +249,11 @@ public final class SelfTest {
             crash("upgrade", t);
         }
         try {
+            quests(server, level, a);
+        } catch (Throwable t) {
+            crash("quests", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -265,6 +275,174 @@ public final class SelfTest {
             RtShop.LOGGER.error("[rtshop-selftest] could not write the result file", t);
         }
         return failed == 0;
+    }
+
+
+    // ------------------------------------------------------------------ 퀘스트
+
+    private static QuestDef tempQuest(String json) {
+        return QuestDef.parse(JsonParser.parseString(json).getAsJsonObject());
+    }
+
+    private static boolean offered(ServerPlayer p, String npc, String id) {
+        for (QuestView v : QuestManager.viewsFor(p, npc)) {
+            if (v.id().equals(id) && v.state() == QuestView.AVAILABLE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void quests(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("quests");
+        QuestManager.Loaded l = QuestManager.reload();
+        check("quest files load without problems", l.problems.isEmpty(), l.problems);
+        check("the tutorial chain and the guide NPC are installed",
+                l.quests.containsKey("tutorial_1") && l.quests.containsKey("tutorial_2")
+                        && l.quests.containsKey("tutorial_3") && l.quests.containsKey("tutorial_4")
+                        && l.npcs.containsKey("guide"));
+        BlockPos npcAt = level.getSharedSpawnPos().above(4);
+        level.getChunkAt(npcAt);
+        check("a quest NPC can be spawned from its definition",
+                ShopServer.spawnNpc(level, Vec3.atBottomCenterOf(npcAt), 0, "quest_guide") != null);
+        for (Villager v : level.getEntitiesOfClass(Villager.class, new AABB(npcAt).inflate(3))) {
+            if (QuestManager.isQuestNpc(v)) {
+                check("the quest NPC is recognised as an NPC (no trading, no damage)", ShopServer.isNpc(v) && "quest_guide".equals(QuestManager.npcKey(v)));
+                v.discard();
+            }
+        }
+
+        QuestManager.reset(a);
+        Economy.setWallet(a, 0);
+        clear(a);
+        List<QuestView> start = QuestManager.viewsFor(a, "quest_guide");
+        check("only the first tutorial quest is offered at the start",
+                start.size() == 1 && start.get(0).id().equals("tutorial_1") && start.get(0).state() == QuestView.AVAILABLE);
+        check("a quest cannot be taken from the wrong NPC", !QuestManager.accept(a, "tutorial_1", "bank"));
+        check("a quest can be accepted", QuestManager.accept(a, "tutorial_1", "quest_guide") && QuestManager.isActive(a, "tutorial_1"));
+        check("it cannot be accepted twice", !QuestManager.accept(a, "tutorial_1", "quest_guide"));
+        check("a quest cannot be turned in before its goals", !QuestManager.turnIn(a, "tutorial_1", "quest_guide", -1));
+        QuestManager.onTalk(a, "shop_farmer");
+        check("talking to some other NPC does not count", !QuestManager.turnIn(a, "tutorial_1", "quest_guide", -1));
+        QuestManager.onTalk(a, "bank");
+        check("a quest must be turned in at the right NPC", !QuestManager.turnIn(a, "tutorial_1", "bank", -1));
+        check("turning in pays the reward", QuestManager.turnIn(a, "tutorial_1", "quest_guide", -1)
+                && Economy.wallet(a) == 1000 && QuestManager.isCompleted(a, "tutorial_1"), Economy.wallet(a));
+        check("a finished quest cannot be taken again", !QuestManager.accept(a, "tutorial_1", "quest_guide"));
+        check("finishing step 1 unlocks step 2 and not step 3", offered(a, "quest_guide", "tutorial_2") && !offered(a, "quest_guide", "tutorial_3"));
+
+        check("delivery quest is accepted", QuestManager.accept(a, "tutorial_2", "quest_guide"));
+        a.getInventory().add(new ItemStack(Items.WHEAT, 7));
+        check("7 of 8 items are not enough", !QuestManager.turnIn(a, "tutorial_2", "quest_guide", -1));
+        a.getInventory().add(new ItemStack(Items.WHEAT, 1));
+        check("8 items complete the delivery, are taken, and pay the reward",
+                QuestManager.turnIn(a, "tutorial_2", "quest_guide", -1) && count(a, s -> s.is(Items.WHEAT)) == 0
+                        && Economy.wallet(a) == 1800, Economy.wallet(a));
+
+        check("kill quest is accepted", QuestManager.accept(a, "tutorial_3", "quest_guide"));
+        QuestManager.onKill(a, EntityType.COW.create(level));
+        for (int i = 0; i < 4; i++) {
+            QuestManager.onKill(a, EntityType.ZOMBIE.create(level));
+        }
+        check("a cow does not count and 4 of 5 monsters are not enough", !QuestManager.turnIn(a, "tutorial_3", "quest_guide", -1));
+        QuestManager.onKill(a, EntityType.SKELETON.create(level));
+        check("5 monsters complete the hunt and pay gold and items",
+                QuestManager.turnIn(a, "tutorial_3", "quest_guide", -1) && Economy.wallet(a) == 3300
+                        && count(a, s -> s.is(Items.BREAD)) == 5, Economy.wallet(a));
+
+        check("last tutorial quest is accepted", QuestManager.accept(a, "tutorial_4", "quest_guide"));
+        QuestManager.onTalk(a, "shop_land");
+        check("a quest with choices cannot be finished without choosing", !QuestManager.turnIn(a, "tutorial_4", "quest_guide", -1));
+        check("an invalid choice is refused", !QuestManager.turnIn(a, "tutorial_4", "quest_guide", 5));
+        check("choosing finishes it and sets the chosen flags only",
+                QuestManager.turnIn(a, "tutorial_4", "quest_guide", 1) && QuestManager.hasFlag(a, "path_combat")
+                        && QuestManager.hasFlag(a, "tutorial_done") && !QuestManager.hasFlag(a, "path_life")
+                        && Economy.wallet(a) == 5300, Economy.wallet(a));
+
+        QuestData data = QuestData.get(server);
+        QuestData reloaded = QuestData.load(data.save(new CompoundTag()));
+        QuestData.Progress rp = reloaded.peek(a.getUUID());
+        check("quest records survive saving and loading", rp != null && rp.completed.size() == 4
+                && rp.flags.contains("path_combat") && rp.flags.contains("tutorial_done"));
+
+        // 임시 퀘스트로 나머지 규칙 점검
+        BlockPos at = a.blockPosition();
+        QuestDef visit = tempQuest("{\"id\":\"t_visit\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"VISIT\",\"x\":" + at.getX()
+                + ",\"y\":" + at.getY() + ",\"z\":" + at.getZ() + ",\"radius\":5}],\"reward\":{\"gold\":10}}");
+        QuestDef pay = tempQuest("{\"id\":\"t_pay\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"PAY\",\"count\":100}],\"reward\":{\"gold\":10}}");
+        QuestDef secret = tempQuest("{\"id\":\"t_secret\",\"giver\":\"quest_guide\",\"requiresFlags\":[\"secret\"],\"blockedByFlags\":[\"blocked\"]}");
+        QuestManager.loaded().quests.put(visit.id, visit);
+        QuestManager.loaded().quests.put(pay.id, pay);
+        QuestManager.loaded().quests.put(secret.id, secret);
+        for (int i = 0; i < 11; i++) {
+            QuestDef q = tempQuest("{\"id\":\"t_l" + i + "\",\"giver\":\"quest_guide\"}");
+            QuestManager.loaded().quests.put(q.id, q);
+        }
+
+        a.setPos(at.getX() + 100.5, at.getY(), at.getZ() + 0.5);
+        check("visit quest is accepted", QuestManager.accept(a, "t_visit", "quest_guide"));
+        QuestManager.checkVisits(a);
+        check("being far away does not complete a visit", !QuestManager.turnIn(a, "t_visit", "quest_guide", -1));
+        a.setPos(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+        QuestManager.checkVisits(a);
+        check("arriving at the place completes the visit", QuestManager.turnIn(a, "t_visit", "quest_guide", -1) && Economy.wallet(a) == 5310);
+
+        Economy.setWallet(a, 50);
+        check("pay quest is accepted", QuestManager.accept(a, "t_pay", "quest_guide"));
+        check("cannot pay without the gold", !QuestManager.turnIn(a, "t_pay", "quest_guide", -1) && Economy.wallet(a) == 50);
+        Economy.setWallet(a, 500);
+        check("paying takes the gold and pays the reward", QuestManager.turnIn(a, "t_pay", "quest_guide", -1) && Economy.wallet(a) == 410, Economy.wallet(a));
+
+        check("a quest needing a flag is hidden until the flag is set", !offered(a, "quest_guide", "t_secret"));
+        QuestManager.setFlag(a, "secret", true);
+        check("setting the flag reveals it", offered(a, "quest_guide", "t_secret"));
+        QuestManager.setFlag(a, "blocked", true);
+        check("a blocking flag hides it again", !offered(a, "quest_guide", "t_secret"));
+        QuestManager.setFlag(a, "secret", false);
+        QuestManager.setFlag(a, "blocked", false);
+
+        int taken = 0;
+        for (int i = 0; i < 11; i++) {
+            if (QuestManager.accept(a, "t_l" + i, "quest_guide")) {
+                taken++;
+            }
+        }
+        check("at most " + QuestManager.MAX_ACTIVE + " quests can be active", taken == QuestManager.MAX_ACTIVE, taken);
+        check("abandoning frees a slot", QuestManager.abandon(a, "t_l0") && QuestManager.accept(a, "t_l10", "quest_guide"));
+        check("an abandoned quest can be taken again later", QuestManager.accept(a, "t_l0", "quest_guide") == false
+                && QuestManager.abandon(a, "t_l1") && QuestManager.accept(a, "t_l0", "quest_guide"));
+
+        boolean badType = false;
+        try {
+            tempQuest("{\"id\":\"x\",\"giver\":\"bank\",\"objectives\":[{\"type\":\"FLY\"}]}");
+        } catch (IllegalArgumentException e) {
+            badType = true;
+        }
+        boolean badId = false;
+        try {
+            tempQuest("{\"id\":\"Bad Id\",\"giver\":\"bank\"}");
+        } catch (IllegalArgumentException e) {
+            badId = true;
+        }
+        check("quest files with an unknown goal type or a bad id are rejected", badType && badId);
+
+        // 잘못된 파일: 없는 선행 퀘스트, 순환
+        Path bad = QuestManager.dir().resolve("zz_selftest.json");
+        Files.writeString(bad, "{\"quests\":["
+                + "{\"id\":\"zz_missing\",\"giver\":\"bank\",\"requires\":[\"does_not_exist\"]},"
+                + "{\"id\":\"zz_a\",\"giver\":\"bank\",\"requires\":[\"zz_b\"]},"
+                + "{\"id\":\"zz_b\",\"giver\":\"bank\",\"requires\":[\"zz_a\"]}]}", StandardCharsets.UTF_8);
+        QuestManager.Loaded lb = QuestManager.reload();
+        check("a missing prerequisite and a prerequisite loop are reported and those quests are dropped",
+                !lb.quests.containsKey("zz_missing") && !lb.quests.containsKey("zz_a") && !lb.quests.containsKey("zz_b")
+                        && lb.problems.size() >= 3 && lb.quests.containsKey("tutorial_1"), lb.problems.size());
+        Files.deleteIfExists(bad);
+
+        QuestManager.reload();
+        QuestManager.reset(a);
+        Economy.setWallet(a, 0);
+        clear(a);
+        a.setPos(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
     }
 
     // ------------------------------------------------------------------ 경제

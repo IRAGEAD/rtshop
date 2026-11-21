@@ -22,6 +22,8 @@ public final class ClientModEvents {
     public static final KeyMapping HUD_KEY = new KeyMapping("key.rtshop.hud", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
     public static final KeyMapping LAND_KEY = new KeyMapping("key.rtshop.land", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
 
+    public static final KeyMapping QUEST_KEY = new KeyMapping("key.rtshop.quest", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
+
     @SubscribeEvent
     public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAboveAll("gold", (gui, graphics, partialTick, screenWidth, screenHeight) ->
@@ -40,5 +42,6 @@ public final class ClientModEvents {
     public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
         event.register(HUD_KEY);
         event.register(LAND_KEY);
+        event.register(QUEST_KEY);
     }
 }

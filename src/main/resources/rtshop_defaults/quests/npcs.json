@@ -1,0 +1,11 @@
+{
+  "_help": "퀘스트 NPC 목록. /rtshop npc quest_<id> 로 소환합니다. 이 파일은 모드 업데이트 때 새 기본값으로 바뀌므로(이전 파일은 config/rtshop/backup 에 보관), 직접 만든 NPC 는 별도 파일(예: my_npcs.json)에 적어 주세요.",
+  "npcs": [
+    {
+      "id": "guide",
+      "name": "모험 안내인 모리스",
+      "profession": "librarian",
+      "greeting": "어서 오게, 새내기 모험가. 이 땅에서 살아남는 법을 하나씩 알려 주지."
+    }
+  ]
+}

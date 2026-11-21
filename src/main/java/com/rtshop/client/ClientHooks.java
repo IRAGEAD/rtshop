@@ -1,6 +1,7 @@
 package com.rtshop.client;
 
 import com.rtshop.net.LandInfoPacket;
+import com.rtshop.net.QuestOpenPacket;
 import com.rtshop.shop.ShopData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -34,6 +35,16 @@ public final class ClientHooks {
             screen.showResult(message, success);
         } else if (mc.player != null) {
             mc.player.displayClientMessage(message, true);
+        }
+    }
+
+    /** 퀘스트 창을 열거나, 이미 열려 있으면 내용만 새로 고친다. */
+    public static void openQuest(QuestOpenPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof QuestScreen screen) {
+            screen.update(packet);
+        } else {
+            mc.setScreen(new QuestScreen(packet));
         }
     }
 

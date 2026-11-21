@@ -1,0 +1,175 @@
+package com.rtshop.quest;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/** 퀘스트 하나의 정의. config/rtshop/quests/*.json 에서 읽는다. */
+public final class QuestDef {
+    public enum Type {
+        /** 아이템을 NPC 에게 건넨다 (완료 때 인벤토리에서 가져간다). */
+        DELIVER,
+        /** 몬스터를 처치한다. */
+        KILL,
+        /** 지정한 장소 근처에 간다. */
+        VISIT,
+        /** 지정한 NPC 와 대화한다. */
+        TALK,
+        /** Gold 를 낸다 (완료 때 소지금에서 가져간다). */
+        PAY;
+
+        static Type parse(String s) {
+            for (Type t : values()) {
+                if (t.name().equalsIgnoreCase(s)) {
+                    return t;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static final class Objective {
+        public Type type;
+        /** DELIVER: 아이템 ID 또는 #태그 / KILL: 엔티티 ID, "*" = 모든 몬스터 / TALK: NPC 키 / VISIT: 차원 ID */
+        public String target = "";
+        /** 필요한 수량 (PAY 는 Gold 액수). */
+        public int count = 1;
+        public int x, y, z, radius = 8;
+        /** 화면에 보일 설명 (비우면 자동으로 만든다). */
+        public String text = "";
+    }
+
+    public static final class ItemReward {
+        public String item;
+        public int count = 1;
+    }
+
+    public static final class Choice {
+        public String text = "";
+        /** 이 선택지를 고르면 얻는 표식. 숨겨진 퀘스트나 직업 해금 조건으로 쓴다. */
+        public final List<String> flags = new ArrayList<>();
+    }
+
+    public String id;
+    /** 같은 줄기(연작) 이름. 목록에서 묶어 보여 주는 용도. */
+    public String chain = "";
+    public String title = "";
+    /** 받기 전에 보이는 이야기. */
+    public String intro = "";
+    /** 진행 중에 보이는 안내. */
+    public String progress = "";
+    /** 완료할 때 보이는 이야기. */
+    public String done = "";
+    /** 퀘스트를 주는 NPC 키 (예: quest_guide, bank, shop_farmer). */
+    public String giver = "";
+    /** 완료를 받는 NPC 키 (비우면 giver 와 같음). */
+    public String turnIn = "";
+    public final List<String> requires = new ArrayList<>();
+    public final List<String> requiresFlags = new ArrayList<>();
+    public final List<String> blockedByFlags = new ArrayList<>();
+    public final List<Objective> objectives = new ArrayList<>();
+    public long rewardGold;
+    public final List<ItemReward> rewardItems = new ArrayList<>();
+    public final List<String> rewardFlags = new ArrayList<>();
+    public final List<Choice> choices = new ArrayList<>();
+    /** 목록 정렬용 (작을수록 위). */
+    public int order;
+
+    public String turnInNpc() {
+        return turnIn == null || turnIn.isEmpty() ? giver : turnIn;
+    }
+
+    private static String str(JsonObject o, String key, String def) {
+        return o.has(key) && !o.get(key).isJsonNull() ? o.get(key).getAsString() : def;
+    }
+
+    private static void strings(JsonObject o, String key, List<String> out) {
+        if (o.has(key) && o.get(key).isJsonArray()) {
+            for (JsonElement e : o.getAsJsonArray(key)) {
+                String s = e.getAsString().trim();
+                if (!s.isEmpty()) {
+                    out.add(s);
+                }
+            }
+        }
+    }
+
+    /** 잘못된 정의면 이유를 담아 IllegalArgumentException. */
+    public static QuestDef parse(JsonObject o) {
+        QuestDef q = new QuestDef();
+        q.id = str(o, "id", "").trim();
+        if (q.id.isEmpty() || !q.id.matches("[a-z0-9_.-]+")) {
+            throw new IllegalArgumentException("id 가 없거나 형식이 틀렸습니다 (영문 소문자·숫자·_ . - 만): '" + q.id + "'");
+        }
+        q.chain = str(o, "chain", "");
+        q.title = str(o, "title", q.id);
+        q.intro = str(o, "intro", "");
+        q.progress = str(o, "progress", "");
+        q.done = str(o, "done", "");
+        q.giver = str(o, "giver", "").trim();
+        q.turnIn = str(o, "turnIn", "").trim();
+        q.order = o.has("order") ? o.get("order").getAsInt() : 0;
+        if (q.giver.isEmpty()) {
+            throw new IllegalArgumentException("퀘스트 '" + q.id + "' 에 giver(퀘스트를 주는 NPC)가 없습니다");
+        }
+        strings(o, "requires", q.requires);
+        strings(o, "requiresFlags", q.requiresFlags);
+        strings(o, "blockedByFlags", q.blockedByFlags);
+        if (o.has("objectives") && o.get("objectives").isJsonArray()) {
+            for (JsonElement e : o.getAsJsonArray("objectives")) {
+                JsonObject jo = e.getAsJsonObject();
+                Objective ob = new Objective();
+                ob.type = Type.parse(str(jo, "type", ""));
+                if (ob.type == null) {
+                    throw new IllegalArgumentException("퀘스트 '" + q.id + "' 의 목표 종류를 알 수 없습니다: " + str(jo, "type", ""));
+                }
+                ob.target = str(jo, "target", "");
+                ob.count = Math.max(1, jo.has("count") ? jo.get("count").getAsInt() : 1);
+                ob.x = jo.has("x") ? jo.get("x").getAsInt() : 0;
+                ob.y = jo.has("y") ? jo.get("y").getAsInt() : 0;
+                ob.z = jo.has("z") ? jo.get("z").getAsInt() : 0;
+                ob.radius = Math.max(1, jo.has("radius") ? jo.get("radius").getAsInt() : 8);
+                ob.text = str(jo, "text", "");
+                if (ob.type != Type.PAY && ob.type != Type.VISIT && ob.target.isEmpty()) {
+                    throw new IllegalArgumentException("퀘스트 '" + q.id + "' 의 " + ob.type + " 목표에 target 이 없습니다");
+                }
+                if (ob.type == Type.VISIT && ob.target.isEmpty()) {
+                    ob.target = "minecraft:overworld";
+                }
+                q.objectives.add(ob);
+            }
+        }
+        if (o.has("reward") && o.get("reward").isJsonObject()) {
+            JsonObject r = o.getAsJsonObject("reward");
+            q.rewardGold = Math.max(0, r.has("gold") ? r.get("gold").getAsLong() : 0);
+            if (r.has("items") && r.get("items").isJsonArray()) {
+                for (JsonElement e : r.getAsJsonArray("items")) {
+                    JsonObject jo = e.getAsJsonObject();
+                    ItemReward ir = new ItemReward();
+                    ir.item = str(jo, "item", "");
+                    ir.count = Math.max(1, jo.has("count") ? jo.get("count").getAsInt() : 1);
+                    if (!ir.item.isEmpty()) {
+                        q.rewardItems.add(ir);
+                    }
+                }
+            }
+            strings(r, "flags", q.rewardFlags);
+        }
+        if (o.has("choices") && o.get("choices").isJsonArray()) {
+            JsonArray arr = o.getAsJsonArray("choices");
+            for (JsonElement e : arr) {
+                JsonObject jo = e.getAsJsonObject();
+                Choice c = new Choice();
+                c.text = str(jo, "text", "");
+                strings(jo, "flags", c.flags);
+                if (!c.text.isEmpty()) {
+                    q.choices.add(c);
+                }
+            }
+        }
+        return q;
+    }
+}

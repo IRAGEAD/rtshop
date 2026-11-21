@@ -18,6 +18,7 @@ import com.rtshop.land.LandManager;
 import com.rtshop.net.OpenBankPacket;
 import com.rtshop.net.OpenHudEditorPacket;
 import com.rtshop.net.OpenShopPacket;
+import com.rtshop.quest.QuestManager;
 import com.rtshop.net.ResultPacket;
 import com.rtshop.net.ShopNet;
 import com.rtshop.test.SelfTest;
@@ -88,6 +89,7 @@ public final class ShopServer {
         FarmConfig.reload();
         FarmEvents.clearCache();
         LandConfig.reload();
+        QuestManager.reload();
         loaded = ShopLoader.loadAll(server);
         SESSIONS.clear();
         return loaded;
@@ -95,7 +97,7 @@ public final class ShopServer {
 
     public static boolean isNpc(Entity e) {
         for (String tag : e.getTags()) {
-            if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX)) {
+            if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX) || tag.startsWith(QuestManager.QUEST_TAG_PREFIX)) {
                 return true;
             }
         }
@@ -160,6 +162,9 @@ public final class ShopServer {
     private static final SuggestionProvider<CommandSourceStack> NPC_IDS = (ctx, b) -> {
         List<String> all = new ArrayList<>(loaded.shops.keySet());
         all.add(BANK);
+        for (String id : QuestManager.loaded().npcs.keySet()) {
+            all.add("quest_" + id);
+        }
         return SharedSuggestionProvider.suggest(all, b);
     };
 
@@ -193,6 +198,41 @@ public final class ShopServer {
                             p.sendSystemMessage(Component.translatable(on ? "rtshop.land.bypass_on" : "rtshop.land.bypass_off"));
                             return 1;
                         })))
+                .then(Commands.literal("quest")
+                        .executes(ctx -> {
+                            QuestManager.openJournal(ctx.getSource().getPlayerOrException());
+                            return 1;
+                        })
+                        .then(Commands.literal("reset").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
+                                    ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                    QuestManager.reset(t);
+                                    feedback(ctx.getSource(), Component.translatable("rtshop.quest.cmd_reset", t.getDisplayName()));
+                                    return 1;
+                                })))
+                        .then(Commands.literal("complete").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .then(Commands.argument("quest", StringArgumentType.word())
+                                                .suggests((ctx, b) -> SharedSuggestionProvider.suggest(QuestManager.loaded().quests.keySet(), b))
+                                                .executes(ctx -> {
+                                                    ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                                    String id = StringArgumentType.getString(ctx, "quest");
+                                                    boolean ok = QuestManager.forceComplete(t, id);
+                                                    feedback(ctx.getSource(), Component.translatable(ok ? "rtshop.quest.cmd_completed" : "rtshop.quest.unknown", id));
+                                                    return ok ? 1 : 0;
+                                                }))))
+                        .then(Commands.literal("flag").requires(src -> src.hasPermission(2))
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .then(Commands.literal("set").then(Commands.argument("flag", StringArgumentType.word()).executes(ctx -> {
+                                            ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                            QuestManager.setFlag(t, StringArgumentType.getString(ctx, "flag"), true);
+                                            return 1;
+                                        })))
+                                        .then(Commands.literal("clear").then(Commands.argument("flag", StringArgumentType.word()).executes(ctx -> {
+                                            ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
+                                            QuestManager.setFlag(t, StringArgumentType.getString(ctx, "flag"), false);
+                                            return 1;
+                                        }))))))
                 .then(Commands.literal("reload").requires(src -> src.hasPermission(2))
                         .executes(ShopServer::cmdReload))
                 .then(Commands.literal("export").requires(src -> src.hasPermission(2))
@@ -276,7 +316,7 @@ public final class ShopServer {
         }
     }
 
-    private static VillagerProfession profession(String name) {
+    public static VillagerProfession profession(String name) {
         switch (name) {
             case "farmer":
                 return VillagerProfession.FARMER;
@@ -321,6 +361,9 @@ public final class ShopServer {
 
     /** 상인(또는 은행원) NPC 를 소환한다. 알 수 없는 종류면 null. */
     public static Villager spawnNpc(ServerLevel level, Vec3 pos, float yaw, String type) {
+        if (type.startsWith("quest_")) {
+            return QuestManager.spawnNpc(level, pos, yaw, type.substring(6));
+        }
         String name;
         String tag;
         VillagerProfession prof;
