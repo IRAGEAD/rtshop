@@ -1,0 +1,88 @@
+RT Shop client self-test
+PASS  server-side setup worked
+PASS  the wallet reached the client (minus the 2,500 G check)  [125950]
+PASS  the quest HUD receives the active quests in the order they were taken  [[job_swordsman_3, job_warrior_1, job_cook_2]]
+PASS  the quest HUD shows a finished quest as ready to hand in
+PASS  the quest HUD can be resized in the HUD editor  [0.9450000000000001]
+PASS  the number of quests to show opens as a list
+PASS  the HUD font opens as a list of the fonts in this game  [[, minecraft:uniform]]
+PASS  picking a font changes the quest HUD font  [minecraft:uniform]
+PASS  picking a text size changes only the text size  [1.25 0.3]
+PASS  the Gold display has its own text size  [0.8]
+PASS  the HUD position editor opens
+PASS  the farmer shop opens  [com.rtshop.client.ShopScreen@4de5d46c]
+PASS  the quantity dialog opens on the sell tab
+PASS  the food shop opens  [com.rtshop.client.ShopScreen@623dac3]
+PASS  the fisher shop opens  [com.rtshop.client.ShopScreen@312eb]
+PASS  the blacksmith shop opens  [com.rtshop.client.ShopScreen@7e34570]
+PASS  the land shop opens  [com.rtshop.client.ShopScreen@975f349]
+PASS  the bank opens  [com.rtshop.client.BankScreen@7b4fbedb]
+PASS  the land settings screen opens  [com.rtshop.client.LandScreen@36b6ce5d]
+PASS  a chest on my land opens  [net.minecraft.client.gui.screens.inventory.ContainerScreen@35c66ad]
+PASS  ...and offers the PIN button to the owner
+PASS  the PIN setup screen opens
+PASS  the PIN entry screen opens
+PASS  the farmer shop opens again
+PASS  buying through the shop screen charges the listed price  [125890 (expected 125890)]
+PASS  selling 3-star wheat pays the 3-star price  [126002 (expected 126002)]
+PASS  'sell all' sells the listed rows  [126242 (expected 126242)]
+PASS  the bank opens again
+PASS  a deposit moves gold into the bank  [301000]
+PASS  /rtshop land opens the land settings  [com.rtshop.client.LandScreen@69c00140]
+PASS  changing permissions on the screen reaches the server  [12]
+PASS  setting a PIN from the client locks the chest on the server
+PASS  /rtshop hud opens the position editor  [com.rtshop.client.HudEditScreen@1c89cec5]
+PASS  /rtshop check turns carried gold into a check  [124942]
+PASS  right-clicking a ripe crop from a real client harvests and replants it  [ok]
+PASS  the quest editor opens for an operator  [com.rtshop.client.QuestEditScreen@681f5a1e]
+PASS  a tutorial quest loads into the editor
+PASS  the story tab lists every control key to insert
+PASS  picking a key inserts {key:...} into the story  [마지막으로, 자네만의 땅이 있어야 하지 않겠나? 토지 상인을 찾아가 토지 문서에 대해 물어보게. 그리고 돌아와서 자네가 어떤 길을 가고 싶은지 말해 주게.{key:key.jump}]
+PASS  {key:...} shows the player's own key  [[Space]]
+PASS  the quest window opens from the guide  [com.rtshop.client.QuestScreen@30e787e2]
+PASS  saving from the editor screen reaches the server and applies at once  [클라이언트에서 고친 제목]
+PASS  after a successful save the editor is no longer marked unsaved
+PASS  goal types open as a popup list with all 5 choices
+PASS  picking from the popup closes it
+PASS  the item picker opens from a delivery goal  [com.rtshop.client.PickerScreen@1b357db2]
+PASS  searching the item picker narrows the list  [1]
+PASS  picking an item fills the goal and returns to the editor  [minecraft:bread]
+PASS  the monster picker opens from a kill goal  [com.rtshop.client.PickerScreen@6385af63]
+PASS  the monster picker lists many monsters  [38]
+PASS  picking a monster fills the kill goal  [minecraft:skeleton]
+PASS  the job screen opens at the job guide  [com.rtshop.client.JobScreen@43a2b00c]
+PASS  choosing a job from the screen works and the screen updates  [com.rtshop.client.JobScreen@43a2b00c]
+PASS  the warrior health bonus reaches the client  [22.0]
+PASS  the job editor opens for an operator  [com.rtshop.client.JobEditScreen@513babf3]
+PASS  weapon types open as a popup list
+PASS  the job guide offers the 9 job quest lines  [com.rtshop.client.QuestScreen@6e41c74d]
+PASS  the sword master offers the next job quest  [com.rtshop.client.QuestScreen@280b9922]
+PASS  mod tips appear only when that mod is installed  [0 검은 휘두른 만큼 손에 붙는다. 좀비 12마리를 상대로 기본기를 익혀라.
+[epicfight] {key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸면, 공격을 이어서 누를 때 연속 베기가 나간다. 블록을 캘 때는 같은 키로 채광 모드로 돌아가라.]
+PASS  key names in the tips turn into the player's keys  [검은 휘두른 만큼 손에 붙는다. 좀비 12마리를 상대로 기본기를 익혀라.
+[epicfight] {key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸면, 공격을 이어서 누를 때 연속 베기가 나간다. 블록을 캘 때는 같은 키로 채광 모드로 돌아가라.]
+PASS  every key named in the job quest tips exists in this game  [[]]
+PASS  talking to the attendance NPC opens the attendance window  [com.rtshop.client.AttendanceScreen@456a0e9e]
+PASS  the attendance window lets you check in at the NPC
+PASS  checking in from the window works and gives the day-1 Gold  [500]
+PASS  the attendance editor opens for an operator  [com.rtshop.client.AttendanceEditScreen@2c174215]
+PASS  saving in the attendance editor changes the reward table  [3333]
+PASS  talking to the gacha merchant opens the gacha window  [com.rtshop.client.GachaScreen@60e06e7e]
+PASS  the gacha window shows the tickets you carry
+PASS  a premium 10-pull from the window shows 10 result cards  [[{"item":"minecraft:golden_axe","count":1,"grade":"uncommon","weight":10,"new":true},{"item":"minecraft:golden_axe","count":1,"grade":"uncommon","weight":10,"new":false},{"item":"minecraft:stone_axe","count":1,"grade":"rare","weight":10,"new":true},{"item":"minecraft:stone_axe","count":1,"grade":"rare","weight":10,"new":false},{"item":"minecraft:golden_axe","count":1,"grade":"uncommon","weight":10,"new":false},{"item":"minecraft:diamond_sword","count":1,"grade":"uncommon","weight":10,"new":true},{"item":"minecraft:wooden_axe","count":1,"grade":"uncommon","weight":10,"new":true},{"item":"minecraft:wooden_axe","count":1,"grade":"uncommon","weight":10,"new":false},{"item":"minecraft:stone_axe","count":1,"grade":"rare","weight":10,"new":false},{"item":"minecraft:diamond_sword","count":1,"grade":"uncommon","weight":10,"new":false}]]
+PASS  the dismantle tab lists the pulled items
+PASS  the gacha editor opens for an operator  [com.rtshop.client.GachaEditScreen@310ad792]
+PASS  the editor's simulation runs 1,000 pulls on the server
+PASS  right-clicking the fisher NPC opens its window  [com.rtshop.client.ShopScreen@700f356b]
+PASS  right-clicking the farmer NPC opens its window  [com.rtshop.client.ShopScreen@4098a6b0]
+PASS  right-clicking the food NPC opens its window  [com.rtshop.client.ShopScreen@7288afd8]
+PASS  right-clicking the blacksmith NPC opens its window  [com.rtshop.client.ShopScreen@172e4d3a]
+PASS  right-clicking the general NPC opens its window  [com.rtshop.client.ShopScreen@6153b116]
+PASS  right-clicking the land NPC opens its window  [com.rtshop.client.ShopScreen@5278bc6d]
+PASS  right-clicking the bank NPC opens its window  [com.rtshop.client.BankScreen@17c533f3]
+PASS  right-clicking the attendance NPC opens its window  [com.rtshop.client.AttendanceScreen@79e0f00b]
+PASS  right-clicking the gacha NPC opens its window  [com.rtshop.client.GachaScreen@7269674d]
+PASS  right-clicking the job NPC opens its window  [com.rtshop.client.JobScreen@73ccc475]
+PASS  no server-side error happened
+
+RESULT: ALL PASS (83 checks)
