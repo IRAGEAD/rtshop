@@ -650,6 +650,34 @@ public final class SelfTest {
             check("swordsman attacks faster only while holding a sword", withSword > bare + 1e-6 && Math.abs(bare - base) < 1e-6,
                     base + " / " + withSword + " / " + bare);
 
+            com.rtshop.job.Jobs.force(a, "combat", "mage");
+            int found = 0;
+            int raised = 0;
+            List<String> names = new ArrayList<>();
+            for (String id : new String[]{"irons_spellbooks:max_mana", "irons_spellbooks:spell_power", "spell_power:arcane", "spell_power:fire",
+                    "spell_power:frost", "spell_power:healing", "spell_power:lightning", "spell_power:soul"}) {
+                net.minecraft.world.entity.ai.attributes.Attribute attr = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(id));
+                if (attr == null || a.getAttribute(attr) == null) {
+                    continue;
+                }
+                found++;
+                if (a.getAttribute(attr).getModifiers().stream().anyMatch(m -> m.getName().startsWith("rtshop job"))) {
+                    raised++;
+                    names.add(id);
+                }
+            }
+            info("mage bonus applied to " + raised + " of " + found + " magic attributes: " + names);
+            if (ModList.get().isLoaded("irons_spellbooks")) {
+                check("mage raises Iron's Spells max mana and spell power", names.contains("irons_spellbooks:max_mana")
+                        && names.contains("irons_spellbooks:spell_power"), names);
+            }
+            if (ModList.get().isLoaded("spell_power")) {
+                check("mage raises Wizards (Spell Power) school power", names.stream().anyMatch(n -> n.startsWith("spell_power:")), names);
+            }
+            com.rtshop.job.Jobs.force(a, "combat", "swordsman");
+            check("the mage bonus is removed after leaving the job", ForgeRegistries.ATTRIBUTES.getValues().stream().noneMatch(at ->
+                    a.getAttribute(at) != null && a.getAttribute(at).getModifiers().stream().anyMatch(m -> m.getName().equals("rtshop job: mage"))));
+
             ShopData fisher = ShopServer.shops().get("fisher");
             int codIdx = fisher == null ? -1 : findEntry(fisher, e -> e.stack.is(Items.COD) && e.fish);
             com.rtshop.job.Jobs.force(a, "life", "fisher");
