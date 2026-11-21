@@ -144,6 +144,14 @@ public final class LandManager {
                 column.add(o);
             }
         }
+        for (Claim o : column) {
+            Land l = data.land(o.landId);
+            if (l != null && l.plot && o.intersects(c.x0, minY, c.z0, c.x1, maxY, c.z1)) {
+                // 구획은 OP 가 정한 모양 그대로 쓴다 (문서로 넓히거나 붙일 수 없음)
+                c.error = Component.translatable("rtshop.plot.err_deed");
+                return c;
+            }
+        }
         boolean overlapsOwn = false;
         for (Claim o : column) {
             if (o.intersects(c.x0, c.y0, c.z0, c.x1, c.y1, c.z1)) {
@@ -187,6 +195,8 @@ public final class LandManager {
             Land l = data.land(o.landId);
             if (l != null && l.owner.equals(p.getUUID())) {
                 c.error = Component.translatable("rtshop.land.err_own");
+            } else if (l != null && l.plot) {
+                c.error = Component.translatable("rtshop.plot.err_overlap", l.name);
             } else {
                 c.error = Component.translatable("rtshop.land.err_other", l == null ? "?" : l.ownerName);
             }
@@ -195,7 +205,7 @@ public final class LandManager {
         if (cfg.minDistanceToOthers > 0) {
             for (Claim o : data.claimsNear(dim, c.x0, c.y0, c.z0, c.x1, c.y1, c.z1, cfg.minDistanceToOthers)) {
                 Land l = data.land(o.landId);
-                if (l != null && !l.owner.equals(p.getUUID())) {
+                if (l != null && !l.owner.equals(p.getUUID()) && !l.forSale()) {
                     c.error = Component.translatable("rtshop.land.err_near", l.ownerName, cfg.minDistanceToOthers);
                     return c;
                 }
@@ -413,6 +423,10 @@ public final class LandManager {
 
     /** 토지를 반환하고 구역마다 토지 문서를 돌려준다. */
     private static void abandon(ServerPlayer p, Land land) {
+        if (land.plot) {
+            PlotManager.giveBack(p, land);
+            return;
+        }
         List<ItemStack> deeds = new ArrayList<>();
         for (Claim c : land.claims) {
             deeds.add(new ItemStack(DeedItem.Type.byId(c.type).item()));

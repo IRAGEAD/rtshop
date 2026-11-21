@@ -18,6 +18,8 @@ import com.rtshop.item.ModItems;
 import com.rtshop.land.LandConfig;
 import com.rtshop.land.LandData;
 import com.rtshop.land.LandManager;
+import com.rtshop.land.PlotManager;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import com.rtshop.quest.QuestData;
 import com.rtshop.quest.QuestDef;
 import com.rtshop.quest.QuestEditor;
@@ -234,6 +236,11 @@ public final class SelfTest {
             land(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             crash("land", t);
+        }
+        try {
+            plots(server, level, a, b, gx + 960, y, gz + 128);
+        } catch (Throwable t) {
+            crash("plots", t);
         }
         try {
             pricing();
@@ -1503,6 +1510,185 @@ public final class SelfTest {
     }
 
     // ------------------------------------------------------------------ 토지
+
+    /**
+     * 구획(3.9): 구불구불한 타원형 밀밭(가운데 나무, 둘레 풀 한 줄, 그 밖은 흙길)을 만들고
+     * 자동 채우기가 밭 모양을 정확히 고르는지, 구획 보호·구매·반환·저장이 맞는지 본다.
+     */
+    private static void plots(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b, int ox, int y, int oz) {
+        section("plots");
+        LandData data = LandData.get(server);
+        String dim = LandManager.dim(level);
+        int size = 40;
+        for (int cx = ox >> 4; cx <= (ox + size) >> 4; cx++) {
+            for (int cz = oz >> 4; cz <= (oz + size) >> 4; cz++) {
+                level.getChunk(cx, cz);
+            }
+        }
+        // 0 = 밖(풀), 1 = 밭, 2 = 풀 테두리, 3 = 흙길
+        int[][] kind = new int[size][size];
+        for (int dz = 0; dz < size; dz++) {
+            for (int dx = 0; dx < size; dx++) {
+                double ex = (dx - 19.5) / 15.0, ez = (dz - 19.5) / 9.0;
+                boolean notch = dx > 26 && dz < 16; // 오른쪽 위를 파낸 모양
+                kind[dz][dx] = ex * ex + ez * ez <= 1.0 && !notch ? 1 : 0;
+            }
+        }
+        for (int pass = 2; pass <= 3; pass++) {
+            int[][] next = new int[size][];
+            for (int dz = 0; dz < size; dz++) {
+                next[dz] = kind[dz].clone();
+            }
+            for (int dz = 1; dz < size - 1; dz++) {
+                for (int dx = 1; dx < size - 1; dx++) {
+                    if (kind[dz][dx] != 0) {
+                        continue;
+                    }
+                    int want = pass - 1;
+                    if (kind[dz][dx - 1] == want || kind[dz][dx + 1] == want || kind[dz - 1][dx] == want || kind[dz + 1][dx] == want) {
+                        next[dz][dx] = pass;
+                    }
+                }
+            }
+            kind = next;
+        }
+        LongOpenHashSet expected = new LongOpenHashSet();
+        for (int dz = 0; dz < size; dz++) {
+            for (int dx = 0; dx < size; dx++) {
+                BlockPos ground = new BlockPos(ox + dx, y, oz + dz);
+                for (int up = 1; up <= 6; up++) {
+                    level.setBlock(ground.above(up), Blocks.AIR.defaultBlockState(), 2);
+                }
+                switch (kind[dz][dx]) {
+                    case 1 -> {
+                        level.setBlock(ground, Blocks.FARMLAND.defaultBlockState(), 2);
+                        level.setBlock(ground.above(), Blocks.WHEAT.defaultBlockState(), 2);
+                        expected.add(PlotManager.key(ox + dx, oz + dz));
+                    }
+                    case 2 -> {
+                        level.setBlock(ground, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                        expected.add(PlotManager.key(ox + dx, oz + dz));
+                    }
+                    case 3 -> level.setBlock(ground, Blocks.DIRT_PATH.defaultBlockState(), 2);
+                    default -> {
+                        level.setBlock(ground, Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                        level.setBlock(ground.above(), Blocks.GRASS.defaultBlockState(), 2);
+                    }
+                }
+            }
+        }
+        // 밭 가운데 나무와 물길 (자동 채우기 때 구멍으로 남았다가 메워져야 함)
+        BlockPos tree = new BlockPos(ox + 12, y, oz + 20);
+        level.setBlock(tree, Blocks.DIRT.defaultBlockState(), 2);
+        for (int up = 1; up <= 3; up++) {
+            level.setBlock(tree.above(up), Blocks.OAK_LOG.defaultBlockState(), 2);
+        }
+        level.setBlock(tree.above(4), Blocks.OAK_LEAVES.defaultBlockState(), 2);
+        for (int dx = 22; dx <= 26; dx++) {
+            BlockPos w = new BlockPos(ox + dx, y, oz + 22);
+            level.setBlock(w.above(), Blocks.AIR.defaultBlockState(), 2);
+            level.setBlock(w, Blocks.WATER.defaultBlockState(), 2);
+        }
+
+        LongOpenHashSet got = PlotManager.floodField(level, ox + 20, oz + 20, -1);
+        int missing = 0, extra = 0;
+        if (got != null) {
+            for (long k : expected) {
+                if (!got.contains(k)) {
+                    missing++;
+                }
+            }
+            for (long k : got) {
+                if (!expected.contains(k)) {
+                    extra++;
+                }
+            }
+        }
+        check("auto fill picks exactly the curved field, its tree and water, and the grass rim, but not the path",
+                got != null && missing == 0 && extra == 0, (got == null ? "null" : got.size()) + " vs " + expected.size()
+                        + " (missing " + missing + ", extra " + extra + ")");
+        int pathX = -1, pathZ = -1;
+        for (int dz = 0; dz < size && pathX < 0; dz++) {
+            for (int dx = 0; dx < size; dx++) {
+                if (kind[dz][dx] == 3) {
+                    pathX = ox + dx;
+                    pathZ = oz + dz;
+                    break;
+                }
+            }
+        }
+        LongOpenHashSet onPath = PlotManager.floodField(level, pathX, pathZ, -1);
+        check("auto fill does not start on a path", onPath != null && onPath.isEmpty());
+        List<int[]> square = List.of(new int[]{0, 0}, new int[]{4, 0}, new int[]{4, 4}, new int[]{0, 4});
+        check("a polygon covers its inside and its edges", PlotManager.polygonCells(square).size() == 25);
+
+        int[] dropped = {0};
+        LandData.Claim claim = PlotManager.buildClaim(level, expected, -1, dropped);
+        check("a plot claim keeps the exact shape", claim != null && claim.area() == expected.size() && claim.mask != null
+                && claim.y0 == y - LandConfig.get().plotDepthBelow && claim.y1 == level.getMaxBuildHeight() - 1,
+                claim == null ? "null" : claim.area() + " y" + claim.y0);
+        if (claim == null) {
+            return;
+        }
+        LandData.Land plot = data.createPlot("test field", 5000);
+        data.addClaim(plot, claim);
+        BlockPos wheat = new BlockPos(ox + 20, y + 1, oz + 20);
+        BlockPos corner = new BlockPos(claim.x0, y, claim.z0); // 네모 범위 안이지만 모양 밖
+        check("the bounding-box corner is outside the plot shape", !claim.hasColumn(claim.x0, claim.z0)
+                && data.landAt(dim, corner) == null);
+        check("a plot for sale is protected from everyone", plot.forSale() && !LandManager.can(b, level, wheat, LandData.BREAK)
+                && !LandManager.can(a, level, wheat, LandData.PLACE));
+        check("right outside the curved edge nothing is protected", LandManager.can(b, level, corner, LandData.BREAK));
+
+        a.setPos(ox + 20.5, y + 1, oz + 20.5);
+        a.setXRot(0.0F);
+        ItemStack deed = new ItemStack(ModItems.LAND_DEED.get(), 1);
+        int aLands = data.landsOf(a.getUUID()).size();
+        LandManager.useDeed(a, deed, DeedItem.Type.NORMAL);
+        check("a land deed cannot be used over a plot", data.landsOf(a.getUUID()).size() == aLands && deed.getCount() == 1);
+
+        b.setPos(ox + 20.5, y + 1, oz + 20.5);
+        Economy.setWallet(b, 4999);
+        check("buying needs enough carried Gold", !PlotManager.buy(b) && plot.forSale() && Economy.wallet(b) == 4999);
+        Economy.setWallet(b, 6000);
+        check("standing in the plot you can buy it", PlotManager.buy(b) && plot.owner.equals(b.getUUID()) && Economy.wallet(b) == 1000);
+        check("after buying the owner may farm it and others may not",
+                LandManager.can(b, level, wheat, LandData.BREAK) && !LandManager.can(a, level, wheat, LandData.BREAK));
+        check("it cannot be bought twice", !PlotManager.buy(a));
+
+        LandData copy = LandData.load(data.save(new CompoundTag()));
+        LandData.Land loaded = copy.landAt(dim, wheat);
+        check("plots and their shape survive a save and reload", loaded != null && loaded.plot && loaded.price == 5000
+                && loaded.owner.equals(b.getUUID()) && copy.landAt(dim, corner) == null
+                && loaded.claims.get(0).area() == claim.area());
+
+        LandManager.handleAction(b, plot.id, LandManager.ACT_ABANDON, "", 0);
+        long refund = 5000L * LandConfig.get().plotRefundPercent / 100;
+        check("returning a plot refunds part of the price and puts it back on sale",
+                plot.forSale() && data.land(plot.id) != null && Economy.wallet(b) == 1000 + refund, Economy.wallet(b));
+
+        // 모양 고치기: 한쪽 절반만 남긴다
+        LongOpenHashSet half = new LongOpenHashSet();
+        for (long k : expected) {
+            if (PlotManager.kx(k) < ox + 20) {
+                half.add(k);
+            }
+        }
+        LandData.Claim smaller = PlotManager.buildClaim(level, half, plot.id, dropped);
+        data.replaceClaim(plot.claims.get(0), smaller);
+        check("a plot's shape can be edited", data.landAt(dim, new BlockPos(ox + 15, y, oz + 20)) == plot
+                && data.landAt(dim, new BlockPos(ox + 25, y, oz + 20)) == null);
+
+        data.removeLand(plot);
+        Economy.setWallet(b, 0);
+        for (int dz = 0; dz < size; dz++) {
+            for (int dx = 0; dx < size; dx++) {
+                for (int up = 0; up <= 6; up++) {
+                    level.setBlock(new BlockPos(ox + dx, y + up, oz + dz), Blocks.AIR.defaultBlockState(), 2);
+                }
+            }
+        }
+    }
 
     private static void land(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b, int gx, int y, int gz) {
         section("land");

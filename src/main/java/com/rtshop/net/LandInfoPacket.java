@@ -27,6 +27,8 @@ public final class LandInfoPacket {
         public String dim;
         public int x0, y0, z0, x1, y1, z1;
         public String type;
+        /** 바닥 칸 수. */
+        public int area;
     }
 
     public static final class View {
@@ -36,6 +38,8 @@ public final class LandInfoPacket {
         public boolean owner;
         public int myPerms;
         public int defaultPerms;
+        /** 구획 토지면 반환할 때 돌려받는 금액, 아니면 -1. */
+        public long plotRefund = -1;
         public final List<MemberView> members = new ArrayList<>();
         public final List<ClaimView> claims = new ArrayList<>();
     }
@@ -54,10 +58,13 @@ public final class LandInfoPacket {
             View v = new View();
             v.id = l.id;
             v.name = l.name;
-            v.ownerName = l.ownerName;
+            v.ownerName = l.forSale() ? "-" : l.ownerName;
             v.owner = LandManager.isOwner(viewer, l) || LandManager.bypass(viewer);
             v.myPerms = LandManager.perms(viewer, l);
             v.defaultPerms = l.defaultPerms;
+            if (l.plot) {
+                v.plotRefund = com.rtshop.land.PlotManager.refundOf(l);
+            }
             if (v.owner) {
                 for (LandData.Member m : l.members.values()) {
                     MemberView mv = new MemberView();
@@ -77,6 +84,7 @@ public final class LandInfoPacket {
                 cv.y1 = c.y1;
                 cv.z1 = c.z1;
                 cv.type = c.type == null ? "normal" : c.type;
+                cv.area = c.area();
                 v.claims.add(cv);
             }
             out.add(v);
@@ -94,6 +102,7 @@ public final class LandInfoPacket {
             buf.writeBoolean(v.owner);
             buf.writeVarInt(v.myPerms);
             buf.writeVarInt(v.defaultPerms);
+            buf.writeLong(v.plotRefund);
             buf.writeVarInt(v.members.size());
             for (MemberView m : v.members) {
                 buf.writeUUID(m.id);
@@ -110,6 +119,7 @@ public final class LandInfoPacket {
                 buf.writeInt(c.y1);
                 buf.writeInt(c.z1);
                 buf.writeUtf(c.type);
+                buf.writeVarInt(c.area);
             }
         }
     }
@@ -126,6 +136,7 @@ public final class LandInfoPacket {
             v.owner = buf.readBoolean();
             v.myPerms = buf.readVarInt();
             v.defaultPerms = buf.readVarInt();
+            v.plotRefund = buf.readLong();
             int mn = buf.readVarInt();
             for (int j = 0; j < mn; j++) {
                 MemberView m = new MemberView();
@@ -145,6 +156,7 @@ public final class LandInfoPacket {
                 c.y1 = buf.readInt();
                 c.z1 = buf.readInt();
                 c.type = buf.readUtf();
+                c.area = buf.readVarInt();
                 v.claims.add(c);
             }
             views.add(v);

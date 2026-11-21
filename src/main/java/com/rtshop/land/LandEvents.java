@@ -77,8 +77,10 @@ public final class LandEvents {
         Long last = LAST_MSG.get(p.getUUID());
         if (last == null || now - last >= 20 || now < last) {
             LAST_MSG.put(p.getUUID(), now);
-            p.displayClientMessage(Component.translatable("rtshop.land.denied", land == null ? "?" : land.ownerName)
-                    .withStyle(ChatFormatting.RED), true);
+            Component msg = land != null && land.forSale()
+                    ? Component.translatable("rtshop.plot.denied_sale", land.name, String.format("%,d", land.price))
+                    : Component.translatable("rtshop.land.denied", land == null ? "?" : land.ownerName);
+            p.displayClientMessage(msg.copy().withStyle(ChatFormatting.RED), true);
         }
     }
 
@@ -222,6 +224,9 @@ public final class LandEvents {
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (!(event.getEntity() instanceof ServerPlayer sp) || !(event.getLevel() instanceof ServerLevel level)) {
             return;
+        }
+        if (event.getItemStack().is(com.rtshop.item.ModItems.PLOT_WAND.get()) && sp.hasPermissions(2)) {
+            return; // 구획 지팡이(OP)는 토지 위에서도 칸을 고를 수 있어야 한다
         }
         BlockPos pos = event.getPos();
         Land land = LandManager.landAt(level, pos);
@@ -455,6 +460,9 @@ public final class LandEvents {
         if ((now + sp.getId()) % 10 != 0) {
             return;
         }
+        if (PlotManager.tick(sp, level, now)) {
+            return; // 구획 지팡이를 든 OP: 선택 영역을 그렸음
+        }
         DeedItem deed = null;
         if (sp.getMainHandItem().getItem() instanceof DeedItem d) {
             deed = d;
@@ -470,8 +478,7 @@ public final class LandEvents {
                 int shown = 0;
                 for (Claim o : data.claimsNear(dim, c.x0, c.y0, c.z0, c.x1, c.y1, c.z1, 24)) {
                     Land l = data.land(o.landId);
-                    drawBox(level, sp, o.x0, o.y0, o.z0, o.x1, o.y1, o.z1,
-                            l != null && l.owner.equals(sp.getUUID()) ? AQUA : ORANGE, 2);
+                    drawClaim(level, sp, o, l != null && l.owner.equals(sp.getUUID()) ? AQUA : ORANGE, 2);
                     if (++shown >= 4) {
                         break;
                     }
@@ -488,16 +495,26 @@ public final class LandEvents {
                 if (land != null) {
                     int shown = 0;
                     for (Claim o : land.claims) {
-                        if (!o.dim.equals(dim) || sp.distanceToSqr((o.x0 + o.x1) / 2.0, sp.getY(), (o.z0 + o.z1) / 2.0) > 96 * 96) {
+                        if (!o.dim.equals(dim) || (o.mask == null
+                                && sp.distanceToSqr((o.x0 + o.x1) / 2.0, sp.getY(), (o.z0 + o.z1) / 2.0) > 96 * 96)) {
                             continue;
                         }
-                        drawBox(level, sp, o.x0, o.y0, o.z0, o.x1, o.y1, o.z1, AQUA, 2);
+                        drawClaim(level, sp, o, AQUA, 2);
                         if (++shown >= 6) {
                             break;
                         }
                     }
                 }
             }
+        }
+    }
+
+    /** 구역 경계를 그린다. 칸 모양 구역은 바닥 둘레를 지면 높이를 따라 그린다. */
+    static void drawClaim(ServerLevel level, ServerPlayer sp, Claim o, Vector3f color, int step) {
+        if (o.mask != null) {
+            PlotManager.drawOutline(level, sp, o::hasColumn, o.x0, o.z0, o.x1, o.z1, color, 1200);
+        } else {
+            drawBox(level, sp, o.x0, o.y0, o.z0, o.x1, o.y1, o.z1, color, step);
         }
     }
 
