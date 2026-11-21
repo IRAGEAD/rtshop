@@ -793,6 +793,71 @@ public final class ShopLoader {
         return p.dynamicFood || p.stack.isEdible() || (res != null && res.processed.contains(id));
     }
 
+    /**
+     * 화로·훈연기·조합대처럼 수고비가 없는(=자동화할 수 있는) 조리법인가.
+     * 이런 조리법으로 싸게 만들 수 있는 음식은 그 값을 넘는 하한을 주지 않는다 (자동화로 돈을 찍어 내지 못하게).
+     */
+    private static boolean automatable(RecipeSolver.Recipe r, PricingConfig pc) {
+        return !pc.labor.containsKey(r.type) && !pc.margins.containsKey(r.type);
+    }
+
+    private record Need(double value, RecipeSolver.Recipe by, List<RecipeSolver.Pick> picks, double cheapest, List<RecipeSolver.Recipe> skipped) {
+    }
+
+    /**
+     * 한 음식의 매입가 하한: 재료를 모두 살 수 있는 조리법들의 순수 재료비 중 가장 큰 값.
+     * 단 자동화할 수 있는 조리법으로 더 싸게 만들 수 있으면, 그보다 비싼 조리법은 보호하지 않는다 (skipped).
+     */
+    private static Need need(String id, Map<String, List<RecipeSolver.Recipe>> makers, Map<String, Double> pcost, RecipeSolver.Env env,
+                             RecipeSolver.Config pure, PricingConfig pc) {
+        List<RecipeSolver.Recipe> rs = makers.getOrDefault(id, List.of());
+        double autoMin = Double.MAX_VALUE;
+        double min = Double.MAX_VALUE;
+        double[] costs = new double[rs.size()];
+        for (int i = 0; i < rs.size(); i++) {
+            costs[i] = RecipeSolver.purchaseRequirement(rs.get(i), id, pcost, env, pure, null);
+            if (costs[i] > 0) {
+                min = Math.min(min, costs[i]);
+                if (automatable(rs.get(i), pc)) {
+                    autoMin = Math.min(autoMin, costs[i]);
+                }
+            }
+        }
+        double best = -1;
+        RecipeSolver.Recipe by = null;
+        List<RecipeSolver.Recipe> skipped = new ArrayList<>();
+        for (int i = 0; i < rs.size(); i++) {
+            if (costs[i] <= 0) {
+                continue;
+            }
+            if (costs[i] > autoMin + 1.0e-6) {
+                skipped.add(rs.get(i));
+                continue;
+            }
+            if (costs[i] > best) {
+                best = costs[i];
+                by = rs.get(i);
+            }
+        }
+        List<RecipeSolver.Pick> picks = new ArrayList<>();
+        if (by != null) {
+            RecipeSolver.purchaseRequirement(by, id, pcost, env, pure, picks);
+        }
+        return new Need(best, by, picks, min == Double.MAX_VALUE ? -1 : min, skipped);
+    }
+
+    /** 다 쓰고 돌려받는 그릇(빈 양동이·병 등)을 되팔 때 받는 값. */
+    private static Map<String, Double> refunds(Map<String, Price> prices, PricingConfig pc) {
+        Map<String, Double> m = new HashMap<>();
+        for (Price p : prices.values()) {
+            if (p.sellableSomewhere && isPlain(p.stack)) {
+                double v = p.sellUnit >= 0 ? p.sellUnit : p.price * pc.sellRatio;
+                m.merge(itemId(p.stack), v, Math::max);
+            }
+        }
+        return m;
+    }
+
     /** 지금 가격표에서 살 수 있는 일반 아이템의 가장 싼 판매가. */
     private static Map<String, Double> supply(Map<String, Price> prices) {
         Map<String, Double> m = new HashMap<>();
@@ -843,6 +908,7 @@ public final class ShopLoader {
         int raised = 0;
         Set<String> raisedIds = new HashSet<>();
         for (int round = 0; round < 8; round++) {
+            RecipeSolver.setRefunds(refunds(out.prices, pc));
             Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(out.prices), usable, scan.env, cfg);
             boolean changed = false;
             for (Price p : out.prices.values()) {
@@ -850,42 +916,31 @@ public final class ShopLoader {
                     continue;
                 }
                 String id = itemId(p.stack);
-                double need = -1;
-                RecipeSolver.Recipe needBy = null;
-                List<RecipeSolver.Pick> needPicks = null;
-                for (RecipeSolver.Recipe r : makers.getOrDefault(id, List.of())) {
-                    List<RecipeSolver.Pick> picks = new ArrayList<>();
-                    double req = RecipeSolver.purchaseRequirement(r, id, pcost, scan.env, cfg, picks);
-                    if (req > need) {
-                        need = req;
-                        needBy = r;
-                        needPicks = picks;
-                    }
-                }
-                p.purchaseNeed = need;
-                if (need <= 0) {
+                Need n = need(id, makers, pcost, scan.env, cfg, pc);
+                p.purchaseNeed = n.value();
+                if (n.value() <= 0) {
                     continue;
                 }
                 double now = p.sellUnit >= 0 ? p.sellUnit : p.price * ratio;
-                if (now + 1.0e-6 >= need) {
+                if (now + 1.0e-6 >= n.value()) {
                     continue;
                 }
-                p.sellUnit = need;
-                p.price = Math.max(p.price, buyPrice(need, Math.max(pc.foodBuyMultiplier, 1.0 / ratio)));
+                p.sellUnit = n.value();
+                p.price = Math.max(p.price, buyPrice(n.value(), Math.max(pc.foodBuyMultiplier, 1.0 / ratio)));
                 p.finished = true;
-                p.basis = needBy.id;
+                p.basis = n.by().id;
                 p.purchaseBasis = true;
                 List<ShopData.Part> parts = new ArrayList<>();
-                for (RecipeSolver.Pick pick : needPicks) {
+                for (RecipeSolver.Pick pick : n.picks()) {
                     Item item = findItem(pick.item);
                     if (item != null) {
                         parts.add(new ShopData.Part(item, (float) pick.count));
                     }
                 }
-                double n = RecipeSolver.outputCount(needBy, id, scan.env);
-                if (!parts.isEmpty() && n > 0) {
+                double cnt = RecipeSolver.outputCount(n.by(), id, scan.env);
+                if (!parts.isEmpty() && cnt > 0) {
                     p.parts = parts;
-                    p.partsOut = (float) n;
+                    p.partsOut = (float) cnt;
                 }
                 changed = true;
                 if (raisedIds.add(id)) {
@@ -906,7 +961,9 @@ public final class ShopLoader {
         if (loaded.scan == null || loaded.scan.env == null) {
             return out;
         }
+        PricingConfig pc = PricingConfig.get();
         RecipeSolver.Config cfg = new RecipeSolver.Config();
+        cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
         List<RecipeSolver.Recipe> usable = new ArrayList<>();
         for (RecipeSolver.Recipe r : loaded.scan.recipes) {
@@ -915,25 +972,20 @@ public final class ShopLoader {
             }
         }
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
+        RecipeSolver.setRefunds(refunds(loaded.prices, pc));
         Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(loaded.prices), usable, loaded.scan.env, cfg);
         for (Price p : loaded.prices.values()) {
             if (!floorTarget(p, loaded.solved)) {
                 continue;
             }
             String id = itemId(p.stack);
-            double lo = Double.MAX_VALUE;
-            double hi = 0;
-            String loBy = "";
-            for (RecipeSolver.Recipe r : makers.getOrDefault(id, List.of())) {
-                double c = RecipeSolver.purchaseRequirement(r, id, pcost, loaded.scan.env, cfg, null);
-                if (c > 0 && c < lo) {
-                    lo = c;
-                    loBy = r.id + " [" + r.type + "]";
-                }
-                hi = Math.max(hi, c);
+            Need n = need(id, makers, pcost, loaded.scan.env, cfg, pc);
+            if (n.value() > 0 && n.cheapest() > 0 && n.value() > n.cheapest() * 1.3) {
+                out.add(String.format(Locale.ROOT, "%s | 매입가 %.1f | 싼 조리법 재료비 %.1f | 비싼 조리법 재료비 %.1f (%s)",
+                        id, p.sellUnit, n.cheapest(), n.value(), n.by() == null ? "" : n.by().type));
             }
-            if (lo < Double.MAX_VALUE && hi > lo * 1.3) {
-                out.add(String.format(Locale.ROOT, "%s | %.1f | %.1f | %s", id, p.sellUnit, lo, loBy));
+            for (RecipeSolver.Recipe r : n.skipped()) {
+                out.add(String.format(Locale.ROOT, "%s | 보호 안 함: %s [%s] (더 싼 자동화 조리법이 있음)", id, r.id, r.type));
             }
         }
         return out;
@@ -946,7 +998,8 @@ public final class ShopLoader {
             return out;
         }
         PricingConfig pc = PricingConfig.get();
-        RecipeSolver.Config cfg = pc.solverConfig();
+        RecipeSolver.Config cfg = new RecipeSolver.Config();
+        cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
         List<RecipeSolver.Recipe> usable = new ArrayList<>();
         for (RecipeSolver.Recipe r : loaded.scan.recipes) {
@@ -955,16 +1008,19 @@ public final class ShopLoader {
             }
         }
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
+        RecipeSolver.setRefunds(refunds(loaded.prices, pc));
         Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(loaded.prices), usable, loaded.scan.env, cfg);
         for (Price p : loaded.prices.values()) {
             if (!floorTarget(p, loaded.solved)) {
                 continue;
             }
             String id = itemId(p.stack);
+            Need n = need(id, makers, pcost, loaded.scan.env, cfg, pc);
             for (RecipeSolver.Recipe r : makers.getOrDefault(id, List.of())) {
-                // 손해 여부는 수고비·마진 없이 순수 재료비와 비교한다
-                List<RecipeSolver.Pick> picks = new ArrayList<>();
-                double cost = RecipeSolver.purchaseRequirement(r, id, pcost, loaded.scan.env, new RecipeSolver.Config(), picks);
+                if (n.skipped().contains(r)) {
+                    continue; // 더 싼 자동화 조리법이 있는 음식의 비싼 조리법 (보고서에 따로 적음)
+                }
+                double cost = RecipeSolver.purchaseRequirement(r, id, pcost, loaded.scan.env, cfg, null);
                 if (cost > 0 && p.sellUnit + 1.0e-6 < cost) {
                     out.add(String.format(Locale.ROOT, "%s 매입가 %.2f < 재료 구입비 %.2f (%s)", id, p.sellUnit, cost, r.id));
                 }

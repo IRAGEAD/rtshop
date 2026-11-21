@@ -708,6 +708,22 @@ public final class RecipeSolver {
     }
 
     /** 레시피 1회의 재료를 모두 pc(구입 원가) 기준으로 마련하는 비용. 한 칸이라도 마련할 수 없으면 INF. */
+    /** 조합 후 돌려받는 그릇(빈 양동이 등)을 되팔아 돌려받는 값. purchaseCosts/purchaseRequirement 전에 정해 둔다. */
+    private static Map<String, Double> refund = Map.of();
+
+    public static synchronized void setRefunds(Map<String, Double> values) {
+        refund = values == null ? Map.of() : values;
+    }
+
+    /** 재료 한 개를 사서 쓰는 순비용: 판매가 - 돌려받는 그릇의 되팔기 값. */
+    private static double netPurchase(String item, double price, Env env) {
+        String rem = env.remainder(item);
+        if (rem == null || rem.equals(item)) {
+            return price;
+        }
+        return Math.max(0, price - refund.getOrDefault(rem, 0.0));
+    }
+
     private static double purchaseTotal(Recipe r, Prepared p, Map<String, Double> pc, Env env, Config cfg, List<Pick> picksOut) {
         double total = cfg.flatExtra.getOrDefault(r.type, 0.0);
         Map<String, Double> sum = picksOut == null ? null : new LinkedHashMap<>();
@@ -725,9 +741,12 @@ public final class RecipeSolver {
                         continue; // 결과물 자신은 재료로 고르지 않는다
                     }
                     Double v = pc.get(item);
-                    if (v != null && v < best) {
-                        best = v;
-                        bestItem = item;
+                    if (v != null) {
+                        double net = netPurchase(item, v, env);
+                        if (net < best) {
+                            best = net;
+                            bestItem = item;
+                        }
                     }
                 }
             }
