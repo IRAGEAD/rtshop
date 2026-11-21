@@ -165,6 +165,7 @@ public final class GachaConfig {
         excludeMods.clear();
         excludeMods.add("cataclysm"); // L_Ender's Cataclysm: 보스 무기·장신구
         excludeMods.add("tacz"); // 총은 데이터(NBT)로 종류가 갈려서 따로 다루어야 함
+        excludeMods.add("simplehats"); // 꾸미기 모자(성능 없음): 장신구 뽑기를 모자로 채우지 않게
         excludeItems.clear();
         for (String s : new String[]{"irons_spellbooks:dev_staff", "irons_spellbooks:necronomicon_spell_book",
                 "irons_spellbooks:dragonskin_spell_book", "irons_spellbooks:legendary_spell_book", "minecraft:debug_stick"}) {

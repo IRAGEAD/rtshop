@@ -315,7 +315,7 @@ public class GachaEditScreen extends Screen {
         y += 16;
         label(x, y + 2, tr("rtshop.gachaedit.weight"), Ui.C_CREAM);
         box(x + 60, y, 50, e.get("weight").getAsString(), 6, v -> e.addProperty("weight", (int) Math.max(0, num(v, 0))));
-        label(x + 116, y + 2, tr("rtshop.gachaedit.weight_hint"), Ui.C_PARCH_DARK);
+        label(x + 116, y + 2, Ui.clip(this.font, tr("rtshop.gachaedit.weight_hint"), w - 116), Ui.C_PARCH_DARK);
         y += 16;
         if (!pet) {
             label(x, y + 2, tr("rtshop.gachaedit.count"), Ui.C_CREAM);
@@ -437,10 +437,9 @@ public class GachaEditScreen extends Screen {
                 box(x + 70 + i * (cw + 4), y, cw, w.has(gname) ? fmt(w.get(gname).getAsDouble()) : "0", 8,
                         v -> w.addProperty(gname, Math.max(0, dnum(v, 0))));
             }
-            y += 15;
+            y += 14;
         }
-        label(x, y + 2, tr("rtshop.gachaedit.odds_hint"), Ui.C_PARCH_DARK);
-        y += 14;
+        y += 2;
         label(x, y + 2, tr("rtshop.gachaedit.guarantee"), Ui.C_CREAM);
         final int gy = y;
         hit(x + 140, y - 1, 100, 14, () -> {
@@ -457,8 +456,14 @@ public class GachaEditScreen extends Screen {
                 markDirty();
             });
         });
-        y += 18;
         JsonObject sh = cfg.getAsJsonObject("shards");
+        hit(x + 250, y - 1, Math.min(170, W - 16 - 250), 14, () -> tr(sh.has("exchangeEnabled") && !sh.get("exchangeEnabled").getAsBoolean()
+                ? "rtshop.gachaedit.exchange_off" : "rtshop.gachaedit.exchange_on"), () -> true, b -> {
+            boolean on = !sh.has("exchangeEnabled") || sh.get("exchangeEnabled").getAsBoolean();
+            sh.addProperty("exchangeEnabled", !on);
+            markDirty();
+        });
+        y += 17;
         for (String kind : new String[]{"dismantle", "exchange"}) {
             JsonObject m = sh.getAsJsonObject(kind);
             label(x, y + 2, tr("rtshop.gachaedit." + kind), Ui.C_CREAM);
@@ -467,15 +472,9 @@ public class GachaEditScreen extends Screen {
                 box(x + 70 + i * (cw + 4), y, cw, m.has(gname) ? m.get(gname).getAsString() : "0", 7,
                         v -> m.addProperty(gname, (int) Math.max(0, num(v, 0))));
             }
-            y += 15;
+            y += 14;
         }
-        hit(x, y, 160, 14, () -> tr(sh.has("exchangeEnabled") && !sh.get("exchangeEnabled").getAsBoolean()
-                ? "rtshop.gachaedit.exchange_off" : "rtshop.gachaedit.exchange_on"), () -> true, b -> {
-            boolean on = !sh.has("exchangeEnabled") || sh.get("exchangeEnabled").getAsBoolean();
-            sh.addProperty("exchangeEnabled", !on);
-            markDirty();
-        });
-        y += 20;
+        y += 4;
         // 모의 뽑기
         final int sy = y;
         hit(x, y, 80, 14, () -> tr("rtshop.gacha.cat." + CATS[simCat]) + " ▼", () -> true, b -> {
@@ -589,7 +588,7 @@ public class GachaEditScreen extends Screen {
         this.renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
         g.drawString(this.font, this.title.getString() + (dirty ? " *" : ""), fx + 10, fy + 8, Ui.C_GOLD, true);
-        String hint = Ui.clip(this.font, tr(tab < 3 ? "rtshop.gachaedit.hint_pool" : "rtshop.attedit.hint_settings"), W - 140);
+        String hint = Ui.clip(this.font, tr(tab < 3 ? "rtshop.gachaedit.hint_pool" : "rtshop.gachaedit.hint_odds"), W - 140);
         g.drawString(this.font, hint, fx + W - 10 - this.font.width(hint), fy + 8, Ui.C_PARCH_DARK, false);
         for (Hit h : hits) {
             boolean hov = Ui.inside(mx, my, h.x(), h.y(), h.w(), h.h());

@@ -2194,7 +2194,8 @@ public final class SelfTest {
         }
         check("boss weapons (Cataclysm etc.) are left out of the gacha", boss.isEmpty(), boss);
         if (fullPack) {
-            check("the full pack also fills accessories (Curios items)", na >= 10, na);
+            check("the full pack also fills accessories (Curios items, cosmetic hats left out)", na >= 10
+                    && c.pool("accessory").stream().noneMatch(e -> e.item.startsWith("simplehats:")), na);
             StringBuilder sb = new StringBuilder();
             for (String cat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
                 int[] g = new int[5];
@@ -2208,7 +2209,20 @@ public final class SelfTest {
                         top.add(e.entity.isEmpty() ? e.item : e.entity);
                     }
                 }
-                info("gacha " + cat + " epic+legendary: " + top);
+                info("gacha " + cat + " epic+legendary (" + top.size() + "): " + String.join(" ", top.subList(0, Math.min(40, top.size()))));
+                java.util.Map<String, Integer> ns = new java.util.TreeMap<>();
+                for (com.rtshop.gacha.GachaConfig.Entry e : c.pool(cat)) {
+                    String id = e.entity.isEmpty() ? e.item : e.entity;
+                    ns.merge(id.substring(0, id.indexOf(':')), 1, Integer::sum);
+                }
+                info("gacha " + cat + " mods: " + ns);
+                if (cat.equals("pet")) {
+                    List<String> all = new ArrayList<>();
+                    for (com.rtshop.gacha.GachaConfig.Entry e : c.pool(cat)) {
+                        all.add(e.entity + "=" + e.grade);
+                    }
+                    info("gacha pets: " + String.join(" ", all));
+                }
             }
             info("gacha grades: " + sb);
         }

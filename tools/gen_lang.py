@@ -320,6 +320,8 @@ NEW = {
  "rtshop.gachaedit.exclude_items": ("자동 분류에서 뺄 아이템", "Items left out of auto-fill"),
  "rtshop.gachaedit.settings_hint1": ("뺄 모드·아이템은 쉼표로 구분합니다 (예: cataclysm). '자동 분류로 다시 채우기'에 쓰입니다.", "Comma separated; used by 'Refill automatically'."),
  "rtshop.gachaedit.settings_hint2": ("티켓 가격은 config/rtshop/shops/gacha_shop.json 에서 바꿉니다.", "Ticket prices: config/rtshop/shops/gacha_shop.json"),
+ "rtshop.gachaedit.hint_odds": ("확률은 비율 · 아이템 없는 등급은 빼고 계산 · 저장하면 바로 적용", "Ratios · empty grades skipped · saves apply at once"),
+ "rtshop.gacha.guarantee_short": ("10회: %s 이상 1개 보장", "x10: one %s or better"),
  "rtshop.gachaedit.hint_pool": ("왼쪽에서 고르고 오른쪽에서 고치기 · 저장하면 바로 적용", "Pick on the left, edit on the right"),
  "rtshop.hud.font": ("글꼴: %s", "Font: %s"),
  "rtshop.hud.font_default": ("기본 글꼴", "Default font"),

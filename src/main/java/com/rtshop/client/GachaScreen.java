@@ -372,11 +372,11 @@ public class GachaScreen extends Screen {
             if (!any) {
                 g.drawString(this.font, tr("rtshop.gacha.empty_short"), px + 8, yy, Ui.C_INK_SOFT, false);
             }
-        }
-        String gu = data.get("tenGuarantee").getAsString();
-        if (!gu.isEmpty()) {
-            String s = tr("rtshop.gacha.guarantee", tr("rtshop.gacha.grade." + gu));
-            g.drawString(this.font, Ui.clip(this.font, s, W - 16), fx + 8, fy + H - 36, Ui.C_CREAM, false);
+            String gu = data.get("tenGuarantee").getAsString();
+            if (!gu.isEmpty() && any) {
+                String s = tr("rtshop.gacha.guarantee_short", tr("rtshop.gacha.grade." + gu));
+                g.drawString(this.font, Ui.clip(this.font, s, pw - 8), px + 4, py + bodyH() - 52, Ui.C_INK_SOFT, false);
+            }
         }
     }
 

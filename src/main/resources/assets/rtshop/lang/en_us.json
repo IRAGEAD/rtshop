@@ -603,5 +603,7 @@
   "rtshop.gachaedit.exclude_items": "Items left out of auto-fill",
   "rtshop.gachaedit.settings_hint1": "Comma separated; used by 'Refill automatically'.",
   "rtshop.gachaedit.settings_hint2": "Ticket prices: config/rtshop/shops/gacha_shop.json",
-  "rtshop.gachaedit.hint_pool": "Pick on the left, edit on the right"
+  "rtshop.gachaedit.hint_pool": "Pick on the left, edit on the right",
+  "rtshop.gachaedit.hint_odds": "Ratios · empty grades skipped · saves apply at once",
+  "rtshop.gacha.guarantee_short": "x10: one %s or better"
 }
