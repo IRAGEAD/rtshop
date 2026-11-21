@@ -58,12 +58,19 @@ def main():
         json.dump(index, open(index_path, 'w'))
     # 같은 모드가 매니페스트와 overrides 에 모두 있으면 overrides 쪽(모드팩에 실제로 들어간 파일)만 쓴다
     def mod_ids(path):
+        # [[mods]] 블록의 modId 만 (dependencies 의 modId 는 빼고)
         try:
             with zipfile.ZipFile(path) as z:
                 toml = z.read('META-INF/mods.toml').decode('utf-8', 'replace')
-            return set(re.findall(r'modId\s*=\s*"([^"]+)"', toml))
         except Exception:
             return set()
+        ids = set()
+        for block in re.split(r'\n\s*\[\[', '\n' + toml):
+            if block.strip().startswith('mods]]'):
+                m = re.search(r'modId\s*=\s*"([^"]+)"', block)
+                if m:
+                    ids.add(m.group(1))
+        return ids
     ov_ids = set()
     for n in overrides:
         ov_ids |= mod_ids(os.path.join(cache, n))
