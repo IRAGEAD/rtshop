@@ -270,22 +270,26 @@ public final class ClientSelfTest {
                         hud.stream().map(com.rtshop.net.QuestHudPacket.Entry::id).toList());
                 check("the quest HUD shows a finished quest as ready to hand in", hud.size() == 3 && hud.get(2).ready() && !hud.get(0).ready());
                 shot(mc, "01_hud");
-                mc.setScreen(new HudEditScreen());
-                wait = 20;
-            }
-            case 3 -> {
-                check("the HUD position editor opens", mc.screen instanceof HudEditScreen);
+                HudEditScreen hudEdit = new HudEditScreen();
+                mc.setScreen(hudEdit);
                 if (mc.screen instanceof HudEditScreen hs) {
                     ClientConfig cfg = ClientConfig.get();
                     hs.select(HudEditScreen.QUEST);
                     double before = cfg.questHudScale;
+                    double beforeW = cfg.questHudWidth;
                     hs.mouseScrolled(0, 0, 1);
-                    check("the quest HUD can be resized in the HUD editor", cfg.questHudScale > before, cfg.questHudScale);
+                    check("the quest HUD can be resized in the HUD editor", cfg.questHudScale > before && cfg.questHudWidth > beforeW, cfg.questHudScale);
                     cfg.questHudScale = before;
+                    cfg.questHudWidth = beforeW;
                     cfg.clampQuest();
                     hs.clickRow2ForTest(1);
-                    check("the number of quests to show opens as a list", hs.popupForTest() != null && hs.popupForTest().sizeForTest() == 5);
                 }
+                wait = 20;
+            }
+            case 3 -> {
+                check("the HUD position editor opens", mc.screen instanceof HudEditScreen);
+                check("the number of quests to show opens as a list", mc.screen instanceof HudEditScreen hs
+                        && hs.popupForTest() != null && hs.popupForTest().sizeForTest() == 5);
                 shot(mc, "02_hud_edit");
                 if (mc.screen instanceof HudEditScreen hs && hs.popupForTest() != null) {
                     hs.popupForTest().pickForTest("3");

@@ -29,10 +29,10 @@ public final class ClientConfig {
     public double hudHeight = DEF_H;
 
     // 퀘스트 HUD (진행 중인 퀘스트와 목표). 위치는 화면 비율, 크기는 글자 배율과 너비 비율.
-    public static final double QDEF_W = 0.2;
+    public static final double QDEF_W = 0.3;
     public static final double QDEF_X = 1 - QDEF_W - 0.004;
     public static final double QDEF_Y = 0.56;
-    public static final double QDEF_SCALE = 1.0;
+    public static final double QDEF_SCALE = 0.9;
     public static final int QDEF_MAX = 3;
     public boolean questHudEnabled = true;
     public double questHudX = QDEF_X;
