@@ -1319,7 +1319,7 @@ public final class SelfTest {
         check("nothing sells for more than the shop charges for it", loops == 0, loops == 0 ? null : loops + ":" + sample);
         check("no crafted item sells for more than its materials", craftLoops == 0, craftLoops == 0 ? null : craftLoops + ":" + sample);
         List<String> buyLoss = ShopLoader.purchaseDeficits(l);
-        check("buying every ingredient from the shops and cooking never loses money, whichever recipe is used",
+        check("buying ingredients from the shops and cooking never loses money, and a hopper-fed furnace cannot farm money",
                 buyLoss.isEmpty(), buyLoss.isEmpty() ? null : buyLoss.size() + ": " + String.join(" / ", buyLoss.subList(0, Math.min(8, buyLoss.size()))));
         int floored = 0;
         for (ShopLoader.Price p : l.prices.values()) {

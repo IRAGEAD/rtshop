@@ -797,11 +797,15 @@ public final class ShopLoader {
      * 화로·훈연기·조합대처럼 수고비가 없는(=자동화할 수 있는) 조리법인가.
      * 이런 조리법으로 싸게 만들 수 있는 음식은 그 값을 넘는 하한을 주지 않는다 (자동화로 돈을 찍어 내지 못하게).
      */
+    private static final Set<String> HOPPER_TYPES = Set.of("minecraft:smelting", "minecraft:smoking", "minecraft:blasting");
+
     private static boolean automatable(RecipeSolver.Recipe r, PricingConfig pc) {
-        return !pc.labor.containsKey(r.type) && !pc.margins.containsKey(r.type);
+        // 이 모드팩에는 자동 조합기가 없으므로, 사람 손 없이 돌릴 수 있는 것은 깔때기로 넣는 화로·훈연기·용광로뿐이다
+        return HOPPER_TYPES.contains(r.type) && !pc.labor.containsKey(r.type);
     }
 
-    private record Need(double value, RecipeSolver.Recipe by, List<RecipeSolver.Pick> picks, double cheapest, List<RecipeSolver.Recipe> skipped) {
+    private record Need(double value, RecipeSolver.Recipe by, List<RecipeSolver.Pick> picks, double cheapest, List<RecipeSolver.Recipe> skipped,
+                        double autoMin) {
     }
 
     /**
@@ -809,16 +813,22 @@ public final class ShopLoader {
      * 단 자동화할 수 있는 조리법으로 더 싸게 만들 수 있으면, 그보다 비싼 조리법은 보호하지 않는다 (skipped).
      */
     private static Need need(String id, Map<String, List<RecipeSolver.Recipe>> makers, Map<String, Double> pcost, RecipeSolver.Env env,
-                             RecipeSolver.Config pure, PricingConfig pc) {
+                             RecipeSolver.Config pure, PricingConfig pc, Map<String, Double> supply) {
         List<RecipeSolver.Recipe> rs = makers.getOrDefault(id, List.of());
         double autoMin = Double.MAX_VALUE;
         double min = Double.MAX_VALUE;
         double[] costs = new double[rs.size()];
         for (int i = 0; i < rs.size(); i++) {
-            costs[i] = RecipeSolver.purchaseRequirement(rs.get(i), id, pcost, env, pure, null);
+            List<RecipeSolver.Pick> used = new ArrayList<>();
+            costs[i] = RecipeSolver.purchaseRequirement(rs.get(i), id, pcost, env, pure, used);
             if (costs[i] > 0) {
                 min = Math.min(min, costs[i]);
-                if (automatable(rs.get(i), pc)) {
+                // 재료를 상점에서 산 그대로 화로에 넣어 만들 수 있는 경우만 '자동화 가능'으로 본다
+                boolean direct = !used.isEmpty();
+                for (RecipeSolver.Pick u : used) {
+                    direct &= supply.containsKey(u.item);
+                }
+                if (direct && automatable(rs.get(i), pc)) {
                     autoMin = Math.min(autoMin, costs[i]);
                 }
             }
@@ -843,7 +853,7 @@ public final class ShopLoader {
         if (by != null) {
             RecipeSolver.purchaseRequirement(by, id, pcost, env, pure, picks);
         }
-        return new Need(best, by, picks, min == Double.MAX_VALUE ? -1 : min, skipped);
+        return new Need(best, by, picks, min == Double.MAX_VALUE ? -1 : min, skipped, autoMin == Double.MAX_VALUE ? -1 : autoMin);
     }
 
     /** 다 쓰고 돌려받는 그릇(빈 양동이·병 등)을 되팔 때 받는 값. */
@@ -909,14 +919,15 @@ public final class ShopLoader {
         Set<String> raisedIds = new HashSet<>();
         for (int round = 0; round < 8; round++) {
             RecipeSolver.setRefunds(refunds(out.prices, pc));
-            Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(out.prices), usable, scan.env, cfg);
+            Map<String, Double> sup = supply(out.prices);
+            Map<String, Double> pcost = RecipeSolver.purchaseCosts(sup, usable, scan.env, cfg);
             boolean changed = false;
             for (Price p : out.prices.values()) {
                 if (!floorTarget(p, out.solved)) {
                     continue;
                 }
                 String id = itemId(p.stack);
-                Need n = need(id, makers, pcost, scan.env, cfg, pc);
+                Need n = need(id, makers, pcost, scan.env, cfg, pc, sup);
                 p.purchaseNeed = n.value();
                 if (n.value() <= 0) {
                     continue;
@@ -973,19 +984,20 @@ public final class ShopLoader {
         }
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
         RecipeSolver.setRefunds(refunds(loaded.prices, pc));
-        Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(loaded.prices), usable, loaded.scan.env, cfg);
+        Map<String, Double> sup = supply(loaded.prices);
+        Map<String, Double> pcost = RecipeSolver.purchaseCosts(sup, usable, loaded.scan.env, cfg);
         for (Price p : loaded.prices.values()) {
             if (!floorTarget(p, loaded.solved)) {
                 continue;
             }
             String id = itemId(p.stack);
-            Need n = need(id, makers, pcost, loaded.scan.env, cfg, pc);
+            Need n = need(id, makers, pcost, loaded.scan.env, cfg, pc, sup);
             if (n.value() > 0 && n.cheapest() > 0 && n.value() > n.cheapest() * 1.3) {
                 out.add(String.format(Locale.ROOT, "%s | 매입가 %.1f | 싼 조리법 재료비 %.1f | 비싼 조리법 재료비 %.1f (%s)",
                         id, p.sellUnit, n.cheapest(), n.value(), n.by() == null ? "" : n.by().type));
             }
             for (RecipeSolver.Recipe r : n.skipped()) {
-                out.add(String.format(Locale.ROOT, "%s | 보호 안 함: %s [%s] (더 싼 자동화 조리법이 있음)", id, r.id, r.type));
+                out.add(String.format(Locale.ROOT, "%s | 보호 안 함: %s [%s] (상점 재료를 화로에 바로 넣어 더 싸게 만들 수 있음)", id, r.id, r.type));
             }
         }
         return out;
@@ -1009,13 +1021,17 @@ public final class ShopLoader {
         }
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
         RecipeSolver.setRefunds(refunds(loaded.prices, pc));
-        Map<String, Double> pcost = RecipeSolver.purchaseCosts(supply(loaded.prices), usable, loaded.scan.env, cfg);
+        Map<String, Double> sup = supply(loaded.prices);
+        Map<String, Double> pcost = RecipeSolver.purchaseCosts(sup, usable, loaded.scan.env, cfg);
         for (Price p : loaded.prices.values()) {
             if (!floorTarget(p, loaded.solved)) {
                 continue;
             }
             String id = itemId(p.stack);
-            Need n = need(id, makers, pcost, loaded.scan.env, cfg, pc);
+            Need n = need(id, makers, pcost, loaded.scan.env, cfg, pc, sup);
+            if (n.autoMin() > 0 && p.sellUnit > n.autoMin() + 1.0e-6) {
+                out.add(String.format(Locale.ROOT, "%s 화로 자동화로 이익: 매입가 %.2f > 상점 재료를 구워 만드는 값 %.2f", id, p.sellUnit, n.autoMin()));
+            }
             for (RecipeSolver.Recipe r : makers.getOrDefault(id, List.of())) {
                 if (n.skipped().contains(r)) {
                     continue; // 더 싼 자동화 조리법이 있는 음식의 비싼 조리법 (보고서에 따로 적음)
