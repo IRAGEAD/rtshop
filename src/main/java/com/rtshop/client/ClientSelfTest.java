@@ -74,7 +74,7 @@ public final class ClientSelfTest {
     private static long expected = 0;
     private static volatile BlockPos cropPos = null;
     private static volatile String harvest = null;
-    private static final int LAST = 45;
+    private static final int LAST = 47;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -604,6 +604,25 @@ public final class ClientSelfTest {
             case 44 -> {
                 check("the quest window opens from the guide", mc.screen instanceof QuestScreen, mc.screen);
                 shot(mc, "24_quest_window");
+                mc.setScreen(null);
+                onServer(mc, com.rtshop.quest.QuestEditor::open);
+                wait = 20;
+            }
+            case 45 -> {
+                if (mc.screen instanceof QuestEditScreen s) {
+                    s.selectForTest("tutorial_2", 1);
+                    shot(mc, "25_qedit_story_after_fix");
+                    s.saveTitleForTest("클라이언트에서 고친 제목");
+                }
+                wait = 30;
+            }
+            case 46 -> {
+                com.rtshop.quest.QuestDef d = com.rtshop.quest.QuestManager.loaded().quests.get("tutorial_2");
+                check("saving from the editor screen reaches the server and applies at once",
+                        d != null && "클라이언트에서 고친 제목".equals(d.title), d == null ? null : d.title);
+                check("after a successful save the editor is no longer marked unsaved",
+                        mc.screen instanceof QuestEditScreen s && !s.isDirtyForTest());
+                shot(mc, "26_qedit_saved");
                 mc.setScreen(null);
                 wait = 10;
             }

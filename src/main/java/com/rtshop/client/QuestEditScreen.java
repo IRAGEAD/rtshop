@@ -581,7 +581,6 @@ public class QuestEditScreen extends Screen {
 
     private MultiLineEditBox area(int x, int y, int w, int h, String value, Consumer<String> onChange) {
         MultiLineEditBox b = new MultiLineEditBox(this.font, x, y, w, h, Component.empty(), Component.empty());
-        b.setCharacterLimit(4000);
         b.setValue(value == null ? "" : value);
         b.setValueListener(v -> {
             onChange.accept(v);
@@ -1235,6 +1234,19 @@ public class QuestEditScreen extends Screen {
         tab = tabIndex;
         loadSelected();
         rebuild();
+    }
+
+    /** 클라이언트 점검: 제목을 바꿔 실제 저장 버튼과 같은 길로 서버에 보낸다. */
+    public void saveTitleForTest(String title) {
+        if (q != null) {
+            q.title = title;
+            dirty = true;
+            save();
+        }
+    }
+
+    public boolean isDirtyForTest() {
+        return dirty;
     }
 
     public boolean hasDraftForTest() {
