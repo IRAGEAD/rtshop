@@ -83,6 +83,7 @@ public final class ClientSelfTest {
     private static final int NPC_END = FX_END + NPCS.length * 3;
     private static volatile int gachaNpc = -1;
     private static volatile int testNpc = -1;
+    private static final int EN_STEPS = 6;
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
@@ -313,6 +314,55 @@ public final class ClientSelfTest {
             default -> {
                 shot(mc, "58_fx_legendary_reveal");
                 check("the legendary animation plays", gs != null && gs.fxActiveForTest());
+                wait = 5;
+            }
+        }
+    }
+
+    /** 영어로 바꿔서 뽑기 화면 글자가 버튼 밖으로 나가지 않는지 본다. */
+    private static void englishStep(Minecraft mc, int k) {
+        GachaScreen gs = mc.screen instanceof GachaScreen s ? s : null;
+        switch (k) {
+            case 0 -> {
+                mc.setScreen(null);
+                mc.options.languageCode = "en_us";
+                mc.getLanguageManager().setSelected("en_us");
+                mc.reloadResourcePacks();
+                wait = 40;
+            }
+            case 1 -> {
+                if (mc.getOverlay() != null) {
+                    step--; // 다시 읽는 중
+                    wait = 20;
+                    return;
+                }
+                onServer(mc, sp -> com.rtshop.gacha.Gacha.open(sp, gachaNpc));
+                wait = 20;
+            }
+            case 2 -> {
+                if (gs != null) {
+                    gs.showForTest(2, 0, -1);
+                }
+                wait = 12;
+            }
+            case 3 -> {
+                shot(mc, "70_gacha_en_accessory");
+                if (gs != null) {
+                    check("English gacha tabs fit inside their buttons", gs.tabsFitForTest(), gs.tabsReportForTest());
+                    gs.showForTest(2, 1, -1);
+                }
+                wait = 5;
+            }
+            case 4 -> {
+                shot(mc, "71_gacha_en_tickets");
+                if (gs != null) {
+                    gs.showForTest(0, 2, -1);
+                }
+                wait = 5;
+            }
+            default -> {
+                shot(mc, "72_gacha_en_dismantle");
+                mc.setScreen(null);
                 wait = 5;
             }
         }
@@ -1194,13 +1244,17 @@ public final class ClientSelfTest {
                     npcStep(mc, step - FX_END - 1);
                     return;
                 }
-                if (step == NPC_END + 1) {
+                if (step > NPC_END && step <= NPC_END + EN_STEPS) {
+                    englishStep(mc, step - NPC_END - 1);
+                    return;
+                }
+                if (step == NPC_END + EN_STEPS + 1) {
                     check("no server-side error happened", serverError == null, serverError);
                     finish(mc);
                     return;
                 }
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > NPC_END + 40) {
+                if (step > NPC_END + EN_STEPS + 40) {
                     done = true;
                     mc.stop();
                 }

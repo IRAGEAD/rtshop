@@ -699,5 +699,6 @@
   "rtshop.gacha.fx.skip": "클릭해서 건너뛰기",
   "rtshop.msg.villager_broken": "이 주민의 거래 목록을 만들 수 없습니다 (다른 모드 오류).",
   "rtshop.gachaedit.ticket_cost": "티켓 교환",
-  "rtshop.gachaedit.top_mods": "영웅·전설 무기 모드"
+  "rtshop.gachaedit.top_mods": "영웅·전설 무기 모드",
+  "rtshop.gachaedit.weapon_mods": "일반~희귀 무기 모드"
 }

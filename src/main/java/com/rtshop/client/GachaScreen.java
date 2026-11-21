@@ -281,21 +281,41 @@ public class GachaScreen extends Screen {
             }));
             return;
         }
+        // 탭 너비는 글자 길이에 맞춘다 (영어처럼 긴 이름도 버튼 안에)
+        String[] catNames = {"rtshop.gacha.cat.weapon", "rtshop.gacha.cat.pet", "rtshop.gacha.cat.accessory"};
+        String[] modes = {"rtshop.gacha.mode.pull", "rtshop.gacha.mode.exchange", "rtshop.gacha.mode.dismantle"};
+        int[] cw = new int[3];
+        int[] mw = new int[3];
+        int total = 0;
+        for (int i = 0; i < 3; i++) {
+            cw[i] = Math.max(50, 26 + this.font.width(tr(catNames[i])));
+            mw[i] = Math.max(44, 12 + this.font.width(tr(modes[i])));
+            total += cw[i] + mw[i] + 4;
+        }
+        int room = W - 16 - 8;
+        if (total > room) {
+            double k = room / (double) total;
+            for (int i = 0; i < 3; i++) {
+                cw[i] = (int) (cw[i] * k);
+                mw[i] = (int) (mw[i] * k);
+            }
+        }
         int x = fx + 8;
         for (int i = 0; i < 3; i++) {
             final int c = i;
-            buttons.add(new Btn(x, fy + 23, 62, 18, "#cat" + i, true, () -> {
+            buttons.add(new Btn(x, fy + 23, cw[i], 18, "#cat" + i, true, () -> {
                 setCat(c);
                 layout();
             }));
-            x += 64;
+            x += cw[i] + 2;
         }
-        String[] modes = {"rtshop.gacha.mode.pull", "rtshop.gacha.mode.exchange", "rtshop.gacha.mode.dismantle"};
-        int mx = fx + W - 8 - 3 * 58 - 4;
+        int mx = fx + W - 8 - (mw[0] + mw[1] + mw[2] + 4);
         for (int i = 0; i < 3; i++) {
             final int m = i;
             boolean en = mode != i && (i != 1 || b("exchangeEnabled"));
-            buttons.add(new Btn(mx + i * 60, fy + 24, 58, 16, tr(modes[i]), en, () -> {
+            int bx = mx;
+            mx += mw[i] + 2;
+            buttons.add(new Btn(bx, fy + 24, mw[i], 16, tr(modes[i]), en, () -> {
                 mode = m;
                 scroll = 0;
                 layout();
@@ -456,7 +476,17 @@ public class GachaScreen extends Screen {
             g.pose().scale(0.95F, 0.95F, 1);
             g.renderItem(new ItemStack(ticketItem(i, 2)), 0, 0);
             g.pose().popPose();
-            g.drawString(this.font, tr(names[i]), bt.x() + 20, bt.y() + 5, sel ? 0xFFFFFFFF : (hover ? Ui.C_CREAM : Ui.C_PARCH_SHADE), sel);
+            String label = tr(names[i]);
+            int avail = bt.w() - 23;
+            int tw = this.font.width(label);
+            int col = sel ? 0xFFFFFFFF : (hover ? Ui.C_CREAM : Ui.C_PARCH_SHADE);
+            if (tw <= avail) {
+                g.drawString(this.font, label, bt.x() + 20, bt.y() + 5, col, sel);
+            } else if (tw * 0.75F <= avail) {
+                Ui.scaledText(g, this.font, label, bt.x() + 20, bt.y() + 6, avail / (float) tw, col, sel);
+            } else {
+                g.drawString(this.font, Ui.clip(this.font, label, avail), bt.x() + 20, bt.y() + 5, col, sel);
+            }
         }
     }
 
@@ -802,6 +832,30 @@ public class GachaScreen extends Screen {
         anim.start(grade, e == null ? new ItemStack(ModItems.SHARD.get()) : icon(e), e == null ? "?" : name(e));
         anim.jumpTo(tick);
         layout();
+    }
+
+    /** 점검용: 탭과 모드 버튼의 글자가 버튼 안에 들어가는지 (탭은 아이콘 옆 공간 기준, 줄여 그리는 것은 허용). */
+    public boolean tabsFitForTest() {
+        return tabsReportForTest().isEmpty();
+    }
+
+    public String tabsReportForTest() {
+        StringBuilder sb = new StringBuilder();
+        String[] names = {"rtshop.gacha.cat.weapon", "rtshop.gacha.cat.pet", "rtshop.gacha.cat.accessory"};
+        for (Btn bt : buttons) {
+            if (bt.label().startsWith("#cat")) {
+                String l = tr(names[bt.label().charAt(4) - '0']);
+                if (this.font.width(l) * 0.75F > bt.w() - 23) {
+                    sb.append(l).append(' ');
+                }
+            } else if (this.font.width(bt.label()) > bt.w() - 4) {
+                sb.append(bt.label()).append(' ');
+            }
+            if (bt.x() + bt.w() > fx + W - 4) {
+                sb.append("outside:").append(bt.label()).append(' ');
+            }
+        }
+        return sb.toString().trim();
     }
 
     public boolean fxActiveForTest() {

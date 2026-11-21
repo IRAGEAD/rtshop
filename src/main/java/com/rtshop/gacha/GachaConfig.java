@@ -125,7 +125,7 @@ public final class GachaConfig {
     public boolean exchangeEnabled = true;
     /** 펫 뽑기의 일반·고급 등급 보상(펫 대신 조각). */
     public static final int[] PET_SHARDS = {2, 5};
-    public static final int CONFIG_VERSION = 2;
+    public static final int CONFIG_VERSION = 3;
     /** 자동 분류에서 뺄 모드·아이템 (보스 무기 등). */
     public final List<String> excludeMods = new ArrayList<>();
     public final List<String> excludeItems = new ArrayList<>();
@@ -153,6 +153,11 @@ public final class GachaConfig {
 
     // ------------------------------------------------------------------ 기본값
 
+    /** 등급 확률 (일반·고급·희귀·영웅·전설). 3.11 에서 낮춤. */
+    static final double[][] NEW_ODDS = {{80, 18, 2, 0, 0}, {58, 33, 8.4, 0.6, 0}, {0, 70, 26.5, 3.2, 0.3}};
+    /** 예전 기본 확률 (이 값 그대로면 새 확률로 바꾼다. 직접 고친 확률은 그대로 둔다). */
+    static final double[][] OLD_ODDS = {{72, 25, 3, 0, 0}, {45, 40, 14, 1, 0}, {0, 55, 39.5, 5, 0.5}};
+
     private static Tier tier(String id, double... w) {
         Tier t = new Tier();
         t.id = id;
@@ -163,9 +168,9 @@ public final class GachaConfig {
     public void defaults() {
         tiers.clear();
         // 영웅·전설은 낮게: 일반 뽑기는 희귀까지, 중급은 영웅 1%, 고급은 영웅 5% · 전설 0.5%
-        tiers.put("normal", tier("normal", 72, 25, 3, 0, 0));
-        tiers.put("mid", tier("mid", 45, 40, 14, 1, 0));
-        tiers.put("high", tier("high", 0, 55, 39.5, 5, 0.5));
+        tiers.put("normal", tier("normal", NEW_ODDS[0]));
+        tiers.put("mid", tier("mid", NEW_ODDS[1]));
+        tiers.put("high", tier("high", NEW_ODDS[2]));
         excludeMods.clear();
         excludeMods.add("cataclysm"); // L_Ender's Cataclysm: 보스 무기·장신구
         excludeMods.add("tacz"); // 총은 데이터(NBT)로 종류가 갈려서 따로 다루어야 함
@@ -219,19 +224,22 @@ public final class GachaConfig {
         return r == null ? 0 : r.ordinal();
     }
 
-    /** 영웅·전설 무기를 내는 모드 (EpicFight Nightfall 등). 이 모드의 무기는 영웅·전설에만, 다른 모드의 무기는 일반~희귀에만 둔다. */
-    public final List<String> topWeaponMods = new ArrayList<>(List.of("efn", "shadowwarrior", "shadow_warrior"));
+    /** 일반~희귀 무기를 가져올 모드 (기본: Epic Fight 의 기본 무기). */
+    public final List<String> weaponMods = new ArrayList<>(List.of("epicfight"));
+    /** 정해 둔 무기 말고도 영웅·전설 무기를 가져올 모드 (기본: 없음). */
+    public final List<String> topWeaponMods = new ArrayList<>();
     /** 등급을 정해 둔 무기 (아이템 ID → 등급). */
     static final Map<String, String> FIXED_WEAPONS = new LinkedHashMap<>();
 
     static {
+        // EpicFight Nightfall: HF-무라사마, HF-블레이드, 고대 스컬크 쌍검, 야마토 2종 = 전설
         for (String id : new String[]{"efn:hf_murasama", "efn:hf_blade", "efn:nf_dual_sword", "efn:yamato_dmc_in_sheath",
-                "efn:yamato_dmc4_in_sheath", "efn:meen_spear"}) {
+                "efn:yamato_dmc4_in_sheath"}) {
             FIXED_WEAPONS.put(id, "legendary");
         }
+        // 여제의 단검, 룬 단검, 초승달, 야수의 발톱, 선봉의 검, 쿠사비마루, 폐허의 대검 = 영웅
         for (String id : new String[]{"efn:nf_shortsword", "efn:nf_shortsword_2", "efn:crescent_moon", "efn:nf_claw",
-                "efn:sword_of_pioneer", "efn:kusabimaru", "efn:ruinsgreatsword", "efn:thornwheel", "efn:exsiliumgladius",
-                "efn:fire_exsiliumgladius", "efn:air_tachi", "efn:co_tachi", "efn:broadblade", "efn:crimson_moon"}) {
+                "efn:sword_of_pioneer", "efn:kusabimaru", "efn:ruinsgreatsword"}) {
             FIXED_WEAPONS.put(id, "epic");
         }
     }
@@ -255,8 +263,8 @@ public final class GachaConfig {
     }
 
     /**
-     * 무기: 일반~희귀는 공격력(근접)·내구도(활 등)·희귀도 순서로, 영웅·전설은 topWeaponMods 의 무기로만.
-     * 정해 둔 무기(FIXED_WEAPONS)와 LesRaisins 근접 무기(LR_MELEE)는 그 등급 그대로.
+     * 무기: 정해 둔 무기(FIXED_WEAPONS)와 LesRaisins 근접 무기(LR_MELEE)는 그 등급 그대로,
+     * 나머지는 weaponMods(기본 Epic Fight)의 기본 무기만 공격력·희귀도 순서로 일반~희귀에. topWeaponMods 의 무기는 영웅·전설에.
      */
     public List<Entry> autoWeapons() {
         List<Object[]> low = new ArrayList<>();
@@ -285,6 +293,9 @@ public final class GachaConfig {
                 }
                 if (topWeaponMods.contains(rl.getNamespace())) {
                     top.add(new Object[]{itemEntry(id, "epic", 10), weaponScore(s)});
+                    continue;
+                }
+                if (!weaponMods.contains(rl.getNamespace())) {
                     continue;
                 }
                 if (s.getRarity() == Rarity.EPIC) {
@@ -544,7 +555,7 @@ public final class GachaConfig {
         help.add("pools: 뽑기 종류별 목록 {item, count, nbt} 또는 {entity} + grade, weight(같은 등급 안에서의 비율).");
         help.add("tenGuarantee: 10회 뽑기에서 하나는 반드시 이 등급 이상. shards.dismantle: 등급별 분해 조각 수, shards.tickets: 티켓 한 장과 바꾸는 데 드는 조각 수.");
         help.add("item 에 rtshop:gacha_shard 를 넣은 칸은 뽑기 표시 없는 조각 보상입니다 (펫 뽑기의 일반·고급 등급).");
-        help.add("topWeaponMods: 영웅·전설 무기를 내는 모드 (자동 분류에서 이 모드의 무기만 영웅·전설, 다른 무기는 희귀까지).");
+        help.add("weaponMods: 자동 분류에서 일반~희귀 무기를 가져올 모드 (기본 epicfight). topWeaponMods: 정해 둔 무기 말고 영웅·전설 무기를 가져올 모드.");
         help.add("excludeMods/excludeItems: 자동 분류에서 뺄 모드·아이템 (보스 무기 등). 뽑기 티켓 가격은 config/rtshop/shops/gacha_shop.json.");
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
@@ -583,6 +594,9 @@ public final class GachaConfig {
         JsonArray ei = new JsonArray();
         excludeItems.forEach(ei::add);
         o.add("excludeItems", ei);
+        JsonArray wm = new JsonArray();
+        weaponMods.forEach(wm::add);
+        o.add("weaponMods", wm);
         JsonArray tm = new JsonArray();
         topWeaponMods.forEach(tm::add);
         o.add("topWeaponMods", tm);
@@ -661,6 +675,12 @@ public final class GachaConfig {
                 c.excludeMods.add(e.getAsString().trim());
             }
         }
+        if (o.has("weaponMods")) {
+            c.weaponMods.clear();
+            for (JsonElement e : o.getAsJsonArray("weaponMods")) {
+                c.weaponMods.add(e.getAsString().trim());
+            }
+        }
         if (o.has("topWeaponMods")) {
             c.topWeaponMods.clear();
             for (JsonElement e : o.getAsJsonArray("topWeaponMods")) {
@@ -726,7 +746,18 @@ public final class GachaConfig {
             c.tenGuarantee = old.tenGuarantee;
             c.tiers.clear();
             c.tiers.putAll(old.tiers);
+            for (int i = 0; i < TIERS.length; i++) {
+                Tier t = c.tiers.get(TIERS[i]);
+                if (t == null || java.util.Arrays.equals(t.weights, OLD_ODDS[i])) {
+                    c.tiers.put(TIERS[i], tier(TIERS[i], NEW_ODDS[i])); // 기본 확률을 쓰던 서버만 새 (낮춘) 확률로
+                }
+            }
             System.arraycopy(old.dismantle, 0, c.dismantle, 0, c.dismantle.length);
+            if (old.version >= 2) {
+                for (int i = 0; i < c.ticketCost.length; i++) {
+                    System.arraycopy(old.ticketCost[i], 0, c.ticketCost[i], 0, c.ticketCost[i].length);
+                }
+            }
             c.exchangeEnabled = old.exchangeEnabled;
             c.excludeItems.clear();
             c.excludeItems.addAll(old.excludeItems);
@@ -744,7 +775,11 @@ public final class GachaConfig {
             }
         }
         for (String cat : CATEGORIES) {
-            c.pool(cat).addAll(c.auto(cat, server));
+            if (old != null && old.version >= 2 && !cat.equals("weapon")) {
+                c.pool(cat).addAll(old.pool(cat)); // 2판 → 3판: 바뀐 것은 무기 규칙뿐, 펫·장신구 목록은 그대로
+            } else {
+                c.pool(cat).addAll(c.auto(cat, server));
+            }
         }
         try {
             c.save();

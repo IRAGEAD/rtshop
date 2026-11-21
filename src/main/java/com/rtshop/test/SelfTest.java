@@ -2507,15 +2507,19 @@ public final class SelfTest {
             for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("weapon")) {
                 int gi = com.rtshop.gacha.GachaConfig.gradeIndex(e.grade);
                 String ns = e.item.substring(0, e.item.indexOf(':'));
-                boolean karambit = e.item.equals("lrtactical:melee") && e.nbt.toLowerCase(java.util.Locale.ROOT).contains("karambit");
+                String nbt = e.nbt.toLowerCase(java.util.Locale.ROOT);
+                boolean lr = e.item.equals("lrtactical:melee");
                 if (gi >= 3) {
                     topN++;
-                    if (!c.topWeaponMods.contains(ns) && !karambit) {
+                    if (!ns.equals("efn") && !(lr && nbt.contains("karambit"))) {
                         badW.add(e.item + "@" + e.grade);
                     }
-                } else if (c.topWeaponMods.contains(ns)) {
+                } else if (!ns.equals("epicfight") && !(lr && (nbt.contains("baseball") || nbt.contains("dagger")) && gi == 2)) {
                     badW.add(e.item + "@" + e.grade);
                 }
+            }
+            if (c.pool("weapon").stream().filter(e -> e.item.startsWith("efn:")).count() != 12) {
+                badW.add("efn count " + c.pool("weapon").stream().filter(e -> e.item.startsWith("efn:")).count());
             }
             java.util.Map<String, String> want = java.util.Map.of("efn:hf_murasama", "legendary", "efn:yamato_dmc_in_sheath", "legendary",
                     "efn:kusabimaru", "epic", "efn:ruinsgreatsword", "epic");
@@ -2524,7 +2528,7 @@ public final class SelfTest {
                     badW.add("missing " + w.getKey());
                 }
             }
-            check("weapons: epic/legendary only from Nightfall-type mods (+ karambit), the fixed ones in place", topN > 0 && badW.isEmpty(), badW);
+            check("weapons: only the 12 fixed Nightfall weapons and the karambit are epic/legendary, the rest are Epic Fight base weapons", topN > 0 && badW.isEmpty(), badW);
             StringBuilder sb = new StringBuilder();
             for (String cat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
                 int[] g = new int[5];
@@ -2560,7 +2564,7 @@ public final class SelfTest {
         for (double x : hw) {
             sum += x;
         }
-        check("grade odds add up to 100% and legendary is rare", Math.abs(sum - 1) < 1e-9 && hw[4] <= 0.01 && hw[3] <= 0.06,
+        check("grade odds add up to 100% and legendary is rare", Math.abs(sum - 1) < 1e-9 && hw[4] <= 0.0031 && hw[3] <= 0.033,
                 java.util.Arrays.toString(hw));
         com.rtshop.gacha.GachaConfig again = com.rtshop.gacha.GachaConfig.fromJson(c.toJson());
         check("gacha settings survive saving", again.pool("weapon").size() == nw && again.tiers.get("high").weights[4] == c.tiers.get("high").weights[4]);

@@ -573,6 +573,9 @@ public class GachaEditScreen extends Screen {
         label(x, y + 2, tr("rtshop.gachaedit.exclude_items"), Ui.C_CREAM);
         box(x + lw, y, bw, join(cfg.getAsJsonArray("excludeItems")), 8000, v -> cfg.add("excludeItems", split(v)));
         y += 16;
+        label(x, y + 2, tr("rtshop.gachaedit.weapon_mods"), Ui.C_CREAM);
+        box(x + lw, y, bw, join(cfg.getAsJsonArray("weaponMods")), 2000, v -> cfg.add("weaponMods", split(v)));
+        y += 16;
         label(x, y + 2, tr("rtshop.gachaedit.top_mods"), Ui.C_CREAM);
         box(x + lw, y, bw, join(cfg.getAsJsonArray("topWeaponMods")), 2000, v -> cfg.add("topWeaponMods", split(v)));
         y += 18;

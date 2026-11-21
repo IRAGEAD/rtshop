@@ -548,8 +548,8 @@
   "rtshop.gacha.buy_tickets": "Buy tickets",
   "rtshop.gacha.exchange_btn": "Trade",
   "rtshop.gacha.dismantle_btn": "Dismantle",
-  "rtshop.gacha.dismantle_low": "Dismantle common+uncommon",
-  "rtshop.gacha.dismantle_rare": "Dismantle up to rare",
+  "rtshop.gacha.dismantle_low": "Dismantle C/U",
+  "rtshop.gacha.dismantle_rare": "Dismantle up to R",
   "rtshop.gacha.cost": "%s shards",
   "rtshop.gacha.gives": "%s shards",
   "rtshop.gacha.view_only": "View only: pull at %s.",
@@ -699,5 +699,6 @@
   "rtshop.gacha.fx.skip": "Click to skip",
   "rtshop.msg.villager_broken": "This villager's trades couldn't be made (another mod's error).",
   "rtshop.gachaedit.ticket_cost": "Ticket cost",
-  "rtshop.gachaedit.top_mods": "Epic/legendary weapon mods"
+  "rtshop.gachaedit.top_mods": "Epic/legendary weapon mods",
+  "rtshop.gachaedit.weapon_mods": "Common-rare weapon mods"
 }
