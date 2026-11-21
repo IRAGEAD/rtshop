@@ -964,6 +964,79 @@ public final class ClientSelfTest {
             case LAST + 9 -> {
                 shot(mc, "44_attendance_settings");
                 mc.setScreen(null);
+                onServer(mc, sp -> {
+                    sp.getInventory().add(new ItemStack(com.rtshop.item.ModItems.TICKET_NORMAL.get(), 10));
+                    sp.getInventory().add(new ItemStack(com.rtshop.item.ModItems.TICKET_HIGH.get(), 10));
+                    net.minecraft.world.entity.npc.Villager v = com.rtshop.shop.ShopServer.spawnNpc(sp.serverLevel(),
+                            sp.position().add(sp.getLookAngle().scale(-2)), sp.getYRot(), "gacha");
+                    com.rtshop.gacha.Gacha.open(sp, v == null ? -1 : v.getId());
+                });
+                wait = 20;
+            }
+            case LAST + 10 -> {
+                check("talking to the gacha merchant opens the gacha window", mc.screen instanceof GachaScreen, mc.screen);
+                shot(mc, "45_gacha");
+                if (mc.screen instanceof GachaScreen s) {
+                    check("the gacha window shows the tickets you carry", s.dataForTest().getAsJsonArray("tickets").get(2).getAsInt() == 10);
+                    s.pullForTest(0, 2, 10);
+                }
+                wait = 20;
+            }
+            case LAST + 11 -> {
+                check("a premium 10-pull from the window shows 10 result cards", mc.screen instanceof GachaScreen s && s.resultsForTest() != null
+                        && s.resultsForTest().size() == 10, mc.screen instanceof GachaScreen s2 ? s2.resultsForTest() : mc.screen);
+                if (mc.screen instanceof GachaScreen s) {
+                    s.revealForTest();
+                }
+                wait = 5;
+            }
+            case LAST + 12 -> {
+                shot(mc, "46_gacha_result");
+                if (mc.screen instanceof GachaScreen s) {
+                    s.showForTest(0, 0, 2);
+                }
+                wait = 5;
+            }
+            case LAST + 13 -> {
+                shot(mc, "47_gacha_odds");
+                if (mc.screen instanceof GachaScreen s) {
+                    s.showForTest(0, 2, -1);
+                }
+                wait = 5;
+            }
+            case LAST + 14 -> {
+                shot(mc, "48_gacha_dismantle");
+                if (mc.screen instanceof GachaScreen s) {
+                    check("the dismantle tab lists the pulled items", s.dataForTest().getAsJsonArray("inventory").size() >= 1);
+                    s.clickForTest();
+                }
+                wait = 20;
+            }
+            case LAST + 15 -> {
+                check("the gacha editor opens for an operator", mc.screen instanceof GachaEditScreen, mc.screen);
+                if (mc.screen instanceof GachaEditScreen s) {
+                    s.selectForTest(0, 0);
+                }
+                wait = 5;
+            }
+            case LAST + 16 -> {
+                shot(mc, "49_gacha_edit");
+                if (mc.screen instanceof GachaEditScreen s) {
+                    s.selectForTest(3, 0);
+                    s.simulateForTest(0, 2);
+                }
+                wait = 20;
+            }
+            case LAST + 17 -> {
+                if (mc.screen instanceof GachaEditScreen s) {
+                    check("the editor's simulation runs 1,000 pulls on the server", s.simForTest() != null
+                            && s.simForTest().get("n").getAsInt() == 1000);
+                }
+                wait = 3;
+            }
+            case LAST + 18 -> {
+                shot(mc, "50_gacha_odds_edit");
+                mc.setScreen(null);
                 check("no server-side error happened", serverError == null, serverError);
                 finish(mc);
             }

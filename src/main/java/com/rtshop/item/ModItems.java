@@ -26,4 +26,20 @@ public final class ModItems {
     /** 일일 출석 진행도 복구권. */
     public static final RegistryObject<Item> RESTORE_TICKET = ITEMS.register("attendance_restore_ticket",
             () -> new RestoreTicketItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.EPIC)));
+
+    /** 뽑기 티켓 (일반 · 중급 · 고급): 주고받을 수 있다. */
+    public static final RegistryObject<Item> TICKET_NORMAL = ITEMS.register("gacha_ticket_normal",
+            () -> new TooltipItem(new Item.Properties().stacksTo(64), false, "item.rtshop.gacha_ticket.tip1", "item.rtshop.gacha_ticket.tip2"));
+    public static final RegistryObject<Item> TICKET_MID = ITEMS.register("gacha_ticket_mid",
+            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false,
+                    "item.rtshop.gacha_ticket.tip1", "item.rtshop.gacha_ticket.tip2"));
+    public static final RegistryObject<Item> TICKET_HIGH = ITEMS.register("gacha_ticket_high",
+            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.RARE), true,
+                    "item.rtshop.gacha_ticket.tip1", "item.rtshop.gacha_ticket.tip2"));
+    /** 뽑기 조각: 뽑은 아이템을 분해하면 나오고, 모아서 원하는 아이템과 바꾼다. */
+    public static final RegistryObject<Item> SHARD = ITEMS.register("gacha_shard",
+            () -> new TooltipItem(new Item.Properties().stacksTo(64), false, "item.rtshop.gacha_shard.tip"));
+    /** 펫 소환권 (뽑기에서 나오는 펫). */
+    public static final RegistryObject<Item> PET_SUMMON = ITEMS.register("pet_summon",
+            () -> new PetSummonItem(new Item.Properties().stacksTo(1)));
 }

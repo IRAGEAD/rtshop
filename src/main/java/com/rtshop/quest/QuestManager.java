@@ -359,6 +359,9 @@ public final class QuestManager {
             if (tag.equals(com.rtshop.attendance.Attendance.NPC_TAG)) {
                 return "attendance";
             }
+            if (tag.equals(com.rtshop.gacha.Gacha.NPC_TAG)) {
+                return "gacha";
+            }
         }
         return null;
     }
@@ -382,6 +385,9 @@ public final class QuestManager {
         }
         if (key.equals("attendance")) {
             return com.rtshop.attendance.AttendanceConfig.get().npcName;
+        }
+        if (key.equals("gacha")) {
+            return com.rtshop.gacha.GachaConfig.get().npcName;
         }
         if (key.startsWith("shop_")) {
             ShopData d = ShopServer.shops().get(key.substring(5));

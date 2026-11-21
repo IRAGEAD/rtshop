@@ -107,6 +107,7 @@ public final class QuestEditor {
         keys.add(new String[]{"bank", EconomyConfig.get().bankNpcName});
         keys.add(new String[]{"job", com.rtshop.job.JobConfig.get().npcName});
         keys.add(new String[]{"attendance", com.rtshop.attendance.AttendanceConfig.get().npcName});
+        keys.add(new String[]{"gacha", com.rtshop.gacha.GachaConfig.get().npcName});
         for (ShopData d : ShopServer.shops().values()) {
             keys.add(new String[]{"shop_" + d.id, d.npcName});
         }

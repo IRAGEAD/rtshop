@@ -46,6 +46,12 @@ public final class ClientHooks {
             screen.showResult(message, success);
         } else if (mc.screen instanceof PickerScreen p && p.parent instanceof QuestEditScreen screen) {
             screen.showResult(message, success);
+        } else if (mc.screen instanceof GachaScreen screen) {
+            screen.showResult(message, success);
+        } else if (mc.screen instanceof GachaEditScreen screen) {
+            screen.showResult(message, success);
+        } else if (mc.screen instanceof PickerScreen p && p.parent instanceof GachaEditScreen screen) {
+            screen.showResult(message, success);
         } else if (mc.screen instanceof AttendanceScreen screen) {
             screen.showResult(message, success);
         } else if (mc.screen instanceof AttendanceEditScreen screen) {
@@ -118,6 +124,43 @@ public final class ClientHooks {
             screen.update(packet.json);
         } else {
             mc.setScreen(new AttendanceScreen(packet.json));
+        }
+    }
+
+    /** 뽑기 창 / 결과 / 편집기 / 자동 분류 / 모의 뽑기. */
+    public static void openGacha(com.rtshop.net.GachaPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        GachaEditScreen editor = mc.screen instanceof GachaEditScreen ge ? ge
+                : (mc.screen instanceof PickerScreen p && p.parent instanceof GachaEditScreen ge2 ? ge2 : null);
+        switch (packet.mode) {
+            case com.rtshop.net.GachaPacket.EDITOR -> {
+                if (editor != null) {
+                    editor.update(packet.json);
+                } else {
+                    mc.setScreen(new GachaEditScreen(packet.json));
+                }
+            }
+            case com.rtshop.net.GachaPacket.AUTOFILL -> {
+                if (editor != null) {
+                    editor.autofill(packet.json);
+                }
+            }
+            case com.rtshop.net.GachaPacket.SIM -> {
+                if (editor != null) {
+                    editor.simulated(packet.json);
+                }
+            }
+            default -> {
+                boolean result = packet.mode == com.rtshop.net.GachaPacket.RESULT;
+                if (mc.screen instanceof GachaScreen screen) {
+                    screen.update(packet.json, result);
+                } else {
+                    mc.setScreen(new GachaScreen(packet.json));
+                    if (result && mc.screen instanceof GachaScreen screen) {
+                        screen.update(packet.json, true);
+                    }
+                }
+            }
         }
     }
 

@@ -91,6 +91,7 @@ public final class ShopServer {
         LandConfig.reload();
         com.rtshop.job.JobConfig.reload();
         com.rtshop.attendance.AttendanceConfig.reload();
+        com.rtshop.gacha.GachaConfig.reload(server);
         QuestManager.reload();
         loaded = ShopLoader.loadAll(server);
         SESSIONS.clear();
@@ -100,7 +101,8 @@ public final class ShopServer {
     public static boolean isNpc(Entity e) {
         for (String tag : e.getTags()) {
             if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX) || tag.startsWith(QuestManager.QUEST_TAG_PREFIX)
-                    || tag.equals(com.rtshop.job.Jobs.NPC_TAG) || tag.equals(com.rtshop.attendance.Attendance.NPC_TAG)) {
+                    || tag.equals(com.rtshop.job.Jobs.NPC_TAG) || tag.equals(com.rtshop.attendance.Attendance.NPC_TAG)
+                    || tag.equals(com.rtshop.gacha.Gacha.NPC_TAG)) {
                 return true;
             }
         }
@@ -172,6 +174,7 @@ public final class ShopServer {
         all.add(BANK);
         all.add("job");
         all.add("attendance");
+        all.add("gacha");
         for (String id : QuestManager.loaded().npcs.keySet()) {
             all.add("quest_" + id);
         }
@@ -247,6 +250,16 @@ public final class ShopServer {
                                     feedback(ctx.getSource(), Component.translatable("rtshop.job.cmd_cooldown", t.getDisplayName()));
                                     return 1;
                                 }))))
+                .then(Commands.literal("gacha")
+                        .executes(ctx -> {
+                            com.rtshop.gacha.Gacha.open(ctx.getSource().getPlayerOrException(), -1);
+                            return 1;
+                        })
+                        .then(Commands.literal("edit").requires(src -> src.getPlayer() == null || com.rtshop.gacha.Gacha.canEdit(src.getPlayer()))
+                                .executes(ctx -> {
+                                    com.rtshop.gacha.Gacha.openEditor(ctx.getSource().getPlayerOrException());
+                                    return 1;
+                                })))
                 .then(Commands.literal("attendance")
                         .executes(ctx -> {
                             com.rtshop.attendance.Attendance.open(ctx.getSource().getPlayerOrException(), -1);
@@ -452,6 +465,9 @@ public final class ShopServer {
         }
         if (type.equals("attendance")) {
             return com.rtshop.attendance.Attendance.spawnNpc(level, pos, yaw);
+        }
+        if (type.equals("gacha")) {
+            return com.rtshop.gacha.Gacha.spawnNpc(level, pos, yaw);
         }
         String name;
         String tag;

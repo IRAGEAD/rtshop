@@ -121,6 +121,12 @@ public final class ClientEvents {
             }
             List<Component> tips = event.getToolTip();
             int at = Math.min(1, tips.size());
+            if (com.rtshop.gacha.Gacha.marked(s)) {
+                String g = com.rtshop.gacha.Gacha.gradeOf(s);
+                tips.add(at++, Component.translatable("rtshop.gacha.tip_mark", Component.translatable("rtshop.gacha.grade." + g))
+                        .withStyle(st -> st.withColor(GachaColors.of(g))));
+                tips.add(at++, Component.translatable("rtshop.gacha.tip_nosell").withStyle(ChatFormatting.DARK_GRAY));
+            }
             int star = SeedRules.star(s);
             if (star > 0) {
                 tips.add(at++, Component.translatable("rtshop.tip.star", SeedRules.starText(star)).withStyle(ChatFormatting.YELLOW));

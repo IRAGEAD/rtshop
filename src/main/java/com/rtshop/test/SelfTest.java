@@ -276,6 +276,11 @@ public final class SelfTest {
             crash("attendance", t);
         }
         try {
+            gacha(server, level, a);
+        } catch (Throwable t) {
+            crash("gacha", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -2162,6 +2167,192 @@ public final class SelfTest {
         check("the attendance NPC can be placed with /rtshop npc attendance", v != null && v.getTags().contains(com.rtshop.attendance.Attendance.NPC_TAG)
                 && v.getCustomName() != null && v.getCustomName().getString().equals(c.npcName));
         check("the attendance NPC also takes part in quests", v != null && "attendance".equals(QuestManager.npcKey(v)));
+        if (v != null) {
+            v.discard();
+        }
+    }
+
+    // ------------------------------------------------------------------ 뽑기
+
+    private static void gacha(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("gacha");
+        com.rtshop.gacha.GachaConfig c = com.rtshop.gacha.GachaConfig.get();
+        int nw = c.pool("weapon").size();
+        int np = c.pool("pet").size();
+        int na = c.pool("accessory").size();
+        info("gacha pools: weapons " + nw + ", pets " + np + ", accessories " + na);
+        check("gacha.json is filled automatically (weapons and pets from the game)", nw >= 10 && np >= 3, nw + " / " + np + " / " + na);
+        boolean fullPack = net.minecraftforge.fml.ModList.get().isLoaded("cataclysm");
+        List<String> boss = new ArrayList<>();
+        for (String cat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
+            for (com.rtshop.gacha.GachaConfig.Entry e : c.pool(cat)) {
+                String id = e.entity.isEmpty() ? e.item : e.entity;
+                if (id.startsWith("cataclysm:") || c.excludeItems.contains(id)) {
+                    boss.add(id);
+                }
+            }
+        }
+        check("boss weapons (Cataclysm etc.) are left out of the gacha", boss.isEmpty(), boss);
+        if (fullPack) {
+            check("the full pack also fills accessories (Curios items)", na >= 10, na);
+            StringBuilder sb = new StringBuilder();
+            for (String cat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
+                int[] g = new int[5];
+                for (com.rtshop.gacha.GachaConfig.Entry e : c.pool(cat)) {
+                    g[com.rtshop.gacha.GachaConfig.gradeIndex(e.grade)]++;
+                }
+                sb.append(cat).append(java.util.Arrays.toString(g)).append(' ');
+                List<String> top = new ArrayList<>();
+                for (com.rtshop.gacha.GachaConfig.Entry e : c.pool(cat)) {
+                    if (e.grade.equals("legendary") || e.grade.equals("epic")) {
+                        top.add(e.entity.isEmpty() ? e.item : e.entity);
+                    }
+                }
+                info("gacha " + cat + " epic+legendary: " + top);
+            }
+            info("gacha grades: " + sb);
+        }
+        double[] hw = com.rtshop.gacha.Gacha.gradeChances(c, "weapon", "high");
+        double sum = 0;
+        for (double x : hw) {
+            sum += x;
+        }
+        check("grade odds add up to 100% and legendary is rare", Math.abs(sum - 1) < 1e-9 && hw[4] <= 0.01 && hw[3] <= 0.06,
+                java.util.Arrays.toString(hw));
+        com.rtshop.gacha.GachaConfig again = com.rtshop.gacha.GachaConfig.fromJson(c.toJson());
+        check("gacha settings survive saving", again.pool("weapon").size() == nw && again.tiers.get("high").weights[4] == c.tiers.get("high").weights[4]);
+        boolean refused;
+        try {
+            com.google.gson.JsonObject broken = c.toJson();
+            broken.getAsJsonObject("pools").getAsJsonArray("weapon").get(0).getAsJsonObject().addProperty("grade", "mythic");
+            com.rtshop.gacha.GachaConfig.fromJson(broken);
+            refused = false;
+        } catch (IllegalArgumentException e) {
+            refused = true;
+        }
+        check("an unknown grade in gacha.json is refused", refused);
+
+        // 시험용 목록: 등급마다 하나씩
+        com.google.gson.JsonObject tj = c.toJson();
+        com.google.gson.JsonArray tp = new com.google.gson.JsonArray();
+        String[] ids = {"minecraft:wooden_sword", "minecraft:stone_sword", "minecraft:iron_sword", "minecraft:diamond_sword", "minecraft:netherite_sword"};
+        for (int i = 0; i < 5; i++) {
+            com.google.gson.JsonObject e = new com.google.gson.JsonObject();
+            e.addProperty("item", ids[i]);
+            e.addProperty("count", 1);
+            e.addProperty("grade", com.rtshop.gacha.GachaConfig.GRADES[i]);
+            e.addProperty("weight", 10);
+            tp.add(e);
+        }
+        tj.getAsJsonObject("pools").add("weapon", tp);
+        com.rtshop.gacha.GachaConfig t = com.rtshop.gacha.GachaConfig.fromJson(tj);
+        net.minecraft.util.RandomSource rng = net.minecraft.util.RandomSource.create(42);
+        int[] counts = new int[5];
+        int n = 40_000;
+        for (int k = 0; k < n; k++) {
+            counts[com.rtshop.gacha.GachaConfig.gradeIndex(com.rtshop.gacha.Gacha.pull(t, "weapon", "high", 1, rng).get(0).grade)]++;
+        }
+        double[] want = com.rtshop.gacha.Gacha.gradeChances(t, "weapon", "high");
+        boolean close = true;
+        for (int g = 0; g < 5; g++) {
+            close &= Math.abs(counts[g] / (double) n - want[g]) < 0.01;
+        }
+        check("pulls follow the published odds (40,000 simulated pulls)", close, java.util.Arrays.toString(counts));
+        boolean noRareInNormalSingles = true;
+        com.google.gson.JsonObject nj = t.toJson();
+        nj.getAsJsonObject("tiers").getAsJsonObject("normal").addProperty("rare", 0);
+        com.rtshop.gacha.GachaConfig t2 = com.rtshop.gacha.GachaConfig.fromJson(nj);
+        for (int k = 0; k < 2000; k++) {
+            noRareInNormalSingles &= com.rtshop.gacha.GachaConfig.gradeIndex(com.rtshop.gacha.Gacha.pull(t2, "weapon", "normal", 1, rng).get(0).grade) < 2;
+        }
+        boolean guaranteed = true;
+        for (int k = 0; k < 200; k++) {
+            int best = 0;
+            for (var e : com.rtshop.gacha.Gacha.pull(t2, "weapon", "normal", 10, rng)) {
+                best = Math.max(best, com.rtshop.gacha.GachaConfig.gradeIndex(e.grade));
+            }
+            guaranteed &= best >= 2;
+        }
+        check("10 pulls always include a rare or better, even when single pulls can't give one", noRareInNormalSingles && guaranteed);
+
+        // 실제 플레이어
+        clear(a);
+        a.getInventory().add(new ItemStack(ModItems.TICKET_NORMAL.get(), 12));
+        check("pulling needs the gacha merchant", com.rtshop.gacha.Gacha.doPull(a, "weapon", "normal", 1, true) == null);
+        var got = com.rtshop.gacha.Gacha.doPull(a, "weapon", "normal", 10, false);
+        long marked = count(a, com.rtshop.gacha.Gacha::marked);
+        check("a 10-pull uses 10 tickets and gives 10 marked items", got != null && got.size() == 10
+                && count(a, st -> st.is(ModItems.TICKET_NORMAL.get())) == 2 && marked >= 1, (got == null ? "null" : got.size()) + " " + marked);
+        check("with 2 tickets left a 10-pull is refused", com.rtshop.gacha.Gacha.doPull(a, "weapon", "normal", 10, false) == null
+                && count(a, st -> st.is(ModItems.TICKET_NORMAL.get())) == 2);
+        ItemStack sample = ItemStack.EMPTY;
+        for (ItemStack st : a.getInventory().items) {
+            if (com.rtshop.gacha.Gacha.marked(st)) {
+                sample = st;
+                break;
+            }
+        }
+        boolean unsellable = !sample.isEmpty();
+        for (ShopData d : ShopServer.shops().values()) {
+            unsellable &= d.findSellEntry(sample) < 0;
+        }
+        check("gacha items can't be sold to any shop", unsellable, sample);
+        int shards = com.rtshop.gacha.Gacha.dismantleAll(a, 4, false);
+        check("dismantling gives shards and removes the items", shards > 0 && count(a, com.rtshop.gacha.Gacha::marked) == 0
+                && count(a, st -> st.is(ModItems.SHARD.get())) == shards, shards);
+        a.getInventory().add(new ItemStack(ModItems.SHARD.get(), 64));
+        a.getInventory().add(new ItemStack(ModItems.SHARD.get(), 64));
+        int idx = -1;
+        for (int k = 0; k < c.pool("weapon").size(); k++) {
+            if (c.pool("weapon").get(k).grade.equals("rare") && com.rtshop.gacha.GachaConfig.valid(c.pool("weapon").get(k))) {
+                idx = k;
+                break;
+            }
+        }
+        long before = count(a, st -> st.is(ModItems.SHARD.get()));
+        boolean ex = idx >= 0 && com.rtshop.gacha.Gacha.exchange(a, "weapon", idx, false);
+        check("shards can be traded for a chosen item", ex && count(a, com.rtshop.gacha.Gacha::marked) == 1
+                && before - count(a, st -> st.is(ModItems.SHARD.get())) == c.exchange[2], idx);
+        // 펫 소환권
+        BlockPos at = level.getSharedSpawnPos().above(8);
+        level.getChunkAt(at);
+        List<String> petFails = new ArrayList<>();
+        int tested = 0;
+        for (com.rtshop.gacha.GachaConfig.Entry e : c.pool("pet")) {
+            ItemStack st = com.rtshop.gacha.Gacha.stackOf(e, "pet");
+            net.minecraft.world.entity.Entity pet = com.rtshop.item.PetSummonItem.summon(a, st, Vec3.atBottomCenterOf(at));
+            tested++;
+            if (!(pet instanceof net.minecraft.world.entity.TamableAnimal ta) || !a.getUUID().equals(ta.getOwnerUUID())) {
+                petFails.add(e.entity);
+            }
+            if (pet != null) {
+                pet.discard();
+            }
+        }
+        check("every pet in the gacha appears tamed to the player (" + tested + " pets)", tested > 0 && petFails.isEmpty(), petFails);
+        clear(a);
+        // 편집은 OP 만
+        check("players who are not OP can't edit the gacha", !com.rtshop.gacha.Gacha.canEdit(a)
+                && !com.rtshop.gacha.Gacha.view(a).get("canEdit").getAsBoolean());
+        com.google.gson.JsonObject hack = new com.google.gson.JsonObject();
+        com.google.gson.JsonObject hj = c.toJson();
+        hj.addProperty("npcName", "hacked");
+        hack.addProperty("json", hj.toString());
+        com.rtshop.gacha.Gacha.handleAction(a, com.rtshop.net.GachaActionPacket.SAVE, hack.toString());
+        check("...and a save sent by a non-OP is ignored", !com.rtshop.gacha.GachaConfig.get().npcName.equals("hacked"));
+        // 티켓 상점
+        ShopData shop = ShopServer.shops().get("gacha_shop");
+        check("the ticket shop is installed", shop != null);
+        if (shop != null) {
+            int i1 = findEntry(shop, en -> en.stack.is(ModItems.TICKET_NORMAL.get()));
+            int i2 = findEntry(shop, en -> en.stack.is(ModItems.TICKET_MID.get()));
+            int i3 = findEntry(shop, en -> en.stack.is(ModItems.TICKET_HIGH.get()));
+            check("tickets cost 1,000 / 5,000 / 20,000 G and can't be sold back", i1 >= 0 && i2 >= 0 && i3 >= 0
+                    && shop.entries.get(i1).price == 1000 && shop.entries.get(i2).price == 5000 && shop.entries.get(i3).price == 20000
+                    && !shop.entries.get(i3).sellable);
+        }
+        net.minecraft.world.entity.npc.Villager v = ShopServer.spawnNpc(level, Vec3.atBottomCenterOf(at), 0, "gacha");
+        check("the gacha merchant can be placed with /rtshop npc gacha", v != null && "gacha".equals(QuestManager.npcKey(v)));
         if (v != null) {
             v.discard();
         }

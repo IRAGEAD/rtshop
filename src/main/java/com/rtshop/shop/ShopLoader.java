@@ -181,7 +181,7 @@ public final class ShopLoader {
     }
 
     /** 나중 버전에서 새로 생긴 기본 상점 (기존 상점 파일은 건드리지 않고, 한 번만 설치한다). */
-    public static final String[] ADDED = {"attendance_shop"};
+    public static final String[] ADDED = {"attendance_shop", "gacha_shop"};
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");

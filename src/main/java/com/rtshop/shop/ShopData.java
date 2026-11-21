@@ -116,8 +116,8 @@ public final class ShopData {
 
     /** 이 아이템을 팔 수 있는 품목의 번호. 없으면 -1. NBT 가 정확히 같은 품목이 우선. */
     public int findSellEntry(ItemStack s) {
-        if (s.isEmpty()) {
-            return -1;
+        if (s.isEmpty() || com.rtshop.gacha.Gacha.marked(s)) {
+            return -1; // 뽑기로 얻은 물건은 상점에 팔 수 없다 (Gold → 뽑기 → 판매 로 돈이 불어나지 않게)
         }
         int loose = -1;
         for (int i = 0; i < entries.size(); i++) {
