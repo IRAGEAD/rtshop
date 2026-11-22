@@ -1146,7 +1146,7 @@
   "rtshop.qedit.hint_advancement": "→ 발전과제를 이루면 완료 (예: minecraft:nether/root)",
   "rtshop.qedit.hint_dimension": "→ 그 차원에 들어가면 완료 (예: minecraft:the_nether)",
   "rtshop.qedit.hint_flag": "→ 그 표식을 가지면 완료 (예: abyss_floor_2 = 나선의 심연 2층)",
-  "rtshop.ui.story_lock_short": "%s 후",
+  "rtshop.ui.story_lock_short": "%s 이후",
   "item.rtshop.scylla_clue": "이상한 단서",
   "item.rtshop.scylla_clue.desc1": "어딘가 폭풍 냄새가 난다.",
   "item.rtshop.scylla_clue.desc2": "쓰기: 수첩에 기록 · 웅크리고 쓰기: 수첩 보기 · 들고 주민에게 말 걸기: 소문 묻기",

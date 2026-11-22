@@ -534,7 +534,7 @@ NEW = {
  "rtshop.quest.obj.deliver": ("%s 납품", "Deliver %s"),
  "rtshop.quest.obj.kill": ("%s 처치", "Defeat %s"),
  "rtshop.quest.obj.visit": ("방문: %s", "Visit: %s"),
- "rtshop.ui.story_lock_short": ("%s 후", "After %s"),
+ "rtshop.ui.story_lock_short": ("%s 이후", "After %s"),
  "rtshop.msg.story_locked": ("이 장비는 메인 스토리 %s을 마치면 살 수 있습니다.", "This gear unlocks after finishing %s of the main story."),
  "rtshop.economy.death_story_boss": ("이야기 보스와의 싸움에서 쓰러졌습니다. 소지금은 잃지 않았습니다.", "You fell fighting a story boss. You kept your Gold."),
  "item.rtshop.scylla_clue": ("이상한 단서", "Strange Clue"),
