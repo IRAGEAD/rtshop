@@ -323,6 +323,11 @@ public final class SelfTest {
             crash("pvp", t);
         }
         try {
+            raid(server, level, a, b);
+        } catch (Throwable t) {
+            crash("raid", t);
+        }
+        try {
             restaurant(server, level, a, b);
         } catch (Throwable t) {
             crash("restaurant", t);
@@ -786,6 +791,203 @@ public final class SelfTest {
             com.rtshop.pvp.Pvp.forgetForTest(a);
             com.rtshop.pvp.Pvp.forgetForTest(b);
             com.rtshop.pvp.PvpConfig.reload();
+        }
+    }
+
+    // ------------------------------------------------------------------ 주간 레이드
+
+    private static void raid(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
+        section("weekly raid");
+        java.nio.file.Path file = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("raid.json");
+        byte[] fileBefore = Files.exists(file) ? Files.readAllBytes(file) : null;
+        com.rtshop.raid.RaidConfig c = com.rtshop.raid.RaidConfig.fresh();
+        c.boss = "minecraft:zombie";
+        c.requireKill = "minecraft:pig";
+        c.requireKills = 1;
+        c.healthMultiplier = 3.0;
+        c.damageMultiplier = 2.0;
+        c.arenaDim = com.rtshop.pvp.Pvp.dim(level);
+        c.arenaX = 6000;
+        c.arenaY = 150;
+        c.arenaZ = 6000;
+        c.arenaRadius = 12;
+        c.arenaHeight = 12;
+        c.returnSet = true;
+        c.returnX = 100.5;
+        c.returnY = 100;
+        c.returnZ = 100.5;
+        c.weeklyGold = 777;
+        com.rtshop.raid.RaidConfig.setForTest(c);
+        com.rtshop.raid.RaidData data = com.rtshop.raid.RaidData.get(server);
+        Item ticket = com.rtshop.item.ModItems.RAID_TICKET.get(), eye = com.rtshop.item.ModItems.RAID_EYE.get(), esc = com.rtshop.item.ModItems.RAID_ESCAPE.get();
+        try {
+            com.rtshop.raid.Raid.resetForTest(server);
+            com.rtshop.raid.RaidConfig back = com.rtshop.raid.RaidConfig.parse(c.toJson());
+            check("raid settings, texts and rewards survive saving and loading", back.boss.equals("minecraft:zombie") && back.healthMultiplier == 3.0
+                    && back.rewards.size() == c.rewards.size() && back.text("successTitle").equals(c.text("successTitle")) && back.chanceFresh[5] == 0.05
+                    && back.weeklyGold == 777 && back.returnSet);
+            // 주간 초기화: 월요일 오전 6시
+            java.time.ZonedDateTime wed = java.time.ZonedDateTime.of(2026, 11, 25, 10, 0, 0, 0, java.time.ZoneId.systemDefault());
+            long ws = com.rtshop.raid.Weekly.weekStart(wed.toInstant().toEpochMilli(), 1, 6);
+            java.time.ZonedDateTime start = java.time.Instant.ofEpochMilli(ws).atZone(java.time.ZoneId.systemDefault());
+            long monEarly = java.time.ZonedDateTime.of(2026, 11, 30, 5, 59, 0, 0, java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long monLate = java.time.ZonedDateTime.of(2026, 11, 30, 6, 1, 0, 0, java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+            check("the week starts on Monday 06:00 (weekly rewards reset then)", start.getDayOfWeek() == java.time.DayOfWeek.MONDAY && start.getHour() == 6
+                    && start.getDayOfMonth() == 23 && com.rtshop.raid.Weekly.id(monEarly, 1, 6) == com.rtshop.raid.Weekly.id(wed.toInstant().toEpochMilli(), 1, 6)
+                    && com.rtshop.raid.Weekly.id(monLate, 1, 6) != com.rtshop.raid.Weekly.id(monEarly, 1, 6), start);
+            // 입장 조건
+            clear(a);
+            clear(b);
+            data.of(a.getUUID()).weeklyWeek = -1;
+            com.rtshop.raid.Raid.setKills(a, 0);
+            a.setPos(100.5, 100, 100.5);
+            String why0 = com.rtshop.raid.Raid.cannotEnter(a);
+            com.rtshop.raid.Raid.setKills(a, 1);
+            String why1 = com.rtshop.raid.Raid.cannotEnter(a);
+            a.getInventory().add(new ItemStack(ticket, 3));
+            check("entering needs one regular boss kill and a raid ticket", why0 != null && why0.equals(c.text("needKill", 1, 0)) && why1 != null
+                    && why1.equals(c.text("needTicket")) && com.rtshop.raid.Raid.cannotEnter(a) == null, why0 + " / " + why1);
+            boolean in = com.rtshop.raid.Raid.enter(a);
+            BlockPos altar = com.rtshop.raid.Raid.altarPos();
+            check("entering uses a ticket, builds the arena with an altar in the middle and hands out the summoning eye and the escape ticket",
+                    in && count(a, s -> s.is(ticket)) == 2 && count(a, s -> s.is(eye)) == 1 && count(a, s -> s.is(esc)) == 1 && com.rtshop.raid.Raid.inArena(a)
+                            && !level.getBlockState(altar).isAir() && level.getBlockState(altar.below()).is(net.minecraft.world.level.block.Blocks.GILDED_BLACKSTONE)
+                            && level.getBlockState(new BlockPos(6000 + 13, 152, 6000)).is(net.minecraft.world.level.block.Blocks.POLISHED_BLACKSTONE_BRICKS)
+                            && level.getBlockState(new BlockPos(6000 + 13, 158, 6000)).is(net.minecraft.world.level.block.Blocks.BARRIER),
+                    in + " " + count(a, s -> s.is(ticket)) + " " + level.getBlockState(altar));
+            // 구역 보호: 부수기·놓기 불가, PvP 불가
+            net.minecraftforge.event.level.BlockEvent.BreakEvent be = new net.minecraftforge.event.level.BlockEvent.BreakEvent(level, altar.below(), level.getBlockState(altar.below()), a);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(be);
+            check("blocks in the raid arena cannot be broken, and there is no PvP there", be.isCanceled()
+                    && com.rtshop.pvp.Pvp.area(level, 6000, 6000) == com.rtshop.pvp.Pvp.AREA_SAFE);
+            // 소환
+            boolean summoned = com.rtshop.raid.Raid.summon(a);
+            net.minecraft.world.entity.Entity boss = level.getEntity(com.rtshop.raid.Raid.bossIdForTest());
+            check("using the eye on the altar wakes the boss with more health than the regular one",
+                    summoned && com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.ACTIVE && boss instanceof net.minecraft.world.entity.LivingEntity le
+                            && le.getMaxHealth() >= 59.9 && le.getHealth() == le.getMaxHealth() && boss.getTags().contains(com.rtshop.raid.Raid.BOSS_TAG),
+                    boss == null ? null : ((net.minecraft.world.entity.LivingEntity) boss).getMaxHealth());
+            // 보스가 깨어난 뒤에는 들어올 수 없다
+            com.rtshop.raid.Raid.setKills(b, 1);
+            b.getInventory().add(new ItemStack(ticket, 1));
+            b.setPos(100.5, 100, 100.5);
+            check("once the boss is awake nobody else can enter", !com.rtshop.raid.Raid.enter(b) && count(b, s -> s.is(ticket)) == 1
+                    && c.text("locked").equals(com.rtshop.raid.Raid.cannotEnter(b)));
+            // 공격력 배율
+            if (boss instanceof net.minecraft.world.entity.LivingEntity le) {
+                net.minecraftforge.event.entity.living.LivingHurtEvent he = new net.minecraftforge.event.entity.living.LivingHurtEvent(a, level.damageSources().mobAttack(le), 4F);
+                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(he);
+                net.minecraft.world.entity.monster.Zombie plain = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
+                net.minecraftforge.event.entity.living.LivingHurtEvent control = new net.minecraftforge.event.entity.living.LivingHurtEvent(a, level.damageSources().mobAttack(plain), 4F);
+                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(control);
+                check("the raid boss hits harder by the configured factor", control.getAmount() > 0 && Math.abs(he.getAmount() - control.getAmount() * 2F) < 0.01,
+                        he.getAmount() + " vs " + control.getAmount());
+            }
+            // 아무도 남지 않으면 보스는 사라지고, 처치로 치지 않는다
+            long walletBefore = Economy.wallet(a);
+            boolean escaped = com.rtshop.raid.Raid.escape(a);
+            com.rtshop.raid.Raid.tick(server);
+            check("the escape ticket returns the player; with nobody left the boss disappears without counting as a kill",
+                    escaped && !com.rtshop.raid.Raid.inArena(a) && Math.abs(a.getX() - 100.5) < 0.01 && count(a, s -> s.is(eye) || s.is(esc)) == 0
+                            && com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.IDLE && (boss == null || !boss.isAlive())
+                            && !com.rtshop.raid.Raid.weeklyClaimed(a) && Economy.wallet(a) == walletBefore && !com.rtshop.raid.Raid.wasRewarded());
+            // 성공: 주간 보상 + 드랍 (가장 높은 등급은 서버 전체에 알림)
+            com.rtshop.raid.Raid.enter(a);
+            com.rtshop.raid.Raid.summon(a);
+            com.rtshop.raid.Raid.testRandom = () -> 0.0;
+            com.rtshop.raid.Raid.lastBroadcast = "";
+            walletBefore = Economy.wallet(a);
+            com.rtshop.raid.Raid.bossDead(server, true);
+            check("a kill by a player pays the weekly reward once and rolls the boss drops (top grade is announced with its custom name)",
+                    com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.DONE && com.rtshop.raid.Raid.weeklyClaimed(a) && Economy.wallet(a) == walletBefore + 777
+                            && count(a, s -> s.is(Items.DIAMOND)) == 8 && count(a, s -> s.is(Items.NETHER_STAR)) == c.rollsFresh
+                            && com.rtshop.raid.Raid.lastBroadcast.contains(c.text("mysteryName")),
+                    Economy.wallet(a) - walletBefore + " " + count(a, s -> s.is(Items.NETHER_STAR)) + " " + com.rtshop.raid.Raid.lastBroadcast);
+            // 이동 투표: 구역 안의 모두가 동의하면 바로 돌아간다
+            com.rtshop.raid.Raid.tick(server);
+            boolean waits = com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.DONE && com.rtshop.raid.Raid.inArena(a);
+            com.rtshop.raid.Raid.vote(a);
+            com.rtshop.raid.Raid.tick(server);
+            check("after the kill players wait for the countdown, or leave at once when everyone agrees", waits && !com.rtshop.raid.Raid.inArena(a)
+                    && com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.IDLE && Math.abs(a.getZ() - 100.5) < 0.01);
+            // 같은 주에 다시: 주간 보상 없음, 낮은 확률
+            clear(a);
+            a.getInventory().add(new ItemStack(ticket, 3));
+            walletBefore = Economy.wallet(a);
+            com.rtshop.raid.Raid.testRandom = () -> 0.6;
+            int got = com.rtshop.raid.Raid.reward(a);
+            check("the same week again: no weekly reward and lower drop odds (a 60 roll drops nothing where it would before)",
+                    Economy.wallet(a) == walletBefore && got == 0 && count(a, s -> s.is(Items.DIAMOND)) == 0
+                            && c.chanceRepeat[0] + c.chanceRepeat[1] + c.chanceRepeat[2] + c.chanceRepeat[3] + c.chanceRepeat[4] + c.chanceRepeat[5]
+                            < c.chanceFresh[0] + c.chanceFresh[1] + c.chanceFresh[2] + c.chanceFresh[3] + c.chanceFresh[4] + c.chanceFresh[5], got);
+            com.rtshop.raid.Weekly.testClockOffset += 8L * 24 * 3600 * 1000;
+            check("the weekly reward is available again after the Monday reset", !com.rtshop.raid.Raid.weeklyClaimed(a));
+            com.rtshop.raid.Weekly.testClockOffset = 0;
+            // 플레이어의 공격이 아닌 죽음: 보상 없음
+            data.of(a.getUUID()).weeklyWeek = -1;
+            com.rtshop.raid.Raid.enter(a);
+            com.rtshop.raid.Raid.summon(a);
+            walletBefore = Economy.wallet(a);
+            com.rtshop.raid.Raid.bossDead(server, false);
+            check("a boss that dies without a player's attack gives nothing", !com.rtshop.raid.Raid.weeklyClaimed(a) && Economy.wallet(a) == walletBefore
+                    && !com.rtshop.raid.Raid.wasRewarded() && com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.DONE);
+            com.rtshop.raid.Raid.forceEnd(server);
+            // 실패: 모두 쓰러지면 보스가 사라지고, 확인하면 마을로
+            com.rtshop.raid.Raid.enter(a);
+            com.rtshop.raid.Raid.summon(a);
+            net.minecraft.world.entity.Entity boss2 = level.getEntity(com.rtshop.raid.Raid.bossIdForTest());
+            com.rtshop.raid.Raid.downForTest(a);
+            com.rtshop.raid.Raid.tick(server);
+            boolean failed = com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.FAILED && (boss2 == null || !boss2.isAlive()) && com.rtshop.raid.Raid.inArena(a);
+            com.rtshop.raid.Raid.handle(a, com.rtshop.raid.Raid.ACT_LEAVE, "");
+            com.rtshop.raid.Raid.tick(server);
+            check("when everyone is down the raid fails: the boss goes, and players return after confirming", failed && !com.rtshop.raid.Raid.inArena(a)
+                    && !com.rtshop.raid.Raid.downed(a) && com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.IDLE && !com.rtshop.raid.Raid.weeklyClaimed(a));
+            // 편집기: 수치·문구·보상을 게임 안에서 고친다
+            com.rtshop.raid.RewardEditor.Target target = com.rtshop.raid.RewardEditor.TARGETS.get("raid");
+            com.google.gson.JsonObject model = target.model(a);
+            com.google.gson.JsonObject edited = new com.google.gson.JsonObject();
+            edited.addProperty("id", "raid");
+            com.google.gson.JsonObject ef = new com.google.gson.JsonObject();
+            ef.addProperty("healthMultiplier", "4.5");
+            ef.addProperty("chanceFresh5", "1.5");
+            ef.addProperty("text.mysteryName", "시험용 이름");
+            edited.add("fields", ef);
+            com.google.gson.JsonArray er = new com.google.gson.JsonArray();
+            er.add(new com.rtshop.raid.Reward(com.rtshop.raid.RaidConfig.G_DROP, 5, "minecraft:dragon_egg", 1).toJson());
+            edited.add("rewards", er);
+            target.apply(a, edited);
+            com.rtshop.raid.RaidConfig now = com.rtshop.raid.RaidConfig.get();
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.GOLDEN_APPLE, 5));
+            target.add(a, com.rtshop.raid.Reward.of(com.rtshop.raid.RaidConfig.G_WEEKLY, 0, a.getMainHandItem()));
+            check("the in-game editor changes numbers, texts and rewards (held items can be added with their count)",
+                    model.getAsJsonArray("fields").size() > 30 && model.getAsJsonArray("groups").size() == 2 && now.healthMultiplier == 4.5
+                            && now.chanceFresh[5] == 1.5 && now.text("mysteryName").equals("시험용 이름") && now.boss.equals("minecraft:zombie")
+                            && now.rewards.size() == 2 && now.rewards.get(1).count == 5 && now.rewards.get(1).item.equals("minecraft:golden_apple"),
+                    now.healthMultiplier + " " + now.rewards.size());
+            check("the raid guide and the raid merchant can be spawned, and the OP commands exist",
+                    !server.getCommands().getDispatcher().parse("rtshop npc raid_guide", server.createCommandSourceStack()).getReader().canRead()
+                            && !server.getCommands().getDispatcher().parse("rtshop raid arena here", server.createCommandSourceStack()).getReader().canRead()
+                            && !server.getCommands().getDispatcher().parse("rtshop raid edit", server.createCommandSourceStack()).getReader().canRead()
+                            && ShopServer.shops().containsKey("raid")
+                            && findEntry(ShopServer.shops().get("raid"), e -> e.stack.is(ticket) && e.buyable) >= 0);
+        } finally {
+            com.rtshop.raid.Raid.testRandom = null;
+            com.rtshop.raid.Weekly.testClockOffset = 0;
+            com.rtshop.raid.Raid.forceEnd(server);
+            com.rtshop.raid.Raid.resetForTest(server);
+            data.of(a.getUUID()).weeklyWeek = -1;
+            data.of(a.getUUID()).kills.clear();
+            data.of(b.getUUID()).kills.clear();
+            clear(a);
+            clear(b);
+            // 구역을 치운다
+            for (int x = 6000 - 15; x <= 6000 + 15; x++)
+                for (int z = 6000 - 15; z <= 6000 + 15; z++)
+                    for (int y = 148; y <= 164; y++) level.setBlock(new BlockPos(x, y, z), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+            if (fileBefore != null) Files.write(file, fileBefore);
+            else Files.deleteIfExists(file);
+            com.rtshop.raid.RaidConfig.reload();
         }
     }
 

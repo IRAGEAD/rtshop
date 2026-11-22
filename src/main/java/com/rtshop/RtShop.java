@@ -58,6 +58,7 @@ public class RtShop {
             event.accept(ModItems.GUARD_DAMAGE);
             event.accept(ModItems.GUARD_DESTROY);
             event.accept(ModItems.GUARD_FULL);
+            event.accept(ModItems.RAID_TICKET);
         }
     }
 }

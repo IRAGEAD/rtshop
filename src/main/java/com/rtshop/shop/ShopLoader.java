@@ -186,7 +186,7 @@ public final class ShopLoader {
     }
 
     /** 나중 버전에서 새로 생긴 기본 상점 (기존 상점 파일은 건드리지 않고, 한 번만 설치한다). */
-    public static final String[] ADDED = {"attendance_shop", "gacha_shop"};
+    public static final String[] ADDED = {"attendance_shop", "gacha_shop", "raid"};
     /** 기본 내용이 크게 바뀐 상점: "이름@판" 이 기록에 없으면 기존 파일을 backup 으로 옮기고 새 기본 파일로 바꾼다 (한 번만). */
     public static final String[] UPGRADED = {"gacha_shop@2"};
     /** 기존 상점 파일에 품목을 덧붙임: "상점+조각파일@판" (조각의 categories/items 중 없는 것만 추가, 한 번만). */

@@ -1,0 +1,24 @@
+{
+ "_설명": [
+  "레이드 상인 (/rtshop npc raid): 주간 레이드 참가 티켓을 팝니다. 값은 price 를 고치고 /rtshop reload.",
+  "레이드 안내인은 /rtshop npc raid_guide, 레이드 설정은 /rtshop raid edit"
+ ],
+ "title": "레이드 상점",
+ "npcName": "레이드 상인",
+ "profession": "armorer",
+ "categories": [
+  {
+   "id": "raid",
+   "name": "레이드",
+   "icon": "rtshop:raid_ticket"
+  }
+ ],
+ "items": [
+  {
+   "item": "rtshop:raid_ticket",
+   "price": 15000,
+   "category": "raid",
+   "sell": false
+  }
+ ]
+}

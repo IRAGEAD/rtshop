@@ -7,6 +7,30 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ # ---- 3.21: 주간 레이드, 보상 편집기
+ "item.rtshop.raid_ticket": ("레이드 참가 티켓", "Raid ticket"),
+ "item.rtshop.raid_ticket.tip1": ("레이드 안내인에게 말을 걸어 주간 레이드에 들어갈 때 1장을 씁니다.", "Used (one per entry) when you enter the weekly raid through the raid guide."),
+ "item.rtshop.raid_ticket.tip2": ("레이드 상인에게서 살 수 있습니다.", "Sold by the raid merchant."),
+ "item.rtshop.raid_eye": ("레이드 소환의 눈", "Raid eye of summoning"),
+ "item.rtshop.raid_eye.tip1": ("레이드 구역 가운데의 제단에 사용하면 레이드 보스가 깨어납니다.", "Use it on the altar in the middle of the raid arena to wake the raid boss."),
+ "item.rtshop.raid_eye.tip2": ("레이드 구역을 나가면 사라집니다.", "It disappears when you leave the raid arena."),
+ "item.rtshop.raid_escape": ("레이드 탈출권", "Raid escape ticket"),
+ "item.rtshop.raid_escape.tip1": ("레이드 구역 안에서 우클릭하면 언제든 마을로 돌아갑니다.", "Right-click inside the raid arena to return to town at any time."),
+ "item.rtshop.raid_escape.tip2": ("구역에 아무도 남지 않으면 보스는 사라집니다 (처치로 인정되지 않음).", "If nobody is left in the arena the boss disappears (it does not count as a kill)."),
+ "rtshop.raid.ui_kills": ("일반 이그니스 처치 %s / %s", "Regular boss kills %s / %s"),
+ "rtshop.raid.ui_tickets": ("참가 티켓 %s장", "Raid tickets: %s"),
+ "rtshop.raid.ui_open": ("입장 가능 · 지금 구역 안 %s명", "Open · %s player(s) inside"),
+ "rtshop.raid.ui_locked": ("보스가 깨어나 문이 닫혔습니다 · 구역 안 %s명", "The boss is awake, the gate is closed · %s inside"),
+ "rtshop.raid.ui_power": ("레이드 보스: 체력 %s%% · 공격력 %s%%", "Raid boss: health %s%% · attack %s%%"),
+ "rtshop.raid.ui_reset": ("주간 보상 초기화까지 %s일 %s시간", "Weekly reward resets in %sd %sh"),
+ "rtshop.redit.tab_num": ("수치", "Numbers"),
+ "rtshop.redit.tab_text": ("문구", "Texts"),
+ "rtshop.redit.tab_rewards": ("보상", "Rewards"),
+ "rtshop.redit.empty": ("이 묶음에는 보상이 없습니다. 아이템을 손에 들고 [손에 든 아이템 추가] 를 누르세요.", "No rewards in this group. Hold an item and press [Add held item]."),
+ "rtshop.redit.add_held": ("손에 든 아이템 추가", "Add held item"),
+ "rtshop.redit.hint": ("값을 눌러 고치고 [저장] 을 누르세요", "Click a value to edit, then press [Save]"),
+ "rtshop.redit.save": ("저장", "Save"),
+
  "rtshop.plot.bought_cleared": ("토지 안의 작물·구조물을 치웠습니다 (블록 %s개). 경작지와 물길은 그대로입니다.", "The crops and structures on the lot were cleared (%s blocks). Farmland and water channels are kept."),
 
  # ---- 3.20: PvP 켜기/끄기, 식당 주인

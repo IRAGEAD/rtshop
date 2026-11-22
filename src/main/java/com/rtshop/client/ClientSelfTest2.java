@@ -416,5 +416,89 @@ final class ClientSelfTest2 {
             });
             waitTicks(10);
         });
+
+        // ------------------------------------------------------------ 주간 레이드: 안내인 대화 → 입장 화면 → 확인, 투표·실패 창, 편집기
+        add(mc -> {
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.raid.Raid.open(sp, -1));
+            waitTicks(20);
+        });
+        add(mc -> {
+            RaidScreen rs = mc.screen instanceof RaidScreen x ? x : null;
+            check("talking to the raid guide starts with a short conversation", rs != null && rs.phaseForTest() == 0, mc.screen);
+            if (rs != null) rs.phaseForTest(1, false);
+            waitTicks(8);
+        });
+        add(mc -> {
+            shot(mc, "100_raid_dialogue");
+            if (mc.screen instanceof RaidScreen rs) rs.phaseForTest(3, false);
+            waitTicks(8);
+        });
+        add(mc -> {
+            RaidScreen rs = mc.screen instanceof RaidScreen x ? x : null;
+            check("then the boss entry screen lists the conditions and every reward (weekly + drops by grade)", rs != null && rs.rowsForTest() >= 10
+                    && !rs.canEnterForTest(), rs == null ? mc.screen : rs.rowsForTest());
+            shot(mc, "100b_raid_entry");
+            if (rs != null) rs.phaseForTest(3, true);
+            waitTicks(5);
+        });
+        add(mc -> {
+            shot(mc, "100c_raid_confirm");
+            com.rtshop.raid.RaidConfig c = com.rtshop.raid.RaidConfig.fresh();
+            com.google.gson.JsonObject o = new com.google.gson.JsonObject();
+            o.addProperty("mode", "vote");
+            o.addProperty("seconds", 30);
+            o.addProperty("agreed", 1);
+            o.addProperty("total", 3);
+            o.addProperty("voted", false);
+            com.google.gson.JsonObject t = new com.google.gson.JsonObject();
+            for (String k : c.texts.keySet()) t.addProperty(k, c.text(k));
+            o.add("texts", t);
+            mc.setScreen(null);
+            RaidClient.receive(com.rtshop.net.RaidPacket.PROMPT, o.toString());
+            waitTicks(5);
+        });
+        add(mc -> {
+            check("after a kill the 'leave now?' vote opens", mc.screen instanceof RaidPromptScreen ps && ps.voteForTest() && ps.agreedForTest() == 1, mc.screen);
+            shot(mc, "100d_raid_vote");
+            com.rtshop.raid.RaidConfig c = com.rtshop.raid.RaidConfig.fresh();
+            com.google.gson.JsonObject o = new com.google.gson.JsonObject();
+            o.addProperty("mode", "fail");
+            o.addProperty("seconds", 60);
+            o.addProperty("agreed", 0);
+            o.addProperty("total", 3);
+            o.addProperty("voted", false);
+            com.google.gson.JsonObject t = new com.google.gson.JsonObject();
+            for (String k : c.texts.keySet()) t.addProperty(k, c.text(k));
+            o.add("texts", t);
+            mc.setScreen(null);
+            RaidClient.receive(com.rtshop.net.RaidPacket.PROMPT, o.toString());
+            waitTicks(5);
+        });
+        add(mc -> {
+            check("a failed raid shows the failure and asks before moving", mc.screen instanceof RaidPromptScreen ps && !ps.voteForTest(), mc.screen);
+            shot(mc, "100e_raid_fail");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.raid.Raid.openEditor(sp, "raid"));
+            waitTicks(20);
+        });
+        add(mc -> {
+            RewardEditScreen es = mc.screen instanceof RewardEditScreen x ? x : null;
+            check("the OP raid editor opens with numbers, texts and rewards", es != null && es.fieldsForTest(true) >= 20 && es.fieldsForTest(false) >= 30
+                    && es.rewardsForTest() >= 10, es == null ? mc.screen : es.fieldsForTest(true) + "/" + es.fieldsForTest(false) + "/" + es.rewardsForTest());
+            shot(mc, "101_raid_editor_numbers");
+            if (es != null) es.tabForTest(1, 0);
+            waitTicks(5);
+        });
+        add(mc -> {
+            shot(mc, "101b_raid_editor_texts");
+            if (mc.screen instanceof RewardEditScreen es) es.tabForTest(2, 1);
+            waitTicks(5);
+        });
+        add(mc -> {
+            shot(mc, "101c_raid_editor_rewards");
+            mc.setScreen(null);
+            waitTicks(5);
+        });
     }
 }

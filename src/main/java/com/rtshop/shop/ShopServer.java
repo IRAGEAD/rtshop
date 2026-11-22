@@ -94,6 +94,7 @@ public final class ShopServer {
         com.rtshop.gacha.GachaConfig.reload(server);
         com.rtshop.enhance.EnhanceConfig.reload();
         com.rtshop.pvp.PvpConfig.reload();
+        com.rtshop.raid.RaidConfig.reload();
         com.rtshop.pvp.Pvp.resyncAll(server);
         com.rtshop.rules.LootRules.reload();
         com.rtshop.rules.RecipeRules.reload();
@@ -111,7 +112,8 @@ public final class ShopServer {
         for (String tag : e.getTags()) {
             if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX) || tag.startsWith(QuestManager.QUEST_TAG_PREFIX)
                     || tag.equals(com.rtshop.job.Jobs.NPC_TAG) || tag.equals(com.rtshop.attendance.Attendance.NPC_TAG)
-                    || tag.equals(com.rtshop.gacha.Gacha.NPC_TAG) || tag.equals(com.rtshop.pshop.Employees.TAG)) {
+                    || tag.equals(com.rtshop.gacha.Gacha.NPC_TAG) || tag.equals(com.rtshop.pshop.Employees.TAG)
+                    || tag.equals(com.rtshop.raid.Raid.GUIDE_TAG)) {
                 return true;
             }
         }
@@ -190,6 +192,7 @@ public final class ShopServer {
         all.add("job");
         all.add("attendance");
         all.add("gacha");
+        all.add("raid_guide");
         for (String id : QuestManager.loaded().npcs.keySet()) {
             all.add("quest_" + id);
         }
@@ -405,6 +408,7 @@ public final class ShopServer {
                                 }))));
         root.then(com.rtshop.pvp.Pvp.adminCommand());
         root.then(Restaurant.adminCommand());
+        root.then(com.rtshop.raid.Raid.adminCommand());
         if (SelfTest.enabled()) {
             root.then(Commands.literal("selftest").requires(src -> src.hasPermission(4)).executes(ctx -> {
                 SelfTest.run(ctx.getSource().getServer());
@@ -525,6 +529,9 @@ public final class ShopServer {
         }
         if (type.equals("gacha")) {
             return com.rtshop.gacha.Gacha.spawnNpc(level, pos, yaw);
+        }
+        if (type.equals("raid_guide")) {
+            return com.rtshop.raid.Raid.spawnGuide(level, pos, yaw);
         }
         String name;
         String tag;

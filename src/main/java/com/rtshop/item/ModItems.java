@@ -49,6 +49,16 @@ public final class ModItems {
                 "item.rtshop.gacha_ticket.tip_" + cat, "item.rtshop.gacha_ticket.tip2"));
     }
 
+    /** 주간 레이드: 참가 티켓(레이드 상인에게서 구매), 소환의 눈(입장하면 지급, 제단에 사용), 탈출권(입장하면 지급). */
+    public static final RegistryObject<Item> RAID_TICKET = ITEMS.register("raid_ticket",
+            () -> new TooltipItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.RARE), false,
+                    "item.rtshop.raid_ticket.tip1", "item.rtshop.raid_ticket.tip2"));
+    public static final RegistryObject<Item> RAID_EYE = ITEMS.register("raid_eye",
+            () -> new TooltipItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.EPIC).fireResistant(), true,
+                    "item.rtshop.raid_eye.tip1", "item.rtshop.raid_eye.tip2"));
+    public static final RegistryObject<Item> RAID_ESCAPE = ITEMS.register("raid_escape",
+            () -> new RaidEscapeItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+
     /** 뽑기 조각: 뽑은 아이템을 분해하면 나오고, 모아서 원하는 아이템과 바꾼다. */
     public static final RegistryObject<Item> SHARD = ITEMS.register("gacha_shard",
             () -> new TooltipItem(new Item.Properties().stacksTo(64), false, "item.rtshop.gacha_shard.tip"));
