@@ -41,6 +41,7 @@ public final class PlayerShops {
     public static final int REMOVE = 5;
     public static final int RENAME = 6;
     public static final int REFRESH = 7;
+    public static final int PAY_WAGE = 8;
 
     static PlayerShopBlockEntity at(ServerPlayer p, BlockPos pos) {
         if (p.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64) return null;
@@ -60,6 +61,7 @@ public final class PlayerShops {
             be.name = "";
             be.setChanged();
         }
+        Employees.hire(p.serverLevel(), pos, be);
         send(p, pos, be, null);
     }
 
@@ -97,6 +99,10 @@ public final class PlayerShops {
         o.addProperty("isOwner", owner);
         o.addProperty("wallet", Economy.wallet(p));
         o.addProperty("totalSales", be.totalSales);
+        Employees.Entry emp = Employees.entry(p.serverLevel(), pos);
+        o.addProperty("employee", emp == null ? "" : emp.name);
+        o.addProperty("working", Employees.working(p.serverLevel(), pos));
+        o.addProperty("wage", Employees.wage());
         JsonArray ls = new JsonArray();
         for (int i = 0; i < be.listings.size(); i++) {
             PlayerShopBlockEntity.Listing l = be.listings.get(i);
@@ -181,6 +187,8 @@ public final class PlayerShops {
                 case BUY -> result = buy(p, be, a.get("i").getAsInt(), a.get("n").getAsInt());
                 case REFRESH -> {
                 }
+                case PAY_WAGE -> result = owner ? Employees.payNow(p, p.serverLevel(), pos)
+                        : Component.translatable("rtshop.pshop.not_owner").withStyle(ChatFormatting.RED);
                 default -> {
                     if (!owner) {
                         result = Component.translatable("rtshop.pshop.not_owner").withStyle(ChatFormatting.RED);
@@ -201,6 +209,10 @@ public final class PlayerShops {
         if (i < 0 || i >= be.listings.size() || n <= 0) return null;
         PlayerShopBlockEntity.Listing l = be.listings.get(i);
         if (be.owner.equals(p.getUUID())) return Component.translatable("rtshop.pshop.own_shop").withStyle(ChatFormatting.RED);
+        if (!Employees.working(p.serverLevel(), be.getBlockPos())) {
+            Employees.Entry emp = Employees.entry(p.serverLevel(), be.getBlockPos());
+            return Component.translatable("rtshop.pshop.closed_today", emp == null ? "" : emp.name).withStyle(ChatFormatting.RED);
+        }
         n = Math.min(n, l.stock);
         if (n <= 0) return Component.translatable("rtshop.pshop.sold_out").withStyle(ChatFormatting.RED);
         long cost = l.price * n;

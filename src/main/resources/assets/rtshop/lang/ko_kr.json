@@ -992,5 +992,16 @@
   "rtshop.quest.locked_active": "다음 퀘스트 「%1$s」 는 진행 중인 「%2$s」 퀘스트를 끝내면 받을 수 있습니다. (%3$s)",
   "rtshop.quest.locked_flag": "다음 퀘스트 「%s」 는 아직 조건이 맞지 않아 받을 수 없습니다.",
   "rtshop.npc.quest_button_none": "퀘스트",
-  "rtshop.shopedit.hint": "매입가를 비우면 기본 비율로 매입"
+  "rtshop.shopedit.hint": "매입가를 비우면 기본 비율로 매입",
+  "rtshop.pshop.emp_label": "%1$s · %2$s 의 직원",
+  "rtshop.pshop.wage_paid": "[직원 고용비] %1$s 의 오늘 고용비 %2$sG 를 냈습니다. (예금 -%3$sG · 지갑 -%4$sG)",
+  "rtshop.pshop.wage_short": "[직원 고용비] Gold 가 모자라 %1$s 의 고용비 %2$sG 를 내지 못했습니다. 오늘은 직원이 쉬어 손님이 살 수 없습니다. 진열대에서 [고용비 내기] 를 누르면 바로 다시 일합니다.",
+  "rtshop.pshop.wage_cant": "예금과 지갑을 합쳐도 고용비 %sG 가 모자랍니다.",
+  "rtshop.pshop.wage_paid_now": "%1$s 의 고용비 %2$sG 를 냈습니다. 다시 일합니다!",
+  "rtshop.pshop.closed_today": "오늘은 직원 %s 이(가) 쉬는 날이라 살 수 없습니다.",
+  "rtshop.pshop.pay_wage": "고용비 내기 (%sG)",
+  "rtshop.pshop.emp_working_owner": "직원 %1$s · 근무 중 (매일 출석 초기화 때 %2$sG)",
+  "rtshop.pshop.emp_working": "직원 %s 이(가) 맞이합니다",
+  "rtshop.pshop.emp_off_owner": "직원 %s · 고용비를 못 내 오늘 휴무 (손님이 살 수 없음)",
+  "rtshop.pshop.emp_off": "오늘은 직원 %s 이(가) 쉬는 날입니다"
 }

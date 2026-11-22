@@ -61,6 +61,7 @@ public class PlayerShopBlock extends HorizontalDirectionalBlock implements Entit
             be.ownerName = sp.getGameProfile().getName();
             be.name = "";
             be.setChanged();
+            Employees.hire(sp.serverLevel(), pos, be);
         }
     }
 
@@ -88,6 +89,9 @@ public class PlayerShopBlock extends HorizontalDirectionalBlock implements Entit
             for (ItemStack s : be.stockItems()) {
                 Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, s);
             }
+        }
+        if (!state.is(newState.getBlock()) && level instanceof net.minecraft.server.level.ServerLevel sl) {
+            Employees.fire(sl, pos);
         }
         super.onRemove(state, level, pos, newState, moving);
     }

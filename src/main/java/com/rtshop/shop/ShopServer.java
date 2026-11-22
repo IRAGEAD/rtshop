@@ -109,7 +109,7 @@ public final class ShopServer {
         for (String tag : e.getTags()) {
             if (tag.equals(BANK_TAG) || tag.startsWith(SHOP_TAG_PREFIX) || tag.startsWith(QuestManager.QUEST_TAG_PREFIX)
                     || tag.equals(com.rtshop.job.Jobs.NPC_TAG) || tag.equals(com.rtshop.attendance.Attendance.NPC_TAG)
-                    || tag.equals(com.rtshop.gacha.Gacha.NPC_TAG)) {
+                    || tag.equals(com.rtshop.gacha.Gacha.NPC_TAG) || tag.equals(com.rtshop.pshop.Employees.TAG)) {
                 return true;
             }
         }

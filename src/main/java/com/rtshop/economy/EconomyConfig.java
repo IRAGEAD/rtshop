@@ -17,12 +17,14 @@ import java.util.List;
 /** config/rtshop/economy.json */
 public final class EconomyConfig {
     /** 설정 파일의 세대. 2 = RT Shop 3.0 (전체 물가를 10배로 세분화). */
-    private static final int CONFIG_VERSION = 2;
+    private static final int CONFIG_VERSION = 3;
 
     public long startingGold = 1000;
     public double deathLossMinPercent = 5.0;
     public double deathLossMaxPercent = 50.0;
     public String bankNpcName = "은행원";
+    /** 플레이어 상점 직원의 하루 고용비 (출석 초기화 시각에 예금 → 지갑 순으로 나간다). */
+    public long employeeWage = 1000;
     public double npcRange = 10.0;
     /** 사망 시 가지고 있던 수표의 금액도 같은 비율로 줄어드는지 여부. */
     public boolean checkDeathLoss = true;
@@ -85,6 +87,7 @@ public final class EconomyConfig {
                         c.playerKillOnlyDrops.add(e.getAsString());
                     }
                 }
+                if (o.has("employeeWage")) c.employeeWage = Math.max(0, o.get("employeeWage").getAsLong());
                 if (o.has("villagerTrading")) c.villagerTrading = o.get("villagerTrading").getAsString();
                 rewrite = version < CONFIG_VERSION;
             }
@@ -111,6 +114,7 @@ public final class EconomyConfig {
             help.add("startingGold: 첫 접속 시 지급 Gold / deathLoss*: 사망 시 소지금 손실 범위(%) / npcRange: NPC와 거래 가능한 거리(블록)");
             help.add("checkDeathLoss: 사망 시 들고 있던 수표 금액도 같은 비율로 감소 / minCheckAmount: 수표 최소 금액");
             help.add("playerKillOnlyDrops: 플레이어가 직접 잡아야만 전리품을 주는 몹 (자동 농장으로 철·금이 무한히 쌓이는 것 방지). 바닐라처럼 하려면 [] 로 비우세요");
+            help.add("employeeWage: 플레이어 상점 직원의 하루 고용비 (출석 초기화 시각에 예금 → 지갑 순으로 지출, 모자라면 그날 휴무). 0 이면 무료");
             help.add("villagerTrading: filtered = 상인 NPC 가 매입하는 물건을 파는 주민 거래만 제거 (기본) / allow = 바닐라 그대로 / block = 주민 거래 전체 차단");
             o.add("_설명", help);
             o.addProperty("configVersion", CONFIG_VERSION);
@@ -124,6 +128,7 @@ public final class EconomyConfig {
             JsonArray drops = new JsonArray();
             playerKillOnlyDrops.forEach(drops::add);
             o.add("playerKillOnlyDrops", drops);
+            o.addProperty("employeeWage", employeeWage);
             o.addProperty("villagerTrading", villagerTrading);
             Files.createDirectories(p.getParent());
             Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);

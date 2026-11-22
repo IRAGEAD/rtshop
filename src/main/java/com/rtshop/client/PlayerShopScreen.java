@@ -199,6 +199,27 @@ public class PlayerShopScreen extends Screen {
             }).bounds(fx + W - 6 - renW, fy + 24, renW, 16).build());
         }
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose()).bounds(fx + W - 56, fy + H - 22, 50, 16).build());
+        if (owner && !working() && !employee().isEmpty()) {
+            Component pay = Component.translatable("rtshop.pshop.pay_wage", Ui.num(data.has("wage") ? data.get("wage").getAsLong() : 0));
+            int w = this.font.width(pay) + 12;
+            addRenderableWidget(Button.builder(pay, b -> act(PlayerShops.PAY_WAGE, "{}")).bounds(fx + W - 60 - w, fy + H - 22, w, 16).build());
+        }
+    }
+
+    private String employee() {
+        return data.has("employee") ? data.get("employee").getAsString() : "";
+    }
+
+    private boolean working() {
+        return !data.has("working") || data.get("working").getAsBoolean();
+    }
+
+    public String employeeForTest() {
+        return employee();
+    }
+
+    public boolean workingForTest() {
+        return working();
     }
 
     private EditBox box(int x, int y, int w, String v) {
@@ -394,12 +415,27 @@ public class PlayerShopScreen extends Screen {
                 compare(g, r, num(priceBox), px + 5, y - 10);
             }
         }
+        // 아래 줄: 직원 상태 + (결과 또는 판매액)
+        int textW = W - 72;
+        for (var c : children()) {
+            if (c instanceof Button b && b.getY() >= fy + H - 24 && b.getX() < fx + W - 60) textW = Math.min(textW, b.getX() - fx - 12);
+        }
+        String emp = employee();
+        boolean two = !emp.isEmpty();
+        if (two) {
+            Component st = working()
+                    ? Component.translatable(owner ? "rtshop.pshop.emp_working_owner" : "rtshop.pshop.emp_working", emp,
+                    Ui.num(data.has("wage") ? data.get("wage").getAsLong() : 0))
+                    : Component.translatable(owner ? "rtshop.pshop.emp_off_owner" : "rtshop.pshop.emp_off", emp);
+            g.drawString(this.font, Ui.clip(this.font, st.getString(), textW), fx + 8, fy + H - 23, working() ? Ui.C_PARCH_SHADE : 0xFFFF7A6A, false);
+        }
+        int ly = two ? fy + H - 13 : fy + H - 18;
         if (result != null) {
-            g.drawString(this.font, Ui.clip(this.font, result.getString(), W - 80), fx + 8, fy + H - 18,
+            g.drawString(this.font, Ui.clip(this.font, result.getString(), textW), fx + 8, ly,
                     result.getStyle().getColor() != null ? result.getStyle().getColor().getValue() | 0xFF000000 : Ui.C_CREAM, false);
         } else if (owner) {
             String s = Component.translatable("rtshop.pshop.total_sales", Ui.num(data.get("totalSales").getAsLong())).getString();
-            g.drawString(this.font, s, fx + 8, fy + H - 18, Ui.C_CREAM, false);
+            g.drawString(this.font, Ui.clip(this.font, s, textW), fx + 8, ly, Ui.C_CREAM, false);
         }
         super.render(g, mx, my, pt);
         for (int k = 0; k < visible && scroll + k < rows.size(); k++) {

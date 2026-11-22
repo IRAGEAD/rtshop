@@ -7,6 +7,19 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ "block.rtshop.player_shop.tip1": ("놓으면 내 상점이 되고 직원이 고용됩니다. 진열대나 직원을 우클릭해서 물건을 올리고 가격·수량을 정하세요.", "Place it to open your own shop and hire a clerk. Right-click the stand or the clerk to list items."),
+ "block.rtshop.player_shop.tip2": ("직원 고용비: 매일 출석 초기화 때 1,000G (예금 → 지갑). 판 돈은 예금으로. 주인만 부술 수 있습니다.", "Clerk wage: 1,000G at each daily reset (bank, then wallet). Earnings go to your bank. Only the owner can break it."),
+ "rtshop.pshop.emp_label": ("%1$s · %2$s 의 직원", "%1$s · %2$s's clerk"),
+ "rtshop.pshop.wage_paid": ("[직원 고용비] %1$s 의 오늘 고용비 %2$sG 를 냈습니다. (예금 -%3$sG · 지갑 -%4$sG)", "[Staff wages] Paid today's wages for %1$s: %2$sG (bank -%3$sG, wallet -%4$sG)."),
+ "rtshop.pshop.wage_short": ("[직원 고용비] Gold 가 모자라 %1$s 의 고용비 %2$sG 를 내지 못했습니다. 오늘은 직원이 쉬어 손님이 살 수 없습니다. 진열대에서 [고용비 내기] 를 누르면 바로 다시 일합니다.", "[Staff wages] Not enough Gold to pay %1$s (%2$sG). Your clerk is off today and customers cannot buy. Press [Pay wage] at the stand to bring them back."),
+ "rtshop.pshop.wage_cant": ("예금과 지갑을 합쳐도 고용비 %sG 가 모자랍니다.", "Not enough Gold in bank and wallet for the %sG wage."),
+ "rtshop.pshop.wage_paid_now": ("%1$s 의 고용비 %2$sG 를 냈습니다. 다시 일합니다!", "Paid %1$s's wage (%2$sG). Back to work!"),
+ "rtshop.pshop.closed_today": ("오늘은 직원 %s 이(가) 쉬는 날이라 살 수 없습니다.", "The clerk %s is off today, so nothing can be bought."),
+ "rtshop.pshop.pay_wage": ("고용비 내기 (%sG)", "Pay wage (%sG)"),
+ "rtshop.pshop.emp_working_owner": ("직원 %1$s · 근무 중 (매일 출석 초기화 때 %2$sG)", "Clerk %1$s · working (%2$sG each daily reset)"),
+ "rtshop.pshop.emp_working": ("직원 %s 이(가) 맞이합니다", "Clerk %s is serving you"),
+ "rtshop.pshop.emp_off_owner": ("직원 %s · 고용비를 못 내 오늘 휴무 (손님이 살 수 없음)", "Clerk %s · off today, wage unpaid (no sales)"),
+ "rtshop.pshop.emp_off": ("오늘은 직원 %s 이(가) 쉬는 날입니다", "Clerk %s is off today"),
  "rtshop.shopedit.count": ("%s개 표시 / 전체 %s개", "%s shown / %s total"),
  "rtshop.shopedit.hint": ("매입가를 비우면 기본 비율로 매입", "Empty buy-back = default ratio"),
  "rtshop.quest.locked_hint": ("다음 퀘스트 「%1$s」 는 「%2$s」 퀘스트를 끝내야 받을 수 있습니다. (%3$s)", "The next quest \"%1$s\" unlocks after you finish \"%2$s\". (%3$s)"),

@@ -59,10 +59,6 @@ public final class NpcButtons {
         return anyQuests && bound.get() == s;
     }
 
-    public static boolean questButtonForTest(Screen s) {
-        return questButton(s);
-    }
-
     private static boolean editButton(Screen s) {
         Minecraft mc = Minecraft.getInstance();
         return s instanceof ShopScreen && mc.player != null && mc.player.hasPermissions(2);

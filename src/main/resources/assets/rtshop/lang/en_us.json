@@ -992,5 +992,16 @@
   "rtshop.quest.locked_active": "The next quest \"%1$s\" unlocks once you finish \"%2$s\", which you are doing now. (%3$s)",
   "rtshop.quest.locked_flag": "The next quest \"%s\" is not unlocked yet.",
   "rtshop.npc.quest_button_none": "Quests",
-  "rtshop.shopedit.hint": "Empty buy-back = default ratio"
+  "rtshop.shopedit.hint": "Empty buy-back = default ratio",
+  "rtshop.pshop.emp_label": "%1$s · %2$s's clerk",
+  "rtshop.pshop.wage_paid": "[Staff wages] Paid today's wages for %1$s: %2$sG (bank -%3$sG, wallet -%4$sG).",
+  "rtshop.pshop.wage_short": "[Staff wages] Not enough Gold to pay %1$s (%2$sG). Your clerk is off today and customers cannot buy. Press [Pay wage] at the stand to bring them back.",
+  "rtshop.pshop.wage_cant": "Not enough Gold in bank and wallet for the %sG wage.",
+  "rtshop.pshop.wage_paid_now": "Paid %1$s's wage (%2$sG). Back to work!",
+  "rtshop.pshop.closed_today": "The clerk %s is off today, so nothing can be bought.",
+  "rtshop.pshop.pay_wage": "Pay wage (%sG)",
+  "rtshop.pshop.emp_working_owner": "Clerk %1$s · working (%2$sG each daily reset)",
+  "rtshop.pshop.emp_working": "Clerk %s is serving you",
+  "rtshop.pshop.emp_off_owner": "Clerk %s · off today, wage unpaid (no sales)",
+  "rtshop.pshop.emp_off": "Clerk %s is off today"
 }
