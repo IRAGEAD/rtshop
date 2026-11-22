@@ -209,7 +209,8 @@ public class RaidScreen extends Screen {
         return Math.max(0, rows.size() * 14 - listH());
     }
 
-    private void embers(GuiGraphics g, int x, int y, int w, int h) {
+    @SuppressWarnings("unused")
+    private void embersOld(GuiGraphics g, int x, int y, int w, int h) {
         float time = (System.currentTimeMillis() - openedAt) / 1000F;
         Fx2D.begin(g, true);
         Fx2D.glow(x + w / 2F, y + h + 30, w * 0.75F, 150, 0x66FF4A10, 0x00FF4A10);
@@ -233,24 +234,17 @@ public class RaidScreen extends Screen {
             return;
         }
         int x = fx(), y = fy();
-        g.fill(0, 0, this.width, this.height, 0x99000000);
-        g.fill(x - 3, y - 3, x + W + 3, y + H + 3, 0xFF000000);
-        g.fill(x - 2, y - 2, x + W + 2, y + H + 2, 0xFF6A1A0C);
-        g.fill(x, y, x + W, y + H, 0xFF120606);
-        embers(g, x, y, W, H);
-        g.fill(x, y, x + W, y + 2, 0xFFFF7A20);
-        g.fill(x, y + H - 2, x + W, y + H, 0xFF6A1A0C);
-        // 제목
-        g.pose().pushPose();
-        g.pose().translate(x + 16, y + 12, 0);
-        g.pose().scale(1.7F, 1.7F, 1F);
-        g.drawString(this.font, t("uiTitle"), 0, 0, 0xFFFFB040, true);
-        g.pose().popPose();
-        g.drawString(this.font, t("uiSub"), x + 17, y + 31, 0xFFD06030, false);
-        g.fill(x + 14, y + 44, x + W - 14, y + 45, 0xFF6A1A0C);
+        float time = (System.currentTimeMillis() - openedAt) / 1000F;
+        g.fill(0, 0, this.width, this.height, 0xB0000000);
+        RaidFx.panel(g, x, y, W, H, time, false);
+        RaidFx.embers(g, x, y, W, H, time, 54, false);
+        RaidFx.title(g, this.font, t("uiTitle"), x + 16, y + 11, 1.7F, 0xFFB040, time);
+        g.drawString(this.font, "◆ " + t("uiSub"), x + 17, y + 31, 0xFFE07038, false);
+        RaidFx.divider(g, x + 14, x + W - 14, y + 44, 0xFF7A20);
         // 왼쪽 아래: 보스의 모습
-        g.enableScissor(x + 2, y + 46, x + 192, y + H - 2);
-        drawBoss(g, x + 98, y + H - 36, 92, 150);
+        g.enableScissor(x + 2, y + 46, x + 194, y + H - 2);
+        RaidFx.summonCircle(g, x + 98, y + H - 40, 78, time);
+        drawBoss(g, x + 98, y + H - 38, 96, 150);
         g.disableScissor();
         g.pose().pushPose();
         g.pose().translate(0, 0, 200);
@@ -286,18 +280,28 @@ public class RaidScreen extends Screen {
         g.pose().popPose();
         // 오른쪽: 보상 목록
         int lx = listX(), lt = listY(), lw = listW(), lh = listH();
-        g.fill(lx - 4, lt - 4, lx + lw + 4, lt + lh + 4, 0xAA000000);
+        g.fill(lx - 5, lt - 5, lx + lw + 5, lt + lh + 5, 0xFF5A1A0C);
+        g.fill(lx - 4, lt - 4, lx + lw + 4, lt + lh + 4, 0xE00A0506);
         g.enableScissor(lx - 4, lt - 2, lx + lw + 4, lt + lh + 2);
         int ry = lt - scroll;
         for (Row r : rows) {
             if (ry > lt - 16 && ry < lt + lh + 2) {
                 if (r.kind == 0) {
-                    g.drawString(this.font, r.text, lx, ry + 3, r.color, false);
+                    Fx2D.begin(g, false);
+                    Fx2D.rect(lx - 3, ry, lx + lw + 3, ry + 13, 0xFF7A2A10, 0x00301008, 0x00301008, 0xFF4A1808);
+                    Fx2D.end();
+                    g.drawString(this.font, "◆ " + r.text, lx, ry + 3, 0xFFFFD890, false);
                 } else if (r.kind == 3) {
-                    if (r.color == GRADE_COLORS[5]) {
-                        g.fill(lx + 4, ry + 1, lx + 10 + this.font.width(r.text), ry + 12, 0xFF8A8A8A);
+                    boolean myst = r.color == GRADE_COLORS[5];
+                    int band = myst ? 0xFF000000 : r.color;
+                    Fx2D.begin(g, false);
+                    Fx2D.rect(lx + 2, ry + 1, lx + lw, ry + 13, Fx2D.alpha(myst ? 0xFF6A6A6A : r.color, 0.42F), 0x00000000, 0x00000000, Fx2D.alpha(myst ? 0xFF6A6A6A : r.color, 0.42F));
+                    Fx2D.end();
+                    g.fill(lx + 2, ry + 1, lx + 4, ry + 13, band);
+                    if (myst) {
+                        g.fill(lx + 6, ry + 2, lx + 12 + this.font.width(r.text), ry + 12, 0xFF9A9A9A);
                     }
-                    g.drawString(this.font, r.text, lx + 7, ry + 3, r.color, false);
+                    g.drawString(this.font, r.text, lx + 9, ry + 3, r.color, false);
                 } else {
                     if (!r.stack.isEmpty()) {
                         g.pose().pushPose();
@@ -309,7 +313,7 @@ public class RaidScreen extends Screen {
                     g.drawString(this.font, Ui.clip(this.font, r.text, lw - 44), lx + 28, ry + 3, r.color, false);
                 }
                 if (!r.right.isEmpty()) {
-                    g.drawString(this.font, r.right, lx + lw - this.font.width(r.right) - 2, ry + 3, r.right.equals("✔") ? 0xFF8FE39A : 0xFFD9C592, false);
+                    g.drawString(this.font, r.right, lx + lw - this.font.width(r.right) - 2, ry + 3, r.right.equals("✔") ? 0xFF8FE39A : 0xFFFFE0A0, false);
                 }
             }
             ry += 14;
@@ -319,26 +323,24 @@ public class RaidScreen extends Screen {
         boolean can = data.get("canEnter").getAsBoolean();
         int[] e = enterBtn(), c = closeBtn();
         boolean hov = !confirm && can && Ui.inside(mx, my, e[0], e[1], e[2], e[3]);
-        g.fill(e[0] - 1, e[1] - 1, e[0] + e[2] + 1, e[1] + e[3] + 1, 0xFF000000);
-        g.fill(e[0], e[1], e[0] + e[2], e[1] + e[3], !can ? 0xFF2A1A16 : hov ? 0xFFD0481C : 0xFF9A2A12);
-        g.fill(e[0], e[1], e[0] + e[2], e[1] + 1, can ? 0xFFFFA050 : 0xFF4A3028);
-        g.drawCenteredString(this.font, t("enterButton"), e[0] + e[2] / 2, e[1] + 6, can ? 0xFFFFF0D0 : 0xFF7A6A60);
+        RaidFx.hotButton(g, this.font, e[0], e[1], e[2], e[3], "⚔ " + t("enterButton"), can, hov, time, false);
         Ui.button(g, this.font, c[0], c[1], c[2], c[3], Component.translatable("gui.cancel").getString(), !confirm && Ui.inside(mx, my, c[0], c[1], c[2], c[3]), true);
         if (confirm) {
             g.pose().pushPose();
             g.pose().translate(0, 0, 300);
             g.fill(0, 0, this.width, this.height, 0xAA000000);
-            int bw = 260, bh = 96, bx = (this.width - bw) / 2, by = this.height / 2 - 50;
-            g.fill(bx - 2, by - 2, bx + bw + 2, by + bh + 2, 0xFFFF7A20);
-            g.fill(bx, by, bx + bw, by + bh, 0xFF160808);
-            g.drawCenteredString(this.font, t("confirmTitle"), this.width / 2, by + 10, 0xFFFFB040);
-            int ty = by + 28;
-            for (FormattedCharSequence l : this.font.split(Component.literal(t("confirmBody")), bw - 24)) {
+            int bw = 270, bh = 100, bx = (this.width - bw) / 2, by = this.height / 2 - 54;
+            RaidFx.panel(g, bx, by, bw, bh, time, false);
+            RaidFx.embers(g, bx, by, bw, bh, time, 16, false);
+            g.drawCenteredString(this.font, "⚔ " + t("confirmTitle") + " ⚔", this.width / 2, by + 11, 0xFFFFC060);
+            RaidFx.divider(g, bx + 30, bx + bw - 30, by + 25, 0xFF7A20);
+            int ty = by + 33;
+            for (FormattedCharSequence l : this.font.split(Component.literal(t("confirmBody")), bw - 28)) {
                 g.drawCenteredString(this.font, l, this.width / 2, ty, 0xFFF5E6C0);
                 ty += 10;
             }
             int[] yb = yesBtn(), nb = noBtn();
-            Ui.button(g, this.font, yb[0], yb[1], yb[2], yb[3], t("confirmYes"), Ui.inside(mx, my, yb[0], yb[1], yb[2], yb[3]), true);
+            RaidFx.hotButton(g, this.font, yb[0], yb[1], yb[2], yb[3], t("confirmYes"), true, Ui.inside(mx, my, yb[0], yb[1], yb[2], yb[3]), time, false);
             Ui.button(g, this.font, nb[0], nb[1], nb[2], nb[3], t("confirmNo"), Ui.inside(mx, my, nb[0], nb[1], nb[2], nb[3]), true);
             g.pose().popPose();
         }
@@ -354,10 +356,18 @@ public class RaidScreen extends Screen {
 
     private void renderDialogue(GuiGraphics g) {
         int bw = Math.min(420, this.width - 40), bh = 62, bx = (this.width - bw) / 2, by = this.height - bh - 34;
-        g.fill(bx - 2, by - 2, bx + bw + 2, by + bh + 2, 0xFF6A1A0C);
-        g.fill(bx, by, bx + bw, by + bh, 0xF0120606);
-        g.fill(bx + 8, by - 8, bx + 16 + this.font.width(t("npcName")), by + 6, 0xFF9A2A12);
-        g.drawString(this.font, t("npcName"), bx + 12, by - 5, 0xFFFFF0D0, false);
+        float time = (System.currentTimeMillis() - openedAt) / 1000F;
+        Fx2D.begin(g, false);
+        Fx2D.rect(0, by - 60, this.width, this.height, 0x00000000, 0x00000000, 0xC0000000, 0xC0000000);
+        Fx2D.end();
+        RaidFx.panel(g, bx, by, bw, bh, time, false);
+        RaidFx.embers(g, bx, by, bw, bh, time, 14, false);
+        int nw = this.font.width(t("npcName")) + 26;
+        g.fill(bx + 9, by - 10, bx + 11 + nw, by + 6, 0xFF000000);
+        Fx2D.begin(g, false);
+        Fx2D.rect(bx + 10, by - 9, bx + 10 + nw, by + 5, 0xFFC83A14, 0xFFC83A14, 0xFF6A1408, 0xFF6A1408);
+        Fx2D.end();
+        g.drawString(this.font, "◆ " + t("npcName"), bx + 15, by - 6, 0xFFFFF0D0, false);
         String full = t("dialogue" + (phase + 1));
         int shown = (int) Math.min(full.length(), (System.currentTimeMillis() - lineAt) / 22);
         int ty = by + 12;

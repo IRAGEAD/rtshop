@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 public class RaidPromptScreen extends Screen {
     private JsonObject data;
     private long openedAt = System.currentTimeMillis();
+    private final long shownAt = System.currentTimeMillis();
 
     public RaidPromptScreen(JsonObject data) {
         super(Component.literal("raid"));
@@ -75,23 +76,32 @@ public class RaidPromptScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         int x = bx(), y = by(), w = bw(), h = vote() ? 78 : 92;
         boolean fail = !vote();
-        g.fill(x - 2, y - 2, x + w + 2, y + h + 2, 0xFF000000);
-        g.fill(x, y, x + w, y + h, fail ? 0xF01C0606 : 0xF0141008);
-        g.fill(x, y, x + w, y + 2, fail ? 0xFFB3261E : 0xFFE8B84A);
+        float time = (System.currentTimeMillis() - shownAt) / 1000F;
         if (fail) {
-            g.pose().pushPose();
-            g.pose().translate(this.width / 2F, y + 10, 0);
-            g.pose().scale(2F, 2F, 1F);
-            g.drawCenteredString(this.font, t("failTitle"), 0, 0, 0xFFFF5040);
-            g.pose().popPose();
+            // 붉게 조여 오는 화면
+            Fx2D.begin(g, false);
+            Fx2D.rect(0, 0, this.width, this.height / 2F, 0xB0300000, 0xB0300000, 0x30100000, 0x30100000);
+            Fx2D.rect(0, this.height / 2F, this.width, this.height, 0x30100000, 0x30100000, 0xB0300000, 0xB0300000);
+            Fx2D.end();
+        } else {
+            Fx2D.begin(g, true);
+            for (int i = 0; i < 12; i++) {
+                Fx2D.ray(this.width / 2F, y + h / 2F, i * 30 + time * 14, 5, 190, Fx2D.rgba(0xFFE08A, 0.22F), Fx2D.rgba(0xFFE08A, 0));
+            }
+            Fx2D.end();
+        }
+        RaidFx.panel(g, x, y, w, h, time, !fail);
+        RaidFx.embers(g, x, y, w, h, time, 14, !fail);
+        if (fail) {
+            RaidFx.title(g, this.font, t("failTitle"), this.width / 2 - this.font.width(t("failTitle")), y + 9, 2F, 0xFF4A38, time);
             g.drawCenteredString(this.font, t("failSub"), this.width / 2, y + 32, 0xFFD9B0A8);
             g.drawCenteredString(this.font, t("failBody") + " (" + secondsLeft() + ")", this.width / 2, y + 46, 0xFFB8AF9C);
             int[] a = agreeBtn();
-            Ui.button(g, this.font, a[0], a[1], a[2], a[3], t("failConfirm"), Ui.inside(mx, my, a[0], a[1], a[2], a[3]), true);
+            RaidFx.hotButton(g, this.font, a[0], a[1], a[2], a[3], t("failConfirm"), true, Ui.inside(mx, my, a[0], a[1], a[2], a[3]), time, false);
             return;
         }
         boolean voted = data.get("voted").getAsBoolean();
-        g.drawCenteredString(this.font, t("voteTitle"), this.width / 2, y + 8, 0xFFF5E6C0);
+        g.drawCenteredString(this.font, "◆ " + t("voteTitle") + " ◆", this.width / 2, y + 9, 0xFFFFF0C8);
         String count;
         try {
             count = String.format(t("voteCount"), data.get("agreed").getAsInt(), data.get("total").getAsInt());
@@ -100,7 +110,7 @@ public class RaidPromptScreen extends Screen {
         }
         g.drawCenteredString(this.font, count + "  ·  " + secondsLeft() + "s", this.width / 2, y + 24, 0xFFE8B84A);
         int[] a = agreeBtn(), s = stayBtn();
-        Ui.button(g, this.font, a[0], a[1], a[2], a[3], voted ? "✔ " + t("voteAgree") : t("voteAgree"), Ui.inside(mx, my, a[0], a[1], a[2], a[3]), !voted);
+        RaidFx.hotButton(g, this.font, a[0], a[1], a[2], a[3], voted ? "✔ " + t("voteAgree") : t("voteAgree"), !voted, Ui.inside(mx, my, a[0], a[1], a[2], a[3]), time, true);
         Ui.button(g, this.font, s[0], s[1], s[2], s[3], t("voteStay"), Ui.inside(mx, my, s[0], s[1], s[2], s[3]), true);
     }
 
