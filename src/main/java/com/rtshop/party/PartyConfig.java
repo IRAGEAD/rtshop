@@ -19,7 +19,7 @@ import java.util.Set;
 public final class PartyConfig {
     public int maxMembers = 12;
     /** 보스 최대 체력의 몇 % 이상을 직접 입혀야 처치로 인정하는가. */
-    public double bossCreditPercent = 5.0;
+    public double bossCreditPercent = 10.0;
     /** 일반 몹 처치 목표를 함께 채우는 파티원 거리 (블록). */
     public int shareRadius = 64;
     /** 파티원끼리 PvP 피해를 막는다. */
@@ -66,6 +66,13 @@ public final class PartyConfig {
                 JsonObject o = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
                 if (o.has("maxMembers")) c.maxMembers = Math.max(2, Math.min(64, o.get("maxMembers").getAsInt()));
                 if (o.has("bossCreditPercent")) c.bossCreditPercent = Math.max(0, Math.min(100, o.get("bossCreditPercent").getAsDouble()));
+                // 3.23.0 테스트판의 기본값 5% 는 새 기본값 10% 로 올린다
+                if (c.bossCreditPercent == 5.0 && !o.has("version")) {
+                    c.bossCreditPercent = 10.0;
+                    o.addProperty("version", 2);
+                    o.addProperty("bossCreditPercent", 10.0);
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().create().toJson(o), StandardCharsets.UTF_8);
+                }
                 if (o.has("shareRadius")) c.shareRadius = Math.max(0, o.get("shareRadius").getAsInt());
                 if (o.has("noFriendlyFire")) c.noFriendlyFire = o.get("noFriendlyFire").getAsBoolean();
                 if (o.has("bosses")) {
@@ -85,6 +92,7 @@ public final class PartyConfig {
     public JsonObject toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("_help", "파티: maxMembers 최대 인원, bossCreditPercent 보스 처치로 인정받는 최소 피해(보스 최대 체력의 %), shareRadius 일반 몹 처치를 함께 채우는 파티원 거리, bosses 보스로 다루는 몹 ID. 저장한 뒤 /rtshop reload");
+        o.addProperty("version", 2);
         o.addProperty("maxMembers", maxMembers);
         o.addProperty("bossCreditPercent", bossCreditPercent);
         o.addProperty("shareRadius", shareRadius);

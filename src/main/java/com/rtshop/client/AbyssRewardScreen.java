@@ -18,7 +18,7 @@ import java.util.List;
 public class AbyssRewardScreen extends Screen {
     private final Screen parent;
     private final long openedAt = System.currentTimeMillis();
-    private static final int W = 330, ROW = 28;
+    private static final int W = 330;
 
     public AbyssRewardScreen(Screen parent) {
         super(Component.literal("abyss rewards"));
@@ -30,8 +30,13 @@ public class AbyssRewardScreen extends Screen {
         return false;
     }
 
+    /** 한 층의 줄 높이: 화면이 낮으면 줄여서 창 전체가 화면 안에 들어가게 한다. */
+    private int row() {
+        return Math.max(22, Math.min(28, (this.height - 16 - 74) / AbyssWeekly.FLOORS));
+    }
+
     private int h() {
-        return 50 + AbyssWeekly.FLOORS * ROW + 28;
+        return 48 + AbyssWeekly.FLOORS * row() + 26;
     }
 
     private int x0() {
@@ -55,7 +60,7 @@ public class AbyssRewardScreen extends Screen {
             return;
         }
         float time = (System.currentTimeMillis() - openedAt) / 1000F;
-        int x = x0(), y = y0(), h = h();
+        int x = x0(), y = y0(), h = h(), ROWH = row();
         AbyssPanel.frame(g, x, y, W, h, time);
         // 머리
         String title = AbyssPanel.t(o, "title");
@@ -74,13 +79,13 @@ public class AbyssRewardScreen extends Screen {
         ItemStack hover = ItemStack.EMPTY;
         double hoverChance = 100;
         for (int f = 1; f <= AbyssWeekly.FLOORS; f++) {
-            int ry = y + 48 + (f - 1) * ROW;
+            int ry = y + 48 + (f - 1) * ROWH;
             boolean done = AbyssPanel.done(o, f);
             Fx2D.begin(g, false);
             int band = done ? 0x40D4A85A : 0x40201846;
-            Fx2D.rect(x + 10, ry, x + W - 10, ry + ROW - 4, band, 0x10000000, 0x10000000, band);
+            Fx2D.rect(x + 10, ry, x + W - 10, ry + ROWH - 4, band, 0x10000000, 0x10000000, band);
             Fx2D.end();
-            g.fill(x + 10, ry + ROW - 4, x + W - 10, ry + ROW - 3, 0x307C64E0);
+            g.fill(x + 10, ry + ROWH - 4, x + W - 10, ry + ROWH - 3, 0x307C64E0);
             AbyssPanel.star(g, x + 24, ry + 12, 7F, done, time, f);
             RaidText.draw(g, this.font, "제 " + AbyssPanel.ROMAN[f - 1] + " 층", RaidText.SERIF, x + 38, ry + 8, done ? RaidFx.GOLD_HI : 0xFFE0D4FF);
             int ix = x + 92;

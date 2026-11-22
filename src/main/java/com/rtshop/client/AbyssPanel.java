@@ -24,7 +24,7 @@ public final class AbyssPanel {
     private AbyssPanel() {
     }
 
-    public static final int W = 150, H = 66;
+    public static final int W = 132, H = 62;
     static final String[] ROMAN = {"I", "II", "III", "IV", "V", "VI"};
     static final int STAR = 0xF3D9A0, VIOLET = 0x9C7BF0, DEEP = 0x5A3FC0;
 
@@ -76,7 +76,7 @@ public final class AbyssPanel {
     /** [자세히 보기] 단추 자리. */
     static int[] detailBtn(int sw, int sh) {
         int[] b = box(sw, sh);
-        return new int[]{b[0] + 8, b[1] + H - 19, W - 16, 13};
+        return new int[]{b[0] + 8, b[1] + H - 17, W - 16, 12};
     }
 
     /** 심연의 판: 남보라 밤하늘 + 잔별 + 금박 이중 테두리 + 모서리 별. */
@@ -164,7 +164,7 @@ public final class AbyssPanel {
         boolean hov = Ui.inside(mx, my, d[0], d[1], d[2], d[3]);
         g.fill(d[0], d[1], d[0] + d[2], d[1] + d[3], hov ? 0xC0402C88 : 0x90201846);
         RaidFx.box(g, d[0], d[1], d[0] + d[2], d[1] + d[3], hov ? RaidFx.GOLD_HI : 0xA0D4A85A);
-        String label = "자세히 보기 ›";
+        String label = "자세히 보기";
         g.pose().pushPose();
         g.pose().translate(d[0] + d[2] / 2F, d[1] + 3, 0);
         g.pose().scale(0.85F, 0.85F, 1F);

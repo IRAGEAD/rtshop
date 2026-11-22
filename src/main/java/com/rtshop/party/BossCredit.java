@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 보스 처치 인정: 보스 최대 체력의 일정 비율(기본 5%) 이상을 직접 입힌 플레이어만 처치한 것으로 친다.
+ * 보스 처치 인정: 보스 최대 체력의 일정 비율(기본 10%) 이상을 직접 입힌 플레이어만 처치한 것으로 친다.
  * 마법·화살·소환수·길들인 동물이 입힌 피해는 주인의 피해로 센다 (Pvp.attackerOf).
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID)

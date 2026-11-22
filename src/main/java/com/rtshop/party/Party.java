@@ -41,7 +41,7 @@ import java.util.UUID;
 
 /**
  * 파티 (최대 12명, party.json): 만들기·초대·수락·나가기·내보내기·파티장 넘기기·해산, 파티 채팅, 파티원끼리 PvP 피해 없음,
- * 파티 표시(HUD), 가까운 파티원과 일반 몹 처치 목표 공유. 보스 처치 인정은 BossCredit (각자 체력 5% 이상).
+ * 파티 표시(HUD), 가까운 파티원과 일반 몹 처치 목표 공유. 보스 처치 인정은 BossCredit (각자 체력 10% 이상).
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID)
 public final class Party {

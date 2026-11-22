@@ -1097,7 +1097,7 @@ public final class QuestManager {
             return;
         }
         if (com.rtshop.party.BossCredit.isBoss(victim)) {
-            // 보스: 최대 체력의 일정 비율(기본 5%) 이상을 직접 입힌 사람만 처치로 인정
+            // 보스: 최대 체력의 일정 비율(기본 10%) 이상을 직접 입힌 사람만 처치로 인정
             for (ServerPlayer p : com.rtshop.party.BossCredit.qualified(victim, server)) onKill(p, victim);
             return;
         }

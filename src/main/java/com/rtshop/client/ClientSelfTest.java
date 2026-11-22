@@ -1026,7 +1026,7 @@ public final class ClientSelfTest {
                     com.rtshop.quest.QuestManager.forceComplete(sp, "job_swordsman_2");
                     com.rtshop.quest.QuestManager.forceComplete(sp, "job_cook_1");
                     com.rtshop.quest.QuestManager.accept(sp, "job_swordsman_3", null);
-                    com.rtshop.quest.QuestManager.accept(sp, "job_warrior_1", null);
+                    com.rtshop.quest.QuestManager.accept(sp, "tutorial_1", null); // 직업 선행 퀘스트는 전투·생활 하나씩이라 대화 퀘스트는 튜토리얼로
                     com.rtshop.quest.QuestManager.accept(sp, "job_cook_2", null);
                 });
                 mc.setScreen(null);

@@ -221,7 +221,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 - `/party create` 로 만들고 `/party invite <이름>` 으로 초대합니다 (최대 12명, `config/rtshop/party.json`). 초대받은 사람은 채팅의 **[수락]** 을 누르거나 `/party accept`.
 - `/party` 정보 · `/party leave` 나가기 · `/party kick <이름>` · `/party leader <이름>` 파티장 넘기기 · `/party disband` 해산 · `/pc <말>` 파티 채팅.
 - 파티원끼리는 서로 다치지 않고, 화면 왼쪽에 파티원 체력이 보입니다. 가까이(64칸) 있는 파티원은 일반 몹 처치 퀘스트 목표를 함께 채웁니다.
-- **보스 처치 인정**: 보스(위더·엔더 드래곤·Mowzie's·Aquamirae·Cataclysm 보스 등, party.json 의 bosses)는 최대 체력의 **5% 이상**을 직접 입힌 사람만 퀘스트·레이드 입장 조건 처치로 인정됩니다 (마법·화살·소환수 피해 포함).
+- **보스 처치 인정**: 보스(위더·엔더 드래곤·Mowzie's·Aquamirae·Cataclysm 보스 등, party.json 의 bosses)는 최대 체력의 **10% 이상**을 직접 입힌 사람만 퀘스트·레이드 입장 조건 처치로 인정됩니다 (마법·화살·소환수 피해 포함).
 
 ### 상인 이름과 직업 선행 퀘스트 (3.23)
 

@@ -794,7 +794,7 @@ public final class Raid {
             }
             return;
         }
-        // 입장 조건: 일반 보스 처치. 보스 목록(party.json)에 있으면 체력의 5% 이상을 입힌 사람만, 아니면 죽인 사람과 근처 40칸 안의 사람
+        // 입장 조건: 일반 보스 처치. 보스 목록(party.json)에 있으면 체력의 10% 이상(party.json)을 입힌 사람만, 아니면 죽인 사람과 근처 40칸 안의 사람
         ResourceLocation id = ForgeRegistries.ENTITY_TYPES.getKey(e.getType());
         if (id != null && !c.requireKill.isBlank() && id.toString().equals(c.requireKill)) {
             RaidData data = RaidData.get(server);

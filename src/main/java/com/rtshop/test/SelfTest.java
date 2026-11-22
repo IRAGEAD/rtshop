@@ -2113,7 +2113,7 @@ public final class SelfTest {
             boolean joined = com.rtshop.party.Party.accept(b);
             check("a party can be made and an invited player joins it", joined && com.rtshop.party.Party.together(server, a.getUUID(), b.getUUID())
                     && g.members.size() == 2);
-            check("the party size limit is 12", pc.maxMembers == 12);
+            check("the party size limit is 12 and a boss kill needs 10% of its health", pc.maxMembers == 12 && pc.bossCreditPercent == 10.0);
             check("merchants have personal names (farmer: 농작물 상인 한나)", com.rtshop.shop.NpcNames.display("farmer", "농작물 상인").equals("농작물 상인 한나")
                     && com.rtshop.shop.NpcNames.display("unknown_shop", "가게").equals("가게"), com.rtshop.shop.NpcNames.display("farmer", "농작물 상인"));
             // 파티원끼리 피해 없음
@@ -2123,10 +2123,10 @@ public final class SelfTest {
             // 보스 처치 인정: 최대 체력의 5% 이상
             net.minecraft.world.entity.animal.IronGolem boss = EntityType.IRON_GOLEM.create(level);
             boss.setPos(a.getX(), a.getY(), a.getZ());
-            com.rtshop.party.BossCredit.record(boss, a, boss.getMaxHealth() * 0.06F);
-            com.rtshop.party.BossCredit.record(boss, b, boss.getMaxHealth() * 0.04F);
+            com.rtshop.party.BossCredit.record(boss, a, boss.getMaxHealth() * 0.11F);
+            com.rtshop.party.BossCredit.record(boss, b, boss.getMaxHealth() * 0.09F);
             List<ServerPlayer> q = com.rtshop.party.BossCredit.qualified(boss, server);
-            check("a boss kill counts only for players who dealt at least 5% of its health (6% yes, 4% no)",
+            check("a boss kill counts only for players who dealt at least 10% of its health (11% yes, 9% no)",
                     q.contains(a) && !q.contains(b), q.size());
             com.rtshop.party.BossCredit.forget(boss);
             boolean left = com.rtshop.party.Party.leave(b);
