@@ -486,14 +486,8 @@ public final class ClientSelfTest {
                         EnhanceFx.last.startsWith("DAMAGE:5:4:guarded"), EnhanceFx.last);
                 onServer(mc, sp -> {
                     com.rtshop.enhance.Enhance.testRoll = null;
-                    if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
-                        if (!m.getCarried().isEmpty()) {
-                            if (!sp.getInventory().add(m.getCarried().copy())) {
-                                sp.getInventory().setItem(sp.getInventory().selected, m.getCarried().copy());
-                            }
-                            m.setCarried(ItemStack.EMPTY);
-                        }
-                    }
+                    // 창을 닫으면 손에 든 결과와 모루 위 물건이 가방으로 돌아온다 (바닐라 모루와 같음)
+                    sp.closeContainer();
                 });
                 wait = 60;
             }
