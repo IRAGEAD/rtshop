@@ -359,6 +359,13 @@ final class ClientSelfTest2 {
             ShopScreen s = mc.screen instanceof ShopScreen x ? x : null;
             check("someone who is not a cook sees that only cooks can sell here", s != null && s.sellLockedForTest() && s.rowsForTest() == 0);
             shot(mc, "99b_restaurant_cook_only");
+            waitTicks(5);
+        });
+        add(mc -> {
+            mc.setScreen(null); // 창을 닫으면 서버의 거래 세션도 닫힌다. 그 뒤에 다시 연다
+            waitTicks(15);
+        });
+        add(mc -> {
             onServer(mc, sp -> {
                 com.rtshop.job.Jobs.force(sp, com.rtshop.job.JobConfig.LIFE, "cook");
                 ShopServer.openShop(sp, com.rtshop.shop.Restaurant.ID, -1);
