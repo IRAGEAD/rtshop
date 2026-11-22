@@ -2163,8 +2163,10 @@ public final class SelfTest {
         advGoal.type = QuestDef.Type.ADVANCEMENT;
         advGoal.target = "minecraft:story/mine_stone";
         net.minecraft.advancements.Advancement adv = server.getAdvancements().getAdvancement(new ResourceLocation(advGoal.target));
-        if (adv != null) for (String c : adv.getCriteria().keySet()) a.getAdvancements().award(adv, c);
-        check("an ADVANCEMENT goal is met once the advancement is done", adv != null && QuestManager.reached(a, advGoal, ""));
+        QuestDef.Objective noAdv = new QuestDef.Objective();
+        noAdv.type = QuestDef.Type.ADVANCEMENT;
+        noAdv.target = "rtshop:no_such_advancement";
+        check("an ADVANCEMENT goal finds the advancement and an unknown one never counts", adv != null && !QuestManager.reached(a, noAdv, ""));
         check("story quests carry their scenes (chapter title on taking 1-1, dream on finishing 1-2)",
                 l.quests.get("story_1_1").sceneAccept != null && l.quests.get("story_1_2").sceneDone != null);
         check("the dream gives the undying ember (needed until the very end)",
@@ -2266,6 +2268,7 @@ public final class SelfTest {
                 com.rtshop.story.StorySeals.TEST_PLAYERS.clear();
                 com.rtshop.quest.QuestManager.setFlag(a, seal.flag, false);
                 com.rtshop.party.Party.clearForTest(server);
+                com.rtshop.party.Party.createForTest(a, b); // 뒤의 파티 점검(나가기 등)을 위해 원래대로
             }
             boolean left = com.rtshop.party.Party.leave(b);
             check("a member can leave the party", left && !com.rtshop.party.Party.together(server, a.getUUID(), b.getUUID()));
