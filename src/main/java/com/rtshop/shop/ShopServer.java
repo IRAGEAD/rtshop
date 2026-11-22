@@ -93,6 +93,11 @@ public final class ShopServer {
         com.rtshop.attendance.AttendanceConfig.reload();
         com.rtshop.gacha.GachaConfig.reload(server);
         com.rtshop.enhance.EnhanceConfig.reload();
+        com.rtshop.rules.LootRules.reload();
+        com.rtshop.rules.RecipeRules.reload();
+        if (server != null && server.getPlayerList() != null) {
+            com.rtshop.rules.RecipeRules.applyAndSync(server);
+        }
         com.rtshop.enhance.Enhance.syncAll(server);
         QuestManager.reload();
         loaded = ShopLoader.loadAll(server);
@@ -263,6 +268,14 @@ public final class ShopServer {
                                     com.rtshop.gacha.Gacha.openEditor(ctx.getSource().getPlayerOrException());
                                     return 1;
                                 })))
+                .then(Commands.literal("recipes").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                    com.rtshop.rules.RulesEditor.handle(ctx.getSource().getPlayerOrException(), com.rtshop.rules.RulesEditor.RECIPE_OPEN, "", "");
+                    return 1;
+                }))
+                .then(Commands.literal("loot").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                    com.rtshop.rules.RulesEditor.handle(ctx.getSource().getPlayerOrException(), com.rtshop.rules.RulesEditor.LOOT_OPEN, "", "");
+                    return 1;
+                }))
                 .then(Commands.literal("enhance")
                         .then(Commands.literal("odds").executes(ctx -> {
                             com.rtshop.enhance.Enhance.action(ctx.getSource().getPlayerOrException(), com.rtshop.net.EnhanceActionPacket.OPEN_ODDS, "");

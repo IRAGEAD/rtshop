@@ -293,6 +293,11 @@ public final class SelfTest {
             crash("castle lots", t);
         }
         try {
+            rules(server, level, a);
+        } catch (Throwable t) {
+            crash("recipe and loot rules", t);
+        }
+        try {
             enhance(server, level, a);
         } catch (Throwable t) {
             crash("enhance", t);
@@ -496,6 +501,114 @@ public final class SelfTest {
                 }
                 data.removeLand(l);
             }
+        }
+    }
+
+    // ------------------------------------------------------------------ 조합법·전리품 규칙
+
+    private static void rules(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("recipe and loot rules");
+        net.minecraft.world.item.crafting.RecipeManager rm = server.getRecipeManager();
+        ResourceLocation tnt = new ResourceLocation("minecraft:tnt");
+        check("TNT can be crafted normally", rm.byKey(tnt).isPresent());
+        com.rtshop.rules.RecipeRules.Rules r = new com.rtshop.rules.RecipeRules.Rules();
+        r.disabled.add("minecraft:tnt");
+        r.disabled.add("item:minecraft:bread");
+        com.google.gson.JsonObject custom = com.google.gson.JsonParser.parseString(
+                "{\"type\":\"minecraft:crafting_shapeless\",\"ingredients\":[{\"item\":\"minecraft:dirt\"},{\"item\":\"minecraft:dirt\"},"
+                        + "{\"item\":\"minecraft:dirt\"}],\"result\":{\"item\":\"minecraft:bread\",\"count\":2}}").getAsJsonObject();
+        r.custom.put("rtshop:custom/test_bread", custom);
+        com.rtshop.rules.RecipeRules.apply(server, r);
+        rm = server.getRecipeManager();
+        int breadRecipes = 0;
+        net.minecraft.world.item.crafting.Recipe<?> mine = null;
+        for (net.minecraft.world.item.crafting.Recipe<?> rec : rm.getRecipes()) {
+            ResourceLocation out = com.rtshop.rules.RecipeRules.outputId(rec, server);
+            if (out != null && out.toString().equals("minecraft:bread")) {
+                breadRecipes++;
+                if (rec.getId().toString().equals("rtshop:custom/test_bread")) mine = rec;
+            }
+        }
+        check("a blocked recipe disappears (TNT)", rm.byKey(tnt).isEmpty());
+        check("item:... blocks every recipe of that item, but a custom recipe for it still works",
+                breadRecipes == 1 && mine != null && mine.getResultItem(server.registryAccess()).getCount() == 2, breadRecipes);
+        net.minecraft.world.inventory.TransientCraftingContainer grid = new net.minecraft.world.inventory.TransientCraftingContainer(
+                new net.minecraft.world.inventory.AbstractContainerMenu(null, -1) {
+                    @Override
+                    public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player p, int i) {
+                        return ItemStack.EMPTY;
+                    }
+
+                    @Override
+                    public boolean stillValid(net.minecraft.world.entity.player.Player p) {
+                        return true;
+                    }
+                }, 3, 3);
+        grid.setItem(0, new ItemStack(Items.DIRT));
+        grid.setItem(4, new ItemStack(Items.DIRT));
+        grid.setItem(8, new ItemStack(Items.DIRT));
+        var found = rm.getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, grid, level);
+        check("the custom recipe crafts in a crafting grid (3 dirt -> 2 bread)", found.isPresent()
+                && found.get().assemble(grid, server.registryAccess()).is(Items.BREAD));
+        com.rtshop.rules.RecipeRules.apply(server, new com.rtshop.rules.RecipeRules.Rules());
+        check("removing the rules brings the original recipes back", server.getRecipeManager().byKey(tnt).isPresent()
+                && server.getRecipeManager().byKey(new ResourceLocation("rtshop:custom/test_bread")).isEmpty());
+        com.rtshop.rules.RecipeRules.apply(server, com.rtshop.rules.RecipeRules.get());
+        com.google.gson.JsonObject list = com.rtshop.rules.RecipeRules.listJson(server);
+        check("the recipe editor gets the full recipe list", list.getAsJsonArray("recipes").size() > 500, list.getAsJsonArray("recipes").size());
+
+        // 전리품
+        java.util.List<String> chests = com.rtshop.rules.LootRules.chestTables(server);
+        check("chest loot tables are listed for the loot editor", chests.contains("minecraft:chests/simple_dungeon") && chests.size() > 10, chests.size());
+        ResourceLocation dungeon = new ResourceLocation("minecraft:chests/simple_dungeon");
+        java.util.Map<String, com.rtshop.rules.LootRules.Stat> raw = com.rtshop.rules.LootRules.sample(level, dungeon, 300, true);
+        com.rtshop.rules.LootRules.Stat saddle = raw.get("minecraft:saddle");
+        check("sampling shows the real odds (dungeon saddle about 15-45%)", saddle != null && saddle.hits > 300 * 0.12 && saddle.hits < 300 * 0.6,
+                saddle == null ? "none" : saddle.hits);
+        com.rtshop.rules.LootRules.Rules lr = new com.rtshop.rules.LootRules.Rules();
+        com.rtshop.rules.LootRules.Table t = new com.rtshop.rules.LootRules.Table();
+        t.remove.add("minecraft:saddle");
+        com.rtshop.rules.LootRules.Add add = new com.rtshop.rules.LootRules.Add();
+        add.item = "minecraft:diamond";
+        add.chance = 1.0;
+        add.min = 2;
+        add.max = 2;
+        t.add.add(add);
+        lr.tables.put("minecraft:chests/simple_dungeon", t);
+        com.rtshop.rules.LootRules.Table g = new com.rtshop.rules.LootRules.Table();
+        com.rtshop.rules.LootRules.Add em = new com.rtshop.rules.LootRules.Add();
+        em.item = "minecraft:emerald_block";
+        em.chance = 0.5;
+        em.min = 1;
+        em.max = 1;
+        g.add.add(em);
+        lr.tables.put("minecraft:chests/*", g);
+        try {
+            com.rtshop.rules.LootRules.setForTest(lr);
+            java.util.Map<String, com.rtshop.rules.LootRules.Stat> after = com.rtshop.rules.LootRules.sample(level, dungeon, 300, false);
+            com.rtshop.rules.LootRules.Stat dia = after.get("minecraft:diamond");
+            check("rules apply to real chest loot: no saddle, always 2 diamonds", !after.containsKey("minecraft:saddle") && dia != null
+                    && dia.hits == 300 && dia.min >= 2, dia == null ? "no diamond" : dia.hits + " " + dia.min);
+            java.util.Map<String, com.rtshop.rules.LootRules.Stat> desert = com.rtshop.rules.LootRules.sample(level,
+                    new ResourceLocation("minecraft:chests/desert_pyramid"), 400, false);
+            com.rtshop.rules.LootRules.Stat eb = desert.get("minecraft:emerald_block");
+            check("a group rule (minecraft:chests/*) applies to every chest at its chance (about 50%)",
+                    eb != null && eb.hits > 400 * 0.38 && eb.hits < 400 * 0.62, eb == null ? "none" : eb.hits);
+            level.setBlockAndUpdate(new BlockPos(0, 120, 4100), net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState());
+            if (level.getBlockEntity(new BlockPos(0, 120, 4100)) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity cb) {
+                cb.setLootTable(dungeon, 7L);
+                cb.unpackLootTable(null);
+                int d = 0;
+                boolean s2 = false;
+                for (int i = 0; i < cb.getContainerSize(); i++) {
+                    if (cb.getItem(i).is(Items.DIAMOND)) d += cb.getItem(i).getCount();
+                    if (cb.getItem(i).is(Items.SADDLE)) s2 = true;
+                }
+                check("a placed dungeon chest gets the changed loot when opened", d >= 2 && !s2, d);
+            }
+            level.setBlockAndUpdate(new BlockPos(0, 120, 4100), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+        } finally {
+            com.rtshop.rules.LootRules.reload();
         }
     }
 

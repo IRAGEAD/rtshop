@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "rtshop:farm"
+    "rtshop:farm",
+    "rtshop:loot_rules"
   ]
 }

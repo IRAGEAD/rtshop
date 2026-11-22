@@ -26,6 +26,7 @@ public class RtShop {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         com.rtshop.enhance.ModEnhance.register(bus);
         ModItems.ITEMS.register(bus);
+        com.rtshop.rules.LootRules.init();
         FarmLootModifier.SERIALIZERS.register(bus);
         bus.addListener(this::onCreativeTab);
         bus.addListener(this::onCommonSetup);

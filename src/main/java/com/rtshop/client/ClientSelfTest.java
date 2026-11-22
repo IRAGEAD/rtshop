@@ -90,6 +90,8 @@ public final class ClientSelfTest {
     private static final int PLOT_END = ENH_END + PLOT_STEPS;
     private static final int PS_STEPS = 8;
     private static final int PS_END = PLOT_END + PS_STEPS;
+    private static final int RULE_STEPS = 12;
+    private static final int RULE_END = PS_END + RULE_STEPS;
     private static volatile BlockPos pshopPos = null;
     private static volatile net.minecraft.world.item.Item pshopWare = null;
     private static volatile int plotNpc = -1;
@@ -698,6 +700,112 @@ public final class ClientSelfTest {
                         sp.serverLevel().removeBlock(pos, false);
                     }
                 });
+                wait = 10;
+            }
+        }
+    }
+
+
+    private static volatile String ruleProbe = "";
+
+    /** 조합법·전리품 편집기 (OP): 조합법 막기·만들기, 상자 확률 보기·바꾸기. */
+    private static void rulesStep(Minecraft mc, int k) {
+        switch (k) {
+            case 0 -> {
+                mc.setScreen(null);
+                onServer(mc, sp -> com.rtshop.rules.RulesEditor.handle(sp, com.rtshop.rules.RulesEditor.RECIPE_OPEN, "", ""));
+                wait = 40;
+            }
+            case 1 -> {
+                RecipeEditScreen rs = mc.screen instanceof RecipeEditScreen r ? r : null;
+                check("the recipe editor opens with the server's recipes", rs != null && rs.totalForTest() > 500, rs == null ? mc.screen : rs.totalForTest());
+                shot(mc, "90_recipes_list");
+                if (rs != null) {
+                    rs.searchForTest("minecraft:tnt", 0);
+                    rs.blockForTest("minecraft:tnt");
+                }
+                wait = 5;
+            }
+            case 2 -> {
+                RecipeEditScreen rs = mc.screen instanceof RecipeEditScreen r ? r : null;
+                check("searching finds TNT and it can be blocked", rs != null && rs.rowsForTest() >= 1 && rs.isBlockedForTest("minecraft:tnt"));
+                shot(mc, "91_recipes_block_tnt");
+                if (rs != null) {
+                    RecipeMakeScreen ms = new RecipeMakeScreen(rs, null, null);
+                    mc.setScreen(ms);
+                    ms.fillForTest(new String[]{"minecraft:dirt", "minecraft:dirt", "minecraft:dirt", "", "minecraft:stick", "", "", "", ""},
+                            "minecraft:bread", 3, true);
+                }
+                wait = 5;
+            }
+            case 3 -> {
+                shot(mc, "92_recipes_make");
+                if (mc.screen instanceof RecipeMakeScreen ms) ms.doneForTest();
+                wait = 5;
+            }
+            case 4 -> {
+                RecipeEditScreen rs = mc.screen instanceof RecipeEditScreen r ? r : null;
+                check("the new recipe is in the list", rs != null && rs.rowsForTest() >= 1);
+                shot(mc, "93_recipes_custom");
+                if (rs != null) rs.saveForTest();
+                wait = 40;
+            }
+            case 5 -> {
+                boolean tntGone = mc.level.getRecipeManager().byKey(new net.minecraft.resources.ResourceLocation("minecraft:tnt")).isEmpty();
+                boolean mine = mc.level.getRecipeManager().byKey(new net.minecraft.resources.ResourceLocation("rtshop:custom/minecraft_bread")).isPresent();
+                check("after saving, the client's recipes change too (TNT gone, new bread recipe there; JEI sees the same)", tntGone && mine,
+                        tntGone + " " + mine);
+                // 되돌리기
+                onServer(mc, sp -> {
+                    try {
+                        com.rtshop.rules.RecipeRules.save(new com.rtshop.rules.RecipeRules.Rules());
+                        com.rtshop.rules.RecipeRules.applyAndSync(sp.server);
+                    } catch (Exception e) {
+                        RtShop.LOGGER.warn("[rtshop-clienttest] could not reset recipe rules", e);
+                    }
+                });
+                mc.setScreen(null);
+                wait = 30;
+            }
+            case 6 -> {
+                check("resetting the rules gives TNT back", mc.level.getRecipeManager().byKey(new net.minecraft.resources.ResourceLocation("minecraft:tnt")).isPresent());
+                onServer(mc, sp -> com.rtshop.rules.RulesEditor.handle(sp, com.rtshop.rules.RulesEditor.LOOT_OPEN, "", ""));
+                wait = 30;
+            }
+            case 7 -> {
+                LootEditScreen ls = mc.screen instanceof LootEditScreen l ? l : null;
+                check("the loot editor opens with the chest loot tables", ls != null && ls.tablesForTest() > 10, ls == null ? mc.screen : ls.tablesForTest());
+                if (ls != null) ls.selectForTest("minecraft:chests/simple_dungeon");
+                wait = 40;
+            }
+            case 8 -> {
+                LootEditScreen ls = mc.screen instanceof LootEditScreen l ? l : null;
+                check("the dungeon chest odds are measured and shown", ls != null && ls.loadedForTest() && ls.rowsForTest() > 5);
+                shot(mc, "94_loot_dungeon");
+                if (ls != null) {
+                    ls.setForTest("minecraft:saddle", 1, 0, 1, 1);
+                    ls.setForTest("minecraft:diamond", 2, 100, 1, 3);
+                    ls.saveForTest();
+                }
+                wait = 40;
+            }
+            case 9 -> {
+                LootEditScreen ls = mc.screen instanceof LootEditScreen l ? l : null;
+                double d = ls == null ? -1 : ls.afterForTest("minecraft:diamond");
+                double s = ls == null ? -1 : ls.afterForTest("minecraft:saddle");
+                check("after saving: saddle 0%, diamond 100% in the dungeon chest", d > 0.99 && s <= 0, d + " " + s);
+                shot(mc, "95_loot_changed");
+                onServer(mc, sp -> {
+                    try {
+                        com.rtshop.rules.LootRules.save(new com.rtshop.rules.LootRules.Rules());
+                    } catch (Exception e) {
+                        RtShop.LOGGER.warn("[rtshop-clienttest] could not reset loot rules", e);
+                    }
+                });
+                wait = 10;
+            }
+            default -> {
+                mc.setScreen(null);
                 wait = 10;
             }
         }
@@ -1644,17 +1752,21 @@ public final class ClientSelfTest {
                     pshopStep(mc, step - PLOT_END - 1);
                     return;
                 }
-                if (step > PS_END && step <= PS_END + EN_STEPS) {
-                    englishStep(mc, step - PS_END - 1);
+                if (step > PS_END && step <= RULE_END) {
+                    rulesStep(mc, step - PS_END - 1);
                     return;
                 }
-                if (step == PS_END + EN_STEPS + 1) {
+                if (step > RULE_END && step <= RULE_END + EN_STEPS) {
+                    englishStep(mc, step - RULE_END - 1);
+                    return;
+                }
+                if (step == RULE_END + EN_STEPS + 1) {
                     check("no server-side error happened", serverError == null, serverError);
                     finish(mc);
                     return;
                 }
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > PS_END + EN_STEPS + 40) {
+                if (step > RULE_END + EN_STEPS + 40) {
                     done = true;
                     mc.stop();
                 }
