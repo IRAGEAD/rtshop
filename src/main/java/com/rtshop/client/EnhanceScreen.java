@@ -22,6 +22,7 @@ import java.util.List;
 public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
     private static final ResourceLocation BG = new ResourceLocation("minecraft", "textures/gui/container/anvil.png");
     public static final int PANEL_W = 168;
+    private boolean showOdds;
 
     public EnhanceScreen(EnhanceMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -35,6 +36,17 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
     protected void init() {
         super.init();
         this.leftPos = (this.width - (this.imageWidth + 6 + PANEL_W)) / 2;
+        int bx = leftPos + imageWidth + 6, by = topPos + imageHeight + 3;
+        addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.translatable("rtshop.enhodds.open"),
+                b -> showOdds = !showOdds).bounds(bx, by, 80, 16).build());
+        if (minecraft.player != null && minecraft.player.hasPermissions(2)) {
+            addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.translatable("rtshop.enhodds.edit"),
+                    b -> {
+                        onClose();
+                        com.rtshop.net.ShopNet.CHANNEL.sendToServer(new com.rtshop.net.EnhanceActionPacket(
+                                com.rtshop.net.EnhanceActionPacket.OPEN_EDITOR, ""));
+                    }).bounds(bx + 84, by, 84, 16).build());
+        }
     }
 
     @Override
@@ -43,6 +55,12 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         super.render(g, mx, my, partial);
         renderPanel(g);
         renderTooltip(g, mx, my);
+        if (showOdds) {
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 400);
+            EnhanceOddsScreen.drawTable(g, font, (width - EnhanceOddsScreen.tableWidth()) / 2, Math.max(2, (height - EnhanceOddsScreen.tableHeight()) / 2));
+            g.pose().popPose();
+        }
     }
 
     @Override
@@ -80,9 +98,15 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
     }
 
     private void renderPanel(GuiGraphics g) {
-        int x = leftPos + imageWidth + 6, y = topPos, w = PANEL_W, h = imageHeight;
         g.pose().pushPose();
         g.pose().translate(0, 0, 200);
+        drawPanel(g, font, menu, minecraft.player, leftPos + imageWidth + 6, topPos, PANEL_W, imageHeight);
+        g.pose().popPose();
+    }
+
+    /** 강화 정보 패널 (확률·재료·Gold·방지권). 강화 창 옆과 시네마틱 모루 장면 위에 함께 쓴다. */
+    public static void drawPanel(GuiGraphics g, net.minecraft.client.gui.Font font, EnhanceMenu menu, net.minecraft.world.entity.player.Player player,
+                                 int x, int y, int w, int h) {
         Ui.woodFrame(g, x, y, w, h);
         Ui.bevel(g, x + 5, y + 5, w - 10, h - 10, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
         int tx = x + 10, ty = y + 10, tw = w - 20;
@@ -93,16 +117,17 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         if (eq.isEmpty() || !Enhance.enhanceable(eq) || cfg.level(Enhance.level(eq) + 1) == null) {
             for (String k : new String[]{"rtshop.enhance.help1", "rtshop.enhance.help2", "rtshop.enhance.help3", "rtshop.enhance.help4"}) {
                 for (FormattedCharSequence line : font.split(Component.translatable(k), tw)) {
+                    if (ty > y + h - 24) break;
                     g.drawString(font, line, tx, ty, Ui.C_INK_SOFT, false);
                     ty += 10;
                 }
                 ty += 3;
             }
-            g.pose().popPose();
             return;
         }
         int cur = Enhance.level(eq);
         EnhanceConfig.Level l = cfg.level(cur + 1);
+        g.drawString(font, Component.literal("+" + cur + " → +" + (cur + 1)), tx + tw - font.width("+" + cur + " → +" + (cur + 1)), y + 10, 0xFF8A5A00, false);
         ItemStack gs = menu.guardStack();
         Enhance.Guard guard = Enhance.guardOf(gs);
         if (!guard.relevant(l)) guard = Enhance.Guard.NONE;
@@ -115,9 +140,9 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         }
         ty += 25;
         g.fill(tx, ty - 2, tx + tw, ty - 1, Ui.C_PARCH_SHADE);
-        boolean free = minecraft.player.getAbilities().instabuild;
+        boolean free = player.getAbilities().instabuild;
         long tick = System.currentTimeMillis() / 1000;
-        for (Enhance.Need n : Enhance.needs(cfg, l, minecraft.player)) {
+        for (Enhance.Need n : Enhance.needs(cfg, l, player)) {
             Item icon = n.items.get((int) (tick % n.items.size()));
             g.renderItem(new ItemStack(icon), tx, ty);
             String name = Ui.clip(font, EnhanceClient.materialName(cfg, n).getString(), tw - 52);
@@ -139,15 +164,29 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
             g.drawString(font, line, tx, ty, guard != Enhance.Guard.NONE ? 0xFF1F6F8B : l.destroy > 0 ? Ui.C_RED : Ui.C_INK_SOFT, false);
             ty += 10;
         }
-        boolean ok = menu.getSlot(2).hasItem() && menu.getSlot(2).mayPickup(minecraft.player);
+        boolean ok = menu.getSlot(2).hasItem() && menu.getSlot(2).mayPickup(player);
         Component hint = Component.translatable(ok ? "rtshop.enhance.click_hint" : "rtshop.enhance.missing");
         List<FormattedCharSequence> hl = font.split(hint, tw);
         int hy = y + h - 10 - hl.size() * 10;
-        for (FormattedCharSequence line : hl) {
-            g.drawString(font, line, tx, hy, ok ? Ui.C_GREEN : Ui.C_RED, false);
-            hy += 10;
+        if (hy > ty) {
+            for (FormattedCharSequence line : hl) {
+                g.drawString(font, line, tx, hy, ok ? Ui.C_GREEN : Ui.C_RED, false);
+                hy += 10;
+            }
         }
-        g.pose().popPose();
+    }
+
+    @Override
+    public boolean mouseClicked(double mx, double my, int button) {
+        if (showOdds) {
+            showOdds = false;
+            return true;
+        }
+        return super.mouseClicked(mx, my, button);
+    }
+
+    public void showOddsForTest(boolean on) {
+        showOdds = on;
     }
 
     /** 시험용: 오른쪽 패널이 화면 안에 들어오는가. */

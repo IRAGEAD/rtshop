@@ -84,7 +84,7 @@ public final class ClientSelfTest {
     private static volatile int gachaNpc = -1;
     private static volatile int testNpc = -1;
     private static final int EN_STEPS = 6;
-    private static final int ENH_STEPS = 9;
+    private static final int ENH_STEPS = 10;
     private static final int ENH_END = NPC_END + ENH_STEPS;
     private static final int PLOT_STEPS = 8;
     private static final int PLOT_END = ENH_END + PLOT_STEPS;
@@ -437,7 +437,7 @@ public final class ClientSelfTest {
                 if (m.getSlot(2).hasItem()) {
                     List<net.minecraft.network.chat.Component> tip = net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, m.getSlot(2).getItem());
                     check("the preview tooltip shows the odds and the materials (also shown in the Cinematic scene)",
-                            tip.stream().anyMatch(c -> c.getString().contains("56%")), tip.size());
+                            tip.stream().anyMatch(c -> c.getString().contains("36%")), tip.size());
                 }
                 shot(mc, "81_enhance_ready");
                 mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
@@ -509,10 +509,21 @@ public final class ClientSelfTest {
                 if (tip.isEmpty()) {
                     RtShop.LOGGER.info("[rtshop-clienttest] sword report after a moment will follow");
                 }
+                if (mc.screen instanceof EnhanceScreen es) es.showOddsForTest(true);
+                else EnhanceOverlay.showTableForTest(true);
+                shot(mc, "83b_enhance_odds_table");
+                EnhanceOverlay.showTableForTest(false);
                 mc.player.closeContainer();
                 wait = 40;
             }
+            case 8 -> {
+                mc.setScreen(new EnhanceEditScreen(com.rtshop.enhance.EnhanceConfig.client().toJson().toString()));
+                wait = 10;
+            }
             default -> {
+                check("the OP enhancement editor opens with all 11 levels", mc.screen instanceof EnhanceEditScreen ed
+                        && ed.configForTest().getAsJsonArray("levels").size() == 11, mc.screen);
+                shot(mc, "83c_enhance_editor");
                 RtShop.LOGGER.info("[rtshop-clienttest] enhanced sword (late): {}", swordWhere);
                 mc.setScreen(null);
                 BlockPos at = anvilPos;

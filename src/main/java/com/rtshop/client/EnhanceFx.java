@@ -40,6 +40,18 @@ public final class EnhanceFx {
             EnhanceConfig.setClient(msg.json);
             return;
         }
+        if (msg.mode == EnhancePacket.EDITOR) {
+            EnhanceConfig.setClient(msg.json);
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.screen instanceof EnhanceEditScreen ed) ed.update(msg.json);
+            else mc.setScreen(new EnhanceEditScreen(msg.json));
+            return;
+        }
+        if (msg.mode == EnhancePacket.ODDS) {
+            EnhanceConfig.setClient(msg.json);
+            Minecraft.getInstance().setScreen(new EnhanceOddsScreen(Minecraft.getInstance().screen));
+            return;
+        }
         Enhance.Outcome o = Enhance.Outcome.values()[Math.max(0, Math.min(3, msg.outcome))];
         show(o, msg.guarded, msg.from, msg.to, msg.item);
     }

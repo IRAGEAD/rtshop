@@ -547,13 +547,62 @@ public final class SelfTest {
             if (Math.abs(sum - 100) > 1e-6) { shape = false; bad.append(" sum+").append(i); }
             if (i > 1) {
                 com.rtshop.enhance.EnhanceConfig.Level p = cfg.level(i - 1);
-                if (!(l.success < p.success && l.maintain <= p.maintain && l.damage >= p.damage && l.destroy >= p.destroy && l.gold > p.gold)) {
+                if (!(l.success < p.success && l.damage >= p.damage && l.destroy >= p.destroy && l.gold > p.gold)) {
                     shape = false;
                     bad.append(" +").append(i);
                 }
             }
         }
-        check("11 enhancement levels: success/keep fall, damage/destroy rise, cost rises, odds add up to 100", shape, bad);
+        check("11 enhancement levels: success falls, damage/destroy rise, cost rises, odds add up to 100", shape, bad);
+        check("from +4 success drops sharply and keep has a big share", cfg.level(4).success <= 50 && cfg.level(3).success - cfg.level(4).success >= 20
+                && cfg.level(4).maintain >= 30 && cfg.level(11).success <= 5 && cfg.level(8).maintain >= 30);
+        // 1판 기본 확률 파일은 2판 확률로 올라간다 (OP 가 바꾼 단계는 그대로)
+        java.nio.file.Path ep = com.rtshop.enhance.EnhanceConfig.path();
+        String keep = Files.exists(ep) ? Files.readString(ep, StandardCharsets.UTF_8) : null;
+        try {
+            com.google.gson.JsonObject old = cfg.toJson();
+            old.addProperty("configVersion", 1);
+            double[][] o1 = {{90, 9, 1, 0}, {83, 9, 8, 0}, {75, 8.5, 16.5, 0}};
+            for (int i = 0; i < 3; i++) {
+                com.google.gson.JsonObject lo = old.getAsJsonArray("levels").get(i).getAsJsonObject();
+                lo.addProperty("success", o1[i][0]);
+                lo.addProperty("maintain", o1[i][1]);
+                lo.addProperty("damage", o1[i][2]);
+                lo.addProperty("destroy", o1[i][3]);
+            }
+            old.getAsJsonArray("levels").get(2).getAsJsonObject().addProperty("success", 70.5);
+            Files.writeString(ep, old.toString(), StandardCharsets.UTF_8);
+            com.rtshop.enhance.EnhanceConfig.reload();
+            com.rtshop.enhance.EnhanceConfig up = com.rtshop.enhance.EnhanceConfig.get();
+            check("an old enhance.json with default odds is upgraded; edited levels are kept",
+                    up.level(1).success == 90 && up.level(1).maintain == 10 && up.level(2).success == 82 && up.level(3).success == 70.5,
+                    up.level(1).success + " " + up.level(2).success + " " + up.level(3).success);
+            // OP 편집기 저장
+            com.google.gson.JsonObject ed = cfg.toJson();
+            ed.getAsJsonArray("levels").get(0).getAsJsonObject().addProperty("success", 77);
+            ed.getAsJsonArray("levels").get(0).getAsJsonObject().addProperty("maintain", 23);
+            com.rtshop.enhance.EnhanceConfig.saveFromEditor(ed.toString());
+            check("the OP editor saves odds and applies them at once", com.rtshop.enhance.EnhanceConfig.get().level(1).success == 77
+                    && Files.readString(ep, StandardCharsets.UTF_8).contains("77"));
+            boolean refused = false;
+            try {
+                com.google.gson.JsonObject badj = cfg.toJson();
+                com.google.gson.JsonObject l1 = badj.getAsJsonArray("levels").get(0).getAsJsonObject();
+                l1.addProperty("success", 0);
+                l1.addProperty("maintain", 0);
+                l1.addProperty("damage", 0);
+                l1.addProperty("destroy", 0);
+                com.rtshop.enhance.EnhanceConfig.saveFromEditor(badj.toString());
+            } catch (Exception e) {
+                refused = true;
+            }
+            check("the editor refuses a level whose odds are all zero", refused && com.rtshop.enhance.EnhanceConfig.get().level(1).success == 77);
+        } finally {
+            if (keep != null) Files.writeString(ep, keep, StandardCharsets.UTF_8);
+            else Files.deleteIfExists(ep);
+            com.rtshop.enhance.EnhanceConfig.reload();
+            cfg = com.rtshop.enhance.EnhanceConfig.get();
+        }
         check("the first levels cannot destroy, high levels can", cfg.level(3).destroy == 0 && cfg.level(4).destroy > 0 && cfg.level(11).destroy > 30);
         boolean mm = net.minecraftforge.fml.ModList.get().isLoaded("miningmaster");
         boolean sp = net.minecraftforge.fml.ModList.get().isLoaded("spelunkery");

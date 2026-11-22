@@ -5,7 +5,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
-version = '3.14.0'
+version = '3.15.0'
 group = 'com.rtshop'
 
 base {
@@ -55,7 +55,8 @@ tasks.named('jar', Jar).configure {
                 'Specification-Version'   : '1',
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : 'rtshop'
+                'Implementation-Vendor'   : 'rtshop',
+                'MixinConfigs'            : 'rtshop.mixins.json'
         ])
     }
     finalizedBy 'reobfJar'

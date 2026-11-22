@@ -1,5 +1,5 @@
 {
- "_설명": "장비 상점에 덧붙이는 강화 품목 (강화 모루, 방지권) 과 Mining Master 보석 매입가. 한 번만 추가되며, 이미 있는 품목은 건드리지 않습니다.",
+ "_설명": "장비 상점에 덧붙이는 강화 품목 (강화 모루, 방지권, Spelunkery 강화 재료) 과 Mining Master 보석 매입가. 이미 있는 품목은 건드리지 않습니다.",
  "categories": [
   {
    "id": "enhance",
@@ -8,22 +8,137 @@
   }
  ],
  "items": [
-  {"item": "rtshop:enhance_anvil", "price": 8000, "category": "enhance", "sell": false},
-  {"item": "rtshop:enhance_guard_damage", "price": 15000, "category": "enhance", "sell": false},
-  {"item": "rtshop:enhance_guard_destroy", "price": 20000, "category": "enhance", "sell": false},
-  {"item": "rtshop:enhance_guard_full", "price": 35000, "category": "enhance", "sell": false},
-  {"item": "miningmaster:ice_sapphire", "price": 1200, "category": "mineral", "buy": false},
-  {"item": "miningmaster:spirit_garnet", "price": 1200, "category": "mineral", "buy": false},
-  {"item": "miningmaster:dive_aquamarine", "price": 1200, "category": "mineral", "buy": false},
-  {"item": "miningmaster:spider_kunzite", "price": 1200, "category": "mineral", "buy": false},
-  {"item": "miningmaster:fire_ruby", "price": 2000, "category": "mineral", "buy": false},
-  {"item": "miningmaster:haste_peridot", "price": 2000, "category": "mineral", "buy": false},
-  {"item": "miningmaster:lucky_citrine", "price": 2000, "category": "mineral", "buy": false},
-  {"item": "miningmaster:unbreaking_iolite", "price": 2000, "category": "mineral", "buy": false},
-  {"item": "miningmaster:heart_rhodonite", "price": 3500, "category": "mineral", "buy": false},
-  {"item": "miningmaster:power_pyrite", "price": 3500, "category": "mineral", "buy": false},
-  {"item": "miningmaster:kinetic_opal", "price": 3500, "category": "mineral", "buy": false},
-  {"item": "miningmaster:divine_beryl", "price": 6000, "category": "mineral", "buy": false},
-  {"item": "miningmaster:air_malachite", "price": 6000, "category": "mineral", "buy": false}
+  {
+   "item": "rtshop:enhance_anvil",
+   "price": 8000,
+   "category": "enhance",
+   "sell": false
+  },
+  {
+   "item": "rtshop:enhance_guard_damage",
+   "price": 15000,
+   "category": "enhance",
+   "sell": false
+  },
+  {
+   "item": "rtshop:enhance_guard_destroy",
+   "price": 20000,
+   "category": "enhance",
+   "sell": false
+  },
+  {
+   "item": "rtshop:enhance_guard_full",
+   "price": 35000,
+   "category": "enhance",
+   "sell": false
+  },
+  {
+   "item": "miningmaster:ice_sapphire",
+   "price": 1200,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:spirit_garnet",
+   "price": 1200,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:dive_aquamarine",
+   "price": 1200,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:spider_kunzite",
+   "price": 1200,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:fire_ruby",
+   "price": 2000,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:haste_peridot",
+   "price": 2000,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:lucky_citrine",
+   "price": 2000,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:unbreaking_iolite",
+   "price": 2000,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:heart_rhodonite",
+   "price": 3500,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:power_pyrite",
+   "price": 3500,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:kinetic_opal",
+   "price": 3500,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:divine_beryl",
+   "price": 6000,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "miningmaster:air_malachite",
+   "price": 6000,
+   "category": "mineral",
+   "buy": false
+  },
+  {
+   "item": "spelunkery:salt",
+   "price": 40,
+   "category": "enhance"
+  },
+  {
+   "item": "spelunkery:raw_magnetite",
+   "price": 150,
+   "category": "enhance"
+  },
+  {
+   "item": "spelunkery:cinnabar",
+   "price": 300,
+   "category": "enhance"
+  },
+  {
+   "item": "spelunkery:sulfur",
+   "price": 250,
+   "category": "enhance"
+  },
+  {
+   "item": "spelunkery:rough_emerald",
+   "price": 2500,
+   "category": "enhance"
+  },
+  {
+   "item": "spelunkery:rough_diamond",
+   "price": 3000,
+   "category": "enhance"
+  }
  ]
 }

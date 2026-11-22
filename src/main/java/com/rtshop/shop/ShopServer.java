@@ -263,8 +263,16 @@ public final class ShopServer {
                                     com.rtshop.gacha.Gacha.openEditor(ctx.getSource().getPlayerOrException());
                                     return 1;
                                 })))
-                .then(Commands.literal("enhance").requires(src -> src.hasPermission(2))
-                        .then(Commands.literal("set").then(Commands.argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 11))
+                .then(Commands.literal("enhance")
+                        .then(Commands.literal("odds").executes(ctx -> {
+                            com.rtshop.enhance.Enhance.action(ctx.getSource().getPlayerOrException(), com.rtshop.net.EnhanceActionPacket.OPEN_ODDS, "");
+                            return 1;
+                        }))
+                        .then(Commands.literal("edit").requires(src -> src.hasPermission(2)).executes(ctx -> {
+                            com.rtshop.enhance.Enhance.action(ctx.getSource().getPlayerOrException(), com.rtshop.net.EnhanceActionPacket.OPEN_EDITOR, "");
+                            return 1;
+                        }))
+                        .then(Commands.literal("set").requires(src -> src.hasPermission(2)).then(Commands.argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 11))
                                 .executes(ctx -> {
                                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                                     net.minecraft.world.item.ItemStack held = p.getMainHandItem();

@@ -322,6 +322,35 @@ public final class Enhance {
         }
     }
 
+    // ------------------------------------------------------------------ 확률표 · OP 편집기
+
+    public static void action(ServerPlayer p, int action, String json) {
+        switch (action) {
+            case com.rtshop.net.EnhanceActionPacket.OPEN_ODDS -> ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
+                    EnhancePacket.open(EnhancePacket.ODDS, EnhanceConfig.get().toJson().toString()));
+            case com.rtshop.net.EnhanceActionPacket.OPEN_EDITOR -> {
+                if (p.hasPermissions(2)) {
+                    ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
+                            EnhancePacket.open(EnhancePacket.EDITOR, EnhanceConfig.get().toJson().toString()));
+                }
+            }
+            case com.rtshop.net.EnhanceActionPacket.SAVE -> {
+                if (!p.hasPermissions(2)) return;
+                try {
+                    EnhanceConfig.saveFromEditor(json);
+                    syncAll(p.server);
+                    p.sendSystemMessage(Component.translatable("rtshop.enhedit.saved").withStyle(ChatFormatting.GREEN));
+                    ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
+                            EnhancePacket.open(EnhancePacket.EDITOR, EnhanceConfig.get().toJson().toString()));
+                } catch (Exception e) {
+                    p.sendSystemMessage(Component.translatable("rtshop.enhedit.failed", String.valueOf(e.getMessage())).withStyle(ChatFormatting.RED));
+                }
+            }
+            default -> {
+            }
+        }
+    }
+
     // ------------------------------------------------------------------ 설정 동기화
 
     public static void sync(ServerPlayer p) {
