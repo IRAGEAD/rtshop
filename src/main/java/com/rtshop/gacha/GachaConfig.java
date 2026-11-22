@@ -233,6 +233,8 @@ public final class GachaConfig {
     /** 정해 둔 무기 말고도 영웅·전설 무기를 가져올 모드 (기본: 없음). */
     public final List<String> topWeaponMods = new ArrayList<>();
     /** 등급을 정해 둔 무기 (아이템 ID → 등급). */
+    public static final String[] YAMATO_ITEMS = {"efn:yamato_dmc_in_sheath", "efn:yamato_dmc4_in_sheath"};
+
     static final Map<String, String> FIXED_WEAPONS = new LinkedHashMap<>();
 
     static {
@@ -250,8 +252,6 @@ public final class GachaConfig {
             FIXED_WEAPONS.put(id, "epic");
         }
     }
-
-    public static final String[] YAMATO_ITEMS = {"efn:yamato_dmc_in_sheath", "efn:yamato_dmc4_in_sheath"};
 
     /**
      * Blade of Shadow (TaCZ 총기팩 katana): 모두 영웅 등급.
