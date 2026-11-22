@@ -164,11 +164,11 @@ public class EnhanceEditScreen extends Screen {
         String[] names = {"rtshop.enhodds.success", "rtshop.enhodds.maintain", "rtshop.enhodds.damage", "rtshop.enhodds.destroy"};
         for (int i = 0; i < 4; i++) {
             String k = keys[i];
-            labels.add(new Object[]{Component.translatable(names[i]), x + i * 70, y});
-            num(x + i * 70, y + 10, 60, fmt(o.get(k).getAsDouble()), v -> o.addProperty(k, parse(v)));
+            labels.add(new Object[]{Component.translatable(names[i]), x + i * 54, y});
+            num(x + i * 54, y + 10, 48, fmt(o.get(k).getAsDouble()), v -> o.addProperty(k, parse(v)));
         }
-        labels.add(new Object[]{Component.translatable("rtshop.enhodds.gold"), x + 280, y});
-        num(x + 280, y + 10, 70, Long.toString(o.get("gold").getAsLong()), v -> o.addProperty("gold", (long) parse(v)));
+        labels.add(new Object[]{Component.translatable("rtshop.enhodds.gold"), x + 220, y});
+        num(x + 220, y + 10, 64, Long.toString(o.get("gold").getAsLong()), v -> o.addProperty("gold", (long) parse(v)));
         y += 34;
         labels.add(new Object[]{Component.translatable("rtshop.enhedit.materials"), x, y});
         y += 11;
@@ -178,14 +178,14 @@ public class EnhanceEditScreen extends Screen {
             int idx = i;
             String id = m.get("item").getAsString();
             icons.add(new Object[]{id, x, y + 1});
-            Button pick = Button.builder(Component.literal(nameOf(id)), b -> pickMaterial(mats, idx)).bounds(x + 20, y, 180, 18).build();
+            Button pick = Button.builder(Component.literal(nameOf(id)), b -> pickMaterial(mats, idx)).bounds(x + 20, y, 160, 18).build();
             addRenderableWidget(pick);
-            num(x + 204, y + 2, 40, Integer.toString(m.get("count").getAsInt()), v -> m.addProperty("count", Math.max(1, (int) parse(v))));
+            num(x + 184, y + 2, 36, Integer.toString(m.get("count").getAsInt()), v -> m.addProperty("count", Math.max(1, (int) parse(v))));
             addRenderableWidget(Button.builder(Component.literal("✕"), b -> {
                 mats.remove(idx);
                 changed();
                 rebuildWidgets();
-            }).bounds(x + 248, y, 18, 18).build());
+            }).bounds(x + 224, y, 18, 18).build());
             y += 20;
         }
         if (mats.size() < 6) {
@@ -321,7 +321,7 @@ public class EnhanceEditScreen extends Screen {
                 double sum = o.get("success").getAsDouble() + o.get("maintain").getAsDouble() + o.get("damage").getAsDouble()
                         + o.get("destroy").getAsDouble();
                 Component c = Component.translatable("rtshop.enhedit.sum", EnhanceClient.pct(sum));
-                g.drawString(font, c, fx + W - 14 - font.width(c), fy + 46, Math.abs(sum - 100) < 0.001 ? Ui.C_GREEN : Ui.C_RED, false);
+                g.drawString(font, c, fx + W - 14 - font.width(c), fy + 8, Math.abs(sum - 100) < 0.001 ? 0xFF7CFF6A : 0xFFFF6060, true);
             }
         }
         super.render(g, mx, my, partial);

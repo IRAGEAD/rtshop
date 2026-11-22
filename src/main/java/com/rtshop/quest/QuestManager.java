@@ -950,26 +950,21 @@ public final class QuestManager {
             return;
         }
         boolean questNpc = isQuestNpc(target);
-        // 상인·은행원·직업 안내인: 웅크리고 말을 걸면 상점 대신 퀘스트 창, 그냥 말을 걸면 원래 화면 + (퀘스트가 있으면) 채팅 안내
-        boolean crouchForQuests = !questNpc && event.getEntity().isShiftKeyDown() && event.getEntity() instanceof ServerPlayer p0
-                && !viewsFor(p0, key).isEmpty();
-        if (questNpc || crouchForQuests) {
+        // 퀘스트 전용 NPC: 바로 퀘스트 창. 상인·은행원·직업 안내인 등: 원래 화면을 열고, 받을 퀘스트가 있으면 그 화면에 [퀘스트] 단추가 뜬다.
+        if (questNpc) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
         }
         if (event.getHand() != InteractionHand.MAIN_HAND || !(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
-        if (questNpc || crouchForQuests) {
+        if (questNpc) {
             openDialog(sp, key, target.getId());
         } else {
             onTalk(sp, key);
-            if (!viewsFor(sp, key).isEmpty()) {
-                sp.sendSystemMessage(Component.translatable("rtshop.quest.npc_hint", npcName(key),
-                        Component.translatable("rtshop.quest.npc_hint_link").withStyle(st -> st.withColor(net.minecraft.ChatFormatting.GOLD)
-                                .withUnderlined(true).withClickEvent(new net.minecraft.network.chat.ClickEvent(
-                                        net.minecraft.network.chat.ClickEvent.Action.RUN_COMMAND, "/rtshop quest open " + target.getId())))));
-            }
+            int n = viewsFor(sp, key).size();
+            com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> sp),
+                    new com.rtshop.net.NpcQuestPacket(target.getId(), n));
         }
     }
 

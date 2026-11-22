@@ -84,9 +84,9 @@ public final class ClientSelfTest {
     private static volatile int gachaNpc = -1;
     private static volatile int testNpc = -1;
     private static final int EN_STEPS = 6;
-    private static final int ENH_STEPS = 10;
+    private static final int ENH_STEPS = 11;
     private static final int ENH_END = NPC_END + ENH_STEPS;
-    private static final int PLOT_STEPS = 8;
+    private static final int PLOT_STEPS = 11;
     private static final int PLOT_END = ENH_END + PLOT_STEPS;
     private static volatile int plotNpc = -1;
     private static volatile int boughtLot = -1;
@@ -464,26 +464,18 @@ public final class ClientSelfTest {
             case 6 -> {
                 swordWhere = "?";
                 onServer(mc, sp -> swordWhere = whereSword(sp));
-                onServer(mc, sp -> {
-                    StringBuilder w = new StringBuilder();
-                    w.append("carried=").append(sp.containerMenu.getCarried()).append(" menu=").append(sp.containerMenu.getClass().getSimpleName());
-                    for (int i = 0; i < sp.containerMenu.slots.size(); i++) {
-                        ItemStack it = sp.containerMenu.slots.get(i).getItem();
-                        if (it.is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" slot").append(i).append('=').append(it.getTag());
-                    }
-                    for (int i = 0; i < sp.getInventory().getContainerSize(); i++) {
-                        if (sp.getInventory().getItem(i).is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" inv").append(i);
-                    }
-                    for (net.minecraft.world.entity.item.ItemEntity ie : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
-                            sp.getBoundingBox().inflate(16))) {
-                        if (ie.getItem().is(net.minecraft.world.item.Items.DIAMOND_SWORD)) w.append(" dropped@").append(ie.blockPosition().toShortString());
-                    }
-                    swordWhere = w.toString();
-                    RtShop.LOGGER.info("[rtshop-clienttest] enhanced sword: {}", swordWhere);
-                });
                 shot(mc, "83_enhance_guarded");
                 check("a destroy roll with a destruction guard only damages the item (+5 -> +4)",
                         EnhanceFx.last.startsWith("DAMAGE:5:4:guarded"), EnhanceFx.last);
+                if (mc.screen instanceof EnhanceScreen es) es.showOddsForTest(true);
+                else EnhanceOverlay.showTableForTest(true);
+                wait = 10;
+            }
+            case 7 -> {
+                check("the odds table can be shown over the enhance window / Cinematic scene", mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu);
+                shot(mc, "83b_enhance_odds_table");
+                if (mc.screen instanceof EnhanceScreen es) es.showOddsForTest(false);
+                EnhanceOverlay.showTableForTest(false);
                 onServer(mc, sp -> {
                     com.rtshop.enhance.Enhance.testRoll = null;
                     // 창을 닫으면 손에 든 결과와 모루 위 물건이 가방으로 돌아온다 (바닐라 모루와 같음)
@@ -491,7 +483,7 @@ public final class ClientSelfTest {
                 });
                 wait = 60;
             }
-            case 7 -> {
+            case 8 -> {
                 String before = swordWhere;
                 onServer(mc, sp -> swordWhere = before + " | later: " + whereSword(sp));
                 ItemStack held = ItemStack.EMPTY;
@@ -504,19 +496,11 @@ public final class ClientSelfTest {
                 List<net.minecraft.network.chat.Component> tip = held.isEmpty() ? List.of()
                         : net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, held);
                 check("an enhanced item shows +N in front of its name", !tip.isEmpty() && tip.get(0).getString().startsWith("+4 "),
-                        tip.isEmpty() ? "no sword; server: " + swordWhere + " | client inv: " + mc.player.getInventory().items.stream()
-                                .filter(x -> !x.isEmpty()).map(x -> x.getItem().toString()).toList() : tip.get(0).getString());
-                if (tip.isEmpty()) {
-                    RtShop.LOGGER.info("[rtshop-clienttest] sword report after a moment will follow");
-                }
-                if (mc.screen instanceof EnhanceScreen es) es.showOddsForTest(true);
-                else EnhanceOverlay.showTableForTest(true);
-                shot(mc, "83b_enhance_odds_table");
-                EnhanceOverlay.showTableForTest(false);
-                mc.player.closeContainer();
-                wait = 40;
+                        tip.isEmpty() ? "no sword; server: " + swordWhere : tip.get(0).getString());
+                mc.setScreen(null);
+                wait = 20;
             }
-            case 8 -> {
+            case 9 -> {
                 mc.setScreen(new EnhanceEditScreen(com.rtshop.enhance.EnhanceConfig.client().toJson().toString()));
                 wait = 10;
             }
@@ -593,7 +577,24 @@ public final class ClientSelfTest {
             case 6 -> {
                 shot(mc, "89_plots_starter_tab");
                 if (ps != null) ps.showForTest(1, 1, 0);
-                wait = 10;
+                ShopNet.CHANNEL.sendToServer(new com.rtshop.net.PlotActionPacket(com.rtshop.land.PlotBrowser.BACK, 0));
+                wait = 20;
+            }
+            case 7 -> {
+                check("[◀ 토지 상점] goes back to the land shop", mc.screen instanceof ShopScreen ss && "land".equals(ss.shopIdForEdit()), mc.screen);
+                shot(mc, "89b_land_shop_back");
+                ShopNet.CHANNEL.sendToServer(new com.rtshop.net.ShopEditActionPacket(com.rtshop.shop.ShopEditor.OPEN, "land", ""));
+                wait = 20;
+            }
+            case 8 -> {
+                check("an OP can edit the merchant's items and prices from the shop window", mc.screen instanceof ShopEditScreen se && se.rowsForTest() > 0,
+                        mc.screen);
+                shot(mc, "89c_shop_editor");
+                wait = 5;
+            }
+            case 9 -> {
+                mc.setScreen(null);
+                wait = 5;
             }
             default -> {
                 mc.setScreen(null);

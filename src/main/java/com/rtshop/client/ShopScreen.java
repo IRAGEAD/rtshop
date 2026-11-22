@@ -554,6 +554,10 @@ public class ShopScreen extends Screen {
         }
     }
 
+    public String shopIdForEdit() {
+        return data.id;
+    }
+
     /** 토지 상인: 문서 외에 구획·성 안 토지를 보는 탭이 붙는다. */
     private boolean landShop() {
         return "land".equals(data.id) || data.entries.stream().anyMatch(e -> e.stack.getItem() instanceof com.rtshop.item.DeedItem);

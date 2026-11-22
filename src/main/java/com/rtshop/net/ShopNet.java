@@ -55,5 +55,8 @@ public final class ShopNet {
         CHANNEL.registerMessage(id++, PlotActionPacket.class, PlotActionPacket::encode, PlotActionPacket::decode, PlotActionPacket::handle);
         CHANNEL.registerMessage(id++, BorderPacket.class, BorderPacket::encode, BorderPacket::decode, BorderPacket::handle);
         CHANNEL.registerMessage(id++, EnhanceActionPacket.class, EnhanceActionPacket::encode, EnhanceActionPacket::decode, EnhanceActionPacket::handle);
+        CHANNEL.registerMessage(id++, ShopEditDataPacket.class, ShopEditDataPacket::encode, ShopEditDataPacket::decode, ShopEditDataPacket::handle);
+        CHANNEL.registerMessage(id++, ShopEditActionPacket.class, ShopEditActionPacket::encode, ShopEditActionPacket::decode, ShopEditActionPacket::handle);
+        CHANNEL.registerMessage(id++, NpcQuestPacket.class, NpcQuestPacket::encode, NpcQuestPacket::decode, NpcQuestPacket::handle);
     }
 }

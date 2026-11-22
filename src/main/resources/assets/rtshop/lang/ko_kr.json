@@ -854,5 +854,21 @@
   "rtshop.enhedit.sum": "합계 %s",
   "rtshop.enhedit.unsaved": "(저장 안 됨)",
   "rtshop.enhedit.saved": "강화 설정을 저장하고 모두에게 적용했습니다.",
-  "rtshop.enhedit.failed": "저장하지 못했습니다: %s"
+  "rtshop.enhedit.failed": "저장하지 못했습니다: %s",
+  "rtshop.npc.quest_button": "퀘스트 (%s)",
+  "rtshop.shopedit.button": "상점 편집 (OP)",
+  "rtshop.shopedit.title": "상점 편집: %s",
+  "rtshop.shopedit.all": "전체",
+  "rtshop.shopedit.search": "검색",
+  "rtshop.shopedit.add": "+ 품목 추가",
+  "rtshop.shopedit.buy_on": "판매",
+  "rtshop.shopedit.buy_off": "§7판매",
+  "rtshop.shopedit.sell_on": "매입",
+  "rtshop.shopedit.sell_off": "§7매입",
+  "rtshop.shopedit.col_item": "품목",
+  "rtshop.shopedit.col_price": "판매가",
+  "rtshop.shopedit.col_sell": "매입가",
+  "rtshop.shopedit.count": "%s개 표시 / 전체 %s개 · 매입가를 비우면 기본 비율",
+  "rtshop.shopedit.saved": "상점 %s 을(를) 저장하고 다시 읽었습니다 (예전 파일은 .bak).",
+  "rtshop.shopedit.failed": "상점을 저장하지 못했습니다: %s"
 }

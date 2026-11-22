@@ -641,6 +641,28 @@ public final class SelfTest {
             Files.deleteIfExists(tmp);
         }
 
+        // OP 상점 편집기: 품목 추가·가격 바꾸기가 저장·적용되고 .bak 로 되돌릴 수 있다
+        if (com.rtshop.shop.ShopEditor.validId("general")) {
+            java.nio.file.Path gf = ShopLoader.dir().resolve("general.json");
+            String orig = Files.readString(gf, StandardCharsets.UTF_8);
+            try {
+                com.google.gson.JsonObject go = com.google.gson.JsonParser.parseString(orig).getAsJsonObject();
+                com.google.gson.JsonObject it = new com.google.gson.JsonObject();
+                it.addProperty("item", "minecraft:dragon_egg");
+                it.addProperty("price", 12345);
+                it.addProperty("category", go.getAsJsonArray("categories").get(0).getAsJsonObject().get("id").getAsString());
+                go.getAsJsonArray("items").add(it);
+                java.nio.file.Path bak = com.rtshop.shop.ShopEditor.save(server, "general", go.toString());
+                ShopLoader.Price pr = ShopServer.loaded().prices.get("minecraft:dragon_egg");
+                check("the OP shop editor saves items and prices and reloads the shops", pr != null && pr.price == 12345 && Files.exists(bak),
+                        pr == null ? "missing" : pr.price);
+            } finally {
+                Files.writeString(gf, orig, StandardCharsets.UTF_8);
+                Files.deleteIfExists(gf.resolveSibling("general.json.bak"));
+                ShopServer.reload(server);
+            }
+        }
+
         // 블록과 창
         BlockPos pos = new BlockPos(0, 120, 4000);
         level.setBlockAndUpdate(pos.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());

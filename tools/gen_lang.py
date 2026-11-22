@@ -733,6 +733,22 @@ NEW = {
  "rtshop.enhedit.unsaved": ("(저장 안 됨)", "(unsaved)"),
  "rtshop.enhedit.saved": ("강화 설정을 저장하고 모두에게 적용했습니다.", "Enhancement settings saved and applied."),
  "rtshop.enhedit.failed": ("저장하지 못했습니다: %s", "Could not save: %s"),
+ "rtshop.npc.quest_button": ("퀘스트 (%s)", "Quests (%s)"),
+ "rtshop.shopedit.button": ("상점 편집 (OP)", "Edit shop (OP)"),
+ "rtshop.shopedit.title": ("상점 편집: %s", "Edit shop: %s"),
+ "rtshop.shopedit.all": ("전체", "All"),
+ "rtshop.shopedit.search": ("검색", "Search"),
+ "rtshop.shopedit.add": ("+ 품목 추가", "+ Add item"),
+ "rtshop.shopedit.buy_on": ("판매", "Sell"),
+ "rtshop.shopedit.buy_off": ("§7판매", "§7Sell"),
+ "rtshop.shopedit.sell_on": ("매입", "Buy"),
+ "rtshop.shopedit.sell_off": ("§7매입", "§7Buy"),
+ "rtshop.shopedit.col_item": ("품목", "Item"),
+ "rtshop.shopedit.col_price": ("판매가", "Price"),
+ "rtshop.shopedit.col_sell": ("매입가", "Buy-back"),
+ "rtshop.shopedit.count": ("%s개 표시 / 전체 %s개 · 매입가를 비우면 기본 비율", "%s shown / %s total · empty buy-back = default ratio"),
+ "rtshop.shopedit.saved": ("상점 %s 을(를) 저장하고 다시 읽었습니다 (예전 파일은 .bak).", "Shop %s saved and reloaded (old file kept as .bak)."),
+ "rtshop.shopedit.failed": ("상점을 저장하지 못했습니다: %s", "Could not save the shop: %s"),
 }
 ko = dict(ko_old); en = dict(en_old)
 for k, (a, b) in NEW.items():

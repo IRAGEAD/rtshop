@@ -854,5 +854,21 @@
   "rtshop.enhedit.sum": "Total %s",
   "rtshop.enhedit.unsaved": "(unsaved)",
   "rtshop.enhedit.saved": "Enhancement settings saved and applied.",
-  "rtshop.enhedit.failed": "Could not save: %s"
+  "rtshop.enhedit.failed": "Could not save: %s",
+  "rtshop.npc.quest_button": "Quests (%s)",
+  "rtshop.shopedit.button": "Edit shop (OP)",
+  "rtshop.shopedit.title": "Edit shop: %s",
+  "rtshop.shopedit.all": "All",
+  "rtshop.shopedit.search": "Search",
+  "rtshop.shopedit.add": "+ Add item",
+  "rtshop.shopedit.buy_on": "Sell",
+  "rtshop.shopedit.buy_off": "§7Sell",
+  "rtshop.shopedit.sell_on": "Buy",
+  "rtshop.shopedit.sell_off": "§7Buy",
+  "rtshop.shopedit.col_item": "Item",
+  "rtshop.shopedit.col_price": "Price",
+  "rtshop.shopedit.col_sell": "Buy-back",
+  "rtshop.shopedit.count": "%s shown / %s total · empty buy-back = default ratio",
+  "rtshop.shopedit.saved": "Shop %s saved and reloaded (old file kept as .bak).",
+  "rtshop.shopedit.failed": "Could not save the shop: %s"
 }
