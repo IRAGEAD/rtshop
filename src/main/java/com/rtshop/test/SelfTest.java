@@ -3301,7 +3301,7 @@ public final class SelfTest {
         // 직원이 사라지면 다시 선다, 진열대를 부수면 떠난다
         net.minecraft.world.entity.Entity v2 = level.getEntity(e2.entity);
         if (v2 != null) v2.discard();
-        com.rtshop.pshop.Employees.checkStaff(server);
+        com.rtshop.pshop.Employees.checkStaff(server, true);
         check("a missing clerk comes back to the stand", level.getEntity(e2.entity) instanceof net.minecraft.world.entity.npc.Villager nv && nv.isAlive());
         java.util.UUID id2 = e2.entity;
         level.removeBlock(pos2, false);

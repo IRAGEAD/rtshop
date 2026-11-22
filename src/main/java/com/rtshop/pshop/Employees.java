@@ -422,10 +422,15 @@ public final class Employees {
 
     /** 불러온 곳의 진열대마다 직원이 있는지 본다: 진열대가 사라졌으면 내보내고, 직원이 없어졌으면 다시 세운다. */
     public static void checkStaff(MinecraftServer server) {
+        checkStaff(server, false);
+    }
+
+    /** force: 시험용. 서버가 막 켜져 엔티티를 아직 불러오는 중이어도 확인한다. */
+    public static void checkStaff(MinecraftServer server, boolean force) {
         Data d = data(server);
         for (Entry e : new ArrayList<>(d.entries.values())) {
             ServerLevel level = server.getLevel(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(e.dim)));
-            if (level == null || !level.isLoaded(e.pos) || !level.areEntitiesLoaded(ChunkPos.asLong(e.pos))) continue;
+            if (level == null || !level.isLoaded(e.pos) || !force && !level.areEntitiesLoaded(ChunkPos.asLong(e.pos))) continue;
             if (!(level.getBlockEntity(e.pos) instanceof PlayerShopBlockEntity be)) {
                 fire(level, e.pos);
                 continue;
