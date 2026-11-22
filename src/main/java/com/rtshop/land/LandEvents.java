@@ -94,6 +94,16 @@ public final class LandEvents {
         return LandManager.guardAt(sl, pos);
     }
 
+    /** 성 영역(산 토지 밖)의 문·다락문·울타리 문·버튼은 누구나 쓸 수 있다. */
+    public static boolean zoneDoor(Land land, BlockState st) {
+        if (land != LandManager.ZONE) return false;
+        net.minecraft.world.level.block.Block b = st.getBlock();
+        return b instanceof net.minecraft.world.level.block.DoorBlock || b instanceof net.minecraft.world.level.block.TrapDoorBlock
+                || b instanceof net.minecraft.world.level.block.FenceGateBlock || b instanceof net.minecraft.world.level.block.ButtonBlock
+                || st.is(net.minecraft.tags.BlockTags.BUTTONS) || st.is(net.minecraft.tags.BlockTags.DOORS) || st.is(net.minecraft.tags.BlockTags.TRAPDOORS)
+                || st.is(net.minecraft.tags.BlockTags.FENCE_GATES);
+    }
+
     private static boolean allowed(ServerPlayer p, Land land, int perm) {
         return land == null || (LandManager.perms(p, land) & perm) != 0;
     }
@@ -245,7 +255,7 @@ public final class LandEvents {
         boolean itemOk = allowed(sp, land, LandData.PLACE) && allowed(sp, frontLand, LandData.PLACE);
         if (land != null) {
             int perm = storage ? LandData.CONTAINER : LandData.USE;
-            if (!allowed(sp, land, perm)) {
+            if (!allowed(sp, land, perm) && !zoneDoor(land, level.getBlockState(pos))) {
                 BlockState st = level.getBlockState(pos);
                 if (storage || st.getMenuProvider(level, pos) != null || interactive(st)) {
                     deny(sp, land);

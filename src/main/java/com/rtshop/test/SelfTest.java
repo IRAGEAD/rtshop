@@ -396,6 +396,13 @@ public final class SelfTest {
             LandData.Land z = LandManager.guardAt(level, new BlockPos(-24360, 70, -5420));
             check("with castle lots installed the castle zone is protected: nothing allowed outside bought land",
                     z == LandManager.ZONE && LandManager.perms(a, z) == 0 && LandManager.guardAt(level, new BlockPos(-24650, 70, -5400)) == null);
+            check("in the castle zone (outside bought lots) anyone may use doors and buttons, but not chests",
+                    com.rtshop.land.LandEvents.zoneDoor(LandManager.ZONE, net.minecraft.world.level.block.Blocks.OAK_DOOR.defaultBlockState())
+                            && com.rtshop.land.LandEvents.zoneDoor(LandManager.ZONE, net.minecraft.world.level.block.Blocks.SPRUCE_FENCE_GATE.defaultBlockState())
+                            && !com.rtshop.land.LandEvents.zoneDoor(LandManager.ZONE, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState())
+                            && com.rtshop.land.LandEvents.zoneDoor(LandManager.ZONE, net.minecraft.world.level.block.Blocks.STONE_BUTTON.defaultBlockState())
+                            && !com.rtshop.land.LandEvents.zoneDoor(LandManager.ZONE, net.minecraft.world.level.block.Blocks.LEVER.defaultBlockState())
+                            && !com.rtshop.land.LandEvents.zoneDoor(z, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState()));
         } finally {
             data.castleInstalled = before;
         }
