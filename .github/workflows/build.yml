@@ -265,7 +265,12 @@ jobs:
       - name: Install Forge server
         run: |
           cd server
-          curl -fsSL -o installer.jar "https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.4.28/forge-1.20.1-47.4.28-installer.jar"
+          # 가장 최신 47.4.x (The Illusioner 는 47.4.29 이상이 필요)
+          FV=$(curl -fsSL https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml | grep -oE "1\.20\.1-47\.4\.[0-9]+" | sort -t. -k5 -n | tail -1)
+          [ -n "$FV" ] || FV=1.20.1-47.4.28
+          echo "FORGE_VER=$FV" >> "$GITHUB_ENV"
+          echo "Forge $FV"
+          curl -fsSL -o installer.jar "https://maven.minecraftforge.net/net/minecraftforge/forge/$FV/forge-$FV-installer.jar"
           java -jar installer.jar --installServer > installer.log 2>&1 || (tail -n 30 installer.log; exit 1)
           cp ../jar/*.jar mods/
           echo "eula=true" > eula.txt
@@ -308,7 +313,7 @@ jobs:
           rm -f client/saves/rtshoptest/session.lock
           printf 'onboardAccessibility:false\ntutorialStep:none\nskipMultiplayerWarning:true\njoinedFirstServer:true\npauseOnLostFocus:false\nguiScale:3\nrenderDistance:2\nsimulationDistance:5\nmaxFps:30\ngraphicsMode:0\nao:false\nnarrator:0\nsoundCategory_master:0.0\nlang:ko_kr\n' > client/options.txt
           echo "mods: $(ls client/mods | wc -l)"
-          (timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:1.20.1-47.4.28 -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
+          (timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
           echo "----- client result -----"
           cat client/rtshop-clienttest.txt 2>/dev/null | cut -c1-300 || echo "no client result"
           echo "----- crash reports -----"
