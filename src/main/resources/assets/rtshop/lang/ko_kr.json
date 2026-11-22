@@ -941,7 +941,7 @@
   "rtshop.rules.item_tip": "%s 을(를) 만드는 조합법을 모두 막거나 풉니다",
   "rtshop.rules.custom_tag": "직접 만든 조합법",
   "rtshop.rules.blocked_tag": "막힘",
-  "rtshop.rules.recipe_count": "보이는 %s / 전체 %s · 막기 규칙 %s · 직접 만든 것 %s",
+  "rtshop.rules.recipe_count": "%s / %s개 · 막기 %s · 직접 %s",
   "rtshop.rules.make_title": "조합법 만들기",
   "rtshop.rules.make_hint": "칸 클릭 = 아이템 고르기 · 우클릭 = 비우기",
   "rtshop.rules.shaped": "모양 그대로",
@@ -969,5 +969,8 @@
   "rtshop.rules.col_after": "적용 후",
   "rtshop.rules.col_custom": "직접: 확률 · 개수",
   "rtshop.rules.loot_foot": "확률 = 상자 하나에 나올 확률 (%s번 열어 본 값)",
-  "rtshop.rules.loot_groups": "묶음 규칙도 적용: %s"
+  "rtshop.rules.loot_groups": "묶음 규칙도 적용: %s",
+  "rtshop.rules.stat_base": "기본 %s ×%s",
+  "rtshop.rules.stat_none": "원래 없음",
+  "rtshop.rules.stat_now": "지금 %s"
 }

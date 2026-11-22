@@ -128,7 +128,7 @@ public class RecipeEditScreen extends Screen {
         fx = (width - W) / 2;
         fy = (height - H) / 2;
         filter();
-        EditBox sb = new EditBox(font, fx + 10, fy + 26, 150, 14, Component.empty());
+        EditBox sb = new EditBox(font, fx + 10, fy + 26, 120, 14, Component.empty());
         sb.setValue(search);
         sb.setHint(Component.translatable("rtshop.rules.search_recipe"));
         sb.setResponder(v -> {
@@ -141,20 +141,22 @@ public class RecipeEditScreen extends Screen {
         });
         addRenderableWidget(sb);
         String[] views = {"rtshop.rules.view_all", "rtshop.rules.view_blocked", "rtshop.rules.view_custom"};
-        int vx = fx + 166;
+        int vx = fx + 136;
         for (int i = 0; i < 3; i++) {
             int k = i;
+            int bw = font.width(Component.translatable(views[i])) + 10;
             Button b = Button.builder(Component.translatable(views[i]), x -> {
                 view = k;
                 scroll = 0;
                 rebuildWidgets();
-            }).bounds(vx, fy + 25, 66, 16).build();
+            }).bounds(vx, fy + 25, bw, 16).build();
             b.active = view != i;
             addRenderableWidget(b);
-            vx += 68;
+            vx += bw + 2;
         }
+        int nw = font.width(Component.translatable("rtshop.rules.new_recipe")) + 12;
         addRenderableWidget(Button.builder(Component.translatable("rtshop.rules.new_recipe"), b -> minecraft.setScreen(new RecipeMakeScreen(this, null, null)))
-                .bounds(fx + W - 92, fy + 25, 84, 16).build());
+                .bounds(Math.max(vx + 4, fx + W - 8 - nw), fy + 25, nw, 16).build());
         listY = fy + 46;
         visible = (fy + H - 30 - listY) / ROW;
         rebuildRows();
@@ -245,7 +247,7 @@ public class RecipeEditScreen extends Screen {
             Ui.scaledText(g, font, Ui.clip(font, sub, (int) ((W - 250) / 0.75F)), fx + 32, y + 11, 0.75F, Ui.C_INK_SOFT, false);
         }
         String count = Component.translatable("rtshop.rules.recipe_count", rows.size(), all.size(), disabled.size(), custom.size()).getString();
-        g.drawString(font, Ui.clip(font, count, W - 270), fx + 10, fy + H - 18, Ui.C_CREAM, false);
+        Ui.scaledText(g, font, Ui.clip(font, count, (int) ((W - 262) / 0.75F)), fx + 10, fy + H - 17, 0.75F, Ui.C_CREAM, false);
         if (!errors.isEmpty()) g.drawString(font, Ui.clip(font, "⚠ " + errors.get(0), W - 20), fx + 10, fy + H - 30, 0xFFFF7060, true);
         super.render(g, mx, my, partial);
     }

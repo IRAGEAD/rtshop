@@ -296,29 +296,33 @@ public class LootEditScreen extends Screen {
         Ui.woodFrame(g, fx, fy, W, H);
         Ui.bevel(g, rx - 4, fy + 58, fx + W - rx - 2, H - 86, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
         g.drawString(font, title, fx + 10, fy + 8, Ui.C_GOLD, true);
-        if (dirty) g.drawString(font, Component.translatable("rtshop.enhedit.unsaved"), fx + 14 + font.width(title), fy + 8, 0xFFFF9050, true);
+        int tx = fx + 14 + font.width(title);
+        if (dirty) {
+            g.drawString(font, Component.translatable("rtshop.enhedit.unsaved"), tx, fy + 8, 0xFFFF9050, true);
+            tx += 4 + font.width(Component.translatable("rtshop.enhedit.unsaved"));
+        }
+        if (!selected.isEmpty()) g.drawString(font, Ui.clip(font, "· " + selected, fx + W - 10 - tx), tx, fy + 8, Ui.C_CREAM, true);
         if (selected.isEmpty()) {
             g.drawString(font, Component.translatable("rtshop.rules.pick_table"), rx + 4, fy + 70, Ui.C_CREAM, false);
         } else {
-            g.drawString(font, Ui.clip(font, selected, fx + W - rx - 210), rx + 204, fy + 44, Ui.C_CREAM, false);
             if (loading) {
                 g.drawString(font, Component.translatable("rtshop.rules.sampling", samples), rx + 4, fy + 70, Ui.C_INK, false);
             }
             int right = fx + W - 8;
-            Ui.scaledText(g, font, Component.translatable("rtshop.rules.col_item").getString(), rx, listY - 9, 0.75F, Ui.C_INK_SOFT, false);
-            Ui.scaledText(g, font, Component.translatable("rtshop.rules.col_base").getString(), right - 244, listY - 9, 0.75F, Ui.C_INK_SOFT, false);
-            Ui.scaledText(g, font, Component.translatable("rtshop.rules.col_after").getString(), right - 192, listY - 9, 0.75F, Ui.C_INK_SOFT, false);
-            Ui.scaledText(g, font, Component.translatable("rtshop.rules.col_custom").getString(), right - 104, listY - 9, 0.75F, Ui.C_INK_SOFT, false);
             for (Object[] d : drawn) {
                 Row r = (Row) d[0];
                 int y = (int) d[1];
                 if (r.mode == 1) g.fill(rx - 2, y - 1, right, y + ROW - 2, 0x30FF2020);
                 if (r.mode == 2) g.fill(rx - 2, y - 1, right, y + ROW - 2, 0x2020A020);
                 g.renderItem(new ItemStack(RulesScreens.item(r.item)), rx, y + 1);
-                g.drawString(font, Ui.clip(font, RulesScreens.name(r.item), right - 248 - (rx + 20)), rx + 20, y + 5, Ui.C_INK, false);
-                String base = r.natural ? pct(r.rawChance) + " ×" + (r.rawMin == r.rawMax ? r.rawMin : r.rawMin + "~" + r.rawMax) : "-";
-                g.drawString(font, base, right - 244, y + 5, Ui.C_INK_SOFT, false);
-                g.drawString(font, pct(r.afterChance), right - 192, y + 5, r.afterChance > 0 ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
+                int textW = right - 156 - (rx + 20);
+                g.drawString(font, Ui.clip(font, RulesScreens.name(r.item), textW), rx + 20, y + 1, Ui.C_INK, false);
+                String base = r.natural ? Component.translatable("rtshop.rules.stat_base", pct(r.rawChance),
+                        r.rawMin == r.rawMax ? Integer.toString(r.rawMin) : r.rawMin + "~" + r.rawMax).getString()
+                        : Component.translatable("rtshop.rules.stat_none").getString();
+                String now = Component.translatable("rtshop.rules.stat_now", pct(r.afterChance)).getString();
+                Ui.scaledText(g, font, Ui.clip(font, base + " · " + now, (int) (textW / 0.75F)), rx + 20, y + 11, 0.75F,
+                        r.afterChance > 0 ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
                 if (r.mode == 2) {
                     g.drawString(font, "%", right - 64, y + 5, Ui.C_INK, false);
                     g.drawString(font, "~", right - 29, y + 5, Ui.C_INK, false);
@@ -326,7 +330,7 @@ public class LootEditScreen extends Screen {
             }
             String foot = Component.translatable("rtshop.rules.loot_foot", samples).getString();
             if (!groups.isEmpty()) foot += "  " + Component.translatable("rtshop.rules.loot_groups", String.join(", ", groups)).getString();
-            g.drawString(font, Ui.clip(font, foot, W - 270), rx - 4, fy + H - 18, Ui.C_CREAM, false);
+            Ui.scaledText(g, font, Ui.clip(font, foot, (int) ((fx + W - 252 - (rx - 4)) / 0.75F)), rx - 4, fy + H - 17, 0.75F, Ui.C_CREAM, false);
         }
         super.render(g, mx, my, partial);
     }

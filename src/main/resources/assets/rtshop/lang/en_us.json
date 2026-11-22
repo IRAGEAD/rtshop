@@ -941,7 +941,7 @@
   "rtshop.rules.item_tip": "Block or allow every recipe that makes %s",
   "rtshop.rules.custom_tag": "custom recipe",
   "rtshop.rules.blocked_tag": "blocked",
-  "rtshop.rules.recipe_count": "Showing %s / %s · %s block rules · %s custom",
+  "rtshop.rules.recipe_count": "%s / %s · %s blocked · %s custom",
   "rtshop.rules.make_title": "Make a recipe",
   "rtshop.rules.make_hint": "Click a slot to pick · right-click to clear",
   "rtshop.rules.shaped": "Shaped",
@@ -969,5 +969,8 @@
   "rtshop.rules.col_after": "Now",
   "rtshop.rules.col_custom": "Set: chance · count",
   "rtshop.rules.loot_foot": "Chance = per chest (measured over %s openings)",
-  "rtshop.rules.loot_groups": "Group rules also apply: %s"
+  "rtshop.rules.loot_groups": "Group rules also apply: %s",
+  "rtshop.rules.stat_base": "base %s ×%s",
+  "rtshop.rules.stat_none": "not in the table",
+  "rtshop.rules.stat_now": "now %s"
 }
