@@ -119,14 +119,14 @@ public final class PvpHud {
                 : Component.translatable(areaKey(where)).getString();
         int subColor = lockSeconds > 0 ? 0xFFFF8A75 : areaColor(where);
         float avail = w - icon - pad * 3;
-        float innerH = h - 8;
+        float innerH = h - 6;
         int mainW = Math.max(1, HudFonts.width(font, main, cfg.pvpHudFont));
         int subW = Math.max(1, HudFonts.width(font, sub, cfg.pvpHudFont));
-        float ms = (float) Math.min(avail / mainW, innerH * 0.50F / 8F * cfg.pvpHudTextScale);
+        float ms = (float) Math.min(avail / mainW, innerH * 0.56F / 8F * cfg.pvpHudTextScale);
         ms = Math.max(0.3F, Math.min(3F, ms));
-        float ss = (float) Math.min(avail / subW, innerH * 0.34F / 8F * cfg.pvpHudTextScale);
+        float ss = (float) Math.min(avail / subW, innerH * 0.38F / 8F * cfg.pvpHudTextScale);
         ss = Math.max(0.3F, Math.min(ms, ss));
-        float total = 8 * ms + 2 + 8 * ss;
+        float total = 8 * ms + 1 + 8 * ss;
         float ty = y + (h - total) / 2F + 0.5F;
         float tx = x + pad * 2 + icon;
         g.pose().pushPose();
@@ -135,7 +135,7 @@ public final class PvpHud {
         HudFonts.draw(g, font, main, 0, 0, pvpOn ? 0xFFFF6A5A : 0xFF9BE3A6, true, cfg.pvpHudFont);
         g.pose().popPose();
         g.pose().pushPose();
-        g.pose().translate(tx, ty + 8 * ms + 2, 0);
+        g.pose().translate(tx, ty + 8 * ms + 1, 0);
         g.pose().scale(ss, ss, 1F);
         HudFonts.draw(g, font, sub, 0, 0, subColor, true, cfg.pvpHudFont);
         g.pose().popPose();

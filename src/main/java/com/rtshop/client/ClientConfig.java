@@ -56,7 +56,7 @@ public final class ClientConfig {
 
     // PvP 상태 표시 (켜짐/꺼짐 + 지금 있는 곳). 위치·크기는 화면 비율.
     public static final double PDEF_W = 247.0 / 1920.0;
-    public static final double PDEF_H = 70.0 / 1004.0;
+    public static final double PDEF_H = 94.0 / 1004.0;
     public static final double PDEF_X = DEF_X;
     public static final double PDEF_Y = DEF_Y - PDEF_H - 0.012;
     public boolean pvpHudEnabled = true;

@@ -392,6 +392,9 @@ final class ClientSelfTest2 {
             ShopScreen s = mc.screen instanceof ShopScreen x ? x : null;
             check("the buy tab now lists exactly that dish", s != null && s.rowsForTest() == 1, s == null ? mc.screen : s.rowsForTest());
             shot(mc, "99d_restaurant_menu_one");
+            waitTicks(5);
+        });
+        add(mc -> {
             mc.setScreen(null);
             int idx = dishIdx;
             String job = lifeJob;
