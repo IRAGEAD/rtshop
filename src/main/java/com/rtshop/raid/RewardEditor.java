@@ -114,7 +114,7 @@ public final class RewardEditor {
                 f.add(field("boss", "레이드 보스 (엔티티 ID)", false, c.boss));
                 f.add(field("requireKill", "입장 조건 몬스터 (엔티티 ID, 비우면 조건 없음)", false, c.requireKill));
                 for (String k : RaidConfig.defaultTexts().keySet()) {
-                    f.add(field("text." + k, k, false, c.text(k)));
+                    f.add(field("text." + k, RaidConfig.label(k), false, c.text(k)));
                 }
                 o.add("fields", f);
                 JsonArray g = new JsonArray();

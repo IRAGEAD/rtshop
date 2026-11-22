@@ -950,6 +950,24 @@ public final class SelfTest {
             com.rtshop.raid.Raid.tick(server);
             check("when everyone is down the raid fails: the boss goes, and players return after confirming", failed && !com.rtshop.raid.Raid.inArena(a)
                     && !com.rtshop.raid.Raid.downed(a) && com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.IDLE && !com.rtshop.raid.Raid.weeklyClaimed(a));
+            // 모드팩: 진짜 이그니스로도 소환된다 (체력 배율, 제단 블록)
+            if (ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation("cataclysm", "ignis"))) {
+                c.boss = "cataclysm:ignis";
+                a.getInventory().add(new ItemStack(ticket, 1));
+                com.rtshop.raid.Raid.build(level);
+                com.rtshop.raid.Raid.enter(a);
+                boolean ok = com.rtshop.raid.Raid.summon(a);
+                net.minecraft.world.entity.Entity ig = ok ? level.getEntity(com.rtshop.raid.Raid.bossIdForTest()) : null;
+                net.minecraft.world.entity.LivingEntity plainIg = (net.minecraft.world.entity.LivingEntity)
+                        ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation("cataclysm", "ignis")).create(level);
+                String altarId = String.valueOf(ForgeRegistries.BLOCKS.getKey(level.getBlockState(com.rtshop.raid.Raid.altarPos()).getBlock()));
+                check("in the pack the raid summons Cataclysm's Ignis with multiplied health, on Cataclysm's altar of fire",
+                        ig instanceof net.minecraft.world.entity.LivingEntity li && plainIg != null && li.getMaxHealth() >= plainIg.getMaxHealth() * 2.9
+                                && ig.getClass().getName().contains("Ignis") && altarId.equals("cataclysm:altar_of_fire"),
+                        (ig == null ? "no boss" : ig.getClass().getSimpleName() + " " + ((net.minecraft.world.entity.LivingEntity) ig).getMaxHealth()) + " " + altarId);
+                com.rtshop.raid.Raid.forceEnd(server);
+                c.boss = "minecraft:zombie";
+            }
             // 편집기: 수치·문구·보상을 게임 안에서 고친다
             com.rtshop.raid.RewardEditor.Target target = com.rtshop.raid.RewardEditor.TARGETS.get("raid");
             com.google.gson.JsonObject model = target.model(a);

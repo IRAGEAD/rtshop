@@ -203,7 +203,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
   - **주간 보상**: 그 주 첫 성공 때 목록 전부 + Gold. 받은 사람의 입장 화면에는 ✔ 가 표시됩니다.
   - **보스 드랍**: 등급 굴림. 주간 보상을 아직 안 받은 사람은 굴림 3번·높은 확률, 이미 받은 사람은 1번·낮은 확률. 등급은 일반·고급·희귀·영웅·전설(뽑기와 같은 색) + 검은색 **[???]** (기본 0.05%). [???] 를 얻으면 서버 전체에 정해 둔 이름(문구의 `mysteryName`)으로 알립니다.
 - **설정 (OP, 게임 안)**: `/rtshop raid edit` → [수치] 체력·공격력 배율, 조건 처치 수, 대기 시간, 굴림 횟수, 등급별 확률(전/후), 초기화 요일·시각 · [문구] 대화·안내·성공/실패 문구 전부, 보스 ID · [보상] 묶음(주간 보상/보스 드랍)을 고르고 **아이템을 손에 들고 [손에 든 아이템 추가]**, 개수·등급 변경, 삭제. [저장] 을 눌러야 적용됩니다. 추가한 보상은 입장 화면의 보상 목록에 바로 나옵니다.
-- **보스 바꾸기**: [문구] 탭의 `boss` 를 다른 Cataclysm 보스 ID 로 (예: `cataclysm:ender_guardian`, `cataclysm:netherite_monstrosity`, `cataclysm:the_harbinger`, `cataclysm:the_leviathan`, `cataclysm:ancient_remnant`). 입장 조건 몬스터(`requireKill`)와 문구도 함께 바꾸세요.
+- **보스 바꾸기**: [문구] 탭 맨 위의 "레이드 보스 (엔티티 ID)" 를 다른 Cataclysm 보스 ID 로 (예: `cataclysm:ender_guardian`, `cataclysm:netherite_monstrosity`, `cataclysm:the_harbinger`, `cataclysm:the_leviathan`, `cataclysm:ancient_remnant`). 입장 조건 몬스터(`requireKill`)와 문구도 함께 바꾸세요.
 - 그 밖의 명령어 (OP): `/rtshop raid` 상태 · `raid end` 강제 종료 · `raid arena build|tp` · `raid kills <플레이어> <수>` · `raid weekly reset <플레이어>`.
 
 ### Spiral Abyss 주간 보상 (3.22)

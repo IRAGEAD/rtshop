@@ -106,6 +106,60 @@ public final class RaidConfig {
         return t;
     }
 
+    /** 편집기에 보일 문구 이름. */
+    public static String label(String key) {
+        return switch (key) {
+            case "npcName" -> "안내인 이름";
+            case "bossName" -> "보스 이름";
+            case "dialogue1" -> "대화 1";
+            case "dialogue2" -> "대화 2";
+            case "dialogue3" -> "대화 3";
+            case "uiTitle" -> "입장 화면 제목";
+            case "uiSub" -> "입장 화면 부제";
+            case "enterButton" -> "입장 버튼";
+            case "confirmTitle" -> "확인 창 제목";
+            case "confirmBody" -> "확인 창 설명";
+            case "confirmYes" -> "확인 창: 예";
+            case "confirmNo" -> "확인 창: 아니오";
+            case "needKill" -> "조건 미달 (처치 수)";
+            case "needTicket" -> "티켓 없음";
+            case "locked" -> "입장 불가 (진행 중)";
+            case "entered" -> "입장 안내";
+            case "summoned" -> "보스 소환 알림";
+            case "alreadySummoned" -> "이미 소환됨";
+            case "successTitle" -> "성공 문구";
+            case "successSub" -> "성공 문구 (작은 글씨)";
+            case "failTitle" -> "실패 문구";
+            case "failSub" -> "실패 문구 (작은 글씨)";
+            case "returnNotice" -> "귀환 안내 (%s = 초)";
+            case "voteTitle" -> "이동 투표 제목";
+            case "voteAgree" -> "투표: 지금 이동";
+            case "voteStay" -> "투표: 머물기";
+            case "voteCount" -> "투표 현황";
+            case "failConfirm" -> "실패 창: 이동 버튼";
+            case "failBody" -> "실패 창 설명";
+            case "despawn" -> "보스 사라짐 안내";
+            case "notByPlayer" -> "보상 없음 안내";
+            case "downed" -> "쓰러짐 안내";
+            case "escaped" -> "탈출 안내";
+            case "weeklyGot" -> "주간 보상 받음";
+            case "weeklyAlready" -> "주간 보상 이미 받음";
+            case "dropGot" -> "드랍 획득 (%s = 아이템)";
+            case "dropNone" -> "드랍 없음";
+            case "mysteryName" -> "[???] 등급의 이름";
+            case "mysteryGot" -> "[???] 획득 알림";
+            case "rewardWeekly" -> "보상 목록: 주간 보상 제목";
+            case "rewardDrops" -> "보상 목록: 드랍 제목";
+            case "title" -> "창 제목";
+            case "reset" -> "초기화 안내";
+            case "floor" -> "층 이름";
+            case "got" -> "보상 받음 알림";
+            case "gotNothing" -> "확률 보상 없음 알림";
+            case "done" -> "받음 표시";
+            default -> key;
+        };
+    }
+
     public String text(String key) {
         String v = texts.get(key);
         if (v == null || v.isEmpty()) {

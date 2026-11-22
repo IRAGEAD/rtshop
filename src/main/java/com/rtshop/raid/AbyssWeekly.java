@@ -397,7 +397,7 @@ public final class AbyssWeekly {
                 }
                 f.add(RewardEditor.field("resetDay", "주간 초기화 요일 (1 = 월요일 … 7 = 일요일)", true, Integer.toString(c.resetDay)));
                 f.add(RewardEditor.field("resetHour", "주간 초기화 시각 (0~23시)", true, Integer.toString(c.resetHour)));
-                for (String k : defaultTexts().keySet()) f.add(RewardEditor.field("text." + k, k, false, c.text(k)));
+                for (String k : defaultTexts().keySet()) f.add(RewardEditor.field("text." + k, RaidConfig.label(k), false, c.text(k)));
                 o.add("fields", f);
                 JsonArray g = new JsonArray();
                 for (int i = 1; i <= FLOORS; i++) g.add(RewardEditor.group("floor" + i, ROMAN[i - 1] + "층", false, true));
