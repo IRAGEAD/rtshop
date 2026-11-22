@@ -47,6 +47,20 @@ public final class ClientConfig {
     /** Gold 표시의 글자 크기 배율 (상자 크기는 그대로, 0.5~1.5). 퀘스트 HUD 의 글자 크기는 questHudScale. */
     public double hudTextScale = 1.0;
 
+    // 강화 정보 패널 (강화 창 옆 / 시네마틱 모루 장면 위). 위치는 화면 비율, -1 = 자동(강화 창 오른쪽 / 화면 오른쪽 가운데).
+    public boolean enhPanelEnabled = true;
+    public double enhPanelX = -1;
+    public double enhPanelY = -1;
+    /** 크기 배율 (0.6~1.5). */
+    public double enhPanelScale = 1.0;
+
+    public void resetEnhPanel() {
+        enhPanelEnabled = true;
+        enhPanelX = -1;
+        enhPanelY = -1;
+        enhPanelScale = 1.0;
+    }
+
     private static ClientConfig instance;
 
     public static synchronized ClientConfig get() {
@@ -113,6 +127,10 @@ public final class ClientConfig {
             o.addProperty("hudFont", hudFont);
             o.addProperty("hudTextScale", hudTextScale);
             o.addProperty("questHudFont", questHudFont);
+            o.addProperty("enhPanelEnabled", enhPanelEnabled);
+            o.addProperty("enhPanelX", enhPanelX);
+            o.addProperty("enhPanelY", enhPanelY);
+            o.addProperty("enhPanelScale", enhPanelScale);
             Path p = path();
             Files.createDirectories(p.getParent());
             Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -150,6 +168,10 @@ public final class ClientConfig {
                 if (o.has("hudFont")) c.hudFont = o.get("hudFont").getAsString();
                 if (o.has("hudTextScale")) c.hudTextScale = o.get("hudTextScale").getAsDouble();
                 if (o.has("questHudFont")) c.questHudFont = o.get("questHudFont").getAsString();
+                if (o.has("enhPanelEnabled")) c.enhPanelEnabled = o.get("enhPanelEnabled").getAsBoolean();
+                if (o.has("enhPanelX")) c.enhPanelX = o.get("enhPanelX").getAsDouble();
+                if (o.has("enhPanelY")) c.enhPanelY = o.get("enhPanelY").getAsDouble();
+                if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
                 c.clamp();
                 c.clampQuest();
                 if (!o.has("questHudEnabled")) {

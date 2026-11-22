@@ -63,6 +63,8 @@ public final class EnhanceConfig {
     public double toughnessPerLevel = 0.5;
     /** 손상 결과일 때 내려가는 단계 수. */
     public int damageDrop = 1;
+    /** 이 단계 이상 성공하면 서버 전체에 알리고 특별 연출을 보인다. */
+    public int broadcastFrom = 7;
 
     private static Level lv(int n, double s, double m, double d, double x, long gold, Object... mats) {
         Level l = new Level();
@@ -156,6 +158,7 @@ public final class EnhanceConfig {
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
         o.addProperty("damageDrop", damageDrop);
+        o.addProperty("broadcastFrom", broadcastFrom);
         JsonObject g = new JsonObject();
         for (Map.Entry<String, List<String>> e : groups.entrySet()) {
             JsonObject go = new JsonObject();
@@ -205,6 +208,7 @@ public final class EnhanceConfig {
     public static EnhanceConfig fromJson(JsonObject o) {
         EnhanceConfig c = new EnhanceConfig();
         c.defaults();
+        if (o.has("broadcastFrom")) c.broadcastFrom = Math.max(1, Math.min(MAX_LEVEL + 1, o.get("broadcastFrom").getAsInt()));
         if (o.has("damageDrop")) c.damageDrop = Math.max(0, Math.min(MAX_LEVEL, o.get("damageDrop").getAsInt()));
         if (o.has("groups")) {
             c.groups.clear();

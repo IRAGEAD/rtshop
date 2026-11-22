@@ -70,13 +70,13 @@ public class EnhanceMenu extends AnvilMenu {
 
     @Override
     protected boolean canMoveIntoInputSlots(ItemStack s) {
-        return Enhance.guardOf(s) != Enhance.Guard.NONE || Enhance.enhanceable(s);
+        return Enhance.enhanceable(s);
     }
 
     /** Shift 클릭: 방지권은 1번 칸, 장비는 0번 칸으로. */
     @Override
     public int getSlotToQuickMoveTo(ItemStack s) {
-        return Enhance.guardOf(s) != Enhance.Guard.NONE ? 1 : 0;
+        return 0;
     }
 
     @Override
@@ -112,12 +112,12 @@ public class EnhanceMenu extends AnvilMenu {
             return;
         }
         Enhance.consume(sp, cfg, l);
-        ItemStack g = guardStack();
-        Enhance.Guard guard = Enhance.guardOf(g);
-        boolean useGuard = guard.relevant(l);
-        if (useGuard && !sp.getAbilities().instabuild) {
-            g.shrink(1);
-            inputSlots.setItem(1, g.isEmpty() ? ItemStack.EMPTY : g);
+        // 미리 사용한 보호권: 이번 강화에 쓰이고, 결과와 상관없이 사라진다
+        int mask = Enhance.activeGuard(sp);
+        Enhance.Guard guard = Enhance.fromMask(mask);
+        boolean useGuard = mask != 0;
+        if (useGuard) {
+            Enhance.setActiveGuard(sp, 0);
         }
         Enhance.Outcome rolled = Enhance.roll(l, Enhance.testRoll != null ? Enhance.testRoll : sp.getRandom().nextDouble());
         Enhance.Outcome o = useGuard ? Enhance.protect(rolled, guard) : rolled;

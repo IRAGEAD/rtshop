@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
     private static final ResourceLocation BG = new ResourceLocation("minecraft", "textures/gui/container/anvil.png");
-    public static final int PANEL_W = 168;
+    public static final int PANEL_W = EnhancePanel.W;
     private boolean showOdds;
 
     public EnhanceScreen(EnhanceMenu menu, Inventory inv, Component title) {
@@ -35,25 +35,30 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
     @Override
     protected void init() {
         super.init();
-        this.leftPos = (this.width - (this.imageWidth + 6 + PANEL_W)) / 2;
-        int bx = leftPos + imageWidth + 6, by = topPos + imageHeight + 3;
-        addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.translatable("rtshop.enhodds.open"),
-                b -> showOdds = !showOdds).bounds(bx, by, 80, 16).build());
-        if (minecraft.player != null && minecraft.player.hasPermissions(2)) {
-            addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.translatable("rtshop.enhodds.edit"),
-                    b -> {
-                        onClose();
-                        com.rtshop.net.ShopNet.CHANNEL.sendToServer(new com.rtshop.net.EnhanceActionPacket(
-                                com.rtshop.net.EnhanceActionPacket.OPEN_EDITOR, ""));
-                    }).bounds(bx + 84, by, 84, 16).build());
+        // 패널이 자동 자리(창 오른쪽)에 들어갈 만큼 창을 왼쪽으로 민다
+        if (ClientConfig.get().enhPanelX < 0 && ClientConfig.get().enhPanelEnabled) {
+            int total = imageWidth + 6 + (int) Math.round(EnhancePanel.W * ClientConfig.get().enhPanelScale);
+            this.leftPos = Math.max(2, (this.width - total) / 2);
         }
+    }
+
+    int[] panelRect() {
+        return EnhancePanel.rect(this, leftPos + imageWidth + 6, topPos);
+    }
+
+    int autoX() {
+        return leftPos + imageWidth + 6;
+    }
+
+    int autoY() {
+        return topPos;
     }
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float partial) {
         renderBackground(g);
         super.render(g, mx, my, partial);
-        renderPanel(g);
+        renderPanel(g, mx, my);
         renderTooltip(g, mx, my);
         if (showOdds) {
             g.pose().pushPose();
@@ -97,10 +102,10 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         }
     }
 
-    private void renderPanel(GuiGraphics g) {
+    private void renderPanel(GuiGraphics g, int mx, int my) {
         g.pose().pushPose();
         g.pose().translate(0, 0, 200);
-        drawPanel(g, font, menu, minecraft.player, leftPos + imageWidth + 6, topPos, PANEL_W, imageHeight);
+        EnhancePanel.render(g, font, menu, this, panelRect(), mx, my, showOdds);
         g.pose().popPose();
     }
 
@@ -128,9 +133,8 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         int cur = Enhance.level(eq);
         EnhanceConfig.Level l = cfg.level(cur + 1);
         g.drawString(font, Component.literal("+" + cur + " → +" + (cur + 1)), tx + tw - font.width("+" + cur + " → +" + (cur + 1)), y + 10, 0xFF8A5A00, false);
-        ItemStack gs = menu.guardStack();
-        Enhance.Guard guard = Enhance.guardOf(gs);
-        if (!guard.relevant(l)) guard = Enhance.Guard.NONE;
+        int mask = Enhance.activeGuard(player);
+        Enhance.Guard guard = Enhance.fromMask(mask);
         double[] e = EnhanceClient.effective(l, guard, cur);
         String[] keys = {"rtshop.enhance.odds_success", "rtshop.enhance.odds_maintain", "rtshop.enhance.odds_damage", "rtshop.enhance.odds_destroy"};
         int[] cols = {Ui.C_GREEN, 0xFF4A4A4A, 0xFFB86A10, Ui.C_RED};
@@ -158,7 +162,7 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         String have = "(" + Ui.num(ClientEconomy.wallet) + ")";
         g.drawString(font, have, tx + tw - font.width(have), ty + 3, Ui.C_INK_SOFT, false);
         ty += 16;
-        Component gl = guard != Enhance.Guard.NONE ? Component.translatable("rtshop.enhance.guard_used", gs.getHoverName())
+        Component gl = guard != Enhance.Guard.NONE ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
                 : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : "rtshop.enhance.no_guard");
         for (FormattedCharSequence line : font.split(gl, tw)) {
             g.drawString(font, line, tx, ty, guard != Enhance.Guard.NONE ? 0xFF1F6F8B : l.destroy > 0 ? Ui.C_RED : Ui.C_INK_SOFT, false);
@@ -182,6 +186,16 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
             showOdds = false;
             return true;
         }
+        int k = EnhancePanel.clicked(panelRect(), mx, my);
+        if (k == 0) {
+            showOdds = true;
+            return true;
+        }
+        if (k > 0) {
+            EnhancePanel.act(k, this);
+            if (k == 3) rebuildWidgets();
+            return true;
+        }
         return super.mouseClicked(mx, my, button);
     }
 
@@ -191,6 +205,7 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
 
     /** 시험용: 오른쪽 패널이 화면 안에 들어오는가. */
     public boolean fitsForTest() {
-        return leftPos >= 0 && leftPos + imageWidth + 6 + PANEL_W <= width;
+        int[] r = panelRect();
+        return leftPos >= 0 && leftPos + imageWidth <= width && r[0] + r[2] <= width && r[1] + r[3] + EnhancePanel.BTN + 3 <= height;
     }
 }

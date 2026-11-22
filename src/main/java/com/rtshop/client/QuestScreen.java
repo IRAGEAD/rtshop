@@ -242,7 +242,7 @@ public class QuestScreen extends Screen {
                     ? "rtshop.quest.empty_journal" : "rtshop.quest.empty_npc").getString() : "";
             int yy = y + 12;
             if (!data.greeting.isEmpty()) {
-                for (FormattedCharSequence line : wrap(data.greeting, w - 20)) {
+                for (FormattedCharSequence line : wrap(untr(data.greeting), w - 20)) {
                     g.drawString(this.font, line, x + 10, yy, Ui.C_INK, false);
                     yy += 11;
                 }
@@ -462,5 +462,25 @@ public class QuestScreen extends Screen {
     public String currentTextForTest() {
         QuestView v = current();
         return v == null ? "" : v.text();
+    }
+
+    /** 서버가 보낸 "\u0001키\u0002인자..." 조각을 이 클라이언트의 언어로 바꾼다. */
+    public static String untr(String text) {
+        if (text.indexOf('\u0001') < 0) return text;
+        StringBuilder out = new StringBuilder();
+        String[] lines = text.split("\n", -1);
+        for (int li = 0; li < lines.length; li++) {
+            String line = lines[li];
+            int at = line.indexOf('\u0001');
+            if (at >= 0) {
+                String[] p = line.substring(at + 1).split("\u0002", -1);
+                Object[] args = new Object[p.length - 1];
+                System.arraycopy(p, 1, args, 0, args.length);
+                line = line.substring(0, at) + Component.translatable(p[0], args).getString();
+            }
+            if (li > 0) out.append('\n');
+            out.append(line);
+        }
+        return out.toString();
     }
 }

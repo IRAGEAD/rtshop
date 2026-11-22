@@ -84,7 +84,7 @@ public final class ClientSelfTest {
     private static volatile int gachaNpc = -1;
     private static volatile int testNpc = -1;
     private static final int EN_STEPS = 6;
-    private static final int ENH_STEPS = 11;
+    private static final int ENH_STEPS = 16;
     private static final int ENH_END = NPC_END + ENH_STEPS;
     private static final int PLOT_STEPS = 11;
     private static final int PLOT_END = ENH_END + PLOT_STEPS;
@@ -389,7 +389,7 @@ public final class ClientSelfTest {
                     sp.serverLevel().setBlockAndUpdate(at, com.rtshop.enhance.ModEnhance.ANVIL.get().defaultBlockState());
                     sp.serverLevel().setBlockAndUpdate(at.above(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                     com.rtshop.enhance.EnhanceConfig cfg = com.rtshop.enhance.EnhanceConfig.get();
-                    for (int lv : new int[]{5, 6}) {
+                    for (int lv : new int[]{5, 6, 7}) {
                         for (com.rtshop.enhance.Enhance.Need n : com.rtshop.enhance.Enhance.needs(cfg, cfg.level(lv), null)) {
                             sp.getInventory().add(new ItemStack(n.items.get(0), n.need * 2));
                         }
@@ -430,8 +430,8 @@ public final class ClientSelfTest {
                 onServer(mc, sp -> {
                     if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
                         m.getSlot(0).set(leveled(net.minecraft.world.item.Items.DIAMOND_SWORD, 4));
-                        m.getSlot(1).set(new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 2));
                     }
+                    com.rtshop.enhance.Enhance.setActiveGuard(sp, com.rtshop.enhance.Enhance.G_DESTROY);
                     com.rtshop.enhance.Enhance.testRoll = 0.0;
                 });
                 wait = 15;
@@ -442,8 +442,10 @@ public final class ClientSelfTest {
                 check("the +5 preview is ready and affordable", ready);
                 if (m.getSlot(2).hasItem()) {
                     List<net.minecraft.network.chat.Component> tip = net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, m.getSlot(2).getItem());
-                    check("the preview tooltip shows the odds and the materials (also shown in the Cinematic scene)",
-                            tip.stream().anyMatch(c -> c.getString().contains("36%")), tip.size());
+                    check("hovering the equipment no longer pops up the odds (they are on the info panel)",
+                            tip.stream().noneMatch(c -> c.getString().contains("%")), tip.size());
+                    check("the guard used beforehand shows on the client", com.rtshop.enhance.Enhance.clientGuard == com.rtshop.enhance.Enhance.G_DESTROY,
+                            com.rtshop.enhance.Enhance.clientGuard);
                 }
                 shot(mc, "81_enhance_ready");
                 mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
@@ -458,6 +460,7 @@ public final class ClientSelfTest {
                         m.setCarried(ItemStack.EMPTY);
                         m.getSlot(0).set(got.isEmpty() ? leveled(net.minecraft.world.item.Items.DIAMOND_SWORD, 5) : got);
                     }
+                    com.rtshop.enhance.Enhance.setActiveGuard(sp, com.rtshop.enhance.Enhance.G_DESTROY);
                     com.rtshop.enhance.Enhance.testRoll = 0.99;
                 });
                 wait = 60;
@@ -473,11 +476,37 @@ public final class ClientSelfTest {
                 shot(mc, "83_enhance_guarded");
                 check("a destroy roll with a destruction guard only damages the item (+5 -> +4)",
                         EnhanceFx.last.startsWith("DAMAGE:5:4:guarded"), EnhanceFx.last);
+                onServer(mc, sp -> {
+                    if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
+                        m.getSlot(0).set(leveled(net.minecraft.world.item.Items.NETHERITE_SWORD, 6));
+                    }
+                    com.rtshop.enhance.Enhance.testRoll = 0.0;
+                });
+                wait = 15;
+            }
+            case 7 -> {
+                var m = mc.player.containerMenu;
+                mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.QUICK_MOVE, mc.player);
+                wait = 40;
+            }
+            case 8 -> {
+                check("a +7 attempt first plays the tense build-up", EnhanceGrandFx.suspense(), EnhanceGrandFx.last);
+                shot(mc, "84a_enhance_grand_suspense");
+                wait = 45;
+            }
+            case 9 -> {
+                check("+6 -> +7 success: the grand success scene plays", EnhanceGrandFx.last.startsWith("SUCCESS:6:7") && EnhanceGrandFx.running()
+                        && !EnhanceGrandFx.suspense(), EnhanceGrandFx.last);
+                shot(mc, "84b_enhance_grand_success");
+                wait = 20;
+            }
+            case 10 -> {
+                shot(mc, "84c_enhance_grand_after");
                 if (mc.screen instanceof EnhanceScreen es) es.showOddsForTest(true);
                 else EnhanceOverlay.showTableForTest(true);
                 wait = 10;
             }
-            case 7 -> {
+            case 11 -> {
                 check("the odds table can be shown over the enhance window / Cinematic scene", mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu);
                 shot(mc, "83b_enhance_odds_table");
                 if (mc.screen instanceof EnhanceScreen es) es.showOddsForTest(false);
@@ -489,7 +518,7 @@ public final class ClientSelfTest {
                 });
                 wait = 60;
             }
-            case 8 -> {
+            case 12 -> {
                 String before = swordWhere;
                 onServer(mc, sp -> swordWhere = before + " | later: " + whereSword(sp));
                 ItemStack held = ItemStack.EMPTY;
@@ -506,7 +535,13 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 wait = 20;
             }
-            case 9 -> {
+            case 13 -> {
+                mc.setScreen(new EnhanceUiScreen(null));
+                wait = 10;
+            }
+            case 14 -> {
+                check("the info-panel settings screen opens", mc.screen instanceof EnhanceUiScreen, mc.screen);
+                shot(mc, "83d_enhance_panel_settings");
                 mc.setScreen(new EnhanceEditScreen(com.rtshop.enhance.EnhanceConfig.client().toJson().toString()));
                 wait = 10;
             }
@@ -595,6 +630,8 @@ public final class ClientSelfTest {
             case 8 -> {
                 check("an OP can edit the merchant's items and prices from the shop window", mc.screen instanceof ShopEditScreen se && se.rowsForTest() > 0,
                         mc.screen);
+                check("the shop editor's columns (price, toggles, category, ✕) all fit in the window", mc.screen instanceof ShopEditScreen se2 && se2.fitsForTest(),
+                        mc.screen);
                 shot(mc, "89c_shop_editor");
                 wait = 5;
             }
@@ -664,6 +701,7 @@ public final class ClientSelfTest {
                 wait = 5;
             }
             case 4 -> {
+                check("the owner's stand panel: every button and box fits inside the window", ps != null && ps.fitsForTest(), mc.screen);
                 shot(mc, "91_pshop_owner_stand");
                 mc.setScreen(null);
                 BlockPos pos = pshopPos;
@@ -894,6 +932,10 @@ public final class ClientSelfTest {
             default -> {
                 if (testNpc >= 0) {
                     check("right-clicking the " + type + " NPC opens its window", mc.screen != null, mc.screen);
+                    if (type.equals("farmer") || type.equals("fisher") || type.equals("food") || type.equals("blacksmith")) {
+                        check("the " + type + " merchant (job quests) shows the [Quests] button on its shop window",
+                                mc.screen != null && NpcButtons.questButtonForTest(mc.screen), mc.screen);
+                    }
                     shot(mc, "60_npc_" + type);
                 }
                 int id = testNpc;

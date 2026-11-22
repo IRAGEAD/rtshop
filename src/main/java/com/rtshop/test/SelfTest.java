@@ -643,13 +643,13 @@ public final class SelfTest {
     }
 
     /** 장비를 올리고(단계 cur), 방지권을 넣고, 굴림값을 정해서 결과 칸을 클릭. 손에 든(또는 가방의) 결과를 돌려준다. */
-    private static ItemStack enhanceOnce(ServerLevel level, BlockPos pos, FakePlayer a, ItemStack gear, int cur, ItemStack guard, double roll,
+    private static ItemStack enhanceOnce(ServerLevel level, BlockPos pos, FakePlayer a, ItemStack gear, int cur, int guardMask, double roll,
                                          net.minecraft.world.inventory.ClickType click) {
         com.rtshop.enhance.EnhanceMenu m = enhanceMenu(level, pos, a);
         ItemStack g = gear.copy();
         com.rtshop.enhance.Enhance.setLevel(g, cur);
         m.getSlot(0).set(g);
-        if (!guard.isEmpty()) m.getSlot(1).set(guard);
+        com.rtshop.enhance.Enhance.setActiveGuard(a, guardMask);
         com.rtshop.enhance.Enhance.testRoll = roll;
         try {
             m.clicked(2, 0, click, a);
@@ -824,59 +824,64 @@ public final class SelfTest {
         ItemStack sword = new ItemStack(Items.IRON_SWORD);
         Economy.setWallet(a, 1_000_000);
         giveMaterials(a, cfg, 1, 1);
-        ItemStack r = enhanceOnce(level, pos, a, sword, 0, ItemStack.EMPTY, 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
+        ItemStack r = enhanceOnce(level, pos, a, sword, 0, 0, 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
         boolean matsGone = com.rtshop.enhance.Enhance.needs(cfg, cfg.level(1), a).stream().allMatch(n -> n.have == 0);
         check("success: +0 -> +1, Gold and materials are used", com.rtshop.enhance.Enhance.level(r) == 1 && !com.rtshop.enhance.Enhance.isPreview(r)
                 && Economy.wallet(a) == 1_000_000 - cfg.level(1).gold && matsGone, com.rtshop.enhance.Enhance.level(r) + " " + Economy.wallet(a));
         giveMaterials(a, cfg, 1, 1);
-        enhanceOnce(level, pos, a, sword, 0, ItemStack.EMPTY, 0.0, net.minecraft.world.inventory.ClickType.QUICK_MOVE);
+        enhanceOnce(level, pos, a, sword, 0, 0, 0.0, net.minecraft.world.inventory.ClickType.QUICK_MOVE);
         ItemStack inBag = first(a, s -> s.is(Items.IRON_SWORD));
         check("shift-click works too (result goes to the bag)", com.rtshop.enhance.Enhance.level(inBag) == 1 && !com.rtshop.enhance.Enhance.isPreview(inBag));
         clear(a);
 
         giveMaterials(a, cfg, 7, 10);
         ItemStack dmgGuard = new ItemStack(com.rtshop.item.ModItems.GUARD_DAMAGE.get(), 3);
-        ItemStack desGuard = new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 3);
-        ItemStack fullGuard = new ItemStack(com.rtshop.item.ModItems.GUARD_FULL.get(), 3);
         // +6 -> +7: success 37, keep 6.5, damage 39, destroy 17.5
-        r = enhanceOnce(level, pos, a, sword, 6, ItemStack.EMPTY, 0.40, net.minecraft.world.inventory.ClickType.PICKUP);
+        r = enhanceOnce(level, pos, a, sword, 6, 0, 0.40, net.minecraft.world.inventory.ClickType.PICKUP);
         check("keep: the level stays", com.rtshop.enhance.Enhance.level(r) == 6 && r.is(Items.IRON_SWORD));
-        r = enhanceOnce(level, pos, a, sword, 6, ItemStack.EMPTY, 0.60, net.minecraft.world.inventory.ClickType.PICKUP);
+        r = enhanceOnce(level, pos, a, sword, 6, 0, 0.60, net.minecraft.world.inventory.ClickType.PICKUP);
         check("damage: the level drops by one", com.rtshop.enhance.Enhance.level(r) == 5 && r.is(Items.IRON_SWORD));
-        r = enhanceOnce(level, pos, a, sword, 6, ItemStack.EMPTY, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
+        r = enhanceOnce(level, pos, a, sword, 6, 0, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
         check("destroy: the item is gone", r.isEmpty() && count(a, s -> s.is(Items.IRON_SWORD)) == 0);
+        // 보호권은 손에 들고 우클릭해 미리 사용 (1장 소모), 같은 보호를 또 걸 수는 없음
+        a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dmgGuard.copy());
+        dmgGuard.getItem().use(level, a, net.minecraft.world.InteractionHand.MAIN_HAND);
+        int afterUse = a.getMainHandItem().getCount();
+        dmgGuard.getItem().use(level, a, net.minecraft.world.InteractionHand.MAIN_HAND);
+        check("a guard ticket is used in advance by right-clicking (one ticket, not twice for the same protection)",
+                com.rtshop.enhance.Enhance.activeGuard(a) == com.rtshop.enhance.Enhance.G_DAMAGE && afterUse == 2 && a.getMainHandItem().getCount() == 2,
+                com.rtshop.enhance.Enhance.activeGuard(a) + " " + afterUse + " " + a.getMainHandItem().getCount());
+        a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         com.rtshop.enhance.EnhanceMenu gm = enhanceMenu(level, pos, a);
         ItemStack g6 = sword.copy();
         com.rtshop.enhance.Enhance.setLevel(g6, 6);
         gm.getSlot(0).set(g6);
-        gm.getSlot(1).set(dmgGuard.copy());
         com.rtshop.enhance.Enhance.testRoll = 0.60;
         gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
         com.rtshop.enhance.Enhance.testRoll = null;
-        check("damage guard: damage becomes keep, one ticket is used", com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6
-                && gm.getSlot(1).getItem().getCount() == 2);
+        check("damage guard: damage becomes keep, and the protection is used up", com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6
+                && com.rtshop.enhance.Enhance.activeGuard(a) == 0);
         gm.setCarried(ItemStack.EMPTY);
         gm.getSlot(0).set(g6.copy());
+        com.rtshop.enhance.Enhance.setActiveGuard(a, com.rtshop.enhance.Enhance.G_DAMAGE);
         com.rtshop.enhance.Enhance.testRoll = 0.99;
         gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
         com.rtshop.enhance.Enhance.testRoll = null;
-        check("damage guard does not stop destruction", gm.getCarried().isEmpty() && gm.getSlot(1).getItem().getCount() == 1);
-        gm.getSlot(1).set(ItemStack.EMPTY);
-        r = enhanceOnce(level, pos, a, sword, 6, desGuard.copy(), 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("damage guard does not stop destruction (and is used up anyway)", gm.getCarried().isEmpty() && com.rtshop.enhance.Enhance.activeGuard(a) == 0);
+        r = enhanceOnce(level, pos, a, sword, 6, 2, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
         check("destruction guard: destroy becomes damage", com.rtshop.enhance.Enhance.level(r) == 5 && r.is(Items.IRON_SWORD));
-        r = enhanceOnce(level, pos, a, sword, 6, fullGuard.copy(), 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
-        ItemStack r2 = enhanceOnce(level, pos, a, sword, 6, fullGuard.copy(), 0.60, net.minecraft.world.inventory.ClickType.PICKUP);
+        r = enhanceOnce(level, pos, a, sword, 6, 3, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
+        ItemStack r2 = enhanceOnce(level, pos, a, sword, 6, 3, 0.60, net.minecraft.world.inventory.ClickType.PICKUP);
         check("protection ticket: both destroy and damage become keep", com.rtshop.enhance.Enhance.level(r) == 6 && com.rtshop.enhance.Enhance.level(r2) == 6);
-        r = enhanceOnce(level, pos, a, sword, 6, fullGuard.copy(), 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
+        r = enhanceOnce(level, pos, a, sword, 6, 3, 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
         check("success still succeeds with a ticket", com.rtshop.enhance.Enhance.level(r) == 7);
         giveMaterials(a, cfg, 1, 1);
         com.rtshop.enhance.EnhanceMenu gm2 = enhanceMenu(level, pos, a);
         gm2.getSlot(0).set(sword.copy());
-        gm2.getSlot(1).set(desGuard.copy());
+        com.rtshop.enhance.Enhance.setActiveGuard(a, com.rtshop.enhance.Enhance.G_DESTROY);
         gm2.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
-        check("a destruction guard is not used up where nothing can be destroyed (+1)", gm2.getSlot(1).getItem().getCount() == 3);
+        check("a used guard is spent on the next attempt whatever happens, even at +1", com.rtshop.enhance.Enhance.activeGuard(a) == 0);
         gm2.setCarried(ItemStack.EMPTY);
-        gm2.getSlot(1).set(ItemStack.EMPTY);
         ItemStack max = sword.copy();
         com.rtshop.enhance.Enhance.setLevel(max, 11);
         gm2.getSlot(0).set(max);
@@ -951,6 +956,10 @@ public final class SelfTest {
         QuestManager.reset(a);
         Economy.setWallet(a, 0);
         clear(a);
+        check("merchants with job quests always get a [Quests] button, even when nothing can be taken yet",
+                QuestManager.hasQuests("shop_farmer") && QuestManager.viewsFor(a, "shop_farmer").isEmpty() && !QuestManager.hasQuests("bank_nobody"));
+        String hint = QuestManager.lockedHint(a, "shop_farmer");
+        check("the empty merchant quest window says which quest to finish first", hint.contains("rtshop.quest.locked_hint"), hint);
         List<QuestView> start = QuestManager.viewsFor(a, "quest_guide");
         check("only the first tutorial quest is offered at the start",
                 start.size() == 1 && start.get(0).id().equals("tutorial_1") && start.get(0).state() == QuestView.AVAILABLE);

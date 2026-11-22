@@ -27,7 +27,11 @@ import java.util.List;
  * 올릴 때 그 물건을 파는 NPC 상점과 그 가격(판매가 · 매입가)을 보고 비교할 수 있다.
  */
 public class PlayerShopScreen extends Screen {
-    private static final int W = 384, H = 236, ROW = 22, LIST_W = 206;
+    private static final int H = 236, ROW = 22, LIST_W = 206;
+    /** 창 너비: 화면이 넓으면 오른쪽 칸을 넓혀 글자가 잘리지 않게 한다. */
+    private int W = 384;
+    /** 오른쪽 칸의 "개당 가격/수량" 글자 너비 (입력 칸은 그 뒤에 놓는다). */
+    private int labW = 40;
 
     record Row(int index, ItemStack item, long price, int stock, long sold, int count, JsonArray npc) {
     }
@@ -129,8 +133,11 @@ public class PlayerShopScreen extends Screen {
 
     @Override
     protected void init() {
+        W = Math.max(384, Math.min(456, this.width - 12));
         fx = (this.width - W) / 2;
         fy = (this.height - H) / 2;
+        labW = Math.max(36, Math.max(this.font.width(Component.translatable("rtshop.pshop.price")),
+                this.font.width(Component.translatable("rtshop.pshop.qty"))) + 8);
         listY = fy + (owner ? 44 : 28);
         visible = (fy + H - 26 - listY) / ROW;
         int px = fx + LIST_W + 14, pw = W - LIST_W - 20;
@@ -144,28 +151,29 @@ public class PlayerShopScreen extends Screen {
         int y = fy + H - 98;
         if (r != null) {
             if (!owner) {
-                qtyBox = box(px + 40, y + 22, 50, keepQty == null ? "1" : keepQty);
+                qtyBox = box(px + labW, y + 22, 50, keepQty == null ? "1" : keepQty);
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.max"), b -> qtyBox.setValue(Integer.toString(maxBuy(r))))
-                        .bounds(px + 94, y + 22, pw - 98, 16).build());
+                        .bounds(px + labW + 54, y + 22, pw - labW - 58, 16).build());
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.buy"), b -> buy(r)).bounds(px + 4, y + 44, pw - 8, 18).build());
             } else if (tab == 0) {
-                priceBox = box(px + 40, y, 60, keepPrice == null ? Long.toString(r.price) : keepPrice);
+                int bx = px + labW + 58, bw = pw - labW - 62;
+                priceBox = box(px + labW, y, 54, keepPrice == null ? Long.toString(r.price) : keepPrice);
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.set_price"), b -> act(PlayerShops.PRICE, "{\"i\":" + r.index
-                        + ",\"price\":" + num(priceBox) + "}")).bounds(px + 104, y, pw - 108, 16).build());
-                qtyBox = box(px + 40, y + 20, 60, keepQty == null ? "1" : keepQty);
+                        + ",\"price\":" + num(priceBox) + "}")).bounds(bx, y, bw, 16).build());
+                qtyBox = box(px + labW, y + 20, 54, keepQty == null ? "1" : keepQty);
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.restock"), b -> act(PlayerShops.RESTOCK, "{\"i\":" + r.index
-                        + ",\"n\":" + num(qtyBox) + "}")).bounds(px + 104, y + 20, (pw - 108) / 2, 16).build());
+                        + ",\"n\":" + num(qtyBox) + "}")).bounds(bx, y + 20, bw / 2, 16).build());
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.take"), b -> act(PlayerShops.TAKE, "{\"i\":" + r.index
-                        + ",\"n\":" + num(qtyBox) + "}")).bounds(px + 104 + (pw - 108) / 2, y + 20, (pw - 108) - (pw - 108) / 2, 16).build());
+                        + ",\"n\":" + num(qtyBox) + "}")).bounds(bx + bw / 2, y + 20, bw - bw / 2, 16).build());
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.remove"), b -> {
                     sel = -1;
                     act(PlayerShops.REMOVE, "{\"i\":" + r.index + "}");
                 }).bounds(px + 4, y + 44, pw - 8, 18).build());
             } else {
-                priceBox = box(px + 40, y, 60, keepPrice == null ? Long.toString(suggest(r)) : keepPrice);
-                qtyBox = box(px + 40, y + 20, 60, keepQty == null ? Integer.toString(Math.min(r.count, com.rtshop.pshop.PlayerShopBlockEntity.MAX_STOCK)) : keepQty);
+                priceBox = box(px + labW, y, 54, keepPrice == null ? Long.toString(suggest(r)) : keepPrice);
+                qtyBox = box(px + labW, y + 20, 54, keepQty == null ? Integer.toString(Math.min(r.count, com.rtshop.pshop.PlayerShopBlockEntity.MAX_STOCK)) : keepQty);
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.all"), b -> qtyBox.setValue(Integer.toString(r.count)))
-                        .bounds(px + 104, y + 20, pw - 108, 16).build());
+                        .bounds(px + labW + 58, y + 20, pw - labW - 62, 16).build());
                 addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.add"), b -> {
                     act(PlayerShops.ADD, "{\"slot\":" + r.index + ",\"price\":" + num(priceBox) + ",\"n\":" + num(qtyBox) + "}");
                     tab = 0;
@@ -178,7 +186,8 @@ public class PlayerShopScreen extends Screen {
         boxSel = sel;
         boxTab = tab;
         if (owner) {
-            nameBox = new EditBox(this.font, fx + 220, fy + 25, W - 226 - 52, 14, Component.empty());
+            int renW = Math.max(40, this.font.width(Component.translatable("rtshop.pshop.rename")) + 12);
+            nameBox = new EditBox(this.font, fx + 220, fy + 25, W - 226 - renW - 6, 14, Component.empty());
             nameBox.setMaxLength(32);
             nameBox.setValue(data.get("name").getAsString());
             nameBox.setHint(Component.translatable("rtshop.pshop.name_hint"));
@@ -187,7 +196,7 @@ public class PlayerShopScreen extends Screen {
                 JsonObject o = new JsonObject();
                 o.addProperty("name", nameBox.getValue());
                 act(PlayerShops.RENAME, o.toString());
-            }).bounds(fx + W - 54, fy + 24, 48, 16).build());
+            }).bounds(fx + W - 6 - renW, fy + 24, renW, 16).build());
         }
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose()).bounds(fx + W - 56, fy + H - 22, 50, 16).build());
     }
@@ -271,13 +280,16 @@ public class PlayerShopScreen extends Screen {
         g.fill(fx + 5, fy + 4, fx + W - 5, fy + 19, Ui.C_WOOD_DARK);
         g.fill(fx + 5, fy + 18, fx + W - 5, fy + 19, Ui.C_GOLD_DARK);
         Ui.coin(g, fx + 9, fy + 4, 14);
-        g.drawString(this.font, Ui.clip(this.font, shopName(), 200), fx + 27, fy + 8, Ui.C_GOLD, true);
         String right = Component.translatable("rtshop.pshop.wallet", Ui.num(data.get("wallet").getAsLong())).getString();
         g.drawString(this.font, right, fx + W - 8 - this.font.width(right), fy + 8, Ui.C_CREAM, false);
+        int titleRight = fx + W - 8 - this.font.width(right) - 10;
         if (!owner) {
-            String by = Component.translatable("rtshop.pshop.owner", data.get("owner").getAsString()).getString();
-            g.drawString(this.font, by, fx + W - 8 - this.font.width(by) - this.font.width(right) - 12, fy + 8, Ui.C_PARCH_SHADE, false);
+            String by = Ui.clip(this.font, Component.translatable("rtshop.pshop.owner", data.get("owner").getAsString()).getString(), 120);
+            titleRight -= this.font.width(by);
+            g.drawString(this.font, by, titleRight, fy + 8, Ui.C_PARCH_SHADE, false);
+            titleRight -= 10;
         }
+        g.drawString(this.font, Ui.clip(this.font, shopName(), Math.min(200, titleRight - (fx + 27))), fx + 27, fy + 8, Ui.C_GOLD, true);
         // 목록
         int lx = fx + 6;
         Ui.bevel(g, lx - 1, listY - 1, LIST_W + 2, visible * ROW + 2, Ui.C_PARCH, Ui.C_PARCH_SHADE, Ui.C_PARCH_HI);
@@ -330,30 +342,48 @@ public class PlayerShopScreen extends Screen {
             int ny = py + 28;
             g.drawString(this.font, Component.translatable("rtshop.pshop.npc_title"), px + 5, ny, Ui.C_WOOD, false);
             ny += 11;
-            int maxLines = Math.max(1, (fy + H - 112 - ny) / 10);
+            // 가격 비교 줄은 아래쪽 비교 문구(y - 10) 위에서 끝나야 한다
+            int limit = fy + H - 98 - 12;
             if (r.npc.isEmpty()) {
-                g.drawString(this.font, Component.translatable("rtshop.pshop.npc_none"), px + 7, ny, Ui.C_INK_SOFT, false);
+                for (var line : this.font.split(Component.translatable("rtshop.pshop.npc_none"), pw - 12)) {
+                    if (ny + 9 > limit) break;
+                    g.drawString(this.font, line, px + 7, ny, Ui.C_INK_SOFT, false);
+                    ny += 10;
+                }
             }
             int shown = 0;
             for (JsonElement e : r.npc) {
-                if (shown >= maxLines) break;
                 JsonObject o = e.getAsJsonObject();
-                StringBuilder sb = new StringBuilder(o.get("shop").getAsString()).append(": ");
+                StringBuilder sb = new StringBuilder();
                 if (o.get("buyable").getAsBoolean()) sb.append(Component.translatable("rtshop.pshop.npc_buy", Ui.num(o.get("price").getAsLong())).getString());
                 if (o.get("sellable").getAsBoolean()) {
                     if (o.get("buyable").getAsBoolean()) sb.append(" · ");
                     sb.append(Component.translatable("rtshop.pshop.npc_sell", Ui.num(Math.round(o.get("sell").getAsDouble()))).getString());
                 }
-                g.drawString(this.font, Ui.clip(this.font, sb.toString(), pw - 12), px + 7, ny, Ui.C_INK, false);
-                ny += 10;
+                String shop = o.get("shop").getAsString() + ": ";
+                String one = shop + sb;
+                boolean fits = this.font.width(one) <= pw - 12;
+                int need = fits ? 10 : 20;
+                if (ny + need - 1 > limit) break;
+                if (fits) {
+                    g.drawString(this.font, one, px + 7, ny, Ui.C_INK, false);
+                } else {
+                    // 한 줄에 다 안 들어가면 상점 이름과 가격을 두 줄로 나눈다
+                    g.drawString(this.font, Ui.clip(this.font, shop, pw - 12), px + 7, ny, Ui.C_INK, false);
+                    g.drawString(this.font, Ui.clip(this.font, sb.toString(), pw - 20), px + 13, ny + 10, Ui.C_INK, false);
+                }
+                ny += need;
                 shown++;
             }
-            if (r.npc.size() > shown) g.drawString(this.font, "…", px + 7, ny, Ui.C_INK_SOFT, false);
+            if (r.npc.size() > shown && shown > 0) {
+                String more = "… +" + (r.npc.size() - shown);
+                g.drawString(this.font, more, px + pw - 6 - this.font.width(more), py + 28, Ui.C_INK_SOFT, false);
+            }
             int y = fy + H - 98;
             if (!owner) {
                 long n = num(qtyBox);
                 long cost = n * r.price;
-                g.drawString(this.font, Component.translatable("rtshop.pshop.total", Ui.num(cost)), px + 5, y + 6,
+                g.drawString(this.font, Ui.clip(this.font, Component.translatable("rtshop.pshop.total", Ui.num(cost)).getString(), pw - 10), px + 5, y + 6,
                         cost > data.get("wallet").getAsLong() ? Ui.C_RED : Ui.C_INK, false);
                 g.drawString(this.font, Component.translatable("rtshop.pshop.qty"), px + 5, y + 26, Ui.C_INK, false);
                 // NPC 판매가와 비교
@@ -389,7 +419,8 @@ public class PlayerShopScreen extends Screen {
         long pct = Math.round((price - npc) * 100.0 / npc);
         Component c = pct < 0 ? Component.translatable("rtshop.pshop.cheaper", -pct) : pct > 0 ? Component.translatable("rtshop.pshop.dearer", pct)
                 : Component.translatable("rtshop.pshop.same");
-        g.drawString(this.font, c, x, y, pct <= 0 ? Ui.C_GREEN : Ui.C_RED, false);
+        int pw = W - LIST_W - 20;
+        g.drawString(this.font, Ui.clip(this.font, c.getString(), pw - 10), x, y, pct <= 0 ? Ui.C_GREEN : Ui.C_RED, false);
     }
 
     @Override
@@ -461,6 +492,12 @@ public class PlayerShopScreen extends Screen {
     }
 
     public boolean fitsForTest() {
+        for (var c : children()) {
+            if (c instanceof net.minecraft.client.gui.components.AbstractWidget w
+                    && (w.getX() < fx || w.getX() + w.getWidth() > fx + W || w.getWidth() < 24 && !(w instanceof EditBox))) {
+                return false;
+            }
+        }
         return fx >= 0 && fy >= 0 && fx + W <= this.width && fy + H <= this.height;
     }
 }

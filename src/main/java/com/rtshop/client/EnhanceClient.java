@@ -81,35 +81,6 @@ public final class EnhanceClient {
         return n.items.get(0).getDescription();
     }
 
-    /** 강화 미리보기 설명 줄 (장비 창 옆 패널과 미리보기 아이템 설명에 함께 쓴다). */
-    public static List<Component> previewLines(Player p, ItemStack equipment, ItemStack guardStack) {
-        List<Component> out = new ArrayList<>();
-        EnhanceConfig cfg = EnhanceConfig.client();
-        int cur = Enhance.level(equipment);
-        EnhanceConfig.Level l = cfg.level(cur + 1);
-        if (l == null) return out;
-        Enhance.Guard g = Enhance.guardOf(guardStack);
-        if (!g.relevant(l)) g = Enhance.Guard.NONE;
-        out.add(Component.translatable("rtshop.enhance.try", cur, cur + 1).withStyle(ChatFormatting.YELLOW));
-        out.add(odds(effective(l, g, cur)));
-        boolean free = p != null && p.getAbilities().instabuild;
-        for (Enhance.Need n : Enhance.needs(cfg, l, p)) {
-            MutableComponent c = Component.literal(" - ").withStyle(ChatFormatting.DARK_GRAY).append(materialName(cfg, n).copy().withStyle(ChatFormatting.GRAY))
-                    .append(Component.literal(" " + n.have + "/" + n.need).withStyle(n.ok() || free ? ChatFormatting.GREEN : ChatFormatting.RED));
-            out.add(c);
-        }
-        boolean goldOk = free || ClientEconomy.wallet >= l.gold;
-        out.add(Component.literal(" - ").withStyle(ChatFormatting.DARK_GRAY).append(Component.literal(Ui.num(l.gold) + " G")
-                .withStyle(goldOk ? ChatFormatting.GOLD : ChatFormatting.RED)));
-        if (g != Enhance.Guard.NONE) {
-            out.add(Component.translatable("rtshop.enhance.guard_used", guardStack.getHoverName()).withStyle(ChatFormatting.AQUA));
-        } else if (l.destroy > 0) {
-            out.add(Component.translatable("rtshop.enhance.destroy_warn").withStyle(ChatFormatting.DARK_RED));
-        }
-        if (free) out.add(Component.translatable("rtshop.enhance.creative").withStyle(ChatFormatting.DARK_AQUA));
-        return out;
-    }
-
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onTooltip(ItemTooltipEvent e) {
         ItemStack s = e.getItemStack();
@@ -124,13 +95,21 @@ public final class EnhanceClient {
             tip.add(Math.min(1, tip.size()), Component.translatable(key, lv, EnhanceConfig.MAX_LEVEL, pct(arr[Math.min(lv, arr.length - 1)]))
                     .withStyle(color(lv)));
         }
+    }
+
+    /** 강화 모루의 장비·결과 칸에 마우스를 올려도 설명 창을 띄우지 않는다 (정보는 강화 정보 패널에 늘 보임). */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onTooltipRender(net.minecraftforge.client.event.RenderTooltipEvent.Pre e) {
+        ItemStack s = e.getItemStack();
+        if (s.isEmpty()) return;
         if (Enhance.isPreview(s)) {
-            Minecraft mc = Minecraft.getInstance();
-            Player p = mc.player;
-            if (p != null && p.containerMenu instanceof com.rtshop.enhance.EnhanceMenu menu) {
-                tip.addAll(previewLines(p, menu.equipment(), menu.guardStack()));
-                tip.add(Component.translatable("rtshop.enhance.take_hint").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
-            }
+            e.setCanceled(true);
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu menu
+                && (s == menu.equipment() || s == menu.getSlot(2).getItem())) {
+            e.setCanceled(true);
         }
     }
 }

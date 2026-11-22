@@ -33,9 +33,12 @@ public final class NpcButtons {
     private static long setAt;
     private static WeakReference<Screen> bound = new WeakReference<>(null);
 
-    public static void setQuests(int entityId, int count) {
+    private static boolean anyQuests;
+
+    public static void setQuests(int entityId, int count, boolean any) {
         npcId = entityId;
         quests = count;
+        anyQuests = any || count > 0;
         setAt = System.currentTimeMillis();
         bound = new WeakReference<>(null);
     }
@@ -53,7 +56,11 @@ public final class NpcButtons {
     }
 
     private static boolean questButton(Screen s) {
-        return quests > 0 && bound.get() == s;
+        return anyQuests && bound.get() == s;
+    }
+
+    public static boolean questButtonForTest(Screen s) {
+        return questButton(s);
     }
 
     private static boolean editButton(Screen s) {
@@ -70,7 +77,8 @@ public final class NpcButtons {
     public static final int H = 14;
 
     private static String questLabel() {
-        return Component.translatable("rtshop.npc.quest_button", quests).getString();
+        return quests > 0 ? Component.translatable("rtshop.npc.quest_button", quests).getString()
+                : Component.translatable("rtshop.npc.quest_button_none").getString();
     }
 
     private static String editLabel() {

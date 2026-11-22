@@ -47,6 +47,10 @@ public final class EnhanceFx {
             else mc.setScreen(new EnhanceEditScreen(msg.json));
             return;
         }
+        if (msg.mode == EnhancePacket.GUARD) {
+            Enhance.clientGuard = msg.outcome;
+            return;
+        }
         if (msg.mode == EnhancePacket.ODDS) {
             EnhanceConfig.setClient(msg.json);
             Minecraft.getInstance().setScreen(new EnhanceOddsScreen(Minecraft.getInstance().screen));
@@ -57,7 +61,19 @@ public final class EnhanceFx {
     }
 
     public static void show(Enhance.Outcome o, boolean guarded, int from, int to, ItemStack item) {
+        // 높은 단계(+7 이상 시도)는 긴장 연출 뒤에 결과를 공개한다
+        if (from + 1 >= com.rtshop.enhance.EnhanceConfig.client().broadcastFrom) {
+            last = o.name() + ":" + from + ":" + to + (guarded ? ":guarded" : "");
+            EnhanceGrandFx.start(o, guarded, from, to, item);
+            return;
+        }
+        showNow(o, guarded, from, to, item, false);
+    }
+
+    /** 결과 표시 (grand = 큰 성공 연출이 이미 글자를 그리므로 띠는 생략). */
+    public static void showNow(Enhance.Outcome o, boolean guarded, int from, int to, ItemStack item, boolean grand) {
         Minecraft mc = Minecraft.getInstance();
+        grandShown = grand;
         last = o.name() + ":" + from + ":" + to + (guarded ? ":guarded" : "");
         icon = item.copy();
         shownAt = System.currentTimeMillis();
@@ -106,11 +122,15 @@ public final class EnhanceFx {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(s, pitch, vol));
     }
 
+    private static boolean grandShown;
+
     public static boolean active() {
-        return System.currentTimeMillis() - shownAt < 2600;
+        return EnhanceGrandFx.running() || System.currentTimeMillis() - shownAt < 2600;
     }
 
     public static void render(GuiGraphics g, int w, int h) {
+        EnhanceGrandFx.render(g, w, h);
+        if (grandShown || EnhanceGrandFx.suspense()) return;
         long t = System.currentTimeMillis() - shownAt;
         if (t > 2600 || shownAt == 0) return;
         float a = t < 150 ? t / 150F : t > 2100 ? (2600 - t) / 500F : 1F;

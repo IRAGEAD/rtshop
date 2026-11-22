@@ -28,15 +28,11 @@ public final class EnhanceOverlay {
     public static boolean active(Screen s) {
         Minecraft mc = Minecraft.getInstance();
         return s != null && mc.player != null && mc.player.containerMenu instanceof EnhanceMenu && !(s instanceof EnhanceScreen)
-                && !(s instanceof EnhanceOddsScreen) && !(s instanceof EnhanceEditScreen);
+                && !(s instanceof EnhanceOddsScreen) && !(s instanceof EnhanceEditScreen) && !(s instanceof EnhanceUiScreen);
     }
 
-    private static int px(Screen s) {
-        return s.width - W - 6;
-    }
-
-    private static int py(Screen s) {
-        return Math.max(4, (s.height - H) / 2 - 10);
+    static int[] rect(Screen s) {
+        return EnhancePanel.rect(s, s.width - W - 6, Math.max(4, (s.height - H) / 2 - 10));
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -50,10 +46,7 @@ public final class EnhanceOverlay {
         GuiGraphics g = e.getGuiGraphics();
         g.pose().pushPose();
         g.pose().translate(0, 0, 500);
-        int x = px(s), y = py(s);
-        EnhanceScreen.drawPanel(g, mc.font, (EnhanceMenu) mc.player.containerMenu, mc.player, x, y, W, H);
-        boolean hov = Ui.inside(e.getMouseX(), e.getMouseY(), x, y + H + 3, W, 16);
-        Ui.button(g, mc.font, x, y + H + 3, W, 16, Component.translatable(table ? "rtshop.enhodds.hide" : "rtshop.enhodds.open").getString(), hov, true);
+        EnhancePanel.render(g, mc.font, (EnhanceMenu) mc.player.containerMenu, s, rect(s), e.getMouseX(), e.getMouseY(), table);
         if (table) {
             EnhanceOddsScreen.drawTable(g, mc.font, (s.width - EnhanceOddsScreen.tableWidth()) / 2, Math.max(2, (s.height - EnhanceOddsScreen.tableHeight()) / 2));
         }
@@ -64,15 +57,18 @@ public final class EnhanceOverlay {
     public static void onClick(ScreenEvent.MouseButtonPressed.Pre e) {
         Screen s = e.getScreen();
         if (!active(s)) return;
-        int x = px(s), y = py(s);
         if (table) {
             table = false;
             e.setCanceled(true);
             return;
         }
-        if (Ui.inside(e.getMouseX(), e.getMouseY(), x, y + H + 3, W, 16)) {
+        int k = EnhancePanel.clicked(rect(s), e.getMouseX(), e.getMouseY());
+        if (k == 0) {
             table = true;
             e.setCanceled(true);
+        } else if (k > 0) {
+            e.setCanceled(true);
+            EnhancePanel.act(k, s);
         }
     }
 

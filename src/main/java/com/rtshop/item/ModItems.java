@@ -67,16 +67,16 @@ public final class ModItems {
                     tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.enhance_anvil.tip2").withStyle(net.minecraft.ChatFormatting.GRAY));
                 }
             });
-    /** 강화 방지권: 강화 모루의 둘째 칸에 넣고 강화하면 한 장씩 쓴다. */
+    /** 강화 보호권: 손에 들고 우클릭해 미리 사용 → 다음 강화 1번에 적용 (결과와 상관없이 소모). */
     public static final RegistryObject<Item> GUARD_DAMAGE = ITEMS.register("enhance_guard_damage",
-            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false,
-                    "item.rtshop.enhance_guard_damage.tip", "item.rtshop.enhance_guard.tip"));
+            () -> new com.rtshop.enhance.GuardItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false,
+                    com.rtshop.enhance.Enhance.Guard.DAMAGE, "item.rtshop.enhance_guard_damage.tip", "item.rtshop.enhance_guard.tip"));
     public static final RegistryObject<Item> GUARD_DESTROY = ITEMS.register("enhance_guard_destroy",
-            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.RARE), false,
-                    "item.rtshop.enhance_guard_destroy.tip", "item.rtshop.enhance_guard.tip"));
+            () -> new com.rtshop.enhance.GuardItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.RARE), false,
+                    com.rtshop.enhance.Enhance.Guard.DESTROY, "item.rtshop.enhance_guard_destroy.tip", "item.rtshop.enhance_guard.tip"));
     public static final RegistryObject<Item> GUARD_FULL = ITEMS.register("enhance_guard_full",
-            () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.EPIC), true,
-                    "item.rtshop.enhance_guard_full.tip", "item.rtshop.enhance_guard.tip"));
+            () -> new com.rtshop.enhance.GuardItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.EPIC), true,
+                    com.rtshop.enhance.Enhance.Guard.FULL, "item.rtshop.enhance_guard_full.tip", "item.rtshop.enhance_guard.tip"));
 
     /** 플레이어 상점 진열대 (블록). */
     public static final RegistryObject<Item> PLAYER_SHOP = ITEMS.register("player_shop",

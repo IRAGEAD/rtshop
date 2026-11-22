@@ -597,6 +597,64 @@ public final class QuestManager {
         return out;
     }
 
+    /** 클라이언트에서 번역할 글: \u0001키\u0002인자\u0002인자... (전용 서버에는 모드 번역이 없다). */
+    public static String tr(String key, String... args) {
+        StringBuilder b = new StringBuilder("\u0001").append(key);
+        for (String a : args) b.append('\u0002').append(a);
+        return b.toString();
+    }
+
+    /** 이 NPC 가 주거나 받는 퀘스트가 하나라도 정의돼 있는가. */
+    public static boolean hasQuests(String npcKey) {
+        for (QuestDef q : loaded.quests.values()) {
+            if (q.giver.equals(npcKey) || q.turnInNpc().equals(npcKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 지금 받을 퀘스트가 없을 때: 이 NPC 의 다음 퀘스트를 열려면 무엇을 먼저 해야 하는지. 없으면 "". */
+    public static String lockedHint(ServerPlayer p, String npcKey) {
+        QuestData.Progress pr = prog(p);
+        for (QuestDef q : loaded.quests.values()) {
+            if (!q.giver.equals(npcKey) || pr.completed.contains(q.id) || pr.active.containsKey(q.id)) {
+                continue;
+            }
+            for (String r : q.requires) {
+                if (pr.completed.contains(r)) {
+                    continue;
+                }
+                QuestDef need = loaded.quests.get(r);
+                if (need == null) {
+                    continue;
+                }
+                // 사슬의 맨 앞(아직 끝내지 않은 가장 이른 퀘스트)까지 거슬러 올라간다
+                for (int guard = 0; guard < 32; guard++) {
+                    QuestDef prev = null;
+                    for (String r2 : need.requires) {
+                        QuestDef d = loaded.quests.get(r2);
+                        if (d != null && !pr.completed.contains(r2)) {
+                            prev = d;
+                            break;
+                        }
+                    }
+                    if (prev == null) {
+                        break;
+                    }
+                    need = prev;
+                }
+                String who = need.giver.isEmpty() ? "" : npcName(need.giver);
+                return tr(pr.active.containsKey(need.id) ? "rtshop.quest.locked_active" : "rtshop.quest.locked_hint",
+                        q.title, need.title, who);
+            }
+            if (!q.requiresFlags.isEmpty()) {
+                return tr("rtshop.quest.locked_flag", q.title);
+            }
+        }
+        return "";
+    }
+
     /** 수첩(진행 중인 모든 퀘스트). */
     public static List<QuestView> journalViews(ServerPlayer p) {
         QuestData.Progress pr = prog(p);
@@ -632,7 +690,14 @@ public final class QuestManager {
                 greeting = n.greeting;
             }
         }
-        send(p, npcKey, npcName(npcKey), greeting, viewsFor(p, npcKey), false);
+        List<QuestView> views = viewsFor(p, npcKey);
+        if (views.isEmpty()) {
+            String hint = lockedHint(p, npcKey);
+            if (!hint.isEmpty()) {
+                greeting = greeting.isEmpty() ? hint : greeting + "\n\n" + hint;
+            }
+        }
+        send(p, npcKey, npcName(npcKey), greeting, views, false);
     }
 
     // ------------------------------------------------------------------ 대화 / 수첩 열기
@@ -964,7 +1029,7 @@ public final class QuestManager {
             onTalk(sp, key);
             int n = viewsFor(sp, key).size();
             com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> sp),
-                    new com.rtshop.net.NpcQuestPacket(target.getId(), n));
+                    new com.rtshop.net.NpcQuestPacket(target.getId(), n, hasQuests(key)));
         }
     }
 

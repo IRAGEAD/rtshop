@@ -16,6 +16,7 @@ public final class EnhancePacket {
     public static final int FX = 1;
     public static final int EDITOR = 2;
     public static final int ODDS = 3;
+    public static final int GUARD = 4;
 
     public final int mode;
     public final String json;
@@ -37,6 +38,10 @@ public final class EnhancePacket {
 
     public static EnhancePacket config(String json) {
         return new EnhancePacket(CONFIG, json, 0, false, 0, 0, ItemStack.EMPTY);
+    }
+
+    public static EnhancePacket guard(int mask) {
+        return new EnhancePacket(GUARD, "", mask, false, 0, 0, ItemStack.EMPTY);
     }
 
     public static EnhancePacket open(int mode, String json) {

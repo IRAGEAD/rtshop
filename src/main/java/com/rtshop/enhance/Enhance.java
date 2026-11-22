@@ -68,6 +68,73 @@ public final class Enhance {
         }
     }
 
+    /** 미리 사용한 보호권 (플레이어 저장 데이터): 1 = 손상 방지, 2 = 파괴 방지. 다음 강화 1번에 쓰이고 사라진다. */
+    public static final String GUARD_KEY = "rtshop_enh_guard";
+    public static final int G_DAMAGE = 1;
+    public static final int G_DESTROY = 2;
+    /** 클라이언트: 지금 걸려 있는 보호. */
+    public static volatile int clientGuard;
+
+    public static Guard fromMask(int mask) {
+        return switch (mask & 3) {
+            case 1 -> Guard.DAMAGE;
+            case 2 -> Guard.DESTROY;
+            case 3 -> Guard.FULL;
+            default -> Guard.NONE;
+        };
+    }
+
+    public static int maskOf(Guard g) {
+        return switch (g) {
+            case DAMAGE -> G_DAMAGE;
+            case DESTROY -> G_DESTROY;
+            case FULL -> G_DAMAGE | G_DESTROY;
+            default -> 0;
+        };
+    }
+
+    public static int activeGuard(Player p) {
+        if (p.level().isClientSide) return clientGuard;
+        return p.getPersistentData().getInt(GUARD_KEY) & 3;
+    }
+
+    public static void setActiveGuard(ServerPlayer p, int mask) {
+        if (mask == 0) p.getPersistentData().remove(GUARD_KEY);
+        else p.getPersistentData().putInt(GUARD_KEY, mask & 3);
+        try {
+            ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), EnhancePacket.guard(mask & 3));
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** 보호권을 손에 들고 우클릭: 미리 사용한다 (이미 걸린 보호면 쓰지 않음). */
+    public static boolean useGuardItem(ServerPlayer p, Guard g) {
+        int cur = activeGuard(p);
+        int add = maskOf(g);
+        if ((cur & add) == add) {
+            p.displayClientMessage(Component.translatable("rtshop.enhance.guard_already").withStyle(ChatFormatting.YELLOW), true);
+            return false;
+        }
+        setActiveGuard(p, cur | add);
+        p.sendSystemMessage(Component.translatable("rtshop.enhance.guard_on", guardName(cur | add)).withStyle(ChatFormatting.AQUA));
+        return true;
+    }
+
+    public static Component guardName(int mask) {
+        return switch (mask & 3) {
+            case 1 -> Component.translatable("rtshop.enhance.guard_name_damage");
+            case 2 -> Component.translatable("rtshop.enhance.guard_name_destroy");
+            case 3 -> Component.translatable("rtshop.enhance.guard_name_full");
+            default -> Component.translatable("rtshop.enhance.guard_name_none");
+        };
+    }
+
+    @SubscribeEvent
+    public static void onClone(PlayerEvent.Clone e) {
+        int m = e.getOriginal().getPersistentData().getInt(GUARD_KEY);
+        if (m != 0) e.getEntity().getPersistentData().putInt(GUARD_KEY, m);
+    }
+
     public static Guard guardOf(ItemStack s) {
         if (s.isEmpty()) return Guard.NONE;
         Item it = s.getItem();
@@ -255,7 +322,7 @@ public final class Enhance {
         } catch (Exception ignored) {
         }
         MinecraftServer server = p.getServer();
-        if (o == Outcome.SUCCESS && to >= 10 && server != null) {
+        if (o == Outcome.SUCCESS && to >= EnhanceConfig.get().broadcastFrom && server != null) {
             Component msg = Component.translatable("rtshop.enhance.broadcast", p.getDisplayName(), item.getHoverName(), to)
                     .withStyle(ChatFormatting.GOLD);
             server.getPlayerList().broadcastSystemMessage(msg, false);
@@ -367,6 +434,9 @@ public final class Enhance {
 
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer sp) sync(sp);
+        if (event.getEntity() instanceof ServerPlayer sp) {
+            sync(sp);
+            setActiveGuard(sp, activeGuard(sp));
+        }
     }
 }

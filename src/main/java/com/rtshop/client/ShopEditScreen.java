@@ -36,6 +36,8 @@ public class ShopEditScreen extends Screen {
     private int scroll;
     private boolean dirty;
     private int fx, fy, W, H, listY, visible;
+    /** 열 위치: 왼쪽 분류 단추 너비, 목록 시작 x, 각 열의 x (오른쪽 끝에서부터 계산해 좁은 화면에서도 잘리지 않는다). */
+    private int catW, x0, xName, nameW, xPrice, xSell, xBuy, xSellT, xCat, xDel, toggleW, catBtnW;
     private static final int ROW = 20;
     private final List<Object[]> icons = new ArrayList<>();
 
@@ -103,6 +105,7 @@ public class ShopEditScreen extends Screen {
         H = Math.min(270, height - 10);
         fx = (width - W) / 2;
         fy = (height - H) / 2;
+        layoutColumns();
         filter();
         // 카테고리
         List<String> cats = new ArrayList<>();
@@ -114,13 +117,15 @@ public class ShopEditScreen extends Screen {
                 category = c;
                 scroll = 0;
                 rebuildWidgets();
-            }).bounds(fx + 8, cy, 84, 16).build();
+            }).bounds(fx + 8, cy, catW, 16).build();
             b.active = !c.equals(category);
             addRenderableWidget(b);
             cy += 17;
             if (cy > fy + H - 50) break;
         }
-        EditBox sb = new EditBox(font, fx + 100, fy + 26, 120, 14, Component.empty());
+        int addW = Math.max(60, font.width(Component.translatable("rtshop.shopedit.add")) + 12);
+        int sbW = Math.max(60, Math.min(160, fx + W - 12 - addW - 6 - x0));
+        EditBox sb = new EditBox(font, x0, fy + 26, sbW, 14, Component.empty());
         sb.setValue(search);
         sb.setHint(Component.translatable("rtshop.shopedit.search"));
         sb.setResponder(v -> {
@@ -142,9 +147,9 @@ public class ShopEditScreen extends Screen {
                     items().add(o);
                     dirty = true;
                     search = "";
-                }))).bounds(fx + 226, fy + 25, 90, 16).build());
-        listY = fy + 50;
-        visible = (fy + H - 30 - listY) / ROW;
+                }))).bounds(x0 + sbW + 6, fy + 25, addW, 16).build());
+        listY = fy + 60;
+        visible = Math.max(1, (fy + H - 30 - listY) / ROW);
         rebuildRows();
     }
 
@@ -154,17 +159,16 @@ public class ShopEditScreen extends Screen {
         for (var w : rowWidgets) removeWidget(w);
         rowWidgets.clear();
         icons.clear();
-        int x = fx + 100;
         scroll = Math.max(0, Math.min(scroll, Math.max(0, rows.size() - visible)));
         for (int i = 0; i < visible && i + scroll < rows.size(); i++) {
             JsonObject o = rows.get(i + scroll);
             int y = listY + i * ROW;
-            icons.add(new Object[]{o.get("item").getAsString(), x, y + 1});
-            EditBox price = num(x + 134, y + 2, 56, fmt(o, "price"), v -> {
+            icons.add(new Object[]{o.get("item").getAsString(), x0, y + 1});
+            EditBox price = num(xPrice, y + 2, xSell - 3 - xPrice, fmt(o, "price"), v -> {
                 if (v.isEmpty()) return;
                 o.addProperty("price", Double.parseDouble(v));
             });
-            EditBox sell = num(x + 194, y + 2, 50, fmt(o, "sellPrice"), v -> {
+            EditBox sell = num(xSell, y + 2, xBuy - 4 - xSell, fmt(o, "sellPrice"), v -> {
                 if (v.isEmpty()) o.remove("sellPrice");
                 else o.addProperty("sellPrice", Double.parseDouble(v));
             });
@@ -176,14 +180,14 @@ public class ShopEditScreen extends Screen {
                 o.addProperty("buy", !(!o.has("buy") || o.get("buy").getAsBoolean()));
                 dirty = true;
                 rebuildRows();
-            }).bounds(x + 248, y, 34, 18).build();
+            }).bounds(xBuy, y, toggleW, 18).build();
             Button sbn = Button.builder(Component.translatable(sl ? "rtshop.shopedit.sell_on" : "rtshop.shopedit.sell_off"), b -> {
                 o.addProperty("sell", !(!o.has("sell") || o.get("sell").getAsBoolean()));
                 dirty = true;
                 rebuildRows();
-            }).bounds(x + 284, y, 34, 18).build();
+            }).bounds(xSellT, y, toggleW, 18).build();
             String cat = o.has("category") ? o.get("category").getAsString() : "";
-            Button cb = Button.builder(Component.literal(Ui.clip(font, categoryName(cat), 40)), b -> {
+            Button cb = Button.builder(Component.literal(Ui.clip(font, categoryName(cat), catBtnW - 6)), b -> {
                 List<String> cs = categories();
                 if (cs.isEmpty()) return;
                 int k = cs.indexOf(cat);
@@ -191,13 +195,13 @@ public class ShopEditScreen extends Screen {
                 dirty = true;
                 filter();
                 rebuildRows();
-            }).bounds(x + 320, y, 44, 18).build();
+            }).bounds(xCat, y, catBtnW, 18).build();
             Button del = Button.builder(Component.literal("✕"), b -> {
                 items().remove(o);
                 dirty = true;
                 filter();
                 rebuildRows();
-            }).bounds(x + 366, y, 18, 18).build();
+            }).bounds(xDel, y, 16, 18).build();
             for (Button b : new Button[]{bb, sbn, cb, del}) {
                 addRenderableWidget(b);
                 rowWidgets.add(b);
@@ -205,15 +209,56 @@ public class ShopEditScreen extends Screen {
         }
         // 아래 단추
         int by = fy + H - 24;
-        Button save = Button.builder(Component.translatable("rtshop.enhedit.save"), b ->
-                ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.SAVE, shopId, file.toString()))).bounds(fx + W - 248, by, 80, 18).build();
+        int[] bw = footerWidths();
+        int bx = fx + W - 8;
+        Button close = Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(bx - bw[2], by, bw[2], 18).build();
+        bx -= bw[2] + 4;
         Button revert = Button.builder(Component.translatable("rtshop.enhedit.revert"), b ->
-                ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.OPEN, shopId, ""))).bounds(fx + W - 164, by, 76, 18).build();
-        Button close = Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 84, by, 76, 18).build();
+                ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.OPEN, shopId, ""))).bounds(bx - bw[1], by, bw[1], 18).build();
+        bx -= bw[1] + 4;
+        Button save = Button.builder(Component.translatable("rtshop.enhedit.save"), b ->
+                ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.SAVE, shopId, file.toString()))).bounds(bx - bw[0], by, bw[0], 18).build();
         for (Button b : new Button[]{save, revert, close}) {
             addRenderableWidget(b);
             rowWidgets.add(b);
         }
+    }
+
+    /** 화면 너비에 맞춰 열 위치를 정한다. 오른쪽 끝(✕)부터 왼쪽으로 쌓고, 남는 너비를 이름 칸에 준다. */
+    private void layoutColumns() {
+        catW = W < 440 ? 66 : 84;
+        x0 = fx + catW + 16;
+        int right = fx + W - 12;
+        toggleW = Math.max(28, Math.max(font.width(Component.translatable("rtshop.shopedit.buy_on")),
+                font.width(Component.translatable("rtshop.shopedit.sell_off"))) + 8);
+        catBtnW = W < 440 ? 38 : 46;
+        xDel = right - 16;
+        xCat = xDel - 2 - catBtnW;
+        xSellT = xCat - 3 - toggleW;
+        xBuy = xSellT - 2 - toggleW;
+        int numW = W < 440 ? 42 : 50;
+        xSell = xBuy - 4 - numW;
+        xPrice = xSell - 3 - numW;
+        xName = x0 + 20;
+        nameW = Math.max(30, xPrice - 4 - xName);
+    }
+
+    private int[] footerWidths() {
+        int[] w = new int[3];
+        String[] keys = {"rtshop.enhedit.save", "rtshop.enhedit.revert", "rtshop.enhodds.close"};
+        for (int i = 0; i < 3; i++) w[i] = Math.max(56, font.width(Component.translatable(keys[i])) + 14);
+        return w;
+    }
+
+    /** 테스트: 모든 단추와 칸이 창 안에 있는가. */
+    public boolean fitsForTest() {
+        for (var r : children()) {
+            if (r instanceof net.minecraft.client.gui.components.AbstractWidget w
+                    && (w.getX() < fx || w.getX() + w.getWidth() > fx + W || w.getY() + w.getHeight() > fy + H)) {
+                return false;
+            }
+        }
+        return fx >= 0 && fx + W <= width;
     }
 
     private EditBox num(int x, int y, int w, String value, java.util.function.Consumer<String> set) {
@@ -234,7 +279,7 @@ public class ShopEditScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
-        if (mx > fx + 96) {
+        if (mx > x0 - 4) {
             scroll = Math.max(0, scroll - (int) Math.signum(delta) * 3);
             rebuildRows();
             return true;
@@ -246,21 +291,31 @@ public class ShopEditScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
-        Ui.bevel(g, fx + 96, fy + 44, W - 104, H - 72, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
-        g.drawString(font, title, fx + 10, fy + 8, Ui.C_GOLD, true);
-        if (dirty) g.drawString(font, Component.translatable("rtshop.enhedit.unsaved"), fx + 14 + font.width(title), fy + 8, 0xFFFF9050, true);
-        int x = fx + 100;
-        g.drawString(font, Component.translatable("rtshop.shopedit.col_item"), x + 20, listY - 9, Ui.C_INK, false);
-        g.drawString(font, Component.translatable("rtshop.shopedit.col_price"), x + 134, listY - 9, Ui.C_INK, false);
-        g.drawString(font, Component.translatable("rtshop.shopedit.col_sell"), x + 194, listY - 9, Ui.C_INK, false);
+        Ui.bevel(g, x0 - 4, fy + 45, fx + W - 8 - (x0 - 4), H - 73, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+        String t = Ui.clip(font, title.getString(), W - 20 - (dirty ? font.width(Component.translatable("rtshop.enhedit.unsaved")) + 6 : 0));
+        g.drawString(font, t, fx + 10, fy + 8, Ui.C_GOLD, true);
+        if (dirty) g.drawString(font, Component.translatable("rtshop.enhedit.unsaved"), fx + 16 + font.width(t), fy + 8, 0xFFFF9050, true);
+        int hy = fy + 49;
+        g.drawString(font, Ui.clip(font, Component.translatable("rtshop.shopedit.col_item").getString(), nameW), xName, hy, Ui.C_INK, false);
+        g.drawString(font, Ui.clip(font, Component.translatable("rtshop.shopedit.col_price").getString(), xSell - xPrice - 2), xPrice, hy, Ui.C_INK, false);
+        g.drawString(font, Ui.clip(font, Component.translatable("rtshop.shopedit.col_sell").getString(), xBuy - xSell - 2), xSell, hy, Ui.C_INK, false);
+        g.fill(x0, listY - 2, fx + W - 12, listY - 1, 0x40000000);
         for (Object[] ic : icons) {
             Item it = item((String) ic[0]);
             int ix = (int) ic[1], iy = (int) ic[2];
             g.renderItem(new ItemStack(it), ix, iy);
-            g.drawString(font, Ui.clip(font, it == Items.BARRIER ? (String) ic[0] : it.getDescription().getString(), 110), ix + 20, iy + 4, Ui.C_INK, false);
+            g.drawString(font, Ui.clip(font, it == Items.BARRIER ? (String) ic[0] : it.getDescription().getString(), nameW), ix + 20, iy + 4, Ui.C_INK, false);
         }
-        String count = Component.translatable("rtshop.shopedit.count", rows.size(), items().size()).getString();
-        g.drawString(font, count, fx + 100, fy + H - 18, Ui.C_INK_SOFT, false);
+        int[] bw = footerWidths();
+        int countW = fx + W - 8 - bw[0] - bw[1] - bw[2] - 12 - 4 - (fx + 10);
+        String count = Ui.clip(font, Component.translatable("rtshop.shopedit.count", rows.size(), items().size()).getString(), countW);
+        g.drawString(font, count, fx + 10, fy + H - 22, Ui.C_PARCH, true);
+        String hint = Component.translatable("rtshop.shopedit.hint").getString();
+        g.pose().pushPose();
+        g.pose().translate(fx + 10, fy + H - 11, 0);
+        g.pose().scale(0.75F, 0.75F, 1);
+        g.drawString(font, Ui.clip(font, hint, (int) (countW / 0.75F)), 0, 0, Ui.C_PARCH_SHADE, false);
+        g.pose().popPose();
         super.render(g, mx, my, partial);
     }
 
