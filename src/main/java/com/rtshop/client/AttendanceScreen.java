@@ -27,7 +27,13 @@ import java.util.List;
  * 출석 창: 일일 출석 달력(보상 표), 이번 주 출석과 주간 보상, 출석하기 / 복구권 사용 / 출석 상점 버튼.
  * 출석 NPC 앞에서 연 경우에만 출석할 수 있고, /rtshop attendance 로 열면 보기만 한다.
  */
-public class AttendanceScreen extends Screen {
+public class AttendanceScreen extends Screen implements NpcButtons.Host {
+    @Override
+    public int[] npcButtonSpot() {
+        String t = Ui.clip(this.font, data.get("npc").getAsString() + " · " + this.title.getString(), W - 20);
+        return new int[]{fx + 10 + this.font.width(t) + 10, fy + 5};
+    }
+
     private static final int COLS = 7;
     private static final int ROWS = 4;
     private static final int CELL_W = 34;
@@ -175,7 +181,7 @@ public class AttendanceScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         this.renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
-        g.drawString(this.font, Ui.clip(this.font, data.get("npc").getAsString() + " · " + this.title.getString(), W - 20), fx + 10, fy + 8, Ui.C_GOLD, true);
+        g.drawString(this.font, Ui.clip(this.font, data.get("npc").getAsString() + " · " + this.title.getString(), W - 20 - NpcButtons.width(this)), fx + 10, fy + 8, Ui.C_GOLD, true);
 
         // 진행 상황
         Ui.bevel(g, fx + 6, fy + 20, W - 12, 34, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);

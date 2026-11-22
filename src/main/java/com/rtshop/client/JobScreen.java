@@ -23,7 +23,12 @@ import java.util.List;
  * 직업 화면: 전투 / 생활 탭, 왼쪽 직업 목록, 오른쪽 패시브 설명과 고르기·바꾸기 버튼.
  * 직업 안내인 앞에서만 고르거나 바꿀 수 있고, /rtshop job 으로 열면 보기만 할 수 있다.
  */
-public class JobScreen extends Screen {
+public class JobScreen extends Screen implements NpcButtons.Host {
+    @Override
+    public int[] npcButtonSpot() {
+        return new int[]{fx + 10 + this.font.width(this.title) + 10, fy + 6};
+    }
+
     private static final String COMBAT = "combat";
     private static final String LIFE = "life";
     private static final int LIST_W = 120;
@@ -214,7 +219,7 @@ public class JobScreen extends Screen {
         g.fill(fx + 5, fy + 22, fx + W - 5, fy + 23, Ui.C_GOLD_DARK);
         g.drawString(this.font, this.title, fx + 10, fy + 9, Ui.C_GOLD, true);
         String now = Component.translatable("rtshop.job.now", nameOf(data.combat), nameOf(data.life)).getString();
-        now = Ui.clip(this.font, now, W - 30 - this.font.width(this.title));
+        now = Ui.clip(this.font, now, W - 30 - this.font.width(this.title) - NpcButtons.width(this));
         g.drawString(this.font, now, fx + W - 10 - this.font.width(now), fy + 9, Ui.C_CREAM, false);
 
         // 탭

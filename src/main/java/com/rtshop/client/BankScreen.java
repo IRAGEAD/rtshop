@@ -12,7 +12,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 
 /** 은행 화면: 이자 없는 단순 보관. 은행 NPC 를 우클릭했을 때만 열립니다. */
-public class BankScreen extends Screen {
+public class BankScreen extends Screen implements NpcButtons.Host {
+    @Override
+    public int[] npcButtonSpot() {
+        return new int[]{fx + 29 + this.font.width(this.title) + 10, fy + 6};
+    }
+
     private static final int W = 236;
     private static final int H = 197;
     private static final int BTN_W = 104;

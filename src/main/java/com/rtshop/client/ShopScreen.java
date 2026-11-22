@@ -35,7 +35,12 @@ import java.util.Map;
  * - 좌클릭: 수량 입력 창, 우클릭: 10개, Shift+클릭: 한 묶음(판매는 전부)
  * - 판매 탭은 내 인벤토리를 기준으로, 같은 아이템이라도 품질(작물 별 등급, 물고기 무게)에 따라 줄이 나뉜다.
  */
-public class ShopScreen extends Screen {
+public class ShopScreen extends Screen implements NpcButtons.Host {
+    @Override
+    public int[] npcButtonSpot() {
+        return new int[]{fx + 29 + this.font.width(this.title) + 10, fy + 7};
+    }
+
 
     // ---- 레이아웃 상수
     private static final int FRAME_W = 396;

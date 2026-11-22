@@ -61,7 +61,46 @@ public final class NpcButtons {
         return s instanceof ShopScreen && mc.player != null && mc.player.hasPermissions(2);
     }
 
-    private static final int X = 6, Y = 6, W = 96, H = 18;
+    /** 상인 화면이 제목 줄에서 단추를 놓을 자리(제목 글자 바로 오른쪽)를 알려 준다. */
+    public interface Host {
+        /** {x, y}: 단추 줄의 왼쪽 위. 높이는 {@link #H}. */
+        int[] npcButtonSpot();
+    }
+
+    public static final int H = 14;
+
+    private static String questLabel() {
+        return Component.translatable("rtshop.npc.quest_button", quests).getString();
+    }
+
+    private static String editLabel() {
+        return Component.translatable("rtshop.shopedit.button").getString();
+    }
+
+    /** 단추들: {x, y, w, 종류(0 퀘스트, 1 편집)}. */
+    private static java.util.List<int[]> layout(Screen s) {
+        java.util.List<int[]> out = new java.util.ArrayList<>();
+        Minecraft mc = Minecraft.getInstance();
+        int[] spot = s instanceof Host h ? h.npcButtonSpot() : new int[]{6, 6};
+        int x = spot[0];
+        if (questButton(s)) {
+            int w = mc.font.width(questLabel()) + 12;
+            out.add(new int[]{x, spot[1], w, 0});
+            x += w + 4;
+        }
+        if (editButton(s)) {
+            int w = mc.font.width(editLabel()) + 12;
+            out.add(new int[]{x, spot[1], w, 1});
+        }
+        return out;
+    }
+
+    /** 제목 줄에서 단추들이 차지하는 너비 (오른쪽 글자를 그만큼 줄이는 데 쓴다). */
+    public static int width(Screen s) {
+        int w = 0;
+        for (int[] b : layout(s)) w += b[2] + 4;
+        return w;
+    }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onRender(ScreenEvent.Render.Post e) {
@@ -69,19 +108,17 @@ public final class NpcButtons {
         if (!npcScreen(s)) return;
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
-        int y = Y;
         g.pose().pushPose();
         g.pose().translate(0, 0, 450);
-        if (questButton(s)) {
-            boolean hov = Ui.inside(e.getMouseX(), e.getMouseY(), X, y, W, H);
-            String label = Component.translatable("rtshop.npc.quest_button", quests).getString();
-            Ui.bevel(g, X, y, W, H, hov ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
-            g.drawString(mc.font, label, X + (W - mc.font.width(label)) / 2, y + 5, Ui.C_INK, false);
-            y += H + 4;
-        }
-        if (editButton(s)) {
-            boolean hov = Ui.inside(e.getMouseX(), e.getMouseY(), X, y, W, H);
-            Ui.button(g, mc.font, X, y, W, H, Component.translatable("rtshop.shopedit.button").getString(), hov, true);
+        for (int[] b : layout(s)) {
+            boolean hov = Ui.inside(e.getMouseX(), e.getMouseY(), b[0], b[1], b[2], H);
+            if (b[3] == 0) {
+                String label = questLabel();
+                Ui.bevel(g, b[0], b[1], b[2], H, hov ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
+                g.drawString(mc.font, label, b[0] + (b[2] - mc.font.width(label)) / 2, b[1] + 3, Ui.C_INK, false);
+            } else {
+                Ui.button(g, mc.font, b[0], b[1], b[2], H, editLabel(), hov, true);
+            }
         }
         g.pose().popPose();
     }
@@ -91,23 +128,19 @@ public final class NpcButtons {
         Screen s = e.getScreen();
         if (!npcScreen(s) || e.getButton() != 0) return;
         Minecraft mc = Minecraft.getInstance();
-        int y = Y;
-        if (questButton(s)) {
-            if (Ui.inside(e.getMouseX(), e.getMouseY(), X, y, W, H)) {
-                e.setCanceled(true);
-                mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        for (int[] b : layout(s)) {
+            if (!Ui.inside(e.getMouseX(), e.getMouseY(), b[0], b[1], b[2], H)) continue;
+            e.setCanceled(true);
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            if (b[3] == 0) {
                 int id = npcId;
                 s.onClose();
                 mc.player.connection.sendCommand("rtshop quest open " + id);
-                return;
+            } else {
+                String id = ((ShopScreen) s).shopIdForEdit();
+                ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.OPEN, id, ""));
             }
-            y += H + 4;
-        }
-        if (editButton(s) && Ui.inside(e.getMouseX(), e.getMouseY(), X, y, W, H)) {
-            e.setCanceled(true);
-            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            String id = ((ShopScreen) s).shopIdForEdit();
-            ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.OPEN, id, ""));
+            return;
         }
     }
 

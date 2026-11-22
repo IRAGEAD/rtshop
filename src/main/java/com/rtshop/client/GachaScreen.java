@@ -27,7 +27,13 @@ import java.util.List;
  * 뽑기 창: 무기·펫·장신구 탭 × (뽑기 / 조각 교환 / 분해).
  * 뽑기: 일반·중급·고급 칸마다 등급 확률과 1회·10회 버튼, 확률표(아이템별 확률), 티켓 사기(상점).
  */
-public class GachaScreen extends Screen {
+public class GachaScreen extends Screen implements NpcButtons.Host {
+    @Override
+    public int[] npcButtonSpot() {
+        String t = Ui.clip(this.font, data.get("npc").getAsString() + " · " + this.title.getString(), W / 2 - 40);
+        return new int[]{fx + 10 + this.font.width(t) + 10, fy + 6};
+    }
+
     public static final String[] CATS = {"weapon", "pet", "accessory"};
     public static final String[] TIERS = {"normal", "mid", "high"};
     public static final String[] GRADES = {"common", "uncommon", "rare", "epic", "legendary"};
