@@ -806,7 +806,8 @@
      }
     ],
     "flags": [
-     "clue_hidden_page"
+     "clue_hidden_page",
+     "scylla_clue_seal_shard"
     ]
    }
   },

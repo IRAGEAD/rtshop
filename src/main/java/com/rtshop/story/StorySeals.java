@@ -257,6 +257,7 @@ public final class StorySeals {
     public static boolean recipeLocked(String itemId) {
         StorySeals c = get();
         if (!c.enabled || !c.rewardOnly.contains(itemId)) return false;
+        if (ScyllaClues.grantsItem(itemId)) return true; // 스킬라 단서를 다 모으면 주는 폭풍의 눈
         for (QuestDef q : QuestManager.loaded().quests.values()) {
             for (QuestDef.ItemReward r : q.rewardItems) if (r.item.equals(itemId)) return true;
         }
@@ -264,7 +265,7 @@ public final class StorySeals {
     }
 
     public static boolean active(Seal s) {
-        return get().enabled && !s.flag.isEmpty() && (s.always || forceActiveForTest || grantedByAnyQuest(s.flag));
+        return get().enabled && !s.flag.isEmpty() && (s.always || forceActiveForTest || grantedByAnyQuest(s.flag) || ScyllaClues.grantsFlag(s.flag));
     }
 
     /** 이 사람이 결계를 지나갈 수 있는가. */

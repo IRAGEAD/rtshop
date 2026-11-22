@@ -201,7 +201,7 @@ p = q("story_3_7", C3 + " (7/8)", "항해일지", ARCH,
       "항해일지를 녹여 읽어 봤어요. 코르넬리아는 '심연의 눈'과 '여덟 번째 눈'을 훔치러 갔대요. 항로를 판 건 회색 망토의 학자… 그리고 마지막 장에 일곱 봉인 구조물의 위치가 적혀 있어요. 그런데 한 장은 일부러 숨겨 놓은 것 같아요. 장로님께는 일곱 봉인 이야기만 전해 주세요.",
       "장로 에르윈에게 일곱 봉인의 위치를 전해 주세요.",
       "일곱 봉인… 드디어 찾았군. (장로의 목소리가 떨린다.) 잘했네, 아주 잘했어. 이제 봉인을 지키러 가세. 나선의 심연 5층과 6층도 열렸다는군.",
-      [talk(ELDER, "장로 에르윈")], gold=4000, items=[item("rtshop:chronicle_page")], requires=[p], turnIn=ELDER, flags=["clue_hidden_page"])
+      [talk(ELDER, "장로 에르윈")], gold=4000, items=[item("rtshop:chronicle_page")], requires=[p], turnIn=ELDER, flags=["clue_hidden_page", "scylla_clue_seal_shard"])
 p = q("story_3_8", C3 + " (8/8)", "심연의 끝", ELDER,
       "봉인으로 가기 전에, 나선의 심연을 끝까지 내려가 보게. 5층과 6층이야. 그곳을 지나면 일곱 봉인의 수호자들과도 겨룰 수 있을 걸세.",
       "나선의 심연 5층과 6층을 깨고 오게.",

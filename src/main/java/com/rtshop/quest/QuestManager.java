@@ -896,7 +896,10 @@ public final class QuestManager {
         giveRewards(p, q);
         p.sendSystemMessage(Component.translatable("rtshop.quest.completed", q.title));
         scene(p, q.sceneDone);
-        if (!q.rewardFlags.isEmpty()) com.rtshop.story.StoryGates.sync(p);
+        if (!q.rewardFlags.isEmpty()) {
+            com.rtshop.story.StoryGates.sync(p);
+            com.rtshop.story.ScyllaClues.checkComplete(p); // 퀘스트가 스킬라 단서를 줄 수도 있다
+        }
         return true;
     }
 
@@ -980,6 +983,7 @@ public final class QuestManager {
 
     /** 처치 목표 진행. */
     public static void onKill(ServerPlayer p, LivingEntity victim) {
+        com.rtshop.story.Hunts.onKill(p, victim); // 토벌 의뢰·몹 도감 (처치 인정은 퀘스트와 같다)
         QuestData.Progress pr = prog(p);
         if (pr.active.isEmpty()) {
             return;

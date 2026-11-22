@@ -68,6 +68,9 @@ public final class ModItems {
     /** 프로스트모가 품고 있던 얼음 결정 (불을 잠재우는 얼음). */
     public static final RegistryObject<Item> FROST_HEART = ITEMS.register("frost_heart",
             () -> new StoryItem(new Item.Properties().stacksTo(4).rarity(net.minecraft.world.item.Rarity.RARE), true, 2));
+    /** 스킬라의 단서 (단서 ID 는 NBT, 이름·설명은 config/rtshop/scylla.json). */
+    public static final RegistryObject<Item> SCYLLA_CLUE = ITEMS.register("scylla_clue",
+            () -> new ClueItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)));
     /** 수도회 견습 서약서 (1장 증표). */
     public static final RegistryObject<Item> OATH_SCROLL = ITEMS.register("oath_scroll",
             () -> new StoryItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false, 2));

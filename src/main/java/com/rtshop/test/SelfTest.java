@@ -2189,8 +2189,43 @@ public final class SelfTest {
             com.rtshop.story.StoryGates.applyToFakeForTest = false;
         }
         // 봉인을 가리키는 눈은 퀘스트 보상으로만 (스킬라의 폭풍의 눈은 아직 주는 퀘스트가 없어 그대로)
-        check("the seal eyes are quest rewards only (flame eye locked, storm eye still craftable)",
-                com.rtshop.story.StorySeals.recipeLocked("cataclysm:flame_eye") && !com.rtshop.story.StorySeals.recipeLocked("cataclysm:storm_eye"));
+        check("the seal eyes are quest/clue rewards only (flame eye and storm eye locked, others untouched)",
+                (com.rtshop.story.StorySeals.recipeLocked("cataclysm:flame_eye") || !net.minecraftforge.fml.ModList.get().isLoaded("cataclysm"))
+                        && com.rtshop.story.StorySeals.recipeLocked("cataclysm:storm_eye")
+                        && !com.rtshop.story.StorySeals.recipeLocked("minecraft:ender_eye"));
+        // 스킬라 추적: 단서를 모으면 폭풍의 눈과 결계가 열린다
+        com.rtshop.story.ScyllaClues sc = com.rtshop.story.ScyllaClues.get();
+        List<String> badClue = new ArrayList<>();
+        for (com.rtshop.story.ScyllaClues.Clue c : sc.clues.values()) {
+            if (c.source.equals("kill") && com.rtshop.story.ScyllaClues.modOk(c.target) && !ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation(c.target))) badClue.add(c.id);
+            if (c.hints.isEmpty()) badClue.add(c.id + " (no hints)");
+        }
+        check("every Scylla clue points at a real monster and has villager hints", badClue.isEmpty() && sc.clues.size() >= sc.needed, badClue);
+        check("a villager gives a profession-specific rumour, others a general one",
+                com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("sky_chart"), "cartographer").contains("폭풍의 지도")
+                        && com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("sky_chart"), "farmer") != null);
+        check("the Scylla seal is on because the clues grant its flag",
+                com.rtshop.story.StorySeals.active(com.rtshop.story.StorySeals.get().seals.get("scylla")));
+        ItemStack clueItem = com.rtshop.story.ScyllaClues.stack(sc.clues.get("wet_logbook"));
+        check("a clue item knows which clue it is", com.rtshop.story.ScyllaClues.of(clueItem) == sc.clues.get("wet_logbook"));
+        a.getInventory().clearContent();
+        int n = 0;
+        for (com.rtshop.story.ScyllaClues.Clue c : sc.clues.values()) {
+            if (n == sc.needed - 1) break;
+            com.rtshop.story.ScyllaClues.record(a, c);
+            n++;
+        }
+        boolean notYet = !QuestManager.hasFlag(a, sc.grantFlag);
+        com.rtshop.story.ScyllaClues.Clue last = null;
+        for (com.rtshop.story.ScyllaClues.Clue c : sc.clues.values()) if (!com.rtshop.story.ScyllaClues.has(a, c.id)) last = c;
+        boolean again = com.rtshop.story.ScyllaClues.record(a, sc.clues.values().iterator().next());
+        com.rtshop.story.ScyllaClues.record(a, last);
+        boolean eye = !net.minecraftforge.fml.ModList.get().isLoaded("cataclysm") || a.getInventory().countItem(ForgeRegistries.ITEMS.getValue(new ResourceLocation("cataclysm:storm_eye"))) == 1;
+        check("collecting every clue completes the storm eye and opens Scylla's seal (not before, and a clue counts once)",
+                notYet && !again && QuestManager.hasFlag(a, sc.grantFlag) && eye, notYet + " " + again + " " + eye);
+        for (String id : sc.clues.keySet()) QuestManager.setFlag(a, com.rtshop.story.ScyllaClues.FLAG_PREFIX + id, false);
+        QuestManager.setFlag(a, sc.grantFlag, false);
+        a.getInventory().clearContent();
         if (net.minecraftforge.fml.ModList.get().isLoaded("cataclysm")) {
             boolean craftable = false;
             for (net.minecraft.world.item.crafting.Recipe<?> r : server.getRecipeManager().getRecipes()) {
@@ -2199,6 +2234,41 @@ public final class SelfTest {
             }
             check("Cataclysm's flame eye has no crafting recipe on the server", !craftable);
         }
+        // 토벌 의뢰판과 몹 도감
+        com.rtshop.story.Hunts.clearForTest(a);
+        com.rtshop.story.Hunts.testMode = true;
+        net.minecraft.nbt.ListTag bl = com.rtshop.story.Hunts.bounties(a);
+        com.rtshop.story.Hunts hs = com.rtshop.story.Hunts.get();
+        boolean onlyVanilla = true;
+        for (int i = 0; i < bl.size(); i++) if (!bl.getCompound(i).getString("entity").startsWith("minecraft:")) onlyVanilla = false;
+        check("a new player gets today's and this week's bounties, only from the opening chapter's mobs",
+                bl.size() == hs.dailyCount + hs.weeklyCount && onlyVanilla, bl);
+        List<String> badHunt = new ArrayList<>();
+        for (com.rtshop.story.Hunts.Pool pool : hs.pools) for (com.rtshop.story.Hunts.Target t : pool.targets) {
+            if (com.rtshop.story.ScyllaClues.modOk(t.entity) && !ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation(t.entity))) badHunt.add(t.entity);
+        }
+        for (com.rtshop.story.Hunts.Book bk : hs.books) for (String e : bk.entities) {
+            if (com.rtshop.story.ScyllaClues.modOk(e) && !ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation(e))) badHunt.add(e);
+        }
+        check("every bounty and bestiary mob exists (when its mod is installed)", badHunt.isEmpty(), badHunt);
+        com.rtshop.story.Hunts.setForTest(a, "minecraft:zombie", 2, 100);
+        net.minecraft.world.entity.monster.Zombie z = new net.minecraft.world.entity.monster.Zombie(level);
+        long w0 = Economy.wallet(a);
+        com.rtshop.story.Hunts.onKill(a, z);
+        boolean firstSeen = com.rtshop.story.Hunts.seen(a, "minecraft:zombie");
+        long w1 = Economy.wallet(a);
+        com.rtshop.story.Hunts.onKill(a, z);
+        long w2 = Economy.wallet(a);
+        check("a bounty pays out once its count is reached (100 G, more with a combat job), and the first kill fills the bestiary",
+                firstSeen && w1 == w0 && w2 - w1 == com.rtshop.story.Hunts.reward(a, 100) && w2 > w1, w0 + " " + w1 + " " + w2);
+        com.rtshop.story.Hunts.onKill(a, z);
+        check("a finished bounty does not pay twice", Economy.wallet(a) == w2);
+        QuestManager.setFlag(a, "story_ch1_done", true);
+        boolean mowzie = com.rtshop.story.Hunts.available(a).stream().anyMatch(t -> t.entity.startsWith("mowziesmobs:"));
+        check("finishing chapter 1 adds Mowzie's mobs to the bounty pool (when installed)", mowzie || !net.minecraftforge.fml.ModList.get().isLoaded("mowziesmobs"));
+        QuestManager.setFlag(a, "story_ch1_done", false);
+        com.rtshop.story.Hunts.clearForTest(a);
+        com.rtshop.story.Hunts.testMode = false;
         // 아바스 층을 깨면 영구 표식이 남는다 (2장 시련)
         com.rtshop.raid.AbyssWeekly.cleared(a, 2);
         check("clearing a Spiral Abyss floor leaves a lasting flag for the story", QuestManager.hasFlag(a, "abyss_floor_2"));
