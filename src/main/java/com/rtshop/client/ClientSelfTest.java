@@ -142,6 +142,7 @@ public final class ClientSelfTest {
     }
 
     private static boolean opening = false;
+    private static int previewWaits = 0;
 
     /**
      * 런처로 실행해 "빠른 시작" 인자가 없을 때: 타이틀 화면에서 시험용 세계(rtshoptest)를 직접 연다.
@@ -612,7 +613,13 @@ public final class ClientSelfTest {
                 wait = 30;
             }
             case 3 -> {
-                check("the preview map of the chosen lot arrives", ps != null && ps.previewReadyForTest());
+                // 모드팩 전체(멀리 보기 모드 포함)에서는 땅 미리보기를 만드는 데 10초 넘게 걸리기도 한다 → 30초까지 기다린다
+                if (ps != null && !ps.previewReadyForTest() && previewWaits++ < 30) {
+                    step--;
+                    wait = 20;
+                    return;
+                }
+                check("the preview map of the chosen lot arrives", ps != null && ps.previewReadyForTest(), "waited " + previewWaits + "s");
                 shot(mc, "86_plots_preview_now");
                 if (ps != null) ps.showForTest(0, 2, 302);
                 wait = 5;

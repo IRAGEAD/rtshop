@@ -2186,6 +2186,7 @@ public final class SelfTest {
             String r3 = com.rtshop.story.StoryGates.lockedChapter(a, enchanted);
             check("story-gated gear: common gear is free, rare gear waits for chapter 1", r1 == null && "1장".equals(r2) && r3 == null, r1 + " " + r2 + " " + r3 + " " + shown);
         } finally {
+            QuestManager.setFlag(a, "story_ch1_done", false);
             com.rtshop.story.StoryGates.applyToFakeForTest = false;
         }
         // 봉인을 가리키는 눈은 퀘스트 보상으로만 (스킬라의 폭풍의 눈은 아직 주는 퀘스트가 없어 그대로)
@@ -2237,6 +2238,7 @@ public final class SelfTest {
         // 토벌 의뢰판과 몹 도감
         com.rtshop.story.Hunts.clearForTest(a);
         com.rtshop.story.Hunts.testMode = true;
+        for (String f : List.of("story_ch1_done", "story_ch2_done", "story_ch3_done")) QuestManager.setFlag(a, f, false);
         net.minecraft.nbt.ListTag bl = com.rtshop.story.Hunts.bounties(a);
         com.rtshop.story.Hunts hs = com.rtshop.story.Hunts.get();
         boolean onlyVanilla = true;
