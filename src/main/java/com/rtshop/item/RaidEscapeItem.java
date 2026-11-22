@@ -26,7 +26,7 @@ public class RaidEscapeItem extends Item {
         if (level.isClientSide() || !(player instanceof ServerPlayer sp)) {
             return InteractionResultHolder.success(stack);
         }
-        return com.rtshop.raid.Raid.escape(sp) ? InteractionResultHolder.consume(stack) : InteractionResultHolder.fail(stack);
+        return com.rtshop.raid.Raid.requestEscape(sp) ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
     }
 
     @Override

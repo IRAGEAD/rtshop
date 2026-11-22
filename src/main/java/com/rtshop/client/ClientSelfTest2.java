@@ -503,6 +503,93 @@ final class ClientSelfTest2 {
             waitTicks(5);
         });
 
+        // ------------------------------------------------------------ 레이드 탈출권: 실제 우클릭으로 쓰면 들어온 자리로 돌아가고 게임이 멈추지 않는다
+        final double[] raidFrom = new double[3];
+        add(mc -> {
+            mc.setScreen(null);
+            raidFrom[0] = mc.player.getX();
+            raidFrom[1] = mc.player.getY();
+            raidFrom[2] = mc.player.getZ();
+            onServer(mc, sp -> {
+                com.rtshop.raid.Raid.resetForTest(sp.server);
+                com.rtshop.raid.Raid.setKills(sp, 5);
+                sp.getInventory().add(new net.minecraft.world.item.ItemStack(com.rtshop.item.ModItems.RAID_TICKET.get(), 1));
+                com.rtshop.raid.Raid.enter(sp);
+            });
+            waitTicks(40);
+        });
+        add(mc -> {
+            check("entering the raid moves the player into the arena", com.rtshop.raid.Raid.inArena(mc.player), mc.player.position());
+            // 문 같은 블록을 눌러도 열리지 않는다 (구역 보호)
+            onServer(mc, sp -> {
+                net.minecraft.world.level.GameType gm = sp.gameMode.getGameModeForPlayer();
+                sp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                net.minecraft.core.BlockPos d = sp.blockPosition().north(2);
+                sp.serverLevel().setBlock(d, net.minecraft.world.level.block.Blocks.OAK_TRAPDOOR.defaultBlockState(), 3);
+                sp.gameMode.useItemOn(sp, sp.serverLevel(), net.minecraft.world.item.ItemStack.EMPTY, net.minecraft.world.InteractionHand.MAIN_HAND,
+                        new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(d), net.minecraft.core.Direction.UP, d, false));
+                boolean opened = sp.serverLevel().getBlockState(d).getValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN);
+                sp.serverLevel().removeBlock(d, false);
+                sp.setGameMode(gm);
+                check("blocks inside the raid arena cannot be used (a trapdoor stays shut)", !opened);
+            });
+            int slot = -1;
+            for (int i = 0; i < 9; i++) {
+                if (mc.player.getInventory().getItem(i).is(com.rtshop.item.ModItems.RAID_ESCAPE.get())) slot = i;
+            }
+            if (slot < 0) {
+                for (int i = 0; i < mc.player.getInventory().items.size(); i++) {
+                    if (mc.player.getInventory().items.get(i).is(com.rtshop.item.ModItems.RAID_ESCAPE.get())) {
+                        final int from = i;
+                        onServer(mc, sp -> {
+                            net.minecraft.world.item.ItemStack st = sp.getInventory().items.get(from);
+                            sp.getInventory().items.set(from, sp.getInventory().items.get(8));
+                            sp.getInventory().items.set(8, st);
+                            sp.inventoryMenu.broadcastChanges();
+                        });
+                        slot = 8;
+                    }
+                }
+            }
+            check("the escape ticket is handed out on entering", slot >= 0);
+            if (slot >= 0) mc.player.getInventory().selected = slot;
+            waitTicks(10);
+        });
+        add(mc -> {
+            check("the escape ticket is in hand", mc.player.getMainHandItem().is(com.rtshop.item.ModItems.RAID_ESCAPE.get()), mc.player.getMainHandItem());
+            mc.gameMode.useItem(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND);
+            waitTicks(60);
+        });
+        add(mc -> {
+            long t0 = mc.level.getGameTime();
+            check("using the escape ticket (real right-click) brings the player back to where they entered, and the game keeps running",
+                    !com.rtshop.raid.Raid.inArena(mc.player) && mc.player.distanceToSqr(raidFrom[0], raidFrom[1], raidFrom[2]) < 4 * 4
+                            && !mc.player.getInventory().hasAnyMatching(s -> s.is(com.rtshop.item.ModItems.RAID_ESCAPE.get())), mc.player.position());
+            shot(mc, "100f_raid_escaped");
+            // 성공 투표 창이 열려 있다가 마을로 돌아오면 닫힌다
+            com.rtshop.raid.RaidConfig c = com.rtshop.raid.RaidConfig.fresh();
+            com.google.gson.JsonObject o = new com.google.gson.JsonObject();
+            o.addProperty("mode", "vote");
+            o.addProperty("seconds", 30);
+            o.addProperty("agreed", 1);
+            o.addProperty("total", 1);
+            o.addProperty("voted", true);
+            com.google.gson.JsonObject t = new com.google.gson.JsonObject();
+            for (String k : c.texts.keySet()) t.addProperty(k, c.text(k));
+            o.add("texts", t);
+            RaidClient.receive(com.rtshop.net.RaidPacket.PROMPT, o.toString());
+            com.google.gson.JsonObject close = new com.google.gson.JsonObject();
+            close.addProperty("mode", "close");
+            RaidClient.receive(com.rtshop.net.RaidPacket.PROMPT, close.toString());
+            check("the 'leave now?' window closes once the player is back in town", !(mc.screen instanceof RaidPromptScreen), mc.screen);
+            waitTicks(20);
+            raidFrom[0] = t0;
+        });
+        add(mc -> {
+            check("the world is still ticking after the escape", mc.level.getGameTime() > (long) raidFrom[0] + 10, mc.level.getGameTime());
+            mc.setScreen(null);
+        });
+
         // ------------------------------------------------------------ Spiral Abyss 주간 보상 창 (층 선택 화면 왼쪽 아래에 그려지는 것)
         add(mc -> {
             mc.setScreen(null);

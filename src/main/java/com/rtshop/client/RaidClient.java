@@ -29,6 +29,12 @@ public final class RaidClient {
                 mc.setScreen(new RaidScreen(o));
             }
             case RaidPacket.PROMPT -> {
+                if ("close".equals(o.get("mode").getAsString())) {
+                    // 마을로 돌아왔다: 남아 있는 투표·실패 창을 닫는다
+                    voteDismissed = false;
+                    if (mc.screen instanceof RaidPromptScreen) mc.setScreen(null);
+                    return;
+                }
                 boolean vote = "vote".equals(o.get("mode").getAsString());
                 if (vote && o.get("agreed").getAsInt() == 0) {
                     voteDismissed = false;

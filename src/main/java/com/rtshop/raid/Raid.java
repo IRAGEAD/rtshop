@@ -89,6 +89,7 @@ public final class Raid {
     public static final String GUIDE_TAG = "rtshop_raid_guide";
     public static final String BOSS_TAG = "rtshop_raid_boss";
     private static final String NBT_IN = "rtshop_raid_in";
+    private static final String NBT_FROM = "rtshop_raid_from";
     private static final String NBT_MODE = "rtshop_raid_mode";
 
     public static final int IDLE = 0, ACTIVE = 1, DONE = 2, FAILED = 3;
@@ -396,6 +397,16 @@ public final class Raid {
         ensureArena(p.server);
         ServerLevel level = arenaLevel(p.server);
         keep(p).putBoolean(NBT_IN, true);
+        // 들어오기 전 자리를 기억해 두었다가 그곳으로 돌려보낸다
+        if (!inArena(p)) {
+            CompoundTag from = new CompoundTag();
+            from.putString("dim", Pvp.dim(p.level()));
+            from.putDouble("x", p.getX());
+            from.putDouble("y", p.getY());
+            from.putDouble("z", p.getZ());
+            from.putFloat("yaw", p.getYRot());
+            keep(p).put(NBT_FROM, from);
+        }
         if (countItem(p, ModItems.RAID_EYE.get()) < 1) Reward.give(p, new ItemStack(ModItems.RAID_EYE.get()));
         if (countItem(p, ModItems.RAID_ESCAPE.get()) < 1) Reward.give(p, new ItemStack(ModItems.RAID_ESCAPE.get()));
         if (p instanceof FakePlayer) {
@@ -412,6 +423,13 @@ public final class Raid {
         RaidConfig c = RaidConfig.get();
         restoreMode(p);
         keep(p).remove(NBT_IN);
+        CompoundTag from = keep(p).getCompound(NBT_FROM);
+        keep(p).remove(NBT_FROM);
+        PENDING_ESCAPE.remove(p.getUUID());
+        // 열려 있는 레이드 창(투표·실패)을 닫게 한다
+        JsonObject close = new JsonObject();
+        close.addProperty("mode", "close");
+        send(p, RaidPacket.PROMPT, close);
         removeItem(p, ModItems.RAID_EYE.get(), -1);
         removeItem(p, ModItems.RAID_ESCAPE.get(), -1);
         if (p instanceof FakePlayer) {
@@ -420,7 +438,20 @@ public final class Raid {
         }
         ServerLevel to = p.server.overworld();
         double x, y, z;
-        if (c.returnSet) {
+        float yaw = p.getYRot();
+        ServerLevel fromLevel = null;
+        if (from.contains("dim")) {
+            for (ServerLevel l : p.server.getAllLevels()) {
+                if (Pvp.dim(l).equals(from.getString("dim"))) fromLevel = l;
+            }
+        }
+        if (fromLevel != null && !inArena(fromLevel, from.getDouble("x"), from.getDouble("y"), from.getDouble("z"))) {
+            to = fromLevel;
+            x = from.getDouble("x");
+            y = from.getDouble("y");
+            z = from.getDouble("z");
+            yaw = from.getFloat("yaw");
+        } else if (c.returnSet) {
             for (ServerLevel l : p.server.getAllLevels()) {
                 if (Pvp.dim(l).equals(c.returnDim)) to = l;
             }
@@ -436,10 +467,23 @@ public final class Raid {
         p.setHealth(Math.max(p.getHealth(), 1));
         p.clearFire();
         p.fallDistance = 0;
-        p.teleportTo(to, x, y, z, p.getYRot(), 0F);
+        if (p.isUsingItem()) p.stopUsingItem();
+        if (p.isPassenger()) p.stopRiding();
+        if (p.containerMenu != p.inventoryMenu) p.closeContainer();
+        // 도착 지점의 청크를 먼저 불러오고, 블록 속이면 위로 올린다
+        BlockPos at = BlockPos.containing(x, y, z);
+        to.getChunk(at.getX() >> 4, at.getZ() >> 4);
+        for (int i = 0; i < 64 && (!to.getBlockState(at).getCollisionShape(to, at).isEmpty() || !to.getBlockState(at.above()).getCollisionShape(to, at.above()).isEmpty()); i++) {
+            at = at.above();
+            y = at.getY();
+        }
+        p.teleportTo(to, x, y, z, yaw, 0F);
     }
 
-    /** 탈출권 사용. */
+    /** 탈출권을 쓴 사람: 아이템을 쓰는 도중에 순간이동하지 않도록 다음 틱에 돌려보낸다. */
+    private static final java.util.Set<UUID> PENDING_ESCAPE = new java.util.HashSet<>();
+
+    /** 탈출권 사용 (곧바로 돌려보낸다: 명령·점검용). */
     public static boolean escape(ServerPlayer p) {
         if (!inArena(p) && !flagged(p)) {
             say(p, "레이드 구역 안에서만 쓸 수 있습니다.", ChatFormatting.RED);
@@ -448,6 +492,31 @@ public final class Raid {
         sendHome(p);
         say(p, RaidConfig.get().text("escaped"), ChatFormatting.YELLOW);
         return true;
+    }
+
+    /** 탈출권 아이템: 이번 틱이 끝난 뒤 돌려보내도록 예약한다. */
+    public static boolean requestEscape(ServerPlayer p) {
+        if (!inArena(p) && !flagged(p)) {
+            say(p, "레이드 구역 안에서만 쓸 수 있습니다.", ChatFormatting.RED);
+            return false;
+        }
+        PENDING_ESCAPE.add(p.getUUID());
+        return true;
+    }
+
+    private static void runEscapes(MinecraftServer server) {
+        if (PENDING_ESCAPE.isEmpty()) return;
+        List<UUID> ids = new ArrayList<>(PENDING_ESCAPE);
+        PENDING_ESCAPE.clear();
+        for (UUID id : ids) {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) continue;
+            try {
+                escape(p);
+            } catch (Throwable t) {
+                RtShop.LOGGER.error("[rtshop] 레이드 탈출 실패: {}", p.getGameProfile().getName(), t);
+            }
+        }
     }
 
     // ------------------------------------------------------------------ 보스
@@ -643,7 +712,9 @@ public final class Raid {
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.getServer() == null || event.getServer().getTickCount() % 10 != 0) {
+        if (event.phase != TickEvent.Phase.END || event.getServer() == null) return;
+        runEscapes(event.getServer());
+        if (event.getServer().getTickCount() % 10 != 0) {
             return;
         }
         try {
@@ -827,10 +898,26 @@ public final class Raid {
         }
     }
 
+    /** 구역 안의 블록은 누르거나 열 수 없다 (제단 제외). 손에 든 아이템(음식·탈출권 등)은 그대로 쓸 수 있다. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onLeftBlock(PlayerInteractEvent.LeftClickBlock event) {
+        BlockPos p = event.getPos();
+        if (!event.getLevel().isClientSide() && inArena(event.getLevel(), p.getX() + 0.5, p.getY(), p.getZ() + 0.5) && !builder(event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onUseBlock(PlayerInteractEvent.RightClickBlock event) {
         if (event.getLevel().isClientSide() || !(event.getEntity() instanceof ServerPlayer sp)) return;
-        if (!RaidConfig.get().enabled || !Pvp.dim(event.getLevel()).equals(RaidConfig.get().arenaDim) || !event.getPos().equals(altarPos())) return;
+        BlockPos bp = event.getPos();
+        boolean altar = RaidConfig.get().enabled && Pvp.dim(event.getLevel()).equals(RaidConfig.get().arenaDim) && bp.equals(altarPos());
+        if (!altar) {
+            if (inArena(event.getLevel(), bp.getX() + 0.5, bp.getY(), bp.getZ() + 0.5) && !builder(sp)) {
+                event.setUseBlock(Event.Result.DENY);
+            }
+            return;
+        }
         // 제단: 원래 기능(아이템 넣기)은 막고, 소환의 눈만 받는다
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);

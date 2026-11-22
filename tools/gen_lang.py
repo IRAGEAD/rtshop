@@ -27,7 +27,7 @@ NEW = {
  "item.rtshop.raid_escape.tip2": ("구역에 아무도 남지 않으면 보스는 사라집니다 (처치로 인정되지 않음).", "If nobody is left in the arena the boss disappears (it does not count as a kill)."),
  "rtshop.raid.ui_kills": ("일반 이그니스 처치 %s / %s", "Regular boss kills %s / %s"),
  "rtshop.raid.ui_tickets": ("참가 티켓 %s장", "Raid tickets: %s"),
- "rtshop.raid.ui_open": ("입장 가능 · 지금 구역 안 %s명", "Open · %s player(s) inside"),
+ "rtshop.raid.ui_open": ("입장 가능 · 현재 구역 안 %s명", "Open · %s player(s) inside"),
  "rtshop.raid.ui_locked": ("보스가 깨어나 문이 닫혔습니다 · 구역 안 %s명", "The boss is awake, the gate is closed · %s inside"),
  "rtshop.raid.ui_power": ("레이드 보스: 체력 %s%% · 공격력 %s%%", "Raid boss: health %s%% · attack %s%%"),
  "rtshop.raid.ui_reset": ("주간 보상 초기화까지 %s일 %s시간", "Weekly reward resets in %sd %sh"),

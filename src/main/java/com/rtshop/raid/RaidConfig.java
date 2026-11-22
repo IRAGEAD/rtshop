@@ -74,7 +74,7 @@ public final class RaidConfig {
         t.put("confirmBody", "참가 티켓 1장을 사용합니다. 이그니스가 소환된 뒤에는 다른 플레이어가 들어올 수 없습니다.");
         t.put("confirmYes", "입장한다");
         t.put("confirmNo", "돌아간다");
-        t.put("needKill", "입장 조건: 이그니스를 %s번 이상 처치해야 합니다 (지금 %s번).");
+        t.put("needKill", "입장 조건: 이그니스를 %s번 이상 처치해야 합니다 (현재 %s번).");
         t.put("needTicket", "레이드 참가 티켓이 필요합니다. 레이드 상인에게서 살 수 있습니다.");
         t.put("locked", "이그니스가 이미 깨어났습니다. 레이드가 끝난 뒤에 다시 오세요.");
         t.put("entered", "레이드 구역에 들어왔습니다. 중앙 제단에 소환의 눈을 사용하면 이그니스가 깨어납니다.");
@@ -346,7 +346,11 @@ public final class RaidConfig {
         }
         if (o.has("texts") && o.get("texts").isJsonObject()) {
             for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("texts").entrySet()) {
-                if (e.getValue().isJsonPrimitive()) c.texts.put(e.getKey(), e.getValue().getAsString());
+                if (!e.getValue().isJsonPrimitive()) continue;
+                String v = e.getValue().getAsString();
+                // 3.22.2: 예전 기본 문구 "(지금 %s번)" 은 새 기본 문구 "(현재 %s번)" 으로 바꾼다 (직접 고친 문구는 그대로)
+                if (e.getKey().equals("needKill") && v.equals("입장 조건: 이그니스를 %s번 이상 처치해야 합니다 (지금 %s번).")) v = c.texts.get("needKill");
+                c.texts.put(e.getKey(), v);
             }
         }
         if (o.has("rewards") && o.get("rewards").isJsonArray()) {
