@@ -32,8 +32,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -481,11 +479,9 @@ public final class Raid {
             }
             mob.setPersistenceRequired();
         }
-        AttributeInstance hp = living.getAttribute(Attributes.MAX_HEALTH);
-        if (hp != null) {
-            hp.setBaseValue(hp.getBaseValue() * c.healthMultiplier);
-            living.setHealth(living.getMaxHealth());
-        }
+        // 체력 배율은 최대 체력을 늘리는 대신 "받는 피해를 그만큼 줄이는" 방식으로 건다
+        // (게임의 최대 체력 한도 1024 에 걸려 배율이 먹지 않는 일이 없게. 체력 2배 = 받는 피해 절반)
+        living.setHealth(living.getMaxHealth());
         living.addTag(BOSS_TAG);
         bossId = living.getUUID();
         state = ACTIVE;
@@ -758,6 +754,10 @@ public final class Raid {
 
     @SubscribeEvent
     public static void onHurt(LivingHurtEvent event) {
+        if (isBoss(event.getEntity())) {
+            event.setAmount((float) (event.getAmount() / Math.max(0.1, RaidConfig.get().healthMultiplier)));
+            return;
+        }
         if (!(event.getEntity() instanceof Player)) return;
         Entity src = event.getSource().getEntity();
         Entity direct = event.getSource().getDirectEntity();

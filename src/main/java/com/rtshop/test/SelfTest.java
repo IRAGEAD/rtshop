@@ -870,10 +870,16 @@ public final class SelfTest {
             // 소환
             boolean summoned = com.rtshop.raid.Raid.summon(a);
             net.minecraft.world.entity.Entity boss = level.getEntity(com.rtshop.raid.Raid.bossIdForTest());
-            check("using the eye on the altar wakes the boss with more health than the regular one",
+            float bossTakes = -1;
+            if (boss instanceof net.minecraft.world.entity.LivingEntity le0) {
+                net.minecraftforge.event.entity.living.LivingHurtEvent bh = new net.minecraftforge.event.entity.living.LivingHurtEvent(le0, level.damageSources().magic(), 9F);
+                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(bh);
+                bossTakes = bh.getAmount();
+            }
+            check("using the eye on the altar wakes the boss; it takes 1/3 damage (= three times the health, without hitting the 1024 health limit)",
                     summoned && com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.ACTIVE && boss instanceof net.minecraft.world.entity.LivingEntity le
-                            && le.getMaxHealth() >= 59.9 && le.getHealth() == le.getMaxHealth() && boss.getTags().contains(com.rtshop.raid.Raid.BOSS_TAG),
-                    boss == null ? null : ((net.minecraft.world.entity.LivingEntity) boss).getMaxHealth());
+                            && le.getHealth() == le.getMaxHealth() && boss.getTags().contains(com.rtshop.raid.Raid.BOSS_TAG) && Math.abs(bossTakes - 3F) < 0.01,
+                    bossTakes);
             // 보스가 깨어난 뒤에는 들어올 수 없다
             com.rtshop.raid.Raid.setKills(b, 1);
             b.getInventory().add(new ItemStack(ticket, 1));
@@ -958,11 +964,9 @@ public final class SelfTest {
                 com.rtshop.raid.Raid.enter(a);
                 boolean ok = com.rtshop.raid.Raid.summon(a);
                 net.minecraft.world.entity.Entity ig = ok ? level.getEntity(com.rtshop.raid.Raid.bossIdForTest()) : null;
-                net.minecraft.world.entity.LivingEntity plainIg = (net.minecraft.world.entity.LivingEntity)
-                        ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation("cataclysm", "ignis")).create(level);
                 String altarId = String.valueOf(ForgeRegistries.BLOCKS.getKey(level.getBlockState(com.rtshop.raid.Raid.altarPos()).getBlock()));
-                check("in the pack the raid summons Cataclysm's Ignis with multiplied health, on Cataclysm's altar of fire",
-                        ig instanceof net.minecraft.world.entity.LivingEntity li && plainIg != null && li.getMaxHealth() >= plainIg.getMaxHealth() * 2.9
+                check("in the pack the raid summons Cataclysm's Ignis at full health, on Cataclysm's altar of fire",
+                        ig instanceof net.minecraft.world.entity.LivingEntity li && li.getHealth() == li.getMaxHealth()
                                 && ig.getClass().getName().contains("Ignis") && altarId.equals("cataclysm:altar_of_fire"),
                         (ig == null ? "no boss" : ig.getClass().getSimpleName() + " " + ((net.minecraft.world.entity.LivingEntity) ig).getMaxHealth()) + " " + altarId);
                 com.rtshop.raid.Raid.forceEnd(server);

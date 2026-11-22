@@ -95,7 +95,7 @@ public final class RewardEditor {
                 o.addProperty("id", "raid");
                 o.addProperty("title", "주간 레이드 설정");
                 JsonArray f = new JsonArray();
-                f.add(field("healthMultiplier", "보스 체력 배율 (일반 보스의 몇 배)", true, num(c.healthMultiplier)));
+                f.add(field("healthMultiplier", "보스 체력 배율 (2 = 받는 피해 절반 = 체력 2배)", true, num(c.healthMultiplier)));
                 f.add(field("damageMultiplier", "보스 공격력 배율", true, num(c.damageMultiplier)));
                 f.add(field("requireKills", "입장 조건: 일반 보스 처치 수", true, num(c.requireKills)));
                 f.add(field("returnSeconds", "성공 뒤 마을로 돌아가기까지 (초)", true, num(c.returnSeconds)));
