@@ -231,6 +231,15 @@ public final class EnhanceGrandFx {
             g.pose().scale(pop, pop, 1);
             g.renderItem(item, -8, -8);
             g.pose().popPose();
+            // 글자 뒤 어두운 띠 (빛줄기 위에서도 읽히게)
+            int bandA = (int) (150 * Math.max(0.15F, fade));
+            int bandTop = (int) (cy + 40), bandBot = (int) (cy + 108);
+            for (int i = 0; i < 6; i++) {
+                int a = bandA * (i + 1) / 6;
+                g.fill(0, bandTop - 6 + i, w, bandTop - 5 + i, a << 24);
+                g.fill(0, bandBot + 5 - i, w, bandBot + 6 - i, a << 24);
+            }
+            g.fill(0, bandTop, w, bandBot, bandA << 24);
             // 큰 글자
             Component big = Component.translatable("rtshop.enhance.grand_success", to);
             float ts = rt < 300 ? 5F - 2F * (rt / 300F) : 3F;
