@@ -123,6 +123,12 @@ public class PlotBrowserScreen extends Screen {
         return SHAPES.size();
     }
 
+    /** 점검용: 이 토지의 받은 모양 {칸 수, 둘레 선 조각 수}. 없으면 null. */
+    public static int[] shapeForTest(int landId) {
+        Shape s = SHAPES.get(landId);
+        return s == null ? null : new int[]{s.mask.cardinality(), s.hEdges.size() + s.vEdges.size()};
+    }
+
     /** 받은 미리보기 지도. */
     static final class Preview {
         int landId, x0, z0, step, w, h;

@@ -74,6 +74,10 @@ final class ClientSelfTest2 {
         return l;
     }
 
+    /** 시험용 농경지 모양 (PlotBrowser.packMask 형식): 아모노스 맵 동쪽의 실제 밀밭 두 곳. */
+    private static final String FIELD_A = "eNpl0sENgzAMhWFXHOihEhNUHSWjhdEySkbgmAOKC7b/iNKePsUP24GKiDxfYr9Vs6OoOqrqbNg0ak2jduIRJQ8dYV1AopQJKyf2WAHSwX5gIjTRaPbNovWJD6U8OjIj08fGa4Rt1kJ2joiN6LHG2ddgWZU7csz2CQP9esFx5RTv8IZ6DY9NfxqOERVsrNFABxoowLPHLRroQP9O2r1UQQMd6N8JkIEd8DjrZKmgXDA1x/u8dJKS7WoH/EMlWf2dJf6bH4d0sINtCVSwDswBmb5vFYrw";
+    private static final String FIELD_B = "eNpl0rERAiEQBVAYggvpQFowNaIUS4HAPmyFDmzhSrhMZuRYT9j/dcaLXrCf5dg1Jht8K7VRzUKdEqiIQ5SqVJMFAfETmVpFovYSSQiIHt1FC4+AqlDbR3H2Eo30oTB6qcqUH71UleqUQIXSwHH/SjWVQ0BshhhIDEQGAgOBgYCAxI1qVIfugDyoJ/Wi9n8lHhd4nGMZ73SBribzXyELJQPF34cteBLI4rET5jRmUlGmwrDn4BvKpjzlKK7H3JkTyswit32ujI3mrEvmub1fuTeVp7Qz";
+
     private record Frame(int target, Enhance.Outcome outcome, long at, String shot) {
     }
 
@@ -223,18 +227,11 @@ final class ClientSelfTest2 {
         add(mc -> {
             farmA = farmB = -1;
             onServer(mc, sp -> {
-                com.rtshop.land.CastlePlots.Def d = com.rtshop.land.CastlePlots.def();
-                int bx = d.mapX0 + (int) (d.mapW * 0.70), bz = d.mapZ0 + (int) (d.mapH * 0.52);
-                // 밀밭 A: 기울어진 타원, 밀밭 B: 콩 모양
-                farmA = plot(sp, "밀밭 A", 133520, bx, bz, 70, 50, (x, z) -> {
-                    double u = (x - 35) / 34.0, v = (z - 25 - (x - 35) * 0.25) / 17.0;
-                    return u * u + v * v <= 1;
-                }).id;
-                farmB = plot(sp, "밀밭 B", 98000, bx + 10, bz + 60, 60, 44, (x, z) -> {
-                    double u = (x - 30) / 29.0, v = (z - 22) / 21.0;
-                    double u2 = (x - 30) / 14.0, v2 = (z - 40) / 12.0;
-                    return u * u + v * v <= 1 && u2 * u2 + v2 * v2 > 1;
-                }).id;
+                // 아모노스 맵의 실제 밀밭 두 곳을 구획 지팡이의 '밭 채우기'로 골랐을 때의 모양 그대로 (밭 + 가운데 빈칸 메우기 + 풀 테두리 한 줄)
+                java.util.BitSet ma = com.rtshop.land.PlotBrowser.unpackMask(FIELD_A);
+                java.util.BitSet mb = com.rtshop.land.PlotBrowser.unpackMask(FIELD_B);
+                farmA = plot(sp, "밀밭 A", 125080, -24176, -5398, 72, 83, (x, z) -> ma.get(z * 72 + x)).id;
+                farmB = plot(sp, "밀밭 B", 141240, -24148, -5292, 79, 76, (x, z) -> mb.get(z * 79 + x)).id;
                 net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
                 var v = ShopServer.spawnNpc(sp.serverLevel(), sp.position().add(look.x * 2, 0, look.z * 2), sp.getYRot() + 180, "land");
                 npc = v == null ? -2 : v.getId();
@@ -246,6 +243,10 @@ final class ClientSelfTest2 {
             PlotBrowserScreen ps = mc.screen instanceof PlotBrowserScreen s ? s : null;
             check("the lot window lists the farmland lots under their own tab", ps != null && ps.countForTest("plot") >= 2, ps == null ? mc.screen : ps.countForTest("plot"));
             check("farmland lots arrive with their real shape (not a square)", PlotBrowserScreen.shapesForTest() >= 2, PlotBrowserScreen.shapesForTest());
+            int[] sa = PlotBrowserScreen.shapeForTest(farmA), sb = PlotBrowserScreen.shapeForTest(farmB);
+            check("the map outline is the lot's own cells: a real field keeps its winding border (every cell, many outline pieces)",
+                    sa != null && sb != null && sa[0] == 3127 && sb[0] == 3531 && sa[1] > 60 && sb[1] > 60,
+                    sa == null || sb == null ? null : sa[0] + "/" + sa[1] + " " + sb[0] + "/" + sb[1]);
             if (ps != null) {
                 ps.showForTest(1, 0, -1);
                 ps.zoomForTest(0.45);
