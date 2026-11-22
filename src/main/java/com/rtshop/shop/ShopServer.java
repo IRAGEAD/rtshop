@@ -454,6 +454,8 @@ public final class ShopServer {
     }
 
     private static int cmdReload(CommandContext<CommandSourceStack> ctx) {
+        NpcNames.reload();
+        com.rtshop.party.PartyConfig.reload();
         ShopLoader.Loaded l = reload(ctx.getSource().getServer());
         int items = 0;
         for (ShopData d : l.shops.values()) {
@@ -518,8 +520,14 @@ public final class ShopServer {
         return 1;
     }
 
-    /** 상인(또는 은행원) NPC 를 소환한다. 알 수 없는 종류면 null. */
+    /** 상인(또는 은행원) NPC 를 소환한다. 알 수 없는 종류면 null. 상인은 개인 이름이 붙는다 (NpcNames). */
     public static Villager spawnNpc(ServerLevel level, Vec3 pos, float yaw, String type) {
+        Villager v = spawnNpc0(level, pos, yaw, type);
+        if (v != null) NpcNames.refresh(v);
+        return v;
+    }
+
+    private static Villager spawnNpc0(ServerLevel level, Vec3 pos, float yaw, String type) {
         if (type.startsWith("quest_")) {
             return QuestManager.spawnNpc(level, pos, yaw, type.substring(6));
         }

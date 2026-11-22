@@ -3,6 +3,14 @@
   "minVersion": "0.8",
   "package": "com.rtshop.mixin",
   "compatibilityLevel": "JAVA_17",
-  "client": ["CinematicAnvilMixin"],
-  "injectors": {"defaultRequire": 0}
+  "client": [
+    "CinematicAnvilMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  },
+  "mixins": [
+    "NightfallCullMixin",
+    "NightfallSpeedMixin"
+  ]
 }

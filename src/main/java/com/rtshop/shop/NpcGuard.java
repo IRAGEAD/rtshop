@@ -147,5 +147,8 @@ public final class NpcGuard {
         if (!v.isInvulnerable()) {
             v.setInvulnerable(true);
         }
+        if (v.tickCount % 100 == 0) {
+            NpcNames.refresh(v);
+        }
     }
 }

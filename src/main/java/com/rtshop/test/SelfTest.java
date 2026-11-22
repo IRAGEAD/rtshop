@@ -333,6 +333,11 @@ public final class SelfTest {
             crash("abyss", t);
         }
         try {
+            party(server, level, a, b);
+        } catch (Throwable t) {
+            crash("party", t);
+        }
+        try {
             restaurant(server, level, a, b);
         } catch (Throwable t) {
             crash("restaurant", t);
@@ -2077,9 +2082,60 @@ public final class SelfTest {
             check("the " + d.name + " quest line can be played from start to end and unlocks the job",
                     ok && QuestManager.hasFlag(a, "unlock_job_" + d.id) && com.rtshop.job.Jobs.unlocked(a, d), fail);
         }
+        // 직업 선행 퀘스트: 전투·생활 직업마다 하나씩만, 포기하면 다른 직업을 고를 수 있다
+        QuestManager.reset(a);
+        boolean s1 = QuestManager.accept(a, "job_swordsman_1", null);
+        boolean w1 = QuestManager.accept(a, "job_warrior_1", null);
+        boolean f1 = QuestManager.accept(a, "job_farmer_1", null);
+        check("only one combat job line at a time (a second combat line is refused, a life line is fine)", s1 && !w1 && f1, s1 + "/" + w1 + "/" + f1);
+        QuestManager.abandon(a, "job_swordsman_1");
+        boolean w2 = QuestManager.accept(a, "job_warrior_1", null);
+        boolean c2 = QuestManager.accept(a, "job_cook_1", null);
+        check("abandoning a job line frees the slot for another job (life slot stays taken by the farmer line)", w2 && !c2, w2 + "/" + c2);
         QuestManager.reset(a);
         Economy.setWallet(a, 0);
         clear(a);
+    }
+
+    // ------------------------------------------------------------------ 파티 · 보스 처치 인정
+
+    private static void party(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
+        section("party and boss credit");
+        com.rtshop.party.PartyConfig pc = com.rtshop.party.PartyConfig.fresh();
+        pc.bosses.add("minecraft:iron_golem");
+        com.rtshop.party.PartyConfig.setForTest(pc);
+        com.rtshop.raid.Raid.TEST_PLAYERS.add(a);
+        com.rtshop.raid.Raid.TEST_PLAYERS.add(b);
+        try {
+            com.rtshop.party.Party.clearForTest(server);
+            com.rtshop.party.Party.Group g = com.rtshop.party.Party.createForTest(a);
+            com.rtshop.party.Party.inviteForTest(b, g);
+            boolean joined = com.rtshop.party.Party.accept(b);
+            check("a party can be made and an invited player joins it", joined && com.rtshop.party.Party.together(server, a.getUUID(), b.getUUID())
+                    && g.members.size() == 2);
+            check("the party size limit is 12", pc.maxMembers == 12);
+            check("merchants have personal names (farmer: 농작물 상인 한나)", com.rtshop.shop.NpcNames.display("farmer", "농작물 상인").equals("농작물 상인 한나")
+                    && com.rtshop.shop.NpcNames.display("unknown_shop", "가게").equals("가게"), com.rtshop.shop.NpcNames.display("farmer", "농작물 상인"));
+            // 파티원끼리 피해 없음
+            net.minecraftforge.event.entity.living.LivingAttackEvent ev = new net.minecraftforge.event.entity.living.LivingAttackEvent(b, a.damageSources().playerAttack(a), 4F);
+            com.rtshop.party.Party.onAttack(ev);
+            check("party members cannot hurt each other", ev.isCanceled());
+            // 보스 처치 인정: 최대 체력의 5% 이상
+            net.minecraft.world.entity.animal.IronGolem boss = EntityType.IRON_GOLEM.create(level);
+            boss.setPos(a.getX(), a.getY(), a.getZ());
+            com.rtshop.party.BossCredit.record(boss, a, boss.getMaxHealth() * 0.06F);
+            com.rtshop.party.BossCredit.record(boss, b, boss.getMaxHealth() * 0.04F);
+            List<ServerPlayer> q = com.rtshop.party.BossCredit.qualified(boss, server);
+            check("a boss kill counts only for players who dealt at least 5% of its health (6% yes, 4% no)",
+                    q.contains(a) && !q.contains(b), q.size());
+            com.rtshop.party.BossCredit.forget(boss);
+            boolean left = com.rtshop.party.Party.leave(b);
+            check("a member can leave the party", left && !com.rtshop.party.Party.together(server, a.getUUID(), b.getUUID()));
+        } finally {
+            com.rtshop.party.Party.clearForTest(server);
+            com.rtshop.raid.Raid.TEST_PLAYERS.clear();
+            com.rtshop.party.PartyConfig.reload();
+        }
     }
 
     // ------------------------------------------------------------------ 직업

@@ -782,6 +782,17 @@ public final class QuestManager {
             p.sendSystemMessage(Component.translatable("rtshop.quest.too_many", MAX_ACTIVE));
             return false;
         }
+        // 직업 선행 퀘스트는 전투·생활 직업마다 한 직업씩만 진행한다
+        String jobId = jobOf(q.id);
+        if (jobId != null) {
+            String busy = busyJob(pr, jobId);
+            if (busy != null) {
+                com.rtshop.job.JobConfig.JobDef bd = com.rtshop.job.JobConfig.get().jobs.get(busy);
+                p.sendSystemMessage(Component.translatable("rtshop.quest.job_busy", bd == null ? busy : bd.name));
+                return false;
+            }
+            pr.flags.remove(JOB_PAUSED + jobId);
+        }
         pr.active.put(q.id, new int[q.objectives.size()]);
         QuestData.get(p.server).dirty();
         p.sendSystemMessage(Component.translatable("rtshop.quest.accepted", q.title));
@@ -795,10 +806,51 @@ public final class QuestManager {
         if (pr.active.remove(questId) == null) {
             return false;
         }
-        QuestData.get(p.server).dirty();
         QuestDef q = loaded.quests.get(questId);
         p.sendSystemMessage(Component.translatable("rtshop.quest.abandoned", q == null ? questId : q.title));
+        String jobId = jobOf(questId);
+        if (jobId != null) {
+            // 이 직업의 선행 퀘스트를 그만둔다: 다른 직업의 선행 퀘스트를 받을 수 있다 (다시 받으면 이어서 진행)
+            pr.flags.add(JOB_PAUSED + jobId);
+            p.sendSystemMessage(Component.translatable("rtshop.quest.job_paused"));
+        }
+        QuestData.get(p.server).dirty();
         return true;
+    }
+
+    // ------------------------------------------------------------------ 직업 선행 퀘스트: 전투·생활 직업마다 하나씩
+
+    private static final String JOB_PAUSED = "_job_paused_";
+    private static final java.util.regex.Pattern JOB_QUEST = java.util.regex.Pattern.compile("^job_([a-z0-9_]+?)_(\\d+)$");
+
+    /** 직업 선행 퀘스트면 그 직업 ID, 아니면 null. */
+    public static String jobOf(String questId) {
+        java.util.regex.Matcher m = JOB_QUEST.matcher(questId == null ? "" : questId);
+        if (!m.matches()) return null;
+        String id = m.group(1);
+        return com.rtshop.job.JobConfig.get().jobs.containsKey(id) ? id : null;
+    }
+
+    /** 이 직업의 선행 퀘스트를 진행 중인가 (받아 둔 단계가 있거나, 몇 단계를 깼고 그만두지 않았으며 아직 직업을 열지 않음). */
+    public static boolean jobInProgress(QuestData.Progress pr, String jobId) {
+        com.rtshop.job.JobConfig.JobDef d = com.rtshop.job.JobConfig.get().jobs.get(jobId);
+        if (d == null || (!d.unlockFlag.isEmpty() && pr.flags.contains(d.unlockFlag))) return false;
+        for (String a : pr.active.keySet()) if (jobId.equals(jobOf(a))) return true;
+        if (pr.flags.contains(JOB_PAUSED + jobId)) return false;
+        for (String c : pr.completed) if (jobId.equals(jobOf(c))) return true;
+        return false;
+    }
+
+    /** jobId 의 선행 퀘스트를 받으려 할 때, 같은 칸(전투/생활)에서 이미 진행 중인 다른 직업 (없으면 null). */
+    public static String busyJob(QuestData.Progress pr, String jobId) {
+        com.rtshop.job.JobConfig cfg = com.rtshop.job.JobConfig.get();
+        com.rtshop.job.JobConfig.JobDef me = cfg.jobs.get(jobId);
+        if (me == null) return null;
+        for (com.rtshop.job.JobConfig.JobDef d : cfg.jobs.values()) {
+            if (d.id.equals(jobId) || !d.slot.equals(me.slot)) continue;
+            if (jobInProgress(pr, d.id)) return d.id;
+        }
+        return null;
     }
 
     /** 퀘스트 완료. npcKey 가 null 이면 NPC 확인을 건너뛴다 (명령어/점검용). */
@@ -1038,8 +1090,27 @@ public final class QuestManager {
         if (event.getEntity().level().isClientSide()) {
             return;
         }
-        if (event.getSource().getEntity() instanceof ServerPlayer sp && event.getEntity() != sp) {
-            onKill(sp, event.getEntity());
+        LivingEntity victim = event.getEntity();
+        net.minecraft.server.MinecraftServer server = victim.getServer();
+        if (server == null || victim instanceof ServerPlayer) {
+            if (event.getSource().getEntity() instanceof ServerPlayer sp && victim != sp) onKill(sp, victim);
+            return;
+        }
+        if (com.rtshop.party.BossCredit.isBoss(victim)) {
+            // 보스: 최대 체력의 일정 비율(기본 5%) 이상을 직접 입힌 사람만 처치로 인정
+            for (ServerPlayer p : com.rtshop.party.BossCredit.qualified(victim, server)) onKill(p, victim);
+            return;
+        }
+        ServerPlayer killer = com.rtshop.pvp.Pvp.attackerOf(event.getSource(), server);
+        if (killer == null) return;
+        onKill(killer, victim);
+        // 일반 몹: 가까이 있는 파티원도 처치 목표를 함께 채운다
+        int r = com.rtshop.party.PartyConfig.get().shareRadius;
+        com.rtshop.party.Party.Group g = r > 0 ? com.rtshop.party.Party.of(server, killer.getUUID()) : null;
+        if (g != null) {
+            for (ServerPlayer m : com.rtshop.party.Party.online(server, g)) {
+                if (m != killer && m.level() == victim.level() && m.distanceToSqr(victim) <= (double) r * r) onKill(m, victim);
+            }
         }
     }
 

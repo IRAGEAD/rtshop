@@ -106,6 +106,17 @@ public final class ClientEvents {
         }
     }
 
+    /** 층 선택 화면의 주간 보상 카드에서 [자세히 보기] 를 누르면 상세 창을 연다. */
+    @SubscribeEvent
+    public static void onAbyssScreenClick(ScreenEvent.MouseButtonPressed.Pre event) {
+        if (AbyssPanel.isFloorScreen(event.getScreen()) && event.getButton() == 0) {
+            try {
+                if (AbyssPanel.click(event.getScreen(), event.getMouseX(), event.getMouseY())) event.setCanceled(true);
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void onAbyssScreenRender(ScreenEvent.Render.Post event) {
         if (AbyssPanel.isFloorScreen(event.getScreen())) {

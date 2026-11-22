@@ -5,7 +5,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
-version = '3.22.2'
+version = '3.23.0'
 group = 'com.rtshop'
 
 base {
@@ -42,9 +42,17 @@ minecraft {
 repositories {
 }
 
+// 다른 모드(Epic Fight 등)의 클래스 이름만 빌려 쓰는 컴파일용 자리표시. jar 에는 들어가지 않는다.
+sourceSets {
+    stubs {
+        java { srcDir 'src/stubs/java' }
+    }
+}
+
 dependencies {
     // 컴파일 기준 버전. 모드팩의 포지(47.4.x)와 API 호환됩니다.
     minecraft 'net.minecraftforge:forge:1.20.1-47.4.0'
+    compileOnly sourceSets.stubs.output
 }
 
 tasks.named('jar', Jar).configure {

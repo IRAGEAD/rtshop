@@ -7,6 +7,9 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ # ---- 3.23: 직업 선행 퀘스트 제한, 파티
+ "rtshop.quest.job_busy": ("이미 %s 선행 퀘스트를 진행 중입니다. 다른 직업으로 바꾸려면 퀘스트 수첩에서 진행 중인 선행 퀘스트를 포기하세요. (직업 선행 퀘스트는 전투·생활 직업마다 하나씩만 진행할 수 있습니다)", "You are already doing the %s job quests. Abandon that quest in your quest book to switch (one combat and one life job line at a time)."),
+ "rtshop.quest.job_paused": ("이 직업의 선행 퀘스트를 그만두었습니다. 이제 다른 직업의 선행 퀘스트를 받을 수 있습니다. (나중에 다시 받으면 깬 단계부터 이어집니다)", "You stopped this job's quest line. You can now take another job's quests (you'll resume where you left off if you come back)."),
  # ---- 3.22.1: 레이드 입장 화면 새 디자인
  "rtshop.raid.ui_req": ("입장 조건", "Requirements"),
  "rtshop.raid.ui_hp": ("보스 체력", "Boss health"),

@@ -619,6 +619,12 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "102_abyss_weekly_panel");
+            mc.setScreen(new AbyssRewardScreen(null));
+            waitTicks(8);
+        });
+        add(mc -> {
+            check("'details' opens the full weekly abyss reward window", mc.screen instanceof AbyssRewardScreen, mc.screen);
+            shot(mc, "102c_abyss_weekly_detail");
             mc.setScreen(null);
             onServer(mc, sp -> com.rtshop.raid.Raid.openEditor(sp, "abyss"));
             waitTicks(20);
