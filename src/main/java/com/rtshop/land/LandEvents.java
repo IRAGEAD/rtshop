@@ -386,8 +386,7 @@ public final class LandEvents {
 
     @SubscribeEvent
     public static void onSpawnCheck(net.minecraftforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck event) {
-        if (monster(event.getEntityType()) && event.getLevel().getLevel() instanceof ServerLevel level
-                && LandManager.inCastleZone(level, event.getPos())) {
+        if (monster(event.getEntityType()) && LandManager.inCastleZone(event.getLevel().getLevel(), event.getPos())) {
             event.setResult(Event.Result.DENY);
         }
     }
@@ -403,7 +402,7 @@ public final class LandEvents {
                 || type == net.minecraft.world.entity.MobSpawnType.BUCKET) {
             return;
         }
-        if (event.getLevel().getLevel() instanceof ServerLevel level && LandManager.inCastleZone(level, mob.blockPosition())) {
+        if (LandManager.inCastleZone(event.getLevel().getLevel(), mob.blockPosition())) {
             event.setSpawnCancelled(true);
         }
     }
