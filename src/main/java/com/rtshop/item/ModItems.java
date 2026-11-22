@@ -59,6 +59,19 @@ public final class ModItems {
     public static final RegistryObject<Item> RAID_ESCAPE = ITEMS.register("raid_escape",
             () -> new RaidEscapeItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
 
+    /** 이야기 물건: 서장에서 꿈속의 기사가 건네는 불씨 (버릴 수 있지만 끝까지 필요하다). */
+    public static final RegistryObject<Item> UNDYING_EMBER = ITEMS.register("undying_ember",
+            () -> new StoryItem(new Item.Properties().stacksTo(1).fireResistant().rarity(net.minecraft.world.item.Rarity.EPIC), true, 3));
+    /** 잿빛 연대기의 찢긴 페이지. */
+    public static final RegistryObject<Item> CHRONICLE_PAGE = ITEMS.register("chronicle_page",
+            () -> new StoryItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false, 2));
+    /** 프로스트모가 품고 있던 얼음 결정 (불을 잠재우는 얼음). */
+    public static final RegistryObject<Item> FROST_HEART = ITEMS.register("frost_heart",
+            () -> new StoryItem(new Item.Properties().stacksTo(4).rarity(net.minecraft.world.item.Rarity.RARE), true, 2));
+    /** 수도회 견습 서약서 (1장 증표). */
+    public static final RegistryObject<Item> OATH_SCROLL = ITEMS.register("oath_scroll",
+            () -> new StoryItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false, 2));
+
     /** 뽑기 조각: 뽑은 아이템을 분해하면 나오고, 모아서 원하는 아이템과 바꾼다. */
     public static final RegistryObject<Item> SHARD = ITEMS.register("gacha_shard",
             () -> new TooltipItem(new Item.Properties().stacksTo(64), false, "item.rtshop.gacha_shard.tip"));

@@ -26,6 +26,13 @@ public final class StoryClient {
 
     public static void receive(int kind, String json) {
         if (kind == StoryPacket.CINEMA) {
+            // 대화창이 열려 있으면 닫고 연출을 보여 준다 (장 제목·환영은 화면 전체를 쓴다)
+            try {
+                JsonObject o = JsonParser.parseString(json).getAsJsonObject();
+                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+                if (o.has("closeScreen") && o.get("closeScreen").getAsBoolean() && mc.screen != null) mc.setScreen(null);
+            } catch (Exception ignored) {
+            }
             Cinematic.play(json);
         } else if (kind == StoryPacket.LORE) {
             try {

@@ -225,7 +225,7 @@ jobs:
               echo "== $J"
               unzip -l "$J" | awk '{print $4}' | grep -E "lang/en_us.json|structures?/|worldgen/|loot_tables/entities|mods.toml" | head -n 200
               unzip -p "$J" 'META-INF/mods.toml' 2>/dev/null | grep -v "^#" | head -n 60
-              for f in $(unzip -l "$J" | awk '{print $4}' | grep -E "worldgen/structure_set/.*json|worldgen/structure/.*json" | head -n 40); do echo "---- $f"; unzip -p "$J" "$f" | head -c 1500; echo; done
+              for f in $(unzip -l "$J" | awk '{print $4}' | grep -E "worldgen/structure_set/[^/]*json" | grep -v "/tags/" | head -n 60); do echo "---- $f"; unzip -p "$J" "$f" | head -c 1500; echo; done
               unzip -p "$J" $(unzip -l "$J" | awk '{print $4}' | grep "lang/en_us.json" | head -1) 2>/dev/null | head -c 60000
             } > "/tmp/inspect/mod-$pat.txt" 2>&1
           done

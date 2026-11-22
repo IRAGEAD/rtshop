@@ -99,7 +99,10 @@ public final class BossIntros {
                 AABB box = p.getBoundingBox().inflate(c.introRadius);
                 List<LivingEntity> near = p.level().getEntitiesOfClass(LivingEntity.class, box,
                         e -> e.isAlive() && !SHOWN.contains(e.getUUID()) && c.intros.containsKey(id(e)) && !e.getPersistentData().getBoolean(SEEN_TAG));
-                for (LivingEntity boss : near) show(boss);
+                for (LivingEntity boss : near) {
+                    StorySeals.Seal seal = StorySeals.ofBoss(boss);
+                    if (seal == null || StorySeals.passes(p, seal)) show(boss); // 결계에 막힌 사람에게는 아직 등장하지 않는다
+                }
             }
         } catch (Throwable t) {
             RtShop.LOGGER.debug("[rtshop] boss intro", t);

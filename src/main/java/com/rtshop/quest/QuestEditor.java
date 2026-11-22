@@ -209,6 +209,12 @@ public final class QuestEditor {
             return new Result(false, "저장하지 못했습니다: " + e.getMessage());
         }
         boolean isNew = origId == null || origId.isEmpty();
+        // 편집 화면에 없는 값(연출)은 원래 퀘스트에서 그대로 가져간다
+        QuestDef old = isNew ? null : QuestManager.loaded().quests.get(origId);
+        if (old != null) {
+            if (q.sceneAccept == null) q.sceneAccept = old.sceneAccept;
+            if (q.sceneDone == null) q.sceneDone = old.sceneDone;
+        }
         try {
             String file = findFile("quests", q.id);
             if (isNew && file != null) {

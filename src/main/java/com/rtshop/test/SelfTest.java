@@ -338,6 +338,11 @@ public final class SelfTest {
             crash("party", t);
         }
         try {
+            story(server, level, a);
+        } catch (Throwable t) {
+            crash("story", t);
+        }
+        try {
             restaurant(server, level, a, b);
         } catch (Throwable t) {
             crash("restaurant", t);
@@ -2099,6 +2104,94 @@ public final class SelfTest {
 
     // ------------------------------------------------------------------ 파티 · 보스 처치 인정
 
+    /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
+    private static void story(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        QuestManager.Loaded l = QuestManager.loaded();
+        List<String> story = new ArrayList<>();
+        for (String id : l.quests.keySet()) if (id.startsWith("story_") || id.startsWith("hidden_")) story.add(id);
+        check("the main story is installed (4 chapters + hidden story)", story.size() >= 40 && l.quests.containsKey("story_4_7c")
+                && l.quests.containsKey("hidden_illusioner_2"), story.size());
+        check("the story quests load without problems", l.problems.stream().noneMatch(x -> x.contains("story")), l.problems);
+        check("the order's three NPCs exist", l.npcs.containsKey("order_elder") && l.npcs.containsKey("order_archivist") && l.npcs.containsKey("order_captain"));
+        net.minecraft.core.Registry<net.minecraft.world.level.levelgen.structure.Structure> sreg =
+                server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        List<String> bad = new ArrayList<>();
+        for (String id : story) {
+            QuestDef q = l.quests.get(id);
+            for (QuestDef.Objective ob : q.objectives) {
+                String ns = ob.target.contains(":") ? ob.target.replace("#", "").substring(0, ob.target.replace("#", "").indexOf(':')) : "minecraft";
+                if (!net.minecraftforge.fml.ModList.get().isLoaded(ns) && !ns.equals("minecraft")) continue;
+                switch (ob.type) {
+                    case KILL -> {
+                        if (!ob.target.equals("*") && !ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation(ob.target))) bad.add(id + " kill " + ob.target);
+                    }
+                    case DELIVER -> {
+                        if (!ob.target.startsWith("#") && !ForgeRegistries.ITEMS.containsKey(new ResourceLocation(ob.target))) bad.add(id + " item " + ob.target);
+                    }
+                    case STRUCTURE -> {
+                        if (ob.target.startsWith("#")) {
+                            if (sreg.getTag(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, new ResourceLocation(ob.target.substring(1)))).isEmpty())
+                                bad.add(id + " structure tag " + ob.target);
+                        } else if (!sreg.containsKey(new ResourceLocation(ob.target))) bad.add(id + " structure " + ob.target);
+                    }
+                    case TALK -> {
+                        if (ob.target.startsWith("quest_") && !l.npcs.containsKey(ob.target.substring(6))) bad.add(id + " npc " + ob.target);
+                    }
+                    default -> {
+                    }
+                }
+            }
+            for (QuestDef.ItemReward ir : q.rewardItems) {
+                String ns = ir.item.substring(0, ir.item.indexOf(':'));
+                if ((ns.equals("minecraft") || net.minecraftforge.fml.ModList.get().isLoaded(ns)) && !ForgeRegistries.ITEMS.containsKey(new ResourceLocation(ir.item)))
+                    bad.add(id + " reward " + ir.item);
+            }
+        }
+        check("every story quest points at real monsters, structures, items and NPCs", bad.isEmpty(), bad);
+        // 새 목표 종류: 표식(FLAG) / 차원(DIMENSION) 은 받자마자 맞으면 바로 채워진다
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "tutorial_done", true);
+        boolean took = QuestManager.accept(a, "story_1_1", "quest_order_elder");
+        long before = Economy.wallet(a);
+        boolean done = QuestManager.turnIn(a, "story_1_1", "quest_order_elder", -1);
+        check("a FLAG goal is met by an existing flag and the first chapter quest can be handed in", took && done && Economy.wallet(a) > before, took + " " + done);
+        QuestDef.Objective dimGoal = new QuestDef.Objective();
+        dimGoal.type = QuestDef.Type.DIMENSION;
+        dimGoal.target = a.level().dimension().location().toString();
+        check("a DIMENSION goal is met in that dimension", QuestManager.reached(a, dimGoal, dimGoal.target));
+        QuestDef.Objective advGoal = new QuestDef.Objective();
+        advGoal.type = QuestDef.Type.ADVANCEMENT;
+        advGoal.target = "minecraft:story/mine_stone";
+        net.minecraft.advancements.Advancement adv = server.getAdvancements().getAdvancement(new ResourceLocation(advGoal.target));
+        if (adv != null) for (String c : adv.getCriteria().keySet()) a.getAdvancements().award(adv, c);
+        check("an ADVANCEMENT goal is met once the advancement is done", adv != null && QuestManager.reached(a, advGoal, ""));
+        check("story quests carry their scenes (chapter title on taking 1-1, dream on finishing 1-2)",
+                l.quests.get("story_1_1").sceneAccept != null && l.quests.get("story_1_2").sceneDone != null);
+        check("the dream gives the undying ember (needed until the very end)",
+                l.quests.get("story_1_2").rewardItems.stream().anyMatch(r -> r.item.equals("rtshop:undying_ember")));
+        // 장비 진열대: 희귀는 1장, 서사는 2장 뒤
+        com.rtshop.story.StoryGates.applyToFakeForTest = true;
+        try {
+            ItemStack rare = new ItemStack(Items.DIAMOND_SWORD);
+            rare.setHoverName(null);
+            ItemStack epicArmor = new ItemStack(Items.NETHERITE_CHESTPLATE);
+            String r1 = com.rtshop.story.StoryGates.lockedChapter(a, new ItemStack(Items.IRON_SWORD));
+            boolean shown = rare.getRarity() == net.minecraft.world.item.Rarity.COMMON;
+            ItemStack enchanted = new ItemStack(Items.IRON_SWORD);
+            enchanted.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 1); // 마법 부여 = RARE
+            String r2 = com.rtshop.story.StoryGates.lockedChapter(a, enchanted);
+            QuestManager.setFlag(a, "story_ch1_done", true);
+            String r3 = com.rtshop.story.StoryGates.lockedChapter(a, enchanted);
+            check("story-gated gear: common gear is free, rare gear waits for chapter 1", r1 == null && "1장".equals(r2) && r3 == null, r1 + " " + r2 + " " + r3 + " " + shown);
+        } finally {
+            com.rtshop.story.StoryGates.applyToFakeForTest = false;
+        }
+        // 아바스 층을 깨면 영구 표식이 남는다 (2장 시련)
+        com.rtshop.raid.AbyssWeekly.cleared(a, 2);
+        check("clearing a Spiral Abyss floor leaves a lasting flag for the story", QuestManager.hasFlag(a, "abyss_floor_2"));
+        QuestManager.reset(a);
+    }
+
     private static void party(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
         section("party and boss credit");
         com.rtshop.party.PartyConfig pc = com.rtshop.party.PartyConfig.fresh();
@@ -2137,6 +2230,43 @@ public final class SelfTest {
             check("every story boss has an entrance and a life story (13 bosses)", com.rtshop.story.StoryConfig.defaults().size() >= 13
                     && com.rtshop.story.StoryConfig.defaults().values().stream().allMatch(i -> !i.lore.isEmpty() && !i.name.isEmpty()));
             sc.intros.remove("minecraft:iron_golem");
+            // 결계: 표식을 주는 퀘스트가 없으면 꺼져 있고, 켜지면 표식이 있어야 지나간다 (파티원이 데려갈 수 있다)
+            com.rtshop.story.StorySeals.Seal seal = com.rtshop.story.StorySeals.get().seals.get("ignis");
+            check("seals turn on only when a quest grants their flag (story quests open the fire altar; an unknown flag stays off)",
+                    seal != null && com.rtshop.story.StorySeals.grantedByAnyQuest(seal.flag) && !com.rtshop.story.StorySeals.grantedByAnyQuest("seal_nobody_gives_this"));
+            com.rtshop.story.StorySeals.forceActiveForTest = true;
+            com.rtshop.story.StorySeals.TEST_PLAYERS.put(a.getUUID(), a);
+            com.rtshop.story.StorySeals.TEST_PLAYERS.put(b.getUUID(), b);
+            try {
+                com.rtshop.quest.QuestManager.setFlag(a, seal.flag, false);
+                com.rtshop.quest.QuestManager.setFlag(b, seal.flag, false);
+                com.rtshop.party.Party.clearForTest(server);
+                boolean blocked = !com.rtshop.story.StorySeals.passes(a, seal);
+                com.rtshop.quest.QuestManager.setFlag(a, seal.flag, true);
+                boolean opened = com.rtshop.story.StorySeals.passes(a, seal);
+                boolean aloneB = !com.rtshop.story.StorySeals.passes(b, seal);
+                com.rtshop.party.Party.createForTest(a, b);
+                boolean carried = com.rtshop.story.StorySeals.passes(b, seal);
+                check("a seal blocks a player without its flag, opens with it, and a party member with it carries others",
+                        blocked && opened && aloneB && carried, blocked + " " + opened + " " + aloneB + " " + carried);
+                check("the fire altar is sealed until the seven seals are broken",
+                        com.rtshop.story.StorySeals.ofBlock("cataclysm:altar_of_fire") == seal);
+                com.google.gson.JsonObject ss = com.google.gson.JsonParser.parseString(
+                        "{\"structures\":[],\"placement\":{\"type\":\"minecraft:random_spread\",\"spacing\":25,\"separation\":8,\"salt\":1}}").getAsJsonObject();
+                com.google.gson.JsonObject sc2 = com.rtshop.story.StructureRarity.scale(ss, 1.6);
+                check("boss structures are spread further apart (25/8 x1.6 -> 40/13)",
+                        sc2 != null && sc2.getAsJsonObject("placement").get("spacing").getAsInt() == 40
+                                && sc2.getAsJsonObject("placement").get("separation").getAsInt() == 13, sc2);
+                if (net.minecraftforge.fml.ModList.get().isLoaded("mowziesmobs")) {
+                    check("the story structure pack spreads Mowzie's boss structures out", com.rtshop.story.StructureRarity.LAST.containsKey("mowziesmobs:wrought_chambers")
+                            && server.getPackRepository().getSelectedIds().contains(com.rtshop.story.StructureRarity.PACK_ID), com.rtshop.story.StructureRarity.LAST);
+                }
+            } finally {
+                com.rtshop.story.StorySeals.forceActiveForTest = false;
+                com.rtshop.story.StorySeals.TEST_PLAYERS.clear();
+                com.rtshop.quest.QuestManager.setFlag(a, seal.flag, false);
+                com.rtshop.party.Party.clearForTest(server);
+            }
             boolean left = com.rtshop.party.Party.leave(b);
             check("a member can leave the party", left && !com.rtshop.party.Party.together(server, a.getUUID(), b.getUUID()));
         } finally {

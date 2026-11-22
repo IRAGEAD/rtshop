@@ -168,6 +168,11 @@ public final class Economy {
         if (!(event.getEntity() instanceof ServerPlayer sp)) {
             return;
         }
+        if (com.rtshop.story.StorySeals.nearStoryBoss(sp)) {
+            // 이야기 보스와 싸우다 죽으면 Gold 를 잃지 않는다 (여러 번 도전이 기본인 보스들)
+            sp.sendSystemMessage(net.minecraft.network.chat.Component.translatable("rtshop.economy.death_story_boss"));
+            return;
+        }
         EconomyConfig c = EconomyConfig.get();
         double pct = c.deathLossMinPercent + sp.getRandom().nextDouble() * (c.deathLossMaxPercent - c.deathLossMinPercent);
         long w = wallet(sp);

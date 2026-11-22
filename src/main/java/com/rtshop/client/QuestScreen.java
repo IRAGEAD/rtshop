@@ -186,6 +186,14 @@ public class QuestScreen extends Screen {
                 return Component.translatable("rtshop.quest.obj.visit", o.text()).getString();
             case TALK:
                 return Component.translatable("rtshop.quest.obj.talk", o.text()).getString();
+            case STRUCTURE:
+                return Component.translatable("rtshop.quest.obj.structure", o.text().isEmpty() ? o.target() : o.text()).getString();
+            case ADVANCEMENT:
+                return Component.translatable("rtshop.quest.obj.advancement", o.text().isEmpty() ? o.target() : o.text()).getString();
+            case FLAG:
+                return o.text().isEmpty() ? o.target() : o.text();
+            case DIMENSION:
+                return Component.translatable("rtshop.quest.obj.dimension", o.text().isEmpty() ? o.target() : o.text()).getString();
             default:
                 return Component.translatable("rtshop.quest.obj.pay").getString();
         }

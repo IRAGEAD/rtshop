@@ -457,6 +457,7 @@ public final class ShopServer {
         NpcNames.reload();
         com.rtshop.party.PartyConfig.reload();
         com.rtshop.story.StoryConfig.reload();
+        com.rtshop.story.StorySeals.reload();
         for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) com.rtshop.story.BossIntros.sendLore(sp);
         ShopLoader.Loaded l = reload(ctx.getSource().getServer());
         int items = 0;
@@ -728,6 +729,11 @@ public final class ShopServer {
     private static void buy(ServerPlayer player, ShopData.Entry entry, int amount) {
         if (!entry.buyable) {
             sendResult(player, Component.translatable("rtshop.msg.not_buyable"), false);
+            return;
+        }
+        String lock = com.rtshop.story.StoryGates.lockedChapter(player, entry.stack);
+        if (lock != null) {
+            sendResult(player, Component.translatable("rtshop.msg.story_locked", lock), false);
             return;
         }
         boolean firstDeed = entry.stack.is(ModItems.FIRST_LAND_DEED.get());

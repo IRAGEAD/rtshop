@@ -258,6 +258,7 @@ public final class AbyssWeekly {
      */
     public static boolean cleared(ServerPlayer p, int f) {
         Config c = config();
+        if (f >= 1 && f <= FLOORS) com.rtshop.quest.QuestManager.setFlag(p, "abyss_floor_" + f, true); // 이야기 퀘스트용 (영구)
         if (!c.enabled || f < 1 || f > FLOORS) return false;
         long week = Weekly.id(Weekly.now(), c.resetDay, c.resetHour);
         Data d = Data.get(p.server);

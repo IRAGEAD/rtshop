@@ -19,7 +19,15 @@ public final class QuestDef {
         /** 지정한 NPC 와 대화한다. */
         TALK,
         /** Gold 를 낸다 (완료 때 소지금에서 가져간다). */
-        PAY;
+        PAY,
+        /** 구조물 안에 들어간다. target: 구조물 ID, #태그, 또는 "모드:*". */
+        STRUCTURE,
+        /** 발전과제(업적)를 이룬다. target: 발전과제 ID. */
+        ADVANCEMENT,
+        /** 차원에 들어간다. target: 차원 ID. */
+        DIMENSION,
+        /** 표식을 갖고 있다 (예: abyss_floor_2 = 나선의 심연 2층을 깬 적이 있다). target: 표식. */
+        FLAG;
 
         static Type parse(String s) {
             for (Type t : values()) {
@@ -96,6 +104,8 @@ public final class QuestDef {
     public final List<Choice> choices = new ArrayList<>();
     /** 목록 정렬용 (작을수록 위). */
     public int order;
+    /** 받을 때 / 끝낼 때 보여 줄 연출 (StoryPacket CINEMA 형식). 없으면 null. */
+    public JsonObject sceneAccept, sceneDone;
 
     public String turnInNpc() {
         return turnIn == null || turnIn.isEmpty() ? giver : turnIn;
@@ -149,6 +159,8 @@ public final class QuestDef {
         putText(o, "intro", intro);
         putText(o, "progress", progress);
         putText(o, "done", done);
+        if (sceneAccept != null) o.add("sceneAccept", sceneAccept);
+        if (sceneDone != null) o.add("sceneDone", sceneDone);
         JsonArray objs = new JsonArray();
         for (Objective ob : objectives) {
             JsonObject jo = new JsonObject();
@@ -213,6 +225,8 @@ public final class QuestDef {
         q.giver = str(o, "giver", "").trim();
         q.turnIn = str(o, "turnIn", "").trim();
         q.order = o.has("order") ? o.get("order").getAsInt() : 0;
+        if (o.has("sceneAccept") && o.get("sceneAccept").isJsonObject()) q.sceneAccept = o.getAsJsonObject("sceneAccept");
+        if (o.has("sceneDone") && o.get("sceneDone").isJsonObject()) q.sceneDone = o.getAsJsonObject("sceneDone");
         if (q.giver.isEmpty()) {
             throw new IllegalArgumentException("퀘스트 '" + q.id + "' 에 giver(퀘스트를 주는 NPC)가 없습니다");
         }

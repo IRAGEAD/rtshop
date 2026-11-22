@@ -31,7 +31,8 @@ public final class PartyConfig {
             "mowziesmobs:ferrous_wroughtnaut", "mowziesmobs:frostmaw", "mowziesmobs:umvuthi", "mowziesmobs:sculptor",
             "aquamirae:captain_cornelia", "aquamirae:maze_mother",
             "cataclysm:ignis", "cataclysm:netherite_monstrosity", "cataclysm:ender_guardian", "cataclysm:the_harbinger",
-            "cataclysm:the_leviathan", "cataclysm:ancient_remnant", "cataclysm:maledictus", "cataclysm:scylla");
+            "cataclysm:the_leviathan", "cataclysm:ancient_remnant", "cataclysm:maledictus", "cataclysm:scylla",
+            "illusioner:illusioner");
 
     private static PartyConfig current;
 

@@ -72,7 +72,7 @@ public final class QuestManager {
      * 모드에 들어 있는 기본 퀘스트 파일. 한 번 설치한 파일은 다시는 덮어쓰지 않는다 (지워도 다시 깔지 않는다).
      * 새 기본 퀘스트는 항상 새 파일 이름으로 추가한다.
      */
-    private static final String[] DEFAULT_FILES = {"npcs.json", "tutorial.json", "job_quests.json"};
+    private static final String[] DEFAULT_FILES = {"npcs.json", "tutorial.json", "job_quests.json", "story.json"};
     /**
      * 예전 버전의 기본 파일 내용(SHA-256). 설치된 파일이 이것과 '완전히 같으면' 아무도 고치지 않은 것이므로 새 기본 파일로 바꾼다.
      * 한 글자라도 고쳤으면 그대로 둔다.
@@ -796,6 +796,7 @@ public final class QuestManager {
         pr.active.put(q.id, new int[q.objectives.size()]);
         QuestData.get(p.server).dirty();
         p.sendSystemMessage(Component.translatable("rtshop.quest.accepted", q.title));
+        scene(p, q.sceneAccept);
         // 이미 조건을 채운 상태(방문 위치에 서 있음 등)를 바로 반영
         checkVisits(p);
         return true;
@@ -891,7 +892,22 @@ public final class QuestManager {
         QuestData.get(p.server).dirty();
         giveRewards(p, q);
         p.sendSystemMessage(Component.translatable("rtshop.quest.completed", q.title));
+        scene(p, q.sceneDone);
         return true;
+    }
+
+    /** 이야기 연출을 보낸다. "party": true 면 가까운 파티원에게도. */
+    public static void scene(ServerPlayer p, com.google.gson.JsonObject o) {
+        if (o == null) return;
+        com.google.gson.JsonObject c = o.deepCopy();
+        if (!c.has("closeScreen")) c.addProperty("closeScreen", true);
+        com.rtshop.story.BossIntros.send(p, c);
+        if (o.has("party") && o.get("party").getAsBoolean()) {
+            com.rtshop.party.Party.Group g = com.rtshop.party.Party.of(p.server, p.getUUID());
+            for (ServerPlayer m : com.rtshop.party.Party.online(p.server, g)) {
+                if (m != p && m.level() == p.level() && m.distanceTo(p) < 64) com.rtshop.story.BossIntros.send(m, c);
+            }
+        }
     }
 
     private static void giveRewards(ServerPlayer p, QuestDef q) {
@@ -995,6 +1011,48 @@ public final class QuestManager {
         }
     }
 
+    /** 구조물·발전과제·차원 목표를 지금 이뤘는가. */
+    public static boolean reached(ServerPlayer p, QuestDef.Objective ob, String dim) {
+        try {
+            switch (ob.type) {
+                case DIMENSION:
+                    return ob.target.equals(dim);
+                case FLAG:
+                    return hasFlag(p, ob.target);
+                case ADVANCEMENT: {
+                    net.minecraft.advancements.Advancement adv = p.server.getAdvancements().getAdvancement(new ResourceLocation(ob.target));
+                    return adv != null && p.getAdvancements().getOrStartProgress(adv).isDone();
+                }
+                case STRUCTURE: {
+                    net.minecraft.server.level.ServerLevel level = p.serverLevel();
+                    net.minecraft.core.BlockPos pos = p.blockPosition();
+                    net.minecraft.world.level.StructureManager sm = level.structureManager();
+                    net.minecraft.core.Registry<net.minecraft.world.level.levelgen.structure.Structure> reg =
+                            level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+                    if (ob.target.startsWith("#")) {
+                        net.minecraft.tags.TagKey<net.minecraft.world.level.levelgen.structure.Structure> tag =
+                                net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, new ResourceLocation(ob.target.substring(1)));
+                        return sm.getStructureWithPieceAt(pos, tag).isValid();
+                    }
+                    if (ob.target.endsWith(":*")) {
+                        String ns = ob.target.substring(0, ob.target.length() - 2);
+                        for (net.minecraft.world.level.levelgen.structure.Structure s : sm.getAllStructuresAt(pos).keySet()) {
+                            ResourceLocation key = reg.getKey(s);
+                            if (key != null && key.getNamespace().equals(ns) && sm.getStructureWithPieceAt(pos, s).isValid()) return true;
+                        }
+                        return false;
+                    }
+                    net.minecraft.world.level.levelgen.structure.Structure s = reg.get(new ResourceLocation(ob.target));
+                    return s != null && sm.getStructureWithPieceAt(pos, s).isValid();
+                }
+                default:
+                    return false;
+            }
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
     /** 방문 목표 진행 (지금 위치 기준). */
     public static void checkVisits(ServerPlayer p) {
         QuestData.Progress pr = prog(p);
@@ -1012,6 +1070,11 @@ public final class QuestManager {
             boolean touched = false;
             for (int i = 0; i < q.objectives.size() && i < pg.length; i++) {
                 QuestDef.Objective ob = q.objectives.get(i);
+                if (pg[i] < ob.count && ob.type != QuestDef.Type.VISIT && reached(p, ob, dim)) {
+                    pg[i] = ob.count;
+                    touched = true;
+                    continue;
+                }
                 if (ob.type != QuestDef.Type.VISIT || pg[i] >= ob.count || !ob.target.equals(dim)) {
                     continue;
                 }
