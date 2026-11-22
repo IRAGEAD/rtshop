@@ -239,7 +239,13 @@ public class RecipeEditScreen extends Screen {
             boolean off = blocked(r);
             if (off) g.fill(fx + 8, y - 1, fx + W - 8, y + ROW - 2, 0x30FF2020);
             g.renderItem(new ItemStack(RulesScreens.item(r.out)), fx + 10, y + 1);
-            if (r.count > 1) g.drawString(font, "×" + r.count, fx + 22, y + 10, 0xFFFFFFFF, true);
+            if (r.count > 1) {
+                g.pose().pushPose();
+                g.pose().translate(0, 0, 200);
+                String c = Integer.toString(r.count);
+                g.drawString(font, c, fx + 27 - font.width(c), y + 10, 0xFFFFFFFF, true);
+                g.pose().popPose();
+            }
             String name = r.out.isEmpty() ? r.id : RulesScreens.name(r.out);
             g.drawString(font, Ui.clip(font, name, W - 250), fx + 32, y + 1, off ? Ui.C_RED : Ui.C_INK, false);
             String sub = r.id + " · " + (custom.containsKey(r.id) ? Component.translatable("rtshop.rules.custom_tag").getString() : r.type)
