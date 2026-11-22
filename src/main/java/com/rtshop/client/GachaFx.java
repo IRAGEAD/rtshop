@@ -999,7 +999,7 @@ public final class GachaFx {
             float alpha = Math.min(1, appear / 4F) * (0.75F + 0.25F * Mth.sin(tt * 0.3F + i));
             g.pose().pushPose();
             g.pose().translate(Mth.cos(a) * rr, Mth.sin(a) * rr, 30);
-            g.pose().mulPose(Axis.ZP.rotation(a + Mth.HALF_PI));
+            g.pose().mulPose(Axis.ZP.rotation(a - Mth.HALF_PI)); // 칼끝이 야마토를 향한다
             spectralSword(g, alpha);
             g.pose().popPose();
         }
@@ -1007,7 +1007,7 @@ public final class GachaFx {
         float pop = since < 14 ? (since < 4 ? 0 : 1 + 0.5F * (1 - (since - 4) / 10F) * Mth.cos((since - 4) * 0.8F)) : 1;
         if (since >= 4) {
             glow(g, 34, YM_CYAN, 0.35F);
-            item(g, 5.2F * pop, Mth.sin(tt * 0.1F) * 2);
+            item(g, 5.2F * pop, -10 + Mth.sin(tt * 0.1F) * 2);
         }
         particles(g, partial);
         g.pose().popPose();
@@ -1020,8 +1020,9 @@ public final class GachaFx {
             int shown = Math.min(title.length(), (int) (ts / 2.5F) + 1);
             g.flush();
             g.pose().pushPose();
-            g.pose().translate(cx, cy + 58, 500);
-            float scale = 4.2F;
+            float scale = 3.2F;
+            int ty = Math.min(cy + 50, height - 66);
+            g.pose().translate(cx, ty, 500);
             g.pose().scale(scale, scale, 1);
             Component full = RaidText.c(title, RaidText.TITLE);
             int fw = font.width(full);
@@ -1039,13 +1040,13 @@ public final class GachaFx {
             if (ts > 16) {
                 float a = Math.min(1, (ts - 16) / 8F);
                 g.pose().pushPose();
-                g.pose().translate(cx, cy + 58 + 9 * scale + 8, 500);
+                g.pose().translate(cx, ty + 9 * scale + 6, 500);
                 g.pose().scale(1.5F, 1.5F, 1);
                 g.drawString(font, name, -font.width(name) / 2, 0, argb(0xFFFFFF, a), true);
                 g.pose().popPose();
                 String sub = Component.translatable("rtshop.gacha.fx.yamato_sub").getString();
                 g.pose().pushPose();
-                g.pose().translate(cx, cy + 58 + 9 * scale + 26, 500);
+                g.pose().translate(cx, ty + 9 * scale + 22, 500);
                 g.drawString(font, sub, -font.width(sub) / 2, 0, argb(YM_CYAN, a * 0.8F), false);
                 g.pose().popPose();
             }
