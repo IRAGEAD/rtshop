@@ -265,6 +265,8 @@ jobs:
           grep -q "RESULT: ALL PASS" rtshop-selftest.txt
       - name: Client screen test inside the whole pack
         # 모드팩의 모든 모드(클라이언트 전용 포함)와 날개 모드를 넣은 실제 클라이언트에서 화면 점검을 돌린다
+        # (서버 자체 점검이 실패해도 화면 점검은 돌린다: 한쪽 실패가 다른 쪽 결과를 가리지 않게)
+        if: always()
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null

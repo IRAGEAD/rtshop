@@ -860,6 +860,10 @@ public final class SelfTest {
                 && com.rtshop.enhance.Enhance.suspenseMs(1) < com.rtshop.enhance.Enhance.suspenseMs(2)
                 && com.rtshop.enhance.Enhance.suspenseMs(2) < com.rtshop.enhance.Enhance.suspenseMs(3));
         // 보호권은 손에 들고 우클릭해 미리 사용 (1장 소모), 같은 보호를 또 걸 수는 없음
+        // (빈 칸을 손으로 고른다: 0번 칸에는 강화 재료가 들어 있어서, 그 칸에 보호권을 쥐여 주면 재료가 사라진다)
+        int handSlot = a.getInventory().selected;
+        a.getInventory().selected = 8;
+        check("the test's hand slot is free", a.getMainHandItem().isEmpty());
         a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dmgGuard.copy());
         dmgGuard.getItem().use(level, a, net.minecraft.world.InteractionHand.MAIN_HAND);
         int afterUse = a.getMainHandItem().getCount();
@@ -868,6 +872,7 @@ public final class SelfTest {
                 com.rtshop.enhance.Enhance.activeGuard(a) == com.rtshop.enhance.Enhance.G_DAMAGE && afterUse == 2 && a.getMainHandItem().getCount() == 2,
                 com.rtshop.enhance.Enhance.activeGuard(a) + " " + afterUse + " " + a.getMainHandItem().getCount());
         a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        a.getInventory().selected = handSlot;
         com.rtshop.enhance.EnhanceMenu gm = enhanceMenu(level, pos, a);
         ItemStack g6 = sword.copy();
         com.rtshop.enhance.Enhance.setLevel(g6, 6);
