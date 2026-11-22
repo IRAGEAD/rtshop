@@ -368,7 +368,7 @@ public final class Hunts {
             if (have >= need) {
                 b.putBoolean("done", true);
                 long gold = reward(p, b.getLong("gold"));
-                Economy.deposit(p, gold);
+                Economy.addWallet(p, gold);
                 p.sendSystemMessage(Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.weekly_done" : "rtshop.hunt.daily_done",
                         victim.getType().getDescription(), need, String.format("%,d", gold)).withStyle(ChatFormatting.GOLD));
                 p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.7F, 1.2F);
@@ -402,7 +402,7 @@ public final class Hunts {
         if (pr[1] == 0 || pr[0] < pr[1] || done.contains(b.id)) return;
         done.putBoolean(b.id, true);
         d.put("books", done);
-        Economy.deposit(p, b.gold);
+        Economy.addWallet(p, b.gold);
         p.sendSystemMessage(Component.translatable("rtshop.hunt.book_done", b.name, String.format("%,d", b.gold)).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         p.level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1F, 1F);
     }
