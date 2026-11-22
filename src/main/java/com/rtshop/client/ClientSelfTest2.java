@@ -641,5 +641,52 @@ final class ClientSelfTest2 {
             onServer(mc, com.rtshop.raid.AbyssWeekly::resetPlayer);
             waitTicks(5);
         });
+
+        // ------------------------------------------------------------ 이야기 연출: 장 제목, 보스 등장(테마별), 환영
+        add(mc -> {
+            mc.setScreen(null);
+            Cinematic.play("{\"kind\":\"title\",\"chapter\":\"제 1 장\",\"title\":\"잿불의 서약\",\"subtitle\":\"골디아, 수도회의 마지막 거점\",\"color\":\"FF7A20\",\"theme\":\"ember\"}");
+            Cinematic.timeForTest = 2.4F;
+            waitTicks(6);
+        });
+        add(mc -> {
+            check("a chapter title card plays", Cinematic.active() && "title".equals(Cinematic.kindForTest()));
+            shot(mc, "110_story_chapter_title");
+            com.rtshop.story.StoryConfig.Intro in = com.rtshop.story.StoryConfig.defaults().get("cataclysm:ignis");
+            Cinematic.play(com.rtshop.story.BossIntros.cinema(in).toString());
+            Cinematic.timeForTest = 2.6F;
+            waitTicks(6);
+        });
+        add(mc -> {
+            check("a boss entrance plays with the boss's name and epithet", Cinematic.active() && "boss".equals(Cinematic.kindForTest()));
+            shot(mc, "111_boss_intro_ignis");
+            Cinematic.play(com.rtshop.story.BossIntros.cinema(com.rtshop.story.StoryConfig.defaults().get("mowziesmobs:frostmaw")).toString());
+            Cinematic.timeForTest = 2.2F;
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "111b_boss_intro_frostmaw");
+            Cinematic.play(com.rtshop.story.BossIntros.cinema(com.rtshop.story.StoryConfig.defaults().get("cataclysm:the_leviathan")).toString());
+            Cinematic.timeForTest = 2.2F;
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "111c_boss_intro_leviathan");
+            Cinematic.play(com.rtshop.story.BossIntros.cinema(com.rtshop.story.StoryConfig.defaults().get("cataclysm:ender_guardian")).toString());
+            Cinematic.timeForTest = 2.2F;
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "111d_boss_intro_ender_guardian");
+            Cinematic.play("{\"kind\":\"vision\",\"speaker\":\"꿈속의 기사\",\"text\":\"또 왔구나, 견습이여.\\n이 불씨를 쥐어라. 언젠가 네가 지켜야 할 것이다.\",\"color\":\"FF7A20\"}");
+            Cinematic.timeForTest = 3.2F;
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "112_story_vision");
+            Cinematic.timeForTest = -1;
+            Cinematic.play("{\"kind\":\"line\",\"seconds\":0.01}");
+            waitTicks(4);
+        });
     }
 }

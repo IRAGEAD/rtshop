@@ -2129,6 +2129,14 @@ public final class SelfTest {
             check("a boss kill counts only for players who dealt at least 10% of its health (11% yes, 9% no)",
                     q.contains(a) && !q.contains(b), q.size());
             com.rtshop.party.BossCredit.forget(boss);
+            // 보스 등장 연출: 처음 가까이 왔을 때 한 번, 떨어뜨린 물건에 이야기 표식
+            com.rtshop.story.StoryConfig sc = com.rtshop.story.StoryConfig.get();
+            sc.intros.put("minecraft:iron_golem", com.rtshop.story.StoryConfig.defaults().get("cataclysm:ignis"));
+            boolean shown = com.rtshop.story.BossIntros.show(boss);
+            check("a story boss plays its entrance once (marked as seen)", shown && com.rtshop.story.BossIntros.seen(boss));
+            check("every story boss has an entrance and a life story (13 bosses)", com.rtshop.story.StoryConfig.defaults().size() >= 13
+                    && com.rtshop.story.StoryConfig.defaults().values().stream().allMatch(i -> !i.lore.isEmpty() && !i.name.isEmpty()));
+            sc.intros.remove("minecraft:iron_golem");
             boolean left = com.rtshop.party.Party.leave(b);
             check("a member can leave the party", left && !com.rtshop.party.Party.together(server, a.getUUID(), b.getUUID()));
         } finally {

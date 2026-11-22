@@ -41,6 +41,8 @@ public final class ClientModEvents {
                 PvpHud.render(graphics, screenWidth, screenHeight));
         event.registerAboveAll("party", (gui, graphics, partialTick, screenWidth, screenHeight) ->
                 PartyHud.render(graphics, screenWidth, screenHeight));
+        event.registerAboveAll("cinematic", (gui, graphics, partialTick, screenWidth, screenHeight) ->
+                Cinematic.render(graphics, screenWidth, screenHeight));
     }
 
     /** 별 등급과 '심기 전용' 표시를 모든 아이템 아이콘 위에 그릴 수 있게 등록한다 (표시할 것이 없으면 아무것도 그리지 않음). */

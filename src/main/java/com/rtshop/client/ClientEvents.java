@@ -144,6 +144,25 @@ public final class ClientEvents {
         ClientEconomy.bank = 0;
     }
 
+    // ------------------------------------------------------------------ 이야기 연출: 화면 흔들림, 보스 아이템 이야기
+
+    @SubscribeEvent
+    public static void onCameraAngles(net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles event) {
+        float[] s = Cinematic.shake();
+        if (s[0] != 0 || s[1] != 0) {
+            event.setYaw(event.getYaw() + s[0]);
+            event.setPitch(event.getPitch() + s[1]);
+        }
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOW)
+    public static void onLoreTooltip(ItemTooltipEvent event) {
+        try {
+            StoryClient.onTooltip(event);
+        } catch (Throwable ignored) {
+        }
+    }
+
     // ------------------------------------------------------------------ 아이템 설명
 
     @SubscribeEvent

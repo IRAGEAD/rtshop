@@ -456,6 +456,8 @@ public final class ShopServer {
     private static int cmdReload(CommandContext<CommandSourceStack> ctx) {
         NpcNames.reload();
         com.rtshop.party.PartyConfig.reload();
+        com.rtshop.story.StoryConfig.reload();
+        for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) com.rtshop.story.BossIntros.sendLore(sp);
         ShopLoader.Loaded l = reload(ctx.getSource().getServer());
         int items = 0;
         for (ShopData d : l.shops.values()) {

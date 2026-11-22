@@ -217,6 +217,18 @@ jobs:
             echo "== grep Cullable users"; grep -rl "entityculling" /tmp/nf --include=*.class | head -40
             echo "== LinkAnimation"; mkdir -p /tmp/ef && (cd /tmp/ef && unzip -q -o "$GITHUB_WORKSPACE/$EFJ" 'yesman/epicfight/api/animation/types/LinkAnimation.class' 'yesman/epicfight/api/animation/types/StaticAnimation.class') && javap -p -constants /tmp/ef/yesman/epicfight/api/animation/types/LinkAnimation.class
           } > /tmp/inspect/nightfall.txt 2>&1
+          # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
+          for pat in illusioner mowziesmobs aquamirae cataclysm; do
+            J="$(ls packcache/*.jar | grep -i "$pat" | head -1)"
+            [ -z "$J" ] && continue
+            {
+              echo "== $J"
+              unzip -l "$J" | awk '{print $4}' | grep -E "lang/en_us.json|structures?/|worldgen/|loot_tables/entities|mods.toml" | head -n 200
+              unzip -p "$J" 'META-INF/mods.toml' 2>/dev/null | grep -v "^#" | head -n 60
+              for f in $(unzip -l "$J" | awk '{print $4}' | grep -E "worldgen/structure_set/.*json|worldgen/structure/.*json" | head -n 40); do echo "---- $f"; unzip -p "$J" "$f" | head -c 1500; echo; done
+              unzip -p "$J" $(unzip -l "$J" | awk '{print $4}' | grep "lang/en_us.json" | head -1) 2>/dev/null | head -c 60000
+            } > "/tmp/inspect/mod-$pat.txt" 2>&1
+          done
           cd /tmp/inspect
           git init -q -b ci-inspect
           git config user.name "github-actions"
