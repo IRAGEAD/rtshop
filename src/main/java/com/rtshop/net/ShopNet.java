@@ -10,7 +10,7 @@ public final class ShopNet {
     private ShopNet() {
     }
 
-    private static final String PROTOCOL = "13";
+    private static final String PROTOCOL = "14";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(RtShop.MODID, "main"),
@@ -58,5 +58,7 @@ public final class ShopNet {
         CHANNEL.registerMessage(id++, ShopEditDataPacket.class, ShopEditDataPacket::encode, ShopEditDataPacket::decode, ShopEditDataPacket::handle);
         CHANNEL.registerMessage(id++, ShopEditActionPacket.class, ShopEditActionPacket::encode, ShopEditActionPacket::decode, ShopEditActionPacket::handle);
         CHANNEL.registerMessage(id++, NpcQuestPacket.class, NpcQuestPacket::encode, NpcQuestPacket::decode, NpcQuestPacket::handle);
+        CHANNEL.registerMessage(id++, PShopDataPacket.class, PShopDataPacket::encode, PShopDataPacket::decode, PShopDataPacket::handle);
+        CHANNEL.registerMessage(id++, PShopActionPacket.class, PShopActionPacket::encode, PShopActionPacket::decode, PShopActionPacket::handle);
     }
 }

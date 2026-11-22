@@ -303,6 +303,11 @@ public final class SelfTest {
             crash("gacha", t);
         }
         try {
+            playerShop(server, level, a, b, new BlockPos(gx + 6, y, gz + 6));
+        } catch (Throwable t) {
+            crash("player shop", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -3010,6 +3015,87 @@ public final class SelfTest {
             Files.writeString(p, saved, StandardCharsets.UTF_8);
             com.rtshop.gacha.GachaConfig.reload(server);
         }
+    }
+
+    /** 플레이어 상점: 주인만 올리기·관리, 다른 사람은 사기, 판 돈은 주인 예금으로, NPC 가격 비교. */
+    private static void playerShop(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b, BlockPos pos) {
+        LINES.add("");
+        LINES.add("[player shop]");
+        com.rtshop.pshop.PlayerShops.lastResult = null;
+        level.setBlock(pos.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 3);
+        level.setBlock(pos, com.rtshop.enhance.ModEnhance.PSHOP.get().defaultBlockState(), 3);
+        check("the player shop block has its block entity", level.getBlockEntity(pos) instanceof com.rtshop.pshop.PlayerShopBlockEntity);
+        if (!(level.getBlockEntity(pos) instanceof com.rtshop.pshop.PlayerShopBlockEntity be)) return;
+        be.owner = a.getUUID();
+        be.ownerName = "rtshop_test_a";
+        a.setPos(pos.getX() + 1.5, pos.getY(), pos.getZ() + 0.5);
+        b.setPos(pos.getX() - 0.5, pos.getY(), pos.getZ() + 0.5);
+        // NPC 상점에 있는 물건 하나를 골라 비교가 나오는지 본다
+        net.minecraft.world.item.Item ware = null;
+        for (com.rtshop.shop.ShopData d : ShopServer.shops().values()) {
+            for (com.rtshop.shop.ShopData.Entry e : d.entries) {
+                if (e.buyable && !e.stack.hasTag() && e.stack.getMaxStackSize() == 64) {
+                    ware = e.stack.getItem();
+                    break;
+                }
+            }
+            if (ware != null) break;
+        }
+        check("an item from an NPC shop was found for the comparison", ware != null);
+        if (ware == null) return;
+        check("NPC shops selling the item are listed with their price", com.rtshop.pshop.PlayerShops.npcPrices(new ItemStack(ware)).size() > 0);
+        a.getInventory().clearContent();
+        b.getInventory().clearContent();
+        a.getInventory().setItem(0, new ItemStack(ware, 40));
+        b.getInventory().setItem(0, new ItemStack(ware, 10));
+        // 남은 올리지 못한다
+        com.rtshop.pshop.PlayerShops.handle(b, pos, com.rtshop.pshop.PlayerShops.ADD, "{\"slot\":0,\"price\":5,\"n\":10}");
+        check("someone else cannot put items on your shop", be.listings.isEmpty() && b.getInventory().getItem(0).getCount() == 10);
+        com.rtshop.pshop.PlayerShops.handle(a, pos, com.rtshop.pshop.PlayerShops.ADD, "{\"slot\":0,\"price\":7,\"n\":30}");
+        check("the owner lists 30 items at 7G each", be.listings.size() == 1 && be.listings.get(0).stock == 30 && be.listings.get(0).price == 7
+                && a.getInventory().getItem(0).getCount() == 10, be.listings.isEmpty() ? "none" : be.listings.get(0).stock);
+        com.rtshop.economy.Economy.setWallet(a, 0);
+        EconomyData ed = EconomyData.get(server);
+        long bankBefore = ed.bank(a.getUUID());
+        com.rtshop.economy.Economy.setWallet(b, 50);
+        com.rtshop.pshop.PlayerShops.handle(b, pos, com.rtshop.pshop.PlayerShops.BUY, "{\"i\":0,\"n\":10}");
+        check("a buyer without enough money cannot buy", be.listings.get(0).stock == 30 && com.rtshop.economy.Economy.wallet(b) == 50);
+        com.rtshop.pshop.PlayerShops.handle(b, pos, com.rtshop.pshop.PlayerShops.BUY, "{\"i\":0,\"n\":5}");
+        check("buying 5 takes 35G and gives the items", com.rtshop.economy.Economy.wallet(b) == 15 && be.listings.get(0).stock == 25
+                && countOf(b, ware) == 15, com.rtshop.economy.Economy.wallet(b) + "G, " + countOf(b, ware));
+        check("the money goes to the owner's bank", ed.bank(a.getUUID()) == bankBefore + 35, ed.bank(a.getUUID()) - bankBefore);
+        com.rtshop.pshop.PlayerShops.handle(a, pos, com.rtshop.pshop.PlayerShops.BUY, "{\"i\":0,\"n\":1}");
+        check("the owner cannot buy from their own shop", be.listings.get(0).stock == 25);
+        com.rtshop.pshop.PlayerShops.handle(b, pos, com.rtshop.pshop.PlayerShops.PRICE, "{\"i\":0,\"price\":1}");
+        check("someone else cannot change the price", be.listings.get(0).price == 7);
+        com.rtshop.pshop.PlayerShops.handle(a, pos, com.rtshop.pshop.PlayerShops.PRICE, "{\"i\":0,\"price\":9}");
+        com.rtshop.pshop.PlayerShops.handle(a, pos, com.rtshop.pshop.PlayerShops.TAKE, "{\"i\":0,\"n\":5}");
+        check("the owner changes the price and takes 5 back", be.listings.get(0).price == 9 && be.listings.get(0).stock == 20 && countOf(a, ware) == 15);
+        com.rtshop.pshop.PlayerShops.handle(a, pos, com.rtshop.pshop.PlayerShops.RESTOCK, "{\"i\":0,\"n\":15}");
+        check("restocking from the bag", be.listings.get(0).stock == 35 && countOf(a, ware) == 0);
+        // 저장 후 다시 읽기
+        net.minecraft.nbt.CompoundTag tag = be.saveWithoutMetadata();
+        com.rtshop.pshop.PlayerShopBlockEntity copy = new com.rtshop.pshop.PlayerShopBlockEntity(pos, level.getBlockState(pos));
+        copy.load(tag);
+        check("the shop is saved with its owner and listings", copy.owner.equals(a.getUUID()) && copy.listings.size() == 1
+                && copy.listings.get(0).stock == 35 && copy.totalSales == 35);
+        com.rtshop.pshop.PlayerShops.handle(a, pos, com.rtshop.pshop.PlayerShops.REMOVE, "{\"i\":0}");
+        check("taking the listing down returns the stock", be.listings.isEmpty() && countOf(a, ware) == 35);
+        net.minecraftforge.event.level.BlockEvent.BreakEvent ev = new net.minecraftforge.event.level.BlockEvent.BreakEvent(level, pos, level.getBlockState(pos), b);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(ev);
+        check("someone else cannot break the shop", ev.isCanceled());
+        level.removeBlock(pos, false);
+        level.setBlock(pos.below(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+        a.getInventory().clearContent();
+        b.getInventory().clearContent();
+    }
+
+    private static int countOf(FakePlayer p, net.minecraft.world.item.Item item) {
+        int n = 0;
+        for (ItemStack s : p.getInventory().items) {
+            if (s.is(item)) n += s.getCount();
+        }
+        return n;
     }
 
     private static void gacha(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {

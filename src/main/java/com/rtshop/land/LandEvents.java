@@ -233,6 +233,9 @@ public final class LandEvents {
             return; // 구획 지팡이(OP)는 토지 위에서도 칸을 고를 수 있어야 한다
         }
         BlockPos pos = event.getPos();
+        if (level.getBlockState(pos).getBlock() instanceof com.rtshop.pshop.PlayerShopBlock && !sp.isSecondaryUseActive()) {
+            return; // 플레이어 상점은 남의 토지 위에 있어도 누구나 열어 살 수 있다 (관리·부수기는 상점이 주인만 허락)
+        }
         Land land = LandManager.guardAt(level, pos);
         boolean storage = LandManager.isStorage(level, pos);
         // 아이템 사용(블록 설치, 양동이, 부싯돌 등): 대상 칸이나 그 앞 칸이 남의 토지면 막는다

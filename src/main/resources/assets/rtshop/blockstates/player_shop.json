@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "rtshop:block/player_shop"
+    },
+    "facing=east": {
+      "model": "rtshop:block/player_shop",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "rtshop:block/player_shop",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "rtshop:block/player_shop",
+      "y": 270
+    }
+  }
+}

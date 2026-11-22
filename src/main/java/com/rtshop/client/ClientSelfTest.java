@@ -88,6 +88,10 @@ public final class ClientSelfTest {
     private static final int ENH_END = NPC_END + ENH_STEPS;
     private static final int PLOT_STEPS = 11;
     private static final int PLOT_END = ENH_END + PLOT_STEPS;
+    private static final int PS_STEPS = 8;
+    private static final int PS_END = PLOT_END + PS_STEPS;
+    private static volatile BlockPos pshopPos = null;
+    private static volatile net.minecraft.world.item.Item pshopWare = null;
     private static volatile int plotNpc = -1;
     private static volatile int boughtLot = -1;
     private static volatile BlockPos anvilPos = null;
@@ -602,6 +606,97 @@ public final class ClientSelfTest {
                 onServer(mc, sp -> {
                     var e = sp.serverLevel().getEntity(id);
                     if (e != null) e.discard();
+                });
+                wait = 10;
+            }
+        }
+    }
+
+    /** 플레이어 상점: 주인 화면(가방에서 올리기 + NPC 가격 비교), 진열, 손님 화면, 사기. */
+    private static void pshopStep(Minecraft mc, int k) {
+        PlayerShopScreen ps = mc.screen instanceof PlayerShopScreen s ? s : null;
+        switch (k) {
+            case 0 -> {
+                mc.setScreen(null);
+                onServer(mc, sp -> {
+                    net.minecraft.world.item.Item ware = null;
+                    for (ShopData d : ShopServer.shops().values()) {
+                        for (ShopData.Entry e : d.entries) {
+                            if (e.buyable && !e.stack.hasTag() && e.stack.getMaxStackSize() == 64 && e.price > 0) {
+                                ware = e.stack.getItem();
+                                break;
+                            }
+                        }
+                        if (ware != null) break;
+                    }
+                    pshopWare = ware;
+                    net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
+                    BlockPos pos = BlockPos.containing(sp.getX() + look.x * 2, sp.getY(), sp.getZ() + look.z * 2);
+                    sp.serverLevel().setBlock(pos, com.rtshop.enhance.ModEnhance.PSHOP.get().defaultBlockState()
+                            .setValue(com.rtshop.pshop.PlayerShopBlock.FACING, sp.getDirection().getOpposite()), 3);
+                    if (sp.serverLevel().getBlockEntity(pos) instanceof com.rtshop.pshop.PlayerShopBlockEntity be) {
+                        be.owner = sp.getUUID();
+                        be.ownerName = sp.getGameProfile().getName();
+                    }
+                    pshopPos = pos;
+                    if (ware != null) sp.getInventory().add(new ItemStack(ware, 48));
+                    com.rtshop.economy.Economy.setWallet(sp, 500000);
+                    com.rtshop.pshop.PlayerShops.open(sp, pos);
+                });
+                wait = 30;
+            }
+            case 1 -> {
+                check("the owner's player shop window opens", ps != null && ps.ownerForTest() && ps.fitsForTest(), mc.screen);
+                if (ps != null && pshopWare != null) ps.bagSelectForTest(pshopWare);
+                wait = 10;
+            }
+            case 2 -> {
+                check("listing from the bag shows the NPC shops that sell it", ps != null && ps.npcCountForTest() > 0, ps == null ? "none" : ps.npcCountForTest());
+                shot(mc, "90_pshop_owner_bag");
+                if (ps != null) ps.addForTest(3, 32);
+                wait = 20;
+            }
+            case 3 -> {
+                check("the owner lists 32 items", ps != null && ps.listingsForTest() == 1 && ps.stockForTest(0) == 32, ps == null ? "none" : ps.stockForTest(0));
+                if (ps != null) ps.selectForTest(0);
+                wait = 5;
+            }
+            case 4 -> {
+                shot(mc, "91_pshop_owner_stand");
+                mc.setScreen(null);
+                BlockPos pos = pshopPos;
+                onServer(mc, sp -> {
+                    if (sp.serverLevel().getBlockEntity(pos) instanceof com.rtshop.pshop.PlayerShopBlockEntity be) {
+                        be.owner = java.util.UUID.nameUUIDFromBytes("rtshop-test-shop-owner".getBytes());
+                        be.ownerName = "Merchant_Kim";
+                        be.name = "김씨네 잡화";
+                    }
+                    com.rtshop.pshop.PlayerShops.open(sp, pos);
+                });
+                wait = 20;
+            }
+            case 5 -> {
+                check("another player's shop opens as a buyer", ps != null && !ps.ownerForTest(), mc.screen);
+                if (ps != null) {
+                    ps.selectForTest(0);
+                    shot(mc, "92_pshop_buyer");
+                    ps.buyForTest(5);
+                }
+                wait = 20;
+            }
+            case 6 -> {
+                check("buying 5 lowers the stock to 27", ps != null && ps.stockForTest(0) == 27, ps == null ? "none" : ps.stockForTest(0));
+                shot(mc, "93_pshop_bought");
+                wait = 5;
+            }
+            default -> {
+                mc.setScreen(null);
+                BlockPos pos = pshopPos;
+                onServer(mc, sp -> {
+                    if (pos != null) {
+                        if (sp.serverLevel().getBlockEntity(pos) instanceof com.rtshop.pshop.PlayerShopBlockEntity be) be.listings.clear();
+                        sp.serverLevel().removeBlock(pos, false);
+                    }
                 });
                 wait = 10;
             }
@@ -1545,17 +1640,21 @@ public final class ClientSelfTest {
                     plotStep(mc, step - ENH_END - 1);
                     return;
                 }
-                if (step > PLOT_END && step <= PLOT_END + EN_STEPS) {
-                    englishStep(mc, step - PLOT_END - 1);
+                if (step > PLOT_END && step <= PS_END) {
+                    pshopStep(mc, step - PLOT_END - 1);
                     return;
                 }
-                if (step == PLOT_END + EN_STEPS + 1) {
+                if (step > PS_END && step <= PS_END + EN_STEPS) {
+                    englishStep(mc, step - PS_END - 1);
+                    return;
+                }
+                if (step == PS_END + EN_STEPS + 1) {
                     check("no server-side error happened", serverError == null, serverError);
                     finish(mc);
                     return;
                 }
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > PLOT_END + EN_STEPS + 40) {
+                if (step > PS_END + EN_STEPS + 40) {
                     done = true;
                     mc.stop();
                 }

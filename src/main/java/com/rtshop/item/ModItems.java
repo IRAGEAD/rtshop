@@ -77,4 +77,15 @@ public final class ModItems {
     public static final RegistryObject<Item> GUARD_FULL = ITEMS.register("enhance_guard_full",
             () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.EPIC), true,
                     "item.rtshop.enhance_guard_full.tip", "item.rtshop.enhance_guard.tip"));
+
+    /** 플레이어 상점 진열대 (블록). */
+    public static final RegistryObject<Item> PLAYER_SHOP = ITEMS.register("player_shop",
+            () -> new net.minecraft.world.item.BlockItem(com.rtshop.enhance.ModEnhance.PSHOP.get(), new Item.Properties()) {
+                @Override
+                public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.Level level,
+                                            java.util.List<net.minecraft.network.chat.Component> tip, net.minecraft.world.item.TooltipFlag flag) {
+                    tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.player_shop.tip1").withStyle(net.minecraft.ChatFormatting.GRAY));
+                    tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.player_shop.tip2").withStyle(net.minecraft.ChatFormatting.GRAY));
+                }
+            });
 }

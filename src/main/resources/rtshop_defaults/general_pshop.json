@@ -1,0 +1,11 @@
+{
+ "_설명": "잡화점에 덧붙이는 플레이어 상점 진열대. 이미 있는 품목은 건드리지 않습니다.",
+ "items": [
+  {
+   "item": "rtshop:player_shop",
+   "price": 5000,
+   "category": "misc",
+   "sell": false
+  }
+ ]
+}

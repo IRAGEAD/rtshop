@@ -53,6 +53,7 @@ public class RtShop {
             event.accept(ModItems.ACC_TICKET_HIGH);
             event.accept(ModItems.SHARD);
             event.accept(ModItems.ENHANCE_ANVIL);
+            event.accept(ModItems.PLAYER_SHOP);
             event.accept(ModItems.GUARD_DAMAGE);
             event.accept(ModItems.GUARD_DESTROY);
             event.accept(ModItems.GUARD_FULL);

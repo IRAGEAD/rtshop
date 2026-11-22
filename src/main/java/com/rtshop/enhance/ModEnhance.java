@@ -22,11 +22,24 @@ public final class ModEnhance {
     public static final RegistryObject<Block> ANVIL = BLOCKS.register("enhance_anvil",
             () -> new EnhanceAnvilBlock(BlockBehaviour.Properties.copy(Blocks.ANVIL)));
 
+    public static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES =
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, RtShop.MODID);
+
+    /** 플레이어 상점 진열대. */
+    public static final RegistryObject<Block> PSHOP = BLOCKS.register("player_shop",
+            () -> new com.rtshop.pshop.PlayerShopBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).strength(2.5F, 1200F).noOcclusion()));
+
+    @SuppressWarnings("DataFlowIssue")
+    public static final RegistryObject<net.minecraft.world.level.block.entity.BlockEntityType<com.rtshop.pshop.PlayerShopBlockEntity>> PSHOP_BE =
+            BLOCK_ENTITIES.register("player_shop", () -> net.minecraft.world.level.block.entity.BlockEntityType.Builder
+                    .of(com.rtshop.pshop.PlayerShopBlockEntity::new, PSHOP.get()).build(null));
+
     public static final RegistryObject<MenuType<EnhanceMenu>> MENU = MENUS.register("enhance",
             () -> new MenuType<>(EnhanceMenu::new, FeatureFlags.VANILLA_SET));
 
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);
+        BLOCK_ENTITIES.register(bus);
         MENUS.register(bus);
     }
 }
