@@ -98,6 +98,10 @@ public final class StorySeals {
     }
 
     public boolean enabled = true;
+    /** 이야기 퀘스트 보상으로만 얻는 물건: 조합법을 막는다 (봉인을 가리키는 대격변의 눈들). 그 물건을 주는 퀘스트가 있을 때만. */
+    public final List<String> rewardOnly = new ArrayList<>(List.of(
+            "cataclysm:monstrous_eye", "cataclysm:desert_eye", "cataclysm:mech_eye", "cataclysm:abyss_eye",
+            "cataclysm:void_eye", "cataclysm:cursed_eye", "cataclysm:flame_eye", "cataclysm:storm_eye"));
     public boolean partyCarry = true;
     public int carryRadius = 48;
     public final Map<String, Seal> seals = new LinkedHashMap<>();
@@ -178,6 +182,12 @@ public final class StorySeals {
                 JsonObject o = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
                 if (o.has("enabled")) c.enabled = o.get("enabled").getAsBoolean();
                 if (o.has("partyCarry")) c.partyCarry = o.get("partyCarry").getAsBoolean();
+                if (o.has("rewardOnly")) {
+                    c.rewardOnly.clear();
+                    for (JsonElement e : o.getAsJsonArray("rewardOnly")) c.rewardOnly.add(e.getAsString());
+                } else {
+                    write = true;
+                }
                 if (o.has("carryRadius")) c.carryRadius = Math.max(8, o.get("carryRadius").getAsInt());
                 if (o.has("seals")) {
                     for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("seals").entrySet()) {
@@ -217,8 +227,11 @@ public final class StorySeals {
     JsonObject toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("_help", "결계: flag 표식이 없는 사람은 bosses 의 보스에게 다가가거나 blocks 의 블록(보스 소환)을 쓸 수 없다. "
-                + "그 표식을 주는 퀘스트가 있을 때만 켜진다 (always: true 면 늘). partyCarry: 표식을 가진 파티원이 carryRadius 안에 있으면 함께 지나간다. 저장한 뒤 /rtshop reload");
+                + "그 표식을 주는 퀘스트가 있을 때만 켜진다 (always: true 면 늘). rewardOnly: 퀘스트 보상으로만 얻게 조합법을 막을 물건 (그 물건을 주는 퀘스트가 있을 때만). partyCarry: 표식을 가진 파티원이 carryRadius 안에 있으면 함께 지나간다. 저장한 뒤 /rtshop reload");
         o.addProperty("enabled", enabled);
+        JsonArray ro = new JsonArray();
+        rewardOnly.forEach(ro::add);
+        o.add("rewardOnly", ro);
         o.addProperty("partyCarry", partyCarry);
         o.addProperty("carryRadius", carryRadius);
         JsonObject s = new JsonObject();
@@ -236,6 +249,16 @@ public final class StorySeals {
             for (QuestDef.Choice ch : q.choices) {
                 if (ch.flags.contains(flag)) return true;
             }
+        }
+        return false;
+    }
+
+    /** 이 물건의 조합법을 막는가: rewardOnly 에 있고, 그 물건을 보상으로 주는 퀘스트가 있을 때 (스킬라의 폭풍의 눈처럼 아직 퀘스트가 없으면 막지 않는다). */
+    public static boolean recipeLocked(String itemId) {
+        StorySeals c = get();
+        if (!c.enabled || !c.rewardOnly.contains(itemId)) return false;
+        for (QuestDef q : QuestManager.loaded().quests.values()) {
+            for (QuestDef.ItemReward r : q.rewardItems) if (r.item.equals(itemId)) return true;
         }
         return false;
     }

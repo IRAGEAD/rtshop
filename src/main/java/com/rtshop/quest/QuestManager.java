@@ -896,6 +896,7 @@ public final class QuestManager {
         giveRewards(p, q);
         p.sendSystemMessage(Component.translatable("rtshop.quest.completed", q.title));
         scene(p, q.sceneDone);
+        if (!q.rewardFlags.isEmpty()) com.rtshop.story.StoryGates.sync(p);
         return true;
     }
 

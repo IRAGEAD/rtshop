@@ -34,6 +34,13 @@ public final class StoryClient {
             } catch (Exception ignored) {
             }
             Cinematic.play(json);
+        } else if (kind == StoryPacket.GATE) {
+            try {
+                JsonObject o = JsonParser.parseString(json).getAsJsonObject();
+                GATE_RARE = o.has("rare") ? o.get("rare").getAsString() : "";
+                GATE_EPIC = o.has("epic") ? o.get("epic").getAsString() : "";
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.LORE) {
             try {
                 JsonObject o = JsonParser.parseString(json).getAsJsonObject();
@@ -48,6 +55,20 @@ public final class StoryClient {
             } catch (Exception ignored) {
             }
         }
+    }
+
+    /** 서버가 알려 준 장비 잠금: 희귀/서사 장비를 사려면 마쳐야 하는 장 ("" = 열림). */
+    public static String GATE_RARE = "", GATE_EPIC = "";
+
+    /** 상점에서 이 장비가 잠겨 있으면 "1장" 같은 장 이름, 아니면 null (서버 StoryGates 와 같은 규칙). */
+    public static String lockedChapter(net.minecraft.world.item.ItemStack s) {
+        if (s.isEmpty() || !(s.isDamageableItem() || s.getItem() instanceof net.minecraft.world.item.ArmorItem)) return null;
+        net.minecraft.world.entity.player.Player p = net.minecraft.client.Minecraft.getInstance().player;
+        if (p != null && p.isCreative()) return null;
+        net.minecraft.world.item.Rarity r = s.getRarity();
+        if (r == net.minecraft.world.item.Rarity.EPIC && !GATE_EPIC.isEmpty()) return GATE_EPIC;
+        if ((r == net.minecraft.world.item.Rarity.RARE || r == net.minecraft.world.item.Rarity.EPIC) && !GATE_RARE.isEmpty()) return GATE_RARE;
+        return null;
     }
 
     public static void onTooltip(ItemTooltipEvent event) {

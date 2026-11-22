@@ -458,7 +458,10 @@ public final class ShopServer {
         com.rtshop.party.PartyConfig.reload();
         com.rtshop.story.StoryConfig.reload();
         com.rtshop.story.StorySeals.reload();
-        for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) com.rtshop.story.BossIntros.sendLore(sp);
+        for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+            com.rtshop.story.BossIntros.sendLore(sp);
+            com.rtshop.story.StoryGates.sync(sp);
+        }
         ShopLoader.Loaded l = reload(ctx.getSource().getServer());
         int items = 0;
         for (ShopData d : l.shops.values()) {

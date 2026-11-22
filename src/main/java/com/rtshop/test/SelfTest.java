@@ -2188,6 +2188,17 @@ public final class SelfTest {
         } finally {
             com.rtshop.story.StoryGates.applyToFakeForTest = false;
         }
+        // 봉인을 가리키는 눈은 퀘스트 보상으로만 (스킬라의 폭풍의 눈은 아직 주는 퀘스트가 없어 그대로)
+        check("the seal eyes are quest rewards only (flame eye locked, storm eye still craftable)",
+                com.rtshop.story.StorySeals.recipeLocked("cataclysm:flame_eye") && !com.rtshop.story.StorySeals.recipeLocked("cataclysm:storm_eye"));
+        if (net.minecraftforge.fml.ModList.get().isLoaded("cataclysm")) {
+            boolean craftable = false;
+            for (net.minecraft.world.item.crafting.Recipe<?> r : server.getRecipeManager().getRecipes()) {
+                ResourceLocation out = com.rtshop.rules.RecipeRules.outputId(r, server);
+                if (out != null && out.toString().equals("cataclysm:flame_eye")) craftable = true;
+            }
+            check("Cataclysm's flame eye has no crafting recipe on the server", !craftable);
+        }
         // 아바스 층을 깨면 영구 표식이 남는다 (2장 시련)
         com.rtshop.raid.AbyssWeekly.cleared(a, 2);
         check("clearing a Spiral Abyss floor leaves a lasting flag for the story", QuestManager.hasFlag(a, "abyss_floor_2"));

@@ -110,6 +110,8 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         boolean affordable = true;
         boolean fits = true;
         boolean sellable = true;
+        /** 구매 탭: 이야기 장을 마쳐야 살 수 있으면 "1장"/"2장" (아니면 null). */
+        String storyLock;
 
         Row(int index, ShopData.Entry entry, ItemStack shown, String name) {
             this.index = index;
@@ -425,6 +427,7 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
                 r.unit = e.price;
                 r.affordable = money >= e.price;
                 r.fits = InvUtil.capacity(inv, e.stack) >= 1;
+                r.storyLock = StoryClient.lockedChapter(e.stack);
                 rows.add(r);
             }
         }
@@ -807,11 +810,11 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         int pw = priceWidth(txt);
         drawPrice(g, txt, x + (CELL - pw) / 2, y + CELL - 11, priceColor(r));
 
-        boolean blocked = sellMode ? !r.sellable : !r.fits;
+        boolean blocked = sellMode ? !r.sellable : !r.fits || r.storyLock != null;
         if (blocked) {
             dim(g, x + 1, y + 1, CELL - 2, CELL - 2, 0x99403020);
             if (!sellMode) {
-                Component full = Component.translatable("rtshop.ui.full");
+                Component full = r.storyLock != null ? Component.translatable("rtshop.ui.story_lock_short", r.storyLock) : Component.translatable("rtshop.ui.full");
                 overText(g, full.getString(), x + (CELL - this.font.width(full)) / 2, y + 12, 0xFFFFC0B0);
             }
         }
@@ -833,11 +836,11 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
 
         drawPrice(g, txt, x + w - 5 - pw, y + (LIST_H - 8) / 2, priceColor(r));
 
-        boolean blocked = sellMode ? !r.sellable : !r.fits;
+        boolean blocked = sellMode ? !r.sellable : !r.fits || r.storyLock != null;
         if (blocked) {
             dim(g, x + 1, y + 1, w - 2, LIST_H - 2, 0x99403020);
             if (!sellMode) {
-                Component full = Component.translatable("rtshop.ui.full");
+                Component full = r.storyLock != null ? Component.translatable("rtshop.ui.story_lock_short", r.storyLock) : Component.translatable("rtshop.ui.full");
                 overText(g, full.getString(), x + w - 8 - this.font.width(full) - pw, y + 7, 0xFFFFC0B0);
             }
         }
@@ -905,6 +908,9 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
             }
             if (!r.fits) {
                 tip.add(Component.translatable("rtshop.msg.inv_full_buy").withStyle(ChatFormatting.RED));
+            }
+            if (r.storyLock != null) {
+                tip.add(Component.translatable("rtshop.msg.story_locked", r.storyLock).withStyle(ChatFormatting.LIGHT_PURPLE));
             }
             appendRecipe(tip, r.entry);
             tip.add(Component.translatable("rtshop.ui.hint_buy").withStyle(ChatFormatting.DARK_GRAY));
@@ -1310,6 +1316,9 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
     }
 
     private void clickRow(Row r, int button) {
+        if (!sellMode && r.storyLock != null) {
+            return; // 이야기 장을 마쳐야 살 수 있다 (툴팁에 이유)
+        }
         if (button == 0 && !hasShiftDown()) {
             openDialog(r); // 좌클릭: 수량을 직접 입력
             return;

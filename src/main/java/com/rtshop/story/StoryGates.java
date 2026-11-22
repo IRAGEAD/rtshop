@@ -32,6 +32,18 @@ public final class StoryGates {
         return null;
     }
 
+    /** 클라이언트에 잠금 상태를 알려 준다 (상점 진열대에 "1장 후" 표시). 접속·퀘스트 완료·다시 읽기 때. */
+    public static void sync(ServerPlayer p) {
+        if (p instanceof net.minecraftforge.common.util.FakePlayer || p.connection == null) return;
+        com.google.gson.JsonObject o = new com.google.gson.JsonObject();
+        String rare = enabled && !passed(p, "story_ch1_done", "story_1_8") ? "1장" : "";
+        String epic = !enabled ? "" : !passed(p, "story_ch1_done", "story_1_8") ? "1장" : !passed(p, "story_ch2_done", "story_2_10") ? "2장" : "";
+        o.addProperty("rare", rare);
+        o.addProperty("epic", epic);
+        com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
+                new com.rtshop.net.StoryPacket(com.rtshop.net.StoryPacket.GATE, o.toString()));
+    }
+
     static boolean passed(ServerPlayer p, String flag, String questId) {
         return !QuestManager.loaded().quests.containsKey(questId) || QuestManager.hasFlag(p, flag);
     }

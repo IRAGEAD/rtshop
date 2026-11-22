@@ -1145,5 +1145,6 @@
   "rtshop.qedit.hint_structure": "-> done inside the structure (e.g. minecraft:desert_pyramid, #minecraft:ruined_portal, cataclysm:*)",
   "rtshop.qedit.hint_advancement": "-> done when the advancement is earned (e.g. minecraft:nether/root)",
   "rtshop.qedit.hint_dimension": "-> done on entering the dimension (e.g. minecraft:the_nether)",
-  "rtshop.qedit.hint_flag": "-> done once the flag is held (e.g. abyss_floor_2 = Spiral Abyss floor 2)"
+  "rtshop.qedit.hint_flag": "-> done once the flag is held (e.g. abyss_floor_2 = Spiral Abyss floor 2)",
+  "rtshop.ui.story_lock_short": "After %s"
 }

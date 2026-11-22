@@ -129,7 +129,10 @@ public final class BossIntros {
     /** 접속할 때 보스 이야기 목록을 보낸다 (물건에 붙은 표식 → 이야기 줄). */
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer p) sendLore(p);
+        if (event.getEntity() instanceof ServerPlayer p) {
+            sendLore(p);
+            StoryGates.sync(p);
+        }
     }
 
     public static void sendLore(ServerPlayer p) {
