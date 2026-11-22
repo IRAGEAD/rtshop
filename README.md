@@ -206,6 +206,14 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 - **보스 바꾸기**: [문구] 탭의 `boss` 를 다른 Cataclysm 보스 ID 로 (예: `cataclysm:ender_guardian`, `cataclysm:netherite_monstrosity`, `cataclysm:the_harbinger`, `cataclysm:the_leviathan`, `cataclysm:ancient_remnant`). 입장 조건 몬스터(`requireKill`)와 문구도 함께 바꾸세요.
 - 그 밖의 명령어 (OP): `/rtshop raid` 상태 · `raid end` 강제 종료 · `raid arena build|tp` · `raid kills <플레이어> <수>` · `raid weekly reset <플레이어>`.
 
+### Spiral Abyss 주간 보상 (3.22)
+
+- Spiral Abyss 의 **층 선택 화면 왼쪽 아래**에 "주간 보상" 창이 뜹니다: I~VI 층마다 이번 주 보상(아이템과 확률, Gold)이 보이고, 이미 받은 층에는 **✔ 받음** 이 표시됩니다. 아이템에 마우스를 올리면 설명과 확률이 나옵니다.
+- **주간 목표 = 그 주에 각 층을 클리어하기.** 층을 클리어하는 순간(같이 들어간 사람 모두) 그 층의 보상을 받습니다. 층마다 주 1회이고 **매주 월요일 오전 6시**에 초기화됩니다 (Spiral Abyss 자체의 주기 초기화와는 별개).
+- **설정 (OP, 게임 안)**: `/rtshop abyss edit` → [보상] 에서 층을 고르고 **아이템을 손에 들고 [손에 든 아이템 추가]**, 개수와 **확률(%)** 변경(Shift 를 누르면 10 씩, 1% 아래는 0.05 씩), 삭제 · [수치] 층별 Gold, 초기화 요일·시각 · [문구]. [저장] 을 눌러야 적용됩니다. 파일은 `config/rtshop/abyss.json`.
+- 그 밖의 명령어 (OP): `/rtshop abyss` 상태(모드 연결 여부) · `abyss reset <플레이어>` 이번 주 기록 지우기 · `abyss clear <플레이어> <층>` 그 층 보상을 직접 지급.
+- Spiral Abyss 를 고치지 않고 진행 상태만 읽습니다. 그 모드가 크게 바뀌어 읽을 수 없게 되면 서버 로그에 알리고 자동 지급만 멈춥니다 (게임은 그대로).
+
 ### 장비 강화 (3.13)
 
 **강화 모루**(장비 상인, 8,000G)를 놓고 우클릭합니다. Cinematic Interactions 가 있으면 모루 장면(망치질)이 그대로 재생되고, 없으면 강화 창이 열립니다.
@@ -359,6 +367,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 | `enhance.json` | 강화 단계별 확률·재료·Gold, 보석 묶음, 능력치 증가율 |
 | `pvp.json` | PvP 켜기/끄기: 마을 밖 허용 여부, PvP 가능 구역·안전 구역, 전투 잠금 시간 (게임 안 `/rtshop pvp ...` 로 수정) |
 | `restaurant.json` | 식당 주인: 판매 보너스, 팔 수 있는 직업, 식품 상인의 요리 판매 여부 |
+| `abyss.json` | Spiral Abyss 주간 보상: 층별 보상·확률·Gold (게임 안 `/rtshop abyss edit`) |
 | `raid.json` | 주간 레이드: 보스·배율·조건·문구·보상·구역 위치 (게임 안 `/rtshop raid edit`) |
 
 수정 후 `/rtshop reload` 로 적용합니다. `farming.json` 은 클라이언트에도 같은 내용을 넣어야 아이템 설명이 맞게 나옵니다.
@@ -373,6 +382,9 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 | `/pvp` · `/pvp on\|off\|status` | 모두 | 내 PvP 켜기/끄기 (PvP 가능한 곳에서만 켤 수 있음) |
 | `/rtshop pvp ...` | OP | PvP 설정: `outside on\|off`, `pos1`·`pos2`·`zone add\|here\|remove\|list\|show`, `combat <초>`, `set <플레이어> on\|off` |
 | `/rtshop restaurant status\|unlock\|lock\|reset` | OP | 식당 메뉴 관리 |
+| `/rtshop npc raid` · `/rtshop npc raid_guide` | OP | 레이드 상인(티켓) · 레이드 안내인 소환 |
+| `/rtshop raid edit` · `raid arena here\|build\|tp` · `raid return here` · `raid end` | OP | 레이드 설정 편집기 · 구역 위치 · 돌아올 곳 · 강제 종료 |
+| `/rtshop abyss edit` · `abyss reset\|clear ...` | OP | Spiral Abyss 주간 보상 편집기 · 기록 관리 |
 | `/rtshop land` | 모두 | 토지 설정 화면 |
 | `/rtshop quest` | 모두 | 퀘스트 수첩 |
 | `/rtshop attendance` | 모두 | 출석부 보기 (출석은 출석 NPC 앞에서) |
