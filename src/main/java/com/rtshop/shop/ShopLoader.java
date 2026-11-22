@@ -1564,7 +1564,7 @@ public final class ShopLoader {
                     Ref ref = new Ref();
                     ref.key = key;
                     ref.category = category;
-                    ref.buy = buy;
+                    ref.buy = buy && !PricingConfig.get().notForSaleMods.contains(rl.getNamespace());
                     ref.sell = sell;
                     ref.loose = loose;
                     ref.fish = fish;

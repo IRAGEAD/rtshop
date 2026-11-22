@@ -41,6 +41,10 @@ public final class PricingConfig {
      */
     public boolean purchaseFloor = true;
     /**
+     * 보스 모드의 장비·재료는 상점이 팔지 않는다 (보스를 잡아서 얻는 것이 스토리의 보상이므로). 플레이어가 상점에 파는 것은 된다.
+     */
+    public final java.util.Set<String> notForSaleMods = new java.util.LinkedHashSet<>(java.util.List.of("cataclysm", "mowziesmobs", "aquamirae"));
+    /**
      * 손으로 만드는 요리(화로에 바로 구울 수 없는 것)의 매입가 하한에 더하는 이익: 0.10 = 재료비의 110% 이상.
      * 요리사는 여기에 직업 보너스(jobs.json 의 dishSell)가 더 붙는다.
      */
@@ -159,6 +163,10 @@ public final class PricingConfig {
                 if (o.has("defaultIngredientValue")) c.defaultIngredientValue = Math.max(0.01, o.get("defaultIngredientValue").getAsDouble());
                 if (o.has("edibleEstimateFactor")) c.edibleEstimateFactor = Math.max(0, o.get("edibleEstimateFactor").getAsDouble());
                 if (o.has("purchaseFloor")) c.purchaseFloor = o.get("purchaseFloor").getAsBoolean();
+                if (o.has("notForSaleMods") && o.get("notForSaleMods").isJsonArray()) {
+                    c.notForSaleMods.clear();
+                    for (com.google.gson.JsonElement e : o.getAsJsonArray("notForSaleMods")) c.notForSaleMods.add(e.getAsString());
+                }
                 if (o.has("handCookedMargin")) c.handCookedMargin = Math.max(0, Math.min(1, o.get("handCookedMargin").getAsDouble()));
                 if (o.has("autoListFoodIngredients")) c.autoListFoodIngredients = o.get("autoListFoodIngredients").getAsBoolean();
                 if (o.has("autoIngredientPrice")) c.autoIngredientPrice = Math.max(1, o.get("autoIngredientPrice").getAsInt());
@@ -191,6 +199,7 @@ public final class PricingConfig {
                 help.add("margins: 레시피 종류별 마진(0.05 = 5%) · labor: 조리 1회당 수고비(G) · flatExtra: 1회당 추가 원가(기본 없음)");
                 help.add("주의: 화로·조합대처럼 자동화할 수 있는 레시피 종류에 margin/labor/flatExtra 를 주면 재료를 사서 만들어 파는 것만으로 돈이 불어납니다");
                 help.add("음식 매입가 = (재료 원가 + flatExtra) × (1 + margin) + labor, 음식 판매가 = 매입가 × foodBuyMultiplier");
+                help.add("notForSaleMods: 이 모드들의 아이템은 상점이 팔지 않습니다 (보스를 잡아서 얻는 스토리 보상). 플레이어가 파는 것은 됩니다");
                 help.add("purchaseFloor 가 켜져 있으면 어떤 조리법으로 만들든 재료를 상점에서 산 값 이상으로 매입합니다");
                 help.add("defaultIngredientValue: 가격표에 없는 재료의 추정가(낮게 유지 권장) · edibleEstimateFactor: 먹을 수 있는 재료의 추정가 배율");
                 help.add("handCookedMargin: 손으로 만든 요리를 팔 때 재료비 위로 더 받는 몫 (0.10 = 10%). 화로에 바로 구울 수 있는 음식은 자동화 때문에 본전");
@@ -205,6 +214,9 @@ public final class PricingConfig {
                 o.addProperty("defaultIngredientValue", c.defaultIngredientValue);
                 o.addProperty("edibleEstimateFactor", c.edibleEstimateFactor);
                 o.addProperty("purchaseFloor", c.purchaseFloor);
+            com.google.gson.JsonArray nfs = new com.google.gson.JsonArray();
+            for (String m : c.notForSaleMods) nfs.add(m);
+            o.add("notForSaleMods", nfs);
                 o.addProperty("handCookedMargin", c.handCookedMargin);
                 o.addProperty("autoListFoodIngredients", c.autoListFoodIngredients);
                 o.addProperty("autoIngredientPrice", c.autoIngredientPrice);
