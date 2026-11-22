@@ -613,9 +613,11 @@ public final class SelfTest {
             check("a lot's land is exactly its own cells (not its bounding box), so touching lots do not overlap",
                     c1 != null && c1.mask != null && cells == t1.area() && cells < (c1.x1 - c1.x0 + 1) * (c1.z1 - c1.z0 + 1), cells);
         } finally {
-            for (LandData.Land l : new ArrayList<>(data.lands())) {
-                if (l.castle()) data.removeLand(l);
+            List<LandData.Land> gone = new ArrayList<>();
+            for (LandData.Land l : data.lands()) {
+                if (l.castle()) gone.add(l);
             }
+            gone.forEach(data::removeLand);
             data.castleInstalled = was;
         }
     }
