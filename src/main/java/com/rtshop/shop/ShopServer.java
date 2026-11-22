@@ -95,6 +95,7 @@ public final class ShopServer {
         com.rtshop.enhance.EnhanceConfig.reload();
         com.rtshop.pvp.PvpConfig.reload();
         com.rtshop.raid.RaidConfig.reload();
+        com.rtshop.raid.AbyssWeekly.reload();
         com.rtshop.pvp.Pvp.resyncAll(server);
         com.rtshop.rules.LootRules.reload();
         com.rtshop.rules.RecipeRules.reload();
@@ -409,6 +410,7 @@ public final class ShopServer {
         root.then(com.rtshop.pvp.Pvp.adminCommand());
         root.then(Restaurant.adminCommand());
         root.then(com.rtshop.raid.Raid.adminCommand());
+        root.then(com.rtshop.raid.AbyssWeekly.adminCommand());
         if (SelfTest.enabled()) {
             root.then(Commands.literal("selftest").requires(src -> src.hasPermission(4)).executes(ctx -> {
                 SelfTest.run(ctx.getSource().getServer());

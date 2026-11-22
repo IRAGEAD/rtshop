@@ -7,6 +7,8 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ "rtshop.abyss.chance": ("받을 확률 %s%%", "Chance: %s%%"),
+
  # ---- 3.21: 주간 레이드, 보상 편집기
  "item.rtshop.raid_ticket": ("레이드 참가 티켓", "Raid ticket"),
  "item.rtshop.raid_ticket.tip1": ("레이드 안내인에게 말을 걸어 주간 레이드에 들어갈 때 1장을 씁니다.", "Used (one per entry) when you enter the weekly raid through the raid guide."),

@@ -1111,5 +1111,6 @@
   "rtshop.redit.empty": "이 묶음에는 보상이 없습니다. 아이템을 손에 들고 [손에 든 아이템 추가] 를 누르세요.",
   "rtshop.redit.add_held": "손에 든 아이템 추가",
   "rtshop.redit.hint": "값을 눌러 고치고 [저장] 을 누르세요",
-  "rtshop.redit.save": "저장"
+  "rtshop.redit.save": "저장",
+  "rtshop.abyss.chance": "받을 확률 %s%%"
 }

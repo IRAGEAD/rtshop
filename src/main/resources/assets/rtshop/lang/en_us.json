@@ -1111,5 +1111,6 @@
   "rtshop.redit.empty": "No rewards in this group. Hold an item and press [Add held item].",
   "rtshop.redit.add_held": "Add held item",
   "rtshop.redit.hint": "Click a value to edit, then press [Save]",
-  "rtshop.redit.save": "Save"
+  "rtshop.redit.save": "Save",
+  "rtshop.abyss.chance": "Chance: %s%%"
 }

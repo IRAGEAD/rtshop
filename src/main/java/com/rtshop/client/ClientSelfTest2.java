@@ -500,5 +500,51 @@ final class ClientSelfTest2 {
             mc.setScreen(null);
             waitTicks(5);
         });
+
+        // ------------------------------------------------------------ Spiral Abyss 주간 보상 창 (층 선택 화면 왼쪽 아래에 그려지는 것)
+        add(mc -> {
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                com.rtshop.raid.AbyssWeekly.resetPlayer(sp);
+                com.rtshop.raid.AbyssWeekly.cleared(sp, 1);
+                com.rtshop.raid.AbyssWeekly.sendView(sp);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            check("the weekly abyss rewards arrive with the floor already cleared marked as received", RaidClient.abyss != null
+                    && RaidClient.abyss.get("mask").getAsLong() == 1 && RaidClient.abyss.getAsJsonArray("rewards").size() >= 6, RaidClient.abyss);
+            mc.setScreen(new net.minecraft.client.gui.screens.Screen(net.minecraft.network.chat.Component.literal("abyss panel")) {
+                @Override
+                public void render(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float partial) {
+                    g.fill(0, 0, this.width, this.height, 0xFF20182C);
+                    AbyssPanel.render(g, this.width, this.height, 40, this.height - 60);
+                }
+
+                @Override
+                public boolean isPauseScreen() {
+                    return false;
+                }
+            });
+            waitTicks(8);
+        });
+        add(mc -> {
+            shot(mc, "102_abyss_weekly_panel");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.raid.Raid.openEditor(sp, "abyss"));
+            waitTicks(20);
+        });
+        add(mc -> {
+            RewardEditScreen es = mc.screen instanceof RewardEditScreen x ? x : null;
+            check("the OP abyss reward editor opens (floors as groups, chance per reward)", es != null && es.id().equals("abyss") && es.rewardsForTest() >= 6, mc.screen);
+            if (es != null) es.tabForTest(2, 2);
+            waitTicks(5);
+        });
+        add(mc -> {
+            shot(mc, "102b_abyss_editor_rewards");
+            mc.setScreen(null);
+            onServer(mc, com.rtshop.raid.AbyssWeekly::resetPlayer);
+            waitTicks(5);
+        });
     }
 }

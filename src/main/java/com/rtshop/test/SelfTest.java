@@ -328,6 +328,11 @@ public final class SelfTest {
             crash("raid", t);
         }
         try {
+            abyss(server, level, a);
+        } catch (Throwable t) {
+            crash("abyss", t);
+        }
+        try {
             restaurant(server, level, a, b);
         } catch (Throwable t) {
             crash("restaurant", t);
@@ -822,6 +827,8 @@ public final class SelfTest {
         Item ticket = com.rtshop.item.ModItems.RAID_TICKET.get(), eye = com.rtshop.item.ModItems.RAID_EYE.get(), esc = com.rtshop.item.ModItems.RAID_ESCAPE.get();
         try {
             com.rtshop.raid.Raid.resetForTest(server);
+            com.rtshop.raid.Raid.TEST_PLAYERS.add(a);
+            com.rtshop.raid.Raid.TEST_PLAYERS.add(b);
             com.rtshop.raid.RaidConfig back = com.rtshop.raid.RaidConfig.parse(c.toJson());
             check("raid settings, texts and rewards survive saving and loading", back.boss.equals("minecraft:zombie") && back.healthMultiplier == 3.0
                     && back.rewards.size() == c.rewards.size() && back.text("successTitle").equals(c.text("successTitle")) && back.chanceFresh[5] == 0.05
@@ -975,6 +982,7 @@ public final class SelfTest {
             com.rtshop.raid.Raid.testRandom = null;
             com.rtshop.raid.Weekly.testClockOffset = 0;
             com.rtshop.raid.Raid.forceEnd(server);
+            com.rtshop.raid.Raid.TEST_PLAYERS.clear();
             com.rtshop.raid.Raid.resetForTest(server);
             data.of(a.getUUID()).weeklyWeek = -1;
             data.of(a.getUUID()).kills.clear();
@@ -988,6 +996,73 @@ public final class SelfTest {
             if (fileBefore != null) Files.write(file, fileBefore);
             else Files.deleteIfExists(file);
             com.rtshop.raid.RaidConfig.reload();
+        }
+    }
+
+    // ------------------------------------------------------------------ Spiral Abyss 주간 보상
+
+    private static void abyss(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("spiral abyss weekly rewards");
+        java.nio.file.Path file = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("abyss.json");
+        byte[] fileBefore = Files.exists(file) ? Files.readAllBytes(file) : null;
+        com.rtshop.raid.AbyssWeekly.Config c = com.rtshop.raid.AbyssWeekly.fresh();
+        c.gold[1] = 1234;
+        c.rewards.clear();
+        com.rtshop.raid.Reward sure = new com.rtshop.raid.Reward("floor2", 0, "minecraft:diamond", 3);
+        com.rtshop.raid.Reward half = new com.rtshop.raid.Reward("floor2", 0, "minecraft:emerald", 2);
+        half.chance = 50;
+        c.rewards.add(sure);
+        c.rewards.add(half);
+        com.rtshop.raid.AbyssWeekly.setForTest(c);
+        try {
+            clear(a);
+            com.rtshop.raid.AbyssWeekly.resetPlayer(a);
+            Economy.setWallet(a, 0);
+            com.rtshop.raid.Raid.testRandom = () -> 0.7; // 70: 확률 50% 보상은 나오지 않는다
+            boolean first = com.rtshop.raid.AbyssWeekly.cleared(a, 2);
+            check("clearing a floor pays that floor's weekly reward (Gold + items by their chance)", first && Economy.wallet(a) == 1234
+                    && count(a, s -> s.is(Items.DIAMOND)) == 3 && count(a, s -> s.is(Items.EMERALD)) == 0
+                    && com.rtshop.raid.AbyssWeekly.claimedMask(a) == 2, Economy.wallet(a) + " " + com.rtshop.raid.AbyssWeekly.claimedMask(a));
+            boolean again = com.rtshop.raid.AbyssWeekly.cleared(a, 2);
+            check("...only once a week per floor, and the list sent to the screen marks it as received", !again && Economy.wallet(a) == 1234
+                    && com.rtshop.raid.AbyssWeekly.view(a).get("mask").getAsLong() == 2
+                    && com.rtshop.raid.AbyssWeekly.view(a).getAsJsonArray("rewards").size() == 2);
+            com.rtshop.raid.Weekly.testClockOffset += 8L * 24 * 3600 * 1000;
+            com.rtshop.raid.Raid.testRandom = () -> 0.2;
+            boolean nextWeek = com.rtshop.raid.AbyssWeekly.claimedMask(a) == 0 && com.rtshop.raid.AbyssWeekly.cleared(a, 2);
+            check("after the Monday 06:00 reset the reward can be earned again", nextWeek && Economy.wallet(a) == 2468 && count(a, s -> s.is(Items.EMERALD)) == 2);
+            com.rtshop.raid.Weekly.testClockOffset = 0;
+            // 편집기
+            com.rtshop.raid.RewardEditor.Target target = com.rtshop.raid.RewardEditor.TARGETS.get("abyss");
+            com.google.gson.JsonObject model = target.model(a);
+            com.google.gson.JsonObject edited = new com.google.gson.JsonObject();
+            edited.addProperty("id", "abyss");
+            com.google.gson.JsonObject ef = new com.google.gson.JsonObject();
+            ef.addProperty("gold0", "999");
+            edited.add("fields", ef);
+            com.google.gson.JsonArray er = new com.google.gson.JsonArray();
+            com.rtshop.raid.Reward nr = new com.rtshop.raid.Reward("floor6", 0, "minecraft:nether_star", 1);
+            nr.chance = 0.5;
+            er.add(nr.toJson());
+            edited.add("rewards", er);
+            target.apply(a, edited);
+            com.rtshop.raid.AbyssWeekly.Config now = com.rtshop.raid.AbyssWeekly.config();
+            check("the in-game editor sets each floor's rewards, their chance and the Gold", model.getAsJsonArray("groups").size() == 6
+                    && now.gold[0] == 999 && now.gold[1] == 1234 && now.rewards.size() == 1 && now.rewards.get(0).chance == 0.5
+                    && now.floor(6).size() == 1, now.gold[0] + " " + now.rewards.size());
+            check("the abyss commands exist", !server.getCommands().getDispatcher().parse("rtshop abyss edit", server.createCommandSourceStack()).getReader().canRead());
+            info("spiral abyss detected: " + com.rtshop.raid.AbyssWeekly.detected());
+            if (net.minecraftforge.fml.ModList.get().isLoaded("spiral_abyss")) {
+                check("Spiral Abyss is installed and its progress can be read (floor clears are detected)", com.rtshop.raid.AbyssWeekly.detected());
+            }
+        } finally {
+            com.rtshop.raid.Raid.testRandom = null;
+            com.rtshop.raid.Weekly.testClockOffset = 0;
+            com.rtshop.raid.AbyssWeekly.resetPlayer(a);
+            clear(a);
+            if (fileBefore != null) Files.write(file, fileBefore);
+            else Files.deleteIfExists(file);
+            com.rtshop.raid.AbyssWeekly.reload();
         }
     }
 

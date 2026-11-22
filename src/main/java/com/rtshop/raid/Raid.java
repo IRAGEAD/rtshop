@@ -114,6 +114,9 @@ public final class Raid {
         });
     }
 
+    /** 점검용: 접속자 목록에 없는 시험용 플레이어도 구역 안 사람으로 센다. */
+    public static final List<ServerPlayer> TEST_PLAYERS = new ArrayList<>();
+
     public static int state() {
         return state;
     }
@@ -150,6 +153,9 @@ public final class Raid {
         List<ServerPlayer> out = new ArrayList<>();
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
             if (inArena(p)) out.add(p);
+        }
+        for (ServerPlayer p : TEST_PLAYERS) {
+            if (inArena(p) && !out.contains(p)) out.add(p);
         }
         return out;
     }
@@ -897,6 +903,7 @@ public final class Raid {
                     say(p, "저장하지 못했습니다: " + e.getMessage(), ChatFormatting.RED);
                 }
             }
+            case AbyssWeekly.ACT_VIEW -> AbyssWeekly.sendView(p);
             default -> {
             }
         }

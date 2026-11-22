@@ -95,6 +95,27 @@ public final class ClientEvents {
         }
     }
 
+    /** Spiral Abyss 층 선택 화면: 열릴 때 주간 보상 정보를 받아 오고, 화면 왼쪽 아래에 그린다. */
+    @SubscribeEvent
+    public static void onAbyssScreenInit(ScreenEvent.Init.Post event) {
+        if (AbyssPanel.isFloorScreen(event.getScreen())) {
+            try {
+                AbyssPanel.request();
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onAbyssScreenRender(ScreenEvent.Render.Post event) {
+        if (AbyssPanel.isFloorScreen(event.getScreen())) {
+            try {
+                AbyssPanel.render(event.getGuiGraphics(), event.getScreen().width, event.getScreen().height, event.getMouseX(), event.getMouseY());
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
         if (event.getScreen() instanceof AbstractContainerScreen<?> acs) {
@@ -107,6 +128,7 @@ public final class ClientEvents {
         ClientLand.clear();
         ClientQuestHud.clear();
         PvpHud.clear();
+        RaidClient.abyss = null;
         ClientEconomy.wallet = 0;
         ClientEconomy.bank = 0;
     }
