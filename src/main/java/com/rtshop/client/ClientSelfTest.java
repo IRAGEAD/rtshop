@@ -921,6 +921,16 @@ public final class ClientSelfTest {
             case 0 -> wait = 100; // 월드가 다 뜰 때까지
             case 1 -> {
                 onServer(mc, sp -> {
+                    // 시험 중에 밤이 되어 몬스터에게 죽지 않도록: 낮으로 고정, 몬스터 안 생김, 무적
+                    sp.serverLevel().setDayTime(1000);
+                    sp.server.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DAYLIGHT).set(false, sp.server);
+                    sp.server.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING).set(false, sp.server);
+                    sp.getAbilities().invulnerable = true;
+                    sp.onUpdateAbilities();
+                    for (net.minecraft.world.entity.Entity e : sp.serverLevel().getEntities(sp, sp.getBoundingBox().inflate(64),
+                            e -> e instanceof net.minecraft.world.entity.monster.Enemy)) {
+                        e.discard();
+                    }
                     sp.getInventory().clearContent();
                     Economy.setWallet(sp, 128_450);
                     EconomyData.get(sp.server).setBank(sp.getUUID(), 300_000);
