@@ -419,7 +419,7 @@ public final class Attendance {
 
     /** 설정의 NPC 이름이 바뀌었으면 이미 세워 둔 출석 NPC 이름도 바꾼다. */
     private static void renameNpcs(MinecraftServer server) {
-        String name = AttendanceConfig.get().npcName;
+        String name = com.rtshop.shop.NpcNames.display("attendance", AttendanceConfig.get().npcName);
         for (ServerLevel level : server.getAllLevels()) {
             for (Entity e : level.getAllEntities()) {
                 if (e.getTags().contains(NPC_TAG) && (e.getCustomName() == null || !e.getCustomName().getString().equals(name))) {

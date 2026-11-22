@@ -3844,7 +3844,7 @@ public final class SelfTest {
         level.getChunkAt(at);
         net.minecraft.world.entity.npc.Villager v = ShopServer.spawnNpc(level, Vec3.atBottomCenterOf(at), 0, "attendance");
         check("the attendance NPC can be placed with /rtshop npc attendance", v != null && v.getTags().contains(com.rtshop.attendance.Attendance.NPC_TAG)
-                && v.getCustomName() != null && v.getCustomName().getString().equals(c.npcName));
+                && v.getCustomName() != null && v.getCustomName().getString().equals(com.rtshop.shop.NpcNames.display("attendance", c.npcName)));
         check("the attendance NPC also takes part in quests", v != null && "attendance".equals(QuestManager.npcKey(v)));
         if (v != null) {
             v.discard();
