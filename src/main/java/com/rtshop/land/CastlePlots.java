@@ -42,7 +42,7 @@ import net.minecraft.tags.BlockTags;
 import java.util.List;
 
 /**
- * 성 안 토지 (아모노스 맵): 성벽 안쪽 바깥 둘레를 16×16 토지로 나눈 목록(rtshop_defaults/castle_plots.json)을 구획으로 등록하고,
+ * 성 안 토지 (아모노스 맵): 성 안 네 구역을 약 256블록짜리 토지로 빈틈 없이 나눈 목록(rtshop_defaults/castle_plots.json)을 구획으로 등록하고,
  * 처음 팔릴 때 그 자리를 평지로 만든다.
  *  - 길·물·성벽 칸은 처음부터 토지에서 빠져 있어서 건드리지 않는다.
  *  - 건물이 여러 칸에 걸쳐 있으면(같은 group) 그 칸들을 함께 평지로 만든다 (그 칸들은 아직 아무도 사지 않은 상태).
@@ -52,8 +52,9 @@ public final class CastlePlots {
     private CastlePlots() {
     }
 
-    /** 2: 네모 반듯한 토지 26칸 + 성 영역. */
-    public static final int VERSION = 2;
+    /** 2: 네모 반듯한 토지 26칸 + 성 영역. 3: 주인이 지도에 표시한 네 구역(A~D)의 13칸만 (예전 칸은 주인이 없으면 지운다).
+     * 4: 네 구역을 빈틈 없이 나눈 24칸 (네모가 아닌 칸 모양, 칸마다 약 256블록, 서로 맞닿음). */
+    public static final int VERSION = 4;
     /** 지면 위로 비우는 높이. */
     public static final int CLEAR_UP = 64;
 
@@ -73,13 +74,15 @@ public final class CastlePlots {
     public static final class Tile {
         public int no, x0, z0, w = 16, h = 16, ground;
         public final List<Obj> objects = new ArrayList<>();
+        /** 칸 모양 (비트 = dz * w + dx). null = 네모 전체. */
+        public java.util.BitSet mask;
 
         public boolean has(int dx, int dz) {
-            return dx >= 0 && dx < w && dz >= 0 && dz < h;
+            return dx >= 0 && dx < w && dz >= 0 && dz < h && (mask == null || mask.get(dz * w + dx));
         }
 
         public int area() {
-            return w * h;
+            return mask == null ? w * h : mask.cardinality();
         }
     }
 
@@ -141,6 +144,9 @@ public final class CastlePlots {
                         tile.w = t.has("w") ? t.get("w").getAsInt() : 16;
                         tile.h = t.has("h") ? t.get("h").getAsInt() : 16;
                         tile.ground = t.get("ground").getAsInt();
+                        if (t.has("mask")) {
+                            tile.mask = PlotBrowser.unpackMask(t.get("mask").getAsString());
+                        }
                         if (t.has("objects")) {
                             for (JsonElement oe : t.getAsJsonArray("objects")) {
                                 JsonArray a = oe.getAsJsonArray();
@@ -170,7 +176,15 @@ public final class CastlePlots {
     }
 
     public static String name(int no) {
-        return "성 안 토지 " + no;
+        return "성 안 토지 " + label(no);
+    }
+
+    /** 3판부터의 번호: 백의 자리 = 구역(1 북서 A, 2 북동 B, 3 남서 C, 4 남 D), 나머지 = 그 구역 안의 순서. 예전 번호(1~99)는 그대로. */
+    public static String label(int no) {
+        if (no >= 100 && no < 2700) {
+            return (char) ('A' + no / 100 - 1) + "-" + (no % 100);
+        }
+        return Integer.toString(no);
     }
 
     public static long price(Tile t) {
@@ -260,17 +274,30 @@ public final class CastlePlots {
         }
     }
 
-    /** 예전(1판) 배치: 아직 안 팔린 칸은 지우고 새 배치를 넣는다. {새로 넣은 수, 남긴 예전 칸 수}. */
+    /**
+     * 예전 배치에서 새 배치로: 주인이 없는 예전 칸은 모두 지우고(새 목록에 없는 번호) 새 배치를 넣는다.
+     * 샀다가 돌려줘서 평지가 된 채 비어 있는 칸은, 저장해 둔 처음 모습으로 되돌린 뒤 지운다.
+     * 주인이 있는 칸은 그대로 둔다 (산 사람의 땅을 지우지 않는다). {새로 넣은 수, 남긴 예전 칸 수}.
+     */
     public static int[] upgrade(MinecraftServer server) {
         LandData data = LandData.get(server);
         List<Land> rm = new ArrayList<>();
         int kept = 0;
         for (Land l : data.lands()) {
             if (!l.castle()) continue;
-            if (l.forSale() && !l.cleared) rm.add(l);
+            if (l.forSale()) rm.add(l);
             else kept++;
         }
-        rm.forEach(data::removeLand);
+        for (Land l : rm) {
+            if (l.cleared) {
+                try {
+                    restore(server, l);
+                } catch (Exception e) {
+                    RtShop.LOGGER.warn("[rtshop] 성 안 토지 {} 의 처음 모습을 되돌리지 못했습니다", l.name, e);
+                }
+            }
+            data.removeLand(l);
+        }
         int[] r = install(server);
         return new int[]{r[0], kept};
     }
@@ -288,7 +315,20 @@ public final class CastlePlots {
                 skipped++;
                 continue;
             }
-            if (!data.claimsNear(dim, t.x0, minY, t.z0, t.x0 + t.w - 1, maxY, t.z0 + t.h - 1, 0).isEmpty()) {
+            boolean taken = false;
+            for (Claim o : data.claimsNear(dim, t.x0, minY, t.z0, t.x0 + t.w - 1, maxY, t.z0 + t.h - 1, 0)) {
+                // 칸 단위로 본다 (맞닿은 이웃 토지는 네모 범위가 겹쳐도 칸은 겹치지 않는다)
+                for (int dz = 0; dz < t.h && !taken; dz++) {
+                    for (int dx = 0; dx < t.w; dx++) {
+                        if (t.has(dx, dz) && o.hasColumn(t.x0 + dx, t.z0 + dz)) {
+                            taken = true;
+                            break;
+                        }
+                    }
+                }
+                if (taken) break;
+            }
+            if (taken) {
                 dropped++; // 빈 구멍이 생기지 않게 칸째로 뺀다
                 continue;
             }
@@ -299,7 +339,7 @@ public final class CastlePlots {
             c.z0 = t.z0;
             c.x1 = t.x0 + t.w - 1;
             c.z1 = t.z0 + t.h - 1;
-            c.mask = null;
+            c.mask = t.mask == null ? null : (java.util.BitSet) t.mask.clone();
             // 높이: 일반 토지 문서와 같다 (발밑 깊이 depthBelowFeet ~ 월드 꼭대기)
             c.y0 = Math.max(minY, t.ground + 1 - cfg.depthBelowFeet);
             c.y1 = maxY;
@@ -331,6 +371,11 @@ public final class CastlePlots {
         data.castleInstalled = -1;
         data.touch();
         return new int[]{rm.size(), kept};
+    }
+
+    /** 이 세계에 성 영역이 있는가 (성 안 토지를 넣은 세계). 건축 보호 설정과 상관없이 PvP 안전 구역 판단에 쓴다. */
+    public static boolean zoneKnown(MinecraftServer server) {
+        return server != null && LandData.get(server).castleInstalled > 0 && def().zone.length >= 3;
     }
 
     /** 성 영역 보호가 켜져 있는가 (이 세계에 성 안 토지를 넣었을 때만). */
@@ -516,7 +561,25 @@ public final class CastlePlots {
         tpl.load(level.holderLookup(Registries.BLOCK), tag);
         int[] o = tag.getIntArray("rtshop_origin");
         BlockPos origin = new BlockPos(o[0], o[1], o[2]);
-        tpl.placeInWorld(level, origin, origin, new StructurePlaceSettings(), level.getRandom(), Block.UPDATE_CLIENTS);
+        // 저장한 모습은 네모 범위 전체지만, 이 토지의 칸만 되돌린다 (맞닿은 이웃 토지는 건드리지 않는다)
+        final Claim own = PlotManager.plotClaim(l);
+        StructurePlaceSettings settings = new StructurePlaceSettings();
+        if (own != null && own.mask != null) {
+            settings.addProcessor(new net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor() {
+                @Override
+                public StructureTemplate.StructureBlockInfo processBlock(net.minecraft.world.level.LevelReader lr, BlockPos a, BlockPos b,
+                                                                         StructureTemplate.StructureBlockInfo raw, StructureTemplate.StructureBlockInfo placed,
+                                                                         StructurePlaceSettings s) {
+                    return own.hasColumn(placed.pos().getX(), placed.pos().getZ()) ? placed : null;
+                }
+
+                @Override
+                protected net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType<?> getType() {
+                    return net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType.NOP;
+                }
+            });
+        }
+        tpl.placeInWorld(level, origin, origin, settings, level.getRandom(), Block.UPDATE_CLIENTS);
         Path rf = removedFile(server, l);
         if (Files.exists(rf)) {
             LandData data = LandData.get(server);

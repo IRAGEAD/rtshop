@@ -313,6 +313,16 @@ public final class SelfTest {
             crash("player shop", t);
         }
         try {
+            pvp(server, level, a, b);
+        } catch (Throwable t) {
+            crash("pvp", t);
+        }
+        try {
+            restaurant(server, level, a, b);
+        } catch (Throwable t) {
+            crash("restaurant", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -364,27 +374,89 @@ public final class SelfTest {
     private static void castle(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
         section("castle lots");
         com.rtshop.land.CastlePlots.Def d = com.rtshop.land.CastlePlots.def();
-        boolean overlap = false, squareish = true;
+        // 4판: 예전 번호(1~34)는 모두 없어지고, 주인이 표시한 네 구역(A~D)을 빈틈 없이 나눈 칸 모양 토지 (칸마다 약 256블록, 서로 맞닿음)
+        boolean overlap = false, sized = true, inside = true, connected = true, whiteClear = true;
         java.util.Set<Integer> nos = new java.util.HashSet<>();
+        java.util.Set<Long> allCells = new java.util.HashSet<>();
+        double[][] white = {{-24322.7, -5526.0, 5.6}, {-24306.2, -5512.5, 9.5}}; // 건드리지 말라고 표시한 두 건물 (흰 원)
+        int touching = 0;
         for (com.rtshop.land.CastlePlots.Tile t : d.tiles) {
             nos.add(t.no);
-            if (Math.max(t.w, t.h) > Math.min(t.w, t.h) * 1.4 + 0.01 || Math.min(t.w, t.h) < 9) squareish = false;
-            for (com.rtshop.land.CastlePlots.Tile u : d.tiles) {
-                if (t != u && t.x0 < u.x0 + u.w && u.x0 < t.x0 + t.w && t.z0 < u.z0 + u.h && u.z0 < t.z0 + t.h) overlap = true;
+            if (t.area() < 225 || t.area() > 285) sized = false;
+            java.util.Set<Long> mine = new java.util.HashSet<>();
+            for (int dz = 0; dz < t.h; dz++) {
+                for (int dx = 0; dx < t.w; dx++) {
+                    if (!t.has(dx, dz)) continue;
+                    int x = t.x0 + dx, z = t.z0 + dz;
+                    long k = ((long) x << 32) ^ (z & 0xffffffffL);
+                    mine.add(k);
+                    if (!allCells.add(k)) overlap = true;
+                    if (!com.rtshop.land.CastlePlots.inZone(x, z)) inside = false;
+                    for (double[] wcirc : white) {
+                        if (Math.hypot(x + 0.5 - wcirc[0], z + 0.5 - wcirc[1]) <= wcirc[2] + 1) whiteClear = false;
+                    }
+                }
             }
+            for (com.rtshop.land.CastlePlots.Obj o : t.objects) {
+                for (double[] wcirc : white) {
+                    if (Math.hypot(o.x + 0.5 - wcirc[0], o.z + 0.5 - wcirc[1]) <= wcirc[2]) whiteClear = false;
+                }
+            }
+            // 한 덩어리인가
+            java.util.ArrayDeque<Long> q = new java.util.ArrayDeque<>();
+            java.util.Set<Long> seen = new java.util.HashSet<>();
+            if (!mine.isEmpty()) {
+                long s0 = mine.iterator().next();
+                q.add(s0);
+                seen.add(s0);
+            }
+            while (!q.isEmpty()) {
+                long k = q.poll();
+                int x = (int) (k >> 32), z = (int) k;
+                long[] ns = {((long) (x + 1) << 32) ^ (z & 0xffffffffL), ((long) (x - 1) << 32) ^ (z & 0xffffffffL),
+                        ((long) x << 32) ^ ((z + 1) & 0xffffffffL), ((long) x << 32) ^ ((z - 1) & 0xffffffffL)};
+                for (long n : ns) {
+                    if (mine.contains(n) && seen.add(n)) q.add(n);
+                }
+            }
+            if (seen.size() != mine.size()) connected = false;
         }
-        boolean removed = java.util.stream.IntStream.of(12, 13, 14, 15, 16, 19, 22).noneMatch(nos::contains);
-        check("castle lots: listed numbers removed (12,13,14,15,16,19,22), every lot a near-square rectangle, none overlapping",
-                removed && squareish && !overlap && d.tiles.size() >= 24, d.tiles.size() + " " + squareish + " " + overlap);
+        for (com.rtshop.land.CastlePlots.Tile t : d.tiles) {
+            boolean touch = false;
+            for (int dz = 0; dz < t.h && !touch; dz++) {
+                for (int dx = 0; dx < t.w && !touch; dx++) {
+                    if (!t.has(dx, dz)) continue;
+                    int x = t.x0 + dx, z = t.z0 + dz;
+                    for (int[] nb : new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+                        long k = ((long) (x + nb[0]) << 32) ^ ((z + nb[1]) & 0xffffffffL);
+                        if (allCells.contains(k) && !t.has(dx + nb[0], dz + nb[1])) touch = true;
+                    }
+                }
+            }
+            if (touch) touching++;
+        }
+        boolean removed = nos.stream().allMatch(n -> n >= 101 && n < 500);
+        check("castle lots v4: only the new lots (A~D), each about 256 blocks and in one piece, inside the castle zone, no cell shared",
+                removed && sized && inside && connected && !overlap && d.tiles.size() >= 20,
+                d.tiles.size() + " " + removed + " " + sized + " " + inside + " " + connected + " " + overlap);
+        check("the lots fill their areas without gaps: every lot touches a neighbour", touching == d.tiles.size(), touching + "/" + d.tiles.size());
+        check("no lot (and nothing a lot removes) touches the two buildings marked to be left alone", whiteClear);
+        check("lots are named by area: 101 -> A-1, 304 -> C-4", com.rtshop.land.CastlePlots.label(101).equals("A-1")
+                && com.rtshop.land.CastlePlots.label(304).equals("C-4") && com.rtshop.land.CastlePlots.label(7).equals("7"));
         check("the castle zone polygon covers the city and the farmland but not across the river",
                 com.rtshop.land.CastlePlots.inZone(-24360, -5420) && com.rtshop.land.CastlePlots.inZone(-24200, -5350)
                         && com.rtshop.land.CastlePlots.inZone(-24500, -5460) && !com.rtshop.land.CastlePlots.inZone(-24360, -5650)
                         && !com.rtshop.land.CastlePlots.inZone(-24650, -5400) && !com.rtshop.land.CastlePlots.inZone(-24350, -5100));
-        long full = com.rtshop.land.CastlePlots.price(com.rtshop.land.CastlePlots.tile(1));
-        com.rtshop.land.CastlePlots.Tile small = null;
-        for (com.rtshop.land.CastlePlots.Tile t : d.tiles) if (small == null || t.area() < small.area()) small = t;
-        check("a full castle lot costs castlePlotPrice; smaller lots cost less",
-                full == LandConfig.get().castlePlotPrice && com.rtshop.land.CastlePlots.price(small) < full, full + " / " + com.rtshop.land.CastlePlots.price(small));
+        com.rtshop.land.CastlePlots.Tile fullTile = new com.rtshop.land.CastlePlots.Tile();
+        long full = com.rtshop.land.CastlePlots.price(fullTile);
+        com.rtshop.land.CastlePlots.Tile small = null, large = null;
+        for (com.rtshop.land.CastlePlots.Tile t : d.tiles) {
+            if (small == null || t.area() < small.area()) small = t;
+            if (large == null || t.area() > large.area()) large = t;
+        }
+        check("a 256-block castle lot costs castlePlotPrice; the price follows the number of blocks",
+                full == LandConfig.get().castlePlotPrice && com.rtshop.land.CastlePlots.price(small) < full
+                        && com.rtshop.land.CastlePlots.price(large) > full, full + " / " + com.rtshop.land.CastlePlots.price(small));
         LandData data = LandData.get(server);
         boolean anyCastle = false;
         for (LandData.Land l : data.lands()) if (l.castle()) anyCastle = true;
@@ -508,6 +580,238 @@ public final class SelfTest {
                 }
                 data.removeLand(l);
             }
+        }
+
+        // 3판으로 올리기: 주인 없는 예전 칸은 지우고, 주인 있는 칸은 남기고, 새 칸을 넣는다
+        int was = data.castleInstalled;
+        LandData.Land oldFree = testLot(data, dim, 7, 5000, 5000, 100);
+        LandData.Land oldOwned = testLot(data, dim, 8, 5040, 5000, 100);
+        oldOwned.owner = b.getUUID();
+        data.castleInstalled = 2;
+        try {
+            int[] up = com.rtshop.land.CastlePlots.upgrade(server);
+            int fresh = 0;
+            boolean oldGone = true, ownedKept = false;
+            for (LandData.Land l : data.lands()) {
+                if (!l.castle()) continue;
+                if (l.castleNo >= 100) fresh++;
+                if (l.castleNo == 7) oldGone = false;
+                if (l.castleNo == 8 && l.owner.equals(b.getUUID())) ownedKept = true;
+            }
+            check("moving to the new castle layout removes ownerless old lots, keeps owned ones and adds the new lots",
+                    oldGone && ownedKept && fresh == d.tiles.size() && up[0] == d.tiles.size() && up[1] == 1
+                            && data.castleInstalled == com.rtshop.land.CastlePlots.VERSION, fresh + " " + up[0] + "/" + up[1] + " " + oldGone + " " + ownedKept);
+            LandData.Land a1 = com.rtshop.land.CastlePlots.landOf(data, 101);
+            check("new lots are named by area (성 안 토지 A-1) and are for sale", a1 != null && a1.forSale() && a1.name.equals("성 안 토지 A-1"),
+                    a1 == null ? null : a1.name);
+            LandData.Claim c1 = a1 == null ? null : PlotManager.plotClaim(a1);
+            com.rtshop.land.CastlePlots.Tile t1 = com.rtshop.land.CastlePlots.tile(101);
+            int cells = 0;
+            if (c1 != null) {
+                for (int x = c1.x0; x <= c1.x1; x++) for (int z = c1.z0; z <= c1.z1; z++) if (c1.hasColumn(x, z)) cells++;
+            }
+            check("a lot's land is exactly its own cells (not its bounding box), so touching lots do not overlap",
+                    c1 != null && c1.mask != null && cells == t1.area() && cells < (c1.x1 - c1.x0 + 1) * (c1.z1 - c1.z0 + 1), cells);
+        } finally {
+            for (LandData.Land l : new ArrayList<>(data.lands())) {
+                if (l.castle()) data.removeLand(l);
+            }
+            data.castleInstalled = was;
+        }
+    }
+
+    // ------------------------------------------------------------------ PvP 켜기/끄기
+
+    private static void pvp(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
+        section("pvp toggle");
+        com.rtshop.pvp.PvpConfig cfg = new com.rtshop.pvp.PvpConfig();
+        com.rtshop.pvp.PvpConfig.setForTest(cfg);
+        LandData data = LandData.get(server);
+        int installedBefore = data.castleInstalled;
+        try {
+            com.rtshop.pvp.Pvp.forgetForTest(a);
+            com.rtshop.pvp.Pvp.forgetForTest(b);
+            a.setPos(700.5, 100, 700.5);
+            b.setPos(703.5, 100, 700.5);
+            check("by default there is no PvP anywhere: PvP cannot be turned on outside a PvP zone",
+                    com.rtshop.pvp.Pvp.area(a) == com.rtshop.pvp.Pvp.AREA_OFF && !com.rtshop.pvp.Pvp.set(a, true, false) && !com.rtshop.pvp.Pvp.on(a)
+                            && "rtshop.pvp.hit_area".equals(com.rtshop.pvp.Pvp.denyReason(a, b)));
+            com.rtshop.pvp.PvpConfig.Zone zone = new com.rtshop.pvp.PvpConfig.Zone();
+            zone.name = "arena";
+            zone.dim = com.rtshop.pvp.Pvp.dim(level);
+            zone.x0 = 690;
+            zone.x1 = 710;
+            zone.z0 = 690;
+            zone.z1 = 710;
+            cfg.zones.add(zone);
+            check("inside a PvP zone PvP can be turned on; hits need both players on",
+                    com.rtshop.pvp.Pvp.area(a) == com.rtshop.pvp.Pvp.AREA_ZONE && "rtshop.pvp.hit_self_off".equals(com.rtshop.pvp.Pvp.denyReason(a, b))
+                            && com.rtshop.pvp.Pvp.set(a, true, false) && com.rtshop.pvp.Pvp.on(a)
+                            && "rtshop.pvp.hit_other_off".equals(com.rtshop.pvp.Pvp.denyReason(a, b))
+                            && com.rtshop.pvp.Pvp.set(b, true, false) && com.rtshop.pvp.Pvp.denyReason(a, b) == null
+                            && com.rtshop.pvp.Pvp.denyReason(b, a) == null);
+            com.rtshop.pvp.Pvp.combat(a);
+            boolean lockedOff = !com.rtshop.pvp.Pvp.set(a, false, false) && com.rtshop.pvp.Pvp.on(a) && com.rtshop.pvp.Pvp.lockSeconds(a) > 0;
+            com.rtshop.pvp.Pvp.testClockOffset += (cfg.combatSeconds + 1) * 1000L;
+            check("PvP cannot be turned off during combat, only after the combat lock",
+                    lockedOff && com.rtshop.pvp.Pvp.lockSeconds(a) == 0 && com.rtshop.pvp.Pvp.set(a, false, false) && !com.rtshop.pvp.Pvp.on(a));
+            com.rtshop.pvp.Pvp.testClockOffset += 5000;
+            com.rtshop.pvp.Pvp.set(a, true, false);
+            // 화살·길들인 동물도 쏜 사람·주인의 공격으로 친다
+            net.minecraft.world.entity.projectile.Arrow arrow = new net.minecraft.world.entity.projectile.Arrow(level, a);
+            net.minecraft.world.entity.animal.Wolf wolf = net.minecraft.world.entity.EntityType.WOLF.create(level);
+            check("arrows count as their shooter's attack",
+                    com.rtshop.pvp.Pvp.attackerOf(level.damageSources().arrow(arrow, a), server) == a
+                            && com.rtshop.pvp.Pvp.attackerOf(level.damageSources().playerAttack(b), server) == b
+                            && wolf != null && com.rtshop.pvp.Pvp.attackerOf(level.damageSources().mobAttack(wolf), server) == null);
+            // 구역을 벗어나면 저절로 꺼진다
+            a.setPos(900.5, 100, 900.5);
+            com.rtshop.pvp.Pvp.tick(a);
+            check("leaving the PvP zone turns PvP off by itself", !com.rtshop.pvp.Pvp.on(a) && com.rtshop.pvp.Pvp.area(a) == com.rtshop.pvp.Pvp.AREA_OFF);
+            // 마을 밖 PvP 를 켜면 구역 밖에서도 가능
+            cfg.outside = true;
+            com.rtshop.pvp.Pvp.testClockOffset += 5000;
+            check("with 'outside' on, PvP can be turned on anywhere outside safe zones",
+                    com.rtshop.pvp.Pvp.area(a) == com.rtshop.pvp.Pvp.AREA_WILD && com.rtshop.pvp.Pvp.set(a, true, false) && com.rtshop.pvp.Pvp.denyReason(a, b) == null);
+            // 안전 구역: 누구도 PvP 불가, 들어가면 꺼진다
+            com.rtshop.pvp.PvpConfig.Zone safe = new com.rtshop.pvp.PvpConfig.Zone();
+            safe.name = "town";
+            safe.dim = zone.dim;
+            safe.x0 = 890;
+            safe.x1 = 910;
+            safe.z0 = 890;
+            safe.z1 = 910;
+            safe.safe = true;
+            cfg.zones.add(safe);
+            boolean safeHit = "rtshop.pvp.hit_safe".equals(com.rtshop.pvp.Pvp.denyReason(a, b)) && "rtshop.pvp.hit_safe".equals(com.rtshop.pvp.Pvp.denyReason(b, a));
+            com.rtshop.pvp.Pvp.tick(a);
+            com.rtshop.pvp.Pvp.testClockOffset += 5000;
+            check("a safe zone blocks every hit, turns PvP off on entry and refuses /pvp on",
+                    safeHit && !com.rtshop.pvp.Pvp.on(a) && com.rtshop.pvp.Pvp.area(a) == com.rtshop.pvp.Pvp.AREA_SAFE && !com.rtshop.pvp.Pvp.set(a, true, false));
+            // 성 영역은 늘 안전 구역 (성 안 토지를 넣은 세계)
+            data.castleInstalled = com.rtshop.land.CastlePlots.VERSION;
+            ServerLevel over = server.overworld();
+            check("the castle area is always a safe zone, even with 'outside' on",
+                    com.rtshop.pvp.Pvp.area(over, -24360, -5420) == com.rtshop.pvp.Pvp.AREA_SAFE
+                            && com.rtshop.pvp.Pvp.area(over, -24650, -5400) == com.rtshop.pvp.Pvp.AREA_WILD);
+            data.castleInstalled = installedBefore;
+            // 설정 저장·읽기
+            com.rtshop.pvp.PvpConfig back = com.rtshop.pvp.PvpConfig.parse(cfg.toJson());
+            check("PvP settings and zones survive saving and loading", back.outside && back.zones.size() == 2 && back.zone("town").safe
+                    && !back.zone("arena").safe && back.zone("arena").x1 == 710 && back.combatSeconds == cfg.combatSeconds);
+            check("the /pvp command exists for everyone and /rtshop pvp for OPs",
+                    !server.getCommands().getDispatcher().parse("pvp on", server.createCommandSourceStack()).getReader().canRead()
+                            && !server.getCommands().getDispatcher().parse("rtshop pvp outside on", server.createCommandSourceStack()).getReader().canRead()
+                            && !server.getCommands().getDispatcher().parse("rtshop pvp zone here test 30", server.createCommandSourceStack()).getReader().canRead());
+        } finally {
+            data.castleInstalled = installedBefore;
+            com.rtshop.pvp.Pvp.testClockOffset = 0;
+            com.rtshop.pvp.Pvp.forgetForTest(a);
+            com.rtshop.pvp.Pvp.forgetForTest(b);
+            com.rtshop.pvp.PvpConfig.reload();
+        }
+    }
+
+    // ------------------------------------------------------------------ 식당 주인
+
+    private static void restaurant(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
+        section("restaurant owner");
+        ShopData rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+        ShopData food = ShopServer.shops().get("food");
+        check("the restaurant shop exists and lists the food merchant's dishes", rest != null && food != null && !rest.entries.isEmpty(),
+                rest == null ? null : rest.entries.size());
+        if (rest == null || food == null || rest.entries.isEmpty()) {
+            return;
+        }
+        com.rtshop.shop.Restaurant.Config rc = com.rtshop.shop.Restaurant.config();
+        com.rtshop.shop.Restaurant.reset(server);
+        rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+        check("the restaurant starts with an empty menu (nothing to buy)", com.rtshop.shop.Restaurant.menuCount(rest) == 0);
+        double worst = (1 + rc.bonus) * (1 + com.rtshop.job.JobConfig.get().job("cook").param("dishSell", 0));
+        List<String> bad = new ArrayList<>();
+        for (ShopData.Entry e : rest.entries) {
+            int fi = findEntry(food, f -> ItemStack.isSameItemSameTags(f.stack, e.stack));
+            if (fi < 0 || Math.abs(e.sellUnit - food.entries.get(fi).sellUnit * (1 + rc.bonus)) > 1e-6 || !e.sellable) {
+                bad.add(ShopLoader.itemId(e.stack) + " sell");
+            } else if (e.price <= food.entries.get(fi).sellUnit * worst) {
+                bad.add(ShopLoader.itemId(e.stack) + " price " + e.price);
+            }
+        }
+        check("every dish pays 5% more than the food merchant, and buying it back never pays (even for a cook)", bad.isEmpty(),
+                bad.isEmpty() ? null : bad.subList(0, Math.min(5, bad.size())));
+        // 팔 요리: 값이 1G 이상 나오는 것
+        int idx = findEntry(rest, e -> e.sellUnit >= 2 && e.stack.getMaxStackSize() >= 8);
+        if (idx < 0) idx = findEntry(rest, e -> e.sellUnit >= 1);
+        if (idx < 0) {
+            info("no dish with a sell price; skipping the selling checks");
+            return;
+        }
+        ShopData.Entry dish = rest.entries.get(idx);
+        int n = Math.min(4, dish.stack.getMaxStackSize());
+        String lifeBefore = com.rtshop.job.Jobs.entry(a).life;
+        try {
+            // 요리사가 아니면 팔 수 없다
+            com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.LIFE, "");
+            clear(a);
+            ItemStack give = dish.stack.copy();
+            give.setCount(n);
+            a.getInventory().add(give);
+            Economy.setWallet(a, 0);
+            ShopServer.openShop(a, com.rtshop.shop.Restaurant.ID, -1);
+            long key = rest.variantKey(dish, dish.stack);
+            ShopServer.handleTransaction(a, com.rtshop.shop.Restaurant.ID, rest.version, idx, true, n, key);
+            final ShopData.Entry dishF = dish;
+            check("a player without the cook job cannot sell to the restaurant owner",
+                    Economy.wallet(a) == 0 && count(a, s -> s.is(dishF.stack.getItem())) == n && !com.rtshop.shop.Restaurant.canSell(a)
+                            && !com.rtshop.shop.Restaurant.viewFor(a, rest).sellLockNote.isEmpty());
+            ShopServer.handleSellAll(a, com.rtshop.shop.Restaurant.ID, rest.version, new int[]{idx}, new long[]{key});
+            check("'sell all' is refused for non-cooks as well", Economy.wallet(a) == 0 && count(a, s -> s.is(dishF.stack.getItem())) == n);
+            // 요리사: 식품 상인 값 × 1.05 × 요리사 보너스
+            com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.LIFE, "cook");
+            double jobMult = ShopServer.jobSellMultiplier(a, dish);
+            long expect = ShopData.revenue(key / 100.0 * jobMult, n);
+            int fi = findEntry(food, f -> ItemStack.isSameItemSameTags(f.stack, dishF.stack));
+            long atFood = ShopData.revenue(food.variantKey(food.entries.get(fi), dish.stack) / 100.0 * ShopServer.jobSellMultiplier(a, food.entries.get(fi)), n);
+            ShopServer.openShop(a, com.rtshop.shop.Restaurant.ID, -1);
+            ShopServer.handleTransaction(a, com.rtshop.shop.Restaurant.ID, rest.version, idx, true, n, key);
+            check("a cook sells dishes for the food merchant's price +5%, on top of the cook bonus",
+                    Economy.wallet(a) == expect && expect >= atFood && expect <= Math.ceil(atFood * (1 + rc.bonus)) + 2
+                            && com.rtshop.shop.Restaurant.viewFor(a, rest).sellLockNote.isEmpty(), Economy.wallet(a) + " / " + expect + " / food " + atFood);
+            ShopData now = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+            check("the dish a cook sold appears on the menu (only that one), same shop version",
+                    com.rtshop.shop.Restaurant.menuCount(now) == 1 && now.entries.get(idx).buyable && now.version == rest.version, com.rtshop.shop.Restaurant.menuCount(now));
+            // 메뉴에 오른 요리는 직업과 상관없이 누구나 산다 (b 는 직업 없음)
+            clear(b);
+            Economy.setWallet(b, 1_000_000);
+            ShopServer.openShop(b, com.rtshop.shop.Restaurant.ID, -1);
+            ShopServer.handleTransaction(b, com.rtshop.shop.Restaurant.ID, now.version, idx, false, 2, 0);
+            int other = findEntry(now, e -> !e.buyable);
+            long afterBuy = Economy.wallet(b);
+            if (other >= 0) {
+                ShopServer.handleTransaction(b, com.rtshop.shop.Restaurant.ID, now.version, other, false, 1, 0);
+            }
+            check("anyone can buy a dish on the menu; dishes not yet on the menu cannot be bought",
+                    count(b, s -> s.is(dishF.stack.getItem())) == 2 && afterBuy == 1_000_000 - 2L * now.entries.get(idx).price && Economy.wallet(b) == afterBuy,
+                    afterBuy);
+            // 저장·읽기, OP 관리
+            com.rtshop.shop.Restaurant.Data copy = com.rtshop.shop.Restaurant.Data.load(com.rtshop.shop.Restaurant.Data.get(server).save(new CompoundTag()));
+            check("the menu survives saving and loading", copy.unlocked.size() == 1 && copy.unlocked.containsKey(ShopLoader.key(dish.stack)));
+            int all = com.rtshop.shop.Restaurant.unlockAll(server);
+            ShopData full = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+            boolean fullMenu = com.rtshop.shop.Restaurant.menuCount(full) == full.entries.size() && all == full.entries.size() - 1;
+            int cleared = com.rtshop.shop.Restaurant.reset(server);
+            check("an OP can put every dish on the menu and clear it again", fullMenu && cleared == full.entries.size()
+                    && com.rtshop.shop.Restaurant.menuCount(ShopServer.shops().get(com.rtshop.shop.Restaurant.ID)) == 0, all + " " + cleared);
+            check("the restaurant owner NPC can be spawned like other merchants (/rtshop npc restaurant)",
+                    !server.getCommands().getDispatcher().parse("rtshop npc restaurant", server.createCommandSourceStack()).getReader().canRead()
+                            && !server.getCommands().getDispatcher().parse("rtshop restaurant unlock all", server.createCommandSourceStack()).getReader().canRead());
+        } finally {
+            com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.LIFE, lifeBefore == null ? "" : lifeBefore);
+            com.rtshop.shop.Restaurant.reset(server);
+            ShopServer.closeSession(a);
+            ShopServer.closeSession(b);
+            clear(a);
+            clear(b);
         }
     }
 

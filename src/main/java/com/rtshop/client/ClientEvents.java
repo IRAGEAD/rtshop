@@ -106,6 +106,7 @@ public final class ClientEvents {
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientLand.clear();
         ClientQuestHud.clear();
+        PvpHud.clear();
         ClientEconomy.wallet = 0;
         ClientEconomy.bank = 0;
     }
@@ -164,6 +165,11 @@ public final class ClientEvents {
         while (ClientModEvents.JOB_KEY.consumeClick()) {
             if (mc.player != null && mc.screen == null && mc.player.connection != null) {
                 mc.player.connection.sendCommand("rtshop job");
+            }
+        }
+        while (ClientModEvents.PVP_KEY.consumeClick()) {
+            if (mc.player != null && mc.screen == null && mc.player.connection != null) {
+                mc.player.connection.sendCommand("pvp");
             }
         }
         while (ClientModEvents.QUEST_KEY.consumeClick()) {

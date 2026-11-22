@@ -38,7 +38,7 @@ import java.util.Map;
 public class ShopScreen extends Screen implements NpcButtons.Host {
     @Override
     public int[] npcButtonSpot() {
-        return new int[]{fx + 29 + this.font.width(this.title) + 10, fy + 7};
+        return new int[]{fx + 29 + this.font.width(titleText()) + 10, fy + 7};
     }
 
 
@@ -121,6 +121,56 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
 
     private final ShopData data;
     private final ItemStack allIcon = new ItemStack(Items.CHEST);
+    /** 서버가 창이 열린 뒤에 알려 준 '지금 살 수 있는 품목' (식당 메뉴). null = 상점 데이터 그대로. */
+    private java.util.BitSet menu;
+
+    private boolean buyable(int index, ShopData.Entry e) {
+        return menu != null ? menu.get(index) : e.buyable;
+    }
+
+    /** 메뉴가 하나씩 늘어나는 상점(식당)인가. */
+    private boolean menuShop() {
+        return !data.emptyNote.isEmpty();
+    }
+
+    private int menuCount() {
+        int n = 0;
+        for (int i = 0; i < data.entries.size(); i++) {
+            if (buyable(i, data.entries.get(i))) n++;
+        }
+        return n;
+    }
+
+    private Component titleText() {
+        if (!menuShop()) {
+            return this.title;
+        }
+        return Component.literal(data.title + " · ").append(Component.translatable("rtshop.restaurant.menu_count", menuCount(), data.entries.size()));
+    }
+
+    public void setMenu(String shopId, int version, int[] buyable) {
+        if (!data.id.equals(shopId) || data.version != version) {
+            return;
+        }
+        java.util.BitSet b = new java.util.BitSet(data.entries.size());
+        for (int i : buyable) {
+            if (i >= 0 && i < data.entries.size()) b.set(i);
+        }
+        menu = b;
+        rebuild();
+    }
+
+    public int menuCountForTest() {
+        return menuCount();
+    }
+
+    public int rowsForTest() {
+        return rows.size();
+    }
+
+    public boolean sellLockedForTest() {
+        return !data.sellLockNote.isEmpty();
+    }
 
     private boolean sellMode = false;
     private int category = -1; // -1 = 전체
@@ -331,8 +381,8 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
             // 내 인벤토리에서 이 상점이 사 주는 것을 품질별로 묶는다
             Map<String, Row> groups = new LinkedHashMap<>();
             for (ItemStack s : inv) {
-                if (s.isEmpty()) {
-                    continue;
+                if (s.isEmpty() || !data.sellLockNote.isEmpty()) {
+                    continue; // 이 상점에 팔 수 없는 플레이어 (식당: 요리사만)
                 }
                 int idx = data.findSellEntry(s);
                 if (idx < 0) {
@@ -364,7 +414,7 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         } else {
             for (int i = 0; i < data.entries.size(); i++) {
                 ShopData.Entry e = data.entries.get(i);
-                if (!e.buyable) {
+                if (!buyable(i, e)) {
                     continue;
                 }
                 String name = e.stack.getHoverName().getString();
@@ -545,7 +595,7 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         g.fill(fx + 5, fy + 4, fx + fw - 5, fy + TITLE_H - 1, C_WOOD_DARK);
         g.fill(fx + 5, fy + TITLE_H - 2, fx + fw - 5, fy + TITLE_H - 1, C_GOLD_DARK);
         Ui.coin(g, fx + 9, fy + 4, 16);
-        g.drawString(this.font, this.title, fx + 29, fy + 9, C_GOLD, true);
+        g.drawString(this.font, titleText(), fx + 29, fy + 9, C_GOLD, true);
 
         drawTab(g, mx, my, tabBuyX, Component.translatable("rtshop.ui.buy"), !sellMode);
         drawTab(g, mx, my, tabSellX, Component.translatable("rtshop.ui.sell"), sellMode);
@@ -662,8 +712,19 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         }
 
         if (rows.isEmpty()) {
+            boolean searching = search != null && !search.getValue().isBlank();
             Component msg = Component.translatable(sellMode ? "rtshop.ui.empty_sell" : "rtshop.ui.empty");
-            g.drawString(this.font, msg, vx + (vw - this.font.width(msg)) / 2, vy + vh / 2 - 4, C_INK_SOFT, false);
+            if (sellMode && !data.sellLockNote.isEmpty()) {
+                msg = Component.translatable(data.sellLockNote);
+            } else if (!sellMode && !data.emptyNote.isEmpty() && !searching && menuCount() == 0) {
+                msg = Component.translatable(data.emptyNote);
+            }
+            List<net.minecraft.util.FormattedCharSequence> lines = this.font.split(msg, Math.max(40, vw - 16));
+            int ly = vy + vh / 2 - lines.size() * 5;
+            for (net.minecraft.util.FormattedCharSequence line : lines) {
+                g.drawString(this.font, line, vx + (vw - this.font.width(line)) / 2, ly, C_INK_SOFT, false);
+                ly += 10;
+            }
         }
         return hover;
     }
@@ -827,6 +888,10 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
             tip.add(Component.translatable("rtshop.tip.owned", r.owned).withStyle(ChatFormatting.GRAY));
             if (!r.sellable) {
                 tip.add(Component.translatable("rtshop.tip.sell_zero").withStyle(ChatFormatting.RED));
+            }
+            if (!data.sellNote.isEmpty()) {
+                String[] note = data.sellNote.split("\\|", 2);
+                tip.add(Component.translatable(note[0], note.length > 1 ? note[1] : "").withStyle(ChatFormatting.GOLD));
             }
             appendRecipe(tip, r.entry);
             tip.add(Component.translatable("rtshop.ui.hint_sell").withStyle(ChatFormatting.DARK_GRAY));

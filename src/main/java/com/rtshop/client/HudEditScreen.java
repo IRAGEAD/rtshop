@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * HUD 를 끌어서 옮기고 크기를 바꾸는 화면 (Gold 표시, 퀘스트 HUD). 닫을 때 자동 저장된다.
+ * HUD 를 끌어서 옮기고 크기를 바꾸는 화면 (Gold 표시, 퀘스트 HUD, PvP 표시). 닫을 때 자동 저장된다.
  * 원하는 HUD 를 눌러 고른 뒤 끌거나 아래 버튼·마우스 휠·방향키로 조절한다.
  */
 public class HudEditScreen extends Screen {
     public static final int GOLD = 0;
     public static final int QUEST = 1;
+    public static final int PVP = 2;
 
     private int selected = GOLD;
     private boolean dragging = false;
@@ -45,7 +46,7 @@ public class HudEditScreen extends Screen {
 
     /** 두 번째 줄 버튼들 {x, w} : 보임/숨김, (퀘스트) 보일 개수, 좁게, 넓게. */
     private int[][] row2() {
-        if (selected == GOLD) {
+        if (selected != QUEST) {
             return new int[][]{{this.width / 2 - 60, 120}};
         }
         int total = 120 + 4 + 96 + 4 + 50 + 4 + 50;
@@ -67,10 +68,10 @@ public class HudEditScreen extends Screen {
     private String row3Label(int i) {
         ClientConfig cfg = ClientConfig.get();
         if (i == 0) {
-            String f = selected == GOLD ? cfg.hudFont : cfg.questHudFont;
+            String f = selected == GOLD ? cfg.hudFont : selected == PVP ? cfg.pvpHudFont : cfg.questHudFont;
             return Ui.clip(this.font, Component.translatable("rtshop.hud.font", HudFonts.label(HudFonts.effective(f))).getString(), 160 - 18) + " ▼";
         }
-        double pct = (selected == GOLD ? cfg.hudTextScale : cfg.questHudScale) * 100;
+        double pct = (selected == GOLD ? cfg.hudTextScale : selected == PVP ? cfg.pvpHudTextScale : cfg.questHudScale) * 100;
         return Component.translatable("rtshop.hud.text_size", Math.round(pct)).getString() + " ▼";
     }
 
@@ -82,28 +83,33 @@ public class HudEditScreen extends Screen {
             for (String f : HudFonts.available()) {
                 opts.add(new ChoicePopup.Option(f, HudFonts.label(f)));
             }
-            String cur = HudFonts.effective(selected == GOLD ? cfg.hudFont : cfg.questHudFont);
+            String cur = HudFonts.effective(selected == GOLD ? cfg.hudFont : selected == PVP ? cfg.pvpHudFont : cfg.questHudFont);
             popup = new ChoicePopup(r3[0][0], row3Y(), r3[0][1], 18, this.height, this.font, opts, cur, v -> {
                 if (selected == GOLD) {
                     cfg.hudFont = v;
+                } else if (selected == PVP) {
+                    cfg.pvpHudFont = v;
                 } else {
                     cfg.questHudFont = v;
                 }
             });
             return;
         }
-        int[] sizes = selected == GOLD ? new int[]{50, 60, 70, 80, 90, 100, 110, 120, 130, 150}
+        int[] sizes = selected != QUEST ? new int[]{50, 60, 70, 80, 90, 100, 110, 120, 130, 150}
                 : new int[]{50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 250};
         for (int n : sizes) {
             opts.add(new ChoicePopup.Option(Integer.toString(n), n + "%"));
         }
-        double now = (selected == GOLD ? cfg.hudTextScale : cfg.questHudScale) * 100;
+        double now = (selected == GOLD ? cfg.hudTextScale : selected == PVP ? cfg.pvpHudTextScale : cfg.questHudScale) * 100;
         String cur = Integer.toString((int) Math.round(now));
         popup = new ChoicePopup(r3[1][0], row3Y(), r3[1][1], 18, this.height, this.font, opts, cur, v -> {
             double sc = Integer.parseInt(v) / 100.0;
             if (selected == GOLD) {
                 cfg.hudTextScale = sc;
                 cfg.clamp();
+            } else if (selected == PVP) {
+                cfg.pvpHudTextScale = sc;
+                cfg.clampPvp();
             } else {
                 // 글자 크기만 바꾼다 (너비는 그대로)
                 cfg.questHudScale = sc;
@@ -120,6 +126,14 @@ public class HudEditScreen extends Screen {
         return QuestHud.bounds(this.width, this.height, QuestHud.previewEntries());
     }
 
+    private int[] pvpBounds() {
+        return PvpHud.bounds(this.width, this.height);
+    }
+
+    private static String nameKey(int which) {
+        return which == GOLD ? "rtshop.hud.name_gold" : which == PVP ? "rtshop.hud.name_pvp" : "rtshop.hud.name_quest";
+    }
+
     @Override
     public void render(GuiGraphics g, int mx, int my, float partial) {
         g.fill(0, 0, this.width, this.height, 0x66000000);
@@ -130,6 +144,13 @@ public class HudEditScreen extends Screen {
         GoldHud.draw(g, gb[0], gb[1], gb[2], gb[3], ClientEconomy.wallet);
         frame(g, qb, selected == QUEST, Ui.inside(mx, my, qb[0], qb[1], qb[2], qb[3]), cfg.questHudEnabled);
         QuestHud.draw(g, this.width, this.height, QuestHud.previewEntries());
+        int[] pb = pvpBounds();
+        frame(g, pb, selected == PVP, Ui.inside(mx, my, pb[0], pb[1], pb[2], pb[3]), cfg.pvpHudEnabled);
+        // 미리보기: 지금 내 상태 그대로 (서버가 PvP 표시를 보내지 않았으면 '꺼짐 · 안전 구역' 견본)
+        PvpHud.draw(g, pb[0], pb[1], pb[2], pb[3], PvpHud.on, PvpHud.systemOn ? PvpHud.area : com.rtshop.pvp.Pvp.AREA_SAFE, 0, -1);
+        if (!cfg.pvpHudEnabled) {
+            hiddenMark(g, pb);
+        }
         if (!cfg.hudEnabled) {
             hiddenMark(g, gb);
         }
@@ -145,7 +166,7 @@ public class HudEditScreen extends Screen {
         g.drawCenteredString(this.font, Component.translatable("rtshop.hud.help1"), this.width / 2, 26, 0xFFD9C592);
         g.drawCenteredString(this.font, Component.translatable("rtshop.hud.help2"), this.width / 2, 38, 0xFFD9C592);
         g.drawCenteredString(this.font, Component.translatable("rtshop.hud.selected",
-                Component.translatable(selected == GOLD ? "rtshop.hud.name_gold" : "rtshop.hud.name_quest")), this.width / 2, 52, 0xFFE8B84A);
+                Component.translatable(nameKey(selected))), this.width / 2, 52, 0xFFE8B84A);
 
         String[] labels = {"rtshop.hud.smaller", "rtshop.hud.bigger", "rtshop.hud.reset", "rtshop.hud.done"};
         for (int i = 0; i < 4; i++) {
@@ -169,7 +190,8 @@ public class HudEditScreen extends Screen {
     private String row2Label(int i) {
         ClientConfig cfg = ClientConfig.get();
         return switch (i) {
-            case 0 -> Component.translatable((selected == GOLD ? cfg.hudEnabled : cfg.questHudEnabled) ? "rtshop.hud.shown" : "rtshop.hud.hidden").getString();
+            case 0 -> Component.translatable((selected == GOLD ? cfg.hudEnabled : selected == PVP ? cfg.pvpHudEnabled : cfg.questHudEnabled)
+                    ? "rtshop.hud.shown" : "rtshop.hud.hidden").getString();
             case 1 -> Component.translatable("rtshop.hud.quest_count", cfg.questHudMax).getString() + " ▼";
             case 2 -> Component.translatable("rtshop.hud.narrower").getString();
             default -> Component.translatable("rtshop.hud.wider").getString();
@@ -198,6 +220,16 @@ public class HudEditScreen extends Screen {
             cfg.questHudScale = Math.max(0.5, Math.min(2.5, cfg.questHudScale * factor));
             cfg.questHudWidth *= cfg.questHudScale / before;
             cfg.clampQuest();
+            return;
+        }
+        if (selected == PVP) {
+            double cx = cfg.pvpHudX + cfg.pvpHudWidth / 2;
+            double cy = cfg.pvpHudY + cfg.pvpHudHeight / 2;
+            cfg.pvpHudWidth = Math.max(0.05, Math.min(0.6, cfg.pvpHudWidth * factor));
+            cfg.pvpHudHeight = Math.max(0.03, Math.min(0.4, cfg.pvpHudHeight * factor));
+            cfg.pvpHudX = cx - cfg.pvpHudWidth / 2;
+            cfg.pvpHudY = cy - cfg.pvpHudHeight / 2;
+            cfg.clampPvp();
             return;
         }
         double cx = cfg.hudX + cfg.hudWidth / 2;
@@ -234,6 +266,8 @@ public class HudEditScreen extends Screen {
         if (Ui.inside(mx, my, btnX(2), btnY(), 72, 18)) {
             if (selected == GOLD) {
                 cfg.resetHud();
+            } else if (selected == PVP) {
+                cfg.resetPvpHud();
             } else {
                 cfg.resetQuestHud();
             }
@@ -267,6 +301,14 @@ public class HudEditScreen extends Screen {
             grabY = my - qb[1];
             return true;
         }
+        int[] pb = pvpBounds();
+        if (Ui.inside(mx, my, pb[0], pb[1], pb[2], pb[3])) {
+            select(PVP);
+            dragging = true;
+            grabX = mx - pb[0];
+            grabY = my - pb[1];
+            return true;
+        }
         if (Ui.inside(mx, my, gb[0], gb[1], gb[2], gb[3])) {
             select(GOLD);
             dragging = true;
@@ -283,6 +325,8 @@ public class HudEditScreen extends Screen {
             case 0 -> {
                 if (selected == GOLD) {
                     cfg.hudEnabled = !cfg.hudEnabled;
+                } else if (selected == PVP) {
+                    cfg.pvpHudEnabled = !cfg.pvpHudEnabled;
                 } else {
                     cfg.questHudEnabled = !cfg.questHudEnabled;
                 }
@@ -331,6 +375,10 @@ public class HudEditScreen extends Screen {
                 cfg.questHudX = nx;
                 cfg.questHudY = Math.min(ny, (this.height - qb[3]) / (double) Math.max(1, this.height));
                 cfg.clampQuest();
+            } else if (selected == PVP) {
+                cfg.pvpHudX = nx;
+                cfg.pvpHudY = ny;
+                cfg.clampPvp();
             } else {
                 cfg.hudX = nx;
                 cfg.hudY = ny;
@@ -363,21 +411,22 @@ public class HudEditScreen extends Screen {
         double sx = 1.0 / Math.max(1, this.width);
         double sy = 1.0 / Math.max(1, this.height);
         boolean q = selected == QUEST;
+        boolean pv = selected == PVP;
         switch (key) {
             case 263 -> { // 왼쪽
-                if (q) cfg.questHudX -= sx; else cfg.hudX -= sx;
+                if (q) cfg.questHudX -= sx; else if (pv) cfg.pvpHudX -= sx; else cfg.hudX -= sx;
             }
             case 262 -> { // 오른쪽
-                if (q) cfg.questHudX += sx; else cfg.hudX += sx;
+                if (q) cfg.questHudX += sx; else if (pv) cfg.pvpHudX += sx; else cfg.hudX += sx;
             }
             case 265 -> { // 위
-                if (q) cfg.questHudY -= sy; else cfg.hudY -= sy;
+                if (q) cfg.questHudY -= sy; else if (pv) cfg.pvpHudY -= sy; else cfg.hudY -= sy;
             }
             case 264 -> { // 아래
-                if (q) cfg.questHudY += sy; else cfg.hudY += sy;
+                if (q) cfg.questHudY += sy; else if (pv) cfg.pvpHudY += sy; else cfg.hudY += sy;
             }
-            case 258 -> { // Tab: 다른 HUD 고르기
-                select(q ? GOLD : QUEST);
+            case 258 -> { // Tab: 다음 HUD 고르기 (Gold → 퀘스트 → PvP)
+                select(selected == GOLD ? QUEST : selected == QUEST ? PVP : GOLD);
                 return true;
             }
             default -> {
@@ -386,6 +435,7 @@ public class HudEditScreen extends Screen {
         }
         cfg.clamp();
         cfg.clampQuest();
+        cfg.clampPvp();
         return true;
     }
 

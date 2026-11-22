@@ -26,6 +26,13 @@ public final class ClientHooks {
         Minecraft.getInstance().setScreen(new ShopScreen(data));
     }
 
+    /** 열려 있는 상점(식당)의 메뉴가 늘었다. */
+    public static void shopMenu(String shopId, int version, int[] buyable) {
+        if (Minecraft.getInstance().screen instanceof ShopScreen screen) {
+            screen.setMenu(shopId, version, buyable);
+        }
+    }
+
     public static void openBank(double lossMin, double lossMax) {
         Minecraft.getInstance().setScreen(new BankScreen(lossMin, lossMax));
     }

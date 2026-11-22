@@ -32,6 +32,8 @@ final class ClientSelfTest2 {
     private static volatile int npc = -1;
     private static volatile int landId = -1;
     private static volatile int farmA = -1, farmB = -1;
+    private static volatile int dishIdx = -1;
+    private static volatile String lifeJob = "";
 
     static int count() {
         return STEPS.size();
@@ -271,6 +273,136 @@ final class ClientSelfTest2 {
                     LandData.Land l = data.land(id);
                     if (l != null) data.removeLand(l);
                 }
+            });
+            waitTicks(10);
+        });
+
+        // ------------------------------------------------------------ PvP 표시 (HUD) 와 HUD 편집 화면
+        add(mc -> {
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                com.rtshop.pvp.PvpConfig.get().outside = true; // 저장하지 않는다 (끝에서 파일을 다시 읽는다)
+                com.rtshop.pvp.Pvp.forgetForTest(sp);
+                com.rtshop.pvp.Pvp.sync(sp);
+                com.rtshop.pvp.Pvp.set(sp, true, false);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            check("the PvP indicator shows ON after /pvp on in a place where PvP is allowed",
+                    PvpHud.systemOn && PvpHud.on && PvpHud.area == com.rtshop.pvp.Pvp.AREA_WILD, PvpHud.on + " " + PvpHud.area);
+            shot(mc, "98_pvp_hud_on");
+            onServer(mc, sp -> {
+                com.rtshop.pvp.PvpConfig.get().outside = false;
+                com.rtshop.pvp.Pvp.tick(sp); // PvP 를 할 수 없는 곳이 되었으므로 저절로 꺼진다
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            check("the PvP indicator turns OFF by itself where PvP is not allowed",
+                    PvpHud.systemOn && !PvpHud.on && PvpHud.area == com.rtshop.pvp.Pvp.AREA_OFF, PvpHud.on + " " + PvpHud.area);
+            shot(mc, "98b_pvp_hud_off");
+            HudEditScreen ed = new HudEditScreen();
+            mc.setScreen(ed);
+            ed.select(HudEditScreen.PVP);
+            waitTicks(10);
+        });
+        add(mc -> {
+            check("the HUD editor can select the PvP indicator (third HUD)", mc.screen instanceof HudEditScreen ed && ed.selectedForTest() == HudEditScreen.PVP, mc.screen);
+            int[] b = PvpHud.bounds(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+            int[] gb = GoldHud.bounds(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+            check("by default the PvP indicator sits just above the Gold box without overlapping it", b[1] + b[3] <= gb[1] && b[0] == gb[0], b[1] + "+" + b[3] + " vs " + gb[1]);
+            shot(mc, "98c_hud_editor_pvp");
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                com.rtshop.pvp.PvpConfig.reload();
+                com.rtshop.pvp.Pvp.forgetForTest(sp);
+                com.rtshop.pvp.Pvp.sync(sp);
+            });
+            waitTicks(10);
+        });
+
+        // ------------------------------------------------------------ 식당 주인: 빈 메뉴 → 요리사가 팔면 메뉴에 오른다
+        add(mc -> {
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                com.rtshop.shop.Restaurant.reset(sp.server);
+                com.rtshop.shop.ShopData rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+                dishIdx = -1;
+                if (rest != null) {
+                    for (int i = 0; i < rest.entries.size() && dishIdx < 0; i++) {
+                        if (rest.entries.get(i).sellUnit >= 2 && rest.entries.get(i).stack.getMaxStackSize() >= 8) dishIdx = i;
+                    }
+                }
+                lifeJob = com.rtshop.job.Jobs.entry(sp).life;
+                com.rtshop.job.Jobs.force(sp, com.rtshop.job.JobConfig.LIFE, "");
+                if (dishIdx >= 0) {
+                    ItemStack give = rest.entries.get(dishIdx).stack.copy();
+                    give.setCount(6);
+                    if (!sp.getInventory().add(give)) {
+                        sp.getInventory().setItem(35, give);
+                    }
+                }
+                ShopServer.openShop(sp, com.rtshop.shop.Restaurant.ID, -1);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            ShopScreen s = mc.screen instanceof ShopScreen x ? x : null;
+            check("the restaurant opens with an empty menu and explains how dishes are added",
+                    s != null && dishIdx >= 0 && s.menuCountForTest() == 0 && s.rowsForTest() == 0, s == null ? mc.screen : s.menuCountForTest() + " idx " + dishIdx);
+            shot(mc, "99_restaurant_empty_menu");
+            if (s != null) s.debugView(true, true, false);
+            waitTicks(5);
+        });
+        add(mc -> {
+            ShopScreen s = mc.screen instanceof ShopScreen x ? x : null;
+            check("someone who is not a cook sees that only cooks can sell here", s != null && s.sellLockedForTest() && s.rowsForTest() == 0);
+            shot(mc, "99b_restaurant_cook_only");
+            onServer(mc, sp -> {
+                com.rtshop.job.Jobs.force(sp, com.rtshop.job.JobConfig.LIFE, "cook");
+                ShopServer.openShop(sp, com.rtshop.shop.Restaurant.ID, -1);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            ShopScreen s = mc.screen instanceof ShopScreen x ? x : null;
+            if (s != null) s.debugView(true, true, false);
+            check("a cook sees the dishes in the inventory on the sell tab", s != null && !s.sellLockedForTest() && s.rowsForTest() >= 1, s == null ? mc.screen : s.rowsForTest());
+            waitTicks(5);
+        });
+        add(mc -> {
+            shot(mc, "99c_restaurant_cook_sells");
+            int idx = dishIdx;
+            onServer(mc, sp -> {
+                com.rtshop.shop.ShopData rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+                if (rest == null || idx < 0) return;
+                com.rtshop.shop.ShopData.Entry e = rest.entries.get(idx);
+                ShopServer.handleTransaction(sp, com.rtshop.shop.Restaurant.ID, rest.version, idx, true, 4, rest.variantKey(e, e.stack));
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            ShopScreen s = mc.screen instanceof ShopScreen x ? x : null;
+            check("the dish the cook sold is added to the open window's menu right away", s != null && s.menuCountForTest() == 1, s == null ? mc.screen : s.menuCountForTest());
+            if (s != null) s.debugView(false, true, false);
+            waitTicks(5);
+        });
+        add(mc -> {
+            ShopScreen s = mc.screen instanceof ShopScreen x ? x : null;
+            check("the buy tab now lists exactly that dish", s != null && s.rowsForTest() == 1, s == null ? mc.screen : s.rowsForTest());
+            shot(mc, "99d_restaurant_menu_one");
+            mc.setScreen(null);
+            int idx = dishIdx;
+            String job = lifeJob;
+            onServer(mc, sp -> {
+                com.rtshop.shop.ShopData rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+                if (rest != null && idx >= 0) {
+                    net.minecraft.world.item.Item it = rest.entries.get(idx).stack.getItem();
+                    sp.getInventory().clearOrCountMatchingItems(st -> st.is(it), -1, sp.inventoryMenu.getCraftSlots());
+                }
+                com.rtshop.shop.Restaurant.reset(sp.server);
+                com.rtshop.job.Jobs.force(sp, com.rtshop.job.JobConfig.LIFE, job == null ? "" : job);
             });
             waitTicks(10);
         });

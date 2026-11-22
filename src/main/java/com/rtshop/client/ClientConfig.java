@@ -54,6 +54,36 @@ public final class ClientConfig {
     /** 크기 배율 (0.6~1.5). */
     public double enhPanelScale = 1.0;
 
+    // PvP 상태 표시 (켜짐/꺼짐 + 지금 있는 곳). 위치·크기는 화면 비율.
+    public static final double PDEF_W = 247.0 / 1920.0;
+    public static final double PDEF_H = 70.0 / 1004.0;
+    public static final double PDEF_X = DEF_X;
+    public static final double PDEF_Y = DEF_Y - PDEF_H - 0.012;
+    public boolean pvpHudEnabled = true;
+    public double pvpHudX = PDEF_X;
+    public double pvpHudY = PDEF_Y;
+    public double pvpHudWidth = PDEF_W;
+    public double pvpHudHeight = PDEF_H;
+    public String pvpHudFont = "";
+    public double pvpHudTextScale = 1.0;
+
+    public void resetPvpHud() {
+        pvpHudX = PDEF_X;
+        pvpHudY = PDEF_Y;
+        pvpHudWidth = PDEF_W;
+        pvpHudHeight = PDEF_H;
+        pvpHudFont = "";
+        pvpHudTextScale = 1.0;
+    }
+
+    public void clampPvp() {
+        pvpHudTextScale = Math.max(0.5, Math.min(1.5, pvpHudTextScale));
+        pvpHudWidth = Math.max(0.05, Math.min(0.6, pvpHudWidth));
+        pvpHudHeight = Math.max(0.03, Math.min(0.4, pvpHudHeight));
+        pvpHudX = Math.max(0, Math.min(1 - pvpHudWidth, pvpHudX));
+        pvpHudY = Math.max(0, Math.min(1 - pvpHudHeight, pvpHudY));
+    }
+
     public void resetEnhPanel() {
         enhPanelEnabled = true;
         enhPanelX = -1;
@@ -111,7 +141,7 @@ public final class ClientConfig {
     public synchronized void save() {
         try {
             JsonObject o = new JsonObject();
-            o.addProperty("_설명", "Gold 표시 박스와 퀘스트 HUD 의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다. questHudScale 은 글자 배율, questHudMax 는 한 번에 보일 퀘스트 수, hudFont/questHudFont 는 글꼴(빈 값 = 기본), hudTextScale 은 Gold 글자 크기입니다.");
+            o.addProperty("_설명", "Gold 표시 박스·퀘스트 HUD·PvP 표시(pvpHud*)의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다. questHudScale 은 글자 배율, questHudMax 는 한 번에 보일 퀘스트 수, hudFont/questHudFont 는 글꼴(빈 값 = 기본), hudTextScale 은 Gold 글자 크기입니다.");
             o.addProperty("configVersion", CONFIG_VERSION);
             o.addProperty("hudEnabled", hudEnabled);
             o.addProperty("hudX", hudX);
@@ -127,6 +157,13 @@ public final class ClientConfig {
             o.addProperty("hudFont", hudFont);
             o.addProperty("hudTextScale", hudTextScale);
             o.addProperty("questHudFont", questHudFont);
+            o.addProperty("pvpHudEnabled", pvpHudEnabled);
+            o.addProperty("pvpHudX", pvpHudX);
+            o.addProperty("pvpHudY", pvpHudY);
+            o.addProperty("pvpHudWidth", pvpHudWidth);
+            o.addProperty("pvpHudHeight", pvpHudHeight);
+            o.addProperty("pvpHudFont", pvpHudFont);
+            o.addProperty("pvpHudTextScale", pvpHudTextScale);
             o.addProperty("enhPanelEnabled", enhPanelEnabled);
             o.addProperty("enhPanelX", enhPanelX);
             o.addProperty("enhPanelY", enhPanelY);
@@ -168,6 +205,14 @@ public final class ClientConfig {
                 if (o.has("hudFont")) c.hudFont = o.get("hudFont").getAsString();
                 if (o.has("hudTextScale")) c.hudTextScale = o.get("hudTextScale").getAsDouble();
                 if (o.has("questHudFont")) c.questHudFont = o.get("questHudFont").getAsString();
+                if (o.has("pvpHudEnabled")) c.pvpHudEnabled = o.get("pvpHudEnabled").getAsBoolean();
+                if (o.has("pvpHudX")) c.pvpHudX = o.get("pvpHudX").getAsDouble();
+                if (o.has("pvpHudY")) c.pvpHudY = o.get("pvpHudY").getAsDouble();
+                if (o.has("pvpHudWidth")) c.pvpHudWidth = o.get("pvpHudWidth").getAsDouble();
+                if (o.has("pvpHudHeight")) c.pvpHudHeight = o.get("pvpHudHeight").getAsDouble();
+                if (o.has("pvpHudFont")) c.pvpHudFont = o.get("pvpHudFont").getAsString();
+                if (o.has("pvpHudTextScale")) c.pvpHudTextScale = o.get("pvpHudTextScale").getAsDouble();
+                c.clampPvp();
                 if (o.has("enhPanelEnabled")) c.enhPanelEnabled = o.get("enhPanelEnabled").getAsBoolean();
                 if (o.has("enhPanelX")) c.enhPanelX = o.get("enhPanelX").getAsDouble();
                 if (o.has("enhPanelY")) c.enhPanelY = o.get("enhPanelY").getAsDouble();

@@ -587,7 +587,7 @@ public class PlotBrowserScreen extends Screen {
                 over = sh.in(wx, wz);
             }
             if (mapScale * Math.min(e.x1 - e.x0 + 1, e.z1 - e.z0 + 1) >= 12) {
-                String label = e.castleNo > 0 ? Integer.toString(e.castleNo) : "";
+                String label = e.castleNo > 0 ? CastlePlots.label(e.castleNo).replace("-", "") : "";
                 if (mapScale >= 5 || (e.castleNo <= 0 && mapScale * (e.x1 - e.x0 + 1) >= font.width(e.name) * 0.8F + 6)) label = e.name;
                 float ts = Math.max(0.5F, Math.min(1F, mapScale / 3F));
                 if (e.castleNo <= 0) ts = Math.max(ts, 0.75F);

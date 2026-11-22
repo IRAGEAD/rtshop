@@ -516,6 +516,7 @@ public final class LandEvents {
             return;
         }
         try {
+            com.rtshop.pvp.Pvp.borders(sp);
             tickBorders(sp, level, now);
         } finally {
             Borders.flush(sp);

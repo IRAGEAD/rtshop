@@ -596,20 +596,20 @@ public final class ClientSelfTest {
                     int n = com.rtshop.land.CastlePlots.def().tiles.size();
                     check("castle lots are listed (" + n + ") and the window fits", ps.countForTest("castle") == n && ps.fitsForTest(), ps.countForTest("castle"));
                     shot(mc, "84_plots_castle_map");
-                    ps.showForTest(0, 0, 3);
+                    ps.showForTest(0, 0, 302);
                     ps.zoomForTest(0.25);
                 }
                 wait = 30;
             }
             case 2 -> {
                 shot(mc, "85_plots_castle_selected");
-                if (ps != null) ps.showForTest(0, 1, 3);
+                if (ps != null) ps.showForTest(0, 1, 302);
                 wait = 30;
             }
             case 3 -> {
                 check("the preview map of the chosen lot arrives", ps != null && ps.previewReadyForTest());
                 shot(mc, "86_plots_preview_now");
-                if (ps != null) ps.showForTest(0, 2, 3);
+                if (ps != null) ps.showForTest(0, 2, 302);
                 wait = 5;
             }
             case 4 -> {

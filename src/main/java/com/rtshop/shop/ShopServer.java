@@ -93,6 +93,8 @@ public final class ShopServer {
         com.rtshop.attendance.AttendanceConfig.reload();
         com.rtshop.gacha.GachaConfig.reload(server);
         com.rtshop.enhance.EnhanceConfig.reload();
+        com.rtshop.pvp.PvpConfig.reload();
+        com.rtshop.pvp.Pvp.resyncAll(server);
         com.rtshop.rules.LootRules.reload();
         com.rtshop.rules.RecipeRules.reload();
         if (server != null && server.getPlayerList() != null) {
@@ -131,6 +133,11 @@ public final class ShopServer {
             RtShop.LOGGER.error("[rtshop] 예전 토지 높이를 늘리지 못했습니다", t);
         }
         com.rtshop.land.CastlePlots.autoInstall(event.getServer());
+        try {
+            rebuildRestaurant(event.getServer()); // 메뉴(월드 저장)를 읽어 살 수 있는 요리를 맞춘다
+        } catch (Throwable t) {
+            RtShop.LOGGER.warn("[rtshop] 식당 메뉴를 읽지 못했습니다", t);
+        }
         SelfTest.onServerStarted(event.getServer());
     }
 
@@ -396,6 +403,8 @@ public final class ShopServer {
                                             t.getDisplayName(), num(Economy.wallet(t)), num(Economy.bank(t))));
                                     return 1;
                                 }))));
+        root.then(com.rtshop.pvp.Pvp.adminCommand());
+        root.then(Restaurant.adminCommand());
         if (SelfTest.enabled()) {
             root.then(Commands.literal("selftest").requires(src -> src.hasPermission(4)).executes(ctx -> {
                 SelfTest.run(ctx.getSource().getServer());
@@ -403,6 +412,7 @@ public final class ShopServer {
             }));
         }
         d.register(root);
+        d.register(com.rtshop.pvp.Pvp.playerCommand("pvp"));
         // 짧은 이름: /border (= /rtshop border)
         d.register(Commands.literal("border")
                 .executes(ctx -> LandManager.setBorder(ctx.getSource().getPlayerOrException(), null) ? 1 : 0)
@@ -563,7 +573,34 @@ public final class ShopServer {
         }
         Economy.sync(player);
         SESSIONS.put(player.getUUID(), new Session(false, d.id, npcId));
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new OpenShopPacket(d));
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new OpenShopPacket(Restaurant.is(d) ? Restaurant.viewFor(player, d) : d));
+    }
+
+    /** 식당 메뉴가 바뀌었다: 상점 데이터를 다시 만들고, 식당 창을 열어 둔 사람들에게 새 메뉴를 알려 준다. */
+    public static ShopData rebuildRestaurant(MinecraftServer server) {
+        ShopData old = loaded.shops.get(Restaurant.ID);
+        if (!Restaurant.is(old)) {
+            return null;
+        }
+        ShopData now = Restaurant.build(loaded, server, old.version);
+        if (now == null) {
+            return null;
+        }
+        loaded.shops.put(Restaurant.ID, now);
+        if (server != null && server.getPlayerList() != null) {
+            int[] menu = new int[Restaurant.menuCount(now)];
+            int k = 0;
+            for (int i = 0; i < now.entries.size(); i++) {
+                if (now.entries.get(i).buyable) menu[k++] = i;
+            }
+            for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+                Session s = SESSIONS.get(p.getUUID());
+                if (s != null && !s.bank() && Restaurant.ID.equals(s.shopId())) {
+                    ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new com.rtshop.net.ShopMenuPacket(Restaurant.ID, now.version, menu));
+                }
+            }
+        }
+        return now;
     }
 
     public static void openBank(ServerPlayer player, int npcId) {
@@ -625,7 +662,9 @@ public final class ShopServer {
         ShopData.Entry entry = d.entries.get(index);
         if (sell) {
             long[] r = sellVariant(player, d, index, variantKey, amount);
-            if (r[0] == 0) {
+            if (r[1] < 0) {
+                sendResult(player, Component.translatable("rtshop.restaurant.cook_only"), false);
+            } else if (r[0] == 0) {
                 sendResult(player, Component.translatable("rtshop.msg.no_item"), false);
             } else if (r[1] <= 0) {
                 sendResult(player, Component.translatable("rtshop.msg.sell_zero"), false);
@@ -641,6 +680,10 @@ public final class ShopServer {
     public static void handleSellAll(ServerPlayer player, String shopId, int version, int[] indexes, long[] keys) {
         ShopData d = validate(player, shopId, version);
         if (d == null) {
+            return;
+        }
+        if (Restaurant.is(d) && !Restaurant.canSell(player)) {
+            sendResult(player, Component.translatable("rtshop.restaurant.cook_only"), false);
             return;
         }
         long count = 0;
@@ -714,6 +757,10 @@ public final class ShopServer {
         if (!entry.sellable) {
             return new long[]{0, 0};
         }
+        boolean restaurant = Restaurant.is(d);
+        if (restaurant && !Restaurant.canSell(player)) {
+            return new long[]{0, -1}; // 요리사만 팔 수 있다
+        }
         List<ItemStack> items = player.getInventory().items;
         long owned = 0;
         for (ItemStack s : items) {
@@ -743,6 +790,13 @@ public final class ShopServer {
         }
         player.getInventory().setChanged();
         Economy.addWallet(player, revenue);
+        if (restaurant) {
+            try {
+                Restaurant.onSold(player, d, index);
+            } catch (Throwable t) {
+                RtShop.LOGGER.warn("[rtshop] 식당 메뉴 등록 실패", t);
+            }
+        }
         return new long[]{sellAmount, revenue};
     }
 

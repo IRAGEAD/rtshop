@@ -421,6 +421,11 @@ public final class ShopLoader {
                     pc.fishNoInfoMultiplier));
             RtShop.LOGGER.info("[rtshop] 상점 '{}' 로드: 품목 {}개", r.id, entries.size());
         }
+        try {
+            Restaurant.install(out, server, versionCounter);
+        } catch (Throwable t) {
+            RtShop.LOGGER.error("[rtshop] 식당 상점을 준비하지 못했습니다", t);
+        }
         long now = System.nanoTime();
         out.loadMillis = (now - startedAt) / 1_000_000L;
         out.pricingMillis = (now - pricingAt) / 1_000_000L;

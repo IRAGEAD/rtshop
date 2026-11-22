@@ -24,6 +24,7 @@ public final class ClientModEvents {
 
     public static final KeyMapping JOB_KEY = new KeyMapping("key.rtshop.job", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
     public static final KeyMapping QUEST_KEY = new KeyMapping("key.rtshop.quest", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
+    public static final KeyMapping PVP_KEY = new KeyMapping("key.rtshop.pvp", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
 
     @SubscribeEvent
     public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
@@ -36,6 +37,8 @@ public final class ClientModEvents {
                 GoldHud.render(graphics, screenWidth, screenHeight));
         event.registerAboveAll("quests", (gui, graphics, partialTick, screenWidth, screenHeight) ->
                 QuestHud.render(graphics, screenWidth, screenHeight));
+        event.registerAboveAll("pvp", (gui, graphics, partialTick, screenWidth, screenHeight) ->
+                PvpHud.render(graphics, screenWidth, screenHeight));
     }
 
     /** 별 등급과 '심기 전용' 표시를 모든 아이템 아이콘 위에 그릴 수 있게 등록한다 (표시할 것이 없으면 아무것도 그리지 않음). */
@@ -52,5 +55,6 @@ public final class ClientModEvents {
         event.register(LAND_KEY);
         event.register(QUEST_KEY);
         event.register(JOB_KEY);
+        event.register(PVP_KEY);
     }
 }

@@ -96,6 +96,12 @@ public final class ShopData {
     public final double fishBonus;
     public final double fishGolden;
     public final double fishNoInfo;
+    /** 구매 탭에 살 것이 하나도 없을 때 보여 줄 안내 (lang 키, 빈 값 = 기본 문구). */
+    public String emptyNote = "";
+    /** 비어 있지 않으면 이 플레이어는 여기에 팔 수 없다: 판매 탭에 이 안내(lang 키)만 보인다. */
+    public String sellLockNote = "";
+    /** 판매 탭의 아이템 설명에 덧붙일 한 줄 ("lang 키|인수"). */
+    public String sellNote = "";
 
     public ShopData(String id, int version, String title, String npcName, String profession,
                     List<Category> categories, List<Entry> entries,
@@ -203,6 +209,9 @@ public final class ShopData {
                 }
             }
         }
+        buf.writeUtf(emptyNote);
+        buf.writeUtf(sellLockNote);
+        buf.writeUtf(sellNote);
     }
 
     public static ShopData read(FriendlyByteBuf buf) {
@@ -250,6 +259,10 @@ public final class ShopData {
             ents.add(new Entry(st, price, sellUnit, cat, (flags & 1) != 0, (flags & 2) != 0, (flags & 4) != 0, (flags & 8) != 0,
                     recipe, recipeOut));
         }
-        return new ShopData(id, version, title, "", "", cats, ents, star, fishBase, fishBonus, fishGolden, fishNoInfo);
+        ShopData d = new ShopData(id, version, title, "", "", cats, ents, star, fishBase, fishBonus, fishGolden, fishNoInfo);
+        d.emptyNote = buf.readUtf();
+        d.sellLockNote = buf.readUtf();
+        d.sellNote = buf.readUtf();
+        return d;
     }
 }
