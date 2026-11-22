@@ -214,6 +214,7 @@ public final class QuestEditor {
         if (old != null) {
             if (q.sceneAccept == null) q.sceneAccept = old.sceneAccept;
             if (q.sceneDone == null) q.sceneDone = old.sceneDone;
+            if (q.mod.isEmpty()) q.mod = old.mod;
         }
         try {
             String file = findFile("quests", q.id);

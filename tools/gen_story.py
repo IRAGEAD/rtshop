@@ -37,9 +37,10 @@ Q = []
 order = [1000]
 
 def q(id, chain, t, giver, intro, progress, done, objs, gold=0, items=None, flags=None, requires=None,
-      requiresFlags=None, turnIn=None, sceneAccept=None, sceneDone=None, choices=None):
+      requiresFlags=None, turnIn=None, sceneAccept=None, sceneDone=None, choices=None, mod=None):
     order[0] += 10
     o = {"id": id, "chain": chain, "order": order[0], "title": t, "giver": giver}
+    if mod: o["mod"] = mod
     if turnIn: o["turnIn"] = turnIn
     if requires: o["requires"] = requires
     if requiresFlags: o["requiresFlags"] = requiresFlags
@@ -294,12 +295,12 @@ p = q("hidden_illusioner_1", CH + " (1/2)", "빈 쪽의 잉크", ARCH,
       "연대기 페이지들을 맞춰 보다가 이상한 걸 발견했어요. 잘린 자리마다 보랏빛 잉크가 묻어 있어요. 환술사들이 쓰는 잉크예요. 숲속 저택의 일리저들이 그런 잉크를 쓴다던데… 저택 아래에 뭔가 있을지도 몰라요.",
       "숲속 저택을 찾아가 보세요.",
       "저택 지하에서 이상한 음악 소리가 들렸다고요? 소리가 나는 상자를 건드리면 무언가 깨어날 거예요. 이제 거울도 당신을 비출 거예요.",
-      [struct("minecraft:mansion", "숲속 저택")], gold=3000, requires=["story_3_7"], requiresFlags=["clue_hidden_page"], flags=["seal_illusioner"])
+      [struct("minecraft:mansion", "숲속 저택")], gold=3000, requires=["story_3_7"], requiresFlags=["clue_hidden_page"], flags=["seal_illusioner"], mod=I)
 p = q("hidden_illusioner_2", CH + " (2/2)", "거짓 연대기의 필경사", ARCH,
       "저택 아래의 환술사를 쓰러뜨리세요. 그가 연대기를 고쳐 썼다면, 진짜 페이지를 가지고 있을 거예요.",
       "저택 아래의 환술사를 쓰러뜨리세요.",
       "진짜 연대기의 한 장이에요! \"회색 망토의 학자 에르윈은 불꽃의 조각을 훔쳤고, 우리는 그의 이름을 지웠다. 그리고 그는 우리의 기록을 지웠다.\" …이걸 장로님이 보시면 안 돼요.",
-      [kill("illusioner:illusioner", 1, "환술사", I)], gold=6000, items=[item("rtshop:chronicle_page", 2)], requires=[p], flags=["clue_true_page"],
+      [kill("illusioner:illusioner", 1, "환술사", I)], gold=6000, items=[item("rtshop:chronicle_page", 2)], requires=[p], flags=["clue_true_page"], mod=I,
       sceneDone=vision("환술사 벨로크", "이 이야기는… 내가 쓴 것이다.\n진짜 마지막 장은 폭풍 속에 있다.", "B48CFF", "minecraft:entity.illusioner.mirror_move"))
 
 data = {

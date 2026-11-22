@@ -198,6 +198,9 @@ public final class QuestManager {
             for (JsonElement e : root.getAsJsonArray("quests")) {
                 try {
                     QuestDef q = QuestDef.parse(e.getAsJsonObject());
+                    if (!QuestDef.modOk(q.mod)) {
+                        continue; // 그 모드가 없으면 퀘스트째 뺀다 (예: 환술사 숨은 이야기)
+                    }
                     applyModConditions(q);
                     out.add(q);
                     files.put(q, name);

@@ -1557,6 +1557,7 @@
    "order": 1440,
    "title": "빈 쪽의 잉크",
    "giver": "quest_order_archivist",
+   "mod": "illusioner",
    "requires": [
     "story_3_7"
    ],
@@ -1586,6 +1587,7 @@
    "order": 1450,
    "title": "거짓 연대기의 필경사",
    "giver": "quest_order_archivist",
+   "mod": "illusioner",
    "requires": [
     "hidden_illusioner_1"
    ],

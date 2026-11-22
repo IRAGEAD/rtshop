@@ -265,11 +265,9 @@ jobs:
       - name: Install Forge server
         run: |
           cd server
-          # 가장 최신 47.4.x (The Illusioner 는 47.4.29 이상이 필요)
-          FV=$(curl -fsSL https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml | grep -oE "1\.20\.1-47\.4\.[0-9]+" | sort -t. -k5 -n | tail -1)
-          [ -n "$FV" ] || FV=1.20.1-47.4.28
+          # 모드팩(RT1 - 2_7)의 Forge 버전
+          FV=1.20.1-47.4.29
           echo "FORGE_VER=$FV" >> "$GITHUB_ENV"
-          echo "Forge $FV"
           curl -fsSL -o installer.jar "https://maven.minecraftforge.net/net/minecraftforge/forge/$FV/forge-$FV-installer.jar"
           java -jar installer.jar --installServer > installer.log 2>&1 || (tail -n 30 installer.log; exit 1)
           cp ../jar/*.jar mods/

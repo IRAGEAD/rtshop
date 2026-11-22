@@ -2110,7 +2110,7 @@ public final class SelfTest {
         List<String> story = new ArrayList<>();
         for (String id : l.quests.keySet()) if (id.startsWith("story_") || id.startsWith("hidden_")) story.add(id);
         check("the main story is installed (4 chapters + hidden story)", story.size() >= 40 && l.quests.containsKey("story_4_7c")
-                && l.quests.containsKey("hidden_illusioner_2"), story.size());
+                && l.quests.containsKey("hidden_illusioner_2") == net.minecraftforge.fml.ModList.get().isLoaded("illusioner"), story.size());
         check("the story quests load without problems", l.problems.stream().noneMatch(x -> x.contains("story")), l.problems);
         check("the order's three NPCs exist", l.npcs.containsKey("order_elder") && l.npcs.containsKey("order_archivist") && l.npcs.containsKey("order_captain"));
         net.minecraft.core.Registry<net.minecraft.world.level.levelgen.structure.Structure> sreg =

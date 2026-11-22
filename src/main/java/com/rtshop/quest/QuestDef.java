@@ -106,6 +106,8 @@ public final class QuestDef {
     public int order;
     /** 받을 때 / 끝낼 때 보여 줄 연출 (StoryPacket CINEMA 형식). 없으면 null. */
     public JsonObject sceneAccept, sceneDone;
+    /** 퀘스트 전체의 모드 조건 ("" = 항상). 맞지 않으면 퀘스트를 아예 불러오지 않는다. */
+    public String mod = "";
 
     public String turnInNpc() {
         return turnIn == null || turnIn.isEmpty() ? giver : turnIn;
@@ -159,6 +161,7 @@ public final class QuestDef {
         putText(o, "intro", intro);
         putText(o, "progress", progress);
         putText(o, "done", done);
+        putText(o, "mod", mod);
         if (sceneAccept != null) o.add("sceneAccept", sceneAccept);
         if (sceneDone != null) o.add("sceneDone", sceneDone);
         JsonArray objs = new JsonArray();
@@ -225,6 +228,7 @@ public final class QuestDef {
         q.giver = str(o, "giver", "").trim();
         q.turnIn = str(o, "turnIn", "").trim();
         q.order = o.has("order") ? o.get("order").getAsInt() : 0;
+        q.mod = str(o, "mod", "").trim();
         if (o.has("sceneAccept") && o.get("sceneAccept").isJsonObject()) q.sceneAccept = o.getAsJsonObject("sceneAccept");
         if (o.has("sceneDone") && o.get("sceneDone").isJsonObject()) q.sceneDone = o.getAsJsonObject("sceneDone");
         if (q.giver.isEmpty()) {
