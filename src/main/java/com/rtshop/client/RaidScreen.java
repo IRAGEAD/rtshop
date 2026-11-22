@@ -37,7 +37,7 @@ public class RaidScreen extends Screen {
     }
 
     private final List<Row> rows = new ArrayList<>();
-    /** 입장 화면의 일러스트: 불꽃 후광과 날개를 등지고 불타는 대검을 치켜든 화염의 군주 (이 모드의 창작 그림). */
+    /** 입장 화면의 일러스트: 불꽃 후광을 등지고 불타는 대검을 짚고 선 화염의 군주 (이 모드의 창작 그림). */
     private static final net.minecraft.resources.ResourceLocation LORD = new net.minecraft.resources.ResourceLocation("rtshop", "textures/gui/raid_lord.png");
     /** 입장 화면에 띄울 보스 (게임 속 실제 모델). 만들 수 없으면 null. */
     private net.minecraft.world.entity.LivingEntity bossEntity;
