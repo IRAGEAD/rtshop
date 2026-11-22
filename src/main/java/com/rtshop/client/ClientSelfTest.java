@@ -121,6 +121,11 @@ public final class ClientSelfTest {
             }
             return;
         }
+        // 다른 모드가 스스로 띄우는 대화창(예: Fantasy Mounts 의 퀘스트 대화)은 점검과 상관없으니 닫는다
+        if (mc.screen != null && mc.screen.getClass().getName().startsWith("com.bonfyre.")) {
+            RtShop.LOGGER.info("[rtshop-clienttest] closing a popup from another mod: {}", mc.screen.getClass().getName());
+            mc.setScreen(null);
+        }
         if (wait > 0) {
             wait--;
             return;

@@ -157,6 +157,11 @@ public final class ClientEvents {
     }
 
     @SubscribeEvent
+    public static void onRenderHand(net.minecraftforge.client.event.RenderHandEvent event) {
+        if (Cinematic.active()) event.setCanceled(true);
+    }
+
+    @SubscribeEvent
     public static void onCameraAngles(net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles event) {
         float[] s = Cinematic.shake();
         if (s[0] != 0 || s[1] != 0) {
