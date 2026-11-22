@@ -4457,13 +4457,13 @@ public final class SelfTest {
         up.pool("weapon").removeIf(e -> e.nbt.contains("\"katana:"));
         up.tiers.get("high").weights[5] = 0;
         up.tiers.get("high").weights[1] = 70;
-        int before = up.pool("weapon").size();
+        int beforeUp = up.pool("weapon").size();
         com.rtshop.gacha.GachaConfig.upgradeTo4ForTest(up);
         boolean movedYamato = up.pool("weapon").stream().filter(e -> java.util.Arrays.asList(com.rtshop.gacha.GachaConfig.YAMATO_ITEMS).contains(e.item))
                 .allMatch(e -> e.grade.equals("yamato"));
         check("upgrading an old gacha.json moves Yamato to YAMATO, adds the 17 Blade of Shadow weapons as epic and sets 0.04% (keeping the list)",
-                movedYamato && up.pool("weapon").size() == before + 17 && up.tiers.get("high").weights[5] == 0.04
-                        && Math.abs(up.tiers.get("high").weights[1] - 69.96) < 1e-9, up.pool("weapon").size() + " vs " + before);
+                movedYamato && up.pool("weapon").size() == beforeUp + 17 && up.tiers.get("high").weights[5] == 0.04
+                        && Math.abs(up.tiers.get("high").weights[1] - 69.96) < 1e-9, up.pool("weapon").size() + " vs " + beforeUp);
         com.rtshop.gacha.GachaConfig again = com.rtshop.gacha.GachaConfig.fromJson(c.toJson());
         check("gacha settings survive saving", again.pool("weapon").size() == nw && again.tiers.get("high").weights[4] == c.tiers.get("high").weights[4]);
         boolean refused;
