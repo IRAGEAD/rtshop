@@ -37,6 +37,8 @@ public class RaidScreen extends Screen {
     }
 
     private final List<Row> rows = new ArrayList<>();
+    /** 입장 화면의 일러스트: 불꽃 후광과 날개를 등지고 불타는 대검을 치켜든 화염의 군주 (이 모드의 창작 그림). */
+    private static final net.minecraft.resources.ResourceLocation LORD = new net.minecraft.resources.ResourceLocation("rtshop", "textures/gui/raid_lord.png");
     /** 입장 화면에 띄울 보스 (게임 속 실제 모델). 만들 수 없으면 null. */
     private net.minecraft.world.entity.LivingEntity bossEntity;
     private boolean bossTried = false;
@@ -194,7 +196,7 @@ public class RaidScreen extends Screen {
     }
 
     private int listY() {
-        return fy() + 58;
+        return fy() + 108;
     }
 
     private int listW() {
@@ -202,7 +204,7 @@ public class RaidScreen extends Screen {
     }
 
     private int listH() {
-        return H - 58 - 40;
+        return H - 108 - 40;
     }
 
     private int maxScroll() {
@@ -241,37 +243,37 @@ public class RaidScreen extends Screen {
         RaidFx.title(g, this.font, t("uiTitle"), x + 16, y + 11, 1.7F, 0xFFB040, time);
         g.drawString(this.font, "◆ " + t("uiSub"), x + 17, y + 31, 0xFFE07038, false);
         RaidFx.divider(g, x + 14, x + W - 14, y + 44, 0xFF7A20);
-        // 왼쪽 아래: 보스의 모습
-        g.enableScissor(x + 2, y + 46, x + 194, y + H - 2);
-        RaidFx.summonCircle(g, x + 98, y + H - 40, 78, time);
-        drawBoss(g, x + 98, y + H - 38, 96, 150);
-        g.disableScissor();
+        // 왼쪽: 화염의 군주 일러스트 (그 위로 불티가 흐른다)
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        g.blit(LORD, x + 10, y + 47, 174, 152, 0F, 0F, 512, 448, 512, 448);
+        RaidFx.embers(g, x + 10, y + 60, 174, 138, time * 1.3F + 7F, 22, false);
         g.pose().pushPose();
         g.pose().translate(0, 0, 200);
-        // 왼쪽: 조건과 상태
-        int ly = y + 52;
+        // 오른쪽 위: 조건과 상태
+        int sx = listX() - 2;
+        int ly = y + 50;
         int need = data.get("needKills").getAsInt(), kills = data.get("kills").getAsInt();
         if (need > 0) {
             boolean ok = kills >= need;
-            line(g, x + 16, ly, (ok ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_kills", kills, need).getString(), ok ? 0xFF8FE39A : 0xFFFF7060);
-            ly += 12;
+            line(g, sx, ly, (ok ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_kills", kills, need).getString(), ok ? 0xFF8FE39A : 0xFFFF7060);
+            ly += 10;
         }
         int tickets = data.get("tickets").getAsInt();
-        line(g, x + 16, ly, (tickets > 0 ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_tickets", tickets).getString(), tickets > 0 ? 0xFF8FE39A : 0xFFFF7060);
-        ly += 12;
+        line(g, sx, ly, (tickets > 0 ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_tickets", tickets).getString(), tickets > 0 ? 0xFF8FE39A : 0xFFFF7060);
+        ly += 10;
         int st = data.get("state").getAsInt();
-        line(g, x + 16, ly, Component.translatable(st == Raid.IDLE ? "rtshop.raid.ui_open" : "rtshop.raid.ui_locked", data.get("inside").getAsInt()).getString(),
+        line(g, sx, ly, Component.translatable(st == Raid.IDLE ? "rtshop.raid.ui_open" : "rtshop.raid.ui_locked", data.get("inside").getAsInt()).getString(),
                 st == Raid.IDLE ? 0xFFF5E6C0 : 0xFFFF7060);
-        ly += 12;
-        line(g, x + 16, ly, Component.translatable("rtshop.raid.ui_power", pctMult(data.get("health").getAsDouble()), pctMult(data.get("damage").getAsDouble())).getString(), 0xFFD9B0A8);
-        ly += 12;
+        ly += 10;
+        line(g, sx, ly, Component.translatable("rtshop.raid.ui_power", pctMult(data.get("health").getAsDouble()), pctMult(data.get("damage").getAsDouble())).getString(), 0xFFD9B0A8);
+        ly += 10;
         long ms = data.get("resetIn").getAsLong();
-        line(g, x + 16, ly, Component.translatable("rtshop.raid.ui_reset", ms / 86_400_000L, (ms / 3_600_000L) % 24).getString(), 0xFFB8AF9C);
+        line(g, sx, ly, Component.translatable("rtshop.raid.ui_reset", ms / 86_400_000L, (ms / 3_600_000L) % 24).getString(), 0xFFB8AF9C);
         String why = data.get("why").getAsString();
         if (!why.isEmpty()) {
             List<FormattedCharSequence> wl = this.font.split(Component.literal(why), 168);
             int wy = y + H - 36 - wl.size() * 10;
-            g.fill(x + 12, wy - 3, x + 190, y + H - 34, 0xB0000000);
+            g.fill(x + 10, wy - 3, x + 184, y + H - 34, 0xC0000000);
             for (FormattedCharSequence l : wl) {
                 g.drawString(this.font, l, x + 16, wy, 0xFFFF9080, false);
                 wy += 10;
@@ -351,7 +353,7 @@ public class RaidScreen extends Screen {
     }
 
     private void line(GuiGraphics g, int x, int y, String s, int color) {
-        g.drawString(this.font, Ui.clip(this.font, s, 172), x, y, color, false);
+        g.drawString(this.font, Ui.clip(this.font, s, listW() + 4), x, y, color, false);
     }
 
     private void renderDialogue(GuiGraphics g) {
