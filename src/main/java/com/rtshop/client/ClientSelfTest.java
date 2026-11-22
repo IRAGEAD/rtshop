@@ -88,11 +88,12 @@ public final class ClientSelfTest {
     private static final int ENH_END = NPC_END + ENH_STEPS;
     private static final int PLOT_STEPS = 11;
     private static final int PLOT_END = ENH_END + PLOT_STEPS;
-    private static final int PS_STEPS = 8;
+    private static final int PS_STEPS = 9;
     private static final int PS_END = PLOT_END + PS_STEPS;
     private static final int RULE_STEPS = 12;
     private static final int RULE_END = PS_END + RULE_STEPS;
     private static volatile BlockPos pshopPos = null;
+    private static volatile int pshopClerk = -1;
     private static volatile net.minecraft.world.item.Item pshopWare = null;
     private static volatile int plotNpc = -1;
     private static volatile int boughtLot = -1;
@@ -686,6 +687,7 @@ public final class ClientSelfTest {
             }
             case 1 -> {
                 check("the owner's player shop window opens", ps != null && ps.ownerForTest() && ps.fitsForTest(), mc.screen);
+                check("the owner window shows the hired clerk", ps != null && !ps.employeeForTest().isEmpty(), ps == null ? "none" : ps.employeeForTest());
                 if (ps != null && pshopWare != null) ps.bagSelectForTest(pshopWare);
                 wait = 10;
             }
@@ -710,12 +712,26 @@ public final class ClientSelfTest {
                         be.owner = java.util.UUID.nameUUIDFromBytes("rtshop-test-shop-owner".getBytes());
                         be.ownerName = "Merchant_Kim";
                         be.name = "김씨네 잡화";
+                        var e = com.rtshop.pshop.Employees.hire(sp.serverLevel(), pos, be);
+                        var v = e == null ? null : sp.serverLevel().getEntity(e.entity);
+                        pshopClerk = v == null ? -1 : v.getId();
                     }
-                    com.rtshop.pshop.PlayerShops.open(sp, pos);
                 });
                 wait = 20;
             }
             case 5 -> {
+                net.minecraft.world.entity.Entity clerk = pshopClerk >= 0 ? mc.level.getEntity(pshopClerk) : null;
+                check("placing the stand hired a clerk who stands by it", clerk != null && clerk.hasCustomName(), pshopClerk);
+                if (clerk != null) {
+                    mc.player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, clerk.getEyePosition());
+                    shot(mc, "91b_pshop_clerk");
+                    mc.gameMode.interact(mc.player, clerk, net.minecraft.world.InteractionHand.MAIN_HAND);
+                }
+                wait = 25;
+            }
+            case 6 -> {
+                check("right-clicking the clerk opens the same shop window", ps != null && !ps.employeeForTest().isEmpty() && ps.workingForTest(),
+                        ps == null ? mc.screen : ps.employeeForTest());
                 check("another player's shop opens as a buyer", ps != null && !ps.ownerForTest(), mc.screen);
                 if (ps != null) {
                     ps.selectForTest(0);
@@ -724,7 +740,7 @@ public final class ClientSelfTest {
                 }
                 wait = 20;
             }
-            case 6 -> {
+            case 7 -> {
                 check("buying 5 lowers the stock to 27", ps != null && ps.stockForTest(0) == 27, ps == null ? "none" : ps.stockForTest(0));
                 shot(mc, "93_pshop_bought");
                 wait = 5;

@@ -3213,10 +3213,101 @@ public final class SelfTest {
         net.minecraftforge.event.level.BlockEvent.BreakEvent ev = new net.minecraftforge.event.level.BlockEvent.BreakEvent(level, pos, level.getBlockState(pos), b);
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(ev);
         check("someone else cannot break the shop", ev.isCanceled());
+        employees(server, level, a, b, pos, be, ware);
+        java.util.UUID clerk = com.rtshop.pshop.Employees.entry(level, pos) == null ? null : com.rtshop.pshop.Employees.entry(level, pos).entity;
         level.removeBlock(pos, false);
+        check("the first clerk leaves with the stand too", clerk == null || level.getEntity(clerk) == null);
         level.setBlock(pos.below(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
         a.getInventory().clearContent();
         b.getInventory().clearContent();
+    }
+
+    private static String trKey(net.minecraft.network.chat.Component c) {
+        return c != null && c.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc ? tc.getKey() : String.valueOf(c);
+    }
+
+    /** 플레이어 상점 직원: 고용, 이름, 우클릭, 고용비(예금 → 지갑), 모자라면 휴무, [고용비 내기], 진열대를 부수면 퇴사. */
+    private static void employees(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b, BlockPos pos,
+                                  com.rtshop.pshop.PlayerShopBlockEntity be, net.minecraft.world.item.Item ware) {
+        LINES.add("");
+        LINES.add("[player shop clerks]");
+        com.rtshop.pshop.Employees.Data sd = com.rtshop.pshop.Employees.data(server);
+        com.rtshop.pshop.Employees.Entry e1 = com.rtshop.pshop.Employees.hire(level, pos, be);
+        net.minecraft.world.entity.Entity v1 = e1 == null ? null : level.getEntity(e1.entity);
+        check("a stand with an owner gets a clerk standing right next to it", v1 instanceof net.minecraft.world.entity.npc.Villager
+                && com.rtshop.pshop.Employees.isEmployee(v1) && v1.distanceToSqr(net.minecraft.world.phys.Vec3.atBottomCenterOf(pos)) <= 2.5, v1);
+        check("the clerk is a protected NPC with a name tag", v1 != null && ShopServer.isNpc(v1) && v1.hasCustomName()
+                && trKey(v1.getCustomName()).equals("rtshop.pshop.emp_label"), v1 == null ? "none" : v1.getCustomName());
+        check("hiring again keeps the same clerk", com.rtshop.pshop.Employees.hire(level, pos, be) == e1 && level.getEntity(e1.entity) == v1);
+        if (v1 != null) {
+            net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract ie = new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract(b, net.minecraft.world.InteractionHand.MAIN_HAND, v1);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(ie);
+            check("right-clicking the clerk opens the stand (no villager trading)", ie.isCanceled());
+        }
+        BlockPos pos2 = pos.offset(4, 0, 0);
+        level.setBlock(pos2.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 3);
+        level.setBlock(pos2, com.rtshop.enhance.ModEnhance.PSHOP.get().defaultBlockState(), 3);
+        com.rtshop.pshop.PlayerShopBlockEntity be2 = (com.rtshop.pshop.PlayerShopBlockEntity) level.getBlockEntity(pos2);
+        be2.owner = b.getUUID();
+        be2.ownerName = "rtshop_test_b";
+        com.rtshop.pshop.Employees.Entry e2 = com.rtshop.pshop.Employees.hire(level, pos2, be2);
+        check("each owner's clerk has a different name", e2 != null && !e2.name.isEmpty() && !e2.name.equals(e1.name), e1.name + " / " + (e2 == null ? "-" : e2.name));
+        check("a newly hired clerk works on the first day for free", com.rtshop.pshop.Employees.working(level, pos2));
+        // 다음 날: 출석 초기화 시각이 지나 고용비를 낸다
+        java.util.function.LongSupplier oldClock = com.rtshop.attendance.Attendance.clock;
+        long now = System.currentTimeMillis();
+        try {
+            com.rtshop.attendance.Attendance.clock = () -> now;
+            sd.lastDay = com.rtshop.pshop.Employees.today();
+            com.rtshop.attendance.Attendance.clock = () -> now + 86_400_000L;
+            long tomorrow = com.rtshop.pshop.Employees.today();
+            EconomyData ed = EconomyData.get(server);
+            ed.setBank(a.getUUID(), 600);
+            ed.setWallet(a.getUUID(), 600);
+            ed.setBank(b.getUUID(), 0);
+            ed.setWallet(b.getUUID(), 300);
+            sd.pending.remove(b.getUUID());
+            com.rtshop.pshop.Employees.payDay(server);
+            check("at the daily reset the wage is taken from the bank first, then the wallet",
+                    ed.bank(a.getUUID()) == 0 && ed.wallet(a.getUUID()) == 200 && e1.paidDay == tomorrow,
+                    ed.bank(a.getUUID()) + " / " + ed.wallet(a.getUUID()));
+            check("an owner who cannot pay keeps the money and the clerk takes the day off",
+                    ed.wallet(b.getUUID()) == 300 && !com.rtshop.pshop.Employees.working(level, pos2));
+            check("the owner gets a wage notice (kept for when they log in)", sd.pending.containsKey(b.getUUID())
+                    && sd.pending.get(b.getUUID()).stream().anyMatch(m -> m.contains("rtshop.pshop.wage_short")), sd.pending.get(b.getUUID()));
+            com.rtshop.pshop.Employees.payDay(server);
+            check("the wage is taken only once a day", ed.wallet(a.getUUID()) == 200);
+            // 쉬는 날에는 살 수 없다
+            com.rtshop.pshop.PlayerShopBlockEntity.Listing l = new com.rtshop.pshop.PlayerShopBlockEntity.Listing();
+            l.item = new ItemStack(ware);
+            l.price = 1;
+            l.stock = 5;
+            be2.listings.add(l);
+            com.rtshop.economy.Economy.setWallet(a, 100);
+            a.setPos(pos2.getX() + 1.5, pos2.getY(), pos2.getZ() + 0.5);
+            com.rtshop.pshop.PlayerShops.handle(a, pos2, com.rtshop.pshop.PlayerShops.BUY, "{\"i\":0,\"n\":1}");
+            check("customers cannot buy while the clerk is off", l.stock == 5 && trKey(com.rtshop.pshop.PlayerShops.lastResult).equals("rtshop.pshop.closed_today"),
+                    trKey(com.rtshop.pshop.PlayerShops.lastResult));
+            b.setPos(pos2.getX() - 0.5, pos2.getY(), pos2.getZ() + 0.5);
+            ed.setWallet(b.getUUID(), 2500);
+            com.rtshop.pshop.PlayerShops.handle(b, pos2, com.rtshop.pshop.PlayerShops.PAY_WAGE, "{}");
+            check("[Pay wage] brings the clerk back to work right away", com.rtshop.pshop.Employees.working(level, pos2) && ed.wallet(b.getUUID()) == 1500,
+                    ed.wallet(b.getUUID()));
+            com.rtshop.pshop.PlayerShops.handle(a, pos2, com.rtshop.pshop.PlayerShops.BUY, "{\"i\":0,\"n\":1}");
+            check("...and customers can buy again", l.stock == 4);
+        } finally {
+            com.rtshop.attendance.Attendance.clock = oldClock;
+        }
+        // 직원이 사라지면 다시 선다, 진열대를 부수면 떠난다
+        net.minecraft.world.entity.Entity v2 = level.getEntity(e2.entity);
+        if (v2 != null) v2.discard();
+        com.rtshop.pshop.Employees.checkStaff(server);
+        check("a missing clerk comes back to the stand", level.getEntity(e2.entity) instanceof net.minecraft.world.entity.npc.Villager nv && nv.isAlive());
+        java.util.UUID id2 = e2.entity;
+        level.removeBlock(pos2, false);
+        level.setBlock(pos2.below(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+        check("breaking the stand sends the clerk away", level.getEntity(id2) == null && com.rtshop.pshop.Employees.entry(level, pos2) == null);
+        a.setPos(pos.getX() + 1.5, pos.getY(), pos.getZ() + 0.5);
     }
 
     private static int countOf(FakePlayer p, net.minecraft.world.item.Item item) {

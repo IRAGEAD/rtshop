@@ -88,7 +88,7 @@ public final class Employees {
         public long paidDay;
 
         String key() {
-            return key(dim, pos);
+            return Employees.key(dim, pos);
         }
     }
 
@@ -96,8 +96,8 @@ public final class Employees {
         static final String NAME = "rtshop_pshop_staff";
         public final Map<String, Entry> entries = new LinkedHashMap<>();
         /** 아직 접속하지 않은 주인에게 보낼 알림(JSON). */
-        final Map<UUID, List<String>> pending = new HashMap<>();
-        long lastDay = Long.MIN_VALUE;
+        public final Map<UUID, List<String>> pending = new HashMap<>();
+        public long lastDay = Long.MIN_VALUE;
 
         static Data load(CompoundTag tag) {
             Data d = new Data();
@@ -421,7 +421,7 @@ public final class Employees {
     }
 
     /** 불러온 곳의 진열대마다 직원이 있는지 본다: 진열대가 사라졌으면 내보내고, 직원이 없어졌으면 다시 세운다. */
-    static void checkStaff(MinecraftServer server) {
+    public static void checkStaff(MinecraftServer server) {
         Data d = data(server);
         for (Entry e : new ArrayList<>(d.entries.values())) {
             ServerLevel level = server.getLevel(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(e.dim)));
