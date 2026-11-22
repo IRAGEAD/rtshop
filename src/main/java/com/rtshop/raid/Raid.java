@@ -311,6 +311,7 @@ public final class Raid {
         for (String k : RaidConfig.defaultTexts().keySet()) t.addProperty(k, c.text(k));
         o.add("texts", t);
         String why = cannotEnter(p);
+        o.addProperty("boss", c.boss);
         o.addProperty("canEnter", why == null);
         o.addProperty("why", why == null ? "" : why);
         o.addProperty("kills", kills(p));

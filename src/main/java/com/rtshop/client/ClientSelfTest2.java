@@ -438,6 +438,9 @@ final class ClientSelfTest2 {
             RaidScreen rs = mc.screen instanceof RaidScreen x ? x : null;
             check("then the boss entry screen lists the conditions and every reward (weekly + drops by grade)", rs != null && rs.rowsForTest() >= 10
                     && !rs.canEnterForTest(), rs == null ? mc.screen : rs.rowsForTest());
+            if (net.minecraftforge.fml.ModList.get().isLoaded("cataclysm")) {
+                check("the entry screen shows the boss itself (Ignis)", rs != null && rs.bossDrawnForTest());
+            }
             shot(mc, "100b_raid_entry");
             if (rs != null) rs.phaseForTest(3, true);
             waitTicks(5);

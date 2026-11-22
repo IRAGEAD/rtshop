@@ -37,6 +37,72 @@ public class RaidScreen extends Screen {
     }
 
     private final List<Row> rows = new ArrayList<>();
+    /** 입장 화면에 띄울 보스 (게임 속 실제 모델). 만들 수 없으면 null. */
+    private net.minecraft.world.entity.LivingEntity bossEntity;
+    private boolean bossTried = false;
+    private boolean bossDrawn = false;
+
+    private net.minecraft.world.entity.LivingEntity bossEntity() {
+        if (!bossTried) {
+            bossTried = true;
+            try {
+                net.minecraft.resources.ResourceLocation rl = net.minecraft.resources.ResourceLocation.tryParse(data.get("boss").getAsString());
+                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+                if (rl != null && mc.level != null && net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.containsKey(rl)
+                        && net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.getValue(rl).create(mc.level) instanceof net.minecraft.world.entity.LivingEntity le) {
+                    le.setNoGravity(true);
+                    le.setSilent(true);
+                    bossEntity = le;
+                }
+            } catch (Throwable t) {
+                bossEntity = null;
+            }
+        }
+        return bossEntity;
+    }
+
+    /** 보스를 불빛 속에 크게 그린다 (천천히 좌우로 몸을 돌린다). */
+    private void drawBoss(GuiGraphics g, int cx, int feetY, int maxH, int maxW) {
+        net.minecraft.world.entity.LivingEntity e = bossEntity();
+        if (e == null) return;
+        float time = (System.currentTimeMillis() - openedAt) / 1000F;
+        float eh = Math.max(0.6F, e.getBbHeight()), ew = Math.max(0.6F, e.getBbWidth());
+        int scale = (int) Math.max(8, Math.min(maxH / eh, maxW / (ew * 1.25F)));
+        Fx2D.begin(g, true);
+        Fx2D.glow(cx, feetY - maxH * 0.45F, maxW * 0.62F, maxH * 0.62F, 0x70FF5A14, 0x00FF5A14);
+        Fx2D.glow(cx, feetY, maxW * 0.55F, 9, 0x90FFB040, 0x00FF7A20);
+        Fx2D.end();
+        float yaw = 180F + (float) Math.sin(time * 0.6F) * 28F;
+        float oBody = e.yBodyRot, oY = e.getYRot(), oX = e.getXRot(), oHeadO = e.yHeadRotO, oHead = e.yHeadRot;
+        try {
+            e.yBodyRot = yaw;
+            e.setYRot(yaw);
+            e.setXRot(0);
+            e.yHeadRot = yaw;
+            e.yHeadRotO = yaw;
+            e.tickCount = (int) (time * 20);
+            org.joml.Quaternionf pose = new org.joml.Quaternionf().rotateZ((float) Math.PI);
+            org.joml.Quaternionf cam = new org.joml.Quaternionf().rotateX(-0.08F);
+            pose.mul(cam);
+            net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventory(g, cx, feetY, scale, pose, cam, e);
+            bossDrawn = true;
+        } catch (Throwable t) {
+            bossEntity = null; // 그릴 수 없는 보스면 그림 없이 간다
+            g.flush();
+        } finally {
+            if (bossEntity != null) {
+                e.yBodyRot = oBody;
+                e.setYRot(oY);
+                e.setXRot(oX);
+                e.yHeadRot = oHead;
+                e.yHeadRotO = oHeadO;
+            }
+        }
+    }
+
+    public boolean bossDrawnForTest() {
+        return bossDrawn;
+    }
 
     public RaidScreen(JsonObject data) {
         super(Component.literal("raid"));
@@ -182,33 +248,42 @@ public class RaidScreen extends Screen {
         g.pose().popPose();
         g.drawString(this.font, t("uiSub"), x + 17, y + 31, 0xFFD06030, false);
         g.fill(x + 14, y + 44, x + W - 14, y + 45, 0xFF6A1A0C);
+        // 왼쪽 아래: 보스의 모습
+        g.enableScissor(x + 2, y + 46, x + 192, y + H - 2);
+        drawBoss(g, x + 98, y + H - 36, 92, 150);
+        g.disableScissor();
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 200);
         // 왼쪽: 조건과 상태
-        int ly = y + 58;
+        int ly = y + 52;
         int need = data.get("needKills").getAsInt(), kills = data.get("kills").getAsInt();
         if (need > 0) {
             boolean ok = kills >= need;
             line(g, x + 16, ly, (ok ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_kills", kills, need).getString(), ok ? 0xFF8FE39A : 0xFFFF7060);
-            ly += 13;
+            ly += 12;
         }
         int tickets = data.get("tickets").getAsInt();
         line(g, x + 16, ly, (tickets > 0 ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_tickets", tickets).getString(), tickets > 0 ? 0xFF8FE39A : 0xFFFF7060);
-        ly += 13;
+        ly += 12;
         int st = data.get("state").getAsInt();
         line(g, x + 16, ly, Component.translatable(st == Raid.IDLE ? "rtshop.raid.ui_open" : "rtshop.raid.ui_locked", data.get("inside").getAsInt()).getString(),
                 st == Raid.IDLE ? 0xFFF5E6C0 : 0xFFFF7060);
-        ly += 13;
+        ly += 12;
         line(g, x + 16, ly, Component.translatable("rtshop.raid.ui_power", pctMult(data.get("health").getAsDouble()), pctMult(data.get("damage").getAsDouble())).getString(), 0xFFD9B0A8);
-        ly += 13;
+        ly += 12;
         long ms = data.get("resetIn").getAsLong();
         line(g, x + 16, ly, Component.translatable("rtshop.raid.ui_reset", ms / 86_400_000L, (ms / 3_600_000L) % 24).getString(), 0xFFB8AF9C);
-        ly += 18;
         String why = data.get("why").getAsString();
         if (!why.isEmpty()) {
-            for (FormattedCharSequence l : this.font.split(Component.literal(why), 168)) {
-                g.drawString(this.font, l, x + 16, ly, 0xFFFF9080, false);
-                ly += 10;
+            List<FormattedCharSequence> wl = this.font.split(Component.literal(why), 168);
+            int wy = y + H - 36 - wl.size() * 10;
+            g.fill(x + 12, wy - 3, x + 190, y + H - 34, 0xB0000000);
+            for (FormattedCharSequence l : wl) {
+                g.drawString(this.font, l, x + 16, wy, 0xFFFF9080, false);
+                wy += 10;
             }
         }
+        g.pose().popPose();
         // 오른쪽: 보상 목록
         int lx = listX(), lt = listY(), lw = listW(), lh = listH();
         g.fill(lx - 4, lt - 4, lx + lw + 4, lt + lh + 4, 0xAA000000);
