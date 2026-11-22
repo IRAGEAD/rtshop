@@ -218,7 +218,11 @@ public class RaidScreen extends Screen {
         int st = data.get("state").getAsInt();
         boolean open = st == Raid.IDLE;
         Fx2D.begin(g, true);
-        Fx2D.glow(cx + 6, ly + 4, 5, Fx2D.rgba(open ? 0x6FD483 : 0xFF5A48, 0.8F + 0.2F * (float) Math.sin(time * 3F)), Fx2D.rgba(open ? 0x6FD483 : 0xFF5A48, 0));
+        Fx2D.glow(cx + 6, ly + 4, 7, Fx2D.rgba(open ? 0x6FD483 : 0xFF5A48, 0.35F + 0.25F * (float) Math.sin(time * 3F)), Fx2D.rgba(open ? 0x6FD483 : 0xFF5A48, 0));
+        Fx2D.end();
+        Fx2D.begin(g, false);
+        Fx2D.ring(cx + 6, ly + 4, 0, 3.2F, 0xFF000000, 0xFF000000);
+        Fx2D.ring(cx + 6, ly + 4, 0, 2.4F, open ? 0xFFC8FFD0 : 0xFFFFD0C8, open ? 0xFF4FB463 : 0xFFE0402E);
         Fx2D.end();
         RaidText.draw(g, this.font, RaidText.clip(this.font, tr(open ? "rtshop.raid.ui_open" : "rtshop.raid.ui_locked", data.get("inside").getAsInt()), RaidText.SANS, cw - 16),
                 RaidText.SANS, cx + 14, ly, open ? 0xFFD8CDB8 : 0xFFF2C8BE);
@@ -362,7 +366,7 @@ public class RaidScreen extends Screen {
         RaidFx.hairline(g, bx + 24, bx + bw - 24, by + 31, 0xD4A85A, 0.9F);
         RaidFx.crest(g, this.width / 2F, by + 31, time);
         int ty = by + 40;
-        for (FormattedCharSequence l : RaidText.split(this.font, t("confirmBody"), RaidText.SANS, bw - 32)) {
+        for (FormattedCharSequence l : RaidText.split(this.font, t("confirmBody"), RaidText.SANS, bw - 70)) {
             g.drawCenteredString(this.font, l, this.width / 2, ty, 0xFFE9DFCB);
             ty += 11;
         }
