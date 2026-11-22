@@ -2491,8 +2491,9 @@ public final class SelfTest {
         for (Item item : ForgeRegistries.ITEMS.getValues()) {
             ItemStack plain = new ItemStack(item);
             String id = String.valueOf(ForgeRegistries.ITEMS.getKey(item));
-            if (!SeedRules.isPlantable(plain) || id.startsWith("tacz:") || id.startsWith("kubejs:")) {
-                continue;
+            if (!SeedRules.isPlantable(plain) || id.startsWith("tacz:") || id.startsWith("kubejs:")
+                    || com.rtshop.shop.PricingConfig.get().notForSaleMods.contains(id.substring(0, id.indexOf(':')))) {
+                continue; // 보스 모드 물건(예: 폴리아스 씨앗)은 상점에서 팔지 않는다
             }
             plantable++;
             boolean sold = false;
