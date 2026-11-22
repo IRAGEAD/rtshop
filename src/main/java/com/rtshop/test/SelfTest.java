@@ -846,6 +846,7 @@ public final class SelfTest {
         // +7 이상 성공: 서버 알림은 강화한 사람의 화면 연출(긴장 구간)이 끝난 뒤에 나간다
         com.rtshop.util.Later.flushForTest();
         com.rtshop.enhance.Enhance.lastBroadcast = "";
+        giveMaterials(a, cfg, 7, 1);
         r = enhanceOnce(level, pos, a, sword, 6, 0, 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
         check("+7 success: the server-wide notice waits for the on-screen build-up", com.rtshop.enhance.Enhance.level(r) == 7
                 && com.rtshop.enhance.Enhance.lastBroadcast.isEmpty() && com.rtshop.util.Later.pendingForTest() == 1,
@@ -858,7 +859,6 @@ public final class SelfTest {
                 && com.rtshop.enhance.Enhance.fxTier(11, 7) == 3
                 && com.rtshop.enhance.Enhance.suspenseMs(1) < com.rtshop.enhance.Enhance.suspenseMs(2)
                 && com.rtshop.enhance.Enhance.suspenseMs(2) < com.rtshop.enhance.Enhance.suspenseMs(3));
-        giveMaterials(a, cfg, 7, 10);
         // 보호권은 손에 들고 우클릭해 미리 사용 (1장 소모), 같은 보호를 또 걸 수는 없음
         a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dmgGuard.copy());
         dmgGuard.getItem().use(level, a, net.minecraft.world.InteractionHand.MAIN_HAND);
