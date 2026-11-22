@@ -79,7 +79,9 @@ public final class ClientSelfTest {
     /** 상인 NPC 를 실제로 우클릭해 보는 단계 (상호작용 때 다른 모드와 부딪혀 튕기는지). */
     private static final String[] NPCS = {"fisher", "farmer", "food", "blacksmith", "general", "land", "bank",
             "attendance", "gacha", "job"};
-    private static final int FX_END = LAST + 18 + 10;
+    /** FX_SHOTS 의 개수 (클래스 초기화 순서 때문에 숫자로 둔다). */
+    private static final int FX_COUNT = 19;
+    private static final int FX_END = LAST + 18 + 5 + FX_COUNT;
     private static final int NPC_END = FX_END + NPCS.length * 3;
     private static volatile int gachaNpc = -1;
     private static volatile int testNpc = -1;
@@ -265,7 +267,28 @@ public final class ClientSelfTest {
         return s;
     }
 
-    /** 뽑기 종류별 화면, 티켓 교환, 영웅·전설 연출의 장면들. */
+    /** 등급별 뽑기 연출의 장면: {등급, 틱, 사진 이름, 기다릴 틱}. YAMATO 의 깨짐은 실제로 흘려서 화면을 찍어 조각낸다. */
+    static final Object[][] FX_SHOTS = {
+            {0, 20, "54a_fx_common_reveal", 2}, {1, 16, "54b_fx_uncommon_pulse", 2}, {1, 28, "54c_fx_uncommon_reveal", 2},
+            {2, 24, "54d_fx_rare_bells", 2}, {2, 36, "54e_fx_rare_hold", 2}, {2, 46, "54f_fx_rare_reveal", 2},
+            {3, 30, "54g_fx_epic_circle", 2}, {3, 52, "54h_fx_epic_lightning", 2}, {3, 74, "54i_fx_epic_reveal", 2},
+            {4, 40, "54j_fx_legendary_fake_epic", 2}, {4, 56, "54k_fx_legendary_silence", 2}, {4, 63, "54l_fx_legendary_strike", 2},
+            {4, 94, "54m_fx_legendary_gold", 2}, {4, 132, "54n_fx_legendary_reveal", 2},
+            {5, 96, "54o_fx_yamato_as_legendary", 2}, {5, 132, "54p_fx_yamato_slashes", 2}, {5, 158, "54q_fx_yamato_quiet", 2},
+            {5, com.rtshop.client.GachaFx.YM_BREAK - 3, "54r_fx_yamato_shatter", 7}, {5, com.rtshop.client.GachaFx.YM_BREAK + 40, "54s_fx_yamato_reveal", 2},
+    };
+
+    static {
+        if (FX_SHOTS.length != FX_COUNT) throw new IllegalStateException("FX_COUNT");
+    }
+
+    private static void fxShot(GachaScreen gs, int i) {
+        Object[] f = FX_SHOTS[i];
+        if (gs != null) gs.fxForTest((Integer) f[0], (Integer) f[1]);
+        wait = (Integer) f[3];
+    }
+
+    /** 뽑기 종류별 화면, 티켓 교환, 등급별 연출의 장면들. */
     private static void gachaStep(Minecraft mc, int k) {
         GachaScreen gs = mc.screen instanceof GachaScreen s ? s : null;
         switch (k) {
@@ -300,44 +323,18 @@ public final class ClientSelfTest {
             }
             case 4 -> {
                 shot(mc, "53_gacha_ticket_exchange");
-                if (gs != null) {
-                    gs.fxForTest(3, 28);
-                }
-                wait = 2;
-            }
-            case 5 -> {
-                shot(mc, "54_fx_epic_charge");
-                check("the epic animation plays", gs != null && gs.fxActiveForTest());
-                if (gs != null) {
-                    gs.fxForTest(3, 48);
-                }
-                wait = 2;
-            }
-            case 6 -> {
-                shot(mc, "55_fx_epic_reveal");
-                if (gs != null) {
-                    gs.fxForTest(4, 40);
-                }
-                wait = 2;
-            }
-            case 7 -> {
-                shot(mc, "56_fx_legendary_charge");
-                if (gs != null) {
-                    gs.fxForTest(4, 58);
-                }
-                wait = 2;
-            }
-            case 8 -> {
-                shot(mc, "57_fx_legendary_upgrade");
-                if (gs != null) {
-                    gs.fxForTest(4, 100);
-                }
-                wait = 2;
+                fxShot(gs, 0);
             }
             default -> {
-                shot(mc, "58_fx_legendary_reveal");
-                check("the legendary animation plays", gs != null && gs.fxActiveForTest());
-                wait = 5;
+                int i = k - 4;
+                Object[] prev = FX_SHOTS[i - 1];
+                shot(mc, (String) prev[2]);
+                check("the " + prev[2] + " scene plays", gs != null && gs.fxActiveForTest(), gs == null ? "no screen" : gs.fxTickForTest());
+                if (i < FX_SHOTS.length) {
+                    fxShot(gs, i);
+                } else {
+                    wait = 5;
+                }
             }
         }
     }

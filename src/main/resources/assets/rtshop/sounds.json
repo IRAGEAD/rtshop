@@ -1,0 +1,11 @@
+{
+  "gacha.yamato": {
+    "subtitle": "rtshop.subtitle.gacha_yamato",
+    "sounds": [
+      {
+        "name": "rtshop:gacha/yamato",
+        "stream": true
+      }
+    ]
+  }
+}

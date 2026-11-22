@@ -4378,9 +4378,14 @@ public final class SelfTest {
                 String ns = e.item.substring(0, e.item.indexOf(':'));
                 String nbt = e.nbt.toLowerCase(java.util.Locale.ROOT);
                 boolean lr = e.item.equals("lrtactical:melee");
+                boolean bos = nbt.contains("\"katana:");
                 if (gi >= 3) {
                     topN++;
-                    if (!ns.equals("efn") && !(lr && nbt.contains("karambit"))) {
+                    if (gi == 5 && !java.util.Arrays.asList(com.rtshop.gacha.GachaConfig.YAMATO_ITEMS).contains(e.item)) {
+                        badW.add("not yamato " + e.item);
+                    }
+                    if (bos && gi != 3) badW.add("blade of shadow not epic " + e.nbt);
+                    if (!ns.equals("efn") && !(lr && nbt.contains("karambit")) && !bos) {
                         badW.add(e.item + "@" + e.grade);
                     }
                 } else if (!ns.equals("epicfight") && !(lr && (nbt.contains("baseball") || nbt.contains("dagger")) && gi == 2)) {
@@ -4390,17 +4395,21 @@ public final class SelfTest {
             if (c.pool("weapon").stream().filter(e -> e.item.startsWith("efn:")).count() != 12) {
                 badW.add("efn count " + c.pool("weapon").stream().filter(e -> e.item.startsWith("efn:")).count());
             }
-            java.util.Map<String, String> want = java.util.Map.of("efn:hf_murasama", "legendary", "efn:yamato_dmc_in_sheath", "legendary",
+            java.util.Map<String, String> want = java.util.Map.of("efn:hf_murasama", "legendary", "efn:yamato_dmc_in_sheath", "yamato",
                     "efn:kusabimaru", "epic", "efn:ruinsgreatsword", "epic");
             for (var w : want.entrySet()) {
                 if (c.pool("weapon").stream().noneMatch(e -> e.item.equals(w.getKey()) && e.grade.equals(w.getValue()))) {
                     badW.add("missing " + w.getKey());
                 }
             }
-            check("weapons: only the 12 fixed Nightfall weapons and the karambit are epic/legendary, the rest are Epic Fight base weapons", topN > 0 && badW.isEmpty(), badW);
+            if (c.pool("weapon").stream().filter(e -> e.nbt.contains("\"katana:")).count() != 17) {
+                badW.add("blade of shadow count " + c.pool("weapon").stream().filter(e -> e.nbt.contains("\"katana:")).count());
+            }
+            check("weapons: the 12 fixed Nightfall weapons, the karambit and the 17 Blade of Shadow weapons are epic+ (Yamato alone is YAMATO), the rest are Epic Fight base weapons",
+                    topN > 0 && badW.isEmpty(), badW);
             StringBuilder sb = new StringBuilder();
             for (String cat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
-                int[] g = new int[5];
+                int[] g = new int[com.rtshop.gacha.GachaConfig.GRADES.length];
                 for (com.rtshop.gacha.GachaConfig.Entry e : c.pool(cat)) {
                     g[com.rtshop.gacha.GachaConfig.gradeIndex(e.grade)]++;
                 }
@@ -4435,6 +4444,26 @@ public final class SelfTest {
         }
         check("grade odds add up to 100% and legendary is rare", Math.abs(sum - 1) < 1e-9 && hw[4] <= 0.0031 && hw[3] <= 0.033,
                 java.util.Arrays.toString(hw));
+        boolean yamatoHere = c.pool("weapon").stream().anyMatch(e -> e.grade.equals("yamato") && com.rtshop.gacha.GachaConfig.valid(e));
+        check("YAMATO is 0.04% in the high weapon draw (only when the Yamato exists), never in pet/accessory draws or lower tiers",
+                (!yamatoHere || Math.abs(hw[5] - 0.0004) < 1e-9)
+                        && com.rtshop.gacha.Gacha.gradeChances(c, "pet", "high")[5] == 0
+                        && com.rtshop.gacha.Gacha.gradeChances(c, "weapon", "mid")[5] == 0, java.util.Arrays.toString(hw));
+        // 3판 설정 → 4판: 목록은 그대로, 야마토는 전설에서 야마토로, Blade of Shadow 가 영웅으로 더해지고 고급 뽑기에 0.04%
+        com.google.gson.JsonObject v3 = c.toJson();
+        v3.addProperty("configVersion", 3);
+        com.rtshop.gacha.GachaConfig up = com.rtshop.gacha.GachaConfig.fromJson(v3);
+        for (com.rtshop.gacha.GachaConfig.Entry e : up.pool("weapon")) if (e.grade.equals("yamato")) e.grade = "legendary";
+        up.pool("weapon").removeIf(e -> e.nbt.contains("\"katana:"));
+        up.tiers.get("high").weights[5] = 0;
+        up.tiers.get("high").weights[1] = 70;
+        int before = up.pool("weapon").size();
+        com.rtshop.gacha.GachaConfig.upgradeTo4ForTest(up);
+        boolean movedYamato = up.pool("weapon").stream().filter(e -> java.util.Arrays.asList(com.rtshop.gacha.GachaConfig.YAMATO_ITEMS).contains(e.item))
+                .allMatch(e -> e.grade.equals("yamato"));
+        check("upgrading an old gacha.json moves Yamato to YAMATO, adds the 17 Blade of Shadow weapons as epic and sets 0.04% (keeping the list)",
+                movedYamato && up.pool("weapon").size() == before + 17 && up.tiers.get("high").weights[5] == 0.04
+                        && Math.abs(up.tiers.get("high").weights[1] - 69.96) < 1e-9, up.pool("weapon").size() + " vs " + before);
         com.rtshop.gacha.GachaConfig again = com.rtshop.gacha.GachaConfig.fromJson(c.toJson());
         check("gacha settings survive saving", again.pool("weapon").size() == nw && again.tiers.get("high").weights[4] == c.tiers.get("high").weights[4]);
         boolean refused;

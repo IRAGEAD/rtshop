@@ -352,10 +352,13 @@ public final class Gacha {
                 give(p, s);
             }
             pe.history.add(0, e.grade + "|" + cat + "|" + e.key() + "|" + now);
-            if (GachaConfig.gradeIndex(e.grade) == GachaConfig.GRADES.length - 1) {
+            int gIdx = GachaConfig.gradeIndex(e.grade);
+            if (gIdx >= 4) {
                 Component name = s.getItem() == ModItems.PET_SUMMON.get() ? petName(e.entity) : s.getHoverName();
-                p.server.getPlayerList().broadcastSystemMessage(Component.translatable("rtshop.gacha.broadcast", p.getDisplayName(),
-                        Component.translatable("rtshop.gacha.tier." + tier), name).withStyle(ChatFormatting.GOLD), false);
+                boolean yamato = gIdx == GachaConfig.YAMATO;
+                p.server.getPlayerList().broadcastSystemMessage(Component.translatable(yamato ? "rtshop.gacha.broadcast_yamato" : "rtshop.gacha.broadcast",
+                        p.getDisplayName(), Component.translatable("rtshop.gacha.tier." + tier), name)
+                        .withStyle(yamato ? ChatFormatting.AQUA : ChatFormatting.GOLD), false);
             }
         }
         while (pe.history.size() > GachaData.HISTORY) {

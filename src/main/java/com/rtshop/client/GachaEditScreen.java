@@ -422,7 +422,7 @@ public class GachaEditScreen extends Screen {
     private void buildOdds(int top) {
         int x = fx + 8;
         int y = top;
-        int cw = 54;
+        int cw = Math.min(54, (W - 16 - 70) / GRADES.length - 4);
         label(x, y + 2, tr("rtshop.gachaedit.odds_head"), Ui.C_GOLD);
         for (int i = 0; i < GRADES.length; i++) {
             label(x + 70 + i * (cw + 4), y + 2, tr("rtshop.gacha.grade." + GRADES[i]), GachaColors.argb(GRADES[i]));

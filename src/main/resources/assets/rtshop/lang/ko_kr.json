@@ -1167,5 +1167,12 @@
   "rtshop.hunt.job_bonus_off": "전투 직업이 있으면 보상 +%s%% · 매일 오전 6시에 새 의뢰",
   "rtshop.hunt.open_book": "[몹 도감 보기]",
   "rtshop.hunt.book_title": "— 몹 도감 — (장을 누르면 자세히)",
-  "rtshop.hunt.click_book": "눌러서 이 장의 몹 보기"
+  "rtshop.hunt.click_book": "눌러서 이 장의 몹 보기",
+  "rtshop.gacha.grade.yamato": "YAMATO",
+  "rtshop.gacha.fx.common": "일반",
+  "rtshop.gacha.fx.uncommon": "고급!",
+  "rtshop.gacha.fx.rare": "희귀!",
+  "rtshop.gacha.fx.yamato_sub": "— 무기 뽑기 최상위 등급 · 야마토 —",
+  "rtshop.gacha.broadcast_yamato": "⚔ %s 님이 %s에서 YAMATO [%s] 을(를) 뽑았습니다!!",
+  "rtshop.subtitle.gacha_yamato": "야마토의 울림"
 }

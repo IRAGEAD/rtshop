@@ -11,6 +11,7 @@ public final class GachaColors {
             case "rare" -> 0x4A9BE8;
             case "epic" -> 0xB45AE8;
             case "legendary" -> 0xF0A030;
+            case "yamato" -> 0x49B6FF;
             default -> 0xB8B8B8;
         };
     }
@@ -26,6 +27,7 @@ public final class GachaColors {
             case "rare" -> 0x1F5FA8;
             case "epic" -> 0x7A2FA8;
             case "legendary" -> 0xB06A00;
+            case "yamato" -> 0x1250A8;
             default -> 0x5E5E5E;
         };
     }

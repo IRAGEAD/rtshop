@@ -42,11 +42,13 @@ import java.util.Map;
  *  - 처음 만들 때 모드 아이템을 성능(공격력·희귀도·체력)으로 줄 세워 자동으로 채운다. 게임 안 편집기(OP)로 고친다.
  */
 public final class GachaConfig {
-    public static final String[] GRADES = {"common", "uncommon", "rare", "epic", "legendary"};
+    /** yamato: 무기 뽑기에만 있는 맨 위 등급 (Nightfall 의 야마토 하나를 위한 등급). */
+    public static final String[] GRADES = {"common", "uncommon", "rare", "epic", "legendary", "yamato"};
+    public static final int YAMATO = 5;
     public static final String[] CATEGORIES = {"weapon", "pet", "accessory"};
     public static final String[] TIERS = {"normal", "mid", "high"};
     /** 자동 분류 때 등급별로 나눌 비율 (성능 순서로 아래부터). */
-    private static final double[] AUTO_SPLIT = {0.35, 0.30, 0.22, 0.10, 0.03};
+    private static final double[] AUTO_SPLIT = {0.35, 0.30, 0.22, 0.10, 0.03, 0};
 
     public static int gradeIndex(String g) {
         for (int i = 0; i < GRADES.length; i++) {
@@ -119,13 +121,13 @@ public final class GachaConfig {
     public final Map<String, Tier> tiers = new LinkedHashMap<>();
     public final Map<String, List<Entry>> pools = new LinkedHashMap<>();
     /** 분해하면 받는 조각 (등급별). */
-    public final int[] dismantle = {1, 3, 10, 40, 150};
+    public final int[] dismantle = {1, 3, 10, 40, 150, 600};
     /** 조각으로 뽑기 티켓 한 장을 바꿀 때 드는 조각 [종류][단계]. 티켓값의 약 9% 를 돌려받는 셈. */
     public final int[][] ticketCost = {{20, 40, 100}, {15, 30, 75}, {15, 30, 75}};
     public boolean exchangeEnabled = true;
     /** 펫 뽑기의 일반·고급 등급 보상(펫 대신 조각). */
     public static final int[] PET_SHARDS = {2, 5};
-    public static final int CONFIG_VERSION = 3;
+    public static final int CONFIG_VERSION = 4;
     /** 자동 분류에서 뺄 모드·아이템 (보스 무기 등). */
     public final List<String> excludeMods = new ArrayList<>();
     public final List<String> excludeItems = new ArrayList<>();
@@ -154,9 +156,11 @@ public final class GachaConfig {
     // ------------------------------------------------------------------ 기본값
 
     /** 등급 확률 (일반·고급·희귀·영웅·전설). 3.11 에서 낮춤. */
-    static final double[][] NEW_ODDS = {{80, 18, 2, 0, 0}, {58, 33, 8.4, 0.6, 0}, {0, 70, 26.5, 3.2, 0.3}};
+    static final double[][] NEW_ODDS = {{80, 18, 2, 0, 0, 0}, {58, 33, 8.4, 0.6, 0, 0}, {0, 69.96, 26.5, 3.2, 0.3, 0.04}};
     /** 예전 기본 확률 (이 값 그대로면 새 확률로 바꾼다. 직접 고친 확률은 그대로 둔다). */
-    static final double[][] OLD_ODDS = {{72, 25, 3, 0, 0}, {45, 40, 14, 1, 0}, {0, 55, 39.5, 5, 0.5}};
+    static final double[][] OLD_ODDS = {{72, 25, 3, 0, 0, 0}, {45, 40, 14, 1, 0, 0}, {0, 55, 39.5, 5, 0.5, 0}};
+    /** 야마토 등급 확률 (고급 뽑기 0.04%). 4판으로 올릴 때 고급 뽑기에 넣는다. */
+    public static final double YAMATO_HIGH = 0.04;
 
     private static Tier tier(String id, double... w) {
         Tier t = new Tier();
@@ -233,14 +237,53 @@ public final class GachaConfig {
 
     static {
         // EpicFight Nightfall: HF-무라사마, HF-블레이드, 고대 스컬크 쌍검, 야마토 2종 = 전설
-        for (String id : new String[]{"efn:hf_murasama", "efn:hf_blade", "efn:nf_dual_sword", "efn:yamato_dmc_in_sheath",
-                "efn:yamato_dmc4_in_sheath"}) {
+        for (String id : new String[]{"efn:hf_murasama", "efn:hf_blade", "efn:nf_dual_sword"}) {
             FIXED_WEAPONS.put(id, "legendary");
+        }
+        // 야마토: 전설에서 빼서 야마토 등급(무기 뽑기 전용)으로
+        for (String id : YAMATO_ITEMS) {
+            FIXED_WEAPONS.put(id, "yamato");
         }
         // 여제의 단검, 룬 단검, 초승달, 야수의 발톱, 선봉의 검, 쿠사비마루, 폐허의 대검 = 영웅
         for (String id : new String[]{"efn:nf_shortsword", "efn:nf_shortsword_2", "efn:crescent_moon", "efn:nf_claw",
                 "efn:sword_of_pioneer", "efn:kusabimaru", "efn:ruinsgreatsword"}) {
             FIXED_WEAPONS.put(id, "epic");
+        }
+    }
+
+    public static final String[] YAMATO_ITEMS = {"efn:yamato_dmc_in_sheath", "efn:yamato_dmc4_in_sheath"};
+
+    /**
+     * Blade of Shadow (TaCZ 총기팩 katana): 모두 영웅 등급.
+     * 검 모양 총(tacz:modern_kinetic_gun + GunId)과 LesRaisins 근접 무기(lrtactical:melee + MeleeWeaponId).
+     */
+    public static final String[] BOS_GUNS = {"aerondight", "dark", "dark_repulsor", "hoshimi", "kirito", "miko", "musou_isshin",
+            "ryuichimonji_1", "shard", "tss", "ak47_ellen", "hk416d"};
+    public static final String[] BOS_MELEE = {"judgment", "murasama_r", "ryuichimonji", "sfsg", "yehuang_r"};
+
+    public static List<Entry> bladeOfShadow() {
+        List<Entry> out = new ArrayList<>();
+        for (String g : BOS_GUNS) {
+            boolean rifle = g.equals("ak47_ellen") || g.equals("hk416d");
+            Entry e = itemEntry("tacz:modern_kinetic_gun", "epic", 10);
+            e.nbt = "{GunId:\"katana:" + g + "\",GunFireMode:\"" + (rifle ? "SEMI" : "AUTO") + "\",GunCurrentAmmoCount:" + (rifle ? 30 : 1)
+                    + ",HasBulletInBarrel:1b}";
+            out.add(e);
+        }
+        for (String m : BOS_MELEE) {
+            Entry e = itemEntry("lrtactical:melee", "epic", 10);
+            e.nbt = "{MeleeWeaponId:\"katana:" + m + "\"}";
+            out.add(e);
+        }
+        return out;
+    }
+
+    /** 이미 있는 칸(같은 아이템·같은 NBT)은 빼고 Blade of Shadow 무기를 더한다. */
+    static void addBladeOfShadow(List<Entry> out) {
+        java.util.Set<String> have = new java.util.HashSet<>();
+        for (Entry e : out) have.add(e.key());
+        for (Entry e : bladeOfShadow()) {
+            if (have.add(e.key())) out.add(e);
         }
     }
 
@@ -283,7 +326,7 @@ public final class GachaConfig {
                 ItemStack s = new ItemStack(item);
                 String fixed = FIXED_WEAPONS.get(id);
                 if (fixed != null) {
-                    out.add(itemEntry(id, fixed, fixed.equals("legendary") ? 8 : 10));
+                    out.add(itemEntry(id, fixed, fixed.equals("legendary") || fixed.equals("yamato") ? 8 : 10));
                     continue;
                 }
                 String type = WeaponTypes.classify(item, jc.weaponTypes, jc.weaponOverrides);
@@ -311,6 +354,9 @@ public final class GachaConfig {
         // LesRaisins 근접 무기: 하나의 아이템에 NBT 로 종류가 갈린다 → 창작 탭에 나오는 종류마다 한 칸
         for (ItemStack s : variants("lrtactical:melee")) {
             try {
+                if (s.getTag() != null && s.getTag().getString("MeleeWeaponId").startsWith("katana:")) {
+                    continue; // Blade of Shadow 근접 무기는 아래에서 영웅으로
+                }
                 String n = (s.getHoverName().getString() + " " + s.getTag()).toLowerCase(Locale.ROOT);
                 String g = null;
                 for (String[] r : LR_MELEE) {
@@ -329,8 +375,9 @@ public final class GachaConfig {
             } catch (Throwable ignored) {
             }
         }
-        grade(low, out, new double[]{0.45, 0.35, 0.20, 0, 0});
-        grade(top, out, new double[]{0, 0, 0, 0.75, 0.25});
+        grade(low, out, new double[]{0.45, 0.35, 0.20, 0, 0, 0});
+        grade(top, out, new double[]{0, 0, 0, 0.75, 0.25, 0});
+        addBladeOfShadow(out);
         return out;
     }
 
@@ -459,7 +506,7 @@ public final class GachaConfig {
             } catch (Throwable ignored) {
             }
         }
-        grade(scored, out, new double[]{0.40, 0.35, 0.25, 0, 0});
+        grade(scored, out, new double[]{0.40, 0.35, 0.25, 0, 0, 0});
         return out;
     }
 
@@ -552,7 +599,7 @@ public final class GachaConfig {
         JsonObject o = new JsonObject();
         JsonArray help = new JsonArray();
         help.add("뽑기 설정. 게임 안에서 /rtshop gacha edit (OP) 또는 뽑기 창의 '편집'으로 고칠 수 있습니다.");
-        help.add("등급: common(일반) uncommon(고급) rare(희귀) epic(영웅) legendary(전설).");
+        help.add("등급: common(일반) uncommon(고급) rare(희귀) epic(영웅) legendary(전설) yamato(야마토: 무기 뽑기 전용, 맨 위 등급).");
         help.add("tiers: 뽑기 단계별 등급 확률(비율). 아이템이 하나도 없는 등급은 빼고 나머지 비율로 뽑습니다.");
         help.add("pools: 뽑기 종류별 목록 {item, count, nbt} 또는 {entity} + grade, weight(같은 등급 안에서의 비율).");
         help.add("tenGuarantee: 10회 뽑기에서 하나는 반드시 이 등급 이상. shards.dismantle: 등급별 분해 조각 수, shards.tickets: 티켓 한 장과 바꾸는 데 드는 조각 수.");
@@ -776,6 +823,18 @@ public final class GachaConfig {
                 RtShop.LOGGER.warn("[rtshop] 예전 gacha.json 을 백업하지 못했습니다: {}", e.getMessage());
             }
         }
+        if (old != null && old.version >= 3) {
+            // 3판 → 4판: 목록은 그대로 두고 (직접 고친 것 보존) 야마토 등급과 Blade of Shadow 만 더한다
+            for (String cat : CATEGORIES) c.pool(cat).addAll(old.pool(cat));
+            upgradeTo4(c);
+            try {
+                c.save();
+                RtShop.LOGGER.info("[rtshop] 뽑기 4판: 야마토 등급과 Blade of Shadow 무기를 더했습니다");
+            } catch (Exception e) {
+                RtShop.LOGGER.error("[rtshop] gacha.json 을 저장하지 못했습니다", e);
+            }
+            return c;
+        }
         for (String cat : CATEGORIES) {
             if (old != null && old.version >= 2 && !cat.equals("weapon")) {
                 c.pool(cat).addAll(old.pool(cat)); // 2판 → 3판: 바뀐 것은 무기 규칙뿐, 펫·장신구 목록은 그대로
@@ -791,6 +850,34 @@ public final class GachaConfig {
             RtShop.LOGGER.error("[rtshop] gacha.json 을 만들지 못했습니다", e);
         }
         return c;
+    }
+
+    public static void upgradeTo4ForTest(GachaConfig c) {
+        upgradeTo4(c);
+    }
+
+    /** 4판: 야마토는 전설 → 야마토 등급, 고급 뽑기에 야마토 확률, Blade of Shadow 무기는 영웅으로 추가. */
+    static void upgradeTo4(GachaConfig c) {
+        List<Entry> w = c.pool("weapon");
+        boolean hasYamato = false;
+        for (Entry e : w) {
+            if (java.util.Arrays.asList(YAMATO_ITEMS).contains(e.item)) {
+                e.grade = "yamato";
+                hasYamato = true;
+            }
+        }
+        if (!hasYamato) {
+            for (String id : YAMATO_ITEMS) {
+                ResourceLocation rl = ResourceLocation.tryParse(id);
+                if (rl != null && ForgeRegistries.ITEMS.containsKey(rl)) w.add(itemEntry(id, "yamato", 8));
+            }
+        }
+        addBladeOfShadow(w);
+        Tier high = c.tiers.get("high");
+        if (high != null && high.weights[YAMATO] <= 0) {
+            high.weights[YAMATO] = YAMATO_HIGH;
+            if (Math.abs(high.weights[1] - 70) < 1e-9) high.weights[1] = 69.96; // 기본 확률을 쓰던 서버는 합이 100 이 되게
+        }
     }
 
     /** 이 이름의 아이템/엔티티가 실제로 있는지 (없는 칸은 뽑기에서 뺀다). */

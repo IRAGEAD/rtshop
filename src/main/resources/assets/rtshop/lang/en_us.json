@@ -1167,5 +1167,12 @@
   "rtshop.hunt.job_bonus_off": "+%s%% with a combat job · new bounties daily at 6 AM",
   "rtshop.hunt.open_book": "[Open bestiary]",
   "rtshop.hunt.book_title": "— Bestiary — (click a chapter for details)",
-  "rtshop.hunt.click_book": "Click to see this chapter's mobs"
+  "rtshop.hunt.click_book": "Click to see this chapter's mobs",
+  "rtshop.gacha.grade.yamato": "YAMATO",
+  "rtshop.gacha.fx.common": "Common",
+  "rtshop.gacha.fx.uncommon": "Uncommon!",
+  "rtshop.gacha.fx.rare": "RARE!",
+  "rtshop.gacha.fx.yamato_sub": "— The highest weapon grade · YAMATO —",
+  "rtshop.gacha.broadcast_yamato": "⚔ %s pulled YAMATO [%3$s] from %2$s!!",
+  "rtshop.subtitle.gacha_yamato": "Yamato resonates"
 }

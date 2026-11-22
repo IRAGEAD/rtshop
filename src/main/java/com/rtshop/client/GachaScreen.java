@@ -36,7 +36,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
 
     public static final String[] CATS = {"weapon", "pet", "accessory"};
     public static final String[] TIERS = {"normal", "mid", "high"};
-    public static final String[] GRADES = {"common", "uncommon", "rare", "epic", "legendary"};
+    public static final String[] GRADES = com.rtshop.gacha.GachaConfig.GRADES;
     private static final int ROW = 18;
     private static final int BANNER = 20;
 
@@ -89,7 +89,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                     cat = i;
                 }
             }
-            // 영웅·전설이 나왔으면 가장 높은 것 하나로 연출부터
+            // 가장 높은 등급 하나로 연출부터 (등급마다 연출이 다르다)
             int best = -1;
             JsonObject bestE = null;
             for (JsonElement el : results) {
@@ -100,7 +100,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                     bestE = e;
                 }
             }
-            if (best >= GachaFx.EPIC && bestE != null) {
+            if (best >= 0 && bestE != null) {
                 anim.start(best, icon(bestE), name(bestE));
             } else {
                 anim.skip();
@@ -115,6 +115,12 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
         status = msg;
         statusOk = ok;
         statusTicks = 200;
+    }
+
+    @Override
+    public void removed() {
+        anim.stop(); // 야마토 음악 등
+        super.removed();
     }
 
     @Override
@@ -160,6 +166,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
 
     private static void flipSound(int gi) {
         switch (gi) {
+            case 5 -> sfx(SoundEvents.TRIDENT_RIPTIDE_3, 1.4F, 0.8F);
             case 4 -> sfx(SoundEvents.PLAYER_LEVELUP, 1.5F, 0.7F);
             case 3 -> sfx(SoundEvents.AMETHYST_CLUSTER_BREAK, 1.2F, 0.9F);
             case 2 -> sfx(SoundEvents.AMETHYST_BLOCK_CHIME, 1.4F, 0.8F);
@@ -594,7 +601,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
         if (v >= 1) {
             return String.format("%.1f%%", v);
         }
-        return String.format("%.2f%%", v);
+        return v >= 0.1 ? String.format("%.2f%%", v) : String.format("%.3f%%", v).replaceAll("0+%$", "%");
     }
 
     /** 확률표: 이 단계에서 아이템 하나하나가 나올 확률. */
@@ -717,8 +724,8 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             if (gi >= 3) {
                 // 테두리를 따라 도는 빛
                 float per = 2 * (cw + ch);
-                for (int k = 0; k < (gi == 4 ? 2 : 1); k++) {
-                    float pos = ((time * (gi == 4 ? 6 : 4) + k * per / 2) % per);
+                for (int k = 0; k < (gi >= 4 ? 2 : 1); k++) {
+                    float pos = ((time * (gi >= 4 ? 6 : 4) + k * per / 2) % per);
                     for (int j = 0; j < 14; j++) {
                         float p = (pos - j * 2 + per) % per;
                         int px, py;
@@ -732,7 +739,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                             px = 0; py = (int) (ch - 1 - (p - 2 * cw - ch));
                         }
                         int a = 255 - j * 16;
-                        g.fill(cx + px - 1, cy + py - 1, cx + px + 2, cy + py + 2, (a << 24) | (gi == 4 ? 0xFFF4C0 : 0xF0D8FF));
+                        g.fill(cx + px - 1, cy + py - 1, cx + px + 2, cy + py + 2, (a << 24) | (gi == 5 ? 0xBFE6FF : gi == 4 ? 0xFFF4C0 : 0xF0D8FF));
                     }
                 }
             }
@@ -821,7 +828,11 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
         }
     }
 
-    /** 점검용: 영웅(3)·전설(4) 연출의 한 장면을 띄운다. */
+    public int fxTickForTest() {
+        return anim.tickForTest();
+    }
+
+    /** 점검용: 연출(0 일반 ~ 5 야마토)의 한 장면을 띄운다. */
     public void fxForTest(int grade, int tick) {
         JsonObject e = null;
         for (JsonElement el : pool()) {
