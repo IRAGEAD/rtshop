@@ -90,28 +90,30 @@ public class RaidPromptScreen extends Screen {
             }
             Fx2D.end();
         }
-        RaidFx.panel(g, x, y, w, h, time, !fail);
+        RaidFx.luxPanel(g, x, y, w, h, time, fail ? RaidFx.FIRE : 0xF0C060);
         RaidFx.embers(g, x, y, w, h, time, 14, !fail);
         if (fail) {
-            RaidFx.title(g, this.font, t("failTitle"), this.width / 2 - this.font.width(t("failTitle")), y + 9, 2F, 0xFF4A38, time);
-            g.drawCenteredString(this.font, t("failSub"), this.width / 2, y + 32, 0xFFD9B0A8);
-            g.drawCenteredString(this.font, t("failBody") + " (" + secondsLeft() + ")", this.width / 2, y + 46, 0xFFB8AF9C);
+            RaidFx.luxTitle(g, this.font, t("failTitle"), this.width / 2, y + 10, 0xFF6A50, time);
+            RaidFx.hairline(g, x + 20, x + w - 20, y + 30, 0xD4A85A, 0.9F);
+            RaidText.center(g, this.font, t("failSub"), RaidText.SANS, this.width / 2, y + 36, 0xFFE0C2B4);
+            RaidText.center(g, this.font, t("failBody") + " (" + secondsLeft() + ")", RaidText.SANS, this.width / 2, y + 49, 0xFFB8AF9C);
             int[] a = agreeBtn();
-            RaidFx.hotButton(g, this.font, a[0], a[1], a[2], a[3], t("failConfirm"), true, Ui.inside(mx, my, a[0], a[1], a[2], a[3]), time, false);
+            RaidFx.luxButton(g, this.font, a[0], a[1], a[2], a[3], t("failConfirm"), true, Ui.inside(mx, my, a[0], a[1], a[2], a[3]), time, true);
             return;
         }
         boolean voted = data.get("voted").getAsBoolean();
-        g.drawCenteredString(this.font, "◆ " + t("voteTitle") + " ◆", this.width / 2, y + 9, 0xFFFFF0C8);
+        RaidText.outlined(g, this.font, t("voteTitle"), RaidText.SERIF, this.width / 2 - RaidText.w(this.font, t("voteTitle"), RaidText.SERIF) / 2, y + 9, RaidFx.GOLD_HI, 0xC0000000);
+        RaidFx.hairline(g, x + 20, x + w - 20, y + 21, 0xD4A85A, 0.9F);
         String count;
         try {
             count = String.format(t("voteCount"), data.get("agreed").getAsInt(), data.get("total").getAsInt());
         } catch (Exception e) {
             count = data.get("agreed").getAsInt() + " / " + data.get("total").getAsInt();
         }
-        g.drawCenteredString(this.font, count + "  ·  " + secondsLeft() + "s", this.width / 2, y + 24, 0xFFE8B84A);
+        RaidText.center(g, this.font, count + "  ·  " + secondsLeft() + "s", RaidText.SANS, this.width / 2, y + 27, 0xFFF0D08A);
         int[] a = agreeBtn(), s = stayBtn();
-        RaidFx.hotButton(g, this.font, a[0], a[1], a[2], a[3], voted ? "✔ " + t("voteAgree") : t("voteAgree"), !voted, Ui.inside(mx, my, a[0], a[1], a[2], a[3]), time, true);
-        Ui.button(g, this.font, s[0], s[1], s[2], s[3], t("voteStay"), Ui.inside(mx, my, s[0], s[1], s[2], s[3]), true);
+        RaidFx.luxButton(g, this.font, a[0], a[1], a[2], a[3], voted ? "✔ " + t("voteAgree") : t("voteAgree"), !voted, Ui.inside(mx, my, a[0], a[1], a[2], a[3]), time, true);
+        RaidFx.luxButton(g, this.font, s[0], s[1], s[2], s[3], t("voteStay"), true, Ui.inside(mx, my, s[0], s[1], s[2], s[3]), time, false);
     }
 
     @Override

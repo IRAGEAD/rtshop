@@ -183,4 +183,201 @@ public final class RaidFx {
         g.drawString(font, text, 0, 0, 0xFF000000 | rgb, false);
         g.pose().popPose();
     }
+
+    // ================================================================== 고급 테마 (금박 테두리 · 흑요석 바탕)
+    public static final int GOLD_HI = 0xFFF3D9A0, GOLD_MID = 0xFFD4A85A, GOLD_LO = 0xFF8A6430, BRONZE = 0xFF4A3018;
+
+    /** 1픽셀 사각 테두리. */
+    public static void box(GuiGraphics g, int x0, int y0, int x1, int y1, int c) {
+        g.fill(x0, y0, x1, y0 + 1, c);
+        g.fill(x0, y1 - 1, x1, y1, c);
+        g.fill(x0, y0 + 1, x0 + 1, y1 - 1, c);
+        g.fill(x1 - 1, y0 + 1, x1, y1 - 1, c);
+    }
+
+    /** 가운데가 진하고 양끝이 사라지는 가로 금줄. */
+    public static void hairline(GuiGraphics g, float x0, float x1, float y, int rgb, float a) {
+        float cx = (x0 + x1) / 2F;
+        Fx2D.begin(g, false);
+        Fx2D.rect(x0, y, cx, y + 1, Fx2D.rgba(rgb, 0), Fx2D.rgba(rgb, a), Fx2D.rgba(rgb, a), Fx2D.rgba(rgb, 0));
+        Fx2D.rect(cx, y, x1, y + 1, Fx2D.rgba(rgb, a), Fx2D.rgba(rgb, 0), Fx2D.rgba(rgb, 0), Fx2D.rgba(rgb, a));
+        Fx2D.end();
+    }
+
+    private static void gem(GuiGraphics g, float cx, float cy, float r, int rgb, float time, float phase) {
+        Fx2D.begin(g, true);
+        Fx2D.glow(cx, cy, r * 3.2F, Fx2D.rgba(rgb, 0.45F + 0.2F * (float) Math.sin(time * 2F + phase)), Fx2D.rgba(rgb, 0));
+        Fx2D.end();
+        Fx2D.begin(g, false);
+        Fx2D.diamond(cx, cy, r + 1.5F, r + 1.5F, 0, 0xFF000000 | (GOLD_MID & 0xFFFFFF));
+        Fx2D.diamond(cx, cy, r, r, 0, 0xFF000000 | rgb);
+        Fx2D.diamond(cx - r * 0.25F, cy - r * 0.3F, r * 0.35F, r * 0.35F, 0, 0xFFFFF4E0);
+        Fx2D.end();
+    }
+
+    /**
+     * 고급 판: 흑요석 바탕(은은한 마름모 무늬, 아래에서 올라오는 열기) + 이중 금박 테두리 + 모서리 금장식과 보석.
+     * accent: 보석과 열기의 색 (불꽃 = FIRE, 승리 = 금빛).
+     */
+    public static void luxPanel(GuiGraphics g, int x, int y, int w, int h, float time, int accent) {
+        for (int i = 6; i >= 1; i--) g.fill(x - 3 - i, y - 3 - i, x + w + 3 + i, y + h + 3 + i, (int) (0x16 + (6 - i) * 0x06) << 24);
+        g.fill(x - 3, y - 3, x + w + 3, y + h + 3, 0xFF000000);
+        Fx2D.begin(g, false);
+        Fx2D.rect(x, y, x + w, y + h, 0xFF100A0B, 0xFF100A0B, 0xFF221010, 0xFF221010);
+        Fx2D.end();
+        Fx2D.begin(g, true);
+        Fx2D.glow(x + w * 0.5F, y + h + 10, w * 0.62F, h * 0.55F, Fx2D.rgba(accent, 0.26F + 0.05F * (float) Math.sin(time * 1.4F)), Fx2D.rgba(accent, 0));
+        Fx2D.glow(x + w * 0.5F, y - 6, w * 0.5F, 40, Fx2D.rgba(0xD4A85A, 0.10F), Fx2D.rgba(0xD4A85A, 0));
+        for (int gx = x + 12; gx < x + w - 6; gx += 16) {
+            for (int gy = y + 12; gy < y + h - 6; gy += 16) {
+                Fx2D.diamond(gx + ((gy - y) / 16 % 2) * 8, gy, 1.2F, 1.2F, 0, Fx2D.rgba(0xD4A85A, 0.05F));
+            }
+        }
+        Fx2D.end();
+        // 이중 금박
+        box(g, x - 3, y - 3, x + w + 3, y + h + 3, GOLD_LO);
+        box(g, x - 1, y - 1, x + w + 1, y + h + 1, GOLD_MID);
+        box(g, x + 2, y + 2, x + w - 2, y + h - 2, 0x60D4A85A);
+        g.fill(x - 1, y - 1, x + w + 1, y, GOLD_HI);
+        // 위 테두리를 따라 천천히 흐르는 빛
+        Fx2D.begin(g, true);
+        float sx = x + ((time * 0.12F) % 1F) * w;
+        Fx2D.glow(sx, y - 1, 30, 3, Fx2D.rgba(0xFFF0C0, 0.55F), Fx2D.rgba(0xFFF0C0, 0));
+        Fx2D.glow(x + w - (sx - x), y + h, 30, 3, Fx2D.rgba(0xFFF0C0, 0.35F), Fx2D.rgba(0xFFF0C0, 0));
+        Fx2D.end();
+        // 모서리 금장식: 꺾쇠 두 겹 + 끝의 작은 마름모 + 보석
+        int[][] cs = {{x, y, 1, 1}, {x + w, y, -1, 1}, {x, y + h, 1, -1}, {x + w, y + h, -1, -1}};
+        int k = 0;
+        for (int[] c : cs) {
+            int cx = c[0], cy = c[1], sx2 = c[2], sy2 = c[3];
+            for (int j = 0; j < 2; j++) {
+                int o = 5 + j * 3, L = j == 0 ? 22 : 13;
+                int col = j == 0 ? GOLD_MID : GOLD_LO;
+                int ax = cx + sx2 * o, ay = cy + sy2 * o;
+                g.fill(Math.min(ax, ax + sx2 * L), ay, Math.max(ax, ax + sx2 * L) + 1, ay + 1, col);
+                g.fill(ax, Math.min(ay, ay + sy2 * L), ax + 1, Math.max(ay, ay + sy2 * L) + 1, col);
+            }
+            Fx2D.begin(g, false);
+            Fx2D.diamond(cx + sx2 * 28.5F, cy + sy2 * 5.5F, 2F, 2F, 0, GOLD_HI);
+            Fx2D.diamond(cx + sx2 * 5.5F, cy + sy2 * 28.5F, 2F, 2F, 0, GOLD_HI);
+            Fx2D.end();
+            gem(g, cx, cy, 3.2F, accent, time, k++ * 1.7F);
+        }
+    }
+
+    /** 그림 액자: 검은 여백 + 금박 + 안쪽 가는 금선, 위·아래 가운데 문장과 네 모서리 마름모. */
+    public static void frame(GuiGraphics g, int x, int y, int w, int h, float time) {
+        box(g, x - 4, y - 4, x + w + 4, y + h + 4, GOLD_LO);
+        box(g, x - 3, y - 3, x + w + 3, y + h + 3, 0xFF000000);
+        box(g, x - 2, y - 2, x + w + 2, y + h + 2, GOLD_MID);
+        g.fill(x - 2, y - 2, x + w + 2, y - 1, GOLD_HI);
+        box(g, x - 1, y - 1, x + w + 1, y + h + 1, 0xFF000000);
+        Fx2D.begin(g, false);
+        for (int[] c : new int[][]{{x - 2, y - 2}, {x + w + 2, y - 2}, {x - 2, y + h + 2}, {x + w + 2, y + h + 2}}) {
+            Fx2D.diamond(c[0], c[1], 4.5F, 4.5F, 0, 0xFF000000);
+            Fx2D.diamond(c[0], c[1], 3.5F, 3.5F, 0, GOLD_MID);
+            Fx2D.diamond(c[0], c[1], 1.6F, 1.6F, 0, GOLD_HI);
+        }
+        Fx2D.end();
+        crest(g, x + w / 2F, y - 2, time);
+        crest(g, x + w / 2F, y + h + 2, time);
+    }
+
+    /** 가운데 문장: 날개처럼 퍼지는 금줄과 붉은 보석. */
+    public static void crest(GuiGraphics g, float cx, float cy, float time) {
+        Fx2D.begin(g, false);
+        Fx2D.tri(cx - 18, cy, GOLD_LO, cx - 5, cy - 2.5F, GOLD_HI, cx - 5, cy + 2.5F, GOLD_HI);
+        Fx2D.tri(cx + 18, cy, GOLD_LO, cx + 5, cy - 2.5F, GOLD_HI, cx + 5, cy + 2.5F, GOLD_HI);
+        Fx2D.end();
+        gem(g, cx, cy, 3.4F, FIRE, time, 0.5F);
+    }
+
+    /** 장식 머리말: ◆ 글자 ─────── (오른쪽으로 사라지는 금줄). */
+    public static void section(GuiGraphics g, Font font, String text, int x, int y, int w) {
+        Fx2D.begin(g, false);
+        Fx2D.diamond(x + 3, y + 4, 2.6F, 2.6F, 0, GOLD_MID);
+        Fx2D.diamond(x + 3, y + 4, 1.1F, 1.1F, 0, GOLD_HI);
+        Fx2D.end();
+        RaidText.draw(g, font, text, RaidText.SERIF, x + 9, y, GOLD_HI);
+        int tx = x + 13 + RaidText.w(font, text, RaidText.SERIF);
+        if (tx < x + w) {
+            Fx2D.begin(g, false);
+            Fx2D.rect(tx, y + 4, x + w, y + 5, Fx2D.alpha(GOLD_MID, 0.85F), Fx2D.alpha(GOLD_MID, 0), Fx2D.alpha(GOLD_MID, 0), Fx2D.alpha(GOLD_MID, 0.85F));
+            Fx2D.end();
+        }
+    }
+
+    /** 둥근 표식: 통과(초록 ✔) / 미달(붉은 ✖). */
+    public static void badge(GuiGraphics g, float cx, float cy, boolean ok) {
+        int c = ok ? 0x6FD483 : 0xFF5A48;
+        Fx2D.begin(g, true);
+        Fx2D.glow(cx, cy, 7, Fx2D.rgba(c, 0.35F), Fx2D.rgba(c, 0));
+        Fx2D.end();
+        Fx2D.begin(g, false);
+        Fx2D.ring(cx, cy, 0, 4.6F, 0xFF000000, 0xFF000000);
+        Fx2D.ring(cx, cy, 0, 3.9F, 0xFF000000 | Fx2D.mix(c, 0x000000, 0.45F), 0xFF000000 | c);
+        if (ok) {
+            Fx2D.line(cx - 2.1F, cy + 0.1F, cx - 0.6F, cy + 1.7F, 1.2F, 0xFFFFFFFF, 0xFFFFFFFF);
+            Fx2D.line(cx - 0.6F, cy + 1.7F, cx + 2.2F, cy - 1.8F, 1.2F, 0xFFFFFFFF, 0xFFFFFFFF);
+        } else {
+            Fx2D.line(cx - 1.7F, cy - 1.7F, cx + 1.7F, cy + 1.7F, 1.2F, 0xFFFFFFFF, 0xFFFFFFFF);
+            Fx2D.line(cx - 1.7F, cy + 1.7F, cx + 1.7F, cy - 1.7F, 1.2F, 0xFFFFFFFF, 0xFFFFFFFF);
+        }
+        Fx2D.end();
+    }
+
+    /**
+     * 고급 단추: 금박 테두리, 주 단추는 진홍빛 칠과 지나가는 금빛, 보조 단추는 어두운 칠. 글자는 명조.
+     */
+    public static void luxButton(GuiGraphics g, Font font, int x, int y, int w, int h, String label, boolean enabled, boolean hover, float time, boolean primary) {
+        g.fill(x - 2, y - 2, x + w + 2, y + h + 2, 0xFF000000);
+        if (!enabled) {
+            box(g, x - 1, y - 1, x + w + 1, y + h + 1, 0xFF4A4038);
+            Fx2D.begin(g, false);
+            Fx2D.rect(x, y, x + w, y + h, 0xFF2A2422, 0xFF2A2422, 0xFF161212, 0xFF161212);
+            Fx2D.end();
+            RaidText.center(g, font, label, RaidText.SERIF, x + w / 2, y + (h - 9) / 2 + 1, 0xFF7E7268);
+            return;
+        }
+        float pulse = 0.5F + 0.5F * (float) Math.sin(time * 2.6F);
+        if (primary) {
+            Fx2D.begin(g, true);
+            Fx2D.glow(x + w / 2F, y + h / 2F, w * 0.6F, h * 1.4F, Fx2D.rgba(FIRE, 0.22F + 0.16F * pulse + (hover ? 0.2F : 0)), Fx2D.rgba(FIRE, 0));
+            Fx2D.end();
+        }
+        box(g, x - 1, y - 1, x + w + 1, y + h + 1, hover ? GOLD_HI : GOLD_MID);
+        int top = primary ? (hover ? 0xFFB8361A : 0xFF9A2612) : (hover ? 0xFF3E2C20 : 0xFF2C1E16);
+        int bot = primary ? (hover ? 0xFF5A0E08 : 0xFF420A06) : (hover ? 0xFF1C120E : 0xFF140C0A);
+        Fx2D.begin(g, false);
+        Fx2D.rect(x, y, x + w, y + h, top, top, bot, bot);
+        Fx2D.end();
+        g.fill(x, y, x + w, y + 1, primary ? 0x90FFD9A0 : 0x50F3D9A0);
+        box(g, x + 1, y + 1, x + w - 1, y + h - 1, 0x30000000);
+        if (primary) {
+            Fx2D.begin(g, true);
+            float sweep = ((time * 0.45F) % 1.8F) - 0.4F;
+            float sx = x + sweep * w;
+            if (sx > x - 16 && sx < x + w + 16) {
+                float l = Math.max(x, sx - 14), r = Math.min(x + w, sx + 14);
+                Fx2D.rect(l, y + 1, r, y + h - 1, Fx2D.rgba(0xFFE6B0, 0), Fx2D.rgba(0xFFE6B0, 0.28F), Fx2D.rgba(0xFFE6B0, 0.28F), Fx2D.rgba(0xFFE6B0, 0));
+            }
+            Fx2D.end();
+        }
+        Fx2D.begin(g, false);
+        Fx2D.diamond(x + 6, y + h / 2F, 2F, 2F, 0, GOLD_MID);
+        Fx2D.diamond(x + w - 6, y + h / 2F, 2F, 2F, 0, GOLD_MID);
+        Fx2D.end();
+        RaidText.outlined(g, font, label, RaidText.SERIF, x + w / 2 - RaidText.w(font, label, RaidText.SERIF) / 2, y + (h - 9) / 2 + 1,
+                primary ? 0xFFFFF1D6 : GOLD_HI, 0xC0000000);
+    }
+
+    /** 큰 제목: 빛무리 + 어두운 테두리 + 금빛 글자 (명조 제목 글꼴). */
+    public static void luxTitle(GuiGraphics g, Font font, String text, int cx, int y, int rgb, float time) {
+        int w = RaidText.w(font, text, RaidText.TITLE);
+        Fx2D.begin(g, true);
+        Fx2D.glow(cx, y + 7, w * 0.62F, 16, Fx2D.rgba(FIRE, 0.30F + 0.10F * (float) Math.sin(time * 1.8F)), Fx2D.rgba(FIRE, 0));
+        Fx2D.end();
+        RaidText.draw(g, font, text, RaidText.TITLE, cx - w / 2 + 1, y + 1, 0xFF2A0804);
+        RaidText.outlined(g, font, text, RaidText.TITLE, cx - w / 2, y, 0xFF000000 | rgb, 0xA0140404);
+    }
 }

@@ -1112,5 +1112,10 @@
   "rtshop.redit.add_held": "Add held item",
   "rtshop.redit.hint": "Click a value to edit, then press [Save]",
   "rtshop.redit.save": "Save",
-  "rtshop.abyss.chance": "Chance: %s%%"
+  "rtshop.abyss.chance": "Chance: %s%%",
+  "rtshop.raid.ui_req": "Requirements",
+  "rtshop.raid.ui_hp": "Boss health",
+  "rtshop.raid.ui_atk": "Boss attack",
+  "rtshop.raid.ui_reset_short": "Weekly reset",
+  "rtshop.raid.ui_time": "%sd %sh"
 }

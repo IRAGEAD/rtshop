@@ -7,6 +7,12 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ # ---- 3.22.1: 레이드 입장 화면 새 디자인
+ "rtshop.raid.ui_req": ("입장 조건", "Requirements"),
+ "rtshop.raid.ui_hp": ("보스 체력", "Boss health"),
+ "rtshop.raid.ui_atk": ("보스 공격력", "Boss attack"),
+ "rtshop.raid.ui_reset_short": ("주간 초기화", "Weekly reset"),
+ "rtshop.raid.ui_time": ("%s일 %s시간", "%sd %sh"),
  "rtshop.abyss.chance": ("받을 확률 %s%%", "Chance: %s%%"),
 
  # ---- 3.21: 주간 레이드, 보상 편집기

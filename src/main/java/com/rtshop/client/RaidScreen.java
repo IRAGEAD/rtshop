@@ -39,73 +39,6 @@ public class RaidScreen extends Screen {
     private final List<Row> rows = new ArrayList<>();
     /** 입장 화면의 일러스트: 불꽃 후광을 등지고 불타는 대검을 짚고 선 화염의 군주 (이 모드의 창작 그림). */
     private static final net.minecraft.resources.ResourceLocation LORD = new net.minecraft.resources.ResourceLocation("rtshop", "textures/gui/raid_lord.png");
-    /** 입장 화면에 띄울 보스 (게임 속 실제 모델). 만들 수 없으면 null. */
-    private net.minecraft.world.entity.LivingEntity bossEntity;
-    private boolean bossTried = false;
-    private boolean bossDrawn = false;
-
-    private net.minecraft.world.entity.LivingEntity bossEntity() {
-        if (!bossTried) {
-            bossTried = true;
-            try {
-                net.minecraft.resources.ResourceLocation rl = net.minecraft.resources.ResourceLocation.tryParse(data.get("boss").getAsString());
-                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-                if (rl != null && mc.level != null && net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.containsKey(rl)
-                        && net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.getValue(rl).create(mc.level) instanceof net.minecraft.world.entity.LivingEntity le) {
-                    le.setNoGravity(true);
-                    le.setSilent(true);
-                    bossEntity = le;
-                }
-            } catch (Throwable t) {
-                bossEntity = null;
-            }
-        }
-        return bossEntity;
-    }
-
-    /** 보스를 불빛 속에 크게 그린다 (천천히 좌우로 몸을 돌린다). */
-    private void drawBoss(GuiGraphics g, int cx, int feetY, int maxH, int maxW) {
-        net.minecraft.world.entity.LivingEntity e = bossEntity();
-        if (e == null) return;
-        float time = (System.currentTimeMillis() - openedAt) / 1000F;
-        float eh = Math.max(0.6F, e.getBbHeight()), ew = Math.max(0.6F, e.getBbWidth());
-        int scale = (int) Math.max(8, Math.min(maxH / eh, maxW / (ew * 1.25F)));
-        Fx2D.begin(g, true);
-        Fx2D.glow(cx, feetY - maxH * 0.45F, maxW * 0.62F, maxH * 0.62F, 0x70FF5A14, 0x00FF5A14);
-        Fx2D.glow(cx, feetY, maxW * 0.55F, 9, 0x90FFB040, 0x00FF7A20);
-        Fx2D.end();
-        float yaw = 180F + (float) Math.sin(time * 0.6F) * 28F;
-        float oBody = e.yBodyRot, oY = e.getYRot(), oX = e.getXRot(), oHeadO = e.yHeadRotO, oHead = e.yHeadRot;
-        try {
-            e.yBodyRot = yaw;
-            e.setYRot(yaw);
-            e.setXRot(0);
-            e.yHeadRot = yaw;
-            e.yHeadRotO = yaw;
-            e.tickCount = (int) (time * 20);
-            org.joml.Quaternionf pose = new org.joml.Quaternionf().rotateZ((float) Math.PI);
-            org.joml.Quaternionf cam = new org.joml.Quaternionf().rotateX(-0.08F);
-            pose.mul(cam);
-            net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventory(g, cx, feetY, scale, pose, cam, e);
-            bossDrawn = true;
-        } catch (Throwable t) {
-            bossEntity = null; // 그릴 수 없는 보스면 그림 없이 간다
-            g.flush();
-        } finally {
-            if (bossEntity != null) {
-                e.yBodyRot = oBody;
-                e.setYRot(oY);
-                e.setXRot(oX);
-                e.yHeadRot = oHead;
-                e.yHeadRotO = oHeadO;
-            }
-        }
-    }
-
-    public boolean bossDrawnForTest() {
-        return bossDrawn;
-    }
-
     public RaidScreen(JsonObject data) {
         super(Component.literal("raid"));
         this.data = data;
@@ -175,58 +108,52 @@ public class RaidScreen extends Screen {
         return (this.height - H) / 2;
     }
 
+    // ---------------------------------------------------------------- 배치 (일러스트와 글자는 서로 다른 칸에만 놓인다)
+    private static final int ART_X = 16, ART_Y = 52, ART_W = 156, ART_H = 136;
+    private static final int COL_X = 186, COL_W = W - 186 - 16;
+    private static final int ROW_H = 13;
+
     private int[] enterBtn() {
-        return new int[]{fx() + 16, fy() + H - 30, 150, 20};
+        return new int[]{fx() + ART_X, fy() + H - 28, ART_W, 18};
     }
 
     private int[] closeBtn() {
-        return new int[]{fx() + W - 76, fy() + H - 30, 60, 20};
+        return new int[]{fx() + W - 24, fy() + 10, 14, 14};
     }
 
     private int[] yesBtn() {
-        return new int[]{this.width / 2 - 112, this.height / 2 + 20, 106, 20};
+        return new int[]{this.width / 2 - 112, this.height / 2 + 24, 106, 18};
     }
 
     private int[] noBtn() {
-        return new int[]{this.width / 2 + 6, this.height / 2 + 20, 106, 20};
+        return new int[]{this.width / 2 + 6, this.height / 2 + 24, 106, 18};
     }
 
+    /** 오른쪽 칸 위쪽(조건·수치)이 끝나는 높이 = 보상 목록이 시작하는 높이. 그릴 때 정해진다. */
+    private int listTop = 140;
+
     private int listX() {
-        return fx() + 196;
+        return fx() + COL_X + 4;
     }
 
     private int listY() {
-        return fy() + 108;
+        return listTop;
     }
 
     private int listW() {
-        return W - 196 - 14;
+        return COL_W - 10;
     }
 
     private int listH() {
-        return H - 108 - 40;
+        return fy() + H - 14 - listTop;
     }
 
     private int maxScroll() {
-        return Math.max(0, rows.size() * 14 - listH());
+        return Math.max(0, rows.size() * ROW_H - listH());
     }
 
-    @SuppressWarnings("unused")
-    private void embersOld(GuiGraphics g, int x, int y, int w, int h) {
-        float time = (System.currentTimeMillis() - openedAt) / 1000F;
-        Fx2D.begin(g, true);
-        Fx2D.glow(x + w / 2F, y + h + 30, w * 0.75F, 150, 0x66FF4A10, 0x00FF4A10);
-        Fx2D.glow(x + 96, y + 78, 90, 60, 0x40FF7A20, 0x00FF7A20);
-        for (int i = 0; i < 46; i++) {
-            float sp = 0.10F + Fx2D.hash(i, 3) * 0.16F;
-            float ph = (time * sp + Fx2D.hash(i, 5)) % 1F;
-            float px = x + Fx2D.hash(i, 1) * w + (float) Math.sin(time * 1.3F + i) * 5F;
-            float py = y + h - ph * h;
-            float a = (1 - ph) * 0.8F;
-            int c = Fx2D.rgba(i % 3 == 0 ? 0xFFD060 : 0xFF6A20, a);
-            Fx2D.glow(px, py, 1.6F + Fx2D.hash(i, 7) * 2F, c, Fx2D.rgba(0xFF3000, 0));
-        }
-        Fx2D.end();
+    private String tr(String key, Object... args) {
+        return Component.translatable(key, args).getString();
     }
 
     @Override
@@ -237,148 +164,249 @@ public class RaidScreen extends Screen {
         }
         int x = fx(), y = fy();
         float time = (System.currentTimeMillis() - openedAt) / 1000F;
-        g.fill(0, 0, this.width, this.height, 0xB0000000);
-        RaidFx.panel(g, x, y, W, H, time, false);
-        RaidFx.embers(g, x, y, W, H, time, 54, false);
-        RaidFx.title(g, this.font, t("uiTitle"), x + 16, y + 11, 1.7F, 0xFFB040, time);
-        g.drawString(this.font, "◆ " + t("uiSub"), x + 17, y + 31, 0xFFE07038, false);
-        RaidFx.divider(g, x + 14, x + W - 14, y + 44, 0xFF7A20);
-        // 왼쪽: 화염의 군주 일러스트 (그 위로 불티가 흐른다)
+        Fx2D.begin(g, false);
+        Fx2D.rect(0, 0, this.width, this.height, 0xB8000000, 0xB8000000, 0xD8000000, 0xD8000000);
+        Fx2D.end();
+        RaidFx.luxPanel(g, x, y, W, H, time, RaidFx.FIRE);
+        RaidFx.embers(g, x + 6, y + 40, W - 12, H - 46, time, 26, false);
+
+        // ── 머리: 제목, 부제, 금줄
+        RaidFx.luxTitle(g, this.font, t("uiTitle"), x + W / 2, y + 9, 0xF3D9A0, time);
+        String sub = spaced(t("uiSub"));
+        int sw = RaidText.w(this.font, sub, RaidText.SANS);
+        RaidText.center(g, this.font, sub, RaidText.SANS, x + W / 2, y + 29, 0xFFC99A62);
+        RaidFx.hairline(g, x + W / 2F - sw / 2F - 70, x + W / 2F - sw / 2F - 8, y + 33, 0xD4A85A, 0.9F);
+        RaidFx.hairline(g, x + W / 2F + sw / 2F + 8, x + W / 2F + sw / 2F + 70, y + 33, 0xD4A85A, 0.9F);
+        RaidFx.hairline(g, x + 12, x + W - 12, y + 42, 0xD4A85A, 0.75F);
+        int[] c = closeBtn();
+        boolean ch = !confirm && Ui.inside(mx, my, c[0], c[1], c[2], c[3]);
+        RaidFx.box(g, c[0], c[1], c[0] + c[2], c[1] + c[3], ch ? RaidFx.GOLD_HI : RaidFx.GOLD_LO);
+        g.fill(c[0] + 1, c[1] + 1, c[0] + c[2] - 1, c[1] + c[3] - 1, ch ? 0xFF4A1A10 : 0xFF180E0C);
+        Fx2D.begin(g, false);
+        Fx2D.line(c[0] + 4, c[1] + 4, c[0] + c[2] - 4, c[1] + c[3] - 4, 1.3F, RaidFx.GOLD_HI, RaidFx.GOLD_HI);
+        Fx2D.line(c[0] + 4, c[1] + c[3] - 4, c[0] + c[2] - 4, c[1] + 4, 1.3F, RaidFx.GOLD_HI, RaidFx.GOLD_HI);
+        Fx2D.end();
+
+        // ── 왼쪽: 액자 속 일러스트 (그 위에는 글자를 얹지 않는다)
+        int ax = x + ART_X, ay = y + ART_Y;
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
-        g.blit(LORD, x + 10, y + 47, 174, 152, 0F, 0F, 512, 448, 512, 448);
-        RaidFx.embers(g, x + 10, y + 60, 174, 138, time * 1.3F + 7F, 22, false);
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 200);
-        // 오른쪽 위: 조건과 상태
-        int sx = listX() - 2;
-        int ly = y + 50;
+        g.fill(ax, ay, ax + ART_W, ay + ART_H, 0xFF0E0506);
+        g.blit(LORD, ax, ay, ART_W, ART_H, 0F, 0F, 512, 448, 512, 448);
+        g.enableScissor(ax, ay, ax + ART_W, ay + ART_H);
+        RaidFx.embers(g, ax, ay + 10, ART_W, ART_H - 10, time * 1.2F + 5F, 18, false);
+        Fx2D.begin(g, true);
+        Fx2D.glow(ax + ART_W * 0.5F, ay + ART_H * 0.265F, 14, Fx2D.rgba(0xFFE0A0, 0.18F + 0.14F * (float) Math.sin(time * 2.4F)), Fx2D.rgba(0xFF8030, 0));
+        Fx2D.end();
+        g.disableScissor();
+        RaidFx.frame(g, ax, ay, ART_W, ART_H, time);
+
+        // ── 오른쪽 위: 입장 조건
+        int cx = x + COL_X, cw = COL_W;
+        RaidFx.section(g, this.font, tr("rtshop.raid.ui_req"), cx, y + 50, cw);
+        int ly = y + 63;
         int need = data.get("needKills").getAsInt(), kills = data.get("kills").getAsInt();
         if (need > 0) {
             boolean ok = kills >= need;
-            line(g, sx, ly, (ok ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_kills", kills, need).getString(), ok ? 0xFF8FE39A : 0xFFFF7060);
-            ly += 10;
+            RaidFx.badge(g, cx + 6, ly + 4, ok);
+            RaidText.draw(g, this.font, RaidText.clip(this.font, tr("rtshop.raid.ui_kills", kills, need), RaidText.SANS, cw - 16), RaidText.SANS, cx + 14, ly, ok ? 0xFFE9F5E0 : 0xFFF2C8BE);
+            ly += 12;
         }
         int tickets = data.get("tickets").getAsInt();
-        line(g, sx, ly, (tickets > 0 ? "✔ " : "✖ ") + Component.translatable("rtshop.raid.ui_tickets", tickets).getString(), tickets > 0 ? 0xFF8FE39A : 0xFFFF7060);
-        ly += 10;
+        RaidFx.badge(g, cx + 6, ly + 4, tickets > 0);
+        RaidText.draw(g, this.font, RaidText.clip(this.font, tr("rtshop.raid.ui_tickets", tickets), RaidText.SANS, cw - 16), RaidText.SANS, cx + 14, ly, tickets > 0 ? 0xFFE9F5E0 : 0xFFF2C8BE);
+        ly += 12;
         int st = data.get("state").getAsInt();
-        line(g, sx, ly, Component.translatable(st == Raid.IDLE ? "rtshop.raid.ui_open" : "rtshop.raid.ui_locked", data.get("inside").getAsInt()).getString(),
-                st == Raid.IDLE ? 0xFFF5E6C0 : 0xFFFF7060);
-        ly += 10;
-        line(g, sx, ly, Component.translatable("rtshop.raid.ui_power", pctMult(data.get("health").getAsDouble()), pctMult(data.get("damage").getAsDouble())).getString(), 0xFFD9B0A8);
-        ly += 10;
-        long ms = data.get("resetIn").getAsLong();
-        line(g, sx, ly, Component.translatable("rtshop.raid.ui_reset", ms / 86_400_000L, (ms / 3_600_000L) % 24).getString(), 0xFFB8AF9C);
+        boolean open = st == Raid.IDLE;
+        Fx2D.begin(g, true);
+        Fx2D.glow(cx + 6, ly + 4, 5, Fx2D.rgba(open ? 0x6FD483 : 0xFF5A48, 0.8F + 0.2F * (float) Math.sin(time * 3F)), Fx2D.rgba(open ? 0x6FD483 : 0xFF5A48, 0));
+        Fx2D.end();
+        RaidText.draw(g, this.font, RaidText.clip(this.font, tr(open ? "rtshop.raid.ui_open" : "rtshop.raid.ui_locked", data.get("inside").getAsInt()), RaidText.SANS, cw - 16),
+                RaidText.SANS, cx + 14, ly, open ? 0xFFD8CDB8 : 0xFFF2C8BE);
+        ly += 12;
         String why = data.get("why").getAsString();
-        if (!why.isEmpty()) {
-            List<FormattedCharSequence> wl = this.font.split(Component.literal(why), 168);
-            int wy = y + H - 36 - wl.size() * 10;
-            g.fill(x + 10, wy - 3, x + 184, y + H - 34, 0xC0000000);
-            for (FormattedCharSequence l : wl) {
-                g.drawString(this.font, l, x + 16, wy, 0xFFFF9080, false);
-                wy += 10;
-            }
+        if (!why.isEmpty() && !data.get("canEnter").getAsBoolean()) {
+            List<FormattedCharSequence> wl = RaidText.split(this.font, why, RaidText.SANS, cw - 12);
+            int n = Math.min(2, wl.size());
+            g.fill(cx + 2, ly - 1, cx + cw, ly + n * 10 + 1, 0x70300806);
+            g.fill(cx + 2, ly - 1, cx + 3, ly + n * 10 + 1, 0xFFFF5A48);
+            for (int i = 0; i < n; i++) g.drawString(this.font, wl.get(i), cx + 7, ly + i * 10, 0xFFFF9A88, false);
+            ly += n * 10 + 4;
         }
-        g.pose().popPose();
-        // 오른쪽: 보상 목록
+
+        // ── 수치 패: 보스 체력 · 보스 공격력 · 주간 초기화
+        int ty = ly + 2, tw = (cw - 8) / 3, th = 25;
+        long ms = data.get("resetIn").getAsLong();
+        String[][] tiles = {
+                {tr("rtshop.raid.ui_hp"), pctMult(data.get("health").getAsDouble()) + "%"},
+                {tr("rtshop.raid.ui_atk"), pctMult(data.get("damage").getAsDouble()) + "%"},
+                {tr("rtshop.raid.ui_reset_short"), tr("rtshop.raid.ui_time", ms / 86_400_000L, (ms / 3_600_000L) % 24)}};
+        for (int i = 0; i < 3; i++) {
+            int tx = cx + i * (tw + 4);
+            Fx2D.begin(g, false);
+            Fx2D.rect(tx, ty, tx + tw, ty + th, 0xFF2A1710, 0xFF2A1710, 0xFF120A09, 0xFF120A09);
+            Fx2D.end();
+            RaidFx.box(g, tx, ty, tx + tw, ty + th, 0xFF5A4024);
+            g.fill(tx + 1, ty, tx + tw - 1, ty + 1, RaidFx.GOLD_MID);
+            g.pose().pushPose();
+            g.pose().translate(tx + tw / 2F, ty + 4, 0);
+            g.pose().scale(0.8F, 0.8F, 1F);
+            RaidText.center(g, this.font, tiles[i][0], RaidText.SANS, 0, 0, 0xFFB4946A);
+            g.pose().popPose();
+            String v = RaidText.clip(this.font, tiles[i][1], RaidText.SERIF, tw - 4);
+            RaidText.center(g, this.font, v, RaidText.SERIF, tx + tw / 2, ty + 13, i == 2 ? 0xFFF3D9A0 : 0xFFFFB07A);
+        }
+
+        // ── 오른쪽 아래: 보상 목록
+        listTop = ty + th + 8;
         int lx = listX(), lt = listY(), lw = listW(), lh = listH();
-        g.fill(lx - 5, lt - 5, lx + lw + 5, lt + lh + 5, 0xFF5A1A0C);
-        g.fill(lx - 4, lt - 4, lx + lw + 4, lt + lh + 4, 0xE00A0506);
-        g.enableScissor(lx - 4, lt - 2, lx + lw + 4, lt + lh + 2);
+        g.fill(lx - 4, lt - 3, lx + lw + 6, lt + lh + 3, 0xD0080405);
+        RaidFx.box(g, lx - 4, lt - 3, lx + lw + 6, lt + lh + 3, 0xFF5A4024);
+        g.fill(lx - 3, lt - 3, lx + lw + 5, lt - 2, 0x80D4A85A);
+        scroll = Math.min(scroll, maxScroll());
+        g.enableScissor(lx - 3, lt - 2, lx + lw + 5, lt + lh + 2);
         int ry = lt - scroll;
         for (Row r : rows) {
-            if (ry > lt - 16 && ry < lt + lh + 2) {
-                if (r.kind == 0) {
-                    Fx2D.begin(g, false);
-                    Fx2D.rect(lx - 3, ry, lx + lw + 3, ry + 13, 0xFF7A2A10, 0x00301008, 0x00301008, 0xFF4A1808);
-                    Fx2D.end();
-                    g.drawString(this.font, "◆ " + r.text, lx, ry + 3, 0xFFFFD890, false);
-                } else if (r.kind == 3) {
-                    boolean myst = r.color == GRADE_COLORS[5];
-                    int band = myst ? 0xFF000000 : r.color;
-                    Fx2D.begin(g, false);
-                    Fx2D.rect(lx + 2, ry + 1, lx + lw, ry + 13, Fx2D.alpha(myst ? 0xFF6A6A6A : r.color, 0.42F), 0x00000000, 0x00000000, Fx2D.alpha(myst ? 0xFF6A6A6A : r.color, 0.42F));
-                    Fx2D.end();
-                    g.fill(lx + 2, ry + 1, lx + 4, ry + 13, band);
-                    if (myst) {
-                        g.fill(lx + 6, ry + 2, lx + 12 + this.font.width(r.text), ry + 12, 0xFF9A9A9A);
-                    }
-                    g.drawString(this.font, r.text, lx + 9, ry + 3, r.color, false);
-                } else {
-                    if (!r.stack.isEmpty()) {
-                        g.pose().pushPose();
-                        g.pose().translate(lx + 12, ry, 0);
-                        g.pose().scale(0.75F, 0.75F, 1F);
-                        g.renderItem(r.stack, 0, 0);
-                        g.pose().popPose();
-                    }
-                    g.drawString(this.font, Ui.clip(this.font, r.text, lw - 44), lx + 28, ry + 3, r.color, false);
-                }
-                if (!r.right.isEmpty()) {
-                    g.drawString(this.font, r.right, lx + lw - this.font.width(r.right) - 2, ry + 3, r.right.equals("✔") ? 0xFF8FE39A : 0xFFFFE0A0, false);
-                }
-            }
-            ry += 14;
+            if (ry > lt - ROW_H - 2 && ry < lt + lh + 2) drawRow(g, r, lx, ry, lw);
+            ry += ROW_H;
         }
         g.disableScissor();
-        // 버튼
-        boolean can = data.get("canEnter").getAsBoolean();
-        int[] e = enterBtn(), c = closeBtn();
-        boolean hov = !confirm && can && Ui.inside(mx, my, e[0], e[1], e[2], e[3]);
-        RaidFx.hotButton(g, this.font, e[0], e[1], e[2], e[3], "⚔ " + t("enterButton"), can, hov, time, false);
-        Ui.button(g, this.font, c[0], c[1], c[2], c[3], Component.translatable("gui.cancel").getString(), !confirm && Ui.inside(mx, my, c[0], c[1], c[2], c[3]), true);
-        if (confirm) {
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 300);
-            g.fill(0, 0, this.width, this.height, 0xAA000000);
-            int bw = 270, bh = 100, bx = (this.width - bw) / 2, by = this.height / 2 - 54;
-            RaidFx.panel(g, bx, by, bw, bh, time, false);
-            RaidFx.embers(g, bx, by, bw, bh, time, 16, false);
-            g.drawCenteredString(this.font, "⚔ " + t("confirmTitle") + " ⚔", this.width / 2, by + 11, 0xFFFFC060);
-            RaidFx.divider(g, bx + 30, bx + bw - 30, by + 25, 0xFF7A20);
-            int ty = by + 33;
-            for (FormattedCharSequence l : this.font.split(Component.literal(t("confirmBody")), bw - 28)) {
-                g.drawCenteredString(this.font, l, this.width / 2, ty, 0xFFF5E6C0);
-                ty += 10;
-            }
-            int[] yb = yesBtn(), nb = noBtn();
-            RaidFx.hotButton(g, this.font, yb[0], yb[1], yb[2], yb[3], t("confirmYes"), true, Ui.inside(mx, my, yb[0], yb[1], yb[2], yb[3]), time, false);
-            Ui.button(g, this.font, nb[0], nb[1], nb[2], nb[3], t("confirmNo"), Ui.inside(mx, my, nb[0], nb[1], nb[2], nb[3]), true);
-            g.pose().popPose();
+        if (maxScroll() > 0) {
+            int bx = lx + lw + 3;
+            g.fill(bx, lt, bx + 1, lt + lh, 0xFF3A2818);
+            int th2 = Math.max(10, lh * lh / (rows.size() * ROW_H));
+            int tyy = lt + (lh - th2) * scroll / maxScroll();
+            g.fill(bx - 1, tyy, bx + 2, tyy + th2, RaidFx.GOLD_MID);
+            Fx2D.begin(g, true);
+            Fx2D.glow(bx + 0.5F, lt + lh, 14, 6, Fx2D.rgba(0xD4A85A, scroll < maxScroll() ? 0.35F : 0), Fx2D.rgba(0xD4A85A, 0));
+            Fx2D.end();
         }
+
+        // ── 입장 단추 (일러스트 아래)
+        boolean can = data.get("canEnter").getAsBoolean();
+        int[] e = enterBtn();
+        boolean hov = !confirm && can && Ui.inside(mx, my, e[0], e[1], e[2], e[3]);
+        RaidFx.luxButton(g, this.font, e[0], e[1], e[2], e[3], t("enterButton"), can, hov, time, true);
+
+        if (confirm) renderConfirm(g, mx, my, time);
+    }
+
+    private void drawRow(GuiGraphics g, Row r, int lx, int ry, int lw) {
+        int ty = ry + 3;
+        if (r.kind == 0) {
+            Fx2D.begin(g, false);
+            Fx2D.rect(lx - 3, ry, lx + lw + 5, ry + ROW_H - 1, 0xC0502A12, 0x00301008, 0x00301008, 0xC0502A12);
+            Fx2D.end();
+            g.fill(lx - 3, ry + ROW_H - 1, lx + lw + 5, ry + ROW_H, 0x40D4A85A);
+            Fx2D.begin(g, false);
+            Fx2D.diamond(lx + 2, ry + 6, 2.4F, 2.4F, 0, RaidFx.GOLD_MID);
+            Fx2D.end();
+            RaidText.draw(g, this.font, RaidText.clip(this.font, r.text, RaidText.SERIF, lw - 24), RaidText.SERIF, lx + 8, ty, RaidFx.GOLD_HI);
+        } else if (r.kind == 3) {
+            boolean myst = r.color == GRADE_COLORS[5];
+            int col = myst ? 0xFF8A8A8A : r.color;
+            Fx2D.begin(g, false);
+            Fx2D.rect(lx + 2, ry + 1, lx + lw, ry + ROW_H - 1, Fx2D.alpha(col, 0.30F), 0x00000000, 0x00000000, Fx2D.alpha(col, 0.30F));
+            Fx2D.diamond(lx + 6, ry + 6, 3F, 3F, 0, 0xFF000000);
+            Fx2D.diamond(lx + 6, ry + 6, 2.2F, 2.2F, 0, myst ? 0xFF1A1A1A : col);
+            Fx2D.end();
+            String name = myst ? "???" : r.text;
+            int nw = RaidText.w(this.font, name, RaidText.SANS);
+            RaidText.draw(g, this.font, name, RaidText.SANS, lx + 12, ty, myst ? 0xFFB0B0B0 : col);
+            int rw = RaidText.w(this.font, r.right, RaidText.SANS);
+            for (int dx = lx + 16 + nw; dx < lx + lw - rw - 6; dx += 3) g.fill(dx, ry + 9, dx + 1, ry + 10, 0x50D4A85A);
+            RaidText.right(g, this.font, r.right, RaidText.SANS, lx + lw - 1, ty, 0xFFF3D9A0);
+            return;
+        } else {
+            int tx = lx + 10;
+            if (!r.stack.isEmpty()) {
+                g.pose().pushPose();
+                g.pose().translate(lx + 9, ry, 0);
+                g.pose().scale(0.75F, 0.75F, 1F);
+                g.renderItem(r.stack, 0, 0);
+                g.pose().popPose();
+                tx = lx + 24;
+            } else if (r.kind == 2) {
+                Fx2D.begin(g, false);
+                Fx2D.ring(lx + 15, ry + 6, 0, 4.2F, 0xFFFFE08A, 0xFFB07A20);
+                Fx2D.ring(lx + 15, ry + 6, 2.2F, 2.9F, 0x90704010, 0x90704010);
+                Fx2D.end();
+                tx = lx + 24;
+            }
+            RaidText.draw(g, this.font, RaidText.clip(this.font, r.text, RaidText.SANS, lw - (tx - lx) - 14), RaidText.SANS, tx, ty, r.kind == 2 ? 0xFFFFD27A : r.color);
+        }
+        if (r.right.equals("✔")) {
+            RaidFx.badge(g, lx + lw - 4, ry + 6, true);
+        } else if (!r.right.isEmpty()) {
+            RaidText.right(g, this.font, r.right, RaidText.SANS, lx + lw - 1, ty, 0xFFF3D9A0);
+        }
+    }
+
+    /** 글자 사이를 조금 띄운다 (부제처럼 작은 글씨를 우아하게). */
+    private static String spaced(String s) {
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            if (i > 0) b.append(s.charAt(i) == ' ' || s.charAt(i - 1) == ' ' ? "" : " ");
+            b.append(s.charAt(i));
+        }
+        return b.toString();
+    }
+
+    private void renderConfirm(GuiGraphics g, int mx, int my, float time) {
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 300);
+        g.fill(0, 0, this.width, this.height, 0xB0000000);
+        int bw = 280, bh = 110, bx = (this.width - bw) / 2, by = this.height / 2 - 62;
+        RaidFx.luxPanel(g, bx, by, bw, bh, time, RaidFx.FIRE);
+        RaidFx.embers(g, bx + 4, by + 4, bw - 8, bh - 8, time, 14, false);
+        RaidFx.luxTitle(g, this.font, t("confirmTitle"), this.width / 2, by + 10, 0xF3D9A0, time);
+        RaidFx.hairline(g, bx + 24, bx + bw - 24, by + 31, 0xD4A85A, 0.9F);
+        RaidFx.crest(g, this.width / 2F, by + 31, time);
+        int ty = by + 40;
+        for (FormattedCharSequence l : RaidText.split(this.font, t("confirmBody"), RaidText.SANS, bw - 32)) {
+            g.drawCenteredString(this.font, l, this.width / 2, ty, 0xFFE9DFCB);
+            ty += 11;
+        }
+        int[] yb = yesBtn(), nb = noBtn();
+        RaidFx.luxButton(g, this.font, yb[0], yb[1], yb[2], yb[3], t("confirmYes"), true, Ui.inside(mx, my, yb[0], yb[1], yb[2], yb[3]), time, true);
+        RaidFx.luxButton(g, this.font, nb[0], nb[1], nb[2], nb[3], t("confirmNo"), true, Ui.inside(mx, my, nb[0], nb[1], nb[2], nb[3]), time, false);
+        g.pose().popPose();
     }
 
     private static String pctMult(double m) {
         return Long.toString(Math.round(m * 100));
     }
 
-    private void line(GuiGraphics g, int x, int y, String s, int color) {
-        g.drawString(this.font, Ui.clip(this.font, s, listW() + 4), x, y, color, false);
-    }
-
     private void renderDialogue(GuiGraphics g) {
-        int bw = Math.min(420, this.width - 40), bh = 62, bx = (this.width - bw) / 2, by = this.height - bh - 34;
+        int bw = Math.min(420, this.width - 40), bh = 64, bx = (this.width - bw) / 2, by = this.height - bh - 30;
         float time = (System.currentTimeMillis() - openedAt) / 1000F;
         Fx2D.begin(g, false);
-        Fx2D.rect(0, by - 60, this.width, this.height, 0x00000000, 0x00000000, 0xC0000000, 0xC0000000);
+        Fx2D.rect(0, by - 70, this.width, this.height, 0x00000000, 0x00000000, 0xD0000000, 0xD0000000);
         Fx2D.end();
-        RaidFx.panel(g, bx, by, bw, bh, time, false);
-        RaidFx.embers(g, bx, by, bw, bh, time, 14, false);
-        int nw = this.font.width(t("npcName")) + 26;
-        g.fill(bx + 9, by - 10, bx + 11 + nw, by + 6, 0xFF000000);
+        RaidFx.luxPanel(g, bx, by, bw, bh, time, RaidFx.FIRE);
+        RaidFx.embers(g, bx + 4, by + 4, bw - 8, bh - 8, time, 12, false);
+        // 이름패
+        String name = t("npcName");
+        int nw = RaidText.w(this.font, name, RaidText.SERIF) + 28, nx = bx + 14, ny = by - 9;
+        g.fill(nx - 2, ny - 2, nx + nw + 2, ny + 15, 0xFF000000);
+        RaidFx.box(g, nx - 1, ny - 1, nx + nw + 1, ny + 14, RaidFx.GOLD_MID);
         Fx2D.begin(g, false);
-        Fx2D.rect(bx + 10, by - 9, bx + 10 + nw, by + 5, 0xFFC83A14, 0xFFC83A14, 0xFF6A1408, 0xFF6A1408);
+        Fx2D.rect(nx, ny, nx + nw, ny + 13, 0xFF9A2612, 0xFF9A2612, 0xFF420A06, 0xFF420A06);
+        Fx2D.diamond(nx + 6, ny + 6.5F, 2F, 2F, 0, RaidFx.GOLD_HI);
+        Fx2D.diamond(nx + nw - 6, ny + 6.5F, 2F, 2F, 0, RaidFx.GOLD_HI);
         Fx2D.end();
-        g.drawString(this.font, "◆ " + t("npcName"), bx + 15, by - 6, 0xFFFFF0D0, false);
+        RaidText.outlined(g, this.font, name, RaidText.SERIF, nx + 14, ny + 3, 0xFFFFF1D6, 0xC0000000);
         String full = t("dialogue" + (phase + 1));
         int shown = (int) Math.min(full.length(), (System.currentTimeMillis() - lineAt) / 22);
-        int ty = by + 12;
-        for (FormattedCharSequence l : this.font.split(Component.literal(full.substring(0, shown)), bw - 24)) {
-            g.drawString(this.font, l, bx + 12, ty, 0xFFF5E6C0, false);
-            ty += 11;
+        int ty = by + 14;
+        for (FormattedCharSequence l : RaidText.split(this.font, full.substring(0, shown), RaidText.SANS, bw - 32)) {
+            g.drawString(this.font, l, bx + 16, ty, 0xFFEDE3CC, false);
+            ty += 12;
         }
-        if (shown >= full.length() && (System.currentTimeMillis() / 400) % 2 == 0) {
-            g.drawString(this.font, "▶", bx + bw - 16, by + bh - 13, 0xFFFFB040, false);
+        if (shown >= full.length()) {
+            float bob = (float) Math.sin(time * 5F) * 1.5F;
+            Fx2D.begin(g, false);
+            Fx2D.tri(bx + bw - 20, by + bh - 14 + bob, RaidFx.GOLD_HI, bx + bw - 12, by + bh - 14 + bob, RaidFx.GOLD_HI, bx + bw - 16, by + bh - 9 + bob, RaidFx.GOLD_MID);
+            Fx2D.end();
         }
     }
 
@@ -432,7 +460,7 @@ public class RaidScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
-        scroll = Math.max(0, Math.min(maxScroll(), scroll - (int) (delta * 14)));
+        scroll = Math.max(0, Math.min(maxScroll(), scroll - (int) (delta * ROW_H)));
         return true;
     }
 

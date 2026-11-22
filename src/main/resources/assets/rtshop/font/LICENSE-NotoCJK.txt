@@ -1,0 +1,4 @@
+raid_serif.ttf and raid_sans.ttf are subsets of Noto Serif CJK KR Bold and Noto Sans CJK KR Medium
+(c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+Licensed under the SIL Open Font License, Version 1.1 — https://openfontlicense.org
+The subsets keep the original glyph outlines (converted to TrueType curves) for ASCII and the 2,350 common Hangul syllables.
