@@ -1137,5 +1137,13 @@
   "rtshop.quest.obj.advancement": "Achieve: %s",
   "rtshop.quest.obj.dimension": "Enter: %s",
   "rtshop.economy.death_story_boss": "You fell fighting a story boss. You kept your Gold.",
-  "rtshop.msg.story_locked": "This gear unlocks after finishing %s of the main story."
+  "rtshop.msg.story_locked": "This gear unlocks after finishing %s of the main story.",
+  "rtshop.qedit.type_structure": "Structure",
+  "rtshop.qedit.type_advancement": "Advancement",
+  "rtshop.qedit.type_dimension": "Dimension",
+  "rtshop.qedit.type_flag": "Flag",
+  "rtshop.qedit.hint_structure": "-> done inside the structure (e.g. minecraft:desert_pyramid, #minecraft:ruined_portal, cataclysm:*)",
+  "rtshop.qedit.hint_advancement": "-> done when the advancement is earned (e.g. minecraft:nether/root)",
+  "rtshop.qedit.hint_dimension": "-> done on entering the dimension (e.g. minecraft:the_nether)",
+  "rtshop.qedit.hint_flag": "-> done once the flag is held (e.g. abyss_floor_2 = Spiral Abyss floor 2)"
 }

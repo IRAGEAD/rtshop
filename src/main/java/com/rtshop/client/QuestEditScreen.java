@@ -965,7 +965,7 @@ public class QuestEditScreen extends Screen {
                             od.target = v;
                             markDirty();
                         }));
-                case VISIT -> box(tx, y, tw, od.target, 200, v -> od.target = v);
+                case VISIT, STRUCTURE, ADVANCEMENT, DIMENSION, FLAG -> box(tx, y, tw, od.target, 200, v -> od.target = v);
                 default -> labels.add(new Label(tx + 2, y + 2, tr("rtshop.qedit.pay_note"), Ui.C_INK_SOFT));
             }
             String helper = switch (od.type) {
@@ -1031,6 +1031,10 @@ public class QuestEditScreen extends Screen {
             case KILL -> tr("rtshop.qedit.hint_kill", od.target.equals("*") ? tr("rtshop.quest.any_monster") : entityName(od.target));
             case VISIT -> tr("rtshop.qedit.hint_visit", od.dim);
             case TALK -> tr("rtshop.qedit.hint_talk", npcLabel(od.target));
+            case STRUCTURE -> tr("rtshop.qedit.hint_structure");
+            case ADVANCEMENT -> tr("rtshop.qedit.hint_advancement");
+            case DIMENSION -> tr("rtshop.qedit.hint_dimension");
+            case FLAG -> tr("rtshop.qedit.hint_flag");
             default -> tr("rtshop.qedit.hint_pay");
         };
     }

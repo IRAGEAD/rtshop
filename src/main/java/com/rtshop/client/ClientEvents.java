@@ -146,6 +146,16 @@ public final class ClientEvents {
 
     // ------------------------------------------------------------------ 이야기 연출: 화면 흔들림, 보스 아이템 이야기
 
+    /** 연출이 도는 동안에는 채팅·체력·핫바 같은 화면 요소를 숨긴다 (영화처럼). */
+    @SubscribeEvent
+    public static void onOverlayPre(net.minecraftforge.client.event.RenderGuiOverlayEvent.Pre event) {
+        if (!Cinematic.active()) return;
+        net.minecraft.resources.ResourceLocation id = event.getOverlay().id();
+        if (id.getNamespace().equals("rtshop") && id.getPath().equals("cinematic")) return;
+        if (id.getPath().equals("vignette") || id.getPath().equals("frostbite") || id.getPath().equals("helmet")) return;
+        event.setCanceled(true);
+    }
+
     @SubscribeEvent
     public static void onCameraAngles(net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles event) {
         float[] s = Cinematic.shake();
