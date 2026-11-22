@@ -636,7 +636,7 @@
   "rtshop.plot.wand_given": "구획 지팡이를 받았습니다. 들고 있으면 선택한 칸이 노란 입자, 판매 중인 구획이 흰 입자로 보입니다.",
   "rtshop.plot.undone": "되돌렸습니다 · 선택 %s칸",
   "rtshop.plot.nothing_to_undo": "되돌릴 것이 없습니다 · 선택 %s칸",
-  "rtshop.plot.cleared": "선택을 비웠습니다.",
+  "rtshop.plot.cleared": "토지 안의 작물·구조물을 치웠습니다 (블록 %s개). 경작지와 물길은 그대로입니다.",
   "rtshop.plot.empty": "선택한 칸이 없습니다. 구획 지팡이로 먼저 고르세요.",
   "rtshop.plot.all_taken": "선택한 칸이 모두 다른 토지와 겹칩니다.",
   "rtshop.plot.default_name": "농지 %s",
@@ -1088,5 +1088,6 @@
   "rtshop.restaurant.cmd_unlocked": "%s 을(를) 메뉴에 올렸습니다.",
   "rtshop.restaurant.cmd_already": "%s 은(는) 이미 메뉴에 있습니다.",
   "rtshop.restaurant.cmd_locked": "%s 을(를) 메뉴에서 내렸습니다.",
-  "rtshop.restaurant.cmd_not_on_menu": "%s 은(는) 메뉴에 없습니다."
+  "rtshop.restaurant.cmd_not_on_menu": "%s 은(는) 메뉴에 없습니다.",
+  "rtshop.plot.bought_cleared": "토지 안의 작물·구조물을 치웠습니다 (블록 %s개). 경작지와 물길은 그대로입니다."
 }

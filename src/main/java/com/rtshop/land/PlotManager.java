@@ -896,12 +896,115 @@ public final class PlotManager {
                     .withStyle(ChatFormatting.GOLD));
             RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 바꾼 블록 {}", p.getGameProfile().getName(), land.name, n);
         }
+        if (!land.castle() && LandConfig.get().plotClearOnBuy) {
+            try {
+                int n = clearPlot(p.server, land);
+                if (n > 0) {
+                    p.sendSystemMessage(Component.translatable("rtshop.plot.bought_cleared", n).withStyle(ChatFormatting.GOLD));
+                }
+                RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 치운 블록 {}", p.getGameProfile().getName(), land.name, n);
+            } catch (Throwable t) {
+                RtShop.LOGGER.warn("[rtshop] 구획 {} 을(를) 치우지 못했습니다", land.name, t);
+            }
+        }
         Claim c = plotClaim(land);
         if (c != null) {
             p.sendSystemMessage(Component.translatable("rtshop.plot.where", (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2).withStyle(ChatFormatting.GRAY));
         }
         p.sendSystemMessage(Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
         return true;
+    }
+
+    /** 땅으로 치는 블록인가 (이 위에 있는 것만 치운다): 경작지·흙·풀·모래·자갈·돌·물 등. */
+    static boolean isGround(BlockState st) {
+        Block b = st.getBlock();
+        if (b instanceof net.minecraft.world.level.block.FarmBlock || b instanceof net.minecraft.world.level.block.LiquidBlock) {
+            return true;
+        }
+        return st.is(net.minecraft.tags.BlockTags.DIRT) || st.is(net.minecraft.tags.BlockTags.SAND)
+                || st.is(net.minecraft.tags.BlockTags.BASE_STONE_OVERWORLD) || st.is(net.minecraft.tags.BlockTags.TERRACOTTA)
+                || b == net.minecraft.world.level.block.Blocks.GRAVEL || b == net.minecraft.world.level.block.Blocks.CLAY
+                || b == net.minecraft.world.level.block.Blocks.DIRT_PATH || b == net.minecraft.world.level.block.Blocks.FARMLAND
+                || b == net.minecraft.world.level.block.Blocks.SANDSTONE || b == net.minecraft.world.level.block.Blocks.SNOW_BLOCK;
+    }
+
+    public static Path plotBackupDir(MinecraftServer server) {
+        return server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("rtshop").resolve("plot_backup");
+    }
+
+    /**
+     * 구획(농경지)을 샀을 때: 토지 칸 안에서 땅 위에 있는 것(작물·울타리·허수아비·나무·건물)을 치운다.
+     * 땅(경작지·흙·물길)은 그대로 둔다. 땅을 찾지 못한 칸은 건드리지 않는다. 치운 블록은 world/rtshop/plot_backup 에 저장한다.
+     * @return 치운 블록 수
+     */
+    public static int clearPlot(MinecraftServer server, Land land) {
+        LandData data = LandData.get(server);
+        int n = 0;
+        net.minecraft.nbt.ListTag removed = new net.minecraft.nbt.ListTag();
+        int flags = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+        BlockState air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (Claim c : land.claims) {
+            ServerLevel level = null;
+            for (ServerLevel l : server.getAllLevels()) {
+                if (LandManager.dim(l).equals(c.dim)) level = l;
+            }
+            if (level == null) continue;
+            for (int z = c.z0; z <= c.z1; z++) {
+                for (int x = c.x0; x <= c.x1; x++) {
+                    if (!c.hasColumn(x, z)) continue;
+                    level.getChunk(x >> 4, z >> 4);
+                    int top = Math.min(c.y1, level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - 1);
+                    int low = Math.max(c.y0, top - 48);
+                    int ground = Integer.MIN_VALUE;
+                    for (int y = top; y >= low; y--) {
+                        pos.set(x, y, z);
+                        if (isGround(level.getBlockState(pos))) {
+                            ground = y;
+                            break;
+                        }
+                    }
+                    if (ground == Integer.MIN_VALUE) continue; // 땅을 찾지 못함 (다리·바닥이 깔린 곳 등): 그대로 둔다
+                    for (int y = top; y > ground; y--) {
+                        pos.set(x, y, z);
+                        BlockState st = level.getBlockState(pos);
+                        if (st.isAir()) continue;
+                        Claim at = data.claimAt(c.dim, x, y, z);
+                        if (at == null || at.landId != land.id) continue;
+                        if (removed.size() < 300000) {
+                            net.minecraft.nbt.CompoundTag e = new net.minecraft.nbt.CompoundTag();
+                            e.putInt("x", x);
+                            e.putInt("y", y);
+                            e.putInt("z", z);
+                            e.put("s", net.minecraft.nbt.NbtUtils.writeBlockState(st));
+                            removed.add(e);
+                        }
+                        level.removeBlockEntity(pos);
+                        level.setBlock(pos, st.getFluidState().isSource() ? net.minecraft.world.level.block.Blocks.WATER.defaultBlockState() : air, flags);
+                        n++;
+                    }
+                }
+            }
+            net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(c.x0, c.y0, c.z0, c.x1 + 1, c.y1 + 1, c.z1 + 1);
+            for (net.minecraft.world.entity.Entity e : level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, box,
+                    e -> (e instanceof net.minecraft.world.entity.decoration.HangingEntity || e instanceof net.minecraft.world.entity.decoration.ArmorStand
+                            || e instanceof net.minecraft.world.entity.item.ItemEntity) && c.hasColumn(e.getBlockX(), e.getBlockZ()))) {
+                e.discard();
+            }
+        }
+        if (!removed.isEmpty()) {
+            try {
+                Path dir = plotBackupDir(server);
+                Files.createDirectories(dir);
+                net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+                tag.putString("land", land.name);
+                tag.put("blocks", removed);
+                net.minecraft.nbt.NbtIo.writeCompressed(tag, dir.resolve("plot_" + land.id + "_" + System.currentTimeMillis() + ".nbt").toFile());
+            } catch (Exception e) {
+                RtShop.LOGGER.warn("[rtshop] 구획 {} 백업 실패: {}", land.name, e.toString());
+            }
+        }
+        return n;
     }
 
     /** 주인이 구획을 반환한다: 구매가의 일부를 돌려받고 구획은 다시 판매 중이 된다. */

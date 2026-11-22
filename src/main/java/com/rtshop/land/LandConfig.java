@@ -44,6 +44,8 @@ public final class LandConfig {
     public long plotPricePerBlock = 40;
     /** 구획을 반환할 때 돌려주는 비율 (구매가 기준 %). */
     public int plotRefundPercent = 50;
+    /** 구획(농경지)을 사면 그 토지 칸 안의 지면 위 것(작물·구조물·나무)을 치운다. */
+    public boolean plotClearOnBuy = true;
     /** 한 사람이 살 수 있는 구획 수 (0 = 제한 없음). */
     public int plotMaxPerPlayer = 0;
     /** 자동 채우기로 한 번에 고를 수 있는 최대 칸 수. 넘으면 경계가 끊긴 것으로 보고 멈춘다. */
@@ -141,6 +143,7 @@ public final class LandConfig {
                 }
                 if (o.has("plotDepthBelow")) c.plotDepthBelow = Math.max(0, Math.min(64, o.get("plotDepthBelow").getAsInt()));
                 if (o.has("plotPricePerBlock")) c.plotPricePerBlock = Math.max(0, o.get("plotPricePerBlock").getAsLong());
+                if (o.has("plotClearOnBuy")) c.plotClearOnBuy = o.get("plotClearOnBuy").getAsBoolean();
                 if (o.has("plotRefundPercent")) c.plotRefundPercent = Math.max(0, Math.min(100, o.get("plotRefundPercent").getAsInt()));
                 if (o.has("plotMaxPerPlayer")) c.plotMaxPerPlayer = Math.max(0, o.get("plotMaxPerPlayer").getAsInt());
                 if (o.has("plotFillMaxArea")) c.plotFillMaxArea = Math.max(16, Math.min(200000, o.get("plotFillMaxArea").getAsInt()));
@@ -241,12 +244,14 @@ public final class LandConfig {
         JsonArray help = new JsonArray();
         help.add("구획(칸 단위 모양의 토지): OP 가 /rtshop plot wand 로 받은 구획 지팡이로 모양을 고르고 /rtshop plot create 로 등록");
         help.add("plotDepthBelow: 구획 안 가장 낮은 지면에서 아래로 덮는 깊이 · plotPricePerBlock: 가격을 안 적었을 때 1칸당 가격");
+        help.add("plotClearOnBuy: 구획(농경지)을 사면 토지 칸 안의 작물·구조물·나무를 치웁니다 (경작지·흙·물은 그대로, 치운 블록은 world/rtshop/plot_backup 에 저장)");
         help.add("plotRefundPercent: 반환 시 구매가의 몇 %를 돌려줄지 · plotMaxPerPlayer: 1인당 구획 수 (0 = 무제한)");
         help.add("plotFillBlocks: 자동 채우기가 밭으로 보는 지면 블록(ID 또는 #태그) · plotRimStopBlocks: 테두리를 넓힐 때 넘지 않는 블록");
         o.add("_구획_설명", help);
         o.addProperty("plotDepthBelow", c.plotDepthBelow);
         o.addProperty("plotPricePerBlock", c.plotPricePerBlock);
         o.addProperty("plotRefundPercent", c.plotRefundPercent);
+        o.addProperty("plotClearOnBuy", c.plotClearOnBuy);
         o.addProperty("plotMaxPerPlayer", c.plotMaxPerPlayer);
         o.addProperty("plotFillMaxArea", c.plotFillMaxArea);
         o.addProperty("plotFillGrowRim", c.plotFillGrowRim);

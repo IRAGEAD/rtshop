@@ -7,6 +7,8 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ "rtshop.plot.bought_cleared": ("토지 안의 작물·구조물을 치웠습니다 (블록 %s개). 경작지와 물길은 그대로입니다.", "The crops and structures on the lot were cleared (%s blocks). Farmland and water channels are kept."),
+
  # ---- 3.20: PvP 켜기/끄기, 식당 주인
  "key.rtshop.pvp": ("PvP 켜기/끄기", "Toggle PvP"),
  "rtshop.hud.name_pvp": ("PvP 표시", "PvP indicator"),

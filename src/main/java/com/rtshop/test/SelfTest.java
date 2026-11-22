@@ -313,6 +313,11 @@ public final class SelfTest {
             crash("player shop", t);
         }
         try {
+            plotClear(server, level, a);
+        } catch (Throwable t) {
+            crash("plot clear", t);
+        }
+        try {
             pvp(server, level, a, b);
         } catch (Throwable t) {
             crash("pvp", t);
@@ -619,6 +624,76 @@ public final class SelfTest {
             }
             gone.forEach(data::removeLand);
             data.castleInstalled = was;
+        }
+    }
+
+    // ------------------------------------------------------------------ 농경지를 사면 작물·구조물을 치운다
+
+    private static void plotClear(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("farmland lot is cleared on purchase");
+        LandData data = LandData.get(server);
+        int X = 3200, Z = 3200, Y = 100;
+        net.minecraft.world.level.block.Block[] B = {net.minecraft.world.level.block.Blocks.STONE, net.minecraft.world.level.block.Blocks.FARMLAND,
+                net.minecraft.world.level.block.Blocks.WHEAT, net.minecraft.world.level.block.Blocks.GRASS_BLOCK, net.minecraft.world.level.block.Blocks.OAK_FENCE,
+                net.minecraft.world.level.block.Blocks.WATER, net.minecraft.world.level.block.Blocks.OAK_PLANKS, net.minecraft.world.level.block.Blocks.AIR};
+        for (int x = X - 2; x <= X + 9; x++) {
+            for (int z = Z - 2; z <= Z + 9; z++) {
+                for (int y = Y - 3; y <= Y + 8; y++) level.setBlock(new BlockPos(x, y, z), (y < Y ? B[0] : B[7]).defaultBlockState(), 2);
+                level.setBlock(new BlockPos(x, Y, z), B[1].defaultBlockState(), 2);
+                level.setBlock(new BlockPos(x, Y + 1, z), B[2].defaultBlockState(), 2);
+            }
+        }
+        level.setBlock(new BlockPos(X + 2, Y, Z + 2), B[5].defaultBlockState(), 2); // 물길
+        level.setBlock(new BlockPos(X + 2, Y + 1, Z + 2), B[7].defaultBlockState(), 2);
+        level.setBlock(new BlockPos(X + 4, Y, Z + 4), B[3].defaultBlockState(), 2); // 허수아비 자리: 풀 위 울타리 + 판자
+        level.setBlock(new BlockPos(X + 4, Y + 1, Z + 4), B[4].defaultBlockState(), 2);
+        level.setBlock(new BlockPos(X + 4, Y + 2, Z + 4), B[4].defaultBlockState(), 2);
+        level.setBlock(new BlockPos(X + 4, Y + 3, Z + 4), B[6].defaultBlockState(), 2);
+        LandData.Land l = data.createPlot("시험 밭", 1000);
+        LandData.Claim c = new LandData.Claim();
+        c.dim = LandManager.dim(level);
+        c.type = "plot";
+        c.x0 = X;
+        c.z0 = Z;
+        c.x1 = X + 7;
+        c.z1 = Z + 7;
+        c.y0 = level.getMinBuildHeight();
+        c.y1 = level.getMaxBuildHeight() - 1;
+        java.util.BitSet m = new java.util.BitSet(64);
+        m.set(0, 64);
+        m.clear(7 * 8 + 7); // 한 칸은 토지가 아님
+        c.mask = m;
+        data.addClaim(l, c);
+        try {
+            Economy.setWallet(a, 5000);
+            boolean bought = PlotManager.buyLand(a, l);
+            check("buying a farmland lot removes the crops and structures standing on it",
+                    bought && level.getBlockState(new BlockPos(X + 1, Y + 1, Z + 1)).isAir() && level.getBlockState(new BlockPos(X + 4, Y + 1, Z + 4)).isAir()
+                            && level.getBlockState(new BlockPos(X + 4, Y + 3, Z + 4)).isAir(), bought);
+            check("...but keeps the farmland, the ground and the water channel",
+                    level.getBlockState(new BlockPos(X + 1, Y, Z + 1)).is(B[1]) && level.getBlockState(new BlockPos(X + 4, Y, Z + 4)).is(B[3])
+                            && level.getBlockState(new BlockPos(X + 2, Y, Z + 2)).is(B[5]) && level.getBlockState(new BlockPos(X + 1, Y - 1, Z + 1)).is(B[0]));
+            check("...and touches nothing outside the lot's own cells",
+                    level.getBlockState(new BlockPos(X + 7, Y + 1, Z + 7)).is(B[2]) && level.getBlockState(new BlockPos(X - 1, Y + 1, Z + 3)).is(B[2])
+                            && level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 3)).is(B[2]));
+            boolean backup = false;
+            java.nio.file.Path dir = PlotManager.plotBackupDir(server);
+            if (Files.isDirectory(dir)) {
+                try (java.util.stream.Stream<java.nio.file.Path> st = Files.list(dir)) {
+                    for (java.nio.file.Path f : st.toList()) {
+                        if (f.getFileName().toString().startsWith("plot_" + l.id + "_")) {
+                            backup = true;
+                            Files.deleteIfExists(f);
+                        }
+                    }
+                }
+            }
+            check("the removed blocks are saved as a backup", backup);
+        } finally {
+            data.removeLand(l);
+            for (int x = X - 2; x <= X + 9; x++)
+                for (int z = Z - 2; z <= Z + 9; z++)
+                    for (int y = Y - 3; y <= Y + 8; y++) level.setBlock(new BlockPos(x, y, z), B[7].defaultBlockState(), 2);
         }
     }
 

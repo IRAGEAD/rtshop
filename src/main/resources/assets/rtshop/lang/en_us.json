@@ -636,7 +636,7 @@
   "rtshop.plot.wand_given": "You got the plot wand. While held, the selection shows in yellow and plots for sale in white.",
   "rtshop.plot.undone": "Undone · %s selected",
   "rtshop.plot.nothing_to_undo": "Nothing to undo · %s selected",
-  "rtshop.plot.cleared": "Selection cleared.",
+  "rtshop.plot.cleared": "The crops and structures on the lot were cleared (%s blocks). Farmland and water channels are kept.",
   "rtshop.plot.empty": "Nothing selected. Use the plot wand first.",
   "rtshop.plot.all_taken": "Every selected block overlaps another land.",
   "rtshop.plot.default_name": "Field %s",
@@ -1088,5 +1088,6 @@
   "rtshop.restaurant.cmd_unlocked": "%s was added to the menu.",
   "rtshop.restaurant.cmd_already": "%s is already on the menu.",
   "rtshop.restaurant.cmd_locked": "%s was removed from the menu.",
-  "rtshop.restaurant.cmd_not_on_menu": "%s is not on the menu."
+  "rtshop.restaurant.cmd_not_on_menu": "%s is not on the menu.",
+  "rtshop.plot.bought_cleared": "The crops and structures on the lot were cleared (%s blocks). Farmland and water channels are kept."
 }
