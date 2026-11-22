@@ -215,7 +215,7 @@ public final class LandConfig {
 
     private static void addCastleKeys(JsonObject o, LandConfig c) {
         JsonArray help = new JsonArray();
-        help.add("성 안 토지: 아모노스 맵(MedievalCity-Amonos)이면 성 안 네 구역(A 북서·B 북동·C 남서·D 남)에 빈틈 없이 나눈 약 256블록짜리 토지 24칸을 판매합니다 (네모가 아닌 모양, 길·성벽·표시한 건물은 제외)");
+        help.add("성 안 토지: 아모노스 맵(MedievalCity-Amonos)이면 성 안 네 구역(A 북서·B 북동·C 남서·D 남)에 빈틈 없이 나눈 약 256블록짜리 토지 25칸을 판매합니다 (네모가 아닌 모양, 길·성벽·표시한 건물은 제외)");
         help.add("토지 상인 창의 [구획 토지] 에서 지도로 미리 보고 삽니다. 사면 그 자리의 건물이 철거되고 평지(풀밭)가 됩니다 (길·남의 토지는 그대로)");
         help.add("castlePlotPrice: 16×16 한 칸 가격 (길이 빠져 작은 칸은 넓이만큼 싸짐) · castlePlotsAuto: false 면 자동 등록 안 함 (/rtshop plot castle install)");
         help.add("plotMerchantRange: 토지 상인 창에서 구획을 살 때 상인과의 최대 거리");
