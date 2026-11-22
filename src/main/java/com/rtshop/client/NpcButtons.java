@@ -34,6 +34,9 @@ public final class NpcButtons {
     private static WeakReference<Screen> bound = new WeakReference<>(null);
 
     private static boolean anyQuests;
+    /** [퀘스트] 단추로 퀘스트 창을 열었을 때: 돌아갈 상인(엔티티 번호)과 누른 시각. 퀘스트 창이 이것으로 [← 돌아가기] 단추를 만든다. */
+    static int returnNpc = -1;
+    static long returnArmedAt;
 
     public static void setQuests(int entityId, int count, boolean any) {
         npcId = entityId;
@@ -138,6 +141,8 @@ public final class NpcButtons {
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             if (b[3] == 0) {
                 int id = npcId;
+                returnNpc = id;
+                returnArmedAt = System.currentTimeMillis();
                 s.onClose();
                 mc.player.connection.sendCommand("rtshop quest open " + id);
             } else {
@@ -146,6 +151,18 @@ public final class NpcButtons {
             }
             return;
         }
+    }
+
+    /** 시험용: [퀘스트] 단추를 누른 것과 같다. */
+    public static boolean pressQuestForTest(Screen s) {
+        if (!questButton(s)) return false;
+        Minecraft mc = Minecraft.getInstance();
+        int id = npcId;
+        returnNpc = id;
+        returnArmedAt = System.currentTimeMillis();
+        s.onClose();
+        mc.player.connection.sendCommand("rtshop quest open " + id);
+        return true;
     }
 
     public static boolean questButtonForTest(Screen s) {

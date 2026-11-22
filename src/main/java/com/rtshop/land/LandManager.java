@@ -56,6 +56,32 @@ public final class LandManager {
     private static final Set<UUID> BYPASS = new HashSet<>();
     /** 경계 표시 요청: 플레이어 -> {토지ID, 끝나는 게임 시각}. */
     static final Map<UUID, long[]> SHOW_BORDER = new HashMap<>();
+    /** /rtshop border 로 경계 표시를 켠 플레이어: 지금 서 있는 토지·농경지의 둘레를 보여 준다 (기본은 꺼짐). */
+    private static final Set<UUID> BORDER_ON = new HashSet<>();
+
+    public static boolean borderOn(ServerPlayer p) {
+        return BORDER_ON.contains(p.getUUID());
+    }
+
+    /** 경계 표시를 켜거나 끈다. on == null 이면 반대로. 켜졌는지 돌려준다. */
+    public static boolean setBorder(ServerPlayer p, Boolean on) {
+        boolean now = on != null ? on : !BORDER_ON.contains(p.getUUID());
+        if (now) {
+            BORDER_ON.add(p.getUUID());
+            Land here = landAt((ServerLevel) p.level(), p.blockPosition());
+            p.sendSystemMessage(Component.translatable(here != null ? "rtshop.land.border_on" : "rtshop.land.border_on_outside")
+                    .withStyle(ChatFormatting.AQUA));
+        } else {
+            BORDER_ON.remove(p.getUUID());
+            SHOW_BORDER.remove(p.getUUID());
+            p.sendSystemMessage(Component.translatable("rtshop.land.border_off").withStyle(ChatFormatting.GRAY));
+        }
+        return now;
+    }
+
+    static void forgetBorder(UUID id) {
+        BORDER_ON.remove(id);
+    }
     private static final Map<UUID, Map<String, Long>> UNLOCKED = new HashMap<>();
     private static final Map<UUID, long[]> PIN_FAILS = new HashMap<>();
 
@@ -70,6 +96,7 @@ public final class LandManager {
     public static void clearRuntime() {
         BYPASS.clear();
         SHOW_BORDER.clear();
+        BORDER_ON.clear();
         UNLOCKED.clear();
         PIN_FAILS.clear();
     }
@@ -284,10 +311,10 @@ public final class LandManager {
         if (!p.isCreative()) {
             stack.shrink(1);
         }
-        SHOW_BORDER.put(p.getUUID(), new long[]{land.id, p.level().getGameTime() + 300});
         p.sendSystemMessage(Component.translatable(expanded ? "rtshop.land.expanded" : "rtshop.land.claimed",
                 c.x0 + "~" + c.x1, c.y0 + "~" + c.y1, c.z0 + "~" + c.z1).withStyle(ChatFormatting.GREEN));
         p.sendSystemMessage(Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
+        p.sendSystemMessage(Component.translatable("rtshop.land.border_hint").withStyle(ChatFormatting.GRAY));
     }
 
     /**

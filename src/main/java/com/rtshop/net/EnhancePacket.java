@@ -17,6 +17,8 @@ public final class EnhancePacket {
     public static final int EDITOR = 2;
     public static final int ODDS = 3;
     public static final int GUARD = 4;
+    /** 누군가 최고 단계 강화에 성공: json = 그 플레이어 이름, to = 단계, item = 장비. */
+    public static final int LEGEND = 5;
 
     public final int mode;
     public final String json;
@@ -42,6 +44,10 @@ public final class EnhancePacket {
 
     public static EnhancePacket guard(int mask) {
         return new EnhancePacket(GUARD, "", mask, false, 0, 0, ItemStack.EMPTY);
+    }
+
+    public static EnhancePacket legend(String player, int level, ItemStack item) {
+        return new EnhancePacket(LEGEND, player, 0, false, 0, level, item);
     }
 
     public static EnhancePacket open(int mode, String json) {

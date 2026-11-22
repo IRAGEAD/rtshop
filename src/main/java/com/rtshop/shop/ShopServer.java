@@ -208,6 +208,10 @@ public final class ShopServer {
                     ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new OpenHudEditorPacket());
                     return 1;
                 }))
+                .then(Commands.literal("border")
+                        .executes(ctx -> LandManager.setBorder(ctx.getSource().getPlayerOrException(), null) ? 1 : 0)
+                        .then(Commands.literal("on").executes(ctx -> LandManager.setBorder(ctx.getSource().getPlayerOrException(), true) ? 1 : 0))
+                        .then(Commands.literal("off").executes(ctx -> LandManager.setBorder(ctx.getSource().getPlayerOrException(), false) ? 1 : 0)))
                 .then(Commands.literal("land")
                         .executes(ctx -> {
                             LandManager.openScreen(ctx.getSource().getPlayerOrException());
@@ -399,6 +403,11 @@ public final class ShopServer {
             }));
         }
         d.register(root);
+        // 짧은 이름: /border (= /rtshop border)
+        d.register(Commands.literal("border")
+                .executes(ctx -> LandManager.setBorder(ctx.getSource().getPlayerOrException(), null) ? 1 : 0)
+                .then(Commands.literal("on").executes(ctx -> LandManager.setBorder(ctx.getSource().getPlayerOrException(), true) ? 1 : 0))
+                .then(Commands.literal("off").executes(ctx -> LandManager.setBorder(ctx.getSource().getPlayerOrException(), false) ? 1 : 0)));
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, ?> goldArgs(int mode) {

@@ -42,6 +42,87 @@ public class PlotBrowserScreen extends Screen {
         }
     }
 
+    /** 네모가 아닌 토지의 실제 모양 (지도에 그릴 채움 네모들과 둘레 선들, 세계 좌표). */
+    static final class Shape {
+        java.util.BitSet mask;
+        int x0, z0, w, h;
+        /** 채움: {x0, z0, x1, z1} (끝 좌표는 포함하지 않음). */
+        final List<int[]> rects = new ArrayList<>();
+        /** 둘레: 가로선 {x0, x1, z}, 세로선 {x, z0, z1}. */
+        final List<int[]> hEdges = new ArrayList<>(), vEdges = new ArrayList<>();
+        double cx, cz;
+
+        boolean in(int x, int z) {
+            return x >= x0 && x < x0 + w && z >= z0 && z < z0 + h && mask.get((z - z0) * w + (x - x0));
+        }
+
+        static Shape of(java.util.BitSet mask, int x0, int z0, int x1, int z1) {
+            Shape s = new Shape();
+            s.mask = mask;
+            s.x0 = x0;
+            s.z0 = z0;
+            s.w = x1 - x0 + 1;
+            s.h = z1 - z0 + 1;
+            // 채움: 줄마다 이어진 칸을 묶고, 위아래로 똑같은 묶음은 하나의 네모로 합친다
+            java.util.Map<Long, Integer> open = new java.util.HashMap<>();
+            long sumX = 0, sumZ = 0, n = 0;
+            for (int z = z0; z <= z1 + 1; z++) {
+                java.util.Map<Long, Integer> next = new java.util.HashMap<>();
+                int run = Integer.MIN_VALUE;
+                for (int x = x0; x <= x1 + 1; x++) {
+                    boolean on = z <= z1 && x <= x1 && s.in(x, z);
+                    if (on) {
+                        sumX += x;
+                        sumZ += z;
+                        n++;
+                    }
+                    if (on && run == Integer.MIN_VALUE) run = x;
+                    if (!on && run != Integer.MIN_VALUE) {
+                        long key = (((long) run) << 32) ^ (x & 0xFFFFFFFFL);
+                        Integer start = open.remove(key);
+                        next.put(key, start == null ? z : start);
+                        run = Integer.MIN_VALUE;
+                    }
+                }
+                for (java.util.Map.Entry<Long, Integer> e : open.entrySet()) {
+                    s.rects.add(new int[]{(int) (e.getKey() >> 32), e.getValue(), (int) (long) e.getKey(), z});
+                }
+                open = next;
+            }
+            s.cx = n == 0 ? (x0 + x1 + 1) / 2.0 : sumX / (double) n + 0.5;
+            s.cz = n == 0 ? (z0 + z1 + 1) / 2.0 : sumZ / (double) n + 0.5;
+            for (int z = z0; z <= z1 + 1; z++) {
+                int run = Integer.MIN_VALUE;
+                for (int x = x0; x <= x1 + 1; x++) {
+                    boolean edge = x <= x1 && (s.in(x, z) != s.in(x, z - 1));
+                    if (edge && run == Integer.MIN_VALUE) run = x;
+                    if (!edge && run != Integer.MIN_VALUE) {
+                        s.hEdges.add(new int[]{run, x, z});
+                        run = Integer.MIN_VALUE;
+                    }
+                }
+            }
+            for (int x = x0; x <= x1 + 1; x++) {
+                int run = Integer.MIN_VALUE;
+                for (int z = z0; z <= z1 + 1; z++) {
+                    boolean edge = z <= z1 && (s.in(x, z) != s.in(x - 1, z));
+                    if (edge && run == Integer.MIN_VALUE) run = z;
+                    if (!edge && run != Integer.MIN_VALUE) {
+                        s.vEdges.add(new int[]{x, run, z});
+                        run = Integer.MIN_VALUE;
+                    }
+                }
+            }
+            return s;
+        }
+    }
+
+    private static final java.util.Map<Integer, Shape> SHAPES = new java.util.HashMap<>();
+
+    public static int shapesForTest() {
+        return SHAPES.size();
+    }
+
     /** 받은 미리보기 지도. */
     static final class Preview {
         int landId, x0, z0, step, w, h;
@@ -186,8 +267,16 @@ public class PlotBrowserScreen extends Screen {
 
     private void apply(JsonObject o) {
         all.clear();
+        SHAPES.clear();
         for (JsonElement el : o.getAsJsonArray("plots")) {
             JsonObject e = el.getAsJsonObject();
+            if (e.has("shape")) {
+                java.util.BitSet mask = PlotBrowser.unpackMask(e.get("shape").getAsString());
+                if (mask != null) {
+                    SHAPES.put(e.get("id").getAsInt(), Shape.of(mask, e.get("x0").getAsInt(), e.get("z0").getAsInt(), e.get("x1").getAsInt(),
+                            e.get("z1").getAsInt()));
+                }
+            }
             all.add(new Entry(e.get("id").getAsInt(), e.get("name").getAsString(), e.get("kind").getAsString(), e.get("area").getAsInt(),
                     e.get("price").getAsLong(), e.get("status").getAsString(), e.get("owner").getAsString(),
                     e.get("x0").getAsInt(), e.get("z0").getAsInt(), e.get("x1").getAsInt(), e.get("z1").getAsInt(),
@@ -450,28 +539,55 @@ public class PlotBrowserScreen extends Screen {
             g.drawString(font, c, vx + vw / 2 - font.width(c) / 2, vy + 6, 0xFFFFFFFF, true);
         }
         // 토지들
+        // 지금 보고 있는 갈래(성 안 토지 / 구획 토지 / 초보 농지)의 토지만 그린다. 다른 갈래를 함께 그리면 서로 겹쳐 보인다.
         Entry hover = null;
         for (Entry e : all) {
+            if (!e.kind.equals(TAB_KINDS[tab])) continue;
             int x0 = sx(e.x0), z0 = sz(e.z0), x1 = sx(e.x1 + 1), z1 = sz(e.z1 + 1);
             if (x1 < vx || x0 > vx + vw || z1 < vy || z0 > vy + vh) continue;
             boolean isSel = sel != null && sel.id == e.id;
-            boolean thisTab = e.kind.equals(TAB_KINDS[tab]);
-            int alpha = thisTab ? (e.sale() ? 0x50 : 0x80) : 0x28;
-            g.fill(x0, z0, Math.max(x0 + 1, x1), Math.max(z0 + 1, z1), statusColor(e, alpha));
-            outline(g, x0, z0, Math.max(x0 + 2, x1), Math.max(z0 + 2, z1), thisTab ? 0xC0000000 : 0x60000000);
-            if (isSel) {
-                long t = System.currentTimeMillis() / 250 % 2;
-                int c = t == 0 ? 0xFFFFE040 : 0xFFFFFFA0;
-                outline(g, x0 - 1, z0 - 1, x1 + 1, z1 + 1, c);
-                outline(g, x0 - 2, z0 - 2, x1 + 2, z1 + 2, c);
+            int fill = statusColor(e, e.sale() ? 0x50 : 0x80);
+            long blink = System.currentTimeMillis() / 250 % 2;
+            int selCol = blink == 0 ? 0xFFFFE040 : 0xFFFFFFA0;
+            Shape sh = SHAPES.get(e.id);
+            float lx, lz;
+            boolean over;
+            if (sh == null) {
+                g.fill(x0, z0, Math.max(x0 + 1, x1), Math.max(z0 + 1, z1), fill);
+                outline(g, x0, z0, Math.max(x0 + 2, x1), Math.max(z0 + 2, z1), 0xC0000000);
+                if (isSel) {
+                    outline(g, x0 - 1, z0 - 1, x1 + 1, z1 + 1, selCol);
+                    outline(g, x0 - 2, z0 - 2, x1 + 2, z1 + 2, selCol);
+                }
+                lx = (x0 + x1) / 2F;
+                lz = (z0 + z1) / 2F;
+                over = mx >= x0 && mx < x1 && my >= z0 && my < z1;
+            } else {
+                // 실제 모양대로 (농경지처럼 네모가 아닌 토지)
+                for (int[] r : sh.rects) {
+                    g.fill(sx(r[0]), sz(r[1]), sx(r[2]), sz(r[3]), fill);
+                }
+                int oc = isSel ? selCol : 0xC0000000;
+                int th = isSel ? 2 : 1;
+                for (int[] r : sh.hEdges) {
+                    g.fill(sx(r[0]), sz(r[2]) - (th - 1), sx(r[1]) + 1, sz(r[2]) + 1, oc);
+                }
+                for (int[] r : sh.vEdges) {
+                    g.fill(sx(r[0]) - (th - 1), sz(r[1]), sx(r[0]) + 1, sz(r[2]) + 1, oc);
+                }
+                lx = sx(sh.cx);
+                lz = sz(sh.cz);
+                int wx = (int) Math.floor(mapCx + (mx - (vx + vw / 2.0)) / mapScale), wz = (int) Math.floor(mapCz + (my - (vy + vh / 2.0)) / mapScale);
+                over = sh.in(wx, wz);
             }
-            if (thisTab && mapScale * Math.min(e.x1 - e.x0 + 1, e.z1 - e.z0 + 1) >= 12) {
+            if (mapScale * Math.min(e.x1 - e.x0 + 1, e.z1 - e.z0 + 1) >= 12) {
                 String label = e.castleNo > 0 ? Integer.toString(e.castleNo) : "";
-                if (mapScale >= 5) label = e.name;
+                if (mapScale >= 5 || (e.castleNo <= 0 && mapScale * (e.x1 - e.x0 + 1) >= font.width(e.name) * 0.8F + 6)) label = e.name;
                 float ts = Math.max(0.5F, Math.min(1F, mapScale / 3F));
-                Ui.scaledText(g, font, label, (x0 + x1) / 2F - font.width(label) * ts / 2, (z0 + z1) / 2F - 4 * ts, ts, 0xFFFFFFFF, true);
+                if (e.castleNo <= 0) ts = Math.max(ts, 0.75F);
+                Ui.scaledText(g, font, label, lx - font.width(label) * ts / 2, lz - 4 * ts, ts, 0xFFFFFFFF, true);
             }
-            if (thisTab && mx >= x0 && mx < x1 && my >= z0 && my < z1 && Ui.inside(mx, my, vx, vy, vw, vh)) hover = e;
+            if (over && Ui.inside(mx, my, vx, vy, vw, vh)) hover = e;
         }
         // 내 위치
         net.minecraft.client.player.LocalPlayer me = Minecraft.getInstance().player;
@@ -733,7 +849,12 @@ public class PlotBrowserScreen extends Screen {
             if (mapButton(mx, my)) return true;
             for (Entry e : all) {
                 if (!e.kind.equals(TAB_KINDS[tab])) continue;
-                if (mx >= sx(e.x0) && mx < sx(e.x1 + 1) && my >= sz(e.z0) && my < sz(e.z1 + 1)) {
+                Shape sh = SHAPES.get(e.id);
+                boolean hit = mx >= sx(e.x0) && mx < sx(e.x1 + 1) && my >= sz(e.z0) && my < sz(e.z1 + 1);
+                if (hit && sh != null) {
+                    hit = sh.in((int) Math.floor(mapCx + (mx - (vx + vw / 2.0)) / mapScale), (int) Math.floor(mapCz + (my - (vy + vh / 2.0)) / mapScale));
+                }
+                if (hit) {
                     select(e, true);
                     List<Entry> rows = rows();
                     int idx = rows.indexOf(e);

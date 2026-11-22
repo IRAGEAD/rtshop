@@ -316,6 +316,27 @@ public final class Enhance {
         };
     }
 
+    // ---- 높은 단계의 연출 (화면은 client/EnhanceGrandFx): 단계 묶음과 긴장 구간의 길이. 서버 알림은 그만큼 늦춘다.
+
+    /** 연출 묶음: 0 = 없음, 1 = +7~+8 (단조), 2 = +9~+10 (각인), 3 = +11 (초월). target = 도전하는 단계. */
+    public static int fxTier(int target, int broadcastFrom) {
+        if (target < broadcastFrom) return 0;
+        return target >= 11 ? 3 : target >= 9 ? 2 : 1;
+    }
+
+    /** 결과를 공개하기 전 긴장 구간(ms). */
+    public static long suspenseMs(int tier) {
+        return switch (tier) {
+            case 1 -> 3000;
+            case 2 -> 4200;
+            case 3 -> 8200;
+            default -> 0;
+        };
+    }
+
+    /** 시험용: 마지막 서버 알림. */
+    public static volatile String lastBroadcast = "";
+
     static void announce(ServerPlayer p, ItemStack item, Outcome o, boolean guarded, int from, int to) {
         try {
             ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), EnhancePacket.fx(o, guarded, from, to, item));
@@ -323,9 +344,28 @@ public final class Enhance {
         }
         MinecraftServer server = p.getServer();
         if (o == Outcome.SUCCESS && to >= EnhanceConfig.get().broadcastFrom && server != null) {
-            Component msg = Component.translatable("rtshop.enhance.broadcast", p.getDisplayName(), item.getHoverName(), to)
-                    .withStyle(ChatFormatting.GOLD);
-            server.getPlayerList().broadcastSystemMessage(msg, false);
+            // 강화한 사람의 화면에서 결과가 공개된 뒤에 알린다 (채팅이 먼저 결과를 말해 버리지 않게)
+            int tier = fxTier(from + 1, EnhanceConfig.get().broadcastFrom);
+            Component who = p.getDisplayName();
+            String whoName = p.getGameProfile().getName();
+            java.util.UUID self = p.getUUID();
+            ItemStack shown = item.copy();
+            com.rtshop.util.Later.run((int) (suspenseMs(tier) / 50) + 8, () -> {
+                Component msg = Component.translatable(to >= 11 ? "rtshop.enhance.broadcast_max" : "rtshop.enhance.broadcast", who, shown.getHoverName(), to)
+                        .withStyle(to >= 11 ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GOLD);
+                server.getPlayerList().broadcastSystemMessage(msg, false);
+                lastBroadcast = to + ":" + whoName;
+                if (to >= 11) {
+                    // 최고 단계: 다른 모든 플레이어의 화면 위쪽에 알림 띠
+                    for (ServerPlayer other : server.getPlayerList().getPlayers()) {
+                        if (other.getUUID().equals(self)) continue;
+                        try {
+                            ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> other), EnhancePacket.legend(whoName, to, shown));
+                        } catch (Exception ignored) {
+                        }
+                    }
+                }
+            });
         }
         RtShop.LOGGER.info("[rtshop] 강화 {} +{} -> {} ({}{}) by {}", item.getItem(), from, o, to, guarded ? ", 방지권" : "",
                 p.getGameProfile().getName());

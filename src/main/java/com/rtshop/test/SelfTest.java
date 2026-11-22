@@ -843,6 +843,22 @@ public final class SelfTest {
         check("damage: the level drops by one", com.rtshop.enhance.Enhance.level(r) == 5 && r.is(Items.IRON_SWORD));
         r = enhanceOnce(level, pos, a, sword, 6, 0, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
         check("destroy: the item is gone", r.isEmpty() && count(a, s -> s.is(Items.IRON_SWORD)) == 0);
+        // +7 이상 성공: 서버 알림은 강화한 사람의 화면 연출(긴장 구간)이 끝난 뒤에 나간다
+        com.rtshop.util.Later.flushForTest();
+        com.rtshop.enhance.Enhance.lastBroadcast = "";
+        r = enhanceOnce(level, pos, a, sword, 6, 0, 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("+7 success: the server-wide notice waits for the on-screen build-up", com.rtshop.enhance.Enhance.level(r) == 7
+                && com.rtshop.enhance.Enhance.lastBroadcast.isEmpty() && com.rtshop.util.Later.pendingForTest() == 1,
+                com.rtshop.enhance.Enhance.lastBroadcast + " / " + com.rtshop.util.Later.pendingForTest());
+        com.rtshop.util.Later.flushForTest();
+        check("...and is then sent to everyone", com.rtshop.enhance.Enhance.lastBroadcast.startsWith("7:"), com.rtshop.enhance.Enhance.lastBroadcast);
+        check("the scene bands are +7~8, +9~10 and +11, each with a longer build-up", com.rtshop.enhance.Enhance.fxTier(6, 7) == 0
+                && com.rtshop.enhance.Enhance.fxTier(7, 7) == 1 && com.rtshop.enhance.Enhance.fxTier(8, 7) == 1
+                && com.rtshop.enhance.Enhance.fxTier(9, 7) == 2 && com.rtshop.enhance.Enhance.fxTier(10, 7) == 2
+                && com.rtshop.enhance.Enhance.fxTier(11, 7) == 3
+                && com.rtshop.enhance.Enhance.suspenseMs(1) < com.rtshop.enhance.Enhance.suspenseMs(2)
+                && com.rtshop.enhance.Enhance.suspenseMs(2) < com.rtshop.enhance.Enhance.suspenseMs(3));
+        giveMaterials(a, cfg, 7, 10);
         // 보호권은 손에 들고 우클릭해 미리 사용 (1장 소모), 같은 보호를 또 걸 수는 없음
         a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dmgGuard.copy());
         dmgGuard.getItem().use(level, a, net.minecraft.world.InteractionHand.MAIN_HAND);
@@ -2259,6 +2275,19 @@ public final class SelfTest {
         check("a land deed cannot be used over a plot", data.landsOf(a.getUUID()).size() == aLands && deed.getCount() == 1);
 
         b.setPos(ox + 20.5, y + 1, oz + 20.5);
+        // 경계 표시: 들어섰다고 켜지지 않고, 명령어(/rtshop border)로 켰을 때만
+        java.util.BitSet packed = com.rtshop.land.PlotBrowser.unpackMask(com.rtshop.land.PlotBrowser.packMask(claim.mask));
+        check("a lot's shape survives packing for the merchant's map", claim.mask.equals(packed));
+        com.google.gson.JsonObject listed = com.rtshop.land.PlotBrowser.list(b);
+        boolean shaped = false;
+        for (com.google.gson.JsonElement el : listed.getAsJsonArray("plots")) {
+            com.google.gson.JsonObject eo = el.getAsJsonObject();
+            if (eo.get("id").getAsInt() == plot.id) shaped = eo.has("shape");
+        }
+        check("the merchant's list carries the real shape of a non-square lot", shaped);
+        check("the border display is off until the player turns it on", !LandManager.borderOn(b));
+        check("/rtshop border toggles it", LandManager.setBorder(b, null) && LandManager.borderOn(b) && !LandManager.setBorder(b, null)
+                && !LandManager.borderOn(b));
         Economy.setWallet(b, 4999);
         check("buying needs enough carried Gold", !PlotManager.buy(b) && plot.forSale() && Economy.wallet(b) == 4999);
         Economy.setWallet(b, 6000);

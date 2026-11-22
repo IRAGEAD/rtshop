@@ -43,15 +43,17 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
     }
 
     int[] panelRect() {
-        return EnhancePanel.rect(this, leftPos + imageWidth + 6, topPos);
+        return EnhancePanel.rect(this, autoX(), autoY());
     }
 
     int autoX() {
         return leftPos + imageWidth + 6;
     }
 
+    /** 정보 창이 강화 창보다 길어서, 둘의 가운데를 맞춘다. */
     int autoY() {
-        return topPos;
+        int ph = (int) Math.round(EnhancePanel.H * ClientConfig.get().enhPanelScale) + EnhancePanel.BTN + 3;
+        return Math.max(2, topPos - (ph - imageHeight) / 2);
     }
 
     @Override
@@ -109,77 +111,6 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         g.pose().popPose();
     }
 
-    /** 강화 정보 패널 (확률·재료·Gold·방지권). 강화 창 옆과 시네마틱 모루 장면 위에 함께 쓴다. */
-    public static void drawPanel(GuiGraphics g, net.minecraft.client.gui.Font font, EnhanceMenu menu, net.minecraft.world.entity.player.Player player,
-                                 int x, int y, int w, int h) {
-        Ui.woodFrame(g, x, y, w, h);
-        Ui.bevel(g, x + 5, y + 5, w - 10, h - 10, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
-        int tx = x + 10, ty = y + 10, tw = w - 20;
-        g.drawString(font, Component.translatable("rtshop.enhance.panel"), tx, ty, Ui.C_INK, false);
-        ty += 13;
-        ItemStack eq = menu.equipment();
-        EnhanceConfig cfg = EnhanceConfig.client();
-        if (eq.isEmpty() || !Enhance.enhanceable(eq) || cfg.level(Enhance.level(eq) + 1) == null) {
-            for (String k : new String[]{"rtshop.enhance.help1", "rtshop.enhance.help2", "rtshop.enhance.help3", "rtshop.enhance.help4"}) {
-                for (FormattedCharSequence line : font.split(Component.translatable(k), tw)) {
-                    if (ty > y + h - 24) break;
-                    g.drawString(font, line, tx, ty, Ui.C_INK_SOFT, false);
-                    ty += 10;
-                }
-                ty += 3;
-            }
-            return;
-        }
-        int cur = Enhance.level(eq);
-        EnhanceConfig.Level l = cfg.level(cur + 1);
-        g.drawString(font, Component.literal("+" + cur + " → +" + (cur + 1)), tx + tw - font.width("+" + cur + " → +" + (cur + 1)), y + 10, 0xFF8A5A00, false);
-        int mask = Enhance.activeGuard(player);
-        Enhance.Guard guard = Enhance.fromMask(mask);
-        double[] e = EnhanceClient.effective(l, guard, cur);
-        String[] keys = {"rtshop.enhance.odds_success", "rtshop.enhance.odds_maintain", "rtshop.enhance.odds_damage", "rtshop.enhance.odds_destroy"};
-        int[] cols = {Ui.C_GREEN, 0xFF4A4A4A, 0xFFB86A10, Ui.C_RED};
-        for (int i = 0; i < 4; i++) {
-            int cx = tx + (i % 2) * (tw / 2), cy = ty + (i / 2) * 11;
-            g.drawString(font, Component.translatable(keys[i], EnhanceClient.pct(e[i])), cx, cy, cols[i], false);
-        }
-        ty += 25;
-        g.fill(tx, ty - 2, tx + tw, ty - 1, Ui.C_PARCH_SHADE);
-        boolean free = player.getAbilities().instabuild;
-        long tick = System.currentTimeMillis() / 1000;
-        for (Enhance.Need n : Enhance.needs(cfg, l, player)) {
-            Item icon = n.items.get((int) (tick % n.items.size()));
-            g.renderItem(new ItemStack(icon), tx, ty);
-            String name = Ui.clip(font, EnhanceClient.materialName(cfg, n).getString(), tw - 52);
-            g.drawString(font, name, tx + 19, ty + 4, Ui.C_INK, false);
-            String cnt = n.have + "/" + n.need;
-            g.drawString(font, cnt, tx + tw - font.width(cnt), ty + 4, n.ok() || free ? Ui.C_GREEN : Ui.C_RED, false);
-            ty += 17;
-        }
-        Ui.coin(g, tx + 2, ty + 1, 12);
-        String gold = Ui.num(l.gold) + " G";
-        boolean goldOk = free || ClientEconomy.wallet >= l.gold;
-        g.drawString(font, gold, tx + 19, ty + 3, goldOk ? Ui.C_GOLD_DARK : Ui.C_RED, false);
-        String have = "(" + Ui.num(ClientEconomy.wallet) + ")";
-        g.drawString(font, have, tx + tw - font.width(have), ty + 3, Ui.C_INK_SOFT, false);
-        ty += 16;
-        Component gl = guard != Enhance.Guard.NONE ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
-                : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : "rtshop.enhance.no_guard");
-        for (FormattedCharSequence line : font.split(gl, tw)) {
-            g.drawString(font, line, tx, ty, guard != Enhance.Guard.NONE ? 0xFF1F6F8B : l.destroy > 0 ? Ui.C_RED : Ui.C_INK_SOFT, false);
-            ty += 10;
-        }
-        boolean ok = menu.getSlot(2).hasItem() && menu.getSlot(2).mayPickup(player);
-        Component hint = Component.translatable(ok ? "rtshop.enhance.click_hint" : "rtshop.enhance.missing");
-        List<FormattedCharSequence> hl = font.split(hint, tw);
-        int hy = y + h - 10 - hl.size() * 10;
-        if (hy > ty) {
-            for (FormattedCharSequence line : hl) {
-                g.drawString(font, line, tx, hy, ok ? Ui.C_GREEN : Ui.C_RED, false);
-                hy += 10;
-            }
-        }
-    }
-
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (showOdds) {
@@ -197,6 +128,11 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
             return true;
         }
         return super.mouseClicked(mx, my, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mx, double my, double delta) {
+        return EnhancePanel.scroll(panelRect(), mx, my, delta) || super.mouseScrolled(mx, my, delta);
     }
 
     public void showOddsForTest(boolean on) {

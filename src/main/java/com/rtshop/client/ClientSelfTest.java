@@ -60,7 +60,7 @@ public final class ClientSelfTest {
     private static final boolean ENABLED = Boolean.getBoolean("rtshop.clienttest");
     private static final List<String> LINES = new ArrayList<>();
     private static int step = 0;
-    private static int wait = 0;
+    static int wait = 0;
     private static int idle = 0;
     private static int passed = 0;
     private static int failed = 0;
@@ -92,6 +92,8 @@ public final class ClientSelfTest {
     private static final int PS_END = PLOT_END + PS_STEPS;
     private static final int RULE_STEPS = 12;
     private static final int RULE_END = PS_END + RULE_STEPS;
+    /** 3.19 부터 덧붙인 시험들 (ClientSelfTest2): 단계 수는 그쪽 목록의 길이. */
+    private static final int X_END = RULE_END + ClientSelfTest2.count();
     private static volatile BlockPos pshopPos = null;
     private static volatile int pshopClerk = -1;
     private static volatile net.minecraft.world.item.Item pshopWare = null;
@@ -202,11 +204,11 @@ public final class ClientSelfTest {
         }
     }
 
-    private static void check(String name, boolean ok) {
+    static void check(String name, boolean ok) {
         check(name, ok, null);
     }
 
-    private static void check(String name, boolean ok, Object detail) {
+    static void check(String name, boolean ok, Object detail) {
         if (ok) {
             passed++;
         } else {
@@ -217,12 +219,12 @@ public final class ClientSelfTest {
         RtShop.LOGGER.info("[rtshop-clienttest] {}", line);
     }
 
-    private static void shot(Minecraft mc, String name) {
+    static void shot(Minecraft mc, String name) {
         Screenshot.grab(mc.gameDirectory, name + ".png", mc.getMainRenderTarget(), c -> {
         });
     }
 
-    private static void onServer(Minecraft mc, Consumer<ServerPlayer> action) {
+    static void onServer(Minecraft mc, Consumer<ServerPlayer> action) {
         IntegratedServer server = mc.getSingleplayerServer();
         UUID id = mc.player.getUUID();
         server.execute(() -> {
@@ -335,7 +337,7 @@ public final class ClientSelfTest {
     }
 
 
-    private static ItemStack leveled(Item item, int lv) {
+    static ItemStack leveled(Item item, int lv) {
         ItemStack s = new ItemStack(item);
         com.rtshop.enhance.Enhance.setLevel(s, lv);
         return s;
@@ -442,9 +444,14 @@ public final class ClientSelfTest {
                 boolean ready = m instanceof com.rtshop.enhance.EnhanceMenu && m.getSlot(2).hasItem() && m.getSlot(2).mayPickup(mc.player);
                 check("the +5 preview is ready and affordable", ready);
                 if (m.getSlot(2).hasItem()) {
-                    List<net.minecraft.network.chat.Component> tip = net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, m.getSlot(2).getItem());
-                    check("hovering the equipment no longer pops up the odds (they are on the info panel)",
-                            tip.stream().noneMatch(c -> c.getString().contains("%")), tip.size());
+                    check("hovering the result in the Cinematic anvil scene no longer pops up its description window",
+                            EnhanceClient.sceneTooltipForTest(m.getSlot(2).getItem()) == 0, EnhanceClient.sceneTooltipForTest(m.getSlot(2).getItem()));
+                    check("...nor the equipment on the anvil", EnhanceClient.sceneTooltipForTest(m.getSlot(0).getItem()) == 0);
+                    check("other items still show their description", EnhanceClient.sceneTooltipForTest(new ItemStack(net.minecraft.world.item.Items.APPLE)) > 0);
+                    List<EnhancePanel.Stat> st = EnhancePanel.stats(m.getSlot(0).getItem(), 4, true, com.rtshop.enhance.EnhanceConfig.client());
+                    check("the info panel shows the real numbers now -> next (bonus % and attack damage)", st.size() >= 2
+                            && st.get(1).next().contains("\u2192") && !st.get(1).now().equals(st.get(1).next().replace(" \u2192 ", "")),
+                            st.size() < 2 ? st.size() : st.get(0).now() + st.get(0).next() + " / " + st.get(1).now() + st.get(1).next());
                     check("the guard used beforehand shows on the client", com.rtshop.enhance.Enhance.clientGuard == com.rtshop.enhance.Enhance.G_DESTROY,
                             com.rtshop.enhance.Enhance.clientGuard);
                 }
@@ -464,9 +471,14 @@ public final class ClientSelfTest {
                     com.rtshop.enhance.Enhance.setActiveGuard(sp, com.rtshop.enhance.Enhance.G_DESTROY);
                     com.rtshop.enhance.Enhance.testRoll = 0.99;
                 });
+                EnhancePanel.setDetailForTest(true);
                 wait = 60;
             }
             case 5 -> {
+                shot(mc, "81b_enhance_detail");
+                check("[Details] shows the item's full description inside the info panel", EnhancePanel.detailForTest() && EnhancePanel.detailLinesForTest() >= 2,
+                        EnhancePanel.detailLinesForTest());
+                EnhancePanel.setDetailForTest(false);
                 var m = mc.player.containerMenu;
                 mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
                 wait = 6;
@@ -1824,17 +1836,21 @@ public final class ClientSelfTest {
                     rulesStep(mc, step - PS_END - 1);
                     return;
                 }
-                if (step > RULE_END && step <= RULE_END + EN_STEPS) {
-                    englishStep(mc, step - RULE_END - 1);
+                if (step > RULE_END && step <= X_END) {
+                    ClientSelfTest2.run(mc, step - RULE_END - 1);
                     return;
                 }
-                if (step == RULE_END + EN_STEPS + 1) {
+                if (step > X_END && step <= X_END + EN_STEPS) {
+                    englishStep(mc, step - X_END - 1);
+                    return;
+                }
+                if (step == X_END + EN_STEPS + 1) {
                     check("no server-side error happened", serverError == null, serverError);
                     finish(mc);
                     return;
                 }
                 // 사진이 디스크에 다 써질 때까지 조금 기다렸다가 끈다
-                if (step > RULE_END + EN_STEPS + 40) {
+                if (step > X_END + EN_STEPS + 40) {
                     done = true;
                     mc.stop();
                 }

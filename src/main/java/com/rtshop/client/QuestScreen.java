@@ -37,10 +37,38 @@ public class QuestScreen extends Screen {
     private int detailScroll = 0;
     private int choice = -1;
     private int fx, fy;
+    /** 상인 화면의 [퀘스트] 단추로 들어왔을 때: 돌아갈 상인의 엔티티 번호 (-1 = 돌아갈 곳 없음). */
+    private int backNpc = -1;
 
     public QuestScreen(QuestOpenPacket data) {
         super(Component.literal(data.title));
         this.data = data;
+        if (!data.journal && System.currentTimeMillis() - NpcButtons.returnArmedAt < 6000) {
+            backNpc = NpcButtons.returnNpc;
+        }
+        NpcButtons.returnArmedAt = 0;
+    }
+
+    private String backLabel() {
+        return "\u25C0 " + Component.translatable("rtshop.quest.back").getString();
+    }
+
+    private int backW() {
+        return this.font.width(backLabel()) + 10;
+    }
+
+    public boolean hasBackForTest() {
+        return backNpc >= 0;
+    }
+
+    /** 상인의 원래 화면(상점·은행 등)으로 돌아간다: 그 상인을 다시 우클릭한 것과 같다. */
+    public void goBack() {
+        Minecraft mc = Minecraft.getInstance();
+        net.minecraft.world.entity.Entity e = mc.level == null ? null : mc.level.getEntity(backNpc);
+        onClose();
+        if (e != null && mc.gameMode != null && mc.player != null) {
+            mc.gameMode.interact(mc.player, e, net.minecraft.world.InteractionHand.MAIN_HAND);
+        }
     }
 
     /** 서버가 보낸 새 내용으로 바꾼다. 보고 있던 퀘스트는 그대로 유지한다. */
@@ -187,8 +215,15 @@ public class QuestScreen extends Screen {
         Ui.woodFrame(g, fx, fy, W, H);
         g.fill(fx + 5, fy + 4, fx + W - 5, fy + 23, Ui.C_WOOD_DARK);
         g.fill(fx + 5, fy + 22, fx + W - 5, fy + 23, Ui.C_GOLD_DARK);
-        String t = Ui.clip(this.font, this.title.getString(), W - 40);
+        int side = backNpc >= 0 ? backW() + 14 : 20;
+        String t = Ui.clip(this.font, this.title.getString(), W - 2 * side);
         g.drawString(this.font, t, fx + (W - this.font.width(t)) / 2, fy + 9, Ui.C_GOLD, true);
+        if (backNpc >= 0) {
+            int bw = backW();
+            boolean hov = Ui.inside(mx, my, fx + 8, fy + 6, bw, 14);
+            Ui.bevel(g, fx + 8, fy + 6, bw, 14, hov ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
+            g.drawString(this.font, backLabel(), fx + 13, fy + 9, Ui.C_INK, false);
+        }
 
         renderList(g, mx, my);
         renderDetail(g, mx, my);
@@ -387,6 +422,11 @@ public class QuestScreen extends Screen {
     public boolean mouseClicked(double mx, double my, int button) {
         if (button != 0) {
             return super.mouseClicked(mx, my, button);
+        }
+        if (backNpc >= 0 && Ui.inside(mx, my, fx + 8, fy + 6, backW(), 14)) {
+            click();
+            goBack();
+            return true;
         }
         // 목록
         int x = listX();

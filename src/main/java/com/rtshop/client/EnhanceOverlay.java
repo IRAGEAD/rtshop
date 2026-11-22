@@ -21,7 +21,7 @@ public final class EnhanceOverlay {
     private EnhanceOverlay() {
     }
 
-    public static final int W = 168, H = 166;
+    public static final int W = EnhancePanel.W, H = EnhancePanel.H;
     private static boolean table;
 
     /** 모루 장면 중인가 (강화 창 메뉴는 열려 있는데 우리 강화 창이 아닌 다른 화면). */
@@ -69,6 +69,14 @@ public final class EnhanceOverlay {
         } else if (k > 0) {
             e.setCanceled(true);
             EnhancePanel.act(k, s);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onScroll(ScreenEvent.MouseScrolled.Pre e) {
+        Screen s = e.getScreen();
+        if (active(s) && EnhancePanel.scroll(rect(s), e.getMouseX(), e.getMouseY(), e.getScrollDelta())) {
+            e.setCanceled(true);
         }
     }
 

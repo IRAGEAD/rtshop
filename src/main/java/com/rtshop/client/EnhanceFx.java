@@ -51,6 +51,10 @@ public final class EnhanceFx {
             Enhance.clientGuard = msg.outcome;
             return;
         }
+        if (msg.mode == EnhancePacket.LEGEND) {
+            legend(msg.json, msg.to, msg.item);
+            return;
+        }
         if (msg.mode == EnhancePacket.ODDS) {
             EnhanceConfig.setClient(msg.json);
             Minecraft.getInstance().setScreen(new EnhanceOddsScreen(Minecraft.getInstance().screen));
@@ -61,8 +65,8 @@ public final class EnhanceFx {
     }
 
     public static void show(Enhance.Outcome o, boolean guarded, int from, int to, ItemStack item) {
-        // 높은 단계(+7 이상 시도)는 긴장 연출 뒤에 결과를 공개한다
-        if (from + 1 >= com.rtshop.enhance.EnhanceConfig.client().broadcastFrom) {
+        // 높은 단계(+7 이상 시도)는 단계 묶음마다 다른 긴장 연출 뒤에 결과를 공개한다
+        if (Enhance.fxTier(from + 1, com.rtshop.enhance.EnhanceConfig.client().broadcastFrom) > 0) {
             last = o.name() + ":" + from + ":" + to + (guarded ? ":guarded" : "");
             EnhanceGrandFx.start(o, guarded, from, to, item);
             return;
@@ -81,9 +85,11 @@ public final class EnhanceFx {
             case SUCCESS -> {
                 title = Component.translatable("rtshop.enhance.fx_success", to);
                 color = to >= 10 ? 0xFF77FF : to >= 7 ? 0xFFC83C : 0x7CFF6A;
-                play(SoundEvents.PLAYER_LEVELUP, 1.2F, 0.9F);
-                play(SoundEvents.ANVIL_USE, 1.4F, 0.6F);
-                if (mc.player != null) {
+                if (!grand) {
+                    play(SoundEvents.PLAYER_LEVELUP, 1.2F, 0.9F);
+                    play(SoundEvents.ANVIL_USE, 1.4F, 0.6F);
+                }
+                if (mc.player != null && !grand) {
                     mc.particleEngine.createTrackingEmitter(mc.player, to >= 10 ? ParticleTypes.TOTEM_OF_UNDYING : ParticleTypes.HAPPY_VILLAGER, 25);
                 }
             }
@@ -125,12 +131,66 @@ public final class EnhanceFx {
     private static boolean grandShown;
 
     public static boolean active() {
-        return EnhanceGrandFx.running() || System.currentTimeMillis() - shownAt < 2600;
+        return EnhanceGrandFx.running() || System.currentTimeMillis() - shownAt < 2600 || System.currentTimeMillis() - legendAt < LEGEND_MS;
+    }
+
+    // ---- 누군가 최고 단계 강화에 성공했을 때: 다른 모든 플레이어의 화면 위쪽에 잠시 뜨는 띠
+
+    private static final long LEGEND_MS = 7000;
+    private static long legendAt;
+    private static String legendWho = "";
+    private static int legendLevel;
+    private static ItemStack legendItem = ItemStack.EMPTY;
+    /** 시험용. */
+    public static volatile String lastLegend = "";
+
+    public static void legend(String who, int level, ItemStack item) {
+        legendWho = who;
+        legendLevel = level;
+        legendItem = item.copy();
+        legendAt = System.currentTimeMillis();
+        lastLegend = who + ":" + level;
+        play(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 0.8F);
+        play(SoundEvents.BELL_RESONATE, 1.3F, 0.5F);
+    }
+
+    private static void renderLegend(GuiGraphics g, int w, int h) {
+        long t = System.currentTimeMillis() - legendAt;
+        if (t < 0 || t > LEGEND_MS) return;
+        Font font = Minecraft.getInstance().font;
+        float slide = Fx2D.easeOut(Fx2D.span(t, 0, 500)) * (1 - Fx2D.easeIn(Fx2D.span(t, LEGEND_MS - 600, LEGEND_MS)));
+        int bh = 30;
+        int y = (int) (-bh - 4 + (bh + 10) * slide);
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 940);
+        g.fill(0, y, w, y + bh, 0xD8100818);
+        Fx2D.begin(g, true);
+        float sweep = (t % 2200) / 2200F * (w + 200) - 100;
+        Fx2D.beam(0, y + 0.5F, w, y + 0.5F, 3, 0xC0FFD98A);
+        Fx2D.beam(0, y + bh - 0.5F, w, y + bh - 0.5F, 3, 0xC0FFD98A);
+        Fx2D.glow(sweep, y + bh / 2F, 90, 26, 0x50FFE9B0, 0x00FFE9B0);
+        for (int i = 0; i < 12; i++) {
+            float tw = Math.abs((float) Math.sin(t * 0.005 + i * 1.9));
+            Fx2D.star(Fx2D.hash(i, 201) * w, y + 4 + Fx2D.hash(i, 202) * (bh - 8), 2 + 3 * tw, 0.7F, Fx2D.rgba(0xFFFFFF, 0.7F * tw * slide));
+        }
+        Fx2D.end();
+        Component line = Component.translatable("rtshop.enhance.legend_banner", legendWho, legendItem.getHoverName(), legendLevel);
+        float scale = Math.min(1.3F, (w - 60) / (float) Math.max(1, font.width(line)));
+        int tw = (int) (font.width(line) * scale);
+        int tx = (w - tw) / 2 + 10;
+        if (!legendItem.isEmpty()) g.renderItem(legendItem, tx - 22, y + 7);
+        g.pose().pushPose();
+        g.pose().translate(tx, y + 15 - 4 * scale, 300);
+        g.pose().scale(scale, scale, 1);
+        g.drawString(font, line, 0, 0, 0xFFFFE9A8, true);
+        g.pose().popPose();
+        g.pose().popPose();
     }
 
     public static void render(GuiGraphics g, int w, int h) {
+        renderLegend(g, w, h);
         EnhanceGrandFx.render(g, w, h);
-        if (grandShown || EnhanceGrandFx.suspense()) return;
+        if (grandShown || EnhanceGrandFx.hidesBanner()) return;
         long t = System.currentTimeMillis() - shownAt;
         if (t > 2600 || shownAt == 0) return;
         float a = t < 150 ? t / 150F : t > 2100 ? (2600 - t) / 500F : 1F;

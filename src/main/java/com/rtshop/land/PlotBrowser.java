@@ -131,6 +131,40 @@ public final class PlotBrowser {
 
     // ------------------------------------------------------------------ 목록
 
+    /** 칸 모양(BitSet)을 압축해 글자로 (Base64(deflate)). */
+    public static String packMask(java.util.BitSet mask) {
+        byte[] raw = mask.toByteArray();
+        java.util.zip.Deflater d = new java.util.zip.Deflater(java.util.zip.Deflater.BEST_SPEED);
+        d.setInput(raw);
+        d.finish();
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream(Math.max(16, raw.length / 4));
+        byte[] buf = new byte[1024];
+        while (!d.finished()) {
+            out.write(buf, 0, d.deflate(buf));
+        }
+        d.end();
+        return java.util.Base64.getEncoder().encodeToString(out.toByteArray());
+    }
+
+    public static java.util.BitSet unpackMask(String text) {
+        try {
+            java.util.zip.Inflater inf = new java.util.zip.Inflater();
+            inf.setInput(java.util.Base64.getDecoder().decode(text));
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            while (!inf.finished()) {
+                int n = inf.inflate(buf);
+                if (n == 0 && (inf.needsInput() || inf.needsDictionary())) break;
+                out.write(buf, 0, n);
+                if (out.size() > (1 << 20)) break;
+            }
+            inf.end();
+            return java.util.BitSet.valueOf(out.toByteArray());
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
     public static JsonObject list(ServerPlayer p) {
         LandData data = LandData.get(p.server);
         LandConfig cfg = LandConfig.get();
@@ -167,6 +201,10 @@ public final class PlotBrowser {
             e.addProperty("cleared", l.cleared);
             if (l.castle() && !l.cleared && l.forSale()) {
                 e.addProperty("clearWith", CastlePlots.objectColumns(l));
+            }
+            if (c.mask != null) {
+                // 네모가 아닌 토지(농경지 등): 지도에 실제 모양대로 그리도록 칸 모양을 함께 보낸다
+                e.addProperty("shape", packMask(c.mask));
             }
             arr.add(e);
         }

@@ -122,6 +122,7 @@ public final class LandEvents {
         LAST_MSG.remove(id);
         LAST_STORAGE.remove(id);
         LandManager.SHOW_BORDER.remove(id);
+        LandManager.forgetBorder(id);
     }
 
     // ------------------------------------------------------------------ 블록 파괴 / 설치
@@ -502,6 +503,7 @@ public final class LandEvents {
     private static final Vector3f RED = new Vector3f(1.0F, 0.25F, 0.2F);
     private static final Vector3f AQUA = new Vector3f(0.3F, 0.8F, 1.0F);
     private static final Vector3f ORANGE = new Vector3f(1.0F, 0.6F, 0.1F);
+    private static final Vector3f WHITE = new Vector3f(1.0F, 1.0F, 1.0F);
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -544,6 +546,25 @@ public final class LandEvents {
                 }
             }
             return;
+        }
+        if (LandManager.borderOn(sp)) {
+            // 명령어로 켠 경계 표시: 지금 서 있는 토지·농경지의 둘레 (작물 위에 서 있으면 발 위치가 한 칸 위일 수 있다)
+            Land here = data.landAt(dim, sp.blockPosition());
+            if (here == null) here = data.landAt(dim, sp.blockPosition().below());
+            if (here != null) {
+                Vector3f col = here.owner.equals(sp.getUUID()) ? AQUA : here.forSale() ? WHITE : ORANGE;
+                int shown = 0;
+                for (Claim o : here.claims) {
+                    if (!o.dim.equals(dim) || (o.mask == null
+                            && sp.distanceToSqr((o.x0 + o.x1) / 2.0, sp.getY(), (o.z0 + o.z1) / 2.0) > 128 * 128)) {
+                        continue;
+                    }
+                    Borders.claim(sp, o, Borders.rgb(col));
+                    if (++shown >= 8) {
+                        break;
+                    }
+                }
+            }
         }
         long[] show = LandManager.SHOW_BORDER.get(sp.getUUID());
         if (show != null) {

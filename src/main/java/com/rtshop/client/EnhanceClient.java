@@ -97,7 +97,60 @@ public final class EnhanceClient {
         }
     }
 
-    /** 강화 모루의 장비·결과 칸에 마우스를 올려도 설명 창을 띄우지 않는다 (정보는 강화 정보 패널에 늘 보임). */
+    /**
+     * 강화 모루의 장비·결과에 마우스를 올려도 설명 창을 띄우지 않는다 (정보는 강화 정보 창에 모두 있다).
+     * Cinematic Interactions 의 모루 장면은 아이템 없이 글줄만 넘겨 그리므로(RenderTooltipEvent.Pre 의 아이템이 비어 있음),
+     * 글줄을 모으는 단계에서 첫 줄(아이템 이름)을 보고 막는다.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onTooltipGather(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents e) {
+        if (gathering) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+        ItemStack s = e.getItemStack();
+        if (!s.isEmpty() && Enhance.isPreview(s)) {
+            e.setCanceled(true);
+            return;
+        }
+        if (!(mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu menu)) return;
+        ItemStack eq = menu.equipment(), res = menu.getSlot(2).getItem();
+        if (!s.isEmpty()) {
+            if (s == eq || s == res) e.setCanceled(true);
+            return;
+        }
+        if (e.getTooltipElements().isEmpty()) return;
+        String first = e.getTooltipElements().get(0).left().map(net.minecraft.network.chat.FormattedText::getString).orElse("");
+        if (!first.isEmpty() && (named(first, eq) || named(first, res))) e.setCanceled(true);
+    }
+
+    private static boolean named(String firstLine, ItemStack s) {
+        return !s.isEmpty() && firstLine.contains(s.getHoverName().getString());
+    }
+
+    /** 강화 정보 창이 장비 설명을 직접 모으는 동안에는 위의 가로채기를 쉬게 한다. */
+    static boolean gathering;
+
+    /** 아이템의 설명 글줄 (설명 창에 뜨던 내용 그대로). */
+    public static List<Component> describe(ItemStack s) {
+        gathering = true;
+        try {
+            return net.minecraft.client.gui.screens.Screen.getTooltipFromItem(Minecraft.getInstance(), s);
+        } catch (Exception ex) {
+            return List.of(s.getHoverName());
+        } finally {
+            gathering = false;
+        }
+    }
+
+    /** 시험용: Cinematic 장면처럼 글줄만으로 설명 창을 그리려 할 때 남는 줄 수 (0 = 숨겨짐). */
+    public static int sceneTooltipForTest(ItemStack s) {
+        Minecraft mc = Minecraft.getInstance();
+        List<Component> lines = new ArrayList<>(net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, s));
+        lines.add(Component.literal("LMB - forge"));
+        return net.minecraftforge.client.ForgeHooksClient.gatherTooltipComponents(ItemStack.EMPTY, lines, java.util.Optional.empty(), 0,
+                mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), mc.font).size();
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onTooltipRender(net.minecraftforge.client.event.RenderTooltipEvent.Pre e) {
         ItemStack s = e.getItemStack();

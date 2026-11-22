@@ -63,7 +63,7 @@ public class EnhanceUiScreen extends Screen {
                 g.pose().pushPose();
                 g.pose().translate(r[0], r[1], 0);
                 g.pose().scale(sc, sc, 1);
-                EnhanceScreen.drawPanel(g, font, m, minecraft.player, 0, 0, EnhancePanel.W, EnhancePanel.H);
+                EnhancePanel.draw(g, font, m, minecraft.player, 0, 0, EnhancePanel.W, EnhancePanel.H);
                 g.pose().popPose();
             }
         } else {

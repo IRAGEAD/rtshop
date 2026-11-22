@@ -887,8 +887,8 @@ public final class PlotManager {
         land.members.clear();
         data.touch();
         LAST_PLOT.remove(p.getUUID());
-        LandManager.SHOW_BORDER.put(p.getUUID(), new long[]{land.id, p.level().getGameTime() + 300});
         p.sendSystemMessage(Component.translatable("rtshop.plot.bought", land.name, money(land.price)).withStyle(ChatFormatting.GREEN));
+        p.sendSystemMessage(Component.translatable("rtshop.land.border_hint").withStyle(ChatFormatting.GRAY));
         if (land.castle() && !land.cleared) {
             int objs = CastlePlots.objectColumns(land);
             int n = CastlePlots.prepare(p.server, land);
@@ -1270,9 +1270,9 @@ public final class PlotManager {
         if (last == null || last != here.id) {
             LAST_PLOT.put(p.getUUID(), here.id);
             Claim c = plotClaim(here);
+            // 안내만 한다. 경계는 스스로 켰을 때만 보인다 (/rtshop border)
             p.sendSystemMessage(Component.translatable("rtshop.plot.for_sale_merchant", here.name, c == null ? 0 : c.area(),
                     money(here.price)).withStyle(ChatFormatting.GOLD));
-            LandManager.SHOW_BORDER.put(p.getUUID(), new long[]{here.id, now + 200});
         }
         return false;
     }
