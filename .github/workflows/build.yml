@@ -199,7 +199,24 @@ jobs:
           for c in $(cat /tmp/inspect/cinematic-users.txt | grep -v "/api/"); do
             echo "######## $c"; javap -p -c -constants "$c" 2>&1 | grep -n -B3 -A25 "Addon" | head -n 300
           done > /tmp/inspect/cinematic-uses.txt
-          cd /tmp/inspect
+          # Epic Fight Nightfall 크래시 조사: Entity Culling 연동 코드와 무기 속도 계산
+          NF="$PWD/../../$(true)"
+          cd "$GITHUB_WORKSPACE"
+          NFJ="$(ls packcache/*.jar | grep -i "nightfall" | head -1)"
+          ECJ="$(ls packcache/*.jar | grep -i "entityculling" | head -1)"
+          EFJ="$(ls packcache/*.jar | grep -i "epic-fight-20" | head -1)"
+          mkdir -p /tmp/nf && (cd /tmp/nf && unzip -q -o "$GITHUB_WORKSPACE/$NFJ" 'com/hm/efn/util/*' 'com/hm/efn/gameasset/EFNAnimations*' 'com/hm/efn/skill/weapon_innate/*' 'com/hm/efn/entity/effect/*' 'META-INF/mods.toml' '*.mixins.json' 2>/dev/null || true)
+          {
+            echo "== jars: $NFJ | $ECJ | $EFJ"
+            cat /tmp/nf/META-INF/mods.toml
+            echo "== entityculling Cullable classes"; unzip -l "$ECJ" | grep -i "cullable\|versionless" | head -40
+            echo "== entityculling packages"; unzip -l "$ECJ" | awk '{print $4}' | grep '\.class$' | sed 's#/[^/]*$##' | sort -u
+            for c in com/hm/efn/util/CullableUtil.class com/hm/efn/gameasset/EFNAnimations.class com/hm/efn/skill/weapon_innate/ShortSwordInnate.class; do
+              echo "######## $c"; javap -p -c -constants "/tmp/nf/$c" 2>&1 | grep -v "^\s*[0-9]*: \(aload\|astore\|iload\|istore\|dup\|pop\)" | head -n 900
+            done
+            echo "== grep Cullable users"; grep -rl "entityculling" /tmp/nf --include=*.class | head -40
+            echo "== LinkAnimation"; mkdir -p /tmp/ef && (cd /tmp/ef && unzip -q -o "$GITHUB_WORKSPACE/$EFJ" 'yesman/epicfight/api/animation/types/LinkAnimation.class' 'yesman/epicfight/api/animation/types/StaticAnimation.class') && javap -p -constants /tmp/ef/yesman/epicfight/api/animation/types/LinkAnimation.class
+          } > /tmp/inspect/nightfall.txt 2>&1
           cd /tmp/inspect
           git init -q -b ci-inspect
           git config user.name "github-actions"

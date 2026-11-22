@@ -34,7 +34,7 @@ public final class NpcGuard {
         for (String t : e.getTags()) {
             if (t.startsWith("rtshop_shop_") || t.startsWith("rtshop_quest_") || t.equals("rtshop_bank")
                     || t.equals("rtshop_job") || t.equals("rtshop_attendance") || t.equals("rtshop_gacha")
-                    || t.equals(com.rtshop.pshop.Employees.TAG)) {
+                    || t.equals(com.rtshop.pshop.Employees.TAG) || t.equals(com.rtshop.raid.Raid.GUIDE_TAG)) {
                 return true;
             }
         }
