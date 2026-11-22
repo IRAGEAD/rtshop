@@ -334,10 +334,9 @@ public final class SelfTest {
 
     // ------------------------------------------------------------------ 성 안 토지
 
-    private static LandData.Land testLot(LandData data, String dim, int no, int group, int x0, int z0, int ground, java.util.BitSet mask) {
+    private static LandData.Land testLot(LandData data, String dim, int no, int x0, int z0, int ground) {
         LandData.Land l = data.createPlot(com.rtshop.land.CastlePlots.name(no), 12000);
         l.castleNo = no;
-        l.castleGroup = group;
         l.castleGround = ground;
         LandData.Claim c = new LandData.Claim();
         c.dim = dim;
@@ -346,9 +345,8 @@ public final class SelfTest {
         c.z0 = z0;
         c.x1 = x0 + 15;
         c.z1 = z0 + 15;
-        c.y0 = ground - 8;
+        c.y0 = ground + 1 - LandConfig.get().depthBelowFeet;
         c.y1 = 319;
-        c.mask = mask;
         data.addClaim(l, c);
         return l;
     }
@@ -356,125 +354,139 @@ public final class SelfTest {
     private static void castle(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
         section("castle lots");
         com.rtshop.land.CastlePlots.Def d = com.rtshop.land.CastlePlots.def();
-        boolean overlap = false, empty = false;
+        boolean overlap = false, squareish = true;
+        java.util.Set<Integer> nos = new java.util.HashSet<>();
         for (com.rtshop.land.CastlePlots.Tile t : d.tiles) {
-            if (t.mask.isEmpty()) empty = true;
+            nos.add(t.no);
+            if (Math.max(t.w, t.h) > Math.min(t.w, t.h) * 1.4 + 0.01 || Math.min(t.w, t.h) < 9) squareish = false;
             for (com.rtshop.land.CastlePlots.Tile u : d.tiles) {
-                if (t != u && Math.abs(t.x0 - u.x0) < 16 && Math.abs(t.z0 - u.z0) < 16) overlap = true;
+                if (t != u && t.x0 < u.x0 + u.w && u.x0 < t.x0 + t.w && t.z0 < u.z0 + u.h && u.z0 < t.z0 + t.h) overlap = true;
             }
         }
-        check("the Amonos castle lot list is bundled: 34 lots of 16x16, none overlapping", d.tiles.size() == 34 && !overlap && !empty
-                && d.mapW > 0 && d.mapW <= d.mapSize && d.mapH <= d.mapSize, d.tiles.size() + " " + overlap + " " + empty);
+        boolean removed = java.util.stream.IntStream.of(12, 13, 14, 15, 16, 19, 22).noneMatch(nos::contains);
+        check("castle lots: listed numbers removed (12,13,14,15,16,19,22), every lot a near-square rectangle, none overlapping",
+                removed && squareish && !overlap && d.tiles.size() >= 24, d.tiles.size() + " " + squareish + " " + overlap);
+        check("the castle zone polygon covers the city and the farmland but not across the river",
+                com.rtshop.land.CastlePlots.inZone(-24360, -5420) && com.rtshop.land.CastlePlots.inZone(-24200, -5350)
+                        && com.rtshop.land.CastlePlots.inZone(-24500, -5460) && !com.rtshop.land.CastlePlots.inZone(-24360, -5650)
+                        && !com.rtshop.land.CastlePlots.inZone(-24650, -5400) && !com.rtshop.land.CastlePlots.inZone(-24350, -5100));
         long full = com.rtshop.land.CastlePlots.price(com.rtshop.land.CastlePlots.tile(1));
         com.rtshop.land.CastlePlots.Tile small = null;
         for (com.rtshop.land.CastlePlots.Tile t : d.tiles) if (small == null || t.area() < small.area()) small = t;
-        check("a full castle lot costs castlePlotPrice; lots cut by roads cost less",
+        check("a full castle lot costs castlePlotPrice; smaller lots cost less",
                 full == LandConfig.get().castlePlotPrice && com.rtshop.land.CastlePlots.price(small) < full, full + " / " + com.rtshop.land.CastlePlots.price(small));
         LandData data = LandData.get(server);
         boolean anyCastle = false;
         for (LandData.Land l : data.lands()) if (l.castle()) anyCastle = true;
-        check("a world that is not the Amonos map gets no castle lots automatically", !anyCastle && !com.rtshop.land.CastlePlots.spawnNear(server));
+        check("a world that is not the Amonos map gets no castle lots and no castle zone", !anyCastle && !com.rtshop.land.CastlePlots.spawnNear(server)
+                && LandManager.guardAt(level, new BlockPos(-24360, 70, -5420)) == null);
+        int before = data.castleInstalled;
+        data.castleInstalled = com.rtshop.land.CastlePlots.VERSION;
+        try {
+            LandData.Land z = LandManager.guardAt(level, new BlockPos(-24360, 70, -5420));
+            check("with castle lots installed the castle zone is protected: nothing allowed outside bought land",
+                    z == LandManager.ZONE && LandManager.perms(a, z) == 0 && LandManager.guardAt(level, new BlockPos(-24650, 70, -5400)) == null);
+        } finally {
+            data.castleInstalled = before;
+        }
         check("only land merchants open the lot browser", com.rtshop.land.PlotBrowser.isLandShop("land") && !com.rtshop.land.PlotBrowser.isLandShop("farmer"));
+        check("lots can no longer be bought by command", server.getCommands().getDispatcher().parse("rtshop plot buy", server.createCommandSourceStack()).getReader().canRead());
 
-        // 시험용 성 안 토지 3칸: A·B 는 한 건물 묶음(50), C 는 빈 땅. A 의 맨 서쪽 줄은 길(토지 아님).
+        // 시험용 토지 2칸 (A·B 는 서로 붙어 있음)
         String dim = LandManager.dim(level);
         int X = 3000, Z = 3000, Y = 100;
         net.minecraft.world.level.block.state.BlockState stone = net.minecraft.world.level.block.Blocks.STONE.defaultBlockState();
         net.minecraft.world.level.block.state.BlockState air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
-        for (int x = X - 2; x < X + 50; x++) {
+        for (int x = X - 8; x < X + 50; x++) {
             for (int z = Z - 2; z < Z + 18; z++) {
                 for (int y = Y - 9; y <= Y + 12; y++) {
                     level.setBlock(new BlockPos(x, y, z), y < Y ? stone : y == Y ? net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState() : air, 2);
                 }
             }
         }
-        java.util.BitSet ma = new java.util.BitSet(256), mb = new java.util.BitSet(256), mc = new java.util.BitSet(256);
-        ma.set(0, 256);
-        for (int dz = 0; dz < 16; dz++) ma.clear(dz * 16);
-        mb.set(0, 256);
-        mc.set(0, 256);
-        mc.clear(5 * 16 + 5);
-        for (int z = Z; z < Z + 16; z++) level.setBlock(new BlockPos(X, Y, z), net.minecraft.world.level.block.Blocks.DIRT_PATH.defaultBlockState(), 2);
-        // A·B 에 걸친 건물, 상자, 지하 빈 곳 / C 의 나무 / C 안에 있는 남의 토지 한 칸(금 블록)
+        // A 에서 B 로 걸친 건물, A 서쪽 밖의 나무(옆에 가로등), 남의 땅에 걸친 건물 한 칸
         for (int x = X + 10; x <= X + 21; x++)
             for (int y = Y + 1; y <= Y + 5; y++)
                 for (int z = Z + 4; z <= Z + 10; z++)
                     level.setBlock(new BlockPos(x, y, z), net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState(), 2);
-        level.setBlock(new BlockPos(X + 12, Y + 6, Z + 6), net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState(), 2);
-        level.setBlock(new BlockPos(X + 5, Y - 3, Z + 5), air, 2);
-        for (int y = Y + 1; y <= Y + 4; y++) level.setBlock(new BlockPos(X + 40, y, Z + 8), net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState(), 2);
-        level.setBlock(new BlockPos(X + 37, Y + 1, Z + 5), net.minecraft.world.level.block.Blocks.GOLD_BLOCK.defaultBlockState(), 2);
-        LandData.Land la = testLot(data, dim, 991, 50, X, Z, Y, ma);
-        LandData.Land lb = testLot(data, dim, 992, 50, X + 16, Z, Y, mb);
-        LandData.Land lc = testLot(data, dim, 993, -1, X + 32, Z, Y, mc);
+        level.setBlock(new BlockPos(X + 5, Y - 2, Z + 5), air, 2);
+        for (int y = Y + 1; y <= Y + 4; y++) level.setBlock(new BlockPos(X - 3, y, Z + 8), net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState(), 2);
+        for (int x = X - 4; x <= X - 1; x++)
+            for (int z = Z + 7; z <= Z + 9; z++)
+                level.setBlock(new BlockPos(x, Y + 5, z), net.minecraft.world.level.block.Blocks.OAK_LEAVES.defaultBlockState(), 2);
+        level.setBlock(new BlockPos(X - 3, Y + 1, Z + 9), net.minecraft.world.level.block.Blocks.GLOWSTONE.defaultBlockState(), 2);
+        level.setBlock(new BlockPos(X + 40, Y + 1, Z + 5), net.minecraft.world.level.block.Blocks.GOLD_BLOCK.defaultBlockState(), 2);
+        com.rtshop.land.CastlePlots.Tile ta = new com.rtshop.land.CastlePlots.Tile();
+        ta.no = 991;
+        ta.x0 = X;
+        ta.z0 = Z;
+        ta.ground = Y;
+        for (int x = X + 16; x <= X + 21; x++)
+            for (int z = Z + 4; z <= Z + 10; z++) ta.objects.add(new com.rtshop.land.CastlePlots.Obj(x, z, Y, false));
+        for (int x = X - 4; x <= X - 1; x++)
+            for (int z = Z + 7; z <= Z + 9; z++) ta.objects.add(new com.rtshop.land.CastlePlots.Obj(x, z, Y, true));
+        ta.objects.add(new com.rtshop.land.CastlePlots.Obj(X + 40, Z + 5, Y, false));
+        com.rtshop.land.CastlePlots.TEST_TILES.put(991, ta);
+        LandData.Land la = testLot(data, dim, 991, X, Z, Y);
+        LandData.Land lb = testLot(data, dim, 992, X + 16, Z, Y);
         LandData.Land other = data.createLand(b.getUUID(), "rtshop_test_b");
         LandData.Claim oc = new LandData.Claim();
         oc.dim = dim;
         oc.type = "normal";
-        oc.x0 = oc.x1 = X + 37;
-        oc.z0 = oc.z1 = Z + 5;
+        oc.x0 = X + 38;
+        oc.x1 = X + 42;
+        oc.z0 = Z + 3;
+        oc.z1 = Z + 7;
         oc.y0 = Y - 8;
         oc.y1 = 319;
         data.addClaim(other, oc);
         try {
+            LandData.Claim ca = PlotManager.plotClaim(la);
+            check("castle lot height works like normal land (from depthBelowFeet under the ground up to the sky)",
+                    ca.y0 == Y + 1 - LandConfig.get().depthBelowFeet && ca.y1 == 319 && ca.mask == null);
             com.rtshop.net.PlotPreviewPacket pv = com.rtshop.land.PlotBrowser.render(level, la, a.getUUID());
-            int nPlot = 0, nClear = 0, nOther = 0;
+            int nPlot = 0, nClear = 0;
             for (byte f : pv.flags) {
                 if ((f & com.rtshop.land.PlotBrowser.FLAG_PLOT) != 0) nPlot++;
                 if ((f & com.rtshop.land.PlotBrowser.FLAG_CLEAR) != 0) nClear++;
-                if ((f & com.rtshop.land.PlotBrowser.FLAG_OTHER) != 0) nOther++;
             }
-            com.rtshop.net.PlotPreviewPacket pc = com.rtshop.land.PlotBrowser.render(level, lc, a.getUUID());
-            int cOther = 0, cPlot = 0;
-            for (byte f : pc.flags) {
-                if ((f & com.rtshop.land.PlotBrowser.FLAG_OTHER) != 0) cOther++;
-                if ((f & com.rtshop.land.PlotBrowser.FLAG_PLOT) != 0) cPlot++;
-            }
-            check("the preview map marks this lot, the lot cleared together with it, and other land",
-                    nPlot == 240 && nClear > 100 && nOther == 0 && pv.w == 32 && pv.h == 32 && cPlot == 255 && cOther > 100,
-                    nPlot + " " + nClear + " " + nOther + " " + pv.w + "x" + pv.h + " / " + cPlot + " " + cOther);
-            com.google.gson.JsonObject list = com.rtshop.land.PlotBrowser.list(a);
-            boolean listed = false;
-            for (com.google.gson.JsonElement e : list.getAsJsonArray("plots")) {
-                com.google.gson.JsonObject o = e.getAsJsonObject();
-                if (o.get("id").getAsInt() == la.id) listed = o.get("kind").getAsString().equals("castle") && o.get("clearWith").getAsInt() == 1;
-            }
-            check("the land merchant lists castle lots and says how many neighbours are cleared with it", listed);
+            check("the preview marks the whole lot (no holes) and the outside parts of objects that will be removed",
+                    nPlot == 256 && nClear >= 40 && nClear < 60, nPlot + " " + nClear);
 
             Economy.setWallet(a, 1_000_000);
             boolean bought = PlotManager.buyLand(a, la);
-            check("buying a castle lot from the merchant works (anywhere, no need to stand on it)", bought && la.owner.equals(a.getUUID())
+            check("buying a castle lot from the merchant works", bought && la.owner.equals(a.getUUID()) && la.defaultPerms == 0
                     && Economy.wallet(a) == 1_000_000 - 12000);
             boolean gone = true;
             for (int x = X + 10; x <= X + 21; x++)
                 for (int y = Y + 1; y <= Y + 5; y++)
                     for (int z = Z + 4; z <= Z + 10; z++)
                         if (!level.getBlockState(new BlockPos(x, y, z)).isAir()) gone = false;
-            check("the building on both lots of the group is removed", gone && level.getBlockState(new BlockPos(X + 12, Y + 6, Z + 6)).isAir());
-            check("the ground is flat grass with dirt below; holes under it are filled",
+            check("a building crossing the border is removed whole, also the part outside the lot", gone);
+            check("a tree touching the lot is removed whole (logs and leaves) but other things next to it stay",
+                    level.getBlockState(new BlockPos(X - 3, Y + 3, Z + 8)).isAir() && level.getBlockState(new BlockPos(X - 4, Y + 5, Z + 7)).isAir()
+                            && level.getBlockState(new BlockPos(X - 3, Y + 1, Z + 9)).is(net.minecraft.world.level.block.Blocks.GLOWSTONE));
+            check("objects are never removed from someone else's land",
+                    level.getBlockState(new BlockPos(X + 40, Y + 1, Z + 5)).is(net.minecraft.world.level.block.Blocks.GOLD_BLOCK));
+            check("the lot is flat grass with dirt below; holes under it are filled",
                     level.getBlockState(new BlockPos(X + 12, Y, Z + 6)).is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)
-                            && level.getBlockState(new BlockPos(X + 20, Y - 1, Z + 6)).is(net.minecraft.world.level.block.Blocks.DIRT)
-                            && level.getBlockState(new BlockPos(X + 5, Y - 3, Z + 5)).is(net.minecraft.world.level.block.Blocks.DIRT));
-            check("the road column (not part of the lot) is untouched",
-                    level.getBlockState(new BlockPos(X, Y, Z + 3)).is(net.minecraft.world.level.block.Blocks.DIRT_PATH));
-            check("the neighbour lot of the same building is levelled but still for sale", lb.cleared && lb.forSale() && la.cleared);
-            check("a lot of another group is not touched", !lc.cleared && level.getBlockState(new BlockPos(X + 40, Y + 2, Z + 8)).is(net.minecraft.world.level.block.Blocks.OAK_LOG));
-            check("the look before buying is backed up", Files.exists(com.rtshop.land.CastlePlots.backupFile(server, la))
-                    && Files.exists(com.rtshop.land.CastlePlots.backupFile(server, lb)));
-            Economy.setWallet(b, 1_000_000);
-            PlotManager.buyLand(b, lc);
-            check("levelling a lot never touches someone else's land inside it",
-                    lc.cleared && level.getBlockState(new BlockPos(X + 40, Y + 2, Z + 8)).isAir()
-                            && level.getBlockState(new BlockPos(X + 37, Y + 1, Z + 5)).is(net.minecraft.world.level.block.Blocks.GOLD_BLOCK));
+                            && level.getBlockState(new BlockPos(X + 8, Y - 1, Z + 6)).is(net.minecraft.world.level.block.Blocks.DIRT)
+                            && level.getBlockState(new BlockPos(X + 5, Y - 2, Z + 5)).is(net.minecraft.world.level.block.Blocks.DIRT));
+            check("the neighbour lot stays for sale", lb.forSale() && !lb.cleared && la.cleared);
+            check("the look before buying is backed up", Files.exists(com.rtshop.land.CastlePlots.backupFile(server, la)));
             PlotManager.giveBack(a, la);
-            check("giving a castle lot back keeps it level and puts it up for sale again", la.forSale() && la.cleared);
+            check("giving a castle lot back keeps it level and puts it up for sale again (owner-only rules)", la.forSale() && la.cleared && la.defaultPerms == 0);
             boolean restored = com.rtshop.land.CastlePlots.restore(server, la);
-            check("an OP can restore a lot to how it was (backup)", restored && !la.cleared
-                    && level.getBlockState(new BlockPos(X + 12, Y + 3, Z + 6)).is(net.minecraft.world.level.block.Blocks.STONE_BRICKS));
+            check("an OP can restore a lot and the removed objects (backup)", restored && !la.cleared
+                    && level.getBlockState(new BlockPos(X + 12, Y + 3, Z + 6)).is(net.minecraft.world.level.block.Blocks.STONE_BRICKS)
+                    && level.getBlockState(new BlockPos(X + 18, Y + 3, Z + 6)).is(net.minecraft.world.level.block.Blocks.STONE_BRICKS)
+                    && level.getBlockState(new BlockPos(X - 3, Y + 3, Z + 8)).is(net.minecraft.world.level.block.Blocks.OAK_LOG));
         } finally {
-            for (LandData.Land l : new LandData.Land[]{la, lb, lc, other}) {
+            com.rtshop.land.CastlePlots.TEST_TILES.clear();
+            for (LandData.Land l : new LandData.Land[]{la, lb, other}) {
                 try {
                     Files.deleteIfExists(com.rtshop.land.CastlePlots.backupFile(server, l));
+                    Files.deleteIfExists(com.rtshop.land.CastlePlots.backupFile(server, l).resolveSibling("castle_" + l.castleNo + "_objects.nbt"));
                 } catch (Exception ignored) {
                 }
                 data.removeLand(l);

@@ -50,6 +50,14 @@ public class PlotBrowserScreen extends Screen {
         ResourceLocation nowId, afterId;
     }
 
+    /** 넓은 지도 (성 지도 밖의 토지). */
+    static final class Area {
+        int landId, x0, z0, step, w, h;
+        DynamicTexture tex;
+    }
+
+    private static final ResourceLocation AREA_TEX = new ResourceLocation(RtShop.MODID, "dynamic/plot_area");
+    private static Area area;
     private static final ResourceLocation NOW_TEX = new ResourceLocation(RtShop.MODID, "dynamic/plot_now");
     private static final ResourceLocation AFTER_TEX = new ResourceLocation(RtShop.MODID, "dynamic/plot_after");
     private static Preview preview;
@@ -71,6 +79,11 @@ public class PlotBrowserScreen extends Screen {
     private boolean first = true;
 
     private int fx, fy, fw, fh, lx, ly, lw, lh, vx, vy, vw, vh, by;
+    /** 지도 보기: 가운데 좌표와 배율(블록당 화면 칸). */
+    private double mapCx, mapCz;
+    private float mapScale = -1;
+    private int mapFor = Integer.MIN_VALUE;
+    private boolean dragging;
     private static final int ROW = 21;
 
     public PlotBrowserScreen() {
@@ -93,6 +106,27 @@ public class PlotBrowserScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
         try {
             byte[] rgb = inflate(m.rgb, m.w * m.h * 3);
+            if (m.area) {
+                NativeImage img = new NativeImage(m.w, m.h, false);
+                for (int z = 0; z < m.h; z++) {
+                    for (int x = 0; x < m.w; x++) {
+                        int i = z * m.w + x;
+                        img.setPixelRGBA(x, z, 0xFF000000 | ((rgb[i * 3 + 2] & 255) << 16) | ((rgb[i * 3 + 1] & 255) << 8) | (rgb[i * 3] & 255));
+                    }
+                }
+                if (area != null) mc.getTextureManager().release(AREA_TEX);
+                Area a = new Area();
+                a.landId = m.landId;
+                a.x0 = m.x0;
+                a.z0 = m.z0;
+                a.step = m.step;
+                a.w = m.w;
+                a.h = m.h;
+                a.tex = new DynamicTexture(img);
+                mc.getTextureManager().register(AREA_TEX, a.tex);
+                area = a;
+                return;
+            }
             Preview p = new Preview();
             p.landId = m.landId;
             p.x0 = m.x0;
@@ -170,7 +204,7 @@ public class PlotBrowserScreen extends Screen {
         if (first) {
             first = false;
             tab = count("castle") > 0 ? 0 : count("plot") > 0 ? 1 : 2;
-            mode = tab == 0 ? MODE_MAP : MODE_NOW;
+            mode = MODE_MAP;
             Entry e = firstOf(TAB_KINDS[tab]);
             if (e != null) select(e, false);
         }
@@ -211,7 +245,27 @@ public class PlotBrowserScreen extends Screen {
         if (preview == null || preview.landId != e.id) {
             ShopNet.CHANNEL.sendToServer(new PlotActionPacket(PlotBrowser.PREVIEW, e.id));
         }
+        if (!onCastleMap(e) && (area == null || !covers(area, e))) {
+            ShopNet.CHANNEL.sendToServer(new PlotActionPacket(PlotBrowser.AREA, e.id));
+        }
+        centerOn(e);
         if (sound) click();
+    }
+
+    private static boolean onCastleMap(Entry e) {
+        CastlePlots.Def d = CastlePlots.def();
+        return d.mapW > 0 && e.x0 >= d.mapX0 && e.x1 < d.mapX0 + d.mapW && e.z0 >= d.mapZ0 && e.z1 < d.mapZ0 + d.mapH;
+    }
+
+    private static boolean covers(Area a, Entry e) {
+        return e.x0 >= a.x0 && e.z0 >= a.z0 && e.x1 < a.x0 + a.w * a.step && e.z1 < a.z0 + a.h * a.step;
+    }
+
+    private void centerOn(Entry e) {
+        mapCx = (e.x0 + e.x1 + 1) / 2.0;
+        mapCz = (e.z0 + e.z1 + 1) / 2.0;
+        if (mapScale < 0) mapScale = Math.max(1F, Math.min(6F, vw / 110F));
+        mapFor = e.id;
     }
 
     private void click() {
@@ -250,7 +304,12 @@ public class PlotBrowserScreen extends Screen {
         Ui.woodFrame(g, fx, fy, fw, fh);
         g.fill(fx + 5, fy + 4, fx + fw - 5, fy + 21, Ui.C_WOOD_DARK);
         g.fill(fx + 5, fy + 20, fx + fw - 5, fy + 21, Ui.C_GOLD_DARK);
-        g.drawString(font, title, fx + 10, fy + 9, Ui.C_GOLD, true);
+        String back = Component.translatable("rtshop.plotui.back").getString();
+        int backW = font.width(back) + 10;
+        boolean hovBack = Ui.inside(mx, my, fx + 7, fy + 5, backW, 14);
+        Ui.bevel(g, fx + 7, fy + 5, backW, 14, hovBack ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
+        g.drawString(font, back, fx + 12, fy + 8, Ui.C_INK, false);
+        g.drawString(font, title, fx + 14 + backW, fy + 9, Ui.C_GOLD, true);
         String money = Ui.num(Math.max(wallet, ClientEconomy.wallet)) + " G";
         Ui.coin(g, fx + fw - 25 - font.width(money), fy + 7, 11);
         g.drawString(font, money, fx + fw - 10 - font.width(money), fy + 9, Ui.C_CREAM, false);
@@ -281,8 +340,8 @@ public class PlotBrowserScreen extends Screen {
 
         renderList(g, mx, my);
         Ui.bevel(g, vx, vy, vw, vh, 0xFF1A140C, Ui.C_SHADOW, Ui.C_WOOD_HI);
-        if (mode == MODE_MAP && tab == 0) {
-            renderCastleMap(g, mx, my);
+        if (mode == MODE_MAP) {
+            renderMap(g, mx, my);
         } else {
             renderPreview(g, mx, my);
         }
@@ -292,7 +351,7 @@ public class PlotBrowserScreen extends Screen {
 
     private int[] modes() {
         if (tab == 0) return new int[]{MODE_MAP, MODE_NOW, MODE_AFTER};
-        return new int[]{MODE_NOW};
+        return new int[]{MODE_MAP, MODE_NOW};
     }
 
     private void renderList(GuiGraphics g, int mx, int my) {
@@ -343,53 +402,132 @@ public class PlotBrowserScreen extends Screen {
         return (alpha << 24) | rgb;
     }
 
-    /** 성 지도: 모든 성 안 토지를 칸 모양으로 표시. 판매 중 = 흰색, 내 토지 = 초록, 팔림 = 회색, 고른 토지 = 노란 테두리. */
-    private void renderCastleMap(GuiGraphics g, int mx, int my) {
-        CastlePlots.Def d = CastlePlots.def();
-        if (d.mapW <= 0) return;
-        float s = Math.min((vw - 6) / (float) d.mapW, (vh - 6) / (float) d.mapH);
-        int dw = (int) (d.mapW * s), dh = (int) (d.mapH * s);
-        int ox = vx + (vw - dw) / 2, oy = vy + (vh - dh) / 2;
-        g.blit(new ResourceLocation(d.mapTexture), ox, oy, dw, dh, 0, 0, d.mapW, d.mapH, d.mapSize, d.mapSize);
+    private int sx(double wx) {
+        return (int) Math.round(vx + vw / 2.0 + (wx - mapCx) * mapScale);
+    }
+
+    private int sz(double wz) {
+        return (int) Math.round(vy + vh / 2.0 + (wz - mapCz) * mapScale);
+    }
+
+    /**
+     * 넓은 지도: 확대(휠·+/-)·이동(끌기). 성 근처는 미리 그려 둔 성 지도, 그 밖은 서버가 그린 둘레 지도를 깐다.
+     * 모든 토지를 상태별 색으로, 고른 토지는 노란 굵은 테두리, 내 위치는 흰 점으로 표시한다.
+     */
+    private void renderMap(GuiGraphics g, int mx, int my) {
         Entry sel = sel();
+        CastlePlots.Def d = CastlePlots.def();
+        if (mapScale < 0) {
+            if (sel != null) centerOn(sel);
+            else if (d.mapW > 0) {
+                mapCx = d.mapX0 + d.mapW / 2.0;
+                mapCz = d.mapZ0 + d.mapH / 2.0;
+                mapScale = Math.max(0.4F, Math.min(vw / (float) d.mapW, vh / (float) d.mapH));
+            } else {
+                centered(g, Component.translatable("rtshop.plotui.pick"));
+                return;
+            }
+        } else if (sel != null && mapFor != sel.id) {
+            centerOn(sel);
+        }
+        g.enableScissor(vx + 1, vy + 1, vx + vw - 1, vy + vh - 1);
+        g.fill(vx + 1, vy + 1, vx + vw - 1, vy + vh - 1, 0xFF2A2418);
+        // 바탕 지도
+        boolean castleBase = d.mapW > 0 && (tab == 0 || (sel != null && onCastleMap(sel)));
+        g.pose().pushPose();
+        g.pose().translate(vx + vw / 2.0, vy + vh / 2.0, 0);
+        g.pose().scale(mapScale, mapScale, 1);
+        g.pose().translate(-mapCx, -mapCz, 0);
+        if (area != null && (sel == null || covers(area, sel))) {
+            g.blit(AREA_TEX, area.x0, area.z0, area.w * area.step, area.h * area.step, 0, 0, area.w, area.h, area.w, area.h);
+        }
+        if (castleBase || d.mapW > 0) {
+            g.blit(new ResourceLocation(d.mapTexture), d.mapX0, d.mapZ0, d.mapW, d.mapH, 0, 0, d.mapW, d.mapH, d.mapSize, d.mapSize);
+        }
+        g.pose().popPose();
+        if (sel != null && !onCastleMap(sel) && (area == null || !covers(area, sel))) {
+            Component c = Component.translatable("rtshop.plotui.loading");
+            g.drawString(font, c, vx + vw / 2 - font.width(c) / 2, vy + 6, 0xFFFFFFFF, true);
+        }
+        // 토지들
         Entry hover = null;
         for (Entry e : all) {
-            if (!e.kind.equals("castle")) continue;
-            CastlePlots.Tile t = CastlePlots.tile(e.castleNo);
-            if (t == null) continue;
-            int alpha = e.sale() ? 0x55 : 0x90;
-            for (int dz = 0; dz < 16; dz++) {
-                int run = -1;
-                for (int dx = 0; dx <= 16; dx++) {
-                    boolean in = dx < 16 && t.has(dx, dz);
-                    if (in && run < 0) run = dx;
-                    if (!in && run >= 0) {
-                        int x0 = ox + (int) ((t.x0 + run - d.mapX0) * s), x1 = ox + (int) ((t.x0 + dx - d.mapX0) * s);
-                        int y0 = oy + (int) ((t.z0 + dz - d.mapZ0) * s), y1 = oy + (int) ((t.z0 + dz + 1 - d.mapZ0) * s);
-                        if (y1 > y0 && x1 > x0) g.fill(x0, y0, x1, y1, statusColor(e, alpha));
-                        run = -1;
-                    }
-                }
-            }
-            int rx0 = ox + (int) ((t.x0 - d.mapX0) * s), rz0 = oy + (int) ((t.z0 - d.mapZ0) * s);
-            int rx1 = ox + (int) ((t.x0 + 16 - d.mapX0) * s), rz1 = oy + (int) ((t.z0 + 16 - d.mapZ0) * s);
+            int x0 = sx(e.x0), z0 = sz(e.z0), x1 = sx(e.x1 + 1), z1 = sz(e.z1 + 1);
+            if (x1 < vx || x0 > vx + vw || z1 < vy || z0 > vy + vh) continue;
             boolean isSel = sel != null && sel.id == e.id;
-            int border = isSel ? 0xFFFFE040 : 0xC0000000;
-            outline(g, rx0, rz0, rx1, rz1, border);
-            if (isSel) outline(g, rx0 - 1, rz0 - 1, rx1 + 1, rz1 + 1, 0xFFFFE040);
-            String no = Integer.toString(e.castleNo);
-            float ts = Math.max(0.5F, Math.min(1F, s * 1.2F));
-            Ui.scaledText(g, font, no, (rx0 + rx1) / 2F - font.width(no) * ts / 2, (rz0 + rz1) / 2F - 4 * ts, ts, 0xFFFFFFFF, true);
-            if (Ui.inside(mx, my, rx0, rz0, rx1 - rx0, rz1 - rz0)) hover = e;
+            boolean thisTab = e.kind.equals(TAB_KINDS[tab]);
+            int alpha = thisTab ? (e.sale() ? 0x50 : 0x80) : 0x28;
+            g.fill(x0, z0, Math.max(x0 + 1, x1), Math.max(z0 + 1, z1), statusColor(e, alpha));
+            outline(g, x0, z0, Math.max(x0 + 2, x1), Math.max(z0 + 2, z1), thisTab ? 0xC0000000 : 0x60000000);
+            if (isSel) {
+                long t = System.currentTimeMillis() / 250 % 2;
+                int c = t == 0 ? 0xFFFFE040 : 0xFFFFFFA0;
+                outline(g, x0 - 1, z0 - 1, x1 + 1, z1 + 1, c);
+                outline(g, x0 - 2, z0 - 2, x1 + 2, z1 + 2, c);
+            }
+            if (thisTab && mapScale * Math.min(e.x1 - e.x0 + 1, e.z1 - e.z0 + 1) >= 12) {
+                String label = e.castleNo > 0 ? Integer.toString(e.castleNo) : "";
+                if (mapScale >= 5) label = e.name;
+                float ts = Math.max(0.5F, Math.min(1F, mapScale / 3F));
+                Ui.scaledText(g, font, label, (x0 + x1) / 2F - font.width(label) * ts / 2, (z0 + z1) / 2F - 4 * ts, ts, 0xFFFFFFFF, true);
+            }
+            if (thisTab && mx >= x0 && mx < x1 && my >= z0 && my < z1 && Ui.inside(mx, my, vx, vy, vw, vh)) hover = e;
         }
-        legend(g, vx + 4, vy + vh - 12, new int[]{0xFFFFFFFF, 0xFF40E040, 0xFF606060},
-                new String[]{"rtshop.plotui.lg_sale", "rtshop.plotui.lg_mine", "rtshop.plotui.lg_sold"});
+        // 내 위치
+        net.minecraft.client.player.LocalPlayer me = Minecraft.getInstance().player;
+        if (me != null) {
+            int px = sx(me.getX()), pz = sz(me.getZ());
+            if (Ui.inside(px, pz, vx, vy, vw, vh)) {
+                g.fill(px - 3, pz - 3, px + 3, pz + 3, 0xFF000000);
+                g.fill(px - 2, pz - 2, px + 2, pz + 2, 0xFFFFFFFF);
+                String meLabel = Component.translatable("rtshop.plotui.you").getString();
+                Ui.scaledText(g, font, meLabel, px + 4, pz - 4, 0.75F, 0xFFFFFFFF, true);
+            }
+        }
+        g.disableScissor();
+        // 조작 단추와 안내
+        String[] btn = {"+", "-", "⌖"};
+        for (int i = 0; i < 3; i++) {
+            int bx = vx + vw - 18, byy = vy + 4 + i * 16;
+            boolean hov = Ui.inside(mx, my, bx, byy, 14, 14);
+            Ui.bevel(g, bx, byy, 14, 14, hov ? Ui.C_WOOD_HI : Ui.C_WOOD, Ui.C_WOOD_HI, Ui.C_SHADOW);
+            g.drawString(font, btn[i], bx + 7 - font.width(btn[i]) / 2, byy + 3, Ui.C_CREAM, false);
+        }
+        Component hint = Component.translatable("rtshop.plotui.map_hint");
+        Ui.scaledText(g, font, hint.getString(), vx + 4, vy + 4, 0.75F, 0xFFE0E0E0, true);
+        legend(g, vx + 4, vy + vh - 12, new int[]{0xFFFFE040, 0xFFFFFFFF, 0xFF40E040, 0xFF606060},
+                new String[]{"rtshop.plotui.lg_this", "rtshop.plotui.lg_sale", "rtshop.plotui.lg_mine", "rtshop.plotui.lg_sold"});
         if (hover != null) {
             List<Component> tip = new ArrayList<>();
             tip.add(Component.literal(hover.name));
             tip.add(Component.literal(statusText(hover)));
             g.renderComponentTooltip(font, tip, mx, my);
         }
+    }
+
+    private boolean mapButton(double mx, double my) {
+        for (int i = 0; i < 3; i++) {
+            int bx = vx + vw - 18, byy = vy + 4 + i * 16;
+            if (Ui.inside(mx, my, bx, byy, 14, 14)) {
+                if (i == 0) zoom(1.5, vx + vw / 2.0, vy + vh / 2.0);
+                else if (i == 1) zoom(1 / 1.5, vx + vw / 2.0, vy + vh / 2.0);
+                else {
+                    Entry e = sel();
+                    if (e != null) centerOn(e);
+                }
+                click();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 커서 아래 지점을 그대로 두고 확대·축소. */
+    private void zoom(double f, double mx, double my) {
+        double wx = mapCx + (mx - (vx + vw / 2.0)) / mapScale, wz = mapCz + (my - (vy + vh / 2.0)) / mapScale;
+        mapScale = (float) Math.max(0.3, Math.min(16, mapScale * f));
+        mapCx = wx - (mx - (vx + vw / 2.0)) / mapScale;
+        mapCz = wz - (my - (vy + vh / 2.0)) / mapScale;
     }
 
     private void outline(GuiGraphics g, int x0, int y0, int x1, int y1, int c) {
@@ -550,6 +688,12 @@ public class PlotBrowserScreen extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (button != 0) return super.mouseClicked(mx, my, button);
+        String back = Component.translatable("rtshop.plotui.back").getString();
+        if (Ui.inside(mx, my, fx + 7, fy + 5, font.width(back) + 10, 14)) {
+            click();
+            ShopNet.CHANNEL.sendToServer(new PlotActionPacket(PlotBrowser.BACK, 0));
+            return true;
+        }
         // 탭
         String[] tabKeys = {"rtshop.plotui.tab_castle", "rtshop.plotui.tab_plot", "rtshop.plotui.tab_starter"};
         int tx = fx + 8;
@@ -580,21 +724,16 @@ public class PlotBrowserScreen extends Screen {
             List<Entry> rows = rows();
             if (i >= 0 && i < rows.size()) {
                 select(rows.get(i), true);
-                if (mode == MODE_MAP && tab != 0) mode = MODE_NOW;
+
             }
             return true;
         }
-        // 성 지도에서 고르기
-        if (mode == MODE_MAP && tab == 0 && Ui.inside(mx, my, vx, vy, vw, vh)) {
-            CastlePlots.Def d = CastlePlots.def();
-            float s = Math.min((vw - 6) / (float) d.mapW, (vh - 6) / (float) d.mapH);
-            int dw = (int) (d.mapW * s), dh = (int) (d.mapH * s);
-            int ox = vx + (vw - dw) / 2, oy = vy + (vh - dh) / 2;
-            double wx = d.mapX0 + (mx - ox) / s, wz = d.mapZ0 + (my - oy) / s;
+        // 지도: 단추, 토지 고르기, 끌어서 이동
+        if (mode == MODE_MAP && Ui.inside(mx, my, vx, vy, vw, vh)) {
+            if (mapButton(mx, my)) return true;
             for (Entry e : all) {
-                if (!e.kind.equals("castle")) continue;
-                CastlePlots.Tile t = CastlePlots.tile(e.castleNo);
-                if (t != null && wx >= t.x0 && wx < t.x0 + 16 && wz >= t.z0 && wz < t.z0 + 16) {
+                if (!e.kind.equals(TAB_KINDS[tab])) continue;
+                if (mx >= sx(e.x0) && mx < sx(e.x1 + 1) && my >= sz(e.z0) && my < sz(e.z1 + 1)) {
                     select(e, true);
                     List<Entry> rows = rows();
                     int idx = rows.indexOf(e);
@@ -603,6 +742,7 @@ public class PlotBrowserScreen extends Screen {
                     return true;
                 }
             }
+            dragging = true;
             return true;
         }
         // 버튼
@@ -632,11 +772,27 @@ public class PlotBrowserScreen extends Screen {
         return super.mouseClicked(mx, my, button);
     }
 
+    @Override
+    public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
+        if (dragging && mode == MODE_MAP && mapScale > 0) {
+            mapCx -= dx / mapScale;
+            mapCz -= dy / mapScale;
+            return true;
+        }
+        return super.mouseDragged(mx, my, button, dx, dy);
+    }
+
+    @Override
+    public boolean mouseReleased(double mx, double my, int button) {
+        dragging = false;
+        return super.mouseReleased(mx, my, button);
+    }
+
     private void setTab(int i) {
         tab = i;
         scroll = 0;
         confirmId = -1;
-        mode = i == 0 ? MODE_MAP : MODE_NOW;
+        mode = MODE_MAP;
         Entry s = sel();
         if (s == null) s = firstOf(TAB_KINDS[i]);
         if (s != null) select(s, false);
@@ -644,6 +800,10 @@ public class PlotBrowserScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
+        if (mode == MODE_MAP && Ui.inside(mx, my, vx, vy, vw, vh) && mapScale > 0) {
+            zoom(delta > 0 ? 1.25 : 0.8, mx, my);
+            return true;
+        }
         if (Ui.inside(mx, my, lx, ly, lw, lh)) {
             scroll = Math.max(0, scroll - (int) Math.signum(delta));
             return true;
@@ -673,6 +833,15 @@ public class PlotBrowserScreen extends Screen {
 
     public int countForTest(String kind) {
         return count(kind);
+    }
+
+    public boolean areaReadyForTest() {
+        Entry e = sel();
+        return e != null && (onCastleMap(e) || (area != null && covers(area, e)));
+    }
+
+    public void zoomForTest(double f) {
+        zoom(f, vx + vw / 2.0, vy + vh / 2.0);
     }
 
     public boolean previewReadyForTest() {

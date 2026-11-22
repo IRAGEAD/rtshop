@@ -77,6 +77,8 @@ public final class LandConfig {
     public long castlePlotPrice = 50000;
     /** 토지 상인 창에서 구획을 살 때 상인 가까이(블록) 있어야 한다. */
     public int plotMerchantRange = 12;
+    /** 성 영역(아모노스 맵의 강·바다로 둘러싸인 성과 농경지): 블록 부수기·놓기·상호작용 금지, 몬스터 스폰 금지. */
+    public boolean castleZoneProtect = true;
 
     public LandConfig() {
         rangedBlocks.put("better_farming_plus:farming_crate", 5);
@@ -157,6 +159,11 @@ public final class LandConfig {
                 if (o.has("castlePlotsAuto")) c.castlePlotsAuto = o.get("castlePlotsAuto").getAsBoolean();
                 if (o.has("castlePlotPrice")) c.castlePlotPrice = Math.max(0, o.get("castlePlotPrice").getAsLong());
                 if (o.has("plotMerchantRange")) c.plotMerchantRange = Math.max(2, o.get("plotMerchantRange").getAsInt());
+                if (o.has("castleZoneProtect")) c.castleZoneProtect = o.get("castleZoneProtect").getAsBoolean();
+                if (!o.has("castleZoneProtect") && o.has("castlePlotPrice")) {
+                    o.addProperty("castleZoneProtect", c.castleZoneProtect);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                }
                 if (!o.has("castlePlotPrice")) {
                     addCastleKeys(o, c);
                     Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -216,6 +223,7 @@ public final class LandConfig {
         o.addProperty("castlePlotsAuto", c.castlePlotsAuto);
         o.addProperty("castlePlotPrice", c.castlePlotPrice);
         o.addProperty("plotMerchantRange", c.plotMerchantRange);
+        o.addProperty("castleZoneProtect", c.castleZoneProtect);
     }
 
     private static void addStarterKeys(JsonObject o, LandConfig c) {

@@ -80,8 +80,7 @@ public final class PlotCommands {
         CommandDispatcher<CommandSourceStack> d = event.getDispatcher();
         d.register(Commands.literal("rtshop").then(Commands.literal("plot")
                 // ---- 누구나
-                .then(Commands.literal("buy").executes(ctx -> PlotManager.buy(ctx.getSource().getPlayerOrException()) ? 1 : 0))
-                .then(Commands.literal("browse").executes(ctx -> {
+                .then(Commands.literal("browse").requires(src -> src.hasPermission(2)).executes(ctx -> {
                     PlotBrowser.handle(ctx.getSource().getPlayerOrException(), PlotBrowser.OPEN, 0);
                     return 1;
                 }))

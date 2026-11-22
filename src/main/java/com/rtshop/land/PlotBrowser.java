@@ -40,19 +40,31 @@ public final class PlotBrowser {
     public static final int BUY = 2;
     public static final int BORDER = 3;
     public static final int STARTER = 4;
+    public static final int BACK = 5;
+    public static final int AREA = 6;
 
     /** 가까이에 토지 상인(토지 문서를 파는 상인 NPC)이 있는가. OP 는 어디서나. */
     public static boolean nearMerchant(ServerPlayer p) {
-        if (p.hasPermissions(2)) return true;
+        return p.hasPermissions(2) || merchant(p) != null;
+    }
+
+    /** 가까운 토지 상인 NPC 와 그 상점 ID. */
+    public static Object[] merchant(ServerPlayer p) {
         int r = LandConfig.get().plotMerchantRange;
+        Object[] best = null;
+        double bd = Double.MAX_VALUE;
         for (Entity e : p.level().getEntities(p, p.getBoundingBox().inflate(r))) {
             for (String tag : e.getTags()) {
                 if (tag.startsWith(ShopServer.SHOP_TAG_PREFIX) && isLandShop(tag.substring(ShopServer.SHOP_TAG_PREFIX.length()))) {
-                    return true;
+                    double dd = e.distanceToSqr(p);
+                    if (dd < bd) {
+                        bd = dd;
+                        best = new Object[]{e, tag.substring(ShopServer.SHOP_TAG_PREFIX.length())};
+                    }
                 }
             }
         }
-        return false;
+        return best;
     }
 
     public static boolean isLandShop(String id) {
@@ -96,6 +108,14 @@ public final class PlotBrowser {
                     p.sendSystemMessage(Component.translatable("rtshop.plotui.border", l.name, (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2)
                             .withStyle(ChatFormatting.AQUA));
                 }
+            }
+            case BACK -> {
+                Object[] m = merchant(p);
+                ShopServer.openShop(p, m == null ? "land" : (String) m[1], m == null ? -1 : ((Entity) m[0]).getId());
+            }
+            case AREA -> {
+                Land l = data.land(id);
+                if (l != null && l.plot) queueArea(p, l);
             }
             case STARTER -> {
                 boolean before = data.starterGiven(p.getUUID());
@@ -143,10 +163,10 @@ public final class PlotBrowser {
             e.addProperty("x1", c.x1);
             e.addProperty("z1", c.z1);
             e.addProperty("castleNo", l.castleNo);
-            e.addProperty("group", l.castleGroup);
+            e.addProperty("group", -1);
             e.addProperty("cleared", l.cleared);
             if (l.castle() && !l.cleared && l.forSale()) {
-                e.addProperty("clearWith", CastlePlots.clearSet(data, l).size() - 1);
+                e.addProperty("clearWith", CastlePlots.objectColumns(l));
             }
             arr.add(e);
         }
@@ -179,8 +199,11 @@ public final class PlotBrowser {
         int w = bx1 - bx0 + 1, h = bz1 - bz0 + 1;
         int step = Math.max(1, (int) Math.ceil(Math.max(w, h) / (double) MAX_SAMPLES));
         int sw = (w + step - 1) / step, sh = (h + step - 1) / step;
-        Set<Integer> clearIds = new HashSet<>();
-        for (Land l : CastlePlots.clearSet(data, land)) clearIds.add(l.id);
+        Set<Long> objCols = new HashSet<>();
+        CastlePlots.Tile tile = land.castle() && !land.cleared ? CastlePlots.tile(land.castleNo) : null;
+        if (tile != null) {
+            for (CastlePlots.Obj o : tile.objects) objCols.add(((long) o.x << 32) ^ (o.z & 0xffffffffL));
+        }
         byte[] rgb = new byte[sw * sh * 3];
         byte[] flags = new byte[sw * sh];
         int minY = level.getMinBuildHeight(), maxY = level.getMaxBuildHeight() - 1;
@@ -208,19 +231,28 @@ public final class PlotBrowser {
                 rgb[i * 3 + 2] = (byte) ((col & 255) * b / 255);
                 int f = 0;
                 List<Claim> near = data.claimsNear(dim, x, minY, z, x, maxY, z, 0);
+                boolean owned = false;
                 for (Claim o : near) {
                     if (!o.hasColumn(x, z)) continue;
                     if (o.landId == land.id) f |= FLAG_PLOT;
-                    else if (clearIds.contains(o.landId)) f |= FLAG_CLEAR;
                     else {
                         Land ol = data.land(o.landId);
                         f |= ol != null && ol.owner.equals(viewer) ? FLAG_MINE : FLAG_OTHER;
+                        if (ol != null && !(ol.castle() && ol.forSale())) owned = true;
                     }
+                }
+                if ((f & FLAG_PLOT) == 0 && !owned && !objCols.isEmpty()) {
+                    for (int dz = 0; dz < step && (f & FLAG_CLEAR) == 0; dz++)
+                        for (int dx = 0; dx < step; dx++)
+                            if (objCols.contains(((long) (x + dx) << 32) ^ ((z + dz) & 0xffffffffL))) {
+                                f |= FLAG_CLEAR;
+                                break;
+                            }
                 }
                 flags[i] = (byte) f;
             }
         }
-        return new PlotPreviewPacket(land.id, bx0, bz0, step, sw, sh, deflate(rgb), flags);
+        return new PlotPreviewPacket(land.id, bx0, bz0, step, sw, sh, deflate(rgb), flags, false);
     }
 
     static byte[] deflate(byte[] in) {
@@ -235,6 +267,87 @@ public final class PlotBrowser {
         }
         d.end();
         return out.toByteArray();
+    }
+
+    // ------------------------------------------------------------------ 넓은 지도 (여러 틱에 나눠 그림)
+
+    public static final int AREA_RADIUS = 112;
+    public static final int AREA_STEP = 2;
+
+    private static final class AreaJob {
+        ServerPlayer p;
+        ServerLevel level;
+        int landId, x0, z0, w, h, row;
+        byte[] rgb;
+        byte[] flags;
+        int[] prev;
+    }
+
+    private static final java.util.Map<java.util.UUID, AreaJob> JOBS = new java.util.HashMap<>();
+
+    static void queueArea(ServerPlayer p, Land l) {
+        Claim c = PlotManager.plotClaim(l);
+        if (c == null) return;
+        AreaJob j = new AreaJob();
+        j.p = p;
+        j.level = p.serverLevel();
+        for (ServerLevel lv : p.server.getAllLevels()) {
+            if (LandManager.dim(lv).equals(c.dim)) j.level = lv;
+        }
+        j.landId = l.id;
+        int cx = (c.x0 + c.x1) / 2, cz = (c.z0 + c.z1) / 2;
+        j.x0 = cx - AREA_RADIUS;
+        j.z0 = cz - AREA_RADIUS;
+        j.w = j.h = AREA_RADIUS * 2 / AREA_STEP;
+        j.rgb = new byte[j.w * j.h * 3];
+        j.flags = new byte[j.w * j.h];
+        j.prev = new int[j.w];
+        for (int sx = 0; sx < j.w; sx++) {
+            int x = j.x0 + sx * AREA_STEP;
+            j.level.getChunk(x >> 4, (j.z0 - AREA_STEP) >> 4);
+            j.prev[sx] = j.level.getHeight(Heightmap.Types.WORLD_SURFACE, x, j.z0 - AREA_STEP);
+        }
+        JOBS.put(p.getUUID(), j);
+    }
+
+    /** 서버 틱마다: 넓은 지도를 몇 줄씩 그려서 다 되면 보낸다 (청크를 한꺼번에 읽어 서버가 멈추지 않게). */
+    public static void tickJobs() {
+        if (JOBS.isEmpty()) return;
+        var it = JOBS.values().iterator();
+        while (it.hasNext()) {
+            AreaJob j = it.next();
+            if (j.p.isRemoved()) {
+                it.remove();
+                continue;
+            }
+            LandData data = LandData.get(j.level.getServer());
+            String dim = LandManager.dim(j.level);
+            int minY = j.level.getMinBuildHeight(), maxY = j.level.getMaxBuildHeight() - 1;
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+            for (int n = 0; n < 6 && j.row < j.h; n++, j.row++) {
+                int z = j.z0 + j.row * AREA_STEP;
+                for (int sx = 0; sx < j.w; sx++) {
+                    int x = j.x0 + sx * AREA_STEP;
+                    j.level.getChunk(x >> 4, z >> 4);
+                    int top = j.level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
+                    pos.set(x, top - 1, z);
+                    BlockState st = j.level.getBlockState(pos);
+                    MapColor mc = st.getMapColor(j.level, pos);
+                    int col = mc == null || mc == MapColor.NONE ? 0x202020 : mc.col;
+                    int b = top > j.prev[sx] ? 255 : top == j.prev[sx] ? 220 : 185;
+                    j.prev[sx] = top;
+                    int i = j.row * j.w + sx;
+                    j.rgb[i * 3] = (byte) (((col >> 16) & 255) * b / 255);
+                    j.rgb[i * 3 + 1] = (byte) (((col >> 8) & 255) * b / 255);
+                    j.rgb[i * 3 + 2] = (byte) ((col & 255) * b / 255);
+                }
+            }
+            if (j.row >= j.h) {
+                it.remove();
+                ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> j.p),
+                        new PlotPreviewPacket(j.landId, j.x0, j.z0, AREA_STEP, j.w, j.h, deflate(j.rgb), j.flags, true));
+            }
+        }
     }
 
     public static void preview(ServerPlayer p, Land l) {

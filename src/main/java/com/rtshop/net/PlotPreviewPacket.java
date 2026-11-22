@@ -12,8 +12,11 @@ public final class PlotPreviewPacket {
     public final int landId, x0, z0, step, w, h;
     public final byte[] rgb;
     public final byte[] flags;
+    /** true = 넓은 지도 (확대·이동용), false = 토지 둘레 미리보기. */
+    public final boolean area;
 
-    public PlotPreviewPacket(int landId, int x0, int z0, int step, int w, int h, byte[] rgb, byte[] flags) {
+    public PlotPreviewPacket(int landId, int x0, int z0, int step, int w, int h, byte[] rgb, byte[] flags, boolean area) {
+        this.area = area;
         this.landId = landId;
         this.x0 = x0;
         this.z0 = z0;
@@ -33,11 +36,12 @@ public final class PlotPreviewPacket {
         buf.writeVarInt(m.h);
         buf.writeByteArray(m.rgb);
         buf.writeByteArray(m.flags);
+        buf.writeBoolean(m.area);
     }
 
     public static PlotPreviewPacket decode(FriendlyByteBuf buf) {
         return new PlotPreviewPacket(buf.readVarInt(), buf.readInt(), buf.readInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
-                buf.readByteArray(1 << 20), buf.readByteArray(1 << 16));
+                buf.readByteArray(1 << 20), buf.readByteArray(1 << 16), buf.readBoolean());
     }
 
     public static void handle(PlotPreviewPacket msg, Supplier<NetworkEvent.Context> ctx) {

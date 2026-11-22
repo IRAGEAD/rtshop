@@ -544,9 +544,11 @@ public final class ClientSelfTest {
             case 1 -> {
                 check("the land merchant's lot window opens", ps != null, mc.screen);
                 if (ps != null) {
-                    check("castle lots are listed (34) and the window fits", ps.countForTest("castle") == 34 && ps.fitsForTest(), ps.countForTest("castle"));
+                    int n = com.rtshop.land.CastlePlots.def().tiles.size();
+                    check("castle lots are listed (" + n + ") and the window fits", ps.countForTest("castle") == n && ps.fitsForTest(), ps.countForTest("castle"));
                     shot(mc, "84_plots_castle_map");
                     ps.showForTest(0, 0, 3);
+                    ps.zoomForTest(0.25);
                 }
                 wait = 30;
             }

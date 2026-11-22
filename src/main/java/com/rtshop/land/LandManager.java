@@ -106,6 +106,33 @@ public final class LandManager {
         return land == null || (perms(p, land) & perm) != 0;
     }
 
+    /** 성 영역의 가짜 토지: 주인 없음, 아무 권한 없음 (OP 우회만 가능). */
+    public static final Land ZONE = zoneLand();
+
+    private static Land zoneLand() {
+        Land l = new Land();
+        l.id = -1;
+        l.owner = LandData.NO_OWNER;
+        l.ownerName = "";
+        l.name = "성 영역";
+        l.defaultPerms = 0;
+        return l;
+    }
+
+    /** 보호 검사용: 토지, 또는 토지가 아닌 성 영역(아모노스 맵)이면 ZONE. */
+    public static Land guardAt(ServerLevel level, BlockPos pos) {
+        Land l = landAt(level, pos);
+        if (l != null) {
+            return l;
+        }
+        return inCastleZone(level, pos) ? ZONE : null;
+    }
+
+    public static boolean inCastleZone(ServerLevel level, BlockPos pos) {
+        return CastlePlots.inZone(pos.getX(), pos.getZ()) && dim(level).equals(CastlePlots.def().dim)
+                && CastlePlots.zoneActive(level.getServer());
+    }
+
     public static Land landAt(ServerLevel level, BlockPos pos) {
         return LandData.get(level.getServer()).landAt(dim(level), pos);
     }

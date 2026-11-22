@@ -890,12 +890,11 @@ public final class PlotManager {
         LandManager.SHOW_BORDER.put(p.getUUID(), new long[]{land.id, p.level().getGameTime() + 300});
         p.sendSystemMessage(Component.translatable("rtshop.plot.bought", land.name, money(land.price)).withStyle(ChatFormatting.GREEN));
         if (land.castle() && !land.cleared) {
-            int others = CastlePlots.clearSet(data, land).size() - 1;
+            int objs = CastlePlots.objectColumns(land);
             int n = CastlePlots.prepare(p.server, land);
-            p.sendSystemMessage(Component.translatable(others > 0 ? "rtshop.castle.cleared_group" : "rtshop.castle.cleared", others)
+            p.sendSystemMessage(Component.translatable(objs > 0 ? "rtshop.castle.cleared_objects" : "rtshop.castle.cleared")
                     .withStyle(ChatFormatting.GOLD));
-            RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 평지로 만든 블록 {} (함께 바뀐 이웃 칸 {})",
-                    p.getGameProfile().getName(), land.name, n, others);
+            RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 바꾼 블록 {}", p.getGameProfile().getName(), land.name, n);
         }
         Claim c = plotClaim(land);
         if (c != null) {
@@ -925,7 +924,7 @@ public final class PlotManager {
         land.owner = LandData.NO_OWNER;
         land.ownerName = "";
         land.paid = 0;
-        land.defaultPerms = land.castle() ? LandData.USE : 0;
+        land.defaultPerms = 0;
         land.members.clear();
         data.touch();
     }
@@ -1244,7 +1243,7 @@ public final class PlotManager {
             if (!s.polygon.isEmpty()) {
                 drawPolygon(level, p, s.polygon);
             }
-            if ((now + p.getId()) % 20 == 0) {
+            {
                 LandData data = LandData.get(p.server);
                 int bx = p.getBlockX(), bz = p.getBlockZ();
                 int shown = 0;
@@ -1271,13 +1270,8 @@ public final class PlotManager {
         if (last == null || last != here.id) {
             LAST_PLOT.put(p.getUUID(), here.id);
             Claim c = plotClaim(here);
-            MutableComponent buy = Component.translatable("rtshop.plot.buy_button").withStyle(Style.EMPTY
-                    .withColor(ChatFormatting.GREEN).withBold(true)
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rtshop plot buy"))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            Component.translatable("rtshop.plot.buy_hover", money(here.price), money(Economy.wallet(p))))));
-            p.sendSystemMessage(Component.translatable("rtshop.plot.for_sale", here.name, c == null ? 0 : c.area(),
-                    money(here.price)).withStyle(ChatFormatting.GOLD).append(" ").append(buy));
+            p.sendSystemMessage(Component.translatable("rtshop.plot.for_sale_merchant", here.name, c == null ? 0 : c.area(),
+                    money(here.price)).withStyle(ChatFormatting.GOLD));
             LandManager.SHOW_BORDER.put(p.getUUID(), new long[]{here.id, now + 200});
         }
         return false;
@@ -1286,45 +1280,8 @@ public final class PlotManager {
     /** 칸 모양의 바깥 둘레를 지면 높이를 따라 입자로 그린다 (플레이어 주변 48칸만). */
     public static void drawOutline(ServerLevel level, ServerPlayer sp, ColumnTest t, int x0, int z0, int x1, int z1,
                                    Vector3f color, int cap) {
-        DustParticleOptions dust = new DustParticleOptions(color, 1.3F);
-        int px = sp.getBlockX(), pz = sp.getBlockZ();
-        int ax0 = Math.max(x0, px - 48), ax1 = Math.min(x1, px + 48);
-        int az0 = Math.max(z0, pz - 48), az1 = Math.min(z1, pz + 48);
-        int n = 0;
-        for (int z = az0; z <= az1; z++) {
-            for (int x = ax0; x <= ax1; x++) {
-                if (!t.has(x, z)) {
-                    continue;
-                }
-                boolean w = !t.has(x - 1, z), e = !t.has(x + 1, z), north = !t.has(x, z - 1), south = !t.has(x, z + 1);
-                if (!(w || e || north || south)) {
-                    continue;
-                }
-                if (!level.hasChunk(x >> 4, z >> 4)) {
-                    continue;
-                }
-                double y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z) + 0.15;
-                if (w) {
-                    level.sendParticles(sp, dust, true, x, y, z + 0.5, 1, 0, 0, 0, 0);
-                    n++;
-                }
-                if (e) {
-                    level.sendParticles(sp, dust, true, x + 1.0, y, z + 0.5, 1, 0, 0, 0, 0);
-                    n++;
-                }
-                if (north) {
-                    level.sendParticles(sp, dust, true, x + 0.5, y, z, 1, 0, 0, 0, 0);
-                    n++;
-                }
-                if (south) {
-                    level.sendParticles(sp, dust, true, x + 0.5, y, z + 1.0, 1, 0, 0, 0, 0);
-                    n++;
-                }
-                if (n >= cap) {
-                    return;
-                }
-            }
-        }
+        int y = sp.getBlockY();
+        Borders.columns(sp, t, x0, z0, x1, z1, y - 6, y + 10, Borders.rgb(color));
     }
 
     private static void drawPolygon(ServerLevel level, ServerPlayer sp, List<int[]> pts) {

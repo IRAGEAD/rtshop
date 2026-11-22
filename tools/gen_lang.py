@@ -687,6 +687,19 @@ NEW = {
  "rtshop.plotui.starter_info": ("농부 직업을 얻으면 빈 초보 농지 하나를 무료로 받습니다. 받지 못했다면 [초보 농지 받기] 를 누르세요.", "Farmers get one free starter field. If you didn't get one, press [Get a starter field]."),
  "rtshop.plotui.starter_given": ("이미 초보 농지를 받았습니다 (한 사람당 한 번).", "You already received a starter field (one per player)."),
  "rtshop.plotui.starter_off": ("이 서버에서는 초보 농지를 나눠 주지 않습니다.", "Starter fields are turned off on this server."),
+ "rtshop.plotui.back": ("◀ 토지 상점", "◀ Land shop"),
+ "rtshop.plotui.you": ("나", "You"),
+ "rtshop.plotui.map_hint": ("끌기: 이동 · 휠: 확대/축소", "Drag: move · Wheel: zoom"),
+ "rtshop.castle.zone_denied": ("성 영역은 보호되어 있습니다. 토지 상인에게서 산 토지 안에서만 짓고 쓸 수 있습니다.", "The castle area is protected. You can only build and use things inside land bought from the land merchant."),
+ "rtshop.castle.cleared": ("토지 안의 건물·나무를 치우고 평지로 만들었습니다. 길과 남의 토지는 그대로입니다.", "The lot was cleared and levelled. Roads and other people's land are untouched."),
+ "rtshop.castle.cleared_objects": ("토지 경계에 걸쳐 있던 나무·건물은 잘린 채 남지 않도록 통째로 없앴습니다 (남의 토지 부분은 그대로).", "Trees and buildings crossing the border were removed whole so nothing is left cut in half (parts on other people's land are kept)."),
+ "rtshop.plot.for_sale_merchant": ("판매 중인 토지 '%s' (%s칸, %s G) — 토지 상인에게서 살 수 있습니다.", "Lot '%s' for sale (%s blocks, %s G) — buy it from the land merchant."),
+ "rtshop.plot.info_sale": ("'%s' · %s칸 · 판매 중 %s G · 토지 상인에게서 구매", "'%s' · %s blocks · for sale %s G · buy from the land merchant"),
+ "rtshop.plot.denied_sale": ("판매 중인 토지 '%s' 입니다 (%s G). 토지 상인에게서 사야 쓸 수 있습니다.", "This lot '%s' is for sale (%s G). Buy it from the land merchant to use it."),
+ "rtshop.plotui.clear_one": ("· 사면 평지로 만듭니다", "· Buying levels the lot"),
+ "rtshop.plotui.clear_group": ("· 사면 평지로 만들고, 경계에 걸친 나무·건물은 통째로 없앱니다", "· Buying levels the lot and removes trees/buildings crossing its border whole"),
+ "rtshop.plotui.lg_clear": ("함께 없어짐", "Removed too"),
+ "rtshop.plotui.lg_flat_too": ("함께 없어짐", "Removed too"),
 }
 ko = dict(ko_old); en = dict(en_old)
 for k, (a, b) in NEW.items():

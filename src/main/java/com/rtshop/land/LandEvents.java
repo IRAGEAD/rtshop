@@ -77,7 +77,8 @@ public final class LandEvents {
         Long last = LAST_MSG.get(p.getUUID());
         if (last == null || now - last >= 20 || now < last) {
             LAST_MSG.put(p.getUUID(), now);
-            Component msg = land != null && land.forSale() && !land.group.isEmpty()
+            Component msg = land == LandManager.ZONE ? Component.translatable("rtshop.castle.zone_denied")
+                    : land != null && land.forSale() && !land.group.isEmpty()
                     ? Component.translatable("rtshop.plot.denied_starter", land.name)
                     : land != null && land.forSale()
                     ? Component.translatable("rtshop.plot.denied_sale", land.name, String.format("%,d", land.price))
@@ -90,7 +91,7 @@ public final class LandEvents {
         if (!(level instanceof ServerLevel sl)) {
             return null;
         }
-        return LandManager.landAt(sl, pos);
+        return LandManager.guardAt(sl, pos);
     }
 
     private static boolean allowed(ServerPlayer p, Land land, int perm) {
@@ -107,6 +108,7 @@ public final class LandEvents {
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         UUID id = event.getEntity().getUUID();
+        Borders.forget(id);
         LAST_MSG.remove(id);
         LAST_STORAGE.remove(id);
         LandManager.SHOW_BORDER.remove(id);
@@ -120,7 +122,7 @@ public final class LandEvents {
             return;
         }
         BlockPos pos = event.getPos();
-        Land land = LandManager.landAt(level, pos);
+        Land land = LandManager.guardAt(level, pos);
         if (land == null) {
             return;
         }
@@ -148,7 +150,7 @@ public final class LandEvents {
         Land deniedLand = null;
         if (event instanceof BlockEvent.EntityMultiPlaceEvent multi) {
             for (BlockSnapshot snap : multi.getReplacedBlockSnapshots()) {
-                Land land = LandManager.landAt(level, snap.getPos());
+                Land land = LandManager.guardAt(level, snap.getPos());
                 if (!allowed(sp, land, LandData.PLACE)) {
                     denied = true;
                     deniedLand = land;
@@ -156,7 +158,7 @@ public final class LandEvents {
                 }
             }
         } else {
-            Land land = LandManager.landAt(level, event.getPos());
+            Land land = LandManager.guardAt(level, event.getPos());
             if (!allowed(sp, land, LandData.PLACE)) {
                 denied = true;
                 deniedLand = land;
@@ -169,7 +171,7 @@ public final class LandEvents {
                 if (!LandManager.isStorage(level, n)) {
                     continue;
                 }
-                Land land = LandManager.landAt(level, n);
+                Land land = LandManager.guardAt(level, n);
                 if (land == null) {
                     continue;
                 }
@@ -213,7 +215,7 @@ public final class LandEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onTrample(BlockEvent.FarmlandTrampleEvent event) {
         if (event.getLevel() instanceof ServerLevel level) {
-            Land land = LandManager.landAt(level, event.getPos());
+            Land land = LandManager.guardAt(level, event.getPos());
             if (land != null && !(event.getEntity() instanceof ServerPlayer sp && allowed(sp, land, LandData.BREAK))) {
                 event.setCanceled(true);
             }
@@ -231,12 +233,12 @@ public final class LandEvents {
             return; // 구획 지팡이(OP)는 토지 위에서도 칸을 고를 수 있어야 한다
         }
         BlockPos pos = event.getPos();
-        Land land = LandManager.landAt(level, pos);
+        Land land = LandManager.guardAt(level, pos);
         boolean storage = LandManager.isStorage(level, pos);
         // 아이템 사용(블록 설치, 양동이, 부싯돌 등): 대상 칸이나 그 앞 칸이 남의 토지면 막는다
         Direction face = event.getFace();
         BlockPos front = face == null ? pos : pos.relative(face);
-        Land frontLand = LandManager.landAt(level, front);
+        Land frontLand = LandManager.guardAt(level, front);
         boolean itemOk = allowed(sp, land, LandData.PLACE) && allowed(sp, frontLand, LandData.PLACE);
         if (land != null) {
             int perm = storage ? LandData.CONTAINER : LandData.USE;
@@ -301,8 +303,8 @@ public final class LandEvents {
         BlockPos pos = hit.getBlockPos();
         BlockPos front = pos.relative(hit.getDirection());
         int perm = empty ? LandData.BREAK : LandData.PLACE;
-        Land a = LandManager.landAt(level, pos);
-        Land b = LandManager.landAt(level, front);
+        Land a = LandManager.guardAt(level, pos);
+        Land b = LandManager.guardAt(level, front);
         if (!allowed(sp, a, perm) || !allowed(sp, b, perm)) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.FAIL);
@@ -317,7 +319,7 @@ public final class LandEvents {
             return;
         }
         if (event.getTarget() instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK) {
-            Land land = LandManager.landAt(level, hit.getBlockPos());
+            Land land = LandManager.guardAt(level, hit.getBlockPos());
             if (!allowed(sp, land, LandData.BREAK)) {
                 event.setCanceled(true);
                 deny(sp, land);
@@ -335,7 +337,7 @@ public final class LandEvents {
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if (event.getEntity() instanceof ServerPlayer sp && event.getLevel() instanceof ServerLevel level
                 && protectedEntity(event.getTarget())) {
-            Land land = LandManager.landAt(level, event.getTarget().blockPosition());
+            Land land = LandManager.guardAt(level, event.getTarget().blockPosition());
             if (!allowed(sp, land, LandData.ENTITY)) {
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.FAIL);
@@ -348,7 +350,7 @@ public final class LandEvents {
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         if (event.getEntity() instanceof ServerPlayer sp && event.getLevel() instanceof ServerLevel level
                 && protectedEntity(event.getTarget())) {
-            Land land = LandManager.landAt(level, event.getTarget().blockPosition());
+            Land land = LandManager.guardAt(level, event.getTarget().blockPosition());
             if (!allowed(sp, land, LandData.ENTITY)) {
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.FAIL);
@@ -361,11 +363,48 @@ public final class LandEvents {
     public static void onAttack(AttackEntityEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp && sp.level() instanceof ServerLevel level
                 && protectedEntity(event.getTarget())) {
-            Land land = LandManager.landAt(level, event.getTarget().blockPosition());
+            Land land = LandManager.guardAt(level, event.getTarget().blockPosition());
             if (!allowed(sp, land, LandData.ENTITY)) {
                 event.setCanceled(true);
                 deny(sp, land);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            PlotBrowser.tickJobs();
+        }
+    }
+
+    // ------------------------------------------------------------------ 성 영역: 몬스터 스폰 금지
+
+    private static boolean monster(net.minecraft.world.entity.EntityType<?> type) {
+        return type.getCategory() == net.minecraft.world.entity.MobCategory.MONSTER;
+    }
+
+    @SubscribeEvent
+    public static void onSpawnCheck(net.minecraftforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck event) {
+        if (monster(event.getEntityType()) && event.getLevel().getLevel() instanceof ServerLevel level
+                && LandManager.inCastleZone(level, event.getPos())) {
+            event.setResult(Event.Result.DENY);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onFinalizeSpawn(net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn event) {
+        var mob = event.getEntity();
+        if (!(mob instanceof Enemy) && !monster(mob.getType())) {
+            return;
+        }
+        var type = event.getSpawnType();
+        if (type == net.minecraft.world.entity.MobSpawnType.SPAWN_EGG || type == net.minecraft.world.entity.MobSpawnType.COMMAND
+                || type == net.minecraft.world.entity.MobSpawnType.BUCKET) {
+            return;
+        }
+        if (event.getLevel().getLevel() instanceof ServerLevel level && LandManager.inCastleZone(level, mob.blockPosition())) {
+            event.setSpawnCancelled(true);
         }
     }
 
@@ -376,9 +415,9 @@ public final class LandEvents {
         if (!LandConfig.get().protectFromExplosions || !(event.getLevel() instanceof ServerLevel level)) {
             return;
         }
-        event.getAffectedBlocks().removeIf(pos -> LandManager.landAt(level, pos) != null);
+        event.getAffectedBlocks().removeIf(pos -> LandManager.guardAt(level, pos) != null);
         event.getAffectedEntities().removeIf(e -> protectedEntity(e) && !(e instanceof net.minecraft.world.entity.LivingEntity)
-                && LandManager.landAt(level, e.blockPosition()) != null);
+                && LandManager.guardAt(level, e.blockPosition()) != null);
     }
 
     @SubscribeEvent
@@ -391,7 +430,7 @@ public final class LandEvents {
             return;
         }
         try {
-            Land own = LandManager.landAt(level, event.getPos());
+            Land own = LandManager.guardAt(level, event.getPos());
             UUID owner = own == null ? null : own.owner;
             var helper = event.getStructureHelper();
             if (helper == null) {
@@ -411,7 +450,7 @@ public final class LandEvents {
     }
 
     private static boolean crosses(ServerLevel level, UUID pistonOwner, BlockPos pos) {
-        Land land = LandManager.landAt(level, pos);
+        Land land = LandManager.guardAt(level, pos);
         return land != null && !land.owner.equals(pistonOwner);
     }
 
@@ -436,7 +475,7 @@ public final class LandEvents {
             return;
         }
         BlockPos pos = new BlockPos((int) last[0], (int) last[1], (int) last[2]);
-        Land land = LandManager.landAt(level, pos);
+        Land land = LandManager.guardAt(level, pos);
         if (land == null) {
             return;
         }
@@ -462,6 +501,14 @@ public final class LandEvents {
         if ((now + sp.getId()) % 10 != 0) {
             return;
         }
+        try {
+            tickBorders(sp, level, now);
+        } finally {
+            Borders.flush(sp);
+        }
+    }
+
+    private static void tickBorders(ServerPlayer sp, ServerLevel level, long now) {
         if (PlotManager.tick(sp, level, now)) {
             return; // 구획 지팡이를 든 OP: 선택 영역을 그렸음
         }
@@ -475,15 +522,13 @@ public final class LandEvents {
         String dim = LandManager.dim(level);
         if (deed != null) {
             LandManager.Candidate c = LandManager.candidate(sp, deed.type);
-            drawBox(level, sp, c.x0, c.y0, c.z0, c.x1, c.y1, c.z1, c.error == null ? GREEN : RED, deed.type.size > 16 ? 2 : 1);
-            if ((now + sp.getId()) % 20 == 0) {
-                int shown = 0;
-                for (Claim o : data.claimsNear(dim, c.x0, c.y0, c.z0, c.x1, c.y1, c.z1, 24)) {
-                    Land l = data.land(o.landId);
-                    drawClaim(level, sp, o, l != null && l.owner.equals(sp.getUUID()) ? AQUA : ORANGE, 2);
-                    if (++shown >= 4) {
-                        break;
-                    }
+            Borders.box(sp, c.x0, c.y0, c.z0, c.x1, c.y1, c.z1, Borders.rgb(c.error == null ? GREEN : RED));
+            int shown = 0;
+            for (Claim o : data.claimsNear(dim, c.x0, c.y0, c.z0, c.x1, c.y1, c.z1, 24)) {
+                Land l = data.land(o.landId);
+                Borders.claim(sp, o, Borders.rgb(l != null && l.owner.equals(sp.getUUID()) ? AQUA : ORANGE));
+                if (++shown >= 6) {
+                    break;
                 }
             }
             return;
@@ -492,7 +537,7 @@ public final class LandEvents {
         if (show != null) {
             if (show[1] < now) {
                 LandManager.SHOW_BORDER.remove(sp.getUUID());
-            } else if ((now + sp.getId()) % 20 == 0) {
+            } else {
                 Land land = data.land((int) show[0]);
                 if (land != null) {
                     int shown = 0;
@@ -501,7 +546,7 @@ public final class LandEvents {
                                 && sp.distanceToSqr((o.x0 + o.x1) / 2.0, sp.getY(), (o.z0 + o.z1) / 2.0) > 96 * 96)) {
                             continue;
                         }
-                        drawClaim(level, sp, o, AQUA, 2);
+                        Borders.claim(sp, o, Borders.rgb(AQUA));
                         if (++shown >= 6) {
                             break;
                         }
