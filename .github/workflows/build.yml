@@ -322,6 +322,8 @@ jobs:
           cp server/rtshop-selftest.txt /tmp/fpshots/ 2>/dev/null || true
           mkdir -p /tmp/fpshots/crash && cp client/crash-reports/*.txt /tmp/fpshots/crash/ 2>/dev/null || true
           tail -n 400 client/logs/latest.log > /tmp/fpshots/client-tail.log 2>/dev/null || true
+          grep -n -A45 "server-side action failed" client/logs/latest.log | head -n 400 > /tmp/fpshots/server-action-errors.txt 2>/dev/null || true
+          grep -n -B12 "rtshop-clienttest\] FAIL" client/logs/latest.log | cut -c1-400 | head -n 600 > /tmp/fpshots/fail-context.txt 2>/dev/null || true
           grep -n -B3 -A8 "Critical injection\|InjectionError\|VillagerTrades" client/logs/latest.log | head -n 200 > /tmp/fpshots/mixin-errors.txt 2>/dev/null || true
           # 어떤 모드가 주민 거래(VillagerTrades)를 Mixin 으로 고치는지
           python3 - packcache > /tmp/fpshots/villager-trade-mixins.txt <<'PY' || true
