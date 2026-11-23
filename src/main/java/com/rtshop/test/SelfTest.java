@@ -2131,6 +2131,21 @@ public final class SelfTest {
             RtShop.LOGGER.info("[rtshop-selftest] IDAS vanilla structures: {} {}", n, com.rtshop.compat.IdasVanilla.LAST);
             check("IDAS no longer switches off vanilla structures the story needs (desert pyramid etc.)",
                     java.nio.file.Files.exists(com.rtshop.compat.IdasVanilla.marker()), n + " " + com.rtshop.compat.IdasVanilla.LAST);
+            // 스토리에 필요한 바닐라 구조물을 실제로 찾을 수 있는가 (/locate 와 같은 방법, 시작점 둘레 64 청크)
+            var sreg = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+            for (String sid : List.of("#minecraft:ruined_portal", "minecraft:desert_pyramid", "minecraft:mansion", "minecraft:ancient_city")) {
+                net.minecraft.core.HolderSet<net.minecraft.world.level.levelgen.structure.Structure> set;
+                if (sid.startsWith("#")) {
+                    set = sreg.getTag(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, new ResourceLocation(sid.substring(1)))).orElse(null);
+                } else {
+                    var h = sreg.getHolder(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE, new ResourceLocation(sid)));
+                    set = h.isPresent() ? net.minecraft.core.HolderSet.direct(h.get()) : null;
+                }
+                long t0 = System.currentTimeMillis();
+                var found = set == null ? null : level.getChunkSource().getGenerator().findNearestMapStructure(level, set, level.getSharedSpawnPos(), 64, false);
+                RtShop.LOGGER.info("[rtshop-selftest] locate {}: {} ({} ms)", sid, found == null ? "none" : found.getFirst(), System.currentTimeMillis() - t0);
+                check("the story's vanilla structure can be found in this world: " + sid, found != null, found == null ? "none" : found.getFirst());
+            }
         }
         com.rtshop.story.WildSpawns.reload();
         check("story mods spawn far less in the open (Mowzie's / Aquamirae keep 15%), normal in their own structures and story biomes",

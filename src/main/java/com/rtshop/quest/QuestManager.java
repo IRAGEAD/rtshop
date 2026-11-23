@@ -1114,18 +1114,22 @@ public final class QuestManager {
                     if (ob.target.startsWith("#")) {
                         net.minecraft.tags.TagKey<net.minecraft.world.level.levelgen.structure.Structure> tag =
                                 net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, new ResourceLocation(ob.target.substring(1)));
-                        return sm.getStructureWithPieceAt(pos, tag).isValid();
+                        if (sm.getStructureWithPieceAt(pos, tag).isValid()) return true;
+                        for (net.minecraft.world.level.levelgen.structure.Structure s : sm.getAllStructuresAt(pos).keySet()) {
+                            if (reg.wrapAsHolder(s).is(tag) && near(sm, pos, s)) return true;
+                        }
+                        return false;
                     }
                     if (ob.target.endsWith(":*")) {
                         String ns = ob.target.substring(0, ob.target.length() - 2);
                         for (net.minecraft.world.level.levelgen.structure.Structure s : sm.getAllStructuresAt(pos).keySet()) {
                             ResourceLocation key = reg.getKey(s);
-                            if (key != null && key.getNamespace().equals(ns) && sm.getStructureWithPieceAt(pos, s).isValid()) return true;
+                            if (key != null && key.getNamespace().equals(ns) && (sm.getStructureWithPieceAt(pos, s).isValid() || near(sm, pos, s))) return true;
                         }
                         return false;
                     }
                     net.minecraft.world.level.levelgen.structure.Structure s = reg.get(new ResourceLocation(ob.target));
-                    return s != null && sm.getStructureWithPieceAt(pos, s).isValid();
+                    return s != null && (sm.getStructureWithPieceAt(pos, s).isValid() || near(sm, pos, s));
                 }
                 default:
                     return false;
@@ -1133,6 +1137,13 @@ public final class QuestManager {
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    /** 구조물 곁 (작은 구조물은 조각 안에 딱 서기 어렵다: 전체 범위를 8칸 넓혀 본다). */
+    private static boolean near(net.minecraft.world.level.StructureManager sm, net.minecraft.core.BlockPos pos,
+                                net.minecraft.world.level.levelgen.structure.Structure s) {
+        net.minecraft.world.level.levelgen.structure.StructureStart st = sm.getStructureAt(pos, s);
+        return st.isValid() && st.getBoundingBox().inflatedBy(8).isInside(pos);
     }
 
     /** 방문 목표 진행 (지금 위치 기준). */
