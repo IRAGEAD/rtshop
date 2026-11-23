@@ -203,6 +203,37 @@ jobs:
           (curl -fsSL -o /tmp/cfr.jar https://repo1.maven.org/maven2/org/benf/cfr/0.152/cfr-0.152.jar \
             && java -jar /tmp/cfr.jar "$CJ" --outputdir /tmp/inspect/cinematic-src --silent true > /tmp/inspect/cinematic-cfr.log 2>&1) || echo "cfr failed"
           ls /tmp/inspect/cinematic-src | head
+          # 스토리 개편: Bosses'Rise 모드의 보스·아이템·구조물 조사 (모드팩에 아직 없는 모드라 직접 받아 본다)
+          {
+            curl -fsSL -A "rtshop-ci" "https://api.cfwidget.com/minecraft/mc-mods/bossesrise" -o /tmp/br.json || echo "cfwidget failed"
+            python3 - <<'PY'
+          import json, re, urllib.request, urllib.parse, os, zipfile
+          try:
+              d = json.load(open('/tmp/br.json'))
+              print('project', d.get('id'), d.get('title'))
+              files = [f for f in d.get('files', []) if '1.20.1' in f.get('versions', []) and any(v.lower() == 'forge' for v in f.get('versions', []))]
+              files.sort(key=lambda f: f.get('uploaded_at', ''), reverse=True)
+              for f in files[:5]: print('file', f.get('id'), f.get('name'), f.get('uploaded_at'), f.get('versions'))
+              if files:
+                  url = f"https://www.curseforge.com/api/v1/mods/{d['id']}/files/{files[0]['id']}/download"
+                  req = urllib.request.Request(url, headers={'User-Agent': 'rtshop-ci'})
+                  data = urllib.request.urlopen(req, timeout=120).read()
+                  open('/tmp/br.jar', 'wb').write(data)
+                  z = zipfile.ZipFile('/tmp/br.jar')
+                  names = z.namelist()
+                  print('size', len(data), 'entries', len(names))
+                  for n in names:
+                      if n.startswith('META-INF/mods.toml'): print(z.read(n).decode('utf8', 'replace')[:1500])
+                  for n in names:
+                      if re.search(r'lang/(en_us|ko_kr)\.json$', n):
+                          print('====', n); print(z.read(n).decode('utf8', 'replace')[:60000])
+                  print('==== structures / loot / entity textures')
+                  for n in names:
+                      if re.search(r'(structures?/|worldgen/|loot_tables/entities|textures/entity|geo/|advancements/)', n) and not n.endswith('/'): print(n)
+          except Exception as e:
+              print('bossesrise inspect failed', e)
+          PY
+          } > /tmp/inspect/bossesrise.txt 2>&1 || true
           # Epic Fight Nightfall 크래시 조사: Entity Culling 연동 코드와 무기 속도 계산
           NF="$PWD/../../$(true)"
           cd "$GITHUB_WORKSPACE"
