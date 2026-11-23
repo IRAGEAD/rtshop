@@ -1338,5 +1338,9 @@
   "rtshop.hud.ui_size": "Window text: %s",
   "rtshop.hud.ui_size.0": "Small",
   "rtshop.hud.ui_size.1": "Normal",
-  "rtshop.hud.ui_size.2": "Large"
+  "rtshop.hud.ui_size.2": "Large",
+  "rtshop.hud.font_sans": "Sans (Noto Sans)",
+  "rtshop.hud.font_serif": "Serif (Noto Serif)",
+  "rtshop.hud.font_serif_bold": "Serif bold",
+  "rtshop.hud.font_title": "Serif title (large)"
 }

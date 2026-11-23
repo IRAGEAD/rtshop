@@ -35,7 +35,7 @@ public final class HudFonts {
             Minecraft.getInstance().getResourceManager().listResources("font", rl -> rl.getPath().endsWith(".json")).keySet().forEach(rl -> {
                 String path = rl.getPath().substring("font/".length(), rl.getPath().length() - ".json".length());
                 String id = rl.getNamespace() + ":" + path;
-                if (path.startsWith("include/") || (id.startsWith("rtshop:ui_") && (id.endsWith("_s") || id.endsWith("_l"))) || id.equals("minecraft:alt") || id.equals("minecraft:illageralt")
+                if (path.startsWith("include/") || (id.startsWith("rtshop:ui_") && !id.equals("rtshop:ui_serif")) || id.equals("minecraft:alt") || id.equals("minecraft:illageralt")
                         || id.equals("minecraft:default") || found.contains(id)) {
                     return;
                 }
@@ -61,6 +61,13 @@ public final class HudFonts {
         }
         if (id.equals("minecraft:uniform")) {
             return Component.translatable("rtshop.hud.font_uniform").getString();
+        }
+        switch (id) {
+            case "rtshop:raid_sans": return Component.translatable("rtshop.hud.font_sans").getString();
+            case "rtshop:ui_serif": return Component.translatable("rtshop.hud.font_serif").getString();
+            case "rtshop:raid_serif": return Component.translatable("rtshop.hud.font_serif_bold").getString();
+            case "rtshop:raid_title": return Component.translatable("rtshop.hud.font_title").getString();
+            default: break;
         }
         return id;
     }

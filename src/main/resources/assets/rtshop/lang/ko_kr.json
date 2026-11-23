@@ -1338,5 +1338,9 @@
   "rtshop.hud.ui_size": "창 글자 크기: %s",
   "rtshop.hud.ui_size.0": "작게",
   "rtshop.hud.ui_size.1": "보통",
-  "rtshop.hud.ui_size.2": "크게"
+  "rtshop.hud.ui_size.2": "크게",
+  "rtshop.hud.font_sans": "고딕 (Noto Sans)",
+  "rtshop.hud.font_serif": "명조 (Noto Serif)",
+  "rtshop.hud.font_serif_bold": "명조 굵게",
+  "rtshop.hud.font_title": "명조 큰 제목"
 }
