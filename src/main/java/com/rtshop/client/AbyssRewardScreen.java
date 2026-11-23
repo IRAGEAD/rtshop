@@ -68,7 +68,7 @@ public class AbyssRewardScreen extends Screen {
         Fx2D.begin(g, true);
         Fx2D.glow(x + W / 2F, y + 16, tw * 0.6F, 14, Fx2D.rgba(AbyssPanel.VIOLET, 0.35F), Fx2D.rgba(AbyssPanel.VIOLET, 0));
         Fx2D.end();
-        RaidText.outlined(g, this.font, title, RaidText.TITLE, x + W / 2 - tw / 2, y + 9, RaidFx.GOLD_HI, 0xB0100820);
+        RaidText.engraved(g, this.font, title, RaidText.TITLE, x + W / 2 - tw / 2, y + 9, 12);
         RaidText.center(g, this.font, AbyssPanel.reset(o), RaidText.SANS, x + W / 2, y + 28, 0xFFB8A8E0);
         RaidFx.hairline(g, x + 16, x + W - 16, y + 40, 0xD4A85A, 0.8F);
         Fx2D.begin(g, false);

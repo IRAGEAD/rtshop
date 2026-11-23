@@ -35,6 +35,7 @@ final class ClientSelfTest2 {
     static volatile int magicSkills;
     static volatile int prevSel;
     static volatile ItemStack prevSlot8 = ItemStack.EMPTY;
+    static final java.util.List<ItemStack> savedInv = new java.util.ArrayList<>();
     private static volatile int landId = -1;
     private static volatile int farmA = -1, farmB = -1;
     private static volatile int dishIdx = -1;
@@ -772,6 +773,10 @@ final class ClientSelfTest2 {
                 com.rtshop.magic.MagicConfig c = com.rtshop.magic.MagicConfig.get();
                 magicSkills = 0;
                 for (String cat : com.rtshop.magic.MagicConfig.CATS) magicSkills += c.pool(cat).size();
+                // 가방을 잠시 비워 둔다 (뽑은 스킬북 10권이 들어갈 자리) — 끝나면 되돌린다
+                savedInv.clear();
+                for (int i = 0; i < sp.getInventory().items.size(); i++) savedInv.add(sp.getInventory().items.get(i).copy());
+                sp.getInventory().items.replaceAll(x -> ItemStack.EMPTY);
                 sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 10));
                 sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET.get(), 20));
                 sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 3));
@@ -866,7 +871,7 @@ final class ClientSelfTest2 {
             mc.setScreen(new FontCalibScreen());
             onServer(mc, sp -> {
                 if (orbPos != null) sp.serverLevel().setBlockAndUpdate(orbPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-                sp.getInventory().setItem(8, prevSlot8);
+                for (int i = 0; i < savedInv.size() && i < sp.getInventory().items.size(); i++) sp.getInventory().items.set(i, savedInv.get(i));
                 sp.getInventory().selected = prevSel;
                 sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(prevSel));
             });

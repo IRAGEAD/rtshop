@@ -677,6 +677,8 @@ NEW = {
  "rtshop.magic.broadcast": ("✦ %s 님이 마법 뽑기에서 전설 스킬북 「%s」을(를) 얻었습니다!", "✦ %s drew the legendary skill book \"%s\"!"),
  "rtshop.magic.broadcast_yamato": ("✦✦ %s 님이 마법 뽑기에서 야마토 스킬북 「%s」을(를) 얻었습니다!", "✦✦ %s drew the Yamato skill book \"%s\"!"),
  "rtshop.magic.broadcast_enchant": ("✦ %s 님이 인챈트 재설정으로 %s 을(를) 붙였습니다!", "✦ %s rerolled into %s!"),
+ "rtshop.hud.font_myeongjo": ("굵은 명조 (레이드)", "Bold Myeongjo (raid)"),
+ "rtshop.hud.font_batang": ("굵은 바탕 (레이드)", "Bold Batang (raid)"),
  "rtshop.qhud.next": ("다음 퀘스트", "Next quest"),
  "rtshop.qhud.next_npc": ("→ %s", "→ %s"),
  "rtshop.qhud.next_more": ("받을 수 있는 퀘스트 %s개 더", "%s more quests available"),

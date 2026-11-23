@@ -377,7 +377,19 @@ public final class RaidFx {
         Fx2D.begin(g, true);
         Fx2D.glow(cx, y + 7, w * 0.62F, 16, Fx2D.rgba(FIRE, 0.30F + 0.10F * (float) Math.sin(time * 1.8F)), Fx2D.rgba(FIRE, 0));
         Fx2D.end();
-        RaidText.draw(g, font, text, RaidText.TITLE, cx - w / 2 + 1, y + 1, 0xFF2A0804);
-        RaidText.outlined(g, font, text, RaidText.TITLE, cx - w / 2, y, 0xFF000000 | rgb, 0xA0140404);
+        // 핏빛 불빛 (고딕 필사본: 금 각인 + 붉은 빛)
+        Fx2D.begin(g, true);
+        Fx2D.glow(cx, y + 7, w * 0.5F, 12, Fx2D.rgba(0xC81E14, 0.26F + 0.08F * (float) Math.sin(time * 2.1F)), Fx2D.rgba(0xC81E14, 0));
+        Fx2D.end();
+        RaidText.engraved(g, font, text, RaidText.TITLE, cx - w / 2, y, 12);
+    }
+
+    /** 고딕 필사체 영문 장식 (제목 위의 작은 글씨) + 양옆 장식선. */
+    public static void gothicBanner(GuiGraphics g, Font font, String text, int cx, int y, float time) {
+        int w = RaidText.w(font, text, RaidText.GOTHIC);
+        RaidText.draw(g, font, text, RaidText.GOTHIC, cx - w / 2 + 1, y + 1, 0xC0200806);
+        RaidText.draw(g, font, text, RaidText.GOTHIC, cx - w / 2, y, 0xFFE8C078);
+        hairline(g, cx - w / 2F - 46, cx - w / 2F - 6, y + 5, 0xD4A85A, 0.8F);
+        hairline(g, cx + w / 2F + 6, cx + w / 2F + 46, y + 5, 0xD4A85A, 0.8F);
     }
 }

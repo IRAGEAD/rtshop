@@ -102,7 +102,7 @@ public class RaidPromptScreen extends Screen {
             return;
         }
         boolean voted = data.get("voted").getAsBoolean();
-        RaidText.outlined(g, this.font, t("voteTitle"), RaidText.SERIF, this.width / 2 - RaidText.w(this.font, t("voteTitle"), RaidText.SERIF) / 2, y + 9, RaidFx.GOLD_HI, 0xC0000000);
+        RaidText.engraved(g, this.font, t("voteTitle"), RaidText.SERIF, this.width / 2 - RaidText.w(this.font, t("voteTitle"), RaidText.SERIF) / 2, y + 9, 8);
         RaidFx.hairline(g, x + 20, x + w - 20, y + 21, 0xD4A85A, 0.9F);
         String count;
         try {

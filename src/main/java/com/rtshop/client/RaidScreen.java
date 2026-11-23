@@ -175,8 +175,16 @@ public class RaidScreen extends Screen {
         String sub = t("uiSub");
         int sw = RaidText.w(this.font, sub, RaidText.SANS);
         RaidText.center(g, this.font, sub, RaidText.SANS, x + W / 2, y + 29, 0xFFC99A62);
-        RaidFx.hairline(g, x + W / 2F - sw / 2F - 70, x + W / 2F - sw / 2F - 8, y + 33, 0xD4A85A, 0.9F);
-        RaidFx.hairline(g, x + W / 2F + sw / 2F + 8, x + W / 2F + sw / 2F + 70, y + 33, 0xD4A85A, 0.9F);
+        // 고딕 필사체 장식: 부제 양옆에 "Abyssal" · "Raid"
+        int lw = RaidText.w(this.font, "Abyssal", RaidText.GOTHIC);
+        int gl = x + W / 2 - sw / 2 - 12 - lw, gr = x + W / 2 + sw / 2 + 12;
+        RaidText.draw(g, this.font, "Abyssal", RaidText.GOTHIC, gl + 1, y + 28, 0xC0200806);
+        RaidText.draw(g, this.font, "Abyssal", RaidText.GOTHIC, gl, y + 27, 0xFFE0B868);
+        RaidText.draw(g, this.font, "Raid", RaidText.GOTHIC, gr + 1, y + 28, 0xC0200806);
+        RaidText.draw(g, this.font, "Raid", RaidText.GOTHIC, gr, y + 27, 0xFFE0B868);
+        int rw = RaidText.w(this.font, "Raid", RaidText.GOTHIC);
+        RaidFx.hairline(g, gl - 50, gl - 6, y + 33, 0xD4A85A, 0.9F);
+        RaidFx.hairline(g, gr + rw + 6, gr + rw + 50, y + 33, 0xD4A85A, 0.9F);
         RaidFx.hairline(g, x + 12, x + W - 12, y + 42, 0xD4A85A, 0.75F);
         int[] c = closeBtn();
         boolean ch = !confirm && Ui.inside(mx, my, c[0], c[1], c[2], c[3]);
@@ -398,7 +406,7 @@ public class RaidScreen extends Screen {
         Fx2D.diamond(nx + 6, ny + 6.5F, 2F, 2F, 0, RaidFx.GOLD_HI);
         Fx2D.diamond(nx + nw - 6, ny + 6.5F, 2F, 2F, 0, RaidFx.GOLD_HI);
         Fx2D.end();
-        RaidText.outlined(g, this.font, name, RaidText.SERIF, nx + 14, ny + 3, 0xFFFFF1D6, 0xC0000000);
+        RaidText.engraved(g, this.font, name, RaidText.SERIF, nx + 14, ny + 3, 8);
         String full = t("dialogue" + (phase + 1));
         int shown = (int) Math.min(full.length(), (System.currentTimeMillis() - lineAt) / 22);
         int ty = by + 14;

@@ -1477,5 +1477,7 @@
   "rtshop.magic.autofilled": "Rebuilt the lists: %s skill books, %s enchantments.",
   "rtshop.magic.broadcast": "✦ %s drew the legendary skill book \"%s\"!",
   "rtshop.magic.broadcast_yamato": "✦✦ %s drew the Yamato skill book \"%s\"!",
-  "rtshop.magic.broadcast_enchant": "✦ %s rerolled into %s!"
+  "rtshop.magic.broadcast_enchant": "✦ %s rerolled into %s!",
+  "rtshop.hud.font_myeongjo": "Bold Myeongjo (raid)",
+  "rtshop.hud.font_batang": "Bold Batang (raid)"
 }

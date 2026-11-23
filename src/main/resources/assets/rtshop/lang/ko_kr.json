@@ -1477,5 +1477,7 @@
   "rtshop.magic.autofilled": "스킬북 %s개와 인챈트 %s개로 목록을 다시 만들었습니다.",
   "rtshop.magic.broadcast": "✦ %s 님이 마법 뽑기에서 전설 스킬북 「%s」을(를) 얻었습니다!",
   "rtshop.magic.broadcast_yamato": "✦✦ %s 님이 마법 뽑기에서 야마토 스킬북 「%s」을(를) 얻었습니다!",
-  "rtshop.magic.broadcast_enchant": "✦ %s 님이 인챈트 재설정으로 %s 을(를) 붙였습니다!"
+  "rtshop.magic.broadcast_enchant": "✦ %s 님이 인챈트 재설정으로 %s 을(를) 붙였습니다!",
+  "rtshop.hud.font_myeongjo": "굵은 명조 (레이드)",
+  "rtshop.hud.font_batang": "굵은 바탕 (레이드)"
 }
