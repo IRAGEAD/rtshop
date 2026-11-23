@@ -236,6 +236,28 @@ public final class ClientSelfTest {
         if (pick != null) {
             RtShop.LOGGER.info("[rtshop-clienttest] pressing '{}' on {}", pick.getMessage().getString(), cls);
             pick.onPress();
+        } else if (cls.contains("ConfirmFixScreen")) {
+            // BCLib 의 데이터 수정 확인 창: 단추가 바닐라 위젯이 아니므로 응답 함수(백업 안 함, 수정 적용)를 직접 부른다
+            for (Class<?> c = s.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+                for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+                    try {
+                        f.setAccessible(true);
+                        Object v = f.get(s);
+                        if (v == null || v instanceof net.minecraft.client.gui.screens.Screen) continue;
+                        for (java.lang.reflect.Method m : v.getClass().getMethods()) {
+                            Class<?>[] pt = m.getParameterTypes();
+                            if (pt.length == 2 && pt[0] == boolean.class && pt[1] == boolean.class) {
+                                RtShop.LOGGER.info("[rtshop-clienttest] answering {} via {}.{}(false, true)", cls, v.getClass().getName(), m.getName());
+                                m.setAccessible(true);
+                                m.invoke(v, false, true);
+                                return;
+                            }
+                        }
+                    } catch (Throwable t) {
+                        RtShop.LOGGER.info("[rtshop-clienttest] could not answer {}: {}", cls, t.toString());
+                    }
+                }
+            }
         }
     }
 
