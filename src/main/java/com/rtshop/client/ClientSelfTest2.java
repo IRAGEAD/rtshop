@@ -694,6 +694,11 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "116b_journal_done");
+            mc.setScreen(new FontCalibScreen());
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "118_font_calib");
             mc.setScreen(null);
             com.rtshop.story.Hunts.testMode = true;
             onServer(mc, sp -> {
