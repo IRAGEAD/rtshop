@@ -1244,7 +1244,7 @@ final class ClientSelfTest2 {
             onServer(mc, sp -> {
                 com.rtshop.quest.QuestManager.NpcDef n = new com.rtshop.quest.QuestManager.NpcDef();
                 n.id = "t_comp";
-                n.name = "{\"ko\":\"기록관 이사벨\",\"en\":\"Isabel\"}";
+                n.name = "기록관 이사벨";
                 com.rtshop.quest.QuestManager.loaded().npcs.put(n.id, n);
                 com.rtshop.quest.QuestDef q = com.rtshop.quest.QuestDef.parse(com.google.gson.JsonParser.parseString(
                         "{\"id\":\"t_inspect\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"INSPECT\",\"target\":\"t_circle\",\"shape\":\"circle\","

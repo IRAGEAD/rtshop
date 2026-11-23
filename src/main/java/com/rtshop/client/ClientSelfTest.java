@@ -1570,7 +1570,7 @@ public final class ClientSelfTest {
             case 48 -> {
                 shot(mc, "27_qedit_goal_popup");
                 if (mc.screen instanceof QuestEditScreen s) {
-                    check("goal types open as a popup list with all 9 choices", s.popupForTest() != null && s.popupForTest().sizeForTest() == 9);
+                    check("goal types open as a popup list with all 10 choices", s.popupForTest() != null && s.popupForTest().sizeForTest() == 10);
                     if (s.popupForTest() != null) {
                         s.popupForTest().pickForTest("DELIVER");
                     }
