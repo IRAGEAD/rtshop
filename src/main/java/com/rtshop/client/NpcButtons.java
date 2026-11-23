@@ -80,6 +80,10 @@ public final class NpcButtons {
                 : Component.translatable("rtshop.npc.quest_button_none").getString();
     }
 
+    private static String talkLabel() {
+        return Component.translatable("rtshop.talk.button").getString();
+    }
+
     private static String editLabel() {
         return Component.translatable("rtshop.shopedit.button").getString();
     }
@@ -90,6 +94,11 @@ public final class NpcButtons {
         Minecraft mc = Minecraft.getInstance();
         int[] spot = s instanceof Host h ? h.npcButtonSpot() : new int[]{6, 6};
         int x = spot[0];
+        if (bound.get() == s) {
+            int w = mc.font.width(talkLabel()) + 12;
+            out.add(new int[]{x, spot[1], w, 2});
+            x += w + 4;
+        }
         if (questButton(s)) {
             int w = mc.font.width(questLabel()) + 12;
             out.add(new int[]{x, spot[1], w, 0});
@@ -119,7 +128,9 @@ public final class NpcButtons {
         g.pose().translate(0, 0, 450);
         for (int[] b : layout(s)) {
             boolean hov = Ui.inside(e.getMouseX(), e.getMouseY(), b[0], b[1], b[2], H);
-            if (b[3] == 0) {
+            if (b[3] == 2) {
+                Ui.button(g, mc.font, b[0], b[1], b[2], H, talkLabel(), hov, true);
+            } else if (b[3] == 0) {
                 String label = questLabel();
                 Ui.bevel(g, b[0], b[1], b[2], H, hov ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
                 g.drawString(mc.font, label, b[0] + (b[2] - mc.font.width(label)) / 2, b[1] + 3, Ui.C_INK, false);
@@ -139,7 +150,11 @@ public final class NpcButtons {
             if (!Ui.inside(e.getMouseX(), e.getMouseY(), b[0], b[1], b[2], H)) continue;
             e.setCanceled(true);
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            if (b[3] == 0) {
+            if (b[3] == 2) {
+                int id = npcId;
+                s.onClose();
+                mc.player.connection.sendCommand("rtshop talk open " + id);
+            } else if (b[3] == 0) {
                 int id = npcId;
                 returnNpc = id;
                 returnArmedAt = System.currentTimeMillis();
@@ -162,6 +177,15 @@ public final class NpcButtons {
         returnArmedAt = System.currentTimeMillis();
         s.onClose();
         mc.player.connection.sendCommand("rtshop quest open " + id);
+        return true;
+    }
+
+    public static boolean pressTalkForTest(Screen s) {
+        if (bound.get() != s) return false;
+        Minecraft mc = Minecraft.getInstance();
+        int id = npcId;
+        s.onClose();
+        mc.player.connection.sendCommand("rtshop talk open " + id);
         return true;
     }
 

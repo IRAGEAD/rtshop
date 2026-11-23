@@ -53,6 +53,14 @@ public class QuestScreen extends Screen {
         return "\u25C0 " + Component.translatable("rtshop.quest.back").getString();
     }
 
+    private String talkLabel() {
+        return Component.translatable("rtshop.talk.button").getString();
+    }
+
+    private int talkW() {
+        return this.font.width(talkLabel()) + 12;
+    }
+
     private int backW() {
         return this.font.width(backLabel()) + 10;
     }
@@ -223,7 +231,7 @@ public class QuestScreen extends Screen {
         Ui.woodFrame(g, fx, fy, W, H);
         g.fill(fx + 5, fy + 4, fx + W - 5, fy + 23, Ui.C_WOOD_DARK);
         g.fill(fx + 5, fy + 22, fx + W - 5, fy + 23, Ui.C_GOLD_DARK);
-        int side = backNpc >= 0 ? backW() + 14 : 20;
+        int side = Math.max(backNpc >= 0 ? backW() + 14 : 20, data.journal ? 20 : talkW() + 14);
         String t = Ui.clip(this.font, this.title.getString(), W - 2 * side);
         g.drawString(this.font, t, fx + (W - this.font.width(t)) / 2, fy + 9, Ui.C_GOLD, true);
         if (backNpc >= 0) {
@@ -231,6 +239,12 @@ public class QuestScreen extends Screen {
             boolean hov = Ui.inside(mx, my, fx + 8, fy + 6, bw, 14);
             Ui.bevel(g, fx + 8, fy + 6, bw, 14, hov ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
             g.drawString(this.font, backLabel(), fx + 13, fy + 9, Ui.C_INK, false);
+        }
+        if (!data.journal) {
+            // [대화]: 이 NPC 와 이야기 (일상·세계관)
+            int tw = talkW();
+            boolean hov = Ui.inside(mx, my, fx + W - 8 - tw, fy + 6, tw, 14);
+            Ui.button(g, this.font, fx + W - 8 - tw, fy + 6, tw, 14, talkLabel(), hov, true);
         }
 
         renderList(g, mx, my);
@@ -434,6 +448,12 @@ public class QuestScreen extends Screen {
         if (backNpc >= 0 && Ui.inside(mx, my, fx + 8, fy + 6, backW(), 14)) {
             click();
             goBack();
+            return true;
+        }
+        if (!data.journal && Ui.inside(mx, my, fx + W - 8 - talkW(), fy + 6, talkW(), 14)) {
+            click();
+            onClose();
+            if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.connection.sendCommand("rtshop talk here");
             return true;
         }
         // 목록

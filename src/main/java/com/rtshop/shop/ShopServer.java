@@ -340,6 +340,32 @@ public final class ShopServer {
                                     feedback(ctx.getSource(), Component.translatable("rtshop.att.cmd_reset", t.getDisplayName()));
                                     return 1;
                                 }))))
+                .then(Commands.literal("talk")
+                        .then(Commands.literal("here").executes(ctx -> {
+                            ServerPlayer sp = ctx.getSource().getPlayerOrException();
+                            int id = QuestManager.sessionEntity(sp);
+                            return id >= 0 && com.rtshop.story.Dialogue.openFor(sp, id) ? 1 : 0;
+                        }))
+                        .then(Commands.literal("open").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
+                                .executes(ctx -> com.rtshop.story.Dialogue.openFor(ctx.getSource().getPlayerOrException(),
+                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity")) ? 1 : 0)))
+                        .then(Commands.literal("done").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
+                                .executes(ctx -> {
+                                    com.rtshop.story.Dialogue.sceneDone(ctx.getSource().getPlayerOrException(),
+                                            com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity"));
+                                    return 1;
+                                })))
+                        .then(Commands.literal("read").then(Commands.argument("npc", StringArgumentType.word()).then(Commands.argument("topic", StringArgumentType.word())
+                                .executes(ctx -> {
+                                    com.rtshop.story.Dialogue.read(ctx.getSource().getPlayerOrException(), StringArgumentType.getString(ctx, "npc"),
+                                            StringArgumentType.getString(ctx, "topic"));
+                                    return 1;
+                                }))))
+                        .then(Commands.literal("lang").then(Commands.argument("lang", StringArgumentType.word())
+                                .executes(ctx -> {
+                                    com.rtshop.story.Loc.set(ctx.getSource().getPlayerOrException(), StringArgumentType.getString(ctx, "lang"));
+                                    return 1;
+                                }))))
                 .then(Commands.literal("quest")
                         .executes(ctx -> {
                             QuestManager.openJournal(ctx.getSource().getPlayerOrException());
@@ -460,6 +486,7 @@ public final class ShopServer {
         com.rtshop.story.StorySeals.reload();
         com.rtshop.story.ScyllaClues.reload();
         com.rtshop.story.Hunts.reload();
+        com.rtshop.story.Dialogue.reload();
         for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) {
             com.rtshop.story.BossIntros.sendLore(sp);
             com.rtshop.story.StoryGates.sync(sp);

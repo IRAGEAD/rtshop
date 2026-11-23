@@ -2164,6 +2164,17 @@ public final class SelfTest {
         long before = Economy.wallet(a);
         boolean done = QuestManager.turnIn(a, "story_1_1", "quest_order_elder", -1);
         check("a FLAG goal is met by an existing flag and the first chapter quest can be handed in", took && done && Economy.wallet(a) > before, took + " " + done);
+        // 대화: 모든 NPC 에게 대화가 있고, 장면이 있는 TALK 목표는 장면을 다 봐야 채워진다
+        check("every NPC has things to talk about (18+ NPCs)", com.rtshop.story.Dialogue.npcCountForTest() >= 18
+                && com.rtshop.story.Dialogue.npcForTest("quest_order_elder") != null && com.rtshop.story.Dialogue.npcForTest("shop_fisher") != null);
+        boolean took2 = QuestManager.accept(a, "story_1_2", "quest_order_elder");
+        boolean pending = com.rtshop.story.Dialogue.pendingScene(a, "quest_order_archivist") != null;
+        QuestManager.onTalk(a, "quest_order_archivist");
+        boolean stillOpen = QuestManager.progressOf(a, "story_1_2")[0] == 0;
+        QuestManager.onTalk(a, "quest_order_archivist", true);
+        boolean filled = QuestManager.progressOf(a, "story_1_2")[0] == 1 && com.rtshop.story.Dialogue.pendingScene(a, "quest_order_archivist") == null;
+        check("a talk goal with a scene waits until the scene is seen, then fills", took2 && pending && stillOpen && filled,
+                took2 + " " + pending + " " + stillOpen + " " + filled);
         QuestDef.Objective dimGoal = new QuestDef.Objective();
         dimGoal.type = QuestDef.Type.DIMENSION;
         dimGoal.target = a.level().dimension().location().toString();

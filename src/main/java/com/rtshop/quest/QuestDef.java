@@ -50,6 +50,8 @@ public final class QuestDef {
         public String text = "";
         /** 모드 조건: "" = 항상, "모드ID" = 그 모드가 있을 때만, "!모드ID" = 그 모드가 없을 때만. */
         public String mod = "";
+        /** TALK: 그 NPC 에게 말을 걸면 대화 상자로 먼저 나오는 장면 ("이름: 대사" 또는 대사). 없으면 바로 채워진다. */
+        public com.google.gson.JsonArray lines;
     }
 
     public static final class ItemReward {
@@ -180,6 +182,7 @@ public final class QuestDef {
             }
             putText(jo, "text", ob.text);
             putText(jo, "mod", ob.mod);
+            if (ob.lines != null && ob.lines.size() > 0) jo.add("lines", ob.lines);
             objs.add(jo);
         }
         o.add("objectives", objs);
@@ -253,6 +256,7 @@ public final class QuestDef {
                 ob.radius = Math.max(1, jo.has("radius") ? jo.get("radius").getAsInt() : 8);
                 ob.text = str(jo, "text", "");
                 ob.mod = str(jo, "mod", "").trim();
+                if (jo.has("lines") && jo.get("lines").isJsonArray()) ob.lines = jo.getAsJsonArray("lines");
                 if (ob.type != Type.PAY && ob.type != Type.VISIT && ob.target.isEmpty()) {
                     throw new IllegalArgumentException("퀘스트 '" + q.id + "' 의 " + ob.type + " 목표에 target 이 없습니다");
                 }

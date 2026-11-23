@@ -64,6 +64,8 @@ public final class ClientConfig {
     public boolean partyHudEnabled = true;
     /** 무기 설명에 무기 분류(검·창·총…)를 적는다. */
     public boolean weaponTypeTooltip = true;
+    /** 대화 상자 글자가 써질 때 나는 작은 소리. */
+    public boolean dialogueSound = true;
     public double pvpHudX = PDEF_X;
     public double pvpHudY = PDEF_Y;
     public double pvpHudWidth = PDEF_W;
@@ -164,6 +166,7 @@ public final class ClientConfig {
             o.addProperty("pvpHudEnabled", pvpHudEnabled);
             o.addProperty("partyHudEnabled", partyHudEnabled);
             o.addProperty("weaponTypeTooltip", weaponTypeTooltip);
+            o.addProperty("dialogueSound", dialogueSound);
             o.addProperty("pvpHudX", pvpHudX);
             o.addProperty("pvpHudY", pvpHudY);
             o.addProperty("pvpHudWidth", pvpHudWidth);
@@ -214,6 +217,7 @@ public final class ClientConfig {
                 if (o.has("pvpHudEnabled")) c.pvpHudEnabled = o.get("pvpHudEnabled").getAsBoolean();
                 if (o.has("partyHudEnabled")) c.partyHudEnabled = o.get("partyHudEnabled").getAsBoolean();
                 if (o.has("weaponTypeTooltip")) c.weaponTypeTooltip = o.get("weaponTypeTooltip").getAsBoolean();
+                if (o.has("dialogueSound")) c.dialogueSound = o.get("dialogueSound").getAsBoolean();
                 if (o.has("pvpHudX")) c.pvpHudX = o.get("pvpHudX").getAsDouble();
                 if (o.has("pvpHudY")) c.pvpHudY = o.get("pvpHudY").getAsDouble();
                 if (o.has("pvpHudWidth")) c.pvpHudWidth = o.get("pvpHudWidth").getAsDouble();

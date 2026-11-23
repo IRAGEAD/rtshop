@@ -23,7 +23,7 @@ def vision(speaker, text, color="FF7A20", sound="minecraft:block.respawn_anchor.
 def line(speaker, text, color="E8C878"):
     return {"kind": "line", "speaker": speaker, "text": text, "color": color}
 
-def talk(npc, text=""): return {"type": "TALK", "target": npc, **({"text": text} if text else {})}
+def talk(npc, text="", lines=None): return {"type": "TALK", "target": npc, **({"text": text} if text else {}), **({"lines": lines} if lines else {})}
 def kill(ent, n=1, text="", mod=""): return {"type": "KILL", "target": ent, "count": n, **({"text": text} if text else {}), **({"mod": mod} if mod else {})}
 def deliver(item, n=1, text="", mod=""): return {"type": "DELIVER", "target": item, "count": n, **({"text": text} if text else {}), **({"mod": mod} if mod else {})}
 def struct(sid, text, mod=""): return {"type": "STRUCTURE", "target": sid, "text": text, **({"mod": mod} if mod else {})}
@@ -69,7 +69,11 @@ p = q("story_1_2", C1 + " (2/8)", "견습 서약", ELDER,
       "수도회의 견습이 되려면 서약을 해야 하네. 기록관 이사벨에게 가서 서약서를 받아 오게. 그리고 내 앞에서 외우는 거야. \"불을 지키고, 봉인을 지킨다.\"",
       "기록관 이사벨을 만나고 오게.",
       "\"불을 지키고, 봉인을 지킨다.\" …좋네. 오늘부터 자네는 잿불 수도회의 견습일세. 오늘 밤은 푹 자 두게. 첫날 밤엔 다들 이상한 꿈을 꾸거든.",
-      [talk(ARCH, "기록관 이사벨")], gold=800, items=[item("rtshop:oath_scroll"), item("rtshop:undying_ember")], requires=[p], flags=["order_apprentice"],
+      [talk(ARCH, "기록관 이사벨", [
+          "기록관 이사벨: 아, 장로님이 보내셨군요! 서약서는 여기 있어요.",
+          "기록관 이사벨: 서약은 세 줄이에요. 첫째, 불을 지킨다. 둘째, 봉인을 지킨다. 셋째… 셋째 줄은 지워져 있네요. 이상하다.",
+          "기록관 이사벨: 신경 쓰지 마세요. 오래된 종이니까요. 장로님께 가져가서 외우면 돼요.",
+      ])], gold=800, items=[item("rtshop:oath_scroll"), item("rtshop:undying_ember")], requires=[p], flags=["order_apprentice"],
       sceneDone=vision("꿈속의 불타는 기사", "또 왔구나, 견습이여.\n이 불씨를 쥐어라. 언젠가 네가 지켜야 할 것이다."))
 p = q("story_1_3", C1 + " (3/8)", "찢긴 연대기", ARCH,
       "수도회의 「잿빛 연대기」예요. 일곱 세력이 세계의 힘을 '눈'에 담아 봉인한 이야기가 적혀 있죠. 그런데… 보세요. 이 부분은 낡아서 떨어진 게 아니라, 누군가 칼로 잘라 낸 자국이에요. 잃어버린 페이지는 옛 유적에 흩어졌다는 소문이 있어요. 무너진 차원문 근처부터 찾아봐 주세요.",
@@ -102,7 +106,11 @@ p = q("story_1_8", C1 + " (8/8)", "깨어나는 수호자들", ELDER,
       "수도회의 옛 기록에 이런 구절이 있네. \"불이 깨어나면 땅의 수호자들이 먼저 미친다.\" 지하의 녹슨 기사, 얼음 거인, 산꼭대기의 석공, 태양의 사제… 그들이 깨어나고 있어. 탐험대장 로란에게 보고하게. 이제부터가 진짜 원정일세.",
       "탐험대장 로란에게 보고하게.",
       "수호자들이라… 좋다, 원정대를 꾸리지. 이제부터 장비 상인도 원정대에 쓸 좋은 장비(희귀 등급)를 내놓을 거다.",
-      [talk(CAPT, "탐험대장 로란")], gold=1300, requires=[p], flags=["story_ch1_done"],
+      [talk(CAPT, "탐험대장 로란", [
+          "탐험대장 로란: 장로가 보냈냐. 얼굴 보니 알겠다. 수호자들 이야기지?",
+          "탐험대장 로란: 이십 년 전에도 같은 일이 있었다. 그때 원정대는 나만 돌아왔다.",
+          "탐험대장 로란: 이번엔 다르게 한다. 네가 있으니까. 준비되면 다시 말 걸어라.",
+      ])], gold=1300, requires=[p], flags=["story_ch1_done"],
       sceneDone=line("탐험대장 로란", "1장 「잿불의 서약」 끝. 수호자들이 깨어난다."))
 
 # ================================================================ 2장 「깨어난 수호자들」 (Mowzie's Mobs)

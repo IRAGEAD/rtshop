@@ -437,6 +437,30 @@ public final class QuestManager {
         return prog(p).flags.contains(flag);
     }
 
+    /** 진행 중인 퀘스트들. */
+    public static List<QuestDef> activeQuests(ServerPlayer p) {
+        List<QuestDef> out = new ArrayList<>();
+        for (String id : prog(p).active.keySet()) {
+            QuestDef q = loaded.quests.get(id);
+            if (q != null) out.add(q);
+        }
+        return out;
+    }
+
+    public static int[] progressOf(ServerPlayer p, String questId) {
+        return prog(p).active.get(questId);
+    }
+
+    /** 지금 열려 있는 퀘스트 창의 NPC (엔티티 번호, 없으면 -1). */
+    public static int sessionEntity(ServerPlayer p) {
+        Session s = SESSIONS.get(p.getUUID());
+        return s == null || s.npcKey() == null ? -1 : s.entityId();
+    }
+
+    public static int viewsCount(ServerPlayer p, String npcKey) {
+        return viewsFor(p, npcKey).size();
+    }
+
     public static boolean isCompleted(ServerPlayer p, String questId) {
         return prog(p).completed.contains(questId);
     }
@@ -911,11 +935,26 @@ public final class QuestManager {
         giveRewards(p, q);
         p.sendSystemMessage(Component.translatable("rtshop.quest.completed", q.title));
         scene(p, q.sceneDone);
+        nextHint(p, q, npcKey);
         if (!q.rewardFlags.isEmpty()) {
             com.rtshop.story.StoryGates.sync(p);
             com.rtshop.story.ScyllaClues.checkComplete(p); // 퀘스트가 스킬라 단서를 줄 수도 있다
         }
         return true;
+    }
+
+    /** 완료한 퀘스트 다음에 이어지는 퀘스트를 누가 주는지 알려 준다 (준 NPC 의 말로). */
+    static void nextHint(ServerPlayer p, QuestDef done, String fromNpc) {
+        String speaker = fromNpc == null ? null : npcName(fromNpc);
+        java.util.Set<String> told = new java.util.HashSet<>();
+        for (QuestDef n : loaded.quests.values()) {
+            if (!n.requires.contains(done.id) || !isAvailable(p, n) || !told.add(n.giver)) continue;
+            Component msg = n.giver.equals(fromNpc)
+                    ? Component.translatable("rtshop.quest.next_same", n.title)
+                    : Component.translatable("rtshop.quest.next_npc", npcName(n.giver), n.title);
+            p.sendSystemMessage(speaker == null ? msg.copy().withStyle(net.minecraft.ChatFormatting.GOLD)
+                    : Component.literal("[" + speaker + "] ").withStyle(net.minecraft.ChatFormatting.YELLOW).append(msg.copy().withStyle(net.minecraft.ChatFormatting.GOLD)));
+        }
     }
 
     /** 이야기 연출을 보낸다. "party": true 면 가까운 파티원에게도. */
@@ -970,6 +1009,11 @@ public final class QuestManager {
 
     /** 대화 목표 진행. */
     public static void onTalk(ServerPlayer p, String npcKey) {
+        onTalk(p, npcKey, false);
+    }
+
+    /** sceneDone: 대화 장면(lines)이 있는 TALK 목표도 채운다 (장면을 다 본 뒤). */
+    public static void onTalk(ServerPlayer p, String npcKey, boolean sceneDone) {
         QuestData.Progress pr = prog(p);
         boolean changed = false;
         for (Map.Entry<String, int[]> e : new ArrayList<>(pr.active.entrySet())) {
@@ -981,7 +1025,8 @@ public final class QuestManager {
             boolean touched = false;
             for (int i = 0; i < q.objectives.size() && i < pg.length; i++) {
                 QuestDef.Objective ob = q.objectives.get(i);
-                if (ob.type == QuestDef.Type.TALK && ob.target.equals(npcKey) && pg[i] < ob.count) {
+                if (ob.type == QuestDef.Type.TALK && ob.target.equals(npcKey) && pg[i] < ob.count
+                        && (sceneDone || ob.lines == null || ob.lines.size() == 0)) {
                     pg[i] = ob.count;
                     touched = true;
                 }
