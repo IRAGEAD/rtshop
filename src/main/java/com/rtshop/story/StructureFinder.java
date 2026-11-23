@@ -64,6 +64,7 @@ public final class StructureFinder {
 
     /** 테스트·로그용: 마지막 검색에서 확인한 후보 수와 걸러낸 수. */
     public static volatile int lastChecked, lastRejected, lastTownSkipped;
+    public static volatile String lastInfo = "";
 
     /** 구조물 ID, #태그, "모드:*" → 구조물 목록. 모르는 대상이면 null. */
     public static List<Holder<Structure>> resolve(ServerLevel level, String target) {
@@ -145,11 +146,19 @@ public final class StructureFinder {
             }
         }
         cands.sort((a, b) -> Double.compare(a.d2, b.d2));
+        int nPl = 0, staged = 0;
+        for (Holder<Structure> h : set) {
+            String id = h.unwrapKey().map(k -> k.location().toString()).orElse("");
+            if (StagedStructures.blocks(id)) staged++;
+            else nPl += state.getPlacementsForStructure(h).size();
+        }
+        int passed = 0;
         long t0 = System.nanoTime();
         Found best = null;
         for (Cand c : cands) {
             if (lastChecked >= MAX_CHECKS || System.nanoTime() - t0 > MAX_NANOS) break;
             if (!c.placement.isStructureChunk(state, c.cx, c.cz)) continue;
+            passed++;
             lastChecked++;
             BlockPos at = verify(level, c.h, c.cx, c.cz);
             if (at == null) {
@@ -159,6 +168,8 @@ public final class StructureFinder {
             best = new Found(at, c.h);
             break;
         }
+        lastInfo = "holders=" + set.size() + " staged=" + staged + " placements=" + nPl + " cands=" + cands.size() + " placementOk=" + passed
+                + " other=" + other.size() + " genStructures=" + level.getServer().getWorldData().worldGenOptions().generateStructures();
         // 다른 방식으로 놓이는 모드 건축물: 바닐라 계산으로 찾은 뒤 실제로 있는지만 확인
         for (Holder<Structure> h : other) {
             if (lastChecked >= MAX_CHECKS) break;

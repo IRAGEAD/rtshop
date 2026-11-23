@@ -2125,22 +2125,29 @@ public final class SelfTest {
         section("Survey compass / locate / equipment stats");
         ServerLevel ow = server.overworld();
         BlockPos spawn = ow.getSharedSpawnPos();
+        // 나침반: 이 시험 세계(평지)에 있는 마을로 확인 — 실제로 생긴 곳만, 마을(성 영역/스폰)에서 1000블럭 이상
         long t0 = System.currentTimeMillis();
-        var portals = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:ruined_portal");
-        var f = com.rtshop.story.StructureFinder.find(ow, portals, spawn, 200, 1000);
+        var villages = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:village");
+        var f = com.rtshop.story.StructureFinder.find(ow, villages, spawn, 200, 1000);
         long ms = System.currentTimeMillis() - t0;
         LINES.add("  compass search: checked=" + com.rtshop.story.StructureFinder.lastChecked + " rejected=" + com.rtshop.story.StructureFinder.lastRejected
-                + " townSkipped=" + com.rtshop.story.StructureFinder.lastTownSkipped + " ms=" + ms + " at=" + (f == null ? "none" : f.pos.toShortString()));
-        check("the survey compass finds a ruined portal that really generated (its start exists in the chunk)",
+                + " townSkipped=" + com.rtshop.story.StructureFinder.lastTownSkipped + " ms=" + ms + " at=" + (f == null ? "none" : f.pos.toShortString())
+                + " " + com.rtshop.story.StructureFinder.lastInfo);
+        check("the survey compass finds a village that really generated (its start exists in the chunk)",
                 f != null && com.rtshop.story.StructureFinder.verify(ow, f.structure, f.pos.getX() >> 4, f.pos.getZ() >> 4) != null,
                 f == null ? "none" : f.pos.toShortString());
         check("the place it points to is at least 1000 blocks from town",
                 f != null && com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ()) >= 1000,
                 f == null ? "none" : String.valueOf((int) com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ())));
         check("the compass search stays quick (under 6 s)", ms < 6000, ms + " ms");
-        BlockPos viaItem = com.rtshop.item.SurveyCompassItem.locate(ow, "#minecraft:ruined_portal", spawn);
+        BlockPos viaItem = com.rtshop.item.SurveyCompassItem.locate(ow, "#minecraft:village", spawn);
         check("the compass item uses the same verified search", viaItem != null && f != null && viaItem.equals(f.pos));
-        var villages = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:village");
+        // 이 세계에 생길 수 없는 건축물(평지의 무너진 차원문)은 절대 가리키지 않는다
+        var portals = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:ruined_portal");
+        var none = com.rtshop.story.StructureFinder.find(ow, portals, spawn, 200, 1000);
+        LINES.add("  ruined portal search: at=" + (none == null ? "none" : none.pos.toShortString()) + " " + com.rtshop.story.StructureFinder.lastInfo);
+        check("a structure that cannot generate in this world is never pointed to (or, if found, it is really there)",
+                none == null || com.rtshop.story.StructureFinder.verify(ow, none.structure, none.pos.getX() >> 4, none.pos.getZ() >> 4) != null);
         var v = com.rtshop.story.StructureFinder.find(ow, villages, spawn, 100, 0);
         check("/locate structure (verified) finds a real village", v != null
                 && com.rtshop.story.StructureFinder.verify(ow, v.structure, v.pos.getX() >> 4, v.pos.getZ() >> 4) != null);
@@ -2166,9 +2173,9 @@ public final class SelfTest {
         };
         net.minecraft.commands.CommandSourceStack css = new net.minecraft.commands.CommandSourceStack(sink, net.minecraft.world.phys.Vec3.atCenterOf(spawn),
                 net.minecraft.world.phys.Vec2.ZERO, ow, 4, "selftest", net.minecraft.network.chat.Component.literal("selftest"), server, null);
-        server.getCommands().performPrefixedCommand(css, "locate structure #minecraft:ruined_portal");
+        server.getCommands().performPrefixedCommand(css, "locate structure #minecraft:village");
         LINES.add("  /locate output: " + out);
-        check("/locate structure answers with a verified place", !out.isEmpty() && com.rtshop.story.StructureFinder.lastChecked > 0, out);
+        check("/locate structure answers with a verified place", !out.isEmpty() && com.rtshop.story.StructureFinder.lastChecked > 0 && !out.get(0).contains("Could not"), out);
 
         // 장비 능력치 설정
         String sword = "minecraft:diamond_sword";
