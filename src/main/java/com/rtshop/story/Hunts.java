@@ -94,6 +94,7 @@ public final class Hunts {
     public final List<Pool> pools = new ArrayList<>();
     public final List<Book> books = new ArrayList<>();
 
+    static final int VERSION = 2;
     private static Hunts current;
     private static final Random RNG = new Random();
 
@@ -117,6 +118,68 @@ public final class Hunts {
         return new Target(e, min, max, gold);
     }
 
+    /** 수량·보상 모두 난이도로 자동 */
+    private static Target a(String e) {
+        return new Target(e, 0, 0, 0);
+    }
+
+    // ------------------------------------------------------------------ 난이도
+    private static final java.util.Map<String, Double> SCORE = new java.util.concurrent.ConcurrentHashMap<>();
+    /** 기본 능력치만으로는 덜 보이는 위험 (폭발, 원거리, 물약 등) */
+    private static final java.util.Map<String, Double> EXTRA = java.util.Map.ofEntries(
+            java.util.Map.entry("minecraft:creeper", 1.8), java.util.Map.entry("minecraft:witch", 1.8),
+            java.util.Map.entry("minecraft:skeleton", 1.25), java.util.Map.entry("minecraft:stray", 1.35),
+            java.util.Map.entry("minecraft:pillager", 1.25), java.util.Map.entry("minecraft:blaze", 1.4),
+            java.util.Map.entry("minecraft:ghast", 1.4), java.util.Map.entry("minecraft:phantom", 1.3),
+            java.util.Map.entry("minecraft:evoker", 2.5), java.util.Map.entry("minecraft:slime", 0.8),
+            java.util.Map.entry("minecraft:wither_skeleton", 1.3), java.util.Map.entry("minecraft:cave_spider", 1.3));
+
+    /** 몹의 난이도 점수 (좀비 ≈ 1.6). 체력·공격력·방어력으로 잰다. */
+    @SuppressWarnings("unchecked")
+    public static double difficulty(String entity) {
+        return SCORE.computeIfAbsent(entity, e -> {
+            double hp = 20, atk = 3, armor = 0;
+            try {
+                ResourceLocation rl = ResourceLocation.tryParse(e);
+                EntityType<?> t = rl == null ? null : ForgeRegistries.ENTITY_TYPES.getValue(rl);
+                if (t != null && net.minecraft.world.entity.ai.attributes.DefaultAttributes.hasSupplier(t)) {
+                    var sup = net.minecraft.world.entity.ai.attributes.DefaultAttributes.getSupplier((EntityType<? extends LivingEntity>) t);
+                    hp = sup.getBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+                    if (sup.hasAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE))
+                        atk = sup.getBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+                    if (sup.hasAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR))
+                        armor = sup.getBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
+                }
+            } catch (Exception ignored) {
+            }
+            double sc = Math.pow(Math.max(1, hp) / 20.0, 0.9) * (1 + Math.max(0, atk) / 6.0) * (1 + Math.max(0, armor) / 20.0);
+            return Math.max(0.3, sc * EXTRA.getOrDefault(e, 1.0));
+        });
+    }
+
+    /** 난이도 별 1~5 */
+    public static int stars(String entity) {
+        double d = difficulty(entity);
+        return d < 1.5 ? 1 : d < 3 ? 2 : d < 6 ? 3 : d < 15 ? 4 : 5;
+    }
+
+    /** 마리당 Gold (목록에 적은 값이 있으면 그 값, 0 이면 난이도로) */
+    public static long goldEach(Target t) {
+        if (t.gold > 0) return t.gold;
+        long g = Math.round(15 * Math.pow(difficulty(t.entity), 1.15));
+        return Math.max(5, Math.round(g / 5.0) * 5);
+    }
+
+    /** 수량 범위 [최소, 최대] (목록에 적은 값이 있으면 그 값, 0 이면 난이도로: 쉬운 몹일수록 많이) */
+    public static int[] range(Target t) {
+        if (t.min > 0 && t.max > 0) return new int[]{t.min, Math.max(t.min, t.max)};
+        int max = (int) Math.max(1, Math.min(30, Math.round(24 / difficulty(t.entity))));
+        int min = (int) Math.max(1, Math.round(max * 0.5));
+        if (t.min > 0) min = t.min;
+        if (t.max > 0) max = t.max;
+        return new int[]{min, Math.max(min, max)};
+    }
+
     private static Book book(String id, String name, long gold, String... e) {
         Book b = new Book();
         b.id = id;
@@ -128,22 +191,18 @@ public final class Hunts {
 
     static Hunts defaults() {
         Hunts h = new Hunts();
-        h.pools.add(pool("",
-                t("minecraft:zombie", 12, 24, 20), t("minecraft:skeleton", 10, 20, 25), t("minecraft:spider", 10, 20, 22),
-                t("minecraft:creeper", 6, 12, 40), t("minecraft:drowned", 8, 16, 30), t("minecraft:husk", 8, 16, 30),
-                t("minecraft:stray", 8, 16, 30), t("minecraft:witch", 2, 5, 120), t("minecraft:enderman", 3, 8, 110),
-                t("minecraft:pillager", 6, 12, 45), t("minecraft:slime", 8, 16, 25)));
-        h.pools.add(pool("story_ch1_done",
-                t("mowziesmobs:foliaath", 3, 6, 180), t("mowziesmobs:lantern", 3, 6, 120), t("mowziesmobs:naga", 2, 4, 260),
-                t("mowziesmobs:umvuthana", 5, 10, 140), t("mowziesmobs:umvuthana_raptor", 1, 3, 300), t("mowziesmobs:grottol", 1, 2, 500),
-                t("minecraft:wither_skeleton", 6, 12, 90), t("minecraft:blaze", 6, 12, 90)));
-        h.pools.add(pool("story_ch2_done",
-                t("aquamirae:tortured_soul", 4, 8, 220), t("aquamirae:anglerfish", 2, 4, 300), t("aquamirae:eel", 1, 2, 600),
-                t("aquamirae:maw", 3, 6, 220), t("aquamirae:spinefish", 4, 8, 160), t("aquamirae:abyssal_scyphoid", 2, 4, 260)));
-        h.pools.add(pool("story_ch3_done",
-                t("cataclysm:koboleton", 6, 12, 200), t("cataclysm:the_watcher", 4, 8, 260), t("cataclysm:deepling", 6, 12, 220),
-                t("cataclysm:deepling_brute", 2, 4, 450), t("cataclysm:draugr", 6, 12, 220), t("cataclysm:elite_draugr", 2, 4, 450),
-                t("cataclysm:endermaptera", 4, 8, 260), t("cataclysm:ignited_revenant", 2, 4, 500), t("cataclysm:the_prowler", 1, 1, 2500)));
+        // 수량(최소·최대)과 마리당 Gold 를 0 으로 두면 몹의 체력·공격력·방어력으로 난이도를 재서 자동으로 정한다
+        h.pools.add(pool("", a("minecraft:zombie"), a("minecraft:skeleton"), a("minecraft:spider"), a("minecraft:creeper"),
+                a("minecraft:drowned"), a("minecraft:husk"), a("minecraft:stray"), a("minecraft:witch"), a("minecraft:enderman"),
+                a("minecraft:pillager"), a("minecraft:vindicator"), a("minecraft:slime")));
+        h.pools.add(pool("story_ch1_done", a("mowziesmobs:foliaath"), a("mowziesmobs:lantern"), a("mowziesmobs:naga"),
+                a("mowziesmobs:umvuthana"), a("mowziesmobs:umvuthana_raptor"), a("mowziesmobs:grottol"),
+                a("minecraft:wither_skeleton"), a("minecraft:blaze")));
+        h.pools.add(pool("story_ch2_done", a("aquamirae:tortured_soul"), a("aquamirae:anglerfish"), a("aquamirae:eel"),
+                a("aquamirae:maw"), a("aquamirae:spinefish"), a("aquamirae:abyssal_scyphoid")));
+        h.pools.add(pool("story_ch3_done", a("cataclysm:koboleton"), a("cataclysm:the_watcher"), a("cataclysm:deepling"),
+                a("cataclysm:deepling_brute"), a("cataclysm:draugr"), a("cataclysm:elite_draugr"), a("cataclysm:endermaptera"),
+                a("cataclysm:ignited_revenant"), a("cataclysm:the_prowler")));
         h.books.add(book("vanilla", "골디아의 들짐승", 3000, "minecraft:zombie", "minecraft:skeleton", "minecraft:spider", "minecraft:creeper",
                 "minecraft:drowned", "minecraft:husk", "minecraft:stray", "minecraft:witch", "minecraft:enderman", "minecraft:pillager",
                 "minecraft:slime", "minecraft:phantom", "minecraft:blaze", "minecraft:wither_skeleton", "minecraft:piglin_brute"));
@@ -168,7 +227,12 @@ public final class Hunts {
     private static Hunts load() {
         Path f = file();
         try {
-            if (Files.exists(f)) return fromJson(JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject());
+            if (Files.exists(f)) {
+                JsonObject o = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
+                Hunts h = fromJson(o);
+                if (!o.has("version") || o.get("version").getAsInt() < VERSION) h.save();
+                return h;
+            }
             Hunts d = defaults();
             Files.createDirectories(f.getParent());
             Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(d.toJson()), StandardCharsets.UTF_8);
@@ -179,11 +243,22 @@ public final class Hunts {
         }
     }
 
+    void save() {
+        try {
+            Files.createDirectories(file().getParent());
+            Files.writeString(file(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(toJson()), StandardCharsets.UTF_8);
+        } catch (Exception ex) {
+            RtShop.LOGGER.warn("[rtshop] hunts.json 을 저장하지 못했습니다: {}", ex.toString());
+        }
+    }
+
     JsonObject toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("_help", "토벌 의뢰판(/bounty)과 몹 도감(/bestiary). pools: flag 표식을 가진 사람에게 그 몹들이 의뢰로 나온다 (\"\" = 누구나). "
-                + "targets: [몹 ID, 최소, 최대, 마리당 Gold]. weekly 의뢰는 weeklyMultiplier 배로 많고 비싸다. jobBonus: 전투 직업이 있으면 보상 +비율. "
+                + "targets: [몹 ID, 최소, 최대, 마리당 Gold] (0 이면 몹의 체력·공격력·방어력으로 잰 난이도로 자동. 몹 ID 만 적어도 된다). "
+                + "게임 안에서는 OP 가 /bounty pool add|remove|list 로 고칠 수 있다. weekly 의뢰는 weeklyMultiplier 배로 많고 비싸다. jobBonus: 전투 직업이 있으면 보상 +비율. "
                 + "books: 장별 도감, 들어 있는 몹(설치된 모드만)을 모두 잡으면 gold 를 한 번 준다.");
+        o.addProperty("version", VERSION);
         o.addProperty("enabled", enabled);
         o.addProperty("dailyCount", dailyCount);
         o.addProperty("weeklyCount", weeklyCount);
@@ -241,14 +316,22 @@ public final class Hunts {
         if (o.has("weeklyMultiplier")) h.weeklyMultiplier = Math.max(1, o.get("weeklyMultiplier").getAsDouble());
         if (o.has("resetHour")) h.resetHour = Math.max(0, Math.min(23, o.get("resetHour").getAsInt()));
         if (o.has("jobBonus")) h.jobBonus = Math.max(0, o.get("jobBonus").getAsDouble());
-        if (o.has("pools")) {
+        // 예전 파일(version 없음)의 목록은 손으로 매긴 보상이라 새 기본 목록(난이도 자동)으로 바꾼다
+        if (!o.has("version") || o.get("version").getAsInt() < VERSION) {
+            h.pools.addAll(defaults().pools);
+        } else if (o.has("pools")) {
             for (JsonElement e : o.getAsJsonArray("pools")) {
                 JsonObject x = e.getAsJsonObject();
                 Pool p = new Pool();
                 p.flag = x.has("flag") ? x.get("flag").getAsString() : "";
                 for (JsonElement te : x.getAsJsonArray("targets")) {
+                    if (te.isJsonPrimitive()) {
+                        p.targets.add(new Target(te.getAsString(), 0, 0, 0));
+                        continue;
+                    }
                     JsonArray a = te.getAsJsonArray();
-                    p.targets.add(new Target(a.get(0).getAsString(), a.get(1).getAsInt(), Math.max(a.get(1).getAsInt(), a.get(2).getAsInt()), a.get(3).getAsLong()));
+                    int mn = a.size() > 1 ? a.get(1).getAsInt() : 0, mx = a.size() > 2 ? a.get(2).getAsInt() : 0;
+                    p.targets.add(new Target(a.get(0).getAsString(), mn, mn > 0 ? Math.max(mn, mx) : mx, a.size() > 3 ? a.get(3).getAsLong() : 0));
                 }
                 h.pools.add(p);
             }
@@ -336,12 +419,14 @@ public final class Hunts {
         for (int i = 0; i < n && !bag.isEmpty(); i++) {
             int pick = bag.size() > 3 && RNG.nextDouble() < 0.5 ? bag.size() - 1 - RNG.nextInt(Math.min(6, bag.size())) : RNG.nextInt(bag.size());
             Target t = bag.remove(pick);
-            int need = (int) Math.round((t.min + RNG.nextInt(t.max - t.min + 1)) * (weekly ? mult : 1));
+            int[] r = range(t);
+            int need = (int) Math.round((r[0] + RNG.nextInt(r[1] - r[0] + 1)) * (weekly ? mult : 1));
             CompoundTag b = new CompoundTag();
             b.putString("entity", t.entity);
             b.putInt("need", Math.max(1, need));
             b.putInt("have", 0);
-            b.putLong("gold", Math.round(t.gold * Math.max(1, need) * (weekly ? 1.25 : 1.0)));
+            b.putLong("gold", Math.round(goldEach(t) * Math.max(1, need) * (weekly ? 1.25 : 1.0)));
+            b.putInt("stars", stars(t.entity));
             b.putBoolean("weekly", weekly);
             b.putBoolean("done", false);
             b.putBoolean("accepted", false); // 게시판에서 골라야 시작된다
@@ -451,6 +536,7 @@ public final class Hunts {
             x.addProperty("have", Math.min(b.getInt("have"), b.getInt("need")));
             x.addProperty("gold", reward(p, b.getLong("gold")));
             x.addProperty("weekly", b.getBoolean("weekly"));
+            x.addProperty("stars", b.contains("stars") ? b.getInt("stars") : stars(b.getString("entity")));
             x.addProperty("accepted", accepted(b));
             x.addProperty("done", b.getBoolean("done"));
             a.add(x);
@@ -553,6 +639,61 @@ public final class Hunts {
         }
     }
 
+    // ------------------------------------------------------------------ 목록 고치기 (OP)
+
+    private static String desc(Target t) {
+        int[] r = range(t);
+        return t.entity + " (" + name(t.entity) + ")  " + "★".repeat(stars(t.entity)) + "  " + r[0] + "~" + r[1]
+                + (t.min > 0 ? "" : " auto") + " × " + goldEach(t) + " G" + (t.gold > 0 ? "" : " auto");
+    }
+
+    static void poolList(net.minecraft.commands.CommandSourceStack src) {
+        for (Pool pl : get().pools) {
+            String head = pl.flag.isEmpty() ? "[누구나 / everyone]" : "[" + pl.flag + "]";
+            src.sendSuccess(() -> Component.literal(head).withStyle(ChatFormatting.GOLD), false);
+            for (Target t : pl.targets) {
+                boolean ok = installed(t.entity);
+                src.sendSuccess(() -> Component.literal(" - " + desc(t)).withStyle(ok ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY), false);
+            }
+        }
+    }
+
+    /** 누구나 받는 목록(flag "")에 넣는다. 이미 있으면 수량·보상만 바꾼다. */
+    public static synchronized int poolAdd(net.minecraft.commands.CommandSourceStack src, String mob, int min, int max, long gold) {
+        if (!installed(mob)) {
+            if (src != null) src.sendFailure(Component.translatable("rtshop.hunt.pool_unknown", mob));
+            return 0;
+        }
+        Hunts h = get();
+        Target found = null;
+        for (Pool pl : h.pools) for (Target t : pl.targets) if (t.entity.equals(mob)) found = t;
+        if (found == null) {
+            Pool open = null;
+            for (Pool pl : h.pools) if (pl.flag.isEmpty()) open = pl;
+            if (open == null) h.pools.add(0, open = new Pool());
+            open.targets.add(found = new Target(mob, 0, 0, 0));
+        }
+        found.min = min;
+        found.max = min > 0 ? Math.max(min, max) : max;
+        found.gold = gold;
+        if (!testMode) h.save();
+        Target f = found;
+        if (src != null) src.sendSuccess(() -> Component.translatable("rtshop.hunt.pool_added", desc(f)).withStyle(ChatFormatting.GREEN), true);
+        return 1;
+    }
+
+    public static synchronized int poolRemove(net.minecraft.commands.CommandSourceStack src, String mob) {
+        Hunts h = get();
+        boolean any = false;
+        for (Pool pl : h.pools) any |= pl.targets.removeIf(t -> t.entity.equals(mob));
+        if (any && !testMode) h.save();
+        if (src != null) {
+            if (any) src.sendSuccess(() -> Component.translatable("rtshop.hunt.pool_removed", mob).withStyle(ChatFormatting.YELLOW), true);
+            else src.sendFailure(Component.translatable("rtshop.hunt.pool_missing", mob));
+        }
+        return any ? 1 : 0;
+    }
+
     @SubscribeEvent
     public static void onCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("bounty").executes(ctx -> {
@@ -571,6 +712,36 @@ public final class Hunts {
                     openBoard(p, ent);
                     return r == 0 ? 1 : 0;
                 })))));
+        // OP: 의뢰로 나오는 몹 목록 고치기 (수량·보상을 비우면 난이도로 자동)
+        event.getDispatcher().register(Commands.literal("bounty").then(Commands.literal("pool").requires(src -> src.hasPermission(2))
+                .then(Commands.literal("list").executes(ctx -> {
+                    poolList(ctx.getSource());
+                    return 1;
+                }))
+                .then(Commands.literal("add").then(Commands.argument("mob", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                        .suggests(net.minecraft.commands.synchronization.SuggestionProviders.SUMMONABLE_ENTITIES)
+                        .executes(ctx -> poolAdd(ctx.getSource(), net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "mob").toString(), 0, 0, 0))
+                        .then(Commands.argument("min", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 999))
+                                .then(Commands.argument("max", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 999))
+                                        .executes(ctx -> poolAdd(ctx.getSource(), net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "mob").toString(),
+                                                com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "min"), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "max"), 0))
+                                        .then(Commands.argument("gold", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0))
+                                                .executes(ctx -> poolAdd(ctx.getSource(), net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "mob").toString(),
+                                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "min"), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "max"),
+                                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "gold"))))))))
+                .then(Commands.literal("remove").then(Commands.argument("mob", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                        .suggests((ctx, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(
+                                get().pools.stream().flatMap(pl -> pl.targets.stream()).map(t -> t.entity), b))
+                        .executes(ctx -> poolRemove(ctx.getSource(), net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "mob").toString()))))
+                .then(Commands.literal("reroll").executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    data(p).putLong("day", -1);
+                    data(p).putLong("week", -1);
+                    data(p).put("list", new ListTag());
+                    bounties(p);
+                    ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.hunt.pool_rerolled").withStyle(ChatFormatting.GREEN), false);
+                    return 1;
+                }))));
         event.getDispatcher().register(Commands.literal("bestiary").executes(ctx -> {
             showBestiary(ctx.getSource().getPlayerOrException(), null);
             return 1;

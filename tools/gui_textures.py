@@ -620,11 +620,12 @@ def btn_leather(w, h, state, seed=91):
     # 윗면 빛, 아랫면 그늘
     d.line([(3, 1), (w - 4, 1)], fill=shade(base, 1.3))
     d.line([(3, h - 2), (w - 4, h - 2)], fill=shade(base, 0.55))
-    sc = (226, 200, 150) if state != 2 else (150, 130, 104)
-    stitch(b, 4, 3, w - 5, 3, sc)
-    stitch(b, 4, h - 4, w - 5, h - 4, sc)
-    stitch(b, 3, 4, 3, h - 5, sc)
-    stitch(b, w - 4, 4, w - 4, h - 5, sc)
+    # 바느질은 가장자리 바로 안쪽(2칸)에만: 가운데 글자 자리와 겹치지 않게
+    sc = (206, 176, 128) if state != 2 else (140, 120, 96)
+    stitch(b, 4, 2, w - 4, 2, sc)
+    stitch(b, 4, h - 3, w - 4, h - 3, sc)
+    stitch(b, 2, 4, 2, h - 4, sc)
+    stitch(b, w - 3, 4, w - 3, h - 4, sc)
     if state == 1:
         d.rounded_rectangle([0, 0, w - 1, h - 1], radius=3, outline=(255, 214, 120, 255))
     return b

@@ -1324,5 +1324,11 @@
   "item.rtshop.survey_compass.none": "찾아갈 장소가 있는 퀘스트를 진행하고 있지 않습니다.",
   "item.rtshop.survey_compass.far": "%s: 가까운 곳에서 찾지 못했습니다. 더 멀리 가서 다시 써 보세요.",
   "item.rtshop.survey_compass.found": "%s: %s쪽으로 약 %s칸",
-  "rtshop.hunt.goal_kill": "처치: %s × %s"
+  "rtshop.hunt.goal_kill": "처치: %s × %s",
+  "rtshop.hunt.difficulty": "난이도",
+  "rtshop.hunt.pool_rerolled": "내 현상금 의뢰를 새로 뽑았습니다.",
+  "rtshop.hunt.pool_unknown": "%s 라는 몹을 찾을 수 없습니다.",
+  "rtshop.hunt.pool_added": "현상금 목록에 넣었습니다: %s (다음 날부터, 바로 보려면 /bounty pool reroll)",
+  "rtshop.hunt.pool_removed": "현상금 목록에서 뺐습니다: %s",
+  "rtshop.hunt.pool_missing": "현상금 목록에 %s 이(가) 없습니다."
 }

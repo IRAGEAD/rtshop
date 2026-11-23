@@ -168,7 +168,18 @@ public class BountyScreen extends Screen {
             String sub = done ? Component.translatable("rtshop.hunt.row_done").getString()
                     : acc ? Component.translatable("rtshop.hunt.row_progress", r.get("have").getAsInt(), r.get("need").getAsInt()).getString()
                     : Component.translatable("rtshop.hunt.row_offer").getString();
-            Ui.scaledText(g, font, sub, lx + 32, ry + 14, 0.8F, done ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
+            if (!acc && !done) {
+                // 아직 안 맡은 의뢰: 난이도 별
+                int st = r.has("stars") ? Math.max(1, Math.min(5, r.get("stars").getAsInt())) : 1;
+                String dl = Component.translatable("rtshop.hunt.difficulty").getString() + " ";
+                Ui.scaledText(g, font, dl, lx + 32, ry + 14, 0.8F, Ui.C_INK_SOFT, false);
+                int sx = lx + 32 + (int) (font.width(dl) * 0.8F);
+                int col = st >= 5 ? 0xFFB0281C : st >= 4 ? 0xFFC0601C : 0xFFB8861E;
+                Ui.scaledText(g, font, "★".repeat(st), sx, ry + 14, 0.8F, col, false);
+                Ui.scaledText(g, font, "☆".repeat(5 - st), sx + (int) (font.width("★".repeat(st)) * 0.8F), ry + 14, 0.8F, 0x80604020, false);
+            } else {
+                Ui.scaledText(g, font, sub, lx + 32, ry + 14, 0.8F, done ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
+            }
             String gold = Ui.num(r.get("gold").getAsLong()) + " G";
             int bx = lx + lw - 64;
             g.drawString(font, gold, bx - 6 - font.width(gold), ry + 8, 0xFF8A5A10, false);

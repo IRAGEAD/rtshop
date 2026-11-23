@@ -2352,6 +2352,29 @@ public final class SelfTest {
             if (com.rtshop.story.ScyllaClues.modOk(e) && !ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation(e))) badHunt.add(e);
         }
         check("every bounty and bestiary mob exists (when its mod is installed)", badHunt.isEmpty(), badHunt);
+        {
+            com.rtshop.story.Hunts.Target zt = null, et = null;
+            for (com.rtshop.story.Hunts.Pool pool : hs.pools) for (com.rtshop.story.Hunts.Target t : pool.targets) {
+                if (t.entity.equals("minecraft:zombie")) zt = t;
+                if (t.entity.equals("minecraft:enderman")) et = t;
+            }
+            boolean auto = zt != null && et != null;
+            long gz = auto ? com.rtshop.story.Hunts.goldEach(zt) : 0, ge = auto ? com.rtshop.story.Hunts.goldEach(et) : 0;
+            int[] rz = auto ? com.rtshop.story.Hunts.range(zt) : new int[2], re = auto ? com.rtshop.story.Hunts.range(et) : new int[2];
+            check("bounty rewards follow the mob's difficulty: an enderman pays more per kill and asks for fewer than a zombie",
+                    auto && ge > gz && re[1] < rz[1] && com.rtshop.story.Hunts.stars("minecraft:enderman") > com.rtshop.story.Hunts.stars("minecraft:zombie"),
+                    gz + "G " + rz[0] + "-" + rz[1] + " / " + ge + "G " + re[0] + "-" + re[1]);
+            boolean added = com.rtshop.story.Hunts.poolAdd(null, "minecraft:cave_spider", 0, 0, 0) == 1;
+            boolean listed = hs.pools.stream().anyMatch(pl -> pl.targets.stream().anyMatch(t -> t.entity.equals("minecraft:cave_spider")));
+            boolean fixed = com.rtshop.story.Hunts.poolAdd(null, "minecraft:cave_spider", 4, 6, 77) == 1;
+            com.rtshop.story.Hunts.Target ct = null;
+            for (com.rtshop.story.Hunts.Pool pool : hs.pools) for (com.rtshop.story.Hunts.Target t : pool.targets) if (t.entity.equals("minecraft:cave_spider")) ct = t;
+            boolean set = ct != null && com.rtshop.story.Hunts.goldEach(ct) == 77 && com.rtshop.story.Hunts.range(ct)[0] == 4 && com.rtshop.story.Hunts.range(ct)[1] == 6;
+            boolean removed = com.rtshop.story.Hunts.poolRemove(null, "minecraft:cave_spider") == 1;
+            boolean unknown = com.rtshop.story.Hunts.poolAdd(null, "minecraft:not_a_mob", 0, 0, 0) == 0;
+            check("an OP can add a mob to the bounty list (auto or with set count/reward) and remove it again",
+                    added && listed && fixed && set && removed && unknown, added + " " + listed + " " + fixed + " " + set + " " + removed + " " + unknown);
+        }
         com.rtshop.story.Hunts.setForTest(a, "minecraft:zombie", 2, 100);
         net.minecraft.world.entity.monster.Zombie z = new net.minecraft.world.entity.monster.Zombie(level);
         long w0 = Economy.wallet(a);

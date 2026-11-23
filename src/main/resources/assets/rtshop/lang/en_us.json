@@ -1324,5 +1324,11 @@
   "item.rtshop.survey_compass.none": "None of your quests is looking for a place.",
   "item.rtshop.survey_compass.far": "%s: nothing nearby. Travel further and try again.",
   "item.rtshop.survey_compass.found": "%s: about %3$s blocks to the %2$s",
-  "rtshop.hunt.goal_kill": "Defeat: %s × %s"
+  "rtshop.hunt.goal_kill": "Defeat: %s × %s",
+  "rtshop.hunt.difficulty": "Difficulty",
+  "rtshop.hunt.pool_rerolled": "Your bounties were re-rolled.",
+  "rtshop.hunt.pool_unknown": "No mob called %s.",
+  "rtshop.hunt.pool_added": "Added to the bounty list: %s (from the next day; /bounty pool reroll to see it now)",
+  "rtshop.hunt.pool_removed": "Removed from the bounty list: %s",
+  "rtshop.hunt.pool_missing": "%s is not on the bounty list."
 }
