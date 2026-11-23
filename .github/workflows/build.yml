@@ -259,7 +259,10 @@ jobs:
           mkdir -p /tmp/inspect/fonts
           for f in songmyung/SongMyung-Regular.ttf gowunbatang/GowunBatang-Bold.ttf blackhansans/BlackHanSans-Regular.ttf \
                    nanummyeongjo/NanumMyeongjo-ExtraBold.ttf diphylleia/Diphylleia-Regular.ttf yeonsung/YeonSung-Regular.ttf \
-                   hahmlet/Hahmlet%5Bwght%5D.ttf eastseadokdo/EastSeaDokdo-Regular.ttf dongle/Dongle-Bold.ttf; do
+                   hahmlet/Hahmlet%5Bwght%5D.ttf eastseadokdo/EastSeaDokdo-Regular.ttf dongle/Dongle-Bold.ttf \
+                   gasoekone/GasoekOne-Regular.ttf grandifloraone/GrandifloraOne-Regular.ttf moiraione/MoiraiOne-Regular.ttf \
+                   gugi/Gugi-Regular.ttf dokdo/Dokdo-Regular.ttf bagelfatone/BagelFatOne-Regular.ttf blackandwhitepicture/BlackAndWhitePicture-Regular.ttf \
+                   kirangharerang/KirangHaerang-Regular.ttf jua/Jua-Regular.ttf dohyeon/DoHyeon-Regular.ttf stylish/Stylish-Regular.ttf; do
             curl -fsSL -o "/tmp/inspect/fonts/$(basename "$f" | sed 's/%5B/[/;s/%5D/]/')" "https://raw.githubusercontent.com/google/fonts/main/ofl/$f" || echo "font fail $f"
           done
           ls -la /tmp/inspect/fonts
