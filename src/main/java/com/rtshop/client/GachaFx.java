@@ -995,7 +995,7 @@ public final class GachaFx {
         }
         particles(g, partial);
         g.pose().popPose();
-        if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 10) flash(g, width, height, 0xFFF8E0, 1 - (tt - LEG_STRIKE) / 10F);
+        if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 7) flash(g, width, height, 0xFFF8E0, 0.9F * (1 - (tt - LEG_STRIKE) / 7F) * (1 - (tt - LEG_STRIKE) / 7F));
         if (tt >= LEG_BURST && tt < LEG_BURST + 12) flash(g, width, height, 0xFFF3C8, 1 - (tt - LEG_BURST) / 12F);
     }
 
@@ -1292,6 +1292,9 @@ public final class GachaFx {
         float slide = k * k * k; // 천천히 → 마지막에 단숨에
         float appear = Mth.clamp((tt - YM_BREAK - 2) / 5F, 0, 1);
         int ink = argb(0x0A0A0A, appear);
+        // 칼이 잘 보이도록 뒤에 옅은 빛의 띠
+        g.fillGradient(-200, -16, 210, 0, argb(0xFFFFFF, 0), argb(0xFFFFFF, 0.75F * appear));
+        g.fillGradient(-200, 0, 210, 16, argb(0xFFFFFF, 0.75F * appear), argb(0xFFFFFF, 0));
         // 칼집 (왼쪽, 입구 x=-10). 칼은 오른쪽으로 뽑혀 있다가 왼쪽으로 미끄러져 들어간다
         float tsuba = 140 - 150 * slide;
         float tipVisible = Math.max(-10, tsuba - 150);
@@ -1305,18 +1308,6 @@ public final class GachaFx {
         g.fill(-150, -3, -10, 3, ink);                              // 칼집
         g.fill(-152, -2, -150, 2, ink);
         g.fill(-12, -4, -10, 4, ink);                               // 칼집 입구
-        g.pose().popPose();
-        // 이명 속 하얀 선: 베인 자리가 흑백 하늘에 남아 있다
-        g.pose().pushPose();
-        g.pose().translate(width / 2F, height / 2F, 470);
-        float len = Mth.sqrt(width * width + height * height) * 0.75F;
-        for (int i = 0; i < slashes.size(); i++) {
-            float[] s = slashes.get(i);
-            float px = s[1] * width, py = s[2] * height;
-            float cx = Mth.cos(s[0]), sy = Mth.sin(s[0]);
-            float a = 0.35F + 0.25F * Mth.sin(tt * 0.5F + i);
-            bar(g, px - cx * len, py - sy * len, px + cx * len, py + sy * len, 1, argb(0x000000, a * 0.5F));
-        }
         g.pose().popPose();
         if (since < 3) flash(g, width, height, 0xFFFFFF, 0.8F * (1 - since / 3F));
         // '딸깍': 칼집 입구에서 작은 섬광
