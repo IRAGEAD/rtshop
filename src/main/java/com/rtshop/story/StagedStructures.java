@@ -59,7 +59,7 @@ public final class StagedStructures {
     /** 점검용: 지형 생성이 건축물마다 물어본 횟수 / 막은 횟수 */
     public static final AtomicLong ASKED = new AtomicLong(), BLOCKED = new AtomicLong();
 
-    static StagedStructures defaults() {
+    public static StagedStructures defaults() {
         StagedStructures s = new StagedStructures();
         for (String id : List.of("mowziesmobs:wrought_chamber", "mowziesmobs:frostmaw_spawn", "mowziesmobs:monastery", "mowziesmobs:umvuthana_grove",
                 "aquamirae:ship", "cataclysm:soul_black_smith", "cataclysm:cursed_pyramid", "cataclysm:ancient_factory", "cataclysm:sunken_city",

@@ -2289,6 +2289,53 @@ public final class SelfTest {
             }
         }
         check("every story quest points at real monsters, structures, items and NPCs", bad.isEmpty(), bad);
+        // 풀팩에서: 이야기가 부르는 모드가 모두 깔려 있고 (이름 틀림 = 조용히 건너뛰는 일 방지),
+        // 발전 과제·차원·결계·단계적 생성·전용 경기장의 이름도 모두 진짜인지
+        {
+            var mods = net.minecraftforge.fml.ModList.get();
+            boolean full = mods.isLoaded("mowziesmobs") && mods.isLoaded("cataclysm") && mods.isLoaded("aquamirae");
+            List<String> wrong = new ArrayList<>();
+            java.util.Set<String> namespaces = new java.util.TreeSet<>();
+            for (String id : story) {
+                QuestDef q = l.quests.get(id);
+                for (QuestDef.Objective ob : q.objectives) {
+                    String t = ob.target.replace("#", "");
+                    if (t.contains(":") && (ob.type == QuestDef.Type.KILL || ob.type == QuestDef.Type.DELIVER || ob.type == QuestDef.Type.STRUCTURE
+                            || ob.type == QuestDef.Type.ADVANCEMENT || ob.type == QuestDef.Type.DIMENSION)) {
+                        namespaces.add(t.substring(0, t.indexOf(':')));
+                    }
+                    if (ob.type == QuestDef.Type.ADVANCEMENT && server.getAdvancements().getAdvancement(new ResourceLocation(ob.target)) == null
+                            && (ob.target.startsWith("minecraft:") || mods.isLoaded(ob.target.substring(0, ob.target.indexOf(':'))))) {
+                        wrong.add(id + " advancement " + ob.target);
+                    }
+                    if (ob.type == QuestDef.Type.DIMENSION && server.getLevel(net.minecraft.resources.ResourceKey.create(
+                            net.minecraft.core.registries.Registries.DIMENSION, new ResourceLocation(ob.target))) == null
+                            && (ob.target.startsWith("minecraft:") || mods.isLoaded(ob.target.substring(0, ob.target.indexOf(':'))))) {
+                        wrong.add(id + " dimension " + ob.target);
+                    }
+                }
+            }
+            java.util.Set<String> structs = new java.util.TreeSet<>();
+            for (com.rtshop.story.StorySeals.Seal se : com.rtshop.story.StorySeals.defaults().values()) structs.addAll(se.structures);
+            structs.addAll(com.rtshop.story.StagedStructures.defaults().structures.keySet());
+            for (String st : structs) {
+                String ns = st.substring(0, st.indexOf(':'));
+                namespaces.add(ns);
+                if ((ns.equals("minecraft") || mods.isLoaded(ns)) && !sreg.containsKey(new ResourceLocation(st))) wrong.add("seal/staged structure " + st);
+            }
+            for (String e : com.rtshop.story.StoryArena.defaults().keySet()) {
+                String ns = e.substring(0, e.indexOf(':'));
+                namespaces.add(ns);
+                if ((ns.equals("minecraft") || mods.isLoaded(ns)) && !ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation(e))) wrong.add("arena boss " + e);
+            }
+            List<String> missingMods = new ArrayList<>();
+            for (String ns : namespaces) if (!ns.equals("minecraft") && !ns.equals("rtshop") && !mods.isLoaded(ns)) missingMods.add(ns);
+            RtShop.LOGGER.info("[rtshop-selftest] story namespaces {} (not installed here: {})", namespaces, missingMods);
+            check("advancements, dimensions, sealed/staged structures and arena bosses named by the story are real", wrong.isEmpty(), wrong);
+            if (full) {
+                check("full pack: every mod the story names is installed (no misspelled mod ids)", missingMods.isEmpty(), missingMods);
+            }
+        }
         // 새 목표 종류: 표식(FLAG) / 차원(DIMENSION) 은 받자마자 맞으면 바로 채워진다
         QuestManager.reset(a);
         QuestManager.setFlag(a, "tutorial_done", true);
