@@ -86,9 +86,9 @@ public class EnhanceOddsScreen extends Screen {
     protected void init() {
         int x = (width - tableWidth()) / 2, y = Math.max(4, (height - tableHeight() - 24) / 2);
         int by = y + tableHeight() + 4;
-        addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(x + tableWidth() - 80, by, 80, 18).build());
+        addRenderableWidget(MButton.of(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(x + tableWidth() - 80, by, 80, 18).build());
         if (minecraft.player != null && minecraft.player.hasPermissions(2)) {
-            addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhodds.edit"),
+            addRenderableWidget(MButton.of(Component.translatable("rtshop.enhodds.edit"),
                     b -> ShopNet.CHANNEL.sendToServer(new EnhanceActionPacket(EnhanceActionPacket.OPEN_EDITOR, ""))).bounds(x, by, 100, 18).build());
         }
     }

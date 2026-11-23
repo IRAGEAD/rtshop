@@ -135,7 +135,7 @@ public class ShopEditScreen extends Screen {
         cats.addAll(categories());
         int cy = fy + 26;
         for (String c : cats) {
-            Button b = MButton.builder(Component.literal(categoryName(c)), x -> {
+            Button b = MButton.of(Component.literal(categoryName(c)), x -> {
                 category = c;
                 scroll = 0;
                 rebuildWidgets();
@@ -159,7 +159,7 @@ public class ShopEditScreen extends Screen {
             }
         });
         addRenderableWidget(sb);
-        addRenderableWidget(MButton.builder(Component.translatable("rtshop.shopedit.add"), b -> minecraft.setScreen(
+        addRenderableWidget(MButton.of(Component.translatable("rtshop.shopedit.add"), b -> minecraft.setScreen(
                 new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
                     JsonObject o = new JsonObject();
                     o.addProperty("item", v);
@@ -203,20 +203,20 @@ public class ShopEditScreen extends Screen {
             rowWidgets.add(sell);
             boolean buy = !o.has("buy") || o.get("buy").getAsBoolean();
             boolean sl = !o.has("sell") || o.get("sell").getAsBoolean();
-            Button bb = MButton.builder(Component.translatable(buy ? "rtshop.shopedit.buy_on" : "rtshop.shopedit.buy_off"), b -> {
+            Button bb = MButton.of(Component.translatable(buy ? "rtshop.shopedit.buy_on" : "rtshop.shopedit.buy_off"), b -> {
                 o.addProperty("buy", !(!o.has("buy") || o.get("buy").getAsBoolean()));
                 promote(o);
                 dirty = true;
                 rebuildRows();
             }).bounds(xBuy, y, toggleW, 18).build();
-            Button sbn = MButton.builder(Component.translatable(sl ? "rtshop.shopedit.sell_on" : "rtshop.shopedit.sell_off"), b -> {
+            Button sbn = MButton.of(Component.translatable(sl ? "rtshop.shopedit.sell_on" : "rtshop.shopedit.sell_off"), b -> {
                 o.addProperty("sell", !(!o.has("sell") || o.get("sell").getAsBoolean()));
                 promote(o);
                 dirty = true;
                 rebuildRows();
             }).bounds(xSellT, y, toggleW, 18).build();
             String cat = o.has("category") ? o.get("category").getAsString() : "";
-            Button cb = MButton.builder(Component.literal(Ui.clip(font, categoryName(cat), catBtnW - 6)), b -> {
+            Button cb = MButton.of(Component.literal(Ui.clip(font, categoryName(cat), catBtnW - 6)), b -> {
                 List<String> cs = categories();
                 if (cs.isEmpty()) return;
                 int k = cs.indexOf(cat);
@@ -226,7 +226,7 @@ public class ShopEditScreen extends Screen {
                 filter();
                 rebuildRows();
             }).bounds(xCat, y, catBtnW, 18).build();
-            Button del = MButton.builder(Component.literal("✕"), b -> {
+            Button del = MButton.of(Component.literal("✕"), b -> {
                 if (isAuto(o)) {
                     // 자동 상품은 목록에서 빼도록 exclude 에 적는다
                     if (!file.has("exclude")) file.add("exclude", new JsonArray());
@@ -247,12 +247,12 @@ public class ShopEditScreen extends Screen {
         int by = fy + H - 24;
         int[] bw = footerWidths();
         int bx = fx + W - 8;
-        Button close = MButton.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(bx - bw[2], by, bw[2], 18).build();
+        Button close = MButton.of(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(bx - bw[2], by, bw[2], 18).build();
         bx -= bw[2] + 4;
-        Button revert = MButton.builder(Component.translatable("rtshop.enhedit.revert"), b ->
+        Button revert = MButton.of(Component.translatable("rtshop.enhedit.revert"), b ->
                 ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.OPEN, shopId, ""))).bounds(bx - bw[1], by, bw[1], 18).build();
         bx -= bw[1] + 4;
-        Button save = MButton.builder(Component.translatable("rtshop.enhedit.save"), b ->
+        Button save = MButton.of(Component.translatable("rtshop.enhedit.save"), b ->
                 ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.SAVE, shopId, file.toString()))).bounds(bx - bw[0], by, bw[0], 18).build();
         for (Button b : new Button[]{save, revert, close}) {
             addRenderableWidget(b);

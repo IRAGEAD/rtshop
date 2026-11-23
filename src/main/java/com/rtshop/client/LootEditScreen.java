@@ -239,12 +239,12 @@ public class LootEditScreen extends Screen {
         rowWidgets.clear();
         drawn.clear();
         if (selected.isEmpty()) return;
-        add(MButton.builder(Component.translatable(clear ? "rtshop.rules.clear_on" : "rtshop.rules.clear_off"), b -> {
+        add(MButton.of(Component.translatable(clear ? "rtshop.rules.clear_on" : "rtshop.rules.clear_off"), b -> {
             clear = !clear;
             dirty = true;
             rebuildRows();
         }).bounds(rx, fy + 40, 104, 16).build());
-        add(MButton.builder(Component.translatable("rtshop.rules.add_item"), b -> minecraft.setScreen(new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
+        add(MButton.of(Component.translatable("rtshop.rules.add_item"), b -> minecraft.setScreen(new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
             Row r = rows.stream().filter(q -> q.item.equals(v)).findFirst().orElse(null);
             if (r == null) {
                 r = new Row();
@@ -262,7 +262,7 @@ public class LootEditScreen extends Screen {
             drawn.add(new Object[]{r, y});
             String[] keys = {"rtshop.rules.mode_default", "rtshop.rules.mode_off", "rtshop.rules.mode_custom"};
             net.minecraft.ChatFormatting[] cols = {net.minecraft.ChatFormatting.WHITE, net.minecraft.ChatFormatting.RED, net.minecraft.ChatFormatting.GREEN};
-            add(MButton.builder(Component.translatable(keys[r.mode]).withStyle(cols[r.mode]), b -> {
+            add(MButton.of(Component.translatable(keys[r.mode]).withStyle(cols[r.mode]), b -> {
                 r.mode = (r.mode + 1) % 3;
                 if (!r.natural && r.mode == 0) r.mode = 1;
                 dirty = true;
@@ -275,9 +275,9 @@ public class LootEditScreen extends Screen {
             }
         }
         int by = fy + H - 24;
-        add(MButton.builder(Component.translatable("rtshop.enhedit.save"), b -> save()).bounds(fx + W - 194, by, 60, 18).build());
-        add(MButton.builder(Component.translatable("rtshop.enhedit.revert"), b -> select(selected)).bounds(fx + W - 130, by, 60, 18).build());
-        add(MButton.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 66, by, 58, 18).build());
+        add(MButton.of(Component.translatable("rtshop.enhedit.save"), b -> save()).bounds(fx + W - 194, by, 60, 18).build());
+        add(MButton.of(Component.translatable("rtshop.enhedit.revert"), b -> select(selected)).bounds(fx + W - 130, by, 60, 18).build());
+        add(MButton.of(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 66, by, 58, 18).build());
     }
 
     private static String fmt(double v) {

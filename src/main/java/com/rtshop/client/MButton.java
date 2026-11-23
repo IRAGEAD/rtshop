@@ -6,13 +6,13 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
-/** 중세풍 나무 단추 (무쇠 띠·리벳). Button.builder 대신 MButton.builder 로 만든다. */
+/** 중세풍 나무 단추 (무쇠 띠·리벳). Button.builder 대신 MButton.of 로 만든다. */
 public class MButton extends Button {
     protected MButton(int x, int y, int w, int h, Component msg, OnPress onPress) {
         super(x, y, w, h, msg, onPress, DEFAULT_NARRATION);
     }
 
-    public static B builder(Component msg, OnPress onPress) {
+    public static B of(Component msg, OnPress onPress) {
         return new B(msg, onPress);
     }
 
