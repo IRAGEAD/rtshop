@@ -28,6 +28,7 @@ public class RtShop {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         com.rtshop.enhance.ModEnhance.register(bus);
         ModItems.ITEMS.register(bus);
+        com.rtshop.magic.MagicRegistry.register(bus);
         com.rtshop.rules.LootRules.init();
         FarmLootModifier.SERIALIZERS.register(bus);
         bus.addListener(this::onCreativeTab);
@@ -62,6 +63,10 @@ public class RtShop {
             event.accept(ModItems.GUARD_FULL);
             event.accept(ModItems.RAID_TICKET);
             event.accept(ModItems.SURVEY_COMPASS);
+            event.accept(com.rtshop.magic.MagicRegistry.ORB_ITEM);
+            event.accept(com.rtshop.magic.MagicRegistry.TICKET);
+            event.accept(com.rtshop.magic.MagicRegistry.TICKET_SELECT);
+            event.accept(com.rtshop.magic.MagicRegistry.SCROLL);
         }
     }
 }

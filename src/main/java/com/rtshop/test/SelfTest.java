@@ -348,6 +348,11 @@ public final class SelfTest {
             crash("finders", t);
         }
         try {
+            magicGacha(server, level, a);
+        } catch (Throwable t) {
+            crash("magic", t);
+        }
+        try {
             restaurant(server, level, a, b);
         } catch (Throwable t) {
             crash("restaurant", t);
@@ -2120,6 +2125,105 @@ public final class SelfTest {
     // ------------------------------------------------------------------ 파티 · 보스 처치 인정
 
     /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
+    /** 마법 뽑기: 분야 선택/무작위 스킬북 뽑기, 야마토는 공격 분야에만, 10회 보장, 티켓, 인챈트 재설정(하나만). */
+    private static void magicGacha(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("Magic gacha");
+        com.rtshop.magic.MagicConfig real = com.rtshop.magic.MagicConfig.get();
+        int realBooks = 0;
+        for (String cat : com.rtshop.magic.MagicConfig.CATS) realBooks += real.pool(cat).size();
+        boolean ef = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
+        LINES.add("  magic pools: " + realBooks + " books, " + real.enchants.size() + " enchants"
+                + (ef ? " (epicfight: " + com.rtshop.magic.MagicSkills.discover().size() + " skills)" : ""));
+        if (ef) {
+            check("with Epic Fight installed the magic gacha fills itself with this pack's skill books", realBooks > 0, realBooks);
+            boolean yamatoOk = true;
+            for (String cat : com.rtshop.magic.MagicConfig.CATS) {
+                if (cat.equals("attack")) continue;
+                for (var e : real.pool(cat)) yamatoOk &= !e.grade.equals("yamato");
+            }
+            check("the yamato grade is only in the attack field", yamatoOk);
+            for (String cat : com.rtshop.magic.MagicConfig.CATS) {
+                StringBuilder sb = new StringBuilder();
+                for (var e : real.pool(cat)) sb.append(e.nbt.replace("{skill:\"", "").replace("\"}", "")).append('=').append(e.grade).append(' ');
+                LINES.add("  magic " + cat + ": " + sb);
+            }
+        }
+        check("the enchant reroll list is filled from this world's enchantments (no curses)", !real.enchants.isEmpty()
+                && real.enchants.stream().noneMatch(e -> e.enchantment() != null && e.enchantment().isCurse()), real.enchants.size());
+        // 시험용 설정 (바닐라 아이템): 공격 분야에 야마토 1·일반 1, 방어에 희귀 1, 회피·패시브·이동에 일반 1
+        com.rtshop.magic.MagicConfig t = new com.rtshop.magic.MagicConfig();
+        t.defaults();
+        java.util.function.BiFunction<String, String, com.rtshop.gacha.GachaConfig.Entry> mk = (item, grade) -> {
+            com.rtshop.gacha.GachaConfig.Entry e = new com.rtshop.gacha.GachaConfig.Entry();
+            e.item = item;
+            e.grade = grade;
+            e.weight = 10;
+            return e;
+        };
+        t.pool("attack").add(mk.apply("minecraft:nether_star", "yamato"));
+        t.pool("attack").add(mk.apply("minecraft:book", "uncommon"));
+        t.pool("guard").add(mk.apply("minecraft:shield", "rare"));
+        t.pool("guard").add(mk.apply("minecraft:paper", "yamato")); // 공격 밖의 야마토는 전설로 내려가야 한다
+        t.pool("dodge").add(mk.apply("minecraft:feather", "uncommon"));
+        t.pool("passive").add(mk.apply("minecraft:apple", "uncommon"));
+        t.pool("mover").add(mk.apply("minecraft:ender_pearl", "uncommon"));
+        t.autoEnchants();
+        t.normalize();
+        check("a yamato prize outside the attack field is moved down to legendary", t.pool("guard").get(1).grade.equals("legendary"));
+        com.rtshop.magic.MagicConfig.set(t);
+        try {
+            a.getInventory().clearContent();
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 10));
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET.get(), 1));
+            var got = com.rtshop.magic.MagicGacha.pull(a, "select", "attack", 10, false);
+            check("a 10× chosen-field draw gives 10 prizes, all from the chosen field", got != null && got.size() == 10
+                    && got.stream().allMatch(e -> t.pool("attack").contains(e)), got == null ? "null" : got.size());
+            check("the 10× draw used 10 chosen-field tickets", a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()) == 0);
+            int marked = 0;
+            for (ItemStack st : a.getInventory().items) if (com.rtshop.gacha.Gacha.marked(st)) marked++;
+            check("drawn prizes carry the gacha mark (can be dismantled for shards)", marked > 0, marked);
+            var none = com.rtshop.magic.MagicGacha.pull(a, "select", "guard", 1, false);
+            check("without a ticket the draw is refused", none == null);
+            var rnd = com.rtshop.magic.MagicGacha.pull(a, "random", "", 1, false);
+            check("a random draw uses the cheap ticket and can give any field", rnd != null && rnd.size() == 1
+                    && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET.get()) == 0);
+            // 등급 확률: 공격 분야 선택 뽑기의 야마토 확률이 0 보다 크고, 방어 분야에는 야마토가 없다
+            var g = t.engine();
+            double[] att = com.rtshop.gacha.Gacha.gradeChances(g, "attack", "select");
+            double[] gua = com.rtshop.gacha.Gacha.gradeChances(g, "guard", "select");
+            check("the attack field has the yamato grade, other fields do not", att[5] > 0 && gua[5] == 0, att[5] + " / " + gua[5]);
+            // 10회 보장: 희귀 이상이 하나는 (공격 분야에는 고급·야마토만 있어 야마토가 보장 몫)
+            int best = 0;
+            for (int i = 0; i < 30; i++) {
+                var l = com.rtshop.gacha.Gacha.pull(g, "attack", "select", 10, net.minecraft.util.RandomSource.create(i));
+                int top = l.stream().mapToInt(e -> com.rtshop.gacha.GachaConfig.gradeIndex(e.grade)).max().orElse(0);
+                if (top >= 2) best++;
+            }
+            check("every 10× draw has a rare-or-better prize (guarantee)", best == 30, best);
+            // 인챈트 재설정
+            ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
+            sword.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 3);
+            sword.enchant(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 2);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword);
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 2));
+            var e1 = com.rtshop.magic.MagicGacha.reroll(a, false);
+            var ench = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(a.getMainHandItem());
+            check("enchant reroll leaves exactly one enchantment that fits the weapon", e1 != null && ench.size() == 1
+                    && ench.keySet().iterator().next().canEnchant(a.getMainHandItem()), ench);
+            check("enchant reroll used one scroll", a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 1);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.DIRT));
+            check("enchant reroll refuses things that are not weapons", com.rtshop.magic.MagicGacha.reroll(a, false) == null
+                    && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 1);
+            // 저장·불러오기 그대로
+            var back = com.rtshop.magic.MagicConfig.fromJson(t.toJson());
+            check("the magic gacha config survives save and load", back.pool("attack").size() == 2 && back.enchants.size() == t.enchants.size()
+                    && back.selectOdds[5] == t.selectOdds[5]);
+        } finally {
+            com.rtshop.magic.MagicConfig.set(real);
+            a.getInventory().clearContent();
+        }
+    }
+
     /** 조사대 나침반·/locate 는 실제로 생긴 건축물만, 마을에서 1000블럭 이상 / 장비 능력치 설정 / 이야기 물건 안내 / 대화 먼저. */
     private static void findersAndStats(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         section("Survey compass / locate / equipment stats");

@@ -55,6 +55,10 @@ public final class ClientHooks {
             screen.showResult(message, success);
         } else if (mc.screen instanceof GachaScreen screen) {
             screen.showResult(message, success);
+        } else if (mc.screen instanceof MagicGachaScreen screen) {
+            screen.showResult(message, success);
+        } else if (mc.screen instanceof MagicEditScreen screen) {
+            screen.showResult(message, success);
         } else if (mc.screen instanceof GachaEditScreen screen) {
             screen.showResult(message, success);
         } else if (mc.screen instanceof PickerScreen p && p.parent instanceof GachaEditScreen screen) {

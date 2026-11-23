@@ -89,7 +89,7 @@ public final class GachaConfig {
             return o;
         }
 
-        static Entry fromJson(JsonObject o) {
+        public static Entry fromJson(JsonObject o) {
             Entry e = new Entry();
             e.item = o.has("item") ? o.get("item").getAsString().trim() : "";
             e.entity = o.has("entity") ? o.get("entity").getAsString().trim() : "";

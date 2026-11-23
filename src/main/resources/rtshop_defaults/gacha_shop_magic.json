@@ -1,0 +1,30 @@
+{
+  "_설명": "마법 뽑기(별빛 수정 구체) 티켓. 뽑기 티켓 상점에 덧붙는다.",
+  "categories": [
+    {
+      "id": "magic_ticket",
+      "name": "마법 뽑기 티켓",
+      "icon": "rtshop:magic_ticket_select"
+    }
+  ],
+  "items": [
+    {
+      "item": "rtshop:magic_ticket",
+      "price": 12000,
+      "category": "magic_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:magic_ticket_select",
+      "price": 30000,
+      "category": "magic_ticket",
+      "sell": false
+    },
+    {
+      "item": "rtshop:enchant_scroll",
+      "price": 8000,
+      "category": "magic_ticket",
+      "sell": false
+    }
+  ]
+}

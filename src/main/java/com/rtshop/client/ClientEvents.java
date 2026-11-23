@@ -177,7 +177,8 @@ public final class ClientEvents {
     public static boolean hideHud() {
         Minecraft mc = Minecraft.getInstance();
         return Cinematic.active() || EnhanceGrandFx.running()
-                || (mc.screen instanceof GachaScreen gs && gs.fxActiveForTest());
+                || (mc.screen instanceof GachaScreen gs && gs.fxActiveForTest())
+                || (mc.screen instanceof MagicGachaScreen ms && ms.fxActiveForTest()) || MagicClient.approachingForTest();
     }
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
@@ -270,7 +271,13 @@ public final class ClientEvents {
     // ------------------------------------------------------------------ 단축키
 
     @SubscribeEvent
+    public static void onRenderTick(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) MagicClient.frame(event.renderTickTime);
+    }
+
+    @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) MagicClient.tick();
         if (event.phase != TickEvent.Phase.END) {
             return;
         }

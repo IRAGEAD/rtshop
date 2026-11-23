@@ -31,6 +31,10 @@ final class ClientSelfTest2 {
     private static final List<Step> STEPS = new ArrayList<>();
     private static volatile int npc = -1;
     static volatile int qnpc = -1;
+    static volatile net.minecraft.core.BlockPos orbPos;
+    static volatile int magicSkills;
+    static volatile int prevSel;
+    static volatile ItemStack prevSlot8 = ItemStack.EMPTY;
     private static volatile int landId = -1;
     private static volatile int farmA = -1, farmB = -1;
     private static volatile int dishIdx = -1;
@@ -753,6 +757,120 @@ final class ClientSelfTest2 {
             shot(mc, "116b_journal_done");
             mc.setScreen(new FontCalibScreen());
             waitTicks(6);
+        });
+        // ------------------------------------------------------------ 마법 뽑기 (별빛 수정 구체)
+        add(mc -> {
+            mc.setScreen(null);
+            orbPos = null;
+            onServer(mc, sp -> {
+                net.minecraft.core.BlockPos at = sp.blockPosition().relative(sp.getDirection(), 2);
+                for (net.minecraft.core.BlockPos q : net.minecraft.core.BlockPos.betweenClosed(at.offset(-1, 0, -1), at.offset(1, 2, 1))) {
+                    sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                }
+                sp.serverLevel().setBlockAndUpdate(at.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                sp.serverLevel().setBlockAndUpdate(at, com.rtshop.magic.MagicRegistry.ORB.get().defaultBlockState());
+                com.rtshop.magic.MagicConfig c = com.rtshop.magic.MagicConfig.get();
+                magicSkills = 0;
+                for (String cat : com.rtshop.magic.MagicConfig.CATS) magicSkills += c.pool(cat).size();
+                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 10));
+                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET.get(), 20));
+                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 3));
+                ItemStack sword = new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD);
+                sword.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 2);
+                sword.enchant(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 1);
+                prevSel = sp.getInventory().selected;
+                prevSlot8 = sp.getInventory().getItem(8).copy();
+                sp.getInventory().selected = 8;
+                sp.getInventory().setItem(8, sword);
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(8));
+                orbPos = at;
+            });
+            waitTicks(15);
+        });
+        add(mc -> {
+            check("the Starlight Crystal Orb was placed and the magic gacha has skill books from this pack", orbPos != null
+                    && mc.level.getBlockState(orbPos).is(com.rtshop.magic.MagicRegistry.ORB.get()) && magicSkills > 0, magicSkills);
+            if (orbPos != null) {
+                mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
+                        net.minecraft.world.phys.Vec3.atCenterOf(orbPos).add(0, 0.5, 0), net.minecraft.core.Direction.UP, orbPos, false));
+            }
+            waitTicks(4);
+        });
+        add(mc -> {
+            check("using the orb first turns the view toward it (approach scene)", MagicClient.approachingForTest() || mc.screen instanceof MagicGachaScreen);
+            shot(mc, "122_magic_approach");
+            waitTicks(25);
+        });
+        add(mc -> {
+            MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
+            check("then the magic gacha window opens", ms != null, mc.screen);
+            shot(mc, "122b_magic_gacha");
+            if (ms != null) {
+                ms.tabForTest(0);
+                ms.catForTest(0);
+                ms.pullForTest(10);
+            }
+            waitTicks(30);
+        });
+        add(mc -> {
+            MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
+            check("a 10× chosen-field draw plays the rune summoning scene", ms != null && ms.fxActiveForTest(), mc.screen);
+            shot(mc, "122c_magic_fx");
+            waitTicks(40);
+        });
+        add(mc -> {
+            shot(mc, "122d_magic_fx_card");
+            waitTicks(120);
+        });
+        add(mc -> {
+            MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
+            check("after the scene the 10 skill books are listed", ms != null && !ms.fxActiveForTest() && ms.shownForTest() == 10,
+                    ms == null ? mc.screen : ms.shownForTest());
+            int books = 0;
+            for (ItemStack st : mc.player.getInventory().items) if (com.rtshop.gacha.Gacha.marked(st)) books++;
+            check("the drawn skill books are in the bag, marked like gacha items (can be dismantled at Lucky)", books > 0, books);
+            shot(mc, "122e_magic_results");
+            if (ms != null) {
+                ms.mouseClicked(5, 5, 0);
+                ms.tabForTest(2);
+            }
+            waitTicks(5);
+        });
+        add(mc -> {
+            shot(mc, "122f_magic_reroll_tab");
+            if (mc.screen instanceof MagicGachaScreen ms) ms.rerollForTest();
+            waitTicks(20);
+        });
+        add(mc -> {
+            ItemStack held = mc.player.getMainHandItem();
+            int n = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(held).size();
+            check("enchant reroll clears the weapon's enchantments and puts exactly one new one on it", n == 1
+                    && mc.screen instanceof MagicGachaScreen ms && !ms.rerollTextForTest().isEmpty(), n);
+            waitTicks(100);
+        });
+        add(mc -> {
+            shot(mc, "122g_magic_reroll_result");
+            if (mc.screen instanceof MagicGachaScreen ms) ms.mouseClicked(5, 5, 0);
+            com.rtshop.net.ShopNet.CHANNEL.sendToServer(new com.rtshop.net.MagicActionPacket(com.rtshop.net.MagicActionPacket.EDIT, ""));
+            waitTicks(20);
+        });
+        add(mc -> {
+            MagicEditScreen es = mc.screen instanceof MagicEditScreen x ? x : null;
+            check("the OP magic gacha editor opens with the attack-field list", es != null && es.rowsForTest() >= 0, mc.screen);
+            shot(mc, "122h_magic_editor");
+            if (es != null) es.tabForTest(6);
+            waitTicks(4);
+        });
+        add(mc -> {
+            shot(mc, "122i_magic_editor_odds");
+            mc.setScreen(new FontCalibScreen());
+            onServer(mc, sp -> {
+                if (orbPos != null) sp.serverLevel().setBlockAndUpdate(orbPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                sp.getInventory().setItem(8, prevSlot8);
+                sp.getInventory().selected = prevSel;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(prevSel));
+            });
+            waitTicks(5);
         });
         add(mc -> {
             shot(mc, "118_font_calib");

@@ -70,5 +70,7 @@ public final class ShopNet {
         CHANNEL.registerMessage(id++, StoryPacket.class, StoryPacket::encode, StoryPacket::decode, StoryPacket::handle);
         CHANNEL.registerMessage(id++, ItemStatsPacket.class, ItemStatsPacket::encode, ItemStatsPacket::decode, ItemStatsPacket::handle);
         CHANNEL.registerMessage(id++, NoticePacket.class, NoticePacket::encode, NoticePacket::decode, NoticePacket::handle);
+        CHANNEL.registerMessage(id++, MagicPacket.class, MagicPacket::encode, MagicPacket::decode, MagicPacket::handle);
+        CHANNEL.registerMessage(id++, MagicActionPacket.class, MagicActionPacket::encode, MagicActionPacket::decode, MagicActionPacket::handle);
     }
 }
