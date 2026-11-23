@@ -46,6 +46,15 @@ public class ArcaneOrbBlock extends BaseEntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
+    /** Cinematic Interactions 가 장면을 시작할 때(또는 장면을 꺼 둔 경우 창으로) 여는 메뉴. */
+    @Override
+    public net.minecraft.world.MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+        return new net.minecraft.world.SimpleMenuProvider((id, inv, player) -> {
+            if (player instanceof ServerPlayer sp) MagicGacha.menuOpened(sp, pos);
+            return new MagicMenu(id, inv, pos);
+        }, net.minecraft.network.chat.Component.translatable("rtshop.magic.altar"));
+    }
+
     @Override
     public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
         return 9;

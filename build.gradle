@@ -51,6 +51,11 @@ sourceSets {
     }
 }
 
+// 자리표시 중 일부(Cinematic Interactions 장면)는 마인크래프트 클래스를 인자로 쓴다
+configurations {
+    stubsCompileOnly.extendsFrom minecraft
+}
+
 dependencies {
     // 컴파일 기준 버전. 모드팩의 포지(47.4.x)와 API 호환됩니다.
     minecraft 'net.minecraftforge:forge:1.20.1-47.4.0'

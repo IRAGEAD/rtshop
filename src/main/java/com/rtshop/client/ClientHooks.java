@@ -39,6 +39,7 @@ public final class ClientHooks {
 
     public static void onResult(Component message, boolean success) {
         Minecraft mc = Minecraft.getInstance();
+        if (MagicClient.sceneResult(message, success)) return;
         if (mc.screen instanceof ShopScreen screen) {
             screen.showResult(message, success);
         } else if (mc.screen instanceof BankScreen screen) {

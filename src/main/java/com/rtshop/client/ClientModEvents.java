@@ -29,6 +29,11 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
         event.enqueueWork(() -> net.minecraft.client.gui.screens.MenuScreens.register(com.rtshop.enhance.ModEnhance.MENU.get(), EnhanceScreen::new));
+        event.enqueueWork(() -> {
+            net.minecraft.client.gui.screens.MenuScreens.register(com.rtshop.magic.MagicRegistry.MENU.get(), MagicMenuScreen::new);
+            // 공통 설정(구체를 Cinematic 작업대로 등록)이 끝난 뒤에 장면을 붙인다
+            if (com.rtshop.magic.MagicRegistry.cinematic) CinematicOrb.register();
+        });
     }
 
     @SubscribeEvent

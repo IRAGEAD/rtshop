@@ -777,9 +777,9 @@ final class ClientSelfTest2 {
                 savedInv.clear();
                 for (int i = 0; i < sp.getInventory().items.size(); i++) savedInv.add(sp.getInventory().items.get(i).copy());
                 sp.getInventory().items.replaceAll(x -> ItemStack.EMPTY);
-                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 10));
-                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET.get(), 20));
-                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 3));
+                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 30));
+                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET.get(), 30));
+                sp.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 6));
                 ItemStack sword = new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD);
                 sword.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 2);
                 sword.enchant(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 1);
@@ -799,7 +799,87 @@ final class ClientSelfTest2 {
                 mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
                         net.minecraft.world.phys.Vec3.atCenterOf(orbPos).add(0, 0.5, 0), net.minecraft.core.Direction.UP, orbPos, false));
             }
-            waitTicks(4);
+            waitTicks(com.rtshop.magic.MagicRegistry.cinematic ? 30 : 4);
+        });
+        // ---- Cinematic Interactions 가 있으면: 구체는 1인칭 장면으로 열린다 (걸어가 몸을 숙이고, 룬석·소환 문양을 손으로 만진다)
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            LINES.add("  cinematic orb scene: phase=" + CinematicOrb.phaseForTest() + " screen=" + mc.screen);
+            check("with Cinematic Interactions the orb starts a first-person scene instead of a window", CinematicOrb.sceneActive(), CinematicOrb.phaseForTest());
+            shot(mc, "123_orb_scene_intro");
+            waitTicks(70);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            check("the scene becomes active and the altar data has arrived", st != null && "ACTIVE".equals(CinematicOrb.phaseForTest()) && st.readyForTest(),
+                    CinematicOrb.phaseForTest());
+            double[] g0 = st == null ? null : st.guiOfForTest(0), g3 = st == null ? null : st.guiOfForTest(3), gs = st == null ? null : st.guiOfForTest(-1);
+            int sw = mc.getWindow().getGuiScaledWidth(), sh = mc.getWindow().getGuiScaledHeight();
+            boolean in = g0 != null && g3 != null && gs != null && g0[1] > 4 && g0[1] < sh && g3[1] < sh - 4 && gs[1] < sh - 4 && g3[0] > 4 && g3[0] < sw;
+            check("the five rune stones and the summoning sigils are inside the view", in,
+                    (g0 == null ? "?" : (int) g0[0] + "," + (int) g0[1]) + " " + (g3 == null ? "?" : (int) g3[0] + "," + (int) g3[1]) + " "
+                            + (gs == null ? "?" : (int) gs[0] + "," + (int) gs[1]) + " of " + sw + "x" + sh);
+            shot(mc, "123b_orb_scene");
+            if (st != null) st.chooseForTest(0);
+            waitTicks(14);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            shot(mc, "123c_orb_scene_attack");
+            check("touching the 10× sigil starts the summoning ritual", st != null && st.pullForTest(10));
+            waitTicks(9);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            shot(mc, "123d_orb_ritual");
+            waitTicks(34);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            check("at the ritual's peak the rune summoning cards play over the scene", st != null && st.fxActiveForTest(), st == null ? "no scene" : st.shownForTest());
+            shot(mc, "123e_orb_fx");
+            waitTicks(170);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            check("after the cards the 10 skill books are listed (scene)", st != null && !st.fxActiveForTest() && st.shownForTest() == 10,
+                    st == null ? "no scene" : st.shownForTest());
+            shot(mc, "123f_orb_results");
+            if (st != null) {
+                st.dismissForTest();
+                st.chooseForTest(-1);
+            }
+            waitTicks(12);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            shot(mc, "123g_orb_scene_random");
+            check("touching the blue sigil rerolls the held weapon's enchantment (scene)", st != null && st.rerollForTest());
+            waitTicks(60);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            int n = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(mc.player.getMainHandItem()).size();
+            check("the scene reroll leaves exactly one enchantment on the weapon", n == 1, n);
+            shot(mc, "123h_orb_reroll");
+            if (st != null) st.dismissForTest();
+            CinematicOrb.leaveForTest();
+            waitTicks(50);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            check("stepping back ends the scene", !CinematicOrb.sceneActive(), CinematicOrb.phaseForTest());
+            // 아래의 창 점검을 위해 보통 창으로 다시 연다 (Cinematic 이 없을 때의 길)
+            onServer(mc, sp -> {
+                if (orbPos != null) com.rtshop.magic.MagicGacha.open(sp, orbPos);
+            });
+            waitTicks(5);
         });
         add(mc -> {
             check("using the orb first turns the view toward it (approach scene)", MagicClient.approachingForTest() || mc.screen instanceof MagicGachaScreen);
@@ -868,6 +948,26 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "122i_magic_editor_odds");
+            if (mc.screen instanceof MagicEditScreen es) es.tabForTest(7);
+            waitTicks(4);
+        });
+        add(mc -> {
+            shot(mc, "122j_magic_editor_pity_rune");
+            mc.setScreen(null);
+            // 메뉴로 열리는 길 (Cinematic 은 있지만 장면을 꺼 둔 경우): 같은 룬 제단 창이 떠야 한다
+            onServer(mc, sp -> {
+                if (orbPos != null) {
+                    var st = sp.serverLevel().getBlockState(orbPos);
+                    var prov = st.getMenuProvider(sp.serverLevel(), orbPos);
+                    if (prov != null) sp.openMenu(prov);
+                }
+            });
+            waitTicks(12);
+        });
+        add(mc -> {
+            check("opened as a menu (scene turned off) the orb shows the same rune altar window", mc.screen instanceof MagicMenuScreen
+                    && mc.player.containerMenu instanceof com.rtshop.magic.MagicMenu, mc.screen);
+            shot(mc, "122k_magic_menu_window");
             mc.setScreen(new FontCalibScreen());
             onServer(mc, sp -> {
                 if (orbPos != null) sp.serverLevel().setBlockAndUpdate(orbPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());

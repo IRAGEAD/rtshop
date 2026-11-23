@@ -51,7 +51,16 @@ public final class MagicRegistry {
             () -> new TooltipItem(new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON), false,
                     "item.rtshop.enchant_scroll.tip", "item.rtshop.magic_ticket.tip2"));
 
+    /** Cinematic Interactions 에 구체가 장면으로 등록되었는가 (CinematicCompat 이 켠다). */
+    public static boolean cinematic;
+
+    /** 구체의 빈 메뉴 (Cinematic Interactions 장면용, 장면을 끄면 룬 제단 창). */
+    public static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, RtShop.MODID);
+    public static final RegistryObject<net.minecraft.world.inventory.MenuType<MagicMenu>> MENU = MENUS.register("magic_altar",
+            () -> net.minecraftforge.common.extensions.IForgeMenuType.create((id, inv, buf) -> new MagicMenu(id, inv, null)));
+
     public static void register(IEventBus bus) {
+        MENUS.register(bus);
         BLOCKS.register(bus);
         BLOCK_ENTITIES.register(bus);
         ITEMS.register(bus);

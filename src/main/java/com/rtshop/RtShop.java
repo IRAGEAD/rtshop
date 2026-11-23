@@ -38,6 +38,9 @@ public class RtShop {
 
     private void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(FarmEvents::registerCompat);
+        event.enqueueWork(() -> {
+            if (net.minecraftforge.fml.ModList.get().isLoaded("cinematic")) com.rtshop.magic.CinematicCompat.register();
+        });
     }
 
     private void onCreativeTab(BuildCreativeModeTabContentsEvent event) {

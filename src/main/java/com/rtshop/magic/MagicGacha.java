@@ -128,6 +128,17 @@ public final class MagicGacha {
         send(p, MagicPacket.VIEW, o);
     }
 
+    /** 메뉴로 열렸을 때 (Cinematic 장면 또는 그 대신 뜨는 창): 자리를 기억하고 창 내용을 먼저 보낸다. */
+    public static void menuOpened(ServerPlayer p, BlockPos pos) {
+        SESSIONS.put(p.getUUID(), pos.immutable());
+        JsonObject o = view(p);
+        o.addProperty("menu", true);
+        o.addProperty("x", pos.getX());
+        o.addProperty("y", pos.getY());
+        o.addProperty("z", pos.getZ());
+        send(p, MagicPacket.VIEW, o);
+    }
+
     private static JsonArray chances(GachaConfig g, String cat, String mode) {
         JsonArray a = new JsonArray();
         for (double d : Gacha.gradeChances(g, cat, mode)) a.add(d);
@@ -249,6 +260,12 @@ public final class MagicGacha {
         JsonObject o = view(p);
         o.add("results", res);
         if (pityHit) o.addProperty("pityHit", true);
+        BlockPos at = SESSIONS.get(p.getUUID());
+        if (at != null) {
+            o.addProperty("x", at.getX());
+            o.addProperty("y", at.getY());
+            o.addProperty("z", at.getZ());
+        }
         o.addProperty("mode", mode);
         o.addProperty("resultCat", select ? cat : MagicConfig.RANDOM);
         send(p, MagicPacket.RESULT, o);

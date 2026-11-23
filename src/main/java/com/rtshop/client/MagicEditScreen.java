@@ -106,6 +106,7 @@ public class MagicEditScreen extends Screen {
         x0 = (width - W) / 2;
         y0 = (height - H) / 2;
         if (tab == 6) initOdds();
+        if (tab == 7) initExtra();
     }
 
     private void numberBox(int x, int y, int w, String value, java.util.function.Consumer<String> set) {
@@ -153,6 +154,99 @@ public class MagicEditScreen extends Screen {
         }
     }
 
+    private JsonObject section(String key) {
+        if (!cfg.has(key)) cfg.add(key, new JsonObject());
+        return cfg.getAsJsonObject(key);
+    }
+
+    private static boolean flag(JsonObject o, String k, boolean def) {
+        return o.has(k) ? o.get(k).getAsBoolean() : def;
+    }
+
+    private static String val(JsonObject o, String k, String def) {
+        return o.has(k) ? num(o.get(k).getAsDouble()) : def;
+    }
+
+    /** 천장·오늘의 룬 칸 */
+    private void initExtra() {
+        JsonObject pity = section("pity"), bl = section("blessing");
+        numberBox(x0 + 130, y0 + 66, 44, val(pity, "count", "80"), v -> {
+            try {
+                pity.addProperty("count", Math.max(1, Math.min(100000, v.isEmpty() ? 1 : (int) Double.parseDouble(v))));
+            } catch (NumberFormatException ignored) {
+            }
+        });
+        numberBox(x0 + 140, y0 + 132, 36, val(bl, "discountPercent", "20"), v -> {
+            try {
+                bl.addProperty("discountPercent", Math.max(0, Math.min(90, v.isEmpty() ? 0 : (int) Double.parseDouble(v))));
+            } catch (NumberFormatException ignored) {
+            }
+        });
+        numberBox(x0 + 256, y0 + 132, 36, val(bl, "periodHours", "24"), v -> {
+            try {
+                bl.addProperty("periodHours", Math.max(1, Math.min(720, v.isEmpty() ? 24 : (int) Double.parseDouble(v))));
+            } catch (NumberFormatException ignored) {
+            }
+        });
+        numberBox(x0 + 372, y0 + 132, 40, val(bl, "oddsBoost", "1"), v -> {
+            try {
+                bl.addProperty("oddsBoost", Math.max(1.0, Math.min(10.0, v.isEmpty() ? 1.0 : Double.parseDouble(v))));
+            } catch (NumberFormatException ignored) {
+            }
+        });
+    }
+
+    private void renderExtra(GuiGraphics g, int mx, int my, int px, int py, int pw) {
+        JsonObject pity = section("pity"), bl = section("blessing");
+        int ty = y0 + 48;
+        for (var line : font.split(Component.translatable("rtshop.magic.edit_pity_head"), pw - 12)) {
+            g.drawString(font, line, px + 6, ty, Ui.C_INK, false);
+            ty += 9;
+            if (ty > y0 + 60) break;
+        }
+        boolean pOn = flag(pity, "enabled", true);
+        btn(g, mx, my, x0 + 16, y0 + 65, 60, 16, tr(pOn ? "rtshop.magic.edit_on" : "rtshop.magic.edit_off"), () -> {
+            pity.addProperty("enabled", !pOn);
+            changed();
+        });
+        g.drawString(font, tr("rtshop.magic.edit_pity_count"), x0 + 90, y0 + 69, Ui.C_INK, false);
+        g.drawString(font, tr("rtshop.magic.edit_pity_grade"), x0 + 190, y0 + 69, Ui.C_INK, false);
+        String pg = pity.has("grade") ? pity.get("grade").getAsString() : "legendary";
+        int gx = x0 + 250;
+        btn(g, mx, my, gx, y0 + 65, 90, 16, tr("rtshop.gacha.grade." + pg) + " ▼", () -> {
+            List<ChoicePopup.Option> o = new ArrayList<>();
+            for (int i = 2; i < 6; i++) o.add(new ChoicePopup.Option(GRADES[i], tr("rtshop.gacha.grade." + GRADES[i])));
+            popup = new ChoicePopup(gx, y0 + 65, 90, 16, height, font, o, pg, v -> {
+                pity.addProperty("grade", v);
+                changed();
+            });
+        });
+        boolean sh = flag(pity, "shared", true);
+        btn(g, mx, my, x0 + 16, y0 + 86, 230, 16, tr("rtshop.magic.edit_pity_shared", tr(sh ? "rtshop.magic.edit_on" : "rtshop.magic.edit_off")), () -> {
+            pity.addProperty("shared", !sh);
+            changed();
+        });
+        ty = y0 + 110;
+        for (var line : font.split(Component.translatable("rtshop.magic.edit_bless_head"), pw - 12)) {
+            g.drawString(font, line, px + 6, ty, Ui.C_INK, false);
+            ty += 9;
+            if (ty > y0 + 122) break;
+        }
+        boolean bOn = flag(bl, "enabled", true);
+        btn(g, mx, my, x0 + 16, y0 + 131, 60, 16, tr(bOn ? "rtshop.magic.edit_on" : "rtshop.magic.edit_off"), () -> {
+            bl.addProperty("enabled", !bOn);
+            changed();
+        });
+        g.drawString(font, tr("rtshop.magic.edit_bless_discount"), x0 + 90, y0 + 135, Ui.C_INK, false);
+        g.drawString(font, tr("rtshop.magic.edit_bless_hours"), x0 + 190, y0 + 135, Ui.C_INK, false);
+        g.drawString(font, tr("rtshop.magic.edit_bless_boost"), x0 + 304, y0 + 135, Ui.C_INK, false);
+        ty = y0 + 154;
+        for (var line : font.split(Component.translatable("rtshop.magic.edit_bless_note"), pw - 12)) {
+            g.drawString(font, line, px + 6, ty, Ui.C_INK_SOFT, false);
+            ty += 9;
+        }
+    }
+
     private void hit(int x, int y, int w, int h, Runnable r) {
         hits.add(new Object[]{x, y, w, h, r});
     }
@@ -186,12 +280,13 @@ public class MagicEditScreen extends Screen {
         g.drawString(font, title, x0 + 10, y0 + 8, Ui.C_GOLD, false);
         if (dirty) g.drawString(font, tr("rtshop.enhedit.unsaved"), x0 + 14 + font.width(title), y0 + 8, 0xFFE0A070, false);
         // 탭
-        String[] names = new String[7];
+        String[] names = new String[8];
         for (int i = 0; i < 5; i++) names[i] = tr("rtshop.magic.cat." + CATS[i]);
         names[5] = tr("rtshop.magic.tab.reroll");
         names[6] = tr("rtshop.magic.edit_odds");
-        int tw = (W - 20) / 7;
-        for (int i = 0; i < 7; i++) {
+        names[7] = tr("rtshop.magic.edit_extra");
+        int tw = (W - 20) / 8;
+        for (int i = 0; i < 8; i++) {
             final int k = i;
             int bx = x0 + 10 + i * tw;
             boolean sel = i == tab;
@@ -207,7 +302,8 @@ public class MagicEditScreen extends Screen {
         int px = x0 + 10, py = y0 + 40, pw = W - 20, ph = H - 72;
         g.fill(px, py, px + pw, py + ph, Ui.C_PARCH);
         if (tab <= 5) renderList(g, mx, my, px, py, pw, ph);
-        else renderOdds(g, mx, my, px, py, pw);
+        else if (tab == 6) renderOdds(g, mx, my, px, py, pw);
+        else renderExtra(g, mx, my, px, py, pw);
         // 아래 단추
         int by = y0 + H - 28;
         btn(g, mx, my, x0 + 10, by, 60, 18, tr("rtshop.enhedit.save"), this::save);

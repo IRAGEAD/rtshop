@@ -32,6 +32,19 @@ public final class MagicClient {
         return approachTicks > 0;
     }
 
+    /** 마지막으로 받은 창 내용 (메뉴로 열리는 창·Cinematic 장면이 처음에 쓴다). */
+    public static JsonObject lastView;
+
+    /** Cinematic Interactions 장면이 등록되어 있는가. */
+    static boolean cinematic() {
+        return com.rtshop.magic.MagicRegistry.cinematic;
+    }
+
+    /** 장면이 진행 중이면 서버의 알림(실패 등)을 장면에 보여 준다. */
+    public static boolean sceneResult(net.minecraft.network.chat.Component msg, boolean ok) {
+        return cinematic() && CinematicOrb.result(msg, ok);
+    }
+
     public static void receive(int kind, String json) {
         Minecraft mc = Minecraft.getInstance();
         JsonObject o;
@@ -40,6 +53,8 @@ public final class MagicClient {
         } catch (Exception e) {
             return;
         }
+        if (kind == MagicPacket.VIEW) lastView = o;
+        if (kind != MagicPacket.EDITOR && cinematic() && CinematicOrb.route(kind, o)) return;
         switch (kind) {
             case MagicPacket.VIEW -> {
                 if (o.has("open") && mc.player != null) {
@@ -80,6 +95,7 @@ public final class MagicClient {
 
     /** 매 틱: 다가가기 연출을 진행하고, 끝나면 창을 연다. */
     public static void tick() {
+        if (cinematic()) CinematicOrb.tick();
         if (approachTicks <= 0) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) {
