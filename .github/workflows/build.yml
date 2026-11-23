@@ -219,6 +219,17 @@ jobs:
           } > /tmp/inspect/nightfall.txt 2>&1
           # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
           ls packcache > /tmp/inspect/jars.txt
+          # 환술사 모드: 유령 우민이 안 보이는 문제를 찾기 위한 렌더러·엔티티 클래스
+          IJ="$(ls packcache/*.jar | grep -i "illusioner" | head -1)"
+          if [ -n "$IJ" ]; then
+            {
+              unzip -l "$IJ" | awk '{print $4}' | grep -E "\.class$" | head -n 200
+              mkdir -p /tmp/ill && (cd /tmp/ill && unzip -o -q "$OLDPWD/$IJ" 2>/dev/null || unzip -o -q "$IJ")
+              for c in $(cd /tmp/ill && find . -name "*.class" | grep -iE "ghost|render|client" | head -n 40); do
+                echo "======== $c"; javap -p -c -constants -cp /tmp/ill "${c#./}" 2>/dev/null | grep -vE "^\s+[0-9]+: (aload|iload|fload|dload|astore|istore|fstore|dstore|dup|pop|return|areturn|ireturn|freturn)" | head -n 260
+              done
+            } > /tmp/inspect/illusioner-render.txt 2>&1 || true
+          fi
           # 'Empty height range: biased[0 above bottom-194 below top]' 경고를 내는 지형 장식 찾기
           for J in packcache/*.jar; do
             unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "worldgen/placed_feature/.*\.json$" | while read f; do

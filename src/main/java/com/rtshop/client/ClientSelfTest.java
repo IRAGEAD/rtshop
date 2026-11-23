@@ -61,6 +61,9 @@ public final class ClientSelfTest {
     private static final List<String> LINES = new ArrayList<>();
     private static int step = 0;
     static int wait = 0;
+    private static boolean barrierPosted;
+    private static volatile boolean barrierDone = true;
+    private static long barrierAt;
     private static int idle = 0;
     private static int passed = 0;
     private static int failed = 0;
@@ -132,6 +135,18 @@ public final class ClientSelfTest {
             wait--;
             return;
         }
+        // 다음 단계 전에 내장 서버가 밀린 일을 마쳤는지 확인한다 (모드팩 전체에서는 지형 생성으로 서버가 수십 초 멈출 때가 있다)
+        if (!barrierPosted) {
+            barrierPosted = true;
+            barrierDone = false;
+            barrierAt = System.currentTimeMillis();
+            mc.getSingleplayerServer().execute(() -> barrierDone = true);
+            return;
+        }
+        if (!barrierDone && System.currentTimeMillis() - barrierAt < 90_000) {
+            return;
+        }
+        barrierPosted = false;
         try {
             next(mc);
         } catch (Throwable t) {

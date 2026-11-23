@@ -2135,7 +2135,7 @@ public final class SelfTest {
                     java.nio.file.Files.exists(com.rtshop.compat.IdasVanilla.marker()), n + " " + com.rtshop.compat.IdasVanilla.LAST);
             // 스토리에 필요한 바닐라 구조물을 실제로 찾을 수 있는가 (/locate 와 같은 방법, 시작점 둘레 64 청크)
             var sreg = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
-            for (String sid : List.of("#minecraft:ruined_portal", "minecraft:desert_pyramid", "minecraft:mansion", "minecraft:ancient_city")) {
+            for (String sid : List.of("#minecraft:ruined_portal", "minecraft:desert_pyramid", "minecraft:ancient_city")) { // 맨션은 히든 보스 자리라 단계적으로 생긴다
                 net.minecraft.core.HolderSet<net.minecraft.world.level.levelgen.structure.Structure> set;
                 if (sid.startsWith("#")) {
                     set = sreg.getTag(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, new ResourceLocation(sid.substring(1)))).orElse(null);

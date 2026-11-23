@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  * 바닐라 우드랜드 맨션 안에는 바닐라 우민(변명자·소환사·약탈자·환술사)이 나타나지 않는다.
- * 맨션은 히든 보스(환술사 모드)의 자리라서, 그 보스와 습격(레이드)에 딸린 우민은 그대로 둔다.
+ * 맨션은 히든 보스(환술사 모드)의 자리라서, 그 보스와 보스가 소환하는 우민, 습격(레이드)에 딸린 우민은 그대로 둔다.
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID)
 public final class MansionIllagers {
@@ -34,6 +34,8 @@ public final class MansionIllagers {
         ResourceLocation id = ForgeRegistries.ENTITY_TYPES.getKey(e.getType());
         if (id == null || !BLOCKED.contains(id.toString())) return;
         if (e instanceof Raider r && r.getCurrentRaid() != null) return; // 습격은 그대로
+        // 맨션이 만들어질 때 놓인 우민(청크와 함께 불러온 것)만 막는다. 보스전 기믹 등 게임 중에 새로 소환되는 우민은 그대로 나온다.
+        if (!event.loadedFromDisk()) return;
         if (inMansion(level, e)) event.setCanceled(true);
     }
 
