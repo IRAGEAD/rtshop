@@ -446,6 +446,8 @@ NEW = {
  "rtshop.gacha.fx.yamato_sub": ("— 무기 뽑기 최상위 등급 · 야마토 —", "— The highest weapon grade · YAMATO —"),
  "rtshop.gacha.broadcast_yamato": ("⚔ %s 님이 %s에서 YAMATO [%s] 을(를) 뽑았습니다!!", "⚔ %s pulled YAMATO [%3$s] from %2$s!!"),
  "rtshop.subtitle.gacha_yamato": ("야마토의 울림", "Yamato resonates"),
+ "rtshop.subtitle.gacha_blackout": ("모든 소리가 끊긴다", "Everything goes silent"),
+ "rtshop.subtitle.gacha_legendary": ("웅장한 화음", "A grand chord"),
  "rtshop.gacha.fx.epic": ("영웅 등급!", "EPIC!"),
  "rtshop.gacha.fx.legendary": ("전설 등급!!", "LEGENDARY!!"),
  "rtshop.gacha.fx.skip": ("클릭해서 건너뛰기", "Click to skip"),

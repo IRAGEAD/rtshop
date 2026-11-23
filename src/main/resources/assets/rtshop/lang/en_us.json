@@ -1253,5 +1253,7 @@
   "rtshop.talk.hint_scene": "Click/Space: next · finish to continue",
   "rtshop.quest.next_npc": "Next, go see %s. (\"%s\")",
   "rtshop.quest.next_same": "There's more to tell. Talk to me again. (\"%s\")",
-  "rtshop.rules.type.smithing": "Smithing table"
+  "rtshop.rules.type.smithing": "Smithing table",
+  "rtshop.subtitle.gacha_blackout": "Everything goes silent",
+  "rtshop.subtitle.gacha_legendary": "A grand chord"
 }

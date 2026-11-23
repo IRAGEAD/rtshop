@@ -36,36 +36,46 @@ import java.util.List;
  * <li>고급 (1.9초): 카드가 떠오르며 초록빛이 한 번 고동치고, 반짝이며 뒤집힌다.</li>
  * <li>희귀 (2.8초): 어두워지고 카드가 돌며 종소리가 세 번 올라간다 → 숨을 멈추는 정적 → 유리처럼 깨지며 푸른 충격파.</li>
  * <li>영웅 (4.4초): 마법진이 그려지고 심장이 뛴다 → 보랏빛 번개가 카드에 내리꽂힌다 → 빨려 들어갔다가 폭발.</li>
- * <li>전설 (7.8초): 영웅인 척 시작 → 갑자기 모든 소리가 멎는 정적 → 하늘에서 금빛 번개가 떨어지며 '승급' →
- *     빛기둥·금빛 고리·올라가는 종소리 → 빨려 들어갔다가 대폭발, 색종이와 함께 전설.</li>
- * <li>YAMATO (14.5초, 무기 뽑기 전용): 전설 연출과 똑같이 가다가, 금빛이 차오르는 순간 음악이 시작되며 시간이 멈춘다 →
- *     음악의 박자에 맞춰 화면 곳곳이 베인다 (차원참) → 정적 → 칼집에 넣는 '딸깍' → 화면이 베인 자리대로 깨져 흩어지고
- *     푸른 허공 속에서 환영검에 둘러싸인 야마토가 나타난다.</li>
+ * <li>전설 (9.1초): 영웅 연출과 똑같이 가다가 폭발 직전에 모든 소리가 끊기며 암전 → 어둠 속에 금빛 금이 간다 →
+ *     웅장한 화음과 함께 전설 카드가 튀어나온다 → 빛기둥·금빛 고리·올라가는 종소리 → 빨려 들어갔다가 대폭발.</li>
+ * <li>YAMATO (17.2초, 무기 뽑기 전용): 전설과 똑같이 가다가 네 번째 종이 울린 뒤 다시 암전 → 칼을 뽑는 소리와 함께
+ *     어둠을 가르는 칼빛 → 점점 빨라지는 차원참 40번과 마지막 X 자 → 화면이 수백 조각으로 깨지고 세상이 흑백으로 멈춘다 →
+ *     천천히 칼집에 넣고 '딸깍' → 조각이 한꺼번에 터져 나가며 색이 돌아오고, 환영검에 둘러싸인 야마토가 나타난다.
+ *     소리는 모두 음악(tools/gacha_audio.py) 하나에 박자를 맞춰 들어 있다.</li>
  * </ul>
  */
 public final class GachaFx {
     public static final int COMMON = 0, UNCOMMON = 1, RARE = 2, EPIC = 3, LEGENDARY = 4, YAMATO = 5;
-    private static final int[] LEN = {28, 38, 56, 88, 156, 290};
+    private static final int[] LEN = {28, 38, 56, 88, 182, 344};
 
     // 희귀
     private static final int RARE_HOLD = 32, RARE_BURST = 40;
     // 영웅
     private static final int EPIC_BOLTS = 48, EPIC_IMPLODE = 62, EPIC_BURST = 66;
-    // 전설 (YAMATO 도 102 틱까지 똑같다)
-    private static final int LEG_SILENCE = 52, LEG_STRIKE = 62, LEG_IMPLODE = 112, LEG_BURST = 118;
+    // 전설: 영웅인 척(~63) → 암전(64) → 전설 카드(78) → 종 네 번 → 폭발(142). YAMATO 도 129 틱까지 똑같다
+    private static final int LEG_DARK = 64, LEG_STRIKE = 78, LEG_IMPLODE = 136, LEG_BURST = 142;
+    private static final int[] LEG_BELLS = {92, 104, 116, 126};
     // YAMATO: 음악(rtshop:gacha.yamato)이 YM_START 에 시작. 아래는 음악 시간(초) × 20 + YM_START
-    public static final int YM_START = 102;
-    /** 음악 속 베는 소리 (초). tools/yamato_music.py 의 SLASH_TIMES 와 같아야 한다. */
-    private static final double[] SLASH_TIMES = {0.32, 0.53, 0.75, 0.86, 1.07, 1.18, 1.39, 1.50, 1.61, 1.71, 1.82, 1.93, 2.03, 2.14};
-    private static final int YM_QUIET = YM_START + 46;   // 2.30초 정적
-    private static final int YM_CLICK = YM_START + 58;   // 2.90초 칼집 '딸깍'
-    public static final int YM_BREAK = YM_START + 60;    // 3.00초 화면이 깨진다
-    private static final int YM_TITLE = YM_BREAK + 12;
+    public static final int YM_START = 130;              // 0.00초 다시 암전
+    private static final int YM_DRAW = YM_START + 8;     // 0.40초 칼을 뽑는다
+    /** 음악 속 차원참 (초). tools/gacha_audio.py 의 SLASH 와 같아야 한다. */
+    private static final double[] SLASH_TIMES = {0.75, 0.816, 0.88, 0.941, 1.0, 1.057, 1.112, 1.165, 1.217, 1.267, 1.316, 1.363, 1.409, 1.454,
+            1.497, 1.539, 1.581, 1.621, 1.66, 1.699, 1.736, 1.773, 1.809, 1.844, 1.879, 1.912, 1.946, 1.978, 2.01, 2.041, 2.072, 2.102, 2.131, 2.16,
+            2.189, 2.217, 2.244, 2.271, 2.298, 2.324};
+    /** 마지막 X 자 (초). */
+    private static final double[] X_TIMES = {2.38, 2.44};
+    public static final int YM_BREAK = YM_START + 50;    // 2.50초 화면이 깨지고 흑백으로 멈춘다
+    private static final int YM_SHEATHE = YM_BREAK + 8;  // 2.90초부터 천천히 칼집에 넣는다
+    private static final int YM_CLICK = YM_START + 72;   // 3.60초 '딸깍'
+    public static final int YM_BOOM = YM_START + 74;     // 3.70초 대폭발, 색이 돌아온다
+    private static final int YM_TITLE = YM_BOOM + 14;
 
     private static final int GRAY = 0xC8C8C8, GREEN = 0x55D24A, GREEN_LIGHT = 0xC8FFB8, BLUE = 0x4A9BE8, BLUE_LIGHT = 0xCFE8FF;
     private static final int PURPLE = 0xB45AE8, PURPLE_LIGHT = 0xE6C2FF, GOLD = 0xFFC63A, GOLD_LIGHT = 0xFFF0B0;
     private static final int YM_BLUE = 0x49B6FF, YM_CYAN = 0x9FF4FF, YM_DEEP = 0x0A1C46;
     private static final ResourceLocation YAMATO_MUSIC = new ResourceLocation("rtshop", "gacha.yamato");
+    private static final ResourceLocation BLACKOUT_SFX = new ResourceLocation("rtshop", "gacha.blackout");
+    private static final ResourceLocation LEGENDARY_SFX = new ResourceLocation("rtshop", "gacha.legendary_pop");
 
     private static final class Spark {
         float x, y, px, py, vx, vy, drag, grav, size;
@@ -75,8 +85,9 @@ public final class GachaFx {
     /** 화면 조각 (YAMATO): 세 꼭짓점(화면 좌표)과 그 자리의 그림. */
     private static final class Shard {
         float[] x = new float[3], y = new float[3];
-        float cx, cy, vx, vy, rot, vr;
+        float cx, cy, vx, vy, rot, vr, dx, dy, speed;
         int delay;
+        boolean blown;
     }
 
     private final RandomSource rnd = RandomSource.create();
@@ -89,8 +100,8 @@ public final class GachaFx {
     private ItemStack stack = ItemStack.EMPTY;
     private String name = "";
     private SoundInstance music;
-    private DynamicTexture shot;
-    private ResourceLocation shotId;
+    private DynamicTexture shot, shotGray;
+    private ResourceLocation shotId, grayId;
     private boolean captured;
     private int lastW = 320, lastH = 240;
 
@@ -105,15 +116,16 @@ public final class GachaFx {
         slashes.clear();
         captured = false;
         if (this.grade == YAMATO) {
+            // 화면 전체를 가로지르는 선: {각도, 가운데에서 비켜난 x, y (화면 비율), 거품 여부}
             RandomSource r = RandomSource.create(9173);
+            float last = 0;
             for (int i = 0; i < SLASH_TIMES.length; i++) {
-                // 화면을 가로지르는 선: 가운데 근처를 지나며 각도는 제각각
-                float a = (float) (r.nextFloat() * Math.PI);
-                float ox = (r.nextFloat() - 0.5F) * 140;
-                float oy = (r.nextFloat() - 0.5F) * 90;
-                float len = 220 + r.nextFloat() * 140;
-                slashes.add(new float[]{ox - Mth.cos(a) * len, oy - Mth.sin(a) * len, ox + Mth.cos(a) * len, oy + Mth.sin(a) * len});
+                float a = last + 0.6F + r.nextFloat() * 1.9F; // 앞의 선과 많이 다른 각도
+                last = a;
+                slashes.add(new float[]{a, (r.nextFloat() - 0.5F) * 0.8F, (r.nextFloat() - 0.5F) * 0.7F, i % 3 == 1 ? 1 : 0});
             }
+            slashes.add(new float[]{(float) Math.toRadians(35), 0, 0, 0});
+            slashes.add(new float[]{(float) Math.toRadians(145), 0, 0, 0});
         }
         events(0);
     }
@@ -145,14 +157,15 @@ public final class GachaFx {
             }
             music = null;
         }
-        if (shotId != null) {
+        for (ResourceLocation id : new ResourceLocation[]{shotId, grayId}) {
+            if (id == null) continue;
             try {
-                Minecraft.getInstance().getTextureManager().release(shotId);
+                Minecraft.getInstance().getTextureManager().release(id);
             } catch (Throwable ignored) {
             }
-            shotId = null;
-            shot = null;
         }
+        shotId = grayId = null;
+        shot = shotGray = null;
         shards.clear();
     }
 
@@ -178,10 +191,23 @@ public final class GachaFx {
         update();
         for (Shard s : shards) {
             if (t - YM_BREAK < s.delay) continue;
+            if (t < YM_BOOM) {
+                // 흑백 속 느린 시간: 아주 천천히 벌어진다
+                s.cx += s.vx * 0.06F;
+                s.cy += s.vy * 0.06F;
+                s.rot += s.vr * 0.06F;
+                continue;
+            }
+            if (!s.blown) {
+                s.blown = true;
+                s.vx = s.dx * s.speed;
+                s.vy = s.dy * s.speed - 2;
+                s.vr *= 4;
+            }
             s.cx += s.vx;
             s.cy += s.vy;
-            s.vy += 0.55F;
-            s.vx *= 0.985F;
+            s.vy += 0.4F;
+            s.vx *= 0.98F;
             s.rot += s.vr;
         }
         if (!active()) stop();
@@ -192,7 +218,7 @@ public final class GachaFx {
     }
 
     private void update() {
-        if (frozen() && t < YM_BREAK) {
+        if (frozen() && t < YM_BOOM) {
             return; // 시간이 멈춘다
         }
         for (int i = sparks.size() - 1; i >= 0; i--) {
@@ -212,6 +238,22 @@ public final class GachaFx {
     private static void sfx(SoundEvent e, float pitch, float vol) {
         try {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(e, pitch, vol));
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** 지금 나는 연출 소리를 모두 끊는다 (암전). */
+    private static void cutAll() {
+        try {
+            Minecraft.getInstance().getSoundManager().stop(null, SoundSource.MASTER);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void sfx2(ResourceLocation id, float vol) {
+        try {
+            Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(id, SoundSource.MASTER, vol, 1.0F, RandomSource.create(), false, 0,
+                    SoundInstance.Attenuation.NONE, 0, 0, 0, true));
         } catch (Throwable ignored) {
         }
     }
@@ -310,31 +352,31 @@ public final class GachaFx {
             yamatoEvents(t);
             return;
         }
+        if (t < LEG_DARK) {
+            epicEvents(t); // 영웅인 척 (폭발 직전까지)
+            return;
+        }
+        for (int k = 0; k < LEG_BELLS.length; k++) {
+            if (t == LEG_BELLS[k]) {
+                sfx(SoundEvents.BELL_BLOCK, new float[]{1.0F, 1.19F, 1.41F, 1.68F}[k], 1.0F);
+                sfx(SoundEvents.NOTE_BLOCK_BELL.value(), new float[]{1.0F, 1.19F, 1.41F, 1.68F}[k], 0.5F);
+            }
+        }
         switch (t) {
-            case 1 -> sfx(SoundEvents.ENCHANTMENT_TABLE_USE, 0.6F, 1.0F);
-            case 3 -> sfx(SoundEvents.AMETHYST_BLOCK_RESONATE, 0.5F, 1.0F);
-            case 8 -> sfx(SoundEvents.WARDEN_HEARTBEAT, 0.9F, 1.0F);
-            case 20 -> sfx(SoundEvents.WARDEN_HEARTBEAT, 0.95F, 1.0F);
-            case 30 -> {
-                sfx(SoundEvents.WARDEN_HEARTBEAT, 1.0F, 1.0F);
-                sfx(SoundEvents.WARDEN_SONIC_CHARGE, 0.8F, 0.5F);
+            case LEG_DARK -> {
+                cutAll();
+                sfx2(BLACKOUT_SFX, 1.0F);
             }
-            case 38 -> sfx(SoundEvents.WARDEN_HEARTBEAT, 1.05F, 1.0F);
-            case 44 -> sfx(SoundEvents.WARDEN_HEARTBEAT, 1.1F, 1.0F);
-            case 49 -> sfx(SoundEvents.WARDEN_HEARTBEAT, 1.15F, 1.0F);
-            // LEG_SILENCE ~ LEG_STRIKE: 아무 소리도 없다 (숨이 멎는다)
-            case LEG_SILENCE + 7 -> sfx(SoundEvents.WARDEN_HEARTBEAT, 0.7F, 0.6F);
+            case LEG_DARK + 7 -> sfx(SoundEvents.WARDEN_HEARTBEAT, 0.7F, 0.7F);
+            case LEG_DARK + 11 -> sfx(SoundEvents.AMETHYST_BLOCK_RESONATE, 0.5F, 0.6F);
             case LEG_STRIKE -> {
-                sfx(SoundEvents.LIGHTNING_BOLT_THUNDER, 0.9F, 1.0F);
-                sfx(SoundEvents.LIGHTNING_BOLT_IMPACT, 0.8F, 1.0F);
-                sfx(SoundEvents.TOTEM_USE, 1.6F, 0.4F);
-                burst(60, 3.0F, GOLD, 0xFFFFFF, GOLD_LIGHT);
+                sfx2(LEGENDARY_SFX, 1.0F);
+                sfx(SoundEvents.LIGHTNING_BOLT_THUNDER, 0.9F, 0.7F);
+                sfx(SoundEvents.TOTEM_USE, 1.4F, 0.5F);
+                burst(110, 5.0F, GOLD, 0xFFFFFF, GOLD_LIGHT);
             }
-            case LEG_STRIKE + 5 -> sfx(SoundEvents.BEACON_ACTIVATE, 1.1F, 1.0F);
-            case 76 -> sfx(SoundEvents.BELL_BLOCK, 1.0F, 1.0F);
-            case 86 -> sfx(SoundEvents.BELL_BLOCK, 1.19F, 1.0F);
-            case 96 -> sfx(SoundEvents.BELL_BLOCK, 1.41F, 1.0F);
-            case 104 -> sfx(SoundEvents.BELL_BLOCK, 1.68F, 1.0F);
+            case LEG_STRIKE + 6 -> sfx(SoundEvents.BEACON_ACTIVATE, 1.1F, 1.0F);
+            case LEG_STRIKE + 26 -> sfx(SoundEvents.WARDEN_SONIC_CHARGE, 0.8F, 0.4F);
             case LEG_IMPLODE -> {
                 sfx(SoundEvents.WARDEN_SONIC_CHARGE, 1.9F, 0.8F);
                 sfx(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.0F);
@@ -344,7 +386,7 @@ public final class GachaFx {
                 sfx(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
                 sfx(SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, 1.0F, 1.0F);
                 sfx(SoundEvents.GENERIC_EXPLODE, 1.4F, 0.5F);
-                burst(160, 5.5F, GOLD, GOLD_LIGHT, 0xFFFFFF);
+                burst(180, 6.0F, GOLD, GOLD_LIGHT, 0xFFFFFF);
             }
             case LEG_BURST + 5 -> sfx(SoundEvents.FIREWORK_ROCKET_TWINKLE, 1.0F, 1.0F);
             case LEG_BURST + 12 -> sfx(SoundEvents.FIREWORK_ROCKET_TWINKLE_FAR, 1.2F, 1.0F);
@@ -356,7 +398,11 @@ public final class GachaFx {
 
     private void yamatoEvents(int t) {
         if (t == YM_START) {
+            cutAll();
             playMusic(); // 이 뒤의 소리는 모두 음악 안에 있다
+        }
+        if (t == YM_BOOM) {
+            burst(220, 7.0F, YM_BLUE, YM_CYAN, 0xFFFFFF);
         }
     }
 
@@ -381,10 +427,26 @@ public final class GachaFx {
             }
             default -> {
                 if (frozen()) {
-                    if (t >= YM_BREAK + 6 && t % 2 == 0) drift(YM_CYAN, 1);
+                    if (t == YM_START) sparks.clear();
+                    if (t >= YM_BOOM + 6 && t % 2 == 0) drift(YM_CYAN, 1);
                     return;
                 }
-                if (t >= 12 && t < LEG_SILENCE && t % 2 == 0) converge(PURPLE, 2);
+                if (t < LEG_DARK) {
+                    // 영웅과 같은 모습
+                    if (t >= 10 && t < EPIC_IMPLODE && t % 2 == 0) converge(PURPLE, 2);
+                    if (t >= EPIC_IMPLODE) converge(PURPLE_LIGHT, 6);
+                    return;
+                }
+                if (t == LEG_DARK) sparks.clear();
+                if (t < LEG_STRIKE) {
+                    // 어둠 속 금에서 새어 나오는 금빛 부스러기
+                    if (t >= LEG_DARK + 8) {
+                        Spark sp = add((rnd.nextFloat() - 0.5F) * 4, (rnd.nextFloat() - 0.5F) * 60, (rnd.nextFloat() - 0.5F) * 1.6F, -0.3F - rnd.nextFloat(),
+                                10 + rnd.nextInt(8), GOLD_LIGHT, 1 + rnd.nextFloat());
+                        sp.drag = 0.95F;
+                    }
+                    return;
+                }
                 if (t >= LEG_STRIKE && t < LEG_IMPLODE) {
                     converge(GOLD, 2);
                     rise(GOLD, 2);
@@ -630,7 +692,7 @@ public final class GachaFx {
     }
 
     private void particles(GuiGraphics g, float partial) {
-        boolean still = frozen() && t < YM_BREAK;
+        boolean still = frozen() && t < YM_BOOM;
         g.pose().pushPose();
         g.pose().translate(0, 0, 350);
         for (Spark s : sparks) {
@@ -841,12 +903,20 @@ public final class GachaFx {
 
     /** 전설 (YAMATO 의 앞부분도 이것). */
     private void renderLegendary(GuiGraphics g, Font font, int width, int height, float tt, float partial) {
+        if (tt < LEG_DARK) {
+            renderEpic(g, font, width, height, tt, partial); // 영웅인 척
+            return;
+        }
+        if (tt < LEG_STRIKE) {
+            renderBlackout(g, width, height, tt, partial);
+            return;
+        }
         boolean still = frozen();
-        float beat = still ? 0 : heartbeat(tt, new int[]{8, 20, 30, 38, 44, 49});
-        boolean silent = tt >= LEG_SILENCE && tt < LEG_STRIKE;
-        boolean gold = tt >= LEG_STRIKE;
-        float dark = silent ? 1 : Math.min(1, tt / 12) * (0.94F + beat * 0.05F);
-        g.fill(0, 0, width, height, argb(silent ? 0x000000 : 0x050302, dark));
+        float beat = 0;
+        boolean silent = false;
+        boolean gold = true;
+        float sinceStrike = tt - LEG_STRIKE;
+        g.fill(0, 0, width, height, argb(0x050302, 0.95F));
         // 빛기둥
         if (gold && tt < LEG_BURST + 30) {
             float pw = Math.min(1, (tt - LEG_STRIKE) / 10F) * (tt >= LEG_IMPLODE && tt < LEG_BURST ? 1 - (tt - LEG_IMPLODE) / 6F : 1);
@@ -879,12 +949,23 @@ public final class GachaFx {
                     ring(g, 54, 1.5F, GOLD, 0.45F * (1 - implode), 22, -tt * 0.09F);
                 }
             }
-            if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 6) {
-                bolt(g, -10, -height / 2F - 10, 0, 0, GOLD_LIGHT, 1 - (tt - LEG_STRIKE) / 6F, 99, 2.5F);
-                bolt(g, 30, -height / 2F - 10, 0, 0, 0xFFFFFF, 0.7F * (1 - (tt - LEG_STRIKE) / 6F), 51, 1.5F);
+            if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 8) {
+                float f = 1 - (tt - LEG_STRIKE) / 8F;
+                bolt(g, -10, -height / 2F - 10, 0, 0, GOLD_LIGHT, f, 99, 3F);
+                bolt(g, 30, -height / 2F - 10, 0, 0, 0xFFFFFF, 0.8F * f, 51, 2F);
+                bolt(g, -width / 2F + 20, -height / 2F, 0, 0, GOLD, 0.6F * f, 13, 1.5F);
+                bolt(g, width / 2F - 20, -height / 2F, 0, 0, GOLD, 0.6F * f, 77, 1.5F);
+            }
+            if (sinceStrike < 16) {
+                // 튀어나오는 순간의 충격파
+                ring(g, 20 + sinceStrike * 22, 7 * (1 - sinceStrike / 16F) + 1, GOLD_LIGHT, 1 - sinceStrike / 16F, 64, 0);
+                ring(g, 10 + sinceStrike * 14, 3, 0xFFFFFF, 0.9F * (1 - sinceStrike / 16F), 64, 0.2F);
+                rays(g, 24, sinceStrike * 2, 60 + sinceStrike * 28, 2.5F, GOLD_LIGHT, 0.7F * (1 - sinceStrike / 16F));
             }
             float amp = still ? 0 : silent ? 0.8F : (gold ? 1.5F + implode * 3 : Mth.clamp((tt - 8) / 44F, 0, 1) * 3) + beat * 1.5F;
             float sc = 1 + (gold ? (tt - LEG_STRIKE) / (float) (LEG_IMPLODE - LEG_STRIKE) * 0.3F - implode * 0.4F : 0.1F) + beat * 0.05F;
+            // 어둠을 뚫고 튀어나온다: 크게 → 출렁이며 제자리
+            if (sinceStrike < 14) sc *= sinceStrike < 2 ? 0.3F + sinceStrike * 0.85F : 1 + 0.45F * (1 - (sinceStrike - 2) / 12F) * Mth.cos((sinceStrike - 2) * 0.9F);
             g.pose().pushPose();
             g.pose().translate((rnd.nextFloat() - 0.5F) * 2 * amp, Mth.sin(tt * 0.15F) * 2 + (rnd.nextFloat() - 0.5F) * 2 * amp, 20);
             g.pose().scale(sc, sc, 1);
@@ -914,8 +995,47 @@ public final class GachaFx {
         }
         particles(g, partial);
         g.pose().popPose();
-        if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 8) flash(g, width, height, 0xFFFFFF, 1 - (tt - LEG_STRIKE) / 8F);
+        if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 10) flash(g, width, height, 0xFFF8E0, 1 - (tt - LEG_STRIKE) / 10F);
         if (tt >= LEG_BURST && tt < LEG_BURST + 12) flash(g, width, height, 0xFFF3C8, 1 - (tt - LEG_BURST) / 12F);
+    }
+
+    /** 전설 암전: 모든 것이 꺼지고, 어둠 한가운데 금빛 금이 세로로 벌어진다. */
+    private void renderBlackout(GuiGraphics g, int width, int height, float tt, float partial) {
+        float d = tt - LEG_DARK;
+        g.fill(0, 0, width, height, 0xFF000000);
+        // 꺼지는 순간 남는 잔상
+        if (d < 4) {
+            g.pose().pushPose();
+            g.pose().translate(width / 2F, height / 2F - 8, 0);
+            glow(g, 60 * (1 - d / 4F), PURPLE_LIGHT, 0.5F * (1 - d / 4F));
+            g.pose().popPose();
+        }
+        if (d >= 6) {
+            float open = ease((d - 6) / (LEG_STRIKE - LEG_DARK - 6F));
+            int cx = width / 2, cy = height / 2 - 8;
+            float h = 6 + open * 70;
+            float w = 0.5F + open * open * 6;
+            g.pose().pushPose();
+            g.pose().translate(cx, cy, 0);
+            glow(g, 10 + open * 40, GOLD, 0.15F + open * 0.35F);
+            // 지그재그 금
+            RandomSource r = RandomSource.create(31);
+            float py = -h;
+            float px = 0;
+            for (int i = 0; i < 8; i++) {
+                float ny = -h + (i + 1) * (2 * h / 8);
+                float nx = (r.nextFloat() - 0.5F) * 6 * (1 - Math.abs(ny) / h);
+                bar(g, px, py, nx, ny, w * 3 + 2, argb(GOLD, 0.35F));
+                bar(g, px, py, nx, ny, w + 0.6F, argb(GOLD_LIGHT, 0.95F));
+                px = nx;
+                py = ny;
+            }
+            g.pose().popPose();
+        }
+        g.pose().pushPose();
+        g.pose().translate(width / 2F, height / 2F - 8, 0);
+        particles(g, partial);
+        g.pose().popPose();
     }
 
     // ------------------------------------------------------------------ YAMATO
@@ -923,39 +1043,13 @@ public final class GachaFx {
     private void renderYamato(GuiGraphics g, Font font, int width, int height, float partial) {
         float tt = t + partial;
         if (t < YM_BREAK) {
-            // 멈춘 전설 장면 (시간이 YM_START 에서 멈춘다) 위에 푸른 정적
             g.pose().pushPose();
             g.pose().translate(0, 0, 300);
-            renderLegendary(g, font, width, height, YM_START, 0);
-            float tint = Math.min(1, (tt - YM_START) / 3F);
-            g.fill(0, 0, width, height, argb(0x081428, 0.55F * tint));
-            g.fill(0, 0, width, height, argb(0x6FA8FF, 0.08F * tint));
-            // 베기 선
-            g.pose().pushPose();
-            g.pose().translate(width / 2F, height / 2F, 100);
-            float glowAll = t >= YM_CLICK ? 1 : 0;
-            for (int i = 0; i < slashes.size(); i++) {
-                int at = YM_START + (int) Math.round(SLASH_TIMES[i] * 20);
-                if (tt < at) continue;
-                float[] s = slashes.get(i);
-                float age = tt - at;
-                float grow = Math.min(1, age / 1.5F);
-                float x1 = Mth.lerp(grow, s[0], s[2]);
-                float y1 = Mth.lerp(grow, s[1], s[3]);
-                float fresh = Math.max(0, 1 - age / 5F);
-                bar(g, s[0], s[1], x1, y1, 7 * fresh + 2 + glowAll * 3, argb(YM_BLUE, 0.35F + 0.3F * fresh + glowAll * 0.3F));
-                bar(g, s[0], s[1], x1, y1, 1.2F + 1.5F * fresh, argb(0xFFFFFF, 0.9F));
+            if (t < YM_START + 15) {
+                renderDraw(g, width, height, tt);
+            } else {
+                renderSlashes(g, font, width, height, tt);
             }
-            g.pose().popPose();
-            // 베일 때마다 번쩍
-            for (double s : SLASH_TIMES) {
-                int at = YM_START + (int) Math.round(s * 20);
-                if (tt >= at && tt < at + 2) g.fill(0, 0, width, height, argb(0xDDF4FF, 0.22F * (1 - (tt - at) / 2F)));
-            }
-            if (t >= YM_QUIET && t < YM_CLICK) {
-                g.fill(0, 0, width, height, argb(0x000000, 0.12F * (tt - YM_QUIET) / (YM_CLICK - YM_QUIET)));
-            }
-            if (t >= YM_CLICK) g.fill(0, 0, width, height, argb(0xFFFFFF, 0.15F));
             g.pose().popPose();
             if (t == YM_BREAK - 1 && !captured) {
                 // 깨지기 직전의 베인 화면을 찍어 둔다 (조각의 그림)
@@ -968,9 +1062,13 @@ public final class GachaFx {
         if (shards.isEmpty()) {
             capture(width, height); // 건너뛰어 바로 온 경우: 그림 없이 조각만
         }
+        if (t < YM_BOOM) {
+            renderGray(g, width, height, tt, partial);
+            return;
+        }
         g.pose().pushPose();
         g.pose().translate(0, 0, 300);
-        float since = tt - YM_BREAK;
+        float since = tt - YM_BOOM;
         // 허공
         g.fill(0, 0, width, height, 0xFF02050C);
         int cx = width / 2;
@@ -985,34 +1083,50 @@ public final class GachaFx {
             g.fill(0, (int) y, width, (int) y + 1, argb(YM_BLUE, a * Math.min(1, since / 10F)));
         }
         g.pose().pushPose();
-        g.pose().translate(cx, cy, 0);
+        float shake = since < 12 ? 9 * (1 - since / 12F) : 0;
+        center(g, width, height, shake);
+        // 폭발: 겹겹의 충격파와 사방으로 뻗는 칼빛
+        if (since < 26) {
+            float f = 1 - since / 26F;
+            ring(g, 20 + since * 26, 10 * f + 1, 0xFFFFFF, f, 72, 0);
+            ring(g, 10 + since * 18, 6 * f + 1, YM_CYAN, f, 72, 0.3F);
+            ring(g, since * 11, 3, YM_BLUE, f, 72, 0.6F);
+            RandomSource rr = RandomSource.create(606);
+            for (int i = 0; i < 26; i++) {
+                float ang = rr.nextFloat() * Mth.TWO_PI;
+                float len = (180 + rr.nextFloat() * 260) * ease(since / 6F);
+                float in = len * Math.max(0, (since - 4) / 22F);
+                bar(g, Mth.cos(ang) * in, Mth.sin(ang) * in, Mth.cos(ang) * len, Mth.sin(ang) * len, 3 * f + 0.5F, argb(i % 3 == 0 ? 0xFFFFFF : YM_CYAN, 0.9F * f));
+            }
+        }
         float in = ease(since / 10F);
         glow(g, 60 + in * 40 + Mth.sin(tt * 0.18F) * 6, YM_BLUE, 0.45F * in);
         rays(g, 12, tt * 0.8F, 230 * in, 1.5F, YM_CYAN, 0.25F * in);
+        rays(g, 6, -tt * 0.5F, 160 * in, 4F, YM_BLUE, 0.18F * in);
         // 환영검: 하나씩 나타나 칼끝을 안으로 두고 돈다
-        int swords = 10;
+        int swords = 12;
         for (int i = 0; i < swords; i++) {
-            float appear = since - 4 - i * 1.6F;
+            float appear = since - 6 - i * 1.3F;
             if (appear < 0) continue;
             float a = tt * 0.035F + i * Mth.TWO_PI / swords;
-            float rr = 96 - 18 * (1 - ease(appear / 8F)) + Mth.sin(tt * 0.1F + i) * 3;
+            float rr2 = 100 - 26 * (1 - ease(appear / 8F)) + Mth.sin(tt * 0.1F + i) * 3;
             float alpha = Math.min(1, appear / 4F) * (0.75F + 0.25F * Mth.sin(tt * 0.3F + i));
             g.pose().pushPose();
-            g.pose().translate(Mth.cos(a) * rr, Mth.sin(a) * rr, 30);
+            g.pose().translate(Mth.cos(a) * rr2, Mth.sin(a) * rr2, 30);
             g.pose().mulPose(Axis.ZP.rotation(a - Mth.HALF_PI)); // 칼끝이 야마토를 향한다
             spectralSword(g, alpha);
             g.pose().popPose();
         }
         // 야마토
-        float pop = since < 14 ? (since < 4 ? 0 : 1 + 0.5F * (1 - (since - 4) / 10F) * Mth.cos((since - 4) * 0.8F)) : 1;
-        if (since >= 4) {
+        float pop = since < 16 ? (since < 3 ? 0 : 1 + 0.6F * (1 - (since - 3) / 13F) * Mth.cos((since - 3) * 0.8F)) : 1;
+        if (since >= 3) {
             glow(g, 34, YM_CYAN, 0.35F);
-            item(g, 5.2F * pop, -10 + Mth.sin(tt * 0.1F) * 2);
+            item(g, 5.4F * pop, -10 + Mth.sin(tt * 0.1F) * 2);
         }
         particles(g, partial);
         g.pose().popPose();
-        // 깨져 흩어지는 화면 조각
-        renderShards(g, since, partial);
+        // 터져 나가는 화면 조각 (흑백에서 색이 돌아오며)
+        renderShards(g, tt - YM_BREAK, partial, Math.min(1, since / 5F));
         // 글자: 한 글자씩
         if (t >= YM_TITLE) {
             float ts = tt - YM_TITLE;
@@ -1032,8 +1146,10 @@ public final class GachaFx {
                 Component c = RaidText.c(ch, RaidText.TITLE);
                 float age = ts - i * 2.5F;
                 float jitter = age < 4 ? (1 - age / 4F) * 1.5F : 0;
+                // 글자가 칼에 베인 듯 위아래로 어긋났다가 붙는다
+                float split = age < 5 ? (1 - age / 5F) * 2 : 0;
                 g.drawString(font, c, (int) (x + jitter), 0, argb(YM_BLUE, 0.6F), false);
-                g.drawString(font, c, x, 0, 0xFF000000 | lerpRgb(0xFFFFFF, YM_CYAN, 0.5F + 0.5F * Mth.sin(tt * 0.3F + i)), false);
+                g.drawString(font, c, x, (int) -split, 0xFF000000 | lerpRgb(0xFFFFFF, YM_CYAN, 0.5F + 0.5F * Mth.sin(tt * 0.3F + i)), false);
                 x += font.width(c);
             }
             g.pose().popPose();
@@ -1052,7 +1168,165 @@ public final class GachaFx {
             }
         }
         g.pose().popPose();
-        if (since < 6) flash(g, width, height, 0xFFFFFF, (1 - since / 6F) * 0.85F);
+        if (since < 8) flash(g, width, height, 0xFFFFFF, (1 - since / 8F) * 0.95F);
+        if (since < 14) flash(g, width, height, 0x9FD8FF, (1 - since / 14F) * 0.25F);
+    }
+
+    /** 다시 암전 → 칼을 뽑는 소리와 함께 어둠을 가로지르는 칼빛. */
+    private void renderDraw(GuiGraphics g, int width, int height, float tt) {
+        g.fill(0, 0, width, height, 0xFF000000);
+        if (tt < YM_DRAW) return;
+        float d = tt - YM_DRAW;
+        int cy = height / 2 - 8;
+        // 칼날이 왼쪽에서 오른쪽으로 스친다 (0.25초) → '챙' 하는 순간 번쩍
+        float sweep = ease(Math.min(1, d / 5F));
+        float x = -20 + sweep * (width + 40);
+        float fade = d < 5 ? 1 : Math.max(0, 1 - (d - 5) / 6F);
+        g.fillGradient(0, cy - 1, (int) x, cy + 1, argb(YM_BLUE, 0), argb(YM_CYAN, 0.9F * fade));
+        g.fill(0, cy, (int) x, cy + 1, argb(0xFFFFFF, 0.85F * fade));
+        g.fillGradient(0, cy - 6, (int) x, cy + 6, argb(YM_BLUE, 0), argb(YM_BLUE, 0.18F * fade));
+        // 칼끝의 반짝임
+        g.pose().pushPose();
+        g.pose().translate(Math.min(x, width - 10), cy, 10);
+        float star = d < 5 ? 1 : Math.max(0, 1 - (d - 5) / 4F);
+        float sz = 10 + 30 * (d >= 4 && d < 8 ? 1 - Math.abs(d - 5) / 3F : 0);
+        g.fill((int) -sz, 0, (int) sz, 1, argb(0xFFFFFF, star));
+        g.fill(0, (int) (-sz / 2), 1, (int) (sz / 2), argb(0xFFFFFF, star));
+        glow(g, 8 + sz * 0.4F, YM_CYAN, 0.5F * star);
+        g.pose().popPose();
+        if (d >= 4.4F && d < 7) flash(g, width, height, 0xCFEFFF, 0.35F * (1 - (d - 4.4F) / 2.6F));
+    }
+
+    /** 이 칼이 몇 틱에 베는지 (음악 시간 → 틱). */
+    private static float slashTick(int i) {
+        double sec = i < SLASH_TIMES.length ? SLASH_TIMES[i] : X_TIMES[i - SLASH_TIMES.length];
+        return (float) (YM_START + sec * 20);
+    }
+
+    /** 멈춘 전설 장면 위로 점점 빨라지는 차원참. */
+    private void renderSlashes(GuiGraphics g, Font font, int width, int height, float tt) {
+        // 가장 최근 칼에 맞춰 화면이 튄다
+        float shake = 0;
+        float lastAge = 99;
+        for (int i = 0; i < slashes.size(); i++) {
+            float age = tt - slashTick(i);
+            if (age < 0) continue;
+            boolean big = i >= SLASH_TIMES.length;
+            if (age < 3) shake = Math.max(shake, (big ? 12 : 5) * (1 - age / 3F));
+            lastAge = Math.min(lastAge, age);
+        }
+        RandomSource sr = RandomSource.create((long) (tt * 3));
+        float ox = (sr.nextFloat() - 0.5F) * 2 * shake, oy = (sr.nextFloat() - 0.5F) * 2 * shake;
+        g.pose().pushPose();
+        g.pose().translate(ox, oy, 0);
+        renderLegendary(g, font, width, height, YM_START - 1, 0); // 멈춘 장면
+        g.pose().popPose();
+        float progress = Mth.clamp((tt - slashTick(0)) / (YM_BREAK - slashTick(0)), 0, 1);
+        // 푸르게 얼어붙은 세상, 벨 때마다 잠깐 밝아진다
+        float lit = lastAge < 2 ? 1 - lastAge / 2F : 0;
+        g.fill(0, 0, width, height, argb(0x000000, 0.55F - 0.25F * lit));
+        g.fill(0, 0, width, height, argb(0x0B2A6A, 0.35F + 0.15F * progress));
+        g.pose().pushPose();
+        g.pose().translate(width / 2F + ox, height / 2F + oy, 100);
+        float len = Mth.sqrt(width * width + height * height) * 0.75F;
+        for (int i = 0; i < slashes.size(); i++) {
+            float at = slashTick(i);
+            if (tt < at) continue;
+            float[] s = slashes.get(i);
+            boolean big = i >= SLASH_TIMES.length;
+            float age = tt - at;
+            float px = s[1] * width, py = s[2] * height;
+            float cx = Mth.cos(s[0]), sy = Mth.sin(s[0]);
+            float x0 = px - cx * len, y0 = py - sy * len;
+            float grow = Math.min(1, age / (big ? 1.2F : 0.6F));
+            float x1 = x0 + (2 * len * cx) * grow, y1 = y0 + (2 * len * sy) * grow;
+            float fresh = Math.max(0, 1 - age / (big ? 8F : 5F));
+            float w = (big ? 16 : 9) * fresh + (big ? 3 : 1.5F);
+            bar(g, x0, y0, x1, y1, w * 2.2F, argb(YM_BLUE, 0.18F + 0.25F * fresh));
+            bar(g, x0, y0, x1, y1, w, argb(YM_CYAN, 0.35F + 0.4F * fresh));
+            bar(g, x0, y0, x1, y1, 1 + (big ? 2.5F : 1.4F) * fresh, argb(0xFFFFFF, 0.95F));
+            // 공간이 둥글게 일그러지는 '차원참' 거품
+            if (s[3] > 0 && age < 10) {
+                float f = 1 - age / 10F;
+                float br = 8 + ease(age / 4F) * 34;
+                g.pose().pushPose();
+                g.pose().translate(px, py, 0);
+                g.fill((int) -br, (int) -br, (int) br, (int) br, argb(0x000814, 0.35F * f));
+                ring(g, br, 2.5F * f + 0.5F, YM_CYAN, f, 40, s[0]);
+                ring(g, br * 0.6F, 1, 0xFFFFFF, 0.7F * f, 30, -s[0]);
+                for (int k = 0; k < 4; k++) {
+                    float ka = s[0] + k * 0.9F;
+                    bar(g, -Mth.cos(ka) * br, -Mth.sin(ka) * br, Mth.cos(ka) * br, Mth.sin(ka) * br, 1.2F, argb(0xFFFFFF, 0.8F * f));
+                }
+                g.pose().popPose();
+            }
+        }
+        g.pose().popPose();
+        // 벨 때마다 번쩍 (X 자는 크게)
+        for (int i = 0; i < slashes.size(); i++) {
+            float age = tt - slashTick(i);
+            boolean big = i >= SLASH_TIMES.length;
+            if (age >= 0 && age < 2) flash(g, width, height, big ? 0xFFFFFF : 0xDDF4FF, (big ? 0.6F : 0.16F) * (1 - age / 2F));
+        }
+        // 마지막 순간: 화면 가장자리부터 하얗게 질린다
+        if (tt > YM_BREAK - 3) flash(g, width, height, 0xFFFFFF, 0.3F * (tt - (YM_BREAK - 3)) / 3F);
+    }
+
+    /** 흑백으로 멈춘 세상: 조각이 천천히 벌어지고, 한가운데서 칼을 천천히 칼집에 넣는다. */
+    private void renderGray(GuiGraphics g, int width, int height, float tt, float partial) {
+        float since = tt - YM_BREAK;
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 300);
+        // 조각 사이로 보이는 하얀 허공 (흑백 반전된 세계)
+        g.fill(0, 0, width, height, 0xFFE8E8E8);
+        g.fillGradient(0, 0, width, height / 2, 0xFFFFFFFF, 0xFFD0D0D0);
+        g.fillGradient(0, height / 2, width, height, 0xFFD0D0D0, 0xFF9A9A9A);
+        g.pose().popPose();
+        // 깨진 직후 한 순간은 아직 색이 남아 있다
+        renderShards(g, since, partial, since < 3 ? 1 - since / 3F : 0);
+        // 칼집에 넣는 칼 (가운데)
+        g.flush();
+        g.pose().pushPose();
+        g.pose().translate(width / 2F, height / 2F + 34, 520);
+        float k = Mth.clamp((tt - YM_SHEATHE) / (YM_CLICK - YM_SHEATHE), 0, 1);
+        float slide = k * k * k; // 천천히 → 마지막에 단숨에
+        float appear = Mth.clamp((tt - YM_BREAK - 2) / 5F, 0, 1);
+        int ink = argb(0x0A0A0A, appear);
+        // 칼집 (왼쪽, 입구 x=-10). 칼은 오른쪽으로 뽑혀 있다가 왼쪽으로 미끄러져 들어간다
+        float tsuba = 140 - 150 * slide;
+        float tipVisible = Math.max(-10, tsuba - 150);
+        if (tsuba > tipVisible) {
+            g.fill((int) tipVisible, -2, (int) tsuba, 2, argb(0x0A0A0A, appear * 0.85F)); // 칼날 테두리
+            g.fill((int) tipVisible, -1, (int) tsuba, 0, argb(0xFFFFFF, appear));        // 칼날 빛
+        }
+        g.fill((int) tsuba, -7, (int) tsuba + 4, 7, ink);          // 코등이
+        g.fill((int) tsuba + 4, -2, (int) tsuba + 50, 2, ink);      // 손잡이
+        for (int i = 0; i < 6; i++) g.fill((int) tsuba + 8 + i * 7, -3, (int) tsuba + 11 + i * 7, 3, ink);
+        g.fill(-150, -3, -10, 3, ink);                              // 칼집
+        g.fill(-152, -2, -150, 2, ink);
+        g.fill(-12, -4, -10, 4, ink);                               // 칼집 입구
+        g.pose().popPose();
+        // 이명 속 하얀 선: 베인 자리가 흑백 하늘에 남아 있다
+        g.pose().pushPose();
+        g.pose().translate(width / 2F, height / 2F, 470);
+        float len = Mth.sqrt(width * width + height * height) * 0.75F;
+        for (int i = 0; i < slashes.size(); i++) {
+            float[] s = slashes.get(i);
+            float px = s[1] * width, py = s[2] * height;
+            float cx = Mth.cos(s[0]), sy = Mth.sin(s[0]);
+            float a = 0.35F + 0.25F * Mth.sin(tt * 0.5F + i);
+            bar(g, px - cx * len, py - sy * len, px + cx * len, py + sy * len, 1, argb(0x000000, a * 0.5F));
+        }
+        g.pose().popPose();
+        if (since < 3) flash(g, width, height, 0xFFFFFF, 0.8F * (1 - since / 3F));
+        // '딸깍': 칼집 입구에서 작은 섬광
+        float c = tt - YM_CLICK;
+        if (c >= 0) {
+            g.pose().pushPose();
+            g.pose().translate(width / 2F - 10, height / 2F + 34, 530);
+            ring(g, 4 + c * 10, 1.5F, 0x000000, Math.max(0, 1 - c / 2F), 32, 0);
+            g.pose().popPose();
+        }
     }
 
     /** 푸른 환영검 (칼끝이 위). */
@@ -1079,15 +1353,27 @@ public final class GachaFx {
             try {
                 Minecraft mc = Minecraft.getInstance();
                 NativeImage img = Screenshot.takeScreenshot(mc.getMainRenderTarget());
+                // 흑백 사본 (대비를 조금 올린다)
+                NativeImage gray = new NativeImage(img.getWidth(), img.getHeight(), false);
+                for (int y = 0; y < img.getHeight(); y++) {
+                    for (int x = 0; x < img.getWidth(); x++) {
+                        int c = img.getPixelRGBA(x, y); // ABGR
+                        float l = 0.3F * (c & 255) + 0.59F * ((c >> 8) & 255) + 0.11F * ((c >> 16) & 255);
+                        int v = Mth.clamp((int) ((l - 110) * 1.35F + 128), 0, 255);
+                        gray.setPixelRGBA(x, y, 0xFF000000 | (v << 16) | (v << 8) | v);
+                    }
+                }
                 shot = new DynamicTexture(img);
                 shotId = mc.getTextureManager().register("rtshop_yamato_break", shot);
+                shotGray = new DynamicTexture(gray);
+                grayId = mc.getTextureManager().register("rtshop_yamato_gray", shotGray);
             } catch (Throwable ex) {
-                shot = null;
-                shotId = null;
+                shot = shotGray = null;
+                shotId = grayId = null;
             }
         }
         // 흔들린 격자 → 삼각형 (베기 선 근처가 먼저 깨진다)
-        int cols = 12, rows = 8;
+        int cols = 20, rows = 12;
         float[][] px = new float[cols + 1][rows + 1];
         float[][] py = new float[cols + 1][rows + 1];
         RandomSource r = RandomSource.create(777);
@@ -1115,57 +1401,69 @@ public final class GachaFx {
                     float mx = (s.x[0] + s.x[1] + s.x[2]) / 3, my = (s.y[0] + s.y[1] + s.y[2]) / 3;
                     float dx = mx - width / 2F, dy = my - height / 2F;
                     float d = Mth.sqrt(dx * dx + dy * dy) + 1;
-                    float sp = 2.5F + r.nextFloat() * 5;
-                    s.vx = dx / d * sp + (r.nextFloat() - 0.5F) * 3;
-                    s.vy = dy / d * sp - 3 - r.nextFloat() * 4;
-                    s.vr = (r.nextFloat() - 0.5F) * 0.25F;
-                    s.delay = (int) (d / Math.max(width, height) * 6);
+                    s.dx = dx / d;
+                    s.dy = dy / d;
+                    s.speed = 9 + r.nextFloat() * 14 + (1 - d / Math.max(width, height)) * 8;
+                    // 흑백 속에서 천천히 벌어질 때의 속도 (0.06 배로 움직인다)
+                    s.vx = s.dx * (4 + r.nextFloat() * 8) + (r.nextFloat() - 0.5F) * 4;
+                    s.vy = s.dy * (4 + r.nextFloat() * 8) + (r.nextFloat() - 0.5F) * 4;
+                    s.vr = (r.nextFloat() - 0.5F) * 0.12F;
+                    s.delay = (int) (d / Math.max(width, height) * 4);
                     shards.add(s);
                 }
             }
         }
     }
 
-    private void renderShards(GuiGraphics g, float since, float partial) {
-        if (shards.isEmpty() || since > 40) return;
+    /** since: 깨진 뒤 틱. colorMix: 흑백 조각 위에 원래 색 조각을 얼마나 겹칠지. */
+    private void renderShards(GuiGraphics g, float since, float partial, float colorMix) {
+        float boom = since - (YM_BOOM - YM_BREAK);
+        float fade = boom < 0 ? 1 : 1 - boom / 24F;
+        if (shards.isEmpty() || fade <= 0) return;
         g.flush();
-        float fade = since < 22 ? 1 : 1 - (since - 22) / 18F;
         Matrix4f m = g.pose().last().pose();
-        boolean tex = shotId != null;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
-        if (tex) {
-            RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
-            RenderSystem.setShaderTexture(0, shotId);
-        } else {
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        }
-        BufferBuilder bb = Tesselator.getInstance().getBuilder();
-        bb.begin(VertexFormat.Mode.TRIANGLES, tex ? DefaultVertexFormat.POSITION_COLOR_TEX : DefaultVertexFormat.POSITION_COLOR);
         float W = Math.max(1, lastW), H = Math.max(1, lastH);
-        for (Shard s : shards) {
-            boolean moving = since >= s.delay;
-            float mx = (s.x[0] + s.x[1] + s.x[2]) / 3, my = (s.y[0] + s.y[1] + s.y[2]) / 3;
-            float lag = moving ? partial : 0;
-            float ox = moving ? s.cx + s.vx * lag : 0, oy = moving ? s.cy + s.vy * lag : 0;
-            float rot = moving ? s.rot + s.vr * lag : 0;
-            float cos = Mth.cos(rot), sin = Mth.sin(rot);
-            float shrink = 0.94F; // 조각 사이 틈
-            for (int v = 0; v < 3; v++) {
-                float lx = (s.x[v] - mx) * shrink, ly = (s.y[v] - my) * shrink;
-                float x = mx + lx * cos - ly * sin + ox;
-                float y = my + lx * sin + ly * cos + oy;
-                if (tex) {
-                    bb.vertex(m, x, y, 450).color(1F, 1F, 1F, fade).uv(s.x[v] / W, s.y[v] / H).endVertex();
-                } else {
-                    bb.vertex(m, x, y, 450).color(0.6F, 0.75F, 1F, fade * 0.8F).endVertex();
+        float speed = boom < 0 ? 0.06F : 1;
+        float shrink = boom < 0 ? 0.975F : 0.92F; // 조각 사이 틈
+        for (int pass = 0; pass < 2; pass++) {
+            ResourceLocation id = pass == 0 ? (grayId != null ? grayId : shotId) : shotId;
+            float a = pass == 0 ? fade : fade * colorMix;
+            if (pass == 1 && (a <= 0.01F || shotId == null)) break;
+            boolean tex = id != null;
+            if (tex) {
+                RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+                RenderSystem.setShaderTexture(0, id);
+            } else {
+                RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            }
+            BufferBuilder bb = Tesselator.getInstance().getBuilder();
+            bb.begin(VertexFormat.Mode.TRIANGLES, tex ? DefaultVertexFormat.POSITION_COLOR_TEX : DefaultVertexFormat.POSITION_COLOR);
+            for (Shard s : shards) {
+                boolean moving = since >= s.delay;
+                float mx = (s.x[0] + s.x[1] + s.x[2]) / 3, my = (s.y[0] + s.y[1] + s.y[2]) / 3;
+                float lag = moving ? partial * speed : 0;
+                float ox = moving ? s.cx + s.vx * lag : 0, oy = moving ? s.cy + s.vy * lag : 0;
+                float rot = moving ? s.rot + s.vr * lag : 0;
+                float cos = Mth.cos(rot), sin = Mth.sin(rot);
+                for (int v = 0; v < 3; v++) {
+                    float lx = (s.x[v] - mx) * shrink, ly = (s.y[v] - my) * shrink;
+                    float x = mx + lx * cos - ly * sin + ox;
+                    float y = my + lx * sin + ly * cos + oy;
+                    if (tex) {
+                        bb.vertex(m, x, y, 450 + pass).color(1F, 1F, 1F, a).uv(s.x[v] / W, s.y[v] / H).endVertex();
+                    } else {
+                        bb.vertex(m, x, y, 450 + pass).color(0.55F, 0.55F, 0.58F, a * 0.9F).endVertex();
+                    }
                 }
             }
+            BufferUploader.drawWithShader(bb.end());
         }
-        BufferUploader.drawWithShader(bb.end());
         RenderSystem.enableCull();
-        // 조각 가장자리의 빛
+        // 조각 가장자리의 빛 (터진 뒤에만: 흑백일 때는 색이 없다)
+        if (boom < 0) return;
         g.pose().pushPose();
         g.pose().translate(0, 0, 460);
         for (Shard s : shards) {

@@ -7,5 +7,21 @@
         "stream": true
       }
     ]
+  },
+  "gacha.blackout": {
+    "subtitle": "rtshop.subtitle.gacha_blackout",
+    "sounds": [
+      {
+        "name": "rtshop:gacha/blackout"
+      }
+    ]
+  },
+  "gacha.legendary_pop": {
+    "subtitle": "rtshop.subtitle.gacha_legendary",
+    "sounds": [
+      {
+        "name": "rtshop:gacha/legendary_pop"
+      }
+    ]
   }
 }

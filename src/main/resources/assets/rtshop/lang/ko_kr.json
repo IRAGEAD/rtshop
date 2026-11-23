@@ -1253,5 +1253,7 @@
   "rtshop.talk.hint_scene": "클릭·스페이스: 다음 · 끝까지 보면 진행됩니다",
   "rtshop.quest.next_npc": "다음 일은 %s에게 가 보세요. (「%s」)",
   "rtshop.quest.next_same": "아직 이야기가 남았어요. 다시 말을 걸어 주세요. (「%s」)",
-  "rtshop.rules.type.smithing": "대장장이 작업대"
+  "rtshop.rules.type.smithing": "대장장이 작업대",
+  "rtshop.subtitle.gacha_blackout": "모든 소리가 끊긴다",
+  "rtshop.subtitle.gacha_legendary": "웅장한 화음"
 }
