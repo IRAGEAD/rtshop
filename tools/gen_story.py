@@ -826,6 +826,44 @@ p = q("hidden_illusioner_2", CH + " (2/2)", "거짓 연대기의 필경사", ARC
       [kill("illusioner:illusioner", 1, "환술사", I)], gold=9000, items=[item("rtshop:chronicle_page", 2)], requires=[p], flags=["clue_true_page"], mod=I,
       sceneDone=vision("환술사 벨로크", "이 이야기는… 내가 고쳐 쓴 것이다.\n진짜 마지막 장은 아직 아무도 쓰지 않았다.", "B48CFF", "minecraft:entity.illusioner.mirror_move"))
 
+# 플레이어의 대답: 대화 상자에서 선택지로 직접 눌러 말한다 (하나뿐이어도). "▷ " 로 시작하는 줄, " ‖ " 로 여러 대답.
+# (퀘스트 ID, 말 거는 NPC) -> [(이 줄 다음에 넣을 위치, 대답), ...]  위치 -1 = 맨 끝
+REPLIES = {
+    ("story_0_03", ARCH): [(1, "셋째 줄은 왜 지워졌나요?"), (-1, "알겠어요. 장로님께 가져갈게요.")],
+    ("story_1_06", CLERK): [(-1, "회색 망토… 기억해 두겠습니다.")],
+    ("story_1_10", ARCH): [(2, "뭐라고 쓰여 있죠?"), (-1, "세 끝… 모두 찾아보겠습니다.")],
+    ("story_1_17", ARCH): [(-1, "제가 정할게요.")],
+    ("story_1_28", ARCH): [(-1, "(마지막 줄을 소리 내어 읽는다)")],
+    ("story_2_01", CAPT): [(-1, "이번엔 아무도 잃지 않을 거예요.")],
+    ("story_2_14", CAPT): [(-1, "약속할게요. 반드시 돌아올게요.")],
+    ("story_3_01", FISHER): [(-1, "엘릭을 꼭 찾아 드릴게요.")],
+    ("story_3_12", FISHER): [(-1, "그 망토, 반드시 찾아내겠습니다.")],
+    ("story_3_16", FISHER): [(-1, "…제가 정하겠습니다.")],
+    ("story_4_01", ELDER): [(-1, "맡겨 주세요. 봉인은 저희가 살피겠습니다.")],
+    ("story_4_22", ELDER): [(-1, "대답은… 곧 들려 드리죠.")],
+    ("story_5_01", CAPT): [(-1, "가요, 대장님.")],
+    ("story_5_06", ARCH): [(-1, "때가 되면, 놓아준다…")],
+    ("story_5_07", FISHER): [(-1, "엘릭도 분명 웃고 있을 거예요.")],
+    ("story_5_07", CAPT): [(-1, "언제든 불러 주세요, 대장님.")],
+    ("hidden_purple_ink", ARCH): [(-1, "괜찮아요. 말해 줘서 고마워요.")],
+}
+_used = set()
+for _q in Q:
+    for _o in _q["objectives"]:
+        if _o.get("type") != "TALK" or "lines" not in _o:
+            continue
+        _key = (_q["id"], _o["target"])
+        _r = REPLIES.get(_key)
+        if not _r:
+            continue
+        _used.add(_key)
+        _lines = list(_o["lines"])
+        for _at, _text in sorted(_r, key=lambda x: -(x[0] if x[0] >= 0 else 10 ** 6)):
+            _pos = len(_lines) if _at < 0 else _at + 1
+            _lines.insert(_pos, "▷ " + _text)
+        _o["lines"] = _lines
+assert _used == set(REPLIES), set(REPLIES) - _used
+
 data = {
     "_help": "메인 스토리 「골디아 연대기」 3판 (서장·1~4장·종장·숨은 이야기). 이 파일은 모드 업데이트 때 새 기본값으로 바뀔 수 있으니, 직접 고쳤다면 이 파일을 계속 고쳐 쓰세요 (고친 파일은 덮어쓰지 않습니다). "
              "목표 종류: STRUCTURE(구조물 곁), ADVANCEMENT(발전과제), DIMENSION(차원), FLAG(표식). sceneAccept/sceneDone: 받을 때/끝낼 때 연출. "

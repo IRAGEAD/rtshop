@@ -30,6 +30,9 @@ public class DialogueScreen extends Screen {
     private int index;
     private float shown;
     private boolean choosing;
+    /** 플레이어가 대답할 줄 ("▷ 대답", " ‖ " 로 여러 대답). -1 = 없음. 대답은 선택지로 직접 눌러 말한다 (하나뿐이어도). */
+    private int replyAt = -1;
+    private static final String REPLY = "\u0000reply";
     private int hover = -1;
     private final List<JsonObject> topics = new ArrayList<>();
     private int sinceSound;
@@ -65,6 +68,7 @@ public class DialogueScreen extends Screen {
         index = 0;
         shown = 0;
         choosing = false;
+        replyAt = -1;
         logCurrent();
     }
 
@@ -81,6 +85,7 @@ public class DialogueScreen extends Screen {
 
     /** "이름: 대사" → {이름, 대사}. 이름이 없으면 이 NPC. */
     private String[] split(String s) {
+        if (s.startsWith("▷")) return new String[]{REPLY, s.substring(1).trim()};
         int c = s.indexOf(": ");
         String head = c > 0 ? s.substring(0, c) : "";
         if (c > 0 && c <= 20 && head.split(" ").length <= 3 && !head.matches(".*[.?!,\"'…].*")) {
@@ -115,12 +120,23 @@ public class DialogueScreen extends Screen {
             shown = cur()[1].length();
             return;
         }
+        if (index + 1 < lines.size() && REPLY.equals(lines.get(index + 1)[0])) {
+            // 다음은 내 차례: 대답을 선택지로 보여 주고 누르기를 기다린다
+            replyAt = index + 1;
+            choosing = true;
+            return;
+        }
         if (index + 1 < lines.size()) {
             index++;
             shown = 0;
             logCurrent();
             return;
         }
+        endLines();
+    }
+
+    /** 줄을 다 읽었을 때: 장면이면 끝내고, 아니면 주제 고르기. */
+    private void endLines() {
         if (scene) {
             // 장면 끝: 서버가 목표를 채우고 퀘스트 창을 연다
             onClose();
@@ -138,6 +154,10 @@ public class DialogueScreen extends Screen {
 
     private List<String[]> choices() {
         List<String[]> out = new ArrayList<>();
+        if (replyAt >= 0 && replyAt < lines.size()) {
+            for (String r : lines.get(replyAt)[1].split(" ‖ ")) out.add(new String[]{"reply", "", r.trim()});
+            return out;
+        }
         if (data.has("main")) out.add(new String[]{"main", "", Component.translatable(data.get("main").getAsString()).getString()});
         for (JsonObject t : topics) {
             String title = t.get("title").getAsString();
@@ -155,8 +175,26 @@ public class DialogueScreen extends Screen {
 
     private void choose(String[] c) {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-        if (!c[0].equals("history") && !c[0].equals("bye")) logMine(c[2].replace("✦ ", ""));
+        if (!c[0].equals("history") && !c[0].equals("bye")) logMine(c[2].replace("✦ ", "").replace("▷ ", ""));
         switch (c[0]) {
+            case "reply" -> {
+                int next = replyAt + 1;
+                replyAt = -1;
+                choosing = false;
+                shown = 0;
+                if (next < lines.size() && REPLY.equals(lines.get(next)[0])) {
+                    // 대답이 이어지면 앞 줄(상대의 말)을 그대로 두고 다시 고른다
+                    shown = cur()[1].length();
+                    replyAt = next;
+                    choosing = true;
+                } else if (next < lines.size()) {
+                    index = next;
+                    logCurrent();
+                } else {
+                    shown = cur()[1].length();
+                    endLines();
+                }
+            }
             case "history" -> {
                 history = TalkHistory.of(npc);
                 historyScroll = Math.max(0, historyLines().size() - historyRows());
@@ -258,7 +296,13 @@ public class DialogueScreen extends Screen {
         if (!choosing) return 70;
         int n = choices().size();
         int rows = n > 4 ? (n + 1) / 2 : n;
-        return Math.max(70, 28 + rows * 11);
+        return Math.max(70, 28 + (textRows() - 1) * 11 + rows * 11);
+    }
+
+    /** 고르는 동안 위에 남겨 두는 상대의 말 줄 수 (대답할 때는 마지막 말을 두 줄까지). */
+    private int textRows() {
+        if (replyAt < 0 || font == null) return 1;
+        return Math.max(1, Math.min(3, font.split(Component.literal(cur()[1]), boxW() - 24).size()));
     }
 
     private int boxY() {
@@ -353,19 +397,22 @@ public class DialogueScreen extends Screen {
         if (choosing) {
             // 마지막 줄을 흐리게 두고 고를 것
             List<FormattedCharSequence> last = font.split(Component.literal(c[1]), w - 24);
-            if (!last.isEmpty()) g.drawString(font, last.get(0), x + 12, y + 8, 0x99F6ECD2, false);
+            int tr = textRows();
+            for (int i = 0; i < Math.min(tr, last.size()); i++)
+                g.drawString(font, last.get(i), x + 12, y + 8 + i * 11, replyAt >= 0 ? 0xD0F6ECD2 : 0x99F6ECD2, false);
+            int top = y + 21 + (tr - 1) * 11;
             List<String[]> cs = choices();
             hover = -1;
             int cols = cs.size() > 4 ? 2 : 1;
             int cw = (w - 24) / cols;
             for (int i = 0; i < cs.size(); i++) {
                 int cx = x + 12 + (i % cols) * cw;
-                int cy = y + 21 + (i / cols) * 11;
+                int cy = top + (i / cols) * 11;
                 boolean hov = mx >= cx && mx < cx + cw - 4 && my >= cy - 1 && my < cy + 10;
                 if (hov) hover = i;
                 String label = (hov ? "▶ " : "▷ ") + cs.get(i)[2];
                 g.drawString(font, font.plainSubstrByWidth(label, cw - 6), cx, cy,
-                        hov ? 0xFFFFE3A3 : cs.get(i)[0].equals("quest") ? 0xFFFFC63A : 0xFFE8DCC0, false);
+                        hov ? 0xFFFFE3A3 : cs.get(i)[0].equals("quest") ? 0xFFFFC63A : cs.get(i)[0].equals("reply") ? 0xFFBFDDF5 : 0xFFE8DCC0, false);
             }
         } else {
             String text = c[1].substring(0, Mth.clamp((int) shown, 0, c[1].length()));
@@ -428,6 +475,22 @@ public class DialogueScreen extends Screen {
     }
 
     // ------------------------------------------------------------------ 점검용
+    /** 점검용: 지금 대답(선택지)을 기다리는가, 첫 대답을 누른다. */
+    public boolean replyingForTest() {
+        return replyAt >= 0 && choosing;
+    }
+
+    public void replyForTest() {
+        for (String[] c : choices()) if (c[0].equals("reply")) {
+            choose(c);
+            return;
+        }
+    }
+
+    public boolean isSceneForTest() {
+        return scene;
+    }
+
     public boolean sceneForTest() {
         return scene;
     }

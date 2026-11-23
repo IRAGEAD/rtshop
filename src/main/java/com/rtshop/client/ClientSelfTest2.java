@@ -700,6 +700,33 @@ final class ClientSelfTest2 {
             check("a quest scene plays in the dialogue box", mc.screen instanceof DialogueScreen d && d.sceneForTest());
             shot(mc, "115_dialogue_scene");
             mc.setScreen(null);
+            // 스토리 대화의 내 대답: 하나뿐이어도 선택지로 직접 누른다
+            com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString("{\"npc\":\"quest_order_archivist\",\"entity\":-1,\"name\":\"기록관 이사벨\","
+                    + "\"mode\":\"scene\",\"greet\":\"\",\"topics\":[],\"lines\":[\"기록관 이사벨: 서약은 세 줄이에요. 셋째 줄은 지워져 있네요.\","
+                    + "\"▷ 셋째 줄은 왜 지워졌나요?\",\"기록관 이사벨: 어머니가 베껴 쓴 거예요. 장로님께 가져가세요.\",\"▷ 알겠어요. 장로님께 가져갈게요.\"]}").getAsJsonObject();
+            DialogueScreen.open(o);
+            waitTicks(10);
+        });
+        add(mc -> {
+            DialogueScreen d = mc.screen instanceof DialogueScreen x ? x : null;
+            if (d != null) d.skipForTest();
+            check("in a story scene the player's line waits as a choice to click, even when there is only one", d != null && d.replyingForTest()
+                    && mc.screen == d, mc.screen);
+            shot(mc, "115b_dialogue_reply");
+            if (d != null) d.replyForTest();
+            waitTicks(4);
+        });
+        add(mc -> {
+            DialogueScreen d = mc.screen instanceof DialogueScreen x ? x : null;
+            check("clicking the reply goes on to the next line", d != null && !d.replyingForTest(), mc.screen);
+            if (d != null) d.skipForTest();
+            check("the last reply is also a click (the scene does not close by itself)", d != null && d.replyingForTest() && mc.screen == d, mc.screen);
+            if (d != null) d.replyForTest();
+            waitTicks(4);
+        });
+        add(mc -> {
+            check("after the last reply the scene ends", !(mc.screen instanceof DialogueScreen), mc.screen);
+            mc.setScreen(null);
             waitTicks(2);
         });
         // ------------------------------------------------------------ 퀘스트 수첩 (어디서나 내용 보기)

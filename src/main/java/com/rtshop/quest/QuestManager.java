@@ -1398,7 +1398,30 @@ public final class QuestManager {
             QuestView v = view(p, q, ready ? QuestView.READY : QuestView.ACTIVE, e.getValue());
             out.add(new com.rtshop.net.QuestHudPacket.Entry(q.id, v.title(), ready, com.rtshop.story.StoryText.t(p, npcName(q.turnInNpc())), v.objectives()));
         }
+        // 받을 수 있는 퀘스트가 있으면 다음에 찾아갈 NPC 를 알려 준다 (메인 스토리 먼저, 숨은 이야기는 알리지 않는다)
+        QuestDef next = null;
+        int more = 0;
+        for (QuestDef q : loaded.quests.values()) {
+            if (q.giver.isEmpty() || q.id.startsWith("hidden") || !QuestDef.modOk(q.mod) || !isAvailable(p, q)) continue;
+            if (next == null || nextRank(q) < nextRank(next)) {
+                if (next != null) more++;
+                next = q;
+            } else {
+                more++;
+            }
+        }
+        if (next != null) {
+            out.add(new com.rtshop.net.QuestHudPacket.Entry(NEXT_ID + more, com.rtshop.story.StoryText.t(p, next.title), false,
+                    com.rtshop.story.StoryText.t(p, npcName(next.giver)), List.of()));
+        }
         return out;
+    }
+
+    /** HUD 의 "다음 퀘스트" 줄 ID (뒤에 그 밖의 받을 수 있는 퀘스트 수). */
+    public static final String NEXT_ID = "_next:";
+
+    private static long nextRank(QuestDef q) {
+        return (q.id.startsWith("story_") ? 0L : 1L << 40) + q.order;
     }
 
     public static void syncHud(ServerPlayer p) {

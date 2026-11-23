@@ -1107,7 +1107,11 @@ public final class ClientSelfTest {
             case 2 -> {
                 check("server-side setup worked", serverError == null, serverError);
                 check("the wallet reached the client (minus the 2,500 G check)", ClientEconomy.wallet == 128_450 - 2_500, ClientEconomy.wallet);
-                List<com.rtshop.net.QuestHudPacket.Entry> hud = ClientQuestHud.entries;
+                List<com.rtshop.net.QuestHudPacket.Entry> hudAll = ClientQuestHud.entries;
+                List<com.rtshop.net.QuestHudPacket.Entry> hud = hudAll.stream().filter(x -> !x.id().startsWith("_next:")).toList();
+                var nextQ = hudAll.stream().filter(x -> x.id().startsWith("_next:")).findFirst().orElse(null);
+                check("the quest HUD also tells which NPC has the next quest to take", nextQ != null && !nextQ.turnIn().isEmpty() && !nextQ.title().isEmpty(),
+                        nextQ == null ? "none" : nextQ.turnIn() + " / " + nextQ.title());
                 check("the quest HUD receives the active quests in the order they were taken", hud.size() == 3
                         && hud.get(0).id().equals("job_swordsman_3") && hud.get(2).id().equals("job_cook_2"),
                         hud.stream().map(com.rtshop.net.QuestHudPacket.Entry::id).toList());

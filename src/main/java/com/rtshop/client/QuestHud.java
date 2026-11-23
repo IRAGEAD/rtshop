@@ -22,6 +22,7 @@ public final class QuestHud {
     private static final int CREAM = 0xFFF5E6C0;
     private static final int SOFT = 0xFFCDB98E;
     private static final int DONE = 0xFF8FD67A;
+    private static final int NEXT = 0xFF9FD0F0;
     private static final int LINE = 10;
     private static final int PAD = 4;
     /** 퀘스트와 퀘스트 사이 간격 (구분선이 들어간다). */
@@ -106,6 +107,13 @@ public final class QuestHud {
     private static List<Row> rows(Font font, List<QuestHudPacket.Entry> list, int inner) {
         ClientConfig cfg = ClientConfig.get();
         List<Row> out = new ArrayList<>();
+        QuestHudPacket.Entry next = null;
+        List<QuestHudPacket.Entry> quests = new ArrayList<>();
+        for (QuestHudPacket.Entry e : list) {
+            if (e.id().startsWith("_next:")) next = e;
+            else quests.add(e);
+        }
+        list = quests;
         int shown = Math.min(list.size(), cfg.questHudMax);
         for (int i = 0; i < shown; i++) {
             QuestHudPacket.Entry e = list.get(i);
@@ -129,6 +137,18 @@ public final class QuestHud {
         }
         if (list.size() > shown) {
             out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.more", list.size() - shown), inner, cfg.questHudFont), SOFT, 0, false));
+        }
+        if (next != null) {
+            // 받을 수 있는 퀘스트: 다음에 찾아갈 NPC
+            out.add(new Row(HudFonts.clip(font, "➤ " + HudLang.tr(cfg.questHudLang, "rtshop.qhud.next"), inner, cfg.questHudFont), NEXT, 0, true));
+            out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.next_npc", next.turnIn()), inner - 8, cfg.questHudFont), CREAM, 8, false));
+            out.add(new Row(HudFonts.clip(font, "「" + next.title() + "」", inner - 8, cfg.questHudFont), SOFT, 8, false));
+            int more = 0;
+            try {
+                more = Integer.parseInt(next.id().substring(6));
+            } catch (NumberFormatException ignored) {
+            }
+            if (more > 0) out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.next_more", more), inner - 8, cfg.questHudFont), SOFT, 8, false));
         }
         return out;
     }
