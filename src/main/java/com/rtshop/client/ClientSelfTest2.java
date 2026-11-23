@@ -804,7 +804,6 @@ final class ClientSelfTest2 {
         // ---- Cinematic Interactions 가 있으면: 구체는 1인칭 장면으로 열린다 (걸어가 몸을 숙이고, 룬석·소환 문양을 손으로 만진다)
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
-            LINES.add("  cinematic orb scene: phase=" + CinematicOrb.phaseForTest() + " screen=" + mc.screen);
             check("with Cinematic Interactions the orb starts a first-person scene instead of a window", CinematicOrb.sceneActive(), CinematicOrb.phaseForTest());
             shot(mc, "123_orb_scene_intro");
             waitTicks(70);
