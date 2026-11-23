@@ -36,7 +36,7 @@ public final class NoticeHud {
     private NoticeHud() {
     }
 
-    static final int MAX_VISIBLE = 4, MAX_LINES = 3, MAX_WIDTH = 340, PAD_X = 8, PAD_Y = 4, GAP = 3;
+    static final int MAX_VISIBLE = 4, MAX_LINES = 3, MAX_WIDTH = 300, PAD_X = 8, PAD_Y = 4, GAP = 3;
     static final long FADE_IN = 140, FADE_OUT = 380;
 
     static final class Entry {
@@ -176,7 +176,10 @@ public final class NoticeHud {
         boolean hidden = ClientEvents.hideHud() || mc.options.hideGui;
         advance(hidden);
         if (hidden) return;
-        draw(g, sw, sh, sh - 62);
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 260);
+        draw(g, sw, sh, sh - 62, MAX_VISIBLE);
+        g.pose().popPose();
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -187,11 +190,11 @@ public final class NoticeHud {
         GuiGraphics g = e.getGuiGraphics();
         g.pose().pushPose();
         g.pose().translate(0, 0, 450);
-        draw(g, e.getScreen().width, e.getScreen().height, e.getScreen().height - 8);
+        draw(g, e.getScreen().width, e.getScreen().height, e.getScreen().height - 8, 2); // 창 위에서는 가장 새 알림 2개만
         g.pose().popPose();
     }
 
-    private static void draw(GuiGraphics g, int sw, int sh, int bottom) {
+    private static void draw(GuiGraphics g, int sw, int sh, int bottom, int maxCount) {
         List<Entry> shown;
         synchronized (ACTIVE) {
             if (ACTIVE.isEmpty()) return;
@@ -199,14 +202,15 @@ public final class NoticeHud {
         }
         Font font = UiFont.get();
         int lh = font.lineHeight + 2;
-        int maxW = Math.max(60, Math.min(MAX_WIDTH, sw - 24));
+        // 가운데 기둥만 쓴다 (오른쪽·왼쪽 HUD 와 겹치지 않게): 화면 폭의 56%, 160~300
+        int maxW = Math.max(Math.min(160, sw - 16), Math.min(MAX_WIDTH, (int) (sw * 0.56)));
         int y = bottom;
         boolean inside = true;
         int totalLines = 0;
         boolean was = UiText.pause();
         try {
             // 새 알림이 아래, 오래된 알림이 위로 밀려 올라간다
-            for (int i = shown.size() - 1; i >= 0; i--) {
+            for (int i = shown.size() - 1; i >= Math.max(0, shown.size() - maxCount); i--) {
                 Entry e = shown.get(i);
                 Component text = e.count > 1 ? e.text.copy().append(Component.literal("  ×" + e.count).withStyle(s -> s.withColor(0xC8B48C))) : e.text;
                 List<FormattedCharSequence> ls = lines(font, text, maxW - PAD_X * 2);
@@ -229,6 +233,7 @@ public final class NoticeHud {
                     g.fill(x0 + bw - 1, y0 + 1, x0 + bw, y0 + bh - 1, bg);
                     g.fill(x0 + 2, y0, x0 + bw - 2, y0 + 1, edge);
                     g.fill(x0 + 2, y0 + bh - 1, x0 + bw - 2, y0 + bh, edge);
+                    g.flush(); // 바탕을 먼저 그려 둔다 (글자와 한 묶음으로 그려지면 바탕이 빠질 수 있다)
                     int ta = Math.max(8, (int) (a * 255));
                     int color = (ta << 24) | UiText.SOFT_WHITE;
                     int ty = y0 + PAD_Y;
@@ -237,6 +242,7 @@ public final class NoticeHud {
                         g.drawString(font, l, x0 + (bw - lw) / 2, ty, color, false);
                         ty += lh;
                     }
+                    g.flush();
                 }
                 y = y0 - GAP;
             }
