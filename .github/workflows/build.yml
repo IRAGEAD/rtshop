@@ -440,7 +440,7 @@ jobs:
           grep -n -A45 "server-side action failed" client/logs/latest.log | head -n 400 > /tmp/fpshots/server-action-errors.txt 2>/dev/null || true
           grep -n -B12 "rtshop-clienttest\] FAIL" client/logs/latest.log | cut -c1-400 | head -n 600 > /tmp/fpshots/fail-context.txt 2>/dev/null || true
           grep -n -B3 -A8 "Critical injection\|InjectionError\|VillagerTrades" client/logs/latest.log | head -n 200 > /tmp/fpshots/mixin-errors.txt 2>/dev/null || true
-          grep -n -iE "avalon|item.?skin|mesh_item|efn:weapon|ruinsgreatsword|duskfire" client/logs/latest.log | cut -c1-500 | head -n 300 > /tmp/fpshots/avalon-log.txt 2>/dev/null || true
+          grep -n -iE "avalon|item.?skin|mesh_item|efn:weapon|ruinsgreatsword|duskfire|EF renderer" client/logs/latest.log | cut -c1-500 | head -n 300 > /tmp/fpshots/avalon-log.txt 2>/dev/null || true
           # 어떤 모드가 주민 거래(VillagerTrades)를 Mixin 으로 고치는지
           python3 - packcache > /tmp/fpshots/villager-trade-mixins.txt <<'PY' || true
           import os, sys, zipfile

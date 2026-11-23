@@ -785,6 +785,7 @@ final class ClientSelfTest2 {
                 add(mc -> {
                     shot(mc, h[1]);
                     com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] held {}: {}", h[0], mc.player == null ? "-" : mc.player.getMainHandItem());
+                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] EF renderer for {}: {}", h[0], efRendererInfo(mc.player == null ? null : mc.player.getMainHandItem()));
                     waitTicks(2);
                 });
             }
@@ -792,6 +793,16 @@ final class ClientSelfTest2 {
                 mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
                 onServer(mc, sp -> sp.getInventory().setItem(sp.getInventory().selected, net.minecraft.world.item.ItemStack.EMPTY));
                 waitTicks(5);
+            });
+        }
+        if (net.minecraftforge.fml.ModList.get().isLoaded("efn")) {
+            add(mc -> {
+                for (String id : new String[]{"efn:ruinsgreatsword", "efn:yamato_dmc", "efn:kusabimaru", "efn:hf_murasama", "efn:broadblade", "wom:moonless", "epicfight:diamond_greatsword"}) {
+                    var it = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation(id));
+                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] EF renderer for {}: {}", id,
+                            it == null || it == net.minecraft.world.item.Items.AIR ? "(no item)" : efRendererInfo(new net.minecraft.world.item.ItemStack(it)));
+                }
+                waitTicks(1);
             });
         }
         // ------------------------------------------------------------ 이야기로 열리는 장비 진열대
@@ -851,5 +862,43 @@ final class ClientSelfTest2 {
             Cinematic.play("{\"kind\":\"line\",\"seconds\":0.01}");
             waitTicks(4);
         });
+    }
+
+    /** Epic Fight 가 이 아이템에 쓰는 렌더러 (Avalon mesh_item 이면 메쉬가 실제로 읽혔는지도). */
+    static String efRendererInfo(net.minecraft.world.item.ItemStack st) {
+        if (st == null || st.isEmpty()) return "(empty)";
+        try {
+            Class<?> ce = Class.forName("yesman.epicfight.client.ClientEngine");
+            Object engine = ce.getMethod("getInstance").invoke(null);
+            Object re = ce.getField("renderEngine").get(engine);
+            Object r = re.getClass().getMethod("getItemRenderer", net.minecraft.world.item.ItemStack.class).invoke(re, st);
+            StringBuilder b = new StringBuilder(r == null ? "null" : r.getClass().getName());
+            if (r != null) {
+                for (Class<?> c = r.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+                    for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+                        if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                        f.setAccessible(true);
+                        Object v = f.get(r);
+                        String vs;
+                        if (v != null && v.getClass().getName().contains("Accessor")) {
+                            Object got;
+                            try {
+                                got = v.getClass().getMethod("get").invoke(v);
+                            } catch (Throwable t) {
+                                got = "ERR " + (t.getCause() != null ? t.getCause() : t);
+                            }
+                            vs = v + " -> " + (got == null ? "null" : got.getClass().getSimpleName());
+                        } else {
+                            vs = String.valueOf(v);
+                        }
+                        if (vs.length() > 120) vs = vs.substring(0, 120);
+                        b.append(" ").append(f.getName()).append("=").append(vs);
+                    }
+                }
+            }
+            return b.toString();
+        } catch (Throwable t) {
+            return "ERR " + t;
+        }
     }
 }
