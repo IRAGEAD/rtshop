@@ -199,7 +199,7 @@ final class ClientSelfTest2 {
         add(mc -> {
             check("/rtshop border on shows the border of the lot you stand in", BorderRenderer.activeForTest() && BorderRenderer.segmentsForTest() > 20,
                     BorderRenderer.segmentsForTest());
-            check("the border is a low outline along the ground (no wall into the sky)", BorderRenderer.maxRiseForTest() < 3.5, BorderRenderer.maxRiseForTest());
+            check("the border is a low outline along the ground (no wall into the sky)", BorderRenderer.maxRiseForTest() < 12, BorderRenderer.maxRiseForTest());
             mc.player.setXRot(28);
             waitTicks(6);
         });

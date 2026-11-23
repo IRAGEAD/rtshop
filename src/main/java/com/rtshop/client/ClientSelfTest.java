@@ -147,6 +147,11 @@ public final class ClientSelfTest {
             return;
         }
         barrierPosted = false;
+        // 서버가 1초 넘게 밀려 있었다면, 밀린 일이 보낸 패킷을 화면 쪽이 받을 시간을 더 주고 한 번 더 확인한다
+        if (System.currentTimeMillis() - barrierAt > 1000) {
+            wait = 20;
+            return;
+        }
         try {
             next(mc);
         } catch (Throwable t) {
