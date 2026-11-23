@@ -107,12 +107,19 @@ public final class ClientSelfTest {
     private static volatile BlockPos anvilPos = null;
     private static volatile String swordWhere = "";
 
+    private static boolean autoMainSet;
+
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
         if (!ENABLED || done || event.phase != TickEvent.Phase.END) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
+        if (!autoMainSet) {
+            // 예전 시험들은 NPC 를 우클릭하면 상점이 바로 열리기를 기대한다: 대화 상자에서 [상점]을 곧바로 고르게 한다
+            autoMainSet = true;
+            DialogueScreen.autoMainForTest = true;
+        }
         if (mc.player == null || mc.level == null || mc.getSingleplayerServer() == null) {
             idle++;
             try {

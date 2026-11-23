@@ -2152,6 +2152,16 @@ public final class SelfTest {
         check("vanilla illagers never appear inside a woodland mansion (the hidden boss and raids are left alone)",
                 com.rtshop.story.MansionIllagers.BLOCKED.contains("minecraft:vindicator") && com.rtshop.story.MansionIllagers.BLOCKED.contains("minecraft:evoker")
                         && !com.rtshop.story.MansionIllagers.BLOCKED.contains("illusioner:illusioner"));
+        check("merchants and service NPCs open with a dialogue first, their own window being the first choice; story-only NPCs have none",
+                "rtshop.talk.main.shop".equals(com.rtshop.story.Dialogue.mainAction("shop_farmer")) && "rtshop.talk.main.bank".equals(com.rtshop.story.Dialogue.mainAction("bank"))
+                        && com.rtshop.story.Dialogue.mainAction("quest_order_archivist") == null);
+        {
+            var arch = com.rtshop.story.Dialogue.npcForTest("quest_order_archivist");
+            var lucky = com.rtshop.story.Dialogue.npcForTest("gacha");
+            check("long small talk can let slip hints toward the hidden bosses; the lucky merchant calls himself Lucky",
+                    arch != null && arch.has("hints") && arch.getAsJsonArray("hints").size() >= 2
+                            && lucky != null && lucky.toString().contains("럭키") && !lucky.toString().contains("릭키"));
+        }
         check("world-generation log spam (empty height range, unknown structure entities) is filtered, other warnings are not",
                 com.rtshop.compat.LogNoise.noisy("Empty height range: {}") && com.rtshop.compat.LogNoise.noisy("Skipping Entity with id {}")
                         && !com.rtshop.compat.LogNoise.noisy("Can't keep up! Is the server overloaded?"));

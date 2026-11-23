@@ -116,6 +116,35 @@ final class ClientSelfTest2 {
             });
             waitTicks(20);
         });
+        // 대화 먼저: 우클릭하면 대화 상자가 열리고, [상점] 선택지로 상점에 간다. 일상 이야기는 누를 때마다 바뀐다.
+        add(mc -> {
+            net.minecraft.world.entity.Entity e = npc >= 0 ? mc.level.getEntity(npc) : null;
+            DialogueScreen.autoMainForTest = false;
+            if (e != null) mc.gameMode.interact(mc.player, e, net.minecraft.world.InteractionHand.MAIN_HAND);
+            waitTicks(25);
+        });
+        add(mc -> {
+            DialogueScreen ds = mc.screen instanceof DialogueScreen x ? x : null;
+            check("right-clicking a merchant opens the dialogue box first, with the shop as a choice", ds != null && ds.hasMainForTest(), mc.screen);
+            if (ds != null) {
+                ds.skipForTest();
+                ds.chatterForTest();
+                String first = ds.lastChatForTest();
+                ds.chatterForTest();
+                String second = ds.lastChatForTest();
+                check("small talk changes every time you click it", !first.isEmpty() && !second.isEmpty() && !first.equals(second), first + " / " + second);
+                ds.skipForTest();
+                shot(mc, "114c_dialogue_first");
+                ds.chooseMainForTest();
+            }
+            waitTicks(25);
+        });
+        add(mc -> {
+            check("choosing [Shop] in the dialogue opens the merchant's shop", mc.screen instanceof ShopScreen, mc.screen);
+            mc.setScreen(null);
+            DialogueScreen.autoMainForTest = true;
+            waitTicks(5);
+        });
         add(mc -> {
             net.minecraft.world.entity.Entity e = npc >= 0 ? mc.level.getEntity(npc) : null;
             check("the farmer NPC for the back-button test is there", e != null, npc);

@@ -171,7 +171,24 @@ public final class Dialogue {
                 JsonArray l = new JsonArray();
                 l.add(pool.get(RNG.nextInt(pool.size())));
                 t.add("lines", l);
+                // 누를 때마다 다른 말을 하도록 전체 목록도 보낸다
+                JsonArray all = new JsonArray();
+                pool.forEach(all::add);
+                t.add("pool", all);
                 topics.add(t);
+            }
+        }
+        // 오래 이야기하면 흘리는 말 (히든 단서 쪽으로 살짝)
+        if (n.has("hints")) {
+            JsonArray hs = new JsonArray();
+            for (JsonElement e : n.getAsJsonArray("hints")) {
+                if (e.isJsonObject() && e.getAsJsonObject().has("text")) {
+                    if (ok(p, e.getAsJsonObject())) hs.add(text(p, e.getAsJsonObject().get("text")));
+                } else hs.add(text(p, e));
+            }
+            if (hs.size() > 0) {
+                out.add("hints", hs);
+                out.addProperty("hintAfter", HINT_AFTER);
             }
         }
         if (n.has("topics")) {
@@ -188,9 +205,58 @@ public final class Dialogue {
             }
         }
         out.add("topics", topics);
+        out.addProperty("chats", chats(p, npcKey));
+        String main = mainAction(npcKey);
+        if (main != null) out.addProperty("main", main);
         out.addProperty("quests", QuestManager.viewsCount(p, npcKey));
         if (com.rtshop.story.Hunts.get().boardNpcs.contains(npcKey)) out.addProperty("bounty", true);
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, out.toString()));
+    }
+
+    /** 이 횟수만큼 일상 이야기를 나누면 가끔 흘리는 말이 섞인다. */
+    public static final int HINT_AFTER = 12;
+
+    /** NPC 의 본래 기능 (대화 상자의 첫 선택지): 번역 키, 없으면 null (이야기 전용 NPC). */
+    public static String mainAction(String npcKey) {
+        if (npcKey == null) return null;
+        if (npcKey.startsWith("shop_")) return "rtshop.talk.main.shop";
+        return switch (npcKey) {
+            case "bank" -> "rtshop.talk.main.bank";
+            case "job" -> "rtshop.talk.main.job";
+            case "attendance" -> "rtshop.talk.main.attendance";
+            case "gacha" -> "rtshop.talk.main.gacha";
+            default -> null;
+        };
+    }
+
+    public static int chats(ServerPlayer p, String npc) {
+        return p.getPersistentData().getCompound("rtshop_chats").getInt(npc);
+    }
+
+    /** 일상 이야기를 한 번 더 나눴다. */
+    public static void chatted(ServerPlayer p, String npc) {
+        net.minecraft.nbt.CompoundTag root = p.getPersistentData();
+        net.minecraft.nbt.CompoundTag c = root.getCompound("rtshop_chats");
+        c.putInt(npc, Math.min(100000, c.getInt(npc) + 1));
+        root.put("rtshop_chats", c);
+    }
+
+    /** 이 사람은 지금 NPC 의 본래 기능으로 바로 간다 (대화 상자에서 고른 것). */
+    private static final java.util.Set<java.util.UUID> BYPASS = new java.util.HashSet<>();
+
+    /** 대화 상자에서 [상점] 등을 골랐다: 그 NPC 를 우클릭한 것처럼 본래 창을 연다. */
+    public static boolean main(ServerPlayer p, int entityId) {
+        Entity e = p.level().getEntity(entityId);
+        String key = e == null ? null : QuestManager.npcKey(e);
+        if (key == null || !near(p, e) || mainAction(key) == null) return false;
+        BYPASS.add(p.getUUID());
+        try {
+            PlayerInteractEvent.EntityInteract ev = new PlayerInteractEvent.EntityInteract(p, InteractionHand.MAIN_HAND, e);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(ev);
+            return ev.isCanceled();
+        } finally {
+            BYPASS.remove(p.getUUID());
+        }
     }
 
     public static String readFlag(String npc, String topic) {
@@ -224,12 +290,21 @@ public final class Dialogue {
         return e.isAlive() && e.distanceToSqr(p) <= r * r;
     }
 
-    /** 말을 걸어야 하는 장면이 있으면, 상점·퀘스트 창보다 먼저 대화 상자를 연다. */
+    /** 점검용·설정: false 면 장면이 있을 때만 대화 상자를 먼저 연다 (예전 방식). */
+    public static boolean dialogueFirst = true;
+
+    /**
+     * NPC 를 우클릭하면 상점·은행 등의 창보다 먼저 대화 상자를 연다 (말을 걸어야 하는 장면이 있으면 그 장면부터).
+     * 대화 상자에서 [상점] 등을 고르면 본래 창으로 간다. 웅크리고 우클릭하면 대화 없이 본래 창을 바로 연다.
+     */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onInteract(PlayerInteractEvent.EntityInteract event) {
         if (event.getLevel().isClientSide() || !(event.getEntity() instanceof ServerPlayer p)) return;
+        if (BYPASS.contains(p.getUUID())) return;
         String key = QuestManager.npcKey(event.getTarget());
-        if (key == null || pendingScene(p, key) == null) return;
+        if (key == null) return;
+        boolean scene = pendingScene(p, key) != null;
+        if (!scene && (!dialogueFirst || p.isShiftKeyDown())) return;
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
         if (event.getHand() == InteractionHand.MAIN_HAND) open(p, key, event.getTarget().getId());

@@ -22,7 +22,7 @@ VERSION = 3
 #  그레고리(은행) 합쇼체, 격식
 #  알버트(직업)   해요체, 차분한 스승
 #  하루(시청 서기) 합쇼체, 꼼꼼
-#  릭키(뽑기)     반말 "~라구, ~지!"
+#  럭키(뽑기)     반말 "~라구, ~지!"
 #  로렌초(식당)   해요체, 요리사의 감탄 "벨리시모!"
 
 def need(flags=None, quests=None, notFlags=None):
@@ -306,7 +306,7 @@ N["attendance"] = {"greet": ["시청 서기 하루입니다. 오늘 출석 도�
         "단 한 사람, 수도회 장로의 이주 기록만 없습니다. 처음부터 여기 계셨다고 하더군요.",
     ], flags=["clue_grey_cloak"]),
 ]}
-N["gacha"] = {"greet": ["행운 상인 릭키라구! 오늘은 뭐가 나올까~?"], "chatter": [
+N["gacha"] = {"greet": ["행운 상인 럭키라구! 오늘은 뭐가 나올까~?"], "chatter": [
     "전설은 기다리는 자에게 온다지! 아마도!",
     "YAMATO? 그거 본 사람은 손에 꼽는다구. 근데 너라면 혹시?",
     "꽝도 분해하면 조각이 된다구. 버릴 건 하나도 없지!",
@@ -314,8 +314,9 @@ N["gacha"] = {"greet": ["행운 상인 릭키라구! 오늘은 뭐가 나올까~
 
 
 # ---------------------------------------------------------------- 2판 스토리: 선택에 대한 반응, 장마다 새 이야기
-def more(npc, greet=None, chatter=None, topics=None):
+def more(npc, greet=None, chatter=None, topics=None, hints=None):
     n = N[npc]
+    if hints: n.setdefault("hints", []).extend(hints)
     if greet: n["greet"].extend(greet)
     if chatter: n["chatter"].extend(chatter)
     if topics: n["topics"].extend(topics)
@@ -385,6 +386,38 @@ more("quest_order_elder",
      chatter=[g("일곱 봉인… 천 년이 이렇게 짧을 줄이야.", flags=["story_ch3_done"], notFlags=["erwin_betrayal"])],
      topics=[topic("gloves", "장갑", ["이 장갑은 벗을 수가 없네. 벗으면… 다들 놀랄 걸세.",
                                      "언젠가 보여 주지. 그때가 오면."], flags=["clue_gloved_hand"], notFlags=["erwin_betrayal"])])
+
+
+# ---------------------------------------------------------------- 오래 이야기하면 흘리는 말 (히든 단서 쪽으로 아주 살짝)
+# 일상 이야기를 12번 넘게 나누면 다섯 번에 한 번 꼴로 섞인다. 결정적인 답은 주지 않는다.
+more("quest_order_archivist", hints=[
+    "…이건 그냥 혼잣말이에요. 잘린 연대기 자리마다 아주 옅은 보랏빛이 묻어 있어요. 우리 잉크는 검은색인데요.",
+    "어머니 일지에 이런 낙서가 있었어요. '거울은 거짓말을 한다. 거울 속 필경사는 더하다.' 무슨 뜻일까요.",
+    "연대기에는 일곱 왕이 나와요. 그런데 왕관 그림은 여덟 개예요. 한 개는 번개 모양이고요.",
+])
+more("quest_order_captain", hints=[
+    "남쪽 따뜻한 바다엔 가라앉은 유적이 많다. 거기서 붓질을 하던 놈이 이상한 악보를 주웠다더군. 제목만 남은.",
+    "폭풍이 칠 때 높은 곳에 올라가 본 적 있나? 바람이 종이를 날려 온다. 대개는 쓰레기지만… 대개는.",
+    "원정 중에 소환사를 셋 잡은 적이 있다. 셋 다 보랏빛 잉크병을 품고 있었지. 습격 때만 나오는 놈들이다.",
+])
+more("shop_fisher", hints=[
+    "따뜻한 바다에서 낚시를 하다 보면 소금에 절은 종이가 걸려 올라올 때가 있지. 대개는 버리지만, 한 번은 '여덟 번째 배'라고 적혀 있었네.",
+    "뇌우 치는 밤엔 드라운드들이 이상한 비늘을 떨군다는 얘기가 있어. 아직도 찌릿하다던가.",
+])
+more("attendance", hints=[
+    "시청 기록에 이상한 항목이 하나 있습니다. '폭풍의 여제께 바치는 세금, 미납.' 날짜는 천 년 전입니다.",
+    "숲속 저택 주변의 안개 민원이 들어온 적이 있습니다. 담당자는 '거울이 사람을 비추지 않는다'고 적고 조사를 그만뒀습니다.",
+])
+more("gacha", hints=[
+    "있잖아, 진짜 행운은 뽑기에만 있는 게 아니라구. 폭풍 치는 날 하늘에서 떨어지는 종이 같은 거? 아무것도 아니야~",
+    "보랏빛 잉크로 쓴 복권은 절대 사지 마! 당첨 번호가 거울처럼 뒤집혀 있다구!",
+])
+more("quest_order_elder", hints=[
+    "…여덟. 아니, 일곱이라고 했나? 나이를 먹으니 숫자가 헷갈리는군.",
+])
+for key in ("shop_general", "shop_blacksmith", "bank"):
+    if key in N:
+        more(key, hints=["바다 위 신전 얘기 들어 봤나? 폭풍이 그치지 않는 곳에 있다던데. 신전 기둥이 여덟 개라나."])
 
 data = {"version": VERSION,
         "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), "

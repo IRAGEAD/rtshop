@@ -1366,5 +1366,10 @@
   "rtshop.jedit.back": "Back",
   "rtshop.jedit.items_title": "%s: %s items",
   "rtshop.jedit.items_none": "No items fall into this type.",
-  "rtshop.jedit.items_hint": "Click a type to move just that item (save to apply)"
+  "rtshop.jedit.items_hint": "Click a type to move just that item (save to apply)",
+  "rtshop.talk.main.shop": "Browse the shop",
+  "rtshop.talk.main.bank": "Use the bank",
+  "rtshop.talk.main.job": "Talk about jobs",
+  "rtshop.talk.main.attendance": "Stamp attendance",
+  "rtshop.talk.main.gacha": "Try your luck"
 }

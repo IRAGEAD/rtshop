@@ -358,6 +358,14 @@ public final class ShopServer {
                         .then(Commands.literal("open").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
                                 .executes(ctx -> com.rtshop.story.Dialogue.openFor(ctx.getSource().getPlayerOrException(),
                                         com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity")) ? 1 : 0)))
+                        .then(Commands.literal("main").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
+                                .executes(ctx -> com.rtshop.story.Dialogue.main(ctx.getSource().getPlayerOrException(),
+                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity")) ? 1 : 0)))
+                        .then(Commands.literal("chat").then(Commands.argument("npc", StringArgumentType.word())
+                                .executes(ctx -> {
+                                    com.rtshop.story.Dialogue.chatted(ctx.getSource().getPlayerOrException(), StringArgumentType.getString(ctx, "npc"));
+                                    return 1;
+                                })))
                         .then(Commands.literal("done").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
                                 .executes(ctx -> {
                                     com.rtshop.story.Dialogue.sceneDone(ctx.getSource().getPlayerOrException(),

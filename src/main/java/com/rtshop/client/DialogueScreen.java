@@ -42,6 +42,7 @@ public class DialogueScreen extends Screen {
         this.npcName = data.get("name").getAsString();
         this.scene = "scene".equals(data.get("mode").getAsString());
         for (JsonElement e : data.getAsJsonArray("topics")) topics.add(e.getAsJsonObject());
+        this.chats = data.has("chats") ? data.get("chats").getAsInt() : 0;
         if (scene) {
             play(data.getAsJsonArray("lines"));
         } else {
@@ -50,6 +51,10 @@ public class DialogueScreen extends Screen {
     }
 
     public static void open(JsonObject o) {
+        if (autoMainForTest && o.has("main") && !"scene".equals(o.get("mode").getAsString()) && Minecraft.getInstance().player != null) {
+            Minecraft.getInstance().player.connection.sendCommand("rtshop talk main " + o.get("entity").getAsInt());
+            return;
+        }
         Minecraft.getInstance().setScreen(new DialogueScreen(o));
     }
 
@@ -111,8 +116,15 @@ public class DialogueScreen extends Screen {
         choosing = true;
     }
 
+    /** 점검용: 대화 상자가 열리면 곧바로 본래 기능(상점 등)을 고른다 (예전 시험이 상점 창을 기대하는 곳). */
+    public static boolean autoMainForTest;
+    private int chats;
+    private String lastChat = "";
+    private static final java.util.Random CHAT_RNG = new java.util.Random();
+
     private List<String[]> choices() {
         List<String[]> out = new ArrayList<>();
+        if (data.has("main")) out.add(new String[]{"main", "", Component.translatable(data.get("main").getAsString()).getString()});
         for (JsonObject t : topics) {
             String title = t.get("title").getAsString();
             boolean isNew = t.has("new") && t.get("new").getAsBoolean();
@@ -128,7 +140,17 @@ public class DialogueScreen extends Screen {
     private void choose(String[] c) {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         switch (c[0]) {
+            case "main" -> {
+                onClose();
+                NpcButtons.returnNpc = entity;
+                NpcButtons.returnArmedAt = System.currentTimeMillis();
+                if (minecraft.player != null) minecraft.player.connection.sendCommand("rtshop talk main " + entity);
+            }
             case "topic" -> {
+                if (c[1].equals("_chatter")) {
+                    chatter();
+                    return;
+                }
                 for (JsonObject t : topics) {
                     if (t.get("id").getAsString().equals(c[1])) {
                         t.addProperty("new", false);
@@ -149,6 +171,56 @@ public class DialogueScreen extends Screen {
             }
             default -> onClose();
         }
+    }
+
+    /** 일상 이야기: 누를 때마다 다른 말. 오래 이야기하면 가끔 흘리는 말이 섞인다. */
+    private void chatter() {
+        JsonObject t = null;
+        for (JsonObject x : topics) if (x.get("id").getAsString().equals("_chatter")) t = x;
+        if (t == null) return;
+        List<String> pool = new ArrayList<>();
+        if (t.has("pool")) for (var e : t.getAsJsonArray("pool")) pool.add(e.getAsString());
+        if (pool.isEmpty()) for (var e : t.getAsJsonArray("lines")) pool.add(e.getAsString());
+        chats++;
+        String line;
+        List<String> hints = new ArrayList<>();
+        if (data.has("hints")) for (var e : data.getAsJsonArray("hints")) hints.add(e.getAsString());
+        int after = data.has("hintAfter") ? data.get("hintAfter").getAsInt() : 12;
+        if (!hints.isEmpty() && chats >= after && (chats - after) % 5 == 0) {
+            line = hints.get(((chats - after) / 5) % hints.size());
+        } else {
+            List<String> rest = new ArrayList<>(pool);
+            if (rest.size() > 1) rest.remove(lastChat);
+            line = rest.get(CHAT_RNG.nextInt(rest.size()));
+        }
+        lastChat = line;
+        JsonArray one = new JsonArray();
+        one.add(line);
+        play(one);
+        if (minecraft.player != null) minecraft.player.connection.sendCommand("rtshop talk chat " + npc);
+    }
+
+    public boolean hasMainForTest() {
+        return data.has("main");
+    }
+
+    public void chooseMainForTest() {
+        for (String[] c : choices()) if (c[0].equals("main")) {
+            choose(c);
+            return;
+        }
+    }
+
+    public int chatsForTest() {
+        return chats;
+    }
+
+    public String lastChatForTest() {
+        return lastChat;
+    }
+
+    public void chatterForTest() {
+        chatter();
     }
 
     // ------------------------------------------------------------------ 그리기
