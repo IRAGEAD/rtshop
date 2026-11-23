@@ -56,6 +56,25 @@ public class ShopEditScreen extends Screen {
         return file.getAsJsonArray("items");
     }
 
+    /** 자동 규칙으로 진열된 상품 (서버가 "_auto" 로 보내 준다). 고치면 직접 항목으로 옮긴다. */
+    private JsonArray autos() {
+        if (!file.has("_auto")) file.add("_auto", new JsonArray());
+        return file.getAsJsonArray("_auto");
+    }
+
+    private static boolean isAuto(JsonObject o) {
+        return o.has("_auto") && o.get("_auto").getAsBoolean();
+    }
+
+    /** 자동 상품을 고쳤다: 직접 항목으로 옮긴다 (그래야 저장된다). */
+    private void promote(JsonObject o) {
+        if (!isAuto(o)) return;
+        o.remove("_auto");
+        autos().remove(o);
+        items().add(o);
+        dirty = true;
+    }
+
     private List<String> categories() {
         List<String> out = new ArrayList<>();
         if (file.has("categories")) {
@@ -82,7 +101,10 @@ public class ShopEditScreen extends Screen {
     private void filter() {
         rows.clear();
         String q = search.toLowerCase();
-        for (JsonElement e : items()) {
+        List<JsonElement> all = new ArrayList<>();
+        items().forEach(all::add);
+        autos().forEach(all::add);
+        for (JsonElement e : all) {
             JsonObject o = e.getAsJsonObject();
             String cat = o.has("category") ? o.get("category").getAsString() : "";
             if (!category.isEmpty() && !category.equals(cat)) continue;
@@ -164,13 +186,18 @@ public class ShopEditScreen extends Screen {
             JsonObject o = rows.get(i + scroll);
             int y = listY + i * ROW;
             icons.add(new Object[]{o.get("item").getAsString(), x0, y + 1});
+            icons.get(icons.size() - 1)[0] = o.get("item").getAsString() + (isAuto(o) ? "\u0000auto" : "");
             EditBox price = num(xPrice, y + 2, xSell - 3 - xPrice, fmt(o, "price"), v -> {
                 if (v.isEmpty()) return;
+                if (v.equals(fmt(o, "price"))) return;
                 o.addProperty("price", Double.parseDouble(v));
+                promote(o);
             });
             EditBox sell = num(xSell, y + 2, xBuy - 4 - xSell, fmt(o, "sellPrice"), v -> {
+                if (v.equals(fmt(o, "sellPrice"))) return;
                 if (v.isEmpty()) o.remove("sellPrice");
                 else o.addProperty("sellPrice", Double.parseDouble(v));
+                promote(o);
             });
             rowWidgets.add(price);
             rowWidgets.add(sell);
@@ -178,11 +205,13 @@ public class ShopEditScreen extends Screen {
             boolean sl = !o.has("sell") || o.get("sell").getAsBoolean();
             Button bb = Button.builder(Component.translatable(buy ? "rtshop.shopedit.buy_on" : "rtshop.shopedit.buy_off"), b -> {
                 o.addProperty("buy", !(!o.has("buy") || o.get("buy").getAsBoolean()));
+                promote(o);
                 dirty = true;
                 rebuildRows();
             }).bounds(xBuy, y, toggleW, 18).build();
             Button sbn = Button.builder(Component.translatable(sl ? "rtshop.shopedit.sell_on" : "rtshop.shopedit.sell_off"), b -> {
                 o.addProperty("sell", !(!o.has("sell") || o.get("sell").getAsBoolean()));
+                promote(o);
                 dirty = true;
                 rebuildRows();
             }).bounds(xSellT, y, toggleW, 18).build();
@@ -192,11 +221,18 @@ public class ShopEditScreen extends Screen {
                 if (cs.isEmpty()) return;
                 int k = cs.indexOf(cat);
                 o.addProperty("category", cs.get((k + 1) % cs.size()));
+                promote(o);
                 dirty = true;
                 filter();
                 rebuildRows();
             }).bounds(xCat, y, catBtnW, 18).build();
             Button del = Button.builder(Component.literal("✕"), b -> {
+                if (isAuto(o)) {
+                    // 자동 상품은 목록에서 빼도록 exclude 에 적는다
+                    if (!file.has("exclude")) file.add("exclude", new JsonArray());
+                    file.getAsJsonArray("exclude").add(o.get("item").getAsString());
+                    autos().remove(o);
+                }
                 items().remove(o);
                 dirty = true;
                 filter();
@@ -300,15 +336,26 @@ public class ShopEditScreen extends Screen {
         g.drawString(font, Ui.clip(font, Component.translatable("rtshop.shopedit.col_price").getString(), xSell - xPrice - 2), xPrice, hy, Ui.C_INK, false);
         g.drawString(font, Ui.clip(font, Component.translatable("rtshop.shopedit.col_sell").getString(), xBuy - xSell - 2), xSell, hy, Ui.C_INK, false);
         g.fill(x0, listY - 2, fx + W - 12, listY - 1, 0x40000000);
+        String autoTag = Component.translatable("rtshop.shopedit.auto_tag").getString();
         for (Object[] ic : icons) {
-            Item it = item((String) ic[0]);
+            String raw = (String) ic[0];
+            boolean auto = raw.endsWith("\u0000auto");
+            String id = auto ? raw.substring(0, raw.length() - 5) : raw;
+            Item it = item(id);
             int ix = (int) ic[1], iy = (int) ic[2];
             g.renderItem(new ItemStack(it), ix, iy);
-            g.drawString(font, Ui.clip(font, it == Items.BARRIER ? (String) ic[0] : it.getDescription().getString(), nameW), ix + 20, iy + 4, Ui.C_INK, false);
+            int tagW = auto ? font.width(autoTag) + 4 : 0;
+            g.drawString(font, Ui.clip(font, it == Items.BARRIER ? id : it.getDescription().getString(), nameW - tagW), ix + 20, iy + 4,
+                    auto ? Ui.C_INK_SOFT : Ui.C_INK, false);
+            if (auto) {
+                int tx = ix + 20 + nameW - tagW + 2;
+                g.fill(tx - 1, iy + 2, tx + tagW - 3, iy + 13, 0x40306090);
+                g.drawString(font, autoTag, tx, iy + 4, 0xFF2A5A8A, false);
+            }
         }
         int[] bw = footerWidths();
         int countW = fx + W - 8 - bw[0] - bw[1] - bw[2] - 12 - 4 - (fx + 10);
-        String count = Ui.clip(font, Component.translatable("rtshop.shopedit.count", rows.size(), items().size()).getString(), countW);
+        String count = Ui.clip(font, Component.translatable("rtshop.shopedit.count", rows.size(), items().size() + autos().size()).getString(), countW);
         g.drawString(font, count, fx + 10, fy + H - 22, Ui.C_PARCH, true);
         String hint = Component.translatable("rtshop.shopedit.hint").getString();
         g.pose().pushPose();

@@ -425,7 +425,7 @@ public class GachaEditScreen extends Screen {
         int cw = Math.min(54, (W - 16 - 70) / GRADES.length - 4);
         label(x, y + 2, tr("rtshop.gachaedit.odds_head"), Ui.C_GOLD);
         for (int i = 0; i < GRADES.length; i++) {
-            label(x + 70 + i * (cw + 4), y + 2, tr("rtshop.gacha.grade." + GRADES[i]), GachaColors.argb(GRADES[i]));
+            label(x + 70 + i * (cw + 4), y + 2, Ui.clip(this.font, tr("rtshop.gacha.grade." + GRADES[i]), cw + 2), GachaColors.argb(GRADES[i]));
         }
         y += 14;
         JsonObject tiers = cfg.getAsJsonObject("tiers");
@@ -487,8 +487,13 @@ public class GachaEditScreen extends Screen {
                 tk.add(cname, new JsonObject());
             }
             JsonObject t = tk.getAsJsonObject(cname);
-            label(tx, y + 2, tr("rtshop.gacha.cat." + cname), Ui.C_PARCH_DARK);
             int lw = this.font.width(tr("rtshop.gacha.cat." + cname)) + 3;
+            if (tx + lw + 3 * 28 > fx + W - 8) {
+                // 한 줄에 다 안 들어가면 다음 줄로
+                y += 16;
+                tx = x + 70;
+            }
+            label(tx, y + 2, tr("rtshop.gacha.cat." + cname), Ui.C_PARCH_DARK);
             for (int i = 0; i < TIERS.length; i++) {
                 final String tname = TIERS[i];
                 box(tx + lw + i * 28, y, 26, t.has(tname) ? t.get(tname).getAsString() : "0", 4,

@@ -788,6 +788,13 @@ public final class QuestManager {
         // 직업 선행 퀘스트는 전투·생활 직업마다 한 직업씩만 진행한다
         String jobId = jobOf(q.id);
         if (jobId != null) {
+            // 이미 그 칸(전투/생활)에 직업이 있으면 다른 직업의 선행 퀘스트는 할 수 없다
+            String has = hasOtherJob(p, jobId);
+            if (has != null) {
+                com.rtshop.job.JobConfig.JobDef hd = com.rtshop.job.JobConfig.get().jobs.get(has);
+                p.sendSystemMessage(Component.translatable("rtshop.quest.job_has", hd == null ? has : hd.name));
+                return false;
+            }
             String busy = busyJob(pr, jobId);
             if (busy != null) {
                 com.rtshop.job.JobConfig.JobDef bd = com.rtshop.job.JobConfig.get().jobs.get(busy);
@@ -846,6 +853,14 @@ public final class QuestManager {
     }
 
     /** jobId 의 선행 퀘스트를 받으려 할 때, 같은 칸(전투/생활)에서 이미 진행 중인 다른 직업 (없으면 null). */
+    /** 그 직업과 같은 칸에 이미 다른 직업이 있으면 그 직업 ID. */
+    public static String hasOtherJob(ServerPlayer p, String jobId) {
+        com.rtshop.job.JobConfig.JobDef me = com.rtshop.job.JobConfig.get().jobs.get(jobId);
+        if (me == null) return null;
+        String cur = com.rtshop.job.Jobs.entry(p).get(me.slot);
+        return cur == null || cur.isEmpty() || cur.equals(jobId) ? null : cur;
+    }
+
     public static String busyJob(QuestData.Progress pr, String jobId) {
         com.rtshop.job.JobConfig cfg = com.rtshop.job.JobConfig.get();
         com.rtshop.job.JobConfig.JobDef me = cfg.jobs.get(jobId);

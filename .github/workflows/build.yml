@@ -218,7 +218,7 @@ jobs:
             echo "== LinkAnimation"; mkdir -p /tmp/ef && (cd /tmp/ef && unzip -q -o "$GITHUB_WORKSPACE/$EFJ" 'yesman/epicfight/api/animation/types/LinkAnimation.class' 'yesman/epicfight/api/animation/types/StaticAnimation.class') && javap -p -constants /tmp/ef/yesman/epicfight/api/animation/types/LinkAnimation.class
           } > /tmp/inspect/nightfall.txt 2>&1
           # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
-          for pat in illusioner mowziesmobs aquamirae cataclysm; do
+          for pat in illusioner mowziesmobs aquamirae cataclysm yazz reincarn; do
             J="$(ls packcache/*.jar | grep -i "$pat" | head -1)"
             [ -z "$J" ] && continue
             {

@@ -178,9 +178,6 @@ public class JobScreen extends Screen implements NpcButtons.Host {
         if (current().isEmpty()) {
             return Component.translatable("rtshop.job.btn_choose").getString();
         }
-        if (confirm) {
-            return Component.translatable("rtshop.job.btn_confirm").getString();
-        }
         return Component.translatable("rtshop.job.btn_change", Ui.num(cost())).getString();
     }
 
@@ -341,6 +338,43 @@ public class JobScreen extends Screen implements NpcButtons.Host {
             }
         }
         super.render(g, mx, my, partial);
+        if (confirm) {
+            renderConfirm(g, mx, my);
+        }
+    }
+
+    // ------------------------------------------------------------------ 확인 창
+
+    private int[] confirmBox() {
+        int w = Math.min(W - 40, 260), h = 84;
+        return new int[]{(this.width - w) / 2, (this.height - h) / 2, w, h};
+    }
+
+    private void renderConfirm(GuiGraphics g, int mx, int my) {
+        JobOpenPacket.JobView j = find(selected);
+        if (j == null) {
+            confirm = false;
+            return;
+        }
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 400);
+        g.fill(0, 0, this.width, this.height, 0xA0000000);
+        int[] b = confirmBox();
+        Ui.woodFrame(g, b[0], b[1], b[2], b[3]);
+        String title = Component.translatable(current().isEmpty() ? "rtshop.job.confirm_title" : "rtshop.job.confirm_change_title", j.name()).getString();
+        g.drawCenteredString(this.font, Ui.clip(this.font, title, b[2] - 16), b[0] + b[2] / 2, b[1] + 10, Ui.C_GOLD);
+        String body = current().isEmpty() ? Component.translatable("rtshop.job.confirm_body").getString()
+                : Component.translatable("rtshop.job.confirm_change_body", Ui.num(cost())).getString();
+        List<net.minecraft.util.FormattedCharSequence> ls = this.font.split(Component.literal(body), b[2] - 20);
+        for (int i = 0; i < Math.min(3, ls.size()); i++) {
+            g.drawCenteredString(this.font, ls.get(i), b[0] + b[2] / 2, b[1] + 26 + i * 10, Ui.C_CREAM);
+        }
+        int bw = (b[2] - 30) / 2, by = b[1] + b[3] - 24;
+        Ui.button(g, this.font, b[0] + 10, by, bw, 16, Component.translatable("rtshop.job.confirm_yes").getString(),
+                Ui.inside(mx, my, b[0] + 10, by, bw, 16), true);
+        Ui.button(g, this.font, b[0] + 20 + bw, by, bw, 16, Component.translatable("rtshop.job.confirm_no").getString(),
+                Ui.inside(mx, my, b[0] + 20 + bw, by, bw, 16), true);
+        g.pose().popPose();
     }
 
     // ------------------------------------------------------------------ 입력
@@ -351,6 +385,21 @@ public class JobScreen extends Screen implements NpcButtons.Host {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        if (confirm) {
+            // 확인 창이 떠 있으면 그 단추만 받는다
+            int[] b = confirmBox();
+            int bw = (b[2] - 30) / 2, by = b[1] + b[3] - 24;
+            JobOpenPacket.JobView j = find(selected);
+            if (button == 0 && Ui.inside(mx, my, b[0] + 10, by, bw, 16) && j != null) {
+                click();
+                confirm = false;
+                ShopNet.CHANNEL.sendToServer(new JobChoosePacket(j.id()));
+            } else if (button != 0 || Ui.inside(mx, my, b[0] + 20 + bw, by, bw, 16) || !Ui.inside(mx, my, b[0], b[1], b[2], b[3])) {
+                click();
+                confirm = false;
+            }
+            return true;
+        }
         if (button != 0) {
             return super.mouseClicked(mx, my, button);
         }
@@ -381,12 +430,7 @@ public class JobScreen extends Screen implements NpcButtons.Host {
         JobOpenPacket.JobView j = find(selected);
         if (j != null && buttonEnabled(j) && Ui.inside(mx, my, btnX(), btnY(), 112, 18)) {
             click();
-            if (!current().isEmpty() && !confirm) {
-                confirm = true; // 돈이 드는 변경은 한 번 더 눌러 확인
-                return true;
-            }
-            confirm = false;
-            ShopNet.CHANNEL.sendToServer(new JobChoosePacket(j.id()));
+            confirm = true; // 고르기·바꾸기 모두 확인 창에서 한 번 더
             return true;
         }
         return super.mouseClicked(mx, my, button);

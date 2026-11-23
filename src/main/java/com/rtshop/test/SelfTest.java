@@ -2106,6 +2106,11 @@ public final class SelfTest {
 
     /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
     private static void story(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        if (net.minecraftforge.fml.ModList.get().isLoaded("fantasy")) {
+            com.rtshop.compat.FantasyQuestsOff.apply(server, true);
+            RtShop.LOGGER.info("[rtshop-selftest] Fantasy Mounts quest settings: {}", com.rtshop.compat.FantasyQuestsOff.LAST);
+            check("Fantasy Mounts quests are off by default (its quest settings were found)", java.nio.file.Files.exists(com.rtshop.compat.FantasyQuestsOff.marker(server)));
+        }
         QuestManager.Loaded l = QuestManager.loaded();
         List<String> story = new ArrayList<>();
         for (String id : l.quests.keySet()) if (id.startsWith("story_") || id.startsWith("hidden_")) story.add(id);

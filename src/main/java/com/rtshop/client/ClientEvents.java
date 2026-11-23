@@ -173,6 +173,19 @@ public final class ClientEvents {
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOW)
     public static void onLoreTooltip(ItemTooltipEvent event) {
         try {
+            // 무기 분류 (전투 직업의 무기 상성 기준)
+            if (ClientConfig.get().weaponTypeTooltip) {
+                com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
+                String type = jc.weaponType(event.getItemStack());
+                if (!type.equals(com.rtshop.job.WeaponTypes.NONE) && !type.equals(com.rtshop.job.WeaponTypes.FIST)) {
+                    event.getToolTip().add(Math.min(1, event.getToolTip().size()),
+                            net.minecraft.network.chat.Component.translatable("rtshop.job.weapon_type_line", jc.typeName(type))
+                                    .withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
             StoryClient.onTooltip(event);
         } catch (Throwable ignored) {
         }

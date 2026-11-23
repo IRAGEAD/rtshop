@@ -46,8 +46,9 @@ public final class NpcNames {
         m.put("attendance_shop", "엘리");
         m.put("bank", "그레고리");
         m.put("job", "알버트");
-        m.put("attendance", "클라라");
+        m.put("attendance", "하루"); // 직함이 "시청 서기 하루" 라 그대로 보인다
         m.put("raid_guide", "발터");
+        m.put("restaurant", "로렌초");
         return m;
     }
 
@@ -67,6 +68,17 @@ public final class NpcNames {
                     if (o.has("names")) {
                         for (Map.Entry<String, com.google.gson.JsonElement> e : o.getAsJsonObject("names").entrySet()) {
                             c.names.put(e.getKey(), e.getValue().getAsString());
+                        }
+                        // 3.27: 시청 서기는 예전처럼 "시청 서기 하루"
+                        if ("클라라".equals(c.names.get("attendance"))) {
+                            c.names.put("attendance", "하루");
+                            save(c);
+                        }
+                        for (Map.Entry<String, String> d : defaults().entrySet()) {
+                            if (!c.names.containsKey(d.getKey())) {
+                                c.names.put(d.getKey(), d.getValue());
+                                save(c);
+                            }
                         }
                     }
                 } else {

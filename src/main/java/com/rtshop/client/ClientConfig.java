@@ -62,6 +62,8 @@ public final class ClientConfig {
     public boolean pvpHudEnabled = true;
     /** 파티 표시 (화면 왼쪽). */
     public boolean partyHudEnabled = true;
+    /** 무기 설명에 무기 분류(검·창·총…)를 적는다. */
+    public boolean weaponTypeTooltip = true;
     public double pvpHudX = PDEF_X;
     public double pvpHudY = PDEF_Y;
     public double pvpHudWidth = PDEF_W;
@@ -161,6 +163,7 @@ public final class ClientConfig {
             o.addProperty("questHudFont", questHudFont);
             o.addProperty("pvpHudEnabled", pvpHudEnabled);
             o.addProperty("partyHudEnabled", partyHudEnabled);
+            o.addProperty("weaponTypeTooltip", weaponTypeTooltip);
             o.addProperty("pvpHudX", pvpHudX);
             o.addProperty("pvpHudY", pvpHudY);
             o.addProperty("pvpHudWidth", pvpHudWidth);
@@ -210,6 +213,7 @@ public final class ClientConfig {
                 if (o.has("questHudFont")) c.questHudFont = o.get("questHudFont").getAsString();
                 if (o.has("pvpHudEnabled")) c.pvpHudEnabled = o.get("pvpHudEnabled").getAsBoolean();
                 if (o.has("partyHudEnabled")) c.partyHudEnabled = o.get("partyHudEnabled").getAsBoolean();
+                if (o.has("weaponTypeTooltip")) c.weaponTypeTooltip = o.get("weaponTypeTooltip").getAsBoolean();
                 if (o.has("pvpHudX")) c.pvpHudX = o.get("pvpHudX").getAsDouble();
                 if (o.has("pvpHudY")) c.pvpHudY = o.get("pvpHudY").getAsDouble();
                 if (o.has("pvpHudWidth")) c.pvpHudWidth = o.get("pvpHudWidth").getAsDouble();

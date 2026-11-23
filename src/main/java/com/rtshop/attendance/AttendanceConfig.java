@@ -91,7 +91,8 @@ public final class AttendanceConfig {
     public double restoreWindowHours = 24;
     public double restoreCooldownHours = 24;
     /** 출석 창의 '출석 상점' 버튼이 여는 상점 ID (복구권을 판다). */
-    public String shop = "attendance_shop";
+    /** 출석 NPC 창의 상점 단추 (""= 없음). 출석 상점은 출석 상점 주인 엘리에게만 있다 (3.27). */
+    public String shop = "";
     public final List<Reward> days = new ArrayList<>();
     public final List<Weekly> weekly = new ArrayList<>();
 
@@ -215,6 +216,7 @@ public final class AttendanceConfig {
         o.addProperty("restoreWindowHours", restoreWindowHours);
         o.addProperty("restoreCooldownHours", restoreCooldownHours);
         o.addProperty("shop", shop);
+        o.addProperty("shopMoved", true);
         JsonArray d = new JsonArray();
         for (Reward r : days) {
             d.add(r.toJson());
@@ -298,6 +300,11 @@ public final class AttendanceConfig {
             if (Files.exists(p)) {
                 JsonObject o = JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject();
                 AttendanceConfig c = fromJson(o);
+                // 3.27: 출석 상점 기능은 출석 상점 주인(엘리)에게만. 예전 기본값이면 시청 서기 창의 상점 단추를 뺀다.
+                if (!o.has("shopMoved") && "attendance_shop".equals(c.shop)) {
+                    c.shop = "";
+                    c.save();
+                }
                 // 3.7.0 이 만든 파일(기준 시각 9시)은 새 기본값 6시로 바꾼다. 보상 등 다른 값은 그대로.
                 if (!o.has("configVersion") && c.resetHour == 9) {
                     c.resetHour = 6;
