@@ -242,6 +242,13 @@ jobs:
             mkdir -p /tmp/efx && unzip -o -q "$EFJ2" -d /tmp/efx
             echo "== EF classes mentioning item_skins / RenderItemBase registry"
             grep -rl --include=*.class -E "item_skins|RegisterItemRenderer|ItemSkin" /tmp/efx | head -n 30
+            for c in com/merlin204/avalon/entity/client/renderer/patch/item/RenderMeshItem.class com/merlin204/avalon/entity/client/renderer/patch/item/AbstractRenderAnimationItem.class com/merlin204/avalon/mixin/SkinnedMeshMixin.class com/merlin204/avalon/event/ClientModEvents.class; do echo "======== AV $c"; javap -p -c -constants "/tmp/av/$c" 2>/dev/null | grep -E "^  [a-z]|ldc|invoke|getstatic|getfield" | head -n 220; done
+            for c in yesman/epicfight/api/client/model/ItemSkinsReloadListener.class yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent\$RegisterItemRenderer.class; do echo "======== EF $c"; javap -p -c -constants "/tmp/efx/$c" 2>/dev/null | grep -E "^  [a-z]|ldc|invoke|getstatic|getfield" | head -n 260; done
+            echo "======== EF RenderEngine (item skin parts)"; javap -p -c -constants /tmp/efx/yesman/epicfight/client/events/engine/RenderEngine.class 2>/dev/null | grep -iE "^  [a-z]|skin|ItemRenderer|addItemRenderer|renderer" | head -n 200
+            EXJ="$(ls packcache/*.jar | grep -i "epicfight-extra" | head -1)"
+            echo "======== EFX item skin related"; mkdir -p /tmp/exj && unzip -o -q "$EXJ" -d /tmp/exj; grep -rl --include=*.class -E "item_skins|ItemSkin|RegisterItemRenderer|efx_epicfight_resource_pack" /tmp/exj | head -n 20
+            cat /tmp/exj/packs/efx_epicfight_resource_pack/pack.mcmeta 2>/dev/null
+            grep -rl --include=*.class "efx_epicfight_resource_pack" /tmp/exj | head -3 | while read c; do javap -p -c -constants "$c" | grep -E "^  [a-z]|ldc|invoke" | head -n 80; done
           } > /tmp/inspect/avalon.txt 2>&1 || true
           # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
           ls packcache > /tmp/inspect/jars.txt
