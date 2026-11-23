@@ -299,13 +299,13 @@ public final class Dialogue {
      * NPC 를 우클릭하면 상점·은행 등의 창보다 먼저 대화 상자를 연다 (말을 걸어야 하는 장면이 있으면 그 장면부터).
      * 대화 상자에서 [상점] 등을 고르면 본래 창으로 간다. 웅크리고 우클릭하면 대화 없이 본래 창을 바로 연다.
      */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
     /** 이 NPC 를 누르면 대화 상자가 먼저 열리는가 (그러면 다른 창은 열지 않는다). */
     public static boolean claims(ServerPlayer p, String key) {
         if (p == null || key == null || BYPASS.contains(p.getUUID())) return false;
         return pendingScene(p, key) != null || (dialogueFirst && !p.isShiftKeyDown());
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onInteract(PlayerInteractEvent.EntityInteract event) {
         if (event.getLevel().isClientSide() || !(event.getEntity() instanceof ServerPlayer p)) return;
         if (BYPASS.contains(p.getUUID())) return;
