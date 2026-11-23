@@ -70,6 +70,14 @@ public class QuestScreen extends Screen {
         return this.font.width(talkLabel()) + 12;
     }
 
+    private String arenaLabel() {
+        return "\u2694 " + Component.translatable("rtshop.arena.button").getString();
+    }
+
+    private int arenaW() {
+        return this.font.width(arenaLabel()) + 16;
+    }
+
     private int backW() {
         return this.font.width(backLabel()) + 10;
     }
@@ -497,6 +505,15 @@ public class QuestScreen extends Screen {
             }
         }
         int by = btnY(v);
+        if (!v.arena().isEmpty()) {
+            // 기억의 문: 이 보스는 나(와 파티)만 들어가는 공간에서 싸운다
+            int aw = arenaW();
+            Ui.button(g, this.font, x + w - 8 - aw, by, aw, 18, arenaLabel(), Ui.inside(mx, my, x + w - 8 - aw, by, aw, 18), true);
+            if (data.journal) return;
+            Ui.button(g, this.font, x + 8, by, 72, 18, Component.translatable("rtshop.quest.abandon").getString(),
+                    Ui.inside(mx, my, x + 8, by, 72, 18), true);
+            return;
+        }
         if (data.journal) {
             // 수첩에서는 내용만 본다: 받기·완료·포기는 그 사람에게 직접 가서
             String key = switch (v.state()) {
@@ -587,6 +604,12 @@ public class QuestScreen extends Screen {
             }
         }
         int by = btnY(v);
+        if (!v.arena().isEmpty() && Ui.inside(mx, my, dx + dw - 8 - arenaW(), by, arenaW(), 18)) {
+            click();
+            onClose();
+            if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.connection.sendCommand("rtshop arena " + v.arena());
+            return true;
+        }
         if (data.journal) {
             return super.mouseClicked(mx, my, button);
         }

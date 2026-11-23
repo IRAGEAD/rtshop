@@ -5,7 +5,7 @@ import java.util.List;
 /** 서버가 클라이언트 화면에 보내는 퀘스트 한 건의 표시용 정보. */
 public record QuestView(String id, String title, String chain, int state, String text,
                         List<ObjView> objectives, long rewardGold, List<RewardItem> rewardItems,
-                        List<String> choices, String npc) {
+                        List<String> choices, String npc, String arena) {
     /** 받을 수 있음 */
     public static final int AVAILABLE = 0;
     /** 진행 중 */

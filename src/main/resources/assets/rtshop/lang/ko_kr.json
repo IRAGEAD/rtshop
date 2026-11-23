@@ -1274,5 +1274,12 @@
   "rtshop.hunt.row_done": "끝낸 의뢰 · 보상을 받았어요",
   "rtshop.hunt.board_far": "현상금 게시판은 시청 서기에게 말을 걸어 볼 수 있어요.",
   "rtshop.hunt.board_full": "이 종류의 의뢰는 더 맡을 수 없어요.",
-  "rtshop.hunt.none_taken": "맡은 의뢰가 없어요. 시청 서기 하루의 현상금 게시판에서 골라 맡으세요."
+  "rtshop.hunt.none_taken": "맡은 의뢰가 없어요. 시청 서기 하루의 현상금 게시판에서 골라 맡으세요.",
+  "rtshop.arena.button": "기억의 문 · 보스전",
+  "rtshop.arena.entered": "기억의 문 너머 — %s(이)가 깨어난다",
+  "rtshop.arena.won": "보스를 쓰러뜨렸습니다. 잠시 뒤 원래 자리로 돌아갑니다. 떨어진 전리품은 가방으로 들어옵니다.",
+  "rtshop.arena.unknown": "이 보스는 기억의 문에서 싸울 수 없습니다.",
+  "rtshop.arena.no_quest": "이 보스를 쓰러뜨리는 퀘스트를 진행 중일 때만 들어갈 수 있습니다.",
+  "rtshop.arena.already": "이미 기억의 문 너머에 있습니다.",
+  "rtshop.arena.full": "지금은 기억의 문이 모두 열려 있습니다. 잠시 뒤 다시 시도하세요."
 }

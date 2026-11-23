@@ -1274,5 +1274,12 @@
   "rtshop.hunt.row_done": "Done · reward paid",
   "rtshop.hunt.board_far": "Talk to the town clerk to see the bounty board.",
   "rtshop.hunt.board_full": "You cannot take more of these.",
-  "rtshop.hunt.none_taken": "No bounties taken. Pick some at the town clerk's bounty board."
+  "rtshop.hunt.none_taken": "No bounties taken. Pick some at the town clerk's bounty board.",
+  "rtshop.arena.button": "Memory Gate · Boss fight",
+  "rtshop.arena.entered": "Beyond the Memory Gate — %s awakens",
+  "rtshop.arena.won": "The boss has fallen. You return shortly; its drops go to your bag.",
+  "rtshop.arena.unknown": "This boss cannot be fought beyond the Memory Gate.",
+  "rtshop.arena.no_quest": "Only while a quest asks you to defeat this boss.",
+  "rtshop.arena.already": "You are already beyond the Memory Gate.",
+  "rtshop.arena.full": "All Memory Gates are in use. Try again shortly."
 }

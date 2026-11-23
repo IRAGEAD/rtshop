@@ -2147,6 +2147,31 @@ public final class SelfTest {
                 check("the story's vanilla structure can be found in this world: " + sid, found != null, found == null ? "none" : found.getFirst());
             }
         }
+        // 기억의 문: 이야기 보스전 전용 공간
+        {
+            com.rtshop.story.StoryArena.reload();
+            com.rtshop.story.StoryArena.testOverworld = true;
+            com.rtshop.story.StoryArena.addTestPlayer(a);
+            a.setPos(0.5, 120, 0.5);
+            boolean noQuest = !com.rtshop.story.StoryArena.enter(a, "minecraft:evoker", false);
+            boolean in = com.rtshop.story.StoryArena.enter(a, "minecraft:evoker", true);
+            var s0 = com.rtshop.story.StoryArena.sessionsForTest().get(0);
+            boolean moved = s0 != null && com.rtshop.story.StoryArena.inSlot(a, s0);
+            com.rtshop.story.StoryArena.forceTick(server, 80);
+            net.minecraft.world.entity.LivingEntity boss = com.rtshop.story.StoryArena.bossForTest(server, 0);
+            check("the Memory Gate takes the player to a private arena and wakes the boss there (only with the quest, or OP force)",
+                    noQuest && in && moved && boss != null && boss.isAlive(), noQuest + " " + in + " " + moved + " " + boss);
+            if (boss != null) boss.kill();
+            com.rtshop.story.StoryArena.forceTick(server, 2);
+            boolean won = s0 != null && s0.state == com.rtshop.story.StoryArena.WON;
+            com.rtshop.story.StoryArena.forceTick(server, 210);
+            check("after the boss falls the player is sent back where they came from and the arena closes",
+                    won && com.rtshop.story.StoryArena.sessionsForTest().isEmpty() && Math.abs(a.getX() - 0.5) < 1 && Math.abs(a.getY() - 120) < 1,
+                    won + " " + com.rtshop.story.StoryArena.sessionsForTest().size() + " " + a.position());
+            com.rtshop.story.StoryArena.clearForTest(server);
+            com.rtshop.story.StoryArena.testOverworld = false;
+            check("the Memory Gate dimension is installed (rtshop:memory)", server.getLevel(com.rtshop.story.StoryArena.DIM) != null);
+        }
         com.rtshop.story.WildSpawns.reload();
         check("story mods spawn far less in the open (Mowzie's / Aquamirae keep 15%), normal in their own structures and story biomes",
                 com.rtshop.story.WildSpawns.keepFor("mowziesmobs") < 0.5 && com.rtshop.story.WildSpawns.keepFor("aquamirae") < 0.5

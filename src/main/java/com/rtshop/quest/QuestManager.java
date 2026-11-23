@@ -603,7 +603,18 @@ public final class QuestManager {
             default -> q.progress.isEmpty() ? q.intro : q.progress;
         };
         String who = state == QuestView.AVAILABLE ? q.giver : q.turnInNpc();
-        return new QuestView(q.id, q.title, q.chain, state, text, objs, q.rewardGold, items, choices, who == null || who.isEmpty() ? "" : npcName(who));
+        // 기억의 문: 아직 못 잡은 이야기 보스가 목표면 [보스전 입장]
+        String arena = "";
+        if (state == QuestView.ACTIVE) {
+            for (int i = 0; i < q.objectives.size(); i++) {
+                QuestDef.Objective ob = q.objectives.get(i);
+                if (ob.type == QuestDef.Type.KILL && objs.get(i).cur() < ob.count && com.rtshop.story.StoryArena.supports(ob.target)) {
+                    arena = ob.target;
+                    break;
+                }
+            }
+        }
+        return new QuestView(q.id, q.title, q.chain, state, text, objs, q.rewardGold, items, choices, who == null || who.isEmpty() ? "" : npcName(who), arena);
     }
 
     /** 한 NPC 앞에서 보일 퀘스트 목록. */

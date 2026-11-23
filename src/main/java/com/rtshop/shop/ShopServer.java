@@ -340,6 +340,15 @@ public final class ShopServer {
                                     feedback(ctx.getSource(), Component.translatable("rtshop.att.cmd_reset", t.getDisplayName()));
                                     return 1;
                                 }))))
+                .then(Commands.literal("arena")
+                        .then(Commands.argument("boss", StringArgumentType.greedyString())
+                                .executes(ctx -> {
+                                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                                    String b = StringArgumentType.getString(ctx, "boss").trim();
+                                    boolean force = b.endsWith(" force") && ctx.getSource().hasPermission(2);
+                                    if (b.endsWith(" force")) b = b.substring(0, b.length() - 6).trim();
+                                    return com.rtshop.story.StoryArena.enter(p, b, force) ? 1 : 0;
+                                })))
                 .then(Commands.literal("talk")
                         .then(Commands.literal("here").executes(ctx -> {
                             ServerPlayer sp = ctx.getSource().getPlayerOrException();
@@ -488,6 +497,7 @@ public final class ShopServer {
         com.rtshop.story.Hunts.reload();
         com.rtshop.story.Dialogue.reload();
         com.rtshop.story.WildSpawns.reload();
+        com.rtshop.story.StoryArena.reload();
         for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) {
             com.rtshop.story.BossIntros.sendLore(sp);
             com.rtshop.story.StoryGates.sync(sp);

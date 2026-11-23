@@ -60,6 +60,7 @@ public final class QuestOpenPacket {
                 buf.writeUtf(c, 512);
             }
             buf.writeUtf(v.npc() == null ? "" : v.npc(), 256);
+            buf.writeUtf(v.arena() == null ? "" : v.arena(), 256);
         }
     }
 
@@ -93,7 +94,7 @@ public final class QuestOpenPacket {
             for (int j = 0; j < cn; j++) {
                 choices.add(buf.readUtf(512));
             }
-            views.add(new QuestView(id, qt, chain, state, text, objs, gold, items, choices, buf.readUtf(256)));
+            views.add(new QuestView(id, qt, chain, state, text, objs, gold, items, choices, buf.readUtf(256), buf.readUtf(256)));
         }
         return new QuestOpenPacket(npcKey, title, greeting, journal, views);
     }
