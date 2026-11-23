@@ -956,7 +956,7 @@ NEW = {
  "rtshop.arena.full": ("지금은 기억의 문이 모두 열려 있습니다. 잠시 뒤 다시 시도하세요.", "All Memory Gates are in use. Try again shortly."),
  "rtshop.hunt.board_screen": ("현상금 게시판", "Bounty board"),
  "rtshop.hunt.board_quota": ("맡은 의뢰 · 일일 %s/%s · 주간 %s/%s", "Taken · Daily %s/%s · Weekly %s/%s"),
- "rtshop.hunt.take": ("맡기", "Take"),
+ "rtshop.hunt.take": ("수락", "Accept"),
  "rtshop.hunt.goal_kill": ("처치: %s × %s", "Defeat: %s × %s"),
  "rtshop.hunt.row_offer": ("게시판에 붙은 의뢰", "Posted on the board"),
  "rtshop.hunt.difficulty": ("난이도", "Difficulty"),

@@ -1268,7 +1268,7 @@
   "rtshop.talk.bounty": "현상금 게시판",
   "rtshop.hunt.board_screen": "현상금 게시판",
   "rtshop.hunt.board_quota": "맡은 의뢰 · 일일 %s/%s · 주간 %s/%s",
-  "rtshop.hunt.take": "맡기",
+  "rtshop.hunt.take": "수락",
   "rtshop.hunt.row_offer": "게시판에 붙은 의뢰",
   "rtshop.hunt.row_progress": "맡은 의뢰 · %s/%s",
   "rtshop.hunt.row_done": "끝낸 의뢰 · 보상을 받았어요",

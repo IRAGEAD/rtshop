@@ -1268,7 +1268,7 @@
   "rtshop.talk.bounty": "Bounty board",
   "rtshop.hunt.board_screen": "Bounty board",
   "rtshop.hunt.board_quota": "Taken · Daily %s/%s · Weekly %s/%s",
-  "rtshop.hunt.take": "Take",
+  "rtshop.hunt.take": "Accept",
   "rtshop.hunt.row_offer": "Posted on the board",
   "rtshop.hunt.row_progress": "Taken · %s/%s",
   "rtshop.hunt.row_done": "Done · reward paid",
