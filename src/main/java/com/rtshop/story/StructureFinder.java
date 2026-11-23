@@ -178,6 +178,11 @@ public final class StructureFinder {
                 lastRejected++;
                 continue;
             }
+            // 가리키는 곳(건축물 한가운데)도 마을에서 충분히 떨어져 있어야 한다
+            if (minTown > 0 && townDistance(level, at.getX(), at.getZ()) < minTown) {
+                lastTownSkipped++;
+                continue;
+            }
             best = new Found(at, c.h, c.cx, c.cz);
             break;
         }
@@ -198,6 +203,10 @@ public final class StructureFinder {
             BlockPos at = verify(level, h, cx, cz);
             if (at == null) {
                 lastRejected++;
+                continue;
+            }
+            if (minTown > 0 && townDistance(level, at.getX(), at.getZ()) < minTown) {
+                lastTownSkipped++;
                 continue;
             }
             if (best == null || at.distSqr(from) < best.pos.distSqr(from)) best = new Found(at, h, cx, cz);
