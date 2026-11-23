@@ -127,6 +127,15 @@ public final class ClientEvents {
         }
     }
 
+    /** Fantasy Mounts 퀘스트 대화창이 저절로 뜨지 않게 한다 (탈것을 처음 볼 때마다 뜨던 것). 설정에서 켤 수 있다. */
+    @SubscribeEvent
+    public static void onFantasyQuestPopup(ScreenEvent.Opening event) {
+        if (event.getNewScreen() != null && !ClientConfig.get().fantasyQuestPopups
+                && event.getNewScreen().getClass().getName().equals("com.bonfyre.fantasy.client.gui.QuestDialogueScreen")) {
+            event.setCanceled(true);
+        }
+    }
+
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
         if (event.getScreen() instanceof AbstractContainerScreen<?> acs) {

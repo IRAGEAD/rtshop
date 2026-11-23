@@ -64,6 +64,8 @@ public final class ClientConfig {
     public boolean partyHudEnabled = true;
     /** 무기 설명에 무기 분류(검·창·총…)를 적는다. */
     public boolean weaponTypeTooltip = true;
+    /** Fantasy Mounts 의 퀘스트 대화창이 저절로 뜨는 것 (기본 끔) */
+    public boolean fantasyQuestPopups = false;
     /** 대화 상자 글자가 써질 때 나는 작은 소리. */
     public boolean dialogueSound = true;
     public double pvpHudX = PDEF_X;
@@ -166,6 +168,7 @@ public final class ClientConfig {
             o.addProperty("pvpHudEnabled", pvpHudEnabled);
             o.addProperty("partyHudEnabled", partyHudEnabled);
             o.addProperty("weaponTypeTooltip", weaponTypeTooltip);
+            o.addProperty("fantasyQuestPopups", fantasyQuestPopups);
             o.addProperty("dialogueSound", dialogueSound);
             o.addProperty("pvpHudX", pvpHudX);
             o.addProperty("pvpHudY", pvpHudY);
@@ -217,6 +220,7 @@ public final class ClientConfig {
                 if (o.has("pvpHudEnabled")) c.pvpHudEnabled = o.get("pvpHudEnabled").getAsBoolean();
                 if (o.has("partyHudEnabled")) c.partyHudEnabled = o.get("partyHudEnabled").getAsBoolean();
                 if (o.has("weaponTypeTooltip")) c.weaponTypeTooltip = o.get("weaponTypeTooltip").getAsBoolean();
+                if (o.has("fantasyQuestPopups")) c.fantasyQuestPopups = o.get("fantasyQuestPopups").getAsBoolean();
                 if (o.has("dialogueSound")) c.dialogueSound = o.get("dialogueSound").getAsBoolean();
                 if (o.has("pvpHudX")) c.pvpHudX = o.get("pvpHudX").getAsDouble();
                 if (o.has("pvpHudY")) c.pvpHudY = o.get("pvpHudY").getAsDouble();
