@@ -492,7 +492,10 @@ jobs:
           rm -f client/saves/rtshoptest/session.lock
           printf 'onboardAccessibility:false\ntutorialStep:none\nskipMultiplayerWarning:true\njoinedFirstServer:true\npauseOnLostFocus:false\nguiScale:3\nrenderDistance:2\nsimulationDistance:5\nmaxFps:30\ngraphicsMode:0\nao:false\nnarrator:0\nsoundCategory_master:0.0\nlang:ko_kr\n' > client/options.txt
           echo "mods: $(ls client/mods | wc -l)"
-          (timeout 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
+          (timeout -k 20 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
+          pkill -9 -f "rtshop.clienttest" || true
+          echo "----- last lines of the client log -----"
+          tail -n 25 client/logs/latest.log 2>/dev/null | cut -c1-300 || tail -n 25 client.log | cut -c1-300
           echo "----- client result -----"
           cat client/rtshop-clienttest.txt 2>/dev/null | cut -c1-300 || echo "no client result"
           echo "----- crash reports -----"
