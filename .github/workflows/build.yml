@@ -229,6 +229,22 @@ jobs:
               unzip -p "$J" $(unzip -l "$J" | awk '{print $4}' | grep "lang/en_us.json" | head -1) 2>/dev/null | head -c 60000
             } > "/tmp/inspect/mod-$pat.txt" 2>&1
           done
+          # Integrated Dungeons and Structures / Integrated API: 바닐라 구조물을 덮어쓰거나 막는 파일
+          for pat in idas integrated; do
+            for J in $(ls packcache/*.jar | grep -i "$pat"); do
+              {
+                echo "== $J"
+                unzip -p "$J" 'META-INF/mods.toml' 2>/dev/null | grep -E "modId|version|displayName" | head -n 10
+                echo "== data/minecraft files"
+                unzip -l "$J" | awk '{print $4}' | grep -E "^data/minecraft/" | head -n 300
+                for f in $(unzip -l "$J" | awk '{print $4}' | grep -E "^data/minecraft/worldgen/(structure_set|structure)/.*json$" | head -n 80); do echo "---- $f"; unzip -p "$J" "$f" | head -c 2500; echo; done
+                echo "== structure_set files of its own (first 40)"
+                for f in $(unzip -l "$J" | awk '{print $4}' | grep -E "worldgen/structure_set/.*json$" | grep -v "^data/minecraft" | head -n 40); do echo "---- $f"; unzip -p "$J" "$f" | head -c 1200; echo; done
+                echo "== config classes"
+                unzip -l "$J" | awk '{print $4}' | grep -i -E "config" | head -n 40
+              } >> "/tmp/inspect/mod-$pat.txt" 2>&1
+            done
+          done
           # Fantasy Mounts: 퀘스트 설정이 어느 설정 파일(서버/공용/클라이언트)의 어떤 키인지
           J="$(ls packcache/*.jar | grep -i "fantasy" | head -1)"
           if [ -n "$J" ]; then

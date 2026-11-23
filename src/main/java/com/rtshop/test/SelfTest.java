@@ -2126,6 +2126,12 @@ public final class SelfTest {
             check("Fantasy Mounts quests are off by default (its quest settings were found)", java.nio.file.Files.exists(com.rtshop.compat.FantasyQuestsOff.marker(server)),
                     com.rtshop.compat.FantasyQuestsOff.modId() + " " + com.rtshop.compat.FantasyQuestsOff.LAST);
         }
+        if (net.minecraftforge.fml.ModList.get().isLoaded("idas")) {
+            int n = com.rtshop.compat.IdasVanilla.apply(true);
+            RtShop.LOGGER.info("[rtshop-selftest] IDAS vanilla structures: {} {}", n, com.rtshop.compat.IdasVanilla.LAST);
+            check("IDAS no longer switches off vanilla structures the story needs (desert pyramid etc.)",
+                    java.nio.file.Files.exists(com.rtshop.compat.IdasVanilla.marker()), n + " " + com.rtshop.compat.IdasVanilla.LAST);
+        }
         com.rtshop.story.WildSpawns.reload();
         check("story mods spawn far less in the open (Mowzie's / Aquamirae keep 15%), normal in their own structures and story biomes",
                 com.rtshop.story.WildSpawns.keepFor("mowziesmobs") < 0.5 && com.rtshop.story.WildSpawns.keepFor("aquamirae") < 0.5
