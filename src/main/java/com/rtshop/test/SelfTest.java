@@ -2245,6 +2245,40 @@ public final class SelfTest {
                 com.rtshop.notice.Notice.hasClick(net.minecraft.network.chat.Component.literal("a ").append(link))
                         && !com.rtshop.notice.Notice.hasClick(net.minecraft.network.chat.Component.literal("plain")));
 
+        // 마법 뽑기 조사: 이 세계의 스킬북(창작 탭에 있는 것)과 스킬 분류
+        if (net.minecraftforge.fml.ModList.get().isLoaded("epicfight")) {
+            try {
+                net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(server.getWorldData().enabledFeatures(), true, server.registryAccess());
+                java.util.Set<String> seen = new java.util.TreeSet<>();
+                for (var tab : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB) {
+                    for (ItemStack st : tab.getDisplayItems()) {
+                        ResourceLocation rid = ForgeRegistries.ITEMS.getKey(st.getItem());
+                        if (rid == null || !(rid.getPath().contains("skill") || rid.getPath().contains("book") && st.hasTag())) continue;
+                        String tag = st.hasTag() ? st.getTag().toString() : "";
+                        if (!seen.add(rid + " " + tag)) continue;
+                        String cat = "";
+                        try {
+                            String sk = st.hasTag() && st.getTag().contains("skill") ? st.getTag().getString("skill") : "";
+                            if (!sk.isEmpty()) {
+                                Class<?> sm = Class.forName("yesman.epicfight.api.data.reloader.SkillManager");
+                                Object skill = null;
+                                for (var m : sm.getMethods()) {
+                                    if (m.getName().equals("getSkill") && m.getParameterCount() == 1 && m.getParameterTypes()[0] == String.class) skill = m.invoke(null, sk);
+                                }
+                                if (skill != null) cat = String.valueOf(skill.getClass().getMethod("getCategory").invoke(skill));
+                            }
+                        } catch (Throwable ignored) {
+                            cat = "?";
+                        }
+                        LINES.add("  skillbook: " + rid + " | " + tag + " | " + st.getHoverName().getString() + " | cat=" + cat);
+                    }
+                }
+                LINES.add("  skillbook total: " + seen.size());
+            } catch (Throwable t) {
+                LINES.add("  skillbook dump failed: " + t);
+            }
+        }
+
         // 꿈속의 기사: 퀘스트를 끝낼 때가 아니라 침대에서 잠들 때 나온다
         var dream = com.rtshop.quest.QuestManager.loaded().quests.get("story_0_03");
         com.google.gson.JsonObject dj = dream == null ? null : dream.sceneDone;

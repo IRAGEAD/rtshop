@@ -255,6 +255,27 @@ jobs:
             cat /tmp/exj/packs/efx_epicfight_resource_pack/pack.mcmeta 2>/dev/null
             grep -rl --include=*.class "efx_epicfight_resource_pack" /tmp/exj | head -3 | while read c; do javap -p -c -constants "$c" | grep -E "^  [a-z]|ldc|invoke" | head -n 80; done
           } > /tmp/inspect/avalon.txt 2>&1 || true
+          # 마법 뽑기: Epic Fight·Nightfall·WoM 스킬북과 스킬 분류(카테고리) 조사
+          {
+            EFJ3="$(ls packcache/*.jar | grep -E "^packcache/epic-fight-20" | head -1)"
+            NFJ3="$(ls packcache/*.jar | grep -i "nightfall" | head -1)"
+            WMJ="$(ls packcache/*.jar | grep -iE "weapons.?of.?miracle|/wom" | head -1)"
+            echo "EF=$EFJ3 NF=$NFJ3 WOM=$WMJ"
+            mkdir -p /tmp/sk/ef /tmp/sk/nf /tmp/sk/wm
+            unzip -o -q "$EFJ3" -d /tmp/sk/ef; unzip -o -q "$NFJ3" -d /tmp/sk/nf; unzip -o -q "$WMJ" -d /tmp/sk/wm
+            echo "== EF skill classes"; find /tmp/sk/ef/yesman/epicfight/skill -maxdepth 2 -name "*.class" | sed 's|/tmp/sk/ef/||' | head -n 200
+            for c in yesman/epicfight/skill/SkillCategories.class yesman/epicfight/skill/SkillCategory.class yesman/epicfight/world/item/SkillBookItem.class yesman/epicfight/api/data/reloader/SkillManager.class yesman/epicfight/skill/Skill.class yesman/epicfight/skill/SkillSlots.class; do echo "######## EF $c"; javap -p -constants "/tmp/sk/ef/$c" 2>&1 | head -n 120; done
+            echo "== EF registry-ish"; grep -rl --include=*.class -E "SkillBuildEvent|registerSkill|SKILL_REGISTRY" /tmp/sk/ef | sed 's|/tmp/sk/ef/||' | head -n 30
+            for c in $(grep -rl --include=*.class -E "SkillBuildEvent" /tmp/sk/ef | head -n 4); do echo "######## EF $c"; javap -p -constants "$c" 2>&1 | head -n 80; done
+            echo "== EF skill lang"; python3 -c "import json,sys; d=json.load(open('/tmp/sk/ef/assets/epicfight/lang/en_us.json')); [print(k,'=',v) for k,v in d.items() if k.startswith('skill.')]" 2>&1 | head -n 300
+            echo "== NF skill classes"; find /tmp/sk/nf -path "*skill*" -name "*.class" | sed 's|/tmp/sk/nf/||' | head -n 200
+            echo "== NF SkillBuildEvent users"; for c in $(grep -rl --include=*.class -E "SkillBuildEvent" /tmp/sk/nf | head -n 4); do echo "######## NF $c"; javap -p -c -constants "$c" 2>&1 | grep -E "ldc|getstatic|invoke" | head -n 200; done
+            echo "== NF lang skills"; for f in $(find /tmp/sk/nf/assets -name en_us.json); do python3 -c "import json,sys; d=json.load(open('$f')); [print(k,'=',v) for k,v in d.items() if 'skill' in k]" 2>&1 | head -n 200; done
+            echo "== WOM skill classes"; find /tmp/sk/wm -path "*skill*" -name "*.class" | sed 's|/tmp/sk/wm/||' | head -n 300
+            echo "== WOM SkillBuildEvent users"; for c in $(grep -rl --include=*.class -E "SkillBuildEvent" /tmp/sk/wm | head -n 4); do echo "######## WOM $c"; javap -p -c -constants "$c" 2>&1 | grep -E "ldc|getstatic|invoke" | head -n 300; done
+            echo "== WOM lang skills"; for f in $(find /tmp/sk/wm/assets -name en_us.json); do python3 -c "import json,sys; d=json.load(open('$f')); [print(k,'=',v) for k,v in d.items() if 'skill' in k]" 2>&1 | head -n 300; done
+            echo "== WOM items with skill/book"; find /tmp/sk/wm/assets -path "*models/item*" | grep -iE "book|skill|scroll" | head -n 40
+          } > /tmp/inspect/skills.txt 2>&1 || true
           # Better Combat: 무기 속성 목록과 이름 자동 부여(fallback)의 실제 이름
           {
             BCJ="$(ls packcache/*.jar | grep -i "bettercombat" | head -1)"
