@@ -245,6 +245,20 @@ public class LootRules extends LootModifier {
 
     // ------------------------------------------------------------------ 확률 보기 (표본 뽑기)
 
+    /** 편집기에 보일 전리품표: 상자(야생 보관함) + 몹 처치 전리품. */
+    public static List<String> editableTables(MinecraftServer server) {
+        List<String> out = chestTables(server);
+        List<String> mobs = new ArrayList<>();
+        for (ResourceLocation id : server.getLootData().getKeys(LootDataType.TABLE)) {
+            if (!id.getPath().startsWith("entities/")) continue;
+            String e = id.getNamespace() + ":" + id.getPath().substring("entities/".length());
+            if (ForgeRegistries.ENTITY_TYPES.containsKey(ResourceLocation.tryParse(e))) mobs.add(id.toString());
+        }
+        mobs.sort(String::compareTo);
+        out.addAll(mobs);
+        return out;
+    }
+
     /** 상자 전리품표 목록. */
     public static List<String> chestTables(MinecraftServer server) {
         List<String> out = new ArrayList<>();
@@ -265,8 +279,29 @@ public class LootRules extends LootModifier {
     public static Map<String, Stat> sample(ServerLevel level, ResourceLocation table, int n, boolean raw) {
         Map<String, Stat> out = new LinkedHashMap<>();
         LootTable lt = level.getServer().getLootData().getLootTable(table);
+        // 몹 전리품표: 그 몹을 (세계에 넣지 않고) 하나 만들어 플레이어가 잡은 것처럼 연다
+        net.minecraft.world.entity.Entity victim = null;
+        net.minecraftforge.common.util.FakePlayer killer = null;
+        if (table.getPath().startsWith("entities/")) {
+            ResourceLocation eid = new ResourceLocation(table.getNamespace(), table.getPath().substring("entities/".length()));
+            net.minecraft.world.entity.EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(eid);
+            try {
+                victim = type == null ? null : type.create(level);
+            } catch (Throwable t) {
+                victim = null;
+            }
+            if (victim == null) return out;
+            killer = net.minecraftforge.common.util.FakePlayerFactory.getMinecraft(level);
+        }
         for (int i = 0; i < n; i++) {
-            LootParams params = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.ZERO).create(LootContextParamSets.CHEST);
+            LootParams params = victim != null
+                    ? new LootParams.Builder(level).withParameter(LootContextParams.THIS_ENTITY, victim)
+                    .withParameter(LootContextParams.ORIGIN, Vec3.ZERO)
+                    .withParameter(LootContextParams.DAMAGE_SOURCE, level.damageSources().playerAttack(killer))
+                    .withOptionalParameter(LootContextParams.KILLER_ENTITY, killer)
+                    .withOptionalParameter(LootContextParams.DIRECT_KILLER_ENTITY, killer)
+                    .withParameter(LootContextParams.LAST_DAMAGE_PLAYER, killer).create(LootContextParamSets.ENTITY)
+                    : new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.ZERO).create(LootContextParamSets.CHEST);
             List<ItemStack> got = new ArrayList<>();
             try {
                 if (raw) {

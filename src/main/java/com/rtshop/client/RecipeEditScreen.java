@@ -38,6 +38,10 @@ public class RecipeEditScreen extends Screen {
     private final List<String> errors = new ArrayList<>();
     private String search = "";
     private int view = 0; // 0 전체, 1 막힌 것, 2 직접 만든 것
+    /** 왼쪽 묶음: "view:0" / "mod:<id>" / "type:<id>" */
+    private String group = "view:0";
+    private final SideList side = new SideList();
+    private int lx, rx0;
     private int scroll;
     boolean dirty;
     private int fx, fy, W, H, listY, visible;
@@ -113,6 +117,8 @@ public class RecipeEditScreen extends Screen {
         for (Row r : all) {
             if (view == 1 && !blocked(r)) continue;
             if (view == 2 && !custom.containsKey(r.id)) continue;
+            if (group.startsWith("mod:") && !r.id.startsWith(group.substring(4) + ":")) continue;
+            if (group.startsWith("type:") && !shortType(r).equals(group.substring(5))) continue;
             if (!q.isEmpty()) {
                 String name = RulesScreens.name(r.out).toLowerCase(Locale.ROOT);
                 if (!r.id.contains(q) && !r.out.contains(q) && !name.contains(q)) continue;
@@ -121,14 +127,69 @@ public class RecipeEditScreen extends Screen {
         }
     }
 
+    /** 조합 종류의 짧은 ID (crafting, smelting, …). */
+    static String shortType(Row r) {
+        if (r.custom) return "custom";
+        String t = r.type;
+        int c = t.indexOf(':');
+        String p = c >= 0 ? t.substring(c + 1) : t;
+        if (p.startsWith("crafting")) return "crafting";
+        return p;
+    }
+
+    private String typeName(String t) {
+        String key = "rtshop.rules.type." + t;
+        return net.minecraft.client.resources.language.I18n.exists(key) ? Component.translatable(key).getString() : t.replace('_', ' ');
+    }
+
+    private static final int[] TYPE_COLORS = {0x8A7A60, 0xB0602E, 0x6E7F8F, 0x7A5AA8, 0x3D7A8B, 0x8B6A3D};
+
+    private int typeColor(String t) {
+        return switch (t) {
+            case "custom" -> 0x2F6EA8;
+            case "crafting" -> 0x8A7A60;
+            case "smelting", "blasting", "smoking", "campfire_cooking" -> 0xB0602E;
+            case "stonecutting" -> 0x6E7F8F;
+            case "smithing", "smithing_transform", "smithing_trim" -> 0x5A5A6A;
+            default -> TYPE_COLORS[Math.abs(t.hashCode()) % TYPE_COLORS.length];
+        };
+    }
+
+    private void buildSide() {
+        side.items.clear();
+        side.selected = group;
+        side.header(Component.translatable("rtshop.rules.side_view").getString());
+        side.item("view:0", Component.translatable("rtshop.rules.view_all").getString(), all.size(), 0);
+        side.item("view:1", Component.translatable("rtshop.rules.view_blocked").getString(), (int) all.stream().filter(this::blocked).count(), 0xB03A2E);
+        side.item("view:2", Component.translatable("rtshop.rules.view_custom").getString(), custom.size(), 0x2F6EA8);
+        Map<String, Integer> types = new java.util.TreeMap<>();
+        Map<String, Integer> mods = new java.util.TreeMap<>((a, b) -> a.equals("minecraft") ? -1 : b.equals("minecraft") ? 1 : a.compareTo(b));
+        for (Row r : all) {
+            types.merge(shortType(r), 1, Integer::sum);
+            mods.merge(r.id.substring(0, Math.max(0, r.id.indexOf(':'))), 1, Integer::sum);
+        }
+        side.header(Component.translatable("rtshop.rules.side_type").getString());
+        for (Map.Entry<String, Integer> e : types.entrySet()) side.item("type:" + e.getKey(), typeName(e.getKey()), e.getValue(), typeColor(e.getKey()));
+        side.header(Component.translatable("rtshop.rules.side_mod").getString());
+        for (Map.Entry<String, Integer> e : mods.entrySet()) side.item("mod:" + e.getKey(), LootEditScreen.modName(e.getKey()), e.getValue(), 0);
+    }
+
     @Override
     protected void init() {
-        W = Math.min(480, width - 10);
+        W = Math.min(520, width - 10);
         H = Math.min(280, height - 10);
         fx = (width - W) / 2;
         fy = (height - H) / 2;
+        lx = fx + 10;
+        int lw = Math.min(130, W / 4);
+        rx0 = lx + lw + 8;
+        side.x = lx;
+        side.y = fy + 46;
+        side.w = lw - 4;
+        side.h = fy + H - 14 - side.y;
+        buildSide();
         filter();
-        EditBox sb = new EditBox(font, fx + 10, fy + 26, 120, 14, Component.empty());
+        EditBox sb = new EditBox(font, fx + 10, fy + 26, lw - 2, 14, Component.empty());
         sb.setValue(search);
         sb.setHint(Component.translatable("rtshop.rules.search_recipe"));
         sb.setResponder(v -> {
@@ -140,24 +201,11 @@ public class RecipeEditScreen extends Screen {
             }
         });
         addRenderableWidget(sb);
-        String[] views = {"rtshop.rules.view_all", "rtshop.rules.view_blocked", "rtshop.rules.view_custom"};
-        int vx = fx + 136;
-        for (int i = 0; i < 3; i++) {
-            int k = i;
-            int bw = font.width(Component.translatable(views[i])) + 10;
-            Button b = Button.builder(Component.translatable(views[i]), x -> {
-                view = k;
-                scroll = 0;
-                rebuildWidgets();
-            }).bounds(vx, fy + 25, bw, 16).build();
-            b.active = view != i;
-            addRenderableWidget(b);
-            vx += bw + 2;
-        }
+        int vx = rx0;
         int nw = font.width(Component.translatable("rtshop.rules.new_recipe")) + 12;
         addRenderableWidget(Button.builder(Component.translatable("rtshop.rules.new_recipe"), b -> minecraft.setScreen(new RecipeMakeScreen(this, null, null)))
                 .bounds(Math.max(vx + 4, fx + W - 8 - nw), fy + 25, nw, 16).build());
-        listY = fy + 46;
+        listY = fy + 47;
         visible = (fy + H - 30 - listY) / ROW;
         rebuildRows();
     }
@@ -167,7 +215,6 @@ public class RecipeEditScreen extends Screen {
         rowWidgets.clear();
         drawn.clear();
         scroll = Math.max(0, Math.min(scroll, Math.max(0, rows.size() - visible)));
-        int x = fx + 10;
         for (int i = 0; i < visible && i + scroll < rows.size(); i++) {
             Row r = rows.get(i + scroll);
             int y = listY + i * ROW;
@@ -220,7 +267,20 @@ public class RecipeEditScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mx, double my, int button) {
+        if (side.click(mx, my, k -> {
+            group = k;
+            view = k.startsWith("view:") ? Integer.parseInt(k.substring(5)) : 0;
+            scroll = 0;
+            filter();
+            rebuildRows();
+        })) return true;
+        return super.mouseClicked(mx, my, button);
+    }
+
+    @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
+        if (side.scroll(mx, my, delta)) return true;
         scroll = Math.max(0, scroll - (int) Math.signum(delta) * 3);
         rebuildRows();
         return true;
@@ -230,32 +290,48 @@ public class RecipeEditScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
-        Ui.bevel(g, fx + 6, fy + 43, W - 12, H - 70, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+        Ui.bevel(g, rx0 - 2, fy + 43, fx + W - 6 - (rx0 - 2), H - 70, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+        side.selected = group;
+        side.render(g, font, mx, my);
         g.drawString(font, title, fx + 10, fy + 8, Ui.C_GOLD, true);
         if (dirty) g.drawString(font, Component.translatable("rtshop.enhedit.unsaved"), fx + 14 + font.width(title), fy + 8, 0xFFFF9050, true);
         for (Object[] d : drawn) {
             Row r = (Row) d[0];
             int y = (int) d[1];
             boolean off = blocked(r);
-            if (off) g.fill(fx + 8, y - 1, fx + W - 8, y + ROW - 2, 0x30FF2020);
-            g.renderItem(new ItemStack(RulesScreens.item(r.out)), fx + 10, y + 1);
+            if (off) g.fill(rx0, y - 1, fx + W - 8, y + ROW - 2, 0x30FF2020);
+            int ix = rx0 + 2;
+            g.renderItem(new ItemStack(RulesScreens.item(r.out)), ix, y + 1);
             if (r.count > 1) {
                 g.pose().pushPose();
                 g.pose().translate(0, 0, 200);
                 String c = Integer.toString(r.count);
-                g.drawString(font, c, fx + 27 - font.width(c), y + 10, 0xFFFFFFFF, true);
+                g.drawString(font, c, ix + 17 - font.width(c), y + 10, 0xFFFFFFFF, true);
                 g.pose().popPose();
             }
+            int textW = fx + W - 160 - (ix + 22);
             String name = r.out.isEmpty() ? r.id : RulesScreens.name(r.out);
-            g.drawString(font, Ui.clip(font, name, W - 250), fx + 32, y + 1, off ? Ui.C_RED : Ui.C_INK, false);
-            String sub = r.id + " · " + (custom.containsKey(r.id) ? Component.translatable("rtshop.rules.custom_tag").getString() : r.type)
-                    + (off ? " · " + Component.translatable("rtshop.rules.blocked_tag").getString() : "");
-            Ui.scaledText(g, font, Ui.clip(font, sub, (int) ((W - 250) / 0.75F)), fx + 32, y + 11, 0.75F, Ui.C_INK_SOFT, false);
+            g.drawString(font, Ui.clip(font, name, textW), ix + 22, y + 1, off ? Ui.C_RED : Ui.C_INK, false);
+            // 꼬리표: 종류 / 상태
+            int cx = ix + 22;
+            String st = shortType(r);
+            cx = chip(g, cx, y + 11, typeName(st), typeColor(st));
+            if (off) cx = chip(g, cx, y + 11, Component.translatable("rtshop.rules.blocked_tag").getString(), 0xB03A2E);
+            Ui.scaledText(g, font, Ui.clip(font, r.id, (int) ((ix + 22 + textW - cx) / 0.7F)), cx + 2, y + 12, 0.7F, Ui.C_INK_SOFT, false);
+            g.fill(rx0, y + ROW - 2, fx + W - 8, y + ROW - 1, 0x20000000);
         }
         String count = Component.translatable("rtshop.rules.recipe_count", rows.size(), all.size(), disabled.size(), custom.size()).getString();
-        Ui.scaledText(g, font, Ui.clip(font, count, (int) ((W - 262) / 0.75F)), fx + 10, fy + H - 17, 0.75F, Ui.C_CREAM, false);
-        if (!errors.isEmpty()) g.drawString(font, Ui.clip(font, "⚠ " + errors.get(0), W - 20), fx + 10, fy + H - 30, 0xFFFF7060, true);
+        Ui.scaledText(g, font, Ui.clip(font, count, (int) ((fx + W - 252 - rx0) / 0.75F)), rx0, fy + H - 17, 0.75F, Ui.C_CREAM, false);
+        if (!errors.isEmpty()) g.drawString(font, Ui.clip(font, "⚠ " + errors.get(0), fx + W - 10 - rx0), rx0, fy + H - 30, 0xFFFF7060, true);
         super.render(g, mx, my, partial);
+    }
+
+    /** 색 꼬리표 (작은 글씨). 다음 x 를 돌려준다. */
+    private int chip(GuiGraphics g, int x, int y, String text, int rgb) {
+        int w = (int) (font.width(text) * 0.7F) + 5;
+        g.fill(x, y, x + w, y + 8, 0xFF000000 | rgb);
+        Ui.scaledText(g, font, text, x + 2, y + 1, 0.7F, 0xFFFFFFFF, false);
+        return x + w + 2;
     }
 
     @Override
@@ -275,6 +351,7 @@ public class RecipeEditScreen extends Screen {
     public void searchForTest(String q, int v) {
         search = q;
         view = v;
+        group = "view:" + v;
         scroll = 0;
         rebuildWidgets();
     }

@@ -50,7 +50,8 @@ public class LootEditScreen extends Screen {
     private int samples = 400;
     private int scroll;
     private int fx, fy, W, H, lw, rx, listY, visible, tVisible;
-    private static final int ROW = 20;
+    private static final int ROW = 24;
+    private final SideList side = new SideList();
     private final List<AbstractWidget> rowWidgets = new ArrayList<>();
     private final List<Object[]> drawn = new ArrayList<>();
 
@@ -164,7 +165,44 @@ public class LootEditScreen extends Screen {
     private void filterTables() {
         shownTables.clear();
         String q = tableSearch.toLowerCase(Locale.ROOT).trim();
-        for (String t : tables) if (q.isEmpty() || t.contains(q)) shownTables.add(t);
+        for (String t : tables) if (q.isEmpty() || t.contains(q) || tableName(t).toLowerCase(Locale.ROOT).contains(q)) shownTables.add(t);
+        // 종류(상자·몹) → 모드별로 묶는다
+        side.items.clear();
+        side.selected = selected;
+        for (String kind : new String[]{"chest", "mob"}) {
+            Map<String, List<String>> byMod = new java.util.TreeMap<>((a, b) -> a.equals("minecraft") ? -1 : b.equals("minecraft") ? 1 : a.compareTo(b));
+            for (String t : shownTables) {
+                boolean mob = t.contains(":entities/");
+                if (mob != kind.equals("mob")) continue;
+                byMod.computeIfAbsent(t.substring(0, t.indexOf(':')), k -> new ArrayList<>()).add(t);
+            }
+            for (Map.Entry<String, List<String>> e : byMod.entrySet()) {
+                side.header(Component.translatable(kind.equals("mob") ? "rtshop.rules.group_mob" : "rtshop.rules.group_chest", modName(e.getKey())).getString());
+                List<String> l = e.getValue();
+                l.sort((a, b) -> tableName(a).compareTo(tableName(b)));
+                for (String t : l) side.item(t, tableName(t), -1, ruled.contains(t) ? 0x3D8B3D : 0);
+            }
+        }
+    }
+
+    static String modName(String ns) {
+        return net.minecraftforge.fml.ModList.get().getModContainerById(ns).map(c -> c.getModInfo().getDisplayName()).orElse(ns);
+    }
+
+    /** 전리품표의 알아보기 쉬운 이름: 몹은 그 몹 이름, 바닐라 상자는 한글 이름, 그 밖은 경로를 다듬어서. */
+    static String tableName(String t) {
+        int c = t.indexOf(':');
+        String ns = t.substring(0, c), path = t.substring(c + 1);
+        if (path.startsWith("entities/")) {
+            net.minecraft.world.entity.EntityType<?> et = net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES
+                    .getValue(net.minecraft.resources.ResourceLocation.tryParse(ns + ":" + path.substring(9)));
+            String n = et == null ? path.substring(9) : et.getDescription().getString();
+            return path.indexOf('/', 9) > 0 ? n + " (" + path.substring(path.indexOf('/', 9) + 1) + ")" : n;
+        }
+        String key = "rtshop.loot." + ns + "." + path.replace('/', '.');
+        if (net.minecraft.client.resources.language.I18n.exists(key)) return Component.translatable(key).getString();
+        String p = path.replace("chests/", "").replace('/', ' ').replace('_', ' ');
+        return p.isEmpty() ? path : Character.toUpperCase(p.charAt(0)) + p.substring(1);
     }
 
     @Override
@@ -173,7 +211,7 @@ public class LootEditScreen extends Screen {
         H = Math.min(280, height - 10);
         fx = (width - W) / 2;
         fy = (height - H) / 2;
-        lw = Math.min(130, W / 4);
+        lw = Math.min(150, W / 3);
         rx = fx + lw + 12;
         filterTables();
         EditBox sb = new EditBox(font, fx + 8, fy + 26, lw - 2, 14, Component.empty());
@@ -187,15 +225,10 @@ public class LootEditScreen extends Screen {
             }
         });
         addRenderableWidget(sb);
-        tVisible = (fy + H - 10 - (fy + 44)) / 14;
-        tableScroll = Math.max(0, Math.min(tableScroll, Math.max(0, shownTables.size() - tVisible)));
-        for (int i = 0; i < tVisible && i + tableScroll < shownTables.size(); i++) {
-            String t = shownTables.get(i + tableScroll);
-            String label = (ruled.contains(t) ? "● " : "") + t.replace("minecraft:chests/", "").replace(":chests/", ": ");
-            Button b = Button.builder(Component.literal(Ui.clip(font, label, lw - 8)), x -> select(t)).bounds(fx + 8, fy + 44 + i * 14, lw - 2, 13).build();
-            b.active = !t.equals(selected);
-            addRenderableWidget(b);
-        }
+        side.x = fx + 10;
+        side.y = fy + 46;
+        side.w = lw - 6;
+        side.h = fy + H - 14 - side.y;
         listY = fy + 60;
         visible = (fy + H - 30 - listY) / ROW;
         rebuildRows();
@@ -228,16 +261,17 @@ public class LootEditScreen extends Screen {
             int y = listY + i * ROW;
             drawn.add(new Object[]{r, y});
             String[] keys = {"rtshop.rules.mode_default", "rtshop.rules.mode_off", "rtshop.rules.mode_custom"};
-            add(Button.builder(Component.translatable(keys[r.mode]), b -> {
+            net.minecraft.ChatFormatting[] cols = {net.minecraft.ChatFormatting.WHITE, net.minecraft.ChatFormatting.RED, net.minecraft.ChatFormatting.GREEN};
+            add(Button.builder(Component.translatable(keys[r.mode]).withStyle(cols[r.mode]), b -> {
                 r.mode = (r.mode + 1) % 3;
                 if (!r.natural && r.mode == 0) r.mode = 1;
                 dirty = true;
                 rebuildRows();
-            }).bounds(right - 152, y, 44, 18).build());
+            }).bounds(right - 152, y + 3, 44, 18).build());
             if (r.mode == 2) {
-                add(num(right - 104, y + 2, 38, fmt(r.chance), v -> r.chance = Double.parseDouble(v)));
-                add(num(right - 50, y + 2, 20, Integer.toString(r.min), v -> r.min = Integer.parseInt(v)));
-                add(num(right - 24, y + 2, 22, Integer.toString(r.max), v -> r.max = Integer.parseInt(v)));
+                add(num(right - 104, y + 5, 38, fmt(r.chance), v -> r.chance = Double.parseDouble(v)));
+                add(num(right - 50, y + 5, 20, Integer.toString(r.min), v -> r.min = Integer.parseInt(v)));
+                add(num(right - 24, y + 5, 22, Integer.toString(r.max), v -> r.max = Integer.parseInt(v)));
             }
         }
         int by = fy + H - 24;
@@ -279,10 +313,15 @@ public class LootEditScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mx, double my, int button) {
+        if (side.click(mx, my, this::select)) return true;
+        return super.mouseClicked(mx, my, button);
+    }
+
+    @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
         if (mx < rx) {
-            tableScroll = Math.max(0, tableScroll - (int) Math.signum(delta) * 3);
-            rebuildWidgets();
+            side.scroll(mx, my, delta);
         } else {
             scroll = Math.max(0, scroll - (int) Math.signum(delta) * 2);
             rebuildRows();
@@ -296,12 +335,14 @@ public class LootEditScreen extends Screen {
         Ui.woodFrame(g, fx, fy, W, H);
         Ui.bevel(g, rx - 4, fy + 58, fx + W - rx - 2, H - 86, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
         g.drawString(font, title, fx + 10, fy + 8, Ui.C_GOLD, true);
+        side.selected = selected;
+        side.render(g, font, mx, my);
         int tx = fx + 14 + font.width(title);
         if (dirty) {
             g.drawString(font, Component.translatable("rtshop.enhedit.unsaved"), tx, fy + 8, 0xFFFF9050, true);
             tx += 4 + font.width(Component.translatable("rtshop.enhedit.unsaved"));
         }
-        if (!selected.isEmpty()) g.drawString(font, Ui.clip(font, "· " + selected, fx + W - 10 - tx), tx, fy + 8, Ui.C_CREAM, true);
+        if (!selected.isEmpty()) g.drawString(font, Ui.clip(font, "· " + tableName(selected), fx + W - 10 - tx), tx, fy + 8, Ui.C_CREAM, true);
         if (selected.isEmpty()) {
             g.drawString(font, Component.translatable("rtshop.rules.pick_table"), rx + 4, fy + 70, Ui.C_CREAM, false);
         } else {
@@ -314,18 +355,25 @@ public class LootEditScreen extends Screen {
                 int y = (int) d[1];
                 if (r.mode == 1) g.fill(rx - 2, y - 1, right, y + ROW - 2, 0x30FF2020);
                 if (r.mode == 2) g.fill(rx - 2, y - 1, right, y + ROW - 2, 0x2020A020);
-                g.renderItem(new ItemStack(RulesScreens.item(r.item)), rx, y + 1);
+                g.fill(rx - 2, y + ROW - 2, right, y + ROW - 1, 0x20000000);
+                g.renderItem(new ItemStack(RulesScreens.item(r.item)), rx, y + 3);
                 int textW = right - 156 - (rx + 20);
                 g.drawString(font, Ui.clip(font, RulesScreens.name(r.item), textW), rx + 20, y + 1, Ui.C_INK, false);
-                String base = r.natural ? Component.translatable("rtshop.rules.stat_base", pct(r.rawChance),
+                // 확률 막대: 위 = 원래(기본), 아래 = 지금 (적용 후)
+                int bx = rx + 20, bw = Math.max(30, textW - 70);
+                g.fill(bx, y + 11, bx + bw, y + 14, 0xFFCDB98D);
+                if (r.natural) g.fill(bx, y + 11, bx + Math.max(1, (int) (bw * Math.min(1, r.rawChance))), y + 14, 0xFF9E8A62);
+                g.fill(bx, y + 16, bx + bw, y + 19, 0xFFCDB98D);
+                if (r.afterChance > 0) g.fill(bx, y + 16, bx + Math.max(1, (int) (bw * Math.min(1, r.afterChance))), y + 19, 0xFF5A8F3A);
+                String base = r.natural ? Component.translatable("rtshop.rules.stat_base_short", pct(r.rawChance),
                         r.rawMin == r.rawMax ? Integer.toString(r.rawMin) : r.rawMin + "~" + r.rawMax).getString()
                         : Component.translatable("rtshop.rules.stat_none").getString();
-                String now = Component.translatable("rtshop.rules.stat_now", pct(r.afterChance)).getString();
-                Ui.scaledText(g, font, Ui.clip(font, base + " · " + now, (int) (textW / 0.75F)), rx + 20, y + 11, 0.75F,
+                Ui.scaledText(g, font, Ui.clip(font, base, (int) (66 / 0.7F)), bx + bw + 4, y + 10, 0.7F, Ui.C_INK_SOFT, false);
+                Ui.scaledText(g, font, Component.translatable("rtshop.rules.stat_now_short", pct(r.afterChance)).getString(), bx + bw + 4, y + 16, 0.7F,
                         r.afterChance > 0 ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
                 if (r.mode == 2) {
-                    g.drawString(font, "%", right - 64, y + 5, Ui.C_INK, false);
-                    g.drawString(font, "~", right - 29, y + 5, Ui.C_INK, false);
+                    g.drawString(font, "%", right - 64, y + 8, Ui.C_INK, false);
+                    g.drawString(font, "~", right - 29, y + 8, Ui.C_INK, false);
                 }
             }
             String foot = Component.translatable("rtshop.rules.loot_foot", samples).getString();

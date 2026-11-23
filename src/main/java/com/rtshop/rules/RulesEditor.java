@@ -55,7 +55,7 @@ public final class RulesEditor {
                 case LOOT_OPEN -> {
                     JsonObject o = new JsonObject();
                     JsonArray t = new JsonArray();
-                    LootRules.chestTables(p.server).forEach(t::add);
+                    LootRules.editableTables(p.server).forEach(t::add);
                     o.add("tables", t);
                     o.add("rules", LootRules.get().toJson());
                     send(p, RulesDataPacket.LOOT_LIST, o);

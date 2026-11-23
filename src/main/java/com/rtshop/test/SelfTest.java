@@ -1262,6 +1262,10 @@ public final class SelfTest {
         com.rtshop.rules.LootRules.Stat saddle = raw.get("minecraft:saddle");
         check("sampling shows the real odds (dungeon saddle about 15-45%)", saddle != null && saddle.hits > 300 * 0.12 && saddle.hits < 300 * 0.6,
                 saddle == null ? "none" : saddle.hits);
+        java.util.List<String> editable = com.rtshop.rules.LootRules.editableTables(server);
+        java.util.Map<String, com.rtshop.rules.LootRules.Stat> zombie = com.rtshop.rules.LootRules.sample(level, new ResourceLocation("minecraft:entities/zombie"), 200, true);
+        check("the loot editor also lists mob drops and samples them (zombie drops rotten flesh)",
+                editable.contains("minecraft:entities/zombie") && zombie.containsKey("minecraft:rotten_flesh"), zombie.keySet());
         com.rtshop.rules.LootRules.Rules lr = new com.rtshop.rules.LootRules.Rules();
         com.rtshop.rules.LootRules.Table t = new com.rtshop.rules.LootRules.Table();
         t.remove.add("minecraft:saddle");
