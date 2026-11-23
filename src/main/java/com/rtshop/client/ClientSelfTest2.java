@@ -769,7 +769,7 @@ final class ClientSelfTest2 {
         });
         // ------------------------------------------------------------ Nightfall 무기를 든 모습 (풀팩에서만): 폐허 대검과 비교용 다른 대검
         if (net.minecraftforge.fml.ModList.get().isLoaded("efn")) {
-            String[][] held = {{"efn:ruinsgreatsword", "119_efn_ruinsgreatsword"}, {"minecraft:diamond_sword", "119b_diamond_sword"}};
+            String[][] held = {{"efn:ruinsgreatsword", "119_efn_ruinsgreatsword"}, {"minecraft:diamond_sword", "119b_diamond_sword"}, {"efn:yamato_dmc", "119c_efn_yamato"}, {"efn:kusabimaru", "119d_efn_kusabimaru"}, {"efn:broadblade", "119e_efn_broadblade"}, {"efn:ruinsgreatsword", "119f_efn_ruinsgreatsword_zoom"}};
             for (String[] h : held) {
                 add(mc -> {
                     mc.setScreen(null);
@@ -780,6 +780,8 @@ final class ClientSelfTest2 {
                         sp.setXRot(10);
                     });
                     mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+                    // 마지막 사진은 가까이서 (시야각을 좁혀 확대)
+                    mc.options.fov().set(h[1].endsWith("_zoom") ? 30 : 70);
                     waitTicks(30);
                 });
                 add(mc -> {
@@ -790,6 +792,7 @@ final class ClientSelfTest2 {
                 });
             }
             add(mc -> {
+                mc.options.fov().set(70);
                 mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
                 onServer(mc, sp -> sp.getInventory().setItem(sp.getInventory().selected, net.minecraft.world.item.ItemStack.EMPTY));
                 waitTicks(5);
