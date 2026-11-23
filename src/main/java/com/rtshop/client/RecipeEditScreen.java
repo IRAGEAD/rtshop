@@ -163,7 +163,7 @@ public class RecipeEditScreen extends Screen {
         side.item("view:1", Component.translatable("rtshop.rules.view_blocked").getString(), (int) all.stream().filter(this::blocked).count(), 0xB03A2E);
         side.item("view:2", Component.translatable("rtshop.rules.view_custom").getString(), custom.size(), 0x2F6EA8);
         Map<String, Integer> types = new java.util.TreeMap<>();
-        Map<String, Integer> mods = new java.util.TreeMap<>((a, b) -> a.equals("minecraft") ? -1 : b.equals("minecraft") ? 1 : a.compareTo(b));
+        Map<String, Integer> mods = new java.util.TreeMap<>((a, b) -> a.equals(b) ? 0 : a.equals("minecraft") ? -1 : b.equals("minecraft") ? 1 : a.compareTo(b));
         for (Row r : all) {
             types.merge(shortType(r), 1, Integer::sum);
             mods.merge(r.id.substring(0, Math.max(0, r.id.indexOf(':'))), 1, Integer::sum);
@@ -255,10 +255,10 @@ public class RecipeEditScreen extends Screen {
         }
         int by = fy + H - 24;
         add(Button.builder(Component.translatable("rtshop.enhedit.save"), b ->
-                ShopNet.CHANNEL.sendToServer(new RulesActionPacket(RulesEditor.RECIPE_SAVE, "", rulesJson().toString()))).bounds(fx + W - 248, by, 80, 18).build());
+                ShopNet.CHANNEL.sendToServer(new RulesActionPacket(RulesEditor.RECIPE_SAVE, "", rulesJson().toString()))).bounds(fx + W - 194, by, 60, 18).build());
         add(Button.builder(Component.translatable("rtshop.enhedit.revert"), b ->
-                ShopNet.CHANNEL.sendToServer(new RulesActionPacket(RulesEditor.RECIPE_OPEN, "", ""))).bounds(fx + W - 164, by, 76, 18).build());
-        add(Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 84, by, 76, 18).build());
+                ShopNet.CHANNEL.sendToServer(new RulesActionPacket(RulesEditor.RECIPE_OPEN, "", ""))).bounds(fx + W - 130, by, 60, 18).build());
+        add(Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 66, by, 58, 18).build());
     }
 
     private void add(AbstractWidget w) {
@@ -321,7 +321,7 @@ public class RecipeEditScreen extends Screen {
             g.fill(rx0, y + ROW - 2, fx + W - 8, y + ROW - 1, 0x20000000);
         }
         String count = Component.translatable("rtshop.rules.recipe_count", rows.size(), all.size(), disabled.size(), custom.size()).getString();
-        Ui.scaledText(g, font, Ui.clip(font, count, (int) ((fx + W - 252 - rx0) / 0.75F)), rx0, fy + H - 17, 0.75F, Ui.C_CREAM, false);
+        Ui.scaledText(g, font, Ui.clip(font, count, (int) ((fx + W - 198 - rx0) / 0.75F)), rx0, fy + H - 17, 0.75F, Ui.C_CREAM, false);
         if (!errors.isEmpty()) g.drawString(font, Ui.clip(font, "⚠ " + errors.get(0), fx + W - 10 - rx0), rx0, fy + H - 30, 0xFFFF7060, true);
         super.render(g, mx, my, partial);
     }

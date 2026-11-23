@@ -927,7 +927,7 @@
   "rtshop.pshop.removed": "Took down %s and got back %s.",
   "rtshop.rules.recipes_title": "Recipe editor (OP)",
   "rtshop.rules.loot_title": "Loot editor (OP)",
-  "rtshop.rules.search_recipe": "Search item or recipe id",
+  "rtshop.rules.search_recipe": "Search name or id",
   "rtshop.rules.search_table": "Search loot tables",
   "rtshop.rules.view_all": "All",
   "rtshop.rules.view_blocked": "Blocked",
@@ -1243,5 +1243,15 @@
   "rtshop.rules.type.campfire_cooking": "Campfire",
   "rtshop.rules.type.stonecutting": "Stonecutter",
   "rtshop.rules.type.smithing_transform": "Smithing",
-  "rtshop.rules.type.smithing_trim": "Armor trim"
+  "rtshop.rules.type.smithing_trim": "Armor trim",
+  "rtshop.talk.button": "Talk",
+  "rtshop.talk.default_greet": "What can I do for you?",
+  "rtshop.talk.chatter": "How are things?",
+  "rtshop.talk.quests": "About quests (%s)",
+  "rtshop.talk.bye": "Goodbye",
+  "rtshop.talk.hint": "Click/Space: next",
+  "rtshop.talk.hint_scene": "Click/Space: next · finish to continue",
+  "rtshop.quest.next_npc": "Next, go see %s. (\"%s\")",
+  "rtshop.quest.next_same": "There's more to tell. Talk to me again. (\"%s\")",
+  "rtshop.rules.type.smithing": "Smithing table"
 }

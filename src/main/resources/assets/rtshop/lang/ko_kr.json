@@ -927,7 +927,7 @@
   "rtshop.pshop.removed": "%s 을(를) 내리고 재고 %s개를 돌려받았습니다.",
   "rtshop.rules.recipes_title": "조합법 편집 (OP)",
   "rtshop.rules.loot_title": "전리품 편집 (OP)",
-  "rtshop.rules.search_recipe": "아이템 이름·조합법 ID 검색",
+  "rtshop.rules.search_recipe": "이름·ID 검색",
   "rtshop.rules.search_table": "전리품표 검색",
   "rtshop.rules.view_all": "전체",
   "rtshop.rules.view_blocked": "막힌 것",
@@ -1243,5 +1243,15 @@
   "rtshop.rules.type.campfire_cooking": "모닥불",
   "rtshop.rules.type.stonecutting": "석재 절단기",
   "rtshop.rules.type.smithing_transform": "대장장이 작업대",
-  "rtshop.rules.type.smithing_trim": "갑옷 장식"
+  "rtshop.rules.type.smithing_trim": "갑옷 장식",
+  "rtshop.talk.button": "대화",
+  "rtshop.talk.default_greet": "무슨 일이세요?",
+  "rtshop.talk.chatter": "요즘 어떠세요?",
+  "rtshop.talk.quests": "퀘스트 이야기 (%s)",
+  "rtshop.talk.bye": "작별 인사",
+  "rtshop.talk.hint": "클릭·스페이스: 다음",
+  "rtshop.talk.hint_scene": "클릭·스페이스: 다음 · 끝까지 보면 진행됩니다",
+  "rtshop.quest.next_npc": "다음 일은 %s에게 가 보세요. (「%s」)",
+  "rtshop.quest.next_same": "아직 이야기가 남았어요. 다시 말을 걸어 주세요. (「%s」)",
+  "rtshop.rules.type.smithing": "대장장이 작업대"
 }

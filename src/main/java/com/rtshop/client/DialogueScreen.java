@@ -175,7 +175,7 @@ public class DialogueScreen extends Screen {
         renderBackground(g);
         int x = boxX(), y = boxY(), w = boxW(), h = boxH();
         // 대화 상자
-        g.fill(x, y, x + w, y + h, 0xE61B140C);
+        g.fill(x, y, x + w, y + h, 0xFC1B140C);
         g.fill(x, y, x + w, y + 1, 0xFFC7A25A);
         g.fill(x, y + h - 1, x + w, y + h, 0xFFC7A25A);
         g.fill(x, y, x + 1, y + h, 0xFFC7A25A);

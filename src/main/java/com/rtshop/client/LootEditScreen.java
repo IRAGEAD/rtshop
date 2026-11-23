@@ -170,7 +170,7 @@ public class LootEditScreen extends Screen {
         side.items.clear();
         side.selected = selected;
         for (String kind : new String[]{"chest", "mob"}) {
-            Map<String, List<String>> byMod = new java.util.TreeMap<>((a, b) -> a.equals("minecraft") ? -1 : b.equals("minecraft") ? 1 : a.compareTo(b));
+            Map<String, List<String>> byMod = new java.util.TreeMap<>((a, b) -> a.equals(b) ? 0 : a.equals("minecraft") ? -1 : b.equals("minecraft") ? 1 : a.compareTo(b));
             for (String t : shownTables) {
                 boolean mob = t.contains(":entities/");
                 if (mob != kind.equals("mob")) continue;
@@ -275,9 +275,9 @@ public class LootEditScreen extends Screen {
             }
         }
         int by = fy + H - 24;
-        add(Button.builder(Component.translatable("rtshop.enhedit.save"), b -> save()).bounds(fx + W - 248, by, 80, 18).build());
-        add(Button.builder(Component.translatable("rtshop.enhedit.revert"), b -> select(selected)).bounds(fx + W - 164, by, 76, 18).build());
-        add(Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 84, by, 76, 18).build());
+        add(Button.builder(Component.translatable("rtshop.enhedit.save"), b -> save()).bounds(fx + W - 194, by, 60, 18).build());
+        add(Button.builder(Component.translatable("rtshop.enhedit.revert"), b -> select(selected)).bounds(fx + W - 130, by, 60, 18).build());
+        add(Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 66, by, 58, 18).build());
     }
 
     private static String fmt(double v) {
@@ -378,7 +378,7 @@ public class LootEditScreen extends Screen {
             }
             String foot = Component.translatable("rtshop.rules.loot_foot", samples).getString();
             if (!groups.isEmpty()) foot += "  " + Component.translatable("rtshop.rules.loot_groups", String.join(", ", groups)).getString();
-            Ui.scaledText(g, font, Ui.clip(font, foot, (int) ((fx + W - 252 - (rx - 4)) / 0.75F)), rx - 4, fy + H - 17, 0.75F, Ui.C_CREAM, false);
+            Ui.scaledText(g, font, Ui.clip(font, foot, (int) ((fx + W - 198 - (rx - 4)) / 0.75F)), rx - 4, fy + H - 17, 0.75F, Ui.C_CREAM, false);
         }
         super.render(g, mx, my, partial);
     }
