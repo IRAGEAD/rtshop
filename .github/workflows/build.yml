@@ -224,9 +224,9 @@ jobs:
           if [ -n "$IJ" ]; then
             {
               unzip -l "$IJ" | awk '{print $4}' | grep -E "\.class$" | head -n 200
-              mkdir -p /tmp/ill && (cd /tmp/ill && unzip -o -q "$OLDPWD/$IJ" 2>/dev/null || unzip -o -q "$IJ")
-              for c in $(cd /tmp/ill && find . -name "*.class" | grep -iE "ghost|render|client" | head -n 40); do
-                echo "======== $c"; javap -p -c -constants -cp /tmp/ill "${c#./}" 2>/dev/null | grep -vE "^\s+[0-9]+: (aload|iload|fload|dload|astore|istore|fstore|dstore|dup|pop|return|areturn|ireturn|freturn)" | head -n 260
+              mkdir -p /tmp/ill && unzip -o -q "$IJ" -d /tmp/ill
+              for c in $(find /tmp/ill -name "*.class" | grep -iE "ghost|render|client" | head -n 40); do
+                echo "======== $c"; javap -p -c -constants "$c" 2>/dev/null | grep -vE "^\s+[0-9]+: (aload|iload|fload|dload|astore|istore|fstore|dstore|dup|pop|return|areturn|ireturn|freturn)" | head -n 260
               done
             } > /tmp/inspect/illusioner-render.txt 2>&1 || true
           fi
