@@ -712,6 +712,22 @@ final class ClientSelfTest2 {
             BountyScreen bs = mc.screen instanceof BountyScreen x ? x : null;
             check("taking a bounty on the board marks it as taken", bs != null && bs.takenForTest() == 1, bs == null ? mc.screen : bs.takenForTest());
             shot(mc, "117_bounty_board");
+            check("RT Shop windows use the chosen window font (Noto Sans by default), not the game's pixel font",
+                    bs != null && UiFont.get() != mc.font && bs.getFontForTest() == UiFont.get() && UiFont.get().width("가나다") > 0,
+                    UiFont.id());
+            ClientConfig.get().uiFont = "serif";
+            ClientConfig.get().uiFontSize = 2;
+            UiFont.changed();
+            waitTicks(6);
+        });
+        add(mc -> {
+            BountyScreen bs = mc.screen instanceof BountyScreen x ? x : null;
+            check("switching to the serif font in large size rebuilds the open window with it",
+                    bs != null && bs.getFontForTest() == UiFont.get() && "rtshop:ui_serif_l".equals(String.valueOf(UiFont.id())), UiFont.id());
+            shot(mc, "117b_bounty_serif_large");
+            ClientConfig.get().uiFont = "sans";
+            ClientConfig.get().uiFontSize = 1;
+            UiFont.changed();
             mc.setScreen(null);
             com.rtshop.story.Hunts.testMode = false;
             onServer(mc, com.rtshop.story.Hunts::clearForTest);

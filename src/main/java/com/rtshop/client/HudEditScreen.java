@@ -65,6 +65,47 @@ public class HudEditScreen extends Screen {
         return new int[][]{{x, 160}, {x + 164, 120}};
     }
 
+    // ---- 맨 위 줄: RT Shop 창 글꼴과 글자 크기 (HUD 와 따로)
+    private int uiRowY() {
+        return 66;
+    }
+
+    private int[][] uiRow() {
+        int total = 150 + 4 + 130;
+        int x = this.width / 2 - total / 2;
+        return new int[][]{{x, 150}, {x + 154, 130}};
+    }
+
+    private String uiRowLabel(int i) {
+        ClientConfig cfg = ClientConfig.get();
+        if (i == 0) {
+            String face = "serif".equals(cfg.uiFont) ? "serif" : "pixel".equals(cfg.uiFont) ? "pixel" : "sans";
+            return Component.translatable("rtshop.hud.ui_font", Component.translatable("rtshop.hud.ui_font." + face)).getString() + " ▼";
+        }
+        return Component.translatable("rtshop.hud.ui_size", Component.translatable("rtshop.hud.ui_size." + cfg.uiFontSize)).getString() + " ▼";
+    }
+
+    private void uiRowClick(int i) {
+        ClientConfig cfg = ClientConfig.get();
+        int[][] r = uiRow();
+        List<ChoicePopup.Option> opts = new ArrayList<>();
+        if (i == 0) {
+            for (String f : UiFont.FACES) opts.add(new ChoicePopup.Option(f, Component.translatable("rtshop.hud.ui_font." + f).getString()));
+            popup = new ChoicePopup(r[0][0], uiRowY(), r[0][1], 18, this.height, this.font, opts, cfg.uiFont, v -> {
+                cfg.uiFont = v;
+                cfg.save();
+                UiFont.changed();
+            });
+            return;
+        }
+        for (int n = 0; n < 3; n++) opts.add(new ChoicePopup.Option(Integer.toString(n), Component.translatable("rtshop.hud.ui_size." + n).getString()));
+        popup = new ChoicePopup(r[1][0], uiRowY(), r[1][1], 18, this.height, this.font, opts, Integer.toString(cfg.uiFontSize), v -> {
+            cfg.uiFontSize = Integer.parseInt(v);
+            cfg.save();
+            UiFont.changed();
+        });
+    }
+
     private String row3Label(int i) {
         ClientConfig cfg = ClientConfig.get();
         if (i == 0) {
@@ -177,6 +218,10 @@ public class HudEditScreen extends Screen {
         for (int i = 0; i < r2.length; i++) {
             Ui.button(g, this.font, r2[i][0], row2Y(), r2[i][1], 18, row2Label(i), Ui.inside(mx, my, r2[i][0], row2Y(), r2[i][1], 18), true);
         }
+        int[][] ur = uiRow();
+        for (int i = 0; i < ur.length; i++) {
+            Ui.button(g, this.font, ur[i][0], uiRowY(), ur[i][1], 18, uiRowLabel(i), Ui.inside(mx, my, ur[i][0], uiRowY(), ur[i][1], 18), true);
+        }
         int[][] r3 = row3();
         for (int i = 0; i < r3.length; i++) {
             Ui.button(g, this.font, r3[i][0], row3Y(), r3[i][1], 18, row3Label(i), Ui.inside(mx, my, r3[i][0], row3Y(), r3[i][1], 18), true);
@@ -281,6 +326,13 @@ public class HudEditScreen extends Screen {
         for (int i = 0; i < r2.length; i++) {
             if (Ui.inside(mx, my, r2[i][0], row2Y(), r2[i][1], 18)) {
                 row2Click(i);
+                return true;
+            }
+        }
+        int[][] ur = uiRow();
+        for (int i = 0; i < ur.length; i++) {
+            if (Ui.inside(mx, my, ur[i][0], uiRowY(), ur[i][1], 18)) {
+                uiRowClick(i);
                 return true;
             }
         }

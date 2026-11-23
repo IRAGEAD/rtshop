@@ -1330,5 +1330,13 @@
   "rtshop.hunt.pool_unknown": "No mob called %s.",
   "rtshop.hunt.pool_added": "Added to the bounty list: %s (from the next day; /bounty pool reroll to see it now)",
   "rtshop.hunt.pool_removed": "Removed from the bounty list: %s",
-  "rtshop.hunt.pool_missing": "%s is not on the bounty list."
+  "rtshop.hunt.pool_missing": "%s is not on the bounty list.",
+  "rtshop.hud.ui_font": "Window font: %s",
+  "rtshop.hud.ui_font.sans": "Sans",
+  "rtshop.hud.ui_font.serif": "Serif",
+  "rtshop.hud.ui_font.pixel": "Game default",
+  "rtshop.hud.ui_size": "Window text: %s",
+  "rtshop.hud.ui_size.0": "Small",
+  "rtshop.hud.ui_size.1": "Normal",
+  "rtshop.hud.ui_size.2": "Large"
 }

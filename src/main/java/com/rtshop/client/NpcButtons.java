@@ -95,17 +95,17 @@ public final class NpcButtons {
         int[] spot = s instanceof Host h ? h.npcButtonSpot() : new int[]{6, 6};
         int x = spot[0];
         if (bound.get() == s) {
-            int w = mc.font.width(talkLabel()) + 12;
+            int w = UiFont.get().width(talkLabel()) + 12;
             out.add(new int[]{x, spot[1], w, 2});
             x += w + 4;
         }
         if (questButton(s)) {
-            int w = mc.font.width(questLabel()) + 12;
+            int w = UiFont.get().width(questLabel()) + 12;
             out.add(new int[]{x, spot[1], w, 0});
             x += w + 4;
         }
         if (editButton(s)) {
-            int w = mc.font.width(editLabel()) + 12;
+            int w = UiFont.get().width(editLabel()) + 12;
             out.add(new int[]{x, spot[1], w, 1});
         }
         return out;
@@ -129,13 +129,13 @@ public final class NpcButtons {
         for (int[] b : layout(s)) {
             boolean hov = Ui.inside(e.getMouseX(), e.getMouseY(), b[0], b[1], b[2], H);
             if (b[3] == 2) {
-                Ui.button(g, mc.font, b[0], b[1], b[2], H, talkLabel(), hov, true);
+                Ui.button(g, UiFont.get(), b[0], b[1], b[2], H, talkLabel(), hov, true);
             } else if (b[3] == 0) {
                 String label = questLabel();
                 Ui.bevel(g, b[0], b[1], b[2], H, hov ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
-                g.drawString(mc.font, label, b[0] + (b[2] - mc.font.width(label)) / 2, b[1] + 3, Ui.C_INK, false);
+                g.drawString(UiFont.get(), label, b[0] + (b[2] - UiFont.get().width(label)) / 2, b[1] + 3, Ui.C_INK, false);
             } else {
-                Ui.button(g, mc.font, b[0], b[1], b[2], H, editLabel(), hov, true);
+                Ui.button(g, UiFont.get(), b[0], b[1], b[2], H, editLabel(), hov, true);
             }
         }
         g.pose().popPose();

@@ -18,7 +18,7 @@ public class MButton extends Button {
 
     @Override
     protected void renderWidget(GuiGraphics g, int mx, int my, float partial) {
-        Ui.button(g, Minecraft.getInstance().font, getX(), getY(), getWidth(), getHeight(), getMessage().getString(), isHoveredOrFocused(), this.active);
+        Ui.button(g, UiFont.get(), getX(), getY(), getWidth(), getHeight(), getMessage().getString(), isHoveredOrFocused(), this.active);
     }
 
     public static final class B {

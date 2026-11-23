@@ -1,0 +1,27 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "rtshop:ui_serif.ttf",
+      "shift": [
+        0.0,
+        0.0
+      ],
+      "size": 10.2,
+      "oversample": 6.0,
+      "skip": ""
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:include/space"
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:include/default"
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:include/unifont"
+    }
+  ]
+}

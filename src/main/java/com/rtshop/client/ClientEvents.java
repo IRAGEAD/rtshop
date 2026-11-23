@@ -63,8 +63,8 @@ public final class ClientEvents {
             int fill = hover ? Ui.C_WOOD_HI : Ui.C_WOOD;
             Ui.bevel(g, x, y, BW, BH, fill, ClientLand.hasPin ? Ui.C_GOLD : Ui.C_WOOD_HI, Ui.C_SHADOW);
             Minecraft mc = Minecraft.getInstance();
-            String s = Ui.clip(mc.font, label, BW - 4);
-            g.drawString(mc.font, s, x + (BW - mc.font.width(s)) / 2, y + 3, ClientLand.hasPin ? Ui.C_GOLD : Ui.C_CREAM, false);
+            String s = Ui.clip(UiFont.get(), label, BW - 4);
+            g.drawString(UiFont.get(), s, x + (BW - UiFont.get().width(s)) / 2, y + 3, ClientLand.hasPin ? Ui.C_GOLD : Ui.C_CREAM, false);
         }
 
         @Override
@@ -144,7 +144,7 @@ public final class ClientEvents {
         // 인벤토리 위의 [퀘스트 수첩]: 어디서든 퀘스트 내용을 본다 (받기·완료·포기는 NPC 앞에서)
         if (event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen inv) {
             String label = net.minecraft.network.chat.Component.translatable("rtshop.quest.journal_button").getString();
-            int w = Minecraft.getInstance().font.width(label) + 10;
+            int w = UiFont.get().width(label) + 10;
             event.addListener(net.minecraft.client.gui.components.Button.builder(net.minecraft.network.chat.Component.literal(label), b -> {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.player != null) {

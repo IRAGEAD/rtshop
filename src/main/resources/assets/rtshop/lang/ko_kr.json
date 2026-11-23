@@ -1330,5 +1330,13 @@
   "rtshop.hunt.pool_unknown": "%s 라는 몹을 찾을 수 없습니다.",
   "rtshop.hunt.pool_added": "현상금 목록에 넣었습니다: %s (다음 날부터, 바로 보려면 /bounty pool reroll)",
   "rtshop.hunt.pool_removed": "현상금 목록에서 뺐습니다: %s",
-  "rtshop.hunt.pool_missing": "현상금 목록에 %s 이(가) 없습니다."
+  "rtshop.hunt.pool_missing": "현상금 목록에 %s 이(가) 없습니다.",
+  "rtshop.hud.ui_font": "창 글꼴: %s",
+  "rtshop.hud.ui_font.sans": "고딕",
+  "rtshop.hud.ui_font.serif": "명조",
+  "rtshop.hud.ui_font.pixel": "게임 기본",
+  "rtshop.hud.ui_size": "창 글자 크기: %s",
+  "rtshop.hud.ui_size.0": "작게",
+  "rtshop.hud.ui_size.1": "보통",
+  "rtshop.hud.ui_size.2": "크게"
 }

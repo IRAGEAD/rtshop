@@ -68,6 +68,10 @@ public final class ClientConfig {
     public boolean fantasyQuestPopups = false;
     /** 대화 상자 글자가 써질 때 나는 작은 소리. */
     public boolean dialogueSound = true;
+    /** RT Shop 창 글꼴: sans(고딕) / serif(명조) / pixel(게임 기본) */
+    public String uiFont = "sans";
+    /** RT Shop 창 글자 크기: 0 작게, 1 보통, 2 크게 */
+    public int uiFontSize = 1;
     public double pvpHudX = PDEF_X;
     public double pvpHudY = PDEF_Y;
     public double pvpHudWidth = PDEF_W;
@@ -170,6 +174,8 @@ public final class ClientConfig {
             o.addProperty("weaponTypeTooltip", weaponTypeTooltip);
             o.addProperty("fantasyQuestPopups", fantasyQuestPopups);
             o.addProperty("dialogueSound", dialogueSound);
+            o.addProperty("uiFont", uiFont);
+            o.addProperty("uiFontSize", uiFontSize);
             o.addProperty("pvpHudX", pvpHudX);
             o.addProperty("pvpHudY", pvpHudY);
             o.addProperty("pvpHudWidth", pvpHudWidth);
@@ -222,6 +228,8 @@ public final class ClientConfig {
                 if (o.has("weaponTypeTooltip")) c.weaponTypeTooltip = o.get("weaponTypeTooltip").getAsBoolean();
                 if (o.has("fantasyQuestPopups")) c.fantasyQuestPopups = o.get("fantasyQuestPopups").getAsBoolean();
                 if (o.has("dialogueSound")) c.dialogueSound = o.get("dialogueSound").getAsBoolean();
+                if (o.has("uiFont")) c.uiFont = o.get("uiFont").getAsString();
+                if (o.has("uiFontSize")) c.uiFontSize = Math.max(0, Math.min(2, o.get("uiFontSize").getAsInt()));
                 if (o.has("pvpHudX")) c.pvpHudX = o.get("pvpHudX").getAsDouble();
                 if (o.has("pvpHudY")) c.pvpHudY = o.get("pvpHudY").getAsDouble();
                 if (o.has("pvpHudWidth")) c.pvpHudWidth = o.get("pvpHudWidth").getAsDouble();

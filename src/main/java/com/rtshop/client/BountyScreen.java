@@ -222,4 +222,8 @@ public class BountyScreen extends Screen {
         scroll -= (int) Math.signum(delta);
         return true;
     }
+
+    net.minecraft.client.gui.Font getFontForTest() {
+        return this.font;
+    }
 }
