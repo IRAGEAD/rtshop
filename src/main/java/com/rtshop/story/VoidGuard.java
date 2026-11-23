@@ -59,6 +59,7 @@ public final class VoidGuard {
             safe = new Vec3(sp.getX() + 0.5, Math.max(y, level.getMinBuildHeight() + 1) + 1, sp.getZ() + 0.5);
         }
         p.teleportTo(level, safe.x, safe.y + 0.1, safe.z, p.getYRot(), p.getXRot());
+        if (p instanceof net.minecraftforge.common.util.FakePlayer) p.setPos(safe.x, safe.y + 0.1, safe.z); // 점검용 가짜 플레이어는 연결이 없다
         p.setDeltaMovement(Vec3.ZERO);
         p.fallDistance = 0;
         p.hurtMarked = true;
