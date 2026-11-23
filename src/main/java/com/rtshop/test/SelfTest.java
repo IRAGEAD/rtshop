@@ -2182,7 +2182,7 @@ public final class SelfTest {
         QuestManager.Loaded l = QuestManager.loaded();
         List<String> story = new ArrayList<>();
         for (String id : l.quests.keySet()) if (id.startsWith("story_") || id.startsWith("hidden_")) story.add(id);
-        check("the main story (2nd edition: prologue, 4 chapters, finale + hidden story) is installed", story.size() >= 40 && l.quests.containsKey("story_5_08") && l.quests.containsKey("story_4_19")
+        check("the main story (3rd edition: prologue, 4 chapters, finale + hidden story) is installed", story.size() >= 100 && l.quests.containsKey("story_5_08") && l.quests.containsKey("story_4_23") && l.quests.containsKey("story_1_29")
                 && l.quests.containsKey("hidden_illusioner_2") == net.minecraftforge.fml.ModList.get().isLoaded("illusioner"), story.size());
         check("the story quests load without problems", l.problems.stream().noneMatch(x -> x.contains("story")), l.problems);
         check("the order's three NPCs exist", l.npcs.containsKey("order_elder") && l.npcs.containsKey("order_archivist") && l.npcs.containsKey("order_captain"));
@@ -2267,11 +2267,11 @@ public final class SelfTest {
             ItemStack enchanted = new ItemStack(Items.IRON_SWORD);
             enchanted.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 1); // 마법 부여 = RARE
             String r2 = com.rtshop.story.StoryGates.lockedChapter(a, enchanted);
-            QuestManager.setFlag(a, "story_ch1_done", true);
+            QuestManager.setFlag(a, "ch1_three_ends", true);
             String r3 = com.rtshop.story.StoryGates.lockedChapter(a, enchanted);
-            check("story-gated gear: common gear is free, rare gear waits for chapter 1", r1 == null && "1장".equals(r2) && r3 == null, r1 + " " + r2 + " " + r3 + " " + shown);
+            check("story-gated gear: common gear is free, rare gear waits for the middle of chapter 1 (the three ends)", r1 == null && "1장 중반".equals(r2) && r3 == null, r1 + " " + r2 + " " + r3 + " " + shown);
         } finally {
-            QuestManager.setFlag(a, "story_ch1_done", false);
+            QuestManager.setFlag(a, "ch1_three_ends", false);
             com.rtshop.story.StoryGates.applyToFakeForTest = false;
         }
         // 봉인을 가리키는 눈은 퀘스트 보상으로만 (스킬라의 폭풍의 눈은 아직 주는 퀘스트가 없어 그대로)

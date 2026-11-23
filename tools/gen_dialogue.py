@@ -3,7 +3,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
-VERSION = 2
+VERSION = 3
 
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
@@ -224,7 +224,7 @@ merchant("shop_blacksmith", ["뭘 찾냐. 칼이냐, 갑옷이냐."], [
     topic("old_knight", "녹슨 기사의 문장", [
         "그 투구 문장, 나도 봤다. 불꽃 기사단 문장이다.",
         "우리 할아버지의 할아버지가 그 기사단 칼을 벼렸다고 했지. 전설인 줄 알았다.",
-    ], quests=["story_2_03"]),
+    ], quests=["story_2_04"]),
 ])
 merchant("shop_general", ["어서 오세요, 손님! 없는 것 빼고 다 있습니다… 아니 있어요!"], [
     "손님, 이 횃불 좀 보세요. 오래 타요. 진짜로요.",
@@ -325,10 +325,24 @@ more("quest_order_archivist",
      topics=[
          topic("ch1_records", "불타는 기록고", ["서가의 기록이 남았어요. 당신이 불 속으로 뛰어든 덕분에요.",
                                              "…미아는 팔에 화상을 입었어요. 그래도 웃더라고요. 기록이 남아서 다행이라고.",
-                                             "저도 그랬을 거예요. 어머니 딸이니까요."], flags=["ch1_saved_records"]),
+                                             "그런데 이상해요. 건진 페이지 몇 장에 보랏빛 잉크로 덧쓴 자국이 있어요. 거울에 비친 것처럼 뒤집힌 글씨로요.",
+                                             "어머니 글씨는 아니에요. 누군가 연대기를 고쳐 쓴 거예요."], flags=["ch1_saved_records"]),
+         topic("ch1_told_all", "어머니의 마지막 줄", ["마지막 줄까지 읽어 줘서 고마워요. '그 손은 장갑을 끼고 있다.'",
+                                                   "…알아요. 이 마을에서 장갑을 벗지 않는 사람이 누군지.",
+                                                   "아직은 아무 말도 안 할 거예요. 증거가 필요해요. 어머니라면 그랬을 거예요."], flags=["ch1_told_all"], notFlags=["erwin_betrayal"]),
+         topic("ch1_folded", "어머니의 마지막 줄", ["접어 둔 마지막 줄, 아직 안 폈어요. 책상 맨 위 서랍에 있어요.",
+                                                 "가끔 손이 가요. 그런데 아직은요. 어머니도 끝까지 읽는 데 열다섯 해가 걸렸으니까요."], flags=["ch1_folded"], notFlags=["erwin_betrayal"]),
+         topic("ch1_folded_after", "접어 둔 줄", ["접어 둔 줄을 폈어요. '…장갑을 끼고 있다.'",
+                                               "당신이 그날 접어 준 게 고마워요. 그때 읽었으면 장로님 앞에서 아무것도 못 했을 거예요."], flags=["ch1_folded", "erwin_betrayal"]),
          topic("ch1_apprentice", "불타는 기록고", ["미아를 끌어내 준 거, 고마워요. 그 아이는 이제 당신을 따라다니겠대요.",
                                                 "서가의 기록은 재가 됐어요. 그런데 이상하죠. 아깝지가 않아요.",
                                                 "어머니도 사람을 먼저 구했을 거예요. 기록은… 다시 쓰면 되니까요."], flags=["ch1_saved_apprentice"]),
+         topic("told_all", "어머니의 마지막 줄", ["마지막 줄을 끝까지 읽어 줘서 고마워요. 듣는 순간 다리가 풀렸지만요.",
+                                             "장갑… 그 말을 들은 뒤로 장로님 손만 보게 돼요. 그래도 모른 척할게요. 아직은요."], flags=["ch1_told_all"], notFlags=["erwin_betrayal"]),
+         topic("folded", "접어 둔 줄", ["마지막 줄, 아직 접어 두고 있어요. 매일 밤 펴 볼까 말까 해요.",
+                                      "…당신이 접어 줘서 다행이에요. 제가 펼 수 있을 때 펼게요."], flags=["ch1_folded"], notFlags=["erwin_betrayal"]),
+         topic("folded_open", "접어 둔 줄", ["접어 둔 줄을 오늘 폈어요. \"그 손은 장갑을 끼고 있다.\"",
+                                           "당신이 접어 둔 덕분에, 제가 직접 펼 수 있었어요. 그게 중요했어요."], flags=["ch1_folded", "erwin_betrayal"]),
          topic("gloved_hand", "장갑 낀 손", ["어머니가 '장갑'이라고 쓴 건… 아니에요. 생각하고 싶지 않아요.",
                                          "장로님은 우리를 거둬 주신 분이에요. 어머니가 사라진 뒤에도요."], flags=["clue_gloved_hand"], notFlags=["erwin_betrayal"]),
          topic("after_betrayal", "에르윈", ["어머니는 끝까지 읽었고, 그래서 돌아오지 못했대요.",

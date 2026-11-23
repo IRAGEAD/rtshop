@@ -740,13 +740,13 @@ final class ClientSelfTest2 {
         });
         // ------------------------------------------------------------ 이야기로 열리는 장비 진열대
         add(mc -> {
-            check("the server tells the client which gear tiers wait for which chapter (rare: chapter 1, epic: chapter 1)",
-                    "1장".equals(StoryClient.GATE_RARE) && "1장".equals(StoryClient.GATE_EPIC), StoryClient.GATE_RARE + "/" + StoryClient.GATE_EPIC);
+            check("the server tells the client which gear tiers wait for which chapter (rare: middle of chapter 1, epic: chapter 1)",
+                    "1장 중반".equals(StoryClient.GATE_RARE) && "1장".equals(StoryClient.GATE_EPIC), StoryClient.GATE_RARE + "/" + StoryClient.GATE_EPIC);
             net.minecraft.world.item.ItemStack sw = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD);
             sw.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 1);
             boolean creative = mc.player.isCreative();
             check("a rare sword shows as locked until chapter 1 (plain gear is open)",
-                    creative || "1장".equals(StoryClient.lockedChapter(sw)) && StoryClient.lockedChapter(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD)) == null,
+                    creative || "1장 중반".equals(StoryClient.lockedChapter(sw)) && StoryClient.lockedChapter(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD)) == null,
                     creative + " " + StoryClient.lockedChapter(sw));
         });
         // ------------------------------------------------------------ 이야기 연출: 장 제목, 보스 등장(테마별), 환영

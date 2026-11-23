@@ -475,6 +475,18 @@ public final class QuestManager {
         return prog(p).active.containsKey(questId);
     }
 
+    /** 진행 중인 퀘스트가 이 구조물(ID 또는 #태그)로 가라고 하는가 (STRUCTURE 목표). 결계 구조물에 들어갈 수 있게 한다. */
+    public static boolean questLeadsTo(ServerPlayer p, String structure) {
+        for (String id : prog(p).active.keySet()) {
+            QuestDef q = loaded.quests.get(id);
+            if (q == null) continue;
+            for (QuestDef.Objective ob : q.objectives) {
+                if (ob.type == QuestDef.Type.STRUCTURE && ob.target.equals(structure)) return true;
+            }
+        }
+        return false;
+    }
+
     public static void setFlag(ServerPlayer p, String flag, boolean on) {
         QuestData.Progress pr = prog(p);
         if (on ? pr.flags.add(flag) : pr.flags.remove(flag)) {
@@ -484,14 +496,15 @@ public final class QuestManager {
 
     /**
      * 스토리 2판으로 옮기기: 예전 스토리에서 끝낸 장은 새 스토리에서도 끝낸 것으로 친다 (장 중간이면 그 장의 처음부터).
-     * 한 번만 한다 (story_v2 표식).
+     * 한 번만 한다 (story_v3 표식).
      */
     public static boolean migrateStory(ServerPlayer p) {
         QuestData.Progress pr = prog(p);
-        if (pr.flags.contains("story_v2")) return false;
+        if (pr.flags.contains("story_v3")) return false;
+        // 장을 끝낸 표식이 있으면 3판의 그 장 퀘스트를 모두 끝낸 것으로 하고, 그 퀘스트들이 주는 표식(결계 등)도 준다
         String[][] rules = {
                 {"order_apprentice", "story_0_"}, {"story_ch1_done", "story_0_", "story_1_"}, {"story_ch2_done", "story_2_"},
-                {"story_ch3_done", "story_3_"}, {"story_done", "story_4_"}, {"story_ch4_done", "story_4_"}};
+                {"story_ch3_done", "story_3_"}, {"story_ch4_done", "story_4_"}, {"story_done", "story_4_", "story_5_"}};
         int n = 0;
         for (String[] r : rules) {
             if (!pr.flags.contains(r[0])) continue;
@@ -500,15 +513,16 @@ public final class QuestManager {
                     if (q.id.startsWith(r[i]) && !pr.completed.contains(q.id)) {
                         pr.completed.add(q.id);
                         pr.active.remove(q.id);
+                        pr.flags.addAll(q.rewardFlags);
                         n++;
                     }
                 }
             }
         }
-        // 예전 스토리 퀘스트(새 정의에 없는 것)는 진행 중 목록에서 뺀다
-        pr.active.keySet().removeIf(id -> id.startsWith("story_") && !loaded.quests.containsKey(id));
+        // 예전 스토리 퀘스트(새 정의에 없는 것)와, 장 안에서 진행 중이던 예전 퀘스트는 진행 중 목록에서 뺀다 (장의 처음부터 다시)
+        pr.active.keySet().removeIf(id -> id.startsWith("story_"));
         if (pr.flags.contains("story_done")) pr.flags.add("story_ch4_done");
-        pr.flags.add("story_v2");
+        pr.flags.add("story_v3");
         QuestData.get(p.server).dirty();
         return n > 0;
     }

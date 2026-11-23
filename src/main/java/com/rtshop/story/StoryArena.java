@@ -90,6 +90,7 @@ public final class StoryArena {
         m.put("mowziesmobs:ferrous_wroughtnaut", spec("iron", 18, 16, false));
         m.put("mowziesmobs:frostmaw", spec("frost", 26, 24, false));
         m.put("mowziesmobs:umvuthi", spec("sun", 24, 24, false));
+        m.put("mowziesmobs:elokosa_howler", spec("stone", 22, 18, false));
         m.put("aquamirae:maze_mother", spec("abyss", 26, 22, true));
         m.put("aquamirae:captain_cornelia", spec("frost", 24, 22, false));
         m.put("ydtwo:twisted_warden", spec("deep", 24, 22, false));

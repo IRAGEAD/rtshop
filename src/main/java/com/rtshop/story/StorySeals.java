@@ -65,7 +65,11 @@ public final class StorySeals {
         public String message = "";
         public final List<String> bosses = new ArrayList<>();
         public final List<String> blocks = new ArrayList<>();
+        /** 이 구조물(ID 또는 #태그) 안으로는 표식이 없으면 들어갈 수 없다 (구조물 전체 범위). */
+        public final List<String> structures = new ArrayList<>();
         public int radius = 20;
+        /** 파일에 structures 칸이 있었는가 (없으면 새 기본값을 넣는다) */
+        transient boolean hadStructures = true;
         /** true 면 표식을 주는 퀘스트가 없어도 늘 켜져 있다. */
         public boolean always;
 
@@ -79,6 +83,11 @@ public final class StorySeals {
             JsonArray k = new JsonArray();
             blocks.forEach(k::add);
             o.add("blocks", k);
+            if (!structures.isEmpty()) {
+                JsonArray st = new JsonArray();
+                structures.forEach(st::add);
+                o.add("structures", st);
+            }
             o.addProperty("radius", radius);
             if (always) o.addProperty("always", true);
             return o;
@@ -91,6 +100,8 @@ public final class StorySeals {
             if (o.has("message")) s.message = o.get("message").getAsString();
             if (o.has("bosses")) for (JsonElement e : o.getAsJsonArray("bosses")) s.bosses.add(e.getAsString());
             if (o.has("blocks")) for (JsonElement e : o.getAsJsonArray("blocks")) s.blocks.add(e.getAsString());
+            if (o.has("structures")) for (JsonElement e : o.getAsJsonArray("structures")) s.structures.add(e.getAsString());
+            s.hadStructures = o.has("structures");
             if (o.has("radius")) s.radius = Math.max(4, o.get("radius").getAsInt());
             if (o.has("always")) s.always = o.get("always").getAsBoolean();
             return s;
@@ -141,31 +152,59 @@ public final class StorySeals {
     public static Map<String, Seal> defaults() {
         Map<String, Seal> m = new LinkedHashMap<>();
         // 2장: 모우지의 몹
-        m.put("wroughtnaut", seal("seal_wroughtnaut", "녹슨 문 앞에 보이지 않는 벽이 있다. 수도회의 기록관이 먼저 할 이야기가 있다고 했다.", 20,
-                b("mowziesmobs:ferrous_wroughtnaut")));
-        m.put("frostmaw", seal("seal_frostmaw", "눈보라가 길을 막는다. 거인이 품은 것이 무엇인지 아직 모른다.", 28, b("mowziesmobs:frostmaw")));
-        m.put("umvuthi", seal("seal_umvuthi", "태양 가면의 부족이 이방인을 들이지 않는다. 탐험대장의 소개장이 필요하다.", 24, b("mowziesmobs:umvuthi")));
-        m.put("sculptor", seal("seal_sculptor", "산꼭대기의 바람이 등을 떠민다. 아직 오를 때가 아니다.", 24, b("mowziesmobs:sculptor")));
+        Seal s_wroughtnaut = seal("seal_wroughtnaut", "녹슨 문 앞에 보이지 않는 벽이 있다. 수도회의 기록관이 먼저 할 이야기가 있다고 했다.", 20,
+                b("mowziesmobs:ferrous_wroughtnaut"));
+        s_wroughtnaut.structures.add("mowziesmobs:wrought_chamber");
+        m.put("wroughtnaut", s_wroughtnaut);
+        Seal s_frostmaw = seal("seal_frostmaw", "눈보라가 길을 막는다. 거인이 품은 것이 무엇인지 아직 모른다.", 28, b("mowziesmobs:frostmaw"));
+        s_frostmaw.structures.add("mowziesmobs:frostmaw_spawn");
+        m.put("frostmaw", s_frostmaw);
+        Seal s_umvuthi = seal("seal_umvuthi", "태양 가면의 부족이 이방인을 들이지 않는다. 탐험대장의 소개장이 필요하다.", 24, b("mowziesmobs:umvuthi"));
+        s_umvuthi.structures.add("mowziesmobs:umvuthana_grove");
+        m.put("umvuthi", s_umvuthi);
+        Seal s_sculptor = seal("seal_sculptor", "산꼭대기의 바람이 등을 떠민다. 아직 오를 때가 아니다.", 24, b("mowziesmobs:sculptor"));
+        s_sculptor.structures.add("mowziesmobs:monastery");
+        m.put("sculptor", s_sculptor);
         // 3장: 아쿠아미라이
-        m.put("cornelia", seal("seal_cornelia", "얼음 위의 유령선이 안개 속으로 물러난다. 선장의 이름을 아직 모른다.", 28, b("aquamirae:captain_cornelia")));
+        Seal s_cornelia = seal("seal_cornelia", "얼음 위의 유령선이 안개 속으로 물러난다. 선장의 이름을 아직 모른다.", 28, b("aquamirae:captain_cornelia"));
+        s_cornelia.structures.add("aquamirae:ship");
+        m.put("cornelia", s_cornelia);
         m.put("maze_mother", seal("seal_maze_mother", "물 밑의 미로가 닫혀 있다.", 24, b("aquamirae:maze_mother")));
         // 4장: 대격변 — 일곱 봉인
-        m.put("netherite_monstrosity", seal("seal_monstrosity", "대장간의 불이 꺼져 있다. 봉인의 순서를 지켜야 한다.", 28,
-                b("cataclysm:netherite_monstrosity")));
-        m.put("ender_guardian", seal("seal_ender_guardian", "공허의 제단이 응답하지 않는다. 봉인의 순서를 지켜야 한다.", 28,
-                b("cataclysm:ender_guardian"), "cataclysm:altar_of_void"));
-        m.put("harbinger", seal("seal_harbinger", "기계의 심장이 잠들어 있다. 봉인의 순서를 지켜야 한다.", 28, b("cataclysm:the_harbinger")));
-        m.put("leviathan", seal("seal_leviathan", "심연의 제단이 차갑다. 봉인의 순서를 지켜야 한다.", 32,
-                b("cataclysm:the_leviathan"), "cataclysm:altar_of_abyss"));
-        m.put("ancient_remnant", seal("seal_remnant", "봉인의 문이 꿈쩍도 하지 않는다. 봉인의 순서를 지켜야 한다.", 28,
-                b("cataclysm:ancient_remnant"), "cataclysm:door_of_seal", "cataclysm:door_of_seal_part"));
-        m.put("maledictus", seal("seal_maledictus", "저주받은 묘비가 침묵한다. 봉인의 순서를 지켜야 한다.", 28,
-                b("cataclysm:maledictus"), "cataclysm:cursed_tombstone"));
-        m.put("ignis", seal("seal_ignis", "불의 제단이 당신을 밀어낸다. 일곱 봉인을 먼저 풀어야 한다.", 32,
-                b("cataclysm:ignis"), "cataclysm:altar_of_fire"));
+        Seal s_netherite_monstrosity = seal("seal_monstrosity", "대장간의 불이 꺼져 있다. 봉인의 순서를 지켜야 한다.", 28,
+                b("cataclysm:netherite_monstrosity"));
+        s_netherite_monstrosity.structures.add("cataclysm:soul_black_smith");
+        m.put("netherite_monstrosity", s_netherite_monstrosity);
+        Seal s_ender_guardian = seal("seal_ender_guardian", "공허의 제단이 응답하지 않는다. 봉인의 순서를 지켜야 한다.", 28,
+                b("cataclysm:ender_guardian"), "cataclysm:altar_of_void");
+        s_ender_guardian.structures.add("cataclysm:ruined_citadel");
+        m.put("ender_guardian", s_ender_guardian);
+        Seal s_harbinger = seal("seal_harbinger", "기계의 심장이 잠들어 있다. 봉인의 순서를 지켜야 한다.", 28, b("cataclysm:the_harbinger"));
+        s_harbinger.structures.add("cataclysm:ancient_factory");
+        m.put("harbinger", s_harbinger);
+        Seal s_leviathan = seal("seal_leviathan", "심연의 제단이 차갑다. 봉인의 순서를 지켜야 한다.", 32,
+                b("cataclysm:the_leviathan"), "cataclysm:altar_of_abyss");
+        s_leviathan.structures.add("cataclysm:sunken_city");
+        m.put("leviathan", s_leviathan);
+        Seal s_ancient_remnant = seal("seal_remnant", "봉인의 문이 꿈쩍도 하지 않는다. 봉인의 순서를 지켜야 한다.", 28,
+                b("cataclysm:ancient_remnant"), "cataclysm:door_of_seal", "cataclysm:door_of_seal_part");
+        s_ancient_remnant.structures.add("cataclysm:cursed_pyramid");
+        m.put("ancient_remnant", s_ancient_remnant);
+        Seal s_maledictus = seal("seal_maledictus", "저주받은 묘비가 침묵한다. 봉인의 순서를 지켜야 한다.", 28,
+                b("cataclysm:maledictus"), "cataclysm:cursed_tombstone");
+        s_maledictus.structures.add("cataclysm:frosted_prison");
+        m.put("maledictus", s_maledictus);
+        Seal s_ignis = seal("seal_ignis", "불의 제단이 당신을 밀어낸다. 일곱 봉인을 먼저 풀어야 한다.", 32,
+                b("cataclysm:ignis"), "cataclysm:altar_of_fire");
+        s_ignis.structures.add("cataclysm:burning_arena");
+        m.put("ignis", s_ignis);
         // 숨은 보스
-        m.put("scylla", seal("seal_scylla", "폭풍이 당신을 알아보지 못한다. 지워진 이름을 먼저 찾아야 한다.", 32, b("cataclysm:scylla")));
-        m.put("illusioner", seal("seal_illusioner", "거울이 당신의 얼굴을 비추지 않는다. 연대기의 빈 쪽을 먼저 찾아야 한다.", 24, b("illusioner:illusioner")));
+        Seal s_scylla = seal("seal_scylla", "폭풍이 당신을 알아보지 못한다. 지워진 이름을 먼저 찾아야 한다.", 32, b("cataclysm:scylla"));
+        s_scylla.structures.add("cataclysm:acropolis");
+        m.put("scylla", s_scylla);
+        Seal ill = seal("seal_illusioner", "저택이 보랏빛 안개에 싸여 있다. 거울이 당신의 얼굴을 비추지 않는다. 연대기의 빈 쪽을 먼저 찾아야 한다.", 24, b("illusioner:illusioner"));
+        ill.structures.add("minecraft:mansion");
+        m.put("illusioner", ill);
         return m;
     }
 
@@ -201,6 +240,12 @@ public final class StorySeals {
                 if (!c.seals.containsKey(e.getKey())) {
                     e.getValue().id = e.getKey();
                     c.seals.put(e.getKey(), e.getValue());
+                    write = true;
+                } else if (!c.seals.get(e.getKey()).hadStructures && !e.getValue().structures.isEmpty()) {
+                    // 예전 파일: 구조물 결계(예: 환술사의 저택)를 새로 넣는다
+                    Seal old = c.seals.get(e.getKey());
+                    old.structures.addAll(e.getValue().structures);
+                    old.hadStructures = true;
                     write = true;
                 }
             }
@@ -371,7 +416,9 @@ public final class StorySeals {
         MinecraftServer server = event.getServer();
         if (server.getTickCount() % 10 != 3) return;
         StorySeals c = get();
-        if (!c.enabled || c.byBoss.isEmpty()) return;
+        if (!c.enabled) return;
+        if (server.getTickCount() % 20 == 3) structureTick(server, c);
+        if (c.byBoss.isEmpty()) return;
         Set<String> live = new HashSet<>();
         for (Seal s : c.seals.values()) if (!s.bosses.isEmpty() && active(s)) live.addAll(s.bosses);
         if (live.isEmpty()) return;
@@ -387,5 +434,46 @@ public final class StorySeals {
                 }
             }
         }
+    }
+
+    /** 표식 없이 결계 구조물 안에 들어온 사람을 밖으로 민다. */
+    private static void structureTick(MinecraftServer server, StorySeals c) {
+        for (Seal s : c.seals.values()) {
+            if (s.structures.isEmpty() || !active(s)) continue;
+            for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+                if (p.isCreative() || p.isSpectator() || passes(p, s)) continue;
+                net.minecraft.world.level.levelgen.structure.BoundingBox box = structureBox(p, s);
+                if (box == null) continue;
+                // 지금 퀘스트가 이 구조물로 보냈다면 들어갈 수 있다 (도착 목표·안의 몹 처치 목표)
+                boolean led = false;
+                for (String st : s.structures) led |= QuestManager.questLeadsTo(p, st);
+                if (led) continue;
+                net.minecraft.core.BlockPos ctr = box.getCenter();
+                pushAway(p, new Vec3(ctr.getX() + 0.5, p.getY(), ctr.getZ() + 0.5), s);
+            }
+        }
+    }
+
+    /** 이 사람이 서 있는 결계 구조물의 범위 (없으면 null). */
+    public static net.minecraft.world.level.levelgen.structure.BoundingBox structureBox(ServerPlayer p, Seal s) {
+        ServerLevel level = p.serverLevel();
+        var reg = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE);
+        net.minecraft.core.BlockPos pos = p.blockPosition();
+        for (String id : s.structures) {
+            try {
+                if (id.startsWith("#")) {
+                    var tag = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE, new net.minecraft.resources.ResourceLocation(id.substring(1)));
+                    var start = level.structureManager().getStructureWithPieceAt(pos, tag);
+                    if (start.isValid()) return start.getBoundingBox();
+                    continue;
+                }
+                var st = reg.get(new net.minecraft.resources.ResourceLocation(id));
+                if (st == null) continue;
+                var start = level.structureManager().getStructureAt(pos, st);
+                if (start.isValid() && start.getBoundingBox().inflatedBy(2).isInside(pos)) return start.getBoundingBox();
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
     }
 }
