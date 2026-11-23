@@ -34,6 +34,11 @@ public final class StoryClient {
             } catch (Exception ignored) {
             }
             Cinematic.play(json);
+        } else if (kind == StoryPacket.BOUNTY) {
+            try {
+                BountyScreen.open(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.DIALOGUE) {
             try {
                 DialogueScreen.open(JsonParser.parseString(json).getAsJsonObject());

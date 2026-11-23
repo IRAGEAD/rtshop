@@ -1264,5 +1264,15 @@
   "rtshop.quest.where_turnin": "완료하려면 %s에게 찾아가세요",
   "rtshop.quest.where_active": "보고할 사람: %s (포기도 그에게서)",
   "rtshop.quest.where_done": "끝낸 퀘스트예요 · %s",
-  "rtshop.quest.journal_button": "퀘스트 수첩"
+  "rtshop.quest.journal_button": "퀘스트 수첩",
+  "rtshop.talk.bounty": "현상금 게시판",
+  "rtshop.hunt.board_screen": "현상금 게시판",
+  "rtshop.hunt.board_quota": "오늘 맡은 의뢰 %s/%s · 이번 주 %s/%s",
+  "rtshop.hunt.take": "맡기",
+  "rtshop.hunt.row_offer": "게시판에 붙은 의뢰",
+  "rtshop.hunt.row_progress": "맡은 의뢰 · %s/%s",
+  "rtshop.hunt.row_done": "끝낸 의뢰 · 보상을 받았어요",
+  "rtshop.hunt.board_far": "현상금 게시판은 시청 서기에게 말을 걸어 볼 수 있어요.",
+  "rtshop.hunt.board_full": "이 종류의 의뢰는 더 맡을 수 없어요.",
+  "rtshop.hunt.none_taken": "맡은 의뢰가 없어요. 시청 서기 하루의 현상금 게시판에서 골라 맡으세요."
 }

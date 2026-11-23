@@ -2126,6 +2126,11 @@ public final class SelfTest {
             check("Fantasy Mounts quests are off by default (its quest settings were found)", java.nio.file.Files.exists(com.rtshop.compat.FantasyQuestsOff.marker(server)),
                     com.rtshop.compat.FantasyQuestsOff.modId() + " " + com.rtshop.compat.FantasyQuestsOff.LAST);
         }
+        com.rtshop.story.WildSpawns.reload();
+        check("story mods spawn far less in the open (Mowzie's / Aquamirae keep 15%), normal in their own structures and story biomes",
+                com.rtshop.story.WildSpawns.keepFor("mowziesmobs") < 0.5 && com.rtshop.story.WildSpawns.keepFor("aquamirae") < 0.5
+                        && com.rtshop.story.WildSpawns.keepFor("minecraft") >= 1 && !com.rtshop.story.WildSpawns.storyArea(level, new BlockPos(0, 80, 0), "mowziesmobs"),
+                com.rtshop.story.WildSpawns.get().keep);
         QuestManager.Loaded l = QuestManager.loaded();
         List<String> story = new ArrayList<>();
         for (String id : l.quests.keySet()) if (id.startsWith("story_") || id.startsWith("hidden_")) story.add(id);
@@ -2274,8 +2279,22 @@ public final class SelfTest {
         com.rtshop.story.Hunts hs = com.rtshop.story.Hunts.get();
         boolean onlyVanilla = true;
         for (int i = 0; i < bl.size(); i++) if (!bl.getCompound(i).getString("entity").startsWith("minecraft:")) onlyVanilla = false;
-        check("a new player gets today's and this week's bounties, only from the opening chapter's mobs",
-                bl.size() == hs.dailyCount + hs.weeklyCount && onlyVanilla, bl);
+        int notTaken = 0;
+        for (int i = 0; i < bl.size(); i++) if (!com.rtshop.story.Hunts.accepted(bl.getCompound(i))) notTaken++;
+        check("the bounty board offers today's and this week's bounties (nothing taken yet), only from the opening chapter's mobs",
+                bl.size() == Math.max(hs.dailyCount, hs.dailyOffers) + Math.max(hs.weeklyCount, hs.weeklyOffers) && notTaken == bl.size() && onlyVanilla, bl);
+        int t0 = com.rtshop.story.Hunts.take(a, -1, 0), t1 = com.rtshop.story.Hunts.take(a, -1, 0);
+        int dailyIdx = 0, takenDaily = 0;
+        for (int i = 0; i < bl.size() && takenDaily < hs.dailyCount + 1; i++) {
+            if (bl.getCompound(i).getBoolean("weekly")) continue;
+            int r = com.rtshop.story.Hunts.take(a, -1, i);
+            if (r == 0) takenDaily++;
+            dailyIdx = r;
+        }
+        check("a bounty is taken at the board; taking it twice does nothing; no more than the daily limit",
+                t0 == 0 && t1 == 1 && dailyIdx == 2, t0 + " " + t1 + " " + dailyIdx + " " + takenDaily);
+        int far = com.rtshop.story.Hunts.take(a, 999999, 1);
+        check("bounties can only be taken next to the board NPC (not from anywhere)", far == 3, far);
         List<String> badHunt = new ArrayList<>();
         for (com.rtshop.story.Hunts.Pool pool : hs.pools) for (com.rtshop.story.Hunts.Target t : pool.targets) {
             if (com.rtshop.story.ScyllaClues.modOk(t.entity) && !ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation(t.entity))) badHunt.add(t.entity);

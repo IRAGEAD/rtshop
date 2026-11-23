@@ -695,6 +695,26 @@ final class ClientSelfTest2 {
         add(mc -> {
             shot(mc, "116b_journal_done");
             mc.setScreen(null);
+            com.rtshop.story.Hunts.testMode = true;
+            onServer(mc, sp -> {
+                com.rtshop.story.Hunts.clearForTest(sp);
+                com.rtshop.story.Hunts.openBoard(sp, -1);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            BountyScreen bs = mc.screen instanceof BountyScreen x ? x : null;
+            check("the bounty board opens with bounties to pick from", bs != null && bs.rowsForTest() > 0 && bs.takenForTest() == 0, mc.screen);
+            if (bs != null) bs.takeFirstForTest();
+            waitTicks(20);
+        });
+        add(mc -> {
+            BountyScreen bs = mc.screen instanceof BountyScreen x ? x : null;
+            check("taking a bounty on the board marks it as taken", bs != null && bs.takenForTest() == 1, bs == null ? mc.screen : bs.takenForTest());
+            shot(mc, "117_bounty_board");
+            mc.setScreen(null);
+            com.rtshop.story.Hunts.testMode = false;
+            onServer(mc, com.rtshop.story.Hunts::clearForTest);
             waitTicks(2);
         });
         // ------------------------------------------------------------ 이야기로 열리는 장비 진열대

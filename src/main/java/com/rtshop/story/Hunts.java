@@ -45,7 +45,7 @@ import java.util.Random;
 /**
  * 토벌 의뢰판과 몹 도감 (config/rtshop/hunts.json).
  * <ul>
- * <li>토벌 의뢰: 매일 dailyCount 개, 매주 weeklyCount 개가 저절로 걸린다. 몹은 깨어 둔 장(표식)에 따라 늘어난다.
+ * <li>토벌 의뢰: 게시판(시청 서기 하루)에 매일 dailyOffers 개, 매주 weeklyOffers 개가 붙고, 그중 dailyCount·weeklyCount 개까지 골라 맡는다. 몹은 깨어 둔 장(표식)에 따라 늘어난다.
  * 다 잡으면 바로 Gold. 전투 직업이 있으면 jobBonus 만큼 더 준다. /bounty 로 본다.</li>
  * <li>몹 도감: 처음 잡은 몹을 기록하고, 장별 목록을 다 채우면 한 번 보상. /bestiary 로 본다.</li>
  * </ul>
@@ -82,6 +82,10 @@ public final class Hunts {
 
     public boolean enabled = true;
     public int dailyCount = 3, weeklyCount = 1;
+    /** 게시판에 붙는 의뢰 수 (이 중에서 dailyCount·weeklyCount 개까지 골라 맡는다) */
+    public int dailyOffers = 6, weeklyOffers = 3;
+    /** 게시판을 맡는 NPC (말을 걸면 [현상금 게시판] 이 보인다) */
+    public List<String> boardNpcs = new ArrayList<>(List.of("attendance"));
     public double weeklyMultiplier = 3.0;
     /** 하루가 바뀌는 시각 (한국 시간 기준 시) */
     public int resetHour = 6;
@@ -183,6 +187,11 @@ public final class Hunts {
         o.addProperty("enabled", enabled);
         o.addProperty("dailyCount", dailyCount);
         o.addProperty("weeklyCount", weeklyCount);
+        o.addProperty("dailyOffers", dailyOffers);
+        o.addProperty("weeklyOffers", weeklyOffers);
+        com.google.gson.JsonArray bn = new com.google.gson.JsonArray();
+        boardNpcs.forEach(bn::add);
+        o.add("boardNpcs", bn);
         o.addProperty("weeklyMultiplier", weeklyMultiplier);
         o.addProperty("resetHour", resetHour);
         o.addProperty("jobBonus", jobBonus);
@@ -223,6 +232,12 @@ public final class Hunts {
         if (o.has("enabled")) h.enabled = o.get("enabled").getAsBoolean();
         if (o.has("dailyCount")) h.dailyCount = Math.max(0, o.get("dailyCount").getAsInt());
         if (o.has("weeklyCount")) h.weeklyCount = Math.max(0, o.get("weeklyCount").getAsInt());
+        if (o.has("dailyOffers")) h.dailyOffers = Math.max(h.dailyCount, o.get("dailyOffers").getAsInt());
+        if (o.has("weeklyOffers")) h.weeklyOffers = Math.max(h.weeklyCount, o.get("weeklyOffers").getAsInt());
+        if (o.has("boardNpcs")) {
+            h.boardNpcs.clear();
+            for (com.google.gson.JsonElement e : o.getAsJsonArray("boardNpcs")) h.boardNpcs.add(e.getAsString());
+        }
         if (o.has("weeklyMultiplier")) h.weeklyMultiplier = Math.max(1, o.get("weeklyMultiplier").getAsDouble());
         if (o.has("resetHour")) h.resetHour = Math.max(0, Math.min(23, o.get("resetHour").getAsInt()));
         if (o.has("jobBonus")) h.jobBonus = Math.max(0, o.get("jobBonus").getAsDouble());
@@ -296,8 +311,8 @@ public final class Hunts {
                 if (b.getBoolean("weekly") ? !newWeek : !newDay) keep.add(b);
             }
             List<Target> avail = available(p);
-            if (newDay) roll(keep, avail, h.dailyCount, false, 1.0);
-            if (newWeek) roll(keep, avail, h.weeklyCount, true, h.weeklyMultiplier);
+            if (newDay) roll(keep, avail, Math.max(h.dailyCount, h.dailyOffers), false, 1.0);
+            if (newWeek) roll(keep, avail, Math.max(h.weeklyCount, h.weeklyOffers), true, h.weeklyMultiplier);
             d.putLong("day", day);
             d.putLong("week", week);
             d.put("list", keep);
@@ -329,6 +344,7 @@ public final class Hunts {
             b.putLong("gold", Math.round(t.gold * Math.max(1, need) * (weekly ? 1.25 : 1.0)));
             b.putBoolean("weekly", weekly);
             b.putBoolean("done", false);
+            b.putBoolean("accepted", false); // 게시판에서 골라야 시작된다
             into.add(b);
         }
     }
@@ -361,7 +377,7 @@ public final class Hunts {
         ListTag list = bounties(p);
         for (int i = 0; i < list.size(); i++) {
             CompoundTag b = list.getCompound(i);
-            if (b.getBoolean("done") || !b.getString("entity").equals(id)) continue;
+            if (b.getBoolean("done") || !accepted(b) || !b.getString("entity").equals(id)) continue;
             int have = b.getInt("have") + 1;
             b.putInt("have", have);
             int need = b.getInt("need");
@@ -377,6 +393,79 @@ public final class Hunts {
             }
             break;
         }
+    }
+
+    /** 맡은 의뢰인가 (예전 저장에는 표시가 없다: 맡은 것으로 본다). */
+    public static boolean accepted(CompoundTag b) {
+        return !b.contains("accepted") || b.getBoolean("accepted");
+    }
+
+    private static int taken(ListTag list, boolean weekly) {
+        int n = 0;
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag b = list.getCompound(i);
+            if (b.getBoolean("weekly") == weekly && accepted(b)) n++;
+        }
+        return n;
+    }
+
+    /** 게시판 NPC 곁(8칸)인가. */
+    public static boolean nearBoard(ServerPlayer p, int entity) {
+        if (testMode && entity == -1) return true;
+        net.minecraft.world.entity.Entity e = p.level().getEntity(entity);
+        if (e == null || e.distanceTo(p) > 8) return false;
+        String key = QuestManager.npcKey(e);
+        return key != null && get().boardNpcs.contains(key);
+    }
+
+    /** 게시판에서 의뢰 하나를 맡는다. 0 = 맡음, 1 = 이미/끝남, 2 = 그 종류는 더 못 맡음, 3 = 게시판 곁이 아님. */
+    public static int take(ServerPlayer p, int entity, int index) {
+        if (!nearBoard(p, entity)) return 3;
+        ListTag list = bounties(p);
+        if (index < 0 || index >= list.size()) return 1;
+        CompoundTag b = list.getCompound(index);
+        if (accepted(b) || b.getBoolean("done")) return 1;
+        boolean weekly = b.getBoolean("weekly");
+        if (taken(list, weekly) >= (weekly ? get().weeklyCount : get().dailyCount)) return 2;
+        b.putBoolean("accepted", true);
+        return 0;
+    }
+
+    /** 게시판 화면에 보낼 내용. */
+    public static com.google.gson.JsonObject boardJson(ServerPlayer p, int entity) {
+        ListTag list = bounties(p);
+        com.google.gson.JsonObject o = new com.google.gson.JsonObject();
+        o.addProperty("entity", entity);
+        o.addProperty("dailyMax", get().dailyCount);
+        o.addProperty("weeklyMax", get().weeklyCount);
+        o.addProperty("dailyTaken", taken(list, false));
+        o.addProperty("weeklyTaken", taken(list, true));
+        com.google.gson.JsonArray a = new com.google.gson.JsonArray();
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag b = list.getCompound(i);
+            com.google.gson.JsonObject x = new com.google.gson.JsonObject();
+            x.addProperty("i", i);
+            x.addProperty("entity", b.getString("entity"));
+            x.addProperty("name", name(b.getString("entity")));
+            x.addProperty("need", b.getInt("need"));
+            x.addProperty("have", Math.min(b.getInt("have"), b.getInt("need")));
+            x.addProperty("gold", reward(p, b.getLong("gold")));
+            x.addProperty("weekly", b.getBoolean("weekly"));
+            x.addProperty("accepted", accepted(b));
+            x.addProperty("done", b.getBoolean("done"));
+            a.add(x);
+        }
+        o.add("list", a);
+        return o;
+    }
+
+    public static void openBoard(ServerPlayer p, int entity) {
+        if (!nearBoard(p, entity)) {
+            p.displayClientMessage(Component.translatable("rtshop.hunt.board_far").withStyle(ChatFormatting.RED), true);
+            return;
+        }
+        com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
+                new com.rtshop.net.StoryPacket(com.rtshop.net.StoryPacket.BOUNTY, boardJson(p, entity).toString()));
     }
 
     public static long reward(ServerPlayer p, long base) {
@@ -413,8 +502,11 @@ public final class Hunts {
         ListTag list = bounties(p);
         p.sendSystemMessage(Component.translatable("rtshop.hunt.board_title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         if (list.isEmpty()) p.sendSystemMessage(Component.translatable("rtshop.hunt.none").withStyle(ChatFormatting.GRAY));
+        int shown = 0;
         for (int i = 0; i < list.size(); i++) {
             CompoundTag b = list.getCompound(i);
+            if (!accepted(b)) continue;
+            shown++;
             boolean done = b.getBoolean("done");
             MutableComponent line = Component.literal(done ? " ✔ " : " ✦ ").withStyle(done ? ChatFormatting.GREEN : ChatFormatting.GOLD)
                     .append(Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.tag_weekly" : "rtshop.hunt.tag_daily").withStyle(ChatFormatting.DARK_AQUA))
@@ -423,6 +515,7 @@ public final class Hunts {
                     .append(Component.literal("  " + String.format("%,d", reward(p, b.getLong("gold"))) + " G").withStyle(ChatFormatting.YELLOW));
             p.sendSystemMessage(line);
         }
+        if (shown == 0) p.sendSystemMessage(Component.translatable("rtshop.hunt.none_taken").withStyle(ChatFormatting.GRAY));
         boolean fighter = !Jobs.entry(p).combat.isEmpty();
         p.sendSystemMessage(Component.translatable(fighter ? "rtshop.hunt.job_bonus_on" : "rtshop.hunt.job_bonus_off", Math.round(get().jobBonus * 100))
                 .withStyle(ChatFormatting.GRAY));
@@ -465,7 +558,19 @@ public final class Hunts {
         event.getDispatcher().register(Commands.literal("bounty").executes(ctx -> {
             showBounties(ctx.getSource().getPlayerOrException());
             return 1;
-        }));
+        }).then(Commands.literal("board").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer()).executes(ctx -> {
+            openBoard(ctx.getSource().getPlayerOrException(), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity"));
+            return 1;
+        }))).then(Commands.literal("take").then(Commands.argument("entity", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
+                .then(Commands.argument("index", com.mojang.brigadier.arguments.IntegerArgumentType.integer()).executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    int ent = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity");
+                    int r = take(p, ent, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "index"));
+                    if (r == 2) p.displayClientMessage(Component.translatable("rtshop.hunt.board_full").withStyle(ChatFormatting.RED), true);
+                    if (r == 0) p.level().playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1F, 1F);
+                    openBoard(p, ent);
+                    return r == 0 ? 1 : 0;
+                })))));
         event.getDispatcher().register(Commands.literal("bestiary").executes(ctx -> {
             showBestiary(ctx.getSource().getPlayerOrException(), null);
             return 1;
@@ -488,6 +593,7 @@ public final class Hunts {
         b.putLong("gold", gold);
         b.putBoolean("weekly", false);
         b.putBoolean("done", false);
+        b.putBoolean("accepted", true);
         l.add(b);
         data(p).put("list", l);
     }

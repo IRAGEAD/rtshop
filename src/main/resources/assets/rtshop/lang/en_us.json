@@ -1264,5 +1264,15 @@
   "rtshop.quest.where_turnin": "Visit %s to turn it in",
   "rtshop.quest.where_active": "Report to %s (abandon there too)",
   "rtshop.quest.where_done": "Finished · %s",
-  "rtshop.quest.journal_button": "Quest journal"
+  "rtshop.quest.journal_button": "Quest journal",
+  "rtshop.talk.bounty": "Bounty board",
+  "rtshop.hunt.board_screen": "Bounty board",
+  "rtshop.hunt.board_quota": "Today %s/%s · This week %s/%s",
+  "rtshop.hunt.take": "Take",
+  "rtshop.hunt.row_offer": "Posted on the board",
+  "rtshop.hunt.row_progress": "Taken · %s/%s",
+  "rtshop.hunt.row_done": "Done · reward paid",
+  "rtshop.hunt.board_far": "Talk to the town clerk to see the bounty board.",
+  "rtshop.hunt.board_full": "You cannot take more of these.",
+  "rtshop.hunt.none_taken": "No bounties taken. Pick some at the town clerk's bounty board."
 }

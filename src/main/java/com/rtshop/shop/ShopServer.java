@@ -487,6 +487,7 @@ public final class ShopServer {
         com.rtshop.story.ScyllaClues.reload();
         com.rtshop.story.Hunts.reload();
         com.rtshop.story.Dialogue.reload();
+        com.rtshop.story.WildSpawns.reload();
         for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) {
             com.rtshop.story.BossIntros.sendLore(sp);
             com.rtshop.story.StoryGates.sync(sp);

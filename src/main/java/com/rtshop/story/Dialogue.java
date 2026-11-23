@@ -189,6 +189,7 @@ public final class Dialogue {
         }
         out.add("topics", topics);
         out.addProperty("quests", QuestManager.viewsCount(p, npcKey));
+        if (com.rtshop.story.Hunts.get().boardNpcs.contains(npcKey)) out.addProperty("bounty", true);
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, out.toString()));
     }
 

@@ -120,6 +120,7 @@ public class DialogueScreen extends Screen {
         }
         int q = data.has("quests") ? data.get("quests").getAsInt() : 0;
         if (q > 0) out.add(new String[]{"quest", "", Component.translatable("rtshop.talk.quests", q).getString()});
+        if (data.has("bounty") && data.get("bounty").getAsBoolean()) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
         out.add(new String[]{"bye", "", Component.translatable("rtshop.talk.bye").getString()});
         return out;
     }
@@ -141,6 +142,10 @@ public class DialogueScreen extends Screen {
                 NpcButtons.returnNpc = entity;
                 NpcButtons.returnArmedAt = System.currentTimeMillis();
                 if (minecraft.player != null) minecraft.player.connection.sendCommand("rtshop quest open " + entity);
+            }
+            case "bounty" -> {
+                onClose();
+                if (minecraft.player != null) minecraft.player.connection.sendCommand("bounty board " + entity);
             }
             default -> onClose();
         }
