@@ -4777,10 +4777,10 @@ public final class SelfTest {
             rr.item = "minecraft:diamond_sword";
             rr.grade = "rare";
             ItemStack rs = com.rtshop.gacha.Gacha.stackOf(rr, "weapon");
-            boolean before = es.isDamageableItem();
+            boolean wasDamageable = es.isDamageableItem();
             es.hurt(50, level.random, null);
             check("epic+ gacha gear does not lose durability (rare still does)",
-                    !before && es.getDamageValue() == 0 && rs.isDamageableItem(), es.getTag() + " / " + rs.getTag());
+                    !wasDamageable && es.getDamageValue() == 0 && rs.isDamageableItem(), es.getTag() + " / " + rs.getTag());
             // 예전에 뽑은 장비: 표시만 있고 보호가 없던 것도 가방에서 보호된다
             ItemStack old = es.copy();
             old.getTag().remove("Unbreakable");
