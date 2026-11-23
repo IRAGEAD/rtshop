@@ -255,6 +255,13 @@ jobs:
             cat /tmp/exj/packs/efx_epicfight_resource_pack/pack.mcmeta 2>/dev/null
             grep -rl --include=*.class "efx_epicfight_resource_pack" /tmp/exj | head -3 | while read c; do javap -p -c -constants "$c" | grep -E "^  [a-z]|ldc|invoke" | head -n 80; done
           } > /tmp/inspect/avalon.txt 2>&1 || true
+          # Better Combat: 무기 속성 목록과 이름 자동 부여(fallback)의 실제 이름
+          {
+            BCJ="$(ls packcache/*.jar | grep -i "bettercombat" | head -1)"
+            mkdir -p /tmp/bc && unzip -o -q "$BCJ" -d /tmp/bc
+            for c in net/bettercombat/logic/WeaponRegistry.class net/bettercombat/logic/WeaponAttributesFallback.class; do echo "======== $c"; javap -p -c -constants /tmp/bc/$c 2>/dev/null | grep -E "^  [a-z]|invoke|getstatic|putstatic" | head -n 120; done
+            grep -rl --include=*.class "WeaponAttributesFallback" /tmp/bc | head
+          } > /tmp/inspect/bettercombat.txt 2>&1 || true
           # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
           ls packcache > /tmp/inspect/jars.txt
           # 환술사 모드: 유령 우민이 안 보이는 문제를 찾기 위한 렌더러·엔티티 클래스

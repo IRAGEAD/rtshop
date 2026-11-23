@@ -769,7 +769,7 @@ final class ClientSelfTest2 {
         });
         // ------------------------------------------------------------ Nightfall 무기를 든 모습 (풀팩에서만): 폐허 대검과 비교용 다른 대검
         if (net.minecraftforge.fml.ModList.get().isLoaded("efn")) {
-            String[][] held = {{"efn:ruinsgreatsword", "119_efn_ruinsgreatsword"}, {"minecraft:diamond_sword", "119b_diamond_sword"}, {"efn:yamato_dmc", "119c_efn_yamato"}, {"efn:kusabimaru", "119d_efn_kusabimaru"}, {"efn:broadblade", "119e_efn_broadblade"}, {"efn:ruinsgreatsword", "119f_efn_ruinsgreatsword_zoom"}};
+            String[][] held = {{"efn:ruinsgreatsword", "119_efn_ruinsgreatsword"}, {"minecraft:diamond_sword", "119b_diamond_sword"}, {"efn:yamato_dmc", "119c_efn_yamato"}, {"efn:kusabimaru", "119d_efn_kusabimaru"}, {"efn:broadblade", "119e_efn_broadblade"}, {"efn:ruinsgreatsword", "119f_efn_ruinsgreatsword_zoom"}, {"efn:meen_spear", "119g_efn_duskfire"}};
             for (String[] h : held) {
                 add(mc -> {
                     mc.setScreen(null);
@@ -789,7 +789,12 @@ final class ClientSelfTest2 {
                     shot(mc, h[1]);
                     com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] held {}: {}", h[0], mc.player == null ? "-" : mc.player.getMainHandItem());
                     com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] EF renderer for {}: {}", h[0], efRendererInfo(mc.player == null ? null : mc.player.getMainHandItem()));
-                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] EF renderer calls while holding {}: {}", h[0], RenderProbe.dump());
+                    String calls = RenderProbe.dump();
+                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] EF renderer calls while holding {}: {}", h[0], calls);
+                    if (h[1].equals("119_efn_ruinsgreatsword") || h[1].equals("119g_efn_duskfire")) {
+                        check("Nightfall's " + h[0] + " is drawn as Epic Fight's 3D model, not Better Combat's flat item",
+                                calls.contains("ef:RenderMeshItem") || calls.contains("ef:RenderAnimationItem") ? !calls.contains("vanilla-layer:PlayerItemInHandLayer:" + h[0]) : false, calls);
+                    }
                     waitTicks(2);
                 });
             }

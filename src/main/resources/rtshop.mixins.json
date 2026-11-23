@@ -15,6 +15,7 @@
   "mixins": [
     "NightfallCullMixin",
     "NightfallSpeedMixin",
-    "StagedStructureMixin"
+    "StagedStructureMixin",
+    "BetterCombatFallbackMixin"
   ]
 }
