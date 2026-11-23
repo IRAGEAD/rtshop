@@ -766,13 +766,49 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
         }
     }
 
+    /** 연출 중에는 대화·퀘스트 단추를 숨긴다. */
+    @Override
+    public boolean npcButtonsHidden() {
+        return anim.active();
+    }
+
+    @Override
+    public boolean keyPressed(int key, int scan, int mods) {
+        if (anim.active()) return true; // ESC 포함 모든 키를 막는다
+        return super.keyPressed(key, scan, mods);
+    }
+
+    @Override
+    public boolean keyReleased(int key, int scan, int mods) {
+        if (anim.active()) return true;
+        return super.keyReleased(key, scan, mods);
+    }
+
+    @Override
+    public boolean charTyped(char c, int mods) {
+        if (anim.active()) return true;
+        return super.charTyped(c, mods);
+    }
+
+    @Override
+    public boolean mouseReleased(double mx, double my, int button) {
+        if (anim.active()) return true;
+        return super.mouseReleased(mx, my, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
+        if (anim.active()) return true;
+        return super.mouseDragged(mx, my, button, dx, dy);
+    }
+
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        if (anim.active()) {
+            anim.skip(); // 어느 단추로 눌러도 연출만 넘긴다
+            return true;
+        }
         if (button == 0) {
-            if (anim.active()) {
-                anim.skip();
-                return true;
-            }
             if (results != null && resultTicks < results.size() * 3 + 4) {
                 resultTicks = results.size() * 3 + 4; // 클릭하면 바로 모두 뒤집기
                 return true;
@@ -791,6 +827,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
+        if (anim.active()) return true;
         scroll = Math.max(0, scroll - (int) Math.signum(delta) * 2);
         layout();
         return true;

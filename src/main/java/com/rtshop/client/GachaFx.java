@@ -46,17 +46,18 @@ import java.util.List;
  */
 public final class GachaFx {
     public static final int COMMON = 0, UNCOMMON = 1, RARE = 2, EPIC = 3, LEGENDARY = 4, YAMATO = 5;
-    private static final int[] LEN = {28, 38, 56, 88, 182, 344};
+    private static final int[] LEN = {28, 38, 56, 88, 182, 390};
 
     // 희귀
     private static final int RARE_HOLD = 32, RARE_BURST = 40;
     // 영웅
     private static final int EPIC_BOLTS = 48, EPIC_IMPLODE = 62, EPIC_BURST = 66;
-    // 전설: 영웅인 척(~63) → 암전(64) → 전설 카드(78) → 종 네 번 → 폭발(142). YAMATO 도 129 틱까지 똑같다
+    // 전설: 영웅인 척(~63) → 암전(64) → 전설 카드(78) → 종 네 번 → 폭발(142).
+    // YAMATO 도 폭발까지 똑같이 간다. 다만 폭발 뒤 상품 대신 뒤집히지 않은 카드가 떠 있다가 YM_START 에 꺼진다
     private static final int LEG_DARK = 64, LEG_STRIKE = 78, LEG_IMPLODE = 136, LEG_BURST = 142;
     private static final int[] LEG_BELLS = {92, 104, 116, 126};
     // YAMATO: 음악(rtshop:gacha.yamato)이 YM_START 에 시작. 아래는 음악 시간(초) × 20 + YM_START
-    public static final int YM_START = 130;              // 0.00초 다시 암전
+    public static final int YM_START = LEG_BURST + 34;   // 0.00초 다시 암전 (전설 카드가 충분히 머문 뒤)
     private static final int YM_DRAW = YM_START + 8;     // 0.40초 칼을 뽑는다
     /** 음악 속 차원참 (초). tools/gacha_audio.py 의 SLASH 와 같아야 한다. */
     private static final double[] SLASH_TIMES = {0.75, 0.816, 0.88, 0.941, 1.0, 1.057, 1.112, 1.165, 1.217, 1.267, 1.316, 1.363, 1.409, 1.454,
@@ -989,7 +990,17 @@ public final class GachaFx {
                 g.pose().popPose();
             }
             float pop = since < 12 ? 1 + 0.7F * (1 - since / 12F) * Mth.cos(since * 0.9F) : 1;
-            item(g, 4.8F * pop, Mth.sin(tt * 0.12F) * 2);
+            if (grade == YAMATO) {
+                // 상품은 아직 보여 주지 않는다: 금이 간 카드가 떠 있다가, 끝에서 흔들리며 빛을 잃는다
+                float end = Mth.clamp((tt - (YM_START - 10)) / 10F, 0, 1);
+                g.pose().pushPose();
+                g.pose().translate((rnd.nextFloat() - 0.5F) * 3 * end, Mth.sin(tt * 0.12F) * 2, 20);
+                g.pose().scale(1.25F * pop, 1.25F * pop, 1);
+                cardBack(g, font, lerpRgb(GOLD_LIGHT, 0x2A3A66, end), 1, lerpRgb(0xFFF6C0, YM_CYAN, end));
+                g.pose().popPose();
+            } else {
+                item(g, 4.8F * pop, Mth.sin(tt * 0.12F) * 2);
+            }
             int col = lerpRgb(GOLD, 0xFFFFFF, 0.5F + 0.5F * Mth.sin(tt * 0.35F));
             label(g, font, "rtshop.gacha.fx.legendary", col, since, 3.0F, true);
         }
@@ -997,6 +1008,7 @@ public final class GachaFx {
         g.pose().popPose();
         if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 7) flash(g, width, height, 0xFFF8E0, 0.9F * (1 - (tt - LEG_STRIKE) / 7F) * (1 - (tt - LEG_STRIKE) / 7F));
         if (tt >= LEG_BURST && tt < LEG_BURST + 12) flash(g, width, height, 0xFFF3C8, 1 - (tt - LEG_BURST) / 12F);
+        if (grade == YAMATO && tt > YM_START - 6) flash(g, width, height, 0x000000, Mth.clamp((tt - (YM_START - 6)) / 6F, 0, 1) * 0.85F);
     }
 
     /** 전설 암전: 모든 것이 꺼지고, 어둠 한가운데 금빛 금이 세로로 벌어진다. */

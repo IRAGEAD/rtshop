@@ -83,7 +83,7 @@ public final class ClientSelfTest {
     private static final String[] NPCS = {"fisher", "farmer", "food", "blacksmith", "general", "land", "bank",
             "attendance", "gacha", "job"};
     /** FX_SHOTS 의 개수 (클래스 초기화 순서 때문에 숫자로 둔다). */
-    private static final int FX_COUNT = 21;
+    private static final int FX_COUNT = 22;
     private static final int FX_END = LAST + 18 + 5 + FX_COUNT;
     private static final int NPC_END = FX_END + NPCS.length * 3;
     private static volatile int gachaNpc = -1;
@@ -301,7 +301,8 @@ public final class ClientSelfTest {
             {3, 30, "54g_fx_epic_circle", 2}, {3, 52, "54h_fx_epic_lightning", 2}, {3, 74, "54i_fx_epic_reveal", 2},
             {4, 40, "54j_fx_legendary_fake_epic", 2}, {4, 72, "54k_fx_legendary_blackout", 2}, {4, 80, "54l_fx_legendary_pop", 2},
             {4, 112, "54m_fx_legendary_gold", 2}, {4, 156, "54n_fx_legendary_reveal", 2},
-            {5, 120, "54o_fx_yamato_as_legendary", 2}, {5, 142, "54p_fx_yamato_draw", 2}, {5, 168, "54q_fx_yamato_slashes", 2},
+            {5, 120, "54o_fx_yamato_as_legendary", 2}, {5, 160, "54o2_fx_yamato_legendary_card", 2},
+            {5, com.rtshop.client.GachaFx.YM_START + 12, "54p_fx_yamato_draw", 2}, {5, com.rtshop.client.GachaFx.YM_START + 38, "54q_fx_yamato_slashes", 2},
             {5, com.rtshop.client.GachaFx.YM_BREAK - 3, "54r_fx_yamato_shatter", 7}, {5, com.rtshop.client.GachaFx.YM_BREAK - 3, "54t_fx_yamato_sheathe", 22},
             {5, com.rtshop.client.GachaFx.YM_BREAK - 3, "54u_fx_yamato_boom", 30}, {5, com.rtshop.client.GachaFx.YM_BOOM + 40, "54s_fx_yamato_reveal", 2},
     };
@@ -358,6 +359,12 @@ public final class ClientSelfTest {
                 Object[] prev = FX_SHOTS[i - 1];
                 shot(mc, (String) prev[2]);
                 check("the " + prev[2] + " scene plays", gs != null && gs.fxActiveForTest(), gs == null ? "no screen" : gs.fxTickForTest());
+                if (i == 1 && gs != null) {
+                    // 연출 중에는 대화 단추가 없고, ESC 같은 키도 먹지 않는다
+                    check("no NPC buttons during the gacha scene", NpcButtons.width(gs) == 0, NpcButtons.width(gs));
+                    gs.keyPressed(256, 0, 0);
+                    check("keys do nothing during the gacha scene", mc.screen == gs && gs.fxActiveForTest(), mc.screen);
+                }
                 if (i < FX_SHOTS.length) {
                     fxShot(gs, i);
                 } else {

@@ -71,6 +71,11 @@ public final class NpcButtons {
     public interface Host {
         /** {x, y}: 단추 줄의 왼쪽 위. 높이는 {@link #H}. */
         int[] npcButtonSpot();
+
+        /** true 면 단추를 하나도 그리지 않는다 (뽑기 연출 중 등). */
+        default boolean npcButtonsHidden() {
+            return false;
+        }
     }
 
     public static final int H = 14;
@@ -92,6 +97,7 @@ public final class NpcButtons {
     private static java.util.List<int[]> layout(Screen s) {
         java.util.List<int[]> out = new java.util.ArrayList<>();
         Minecraft mc = Minecraft.getInstance();
+        if (s instanceof Host hh && hh.npcButtonsHidden()) return out;
         int[] spot = s instanceof Host h ? h.npcButtonSpot() : new int[]{6, 6};
         int x = spot[0];
         if (bound.get() == s) {

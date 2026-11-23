@@ -172,9 +172,9 @@ public final class Dialogue {
                 l.add(pool.get(RNG.nextInt(pool.size())));
                 t.add("lines", l);
                 // 누를 때마다 다른 말을 하도록 전체 목록도 보낸다
-                JsonArray all = new JsonArray();
-                pool.forEach(all::add);
-                t.add("pool", all);
+                JsonArray every = new JsonArray();
+                pool.forEach(every::add);
+                t.add("pool", every);
                 topics.add(t);
             }
         }
