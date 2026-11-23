@@ -235,9 +235,12 @@ jobs:
             {
               echo "== $J"
               unzip -p "$J" 'META-INF/mods.toml' 2>/dev/null | grep -v "^#" | head -n 30
-              for c in $(unzip -l "$J" | awk '{print $4}' | grep -i -E "config.*\.class$" | head -n 40); do
-                echo "---- $c"; unzip -p "$J" "$c" | strings -n 4 | grep -i -E "quest|dialog|tutorial|guide|register|SERVER|COMMON|CLIENT" | head -n 60
+              echo "== files with quest/config/toml/json in the name"
+              unzip -l "$J" | awk '{print $4}' | grep -i -E "quest|\.toml|settings|defaults?/" | head -n 80
+              for c in $(unzip -l "$J" | awk '{print $4}' | grep -i -E "(quest/|config/WorldSettings|config/FantasyConfigs|WorldFiles|SettingsSync|ConfigSchema\.class)" | grep "\.class$" | head -n 40); do
+                echo "---- $c"; unzip -p "$J" "$c" | strings -n 3 | grep -v "^[(L\[]" | grep -i -E "quest|enable|toml|json|world|setting|\." | head -n 80
               done
+              for f in $(unzip -l "$J" | awk '{print $4}' | grep -i -E "(\.toml|quest.*\.json|settings.*\.json)$" | head -n 10); do echo "---- $f"; unzip -p "$J" "$f" | head -c 4000; echo; done
             } > /tmp/inspect/mod-fantasy.txt 2>&1
           fi
           cd /tmp/inspect
