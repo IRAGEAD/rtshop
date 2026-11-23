@@ -689,13 +689,17 @@ public final class SelfTest {
             boolean bought = PlotManager.buyLand(a, l);
             check("buying a farmland lot removes the crops and structures standing on it",
                     bought && level.getBlockState(new BlockPos(X + 1, Y + 1, Z + 1)).isAir() && level.getBlockState(new BlockPos(X + 4, Y + 1, Z + 4)).isAir()
-                            && level.getBlockState(new BlockPos(X + 4, Y + 3, Z + 4)).isAir(), bought);
+                            && level.getBlockState(new BlockPos(X + 4, Y + 3, Z + 4)).isAir(),
+                    bought + " " + level.getBlockState(new BlockPos(X + 1, Y + 1, Z + 1)) + " " + level.getBlockState(new BlockPos(X + 4, Y + 1, Z + 4))
+                            + " " + level.getBlockState(new BlockPos(X + 4, Y + 3, Z + 4)) + " ground=" + level.getBlockState(new BlockPos(X + 1, Y, Z + 1)));
             check("...but keeps the farmland, the ground and the water channel",
                     level.getBlockState(new BlockPos(X + 1, Y, Z + 1)).is(B[1]) && level.getBlockState(new BlockPos(X + 4, Y, Z + 4)).is(B[3])
                             && level.getBlockState(new BlockPos(X + 2, Y, Z + 2)).is(B[5]) && level.getBlockState(new BlockPos(X + 1, Y - 1, Z + 1)).is(B[0]));
             check("...and touches nothing outside the lot's own cells",
                     level.getBlockState(new BlockPos(X + 7, Y + 1, Z + 7)).is(B[2]) && level.getBlockState(new BlockPos(X - 1, Y + 1, Z + 3)).is(B[2])
-                            && level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 3)).is(B[2]));
+                            && level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 3)).is(B[2]),
+                    level.getBlockState(new BlockPos(X + 7, Y + 1, Z + 7)) + " " + level.getBlockState(new BlockPos(X - 1, Y + 1, Z + 3)) + " "
+                            + level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 3)));
             boolean backup = false;
             java.nio.file.Path dir = PlotManager.plotBackupDir(server);
             if (Files.isDirectory(dir)) {
@@ -2110,10 +2114,17 @@ public final class SelfTest {
 
     /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
     private static void story(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
-        if (net.minecraftforge.fml.ModList.get().isLoaded("fantasy")) {
+        {
+            StringBuilder ids = new StringBuilder();
+            for (net.minecraftforge.forgespi.language.IModInfo m : net.minecraftforge.fml.ModList.get().getMods())
+                if ((m.getModId() + m.getDisplayName()).toLowerCase(java.util.Locale.ROOT).contains("fant")) ids.append(m.getModId()).append('=').append(m.getDisplayName()).append(' ');
+            RtShop.LOGGER.info("[rtshop-selftest] Fantasy mods: {} -> {}", ids, com.rtshop.compat.FantasyQuestsOff.modId());
+        }
+        if (com.rtshop.compat.FantasyQuestsOff.modId() != null) {
             com.rtshop.compat.FantasyQuestsOff.apply(server, true);
             RtShop.LOGGER.info("[rtshop-selftest] Fantasy Mounts quest settings: {}", com.rtshop.compat.FantasyQuestsOff.LAST);
-            check("Fantasy Mounts quests are off by default (its quest settings were found)", java.nio.file.Files.exists(com.rtshop.compat.FantasyQuestsOff.marker(server)));
+            check("Fantasy Mounts quests are off by default (its quest settings were found)", java.nio.file.Files.exists(com.rtshop.compat.FantasyQuestsOff.marker(server)),
+                    com.rtshop.compat.FantasyQuestsOff.modId() + " " + com.rtshop.compat.FantasyQuestsOff.LAST);
         }
         QuestManager.Loaded l = QuestManager.loaded();
         List<String> story = new ArrayList<>();

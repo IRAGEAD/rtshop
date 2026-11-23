@@ -229,6 +229,17 @@ jobs:
               unzip -p "$J" $(unzip -l "$J" | awk '{print $4}' | grep "lang/en_us.json" | head -1) 2>/dev/null | head -c 60000
             } > "/tmp/inspect/mod-$pat.txt" 2>&1
           done
+          # Fantasy Mounts: 퀘스트 설정이 어느 설정 파일(서버/공용/클라이언트)의 어떤 키인지
+          J="$(ls packcache/*.jar | grep -i "fantasy" | head -1)"
+          if [ -n "$J" ]; then
+            {
+              echo "== $J"
+              unzip -p "$J" 'META-INF/mods.toml' 2>/dev/null | grep -v "^#" | head -n 30
+              for c in $(unzip -l "$J" | awk '{print $4}' | grep -i -E "config.*\.class$" | head -n 40); do
+                echo "---- $c"; unzip -p "$J" "$c" | strings -n 4 | grep -i -E "quest|dialog|tutorial|guide|register|SERVER|COMMON|CLIENT" | head -n 60
+              done
+            } > /tmp/inspect/mod-fantasy.txt 2>&1
+          fi
           cd /tmp/inspect
           git init -q -b ci-inspect
           git config user.name "github-actions"

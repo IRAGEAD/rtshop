@@ -35,6 +35,14 @@ public final class FantasyQuestsOff {
         return server.getWorldPath(LevelResource.ROOT).resolve("rtshop_fantasy_quests_off");
     }
 
+    /** 설치된 Fantasy Mounts 의 모드 id (이름이나 id 로 찾는다). 없으면 null. */
+    public static String modId() {
+        for (String id : MOD_IDS) if (ModList.get().isLoaded(id)) return id;
+        for (net.minecraftforge.forgespi.language.IModInfo m : ModList.get().getMods())
+            if (m.getDisplayName().toLowerCase(java.util.Locale.ROOT).contains("fantasy mounts")) return m.getModId();
+        return null;
+    }
+
     @SubscribeEvent
     public static void onStarted(ServerStartedEvent event) {
         apply(event.getServer(), false);
@@ -43,13 +51,7 @@ public final class FantasyQuestsOff {
     /** force: 표시 파일이 있어도 다시 끈다 (점검용). 끈 설정 수. */
     public static int apply(MinecraftServer server, boolean force) {
         LAST.clear();
-        String mod = null;
-        for (String id : MOD_IDS) {
-            if (ModList.get().isLoaded(id)) {
-                mod = id;
-                break;
-            }
-        }
+        String mod = modId();
         if (mod == null) return 0;
         Path mark = marker(server);
         if (!force && Files.exists(mark)) return 0;
