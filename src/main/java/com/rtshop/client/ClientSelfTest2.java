@@ -642,6 +642,36 @@ final class ClientSelfTest2 {
             waitTicks(5);
         });
 
+        // ------------------------------------------------------------ NPC 대화 상자
+        add(mc -> {
+            com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString("{\"npc\":\"quest_order_elder\",\"entity\":-1,\"name\":\"수도회 장로 에르윈\","
+                    + "\"mode\":\"talk\",\"greet\":\"불을 지키고, 봉인을 지킨다. …견습이여, 오늘은 무엇을 배우러 왔나.\",\"quests\":1,"
+                    + "\"topics\":[{\"id\":\"_chatter\",\"title\":\"요즘 어떠세요?\",\"lines\":[\"이 장갑 말인가? 오래된 화상 자국이 있어서 말일세.\"]},"
+                    + "{\"id\":\"order\",\"title\":\"잿불 수도회에 대해\",\"new\":true,\"lines\":[\"잿불 수도회는 불을 지키는 자들이 세운 곳일세.\"]}]}").getAsJsonObject();
+            DialogueScreen.open(o);
+            waitTicks(30);
+        });
+        add(mc -> {
+            check("the dialogue box opens and writes the greeting", mc.screen instanceof DialogueScreen d && !d.sceneForTest());
+            shot(mc, "113_dialogue_greet");
+            if (mc.screen instanceof DialogueScreen d) d.skipForTest();
+            waitTicks(4);
+        });
+        add(mc -> {
+            check("after the greeting the player picks a topic (chatter, lore, quests, goodbye)", mc.screen instanceof DialogueScreen d && d.choosingForTest());
+            shot(mc, "114_dialogue_choices");
+            com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString("{\"npc\":\"quest_order_archivist\",\"entity\":-1,\"name\":\"기록관 이사벨\","
+                    + "\"mode\":\"scene\",\"greet\":\"\",\"topics\":[],\"lines\":[\"기록관 이사벨: 아, 장로님이 보내셨군요! 서약서는 여기 있어요.\","
+                    + "\"탐험대장 로란: 나도 왔다.\"]}").getAsJsonObject();
+            DialogueScreen.open(o);
+            waitTicks(40);
+        });
+        add(mc -> {
+            check("a quest scene plays in the dialogue box", mc.screen instanceof DialogueScreen d && d.sceneForTest());
+            shot(mc, "115_dialogue_scene");
+            mc.setScreen(null);
+            waitTicks(2);
+        });
         // ------------------------------------------------------------ 이야기로 열리는 장비 진열대
         add(mc -> {
             check("the server tells the client which gear tiers wait for which chapter (rare: chapter 1, epic: chapter 1)",
