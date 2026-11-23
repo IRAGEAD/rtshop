@@ -1642,6 +1642,14 @@ public final class ClientSelfTest {
             }
             case LAST -> {
                 shot(mc, "37_jedit_types");
+                if (mc.screen instanceof JobEditScreen s) {
+                    s.showCategoriesForTest(1);
+                    int before = s.typeCountForTest();
+                    s.addTypeForTest();
+                    check("the job editor can add a new weapon type (category) that the per-job weapon table then uses",
+                            s.typeCountForTest() == before + 1 && s.typeExistsForTest("custom_1") && s.dirtyForTest(), before + " -> " + s.typeCountForTest());
+                    s.showCategoriesForTest(2);
+                }
                 mc.setScreen(null);
                 onServer(mc, sp -> {
                     com.rtshop.job.Jobs.force(sp, "combat", "");

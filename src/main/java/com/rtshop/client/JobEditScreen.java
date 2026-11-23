@@ -208,6 +208,7 @@ public class JobEditScreen extends Screen {
         hits.clear();
         texts.clear();
         icons.clear();
+        clearWidgets();
         // 왼쪽 목록
         JsonArray jobs = jobs();
         for (int i = 0; i < jobs.size(); i++) {
@@ -224,6 +225,7 @@ public class JobEditScreen extends Screen {
         }
         hit(fx + 6, top() + jobs.size() * 15 + 6, LIST_W, 14, () -> tr("rtshop.jedit.weapon_types"), () -> selected != -1, b -> {
             selected = -1;
+            typesTab = 0;
             scroll = 0;
             rebuild();
         });
@@ -236,7 +238,24 @@ public class JobEditScreen extends Screen {
         });
 
         if (selected == -1) {
-            buildTypes();
+            int tw = (rw() - 4) / 2;
+            hit(rx(), fy + 27, tw, 14, () -> tr("rtshop.jedit.sub_overrides"), () -> typesTab == 1 || typesTab == 2, b -> {
+                typesTab = 0;
+                scroll = 0;
+                rebuild();
+            });
+            hit(rx() + tw + 4, fy + 27, tw, 14, () -> tr("rtshop.jedit.sub_categories"), () -> typesTab == 0, b -> {
+                typesTab = 1;
+                scroll = 0;
+                rebuild();
+            });
+            if (typesTab == 0) {
+                buildTypes();
+            } else if (typesTab == 1) {
+                buildCategories();
+            } else {
+                buildCategoryItems();
+            }
             return;
         }
         JsonObject j = job();
@@ -497,6 +516,253 @@ public class JobEditScreen extends Screen {
 
     public ChoicePopup popupForTest() {
         return popup;
+    }
+
+    // ------------------------------------------------------------------ 무기 종류 (카테고리) 관리
+
+    /** 0 = 아이템 예외, 1 = 무기 종류 목록, 2 = 고른 종류에 든 아이템 */
+    private int typesTab = 0;
+    private int selType = 0;
+
+    /** 모델의 무기 종류 배열 (없으면 지금 설정에서 채운다). */
+    private JsonArray typeArray() {
+        if (!model.has("weaponTypes") || !model.get("weaponTypes").isJsonArray()) {
+            JsonArray a = new JsonArray();
+            JobConfig cfg = parsed();
+            for (WeaponTypes.Type t : cfg != null ? cfg.weaponTypes : WeaponTypes.defaults()) a.add(WeaponTypes.write(t));
+            model.add("weaponTypes", a);
+        }
+        return model.getAsJsonArray("weaponTypes");
+    }
+
+    private static String joinList(JsonObject t, String key) {
+        if (!t.has(key) || !t.get(key).isJsonArray()) return "";
+        List<String> l = new ArrayList<>();
+        for (JsonElement e : t.getAsJsonArray(key)) l.add(e.getAsString());
+        return String.join(", ", l);
+    }
+
+    private static void setList(JsonObject t, String key, String text) {
+        JsonArray a = new JsonArray();
+        for (String part : text.split(",")) {
+            String v = part.trim().toLowerCase(Locale.ROOT);
+            if (!v.isEmpty()) a.add(v);
+        }
+        t.add(key, a);
+    }
+
+    private void buildCategories() {
+        JsonArray types = typeArray();
+        int x = rx() + 6;
+        int y = top() + 4;
+        int listRows = 7;
+        selType = Math.max(0, Math.min(selType, types.size() - 1));
+        scroll = Math.max(0, Math.min(Math.max(0, types.size() - listRows), scroll));
+        for (int i = scroll; i < Math.min(types.size(), scroll + listRows); i++) {
+            final int idx = i;
+            JsonObject t = types.get(i).getAsJsonObject();
+            boolean melee = !t.has("melee") || t.get("melee").getAsBoolean();
+            icons.add(new Icon(x, y - 2, icon(t.has("icon") ? t.get("icon").getAsString() : "")));
+            hit(x + 16, y - 1, rw() - 166, 13, () -> (idx == selType ? "▶ " : "") + t.get("name").getAsString(), () -> idx != selType, b -> {
+                selType = idx;
+                rebuild();
+            });
+            int bx = rx() + rw() - 146;
+            hit(bx, y - 1, 46, 13, () -> tr(melee ? "rtshop.jedit.melee" : "rtshop.jedit.ranged"), () -> true, b -> {
+                t.addProperty("melee", !melee);
+                dirty = true;
+                rebuild();
+            });
+            hit(bx + 48, y - 1, 14, 13, () -> "▲", () -> idx > 0, b -> {
+                moveType(idx, -1);
+            });
+            hit(bx + 64, y - 1, 14, 13, () -> "▼", () -> idx < types.size() - 1, b -> {
+                moveType(idx, 1);
+            });
+            hit(bx + 80, y - 1, 40, 13, () -> tr("rtshop.jedit.items_of"), () -> true, b -> {
+                selType = idx;
+                typesTab = 2;
+                scroll = 0;
+                rebuild();
+            });
+            hit(bx + 122, y - 1, 14, 13, () -> "X", () -> types.size() > 1, b -> deleteType(idx));
+            y += 15;
+        }
+        hit(x, y, 110, 13, () -> tr("rtshop.jedit.add_type"), () -> true, b -> addType());
+        text(x + 116, y + 3, () -> tr("rtshop.jedit.order_hint"), Ui.C_INK_SOFT);
+        y += 18;
+        if (types.isEmpty()) return;
+        JsonObject t = types.get(selType).getAsJsonObject();
+        // 고른 종류의 자세한 설정
+        g2(x, y, tr("rtshop.jedit.f_name"), t.get("name").getAsString(), 40, v -> {
+            t.addProperty("name", v.isBlank() ? t.get("id").getAsString() : v);
+            dirty = true;
+        });
+        hit(rx() + rw() - 96, y - 1, 90, 14, () -> tr("rtshop.jedit.f_icon"), () -> true, b -> {
+            if (minecraft != null) {
+                minecraft.setScreen(new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
+                    t.addProperty("icon", v);
+                    dirty = true;
+                }));
+            }
+        });
+        y += 17;
+        g2(x, y, tr("rtshop.jedit.f_has"), joinList(t, "nameHas"), 400, v -> {
+            setList(t, "nameHas", v);
+            dirty = true;
+        });
+        y += 17;
+        g2(x, y, tr("rtshop.jedit.f_ends"), joinList(t, "nameEnds"), 200, v -> {
+            setList(t, "nameEnds", v);
+            dirty = true;
+        });
+        y += 17;
+        g2(x, y, tr("rtshop.jedit.f_mods"), joinList(t, "mods"), 200, v -> {
+            setList(t, "mods", v);
+            dirty = true;
+        });
+        y += 17;
+        g2(x, y, tr("rtshop.jedit.f_classes"), joinList(t, "classes"), 200, v -> {
+            setList(t, "classes", v);
+            dirty = true;
+        });
+        text(x, y + 16, () -> tr("rtshop.jedit.classes_hint"), Ui.C_INK_SOFT);
+    }
+
+    /** 이름표 + 입력 칸 한 줄 */
+    private void g2(int x, int y, String label, String value, int max, Consumer<String> onChange) {
+        text(x, y + 3, () -> label, Ui.C_GOLD_DARK);
+        int lx = x + 70;
+        int w = rx() + rw() - 104 - lx;
+        net.minecraft.client.gui.components.EditBox box = new net.minecraft.client.gui.components.EditBox(this.font, lx, y, w, 13, Component.literal(label));
+        box.setMaxLength(max);
+        box.setValue(value);
+        box.setResponder(onChange);
+        addRenderableWidget(box);
+    }
+
+    private void moveType(int idx, int dir) {
+        JsonArray a = typeArray();
+        int j = idx + dir;
+        if (j < 0 || j >= a.size()) return;
+        JsonElement e = a.get(idx);
+        a.set(idx, a.get(j));
+        a.set(j, e);
+        if (selType == idx) selType = j;
+        dirty = true;
+        rebuild();
+    }
+
+    private void addType() {
+        JsonArray a = typeArray();
+        int n = 1;
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        for (JsonElement e : a) ids.add(e.getAsJsonObject().get("id").getAsString());
+        while (ids.contains("custom_" + n)) n++;
+        WeaponTypes.Type t = new WeaponTypes.Type();
+        t.id = "custom_" + n;
+        t.name = tr("rtshop.jedit.new_type", n);
+        t.icon = "minecraft:iron_sword";
+        // 새 종류는 맨 위: 이름 규칙이 다른 종류보다 먼저 맞도록
+        JsonArray b = new JsonArray();
+        b.add(WeaponTypes.write(t));
+        a.forEach(b::add);
+        model.add("weaponTypes", b);
+        selType = 0;
+        scroll = 0;
+        dirty = true;
+        rebuild();
+    }
+
+    /** 종류를 지운다: 그 종류로 정한 아이템 예외는 '자동'으로, 직업의 그 종류 상성은 지운다. */
+    private void deleteType(int idx) {
+        JsonArray a = typeArray();
+        if (a.size() <= 1) return;
+        String id = a.get(idx).getAsJsonObject().get("id").getAsString();
+        a.remove(idx);
+        JsonObject over = obj(model, "weaponOverrides");
+        for (String k : new ArrayList<>(over.keySet())) if (id.equals(over.get(k).getAsString())) over.remove(k);
+        for (JsonElement je : jobs()) {
+            JsonObject j = je.getAsJsonObject();
+            if (j.has("weapons") && j.get("weapons").isJsonObject()) j.getAsJsonObject("weapons").remove(id);
+        }
+        selType = Math.max(0, Math.min(selType, a.size() - 1));
+        dirty = true;
+        rebuild();
+    }
+
+    /** 지금 설정(저장 전)으로 이 종류에 들어가는 아이템 */
+    private List<String> itemsOfType(String typeId) {
+        JobConfig cfg = parsed();
+        List<String> out = new ArrayList<>();
+        if (cfg == null) return out;
+        for (Item item : ForgeRegistries.ITEMS) {
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            if (rl == null) continue;
+            if (typeId.equals(WeaponTypes.classify(item, cfg.weaponTypes, cfg.weaponOverrides))) out.add(rl.toString());
+        }
+        return out;
+    }
+
+    private List<String> itemsCache;
+    private String itemsCacheKey = "";
+
+    private void buildCategoryItems() {
+        JsonArray types = typeArray();
+        if (types.isEmpty()) {
+            typesTab = 1;
+            return;
+        }
+        selType = Math.max(0, Math.min(selType, types.size() - 1));
+        JsonObject t = types.get(selType).getAsJsonObject();
+        String typeId = t.get("id").getAsString();
+        String key = typeId + "|" + model.toString().hashCode();
+        if (itemsCache == null || !key.equals(itemsCacheKey)) {
+            itemsCache = itemsOfType(typeId);
+            itemsCacheKey = key;
+        }
+        List<String> ids = itemsCache;
+        int x = rx() + 6;
+        int y = top() + 4;
+        int w = rw() - 12;
+        hit(x, y - 1, 60, 13, () -> "◀ " + tr("rtshop.jedit.back"), () -> true, b -> {
+            typesTab = 1;
+            scroll = 0;
+            rebuild();
+        });
+        text(x + 66, y + 2, () -> tr("rtshop.jedit.items_title", t.get("name").getAsString(), ids.size()), Ui.C_GOLD_DARK);
+        y += 16;
+        int maxRows = Math.max(1, (top() + bodyH() - 20 - y) / 15);
+        scroll = Math.max(0, Math.min(Math.max(0, ids.size() - maxRows), scroll));
+        for (int i = scroll; i < Math.min(ids.size(), scroll + maxRows); i++) {
+            String id = ids.get(i);
+            icons.add(new Icon(x, y - 2, icon(id)));
+            text(x + 18, y + 2, () -> Ui.clip(this.font, itemName(id), w - 120), Ui.C_INK);
+            addCycle(rx() + rw() - 100, y, id);
+            y += 15;
+        }
+        if (ids.isEmpty()) text(x, y + 2, () -> tr("rtshop.jedit.items_none"), Ui.C_INK_SOFT);
+        text(x, top() + bodyH() - 12, () -> tr("rtshop.jedit.items_hint"), Ui.C_INK_SOFT);
+    }
+
+    /** 점검용 */
+    public int typeCountForTest() {
+        return typeArray().size();
+    }
+
+    public void addTypeForTest() {
+        addType();
+    }
+
+    public void showCategoriesForTest(int sub) {
+        selected = -1;
+        typesTab = sub;
+        rebuild();
+    }
+
+    public boolean typeExistsForTest(String id) {
+        for (JsonElement e : typeArray()) if (e.getAsJsonObject().get("id").getAsString().equals(id)) return true;
+        return false;
     }
 
     // ------------------------------------------------------------------ 저장
