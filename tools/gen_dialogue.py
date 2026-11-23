@@ -3,7 +3,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
-VERSION = 3
+VERSION = 4
 
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
@@ -386,6 +386,177 @@ more("quest_order_elder",
      chatter=[g("일곱 봉인… 천 년이 이렇게 짧을 줄이야.", flags=["story_ch3_done"], notFlags=["erwin_betrayal"])],
      topics=[topic("gloves", "장갑", ["이 장갑은 벗을 수가 없네. 벗으면… 다들 놀랄 걸세.",
                                      "언젠가 보여 주지. 그때가 오면."], flags=["clue_gloved_hand"], notFlags=["erwin_betrayal"])])
+
+
+# ---------------------------------------------------------------- 직업 스승 다섯 (일상 이야기 + 스토리 이야기)
+#  레온(검술 교관)  해라체, 엄하고 짧게 "~다, ~지"
+#  브론(전사 대장)  호탕한 해라체 "하하! ~라고!"
+#  가렌(방패 수호자) 말수 적은 해라체, 한두 마디
+#  리아(사냥꾼)     반말 해체 "~야, ~지?"
+#  엘리스(대마법사)  다정한 노스승 "~단다, ~구나"
+def b(ko, en): return {"ko": ko, "en": en}
+def gb(ko, en, **kw):
+    o = {"text": b(ko, en)}
+    if kw: o.update(need(**kw))
+    return o
+def tb(id, ko, en, lines, **kw):
+    o = {"id": id, "title": b(ko, en), "lines": lines}
+    if kw: o.update(need(**kw))
+    return o
+
+N["quest_sword_master"] = {
+    "greet": [
+        b("검은 정직한 무기다. 휘두른 만큼만 돌려주지. …무슨 일이냐.", "A sword is an honest weapon. It gives back only what you swing. …What is it?"),
+        gb("수도회 견습이 됐다고? 칼끝이 흔들리면 서약도 흔들린다. 잊지 마라.", "An apprentice of the Order now? If your blade wavers, so does your oath. Remember that.", flags=["order_apprentice"]),
+        gb("장로 일은 들었다. …검을 내려놓지 마라. 지금은 더더욱.", "I heard about the Elder. …Don't put down your sword. Least of all now.", flags=["erwin_betrayal"]),
+    ],
+    "chatter": [
+        b("아침마다 천 번 휘두른다. 그래야 하루가 시작된 것 같지.", "A thousand swings every morning. Only then does the day feel started."),
+        b("숫돌은 매일 쓴다. 날이 무뎌지는 건 하루면 충분하다.", "I use the whetstone every day. One day is all it takes for an edge to dull."),
+        b("검술은 발에서 시작한다. 팔은 마지막이다.", "Swordplay starts at the feet. The arms come last."),
+        b("제자 중에 제일 빠른 놈은 제일 먼저 다쳤다. 빠른 것보다 정확한 게 낫다.", "My fastest student was the first to get hurt. Precise beats fast."),
+        gb("서리 숨결이 부는 산에 다녀왔다고? 칼날에 얼음이 끼면 바로 털어라.", "Back from the mountains with the frost breath? Shake the ice off your blade right away.", flags=["story_ch2_done"]),
+    ],
+    "topics": [
+        tb("sword_way", "검사의 길", "The way of the sword", [
+            b("검사는 한 걸음 안에서 싸운다. 그 한 걸음을 지배하는 자가 이긴다.", "A swordsman fights within a single step. Whoever rules that step wins."),
+            b("다른 무기를 들면 손이 어색해질 거다. 그게 검사의 대가다.", "Pick up another weapon and your hands will feel wrong. That is the price of the sword."),
+        ]),
+        tb("leon_past", "레온의 옛날", "Leon's past", [
+            b("나도 한때는 원정대에 들어가고 싶었다. 로란이 사람을 고를 때 말이다.", "I once wanted to join the expedition too. Back when Loran was choosing people."),
+            b("떨어졌다. 그 덕에 살아 있지. …돌아오지 못한 열두 명 중에 내 동기가 둘 있었다.", "I wasn't picked. That's why I'm alive. …Two of my classmates were among the twelve who never came back."),
+        ], flags=["story_ch1_done"]),
+        tb("leon_guardians", "깨어나는 수호자들", "The waking guardians", [
+            b("녹슨 기사와 싸웠다고? 그놈의 검은 무겁지만 느리다. 첫 휘두름을 피하면 길이 보인다.", "You fought the rusted knight? Its blade is heavy but slow. Dodge the first swing and you'll see the way in."),
+            b("수호자들이 왜 깨어났는지는 모른다. 다만 검을 든 놈은 다 이유가 있어서 든 거다.", "I don't know why the guardians woke. But anyone who takes up a blade has a reason."),
+        ], flags=["story_ch2_done"]),
+        tb("leon_erwin", "장로에 대해", "About the Elder", [
+            b("장로는 한 번도 검을 들지 않았다. 늘 장갑 낀 손을 등 뒤로 감췄지.", "The Elder never once held a sword. He always kept those gloved hands behind his back."),
+            b("…검을 들지 않는 자가 더 무서울 때가 있다. 이번에 알았다.", "…Sometimes the one who never draws a blade is the one to fear. I learned that this time."),
+        ], flags=["erwin_betrayal"]),
+    ],
+}
+
+N["quest_war_chief"] = {
+    "greet": [
+        b("하하! 덩치 좋은 녀석이 왔군! 오늘은 뭘 부수러 왔나?", "Ha ha! A sturdy one! What are we smashing today?"),
+        gb("견습이라고? 하하! 수도회 옷이 꽉 끼겠군! 근육 때문에!", "An apprentice? Ha! That Order robe must be tight. All that muscle!", flags=["order_apprentice"]),
+        gb("다 끝났다면서! 하하하! 오늘은 내가 산다! …술은 마르타한테 가서 받아 와라!", "I hear it's all over! Ha ha ha! Drinks are on me today! …Go get them from Martha!", flags=["story_done"]),
+    ],
+    "chatter": [
+        b("도끼 한 자루면 세상 웬만한 문제는 풀린다! 안 풀리면 두 자루다!", "One axe solves most of the world's problems! If not, use two!"),
+        b("밥은 많이 먹어라! 굶은 전사는 첫 번째 바람에 날아간다!", "Eat plenty! A starving warrior is blown away by the first gust!"),
+        b("어제 대장장이 브람이랑 팔씨름했다. …비겼다. 다음엔 이긴다!", "Arm-wrestled Bram the smith yesterday. …A draw. Next time I win!"),
+        b("전사는 맞으면서 배운다! 그러니까 많이 맞아라! 하하!", "Warriors learn by getting hit! So get hit a lot! Ha ha!"),
+        gb("거대한 쇠 기사가 쓰러졌다고? 그 녀석 투구 하나 가져오지 그랬냐! 내 방에 걸게!", "The giant iron knight fell? Should've brought me its helmet! I'd hang it on my wall!", flags=["story_ch2_done"]),
+    ],
+    "topics": [
+        tb("warrior_way", "전사의 길", "The way of the warrior", [
+            b("전사는 앞으로 간다! 뒤를 볼 시간에 한 걸음 더 간다!", "A warrior moves forward! Instead of looking back, take one more step!"),
+            b("빨리 달리는 다리, 무거운 걸 드는 팔. 그거면 된다! 섬세한 건 레온한테 배워라!", "Fast legs, strong arms. That's all you need! Learn the delicate stuff from Leon!"),
+        ]),
+        tb("bron_sea", "바다 이야기", "Sea stories", [
+            b("얼음 바다에 다녀왔다고? 나는 배 멀미가 심해서 못 간다! …비밀이다!", "You went to the frozen sea? I get terribly seasick, so I can't! …That's a secret!"),
+            b("오스카 영감님 동생 얘기는 들었다. 그 집 등불, 마을에서 제일 오래 켜져 있었지.", "I heard about old Oscar's brother. That lantern of his burned longer than any in town."),
+        ], flags=["story_ch3_done"]),
+        tb("bron_fight", "같이 싸우기", "Fighting together", [
+            b("혼자 싸우는 놈은 강해 보여도 오래 못 간다! 파티를 짜라! 최대 열두 명이다!", "Lone fighters look strong but don't last! Form a party! Up to twelve people!"),
+            b("불꽃 경기장에 간다면 날 불러라! …아, 나는 마을을 지켜야 하는구나. 하하! 대신 이 함성 가져가라! 우오오오!", "If you're going to the burning arena, call me! …Ah, I have to guard the town. Ha! Take this war cry instead! Raaargh!"),
+        ], flags=["story_ch4_done"]),
+    ],
+}
+
+N["quest_shield_keeper"] = {
+    "greet": [
+        b("…왔나.", "…You came."),
+        gb("견습. 방패는 들었나.", "Apprentice. Did you bring a shield?", flags=["order_apprentice"]),
+        gb("…다 돌아왔군. 좋다.", "…Everyone made it back. Good.", flags=["story_done"]),
+    ],
+    "chatter": [
+        b("방패에 흠집이 늘수록 뒤에 선 사람이 산다.", "The more scratches on the shield, the more people behind it live."),
+        b("…말은 적게. 방패는 높게.", "…Few words. Shield high."),
+        b("넘어지지 않는 법보다 일어나는 법을 먼저 배워라.", "Learn to stand back up before you learn not to fall."),
+        b("밤에는 성벽을 돈다. 잠이 안 와서가 아니다. …아마도.", "At night I walk the walls. Not because I can't sleep. …Probably."),
+        gb("남쪽 하늘이 붉다. 방패 끈을 다시 묶어 둬라.", "The southern sky is red. Retie your shield straps.", flags=["story_ch3_done"]),
+    ],
+    "topics": [
+        tb("tank_way", "탱커의 길", "The way of the tank", [
+            b("동료 앞에 서는 자가 가장 늦게 쓰러져야 한다.", "The one who stands before their comrades must be the last to fall."),
+            b("막을 때 방패를 밀어라. 받기만 하면 무너진다.", "Push the shield when you block. Only take hits, and you'll crumble."),
+        ]),
+        tb("garen_scar", "가렌의 흉터", "Garen's scar", [
+            b("…이 흉터? 스무 해 전이다.", "…This scar? Twenty years ago."),
+            b("원정대가 떠나던 날 부두에서 배웅했다. 짐을 들다 다쳤지. 그래서 못 갔다.", "I saw the expedition off at the docks. Hurt myself carrying their packs. So I couldn't go."),
+            b("…갔으면 막을 수 있었을까. 매일 생각한다.", "…Could I have shielded them if I'd gone? I think about it every day."),
+        ], flags=["story_ch1_done"]),
+        tb("garen_tags", "명패", "The name plates", [
+            b("로란이 명패를 받을 때마다 나도 이름을 외운다.", "Every time Loran takes back a name plate, I memorize the name too."),
+            b("열두 개. …다 모이면 성벽에 새길 거다.", "Twelve. …When they're all back, I'll carve them into the wall."),
+        ], flags=["story_ch2_done"]),
+    ],
+}
+
+N["quest_hunter"] = {
+    "greet": [
+        b("쉿, 바람 소리를 들어 봐. …응, 이제 말해도 돼. 무슨 일이야?", "Shh, listen to the wind. …Okay, you can talk now. What's up?"),
+        gb("견습이 됐구나! 수도회 사람들은 숲을 잘 안 오던데, 너는 자주 와.", "So you're an apprentice now! Order people rarely come to the woods, but you do.", flags=["order_apprentice"]),
+        gb("폭풍이 그쳤어. 새들이 돌아왔더라. 네 덕이지?", "The storms stopped. The birds came back. That was you, wasn't it?", flags=["story_done"]),
+    ],
+    "chatter": [
+        b("활은 눈보다 귀로 쏘는 거야. 바람이 어디로 부는지 먼저 들어.", "You shoot a bow with your ears more than your eyes. Listen to where the wind blows first."),
+        b("화살촉은 직접 갈아. 남이 간 건 어딘가 어긋나 있거든.", "Sharpen your own arrowheads. Someone else's are always off somewhere."),
+        b("여우는 똑똑해. 발자국을 일부러 두 번 밟고 지나가.", "Foxes are clever. They step in their own tracks on purpose."),
+        b("오늘 사슴을 봤는데 안 쐈어. 새끼가 있었거든.", "I saw a deer today but didn't shoot. It had a fawn."),
+        gb("남쪽 사막 피라미드 근처엔 바람이 이상하게 불어. 화살이 자꾸 왼쪽으로 휘어.", "The wind blows strangely near the desert pyramid. My arrows keep curving left.", flags=["order_apprentice"]),
+    ],
+    "topics": [
+        tb("archer_way", "궁수의 길", "The way of the archer", [
+            b("멀수록 세게 박혀. 거리를 두는 게 궁수의 무기야.", "The farther away, the harder it hits. Distance is an archer's weapon."),
+            b("대신 가까이 오면 끝이야. 그러니까 발을 멈추지 마.", "But if they get close, it's over. So never stop moving."),
+        ]),
+        tb("ria_forest", "숲의 소문", "Forest rumors", [
+            b("밤에 숲 깊은 곳에서 노래가 들릴 때가 있어. 따라가면 안 돼. 진짜야.", "Sometimes you hear singing deep in the woods at night. Don't follow it. I mean it."),
+            b("햇빛 가면을 쓴 무리가 남쪽 정글에 있대. 태양을 섬긴다나.", "They say a tribe in sun masks lives in the southern jungle. Sun worshippers, apparently."),
+        ], flags=["story_ch1_done"]),
+        tb("ria_kael", "카엘", "Kael", [
+            b("카엘이라는 사람, 원정대 지도에 이름이 있었다며?", "That Kael—his name was on the expedition map, right?"),
+            b("…가면을 스무 해 동안 쓰고 있었다니. 숲에서 혼자 오래 지내 봐서 알아. 사람은 혼자 있으면 무언가를 꼭 붙잡아.", "…Wearing a mask for twenty years. I've lived alone in the woods a long time, so I get it. Alone, people cling to something."),
+        ], flags=["story_ch2_done"]),
+    ],
+}
+
+N["quest_archmage"] = {
+    "greet": [
+        b("어서 오렴. 마력은 책 속에만 있지 않단다. 오늘은 무엇이 궁금하니?", "Welcome, dear. Magic isn't only in books. What are you curious about today?"),
+        gb("수도회 견습이 되었구나. 불을 지키는 일… 마법사에게도 낯설지 않은 일이란다.", "So you've become an Order apprentice. Guarding the fire… it's not unfamiliar to a mage either.", flags=["order_apprentice"]),
+        gb("…에르윈 일은 마음이 아프구나. 별은 다 보고 있었을 텐데.", "…My heart aches about Erwin. The stars must have seen it all.", flags=["erwin_betrayal"]),
+    ],
+    "chatter": [
+        b("밤하늘의 별은 오래된 책이란다. 읽는 법만 알면 말이지.", "The night sky is an old book. If you know how to read it."),
+        b("마나가 바닥나면 차 한 잔 하렴. 진짜로 도움이 된단다.", "When your mana runs dry, have a cup of tea. It truly helps."),
+        b("주문은 외우는 게 아니라 이해하는 거란다. 이해한 주문은 잊히지 않아.", "Spells aren't memorized, they're understood. An understood spell is never forgotten."),
+        b("오늘 밤엔 남쪽 별자리가 흐리구나. …폭풍이 오려나.", "The southern constellations are faint tonight. …A storm coming, perhaps."),
+        gb("이그니스의 불꽃 속에 회색 연기가 섞여 있었다고? …그건 불의 것이 아니란다.", "Grey smoke mixed into Ignis's flames? …That doesn't belong to fire, dear.", flags=["story_ch4_done"]),
+    ],
+    "topics": [
+        tb("mage_way", "마법사의 길", "The way of the mage", [
+            b("마법사는 몸이 약한 대신 멀리, 넓게 본단다.", "A mage is frail in body, but sees far and wide."),
+            b("앞에 설 동료를 믿으렴. 마법사는 혼자서는 별 하나만큼만 빛난단다.", "Trust the companions in front of you. Alone, a mage shines only as bright as one star."),
+        ]),
+        tb("elise_seals", "봉인과 마력", "Seals and magic", [
+            b("봉인은 마력으로 짠 매듭이란다. 천 년을 버틴 매듭이면… 아주 정성스럽게 묶였겠지.", "A seal is a knot woven of magic. One that has held a thousand years… must have been tied with great care."),
+            b("매듭은 묶은 사람만 쉽게 풀 수 있단다. 그 점을 잊지 마렴.", "Only the one who tied a knot can untie it easily. Don't forget that."),
+        ], flags=["clue_eighth_seal"]),
+        tb("elise_ink", "보랏빛 잉크", "Purple ink", [
+            b("보랏빛 잉크? 환술사들이 즐겨 쓰는 것이란다. 거울에 비춰야 읽히는 글을 쓰지.", "Purple ink? Illusioners are fond of it. They write words that can only be read in a mirror."),
+            b("…기록관 아이에게 거울을 가져가 보라고 전해 주렴.", "…Tell the archivist girl to try holding a mirror to it."),
+        ], flags=["story_ch1_done"]),
+        tb("elise_stars", "별의 이야기", "A story of the stars", [
+            b("천 년 전에도 별은 같은 자리에 있었단다. 사람들만 자리를 바꿨지.", "A thousand years ago, the stars were in the same places. Only people moved."),
+            b("이제 네 이름도 연대기에 남았구나. 별처럼 오래 남기를 바란단다.", "Now your name is in the chronicle too. May it last as long as the stars."),
+        ], flags=["story_done"]),
+    ],
+}
 
 
 # ---------------------------------------------------------------- 오래 이야기하면 흘리는 말 (히든 단서 쪽으로 아주 살짝)

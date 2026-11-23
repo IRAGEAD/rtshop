@@ -2392,6 +2392,14 @@ public final class SelfTest {
                 dj != null && dj.has("onSleep") && a.getPersistentData().contains(com.rtshop.quest.QuestManager.SLEEP_SCENE));
         a.getPersistentData().remove(com.rtshop.quest.QuestManager.SLEEP_SCENE);
 
+        // 직업 스승 다섯도 일상 이야기와 스토리 이야기를 한다
+        int mentors = 0;
+        for (String k : List.of("quest_sword_master", "quest_war_chief", "quest_shield_keeper", "quest_hunter", "quest_archmage")) {
+            var n = com.rtshop.story.Dialogue.npcForTest(k);
+            if (n != null && n.has("chatter") && n.getAsJsonArray("chatter").size() >= 4 && n.has("topics") && n.getAsJsonArray("topics").size() >= 3) mentors++;
+        }
+        check("the five job mentors (Leon, Bron, Garen, Ria, Elise) have small talk and story topics", mentors == 5, mentors);
+
         // 대화 먼저: 퀘스트 NPC 도 대화가 가로챈다 (퀘스트 창이 대화 상자를 덮지 않게)
         check("quest NPCs open the dialogue first (Dialogue claims the click)", com.rtshop.story.Dialogue.claims(a, "quest_order_archivist")
                 && com.rtshop.story.Dialogue.claims(a, "quest_order_captain"));

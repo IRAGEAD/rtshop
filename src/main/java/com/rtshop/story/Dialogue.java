@@ -45,7 +45,7 @@ public final class Dialogue {
     }
 
     /** 기본 파일의 판 (이보다 낮고 직접 고치지 않은 파일은 새 기본값으로 바꾼다). */
-    public static final int DEFAULT_VERSION = 3;
+    public static final int DEFAULT_VERSION = 4;
     private static JsonObject config;
     private static final Random RNG = new Random();
 
