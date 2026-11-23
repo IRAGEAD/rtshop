@@ -199,6 +199,10 @@ jobs:
           for c in $(cat /tmp/inspect/cinematic-users.txt | grep -v "/api/"); do
             echo "######## $c"; javap -p -c -constants "$c" 2>&1 | grep -n -B3 -A25 "Addon" | head -n 300
           done > /tmp/inspect/cinematic-uses.txt
+          # 마법 뽑기 장면(애드온 API) 설계용: Cinematic 전체를 읽을 수 있는 소스로 풀어 둔다 (MIT)
+          (curl -fsSL -o /tmp/cfr.jar https://repo1.maven.org/maven2/org/benf/cfr/0.152/cfr-0.152.jar \
+            && java -jar /tmp/cfr.jar "$CJ" --outputdir /tmp/inspect/cinematic-src --silent true > /tmp/inspect/cinematic-cfr.log 2>&1) || echo "cfr failed"
+          ls /tmp/inspect/cinematic-src | head
           # Epic Fight Nightfall 크래시 조사: Entity Culling 연동 코드와 무기 속도 계산
           NF="$PWD/../../$(true)"
           cd "$GITHUB_WORKSPACE"

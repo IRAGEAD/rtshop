@@ -1479,5 +1479,17 @@
   "rtshop.magic.broadcast_yamato": "✦✦ %s drew the Yamato skill book \"%s\"!",
   "rtshop.magic.broadcast_enchant": "✦ %s rerolled into %s!",
   "rtshop.hud.font_myeongjo": "Bold Myeongjo (raid)",
-  "rtshop.hud.font_batang": "Bold Batang (raid)"
+  "rtshop.hud.font_batang": "Bold Batang (raid)",
+  "rtshop.magic.altar": "Rune Altar",
+  "rtshop.magic.tab2.select": "Chosen",
+  "rtshop.magic.tab2.random": "Random",
+  "rtshop.magic.tab2.reroll": "Enchant",
+  "rtshop.magic.times": "Summon ×%s",
+  "rtshop.magic.cost.select": "%s chosen tickets",
+  "rtshop.magic.cost.random": "%s magic tickets",
+  "rtshop.magic.cost.reroll": "%s scrolls",
+  "rtshop.magic.reroll_btn": "Reroll enchant",
+  "rtshop.magic.kinds": "%s books",
+  "rtshop.magic.all_fields": "All fields",
+  "rtshop.magic.random_short": "All five runes answer · cheaper"
 }

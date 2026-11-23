@@ -138,6 +138,8 @@ public final class MagicGacha {
     public static JsonObject view(ServerPlayer p) {
         MagicConfig c = MagicConfig.get();
         GachaConfig g = c.engine();
+        long now = System.currentTimeMillis();
+        String blessed = c.blessedCat(now);
         JsonObject o = new JsonObject();
         JsonObject tickets = new JsonObject();
         tickets.addProperty("select", count(p, MagicRegistry.TICKET_SELECT.get()));
@@ -153,14 +155,31 @@ public final class MagicGacha {
         for (String cat : MagicConfig.CATS) {
             JsonObject x = new JsonObject();
             x.addProperty("count", g.pool(cat).size());
-            x.add("chances", chances(g, cat, MagicConfig.MODE_SELECT));
+            x.add("chances", chances(cat.equals(blessed) ? c.engineFor(MagicConfig.MODE_SELECT, cat, now) : g, cat, MagicConfig.MODE_SELECT));
+            x.addProperty("cost1", c.cost(MagicConfig.MODE_SELECT, cat, 1, now));
+            x.addProperty("cost10", c.cost(MagicConfig.MODE_SELECT, cat, 10, now));
             cats.add(cat, x);
         }
         o.add("cats", cats);
         JsonObject rnd = new JsonObject();
         rnd.addProperty("count", g.pool(MagicConfig.RANDOM).size());
         rnd.add("chances", chances(g, MagicConfig.RANDOM, MagicConfig.MODE_RANDOM));
+        rnd.addProperty("cost1", c.cost(MagicConfig.MODE_RANDOM, "", 1, now));
+        rnd.addProperty("cost10", c.cost(MagicConfig.MODE_RANDOM, "", 10, now));
         o.add("random", rnd);
+        JsonObject pity = new JsonObject();
+        pity.addProperty("on", c.pityOn && GachaConfig.gradeIndex(c.pityGrade) >= 0);
+        pity.addProperty("count", c.pityCount);
+        pity.addProperty("grade", c.pityGrade);
+        pity.addProperty("select", pityOf(p, c, MagicConfig.MODE_SELECT));
+        pity.addProperty("random", pityOf(p, c, MagicConfig.MODE_RANDOM));
+        o.add("pity", pity);
+        JsonObject bl = new JsonObject();
+        bl.addProperty("cat", blessed);
+        bl.addProperty("discount", c.blessDiscount);
+        bl.addProperty("boost", c.blessBoost);
+        bl.addProperty("ends", c.blessEndsIn(now));
+        o.add("blessing", bl);
         o.add("enchantChances", enchantChances(c, p.getMainHandItem()));
         ItemStack held = p.getMainHandItem();
         o.addProperty("held", held.isEmpty() ? "" : String.valueOf(ForgeRegistries.ITEMS.getKey(held.getItem())));
@@ -187,7 +206,8 @@ public final class MagicGacha {
             fail(p, Component.translatable("rtshop.gacha.broken"));
             return null;
         }
-        GachaConfig g = c.engine();
+        long now = System.currentTimeMillis();
+        GachaConfig g = c.engineFor(mode, select ? cat : "", now);
         double sum = 0;
         for (double x : Gacha.gradeChances(g, pool, mode)) sum += x;
         if (sum <= 0) {
@@ -195,7 +215,7 @@ public final class MagicGacha {
             return null;
         }
         Item t = ticketFor(mode);
-        int cost = (select ? c.selectCost : c.randomCost) * n;
+        int cost = c.cost(mode, select ? cat : "", n, now);
         if (count(p, t) < cost) {
             fail(p, Component.translatable("rtshop.gacha.no_ticket", new ItemStack(t).getHoverName(), cost));
             return null;
@@ -206,7 +226,8 @@ public final class MagicGacha {
             return null;
         }
         take(p, t, cost);
-        List<GachaConfig.Entry> got = Gacha.pull(g, pool, mode, n, p.getRandom());
+        List<GachaConfig.Entry> got = new ArrayList<>(Gacha.pull(g, pool, mode, n, p.getRandom()));
+        boolean pityHit = applyPity(p, c, g, pool, mode, got);
         JsonArray res = new JsonArray();
         for (GachaConfig.Entry e : got) {
             String ecat = catOf(c, e);
@@ -227,10 +248,52 @@ public final class MagicGacha {
         }
         JsonObject o = view(p);
         o.add("results", res);
+        if (pityHit) o.addProperty("pityHit", true);
         o.addProperty("mode", mode);
         o.addProperty("resultCat", select ? cat : MagicConfig.RANDOM);
         send(p, MagicPacket.RESULT, o);
         return got;
+    }
+
+    // ------------------------------------------------------------------ 천장
+
+    private static String pityKey(MagicConfig c, String mode) {
+        return c.pityShared ? "rtshop_magic_pity" : "rtshop_magic_pity_" + mode;
+    }
+
+    /** 확정 등급 없이 이어진 뽑기 횟수. */
+    public static int pityOf(ServerPlayer p, MagicConfig c, String mode) {
+        return p.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG).getInt(pityKey(c, mode));
+    }
+
+    public static void setPity(ServerPlayer p, MagicConfig c, String mode, int v) {
+        CompoundTag root = p.getPersistentData();
+        CompoundTag pers = root.getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG);
+        pers.putInt(pityKey(c, mode), Math.max(0, v));
+        root.put(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG, pers);
+    }
+
+    /** 뽑은 것을 차례로 세어, 천장에 닿은 칸을 확정 등급으로 바꾼다. 바꾼 것이 있으면 true. */
+    private static boolean applyPity(ServerPlayer p, MagicConfig c, GachaConfig g, String pool, String mode, List<GachaConfig.Entry> got) {
+        int min = GachaConfig.gradeIndex(c.pityGrade);
+        if (!c.pityOn || min < 0 || got.isEmpty()) return false;
+        int cnt = pityOf(p, c, mode);
+        boolean hit = false;
+        for (int i = 0; i < got.size(); i++) {
+            cnt++;
+            if (GachaConfig.gradeIndex(got.get(i).grade) >= min) {
+                cnt = 0;
+            } else if (cnt >= c.pityCount) {
+                GachaConfig.Entry e = Gacha.pickOfGrade(g, pool, min, p.getRandom());
+                if (e != null) {
+                    got.set(i, e);
+                    cnt = 0;
+                    hit = true;
+                }
+            }
+        }
+        setPity(p, c, mode, cnt);
+        return hit;
     }
 
     /** 이 칸이 들어 있는 분야. */

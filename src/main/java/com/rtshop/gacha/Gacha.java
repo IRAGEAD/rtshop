@@ -133,6 +133,16 @@ public final class Gacha {
         return list.get(list.size() - 1);
     }
 
+    /** 천장용: minGrade 등급(없으면 그 위, 야마토는 건너뜀)에서 하나. 없으면 null. */
+    public static GachaConfig.Entry pickOfGrade(GachaConfig c, String cat, int minGrade, RandomSource rng) {
+        List<List<GachaConfig.Entry>> g = byGrade(c, cat);
+        for (int k = Math.max(0, minGrade); k < g.size(); k++) {
+            if (k == GachaConfig.YAMATO && minGrade != GachaConfig.YAMATO) continue;
+            if (!g.get(k).isEmpty()) return pickIn(g.get(k), rng);
+        }
+        return null;
+    }
+
     /** n 번 뽑는다. 10회면 하나는 보장 등급 이상. 뽑을 것이 없으면 빈 목록. */
     public static List<GachaConfig.Entry> pull(GachaConfig c, String cat, String tier, int n, RandomSource rng) {
         List<GachaConfig.Entry> out = new ArrayList<>();

@@ -139,3 +139,103 @@ for i, g in enumerate(glyphs):
         d.line((ox + x1, y1, ox + x2, y2), fill=(235, 225, 255, 255), width=1)
 save(runes, 'gui/magic_runes.png')
 print('ok')
+
+# ---------------------------------------------------------------- 룬 제단 창 (GUI) 그림
+import random as _r
+def _save(img, rel): save(img, rel)
+# 흑요석 판 (타일)
+rnd = _r.Random(11)
+slab = Image.new('RGBA', (64, 64))
+px = slab.load()
+for y in range(64):
+    for x in range(64):
+        v = rnd.randint(0, 10)
+        px[x, y] = (14 + v, 11 + v // 2, 22 + v + v // 2, 255)
+d = ImageDraw.Draw(slab)
+for _ in range(5):
+    x, y = rnd.randint(0, 63), rnd.randint(0, 63)
+    for k in range(rnd.randint(6, 14)):
+        d.point((x % 64, y % 64), fill=(34, 24, 52, 255))
+        x += rnd.choice([-1, 0, 1]); y += 1
+_save(slab, 'gui/magic/slab.png')
+
+def big_ring(size, r_out, r_in, n, color, runes=True, seed=1):
+    S = size * 2  # 두 배로 그려 줄인다 (매끈하게)
+    im = Image.new('RGBA', (S, S)); d = ImageDraw.Draw(im); c = S / 2
+    d.ellipse((c - r_out * 2, c - r_out * 2, c + r_out * 2, c + r_out * 2), outline=color, width=5)
+    d.ellipse((c - r_in * 2, c - r_in * 2, c + r_in * 2, c + r_in * 2), outline=color, width=3)
+    rr = _r.Random(seed)
+    for i in range(n):
+        a = i * 2 * math.pi / n
+        mid = (r_out + r_in)
+        x, y = c + mid * math.cos(a), c + mid * math.sin(a)
+        nx, ny = math.cos(a), math.sin(a); tx, ty = -ny, nx
+        h = (r_out - r_in) * 0.62
+        if runes:
+            # 룬: 세로 획 + 무작위 가지 한두 개
+            d.line((x - nx * h, y - ny * h, x + nx * h, y + ny * h), fill=color, width=4)
+            for _ in range(rr.randint(1, 2)):
+                o = rr.uniform(-0.6, 0.6) * h; s = rr.choice([-1, 1])
+                d.line((x + nx * o, y + ny * o, x + nx * (o + h * 0.5) + tx * s * h * 0.7, y + ny * (o + h * 0.5) + ty * s * h * 0.7), fill=color, width=4)
+        else:
+            d.ellipse((x - 4, y - 4, x + 4, y + 4), fill=color)
+    return im.resize((size, size), Image.LANCZOS)
+
+_save(big_ring(256, 124, 104, 20, (255, 255, 255, 255), seed=3), 'gui/magic/ring_outer.png')
+_save(big_ring(256, 124, 112, 28, (255, 255, 255, 255), runes=False), 'gui/magic/ring_inner.png')
+tick = Image.new('RGBA', (512, 512)); d = ImageDraw.Draw(tick)
+for i in range(48):
+    a = i * math.pi / 24; r0, r1 = 236, (252 if i % 4 == 0 else 244)
+    d.line((256 + math.cos(a) * r0, 256 + math.sin(a) * r0, 256 + math.cos(a) * r1, 256 + math.sin(a) * r1), fill=(255, 255, 255, 230), width=3)
+_save(tick.resize((256, 256), Image.LANCZOS), 'gui/magic/ring_ticks.png')
+
+# 구슬과 빛무리 (크게)
+N = 128
+o = Image.new('RGBA', (N, N)); px = o.load()
+for y in range(N):
+    for x in range(N):
+        dx, dy = (x - 63.5) / 63.5, (y - 63.5) / 63.5; r = math.hypot(dx, dy)
+        if r > 1: continue
+        hl = max(0, 1 - math.hypot(dx + 0.35, dy + 0.38) * 1.7); k = 1 - r * 0.6
+        rim = max(0, (r - 0.8) / 0.2) * 0.5
+        c = (int(110 * k + 140 * hl + 60 * rim), int(52 * k + 180 * hl + 30 * rim), int(205 * k + 50 * hl + 50 * rim))
+        a = 255 if r < 0.96 else int(255 * (1 - (r - 0.96) / 0.04))
+        px[x, y] = (min(255, c[0]), min(255, c[1]), min(255, c[2]), a)
+_save(o, 'gui/magic/orb.png')
+gl = Image.new('RGBA', (N, N)); px = gl.load()
+for y in range(N):
+    for x in range(N):
+        r = math.hypot((x - 63.5) / 63.5, (y - 63.5) / 63.5)
+        if r < 1: px[x, y] = (255, 255, 255, int(220 * (1 - r) ** 2.2))
+_save(gl, 'gui/magic/glow.png')
+
+# 룬석 (마름모): 꺼짐 / 켜짐. 5개 룬을 가로로 (각 64x80)
+def stone_sheet(lit):
+    S = 2
+    im = Image.new('RGBA', (64 * 5 * S, 80 * S)); d = ImageDraw.Draw(im)
+    for i, g in enumerate(glyphs):
+        ox = i * 64 * S; cx, cy = ox + 32 * S, 40 * S
+        body = (58, 34, 96, 255) if lit else (30, 24, 44, 255)
+        edge = (246, 208, 128, 255) if lit else (124, 98, 170, 255)
+        pts = [(cx, cy - 37 * S), (cx + 29 * S, cy), (cx, cy + 37 * S), (cx - 29 * S, cy)]
+        d.polygon(pts, fill=body, outline=edge)
+        d.line(pts + [pts[0]], fill=edge, width=3 * S)
+        # 깎인 면
+        d.polygon([(cx, cy - 37 * S), (cx + 29 * S, cy), (cx, cy - 6 * S)], fill=tuple(min(255, v + (26 if lit else 12)) for v in body[:3]) + (255,))
+        d.polygon([(cx, cy + 37 * S), (cx - 29 * S, cy), (cx, cy + 6 * S)], fill=tuple(max(0, v - 10) for v in body[:3]) + (255,))
+        d.line(pts + [pts[0]], fill=edge, width=3 * S)
+        col = (255, 244, 214, 255) if lit else (168, 150, 204, 255)
+        for (x1, y1, x2, y2) in g:
+            d.line((cx + (x1 - 8) * 2.2 * S, cy - 26 * S + (y1 - 2) * 1.5 * S, cx + (x2 - 8) * 2.2 * S, cy - 26 * S + (y2 - 2) * 1.5 * S), fill=col, width=2 * S)
+    return im.resize((320, 80), Image.LANCZOS)
+_save(stone_sheet(False), 'gui/magic/stones.png')
+_save(stone_sheet(True), 'gui/magic/stones_on.png')
+# 오각 별 (소환진 안쪽 선)
+st = Image.new('RGBA', (512, 512)); d = ImageDraw.Draw(st)
+P = [(256 + 206 * math.cos(math.radians(-90 + 72 * i)), 256 + 206 * math.sin(math.radians(-90 + 72 * i))) for i in range(5)]
+for i in range(5):
+    d.line((P[i], P[(i + 2) % 5]), fill=(255, 255, 255, 150), width=3)
+    d.line((P[i], P[(i + 1) % 5]), fill=(255, 255, 255, 70), width=2)
+d.ellipse((256 - 78, 256 - 78, 256 + 78, 256 + 78), outline=(255, 255, 255, 120), width=2)
+_save(st.resize((256, 256), Image.LANCZOS), 'gui/magic/star.png')
+print('altar ok')

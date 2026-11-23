@@ -84,6 +84,14 @@ public final class MagicConfig {
     /** 한 번 뽑을 때 쓰는 티켓 수. */
     public int selectCost = 1, randomCost = 1, rerollCost = 1;
     public String tenGuarantee = "rare";
+    /** 천장: pityCount 번째 뽑기까지 pityGrade 이상이 안 나오면 그 등급을 확정으로 준다. shared = 선택·무작위 뽑기를 함께 센다. */
+    public boolean pityOn = true, pityShared = true;
+    public int pityCount = 80;
+    public String pityGrade = "legendary";
+    /** 오늘의 룬: blessHours 시간마다 분야 하나가 축복을 받아, 그 분야 선택 뽑기의 티켓 값이 blessDiscount % 싸지고 영웅 이상 확률이 blessBoost 배가 된다. */
+    public boolean blessOn = true;
+    public int blessDiscount = 20, blessHours = 24;
+    public double blessBoost = 1.0;
     /** 인챈트를 다시 붙일 수 있는 장비: weapon(근접 무기)·bow·crossbow·trident·armor·tool. */
     public final List<String> rerollKinds = new ArrayList<>(List.of("weapon", "bow", "crossbow", "trident"));
     public String loadError;
@@ -177,6 +185,46 @@ public final class MagicConfig {
         return g;
     }
 
+    /** 축복받은 분야의 선택 뽑기용 엔진 (영웅 이상 확률 blessBoost 배). 축복이 아니면 보통 엔진. */
+    public GachaConfig engineFor(String mode, String cat, long nowMs) {
+        GachaConfig g = engine();
+        if (MODE_SELECT.equals(mode) && blessBoost > 1.0 && cat.equals(blessedCat(nowMs))) {
+            double[] w = g.tiers.get(MODE_SELECT).weights;
+            for (int i = 3; i < w.length; i++) w[i] *= blessBoost;
+        }
+        return g;
+    }
+
+    private long period(long nowMs) {
+        return Math.floorDiv(nowMs + java.util.TimeZone.getDefault().getOffset(nowMs), Math.max(1, blessHours) * 3_600_000L);
+    }
+
+    /** 지금 축복받은 분야 (꺼져 있으면 ""). 주기마다 바뀌고, 다섯 주기 안에 모든 분야가 한 번씩 돈다. */
+    public String blessedCat(long nowMs) {
+        if (!blessOn) return "";
+        long p = period(nowMs), cyc = Math.floorDiv(p, 5L);
+        long h = cyc * 0x9E3779B97F4A7C15L;
+        h ^= h >>> 29;
+        int step = 1 + (int) Math.floorMod(h, 4L), off = (int) Math.floorMod(h >>> 7, 5L);
+        return CATS[(int) Math.floorMod(Math.floorMod(p, 5L) * step + off, 5L)];
+    }
+
+    /** 다음 룬으로 바뀔 때까지 남은 초. */
+    public long blessEndsIn(long nowMs) {
+        long len = Math.max(1, blessHours) * 3_600_000L;
+        return ((period(nowMs) + 1) * len - (nowMs + java.util.TimeZone.getDefault().getOffset(nowMs))) / 1000L;
+    }
+
+    /** n 번 뽑을 때 쓰는 티켓 수 (축복받은 분야의 선택 뽑기는 할인, 적어도 1장). */
+    public int cost(String mode, String cat, int n, long nowMs) {
+        boolean select = MODE_SELECT.equals(mode);
+        int base = (select ? selectCost : randomCost) * n;
+        if (select && blessDiscount > 0 && cat.equals(blessedCat(nowMs))) {
+            return Math.max(1, (int) Math.ceil(base * (100 - blessDiscount) / 100.0 - 1e-9));
+        }
+        return base;
+    }
+
     /** 야마토 등급이 공격 분야 밖에 있으면 공격 분야로 옮긴다 (야마토는 공격 분야에만). */
     public void normalize() {
         for (String c : CATS) {
@@ -195,7 +243,8 @@ public final class MagicConfig {
         o.addProperty("_help", "마법 뽑기 설정. pools: 분야(attack 공격·guard 방어·dodge 회피·passive 패시브·mover 이동)별 스킬북 목록 "
                 + "(item, nbt, grade 등급, weight 같은 등급 안 가중치). odds: 등급별 확률 (common, uncommon, rare, epic, legendary, yamato 순). "
                 + "야마토 등급은 공격 분야에만 둘 수 있다. enchants: 인챈트 재설정 목록 (enchant, level, grade, weight). "
-                + "costs: 한 번에 쓰는 티켓 수. 게임 안에서는 OP 가 마법 뽑기 창의 [편집] 으로 고친다. 고친 뒤 /rtshop reload.");
+                + "costs: 한 번에 쓰는 티켓 수. pity(천장): count 번째까지 grade 이상이 안 나오면 확정, shared=선택·무작위를 함께 센다. "
+                + "blessing(오늘의 룬): periodHours 시간마다 바뀌는 분야의 선택 뽑기가 discountPercent % 싸지고 영웅 이상 확률이 oddsBoost 배. 게임 안에서는 OP 가 마법 뽑기 창의 [편집] 으로 고친다. 고친 뒤 /rtshop reload.");
         o.addProperty("configVersion", version);
         o.addProperty("tenGuarantee", tenGuarantee);
         JsonObject odds = new JsonObject();
@@ -208,6 +257,18 @@ public final class MagicConfig {
         costs.addProperty("random", randomCost);
         costs.addProperty("reroll", rerollCost);
         o.add("costs", costs);
+        JsonObject pity = new JsonObject();
+        pity.addProperty("enabled", pityOn);
+        pity.addProperty("count", pityCount);
+        pity.addProperty("grade", pityGrade);
+        pity.addProperty("shared", pityShared);
+        o.add("pity", pity);
+        JsonObject bl = new JsonObject();
+        bl.addProperty("enabled", blessOn);
+        bl.addProperty("discountPercent", blessDiscount);
+        bl.addProperty("periodHours", blessHours);
+        bl.addProperty("oddsBoost", blessBoost);
+        o.add("blessing", bl);
         JsonArray kinds = new JsonArray();
         rerollKinds.forEach(kinds::add);
         o.add("rerollKinds", kinds);
@@ -250,6 +311,20 @@ public final class MagicConfig {
             if (co.has("select")) c.selectCost = Math.max(1, Math.min(64, co.get("select").getAsInt()));
             if (co.has("random")) c.randomCost = Math.max(1, Math.min(64, co.get("random").getAsInt()));
             if (co.has("reroll")) c.rerollCost = Math.max(1, Math.min(64, co.get("reroll").getAsInt()));
+        }
+        if (o.has("pity")) {
+            JsonObject pi = o.getAsJsonObject("pity");
+            if (pi.has("enabled")) c.pityOn = pi.get("enabled").getAsBoolean();
+            if (pi.has("count")) c.pityCount = Math.max(1, Math.min(100000, pi.get("count").getAsInt()));
+            if (pi.has("grade") && GachaConfig.gradeIndex(pi.get("grade").getAsString()) >= 0) c.pityGrade = pi.get("grade").getAsString();
+            if (pi.has("shared")) c.pityShared = pi.get("shared").getAsBoolean();
+        }
+        if (o.has("blessing")) {
+            JsonObject bl = o.getAsJsonObject("blessing");
+            if (bl.has("enabled")) c.blessOn = bl.get("enabled").getAsBoolean();
+            if (bl.has("discountPercent")) c.blessDiscount = Math.max(0, Math.min(90, bl.get("discountPercent").getAsInt()));
+            if (bl.has("periodHours")) c.blessHours = Math.max(1, Math.min(720, bl.get("periodHours").getAsInt()));
+            if (bl.has("oddsBoost")) c.blessBoost = Math.max(1.0, Math.min(10.0, bl.get("oddsBoost").getAsDouble()));
         }
         if (o.has("rerollKinds")) {
             c.rerollKinds.clear();

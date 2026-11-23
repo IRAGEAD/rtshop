@@ -2169,6 +2169,8 @@ public final class SelfTest {
         t.pool("mover").add(mk.apply("minecraft:ender_pearl", "uncommon"));
         t.autoEnchants();
         t.normalize();
+        t.pityOn = false; // 천장·오늘의 룬은 아래에서 따로 확인
+        t.blessOn = false;
         check("a yamato prize outside the attack field is moved down to legendary", t.pool("guard").get(1).grade.equals("legendary"));
         com.rtshop.magic.MagicConfig.set(t);
         try {
@@ -2218,6 +2220,72 @@ public final class SelfTest {
             var back = com.rtshop.magic.MagicConfig.fromJson(t.toJson());
             check("the magic gacha config survives save and load", back.pool("attack").size() == 2 && back.enchants.size() == t.enchants.size()
                     && back.selectOdds[5] == t.selectOdds[5]);
+            // ---- 천장: 5회 안에 희귀 이상이 없으면 5회째에 확정
+            String SEL = "select";
+            t.pityOn = true;
+            t.pityCount = 5;
+            t.pityGrade = "rare";
+            t.pityShared = true;
+            com.rtshop.magic.MagicGacha.setPity(a, t, SEL, 0);
+            a.getInventory().clearContent();
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 20));
+            for (int i = 0; i < 6; i++) com.rtshop.magic.MagicGacha.pull(a, SEL, "passive", 1, false);
+            check("pity counter grows while nothing of the pity grade comes (and waits when the field has none)",
+                    com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 6, com.rtshop.magic.MagicGacha.pityOf(a, t, SEL));
+            check("the pity counter is shared between chosen and random draws when set so",
+                    com.rtshop.magic.MagicGacha.pityOf(a, t, "random") == 6);
+            com.rtshop.magic.MagicGacha.pull(a, SEL, "guard", 1, false);
+            check("a pity-grade prize resets the counter", com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 0);
+            t.pool("dodge").add(mk.apply("minecraft:rabbit_foot", "rare"));
+            double[] keep = t.selectOdds.clone();
+            t.selectOdds[1] = 100;
+            t.selectOdds[2] = 0.0000001;
+            String last = "";
+            for (int i = 0; i < 5; i++) {
+                var one = com.rtshop.magic.MagicGacha.pull(a, SEL, "dodge", 1, false);
+                last = one == null || one.isEmpty() ? "null" : one.get(0).grade;
+            }
+            check("the 5th draw without a rare is turned into a guaranteed rare (pity), and the counter restarts",
+                    last.equals("rare") && com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 0, last + " / " + com.rtshop.magic.MagicGacha.pityOf(a, t, SEL));
+            System.arraycopy(keep, 0, t.selectOdds, 0, keep.length);
+            t.pityShared = false;
+            com.rtshop.magic.MagicGacha.setPity(a, t, SEL, 3);
+            check("with separate counting the random draw has its own pity counter", com.rtshop.magic.MagicGacha.pityOf(a, t, "random") == 0
+                    && com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 3);
+            t.pityOn = false;
+            // ---- 오늘의 룬: 축복받은 분야의 선택 뽑기 할인
+            t.blessOn = true;
+            t.blessDiscount = 20;
+            t.blessHours = 24;
+            long now = System.currentTimeMillis();
+            String bc = t.blessedCat(now);
+            String other = bc.equals("attack") ? "guard" : "attack";
+            check("today's rune is one of the five fields", java.util.List.of(com.rtshop.magic.MagicConfig.CATS).contains(bc), bc);
+            check("the blessed field's 10× chosen draw costs 20% fewer tickets (8), single stays 1; other fields and random stay full",
+                    t.cost(SEL, bc, 10, now) == 8 && t.cost(SEL, bc, 1, now) == 1 && t.cost(SEL, other, 10, now) == 10 && t.cost("random", "", 10, now) == 10,
+                    t.cost(SEL, bc, 10, now) + "/" + t.cost(SEL, bc, 1, now) + "/" + t.cost(SEL, other, 10, now));
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            for (int i = 0; i < 10; i++) seen.add(t.blessedCat(now + i * 86_400_000L));
+            check("the rune changes each period and every field gets its turn", seen.size() == 5 && t.blessEndsIn(now) > 0 && t.blessEndsIn(now) <= 86_400, seen);
+            a.getInventory().clearContent();
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 10));
+            var bl = com.rtshop.magic.MagicGacha.pull(a, SEL, bc, 10, false);
+            check("a blessed 10× draw really takes only 8 tickets", bl != null && bl.size() == 10
+                    && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()) == 2,
+                    a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()));
+            t.blessBoost = 2;
+            check("the rune's odds boost doubles epic-and-better weights only in the blessed field",
+                    t.engineFor(SEL, bc, now).tiers.get(SEL).weights[3] == t.selectOdds[3] * 2
+                            && t.engineFor(SEL, other, now).tiers.get(SEL).weights[3] == t.selectOdds[3]
+                            && t.engineFor(SEL, bc, now).tiers.get(SEL).weights[1] == t.selectOdds[1]);
+            t.pityCount = 77;
+            var back2 = com.rtshop.magic.MagicConfig.fromJson(t.toJson());
+            check("pity and rune settings survive save and load", back2.pityCount == 77 && !back2.pityShared && back2.blessBoost == 2 && back2.blessDiscount == 20);
+            var vw = com.rtshop.magic.MagicGacha.view(a);
+            check("the window data carries the pity gauge and today's rune", vw.has("pity") && vw.getAsJsonObject("blessing").get("cat").getAsString().equals(bc)
+                    && vw.getAsJsonObject("cats").getAsJsonObject(bc).get("cost10").getAsInt() == 8);
+            t.blessOn = false;
+            check("with the rune turned off nothing is blessed and prices are full", t.blessedCat(now).isEmpty() && t.cost(SEL, bc, 10, now) == 10);
         } finally {
             com.rtshop.magic.MagicConfig.set(real);
             a.getInventory().clearContent();
