@@ -112,11 +112,11 @@ public final class Enhance {
         int cur = activeGuard(p);
         int add = maskOf(g);
         if ((cur & add) == add) {
-            p.displayClientMessage(Component.translatable("rtshop.enhance.guard_already").withStyle(ChatFormatting.YELLOW), true);
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.enhance.guard_already").withStyle(ChatFormatting.YELLOW), true);
             return false;
         }
         setActiveGuard(p, cur | add);
-        p.sendSystemMessage(Component.translatable("rtshop.enhance.guard_on", guardName(cur | add)).withStyle(ChatFormatting.AQUA));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.enhance.guard_on", guardName(cur | add)).withStyle(ChatFormatting.AQUA));
         return true;
     }
 
@@ -353,7 +353,7 @@ public final class Enhance {
             com.rtshop.util.Later.run((int) (suspenseMs(tier) / 50) + 8, () -> {
                 Component msg = Component.translatable(to >= 11 ? "rtshop.enhance.broadcast_max" : "rtshop.enhance.broadcast", who, shown.getHoverName(), to)
                         .withStyle(to >= 11 ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GOLD);
-                server.getPlayerList().broadcastSystemMessage(msg, false);
+                com.rtshop.notice.Notice.broadcast(server, msg, false);
                 lastBroadcast = to + ":" + whoName;
                 if (to >= 11) {
                     // 최고 단계: 다른 모든 플레이어의 화면 위쪽에 알림 띠
@@ -446,11 +446,11 @@ public final class Enhance {
                 try {
                     EnhanceConfig.saveFromEditor(json);
                     syncAll(p.server);
-                    p.sendSystemMessage(Component.translatable("rtshop.enhedit.saved").withStyle(ChatFormatting.GREEN));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.enhedit.saved").withStyle(ChatFormatting.GREEN));
                     ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
                             EnhancePacket.open(EnhancePacket.EDITOR, EnhanceConfig.get().toJson().toString()));
                 } catch (Exception e) {
-                    p.sendSystemMessage(Component.translatable("rtshop.enhedit.failed", String.valueOf(e.getMessage())).withStyle(ChatFormatting.RED));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.enhedit.failed", String.valueOf(e.getMessage())).withStyle(ChatFormatting.RED));
                 }
             }
             default -> {

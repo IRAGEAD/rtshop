@@ -390,7 +390,7 @@ public final class Employees {
         lastNotice = msg;
         ServerPlayer op = server.getPlayerList().getPlayer(owner);
         if (op != null) {
-            op.sendSystemMessage(msg);
+            com.rtshop.notice.Notice.send(op, msg);
         } else {
             Data d = data(server);
             List<String> l = d.pending.computeIfAbsent(owner, x -> new ArrayList<>());
@@ -485,7 +485,7 @@ public final class Employees {
         for (String m : msgs) {
             try {
                 Component c = Component.Serializer.fromJson(m);
-                if (c != null) sp.sendSystemMessage(c);
+                if (c != null) com.rtshop.notice.Notice.send(sp, c);
             } catch (Exception ignored) {
             }
         }

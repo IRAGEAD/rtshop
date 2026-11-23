@@ -421,7 +421,7 @@ public final class Gacha {
             if (gIdx >= 4) {
                 Component name = s.getItem() == ModItems.PET_SUMMON.get() ? petName(e.entity) : s.getHoverName();
                 boolean yamato = gIdx == GachaConfig.YAMATO;
-                p.server.getPlayerList().broadcastSystemMessage(Component.translatable(yamato ? "rtshop.gacha.broadcast_yamato" : "rtshop.gacha.broadcast",
+                com.rtshop.notice.Notice.broadcast(p.server, Component.translatable(yamato ? "rtshop.gacha.broadcast_yamato" : "rtshop.gacha.broadcast",
                         p.getDisplayName(), Component.translatable("rtshop.gacha.tier." + tier), name)
                         .withStyle(yamato ? ChatFormatting.AQUA : ChatFormatting.GOLD), false);
             }
@@ -689,7 +689,7 @@ public final class Gacha {
 
     public static void openEditor(ServerPlayer p) {
         if (!canEdit(p)) {
-            p.sendSystemMessage(Component.translatable("rtshop.gacha.op_only"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.gacha.op_only"));
             return;
         }
         send(p, GachaPacket.EDITOR, GachaConfig.get().toJson());
@@ -713,7 +713,7 @@ public final class Gacha {
 
     private static void handleSave(ServerPlayer p, String json) {
         if (!canEdit(p)) {
-            p.sendSystemMessage(Component.translatable("rtshop.gacha.op_only"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.gacha.op_only"));
             return;
         }
         String err = save(json, p.server);

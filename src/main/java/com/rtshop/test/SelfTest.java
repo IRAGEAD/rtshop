@@ -2134,7 +2134,7 @@ public final class SelfTest {
                 + " townSkipped=" + com.rtshop.story.StructureFinder.lastTownSkipped + " ms=" + ms + " at=" + (f == null ? "none" : f.pos.toShortString())
                 + " " + com.rtshop.story.StructureFinder.lastInfo);
         check("the survey compass finds a village that really generated (its start exists in the chunk)",
-                f != null && com.rtshop.story.StructureFinder.verify(ow, f.structure, f.pos.getX() >> 4, f.pos.getZ() >> 4) != null,
+                f != null && com.rtshop.story.StructureFinder.verify(ow, f.structure, f.cx, f.cz) != null,
                 f == null ? "none" : f.pos.toShortString());
         check("the place it points to is at least 1000 blocks from town",
                 f != null && com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ()) >= 1000,
@@ -2147,10 +2147,10 @@ public final class SelfTest {
         var none = com.rtshop.story.StructureFinder.find(ow, portals, spawn, 200, 1000);
         LINES.add("  ruined portal search: at=" + (none == null ? "none" : none.pos.toShortString()) + " " + com.rtshop.story.StructureFinder.lastInfo);
         check("a structure that cannot generate in this world is never pointed to (or, if found, it is really there)",
-                none == null || com.rtshop.story.StructureFinder.verify(ow, none.structure, none.pos.getX() >> 4, none.pos.getZ() >> 4) != null);
+                none == null || com.rtshop.story.StructureFinder.verify(ow, none.structure, none.cx, none.cz) != null);
         var v = com.rtshop.story.StructureFinder.find(ow, villages, spawn, 100, 0);
         check("/locate structure (verified) finds a real village", v != null
-                && com.rtshop.story.StructureFinder.verify(ow, v.structure, v.pos.getX() >> 4, v.pos.getZ() >> 4) != null);
+                && com.rtshop.story.StructureFinder.verify(ow, v.structure, v.cx, v.cz) != null);
         check("an unknown structure target resolves to nothing", com.rtshop.story.StructureFinder.resolve(ow, "rtshop:no_such_structure") == null);
         // /locate structure 명령이 우리 검색으로 바뀌었는가 (결과 문장)
         List<String> out = new ArrayList<>();
@@ -2227,6 +2227,16 @@ public final class SelfTest {
                 net.minecraft.world.item.TooltipFlag.NORMAL);
         check("a story item's tooltip shows the 'main story item' header and where it is used",
                 tip.stream().anyMatch(c -> c.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t && t.getKey().equals("item.rtshop.frost_heart.guide")));
+
+        // 알림: 채팅 대신 알림 상자로 (누를 수 있는 글은 채팅으로)
+        int sentBefore = com.rtshop.notice.Notice.sentForTest;
+        com.rtshop.notice.Notice.send(a, net.minecraft.network.chat.Component.translatable("rtshop.castle.zone_denied"));
+        check("mod notices go to the notice box instead of chat", com.rtshop.notice.Notice.sentForTest == sentBefore + 1);
+        net.minecraft.network.chat.Component link = net.minecraft.network.chat.Component.literal("x").withStyle(st -> st.withClickEvent(
+                new net.minecraft.network.chat.ClickEvent(net.minecraft.network.chat.ClickEvent.Action.RUN_COMMAND, "/rtshop quest")));
+        check("a notice with a clickable link stays in chat (it can only be clicked there)",
+                com.rtshop.notice.Notice.hasClick(net.minecraft.network.chat.Component.literal("a ").append(link))
+                        && !com.rtshop.notice.Notice.hasClick(net.minecraft.network.chat.Component.literal("plain")));
 
         // 대화 먼저: 퀘스트 NPC 도 대화가 가로챈다 (퀘스트 창이 대화 상자를 덮지 않게)
         check("quest NPCs open the dialogue first (Dialogue claims the click)", com.rtshop.story.Dialogue.claims(a, "quest_order_archivist")

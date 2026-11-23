@@ -454,7 +454,7 @@ public final class Hunts {
             d.put("seen", seen);
             for (Book b : h.books) {
                 if (!b.entities.contains(id)) continue;
-                p.displayClientMessage(Component.translatable("rtshop.hunt.new_entry", victim.getType().getDescription(), b.name).withStyle(ChatFormatting.GREEN), true);
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.new_entry", victim.getType().getDescription(), b.name).withStyle(ChatFormatting.GREEN), true);
                 checkBook(p, b);
             }
         }
@@ -470,11 +470,11 @@ public final class Hunts {
                 b.putBoolean("done", true);
                 long gold = reward(p, b.getLong("gold"));
                 Economy.addWallet(p, gold);
-                p.sendSystemMessage(Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.weekly_done" : "rtshop.hunt.daily_done",
+                com.rtshop.notice.Notice.send(p, Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.weekly_done" : "rtshop.hunt.daily_done",
                         victim.getType().getDescription(), need, String.format("%,d", gold)).withStyle(ChatFormatting.GOLD));
                 p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.7F, 1.2F);
             } else {
-                p.displayClientMessage(Component.translatable("rtshop.hunt.progress", victim.getType().getDescription(), have, need).withStyle(ChatFormatting.YELLOW), true);
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.progress", victim.getType().getDescription(), have, need).withStyle(ChatFormatting.YELLOW), true);
             }
             break;
         }
@@ -547,7 +547,7 @@ public final class Hunts {
 
     public static void openBoard(ServerPlayer p, int entity) {
         if (!nearBoard(p, entity)) {
-            p.displayClientMessage(Component.translatable("rtshop.hunt.board_far").withStyle(ChatFormatting.RED), true);
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.board_far").withStyle(ChatFormatting.RED), true);
             return;
         }
         com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
@@ -578,7 +578,7 @@ public final class Hunts {
         done.putBoolean(b.id, true);
         d.put("books", done);
         Economy.addWallet(p, b.gold);
-        p.sendSystemMessage(Component.translatable("rtshop.hunt.book_done", b.name, String.format("%,d", b.gold)).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.book_done", b.name, String.format("%,d", b.gold)).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         p.level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1F, 1F);
     }
 
@@ -707,7 +707,7 @@ public final class Hunts {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                     int ent = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "entity");
                     int r = take(p, ent, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "index"));
-                    if (r == 2) p.displayClientMessage(Component.translatable("rtshop.hunt.board_full").withStyle(ChatFormatting.RED), true);
+                    if (r == 2) com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.board_full").withStyle(ChatFormatting.RED), true);
                     if (r == 0) p.level().playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1F, 1F);
                     openBoard(p, ent);
                     return r == 0 ? 1 : 0;

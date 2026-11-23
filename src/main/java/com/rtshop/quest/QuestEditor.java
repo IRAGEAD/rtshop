@@ -54,7 +54,7 @@ public final class QuestEditor {
 
     public static void open(ServerPlayer p) {
         if (!allowed(p)) {
-            p.sendSystemMessage(Component.translatable("rtshop.qedit.no_permission"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), snapshot(p.server));
@@ -375,7 +375,7 @@ public final class QuestEditor {
 
     public static void handle(ServerPlayer p, int action, String origId, String json) {
         if (!allowed(p)) {
-            p.sendSystemMessage(Component.translatable("rtshop.qedit.no_permission"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }
         Result r = switch (action) {

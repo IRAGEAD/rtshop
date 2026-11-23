@@ -248,10 +248,10 @@ public final class ItemStats {
             save();
             syncAll(p.server);
             refreshEquipment(p.server);
-            p.sendSystemMessage(Component.translatable(m.isEmpty() ? "rtshop.itemstats.reset" : "rtshop.itemstats.saved", itemId)
+            com.rtshop.notice.Notice.send(p, Component.translatable(m.isEmpty() ? "rtshop.itemstats.reset" : "rtshop.itemstats.saved", itemId)
                     .withStyle(ChatFormatting.GREEN));
         } catch (Exception ex) {
-            p.sendSystemMessage(Component.translatable("rtshop.itemstats.failed", String.valueOf(ex.getMessage())).withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.itemstats.failed", String.valueOf(ex.getMessage())).withStyle(ChatFormatting.RED));
         }
     }
 

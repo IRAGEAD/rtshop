@@ -82,7 +82,7 @@ public final class PlotBrowser {
 
     public static void handle(ServerPlayer p, int action, int id) {
         if (!nearMerchant(p)) {
-            p.sendSystemMessage(Component.translatable("rtshop.plotui.too_far").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plotui.too_far").withStyle(ChatFormatting.RED));
             return;
         }
         LandData data = LandData.get(p.server);
@@ -105,7 +105,7 @@ public final class PlotBrowser {
                 Claim c = l == null ? null : PlotManager.plotClaim(l);
                 if (c != null) {
                     LandManager.SHOW_BORDER.put(p.getUUID(), new long[]{l.id, p.level().getGameTime() + 1200});
-                    p.sendSystemMessage(Component.translatable("rtshop.plotui.border", l.name, (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2)
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plotui.border", l.name, (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2)
                             .withStyle(ChatFormatting.AQUA));
                 }
             }

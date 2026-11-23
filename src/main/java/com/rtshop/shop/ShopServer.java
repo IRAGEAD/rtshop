@@ -206,7 +206,7 @@ public final class ShopServer {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("rtshop")
                 .then(Commands.literal("balance").executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
-                    p.sendSystemMessage(Component.translatable("rtshop.msg.balance",
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.balance",
                             num(Economy.wallet(p)), num(Economy.bank(p))));
                     return 1;
                 }))
@@ -231,7 +231,7 @@ public final class ShopServer {
                         .then(Commands.literal("bypass").requires(src -> src.hasPermission(2)).executes(ctx -> {
                             ServerPlayer p = ctx.getSource().getPlayerOrException();
                             boolean on = LandManager.toggleBypass(p);
-                            p.sendSystemMessage(Component.translatable(on ? "rtshop.land.bypass_on" : "rtshop.land.bypass_off"));
+                            com.rtshop.notice.Notice.send(p, Component.translatable(on ? "rtshop.land.bypass_on" : "rtshop.land.bypass_off"));
                             return 1;
                         })))
                 .then(Commands.literal("job")
@@ -502,7 +502,7 @@ public final class ShopServer {
     private static void feedback(CommandSourceStack src, Component msg) {
         Entity e = src.getEntity();
         if (e instanceof ServerPlayer sp) {
-            sp.sendSystemMessage(msg);
+            com.rtshop.notice.Notice.send(sp, msg);
         } else {
             src.getServer().sendSystemMessage(msg);
         }
@@ -654,7 +654,7 @@ public final class ShopServer {
     public static void openShop(ServerPlayer player, String shopId, int npcId) {
         ShopData d = loaded.shops.get(shopId);
         if (d == null) {
-            player.sendSystemMessage(Component.translatable("rtshop.msg.unknown_shop", shopId));
+            com.rtshop.notice.Notice.send(player, Component.translatable("rtshop.msg.unknown_shop", shopId));
             return;
         }
         Economy.sync(player);

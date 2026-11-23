@@ -69,12 +69,12 @@ public final class LandManager {
         if (now) {
             BORDER_ON.add(p.getUUID());
             Land here = landAt((ServerLevel) p.level(), p.blockPosition());
-            p.sendSystemMessage(Component.translatable(here != null ? "rtshop.land.border_on" : "rtshop.land.border_on_outside")
+            com.rtshop.notice.Notice.send(p, Component.translatable(here != null ? "rtshop.land.border_on" : "rtshop.land.border_on_outside")
                     .withStyle(ChatFormatting.AQUA));
         } else {
             BORDER_ON.remove(p.getUUID());
             SHOW_BORDER.remove(p.getUUID());
-            p.sendSystemMessage(Component.translatable("rtshop.land.border_off").withStyle(ChatFormatting.GRAY));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.border_off").withStyle(ChatFormatting.GRAY));
         }
         return now;
     }
@@ -274,7 +274,7 @@ public final class LandManager {
     public static void useDeed(ServerPlayer p, ItemStack stack, DeedItem.Type type) {
         Candidate c = candidate(p, type);
         if (c.error != null) {
-            p.sendSystemMessage(c.error.copy().withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, c.error.copy().withStyle(ChatFormatting.RED));
             return;
         }
         LandData data = data(p);
@@ -311,10 +311,10 @@ public final class LandManager {
         if (!p.isCreative()) {
             stack.shrink(1);
         }
-        p.sendSystemMessage(Component.translatable(expanded ? "rtshop.land.expanded" : "rtshop.land.claimed",
+        com.rtshop.notice.Notice.send(p, Component.translatable(expanded ? "rtshop.land.expanded" : "rtshop.land.claimed",
                 c.x0 + "~" + c.x1, c.y0 + "~" + c.y1, c.z0 + "~" + c.z1).withStyle(ChatFormatting.GREEN));
-        p.sendSystemMessage(Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
-        p.sendSystemMessage(Component.translatable("rtshop.land.border_hint").withStyle(ChatFormatting.GRAY));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.border_hint").withStyle(ChatFormatting.GRAY));
     }
 
     /**
@@ -388,7 +388,7 @@ public final class LandManager {
             return;
         }
         if (land == null || (!isOwner(p, land) && !bypass(p))) {
-            p.sendSystemMessage(Component.translatable("rtshop.land.not_owner").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.not_owner").withStyle(ChatFormatting.RED));
             openScreen(p);
             return;
         }
@@ -418,7 +418,7 @@ public final class LandManager {
             }
             case ACT_SHOW_BORDER -> {
                 SHOW_BORDER.put(p.getUUID(), new long[]{land.id, p.level().getGameTime() + 400});
-                p.sendSystemMessage(Component.translatable("rtshop.land.border_shown"));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.border_shown"));
                 return; // 화면을 다시 열지 않는다 (입자가 보이도록 클라이언트가 화면을 닫음)
             }
             case ACT_RENAME -> {
@@ -457,7 +457,7 @@ public final class LandManager {
             }
         }
         if (id == null) {
-            p.sendSystemMessage(Component.translatable("rtshop.land.member_unknown", name).withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.member_unknown", name).withStyle(ChatFormatting.RED));
             return;
         }
         if (id.equals(land.owner)) {
@@ -472,7 +472,7 @@ public final class LandManager {
         }
         m.name = realName;
         data(p).touch();
-        p.sendSystemMessage(Component.translatable("rtshop.land.member_added", realName).withStyle(ChatFormatting.GREEN));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.member_added", realName).withStyle(ChatFormatting.GREEN));
     }
 
     /** 토지를 반환하고 구역마다 토지 문서를 돌려준다. */
@@ -492,14 +492,14 @@ public final class LandManager {
             }
         }
         if (free < deeds.size()) {
-            p.sendSystemMessage(Component.translatable("rtshop.land.abandon_space", deeds.size()).withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.abandon_space", deeds.size()).withStyle(ChatFormatting.RED));
             return;
         }
         data(p).removeLand(land);
         for (ItemStack d : deeds) {
             p.getInventory().add(d);
         }
-        p.sendSystemMessage(Component.translatable("rtshop.land.abandoned", deeds.size()).withStyle(ChatFormatting.YELLOW));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.abandoned", deeds.size()).withStyle(ChatFormatting.YELLOW));
     }
 
     // ------------------------------------------------------------------ 보관함 PIN
@@ -562,11 +562,11 @@ public final class LandManager {
         Level level = p.level();
         Land land = data(p).landAt(dim(level), pos);
         if (land == null || (!isOwner(p, land) && !bypass(p))) {
-            p.sendSystemMessage(Component.translatable("rtshop.pin.owner_only").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.owner_only").withStyle(ChatFormatting.RED));
             return;
         }
         if (p.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 100 || !isStorage(level, pos)) {
-            p.sendSystemMessage(Component.translatable("rtshop.pin.not_storage").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.not_storage").withStyle(ChatFormatting.RED));
             return;
         }
         String dim = dim(level);
@@ -576,12 +576,12 @@ public final class LandManager {
             if (other != null) {
                 data(p).setPin(dim, other, null);
             }
-            p.sendSystemMessage(Component.translatable("rtshop.pin.removed").withStyle(ChatFormatting.YELLOW));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.removed").withStyle(ChatFormatting.YELLOW));
             return;
         }
         if (!validPin(pin)) {
             LandConfig cfg = LandConfig.get();
-            p.sendSystemMessage(Component.translatable("rtshop.pin.invalid", cfg.pinMinLength, cfg.pinMaxLength).withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.invalid", cfg.pinMinLength, cfg.pinMaxLength).withStyle(ChatFormatting.RED));
             return;
         }
         LandData.Pin entry = new LandData.Pin();
@@ -591,7 +591,7 @@ public final class LandManager {
         if (other != null) {
             data(p).setPin(dim, other, entry);
         }
-        p.sendSystemMessage(Component.translatable("rtshop.pin.set").withStyle(ChatFormatting.GREEN));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.set").withStyle(ChatFormatting.GREEN));
     }
 
     /** 이 플레이어가 PIN 을 입력해야 열 수 있는 보관함인가. */
@@ -625,7 +625,7 @@ public final class LandManager {
         long now = level.getGameTime();
         long[] fails = PIN_FAILS.computeIfAbsent(p.getUUID(), k -> new long[]{0, 0});
         if (fails[1] > now) {
-            p.sendSystemMessage(Component.translatable("rtshop.pin.locked_out", (fails[1] - now) / 20 + 1).withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.locked_out", (fails[1] - now) / 20 + 1).withStyle(ChatFormatting.RED));
             return false;
         }
         String dim = dim(level);
@@ -646,7 +646,7 @@ public final class LandManager {
             if (other != null) {
                 m.put(LandData.pinKey(dim, other), until);
             }
-            p.sendSystemMessage(Component.translatable("rtshop.pin.ok").withStyle(ChatFormatting.GREEN));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.ok").withStyle(ChatFormatting.GREEN));
             return true;
         }
         fails[0]++;
@@ -654,12 +654,12 @@ public final class LandManager {
             fails[0] = 0;
             fails[1] = now + cfg.pinLockoutSeconds * 20L;
         }
-        p.sendSystemMessage(Component.translatable("rtshop.pin.wrong").withStyle(ChatFormatting.RED));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pin.wrong").withStyle(ChatFormatting.RED));
         Land land = data(p).landAt(dim, pos);
         if (land != null) {
             ServerPlayer owner = p.server.getPlayerList().getPlayer(land.owner);
             if (owner != null && owner != p) {
-                owner.sendSystemMessage(Component.translatable("rtshop.pin.alert", p.getGameProfile().getName(),
+                com.rtshop.notice.Notice.send(owner, Component.translatable("rtshop.pin.alert", p.getGameProfile().getName(),
                         pos.getX() + ", " + pos.getY() + ", " + pos.getZ()).withStyle(ChatFormatting.YELLOW));
             }
         }

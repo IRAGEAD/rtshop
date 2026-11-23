@@ -359,7 +359,7 @@ public final class StorySeals {
         Long last = LAST_MSG.get(p.getUUID());
         if (last != null && now - last < 60) return;
         LAST_MSG.put(p.getUUID(), now);
-        p.displayClientMessage(Component.literal("✦ " + StoryText.t(p, s.message)).withStyle(ChatFormatting.LIGHT_PURPLE), true);
+        com.rtshop.notice.Notice.send(p, Component.literal("✦ " + StoryText.t(p, s.message)).withStyle(ChatFormatting.LIGHT_PURPLE), true);
         p.level().playSound(null, p.blockPosition(), SoundEvents.RESPAWN_ANCHOR_DEPLETE.get(), SoundSource.PLAYERS, 0.6F, 1.4F);
     }
 

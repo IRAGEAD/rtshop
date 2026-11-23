@@ -387,10 +387,10 @@ public final class FarmEvents {
             }
         }
         if (notReplanted > 0) {
-            sp.displayClientMessage(Component.translatable("rtshop.msg.harvest_no_seed", notReplanted)
+            com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.msg.harvest_no_seed", notReplanted)
                     .withStyle(ChatFormatting.YELLOW), true);
         } else if (denied && harvested == 0) {
-            sp.displayClientMessage(Component.translatable("rtshop.msg.harvest_denied").withStyle(ChatFormatting.RED), true);
+            com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.msg.harvest_denied").withStyle(ChatFormatting.RED), true);
         }
     }
 

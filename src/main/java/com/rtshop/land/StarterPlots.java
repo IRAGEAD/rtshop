@@ -34,7 +34,7 @@ public final class StarterPlots {
                     for (Land l : data.landsOf(p.getUUID())) {
                         if (l.plot && cfg.starterPlotGroup.equals(l.group)) {
                             PlotManager.resetToSale(data, l);
-                            p.sendSystemMessage(Component.translatable("rtshop.plot.starter_revoked", l.name).withStyle(ChatFormatting.YELLOW));
+                            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.starter_revoked", l.name).withStyle(ChatFormatting.YELLOW));
                         }
                     }
                 }
@@ -50,10 +50,10 @@ public final class StarterPlots {
                 }
             }
             if (free == null) {
-                p.sendSystemMessage(Component.translatable("rtshop.plot.starter_none").withStyle(ChatFormatting.GOLD));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.starter_none").withStyle(ChatFormatting.GOLD));
                 for (ServerPlayer op : p.server.getPlayerList().getPlayers()) {
                     if (op.hasPermissions(2) && op != p) {
-                        op.sendSystemMessage(Component.translatable("rtshop.plot.starter_none_op", p.getGameProfile().getName())
+                        com.rtshop.notice.Notice.send(op, Component.translatable("rtshop.plot.starter_none_op", p.getGameProfile().getName())
                                 .withStyle(ChatFormatting.GOLD));
                     }
                 }
@@ -76,9 +76,9 @@ public final class StarterPlots {
         data.touch();
         Claim c = PlotManager.plotClaim(land);
         int x = c == null ? 0 : (c.x0 + c.x1) / 2, z = c == null ? 0 : (c.z0 + c.z1) / 2;
-        p.sendSystemMessage(Component.translatable("rtshop.plot.starter_given", land.name, c == null ? 0 : c.area(), x, z)
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.starter_given", land.name, c == null ? 0 : c.area(), x, z)
                 .withStyle(ChatFormatting.GREEN));
-        p.sendSystemMessage(Component.translatable("rtshop.plot.starter_hint").withStyle(ChatFormatting.GRAY));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.starter_hint").withStyle(ChatFormatting.GRAY));
         RtShop.LOGGER.info("[rtshop] {} 에게 초보 농지 '{}' 를 주었습니다", p.getGameProfile().getName(), land.name);
     }
 

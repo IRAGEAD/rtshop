@@ -64,7 +64,7 @@ public final class VoidGuard {
         p.fallDistance = 0;
         p.hurtMarked = true;
         p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
-        p.displayClientMessage(Component.translatable("rtshop.void.rescued").withStyle(ChatFormatting.LIGHT_PURPLE), true);
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.void.rescued").withStyle(ChatFormatting.LIGHT_PURPLE), true);
     }
 
     @SubscribeEvent

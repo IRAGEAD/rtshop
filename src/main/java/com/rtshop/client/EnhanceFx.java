@@ -120,7 +120,7 @@ public final class EnhanceFx {
                     .append(Component.literal(" - ").withStyle(ChatFormatting.DARK_GRAY)).append(title.copy().withStyle(s -> s.withColor(color)));
             if (guarded) chat = chat.copy().append(Component.literal(" (").append(Component.translatable("rtshop.enhance.fx_guarded")).append(")")
                     .withStyle(ChatFormatting.AQUA));
-            mc.player.displayClientMessage(chat, false);
+            NoticeHud.push(chat);
         }
     }
 

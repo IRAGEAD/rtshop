@@ -184,37 +184,37 @@ public final class Pvp {
         boolean next = want == null ? !cur : want;
         St s = st(p);
         if (!cfg.enabled && !force) {
-            p.displayClientMessage(Component.translatable("rtshop.pvp.system_off").withStyle(ChatFormatting.GRAY), false);
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pvp.system_off").withStyle(ChatFormatting.GRAY), false);
             return false;
         }
         if (next == cur) {
-            p.displayClientMessage(Component.translatable(cur ? "rtshop.pvp.already_on" : "rtshop.pvp.already_off").withStyle(ChatFormatting.GRAY), false);
+            com.rtshop.notice.Notice.send(p, Component.translatable(cur ? "rtshop.pvp.already_on" : "rtshop.pvp.already_off").withStyle(ChatFormatting.GRAY), false);
             return false;
         }
         if (!force) {
             if (next) {
                 int a = area(p);
                 if (!capable(a)) {
-                    p.displayClientMessage(Component.translatable(a == AREA_SAFE ? "rtshop.pvp.deny_safe" : "rtshop.pvp.deny_area")
+                    com.rtshop.notice.Notice.send(p, Component.translatable(a == AREA_SAFE ? "rtshop.pvp.deny_safe" : "rtshop.pvp.deny_area")
                             .withStyle(ChatFormatting.RED), false);
                     return false;
                 }
             } else {
                 int lock = lockSeconds(p);
                 if (lock > 0) {
-                    p.displayClientMessage(Component.translatable("rtshop.pvp.deny_combat", lock).withStyle(ChatFormatting.RED), false);
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pvp.deny_combat", lock).withStyle(ChatFormatting.RED), false);
                     return false;
                 }
             }
             long wait = s.lastSwitch + cfg.switchSeconds * 1000L - now();
             if (wait > 0) {
-                p.displayClientMessage(Component.translatable("rtshop.pvp.deny_cooldown", (wait + 999) / 1000).withStyle(ChatFormatting.RED), false);
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pvp.deny_cooldown", (wait + 999) / 1000).withStyle(ChatFormatting.RED), false);
                 return false;
             }
         }
         store(p, next);
         s.lastSwitch = now();
-        p.displayClientMessage(Component.translatable(next ? "rtshop.pvp.on" : "rtshop.pvp.off")
+        com.rtshop.notice.Notice.send(p, Component.translatable(next ? "rtshop.pvp.on" : "rtshop.pvp.off")
                 .withStyle(next ? ChatFormatting.RED : ChatFormatting.GREEN), false);
         sync(p);
         return true;
@@ -296,7 +296,7 @@ public final class Pvp {
             St s = st(attacker);
             if (now() - s.lastWarn > 1500) {
                 s.lastWarn = now();
-                attacker.displayClientMessage(Component.translatable(why, victim.getDisplayName()).withStyle(ChatFormatting.RED), true);
+                com.rtshop.notice.Notice.send(attacker, Component.translatable(why, victim.getDisplayName()).withStyle(ChatFormatting.RED), true);
             }
             return;
         }
@@ -335,7 +335,7 @@ public final class Pvp {
                 String key = a == AREA_SAFE ? "rtshop.pvp.enter_safe" : capable(a) ? (capable(before) ? null : "rtshop.pvp.enter_zone")
                         : (capable(before) ? "rtshop.pvp.leave_zone" : null);
                 if (key != null) {
-                    p.displayClientMessage(Component.translatable(key).withStyle(a == AREA_SAFE ? ChatFormatting.GREEN
+                    com.rtshop.notice.Notice.send(p, Component.translatable(key).withStyle(a == AREA_SAFE ? ChatFormatting.GREEN
                             : capable(a) ? ChatFormatting.GOLD : ChatFormatting.GRAY), true);
                 }
             }
@@ -343,7 +343,7 @@ public final class Pvp {
         if (cfg.enabled && on(p) && !capable(a)) {
             store(p, false);
             s.combatUntil = 0;
-            p.displayClientMessage(Component.translatable(a == AREA_SAFE ? "rtshop.pvp.auto_off_safe" : "rtshop.pvp.auto_off")
+            com.rtshop.notice.Notice.send(p, Component.translatable(a == AREA_SAFE ? "rtshop.pvp.auto_off_safe" : "rtshop.pvp.auto_off")
                     .withStyle(ChatFormatting.YELLOW), false);
         }
         int hash = (on(p) ? 1 : 0) | (a << 1) | (lockSeconds(p) << 4) | (cfg.enabled ? 1 << 20 : 0);
@@ -461,7 +461,7 @@ public final class Pvp {
 
     private static int status(ServerPlayer p) {
         int a = area(p);
-        p.displayClientMessage(Component.translatable("rtshop.pvp.status",
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pvp.status",
                 Component.translatable(on(p) ? "rtshop.pvp.word_on" : "rtshop.pvp.word_off").withStyle(on(p) ? ChatFormatting.RED : ChatFormatting.GREEN),
                 areaName(a).withStyle(a == AREA_SAFE ? ChatFormatting.GREEN : capable(a) ? ChatFormatting.GOLD : ChatFormatting.GRAY)), false);
         return 1;

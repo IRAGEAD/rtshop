@@ -825,7 +825,7 @@ public final class QuestManager {
         double r = EconomyConfig.get().npcRange + 2;
         String key = e == null ? null : npcKey(e);
         if (key == null || !e.isAlive() || e.distanceToSqr(p) > r * r) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.too_far"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.too_far"));
             return false;
         }
         openDialog(p, key, entityId);
@@ -857,14 +857,14 @@ public final class QuestManager {
         switch (action) {
             case QuestActionPacket.ACCEPT -> {
                 if (!sessionOk(p, s)) {
-                    p.sendSystemMessage(Component.translatable("rtshop.quest.too_far"));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.too_far"));
                     return;
                 }
                 accept(p, questId, s.npcKey());
             }
             case QuestActionPacket.TURN_IN -> {
                 if (!sessionOk(p, s)) {
-                    p.sendSystemMessage(Component.translatable("rtshop.quest.too_far"));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.too_far"));
                     return;
                 }
                 turnIn(p, questId, s.npcKey(), choice);
@@ -880,16 +880,16 @@ public final class QuestManager {
     public static boolean accept(ServerPlayer p, String questId, String npcKey) {
         QuestDef q = loaded.quests.get(questId);
         if (q == null || (npcKey != null && !q.giver.equals(npcKey))) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.unknown"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.unknown"));
             return false;
         }
         if (!isAvailable(p, q)) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.not_available"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.not_available"));
             return false;
         }
         QuestData.Progress pr = prog(p);
         if (pr.active.size() >= MAX_ACTIVE) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.too_many", MAX_ACTIVE));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.too_many", MAX_ACTIVE));
             return false;
         }
         // 직업 선행 퀘스트는 전투·생활 직업마다 한 직업씩만 진행한다
@@ -899,20 +899,20 @@ public final class QuestManager {
             String has = hasOtherJob(p, jobId);
             if (has != null) {
                 com.rtshop.job.JobConfig.JobDef hd = com.rtshop.job.JobConfig.get().jobs.get(has);
-                p.sendSystemMessage(Component.translatable("rtshop.quest.job_has", hd == null ? has : hd.name));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.job_has", hd == null ? has : hd.name));
                 return false;
             }
             String busy = busyJob(pr, jobId);
             if (busy != null) {
                 com.rtshop.job.JobConfig.JobDef bd = com.rtshop.job.JobConfig.get().jobs.get(busy);
-                p.sendSystemMessage(Component.translatable("rtshop.quest.job_busy", bd == null ? busy : bd.name));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.job_busy", bd == null ? busy : bd.name));
                 return false;
             }
             pr.flags.remove(JOB_PAUSED + jobId);
         }
         pr.active.put(q.id, new int[q.objectives.size()]);
         QuestData.get(p.server).dirty();
-        p.sendSystemMessage(Component.translatable("rtshop.quest.accepted", com.rtshop.story.StoryText.t(p, q.title)));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.accepted", com.rtshop.story.StoryText.t(p, q.title)));
         com.rtshop.story.StagedStructures.scan(p); // 이 퀘스트가 가리키는 이야기 건축물이 새 지형에 생기기 시작한다
         scene(p, q.sceneAccept);
         // 이미 조건을 채운 상태(방문 위치에 서 있음 등)를 바로 반영
@@ -926,12 +926,12 @@ public final class QuestManager {
             return false;
         }
         QuestDef q = loaded.quests.get(questId);
-        p.sendSystemMessage(Component.translatable("rtshop.quest.abandoned", q == null ? questId : com.rtshop.story.StoryText.t(p, q.title)));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.abandoned", q == null ? questId : com.rtshop.story.StoryText.t(p, q.title)));
         String jobId = jobOf(questId);
         if (jobId != null) {
             // 이 직업의 선행 퀘스트를 그만둔다: 다른 직업의 선행 퀘스트를 받을 수 있다 (다시 받으면 이어서 진행)
             pr.flags.add(JOB_PAUSED + jobId);
-            p.sendSystemMessage(Component.translatable("rtshop.quest.job_paused"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.job_paused"));
         }
         QuestData.get(p.server).dirty();
         return true;
@@ -986,19 +986,19 @@ public final class QuestManager {
         QuestData.Progress pr = prog(p);
         int[] pg = pr.active.get(questId);
         if (q == null || pg == null) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.unknown"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.unknown"));
             return false;
         }
         if (npcKey != null && !q.turnInNpc().equals(npcKey)) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.wrong_npc", npcName(q.turnInNpc())));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.wrong_npc", npcName(q.turnInNpc())));
             return false;
         }
         if (!allDone(p, q, pg)) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.not_done"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.not_done"));
             return false;
         }
         if (!q.choices.isEmpty() && (choice < 0 || choice >= q.choices.size())) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.need_choice"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.need_choice"));
             return false;
         }
         // 납품·지불을 가져간다
@@ -1017,7 +1017,7 @@ public final class QuestManager {
         }
         QuestData.get(p.server).dirty();
         giveRewards(p, q);
-        p.sendSystemMessage(Component.translatable("rtshop.quest.completed", com.rtshop.story.StoryText.t(p, q.title)));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.completed", com.rtshop.story.StoryText.t(p, q.title)));
         scene(p, q.sceneDone);
         nextHint(p, q, npcKey);
         if (!q.rewardFlags.isEmpty()) {
@@ -1036,7 +1036,7 @@ public final class QuestManager {
             Component msg = n.giver.equals(fromNpc)
                     ? Component.translatable("rtshop.quest.next_same", com.rtshop.story.StoryText.t(p, n.title))
                     : Component.translatable("rtshop.quest.next_npc", com.rtshop.story.StoryText.t(p, npcName(n.giver)), com.rtshop.story.StoryText.t(p, n.title));
-            p.sendSystemMessage(speaker == null ? msg.copy().withStyle(net.minecraft.ChatFormatting.GOLD)
+            com.rtshop.notice.Notice.send(p, speaker == null ? msg.copy().withStyle(net.minecraft.ChatFormatting.GOLD)
                     : Component.literal("[" + speaker + "] ").withStyle(net.minecraft.ChatFormatting.YELLOW).append(msg.copy().withStyle(net.minecraft.ChatFormatting.GOLD)));
         }
     }
@@ -1063,7 +1063,7 @@ public final class QuestManager {
     private static void giveRewards(ServerPlayer p, QuestDef q) {
         if (q.rewardGold > 0) {
             Economy.addWallet(p, q.rewardGold);
-            p.sendSystemMessage(Component.translatable("rtshop.quest.reward_gold", String.format("%,d", q.rewardGold)));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_gold", String.format("%,d", q.rewardGold)));
         }
         for (QuestDef.ItemReward ir : q.rewardItems) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ir.item));
@@ -1080,7 +1080,7 @@ public final class QuestManager {
                 }
                 left -= n;
             }
-            p.sendSystemMessage(Component.translatable("rtshop.quest.reward_item",
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_item",
                     new ItemStack(item).getHoverName(), ir.count));
         }
     }
@@ -1089,10 +1089,10 @@ public final class QuestManager {
 
     private static void notifyProgress(ServerPlayer p, QuestDef q, int[] pg) {
         if (allDone(p, q, pg)) {
-            p.sendSystemMessage(Component.translatable("rtshop.quest.objectives_done", com.rtshop.story.StoryText.t(p, q.title),
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.objectives_done", com.rtshop.story.StoryText.t(p, q.title),
                     npcName(q.turnInNpc())));
         } else {
-            p.displayClientMessage(Component.translatable("rtshop.quest.progress", com.rtshop.story.StoryText.t(p, q.title)), true);
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.progress", com.rtshop.story.StoryText.t(p, q.title)), true);
         }
     }
 

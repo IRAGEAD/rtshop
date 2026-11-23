@@ -145,7 +145,7 @@ public final class Party {
     // ------------------------------------------------------------------ 행동
 
     private static void say(ServerPlayer p, Component c) {
-        p.sendSystemMessage(Component.literal("[파티] ").withStyle(ChatFormatting.AQUA).append(c));
+        com.rtshop.notice.Notice.send(p, Component.literal("[파티] ").withStyle(ChatFormatting.AQUA).append(c));
     }
 
     private static void say(ServerPlayer p, String s, ChatFormatting color) {

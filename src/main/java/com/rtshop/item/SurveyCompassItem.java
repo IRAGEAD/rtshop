@@ -60,18 +60,18 @@ public class SurveyCompassItem extends Item {
             if (target != null) break;
         }
         if (target == null) {
-            p.displayClientMessage(Component.translatable("item.rtshop.survey_compass.none").withStyle(ChatFormatting.GRAY), true);
+            com.rtshop.notice.Notice.send(p, Component.translatable("item.rtshop.survey_compass.none").withStyle(ChatFormatting.GRAY), true);
             return InteractionResultHolder.consume(stack);
         }
         BlockPos at = locate(p.serverLevel(), target, p.blockPosition());
         if (at == null) {
-            p.displayClientMessage(Component.translatable("item.rtshop.survey_compass.far", label).withStyle(ChatFormatting.RED), true);
+            com.rtshop.notice.Notice.send(p, Component.translatable("item.rtshop.survey_compass.far", label).withStyle(ChatFormatting.RED), true);
         } else {
             double dx = at.getX() + 0.5 - p.getX(), dz = at.getZ() + 0.5 - p.getZ();
             int dist = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
             int idx = Math.floorMod((int) Math.round(Math.toDegrees(Math.atan2(-dx, dz)) / 45.0), 8);
             boolean ko = !"en".equals(com.rtshop.story.Loc.lang(p));
-            p.displayClientMessage(Component.translatable("item.rtshop.survey_compass.found", label, ko ? DIRS[idx] : DIRS_EN[idx], dist)
+            com.rtshop.notice.Notice.send(p, Component.translatable("item.rtshop.survey_compass.found", label, ko ? DIRS[idx] : DIRS_EN[idx], dist)
                     .withStyle(ChatFormatting.GOLD), true);
             level.playSound(null, p.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1F, 1F);
         }

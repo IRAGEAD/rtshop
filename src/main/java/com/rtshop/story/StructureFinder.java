@@ -55,10 +55,14 @@ public final class StructureFinder {
     public static final class Found {
         public final BlockPos pos;
         public final Holder<Structure> structure;
+        /** 건축물 시작점이 있는 청크 (pos 는 건축물 한가운데라 다른 청크일 수 있다). */
+        public final int cx, cz;
 
-        Found(BlockPos pos, Holder<Structure> structure) {
+        Found(BlockPos pos, Holder<Structure> structure, int cx, int cz) {
             this.pos = pos;
             this.structure = structure;
+            this.cx = cx;
+            this.cz = cz;
         }
     }
 
@@ -133,7 +137,7 @@ public final class StructureFinder {
                     int rx0 = Math.floorDiv(fx, sp), rz0 = Math.floorDiv(fz, sp);
                     for (int rx = rx0 - r; rx <= rx0 + r; rx++) {
                         for (int rz = rz0 - r; rz <= rz0 + r; rz++) {
-                            ChunkPos c = rs.getPotentialStructureChunk(seed, rx, rz);
+                            ChunkPos c = rs.getPotentialStructureChunk(seed, rx * sp, rz * sp); // 청크 좌표를 받는다 (안에서 구역으로 나눔)
                             add(level, cands, seen, h, pl, c.x, c.z, fx, fz, radiusChunks, minTown);
                         }
                     }
@@ -165,7 +169,7 @@ public final class StructureFinder {
                 lastRejected++;
                 continue;
             }
-            best = new Found(at, c.h);
+            best = new Found(at, c.h, c.cx, c.cz);
             break;
         }
         lastInfo = "holders=" + set.size() + " staged=" + staged + " placements=" + nPl + " cands=" + cands.size() + " placementOk=" + passed
@@ -187,7 +191,7 @@ public final class StructureFinder {
                 lastRejected++;
                 continue;
             }
-            if (best == null || at.distSqr(from) < best.pos.distSqr(from)) best = new Found(at, h);
+            if (best == null || at.distSqr(from) < best.pos.distSqr(from)) best = new Found(at, h, cx, cz);
         }
         return best;
     }

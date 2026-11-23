@@ -66,7 +66,7 @@ public final class ClientHooks {
         } else if (mc.screen instanceof PickerScreen p && p.parent instanceof AttendanceEditScreen screen) {
             screen.showResult(message, success);
         } else if (mc.player != null) {
-            mc.player.displayClientMessage(message, true);
+            NoticeHud.push(message);
         }
     }
 

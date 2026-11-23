@@ -194,7 +194,7 @@ public final class SeedRules {
                 || target.is(BlockTags.JUNGLE_LOGS) || target.is(Blocks.MUD);
         if (event.getLevel().isClientSide) {
             if (soil) {
-                player.displayClientMessage(Component.translatable(
+                com.rtshop.notice.Notice.send(player, Component.translatable(
                         isDual(stack) ? "rtshop.msg.need_shop_seed_dual" : "rtshop.msg.need_shop_seed"), true);
             }
         } else if (soil && player instanceof ServerPlayer sp) {
@@ -209,7 +209,7 @@ public final class SeedRules {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.FAIL);
             if (event.getLevel().isClientSide) {
-                event.getEntity().displayClientMessage(Component.translatable("rtshop.msg.seed_not_food"), true);
+                com.rtshop.notice.Notice.send(event.getEntity(), Component.translatable("rtshop.msg.seed_not_food"), true);
             }
         }
     }

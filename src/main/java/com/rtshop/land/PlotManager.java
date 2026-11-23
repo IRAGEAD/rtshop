@@ -174,7 +174,7 @@ public final class PlotManager {
     }
 
     private static void bar(ServerPlayer p, Component c) {
-        p.displayClientMessage(c, true);
+        com.rtshop.notice.Notice.send(p, c, true);
     }
 
     // ------------------------------------------------------------------ 지면 판정
@@ -509,14 +509,14 @@ public final class PlotManager {
                 boolean add = (s.mode == FILL_ADD) == primary;
                 LongOpenHashSet region = floodField(level, x, z, s.editing);
                 if (region == null) {
-                    p.sendSystemMessage(Component.translatable("rtshop.plot.fill_too_big", LandConfig.get().plotFillMaxArea)
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.fill_too_big", LandConfig.get().plotFillMaxArea)
                             .withStyle(ChatFormatting.RED));
                     return;
                 }
                 if (region.isEmpty() && add) {
                     BlockPos top = surface(level, x, z);
                     String id = top == null ? "?" : String.valueOf(ForgeRegistries.BLOCKS.getKey(level.getBlockState(top).getBlock()));
-                    p.sendSystemMessage(Component.translatable("rtshop.plot.fill_not_field", id).withStyle(ChatFormatting.RED));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.fill_not_field", id).withStyle(ChatFormatting.RED));
                     return;
                 }
                 if (!add && region.isEmpty()) {
@@ -586,7 +586,7 @@ public final class PlotManager {
     /** 다각형을 닫아 안쪽 칸을 선택에 더한다. */
     public static boolean closePolygon(ServerPlayer p, Selection s) {
         if (s.polygon.size() < 3) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.poly_need3").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.poly_need3").withStyle(ChatFormatting.RED));
             return false;
         }
         LongOpenHashSet cells = polygonCells(s.polygon);
@@ -605,7 +605,7 @@ public final class PlotManager {
         }
         s.polygon.clear();
         s.bounds();
-        p.sendSystemMessage(Component.translatable("rtshop.plot.added", s.cells.size() - before, s.cells.size())
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.added", s.cells.size() - before, s.cells.size())
                 .withStyle(ChatFormatting.YELLOW));
         return true;
     }
@@ -638,7 +638,7 @@ public final class PlotManager {
             c.append(Component.translatable("rtshop.plot.mode_brush", s.brush));
         }
         bar(p, c.withStyle(ChatFormatting.AQUA));
-        p.sendSystemMessage(Component.translatable("rtshop.plot.mode_help." + MODE_KEYS[s.mode]).withStyle(ChatFormatting.GRAY));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.mode_help." + MODE_KEYS[s.mode]).withStyle(ChatFormatting.GRAY));
     }
 
     public static boolean undo(ServerPlayer p) {
@@ -731,13 +731,13 @@ public final class PlotManager {
     public static Land create(ServerPlayer p, long price, String name) {
         Selection s = selection(p);
         if (s.cells.isEmpty()) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.empty").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.empty").withStyle(ChatFormatting.RED));
             return null;
         }
         int[] dropped = {0};
         Claim c = buildClaim(p.serverLevel(), s.cells, -1, dropped);
         if (c == null) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.all_taken").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.all_taken").withStyle(ChatFormatting.RED));
             return null;
         }
         LandData data = LandData.get(p.server);
@@ -752,10 +752,10 @@ public final class PlotManager {
         s.polygon.clear();
         s.editing = -1;
         s.bounds();
-        p.sendSystemMessage(Component.translatable("rtshop.plot.created", land.id, land.name, c.area(), money(land.price))
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.created", land.id, land.name, c.area(), money(land.price))
                 .withStyle(ChatFormatting.GREEN));
         if (dropped[0] > 0) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.dropped", dropped[0]).withStyle(ChatFormatting.GOLD));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.dropped", dropped[0]).withStyle(ChatFormatting.GOLD));
         }
         return land;
     }
@@ -765,7 +765,7 @@ public final class PlotManager {
         Selection s = selection(p);
         Claim c = plotClaim(land);
         if (c == null || !c.dim.equals(s.dim)) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.other_dim").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.other_dim").withStyle(ChatFormatting.RED));
             return false;
         }
         s.snapshot();
@@ -774,7 +774,7 @@ public final class PlotManager {
         s.polygon.clear();
         s.editing = land.id;
         s.bounds();
-        p.sendSystemMessage(Component.translatable("rtshop.plot.editing", land.id, land.name, s.cells.size()).withStyle(ChatFormatting.YELLOW));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.editing", land.id, land.name, s.cells.size()).withStyle(ChatFormatting.YELLOW));
         return true;
     }
 
@@ -784,23 +784,23 @@ public final class PlotManager {
         LandData data = LandData.get(p.server);
         Land land = s.editing < 0 ? null : data.land(s.editing);
         if (land == null || !land.plot) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.not_editing").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.not_editing").withStyle(ChatFormatting.RED));
             return false;
         }
         Claim old = plotClaim(land);
         int[] dropped = {0};
         Claim fresh = buildClaim(p.serverLevel(), s.cells, land.id, dropped);
         if (fresh == null || old == null) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.empty").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.empty").withStyle(ChatFormatting.RED));
             return false;
         }
         data.replaceClaim(old, fresh);
         s.cells.clear();
         s.editing = -1;
         s.bounds();
-        p.sendSystemMessage(Component.translatable("rtshop.plot.saved", land.id, land.name, fresh.area()).withStyle(ChatFormatting.GREEN));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.saved", land.id, land.name, fresh.area()).withStyle(ChatFormatting.GREEN));
         if (dropped[0] > 0) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.dropped", dropped[0]).withStyle(ChatFormatting.GOLD));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.dropped", dropped[0]).withStyle(ChatFormatting.GOLD));
         }
         return true;
     }
@@ -843,7 +843,7 @@ public final class PlotManager {
     public static boolean buy(ServerPlayer p) {
         Land land = plotAt(p);
         if (land == null) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.not_in_plot").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.not_in_plot").withStyle(ChatFormatting.RED));
             return false;
         }
         return buyLand(p, land);
@@ -876,7 +876,7 @@ public final class PlotManager {
         LandData data = LandData.get(p.server);
         Component why = cannotBuy(p, land);
         if (why != null) {
-            p.sendSystemMessage(why.copy().withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, why.copy().withStyle(ChatFormatting.RED));
             return false;
         }
         Economy.addWallet(p, -land.price);
@@ -887,12 +887,12 @@ public final class PlotManager {
         land.members.clear();
         data.touch();
         LAST_PLOT.remove(p.getUUID());
-        p.sendSystemMessage(Component.translatable("rtshop.plot.bought", land.name, money(land.price)).withStyle(ChatFormatting.GREEN));
-        p.sendSystemMessage(Component.translatable("rtshop.land.border_hint").withStyle(ChatFormatting.GRAY));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.bought", land.name, money(land.price)).withStyle(ChatFormatting.GREEN));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.border_hint").withStyle(ChatFormatting.GRAY));
         if (land.castle() && !land.cleared) {
             int objs = CastlePlots.objectColumns(land);
             int n = CastlePlots.prepare(p.server, land);
-            p.sendSystemMessage(Component.translatable(objs > 0 ? "rtshop.castle.cleared_objects" : "rtshop.castle.cleared")
+            com.rtshop.notice.Notice.send(p, Component.translatable(objs > 0 ? "rtshop.castle.cleared_objects" : "rtshop.castle.cleared")
                     .withStyle(ChatFormatting.GOLD));
             RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 바꾼 블록 {}", p.getGameProfile().getName(), land.name, n);
         }
@@ -900,7 +900,7 @@ public final class PlotManager {
             try {
                 int n = clearPlot(p.server, land);
                 if (n > 0) {
-                    p.sendSystemMessage(Component.translatable("rtshop.plot.bought_cleared", n).withStyle(ChatFormatting.GOLD));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.bought_cleared", n).withStyle(ChatFormatting.GOLD));
                 }
                 RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 치운 블록 {}", p.getGameProfile().getName(), land.name, n);
             } catch (Throwable t) {
@@ -909,9 +909,9 @@ public final class PlotManager {
         }
         Claim c = plotClaim(land);
         if (c != null) {
-            p.sendSystemMessage(Component.translatable("rtshop.plot.where", (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2).withStyle(ChatFormatting.GRAY));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.where", (c.x0 + c.x1) / 2, (c.z0 + c.z1) / 2).withStyle(ChatFormatting.GRAY));
         }
-        p.sendSystemMessage(Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.land.claimed_hint").withStyle(ChatFormatting.GRAY));
         return true;
     }
 
@@ -1011,7 +1011,7 @@ public final class PlotManager {
     public static void giveBack(ServerPlayer p, Land land) {
         if (!land.group.isEmpty()) {
             resetToSale(LandData.get(p.server), land);
-            p.sendSystemMessage(Component.translatable("rtshop.plot.starter_returned", land.name).withStyle(ChatFormatting.YELLOW));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.starter_returned", land.name).withStyle(ChatFormatting.YELLOW));
             return;
         }
         long refund = land.paid * LandConfig.get().plotRefundPercent / 100;
@@ -1019,7 +1019,7 @@ public final class PlotManager {
         if (refund > 0) {
             Economy.addWallet(p, refund);
         }
-        p.sendSystemMessage(Component.translatable("rtshop.plot.given_back", land.name, money(refund)).withStyle(ChatFormatting.YELLOW));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.given_back", land.name, money(refund)).withStyle(ChatFormatting.YELLOW));
     }
 
     public static void resetToSale(LandData data, Land land) {
@@ -1374,7 +1374,7 @@ public final class PlotManager {
             LAST_PLOT.put(p.getUUID(), here.id);
             Claim c = plotClaim(here);
             // 안내만 한다. 경계는 스스로 켰을 때만 보인다 (/rtshop border)
-            p.sendSystemMessage(Component.translatable("rtshop.plot.for_sale_merchant", here.name, c == null ? 0 : c.area(),
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.for_sale_merchant", here.name, c == null ? 0 : c.area(),
                     money(here.price)).withStyle(ChatFormatting.GOLD));
         }
         return false;

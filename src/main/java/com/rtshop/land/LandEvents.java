@@ -83,7 +83,7 @@ public final class LandEvents {
                     : land != null && land.forSale()
                     ? Component.translatable("rtshop.plot.denied_sale", land.name, String.format("%,d", land.price))
                     : Component.translatable("rtshop.land.denied", land == null ? "?" : land.ownerName);
-            p.displayClientMessage(msg.copy().withStyle(ChatFormatting.RED), true);
+            com.rtshop.notice.Notice.send(p, msg.copy().withStyle(ChatFormatting.RED), true);
         }
     }
 
@@ -145,7 +145,7 @@ public final class LandEvents {
         if (LandManager.hasPin(level, pos)) {
             if (!LandManager.isOwner(sp, land) && !LandManager.bypass(sp)) {
                 event.setCanceled(true);
-                sp.displayClientMessage(Component.translatable("rtshop.pin.break_denied").withStyle(ChatFormatting.RED), true);
+                com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.pin.break_denied").withStyle(ChatFormatting.RED), true);
                 return;
             }
             LandManager.clearPin(level, pos);

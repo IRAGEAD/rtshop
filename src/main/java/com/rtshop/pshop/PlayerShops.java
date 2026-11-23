@@ -227,7 +227,7 @@ public final class PlayerShops {
         payOwner(p.server, be.owner, cost);
         ServerPlayer op = p.server.getPlayerList().getPlayer(be.owner);
         if (op != null) {
-            op.sendSystemMessage(Component.translatable("rtshop.pshop.sold_msg", p.getDisplayName(), l.item.getHoverName(), n, Long.toString(cost))
+            com.rtshop.notice.Notice.send(op, Component.translatable("rtshop.pshop.sold_msg", p.getDisplayName(), l.item.getHoverName(), n, Long.toString(cost))
                     .withStyle(ChatFormatting.GOLD));
         }
         RtShop.LOGGER.info("[rtshop] 플레이어 상점 {}: {} 이(가) {} x{} 을(를) {}G 에 샀습니다", be.ownerName, p.getGameProfile().getName(),

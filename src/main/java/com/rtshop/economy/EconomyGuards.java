@@ -76,7 +76,7 @@ public final class EconomyGuards {
         if (mode.equals("block")) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.FAIL);
-            player.displayClientMessage(Component.translatable("rtshop.msg.villager_blocked").withStyle(ChatFormatting.RED), true);
+            com.rtshop.notice.Notice.send(player, Component.translatable("rtshop.msg.villager_blocked").withStyle(ChatFormatting.RED), true);
             return;
         }
         try {

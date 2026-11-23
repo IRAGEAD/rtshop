@@ -123,7 +123,7 @@ public final class NpcGuard {
             e.setCanceled(true);
             e.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
             RtShop.LOGGER.error("[rtshop] 주민 {} 의 거래 목록을 만들다 다른 모드에서 오류가 났습니다 (서버를 지키려고 상호작용을 막았습니다)", v, t);
-            e.getEntity().displayClientMessage(net.minecraft.network.chat.Component.translatable("rtshop.msg.villager_broken")
+            com.rtshop.notice.Notice.send(e.getEntity(), net.minecraft.network.chat.Component.translatable("rtshop.msg.villager_broken")
                     .withStyle(net.minecraft.ChatFormatting.RED), true);
         }
     }

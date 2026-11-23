@@ -173,7 +173,7 @@ public final class StagedStructures {
         d.setDirty();
         recompute(server);
         RtShop.LOGGER.info("[rtshop] 이야기 건축물 생성이 풀렸습니다: {}{}", id, by == null ? "" : " (" + by.getGameProfile().getName() + ")");
-        if (by != null) by.displayClientMessage(Component.translatable("rtshop.staged.unlocked").withStyle(ChatFormatting.GOLD), false);
+        if (by != null) com.rtshop.notice.Notice.send(by, Component.translatable("rtshop.staged.unlocked").withStyle(ChatFormatting.GOLD), false);
         return true;
     }
 

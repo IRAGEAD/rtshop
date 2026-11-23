@@ -242,7 +242,7 @@ public final class StoryArena {
     public static boolean enter(ServerPlayer p, String boss, boolean force) {
         String why = cannotEnter(p, boss, force);
         if (why != null) {
-            p.displayClientMessage(Component.translatable(why).withStyle(ChatFormatting.RED), false);
+            com.rtshop.notice.Notice.send(p, Component.translatable(why).withStyle(ChatFormatting.RED), false);
             return false;
         }
         MinecraftServer server = p.server;
@@ -279,7 +279,7 @@ public final class StoryArena {
             if (m.isPassenger()) m.stopRiding();
             if (m instanceof net.minecraftforge.common.util.FakePlayer) m.setPos(x, c.getY() + 1, z);
             else m.teleportTo(level, x, c.getY() + 1, z, yaw, 0F);
-            m.displayClientMessage(Component.translatable("rtshop.arena.entered", Hunts.name(boss)).withStyle(ChatFormatting.GOLD), true);
+            com.rtshop.notice.Notice.send(m, Component.translatable("rtshop.arena.entered", Hunts.name(boss)).withStyle(ChatFormatting.GOLD), true);
             i++;
         }
         level.playSound(null, c, SoundEvents.END_PORTAL_SPAWN, SoundSource.HOSTILE, 0.6F, 0.8F);
@@ -458,7 +458,7 @@ public final class StoryArena {
                     if (boss == null || !boss.isAlive()) {
                         s.state = WON;
                         s.endAt = now + 200;
-                        for (ServerPlayer p : inside) p.displayClientMessage(Component.translatable("rtshop.arena.won").withStyle(ChatFormatting.GOLD), false);
+                        for (ServerPlayer p : inside) com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.arena.won").withStyle(ChatFormatting.GOLD), false);
                     } else if (inside.isEmpty()) {
                         s.state = LOST;
                         s.endAt = now + 20;

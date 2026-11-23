@@ -799,6 +799,42 @@ final class ClientSelfTest2 {
             mc.setScreen(null);
             waitTicks(10);
         });
+        // 알림 상자: 채팅 대신 핫바 위에, 창 글꼴로, 화면 밖으로 넘치지 않게
+        add(mc -> {
+            NoticeHud.clearForTest();
+            mc.player.connection.sendCommand("rtshop balance");
+            waitTicks(15);
+        });
+        add(mc -> {
+            check("a server notice (/rtshop balance) shows in the notice box, not in chat", NoticeHud.activeForTest() > 0
+                    && !NoticeHud.historyForTest().isEmpty(), NoticeHud.historyForTest());
+            NoticeHud.push(net.minecraft.network.chat.Component.literal("「습격의 징조」 퀘스트를 받았습니다. 「조사대원」에게 가 보세요.")
+                    .withStyle(net.minecraft.ChatFormatting.GOLD));
+            NoticeHud.push(net.minecraft.network.chat.Component.literal("이 땅은 성 영역입니다. 산 토지 밖에서는 블록을 부수거나 놓을 수 없습니다. "
+                    + "아주 긴 알림도 화면 폭에 맞춰 줄을 바꾸고, 세 줄이 넘으면 끝을 줄임표로 줄입니다. 글자가 깨지거나 화면 밖으로 나가지 않아야 합니다. "
+                    + "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW").withStyle(net.minecraft.ChatFormatting.RED));
+            NoticeHud.push(net.minecraft.network.chat.Component.literal("같은 알림은 묶어서 보여 줍니다"));
+            NoticeHud.push(net.minecraft.network.chat.Component.literal("같은 알림은 묶어서 보여 줍니다"));
+            waitTicks(12);
+        });
+        add(mc -> {
+            check("notices stay inside the screen and long ones wrap to at most 3 lines each", NoticeHud.lastInsideForTest
+                    && NoticeHud.lastLinesForTest > 0 && NoticeHud.lastLinesForTest <= 3 * NoticeHud.MAX_VISIBLE, NoticeHud.lastLinesForTest);
+            shot(mc, "121_notices");
+            mc.player.connection.sendCommand("rtshop quest");
+            waitTicks(25);
+        });
+        add(mc -> {
+            NoticeHud.push(net.minecraft.network.chat.Component.literal("창이 열려 있어도 알림은 화면 아래에 보입니다").withStyle(net.minecraft.ChatFormatting.GREEN));
+            waitTicks(10);
+        });
+        add(mc -> {
+            check("with a window open the notice draws on top of it, still inside the screen", mc.screen != null && NoticeHud.lastInsideForTest, mc.screen);
+            shot(mc, "121b_notice_over_window");
+            mc.setScreen(null);
+            NoticeHud.clearForTest();
+            waitTicks(5);
+        });
         add(mc -> {
             com.rtshop.story.Hunts.testMode = true;
             onServer(mc, sp -> {

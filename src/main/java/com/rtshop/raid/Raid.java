@@ -278,7 +278,7 @@ public final class Raid {
     }
 
     private static void say(ServerPlayer p, String text, ChatFormatting color) {
-        p.sendSystemMessage(Component.literal(text).withStyle(color));
+        com.rtshop.notice.Notice.send(p, Component.literal(text).withStyle(color));
     }
 
     private static void title(ServerPlayer p, String title, String sub, ChatFormatting color) {

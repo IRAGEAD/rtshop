@@ -82,26 +82,26 @@ public final class Economy {
     public static boolean issueCheck(ServerPlayer p, long amount) {
         EconomyConfig c = EconomyConfig.get();
         if (amount < c.minCheckAmount) {
-            p.sendSystemMessage(Component.translatable("rtshop.msg.check_min", fmt(c.minCheckAmount)));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.check_min", fmt(c.minCheckAmount)));
             return false;
         }
         if (wallet(p) < amount) {
-            p.sendSystemMessage(Component.translatable("rtshop.msg.no_money"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.no_money"));
             return false;
         }
         if (p.getInventory().getFreeSlot() < 0) {
-            p.sendSystemMessage(Component.translatable("rtshop.msg.check_no_space"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.check_no_space"));
             return false;
         }
         UUID id = UUID.randomUUID();
         ItemStack stack = CheckItem.create(id, amount, p.getGameProfile().getName());
         if (!p.getInventory().add(stack)) {
-            p.sendSystemMessage(Component.translatable("rtshop.msg.check_no_space"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.check_no_space"));
             return false;
         }
         data(p).setCheck(id, amount);
         setWallet(p, wallet(p) - amount);
-        p.sendSystemMessage(Component.translatable("rtshop.msg.check_issued", fmt(amount)).withStyle(ChatFormatting.GOLD));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.check_issued", fmt(amount)).withStyle(ChatFormatting.GOLD));
         return true;
     }
 
@@ -110,13 +110,13 @@ public final class Economy {
         UUID id = CheckItem.id(stack);
         long amount = id == null ? 0 : data(p).checkAmount(id);
         if (amount <= 0) {
-            p.sendSystemMessage(Component.translatable("rtshop.msg.check_invalid").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.check_invalid").withStyle(ChatFormatting.RED));
             return false;
         }
         data(p).setCheck(id, 0);
         stack.shrink(1);
         setWallet(p, wallet(p) + amount);
-        p.sendSystemMessage(Component.translatable("rtshop.msg.check_redeemed", fmt(amount), fmt(wallet(p))).withStyle(ChatFormatting.GOLD));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.msg.check_redeemed", fmt(amount), fmt(wallet(p))).withStyle(ChatFormatting.GOLD));
         return true;
     }
 
@@ -170,7 +170,7 @@ public final class Economy {
         }
         if (com.rtshop.story.StorySeals.nearStoryBoss(sp)) {
             // 이야기 보스와 싸우다 죽으면 Gold 를 잃지 않는다 (여러 번 도전이 기본인 보스들)
-            sp.sendSystemMessage(net.minecraft.network.chat.Component.translatable("rtshop.economy.death_story_boss"));
+            com.rtshop.notice.Notice.send(sp, net.minecraft.network.chat.Component.translatable("rtshop.economy.death_story_boss"));
             return;
         }
         EconomyConfig c = EconomyConfig.get();
@@ -179,7 +179,7 @@ public final class Economy {
         long loss = Math.min(w, Math.round(w * pct / 100.0D));
         if (loss > 0) {
             setWallet(sp, w - loss);
-            sp.sendSystemMessage(Component.translatable("rtshop.msg.death_loss",
+            com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.msg.death_loss",
                     fmt(loss), String.format("%.1f", pct), fmt(w - loss)).withStyle(ChatFormatting.RED));
         }
         // 들고 있던 수표도 같은 비율로 가치가 줄어든다 (보관함에 넣어 둔 수표는 영향 없음)
@@ -205,7 +205,7 @@ public final class Economy {
                 }
             }
             if (checkLoss > 0) {
-                sp.sendSystemMessage(Component.translatable("rtshop.msg.death_loss_check", fmt(checkLoss)).withStyle(ChatFormatting.RED));
+                com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.msg.death_loss_check", fmt(checkLoss)).withStyle(ChatFormatting.RED));
             }
         }
     }

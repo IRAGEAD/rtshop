@@ -209,9 +209,9 @@ public final class Attendance {
         if (ch != Change.NONE) {
             d.dirty();
             if (ch == Change.GRACE) {
-                p.sendSystemMessage(Component.translatable("rtshop.att.grace_warn", before).withStyle(ChatFormatting.GOLD));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.grace_warn", before).withStyle(ChatFormatting.GOLD));
             } else {
-                p.sendSystemMessage(Component.translatable("rtshop.att.reset_warn", before, time(e.resetAt + (long) (c.restoreWindowHours * HOUR), c))
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.reset_warn", before, time(e.resetAt + (long) (c.restoreWindowHours * HOUR), c))
                         .withStyle(ChatFormatting.RED));
             }
         }
@@ -269,10 +269,10 @@ public final class Attendance {
         if (ci.dayIndex() >= 0) {
             give(p, c.days.get(ci.dayIndex()));
         }
-        p.sendSystemMessage(Component.translatable("rtshop.att.checked", ci.streak(), ci.dayIndex() + 1).withStyle(ChatFormatting.GREEN));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.checked", ci.streak(), ci.dayIndex() + 1).withStyle(ChatFormatting.GREEN));
         for (AttendanceConfig.Weekly w : ci.weekly()) {
             give(p, w.reward);
-            p.sendSystemMessage(Component.translatable("rtshop.att.weekly_got", w.days).withStyle(ChatFormatting.AQUA));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.weekly_got", w.days).withStyle(ChatFormatting.AQUA));
         }
         result(p, Component.translatable("rtshop.att.checked_short", ci.streak()), true);
         send(p, SESSIONS.getOrDefault(p.getUUID(), -1));
@@ -291,15 +291,15 @@ public final class Attendance {
         switch (r) {
             case OK -> {
                 d.dirty();
-                p.sendSystemMessage(Component.translatable("rtshop.att.restored", saved, e.streak).withStyle(ChatFormatting.GREEN));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.restored", saved, e.streak).withStyle(ChatFormatting.GREEN));
                 result(p, Component.translatable("rtshop.att.restored_short", e.streak), true);
                 send(p, SESSIONS.getOrDefault(p.getUUID(), -1));
                 return true;
             }
-            case EXPIRED -> p.sendSystemMessage(Component.translatable("rtshop.att.restore_expired").withStyle(ChatFormatting.RED));
-            case COOLDOWN -> p.sendSystemMessage(Component.translatable("rtshop.att.restore_cooldown",
+            case EXPIRED -> com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.restore_expired").withStyle(ChatFormatting.RED));
+            case COOLDOWN -> com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.restore_cooldown",
                     time(e.restoreAt + (long) (c.restoreCooldownHours * HOUR), c)).withStyle(ChatFormatting.RED));
-            default -> p.sendSystemMessage(Component.translatable("rtshop.att.restore_nothing").withStyle(ChatFormatting.YELLOW));
+            default -> com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.restore_nothing").withStyle(ChatFormatting.YELLOW));
         }
         result(p, Component.translatable("rtshop.att.restore_fail"), false);
         return false;
@@ -323,7 +323,7 @@ public final class Attendance {
     public static void give(ServerPlayer p, AttendanceConfig.Reward r) {
         if (r.gold > 0) {
             Economy.addWallet(p, r.gold);
-            p.sendSystemMessage(Component.translatable("rtshop.quest.reward_gold", String.format("%,d", r.gold)));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_gold", String.format("%,d", r.gold)));
         }
         for (AttendanceConfig.Item it : r.items) {
             Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(it.item()));
@@ -340,7 +340,7 @@ public final class Attendance {
                 }
                 left -= n;
             }
-            p.sendSystemMessage(Component.translatable("rtshop.quest.reward_item", new ItemStack(item).getHoverName(), it.count()));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_item", new ItemStack(item).getHoverName(), it.count()));
         }
     }
 
@@ -377,7 +377,7 @@ public final class Attendance {
 
     public static void openEditor(ServerPlayer p) {
         if (!canEdit(p)) {
-            p.sendSystemMessage(Component.translatable("rtshop.att.op_only"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.op_only"));
             return;
         }
         if (real(p)) {
@@ -405,7 +405,7 @@ public final class Attendance {
 
     private static void handleSave(ServerPlayer p, String json) {
         if (!canEdit(p)) {
-            p.sendSystemMessage(Component.translatable("rtshop.att.op_only"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.op_only"));
             return;
         }
         String err = save(json);
@@ -572,7 +572,7 @@ public final class Attendance {
         msg.append(Component.literal(" "));
         msg.append(Component.translatable("rtshop.att.remind_link").withStyle(st -> st.withColor(ChatFormatting.GOLD).withUnderlined(true)
                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rtshop attendance"))));
-        p.sendSystemMessage(msg);
+        com.rtshop.notice.Notice.send(p, msg);
     }
 
     @SubscribeEvent

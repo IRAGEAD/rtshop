@@ -131,11 +131,11 @@ public final class PlotCommands {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                     Land l = PlotManager.plotAt(p);
                     if (l == null) {
-                        p.sendSystemMessage(Component.translatable("rtshop.plot.not_in_plot").withStyle(ChatFormatting.GRAY));
+                        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.not_in_plot").withStyle(ChatFormatting.GRAY));
                         return 0;
                     }
                     Claim c = PlotManager.plotClaim(l);
-                    p.sendSystemMessage(Component.translatable(l.forSale() ? "rtshop.plot.info_sale" : "rtshop.plot.info_owned",
+                    com.rtshop.notice.Notice.send(p, Component.translatable(l.forSale() ? "rtshop.plot.info_sale" : "rtshop.plot.info_owned",
                             l.name, c == null ? 0 : c.area(), PlotManager.money(l.price), l.ownerName).withStyle(ChatFormatting.GOLD));
                     LandManager.SHOW_BORDER.put(p.getUUID(), new long[]{l.id, p.level().getGameTime() + 300});
                     return 1;
@@ -144,7 +144,7 @@ public final class PlotCommands {
                 .then(Commands.literal("wand").requires(s -> s.hasPermission(2)).executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                     p.getInventory().add(new ItemStack(ModItems.PLOT_WAND.get()));
-                    p.sendSystemMessage(Component.translatable("rtshop.plot.wand_given").withStyle(ChatFormatting.GREEN));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.wand_given").withStyle(ChatFormatting.GREEN));
                     PlotManager.showMode(p, PlotManager.selection(p));
                     return 1;
                 }))
@@ -176,7 +176,7 @@ public final class PlotCommands {
                 .then(Commands.literal("undo").requires(s -> s.hasPermission(2)).executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                     boolean ok = PlotManager.undo(p);
-                    p.sendSystemMessage(Component.translatable(ok ? "rtshop.plot.undone" : "rtshop.plot.nothing_to_undo",
+                    com.rtshop.notice.Notice.send(p, Component.translatable(ok ? "rtshop.plot.undone" : "rtshop.plot.nothing_to_undo",
                             PlotManager.selection(p).cells.size()));
                     return ok ? 1 : 0;
                 }))
@@ -188,7 +188,7 @@ public final class PlotCommands {
                     s.polygon.clear();
                     s.editing = -1;
                     s.bounds();
-                    p.sendSystemMessage(Component.translatable("rtshop.plot.cleared"));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.cleared"));
                     return 1;
                 }))
                 .then(Commands.literal("polygon").requires(s -> s.hasPermission(2))
@@ -199,7 +199,7 @@ public final class PlotCommands {
                         .then(Commands.literal("clear").executes(ctx -> {
                             ServerPlayer p = ctx.getSource().getPlayerOrException();
                             PlotManager.selection(p).polygon.clear();
-                            p.sendSystemMessage(Component.translatable("rtshop.plot.poly_cleared"));
+                            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.poly_cleared"));
                             return 1;
                         })))
                 // ---- OP: 등록·관리
@@ -408,11 +408,11 @@ public final class PlotCommands {
         }
         try {
             int[] r = PlotManager.importFile(p, file);
-            p.sendSystemMessage(Component.translatable("rtshop.plot.imported", r[0], r[1], r[2]).withStyle(ChatFormatting.GREEN));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.imported", r[0], r[1], r[2]).withStyle(ChatFormatting.GREEN));
             return r[0];
         } catch (Exception ex) {
             RtShop.LOGGER.warn("[rtshop] plot import failed", ex);
-            p.sendSystemMessage(Component.translatable("rtshop.plot.import_failed", file, String.valueOf(ex.getMessage()))
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.import_failed", file, String.valueOf(ex.getMessage()))
                     .withStyle(ChatFormatting.RED));
             return 0;
         }

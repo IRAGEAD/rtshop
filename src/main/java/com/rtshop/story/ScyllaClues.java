@@ -272,7 +272,7 @@ public final class ScyllaClues {
         QuestManager.setFlag(p, FLAG_PREFIX + c.id, true);
         ScyllaClues s = get();
         int n = count(p);
-        p.sendSystemMessage(Component.translatable("rtshop.scylla.recorded", c.name, n, s.needed).withStyle(ChatFormatting.AQUA));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.recorded", c.name, n, s.needed).withStyle(ChatFormatting.AQUA));
         p.level().playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1F, 0.8F);
         checkComplete(p);
         return true;
@@ -285,7 +285,7 @@ public final class ScyllaClues {
             // 단서는 다 모였지만 폭풍은 연대기의 마지막 장이 쓰인 뒤에야 열린다
             if (!QuestManager.hasFlag(p, "scylla_waiting")) {
                 QuestManager.setFlag(p, "scylla_waiting", true);
-                p.sendSystemMessage(Component.translatable("rtshop.scylla.waiting").withStyle(ChatFormatting.DARK_AQUA));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.waiting").withStyle(ChatFormatting.DARK_AQUA));
             }
             return;
         }
@@ -305,7 +305,7 @@ public final class ScyllaClues {
         v.addProperty("seconds", 7);
         v.addProperty("closeScreen", true);
         BossIntros.send(p, v);
-        p.sendSystemMessage(Component.translatable("rtshop.scylla.complete").withStyle(ChatFormatting.GOLD));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.complete").withStyle(ChatFormatting.GOLD));
     }
 
     /** 수첩: 모은 단서와 들은 소문 (채팅으로). */
@@ -348,7 +348,7 @@ public final class ScyllaClues {
         } else if (!p.getInventory().add(st)) {
             p.drop(st, false);
         }
-        p.displayClientMessage(Component.translatable("rtshop.scylla.found", c.name).withStyle(ChatFormatting.AQUA), true);
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.found", c.name).withStyle(ChatFormatting.AQUA), true);
     }
 
     @SubscribeEvent
@@ -419,7 +419,7 @@ public final class ScyllaClues {
         ResourceLocation prof = ForgeRegistries.VILLAGER_PROFESSIONS.getKey(v.getVillagerData().getProfession());
         String line = hintFor(c, prof == null ? "none" : prof.getPath());
         if (line == null) return;
-        p.sendSystemMessage(Component.literal("[" + v.getDisplayName().getString() + "] ").withStyle(ChatFormatting.YELLOW)
+        com.rtshop.notice.Notice.send(p, Component.literal("[" + v.getDisplayName().getString() + "] ").withStyle(ChatFormatting.YELLOW)
                 .append(Component.literal(line).withStyle(ChatFormatting.WHITE)));
         CompoundTag heard = p.getPersistentData().getCompound("rtshop_clue_heard");
         heard.putString(c.id, line);

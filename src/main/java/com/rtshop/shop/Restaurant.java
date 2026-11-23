@@ -310,7 +310,7 @@ public final class Restaurant {
             Component msg = Component.translatable("rtshop.restaurant.new_menu", by == null ? "" : by,
                     stack.getHoverName().copy().withStyle(ChatFormatting.YELLOW), menuCount(now), now.entries.size()).withStyle(ChatFormatting.GOLD);
             for (ServerPlayer o : server.getPlayerList().getPlayers()) {
-                o.sendSystemMessage(msg);
+                com.rtshop.notice.Notice.send(o, msg);
             }
         }
         return true;

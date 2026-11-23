@@ -17,7 +17,7 @@ public final class JobEditor {
 
     public static void open(ServerPlayer p) {
         if (!p.hasPermissions(2)) {
-            p.sendSystemMessage(Component.translatable("rtshop.qedit.no_permission"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new JobEditorPacket(JobConfig.get().toJson().toString()));
@@ -43,7 +43,7 @@ public final class JobEditor {
 
     public static void handleSave(ServerPlayer p, String json) {
         if (!p.hasPermissions(2)) {
-            p.sendSystemMessage(Component.translatable("rtshop.qedit.no_permission"));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }
         String err = save(json);

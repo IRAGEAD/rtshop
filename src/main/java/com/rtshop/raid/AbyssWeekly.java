@@ -290,7 +290,7 @@ public final class AbyssWeekly {
         } catch (Exception e) {
             msg = c.text("got");
         }
-        p.sendSystemMessage(Component.literal(msg).withStyle(ChatFormatting.GOLD));
+        com.rtshop.notice.Notice.send(p, Component.literal(msg).withStyle(ChatFormatting.GOLD));
         sendView(p);
         return true;
     }

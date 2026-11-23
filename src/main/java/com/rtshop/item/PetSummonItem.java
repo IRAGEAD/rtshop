@@ -107,10 +107,10 @@ public class PetSummonItem extends Item {
     private static InteractionResult use(ServerPlayer p, ItemStack stack, Vec3 at) {
         Entity e = summon(p, stack, at);
         if (e == null) {
-            p.sendSystemMessage(Component.translatable("rtshop.gacha.pet_fail").withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.gacha.pet_fail").withStyle(ChatFormatting.RED));
             return InteractionResult.FAIL;
         }
-        p.sendSystemMessage(Component.translatable("rtshop.gacha.pet_summoned", e.getDisplayName()).withStyle(ChatFormatting.GREEN));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.gacha.pet_summoned", e.getDisplayName()).withStyle(ChatFormatting.GREEN));
         if (!p.getAbilities().instabuild) {
             stack.shrink(1);
         }

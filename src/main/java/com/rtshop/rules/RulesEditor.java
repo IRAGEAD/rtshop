@@ -45,10 +45,10 @@ public final class RulesEditor {
                     JsonObject o = RecipeRules.listJson(p.server);
                     o.addProperty("saved", true);
                     send(p, RulesDataPacket.RECIPES, o);
-                    p.sendSystemMessage(Component.translatable("rtshop.rules.recipes_saved", RecipeRules.lastDisabled, RecipeRules.lastCustom)
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.rules.recipes_saved", RecipeRules.lastDisabled, RecipeRules.lastCustom)
                             .withStyle(ChatFormatting.GREEN));
                     for (String e : RecipeRules.lastErrors) {
-                        p.sendSystemMessage(Component.translatable("rtshop.rules.recipe_error", e).withStyle(ChatFormatting.RED));
+                        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.rules.recipe_error", e).withStyle(ChatFormatting.RED));
                     }
                     RtShop.LOGGER.info("[rtshop] {} 이(가) 조합법 규칙을 고쳤습니다", p.getGameProfile().getName());
                 }
@@ -71,14 +71,14 @@ public final class RulesEditor {
                     JsonObject o = sampleJson(p, key);
                     o.addProperty("saved", true);
                     send(p, RulesDataPacket.LOOT_TABLE, o);
-                    p.sendSystemMessage(Component.translatable("rtshop.rules.loot_saved", key).withStyle(ChatFormatting.GREEN));
+                    com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.rules.loot_saved", key).withStyle(ChatFormatting.GREEN));
                     RtShop.LOGGER.info("[rtshop] {} 이(가) 전리품 {} 규칙을 고쳤습니다", p.getGameProfile().getName(), key);
                 }
                 default -> {
                 }
             }
         } catch (Exception e) {
-            p.sendSystemMessage(Component.translatable("rtshop.rules.failed", String.valueOf(e.getMessage())).withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.rules.failed", String.valueOf(e.getMessage())).withStyle(ChatFormatting.RED));
             RtShop.LOGGER.warn("[rtshop] 규칙 편집 실패", e);
         }
     }

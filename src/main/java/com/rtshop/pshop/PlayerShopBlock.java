@@ -97,6 +97,6 @@ public class PlayerShopBlock extends HorizontalDirectionalBlock implements Entit
     }
 
     public static void denyBreak(ServerPlayer p) {
-        p.displayClientMessage(Component.translatable("rtshop.pshop.not_owner").withStyle(ChatFormatting.RED), true);
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.pshop.not_owner").withStyle(ChatFormatting.RED), true);
     }
 }

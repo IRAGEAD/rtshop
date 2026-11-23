@@ -94,12 +94,12 @@ public final class ShopEditor {
                 ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new ShopEditDataPacket(id, content));
             } else if (action == SAVE) {
                 Path bak = save(p.server, id, json);
-                p.sendSystemMessage(Component.translatable("rtshop.shopedit.saved", id).withStyle(ChatFormatting.GREEN));
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.shopedit.saved", id).withStyle(ChatFormatting.GREEN));
                 RtShop.LOGGER.info("[rtshop] {} 이(가) 상점 {} 을(를) 게임 안에서 고쳤습니다 (예전 파일: {})", p.getGameProfile().getName(), id, bak.getFileName());
                 ShopServer.openShop(p, id, -1);
             }
         } catch (Exception e) {
-            p.sendSystemMessage(Component.translatable("rtshop.shopedit.failed", String.valueOf(e.getMessage())).withStyle(ChatFormatting.RED));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.shopedit.failed", String.valueOf(e.getMessage())).withStyle(ChatFormatting.RED));
         }
     }
 }
