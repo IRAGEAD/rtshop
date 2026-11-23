@@ -262,7 +262,9 @@ jobs:
                    hahmlet/Hahmlet%5Bwght%5D.ttf eastseadokdo/EastSeaDokdo-Regular.ttf dongle/Dongle-Bold.ttf \
                    gasoekone/GasoekOne-Regular.ttf grandifloraone/GrandifloraOne-Regular.ttf moiraione/MoiraiOne-Regular.ttf \
                    gugi/Gugi-Regular.ttf dokdo/Dokdo-Regular.ttf bagelfatone/BagelFatOne-Regular.ttf blackandwhitepicture/BlackAndWhitePicture-Regular.ttf \
-                   kirangharerang/KirangHaerang-Regular.ttf jua/Jua-Regular.ttf dohyeon/DoHyeon-Regular.ttf stylish/Stylish-Regular.ttf; do
+                   kirangharerang/KirangHaerang-Regular.ttf jua/Jua-Regular.ttf dohyeon/DoHyeon-Regular.ttf stylish/Stylish-Regular.ttf \
+                   unifrakturmaguntia/UnifrakturMaguntia-Book.ttf grenzegotisch/GrenzeGotisch%5Bwght%5D.ttf cinzeldecorative/CinzelDecorative-Bold.ttf \
+                   cinzeldecorative/CinzelDecorative-Black.ttf pirataone/PirataOne-Regular.ttf newrocker/NewRocker-Regular.ttf metalmania/MetalMania-Regular.ttf; do
             curl -fsSL -o "/tmp/inspect/fonts/$(basename "$f" | sed 's/%5B/[/;s/%5D/]/')" "https://raw.githubusercontent.com/google/fonts/main/ofl/$f" || echo "font fail $f"
           done
           ls -la /tmp/inspect/fonts
