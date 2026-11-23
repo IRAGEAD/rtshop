@@ -31,7 +31,7 @@ public final class FantasyQuestsOff {
     /** 마지막으로 끈 설정 이름 (점검용). */
     public static final List<String> LAST = new ArrayList<>();
 
-    static Path marker(MinecraftServer server) {
+    public static Path marker(MinecraftServer server) {
         return server.getWorldPath(LevelResource.ROOT).resolve("rtshop_fantasy_quests_off");
     }
 
