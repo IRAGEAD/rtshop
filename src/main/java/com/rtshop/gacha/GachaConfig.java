@@ -118,6 +118,8 @@ public final class GachaConfig {
     public String shop = "gacha_shop";
     /** 10회 뽑기에서 하나는 반드시 이 등급 이상. "" 이면 보장 없음. */
     public String tenGuarantee = "rare";
+    /** 이 등급 이상으로 뽑은 장비는 내구도가 닳지 않는다 (빈 값이면 끔). */
+    public String unbreakableFrom = "epic";
     public final Map<String, Tier> tiers = new LinkedHashMap<>();
     public final Map<String, List<Entry>> pools = new LinkedHashMap<>();
     /** 분해하면 받는 조각 (등급별). */
@@ -603,6 +605,7 @@ public final class GachaConfig {
         help.add("tiers: 뽑기 단계별 등급 확률(비율). 아이템이 하나도 없는 등급은 빼고 나머지 비율로 뽑습니다.");
         help.add("pools: 뽑기 종류별 목록 {item, count, nbt} 또는 {entity} + grade, weight(같은 등급 안에서의 비율).");
         help.add("tenGuarantee: 10회 뽑기에서 하나는 반드시 이 등급 이상. shards.dismantle: 등급별 분해 조각 수, shards.tickets: 티켓 한 장과 바꾸는 데 드는 조각 수.");
+        help.add("unbreakableFrom: 이 등급 이상으로 뽑은 장비는 내구도가 닳지 않습니다 (기본 epic = 영웅 이상, 빈 값이면 끔).");
         help.add("item 에 rtshop:gacha_shard 를 넣은 칸은 뽑기 표시 없는 조각 보상입니다 (펫 뽑기의 일반·고급 등급).");
         help.add("weaponMods: 자동 분류에서 일반~희귀 무기를 가져올 모드 (기본 epicfight). topWeaponMods: 정해 둔 무기 말고 영웅·전설 무기를 가져올 모드.");
         help.add("excludeMods/excludeItems: 자동 분류에서 뺄 모드·아이템 (보스 무기 등). 뽑기 티켓 가격은 config/rtshop/shops/gacha_shop.json.");
@@ -611,6 +614,7 @@ public final class GachaConfig {
         o.addProperty("npcName", npcName);
         o.addProperty("shop", shop);
         o.addProperty("tenGuarantee", tenGuarantee);
+        o.addProperty("unbreakableFrom", unbreakableFrom);
         JsonObject t = new JsonObject();
         for (Tier tr : tiers.values()) {
             JsonObject w = new JsonObject();
@@ -668,6 +672,10 @@ public final class GachaConfig {
         if (o.has("npcName")) c.npcName = o.get("npcName").getAsString();
         if (o.has("shop")) c.shop = o.get("shop").getAsString().trim();
         if (o.has("tenGuarantee")) c.tenGuarantee = o.get("tenGuarantee").getAsString().trim();
+        if (o.has("unbreakableFrom")) c.unbreakableFrom = o.get("unbreakableFrom").getAsString().trim();
+        if (!c.unbreakableFrom.isEmpty() && gradeIndex(c.unbreakableFrom) < 0) {
+            throw new IllegalArgumentException("내구도 보호 등급을 알 수 없습니다: " + c.unbreakableFrom);
+        }
         if (c.npcName.isBlank()) {
             throw new IllegalArgumentException("NPC 이름이 비어 있습니다");
         }
@@ -793,6 +801,7 @@ public final class GachaConfig {
             c.npcName = old.npcName;
             c.shop = old.shop;
             c.tenGuarantee = old.tenGuarantee;
+            c.unbreakableFrom = old.unbreakableFrom;
             c.tiers.clear();
             c.tiers.putAll(old.tiers);
             for (int i = 0; i < TIERS.length; i++) {

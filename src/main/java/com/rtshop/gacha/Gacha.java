@@ -215,7 +215,41 @@ public final class Gacha {
         m.putString("c", cat);
         m.putString("k", e.key());
         s.getOrCreateTag().put(MARK, m);
+        protect(s);
         return s;
+    }
+
+    /** 이 뽑기 장비가 내구도 보호 대상인가 (설정한 등급 이상, 내구도가 있는 물건). */
+    public static boolean shouldProtect(ItemStack s) {
+        if (!marked(s)) return false;
+        String from = GachaConfig.get().unbreakableFrom;
+        if (from == null || from.isEmpty()) return false;
+        int min = GachaConfig.gradeIndex(from);
+        return min >= 0 && GachaConfig.gradeIndex(gradeOf(s)) >= min && s.getItem().canBeDepleted();
+    }
+
+    /** 영웅 이상 뽑기 장비: 닳지 않게(Unbreakable) 하고 닳아 있던 내구도는 채운다. 바꿨으면 true. */
+    public static boolean protect(ItemStack s) {
+        if (!shouldProtect(s)) return false;
+        CompoundTag t = s.getOrCreateTag();
+        if (t.getBoolean("Unbreakable") && s.getDamageValue() == 0) return false;
+        t.putBoolean("Unbreakable", true);
+        s.setDamageValue(0);
+        return true;
+    }
+
+    /** 예전에 뽑아 둔 장비도 가방에 들어오면 보호한다 (2초마다 가방만 훑음). */
+    @SubscribeEvent
+    public static void onPlayerTick(net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || event.player.level().isClientSide()
+                || (event.player.tickCount + event.player.getId()) % 40 != 0) {
+            return;
+        }
+        net.minecraft.world.entity.player.Inventory inv = event.player.getInventory();
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack st = inv.getItem(i);
+            if (marked(st)) protect(st);
+        }
     }
 
     public static boolean marked(ItemStack s) {

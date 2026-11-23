@@ -4767,6 +4767,27 @@ public final class SelfTest {
                 && count(a, st -> st.is(ModItems.PET_TICKET_NORMAL.get())) == 0 && count(a, st -> st.is(ModItems.TICKET_NORMAL.get())) == 10,
                 shardGot + " / " + expect);
         clear(a);
+        // 영웅 이상 뽑기 장비는 내구도가 닳지 않는다 (희귀는 그대로)
+        {
+            com.rtshop.gacha.GachaConfig.Entry ep = new com.rtshop.gacha.GachaConfig.Entry();
+            ep.item = "minecraft:diamond_sword";
+            ep.grade = "epic";
+            ItemStack es = com.rtshop.gacha.Gacha.stackOf(ep, "weapon");
+            com.rtshop.gacha.GachaConfig.Entry rr = new com.rtshop.gacha.GachaConfig.Entry();
+            rr.item = "minecraft:diamond_sword";
+            rr.grade = "rare";
+            ItemStack rs = com.rtshop.gacha.Gacha.stackOf(rr, "weapon");
+            boolean before = es.isDamageableItem();
+            es.hurt(50, level.random, null);
+            check("epic+ gacha gear does not lose durability (rare still does)",
+                    !before && es.getDamageValue() == 0 && rs.isDamageableItem(), es.getTag() + " / " + rs.getTag());
+            // 예전에 뽑은 장비: 표시만 있고 보호가 없던 것도 가방에서 보호된다
+            ItemStack old = es.copy();
+            old.getTag().remove("Unbreakable");
+            old.setDamageValue(100);
+            boolean fixed = com.rtshop.gacha.Gacha.protect(old);
+            check("old epic+ gacha gear gets protected and repaired", fixed && !old.isDamageableItem() && old.getDamageValue() == 0, old.getTag());
+        }
         // 펫 소환권
         BlockPos at = level.getSharedSpawnPos().above(8);
         level.getChunkAt(at);
