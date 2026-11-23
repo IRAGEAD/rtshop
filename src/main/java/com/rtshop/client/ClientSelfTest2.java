@@ -870,7 +870,7 @@ final class ClientSelfTest2 {
             shot(mc, "123h_orb_reroll");
             if (st != null) st.dismissForTest();
             CinematicOrb.leaveForTest();
-            waitTicks(100);
+            waitTicks(220);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;

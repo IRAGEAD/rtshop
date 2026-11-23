@@ -213,7 +213,8 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     public CameraRig.Pose lean() {
         Vec3 eye = top.add(side().scale(1.18)).add(0.0, 1.0, 0.0);
         Vec3 look = top.add(0.0, 0.42, 0.0).subtract(eye);
-        float yaw = (float) Math.toDegrees(Math.atan2(-look.x, look.z));
+        // 오른쪽으로 조금 돌려, 장면이 화면 왼쪽에 놓이게 한다 (오른쪽에는 룬 제단 패널이 겹친다)
+        float yaw = (float) Math.toDegrees(Math.atan2(-look.x, look.z)) + 10.0f;
         float pitch = (float) -Math.toDegrees(Math.atan2(look.y, Math.hypot(look.x, look.z)));
         return new CameraRig.Pose(eye, yaw, pitch, 0.0f);
     }
@@ -488,10 +489,10 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         boolean refused = clock - refuseAt >= 0.0 && clock - refuseAt < 0.5;
         EnchantFx.CirclePalette pal = refused ? EnchantFx.CirclePalette.RED : EnchantFx.CirclePalette.VIOLET;
         // 받침대 위의 소환진 두 겹
-        EnchantFx.circle(pose, buffers, cam, top.add(0.0, 0.012, 0.0), 0.47, spin, pal, 0.85f * g);
-        EnchantFx.circle(pose, buffers, cam, top.add(0.0, 0.02, 0.0), 0.25, -spin * 1.7, pal, 0.55f * g);
+        EnchantFx.circle(pose, buffers, cam, top.add(0.0, 0.012, 0.0), 0.47, spin, pal, 0.50f * g);
+        EnchantFx.circle(pose, buffers, cam, top.add(0.0, 0.02, 0.0), 0.25, -spin * 1.7, pal, 0.32f * g);
         // 구체 둘레에 서 있는 큰 소환진 (룬석들이 놓인 원)
-        EnchantFx.circleBillboard(pose, buffers, camera, orb.subtract(side().scale(0.03)), RING * 1.12, -spin * 0.6, pal, 0.5f * g);
+        EnchantFx.circleBillboard(pose, buffers, camera, orb.subtract(side().scale(0.03)), RING * 1.12, -spin * 0.6, pal, 0.26f * g);
         EnchantFx.billboard(pose, buffers, camera, orb, 0.26, clock * 0.4, EnchantFx.GLOW, 0.30f * g, 0.18f * g, 0.50f * g);
         if (t >= 0.0) {
             double peak = PEAK / RITUAL;
@@ -535,7 +536,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
             float bright = lit ? 1.0f : hov ? 0.95f : 0.72f;
             quad(pose, buffers, camera, lit ? STONES_ON : STONES, at, size * 0.8, size, i / 5f, (i + 1) / 5f, bright, (float) p);
             String name = tr("rtshop.magic.cat." + CATS[i]);
-            label(pose, buffers, camera, at.add(0.0, -size - 0.026, 0.0), name, 0.0064f * appear, rune ? 0xFF8FE4FF : lit ? 0xFFFFE9B0 : 0xFFB8A8DC, (float) p);
+            label(pose, buffers, camera, at.add(0.0, -size - 0.03, 0.0), name, 0.0082f * appear, rune ? 0xFF8FE4FF : lit ? 0xFFFFE9B0 : 0xFFB8A8DC, (float) p);
         }
         // 소환 문양
         for (Target s : new Target[]{Target.PULL1, Target.PULL10, Target.REROLL}) {
@@ -567,9 +568,9 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         Vector3f look = camera.getLookVector();
         Vec3 text = at.subtract(look.x() * 0.01, look.y() * 0.01, look.z() * 0.01);
         String head = s == Target.REROLL ? tr("rtshop.magic.sigil.reroll") : tr("rtshop.magic.sigil.times", s == Target.PULL10 ? 10 : 1);
-        label(pose, buffers, camera, text.add(0.0, 0.014, 0.0), head, 0.0066f * appear * (hovered ? 1.2f : 1.0f), affordable ? 0xFFF4EEFF : 0xFFFF6B6B, alpha);
+        label(pose, buffers, camera, text.add(0.0, 0.018, 0.0), head, 0.0088f * appear * (hovered ? 1.2f : 1.0f), affordable ? 0xFFF4EEFF : 0xFFFF6B6B, alpha);
         String sub = "×" + cost(s);
-        label(pose, buffers, camera, text.add(0.0, -0.038, 0.0), sub, 0.0050f * appear, affordable ? (blue ? 0xFF9CC8FF : 0xFFB9A6FF) : 0xFF7A4A55, alpha);
+        label(pose, buffers, camera, text.add(0.0, -0.046, 0.0), sub, 0.0062f * appear, affordable ? (blue ? 0xFF9CC8FF : 0xFFB9A6FF) : 0xFF7A4A55, alpha);
     }
 
     /** 카메라를 보는 사각형 (룬석 그림의 한 칸). */
@@ -616,7 +617,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         hudOn[0] = hudOn[1] = false;
         boolean fxOn = fx.active();
         if (Scene.phase == Scene.Phase.ACTIVE && alpha > 0.6f && !fxOn && shown.isEmpty() && ready()) {
-            int pw = Math.min(176, w / 3), px = w - pw - 12, py = 30;
+            int pw = Math.min(170, w * 3 / 10), px = w - pw - 10, py = 30;
             panel.renderHud(g, px, py, pw);
             int by = py + MagicGachaScreen.HUD_H + 8;
             boolean edit = data.has("canEdit") && data.get("canEdit").getAsBoolean();
