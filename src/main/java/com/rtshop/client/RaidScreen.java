@@ -176,8 +176,8 @@ public class RaidScreen extends Screen {
         int sw = RaidText.w(this.font, sub, RaidText.SANS);
         RaidText.center(g, this.font, sub, RaidText.SANS, x + W / 2, y + 29, 0xFFC99A62);
         // 고딕 필사체 장식: 부제 양옆에 "Abyssal" · "Raid"
-        int lw = RaidText.w(this.font, "Abyssal", RaidText.GOTHIC);
-        int gl = x + W / 2 - sw / 2 - 12 - lw, gr = x + W / 2 + sw / 2 + 12;
+        int gotW = RaidText.w(this.font, "Abyssal", RaidText.GOTHIC);
+        int gl = x + W / 2 - sw / 2 - 12 - gotW, gr = x + W / 2 + sw / 2 + 12;
         RaidText.draw(g, this.font, "Abyssal", RaidText.GOTHIC, gl + 1, y + 28, 0xC0200806);
         RaidText.draw(g, this.font, "Abyssal", RaidText.GOTHIC, gl, y + 27, 0xFFE0B868);
         RaidText.draw(g, this.font, "Raid", RaidText.GOTHIC, gr + 1, y + 28, 0xC0200806);
