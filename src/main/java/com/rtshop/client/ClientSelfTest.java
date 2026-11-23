@@ -244,7 +244,10 @@ public final class ClientSelfTest {
                         f.setAccessible(true);
                         Object v = f.get(s);
                         if (v == null || v instanceof net.minecraft.client.gui.screens.Screen) continue;
-                        for (java.lang.reflect.Method m : v.getClass().getMethods()) {
+                        java.util.List<java.lang.reflect.Method> ms = new java.util.ArrayList<>();
+                        for (Class<?> itf : v.getClass().getInterfaces()) ms.addAll(java.util.Arrays.asList(itf.getMethods()));
+                        ms.addAll(java.util.Arrays.asList(v.getClass().getMethods()));
+                        for (java.lang.reflect.Method m : ms) {
                             Class<?>[] pt = m.getParameterTypes();
                             if (pt.length == 2 && pt[0] == boolean.class && pt[1] == boolean.class) {
                                 RtShop.LOGGER.info("[rtshop-clienttest] answering {} via {}.{}(false, true)", cls, v.getClass().getName(), m.getName());
