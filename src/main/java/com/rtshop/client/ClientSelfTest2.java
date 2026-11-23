@@ -738,6 +738,33 @@ final class ClientSelfTest2 {
             onServer(mc, com.rtshop.story.Hunts::clearForTest);
             waitTicks(2);
         });
+        // ------------------------------------------------------------ Nightfall 무기를 든 모습 (풀팩에서만): 폐허 대검과 비교용 다른 대검
+        if (net.minecraftforge.fml.ModList.get().isLoaded("efn")) {
+            String[][] held = {{"efn:ruinsgreatsword", "119_efn_ruinsgreatsword"}, {"minecraft:diamond_sword", "119b_diamond_sword"}};
+            for (String[] h : held) {
+                add(mc -> {
+                    mc.setScreen(null);
+                    onServer(mc, sp -> {
+                        var it = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation(h[0]));
+                        if (it != null) sp.getInventory().setItem(sp.getInventory().selected, new net.minecraft.world.item.ItemStack(it));
+                        sp.setYRot(180);
+                        sp.setXRot(10);
+                    });
+                    mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+                    waitTicks(30);
+                });
+                add(mc -> {
+                    shot(mc, h[1]);
+                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] held {}: {}", h[0], mc.player == null ? "-" : mc.player.getMainHandItem());
+                    waitTicks(2);
+                });
+            }
+            add(mc -> {
+                mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+                onServer(mc, sp -> sp.getInventory().setItem(sp.getInventory().selected, net.minecraft.world.item.ItemStack.EMPTY));
+                waitTicks(5);
+            });
+        }
         // ------------------------------------------------------------ 이야기로 열리는 장비 진열대
         add(mc -> {
             check("the server tells the client which gear tiers wait for which chapter (rare: middle of chapter 1, epic: chapter 1)",
