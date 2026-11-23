@@ -2173,8 +2173,6 @@ public final class SelfTest {
             check("staged story structures: locked at first, plain structures are not, and world generation really asks (mixin applied)",
                     lockedAtStart && asked > 0, lockedAtStart + " asked=" + asked);
             QuestManager.reset(a);
-            QuestManager.forceComplete(a, "story_0_03");
-            for (String id : QuestManager.loaded().quests.keySet()) if (id.startsWith("story_1_")) QuestManager.forceComplete(a, id);
             // 모드 없이도 시험할 수 있게 이글루를 잠깐 단계적 건축물로 넣는다 (1장 7번 퀘스트가 이글루로 보낸다)
             com.rtshop.story.StagedStructures.get().structures.put("minecraft:igloo", "");
             com.rtshop.story.StagedStructures.recompute(server);
