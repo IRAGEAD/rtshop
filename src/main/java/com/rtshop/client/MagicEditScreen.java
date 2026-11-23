@@ -176,19 +176,19 @@ public class MagicEditScreen extends Screen {
             } catch (NumberFormatException ignored) {
             }
         });
-        numberBox(x0 + 140, y0 + 132, 36, val(bl, "discountPercent", "20"), v -> {
+        numberBox(x0 + 130, y0 + 132, 32, val(bl, "discountPercent", "20"), v -> {
             try {
                 bl.addProperty("discountPercent", Math.max(0, Math.min(90, v.isEmpty() ? 0 : (int) Double.parseDouble(v))));
             } catch (NumberFormatException ignored) {
             }
         });
-        numberBox(x0 + 256, y0 + 132, 36, val(bl, "periodHours", "24"), v -> {
+        numberBox(x0 + 232, y0 + 132, 32, val(bl, "periodHours", "24"), v -> {
             try {
                 bl.addProperty("periodHours", Math.max(1, Math.min(720, v.isEmpty() ? 24 : (int) Double.parseDouble(v))));
             } catch (NumberFormatException ignored) {
             }
         });
-        numberBox(x0 + 372, y0 + 132, 40, val(bl, "oddsBoost", "1"), v -> {
+        numberBox(x0 + 340, y0 + 132, 36, val(bl, "oddsBoost", "1"), v -> {
             try {
                 bl.addProperty("oddsBoost", Math.max(1.0, Math.min(10.0, v.isEmpty() ? 1.0 : Double.parseDouble(v))));
             } catch (NumberFormatException ignored) {
@@ -238,8 +238,8 @@ public class MagicEditScreen extends Screen {
             changed();
         });
         g.drawString(font, tr("rtshop.magic.edit_bless_discount"), x0 + 90, y0 + 135, Ui.C_INK, false);
-        g.drawString(font, tr("rtshop.magic.edit_bless_hours"), x0 + 190, y0 + 135, Ui.C_INK, false);
-        g.drawString(font, tr("rtshop.magic.edit_bless_boost"), x0 + 304, y0 + 135, Ui.C_INK, false);
+        g.drawString(font, tr("rtshop.magic.edit_bless_hours"), x0 + 172, y0 + 135, Ui.C_INK, false);
+        g.drawString(font, tr("rtshop.magic.edit_bless_boost"), x0 + 274, y0 + 135, Ui.C_INK, false);
         ty = y0 + 154;
         for (var line : font.split(Component.translatable("rtshop.magic.edit_bless_note"), pw - 12)) {
             g.drawString(font, line, px + 6, ty, Ui.C_INK_SOFT, false);

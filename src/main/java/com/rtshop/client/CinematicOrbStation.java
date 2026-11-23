@@ -49,7 +49,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     private static final ResourceLocation STONES = new ResourceLocation("rtshop", "textures/gui/magic/stones.png");
     private static final ResourceLocation STONES_ON = new ResourceLocation("rtshop", "textures/gui/magic/stones_on.png");
     private static final String[] CATS = MagicGachaScreen.CATS;
-    private static final double RING = 0.36, STONE = 0.085, SIGIL = 0.07;
+    private static final double RING = 0.37, STONE = 0.10, SIGIL = 0.085;
     public static final double RITUAL = 1.6, PEAK = 0.55;
 
     public enum Target {
@@ -194,9 +194,9 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     /** 소환 문양의 자리: [1회] [10회] 는 받침대 앞쪽, 재설정은 오른쪽 모서리. */
     public Vec3 sigilPos(Target t) {
         double clock = Scene.clock();
-        double x = t == Target.PULL1 ? -0.13 : t == Target.PULL10 ? 0.13 : 0.33;
-        double out = t == Target.REROLL ? 0.24 : 0.30;
-        Vec3 at = top.add(side().scale(out)).add(right().scale(x)).add(0.0, 0.10 + 0.008 * Math.sin(clock * 1.6 + x * 9.0), 0.0);
+        double x = t == Target.PULL1 ? -0.15 : t == Target.PULL10 ? 0.15 : 0.36;
+        double out = t == Target.REROLL ? 0.20 : 0.30;
+        Vec3 at = top.add(side().scale(out)).add(right().scale(x)).add(0.0, 0.115 + 0.008 * Math.sin(clock * 1.6 + x * 9.0), 0.0);
         double d = clock - refuseAt;
         if (t == refuseWhat && d >= 0.0 && d < 0.35) at = at.add(right().scale(0.02 * Math.sin(d * 60.0) * (1.0 - d / 0.35)));
         return at;
@@ -475,6 +475,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     @Override
     public void renderScene(PoseStack pose, MultiBufferSource buffers, Camera camera, int light) {
         Vec3 cam = camera.getPosition();
+        MagicClient.sceneAt(pos, (float) presence());
         double clock = Scene.clock();
         double t = ritualTime();
         boolean sigilHover = target == Target.PULL1 || target == Target.PULL10 || target == Target.REROLL;
@@ -491,7 +492,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         EnchantFx.circle(pose, buffers, cam, top.add(0.0, 0.02, 0.0), 0.25, -spin * 1.7, pal, 0.55f * g);
         // 구체 둘레에 서 있는 큰 소환진 (룬석들이 놓인 원)
         EnchantFx.circleBillboard(pose, buffers, camera, orb.subtract(side().scale(0.03)), RING * 1.12, -spin * 0.6, pal, 0.5f * g);
-        EnchantFx.billboard(pose, buffers, camera, orb, 0.30, clock * 0.4, EnchantFx.GLOW, 0.30f * g, 0.18f * g, 0.50f * g);
+        EnchantFx.billboard(pose, buffers, camera, orb, 0.26, clock * 0.4, EnchantFx.GLOW, 0.30f * g, 0.18f * g, 0.50f * g);
         if (t >= 0.0) {
             double peak = PEAK / RITUAL;
             double beam = t < peak ? 0.0 : 1.0 - Anim.smoother((t - peak) / (1.0 - peak));
@@ -534,7 +535,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
             float bright = lit ? 1.0f : hov ? 0.95f : 0.72f;
             quad(pose, buffers, camera, lit ? STONES_ON : STONES, at, size * 0.8, size, i / 5f, (i + 1) / 5f, bright, (float) p);
             String name = tr("rtshop.magic.cat." + CATS[i]);
-            label(pose, buffers, camera, at.add(0.0, -size - 0.022, 0.0), name, 0.0052f * appear, rune ? 0xFF8FE4FF : lit ? 0xFFFFE9B0 : 0xFFB8A8DC, (float) p);
+            label(pose, buffers, camera, at.add(0.0, -size - 0.026, 0.0), name, 0.0064f * appear, rune ? 0xFF8FE4FF : lit ? 0xFFFFE9B0 : 0xFFB8A8DC, (float) p);
         }
         // 소환 문양
         for (Target s : new Target[]{Target.PULL1, Target.PULL10, Target.REROLL}) {
@@ -566,9 +567,9 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         Vector3f look = camera.getLookVector();
         Vec3 text = at.subtract(look.x() * 0.01, look.y() * 0.01, look.z() * 0.01);
         String head = s == Target.REROLL ? tr("rtshop.magic.sigil.reroll") : tr("rtshop.magic.sigil.times", s == Target.PULL10 ? 10 : 1);
-        label(pose, buffers, camera, text.add(0.0, 0.012, 0.0), head, 0.0056f * appear * (hovered ? 1.2f : 1.0f), affordable ? 0xFFF4EEFF : 0xFFFF6B6B, alpha);
+        label(pose, buffers, camera, text.add(0.0, 0.014, 0.0), head, 0.0066f * appear * (hovered ? 1.2f : 1.0f), affordable ? 0xFFF4EEFF : 0xFFFF6B6B, alpha);
         String sub = "×" + cost(s);
-        label(pose, buffers, camera, text.add(0.0, -0.032, 0.0), sub, 0.0042f * appear, affordable ? (blue ? 0xFF9CC8FF : 0xFFB9A6FF) : 0xFF7A4A55, alpha);
+        label(pose, buffers, camera, text.add(0.0, -0.038, 0.0), sub, 0.0050f * appear, affordable ? (blue ? 0xFF9CC8FF : 0xFFB9A6FF) : 0xFF7A4A55, alpha);
     }
 
     /** 카메라를 보는 사각형 (룬석 그림의 한 칸). */

@@ -32,6 +32,23 @@ public final class MagicClient {
         return approachTicks > 0;
     }
 
+    private static BlockPos scenePos;
+    private static long sceneSeen;
+    private static float sceneK;
+
+    /** Cinematic 장면이 매 프레임 알린다: 이 구체가 장면 속에 있고, 장면이 얼마나 펼쳐졌는가(0~1). */
+    public static void sceneAt(BlockPos pos, float k) {
+        scenePos = pos;
+        sceneSeen = System.currentTimeMillis();
+        sceneK = k;
+    }
+
+    /** 이 구체가 장면 속에 있는 정도 (장면이 아니면 0). */
+    public static float sceneK(BlockPos pos) {
+        if (scenePos == null || !scenePos.equals(pos) || System.currentTimeMillis() - sceneSeen > 250) return 0F;
+        return Mth.clamp(sceneK, 0F, 1F);
+    }
+
     /** 마지막으로 받은 창 내용 (메뉴로 열리는 창·Cinematic 장면이 처음에 쓴다). */
     public static JsonObject lastView;
 

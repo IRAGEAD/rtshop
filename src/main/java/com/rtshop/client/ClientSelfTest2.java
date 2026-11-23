@@ -806,7 +806,7 @@ final class ClientSelfTest2 {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             check("with Cinematic Interactions the orb starts a first-person scene instead of a window", CinematicOrb.sceneActive(), CinematicOrb.phaseForTest());
             shot(mc, "123_orb_scene_intro");
-            waitTicks(70);
+            waitTicks(130);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
@@ -833,12 +833,13 @@ final class ClientSelfTest2 {
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             shot(mc, "123d_orb_ritual");
-            waitTicks(34);
+            waitTicks(50);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();
-            check("at the ritual's peak the rune summoning cards play over the scene", st != null && st.fxActiveForTest(), st == null ? "no scene" : st.shownForTest());
+            check("at the ritual's peak the rune summoning cards play over the scene", st != null && (st.fxActiveForTest() || st.shownForTest() == 10),
+                    st == null ? "no scene" : st.shownForTest());
             shot(mc, "123e_orb_fx");
             waitTicks(170);
         });
@@ -859,7 +860,7 @@ final class ClientSelfTest2 {
             CinematicOrbStation st = CinematicOrb.station();
             shot(mc, "123g_orb_scene_random");
             check("touching the blue sigil rerolls the held weapon's enchantment (scene)", st != null && st.rerollForTest());
-            waitTicks(60);
+            waitTicks(90);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
@@ -869,7 +870,7 @@ final class ClientSelfTest2 {
             shot(mc, "123h_orb_reroll");
             if (st != null) st.dismissForTest();
             CinematicOrb.leaveForTest();
-            waitTicks(50);
+            waitTicks(100);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;

@@ -36,16 +36,18 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
         float time = (be.getLevel().getGameTime() % 24000L) + partial;
         float flare = MagicClient.flare(be.getBlockPos());
         float speed = 1F + flare * 5F;
-        float bob = Mth.sin(time * 0.08F) * 0.05F;
+        // Cinematic 장면 동안에는 구슬과 고리가 작게 모인다 (둘레에 룬석과 소환진이 놓일 자리를 낸다)
+        float k = MagicClient.sceneK(be.getBlockPos());
+        float bob = Mth.sin(time * 0.08F) * 0.05F * (1F - k);
         ps.pushPose();
         ps.translate(0.5, 1.2 + bob, 0.5);
         // 고리 (수평으로 눕혀 서로 반대로 돈다, 조금 기울임)
-        ring(ps, buf, RING_OUT, 0.95F, time * 1.2F * speed, 12F, 0.9F + flare * 0.1F);
-        ring(ps, buf, RING_IN, 0.62F, -time * 2.1F * speed, -18F, 0.85F + flare * 0.15F);
+        ring(ps, buf, RING_OUT, Mth.lerp(k, 0.95F, 0.30F), time * 1.2F * speed, 12F, 0.9F + flare * 0.1F);
+        ring(ps, buf, RING_IN, Mth.lerp(k, 0.62F, 0.21F), -time * 2.1F * speed, -18F, 0.85F + flare * 0.15F);
         // 구슬 (카메라를 본다)
         ps.pushPose();
         ps.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
-        float s = 0.34F + flare * 0.04F;
+        float s = Mth.lerp(k, 0.34F, 0.14F) + flare * 0.04F * (1F - 0.5F * k);
         quad(ps, buf.getBuffer(RenderType.entityTranslucent(GLOW)), s * 2.6F, 0.55F + flare * 0.45F);
         ps.translate(0, 0, 0.01);
         quad(ps, buf.getBuffer(RenderType.entityTranslucent(ORB)), s, 1F);

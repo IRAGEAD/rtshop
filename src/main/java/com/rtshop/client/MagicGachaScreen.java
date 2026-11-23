@@ -405,7 +405,7 @@ public class MagicGachaScreen extends Screen {
         g.fill(x, y, x + w, y + h, hov ? 0xFF2E2250 : 0xE0161028);
         box(g, x, y, w, h, hov ? C_EDGE : 0xFF5A4690);
         String s = clipF(label, w - 6);
-        txt(g, s, x + (w - tw(s)) / 2, y + (h - 9) / 2, hov ? C_GOLD : C_TEXT);
+        txt(g, s, x + (w - tw(s)) / 2, y + (h - 9) / 2 + 2, hov ? C_GOLD : C_TEXT);
     }
 
     /** 장면 패널 아래 한 줄 알림. */
@@ -435,9 +435,9 @@ public class MagicGachaScreen extends Screen {
         int in1 = Math.round(Math.abs(1 - (h - 1) / 2F) * 0.55F);
         g.fill(x + in1 + 3, y + 2, x + w - in1 - 3, y + 3, enabled ? 0x50FFFFFF : 0x18FFFFFF);
         String a = RaidText.clip(font, top, FT, w - 18);
-        RaidText.outlined(g, font, a, FT, x + (w - RaidText.w(font, a, FT)) / 2, y + 3, enabled ? C_GOLD : 0xFF7A7090, 0xFF140A28);
+        RaidText.outlined(g, font, a, FT, x + (w - RaidText.w(font, a, FT)) / 2, y + 5, enabled ? C_GOLD : 0xFF7A7090, 0xFF140A28);
         String b = clipF(sub, w - 18);
-        txt(g, b, x + (w - tw(b)) / 2, y + h - 11, enabled ? 0xFFD8CCF8 : 0xFF6A6080);
+        txt(g, b, x + (w - tw(b)) / 2, y + h - 10, enabled ? 0xFFD8CCF8 : 0xFF6A6080);
         hits.add(new Object[]{x, y, w, h, r, enabled});
     }
 
@@ -447,7 +447,7 @@ public class MagicGachaScreen extends Screen {
         g.fill(x, y, x + w, y + h, hov ? 0xFF2E2250 : 0xFF161028);
         box(g, x, y, w, h, hov ? C_EDGE : 0xFF5A4690);
         String s = clipF(label, w - 6);
-        txt(g, s, x + (w - tw(s)) / 2, y + (h - 9) / 2, !enabled ? 0xFF6A6080 : hov ? C_GOLD : C_TEXT);
+        txt(g, s, x + (w - tw(s)) / 2, y + (h - 9) / 2 + 2, !enabled ? 0xFF6A6080 : hov ? C_GOLD : C_TEXT);
         hits.add(new Object[]{x, y, w, h, r, enabled});
     }
 
@@ -549,8 +549,9 @@ public class MagicGachaScreen extends Screen {
             if (lit) spin(g, GLOW, 128, sx, sy, 27, 0, mix(0xFFD890, gc, k), chosen ? 0.55F : flashAt == i ? 0.6F : 0.22F, true);
             stone(g, lit ? STONES_ON : STONES, i, sx, sy, sc, tab == 2 ? 0.5F : 1F);
             String nm = tr("rtshop.magic.cat." + CATS[i]);
-            RaidText.outlined(g, font, nm, F, sx - tw(nm) / 2, sy + 22, tab == 2 ? 0xFF6A6080 : rune ? C_RUNE : lit ? C_GOLD : 0xFFB8A8DC, 0xFF0A0612);
-            if (rune) gem(g, sx, sy - 24, 2, C_RUNE);
+            g.fill(sx - tw(nm) / 2 - 3, sy + 21, sx + tw(nm) / 2 + 3, sy + 33, 0xB00A0612);
+            RaidText.outlined(g, font, nm, F, sx - tw(nm) / 2, sy + 24, tab == 2 ? 0xFF6A6080 : rune ? C_RUNE : lit ? C_GOLD : 0xFFB8A8DC, 0xFF0A0612);
+            if (rune) gem(g, sx - tw(nm) / 2 - 7, sy + 28, 2, C_RUNE);
             if (tab != 2) {
                 hits.add(new Object[]{sx - 14, sy - 19, 28, 50, (Runnable) () -> {
                     tab = 0;
@@ -572,11 +573,11 @@ public class MagicGachaScreen extends Screen {
             if (sel) g.fill(bx, y0 + 34, bx + tbw - 3, y0 + 35, 0xFF8A6AD8);
             g.fill(bx, y0 + 48, bx + tbw - 3, y0 + 49, sel ? 0xFFE8C070 : 0xFF4A3A7A);
             String s = clipF(tabs[i], tbw - 8);
-            txt(g, s, bx + (tbw - 3 - tw(s)) / 2, y0 + 37, sel ? C_GOLD : 0xFFA898CC);
+            txt(g, s, bx + (tbw - 3 - tw(s)) / 2, y0 + 38, sel ? C_GOLD : 0xFFA898CC);
             hits.add(new Object[]{bx, y0 + 34, tbw - 3, 15, (Runnable) () -> tab = ti, true});
         }
         int py = y0 + 56;
-        int by2 = y0 + H - 58;
+        int by2 = y0 + H - 60;
         if (tab == 2) {
             rerollPanel(g, mx, my, rx, py, rw, by2);
         } else {
@@ -587,8 +588,8 @@ public class MagicGachaScreen extends Screen {
             int c1 = src.has("cost1") ? src.get("cost1").getAsInt() : cost(mode);
             int c10 = src.has("cost10") ? src.get("cost10").getAsInt() : cost(mode) * 10;
             int bw = (rw - 6) / 2;
-            crystal(g, mx, my, rx, by2, bw, 25, tr("rtshop.magic.times", 1), tr("rtshop.magic.cost." + mode, c1), !fxOn && have >= c1, () -> pull(1));
-            crystal(g, mx, my, rx + bw + 6, by2, bw, 25, tr("rtshop.magic.times", 10), tr("rtshop.magic.cost." + mode, c10),
+            crystal(g, mx, my, rx, by2, bw, 28, tr("rtshop.magic.times", 1), tr("rtshop.magic.cost." + mode, c1), !fxOn && have >= c1, () -> pull(1));
+            crystal(g, mx, my, rx + bw + 6, by2, bw, 28, tr("rtshop.magic.times", 10), tr("rtshop.magic.cost." + mode, c10),
                     !fxOn && have >= c10, () -> pull(10));
         }
 
@@ -665,8 +666,8 @@ public class MagicGachaScreen extends Screen {
             if (d[i] <= 0) continue;
             int yy = y + row * 12;
             int col = GachaColors.argb(GRADES[i]);
-            gem(g, x + 3, yy + 4, 3, col);
-            txt(g, clipF(tr("rtshop.gacha.grade." + GRADES[i]), 46), x + 10, yy, col);
+            gem(g, x + 3, yy + 5, 3, col);
+            txt(g, clipF(tr("rtshop.gacha.grade." + GRADES[i]), 46), x + 10, yy + 2, col);
             String p = GachaScreen.pct(d[i]);
             int bx = x + 58, bw = Math.max(10, w - 58 - 44);
             g.fill(bx - 1, yy + 2, bx + bw + 1, yy + 8, 0xFF2A1F48);
@@ -674,7 +675,7 @@ public class MagicGachaScreen extends Screen {
             int fw = Math.max(1, (int) (bw * Math.min(1, d[i])));
             g.fill(bx, yy + 3, bx + fw, yy + 7, col);
             g.fill(bx, yy + 3, bx + fw, yy + 4, 0x60FFFFFF);
-            txt(g, p, x + w - tw(p), yy, C_TEXT);
+            txt(g, p, x + w - tw(p), yy + 2, C_TEXT);
             row++;
         }
         if (row == 0) {
@@ -714,7 +715,7 @@ public class MagicGachaScreen extends Screen {
         g.fill(x, hy + 11, x + w, hy + 12, 0xFF3A2A66);
         odds(g, x, hy + 15, w);
         int c = cost("reroll");
-        crystal(g, mx, my, x, by2, w, 25, tr("rtshop.magic.reroll_btn"), tr("rtshop.magic.cost.reroll", c),
+        crystal(g, mx, my, x, by2, w, 28, tr("rtshop.magic.reroll_btn"), tr("rtshop.magic.cost.reroll", c),
                 !fx.active() && ok && tickets("reroll") >= c, this::reroll);
     }
 
