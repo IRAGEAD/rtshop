@@ -2184,7 +2184,10 @@ public final class SelfTest {
                     pg == null ? "null" : java.util.Arrays.toString(pg));
             if (z.isAlive()) z.discard();
             QuestManager.abandon(a, "t_inspect");
-            for (int i = 0; i < 220 && !c.isRemoved(); i++) c.tick();
+            for (int i = 0; i < 220 && !c.isRemoved(); i++) {
+                c.tickCount++;
+                c.tick();
+            }
             check("the companion leaves when its quest is no longer active", c.isRemoved() && com.rtshop.story.Companions.count(a) == 0);
             if (!c.isRemoved()) c.discard();
         }
