@@ -353,6 +353,12 @@ public final class Gacha {
         }
     }
 
+    /** 티켓 상점에서 뽑기 화면으로 돌아간다 (같은 행운 상인 앞에서). */
+    public static void back(ServerPlayer p) {
+        Integer id = SESSIONS.get(p.getUUID());
+        open(p, id == null ? -1 : id);
+    }
+
     public static void open(ServerPlayer p, int npcId) {
         SESSIONS.put(p.getUUID(), npcId);
         send(p, GachaPacket.VIEW, view(p));
@@ -760,6 +766,15 @@ public final class Gacha {
         if (event.getHand() == InteractionHand.MAIN_HAND && event.getEntity() instanceof ServerPlayer sp) {
             open(sp, event.getTarget().getId());
         }
+    }
+
+    /** 예전 이름표의 오타('릭키')를 고친다. */
+    @SubscribeEvent
+    public static void onJoin(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
+        Entity e = event.getEntity();
+        if (event.getLevel().isClientSide() || !e.getTags().contains(NPC_TAG) || e.getCustomName() == null) return;
+        String n = e.getCustomName().getString();
+        if (n.contains("릭키")) e.setCustomName(net.minecraft.network.chat.Component.literal(n.replace("릭키", "럭키")));
     }
 
     @SubscribeEvent

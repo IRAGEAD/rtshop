@@ -172,7 +172,7 @@ public class RaidScreen extends Screen {
 
         // ── 머리: 제목, 부제, 금줄
         RaidFx.luxTitle(g, this.font, t("uiTitle"), x + W / 2, y + 9, 0xF3D9A0, time);
-        String sub = spaced(t("uiSub"));
+        String sub = t("uiSub");
         int sw = RaidText.w(this.font, sub, RaidText.SANS);
         RaidText.center(g, this.font, sub, RaidText.SANS, x + W / 2, y + 29, 0xFFC99A62);
         RaidFx.hairline(g, x + W / 2F - sw / 2F - 70, x + W / 2F - sw / 2F - 8, y + 33, 0xD4A85A, 0.9F);

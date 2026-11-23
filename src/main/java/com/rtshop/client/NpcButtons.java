@@ -89,6 +89,19 @@ public final class NpcButtons {
         return Component.translatable("rtshop.talk.button").getString();
     }
 
+    /** 행운 상인의 티켓 상점인가 (뽑기 화면으로 돌아가는 단추를 붙인다) */
+    private static boolean ticketShop(Screen s) {
+        return s instanceof ShopScreen ss && ss.shopIdForEdit() != null && ss.shopIdForEdit().contains("gacha");
+    }
+
+    private static String gachaBackLabel() {
+        return Component.translatable("rtshop.gacha.back_to_gacha").getString();
+    }
+
+    public static boolean gachaBackForTest(Screen s) {
+        return ticketShop(s);
+    }
+
     private static String editLabel() {
         return Component.translatable("rtshop.shopedit.button").getString();
     }
@@ -113,6 +126,11 @@ public final class NpcButtons {
         if (editButton(s)) {
             int w = UiFont.get().width(editLabel()) + 12;
             out.add(new int[]{x, spot[1], w, 1});
+            x += w + 4;
+        }
+        if (ticketShop(s)) {
+            int w = UiFont.get().width(gachaBackLabel()) + 12;
+            out.add(new int[]{x, spot[1], w, 3});
         }
         return out;
     }
@@ -140,6 +158,8 @@ public final class NpcButtons {
                 String label = questLabel();
                 Ui.bevel(g, b[0], b[1], b[2], H, hov ? Ui.C_GOLD : Ui.C_GOLD_DARK, Ui.C_GOLD, Ui.C_SHADOW);
                 g.drawString(UiFont.get(), label, b[0] + (b[2] - UiFont.get().width(label)) / 2, b[1] + 3, Ui.C_INK, false);
+            } else if (b[3] == 3) {
+                Ui.button(g, UiFont.get(), b[0], b[1], b[2], H, gachaBackLabel(), hov, true);
             } else {
                 Ui.button(g, UiFont.get(), b[0], b[1], b[2], H, editLabel(), hov, true);
             }
@@ -166,6 +186,8 @@ public final class NpcButtons {
                 returnArmedAt = System.currentTimeMillis();
                 s.onClose();
                 mc.player.connection.sendCommand("rtshop quest open " + id);
+            } else if (b[3] == 3) {
+                mc.player.connection.sendCommand("rtshop gacha back");
             } else {
                 String id = ((ShopScreen) s).shopIdForEdit();
                 ShopNet.CHANNEL.sendToServer(new ShopEditActionPacket(ShopEditor.OPEN, id, ""));

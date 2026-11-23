@@ -21,7 +21,7 @@ public class FontCalibScreen extends Screen {
         for (int i = 0; i < IDS.length; i++) {
             int y = 10 + i * 20;
             g.fill(4, y, 8, y + 9, 0xFFFF0000); // 줄의 위치 표시 (9칸)
-            var c = Component.literal("가나다맡기 Ag");
+            var c = Component.literal("가나다맡기 Ag 「습격의 징조」는 「조사대원」 · 『책』 【끝】…");
             if (!IDS[i].isEmpty()) {
                 ResourceLocation rl = new ResourceLocation(IDS[i]);
                 c = c.withStyle(s -> s.withFont(rl));

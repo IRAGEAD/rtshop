@@ -1044,6 +1044,11 @@ public final class QuestManager {
     /** 이야기 연출을 보낸다. "party": true 면 가까운 파티원에게도. */
     public static void scene(ServerPlayer p, com.google.gson.JsonObject o) {
         if (o == null) return;
+        if (o.has("onSleep") && o.get("onSleep").getAsBoolean()) {
+            // 꿈 장면: 다음에 침대에서 잠들 때 보여 준다
+            p.getPersistentData().putString(SLEEP_SCENE, o.toString());
+            return;
+        }
         com.google.gson.JsonObject c = o.deepCopy();
         if (!c.has("closeScreen")) c.addProperty("closeScreen", true);
         com.rtshop.story.BossIntros.send(p, c);
@@ -1292,6 +1297,10 @@ public final class QuestManager {
         if (key == null) {
             return;
         }
+        // 대화 상자가 먼저 열리는 NPC: 퀘스트 창은 대화의 [퀘스트] 로만 연다 (같이 열리면 대화 상자를 덮어 버렸다)
+        if (event.getEntity() instanceof ServerPlayer claimer && com.rtshop.story.Dialogue.claims(claimer, key)) {
+            return;
+        }
         boolean questNpc = isQuestNpc(target);
         // 퀘스트 전용 NPC: 바로 퀘스트 창. 상인·은행원·직업 안내인 등: 원래 화면을 열고, 받을 퀘스트가 있으면 그 화면에 [퀘스트] 단추가 뜬다.
         if (questNpc) {
@@ -1308,6 +1317,24 @@ public final class QuestManager {
             int n = viewsFor(sp, key).size();
             com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> sp),
                     new com.rtshop.net.NpcQuestPacket(target.getId(), n, hasQuests(key)));
+        }
+    }
+
+    public static final String SLEEP_SCENE = "rtshop_sleep_scene";
+
+    /** 침대에서 잠이 들면(잠든 지 1.5초) 미뤄 둔 꿈 장면을 보여 준다. 잠자는 화면은 닫지 않는다 (닫으면 깨어난다). */
+    @SubscribeEvent
+    public static void onSleepTick(net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || !(event.player instanceof ServerPlayer p)) return;
+        if (!p.isSleeping() || p.getSleepTimer() < 30 || !p.getPersistentData().contains(SLEEP_SCENE)) return;
+        try {
+            com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString(p.getPersistentData().getString(SLEEP_SCENE)).getAsJsonObject();
+            o.remove("onSleep");
+            o.addProperty("closeScreen", false);
+            p.getPersistentData().remove(SLEEP_SCENE);
+            com.rtshop.story.BossIntros.send(p, o);
+        } catch (Exception e) {
+            p.getPersistentData().remove(SLEEP_SCENE);
         }
     }
 

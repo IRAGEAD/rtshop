@@ -36,5 +36,7 @@ public class ClueItem extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tip, TooltipFlag flag) {
         tip.add(Component.translatable("item.rtshop.scylla_clue.desc1").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         tip.add(Component.translatable("item.rtshop.scylla_clue.desc2").withStyle(ChatFormatting.DARK_AQUA));
+        tip.add(Component.translatable("rtshop.story_item.clue_header").withStyle(ChatFormatting.GOLD));
+        tip.add(Component.translatable("item.rtshop.scylla_clue.guide").withStyle(ChatFormatting.AQUA));
     }
 }

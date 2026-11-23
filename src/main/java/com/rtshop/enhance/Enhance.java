@@ -421,10 +421,10 @@ public final class Enhance {
         EnhanceConfig cfg = client ? EnhanceConfig.client() : EnhanceConfig.get();
         EquipmentSlot slot = e.getSlotType();
         if (k == Kind.WEAPON && slot == EquipmentSlot.MAINHAND) {
-            add(e, Attributes.ATTACK_DAMAGE, WEAPON_ID, weaponBonus(cfg, lv, sum(e.getOriginalModifiers().get(Attributes.ATTACK_DAMAGE))));
+            add(e, Attributes.ATTACK_DAMAGE, WEAPON_ID, weaponBonus(cfg, lv, sum(e.getModifiers().get(Attributes.ATTACK_DAMAGE))));
         } else if (k == Kind.ARMOR && slot == LivingEntity.getEquipmentSlotForItem(s) && slot.getType() == EquipmentSlot.Type.ARMOR) {
             int i = slot.getIndex();
-            add(e, Attributes.ARMOR, ARMOR_ID[i], armorBonus(cfg, lv, sum(e.getOriginalModifiers().get(Attributes.ARMOR))));
+            add(e, Attributes.ARMOR, ARMOR_ID[i], armorBonus(cfg, lv, sum(e.getModifiers().get(Attributes.ARMOR))));
             add(e, Attributes.ARMOR_TOUGHNESS, TOUGH_ID[i], toughnessBonus(cfg, lv));
         }
     }

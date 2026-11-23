@@ -278,6 +278,10 @@ public final class ShopServer {
                             com.rtshop.gacha.Gacha.open(ctx.getSource().getPlayerOrException(), -1);
                             return 1;
                         })
+                        .then(Commands.literal("back").executes(ctx -> {
+                            com.rtshop.gacha.Gacha.back(ctx.getSource().getPlayerOrException());
+                            return 1;
+                        }))
                         .then(Commands.literal("edit").requires(src -> src.getPlayer() == null || com.rtshop.gacha.Gacha.canEdit(src.getPlayer()))
                                 .executes(ctx -> {
                                     com.rtshop.gacha.Gacha.openEditor(ctx.getSource().getPlayerOrException());
@@ -513,6 +517,8 @@ public final class ShopServer {
         com.rtshop.story.Hunts.reload();
         com.rtshop.story.Dialogue.reload();
         com.rtshop.story.StoryText.reload();
+        com.rtshop.stats.ItemStats.load();
+        com.rtshop.stats.ItemStats.syncAll(ctx.getSource().getServer());
         com.rtshop.story.WildSpawns.reload();
         com.rtshop.story.StoryArena.reload();
         for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) {

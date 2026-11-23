@@ -651,7 +651,11 @@ public final class GachaFx {
         g.pose().pushPose();
         g.pose().translate(0, 0, 10);
         g.pose().scale(2.5F, 2.5F, 1);
-        g.drawCenteredString(font, "?", 0, -4, 0xFF000000 | trim);
+        // 기본 글꼴의 "?" 를 그림자 없이 카드 한가운데에 (폭·높이로 정확히 가운데를 맞춘다)
+        Component q = Component.literal("?").withStyle(st -> st.withFont(net.minecraft.network.chat.Style.DEFAULT_FONT));
+        var mcFont = net.minecraft.client.Minecraft.getInstance().font;
+        int qw = mcFont.width(q) - 1; // 글자 오른쪽의 빈 한 칸은 빼고
+        g.drawString(mcFont, q, -qw / 2, -3, 0xFF000000 | trim, false);
         g.pose().popPose();
         if (crack > 0) {
             int c = 0xFF000000 | crackRgb;
@@ -713,6 +717,15 @@ public final class GachaFx {
         if (!active()) {
             return;
         }
+        boolean was = UiText.pause(); // 연출은 원래 모양(그림자 포함)으로
+        try {
+            renderFx(g, font, width, height, partial);
+        } finally {
+            UiText.resume(was);
+        }
+    }
+
+    private void renderFx(GuiGraphics g, Font font, int width, int height, float partial) {
         lastW = width;
         lastH = height;
         float tt = t + partial;

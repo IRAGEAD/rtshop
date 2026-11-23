@@ -669,7 +669,7 @@ public final class GachaConfig {
         GachaConfig c = new GachaConfig();
         c.defaults();
         c.version = o.has("configVersion") ? o.get("configVersion").getAsInt() : 1;
-        if (o.has("npcName")) c.npcName = o.get("npcName").getAsString();
+        if (o.has("npcName")) c.npcName = o.get("npcName").getAsString().replace("릭키", "럭키"); // 예전 오타
         if (o.has("shop")) c.shop = o.get("shop").getAsString().trim();
         if (o.has("tenGuarantee")) c.tenGuarantee = o.get("tenGuarantee").getAsString().trim();
         if (o.has("unbreakableFrom")) c.unbreakableFrom = o.get("unbreakableFrom").getAsString().trim();

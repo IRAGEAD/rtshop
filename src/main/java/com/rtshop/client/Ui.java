@@ -35,7 +35,7 @@ public final class Ui {
     public static final int C_PARCH_HI = 0xFFF6EBCB;
     public static final int C_INK = 0xFF3A2814;
     public static final int C_INK_SOFT = 0xFF7A6240;
-    public static final int C_CREAM = 0xFFF5E6C0;
+    public static final int C_CREAM = 0xFFE9DCBC;
     public static final int C_RED = 0xFFA02C1E;
     public static final int C_GREEN = 0xFF2F6B24;
 
@@ -165,8 +165,8 @@ public final class Ui {
         String s = clip(font, label, w - 8);
         int tx = x + (w - font.width(s)) / 2, tyy = y + (h - 8) / 2;
         if (enabled) {
-            g.drawString(font, s, tx + 1, tyy + 1, 0xFF2A1406, false);
-            g.drawString(font, s, tx, tyy, hover ? 0xFFFFE9B0 : C_CREAM, false);
+            // 그림자 없이, 눈부시지 않은 크림색
+            g.drawString(font, s, tx, tyy, hover ? 0xFFF2E4C4 : 0xFFE2D3B2, false);
         } else {
             g.drawString(font, s, tx, tyy, 0xFFB8A888, false);
         }

@@ -30,6 +30,7 @@ final class ClientSelfTest2 {
 
     private static final List<Step> STEPS = new ArrayList<>();
     private static volatile int npc = -1;
+    static volatile int qnpc = -1;
     private static volatile int landId = -1;
     private static volatile int farmA = -1, farmB = -1;
     private static volatile int dishIdx = -1;
@@ -729,6 +730,76 @@ final class ClientSelfTest2 {
         add(mc -> {
             shot(mc, "118_font_calib");
             mc.setScreen(null);
+            // 퀘스트 NPC(기록관 이사벨)도 우클릭하면 대화 상자가 먼저 열린다
+            qnpc = -1;
+            DialogueScreen.autoMainForTest = false;
+            onServer(mc, sp -> {
+                net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
+                var v = com.rtshop.quest.QuestManager.spawnNpc(sp.serverLevel(), sp.position().add(look.x * 2, 0, look.z * 2), sp.getYRot() + 180,
+                        "quest_order_archivist");
+                qnpc = v == null ? -2 : v.getId();
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            net.minecraft.world.entity.Entity e = qnpc >= 0 ? mc.level.getEntity(qnpc) : null;
+            check("the archivist quest NPC for the dialogue-first test is there", e != null, qnpc);
+            if (e != null) mc.gameMode.interact(mc.player, e, net.minecraft.world.InteractionHand.MAIN_HAND);
+            waitTicks(25);
+        });
+        add(mc -> {
+            DialogueScreen ds = mc.screen instanceof DialogueScreen x ? x : null;
+            check("right-clicking a story quest NPC opens the dialogue box first (not the quest window)", ds != null, mc.screen);
+            if (ds != null) {
+                ds.skipForTest();
+                check("the story NPC's dialogue offers [Quests] as a choice", ds.hasQuestChoiceForTest());
+                shot(mc, "119_quest_npc_dialogue");
+                int lines = ds.openHistoryForTest();
+                check("the dialogue can show the conversation history with this NPC", lines > 0, lines);
+            }
+            waitTicks(4);
+        });
+        add(mc -> {
+            shot(mc, "119b_dialogue_history");
+            mc.setScreen(null);
+            DialogueScreen.autoMainForTest = true;
+            onServer(mc, sp -> {
+                net.minecraft.world.entity.Entity e = qnpc >= 0 ? sp.serverLevel().getEntity(qnpc) : null;
+                if (e != null) e.discard();
+            });
+            mc.player.connection.sendCommand("rtshop itemstats edit minecraft:diamond_sword");
+            waitTicks(20);
+        });
+        // 장비 능력치 편집기
+        add(mc -> {
+            ItemStatsScreen is = mc.screen instanceof ItemStatsScreen x ? x : null;
+            check("the equipment stats editor opens for a diamond sword", is != null && "minecraft:diamond_sword".equals(is.itemForTest()), mc.screen);
+            if (is != null) {
+                Double orig = is.originalForTest().get("minecraft:generic.attack_damage");
+                check("the editor shows the sword's original damage (7) and speed (1.6)", orig != null && Math.abs(orig - 7) < 1e-6
+                        && is.originalForTest().get("minecraft:generic.attack_speed") != null
+                        && Math.abs(is.originalForTest().get("minecraft:generic.attack_speed") - 1.6) < 1e-6, is.originalForTest());
+                shot(mc, "120_item_stats");
+                is.setAndSaveForTest("minecraft:generic.attack_damage", "9");
+            }
+            waitTicks(25);
+        });
+        add(mc -> {
+            var m = com.rtshop.stats.ItemStats.table(true).get("minecraft:diamond_sword");
+            double dmg = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD)
+                    .getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND)
+                    .get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).stream().mapToDouble(x -> x.getAmount()).sum() + 1;
+            check("saving in the editor reaches the client too (the tooltip shows damage 9)", m != null && Math.abs(dmg - 9) < 1e-6, dmg);
+            shot(mc, "120b_item_stats_saved");
+            onServer(mc, sp -> {
+                com.rtshop.stats.ItemStats.put("minecraft:diamond_sword", null);
+                com.rtshop.stats.ItemStats.save();
+                com.rtshop.stats.ItemStats.syncAll(sp.server);
+            });
+            mc.setScreen(null);
+            waitTicks(10);
+        });
+        add(mc -> {
             com.rtshop.story.Hunts.testMode = true;
             onServer(mc, sp -> {
                 com.rtshop.story.Hunts.clearForTest(sp);

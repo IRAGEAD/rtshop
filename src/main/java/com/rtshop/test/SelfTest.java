@@ -343,6 +343,11 @@ public final class SelfTest {
             crash("story", t);
         }
         try {
+            findersAndStats(server, level, a);
+        } catch (Throwable t) {
+            crash("finders", t);
+        }
+        try {
             restaurant(server, level, a, b);
         } catch (Throwable t) {
             crash("restaurant", t);
@@ -2115,6 +2120,112 @@ public final class SelfTest {
     // ------------------------------------------------------------------ 파티 · 보스 처치 인정
 
     /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
+    /** 조사대 나침반·/locate 는 실제로 생긴 건축물만, 마을에서 1000블럭 이상 / 장비 능력치 설정 / 이야기 물건 안내 / 대화 먼저. */
+    private static void findersAndStats(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        section("Survey compass / locate / equipment stats");
+        ServerLevel ow = server.overworld();
+        BlockPos spawn = ow.getSharedSpawnPos();
+        long t0 = System.currentTimeMillis();
+        var portals = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:ruined_portal");
+        var f = com.rtshop.story.StructureFinder.find(ow, portals, spawn, 200, 1000);
+        long ms = System.currentTimeMillis() - t0;
+        LINES.add("  compass search: checked=" + com.rtshop.story.StructureFinder.lastChecked + " rejected=" + com.rtshop.story.StructureFinder.lastRejected
+                + " townSkipped=" + com.rtshop.story.StructureFinder.lastTownSkipped + " ms=" + ms + " at=" + (f == null ? "none" : f.pos.toShortString()));
+        check("the survey compass finds a ruined portal that really generated (its start exists in the chunk)",
+                f != null && com.rtshop.story.StructureFinder.verify(ow, f.structure, f.pos.getX() >> 4, f.pos.getZ() >> 4) != null,
+                f == null ? "none" : f.pos.toShortString());
+        check("the place it points to is at least 1000 blocks from town",
+                f != null && com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ()) >= 1000,
+                f == null ? "none" : String.valueOf((int) com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ())));
+        check("the compass search stays quick (under 6 s)", ms < 6000, ms + " ms");
+        BlockPos viaItem = com.rtshop.item.SurveyCompassItem.locate(ow, "#minecraft:ruined_portal", spawn);
+        check("the compass item uses the same verified search", viaItem != null && f != null && viaItem.equals(f.pos));
+        var villages = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:village");
+        var v = com.rtshop.story.StructureFinder.find(ow, villages, spawn, 100, 0);
+        check("/locate structure (verified) finds a real village", v != null
+                && com.rtshop.story.StructureFinder.verify(ow, v.structure, v.pos.getX() >> 4, v.pos.getZ() >> 4) != null);
+        check("an unknown structure target resolves to nothing", com.rtshop.story.StructureFinder.resolve(ow, "rtshop:no_such_structure") == null);
+        // /locate structure 명령이 우리 검색으로 바뀌었는가 (결과 문장)
+        List<String> out = new ArrayList<>();
+        net.minecraft.commands.CommandSource sink = new net.minecraft.commands.CommandSource() {
+            public void sendSystemMessage(net.minecraft.network.chat.Component c) {
+                out.add(c.getString());
+            }
+
+            public boolean acceptsSuccess() {
+                return true;
+            }
+
+            public boolean acceptsFailure() {
+                return true;
+            }
+
+            public boolean shouldInformAdmins() {
+                return false;
+            }
+        };
+        net.minecraft.commands.CommandSourceStack css = new net.minecraft.commands.CommandSourceStack(sink, net.minecraft.world.phys.Vec3.atCenterOf(spawn),
+                net.minecraft.world.phys.Vec2.ZERO, ow, 4, "selftest", net.minecraft.network.chat.Component.literal("selftest"), server, null);
+        server.getCommands().performPrefixedCommand(css, "locate structure #minecraft:ruined_portal");
+        LINES.add("  /locate output: " + out);
+        check("/locate structure answers with a verified place", !out.isEmpty() && com.rtshop.story.StructureFinder.lastChecked > 0, out);
+
+        // 장비 능력치 설정
+        String sword = "minecraft:diamond_sword";
+        Map<String, Map<String, Double>> keep = new java.util.LinkedHashMap<>(com.rtshop.stats.ItemStats.table(false));
+        try {
+            Map<String, Double> m = new java.util.LinkedHashMap<>();
+            m.put("minecraft:generic.attack_damage", 12.0);
+            m.put("minecraft:generic.attack_speed", 2.0);
+            com.rtshop.stats.ItemStats.put(sword, m);
+            ItemStack st = new ItemStack(Items.DIAMOND_SWORD);
+            var mods = st.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND);
+            double dmg = mods.get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).stream().mapToDouble(x -> x.getAmount()).sum();
+            double spd = mods.get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED).stream().mapToDouble(x -> x.getAmount()).sum();
+            check("equipment stats: a diamond sword set to damage 12 / speed 2 shows exactly that", Math.abs(dmg - 11) < 1e-6 && Math.abs(spd + 2) < 1e-6,
+                    "dmg+1=" + (dmg + 1) + " spd+4=" + (spd + 4));
+            Map<String, Double> arm = new java.util.LinkedHashMap<>();
+            arm.put("minecraft:generic.armor", 11.0);
+            com.rtshop.stats.ItemStats.put("minecraft:iron_chestplate", arm);
+            ItemStack chest = new ItemStack(Items.IRON_CHESTPLATE);
+            double armor = chest.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.CHEST)
+                    .get(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).stream().mapToDouble(x -> x.getAmount()).sum();
+            double handArmor = chest.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND)
+                    .get(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).stream().mapToDouble(x -> x.getAmount()).sum();
+            check("equipment stats: an iron chestplate set to armor 11 gives 11 when worn and nothing in the hand", Math.abs(armor - 11) < 1e-6 && handArmor == 0,
+                    armor + " / " + handArmor);
+            com.rtshop.stats.ItemStats.put(sword, null);
+            double back = new ItemStack(Items.DIAMOND_SWORD).getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND)
+                    .get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).stream().mapToDouble(x -> x.getAmount()).sum();
+            check("equipment stats: clearing an item gives back its original stats (diamond sword 7)", Math.abs(back + 1 - 7) < 1e-6, back + 1);
+            var json = com.rtshop.stats.ItemStats.toJson();
+            check("equipment stats are written to item_stats.json with a help line", json.has("_help") && json.getAsJsonObject("items").has("minecraft:iron_chestplate"));
+        } finally {
+            for (String k : new ArrayList<>(com.rtshop.stats.ItemStats.table(false).keySet())) com.rtshop.stats.ItemStats.put(k, null);
+            keep.forEach(com.rtshop.stats.ItemStats::put);
+        }
+
+        // 이야기 물건 안내 문구
+        int guides = 0;
+        String[] storyItems = {"undying_ember", "chronicle_page", "frost_heart", "oath_scroll", "mother_journal", "grey_coin", "old_expedition_map",
+                "expedition_tag", "broken_sun_mask", "crew_name_tag", "frozen_logbook", "grey_ash", "memory_shard", "chronicle_last_page"};
+        try (var in = SelfTest.class.getResourceAsStream("/assets/rtshop/lang/ko_kr.json")) {
+            com.google.gson.JsonObject lang = com.google.gson.JsonParser.parseString(new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            for (String id : storyItems) if (lang.has("item.rtshop." + id + ".guide")) guides++;
+            check("every main story item has a guide line in its tooltip (" + storyItems.length + ")", guides == storyItems.length
+                    && lang.has("rtshop.story_item.header") && lang.has("item.rtshop.scylla_clue.guide") && lang.has("item.rtshop.survey_compass.desc3"), guides);
+        }
+        List<net.minecraft.network.chat.Component> tip = new ArrayList<>();
+        new ItemStack(com.rtshop.item.ModItems.FROST_HEART.get()).getItem().appendHoverText(new ItemStack(com.rtshop.item.ModItems.FROST_HEART.get()), null, tip,
+                net.minecraft.world.item.TooltipFlag.NORMAL);
+        check("a story item's tooltip shows the 'main story item' header and where it is used",
+                tip.stream().anyMatch(c -> c.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t && t.getKey().equals("item.rtshop.frost_heart.guide")));
+
+        // 대화 먼저: 퀘스트 NPC 도 대화가 가로챈다 (퀘스트 창이 대화 상자를 덮지 않게)
+        check("quest NPCs open the dialogue first (Dialogue claims the click)", com.rtshop.story.Dialogue.claims(a, "quest_order_archivist")
+                && com.rtshop.story.Dialogue.claims(a, "quest_order_captain"));
+    }
+
     private static void story(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         {
             StringBuilder ids = new StringBuilder();

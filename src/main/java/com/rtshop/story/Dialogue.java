@@ -209,6 +209,8 @@ public final class Dialogue {
         String main = mainAction(npcKey);
         if (main != null) out.addProperty("main", main);
         out.addProperty("quests", QuestManager.viewsCount(p, npcKey));
+        // 퀘스트를 주는 NPC 는 받을 퀘스트가 없어도 [퀘스트] 를 보인다 (진행 중·지난 퀘스트·다음 안내)
+        if (npcKey.startsWith("quest_") || QuestManager.hasQuests(npcKey)) out.addProperty("questNpc", true);
         if (com.rtshop.story.Hunts.get().boardNpcs.contains(npcKey)) out.addProperty("bounty", true);
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, StoryText.json(p, out).toString()));
     }
@@ -298,13 +300,18 @@ public final class Dialogue {
      * 대화 상자에서 [상점] 등을 고르면 본래 창으로 간다. 웅크리고 우클릭하면 대화 없이 본래 창을 바로 연다.
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
+    /** 이 NPC 를 누르면 대화 상자가 먼저 열리는가 (그러면 다른 창은 열지 않는다). */
+    public static boolean claims(ServerPlayer p, String key) {
+        if (p == null || key == null || BYPASS.contains(p.getUUID())) return false;
+        return pendingScene(p, key) != null || (dialogueFirst && !p.isShiftKeyDown());
+    }
+
     public static void onInteract(PlayerInteractEvent.EntityInteract event) {
         if (event.getLevel().isClientSide() || !(event.getEntity() instanceof ServerPlayer p)) return;
         if (BYPASS.contains(p.getUUID())) return;
         String key = QuestManager.npcKey(event.getTarget());
         if (key == null) return;
-        boolean scene = pendingScene(p, key) != null;
-        if (!scene && (!dialogueFirst || p.isShiftKeyDown())) return;
+        if (!claims(p, key)) return;
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
         if (event.getHand() == InteractionHand.MAIN_HAND) open(p, key, event.getTarget().getId());

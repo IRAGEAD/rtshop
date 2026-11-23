@@ -78,28 +78,25 @@ public class SurveyCompassItem extends Item {
         return InteractionResultHolder.consume(stack);
     }
 
-    /** 구조물 ID, #태그 또는 "모드:*" 의 가장 가까운 자리 (반경 96 청크). 없으면 null. */
+    /** 마을(성 영역)에서 최소 이만큼 떨어진 건축물만 안내한다. */
+    public static final double MIN_TOWN = 1000;
+
+    /**
+     * 구조물 ID, #태그 또는 "모드:*" 가운데 실제로 생긴 가장 가까운 자리 (반경 200 청크, 마을에서 1000블럭 이상).
+     * 없으면 null. 생기지 않은 자리(다른 모드·단계 잠금·지형 조건)는 알려 주지 않는다.
+     */
     public static BlockPos locate(ServerLevel level, String target, BlockPos from) {
-        Registry<Structure> reg = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        HolderSet<Structure> set = null;
-        if (target.startsWith("#")) {
-            set = reg.getTag(TagKey.create(Registries.STRUCTURE, new ResourceLocation(target.substring(1)))).orElse(null);
-        } else if (target.endsWith(":*")) {
-            String ns = target.substring(0, target.length() - 2);
-            List<Holder<Structure>> hs = reg.holders().filter(h -> h.key().location().getNamespace().equals(ns)).map(h -> (Holder<Structure>) h).toList();
-            set = hs.isEmpty() ? null : HolderSet.direct(hs);
-        } else {
-            var h = reg.getHolder(ResourceKey.create(Registries.STRUCTURE, new ResourceLocation(target)));
-            set = h.isPresent() ? HolderSet.direct(h.get()) : null;
-        }
+        var set = com.rtshop.story.StructureFinder.resolve(level, target);
         if (set == null) return null;
-        Pair<BlockPos, Holder<Structure>> r = level.getChunkSource().getGenerator().findNearestMapStructure(level, set, from, 96, false);
-        return r == null ? null : r.getFirst();
+        var f = com.rtshop.story.StructureFinder.find(level, set, from, 200, MIN_TOWN);
+        return f == null ? null : f.pos;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tip, TooltipFlag flag) {
         tip.add(Component.translatable("item.rtshop.survey_compass.desc1").withStyle(ChatFormatting.GRAY));
         tip.add(Component.translatable("item.rtshop.survey_compass.desc2").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+        tip.add(Component.translatable("rtshop.story_item.tool_header").withStyle(ChatFormatting.GOLD));
+        tip.add(Component.translatable("item.rtshop.survey_compass.desc3").withStyle(ChatFormatting.AQUA));
     }
 }

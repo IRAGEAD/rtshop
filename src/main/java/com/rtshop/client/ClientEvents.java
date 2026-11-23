@@ -173,6 +173,23 @@ public final class ClientEvents {
     // ------------------------------------------------------------------ 이야기 연출: 화면 흔들림, 보스 아이템 이야기
 
     /** 연출이 도는 동안에는 채팅·체력·핫바 같은 화면 요소를 숨긴다 (영화처럼). */
+    /** 연출 중(이야기 장면·뽑기·강화 대성공 장면)에는 화면의 모든 표시(퀘스트 HUD, 다른 모드 표시 포함)를 잠시 끈다. */
+    public static boolean hideHud() {
+        Minecraft mc = Minecraft.getInstance();
+        return Cinematic.active() || EnhanceGrandFx.running()
+                || (mc.screen instanceof GachaScreen gs && gs.fxActiveForTest());
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onGuiPre(net.minecraftforge.client.event.RenderGuiEvent.Pre event) {
+        if (!hideHud()) return;
+        // 화면 표시 전체를 건너뛰되, 이야기 장면만은 직접 그린다
+        int sw = event.getWindow().getGuiScaledWidth(), sh = event.getWindow().getGuiScaledHeight();
+        if (Cinematic.active()) Cinematic.render(event.getGuiGraphics(), sw, sh);
+        if (EnhanceFx.active() && Minecraft.getInstance().screen == null) EnhanceFx.render(event.getGuiGraphics(), sw, sh);
+        event.setCanceled(true);
+    }
+
     @SubscribeEvent
     public static void onOverlayPre(net.minecraftforge.client.event.RenderGuiOverlayEvent.Pre event) {
         if (!Cinematic.active()) return;

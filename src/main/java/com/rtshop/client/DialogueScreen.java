@@ -47,6 +47,7 @@ public class DialogueScreen extends Screen {
             play(data.getAsJsonArray("lines"));
         } else {
             lines.add(new String[]{npcName, data.get("greet").getAsString()});
+            logCurrent();
         }
     }
 
@@ -64,6 +65,18 @@ public class DialogueScreen extends Screen {
         index = 0;
         shown = 0;
         choosing = false;
+        logCurrent();
+    }
+
+    /** 지금 줄을 대화 내역에 남긴다. */
+    private void logCurrent() {
+        if (index < lines.size()) TalkHistory.add(npc, lines.get(index)[0], lines.get(index)[1]);
+    }
+
+    /** 내가 고른 것도 내역에 남긴다. */
+    private void logMine(String text) {
+        String me = Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getName().getString() : "me";
+        TalkHistory.add(npc, "▷ " + me, text);
     }
 
     /** "이름: 대사" → {이름, 대사}. 이름이 없으면 이 NPC. */
@@ -105,6 +118,7 @@ public class DialogueScreen extends Screen {
         if (index + 1 < lines.size()) {
             index++;
             shown = 0;
+            logCurrent();
             return;
         }
         if (scene) {
@@ -132,6 +146,8 @@ public class DialogueScreen extends Screen {
         }
         int q = data.has("quests") ? data.get("quests").getAsInt() : 0;
         if (q > 0) out.add(new String[]{"quest", "", Component.translatable("rtshop.talk.quests", q).getString()});
+        else if (data.has("questNpc")) out.add(new String[]{"quest", "", Component.translatable("rtshop.talk.quests_none").getString()});
+        out.add(new String[]{"history", "", Component.translatable("rtshop.talk.history").getString()});
         if (data.has("bounty") && data.get("bounty").getAsBoolean()) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
         out.add(new String[]{"bye", "", Component.translatable("rtshop.talk.bye").getString()});
         return out;
@@ -139,7 +155,12 @@ public class DialogueScreen extends Screen {
 
     private void choose(String[] c) {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        if (!c[0].equals("history") && !c[0].equals("bye")) logMine(c[2].replace("✦ ", ""));
         switch (c[0]) {
+            case "history" -> {
+                history = TalkHistory.of(npc);
+                historyScroll = Math.max(0, historyLines().size() - historyRows());
+            }
             case "main" -> {
                 onClose();
                 NpcButtons.returnNpc = entity;
@@ -234,7 +255,10 @@ public class DialogueScreen extends Screen {
     }
 
     private int boxH() {
-        return 70;
+        if (!choosing) return 70;
+        int n = choices().size();
+        int rows = n > 4 ? (n + 1) / 2 : n;
+        return Math.max(70, 28 + rows * 11);
     }
 
     private int boxY() {
@@ -247,9 +271,69 @@ public class DialogueScreen extends Screen {
         g.fillGradient(0, height / 2, width, height, 0x00000000, 0xA0000000);
     }
 
+    /** 대화 내역 보기 (null 이 아니면 보이는 중). */
+    private List<String[]> history;
+    private int historyScroll;
+
+    private int historyRows() {
+        return Math.max(4, (boxY() - 40) / 11);
+    }
+
+    /** 내역을 화면 폭에 맞춰 접은 줄들: {색, 글} */
+    private List<Object[]> historyLines() {
+        List<Object[]> out = new ArrayList<>();
+        if (history == null) return out;
+        int w = boxW() - 24;
+        for (String[] h : history) {
+            boolean mine = h[0].startsWith("▷ ");
+            int col = mine ? 0xFF9FD0FF : 0xFFE8C878;
+            List<FormattedCharSequence> ls = font.split(Component.literal(h[0] + ": " + h[1]), w);
+            for (int i = 0; i < ls.size(); i++) out.add(new Object[]{i == 0 ? col : 0xFFE6DCC8, ls.get(i)});
+        }
+        return out;
+    }
+
+    private void renderHistory(GuiGraphics g) {
+        int x = boxX(), w = boxW();
+        int rows = historyRows();
+        int top = boxY() + boxH() - (rows * 11 + 30);
+        int bottom = boxY() + boxH();
+        g.fill(x, top, x + w, bottom, 0xF51B140C);
+        g.fill(x, top, x + w, top + 1, 0xFFC7A25A);
+        g.fill(x, bottom - 1, x + w, bottom, 0xFFC7A25A);
+        g.fill(x, top, x + 1, bottom, 0xFFC7A25A);
+        g.fill(x + w - 1, top, x + w, bottom, 0xFFC7A25A);
+        g.drawString(font, Component.translatable("rtshop.talk.history_title", npcName), x + 12, top + 7, 0xFFE8C878, false);
+        List<Object[]> ls = historyLines();
+        if (ls.isEmpty()) {
+            g.drawString(font, Component.translatable("rtshop.talk.history_empty"), x + 12, top + 22, 0x99E6DCC8, false);
+        }
+        historyScroll = Math.max(0, Math.min(historyScroll, Math.max(0, ls.size() - rows)));
+        for (int i = 0; i < rows && historyScroll + i < ls.size(); i++) {
+            Object[] l = ls.get(historyScroll + i);
+            g.drawString(font, (FormattedCharSequence) l[1], x + 12, top + 22 + i * 11, (Integer) l[0], false);
+        }
+        String hint = Component.translatable("rtshop.talk.history_hint").getString();
+        Ui.scaledText(g, font, hint, x + w - 10 - (int) (font.width(hint) * 0.7F), bottom - 10, 0.7F, 0x88F6ECD2, false);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mx, double my, double delta) {
+        if (history != null) {
+            historyScroll = Math.max(0, historyScroll - (int) Math.signum(delta) * 3);
+            return true;
+        }
+        return super.mouseScrolled(mx, my, delta);
+    }
+
     @Override
     public void render(GuiGraphics g, int mx, int my, float partial) {
         renderBackground(g);
+        if (history != null) {
+            renderHistory(g);
+            super.render(g, mx, my, partial);
+            return;
+        }
         int x = boxX(), y = boxY(), w = boxW(), h = boxH();
         // 대화 상자
         g.fill(x, y, x + w, y + h, 0xFC1B140C);
@@ -300,6 +384,10 @@ public class DialogueScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        if (history != null) {
+            history = null; // 아무 곳이나 누르면 고르기로 돌아간다
+            return true;
+        }
         if (choosing) {
             List<String[]> cs = choices();
             if (hover >= 0 && hover < cs.size()) {
@@ -314,6 +402,12 @@ public class DialogueScreen extends Screen {
 
     @Override
     public boolean keyPressed(int key, int scan, int mods) {
+        if (history != null) {
+            if (key == 256 || key == 32 || key == 257 || key == 335) history = null; // ESC·스페이스·엔터: 돌아가기
+            else if (key == 265) historyScroll = Math.max(0, historyScroll - 1);
+            else if (key == 264) historyScroll++;
+            return true;
+        }
         if (key == 32 || key == 257 || key == 335) { // 스페이스·엔터
             if (choosing) return true;
             advance();
@@ -356,5 +450,16 @@ public class DialogueScreen extends Screen {
 
     public boolean choosingForTest() {
         return choosing;
+    }
+
+    /** 점검용: 대화 내역을 연다 (보이는 줄 수). */
+    public int openHistoryForTest() {
+        for (String[] c : choices()) if (c[0].equals("history")) choose(c);
+        return history == null ? -1 : history.size();
+    }
+
+    public boolean hasQuestChoiceForTest() {
+        for (String[] c : choices()) if (c[0].equals("quest")) return true;
+        return false;
     }
 }

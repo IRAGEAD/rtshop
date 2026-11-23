@@ -188,6 +188,15 @@ public final class EnhanceFx {
     }
 
     public static void render(GuiGraphics g, int w, int h) {
+        boolean was = UiText.pause(); // 연출은 원래 모양으로
+        try {
+            renderFx(g, w, h);
+        } finally {
+            UiText.resume(was);
+        }
+    }
+
+    private static void renderFx(GuiGraphics g, int w, int h) {
         renderLegend(g, w, h);
         EnhanceGrandFx.render(g, w, h);
         if (grandShown || EnhanceGrandFx.hidesBanner()) return;

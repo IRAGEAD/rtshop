@@ -35,5 +35,8 @@ public class StoryItem extends Item {
         if (stack.hasTag() && stack.getTag().contains("rtshop_page")) {
             tip.add(Component.literal(stack.getTag().getString("rtshop_page")).withStyle(ChatFormatting.GOLD));
         }
+        // 안내: 메인 스토리 물건이라는 표시와 어디에 쓰는지 (item.rtshop.<id>.guide)
+        tip.add(Component.translatable("rtshop.story_item.header").withStyle(ChatFormatting.GOLD));
+        tip.add(Component.translatable(getDescriptionId() + ".guide").withStyle(ChatFormatting.AQUA));
     }
 }

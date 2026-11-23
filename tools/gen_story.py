@@ -87,7 +87,7 @@ p = q("story_0_03", ch(C0, 3, 3), "견습 서약", ELDER,
           "기록관 이사벨: 서약은 세 줄이에요. 첫째, 불을 지킨다. 둘째, 봉인을 지킨다. 셋째… 셋째 줄은 지워져 있네요.",
           "기록관 이사벨: 이 서약서, 우리 어머니가 베껴 쓴 거예요. 어머니도 기록관이었거든요. 열다섯 해 전에… 아, 아니에요. 장로님께 가져가세요.",
       ])], gold=800, items=[item("rtshop:oath_scroll"), item("rtshop:undying_ember"), item("rtshop:survey_compass")], requires=[p], flags=["order_apprentice"],
-      sceneDone=vision("꿈속의 불타는 기사", "불씨를 쥔 자들아. 너희는 몇이냐.\n…많구나. 그래도 아직은, 오지 마라."))
+      sceneDone=dict(vision("꿈속의 불타는 기사", "불씨를 쥔 자들아. 너희는 몇이냐.\n…많구나. 그래도 아직은, 오지 마라."), onSleep=True))
 
 
 # ================================================================ 1장 「잿불의 서약」 — 이사벨의 이야기 (바닐라 · BetterNether · Yazz · Wither: Reincarnated · Ender Dragon Plus)
