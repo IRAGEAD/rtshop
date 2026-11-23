@@ -21,6 +21,8 @@ minecraft {
     runs {
         configureEach {
             workingDirectory project.file('run')
+            // 개발 실행에서도 믹스인을 적용한다 (jar 에서는 MANIFEST 의 MixinConfigs 로)
+            args '-mixin.config=rtshop.mixins.json'
         }
         client {
             // ./gradlew runClient -PrtshopClientTest : 화면을 차례로 열어 사진을 찍고 끈다 (빌드 검증용)

@@ -2158,7 +2158,16 @@ public final class SelfTest {
             long asked0 = com.rtshop.story.StagedStructures.ASKED.get();
             var nether = server.getLevel(net.minecraft.world.level.Level.NETHER);
             if (nether != null) {
-                for (int i = 0; i < 6; i++) nether.getChunk(400 + i * 3, 400, net.minecraft.world.level.chunk.ChunkStatus.STRUCTURE_STARTS, true);
+                // 네더 요새·보루 자리 후보 청크를 몇 개 만들어 본다 (그 자리에서만 건축물을 물어본다)
+                var state = nether.getChunkSource().getGeneratorState();
+                var sets = nether.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE_SET);
+                var nc = sets.getHolder(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE_SET, new ResourceLocation("minecraft:nether_complexes")));
+                if (nc.isPresent() && nc.get().value().placement() instanceof net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement rsp) {
+                    for (int i = 0; i < 3; i++) {
+                        net.minecraft.world.level.ChunkPos cp = rsp.getPotentialStructureChunk(state.getLevelSeed(), 40 + i, 40);
+                        nether.getChunk(cp.x, cp.z, net.minecraft.world.level.chunk.ChunkStatus.STRUCTURE_STARTS, true);
+                    }
+                }
             }
             long asked = com.rtshop.story.StagedStructures.ASKED.get() - asked0;
             check("staged story structures: locked at first, plain structures are not, and world generation really asks (mixin applied)",
@@ -2166,11 +2175,15 @@ public final class SelfTest {
             QuestManager.reset(a);
             QuestManager.forceComplete(a, "story_0_03");
             for (String id : QuestManager.loaded().quests.keySet()) if (id.startsWith("story_1_")) QuestManager.forceComplete(a, id);
-            boolean took = QuestManager.accept(a, "story_2_01", "quest_order_captain");
-            QuestManager.forceComplete(a, "story_2_01");
-            QuestManager.forceComplete(a, "story_2_02");
-            boolean took3 = QuestManager.accept(a, "story_2_03", "quest_order_captain");
-            boolean chamberOpen = !com.rtshop.story.StagedStructures.isLocked("mowziesmobs:wrought_chamber");
+            // 모드 없이도 시험할 수 있게 이글루를 잠깐 단계적 건축물로 넣는다 (1장 7번 퀘스트가 이글루로 보낸다)
+            com.rtshop.story.StagedStructures.get().structures.put("minecraft:igloo", "");
+            com.rtshop.story.StagedStructures.recompute(server);
+            for (String id : List.of("story_0_01", "story_0_02", "story_0_03", "story_1_01", "story_1_02", "story_1_03", "story_1_04", "story_1_05", "story_1_06"))
+                QuestManager.forceComplete(a, id);
+            boolean took = com.rtshop.story.StagedStructures.isLocked("minecraft:igloo");
+            boolean took3 = QuestManager.accept(a, "story_1_07", "quest_order_archivist");
+            boolean chamberOpen = !com.rtshop.story.StagedStructures.isLocked("minecraft:igloo");
+            com.rtshop.story.StagedStructures.get().structures.remove("minecraft:igloo");
             boolean othersStill = com.rtshop.story.StagedStructures.isLocked("aquamirae:ship") && com.rtshop.story.StagedStructures.isLocked("minecraft:mansion");
             check("taking the quest that leads to a story structure starts generating it for the whole server; later ones stay locked",
                     took3 && chamberOpen && othersStill, took + " " + took3 + " " + chamberOpen + " " + othersStill);
@@ -2334,9 +2347,15 @@ public final class SelfTest {
         for (com.rtshop.story.ScyllaClues.Clue c : sc.clues.values()) if (!com.rtshop.story.ScyllaClues.has(a, c.id)) last = c;
         boolean again = com.rtshop.story.ScyllaClues.record(a, sc.clues.values().iterator().next());
         com.rtshop.story.ScyllaClues.record(a, last);
+        // 메인 스토리를 끝내기 전에는 단서를 다 모아도 열리지 않는다
+        boolean waits = !QuestManager.hasFlag(a, sc.grantFlag);
+        QuestManager.setFlag(a, "story_done", true);
+        com.rtshop.story.ScyllaClues.checkComplete(a);
         boolean eye = !net.minecraftforge.fml.ModList.get().isLoaded("cataclysm") || a.getInventory().countItem(ForgeRegistries.ITEMS.getValue(new ResourceLocation("cataclysm:storm_eye"))) == 1;
-        check("collecting every clue completes the storm eye and opens Scylla's seal (not before, and a clue counts once)",
-                notYet && !again && QuestManager.hasFlag(a, sc.grantFlag) && eye, notYet + " " + again + " " + eye);
+        check("collecting every clue completes the storm eye and opens Scylla's seal, but only after the main story ends (not before, and a clue counts once)",
+                notYet && !again && waits && QuestManager.hasFlag(a, sc.grantFlag) && eye, notYet + " " + again + " " + waits + " " + eye);
+        QuestManager.setFlag(a, "story_done", false);
+        QuestManager.setFlag(a, "scylla_waiting", false);
         for (String id : sc.clues.keySet()) QuestManager.setFlag(a, com.rtshop.story.ScyllaClues.FLAG_PREFIX + id, false);
         QuestManager.setFlag(a, sc.grantFlag, false);
         a.getInventory().clearContent();
