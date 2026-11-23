@@ -1371,5 +1371,6 @@
   "rtshop.talk.main.bank": "Use the bank",
   "rtshop.talk.main.job": "Talk about jobs",
   "rtshop.talk.main.attendance": "Stamp attendance",
-  "rtshop.talk.main.gacha": "Try your luck"
+  "rtshop.talk.main.gacha": "Try your luck",
+  "rtshop.gacha.inventory_full": "Not enough free inventory space: %1$s pulls need %1$s free slots (you have %2$s). Make room and try again."
 }

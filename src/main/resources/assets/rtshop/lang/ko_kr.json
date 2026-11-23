@@ -1371,5 +1371,6 @@
   "rtshop.talk.main.bank": "은행 이용하기",
   "rtshop.talk.main.job": "직업 상담",
   "rtshop.talk.main.attendance": "출석 도장 찍기",
-  "rtshop.talk.main.gacha": "뽑기 하러 가기"
+  "rtshop.talk.main.gacha": "뽑기 하러 가기",
+  "rtshop.gacha.inventory_full": "가방에 빈칸이 부족합니다. 뽑은 물건 %1$s개를 받으려면 빈칸이 %1$s칸 이상 필요해요 (지금 %2$s칸). 가방을 비운 뒤 다시 뽑아 주세요."
 }

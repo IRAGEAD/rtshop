@@ -427,6 +427,7 @@ NEW = {
  "rtshop.gacha.broken": ("뽑기 설정 파일에 문제가 있어 잠시 쉽니다 (OP: gacha.json 확인).", "The gacha config has an error (OP: check gacha.json)."),
  "rtshop.gacha.empty": ("이 뽑기에는 아직 아이템이 없습니다.", "This gacha has no items yet."),
  "rtshop.gacha.no_ticket": ("%s 이(가) %s장 필요합니다.", "You need %2$s x %1$s."),
+ "rtshop.gacha.inventory_full": ("가방에 빈칸이 부족합니다. 뽑은 물건 %1$s개를 받으려면 빈칸이 %1$s칸 이상 필요해요 (지금 %2$s칸). 가방을 비운 뒤 다시 뽑아 주세요.", "Not enough free inventory space: %1$s pulls need %1$s free slots (you have %2$s). Make room and try again."),
  "rtshop.gacha.no_shards": ("조각이 %s개 필요합니다.", "You need %s shards."),
  "rtshop.gacha.exchanged": ("%s %s장을 조각 %s개로 바꿨습니다.", "Traded %3$s shards for %2$s x %1$s."),
  "rtshop.gacha.trade1": ("1장", "x1"),

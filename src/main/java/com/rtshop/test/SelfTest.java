@@ -4749,6 +4749,18 @@ public final class SelfTest {
                 && before - count(a, st -> st.is(ModItems.SHARD.get())) == 2L * c.ticketCost[1][1], before);
         check("...but not without enough shards", !com.rtshop.gacha.Gacha.exchange(a, "weapon", "high", 64, false));
         clear(a);
+        // 가방 빈칸이 뽑을 개수보다 적으면 뽑기를 막는다 (티켓은 그대로)
+        a.getInventory().items.set(0, new ItemStack(ModItems.TICKET_NORMAL.get(), 10));
+        for (int i = 1; i < a.getInventory().items.size() - 5; i++) {
+            a.getInventory().items.set(i, new ItemStack(net.minecraft.world.item.Items.DIRT, 64));
+        }
+        // 빈칸 5 + 티켓 10장을 다 쓰면 비는 칸 1 = 6칸: 10회는 막히고 1회는 된다
+        boolean tenBlocked = com.rtshop.gacha.Gacha.doPull(a, "weapon", "normal", 10, false) == null
+                && count(a, st -> st.is(ModItems.TICKET_NORMAL.get())) == 10;
+        boolean oneOk = com.rtshop.gacha.Gacha.doPull(a, "weapon", "normal", 1, false) != null;
+        check("a pull is refused (tickets kept) when the inventory lacks free slots for every item", tenBlocked && oneOk
+                && com.rtshop.gacha.Gacha.freeSlotsAfterTaking(a, ModItems.TICKET_NORMAL.get(), 9) == 5, tenBlocked + " " + oneOk);
+        clear(a);
         // 펫 뽑기의 조각 보상은 표시 없는 조각
         a.getInventory().add(new ItemStack(ModItems.PET_TICKET_NORMAL.get(), 10));
         a.getInventory().add(new ItemStack(ModItems.TICKET_NORMAL.get(), 10));

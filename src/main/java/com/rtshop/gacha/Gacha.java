@@ -273,6 +273,24 @@ public final class Gacha {
         return p.getInventory().countItem(item);
     }
 
+    /** 티켓 n 장을 쓰고 난 뒤 가방(주 가방 36칸)의 빈칸 수. 다 써서 비는 티켓 칸도 센다. */
+    public static int freeSlotsAfterTaking(ServerPlayer p, Item item, int n) {
+        Inventory inv = p.getInventory();
+        int free = 0;
+        int left = n;
+        for (int i = 0; i < inv.items.size(); i++) {
+            ItemStack s = inv.items.get(i);
+            if (s.isEmpty()) {
+                free++;
+            } else if (left > 0 && s.is(item)) {
+                int t = Math.min(left, s.getCount());
+                left -= t;
+                if (t == s.getCount()) free++;
+            }
+        }
+        return free;
+    }
+
     private static boolean take(ServerPlayer p, Item item, int n) {
         if (count(p, item) < n) {
             return false;
@@ -364,6 +382,13 @@ public final class Gacha {
             return null;
         }
         Item t = ticket(cat, tier);
+        if (count(p, t) >= n) {
+            int free = freeSlotsAfterTaking(p, t, n);
+            if (free < n) {
+                result(p, Component.translatable("rtshop.gacha.inventory_full", n, free), false);
+                return null;
+            }
+        }
         if (!take(p, t, n)) {
             result(p, Component.translatable("rtshop.gacha.no_ticket", new ItemStack(t).getHoverName(), n), false);
             return null;
