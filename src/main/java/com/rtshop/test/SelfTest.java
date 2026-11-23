@@ -2245,6 +2245,15 @@ public final class SelfTest {
                 com.rtshop.notice.Notice.hasClick(net.minecraft.network.chat.Component.literal("a ").append(link))
                         && !com.rtshop.notice.Notice.hasClick(net.minecraft.network.chat.Component.literal("plain")));
 
+        // 꿈속의 기사: 퀘스트를 끝낼 때가 아니라 침대에서 잠들 때 나온다
+        var dream = com.rtshop.quest.QuestManager.loaded().quests.get("story_0_03");
+        com.google.gson.JsonObject dj = dream == null ? null : dream.sceneDone;
+        a.getPersistentData().remove(com.rtshop.quest.QuestManager.SLEEP_SCENE);
+        if (dj != null) com.rtshop.quest.QuestManager.scene(a, dj);
+        check("the first dream-knight scene waits for the player to sleep in a bed (not shown on finishing the quest)",
+                dj != null && dj.has("onSleep") && a.getPersistentData().contains(com.rtshop.quest.QuestManager.SLEEP_SCENE));
+        a.getPersistentData().remove(com.rtshop.quest.QuestManager.SLEEP_SCENE);
+
         // 대화 먼저: 퀘스트 NPC 도 대화가 가로챈다 (퀘스트 창이 대화 상자를 덮지 않게)
         check("quest NPCs open the dialogue first (Dialogue claims the click)", com.rtshop.story.Dialogue.claims(a, "quest_order_archivist")
                 && com.rtshop.story.Dialogue.claims(a, "quest_order_captain"));
