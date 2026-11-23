@@ -1255,5 +1255,14 @@
   "rtshop.quest.next_same": "There's more to tell. Talk to me again. (\"%s\")",
   "rtshop.rules.type.smithing": "Smithing table",
   "rtshop.subtitle.gacha_blackout": "Everything goes silent",
-  "rtshop.subtitle.gacha_legendary": "A grand chord"
+  "rtshop.subtitle.gacha_legendary": "A grand chord",
+  "rtshop.quest.state_done": "Done",
+  "rtshop.quest.tab_active": "Active %s",
+  "rtshop.quest.tab_available": "Available %s",
+  "rtshop.quest.tab_done": "Done %s",
+  "rtshop.quest.where_accept": "Visit %s to accept it",
+  "rtshop.quest.where_turnin": "Visit %s to turn it in",
+  "rtshop.quest.where_active": "Report to %s (abandon there too)",
+  "rtshop.quest.where_done": "Finished · %s",
+  "rtshop.quest.journal_button": "Quest journal"
 }

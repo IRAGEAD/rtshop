@@ -212,7 +212,7 @@ public class JobScreen extends Screen implements NpcButtons.Host {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         this.renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
-        g.fill(fx + 5, fy + 4, fx + W - 5, fy + 23, Ui.C_WOOD_DARK);
+        Ui.titleBand(g, fx + 5, fy + 4, fx + W - 5, fy + 23);
         g.fill(fx + 5, fy + 22, fx + W - 5, fy + 23, Ui.C_GOLD_DARK);
         g.drawString(this.font, this.title, fx + 10, fy + 9, Ui.C_GOLD, true);
         String now = Component.translatable("rtshop.job.now", nameOf(data.combat), nameOf(data.life)).getString();

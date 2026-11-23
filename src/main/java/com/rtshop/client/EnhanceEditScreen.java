@@ -126,7 +126,7 @@ public class EnhanceEditScreen extends Screen {
             int idx = i;
             Component t = Component.translatable(tabs[i]);
             int w = font.width(t) + 16;
-            Button b = Button.builder(t, x -> {
+            Button b = MButton.builder(t, x -> {
                 tab = idx;
                 rebuildWidgets();
             }).bounds(tx, fy + 22, w, 16).build();
@@ -139,18 +139,18 @@ public class EnhanceEditScreen extends Screen {
         else if (tab == 1) initGroups(cx, cy);
         else initBonus(cx, cy);
         int by = fy + H - 24;
-        addRenderableWidget(Button.builder(Component.translatable("rtshop.enhedit.save"), b -> {
+        addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhedit.save"), b -> {
             ShopNet.CHANNEL.sendToServer(new EnhanceActionPacket(EnhanceActionPacket.SAVE, cfg.toString()));
         }).bounds(fx + W - 248, by, 80, 18).build());
-        addRenderableWidget(Button.builder(Component.translatable("rtshop.enhedit.revert"), b ->
+        addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhedit.revert"), b ->
                 ShopNet.CHANNEL.sendToServer(new EnhanceActionPacket(EnhanceActionPacket.OPEN_EDITOR, ""))).bounds(fx + W - 164, by, 76, 18).build());
-        addRenderableWidget(Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 84, by, 76, 18).build());
+        addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 84, by, 76, 18).build());
     }
 
     private void initLevels(int cx, int cy) {
         for (int lv = 1; lv <= 11; lv++) {
             int l = lv;
-            Button b = Button.builder(Component.literal("+" + lv), x -> {
+            Button b = MButton.builder(Component.literal("+" + lv), x -> {
                 level = l;
                 rebuildWidgets();
             }).bounds(cx + ((lv - 1) % 2) * 30, cy + ((lv - 1) / 2) * 20, 28, 18).build();
@@ -178,10 +178,10 @@ public class EnhanceEditScreen extends Screen {
             int idx = i;
             String id = m.get("item").getAsString();
             icons.add(new Object[]{id, x, y + 1});
-            Button pick = Button.builder(Component.literal(nameOf(id)), b -> pickMaterial(mats, idx)).bounds(x + 20, y, 160, 18).build();
+            Button pick = MButton.builder(Component.literal(nameOf(id)), b -> pickMaterial(mats, idx)).bounds(x + 20, y, 160, 18).build();
             addRenderableWidget(pick);
             num(x + 184, y + 2, 36, Integer.toString(m.get("count").getAsInt()), v -> m.addProperty("count", Math.max(1, (int) parse(v))));
-            addRenderableWidget(Button.builder(Component.literal("✕"), b -> {
+            addRenderableWidget(MButton.builder(Component.literal("✕"), b -> {
                 mats.remove(idx);
                 changed();
                 rebuildWidgets();
@@ -189,7 +189,7 @@ public class EnhanceEditScreen extends Screen {
             y += 20;
         }
         if (mats.size() < 6) {
-            addRenderableWidget(Button.builder(Component.translatable("rtshop.enhedit.add_item"), b -> {
+            addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhedit.add_item"), b -> {
                 minecraft.setScreen(new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
                     JsonObject m = new JsonObject();
                     m.addProperty("item", v);
@@ -198,7 +198,7 @@ public class EnhanceEditScreen extends Screen {
                     changed();
                 }));
             }).bounds(x, y + 2, 110, 18).build());
-            addRenderableWidget(Button.builder(Component.translatable("rtshop.enhedit.add_group"), b -> {
+            addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhedit.add_group"), b -> {
                 List<String> gs = new ArrayList<>(cfg.getAsJsonObject("groups").keySet());
                 if (gs.isEmpty()) return;
                 JsonObject m = new JsonObject();
@@ -235,7 +235,7 @@ public class EnhanceEditScreen extends Screen {
         for (Map.Entry<String, JsonElement> e : groups.entrySet()) {
             String k = e.getKey();
             String name = e.getValue().getAsJsonObject().has("name") ? e.getValue().getAsJsonObject().get("name").getAsString() : k;
-            Button b = Button.builder(Component.literal(name), x -> {
+            Button b = MButton.builder(Component.literal(name), x -> {
                 group = k;
                 rebuildWidgets();
             }).bounds(cx, y, 100, 18).build();
@@ -261,11 +261,11 @@ public class EnhanceEditScreen extends Screen {
             int idx = i;
             String id = items.get(i).getAsString();
             icons.add(new Object[]{id, x + (i % 2) * 150, y + 1 + (i / 2) * 20});
-            addRenderableWidget(Button.builder(Component.literal(nameOf(id)), b -> minecraft.setScreen(new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
+            addRenderableWidget(MButton.builder(Component.literal(nameOf(id)), b -> minecraft.setScreen(new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
                 items.set(idx, new com.google.gson.JsonPrimitive(v));
                 changed();
             }))).bounds(x + 20 + (i % 2) * 150, y + (i / 2) * 20, 106, 18).build());
-            addRenderableWidget(Button.builder(Component.literal("✕"), b -> {
+            addRenderableWidget(MButton.builder(Component.literal("✕"), b -> {
                 items.remove(idx);
                 changed();
                 rebuildWidgets();
@@ -273,7 +273,7 @@ public class EnhanceEditScreen extends Screen {
         }
         int rows = (items.size() + 1) / 2;
         if (items.size() < 10) {
-            addRenderableWidget(Button.builder(Component.translatable("rtshop.enhedit.add_item"), b -> minecraft.setScreen(
+            addRenderableWidget(MButton.builder(Component.translatable("rtshop.enhedit.add_item"), b -> minecraft.setScreen(
                     new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
                         items.add(v);
                         changed();

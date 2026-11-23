@@ -672,6 +672,31 @@ final class ClientSelfTest2 {
             mc.setScreen(null);
             waitTicks(2);
         });
+        // ------------------------------------------------------------ 퀘스트 수첩 (어디서나 내용 보기)
+        add(mc -> {
+            mc.setScreen(null);
+            mc.player.connection.sendCommand("rtshop quest");
+            waitTicks(20);
+        });
+        add(mc -> {
+            QuestScreen qs = mc.screen instanceof QuestScreen x ? x : null;
+            check("the quest journal opens anywhere (/rtshop quest)", qs != null, mc.screen);
+            if (qs != null) qs.tabForTest(1);
+            waitTicks(4);
+        });
+        add(mc -> {
+            QuestScreen qs = mc.screen instanceof QuestScreen x ? x : null;
+            check("the journal lists quests the player can take now, read-only (go to the giver to accept)", qs != null && qs.shownForTest() > 0,
+                    qs == null ? mc.screen : qs.shownForTest());
+            shot(mc, "116_journal_available");
+            if (qs != null) qs.tabForTest(2);
+            waitTicks(4);
+        });
+        add(mc -> {
+            shot(mc, "116b_journal_done");
+            mc.setScreen(null);
+            waitTicks(2);
+        });
         // ------------------------------------------------------------ 이야기로 열리는 장비 진열대
         add(mc -> {
             check("the server tells the client which gear tiers wait for which chapter (rare: chapter 1, epic: chapter 1)",

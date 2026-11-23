@@ -162,19 +162,19 @@ public class RecipeMakeScreen extends Screen {
         cnt.setFilter(s -> s.isEmpty() || s.matches("[0-9]{1,2}"));
         cnt.setResponder(v -> count = v.isEmpty() ? 1 : Math.max(1, Math.min(64, Integer.parseInt(v))));
         addRenderableWidget(cnt);
-        addRenderableWidget(Button.builder(Component.translatable(shaped ? "rtshop.rules.shaped" : "rtshop.rules.shapeless"), b -> {
+        addRenderableWidget(MButton.builder(Component.translatable(shaped ? "rtshop.rules.shaped" : "rtshop.rules.shapeless"), b -> {
             shaped = !shaped;
             rebuildWidgets();
         }).bounds(fx + 20, gy + 72, 120, 16).build());
         if (editId == null) {
-            addRenderableWidget(Button.builder(Component.translatable(blockOriginal ? "rtshop.rules.block_orig_on" : "rtshop.rules.block_orig_off"), b -> {
+            addRenderableWidget(MButton.builder(Component.translatable(blockOriginal ? "rtshop.rules.block_orig_on" : "rtshop.rules.block_orig_off"), b -> {
                 blockOriginal = !blockOriginal;
                 rebuildWidgets();
             }).bounds(fx + 20, gy + 92, W - 40, 16).build());
         }
         int by = fy + H - 26;
-        addRenderableWidget(Button.builder(Component.translatable("rtshop.rules.make_ok"), b -> done()).bounds(fx + W - 172, by, 80, 18).build());
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent)).bounds(fx + W - 88, by, 76, 18).build());
+        addRenderableWidget(MButton.builder(Component.translatable("rtshop.rules.make_ok"), b -> done()).bounds(fx + W - 172, by, 80, 18).build());
+        addRenderableWidget(MButton.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent)).bounds(fx + W - 88, by, 76, 18).build());
     }
 
     private void done() {

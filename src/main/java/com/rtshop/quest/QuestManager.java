@@ -579,7 +579,7 @@ public final class QuestManager {
         for (int i = 0; i < q.objectives.size(); i++) {
             QuestDef.Objective ob = q.objectives.get(i);
             int stored = progress != null && i < progress.length ? progress[i] : 0;
-            int cur = state == QuestView.AVAILABLE ? 0 : current(p, ob, stored);
+            int cur = state == QuestView.AVAILABLE ? 0 : state == QuestView.DONE ? ob.count : current(p, ob, stored);
             String text = ob.text;
             String target = ob.target;
             if (text.isEmpty() && ob.type == QuestDef.Type.TALK) {
@@ -599,10 +599,11 @@ public final class QuestManager {
         }
         String text = switch (state) {
             case QuestView.AVAILABLE -> q.intro;
-            case QuestView.READY -> q.done.isEmpty() ? q.progress : q.done;
+            case QuestView.READY, QuestView.DONE -> q.done.isEmpty() ? q.progress : q.done;
             default -> q.progress.isEmpty() ? q.intro : q.progress;
         };
-        return new QuestView(q.id, q.title, q.chain, state, text, objs, q.rewardGold, items, choices);
+        String who = state == QuestView.AVAILABLE ? q.giver : q.turnInNpc();
+        return new QuestView(q.id, q.title, q.chain, state, text, objs, q.rewardGold, items, choices, who == null || who.isEmpty() ? "" : npcName(who));
     }
 
     /** 한 NPC 앞에서 보일 퀘스트 목록. */
@@ -682,7 +683,7 @@ public final class QuestManager {
         return "";
     }
 
-    /** 수첩(진행 중인 모든 퀘스트). */
+    /** 수첩: 진행 중 → 지금 받을 수 있는 것 → 끝낸 것. 내용은 어디서나 볼 수 있고, 받기·완료·포기는 그 NPC 앞에서만. */
     public static List<QuestView> journalViews(ServerPlayer p) {
         QuestData.Progress pr = prog(p);
         List<QuestView> out = new ArrayList<>();
@@ -692,6 +693,19 @@ public final class QuestManager {
                 out.add(view(p, q, allDone(p, q, pg) ? QuestView.READY : QuestView.ACTIVE, pg));
             }
         }
+        for (QuestDef q : loaded.quests.values()) {
+            if (!pr.active.containsKey(q.id) && !q.giver.isEmpty() && isAvailable(p, q)) {
+                out.add(view(p, q, QuestView.AVAILABLE, null));
+            }
+        }
+        List<QuestView> done = new ArrayList<>();
+        for (QuestDef q : loaded.quests.values()) {
+            if (pr.completed.contains(q.id) && !pr.active.containsKey(q.id)) {
+                done.add(view(p, q, QuestView.DONE, null));
+            }
+        }
+        java.util.Collections.reverse(done); // 최근에 가까운 것부터
+        out.addAll(done);
         return out;
     }
 

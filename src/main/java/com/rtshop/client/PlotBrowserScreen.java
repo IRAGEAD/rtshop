@@ -397,7 +397,7 @@ public class PlotBrowserScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         renderBackground(g);
         Ui.woodFrame(g, fx, fy, fw, fh);
-        g.fill(fx + 5, fy + 4, fx + fw - 5, fy + 21, Ui.C_WOOD_DARK);
+        Ui.titleBand(g, fx + 5, fy + 4, fx + fw - 5, fy + 21);
         g.fill(fx + 5, fy + 20, fx + fw - 5, fy + 21, Ui.C_GOLD_DARK);
         String back = Component.translatable("rtshop.plotui.back").getString();
         int backW = font.width(back) + 10;

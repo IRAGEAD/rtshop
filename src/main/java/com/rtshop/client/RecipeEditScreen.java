@@ -203,7 +203,7 @@ public class RecipeEditScreen extends Screen {
         addRenderableWidget(sb);
         int vx = rx0;
         int nw = font.width(Component.translatable("rtshop.rules.new_recipe")) + 12;
-        addRenderableWidget(Button.builder(Component.translatable("rtshop.rules.new_recipe"), b -> minecraft.setScreen(new RecipeMakeScreen(this, null, null)))
+        addRenderableWidget(MButton.builder(Component.translatable("rtshop.rules.new_recipe"), b -> minecraft.setScreen(new RecipeMakeScreen(this, null, null)))
                 .bounds(Math.max(vx + 4, fx + W - 8 - nw), fy + 25, nw, 16).build());
         listY = fy + 47;
         visible = (fy + H - 30 - listY) / ROW;
@@ -222,7 +222,7 @@ public class RecipeEditScreen extends Screen {
             int bx = fx + W - 10;
             if (custom.containsKey(r.id)) {
                 bx -= 18;
-                add(Button.builder(Component.literal("✕"), b -> {
+                add(MButton.builder(Component.literal("✕"), b -> {
                     custom.remove(r.id);
                     all.removeIf(q -> q.id.equals(r.id) && q.custom);
                     disabled.remove(r.id);
@@ -231,13 +231,13 @@ public class RecipeEditScreen extends Screen {
                     rebuildRows();
                 }).bounds(bx, y, 18, 18).build());
                 bx -= 40;
-                add(Button.builder(Component.translatable("rtshop.rules.edit"), b -> minecraft.setScreen(new RecipeMakeScreen(this, r.id, custom.get(r.id))))
+                add(MButton.builder(Component.translatable("rtshop.rules.edit"), b -> minecraft.setScreen(new RecipeMakeScreen(this, r.id, custom.get(r.id))))
                         .bounds(bx, y, 38, 18).build());
             }
             if (!r.out.isEmpty() && !custom.containsKey(r.id)) {
                 boolean itemOff = disabled.contains("item:" + r.out);
                 bx -= 50;
-                Button ib = Button.builder(Component.translatable(itemOff ? "rtshop.rules.item_on" : "rtshop.rules.item_off"), b -> {
+                Button ib = MButton.builder(Component.translatable(itemOff ? "rtshop.rules.item_on" : "rtshop.rules.item_off"), b -> {
                     if (!disabled.remove("item:" + r.out)) disabled.add("item:" + r.out);
                     dirty = true;
                     rebuildRows();
@@ -247,18 +247,18 @@ public class RecipeEditScreen extends Screen {
             }
             boolean off = disabled.contains(r.id);
             bx -= 46;
-            add(Button.builder(Component.translatable(off ? "rtshop.rules.unblock" : "rtshop.rules.block"), b -> {
+            add(MButton.builder(Component.translatable(off ? "rtshop.rules.unblock" : "rtshop.rules.block"), b -> {
                 if (!disabled.remove(r.id)) disabled.add(r.id);
                 dirty = true;
                 rebuildRows();
             }).bounds(bx, y, 44, 18).build());
         }
         int by = fy + H - 24;
-        add(Button.builder(Component.translatable("rtshop.enhedit.save"), b ->
+        add(MButton.builder(Component.translatable("rtshop.enhedit.save"), b ->
                 ShopNet.CHANNEL.sendToServer(new RulesActionPacket(RulesEditor.RECIPE_SAVE, "", rulesJson().toString()))).bounds(fx + W - 194, by, 60, 18).build());
-        add(Button.builder(Component.translatable("rtshop.enhedit.revert"), b ->
+        add(MButton.builder(Component.translatable("rtshop.enhedit.revert"), b ->
                 ShopNet.CHANNEL.sendToServer(new RulesActionPacket(RulesEditor.RECIPE_OPEN, "", ""))).bounds(fx + W - 130, by, 60, 18).build());
-        add(Button.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 66, by, 58, 18).build());
+        add(MButton.builder(Component.translatable("rtshop.enhodds.close"), b -> onClose()).bounds(fx + W - 66, by, 58, 18).build());
     }
 
     private void add(AbstractWidget w) {

@@ -1217,15 +1217,11 @@ public final class GachaFx {
         }
         RandomSource sr = RandomSource.create((long) (tt * 3));
         float ox = (sr.nextFloat() - 0.5F) * 2 * shake, oy = (sr.nextFloat() - 0.5F) * 2 * shake;
-        g.pose().pushPose();
-        g.pose().translate(ox, oy, 0);
-        renderLegendary(g, font, width, height, YM_START - 1, 0); // 멈춘 장면
-        g.pose().popPose();
+        // 배경은 암전: 칠흑 속에서 칼빛만 보인다. 벨 때마다 어둠이 아주 잠깐 푸르게 흔들린다
         float progress = Mth.clamp((tt - slashTick(0)) / (YM_BREAK - slashTick(0)), 0, 1);
-        // 푸르게 얼어붙은 세상, 벨 때마다 잠깐 밝아진다
         float lit = lastAge < 2 ? 1 - lastAge / 2F : 0;
-        g.fill(0, 0, width, height, argb(0x000000, 0.55F - 0.25F * lit));
-        g.fill(0, 0, width, height, argb(0x0B2A6A, 0.35F + 0.15F * progress));
+        g.fill(0, 0, width, height, 0xFF000000);
+        g.fill(0, 0, width, height, argb(0x0B2A6A, 0.10F * lit + 0.06F * progress));
         g.pose().pushPose();
         g.pose().translate(width / 2F + ox, height / 2F + oy, 100);
         float len = Mth.sqrt(width * width + height * height) * 0.75F;

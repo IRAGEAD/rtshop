@@ -15,6 +15,13 @@ public final class Ui {
     }
 
     public static final ResourceLocation COIN = new ResourceLocation(RtShop.MODID, "textures/gui/gold_coin.png");
+    // 중세풍 질감 (tools/gui_textures.py atlas 로 만든 픽셀 그림)
+    public static final ResourceLocation LEATHER = new ResourceLocation(RtShop.MODID, "textures/gui/medieval/leather.png");
+    public static final ResourceLocation PARCHMENT = new ResourceLocation(RtShop.MODID, "textures/gui/medieval/parchment.png");
+    public static final ResourceLocation CORNERS = new ResourceLocation(RtShop.MODID, "textures/gui/medieval/leather_corners.png");
+    public static final ResourceLocation BUTTON = new ResourceLocation(RtShop.MODID, "textures/gui/medieval/button.png");
+    public static final ResourceLocation SEAL = new ResourceLocation(RtShop.MODID, "textures/gui/medieval/seal.png");
+    private static final int STITCH = 0xD8E6CC94;
 
     public static final int C_SHADOW = 0xFF140B05;
     public static final int C_WOOD = 0xFF5C3A1E;
@@ -32,33 +39,121 @@ public final class Ui {
     public static final int C_RED = 0xFFA02C1E;
     public static final int C_GREEN = 0xFF2F6B24;
 
+    /** 질감을 이어 붙여 칠한다 (ts = 질감 한 장의 크기). */
+    public static void tile(GuiGraphics g, ResourceLocation tex, int x, int y, int w, int h, int ts) {
+        for (int yy = 0; yy < h; yy += ts) {
+            for (int xx = 0; xx < w; xx += ts) {
+                g.blit(tex, x + xx, y + yy, 0.0F, 0.0F, Math.min(ts, w - xx), Math.min(ts, h - yy), ts, ts);
+            }
+        }
+    }
+
+    private static boolean parchmentFill(int fill) {
+        return fill == C_PARCH || fill == C_PARCH_DARK || fill == C_PARCH_HI;
+    }
+
+    /** 올록볼록한 판. 양피지 색이면 양피지 질감을 깐다. */
     public static void bevel(GuiGraphics g, int x, int y, int w, int h, int fill, int hi, int lo) {
         g.fill(x, y, x + w, y + h, lo);
         g.fill(x, y, x + w - 1, y + h - 1, hi);
+        if (parchmentFill(fill) && w >= 10 && h >= 8) {
+            float c = fill == C_PARCH_DARK ? 0.9F : fill == C_PARCH_HI ? 1.0F : 0.97F;
+            RenderSystem.setShaderColor(c, c * (fill == C_PARCH_DARK ? 0.98F : 1F), c * (fill == C_PARCH_DARK ? 0.94F : 1F), 1F);
+            tile(g, PARCHMENT, x + 1, y + 1, w - 2, h - 2, 128);
+            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+            if (fill == C_PARCH_HI) g.fill(x + 1, y + 1, x + w - 1, y + h - 1, 0x22FFFFFF);
+            // 가장자리가 누렇게 바랜 양피지
+            if (w >= 40 && h >= 30) {
+                int e = 0x24724A1C;
+                g.fillGradient(x + 1, y + 1, x + w - 1, y + 5, e, 0);
+                g.fillGradient(x + 1, y + h - 5, x + w - 1, y + h - 1, 0, e);
+                for (int k = 0; k < 4; k++) {
+                    int a = (0x24 * (4 - k) / 4) << 24 | 0x724A1C;
+                    g.fill(x + 1 + k, y + 1, x + 2 + k, y + h - 1, a);
+                    g.fill(x + w - 2 - k, y + 1, x + w - 1 - k, y + h - 1, a);
+                }
+            }
+            return;
+        }
         g.fill(x + 1, y + 1, x + w - 1, y + h - 1, fill);
     }
 
-    /** 나무 틀(그림자, 나뭇결, 모서리 금속 장식 포함). */
-    public static void woodFrame(GuiGraphics g, int x, int y, int w, int h) {
-        g.fill(x - 2, y - 2, x + w + 2, y + h + 2, C_SHADOW);
-        g.fill(x, y, x + w, y + h, C_WOOD);
-        for (int yy = y + 3; yy < y + h - 2; yy += 5) {
-            g.fill(x + 1, yy, x + w - 1, yy + 1, 0x22000000);
-        }
-        g.fill(x, y, x + w, y + 1, C_WOOD_HI);
-        g.fill(x, y, x + 1, y + h, C_WOOD_HI);
-        int[][] corners = {{x + 2, y + 2}, {x + w - 5, y + 2}, {x + 2, y + h - 5}, {x + w - 5, y + h - 5}};
-        for (int[] c : corners) {
-            g.fill(c[0], c[1], c[0] + 3, c[1] + 3, C_GOLD_DARK);
-            g.fill(c[0], c[1], c[0] + 2, c[1] + 2, C_GOLD);
+    private static void stitchH(GuiGraphics g, int x0, int x1, int y) {
+        for (int x = x0; x < x1 - 1; x += 4) {
+            g.fill(x, y, x + 2, y + 1, STITCH);
+            g.fill(x, y + 1, x + 2, y + 2, 0x55000000);
         }
     }
 
+    private static void stitchV(GuiGraphics g, int x, int y0, int y1) {
+        for (int y = y0; y < y1 - 1; y += 4) {
+            g.fill(x, y, x + 1, y + 2, STITCH);
+            g.fill(x + 1, y, x + 2, y + 2, 0x55000000);
+        }
+    }
+
+    /** 창 틀: 눌러 새긴 무늬와 바느질이 있는 짙은 가죽 장정 + 바느질한 가죽 모서리. */
+    public static void woodFrame(GuiGraphics g, int x, int y, int w, int h) {
+        g.fill(x - 3, y - 2, x + w + 3, y + h + 4, 0x66000000);
+        g.fill(x - 2, y - 2, x + w + 2, y + h + 2, C_SHADOW);
+        tile(g, LEATHER, x, y, w, h, 128);
+        // 닳은 가장자리와 입체감
+        g.fill(x, y, x + w, y + 1, 0x50FFD9A0);
+        g.fill(x, y, x + 1, y + h, 0x40FFD9A0);
+        g.fill(x, y + h - 1, x + w, y + h, 0x80000000);
+        g.fill(x + w - 1, y, x + w, y + h, 0x70000000);
+        // 눌러 새긴 테두리 홈
+        int k = 5;
+        g.fill(x + k, y + k, x + w - k, y + k + 1, 0x70000000);
+        g.fill(x + k, y + h - k - 1, x + w - k, y + h - k, 0x30FFD9A0);
+        g.fill(x + k, y + k, x + k + 1, y + h - k, 0x70000000);
+        g.fill(x + w - k - 1, y + k, x + w - k, y + h - k, 0x30FFD9A0);
+        // 바느질
+        stitchH(g, x + 4, x + w - 4, y + 2);
+        stitchH(g, x + 4, x + w - 4, y + h - 4);
+        stitchV(g, x + 2, y + 4, y + h - 4);
+        stitchV(g, x + w - 4, y + 4, y + h - 4);
+        // 바느질한 가죽 모서리 (놋쇠 리벳)
+        if (w >= 60 && h >= 50) {
+            RenderSystem.enableBlend();
+            g.blit(CORNERS, x - 2, y - 2, 0.0F, 0.0F, 22, 22, 44, 44);
+            g.blit(CORNERS, x + w - 20, y - 2, 22.0F, 0.0F, 22, 22, 44, 44);
+            g.blit(CORNERS, x - 2, y + h - 20, 0.0F, 22.0F, 22, 22, 44, 44);
+            g.blit(CORNERS, x + w - 20, y + h - 20, 22.0F, 22.0F, 22, 22, 44, 44);
+        }
+    }
+
+    /** 제목 띠: 더 짙은 가죽에 바느질, 양끝 놋쇠 징, 아래 금박 선. */
+    public static void titleBand(GuiGraphics g, int x0, int y0, int x1, int y1) {
+        RenderSystem.setShaderColor(0.62F, 0.58F, 0.55F, 1F);
+        tile(g, LEATHER, x0, y0, x1 - x0, y1 - y0, 128);
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        g.fill(x0, y0, x1, y0 + 1, 0x90000000);
+        g.fill(x0, y1 - 1, x1, y1, 0x40FFD9A0);
+        stitchH(g, x0 + 3, x1 - 3, y0 + 2);
+        stitchH(g, x0 + 3, x1 - 3, y1 - 4);
+        for (int rx : new int[]{x0 + 4, x1 - 7}) {
+            int ry = (y0 + y1) / 2 - 1;
+            g.fill(rx, ry, rx + 3, ry + 3, 0xFF7A5214);
+            g.fill(rx, ry, rx + 2, ry + 2, 0xFFE8C060);
+        }
+    }
+
+    /** 나무 판자 단추 (양끝 무쇠 띠와 리벳, 마우스를 올리면 놋쇠로 빛난다). */
     public static void button(GuiGraphics g, Font font, int x, int y, int w, int h, String label, boolean hover, boolean enabled) {
-        int fill = !enabled ? C_WOOD_DARK : (hover ? C_WOOD_HI : C_WOOD);
-        bevel(g, x, y, w, h, fill, C_WOOD_HI, C_SHADOW);
-        String s = clip(font, label, w - 6);
-        g.drawString(font, s, x + (w - font.width(s)) / 2, y + (h - 8) / 2, enabled ? C_CREAM : C_INK_SOFT, false);
+        int v = !enabled ? 32 : hover ? 16 : 0;
+        RenderSystem.enableBlend();
+        int side = Math.min(7, w / 2);
+        g.blit(BUTTON, x, y, side, h, 0.0F, (float) v, side, 16, 64, 48);
+        g.blit(BUTTON, x + w - side, y, side, h, (float) (64 - side), (float) v, side, 16, 64, 48);
+        for (int xx = x + side; xx < x + w - side; xx += 50) {
+            int seg = Math.min(50, x + w - side - xx);
+            g.blit(BUTTON, xx, y, seg, h, 7.0F, (float) v, seg, 16, 64, 48);
+        }
+        String s = clip(font, label, w - 12);
+        int tx = x + (w - font.width(s)) / 2, ty = y + (h - 8) / 2;
+        g.drawString(font, s, tx + 1, ty + 1, 0xC0180A02, false);
+        g.drawString(font, s, tx, ty, !enabled ? 0xFFB8A888 : hover ? 0xFFFFF0C8 : C_CREAM, false);
     }
 
     /** G 금화 아이콘을 size×size 크기로 그립니다. */

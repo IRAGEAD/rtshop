@@ -142,9 +142,9 @@ public class PlayerShopScreen extends Screen {
         visible = (fy + H - 26 - listY) / ROW;
         int px = fx + LIST_W + 14, pw = W - LIST_W - 20;
         if (owner) {
-            addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.tab_stand", listings.size(), com.rtshop.pshop.PlayerShopBlockEntity.MAX_LISTINGS),
+            addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.tab_stand", listings.size(), com.rtshop.pshop.PlayerShopBlockEntity.MAX_LISTINGS),
                     b -> switchTab(0)).bounds(fx + 6, fy + 24, 100, 16).build()).active = tab != 0;
-            addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.tab_bag"), b -> switchTab(1))
+            addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.tab_bag"), b -> switchTab(1))
                     .bounds(fx + 108, fy + 24, 104, 16).build()).active = tab != 1;
         }
         Row r = selected();
@@ -152,29 +152,29 @@ public class PlayerShopScreen extends Screen {
         if (r != null) {
             if (!owner) {
                 qtyBox = box(px + labW, y + 22, 50, keepQty == null ? "1" : keepQty);
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.max"), b -> qtyBox.setValue(Integer.toString(maxBuy(r))))
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.max"), b -> qtyBox.setValue(Integer.toString(maxBuy(r))))
                         .bounds(px + labW + 54, y + 22, pw - labW - 58, 16).build());
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.buy"), b -> buy(r)).bounds(px + 4, y + 44, pw - 8, 18).build());
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.buy"), b -> buy(r)).bounds(px + 4, y + 44, pw - 8, 18).build());
             } else if (tab == 0) {
                 int bx = px + labW + 58, bw = pw - labW - 62;
                 priceBox = box(px + labW, y, 54, keepPrice == null ? Long.toString(r.price) : keepPrice);
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.set_price"), b -> act(PlayerShops.PRICE, "{\"i\":" + r.index
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.set_price"), b -> act(PlayerShops.PRICE, "{\"i\":" + r.index
                         + ",\"price\":" + num(priceBox) + "}")).bounds(bx, y, bw, 16).build());
                 qtyBox = box(px + labW, y + 20, 54, keepQty == null ? "1" : keepQty);
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.restock"), b -> act(PlayerShops.RESTOCK, "{\"i\":" + r.index
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.restock"), b -> act(PlayerShops.RESTOCK, "{\"i\":" + r.index
                         + ",\"n\":" + num(qtyBox) + "}")).bounds(bx, y + 20, bw / 2, 16).build());
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.take"), b -> act(PlayerShops.TAKE, "{\"i\":" + r.index
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.take"), b -> act(PlayerShops.TAKE, "{\"i\":" + r.index
                         + ",\"n\":" + num(qtyBox) + "}")).bounds(bx + bw / 2, y + 20, bw - bw / 2, 16).build());
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.remove"), b -> {
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.remove"), b -> {
                     sel = -1;
                     act(PlayerShops.REMOVE, "{\"i\":" + r.index + "}");
                 }).bounds(px + 4, y + 44, pw - 8, 18).build());
             } else {
                 priceBox = box(px + labW, y, 54, keepPrice == null ? Long.toString(suggest(r)) : keepPrice);
                 qtyBox = box(px + labW, y + 20, 54, keepQty == null ? Integer.toString(Math.min(r.count, com.rtshop.pshop.PlayerShopBlockEntity.MAX_STOCK)) : keepQty);
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.all"), b -> qtyBox.setValue(Integer.toString(r.count)))
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.all"), b -> qtyBox.setValue(Integer.toString(r.count)))
                         .bounds(px + labW + 58, y + 20, pw - labW - 62, 16).build());
-                addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.add"), b -> {
+                addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.add"), b -> {
                     act(PlayerShops.ADD, "{\"slot\":" + r.index + ",\"price\":" + num(priceBox) + ",\"n\":" + num(qtyBox) + "}");
                     tab = 0;
                     sel = -1;
@@ -192,17 +192,17 @@ public class PlayerShopScreen extends Screen {
             nameBox.setValue(data.get("name").getAsString());
             nameBox.setHint(Component.translatable("rtshop.pshop.name_hint"));
             addRenderableWidget(nameBox);
-            addRenderableWidget(Button.builder(Component.translatable("rtshop.pshop.rename"), b -> {
+            addRenderableWidget(MButton.builder(Component.translatable("rtshop.pshop.rename"), b -> {
                 JsonObject o = new JsonObject();
                 o.addProperty("name", nameBox.getValue());
                 act(PlayerShops.RENAME, o.toString());
             }).bounds(fx + W - 6 - renW, fy + 24, renW, 16).build());
         }
-        addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose()).bounds(fx + W - 56, fy + H - 22, 50, 16).build());
+        addRenderableWidget(MButton.builder(Component.translatable("gui.done"), b -> onClose()).bounds(fx + W - 56, fy + H - 22, 50, 16).build());
         if (owner && !working() && !employee().isEmpty()) {
             Component pay = Component.translatable("rtshop.pshop.pay_wage", Ui.num(data.has("wage") ? data.get("wage").getAsLong() : 0));
             int w = this.font.width(pay) + 12;
-            addRenderableWidget(Button.builder(pay, b -> act(PlayerShops.PAY_WAGE, "{}")).bounds(fx + W - 60 - w, fy + H - 22, w, 16).build());
+            addRenderableWidget(MButton.builder(pay, b -> act(PlayerShops.PAY_WAGE, "{}")).bounds(fx + W - 60 - w, fy + H - 22, w, 16).build());
         }
     }
 
@@ -298,7 +298,7 @@ public class PlayerShopScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float pt) {
         renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
-        g.fill(fx + 5, fy + 4, fx + W - 5, fy + 19, Ui.C_WOOD_DARK);
+        Ui.titleBand(g, fx + 5, fy + 4, fx + W - 5, fy + 19);
         g.fill(fx + 5, fy + 18, fx + W - 5, fy + 19, Ui.C_GOLD_DARK);
         Ui.coin(g, fx + 9, fy + 4, 14);
         String right = Component.translatable("rtshop.pshop.wallet", Ui.num(data.get("wallet").getAsLong())).getString();

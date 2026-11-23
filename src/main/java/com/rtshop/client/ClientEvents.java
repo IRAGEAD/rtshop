@@ -132,6 +132,17 @@ public final class ClientEvents {
         if (event.getScreen() instanceof AbstractContainerScreen<?> acs) {
             event.addListener(new PinButton(acs));
         }
+        // 인벤토리 위의 [퀘스트 수첩]: 어디서든 퀘스트 내용을 본다 (받기·완료·포기는 NPC 앞에서)
+        if (event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen inv) {
+            String label = net.minecraft.network.chat.Component.translatable("rtshop.quest.journal_button").getString();
+            int w = Minecraft.getInstance().font.width(label) + 10;
+            event.addListener(net.minecraft.client.gui.components.Button.builder(net.minecraft.network.chat.Component.literal(label), b -> {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.player != null) {
+                    mc.player.connection.sendCommand("rtshop quest");
+                }
+            }).bounds(inv.getGuiLeft() + inv.getXSize() - w, inv.getGuiTop() - 16, w, 14).build());
+        }
     }
 
     @SubscribeEvent

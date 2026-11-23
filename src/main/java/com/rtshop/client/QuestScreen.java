@@ -32,6 +32,10 @@ public class QuestScreen extends Screen {
     private static final int ROW_H = 24;
 
     private QuestOpenPacket data;
+    /** 수첩: 서버가 보낸 전체 목록 (data 는 지금 탭에 맞게 거른 것). */
+    private QuestOpenPacket full;
+    /** 수첩 탭: 0 진행 중, 1 받을 수 있음, 2 완료 */
+    private int tab = 0;
     private int selected = 0;
     private int listScroll = 0;
     private int detailScroll = 0;
@@ -42,7 +46,12 @@ public class QuestScreen extends Screen {
 
     public QuestScreen(QuestOpenPacket data) {
         super(Component.literal(data.title));
+        this.full = data;
         this.data = data;
+        if (data.journal) {
+            tab = count(0) > 0 ? 0 : count(1) > 0 ? 1 : 0;
+            this.data = filtered();
+        }
         if (!data.journal && System.currentTimeMillis() - NpcButtons.returnArmedAt < 6000) {
             backNpc = NpcButtons.returnNpc;
         }
@@ -79,10 +88,60 @@ public class QuestScreen extends Screen {
         }
     }
 
+    private static int tabOf(QuestView v) {
+        return switch (v.state()) {
+            case QuestView.AVAILABLE -> 1;
+            case QuestView.DONE -> 2;
+            default -> 0;
+        };
+    }
+
+    private int count(int t) {
+        int n = 0;
+        for (QuestView v : full.views) if (tabOf(v) == t) n++;
+        return n;
+    }
+
+    private QuestOpenPacket filtered() {
+        List<QuestView> l = new java.util.ArrayList<>();
+        for (QuestView v : full.views) if (tabOf(v) == tab) l.add(v);
+        return new QuestOpenPacket(full.npcKey, full.title, full.greeting, true, l);
+    }
+
+    private static final String[] TAB_KEYS = {"rtshop.quest.tab_active", "rtshop.quest.tab_available", "rtshop.quest.tab_done"};
+
+    private String tabLabel(int t) {
+        return Component.translatable(TAB_KEYS[t], count(t)).getString();
+    }
+
+    /** 수첩 탭의 x 위치 (오른쪽부터). */
+    private int tabX(int t) {
+        int x = fx + W - 8;
+        for (int i = 2; i >= t; i--) x -= this.font.width(tabLabel(i)) + 12 + (i == t ? 0 : 3);
+        return x;
+    }
+
+    public int tabForTest() {
+        return tab;
+    }
+
+    public void tabForTest(int t) {
+        tab = t;
+        data = filtered();
+        selected = 0;
+        listScroll = 0;
+        detailScroll = 0;
+    }
+
+    public int shownForTest() {
+        return data.views.size();
+    }
+
     /** 서버가 보낸 새 내용으로 바꾼다. 보고 있던 퀘스트는 그대로 유지한다. */
     public void update(QuestOpenPacket packet) {
         String keep = current() == null ? null : current().id();
-        this.data = packet;
+        this.full = packet;
+        this.data = packet.journal ? filtered() : packet;
         selected = 0;
         for (int i = 0; i < data.views.size(); i++) {
             if (data.views.get(i).id().equals(keep)) {
@@ -211,6 +270,7 @@ public class QuestScreen extends Screen {
         return switch (state) {
             case QuestView.READY -> Ui.C_GREEN;
             case QuestView.ACTIVE -> Ui.C_GOLD_DARK;
+            case QuestView.DONE -> Ui.C_INK_SOFT;
             default -> Ui.C_INK;
         };
     }
@@ -219,6 +279,7 @@ public class QuestScreen extends Screen {
         return Component.translatable(switch (state) {
             case QuestView.READY -> "rtshop.quest.state_ready";
             case QuestView.ACTIVE -> "rtshop.quest.state_active";
+            case QuestView.DONE -> "rtshop.quest.state_done";
             default -> "rtshop.quest.state_new";
         }).getString();
     }
@@ -229,11 +290,24 @@ public class QuestScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         this.renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
-        g.fill(fx + 5, fy + 4, fx + W - 5, fy + 23, Ui.C_WOOD_DARK);
+        Ui.titleBand(g, fx + 5, fy + 4, fx + W - 5, fy + 23);
         g.fill(fx + 5, fy + 22, fx + W - 5, fy + 23, Ui.C_GOLD_DARK);
         int side = Math.max(backNpc >= 0 ? backW() + 14 : 20, data.journal ? 20 : talkW() + 14);
-        String t = Ui.clip(this.font, this.title.getString(), W - 2 * side);
-        g.drawString(this.font, t, fx + (W - this.font.width(t)) / 2, fy + 9, Ui.C_GOLD, true);
+        if (data.journal) {
+            // 수첩: 제목은 왼쪽, 오른쪽에 탭 (진행 중 / 받을 수 있음 / 완료)
+            int tx0 = tabX(0);
+            String t = Ui.clip(this.font, this.title.getString(), tx0 - fx - 18);
+            g.drawString(this.font, t, fx + 10, fy + 9, Ui.C_GOLD, true);
+            for (int i = 0; i < 3; i++) {
+                int tx = tabX(i), tw = this.font.width(tabLabel(i)) + 12;
+                boolean on = i == tab, hov = Ui.inside(mx, my, tx, fy + 6, tw, 14);
+                Ui.bevel(g, tx, fy + 6, tw, 14, on ? Ui.C_GOLD : hov ? Ui.C_GOLD_DARK : Ui.C_WOOD, on ? 0xFFFFE9A8 : Ui.C_WOOD_HI, Ui.C_SHADOW);
+                g.drawString(this.font, tabLabel(i), tx + 6, fy + 9, on ? Ui.C_INK : Ui.C_CREAM, false);
+            }
+        } else {
+            String t = Ui.clip(this.font, this.title.getString(), W - 2 * side);
+            g.drawString(this.font, t, fx + (W - this.font.width(t)) / 2, fy + 9, Ui.C_GOLD, true);
+        }
         if (backNpc >= 0) {
             int bw = backW();
             boolean hov = Ui.inside(mx, my, fx + 8, fy + 6, bw, 14);
@@ -423,6 +497,19 @@ public class QuestScreen extends Screen {
             }
         }
         int by = btnY(v);
+        if (data.journal) {
+            // 수첩에서는 내용만 본다: 받기·완료·포기는 그 사람에게 직접 가서
+            String key = switch (v.state()) {
+                case QuestView.AVAILABLE -> "rtshop.quest.where_accept";
+                case QuestView.READY -> "rtshop.quest.where_turnin";
+                case QuestView.DONE -> "rtshop.quest.where_done";
+                default -> "rtshop.quest.where_active";
+            };
+            String who = v.npc().isEmpty() ? "?" : v.npc();
+            String msg = Ui.clip(this.font, Component.translatable(key, who).getString(), w - 16);
+            g.drawString(this.font, msg, x + 8, by + 5, v.state() == QuestView.READY ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
+            return;
+        }
         if (v.state() == QuestView.AVAILABLE) {
             Ui.button(g, this.font, x + w - 96, by, 88, 18, Component.translatable("rtshop.quest.accept").getString(),
                     Ui.inside(mx, my, x + w - 96, by, 88, 18), true);
@@ -449,6 +536,17 @@ public class QuestScreen extends Screen {
             click();
             goBack();
             return true;
+        }
+        if (data.journal) {
+            for (int i = 0; i < 3; i++) {
+                if (Ui.inside(mx, my, tabX(i), fy + 6, this.font.width(tabLabel(i)) + 12, 14)) {
+                    if (i != tab) {
+                        click();
+                        tabForTest(i);
+                    }
+                    return true;
+                }
+            }
         }
         if (!data.journal && Ui.inside(mx, my, fx + W - 8 - talkW(), fy + 6, talkW(), 14)) {
             click();
@@ -489,6 +587,9 @@ public class QuestScreen extends Screen {
             }
         }
         int by = btnY(v);
+        if (data.journal) {
+            return super.mouseClicked(mx, my, button);
+        }
         if (v.state() == QuestView.AVAILABLE) {
             if (Ui.inside(mx, my, dx + dw - 96, by, 88, 18)) {
                 click();

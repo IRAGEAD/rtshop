@@ -115,7 +115,7 @@ public class BankScreen extends Screen implements NpcButtons.Host {
         Ui.woodFrame(g, fx, fy, W, H);
 
         // 제목
-        g.fill(fx + 5, fy + 4, fx + W - 5, fy + 23, Ui.C_WOOD_DARK);
+        Ui.titleBand(g, fx + 5, fy + 4, fx + W - 5, fy + 23);
         g.fill(fx + 5, fy + 22, fx + W - 5, fy + 23, Ui.C_GOLD_DARK);
         Ui.coin(g, fx + 9, fy + 5, 16);
         g.drawString(this.font, this.title, fx + 29, fy + 9, Ui.C_GOLD, true);

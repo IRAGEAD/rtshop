@@ -225,7 +225,7 @@ public class LandScreen extends Screen {
     public void render(GuiGraphics g, int mx, int my, float partial) {
         this.renderBackground(g);
         Ui.woodFrame(g, fx, fy, fw, fh);
-        g.fill(fx + 5, fy + 4, fx + fw - 5, fy + 23, Ui.C_WOOD_DARK);
+        Ui.titleBand(g, fx + 5, fy + 4, fx + fw - 5, fy + 23);
         g.fill(fx + 5, fy + 22, fx + fw - 5, fy + 23, Ui.C_GOLD_DARK);
         g.renderItem(icon, fx + 9, fy + 5);
         g.drawString(this.font, this.title, fx + 29, fy + 9, Ui.C_GOLD, true);

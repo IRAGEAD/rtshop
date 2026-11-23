@@ -595,7 +595,7 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
     private void drawFrame(GuiGraphics g, int mx, int my) {
         Ui.woodFrame(g, fx, fy, fw, fh);
         // 제목 줄
-        g.fill(fx + 5, fy + 4, fx + fw - 5, fy + TITLE_H - 1, C_WOOD_DARK);
+        Ui.titleBand(g, fx + 5, fy + 4, fx + fw - 5, fy + TITLE_H - 1);
         g.fill(fx + 5, fy + TITLE_H - 2, fx + fw - 5, fy + TITLE_H - 1, C_GOLD_DARK);
         Ui.coin(g, fx + 9, fy + 4, 16);
         g.drawString(this.font, titleText(), fx + 29, fy + 9, C_GOLD, true);
