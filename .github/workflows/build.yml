@@ -226,6 +226,23 @@ jobs:
             grep -rl --include=*.class -i "ruin" /tmp/nfr | head -n 40
             for c in $(grep -rl --include=*.class "ruins_greatsword\|RUINS_GREATSWORD\|ruin_greatsword" /tmp/nfr | head -n 12); do echo "======== $c"; javap -p -c -constants "$c" 2>/dev/null | grep -iE "^  [a-z]|ruin|ldc" | head -n 120; done
           } > /tmp/inspect/nightfall-ruin.txt 2>&1 || true
+          # Avalon 의 item_skins(mesh_item) 처리: 어디서 읽고 언제 적용하는지 + 모든 item_skins 목록
+          {
+            AVJ="$(ls packcache/*.jar | grep -i "avalon" | head -1)"
+            EFJ2="$(ls packcache/*.jar | grep -E "^packcache/epic-fight-20" | head -1)"
+            echo "AVJ=$AVJ EFJ=$EFJ2"
+            for J in packcache/*.jar; do unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "/item_skins/.*\.json$" | sed "s|^|$(basename "$J"): |"; done | head -n 200
+            echo "---- duskfire"; for J in packcache/*.jar; do unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -i "duskfire" | sed "s|^|$(basename "$J"): |"; done | head -n 60
+            for f in $(for J in packcache/*.jar; do unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -iE "item_skins/.*duskfire.*json$|models/item/.*duskfire.*json$"; done | head -n 6); do for J in packcache/*.jar; do unzip -p "$J" "$f" 2>/dev/null | head -c 1500; done; echo; done
+            mkdir -p /tmp/av && unzip -o -q "$AVJ" -d /tmp/av
+            find /tmp/av -name "*.class" | sed 's|/tmp/av/||' | head -n 400
+            for c in $(grep -rl --include=*.class -E "item_skins|mesh_item|ItemSkin" /tmp/av | head -n 25); do echo "======== $c"; javap -p -c -constants "$c" 2>/dev/null | grep -E "^  [a-z]|ldc|invoke|getstatic|putstatic" | head -n 200; done
+            cat /tmp/av/META-INF/mods.toml 2>/dev/null
+            find /tmp/av -name "*.mixins.json" -exec sh -c 'echo "== $1"; cat "$1"' _ {} \;
+            mkdir -p /tmp/efx && unzip -o -q "$EFJ2" -d /tmp/efx
+            echo "== EF classes mentioning item_skins / RenderItemBase registry"
+            grep -rl --include=*.class -E "item_skins|RegisterItemRenderer|ItemSkin" /tmp/efx | head -n 30
+          } > /tmp/inspect/avalon.txt 2>&1 || true
           # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
           ls packcache > /tmp/inspect/jars.txt
           # 환술사 모드: 유령 우민이 안 보이는 문제를 찾기 위한 렌더러·엔티티 클래스
@@ -416,6 +433,7 @@ jobs:
           grep -n -A45 "server-side action failed" client/logs/latest.log | head -n 400 > /tmp/fpshots/server-action-errors.txt 2>/dev/null || true
           grep -n -B12 "rtshop-clienttest\] FAIL" client/logs/latest.log | cut -c1-400 | head -n 600 > /tmp/fpshots/fail-context.txt 2>/dev/null || true
           grep -n -B3 -A8 "Critical injection\|InjectionError\|VillagerTrades" client/logs/latest.log | head -n 200 > /tmp/fpshots/mixin-errors.txt 2>/dev/null || true
+          grep -n -iE "avalon|item.?skin|mesh_item|efn:weapon|ruinsgreatsword|duskfire" client/logs/latest.log | cut -c1-500 | head -n 300 > /tmp/fpshots/avalon-log.txt 2>/dev/null || true
           # 어떤 모드가 주민 거래(VillagerTrades)를 Mixin 으로 고치는지
           python3 - packcache > /tmp/fpshots/villager-trade-mixins.txt <<'PY' || true
           import os, sys, zipfile
