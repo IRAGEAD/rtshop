@@ -1680,8 +1680,10 @@ public final class SelfTest {
         String hint = QuestManager.lockedHint(a, "shop_farmer");
         check("the empty merchant quest window says which quest to finish first", hint.contains("rtshop.quest.locked_hint"), hint);
         List<QuestView> start = QuestManager.viewsFor(a, "quest_guide");
-        check("only the first tutorial quest is offered at the start",
-                start.size() == 1 && start.get(0).id().equals("tutorial_1") && start.get(0).state() == QuestView.AVAILABLE);
+        check("only the first tutorial quest (and the prologue that wraps it) is offered at the start",
+                start.stream().anyMatch(v -> v.id().equals("tutorial_1") && v.state() == QuestView.AVAILABLE)
+                        && start.stream().allMatch(v -> v.id().equals("tutorial_1") || v.id().equals("story_0_01")),
+                start.stream().map(QuestView::id).toList().toString());
         check("a quest cannot be taken from the wrong NPC", !QuestManager.accept(a, "tutorial_1", "bank"));
         check("a quest can be accepted", QuestManager.accept(a, "tutorial_1", "quest_guide") && QuestManager.isActive(a, "tutorial_1"));
         check("it cannot be accepted twice", !QuestManager.accept(a, "tutorial_1", "quest_guide"));
