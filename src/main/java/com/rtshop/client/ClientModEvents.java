@@ -39,6 +39,7 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void onRegisterRenderers(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(com.rtshop.magic.MagicRegistry.ORB_BE.get(), ArcaneOrbRenderer::new);
+        event.registerEntityRenderer(com.rtshop.story.Companions.TYPE.get(), CompanionRenderer::new);
     }
 
     @SubscribeEvent

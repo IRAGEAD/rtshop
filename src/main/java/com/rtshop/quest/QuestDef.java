@@ -27,7 +27,12 @@ public final class QuestDef {
         /** 차원에 들어간다. target: 차원 ID. */
         DIMENSION,
         /** 표식을 갖고 있다 (예: abyss_floor_2 = 나선의 심연 2층을 깬 적이 있다). target: 표식. */
-        FLAG;
+        FLAG,
+        /**
+         * 장소 조사: 흔적에 다가가 살펴본다. target: 흔적 ID (영문 소문자·숫자·_). at: 흔적이 나타날 구조물 (STRUCTURE 목표와 같은 형식, 비우면 어디서나),
+         * shape: 흔적의 모양, lines: 살펴볼 때 나오는 글. target 을 "id@구조물" 로 적어도 된다.
+         */
+        INSPECT;
 
         static Type parse(String s) {
             for (Type t : values()) {
@@ -52,7 +57,13 @@ public final class QuestDef {
         public String mod = "";
         /** TALK: 그 NPC 에게 말을 걸면 대화 상자로 먼저 나오는 장면 ("이름: 대사" 또는 대사). 없으면 바로 채워진다. */
         public com.google.gson.JsonArray lines;
+        /** INSPECT: 흔적이 나타날 구조물 (ID, #태그, "모드:*"). 비우면 퀘스트를 받은 뒤 어디서나 곁에 나타난다. */
+        public String at = "";
+        /** INSPECT: 흔적의 모양 (circle 마법진 · mural 벽화 · scrawl 낙서 · board 명령판 · camp 야영지 · relic 유품 · bones 유해 · book 기록). */
+        public String shape = "";
     }
+
+    public static final String[] SHAPES = {"circle", "mural", "scrawl", "board", "camp", "relic", "bones", "book"};
 
     public static final class ItemReward {
         public String item;
@@ -110,6 +121,11 @@ public final class QuestDef {
     public JsonObject sceneAccept, sceneDone;
     /** 퀘스트 전체의 모드 조건 ("" = 항상). 맞지 않으면 퀘스트를 아예 불러오지 않는다. */
     public String mod = "";
+    /**
+     * 동행: {"npc": NPC ID, "at": 나타날 구조물(비우면 받자마자), "style": none·melee·bolt,
+     * "lines": {"arrive":[..], "fight":[..], "low":[..], "idle":[..], "spot":[..], "done":[..]}}. 없으면 null.
+     */
+    public JsonObject companion;
 
     public String turnInNpc() {
         return turnIn == null || turnIn.isEmpty() ? giver : turnIn;
@@ -166,6 +182,7 @@ public final class QuestDef {
         putText(o, "mod", mod);
         if (sceneAccept != null) o.add("sceneAccept", sceneAccept);
         if (sceneDone != null) o.add("sceneDone", sceneDone);
+        if (companion != null) o.add("companion", companion);
         JsonArray objs = new JsonArray();
         for (Objective ob : objectives) {
             JsonObject jo = new JsonObject();
@@ -183,6 +200,8 @@ public final class QuestDef {
             putText(jo, "text", ob.text);
             putText(jo, "mod", ob.mod);
             if (ob.lines != null && ob.lines.size() > 0) jo.add("lines", ob.lines);
+            putText(jo, "at", ob.at);
+            putText(jo, "shape", ob.shape);
             objs.add(jo);
         }
         o.add("objectives", objs);
@@ -234,6 +253,7 @@ public final class QuestDef {
         q.mod = str(o, "mod", "").trim();
         if (o.has("sceneAccept") && o.get("sceneAccept").isJsonObject()) q.sceneAccept = o.getAsJsonObject("sceneAccept");
         if (o.has("sceneDone") && o.get("sceneDone").isJsonObject()) q.sceneDone = o.getAsJsonObject("sceneDone");
+        if (o.has("companion") && o.get("companion").isJsonObject() && o.getAsJsonObject("companion").has("npc")) q.companion = o.getAsJsonObject("companion");
         if (q.giver.isEmpty()) {
             throw new IllegalArgumentException("퀘스트 '" + q.id + "' 에 giver(퀘스트를 주는 NPC)가 없습니다");
         }
@@ -257,6 +277,19 @@ public final class QuestDef {
                 ob.text = str(jo, "text", "");
                 ob.mod = str(jo, "mod", "").trim();
                 if (jo.has("lines") && jo.get("lines").isJsonArray()) ob.lines = jo.getAsJsonArray("lines");
+                ob.at = str(jo, "at", "").trim();
+                ob.shape = str(jo, "shape", "").trim();
+                if (ob.type == Type.INSPECT) {
+                    int cut = ob.target.indexOf('@');
+                    if (cut > 0) { // "id@구조물" 로 한 줄에 적은 경우
+                        if (ob.at.isEmpty()) ob.at = ob.target.substring(cut + 1).trim();
+                        ob.target = ob.target.substring(0, cut).trim();
+                    }
+                    if (!ob.target.matches("[a-z0-9_]+")) {
+                        throw new IllegalArgumentException("퀘스트 '" + q.id + "' 의 조사 목표 ID 는 영문 소문자·숫자·_ 만 쓸 수 있습니다: '" + ob.target + "'");
+                    }
+                    ob.count = 1;
+                }
                 if (ob.type != Type.PAY && ob.type != Type.VISIT && ob.target.isEmpty()) {
                     throw new IllegalArgumentException("퀘스트 '" + q.id + "' 의 " + ob.type + " 목표에 target 이 없습니다");
                 }

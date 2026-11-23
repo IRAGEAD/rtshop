@@ -118,7 +118,19 @@ public final class MagicGacha {
 
     // ------------------------------------------------------------------ 창
 
+    /** 룬 제단 잠금: 설정한 표식(이야기 진행)이 없으면 거울이 아무것도 비추지 않는다. */
+    public static boolean locked(ServerPlayer p) {
+        com.rtshop.story.StorySystems.ensure();
+        String f = com.rtshop.story.StorySystems.altarLockFlag;
+        if (f == null || f.isEmpty() || canEdit(p)) return false;
+        return !com.rtshop.quest.QuestManager.hasFlag(p, f);
+    }
+
     public static void open(ServerPlayer p, BlockPos pos) {
+        if (locked(p)) {
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.magic.locked"), true);
+            return;
+        }
         SESSIONS.put(p.getUUID(), pos.immutable());
         JsonObject o = view(p);
         o.addProperty("open", true);

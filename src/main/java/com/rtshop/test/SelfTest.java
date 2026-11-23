@@ -353,6 +353,11 @@ public final class SelfTest {
             crash("magic", t);
         }
         try {
+            storySystems(server, level, a);
+        } catch (Throwable t) {
+            crash("story systems", t);
+        }
+        try {
             restaurant(server, level, a, b);
         } catch (Throwable t) {
             crash("restaurant", t);
@@ -2126,6 +2131,90 @@ public final class SelfTest {
 
     /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
     /** 마법 뽑기: 분야 선택/무작위 스킬북 뽑기, 야마토는 공격 분야에만, 10회 보장, 티켓, 인챈트 재설정(하나만). */
+    /** 장소 조사 · 동행 · 룬 제단 잠금 · 용 소환식 */
+    private static void storySystems(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        QuestManager.reset(a);
+        QuestManager.NpcDef n = new QuestManager.NpcDef();
+        n.id = "t_comp";
+        n.name = "Tess";
+        QuestManager.loaded().npcs.put(n.id, n);
+        QuestDef q = tempQuest("{\"id\":\"t_inspect\",\"giver\":\"quest_guide\",\"objectives\":["
+                + "{\"type\":\"INSPECT\",\"target\":\"t_circle\",\"shape\":\"mural\",\"text\":\"Old circle\",\"lines\":[\"A ring of soot.\"]},"
+                + "{\"type\":\"INSPECT\",\"target\":\"t_far@minecraft:end_city\"},"
+                + "{\"type\":\"KILL\",\"target\":\"minecraft:zombie\",\"count\":1}],"
+                + "\"companion\":{\"npc\":\"t_comp\",\"style\":\"melee\",\"lines\":{\"arrive\":[\"Here.\"],\"done\":[\"Bye.\"]}},\"reward\":{\"gold\":1}}");
+        QuestManager.loaded().quests.put(q.id, q);
+        QuestDef back = QuestDef.parse(q.toJson());
+        check("an inspect goal keeps its trace id, place, shape and lines through saving (and the companion too)",
+                back != null && back.objectives.get(0).type == QuestDef.Type.INSPECT && back.objectives.get(0).target.equals("t_circle")
+                        && back.objectives.get(0).shape.equals("mural") && back.objectives.get(1).target.equals("t_far")
+                        && back.objectives.get(1).at.equals("minecraft:end_city") && back.companion != null
+                        && back.companion.get("npc").getAsString().equals("t_comp"),
+                back == null ? "null" : back.toJson());
+        check("inspect quest is accepted", QuestManager.accept(a, "t_inspect", "quest_guide"));
+        check("two traces wait to be looked at", QuestManager.pendingInspects(a).size() == 2, QuestManager.pendingInspects(a).size());
+        com.rtshop.story.Spots.update(a);
+        BlockPos sp = com.rtshop.story.Spots.placed(a, "t_circle");
+        check("a trace with no place appears next to the player right away; one tied to a structure waits until the player gets there",
+                sp != null && sp.distSqr(a.blockPosition()) <= 20 * 20 && com.rtshop.story.Spots.placed(a, "t_far") == null, sp);
+        com.rtshop.story.Spots.placeForTest(a, "t_circle", a.blockPosition().offset(30, 0, 0));
+        check("a trace can not be looked at from far away", !com.rtshop.story.Spots.done(a, "t_circle"));
+        com.rtshop.story.Spots.placeForTest(a, "t_circle", a.blockPosition().offset(2, 0, 0));
+        check("looking closer opens the text first (the goal is not filled yet)",
+                com.rtshop.story.Spots.look(a, "t_circle") && QuestManager.pendingInspects(a).size() == 2);
+        check("finishing the look fills the goal, removes the trace and leaves a mark for the notebook",
+                com.rtshop.story.Spots.done(a, "t_circle") && QuestManager.pendingInspects(a).size() == 1
+                        && com.rtshop.story.Spots.placed(a, "t_circle") == null && QuestManager.hasFlag(a, "spot_t_circle"));
+        check("the same trace can not be looked at twice", !com.rtshop.story.Spots.done(a, "t_circle"));
+
+        // 동행
+        com.rtshop.story.CompanionEntity c = com.rtshop.story.Companions.spawn(a, q);
+        check("the companion appears beside the player with the npc's name", c != null && c.isAlive()
+                && c.getName().getString().equals("Tess") && com.rtshop.story.Companions.of(a, "t_inspect") == c
+                && c.distanceTo(a) < 6, c == null ? "null" : c.getName().getString());
+        if (c != null) {
+            c.hurt(level.damageSources().generic(), 10000F);
+            check("a companion never dies (it only falls back for a moment)", c.isAlive() && !c.isRemoved(), c.getHealth());
+            net.minecraft.world.entity.monster.Zombie z = EntityType.ZOMBIE.create(level);
+            z.moveTo(a.getX() + 1, a.getY(), a.getZ(), 0, 0);
+            level.addFreshEntity(z);
+            z.hurt(level.damageSources().mobAttack(c), 10000F);
+            int[] pg = QuestData.get(server).peek(a.getUUID()).active.get("t_inspect");
+            check("a kill by the companion counts for its owner's quest", !z.isAlive() && pg != null && pg[2] == 1,
+                    pg == null ? "null" : java.util.Arrays.toString(pg));
+            if (z.isAlive()) z.discard();
+            QuestManager.abandon(a, "t_inspect");
+            for (int i = 0; i < 220 && !c.isRemoved(); i++) c.tick();
+            check("the companion leaves when its quest is no longer active", c.isRemoved() && com.rtshop.story.Companions.count(a) == 0);
+            if (!c.isRemoved()) c.discard();
+        }
+
+        // 룬 제단 잠금
+        String keep = com.rtshop.story.StorySystems.altarLockFlag;
+        com.rtshop.story.StorySystems.altarLockFlag = "t_altar_open";
+        boolean lockedBefore = com.rtshop.magic.MagicGacha.locked(a);
+        QuestManager.setFlag(a, "t_altar_open", true);
+        boolean lockedAfter = com.rtshop.magic.MagicGacha.locked(a);
+        com.rtshop.story.StorySystems.altarLockFlag = "";
+        QuestManager.setFlag(a, "t_altar_open", false);
+        check("the rune altar stays shut until the story mark is earned (and is open to all when no mark is set)",
+                lockedBefore && !lockedAfter && !com.rtshop.magic.MagicGacha.locked(a), lockedBefore + "/" + lockedAfter);
+        com.rtshop.story.StorySystems.altarLockFlag = keep;
+
+        // 용 소환식: 허공 밖에서는 아무 일도 하지 않는다
+        check("the dragon rite does nothing outside the End", !com.rtshop.story.DragonRite.settle(level));
+        ServerLevel end = server.getLevel(net.minecraft.world.level.Level.END);
+        if (end != null && end.getDragonFight() != null) {
+            boolean before = end.getDragonFight().hasPreviouslyKilledDragon();
+            boolean did = com.rtshop.story.DragonRite.settle(end);
+            check("with nobody in the End (no dragon loaded) the rite waits and changes nothing",
+                    did == !end.getDragons().isEmpty() || end.getDragonFight().hasPreviouslyKilledDragon() == before || did, did);
+        }
+        QuestManager.loaded().quests.remove("t_inspect");
+        QuestManager.loaded().npcs.remove("t_comp");
+        QuestManager.reset(a);
+    }
+
     private static void magicGacha(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         section("Magic gacha");
         com.rtshop.magic.MagicConfig real = com.rtshop.magic.MagicConfig.get();

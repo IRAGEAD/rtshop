@@ -230,6 +230,8 @@ public class QuestEditScreen extends Screen {
                 if (ob.type == QuestDef.Type.VISIT) {
                     od.dim = ob.target;
                     od.target = ob.x + " " + ob.y + " " + ob.z;
+                } else if (ob.type == QuestDef.Type.INSPECT) {
+                    od.target = ob.at.isEmpty() ? ob.target : ob.target + "@" + ob.at; // 흔적ID@나타날 구조물
                 } else if (ob.type != QuestDef.Type.PAY) {
                     od.target = ob.target;
                 }
@@ -965,7 +967,7 @@ public class QuestEditScreen extends Screen {
                             od.target = v;
                             markDirty();
                         }));
-                case VISIT, STRUCTURE, ADVANCEMENT, DIMENSION, FLAG -> box(tx, y, tw, od.target, 200, v -> od.target = v);
+                case VISIT, STRUCTURE, ADVANCEMENT, DIMENSION, FLAG, INSPECT -> box(tx, y, tw, od.target, 200, v -> od.target = v);
                 default -> labels.add(new Label(tx + 2, y + 2, tr("rtshop.qedit.pay_note"), Ui.C_INK_SOFT));
             }
             String helper = switch (od.type) {
@@ -1035,6 +1037,7 @@ public class QuestEditScreen extends Screen {
             case ADVANCEMENT -> tr("rtshop.qedit.hint_advancement");
             case DIMENSION -> tr("rtshop.qedit.hint_dimension");
             case FLAG -> tr("rtshop.qedit.hint_flag");
+            case INSPECT -> tr("rtshop.qedit.hint_inspect");
             default -> tr("rtshop.qedit.hint_pay");
         };
     }

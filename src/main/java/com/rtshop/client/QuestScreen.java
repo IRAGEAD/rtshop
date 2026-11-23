@@ -270,6 +270,8 @@ public class QuestScreen extends Screen {
                 return HudLang.tr(lang, "rtshop.quest.obj.structure", o.text().isEmpty() ? o.target() : o.text());
             case ADVANCEMENT:
                 return HudLang.tr(lang, "rtshop.quest.obj.advancement", o.text().isEmpty() ? o.target() : o.text());
+            case INSPECT:
+                return HudLang.tr(lang, "rtshop.quest.obj.inspect", o.text().isEmpty() ? HudLang.tr(lang, "rtshop.spot.trace") : o.text());
             case FLAG:
                 return o.text().isEmpty() ? o.target() : o.text();
             case DIMENSION:

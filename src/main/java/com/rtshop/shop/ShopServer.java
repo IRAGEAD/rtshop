@@ -361,6 +361,11 @@ public final class ShopServer {
                             QuestManager.syncHud(sp);
                             return 1;
                         })))
+                .then(Commands.literal("spot")
+                        .then(Commands.literal("look").then(Commands.argument("id", StringArgumentType.word())
+                                .executes(ctx -> com.rtshop.story.Spots.look(ctx.getSource().getPlayerOrException(), StringArgumentType.getString(ctx, "id")) ? 1 : 0)))
+                        .then(Commands.literal("done").then(Commands.argument("id", StringArgumentType.word())
+                                .executes(ctx -> com.rtshop.story.Spots.done(ctx.getSource().getPlayerOrException(), StringArgumentType.getString(ctx, "id")) ? 1 : 0))))
                 .then(Commands.literal("talk")
                         .then(Commands.literal("here").executes(ctx -> {
                             ServerPlayer sp = ctx.getSource().getPlayerOrException();
@@ -517,6 +522,7 @@ public final class ShopServer {
         com.rtshop.story.Hunts.reload();
         com.rtshop.story.Dialogue.reload();
         com.rtshop.story.StoryText.reload();
+        com.rtshop.story.StorySystems.load();
         com.rtshop.stats.ItemStats.load();
         com.rtshop.stats.ItemStats.syncAll(ctx.getSource().getServer());
         com.rtshop.story.WildSpawns.reload();

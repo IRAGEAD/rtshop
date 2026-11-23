@@ -215,6 +215,15 @@ public final class QuestEditor {
             if (q.sceneAccept == null) q.sceneAccept = old.sceneAccept;
             if (q.sceneDone == null) q.sceneDone = old.sceneDone;
             if (q.mod.isEmpty()) q.mod = old.mod;
+            if (q.companion == null) q.companion = old.companion;
+            // 목표의 장면 글·조사 위치·모양: 같은 자리의 같은 목표면 그대로 둔다
+            for (int i = 0; i < q.objectives.size() && i < old.objectives.size(); i++) {
+                QuestDef.Objective a = q.objectives.get(i), b = old.objectives.get(i);
+                if (a.type != b.type || !a.target.equals(b.target)) continue;
+                if (a.lines == null) a.lines = b.lines;
+                if (a.at.isEmpty()) a.at = b.at;
+                if (a.shape.isEmpty()) a.shape = b.shape;
+            }
         }
         try {
             String file = findFile("quests", q.id);

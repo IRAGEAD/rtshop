@@ -140,7 +140,11 @@ public class DialogueScreen extends Screen {
         if (scene) {
             // 장면 끝: 서버가 목표를 채우고 퀘스트 창을 연다
             onClose();
-            if (minecraft.player != null) minecraft.player.connection.sendCommand("rtshop talk done " + entity);
+            if (minecraft.player != null) {
+                // 흔적을 살펴본 장면이면 조사 목표를, NPC 와의 장면이면 대화 목표를 채운다
+                if (data.has("spot")) minecraft.player.connection.sendCommand("rtshop spot done " + data.get("spot").getAsString());
+                else minecraft.player.connection.sendCommand("rtshop talk done " + entity);
+            }
             return;
         }
         choosing = true;

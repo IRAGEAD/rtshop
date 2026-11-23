@@ -50,7 +50,13 @@ public class ArcaneOrbBlock extends BaseEntityBlock {
     @Override
     public net.minecraft.world.MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return new net.minecraft.world.SimpleMenuProvider((id, inv, player) -> {
-            if (player instanceof ServerPlayer sp) MagicGacha.menuOpened(sp, pos);
+            if (player instanceof ServerPlayer sp) {
+                if (MagicGacha.locked(sp)) { // 잠겨 있으면 메뉴(장면)를 열지 않는다
+                    com.rtshop.notice.Notice.send(sp, net.minecraft.network.chat.Component.translatable("rtshop.magic.locked"), true);
+                    return null;
+                }
+                MagicGacha.menuOpened(sp, pos);
+            }
             return new MagicMenu(id, inv, pos);
         }, net.minecraft.network.chat.Component.translatable("rtshop.magic.altar"));
     }

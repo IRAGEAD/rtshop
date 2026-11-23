@@ -1214,6 +1214,56 @@ public final class QuestManager {
         }
     }
 
+    /** 지금 이 구조물(ID, #태그, "모드:*") 안이나 곁에 있는가. */
+    public static boolean atStructure(ServerPlayer p, String target) {
+        if (target == null || target.isBlank()) return true;
+        QuestDef.Objective ob = new QuestDef.Objective();
+        ob.type = QuestDef.Type.STRUCTURE;
+        ob.target = target.trim();
+        return reached(p, ob, p.level().dimension().location().toString());
+    }
+
+    /** 아직 살펴보지 않은 조사 목표들: {퀘스트, 목표}. */
+    public static List<Object[]> pendingInspects(ServerPlayer p) {
+        List<Object[]> out = new ArrayList<>();
+        QuestData.Progress pr = prog(p);
+        for (Map.Entry<String, int[]> e : pr.active.entrySet()) {
+            QuestDef q = loaded.quests.get(e.getKey());
+            if (q == null) continue;
+            int[] pg = e.getValue();
+            for (int i = 0; i < q.objectives.size() && i < pg.length; i++) {
+                QuestDef.Objective ob = q.objectives.get(i);
+                if (ob.type == QuestDef.Type.INSPECT && pg[i] < ob.count) out.add(new Object[]{q, ob});
+            }
+        }
+        return out;
+    }
+
+    /** 흔적을 살펴봤다: 그 조사 목표를 채운다. */
+    public static boolean completeInspect(ServerPlayer p, String spotId) {
+        QuestData.Progress pr = prog(p);
+        boolean any = false;
+        for (Map.Entry<String, int[]> e : new ArrayList<>(pr.active.entrySet())) {
+            QuestDef q = loaded.quests.get(e.getKey());
+            if (q == null) continue;
+            int[] pg = e.getValue();
+            boolean touched = false;
+            for (int i = 0; i < q.objectives.size() && i < pg.length; i++) {
+                QuestDef.Objective ob = q.objectives.get(i);
+                if (ob.type == QuestDef.Type.INSPECT && ob.target.equals(spotId) && pg[i] < ob.count) {
+                    pg[i] = ob.count;
+                    touched = true;
+                }
+            }
+            if (touched) {
+                any = true;
+                notifyProgress(p, q, pg);
+            }
+        }
+        if (any) QuestData.get(p.server).dirty();
+        return any;
+    }
+
     /** 구조물 곁 (작은 구조물은 조각 안에 딱 서기 어렵다: 전체 범위를 8칸 넓혀 본다). */
     private static boolean near(net.minecraft.world.level.StructureManager sm, net.minecraft.core.BlockPos pos,
                                 net.minecraft.world.level.levelgen.structure.Structure s) {
@@ -1355,6 +1405,8 @@ public final class QuestManager {
             return;
         }
         ServerPlayer killer = com.rtshop.pvp.Pvp.attackerOf(event.getSource(), server);
+        // 동행이 잡은 것은 함께 다니는 플레이어의 몫으로 센다
+        if (killer == null && event.getSource().getEntity() instanceof com.rtshop.story.CompanionEntity c) killer = c.owner();
         if (killer == null) return;
         onKill(killer, victim);
         // 일반 몹: 가까이 있는 파티원도 처치 목표를 함께 채운다

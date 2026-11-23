@@ -1518,5 +1518,15 @@
   "rtshop.magic.tip.unchoose": "다시 만지면 무작위 뽑기로 돌아갑니다",
   "rtshop.magic.tip.from": "%s 분야에서 뽑습니다",
   "rtshop.magic.tip.from_all": "모든 분야에서 무작위로 뽑습니다%s",
-  "rtshop.magic.tip.touch": "문양을 만지면 소환합니다"
+  "rtshop.magic.tip.touch": "문양을 만지면 소환합니다",
+  "rtshop.magic.locked": "거울이 아무것도 비추지 않는다. 아직 때가 아닌 듯하다.",
+  "rtshop.spot.trace": "흔적",
+  "rtshop.spot.prompt": "[%s] 살펴보기",
+  "rtshop.spot.appeared": "근처에 살펴볼 것이 있다: %s",
+  "rtshop.spot.appeared_plain": "근처에 살펴볼 흔적이 있다.",
+  "rtshop.quest.obj.inspect": "살펴보기: %s",
+  "rtshop.qedit.hint_inspect": "흔적ID@구조물 (예: old_camp@minecraft:end_city). 플레이어가 그 구조물에 닿으면 근처에 흔적이 나타나고, 다가가 우클릭하면 채워진다. 구조물을 비우면 받자마자 곁에 나타난다.",
+  "rtshop.rite.sleeping": "용은 받침대 위에서 돌처럼 굳어 잠들어 있다. 받침대 네 모서리에 수정을 놓으면 깨어난다.",
+  "entity.rtshop.companion": "동행",
+  "rtshop.qedit.type_inspect": "조사"
 }

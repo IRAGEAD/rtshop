@@ -1225,9 +1225,78 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "112_story_vision");
+            Cinematic.play("{\"kind\":\"names\",\"title\":\"골디아 연대기 · 잠든 이름\",\"speaker\":\"기록관 이사벨\",\"text\":\"헬바르, 서약을 거절한 기사\\n하르겐 · 이졸데 · 메르윈\\n그리고 이름을 내어 준 여덟째 왕\"}");
+            Cinematic.timeForTest = 4.3F;
+            waitTicks(6);
+        });
+        add(mc -> {
+            check("the name-writing scene plays (names are penned line by line)", Cinematic.active() && "names".equals(Cinematic.kindForTest()));
+            shot(mc, "112b_story_names");
             Cinematic.timeForTest = -1;
             Cinematic.play("{\"kind\":\"line\",\"seconds\":0.01}");
             waitTicks(4);
+        });
+        // ------------------------------------------------------------ 장소 조사 · 동행
+        add(mc -> {
+            mc.setScreen(null);
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            mc.options.fov().set(70);
+            onServer(mc, sp -> {
+                com.rtshop.quest.QuestManager.NpcDef n = new com.rtshop.quest.QuestManager.NpcDef();
+                n.id = "t_comp";
+                n.name = "{\"ko\":\"기록관 이사벨\",\"en\":\"Isabel\"}";
+                com.rtshop.quest.QuestManager.loaded().npcs.put(n.id, n);
+                com.rtshop.quest.QuestDef q = com.rtshop.quest.QuestDef.parse(com.google.gson.JsonParser.parseString(
+                        "{\"id\":\"t_inspect\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"INSPECT\",\"target\":\"t_circle\",\"shape\":\"circle\","
+                                + "\"text\":\"그을린 마법진\",\"lines\":[\"바닥에 원이 그을려 있다. 누군가 여기서 무언가를 불렀다.\",\"원 한가운데에 지워진 글자가 하나 있다.\"]}],"
+                                + "\"companion\":{\"npc\":\"t_comp\",\"style\":\"melee\",\"lines\":{\"arrive\":[\"여기예요. 발밑을 조심해요.\"],\"spot\":[\"저기, 바닥에 뭔가 있어요.\"]}}}").getAsJsonObject());
+                com.rtshop.quest.QuestManager.loaded().quests.put(q.id, q);
+                sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), 0F, 14F);
+                boolean ok = com.rtshop.quest.QuestManager.accept(sp, "t_inspect", null);
+                com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] inspect quest accepted: {}", ok);
+                com.rtshop.story.Spots.placeForTest(sp, "t_circle", sp.blockPosition().offset(0, 0, 3));
+                com.rtshop.story.Spots.update(sp);
+            });
+            waitTicks(50);
+        });
+        add(mc -> {
+            check("the trace to look at is shown in the world and can be aimed at", SpotClient.countForTest() == 1 && "t_circle".equals(SpotClient.aimedForTest()),
+                    SpotClient.countForTest() + " / " + SpotClient.aimedForTest());
+            boolean comp = false;
+            for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                if (e instanceof com.rtshop.story.CompanionEntity) comp = true;
+            }
+            check("the companion walks beside the player once the quest place is reached", comp);
+            shot(mc, "124_spot_marker");
+            onServer(mc, sp -> sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), 150F, 5F));
+            mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            waitTicks(25);
+        });
+        add(mc -> {
+            shot(mc, "124b_companion");
+            mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            onServer(mc, sp -> sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), 0F, 14F));
+            waitTicks(10);
+        });
+        add(mc -> {
+            SpotClient.look("t_circle");
+            waitTicks(20);
+        });
+        add(mc -> {
+            check("looking closer opens what is written there", mc.screen instanceof DialogueScreen, mc.screen);
+            shot(mc, "124c_spot_text");
+            if (mc.player != null) mc.player.connection.sendCommand("rtshop spot done t_circle");
+            mc.setScreen(null);
+            waitTicks(30);
+        });
+        add(mc -> {
+            check("after the look is finished the trace is gone", SpotClient.countForTest() == 0, SpotClient.countForTest());
+            onServer(mc, sp -> {
+                com.rtshop.quest.QuestManager.abandon(sp, "t_inspect");
+                com.rtshop.quest.QuestManager.loaded().quests.remove("t_inspect");
+                com.rtshop.quest.QuestManager.loaded().npcs.remove("t_comp");
+            });
+            waitTicks(30);
         });
     }
 

@@ -1518,5 +1518,15 @@
   "rtshop.magic.tip.unchoose": "Touch again to go back to random",
   "rtshop.magic.tip.from": "Draws from the %s field",
   "rtshop.magic.tip.from_all": "Draws at random from every field%s",
-  "rtshop.magic.tip.touch": "Touch the sigil to summon"
+  "rtshop.magic.tip.touch": "Touch the sigil to summon",
+  "rtshop.magic.locked": "The mirror shows nothing. It is not time yet.",
+  "rtshop.spot.trace": "Trace",
+  "rtshop.spot.prompt": "[%s] Look closer",
+  "rtshop.spot.appeared": "Something nearby is worth a closer look: %s",
+  "rtshop.spot.appeared_plain": "There is a trace nearby worth a closer look.",
+  "rtshop.quest.obj.inspect": "Look closer: %s",
+  "rtshop.qedit.hint_inspect": "traceid@structure (e.g. old_camp@minecraft:end_city). When the player reaches that structure a trace appears nearby; right-clicking it fills the goal. Leave the structure out and it appears right away.",
+  "rtshop.rite.sleeping": "The dragon sleeps on the pedestal, hard as stone. Place crystals on its four sides to wake it.",
+  "entity.rtshop.companion": "Companion",
+  "rtshop.qedit.type_inspect": "Inspect"
 }

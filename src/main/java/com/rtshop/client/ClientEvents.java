@@ -164,6 +164,7 @@ public final class ClientEvents {
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientLand.clear();
         ClientQuestHud.clear();
+        SpotClient.clear();
         PvpHud.clear();
         RaidClient.abyss = null;
         ClientEconomy.wallet = 0;

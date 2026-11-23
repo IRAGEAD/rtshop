@@ -68,6 +68,7 @@ public final class Cinematic {
             case "boss" -> 5.0F;
             case "title" -> 5.5F;
             case "vision" -> 6.0F;
+            case "names" -> 3.2F + 1.3F * Math.max(1, str("text", "").split("\n").length);
             default -> 4.0F;
         };
     }
@@ -112,6 +113,7 @@ public final class Cinematic {
                 case "title" -> title(g, mc.font, sw, sh, t, dur);
                 case "boss" -> boss(g, mc.font, sw, sh, t, dur);
                 case "vision" -> vision(g, mc.font, sw, sh, t, dur);
+                case "names" -> names(g, mc.font, sw, sh, t, dur);
                 default -> line(g, mc.font, sw, sh, t, dur);
             }
         } catch (Throwable e) {
@@ -257,6 +259,42 @@ public final class Cinematic {
             float li = Math.max(0, Math.min(1, (t - 0.6F - i * 0.9F) / 0.7F)) * k;
             RaidText.center(g, font, lines[i], RaidText.SERIF, sw / 2, y + i * 14, (Math.round(255 * li) << 24) | 0xF3E6CC);
         }
+    }
+
+    /**
+     * 이름 적기: 잠재운 존재의 이름을 기록관이 연대기에 한 줄씩 적는다 (불은 이름을 먹는다, 그래서 이름을 적는다).
+     * text = 줄바꿈으로 나눈 이름들, speaker = 적는 사람, title = 머리말.
+     */
+    private static void names(GuiGraphics g, Font font, int sw, int sh, float t, float dur) {
+        float k = fadeInOut(t, dur, 0.8F, 1.0F);
+        String[] lines = str("text", "").split("\n");
+        int pw = Math.min(sw - 60, 250), ph = 54 + lines.length * 18;
+        int x = (sw - pw) / 2, y = (sh - ph) / 2;
+        Fx2D.begin(g, false);
+        Fx2D.rect(0, 0, sw, sh, Fx2D.rgba(0x060302, 0.62F * k), Fx2D.rgba(0x060302, 0.62F * k), Fx2D.rgba(0x060302, 0.62F * k), Fx2D.rgba(0x060302, 0.62F * k));
+        // 양피지 한 장
+        Fx2D.rect(x, y, x + pw, y + ph, Fx2D.rgba(0xE9D9B0, 0.96F * k), Fx2D.rgba(0xE9D9B0, 0.96F * k), Fx2D.rgba(0xD6C292, 0.96F * k), Fx2D.rgba(0xD6C292, 0.96F * k));
+        Fx2D.rect(x + 14, y + 26, x + pw - 14, y + 27, Fx2D.rgba(0x7A5A2E, 0.7F * k), Fx2D.rgba(0x7A5A2E, 0.7F * k), Fx2D.rgba(0x7A5A2E, 0.7F * k), Fx2D.rgba(0x7A5A2E, 0.7F * k));
+        Fx2D.end();
+        int a = Math.round(255 * k);
+        if (a < 8) return;
+        RaidText.center(g, font, str("title", ""), RaidText.SANS, sw / 2, y + 10, (a << 24) | 0x6A4A22);
+        for (int i = 0; i < lines.length; i++) {
+            // 한 글자씩 적힌다
+            float start = 1.0F + i * 1.3F;
+            int n = Math.max(0, Math.min(lines[i].length(), Math.round((t - start) / 0.9F * lines[i].length())));
+            if (n <= 0) continue;
+            String part = lines[i].substring(0, n);
+            int full = RaidText.w(font, lines[i], RaidText.SERIF);
+            int lx = sw / 2 - full / 2, ly = y + 36 + i * 18;
+            RaidText.draw(g, font, part, RaidText.SERIF, lx, ly, (a << 24) | 0x2A1A0C);
+            if (n < lines[i].length()) { // 펜 끝의 젖은 잉크
+                int px = lx + RaidText.w(font, part, RaidText.SERIF);
+                g.fill(px + 1, ly + 8, px + 3, ly + 10, (a << 24) | 0x1A0E06);
+            }
+        }
+        String by = str("speaker", "");
+        if (!by.isEmpty()) RaidText.right(g, font, by, RaidText.SANS, x + pw - 14, y + ph - 14, (Math.round(a * 0.8F) << 24) | 0x6A4A22);
     }
 
     private static void line(GuiGraphics g, Font font, int sw, int sh, float t, float dur) {
