@@ -768,6 +768,13 @@ final class ClientSelfTest2 {
                 for (net.minecraft.core.BlockPos q : net.minecraft.core.BlockPos.betweenClosed(at.offset(-1, 0, -1), at.offset(1, 2, 1))) {
                     sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                 }
+                for (net.minecraft.core.BlockPos q : net.minecraft.core.BlockPos.betweenClosed(at.offset(-3, -1, -3), at.offset(3, -1, 3))) {
+                    sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                }
+                for (net.minecraft.core.BlockPos q : net.minecraft.core.BlockPos.betweenClosed(at.offset(-3, 0, -3), at.offset(3, 2, 3))) {
+                    if (!sp.serverLevel().getBlockState(q).isAir()) sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                }
+                sp.connection.teleport(sp.blockPosition().getX() + 0.5, at.getY(), sp.blockPosition().getZ() + 0.5, sp.getYRot(), sp.getXRot());
                 sp.serverLevel().setBlockAndUpdate(at.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 sp.serverLevel().setBlockAndUpdate(at, com.rtshop.magic.MagicRegistry.ORB.get().defaultBlockState());
                 com.rtshop.magic.MagicConfig c = com.rtshop.magic.MagicConfig.get();
@@ -790,7 +797,7 @@ final class ClientSelfTest2 {
                 sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(8));
                 orbPos = at;
             });
-            waitTicks(15);
+            waitTicks(60); // 앞의 창이 게임을 멈춰 세계를 저장하는 동안 서버가 늦게 깨어난다
         });
         add(mc -> {
             check("the Starlight Crystal Orb was placed and the magic gacha has skill books from this pack", orbPos != null

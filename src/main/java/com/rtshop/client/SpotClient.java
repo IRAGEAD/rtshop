@@ -168,12 +168,13 @@ public final class SpotClient {
         String name = s.label.isEmpty() ? Component.translatable("rtshop.spot.trace").getString() : s.label;
         String line = Component.translatable("rtshop.spot.prompt", key).getString();
         int w = Math.max(RaidText.w(mc.font, line, RaidText.SANS), RaidText.w(mc.font, name, RaidText.SERIF)) + 18;
-        int x = (sw - w) / 2, y = sh / 2 + 5; // 알림 상자(화면 아래쪽 가운데)와 겹치지 않게 조준점 바로 아래
+        // 조준점 왼쪽: 아래쪽 가운데의 알림 상자, 오른쪽의 퀘스트 목록과 겹치지 않는다
+        int x = sw / 2 - 14 - w, y = sh / 2 - 13, cx = x + w / 2;
         g.fill(x, y, x + w, y + 27, 0xB0120C06);
         g.fill(x, y, x + w, y + 1, 0xFFD8B060);
         g.fill(x, y + 26, x + w, y + 27, 0xFFD8B060);
-        RaidText.center(g, mc.font, name, RaidText.SERIF, sw / 2, y + 4, 0xFFFFE9B0);
-        RaidText.center(g, mc.font, line, RaidText.SANS, sw / 2, y + 15, 0xFFF2EADC);
+        RaidText.center(g, mc.font, name, RaidText.SERIF, cx, y + 4, 0xFFFFE9B0);
+        RaidText.center(g, mc.font, line, RaidText.SANS, cx, y + 15, 0xFFF2EADC);
     }
 
     @SubscribeEvent

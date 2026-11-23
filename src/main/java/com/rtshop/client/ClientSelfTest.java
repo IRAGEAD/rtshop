@@ -452,6 +452,14 @@ public final class ClientSelfTest {
                     for (BlockPos q : BlockPos.betweenClosed(at.offset(-1, 0, -1), at.offset(1, 2, 1))) {
                         sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                     }
+                    // 모루 둘레와 발밑을 단단한 바닥으로 (Cinematic 장면은 모루 앞까지 걸어갈 바닥이 있어야 시작한다)
+                    for (BlockPos q : BlockPos.betweenClosed(at.offset(-3, -1, -3), at.offset(3, -1, 3))) {
+                        sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                    }
+                    for (BlockPos q : BlockPos.betweenClosed(at.offset(-3, 0, -3), at.offset(3, 2, 3))) {
+                        if (!sp.serverLevel().getBlockState(q).isAir()) sp.serverLevel().setBlockAndUpdate(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    }
+                    sp.connection.teleport(sp.blockPosition().getX() + 0.5, at.getY(), sp.blockPosition().getZ() + 0.5, sp.getYRot(), sp.getXRot());
                     sp.serverLevel().setBlockAndUpdate(at.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                     sp.serverLevel().setBlockAndUpdate(at, com.rtshop.enhance.ModEnhance.ANVIL.get().defaultBlockState());
                     sp.serverLevel().setBlockAndUpdate(at.above(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
@@ -465,7 +473,7 @@ public final class ClientSelfTest {
                     com.rtshop.economy.Economy.setWallet(sp, 200000);
                     anvilPos = at;
                 });
-                wait = 10;
+                wait = 25;
             }
             case 1 -> {
                 closeForeign(mc);
