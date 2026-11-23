@@ -570,6 +570,7 @@ NEW = {
  "rtshop.staged.unlocked": ("✦ 이야기의 새 장소가 세상 어딘가에 나타나기 시작했다. (아직 가 보지 않은 땅에서 찾아보세요)", "✦ A new place of the story begins to appear somewhere in the world. (Look in lands not yet explored)"),
  "rtshop.staged.unlocked_n": ("이야기 건축물 %s곳의 생성을 풀었습니다.", "Unlocked generation of %s story structures."),
  "rtshop.staged.title": ("단계적 이야기 건축물 (%s)", "Staged story structures (%s)"),
+ "rtshop.void.rescued": ("✦ 공허가 당신을 삼키기 전에, 불씨가 당신을 마지막으로 딛은 땅으로 끌어올렸다.", "✦ Before the void could take you, the ember pulled you back to the last ground you stood on."),
  "rtshop.scylla.waiting": ("단서는 모두 모였다. 그러나 폭풍은 아직 당신을 부르지 않는다. 연대기의 마지막 장이 쓰인 뒤에…", "Every clue is gathered, yet the storm does not call you. Not until the chronicle's last page is written…"),
  "rtshop.scylla.complete": ("단서를 찢긴 연대기에 맞추자, 빈 마지막 장에 번개가 새겨졌다. 폭풍의 눈이 완성되었다.", "Matched against the torn chronicle, lightning etches the empty last page. The Storm Eye is complete."),
 "item.rtshop.mother_journal": ("기록관 엘레나의 일지", "Archivist Elena's Journal"),

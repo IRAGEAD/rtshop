@@ -2149,6 +2149,22 @@ public final class SelfTest {
                 check("the story's vanilla structure can be found in this world: " + sid, found != null, found == null ? "none" : found.getFirst());
             }
         }
+        check("world-generation log spam (empty height range, unknown structure entities) is filtered, other warnings are not",
+                com.rtshop.compat.LogNoise.noisy("Empty height range: {}") && com.rtshop.compat.LogNoise.noisy("Skipping Entity with id {}")
+                        && !com.rtshop.compat.LogNoise.noisy("Can't keep up! Is the server overloaded?"));
+        {
+            // 공허 추락 방지: 공허 아래로 떨어지면 마지막으로 딛은 땅으로 돌아온다 (기억의 문·환술사의 공허 차원)
+            var mem = server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, new ResourceLocation("rtshop:memory")));
+            boolean ok = mem != null && com.rtshop.story.VoidGuard.guarded(mem) && com.rtshop.story.VoidGuard.DIMS.contains("illusioner:corrupted_void");
+            {
+                a.setPos(0.5, 100, 0.5);
+                a.setPos(0.5, level.getMinBuildHeight() - 10, 0.5);
+                com.rtshop.story.VoidGuard.rescue(a);
+                ok &= a.getY() > level.getMinBuildHeight();
+                a.setPos(0.5, 100, 0.5);
+            }
+            check("falling into the void in the Memory Gate or the Illusioner's void brings you back to solid ground", ok);
+        }
         // 단계적 이야기 건축물: 풀리기 전에는 새 지형에 생기지 않는다
         {
             com.rtshop.story.StagedStructures.reload();

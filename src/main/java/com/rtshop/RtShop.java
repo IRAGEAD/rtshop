@@ -23,6 +23,7 @@ public class RtShop {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public RtShop() {
+        com.rtshop.compat.LogNoise.install(); // 지형 생성 경고 폭주 걸러 내기
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         com.rtshop.enhance.ModEnhance.register(bus);
         ModItems.ITEMS.register(bus);
