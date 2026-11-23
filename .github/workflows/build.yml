@@ -255,6 +255,14 @@ jobs:
             cat /tmp/exj/packs/efx_epicfight_resource_pack/pack.mcmeta 2>/dev/null
             grep -rl --include=*.class "efx_epicfight_resource_pack" /tmp/exj | head -3 | while read c; do javap -p -c -constants "$c" | grep -E "^  [a-z]|ldc|invoke" | head -n 80; done
           } > /tmp/inspect/avalon.txt 2>&1 || true
+          # 레이드 글꼴 후보 (SIL OFL, Google Fonts): 장식 글꼴을 받아 둔다
+          mkdir -p /tmp/inspect/fonts
+          for f in songmyung/SongMyung-Regular.ttf gowunbatang/GowunBatang-Bold.ttf blackhansans/BlackHanSans-Regular.ttf \
+                   nanummyeongjo/NanumMyeongjo-ExtraBold.ttf diphylleia/Diphylleia-Regular.ttf yeonsung/YeonSung-Regular.ttf \
+                   hahmlet/Hahmlet%5Bwght%5D.ttf eastseadokdo/EastSeaDokdo-Regular.ttf dongle/Dongle-Bold.ttf; do
+            curl -fsSL -o "/tmp/inspect/fonts/$(basename "$f" | sed 's/%5B/[/;s/%5D/]/')" "https://raw.githubusercontent.com/google/fonts/main/ofl/$f" || echo "font fail $f"
+          done
+          ls -la /tmp/inspect/fonts
           # 마법 뽑기: Epic Fight·Nightfall·WoM 스킬북과 스킬 분류(카테고리) 조사
           {
             EFJ3="$(ls packcache/*.jar | grep -E "^packcache/epic-fight-20" | head -1)"
