@@ -219,6 +219,12 @@ jobs:
           } > /tmp/inspect/nightfall.txt 2>&1
           # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
           ls packcache > /tmp/inspect/jars.txt
+          # 'Empty height range: biased[0 above bottom-194 below top]' 경고를 내는 지형 장식 찾기
+          for J in packcache/*.jar; do
+            unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "worldgen/placed_feature/.*\.json$" | while read f; do
+              if unzip -p "$J" "$f" 2>/dev/null | tr -d ' \n' | grep -q '"below_top":194'; then echo "$J :: $f"; fi
+            done
+          done > /tmp/inspect/height-194.txt 2>&1 || true
           for J in packcache/*.jar; do
             unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/[^/]+/worldgen/structure/.*\.json$" | sed "s|^|$(basename "$J"): |"
           done > /tmp/inspect/all-structures.txt 2>&1 || true
