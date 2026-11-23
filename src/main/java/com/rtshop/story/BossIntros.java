@@ -66,7 +66,7 @@ public final class BossIntros {
 
     public static void send(ServerPlayer p, JsonObject o) {
         if (p instanceof FakePlayer || p.connection == null) return;
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.CINEMA, o.toString()));
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.CINEMA, StoryText.json(p, o).toString()));
     }
 
     /** 이 보스의 등장 연출을 보여 준다 (근처 사람 모두). 보여 줬으면 true. */
@@ -141,11 +141,11 @@ public final class BossIntros {
         for (Map.Entry<String, StoryConfig.Intro> e : StoryConfig.get().intros.entrySet()) {
             if (e.getValue().lore.isEmpty()) continue;
             JsonArray a = new JsonArray();
-            a.add("— " + e.getValue().name + ", " + e.getValue().epithet + " —");
+            a.add("— " + StoryText.t(p, e.getValue().name) + ", " + StoryText.t(p, e.getValue().epithet) + " —");
             for (String l : e.getValue().lore) a.add(l);
             o.add("boss:" + e.getKey(), a);
         }
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.LORE, o.toString()));
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.LORE, StoryText.json(p, o).toString()));
     }
 
     /** 점검용 */

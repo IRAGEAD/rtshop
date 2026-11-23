@@ -112,15 +112,15 @@ public final class QuestHud {
             String title = (e.ready() ? "✔ " : "◆ ") + e.title();
             out.add(new Row(HudFonts.clip(font, title, inner, cfg.questHudFont), e.ready() ? DONE : Ui.C_GOLD, 0, true));
             if (e.ready()) {
-                String back = Component.translatable("rtshop.qhud.return", e.turnIn()).getString();
+                String back = HudLang.tr(cfg.questHudLang, "rtshop.qhud.return", e.turnIn());
                 out.add(new Row(HudFonts.clip(font, back, inner - 8, cfg.questHudFont), DONE, 8, false));
                 continue;
             }
             for (QuestView.ObjView o : e.objectives()) {
                 boolean done = o.cur() >= o.need();
-                String label = QuestScreen.objectiveName(o);
+                String label = QuestScreen.objectiveName(o, cfg.questHudLang);
                 if (o.type() == QuestDef.Type.PAY.ordinal()) {
-                    label = Component.translatable("rtshop.quest.obj.pay_amount", Ui.num(o.need())).getString();
+                    label = HudLang.tr(cfg.questHudLang, "rtshop.quest.obj.pay_amount", Ui.num(o.need()));
                 } else if (o.need() > 1) {
                     label += " " + Math.min(o.cur(), o.need()) + "/" + o.need();
                 }
@@ -128,7 +128,7 @@ public final class QuestHud {
             }
         }
         if (list.size() > shown) {
-            out.add(new Row(HudFonts.clip(font, Component.translatable("rtshop.qhud.more", list.size() - shown).getString(), inner, cfg.questHudFont), SOFT, 0, false));
+            out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.more", list.size() - shown), inner, cfg.questHudFont), SOFT, 0, false));
         }
         return out;
     }

@@ -349,6 +349,14 @@ public final class ShopServer {
                                     if (b.endsWith(" force")) b = b.substring(0, b.length() - 6).trim();
                                     return com.rtshop.story.StoryArena.enter(p, b, force) ? 1 : 0;
                                 })))
+                .then(Commands.literal("storylang").then(Commands.argument("lang", StringArgumentType.word())
+                        .executes(ctx -> {
+                            ServerPlayer sp = ctx.getSource().getPlayerOrException();
+                            com.rtshop.story.StoryText.setLang(sp, StringArgumentType.getString(ctx, "lang"));
+                            com.rtshop.story.BossIntros.sendLore(sp);
+                            QuestManager.syncHud(sp);
+                            return 1;
+                        })))
                 .then(Commands.literal("talk")
                         .then(Commands.literal("here").executes(ctx -> {
                             ServerPlayer sp = ctx.getSource().getPlayerOrException();
@@ -504,6 +512,7 @@ public final class ShopServer {
         com.rtshop.story.ScyllaClues.reload();
         com.rtshop.story.Hunts.reload();
         com.rtshop.story.Dialogue.reload();
+        com.rtshop.story.StoryText.reload();
         com.rtshop.story.WildSpawns.reload();
         com.rtshop.story.StoryArena.reload();
         for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) {

@@ -170,6 +170,7 @@ public final class ClientSelfTest {
         step++;
     }
 
+    static volatile String storyLangSeen = "";
     private static boolean opening = false;
     private static int previewWaits = 0;
 
@@ -1160,6 +1161,12 @@ public final class ClientSelfTest {
             case 3 -> {
                 check("the HUD position editor opens", mc.screen instanceof HudEditScreen);
                 shot(mc, "02_hud_edit");
+                check("each HUD can use its own language (English / Korean regardless of the game language)",
+                        "+ 3 more (quest journal)".equals(HudLang.tr("en_us", "rtshop.qhud.more", 3))
+                                && HudLang.tr("ko_kr", "rtshop.qhud.more", 3).startsWith("+ 3개 더"), HudLang.tr("en_us", "rtshop.qhud.more", 3));
+                storyLangSeen = "?";
+                onServer(mc, sp -> storyLangSeen = com.rtshop.story.StoryText.langOf(sp) + "|" + sp.getPersistentData().getString(com.rtshop.story.StoryText.TAG));
+                RtShop.LOGGER.info("[rtshop-clienttest] story language the server knows: {}", storyLangSeen);
                 ClientConfig hc = ClientConfig.get();
                 hc.questHudFont = "";
                 hc.questHudScale = ClientConfig.QDEF_SCALE;

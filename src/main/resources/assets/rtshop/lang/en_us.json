@@ -1372,5 +1372,8 @@
   "rtshop.talk.main.job": "Talk about jobs",
   "rtshop.talk.main.attendance": "Stamp attendance",
   "rtshop.talk.main.gacha": "Try your luck",
-  "rtshop.gacha.inventory_full": "Not enough free inventory space: %1$s pulls need %1$s free slots (you have %2$s). Make room and try again."
+  "rtshop.gacha.inventory_full": "Not enough free inventory space: %1$s pulls need %1$s free slots (you have %2$s). Make room and try again.",
+  "rtshop.hud.lang": "Language: %s",
+  "rtshop.hud.lang_game": "Game language",
+  "rtshop.hud.story_lang": "Story language: %s"
 }

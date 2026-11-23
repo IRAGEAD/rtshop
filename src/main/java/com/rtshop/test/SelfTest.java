@@ -2336,6 +2336,35 @@ public final class SelfTest {
                 check("full pack: every mod the story names is installed (no misspelled mod ids)", missingMods.isEmpty(), missingMods);
             }
         }
+        // 스토리 언어: 영어를 고른 플레이어에게는 퀘스트·대화가 영어로, 한국어는 원문 그대로
+        {
+            com.rtshop.story.StoryText.setLang(a, "en_us");
+            QuestDef q101 = l.quests.get("story_1_01");
+            String en = com.rtshop.story.StoryText.t(a, q101.title);
+            com.google.gson.JsonObject probe = new com.google.gson.JsonObject();
+            probe.addProperty("id", "story_1_01");
+            probe.addProperty("text", q101.intro);
+            com.google.gson.JsonElement pj = com.rtshop.story.StoryText.json(a, probe);
+            // 원문 문장 중 번역이 있는 비율
+            int all = 0, has = 0;
+            List<String> miss = new ArrayList<>();
+            for (String id : story) {
+                QuestDef q = l.quests.get(id);
+                for (String s : new String[]{q.title, q.intro, q.progress, q.done}) {
+                    if (s == null || !s.matches("(?s).*[가-힣].*")) continue;
+                    all++;
+                    if (!com.rtshop.story.StoryText.t(a, s).equals(s)) has++;
+                    else if (miss.size() < 5) miss.add(s.length() > 30 ? s.substring(0, 30) : s);
+                }
+            }
+            com.rtshop.story.StoryText.setLang(a, "ko_kr");
+            String ko = com.rtshop.story.StoryText.t(a, q101.title);
+            check("story language: English players get the English story, Korean players the original (and ids stay untouched)",
+                    "The Torn Chronicle".equals(en) && q101.title.equals(ko) && pj.getAsJsonObject().get("id").getAsString().equals("story_1_01")
+                            && !pj.getAsJsonObject().get("text").getAsString().equals(q101.intro), en + " / " + ko);
+            check("almost every story line has an English version (" + has + "/" + all + ")", all > 0 && has >= all * 0.97, miss);
+            com.rtshop.story.StoryText.setLang(a, "");
+        }
         // 새 목표 종류: 표식(FLAG) / 차원(DIMENSION) 은 받자마자 맞으면 바로 채워진다
         QuestManager.reset(a);
         QuestManager.setFlag(a, "tutorial_done", true);

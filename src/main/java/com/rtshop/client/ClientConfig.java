@@ -78,6 +78,10 @@ public final class ClientConfig {
     public double pvpHudHeight = PDEF_H;
     public String pvpHudFont = "";
     public double pvpHudTextScale = 1.0;
+    /** HUD·스토리 언어: "" = 게임 언어를 따름, ko_kr, en_us */
+    public String questHudLang = "";
+    public String pvpHudLang = "";
+    public String storyLang = "";
 
     public void resetPvpHud() {
         pvpHudX = PDEF_X;
@@ -182,6 +186,9 @@ public final class ClientConfig {
             o.addProperty("pvpHudHeight", pvpHudHeight);
             o.addProperty("pvpHudFont", pvpHudFont);
             o.addProperty("pvpHudTextScale", pvpHudTextScale);
+            o.addProperty("questHudLang", questHudLang);
+            o.addProperty("pvpHudLang", pvpHudLang);
+            o.addProperty("storyLang", storyLang);
             o.addProperty("enhPanelEnabled", enhPanelEnabled);
             o.addProperty("enhPanelX", enhPanelX);
             o.addProperty("enhPanelY", enhPanelY);
@@ -236,6 +243,9 @@ public final class ClientConfig {
                 if (o.has("pvpHudHeight")) c.pvpHudHeight = o.get("pvpHudHeight").getAsDouble();
                 if (o.has("pvpHudFont")) c.pvpHudFont = o.get("pvpHudFont").getAsString();
                 if (o.has("pvpHudTextScale")) c.pvpHudTextScale = o.get("pvpHudTextScale").getAsDouble();
+                if (o.has("questHudLang")) c.questHudLang = HudLang.normalize(o.get("questHudLang").getAsString());
+                if (o.has("pvpHudLang")) c.pvpHudLang = HudLang.normalize(o.get("pvpHudLang").getAsString());
+                if (o.has("storyLang")) c.storyLang = HudLang.normalize(o.get("storyLang").getAsString());
                 c.clampPvp();
                 if (o.has("enhPanelEnabled")) c.enhPanelEnabled = o.get("enhPanelEnabled").getAsBoolean();
                 if (o.has("enhPanelX")) c.enhPanelX = o.get("enhPanelX").getAsDouble();

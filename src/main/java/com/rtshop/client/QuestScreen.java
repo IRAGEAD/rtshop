@@ -240,37 +240,42 @@ public class QuestScreen extends Screen {
     }
 
     public static String objectiveName(QuestView.ObjView o) {
+        return objectiveName(o, "");
+    }
+
+    /** 목표 한 줄. lang: HUD 언어 ("" = 게임 언어) */
+    public static String objectiveName(QuestView.ObjView o, String lang) {
         QuestDef.Type t = QuestDef.Type.values()[Math.max(0, Math.min(QuestDef.Type.values().length - 1, o.type()))];
         switch (t) {
             case DELIVER: {
                 String name = o.text().isEmpty() ? itemName(o.target()) : o.text();
-                return Component.translatable("rtshop.quest.obj.deliver", name).getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.deliver", name);
             }
             case KILL: {
                 String name;
                 if (!o.text().isEmpty()) {
                     name = o.text();
                 } else if (o.target().equals("*")) {
-                    name = Component.translatable("rtshop.quest.any_monster").getString();
+                    name = HudLang.tr(lang, "rtshop.quest.any_monster");
                 } else {
                     name = EntityType.byString(o.target()).map(e -> e.getDescription().getString()).orElse(o.target());
                 }
-                return Component.translatable("rtshop.quest.obj.kill", name).getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.kill", name);
             }
             case VISIT:
-                return Component.translatable("rtshop.quest.obj.visit", o.text()).getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.visit", o.text());
             case TALK:
-                return Component.translatable("rtshop.quest.obj.talk", o.text()).getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.talk", o.text());
             case STRUCTURE:
-                return Component.translatable("rtshop.quest.obj.structure", o.text().isEmpty() ? o.target() : o.text()).getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.structure", o.text().isEmpty() ? o.target() : o.text());
             case ADVANCEMENT:
-                return Component.translatable("rtshop.quest.obj.advancement", o.text().isEmpty() ? o.target() : o.text()).getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.advancement", o.text().isEmpty() ? o.target() : o.text());
             case FLAG:
                 return o.text().isEmpty() ? o.target() : o.text();
             case DIMENSION:
-                return Component.translatable("rtshop.quest.obj.dimension", o.text().isEmpty() ? o.target() : o.text()).getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.dimension", o.text().isEmpty() ? o.target() : o.text());
             default:
-                return Component.translatable("rtshop.quest.obj.pay").getString();
+                return HudLang.tr(lang, "rtshop.quest.obj.pay");
         }
     }
 

@@ -210,7 +210,7 @@ public final class Dialogue {
         if (main != null) out.addProperty("main", main);
         out.addProperty("quests", QuestManager.viewsCount(p, npcKey));
         if (com.rtshop.story.Hunts.get().boardNpcs.contains(npcKey)) out.addProperty("bounty", true);
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, out.toString()));
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, StoryText.json(p, out).toString()));
     }
 
     /** 이 횟수만큼 일상 이야기를 나누면 가끔 흘리는 말이 섞인다. */

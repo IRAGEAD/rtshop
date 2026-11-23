@@ -154,6 +154,12 @@ public final class ClientEvents {
         }
     }
 
+    /** 접속하면 내 스토리 언어를 서버에 알린다. */
+    @SubscribeEvent
+    public static void onLogin(ClientPlayerNetworkEvent.LoggingIn event) {
+        HudLang.sendStoryLang();
+    }
+
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientLand.clear();

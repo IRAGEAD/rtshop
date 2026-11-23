@@ -114,9 +114,10 @@ public final class PvpHud {
 
         Font font = Minecraft.getInstance().font;
         ClientConfig cfg = ClientConfig.get();
-        String main = Component.translatable(pvpOn ? "rtshop.pvp.hud_on" : "rtshop.pvp.hud_off").getString();
-        String sub = lockSeconds > 0 ? Component.translatable("rtshop.pvp.hud_combat", lockSeconds).getString()
-                : Component.translatable(areaKey(where)).getString();
+        String lang = ClientConfig.get().pvpHudLang;
+        String main = HudLang.tr(lang, pvpOn ? "rtshop.pvp.hud_on" : "rtshop.pvp.hud_off");
+        String sub = lockSeconds > 0 ? HudLang.tr(lang, "rtshop.pvp.hud_combat", lockSeconds)
+                : HudLang.tr(lang, areaKey(where));
         int subColor = lockSeconds > 0 ? 0xFFFF8A75 : areaColor(where);
         float avail = w - icon - pad * 3;
         float innerH = h - 6;

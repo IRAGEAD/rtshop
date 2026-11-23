@@ -58,11 +58,16 @@ public class HudEditScreen extends Screen {
         return row2Y() - 22;
     }
 
-    /** 세 번째 줄 버튼들 {x, w} : 글꼴, 글자 크기 (두 HUD 모두). */
+    /** 세 번째 줄 버튼들 {x, w} : 글꼴, 글자 크기, (퀘스트·PvP HUD) 언어. */
     private int[][] row3() {
-        int total = 160 + 4 + 120;
+        if (selected == GOLD) {
+            int total = 160 + 4 + 120;
+            int x = this.width / 2 - total / 2;
+            return new int[][]{{x, 160}, {x + 164, 120}};
+        }
+        int total = 150 + 4 + 110 + 4 + 120;
         int x = this.width / 2 - total / 2;
-        return new int[][]{{x, 160}, {x + 164, 120}};
+        return new int[][]{{x, 150}, {x + 154, 110}, {x + 268, 120}};
     }
 
     // ---- 맨 위 줄: RT Shop 창 글꼴과 글자 크기 (HUD 와 따로)
@@ -70,25 +75,38 @@ public class HudEditScreen extends Screen {
         return 66;
     }
 
+    /** 맨 위 줄: 창 글꼴, 창 글자 크기, 스토리 대사 언어. */
     private int[][] uiRow() {
-        int total = 150 + 4 + 130;
+        int total = 130 + 4 + 110 + 4 + 150;
         int x = this.width / 2 - total / 2;
-        return new int[][]{{x, 150}, {x + 154, 130}};
+        return new int[][]{{x, 130}, {x + 134, 110}, {x + 248, 150}};
     }
 
     private String uiRowLabel(int i) {
         ClientConfig cfg = ClientConfig.get();
         if (i == 0) {
             String face = "serif".equals(cfg.uiFont) ? "serif" : "pixel".equals(cfg.uiFont) ? "pixel" : "sans";
-            return Component.translatable("rtshop.hud.ui_font", Component.translatable("rtshop.hud.ui_font." + face)).getString() + " ▼";
+            return Ui.clip(this.font, Component.translatable("rtshop.hud.ui_font", Component.translatable("rtshop.hud.ui_font." + face)).getString(), 130 - 18) + " ▼";
         }
-        return Component.translatable("rtshop.hud.ui_size", Component.translatable("rtshop.hud.ui_size." + cfg.uiFontSize)).getString() + " ▼";
+        if (i == 2) {
+            return Ui.clip(this.font, Component.translatable("rtshop.hud.story_lang", HudLang.label(cfg.storyLang)).getString(), 150 - 18) + " ▼";
+        }
+        return Ui.clip(this.font, Component.translatable("rtshop.hud.ui_size", Component.translatable("rtshop.hud.ui_size." + cfg.uiFontSize)).getString(), 110 - 18) + " ▼";
     }
 
     private void uiRowClick(int i) {
         ClientConfig cfg = ClientConfig.get();
         int[][] r = uiRow();
         List<ChoicePopup.Option> opts = new ArrayList<>();
+        if (i == 2) {
+            for (String l : HudLang.LANGS) opts.add(new ChoicePopup.Option(l.isEmpty() ? "auto" : l, HudLang.label(l)));
+            popup = new ChoicePopup(r[2][0], uiRowY(), r[2][1], 18, this.height, this.font, opts, cfg.storyLang.isEmpty() ? "auto" : cfg.storyLang, v -> {
+                cfg.storyLang = HudLang.normalize(v);
+                cfg.save();
+                HudLang.sendStoryLang();
+            });
+            return;
+        }
         if (i == 0) {
             for (String f : UiFont.FACES) opts.add(new ChoicePopup.Option(f, Component.translatable("rtshop.hud.ui_font." + f).getString()));
             popup = new ChoicePopup(r[0][0], uiRowY(), r[0][1], 18, this.height, this.font, opts, cfg.uiFont, v -> {
@@ -110,16 +128,33 @@ public class HudEditScreen extends Screen {
         ClientConfig cfg = ClientConfig.get();
         if (i == 0) {
             String f = selected == GOLD ? cfg.hudFont : selected == PVP ? cfg.pvpHudFont : cfg.questHudFont;
-            return Ui.clip(this.font, Component.translatable("rtshop.hud.font", HudFonts.label(HudFonts.effective(f))).getString(), 160 - 18) + " ▼";
+            return Ui.clip(this.font, Component.translatable("rtshop.hud.font", HudFonts.label(HudFonts.effective(f))).getString(), r3w(0) - 18) + " ▼";
+        }
+        if (i == 2) {
+            String l = selected == PVP ? cfg.pvpHudLang : cfg.questHudLang;
+            return Ui.clip(this.font, Component.translatable("rtshop.hud.lang", HudLang.label(l)).getString(), 120 - 18) + " ▼";
         }
         double pct = (selected == GOLD ? cfg.hudTextScale : selected == PVP ? cfg.pvpHudTextScale : cfg.questHudScale) * 100;
-        return Component.translatable("rtshop.hud.text_size", Math.round(pct)).getString() + " ▼";
+        return Ui.clip(this.font, Component.translatable("rtshop.hud.text_size", Math.round(pct)).getString(), r3w(1) - 18) + " ▼";
+    }
+
+    private int r3w(int i) {
+        return row3()[i][1];
     }
 
     private void row3Click(int i) {
         ClientConfig cfg = ClientConfig.get();
         int[][] r3 = row3();
         List<ChoicePopup.Option> opts = new ArrayList<>();
+        if (i == 2) {
+            for (String l : HudLang.LANGS) opts.add(new ChoicePopup.Option(l.isEmpty() ? "auto" : l, HudLang.label(l)));
+            String cur = selected == PVP ? cfg.pvpHudLang : cfg.questHudLang;
+            popup = new ChoicePopup(r3[2][0], row3Y(), r3[2][1], 18, this.height, this.font, opts, cur.isEmpty() ? "auto" : cur, v -> {
+                if (selected == PVP) cfg.pvpHudLang = HudLang.normalize(v);
+                else cfg.questHudLang = HudLang.normalize(v);
+            });
+            return;
+        }
         if (i == 0) {
             for (String f : HudFonts.available()) {
                 opts.add(new ChoicePopup.Option(f, HudFonts.label(f)));
