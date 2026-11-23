@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * 공허 추락 방지: 환술사의 '타락한 공허' 차원과 기억의 문(rtshop:memory)에서 공허로 떨어지면
+ * 공허 추락 방지: 기억의 문(rtshop:memory)에서 공허로 떨어지면
  * 마지막으로 서 있던 땅으로 되돌려 보낸다 (잠깐 천천히 떨어지기). 공허 피해로는 죽지 않는다.
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID)
@@ -32,7 +32,7 @@ public final class VoidGuard {
     private VoidGuard() {
     }
 
-    public static final Set<String> DIMS = Set.of("illusioner:corrupted_void", "rtshop:memory");
+    public static final Set<String> DIMS = Set.of("rtshop:memory");
     private static final Map<UUID, Vec3> SAFE = new HashMap<>();
     private static final Map<UUID, String> SAFE_DIM = new HashMap<>();
 
