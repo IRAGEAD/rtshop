@@ -2180,7 +2180,7 @@ public final class SelfTest {
         QuestManager.Loaded l = QuestManager.loaded();
         List<String> story = new ArrayList<>();
         for (String id : l.quests.keySet()) if (id.startsWith("story_") || id.startsWith("hidden_")) story.add(id);
-        check("the main story is installed (4 chapters + hidden story)", story.size() >= 40 && l.quests.containsKey("story_4_7c")
+        check("the main story (2nd edition: prologue, 4 chapters, finale + hidden story) is installed", story.size() >= 40 && l.quests.containsKey("story_5_08") && l.quests.containsKey("story_4_19")
                 && l.quests.containsKey("hidden_illusioner_2") == net.minecraftforge.fml.ModList.get().isLoaded("illusioner"), story.size());
         check("the story quests load without problems", l.problems.stream().noneMatch(x -> x.contains("story")), l.problems);
         check("the order's three NPCs exist", l.npcs.containsKey("order_elder") && l.npcs.containsKey("order_archivist") && l.npcs.containsKey("order_captain"));
@@ -2222,19 +2222,20 @@ public final class SelfTest {
         // 새 목표 종류: 표식(FLAG) / 차원(DIMENSION) 은 받자마자 맞으면 바로 채워진다
         QuestManager.reset(a);
         QuestManager.setFlag(a, "tutorial_done", true);
-        boolean took = QuestManager.accept(a, "story_1_1", "quest_order_elder");
+        boolean took = QuestManager.accept(a, "story_0_01", "quest_guide");
         long before = Economy.wallet(a);
-        boolean done = QuestManager.turnIn(a, "story_1_1", "quest_order_elder", -1);
-        check("a FLAG goal is met by an existing flag and the first chapter quest can be handed in", took && done && Economy.wallet(a) > before, took + " " + done);
+        boolean done = QuestManager.turnIn(a, "story_0_01", "quest_guide", -1);
+        check("a FLAG goal is met by an existing flag and the prologue's first quest can be handed in", took && done && Economy.wallet(a) > before, took + " " + done);
         // 대화: 모든 NPC 에게 대화가 있고, 장면이 있는 TALK 목표는 장면을 다 봐야 채워진다
         check("every NPC has things to talk about (18+ NPCs)", com.rtshop.story.Dialogue.npcCountForTest() >= 18
                 && com.rtshop.story.Dialogue.npcForTest("quest_order_elder") != null && com.rtshop.story.Dialogue.npcForTest("shop_fisher") != null);
-        boolean took2 = QuestManager.accept(a, "story_1_2", "quest_order_elder");
+        QuestManager.forceComplete(a, "story_0_02");
+        boolean took2 = QuestManager.accept(a, "story_0_03", "quest_order_elder");
         boolean pending = com.rtshop.story.Dialogue.pendingScene(a, "quest_order_archivist") != null;
         QuestManager.onTalk(a, "quest_order_archivist");
-        boolean stillOpen = QuestManager.progressOf(a, "story_1_2")[0] == 0;
+        boolean stillOpen = QuestManager.progressOf(a, "story_0_03")[0] == 0;
         QuestManager.onTalk(a, "quest_order_archivist", true);
-        boolean filled = QuestManager.progressOf(a, "story_1_2")[0] == 1 && com.rtshop.story.Dialogue.pendingScene(a, "quest_order_archivist") == null;
+        boolean filled = QuestManager.progressOf(a, "story_0_03")[0] == 1 && com.rtshop.story.Dialogue.pendingScene(a, "quest_order_archivist") == null;
         check("a talk goal with a scene waits until the scene is seen, then fills", took2 && pending && stillOpen && filled,
                 took2 + " " + pending + " " + stillOpen + " " + filled);
         QuestDef.Objective dimGoal = new QuestDef.Objective();
@@ -2250,9 +2251,9 @@ public final class SelfTest {
         noAdv.target = "rtshop:no_such_advancement";
         check("an ADVANCEMENT goal finds the advancement and an unknown one never counts", adv != null && !QuestManager.reached(a, noAdv, ""));
         check("story quests carry their scenes (chapter title on taking 1-1, dream on finishing 1-2)",
-                l.quests.get("story_1_1").sceneAccept != null && l.quests.get("story_1_2").sceneDone != null);
+                l.quests.get("story_0_01").sceneAccept != null && l.quests.get("story_0_03").sceneDone != null && l.quests.get("story_1_01").sceneAccept != null);
         check("the dream gives the undying ember (needed until the very end)",
-                l.quests.get("story_1_2").rewardItems.stream().anyMatch(r -> r.item.equals("rtshop:undying_ember")));
+                l.quests.get("story_0_03").rewardItems.stream().anyMatch(r -> r.item.equals("rtshop:undying_ember")));
         // 장비 진열대: 희귀는 1장, 서사는 2장 뒤
         com.rtshop.story.StoryGates.applyToFakeForTest = true;
         try {

@@ -95,6 +95,46 @@ public class BountyScreen extends Screen {
         return egg == null ? new ItemStack(net.minecraft.world.item.Items.PAPER) : new ItemStack(egg);
     }
 
+    /** 몹 모습 (3D 모델을 작게). 만들 수 없는 몹은 null. */
+    private static final java.util.Map<String, net.minecraft.world.entity.LivingEntity> MODELS = new java.util.HashMap<>();
+
+    static net.minecraft.world.entity.LivingEntity model(String entity) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return null;
+        net.minecraft.world.entity.LivingEntity e = MODELS.get(entity);
+        if (e != null && e.level() == mc.level) return e;
+        try {
+            EntityType<?> t = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(entity));
+            net.minecraft.world.entity.Entity made = t == null ? null : t.create(mc.level);
+            e = made instanceof net.minecraft.world.entity.LivingEntity l ? l : null;
+        } catch (Throwable ex) {
+            e = null;
+        }
+        MODELS.put(entity, e);
+        return e;
+    }
+
+    /** 몹 그림: 칸(box×box) 안에 맞춰 천천히 도는 3D 모습. 없으면 알 아이콘. */
+    static void drawMob(GuiGraphics g, String entity, int x, int y, int box, float spin) {
+        net.minecraft.world.entity.LivingEntity e = model(entity);
+        if (e == null) {
+            g.renderItem(new ItemStack(net.minecraft.world.item.Items.PAPER), x + (box - 16) / 2, y + (box - 16) / 2);
+            return;
+        }
+        float size = Math.max(e.getBbHeight(), e.getBbWidth());
+        int scale = Math.max(2, (int) (box * 0.8F / Math.max(0.5F, size)));
+        g.enableScissor(x, y, x + box, y + box);
+        e.yBodyRot = 180F + spin;
+        e.yBodyRotO = e.yBodyRot;
+        e.setYRot(e.yBodyRot);
+        e.yHeadRot = e.yBodyRot;
+        e.yHeadRotO = e.yBodyRot;
+        e.setXRot(0);
+        net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventory(g, x + box / 2, y + box - 2, scale,
+                new org.joml.Quaternionf().rotateZ((float) Math.PI).rotateX(-0.25F), null, e);
+        g.disableScissor();
+    }
+
     @Override
     public void render(GuiGraphics g, int mx, int my, float partial) {
         renderBackground(g);
@@ -119,15 +159,16 @@ public class BountyScreen extends Screen {
             boolean acc = r.get("accepted").getAsBoolean(), done = r.get("done").getAsBoolean(), weekly = r.get("weekly").getAsBoolean();
             Ui.bevel(g, lx + 3, ry, lw - 6, ROW - 2, acc ? Ui.C_PARCH_HI : Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
             if (acc && !done) g.fill(lx + 3, ry, lx + 5, ry + ROW - 2, 0xFFA02C1E); // 붉은 책갈피: 맡은 의뢰
-            g.renderItem(icon(r.get("entity").getAsString()), lx + 8, ry + 3);
+            g.fill(lx + 6, ry + 1, lx + 28, ry + ROW - 3, 0x30000000);
+            drawMob(g, r.get("entity").getAsString(), lx + 6, ry + 1, 22, (System.currentTimeMillis() % 7200) / 20F);
             String tag = Component.translatable(weekly ? "rtshop.hunt.tag_weekly" : "rtshop.hunt.tag_daily").getString();
             String name = r.get("name").getAsString() + " × " + r.get("need").getAsInt();
-            g.drawString(font, tag, lx + 28, ry + 3, weekly ? 0xFF2F5E8A : 0xFF6A4A1E, false);
-            g.drawString(font, Ui.clip(font, name, lw - 130), lx + 28 + font.width(tag) + 4, ry + 3, done ? Ui.C_INK_SOFT : Ui.C_INK, false);
+            g.drawString(font, tag, lx + 32, ry + 3, weekly ? 0xFF2F5E8A : 0xFF6A4A1E, false);
+            g.drawString(font, Ui.clip(font, name, lw - 134), lx + 32 + font.width(tag) + 4, ry + 3, done ? Ui.C_INK_SOFT : Ui.C_INK, false);
             String sub = done ? Component.translatable("rtshop.hunt.row_done").getString()
                     : acc ? Component.translatable("rtshop.hunt.row_progress", r.get("have").getAsInt(), r.get("need").getAsInt()).getString()
                     : Component.translatable("rtshop.hunt.row_offer").getString();
-            Ui.scaledText(g, font, sub, lx + 28, ry + 14, 0.8F, done ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
+            Ui.scaledText(g, font, sub, lx + 32, ry + 14, 0.8F, done ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
             String gold = Ui.num(r.get("gold").getAsLong()) + " G";
             int bx = lx + lw - 64;
             g.drawString(font, gold, bx - 6 - font.width(gold), ry + 8, 0xFF8A5A10, false);

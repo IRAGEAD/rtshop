@@ -27,8 +27,8 @@ public final class StoryGates {
         if (!enabled || p.isCreative() || s.isEmpty() || !gear(s)) return null;
         if (p instanceof net.minecraftforge.common.util.FakePlayer && !applyToFakeForTest) return null;
         Rarity r = s.getRarity();
-        if (r == Rarity.EPIC && !passed(p, "story_ch2_done", "story_2_10")) return "2장";
-        if ((r == Rarity.RARE || r == Rarity.EPIC) && !passed(p, "story_ch1_done", "story_1_8")) return "1장";
+        if (r == Rarity.EPIC && !passed(p, "story_ch2_done", "story_2_16")) return "2장";
+        if ((r == Rarity.RARE || r == Rarity.EPIC) && !passed(p, "story_ch1_done", "story_1_14")) return "1장";
         return null;
     }
 
@@ -36,8 +36,8 @@ public final class StoryGates {
     public static void sync(ServerPlayer p) {
         if (p instanceof net.minecraftforge.common.util.FakePlayer || p.connection == null) return;
         com.google.gson.JsonObject o = new com.google.gson.JsonObject();
-        String rare = enabled && !passed(p, "story_ch1_done", "story_1_8") ? "1장" : "";
-        String epic = !enabled ? "" : !passed(p, "story_ch1_done", "story_1_8") ? "1장" : !passed(p, "story_ch2_done", "story_2_10") ? "2장" : "";
+        String rare = enabled && !passed(p, "story_ch1_done", "story_1_14") ? "1장" : "";
+        String epic = !enabled ? "" : !passed(p, "story_ch1_done", "story_1_14") ? "1장" : !passed(p, "story_ch2_done", "story_2_16") ? "2장" : "";
         o.addProperty("rare", rare);
         o.addProperty("epic", epic);
         com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),

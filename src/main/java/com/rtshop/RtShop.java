@@ -59,6 +59,7 @@ public class RtShop {
             event.accept(ModItems.GUARD_DESTROY);
             event.accept(ModItems.GUARD_FULL);
             event.accept(ModItems.RAID_TICKET);
+            event.accept(ModItems.SURVEY_COMPASS);
         }
     }
 }

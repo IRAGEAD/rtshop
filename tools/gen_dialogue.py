@@ -3,7 +3,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
-VERSION = 1
+VERSION = 2
 
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
@@ -224,7 +224,7 @@ merchant("shop_blacksmith", ["뭘 찾냐. 칼이냐, 갑옷이냐."], [
     topic("old_knight", "녹슨 기사의 문장", [
         "그 투구 문장, 나도 봤다. 불꽃 기사단 문장이다.",
         "우리 할아버지의 할아버지가 그 기사단 칼을 벼렸다고 했지. 전설인 줄 알았다.",
-    ], quests=["story_2_2"]),
+    ], quests=["story_2_03"]),
 ])
 merchant("shop_general", ["어서 오세요, 손님! 없는 것 빼고 다 있습니다… 아니 있어요!"], [
     "손님, 이 횃불 좀 보세요. 오래 타요. 진짜로요.",
@@ -311,6 +311,66 @@ N["gacha"] = {"greet": ["행운 상인 릭키라구! 오늘은 뭐가 나올까~
     "YAMATO? 그거 본 사람은 손에 꼽는다구. 근데 너라면 혹시?",
     "꽝도 분해하면 조각이 된다구. 버릴 건 하나도 없지!",
 ], "topics": []}
+
+
+# ---------------------------------------------------------------- 2판 스토리: 선택에 대한 반응, 장마다 새 이야기
+def more(npc, greet=None, chatter=None, topics=None):
+    n = N[npc]
+    if greet: n["greet"].extend(greet)
+    if chatter: n["chatter"].extend(chatter)
+    if topics: n["topics"].extend(topics)
+
+more("quest_order_archivist",
+     greet=[g("조사대원님. …어머니의 일지는 제 책상 맨 위 서랍에 있어요. 매일 한 줄씩 읽어요.", flags=["story_ch1_done"])],
+     topics=[
+         topic("ch1_records", "불타는 기록고", ["서가의 기록이 남았어요. 당신이 불 속으로 뛰어든 덕분에요.",
+                                             "…미아는 팔에 화상을 입었어요. 그래도 웃더라고요. 기록이 남아서 다행이라고.",
+                                             "저도 그랬을 거예요. 어머니 딸이니까요."], flags=["ch1_saved_records"]),
+         topic("ch1_apprentice", "불타는 기록고", ["미아를 끌어내 준 거, 고마워요. 그 아이는 이제 당신을 따라다니겠대요.",
+                                                "서가의 기록은 재가 됐어요. 그런데 이상하죠. 아깝지가 않아요.",
+                                                "어머니도 사람을 먼저 구했을 거예요. 기록은… 다시 쓰면 되니까요."], flags=["ch1_saved_apprentice"]),
+         topic("gloved_hand", "장갑 낀 손", ["어머니가 '장갑'이라고 쓴 건… 아니에요. 생각하고 싶지 않아요.",
+                                         "장로님은 우리를 거둬 주신 분이에요. 어머니가 사라진 뒤에도요."], flags=["clue_gloved_hand"], notFlags=["erwin_betrayal"]),
+         topic("after_betrayal", "에르윈", ["어머니는 끝까지 읽었고, 그래서 돌아오지 못했대요.",
+                                        "…괜찮아요. 저는 끝까지 읽을 거예요. 그리고 돌아올 거예요. 당신들이 있으니까."], flags=["erwin_betrayal"]),
+         topic("feigned", "그때의 대답", ["에르윈 앞에서 제안을 받아들이는 척했다면서요. 덕분에 원정대가 모일 시간을 벌었어요.",
+                                       "…그래도 다음엔 그런 연기는 하지 마세요. 심장이 멎는 줄 알았어요."], flags=["ch4_feigned"]),
+         topic("refused", "그때의 대답", ["\"불을 지키고, 봉인을 지킨다.\" 에르윈 앞에서 그렇게 말했다면서요.",
+                                       "어머니가 들었으면 좋아했을 거예요."], flags=["ch4_refused"]),
+         topic("forgave", "연대기의 마지막 장", ["에르윈의 이름을 연대기에 남겼어요. 당신의 뜻대로요.",
+                                             "천 년 동안 스승을 기다린 사람. 나쁜 사람이었지만… 혼자이긴 했겠죠."], flags=["fin_forgave"]),
+         topic("erased", "연대기의 마지막 장", ["에르윈의 이름은 적지 않았어요. 그가 지운 이름들 자리에, 어머니의 이름을 적었어요.",
+                                            "엘레나. 기록관 엘레나."], flags=["fin_erased"]),
+     ])
+more("quest_order_captain",
+     greet=[g("왔냐. 명단은 태웠다. 이제 너희가 내 명단이다.", flags=["ch2_roster_burned"])],
+     topics=[
+         topic("truth", "카엘에게 한 말", ["카엘에게 진실을 말했다. 버린 게 아니라 살린 거라고.",
+                                         "놈이 웃더군. '알아. 처음부터 알았어. 그래도 원망할 사람이 필요했어.'",
+                                         "…스무 해 동안 서로 미안해하고 있었던 거다."], flags=["ch2_told_truth"]),
+         topic("secret", "카엘에게 한 말", ["끝까지 말하지 않았다. 카엘은 나를 원망하면서 갔다.",
+                                         "그래도 괜찮다. 원망할 사람이라도 있어야 스무 해를 버티지.",
+                                         "…가끔은, 말할 걸 그랬나 싶다."], flags=["ch2_kept_secret"]),
+         topic("expedition", "원정대", ["조사대는 내가 본 원정대 중에 제일 시끄럽다.", "좋은 뜻이다."], flags=["story_ch2_done"]),
+     ])
+more("shop_fisher",
+     greet=[g("자네군. 그물을 다시 던졌다네. 바다가… 다시 정직해졌어.", flags=["story_ch3_done"])],
+     topics=[
+         topic("released", "엘릭", ["엘릭을 보냈다네. 등불을 여니 웃음소리가 바다 쪽으로 멀어지더군.",
+                                   "열다섯 해 동안 켠 등불을 이제 껐다네. 이상하게 마음이 따뜻하군."], flags=["ch3_released"]),
+         topic("kept", "엘릭", ["등불은 아직 내 곁에 있다네. 밤이면 그 안에서 웃음소리가 들리지.",
+                               "언젠가는 보내 줘야겠지. …내가 그물을 못 던지는 날이 오면, 그때 같이 가겠네."], flags=["ch3_kept_lantern"]),
+         topic("elric", "동생 엘릭", ["엘릭은 나보다 그물을 잘 던졌다네. 웃음소리가 컸고.",
+                                    "코넬리아 선장의 배에 오를 때 그랬지. '형, 돌아오면 큰 놈 잡아 줄게.'"], quests=["story_3_01"]),
+     ])
+more("attendance",
+     topics=[topic("grey_coin", "회색 금화", ["회색 금화의 현상금은 열다섯 해 전 봄에도 붙었습니다.",
+                                              "그해 봄, 기록관 엘레나 씨의 실종 신고를 받은 것도 저였습니다.",
+                                              "신고서를 가져간 분은… 장로님이었습니다."], flags=["clue_grey_coin"])])
+more("quest_order_elder",
+     chatter=[g("일곱 봉인… 천 년이 이렇게 짧을 줄이야.", flags=["story_ch3_done"], notFlags=["erwin_betrayal"])],
+     topics=[topic("gloves", "장갑", ["이 장갑은 벗을 수가 없네. 벗으면… 다들 놀랄 걸세.",
+                                     "언젠가 보여 주지. 그때가 오면."], flags=["clue_gloved_hand"], notFlags=["erwin_betrayal"])])
 
 data = {"version": VERSION,
         "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), "

@@ -75,6 +75,25 @@ public final class ModItems {
     public static final RegistryObject<Item> OATH_SCROLL = ITEMS.register("oath_scroll",
             () -> new StoryItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false, 2));
 
+    // ---- 이야기 물건 (2판 스토리) ----
+    public static final RegistryObject<Item> MOTHER_JOURNAL = story("mother_journal", 1, net.minecraft.world.item.Rarity.RARE, true, 3);
+    public static final RegistryObject<Item> GREY_COIN = story("grey_coin", 16, net.minecraft.world.item.Rarity.UNCOMMON, false, 2);
+    public static final RegistryObject<Item> OLD_EXPEDITION_MAP = story("old_expedition_map", 1, net.minecraft.world.item.Rarity.RARE, false, 3);
+    public static final RegistryObject<Item> EXPEDITION_TAG = story("expedition_tag", 12, net.minecraft.world.item.Rarity.UNCOMMON, false, 2);
+    public static final RegistryObject<Item> BROKEN_SUN_MASK = story("broken_sun_mask", 1, net.minecraft.world.item.Rarity.RARE, true, 3);
+    public static final RegistryObject<Item> CREW_NAME_TAG = story("crew_name_tag", 16, net.minecraft.world.item.Rarity.UNCOMMON, false, 2);
+    public static final RegistryObject<Item> FROZEN_LOGBOOK = story("frozen_logbook", 1, net.minecraft.world.item.Rarity.RARE, true, 3);
+    public static final RegistryObject<Item> GREY_ASH = story("grey_ash", 1, net.minecraft.world.item.Rarity.EPIC, true, 3);
+    public static final RegistryObject<Item> MEMORY_SHARD = story("memory_shard", 8, net.minecraft.world.item.Rarity.RARE, true, 2);
+    public static final RegistryObject<Item> CHRONICLE_LAST_PAGE = story("chronicle_last_page", 1, net.minecraft.world.item.Rarity.EPIC, true, 3);
+    /** 조사대 나침반: 진행 중인 퀘스트가 찾는 구조물 쪽을 가리킨다 (제작하거나 비싸게 산다). */
+    public static final RegistryObject<Item> SURVEY_COMPASS = ITEMS.register("survey_compass",
+            () -> new SurveyCompassItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+
+    private static RegistryObject<Item> story(String id, int stack, net.minecraft.world.item.Rarity r, boolean foil, int lines) {
+        return ITEMS.register(id, () -> new StoryItem(new Item.Properties().stacksTo(stack).rarity(r), foil, lines));
+    }
+
     /** 뽑기 조각: 뽑은 아이템을 분해하면 나오고, 모아서 원하는 아이템과 바꾼다. */
     public static final RegistryObject<Item> SHARD = ITEMS.register("gacha_shard",
             () -> new TooltipItem(new Item.Properties().stacksTo(64), false, "item.rtshop.gacha_shard.tip"));

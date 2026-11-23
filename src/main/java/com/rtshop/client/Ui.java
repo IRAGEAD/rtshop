@@ -139,21 +139,21 @@ public final class Ui {
         }
     }
 
-    /** 나무 판자 단추 (양끝 무쇠 띠와 리벳, 마우스를 올리면 놋쇠로 빛난다). */
+    /** 단추: 예전처럼 깔끔한 나무 판 (밝은 윗선·어두운 아랫선), 마우스를 올리면 밝아지고 금테가 둘린다. */
     public static void button(GuiGraphics g, Font font, int x, int y, int w, int h, String label, boolean hover, boolean enabled) {
-        int v = !enabled ? 32 : hover ? 16 : 0;
-        RenderSystem.enableBlend();
-        int side = Math.min(7, w / 2);
-        g.blit(BUTTON, x, y, side, h, 0.0F, (float) v, side, 16, 64, 48);
-        g.blit(BUTTON, x + w - side, y, side, h, (float) (64 - side), (float) v, side, 16, 64, 48);
-        for (int xx = x + side; xx < x + w - side; xx += 50) {
-            int seg = Math.min(50, x + w - side - xx);
-            g.blit(BUTTON, xx, y, seg, h, 7.0F, (float) v, seg, 16, 64, 48);
+        int fill = !enabled ? C_WOOD_DARK : (hover ? C_WOOD_HI : C_WOOD);
+        g.fill(x, y, x + w, y + h, C_SHADOW);
+        g.fill(x, y, x + w - 1, y + h - 1, enabled ? C_WOOD_HI : C_WOOD);
+        g.fill(x + 1, y + 1, x + w - 1, y + h - 1, fill);
+        g.fill(x + 1, y + h - 2, x + w - 1, y + h - 1, 0x40000000);
+        if (hover && enabled) {
+            g.fill(x, y, x + w, y + 1, C_GOLD);
+            g.fill(x, y + h - 1, x + w, y + h, C_GOLD_DARK);
+            g.fill(x, y, x + 1, y + h, C_GOLD);
+            g.fill(x + w - 1, y, x + w, y + h, C_GOLD_DARK);
         }
-        String s = clip(font, label, w - 12);
-        int tx = x + (w - font.width(s)) / 2, ty = y + (h - 8) / 2;
-        g.drawString(font, s, tx + 1, ty + 1, 0xC0180A02, false);
-        g.drawString(font, s, tx, ty, !enabled ? 0xFFB8A888 : hover ? 0xFFFFF0C8 : C_CREAM, false);
+        String s = clip(font, label, w - 6);
+        g.drawString(font, s, x + (w - font.width(s)) / 2, y + (h - 8) / 2, enabled ? C_CREAM : C_INK_SOFT, false);
     }
 
     /** G 금화 아이콘을 size×size 크기로 그립니다. */

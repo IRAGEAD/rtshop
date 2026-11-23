@@ -405,6 +405,12 @@
    "category": "misc",
    "sellPrice": 450,
    "buy": false
+  },
+  {
+   "item": "rtshop:survey_compass",
+   "price": 6000,
+   "category": "misc",
+   "sell": false
   }
  ],
  "auto": [

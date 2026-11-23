@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [" P ", "PCP", " G "],
+  "key": {
+    "P": {"item": "minecraft:paper"},
+    "C": {"item": "minecraft:compass"},
+    "G": {"item": "minecraft:gold_ingot"}
+  },
+  "result": {"item": "rtshop:survey_compass"}
+}

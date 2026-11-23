@@ -80,7 +80,13 @@ public final class QuestManager {
     private static final Map<String, Set<String>> OLD_DEFAULTS = Map.of(
             "job_quests.json", Set.of(
                     "9a51ce61d48d98107461017071f42f94276d31641b0a88349b1b88387dc8b540", // 3.6.0
-                    "1e9b133e53648071971c057461ddfa6cf659694ae328164b0b68ed2f22655c52")); // 3.6.1
+                    "1e9b133e53648071971c057461ddfa6cf659694ae328164b0b68ed2f22655c52"), // 3.6.1
+            // 스토리 1판 (3.20 ~ 3.27). 고치지 않았다면 2판으로 바꾼다 (진행은 migrateStory 가 옮긴다)
+            "story.json", Set.of(
+                    "0dd45697fc0f561ba7c05695829b407681e44109f918e91a5cb592dd74f61cbd",
+                    "28a39e558504c9821ceda9d4f0ef29492bb8312a1c4dba3163befb4afc8ebd5a",
+                    "783b2a39cddfd5931f88581e133775b74bb67b30480f3b4b8f0f5a70612dd2f0",
+                    "f3f736fe44395acdef7d7b11fbc4153c7010385699f506da743489afb9ff2093"));
 
     /** 편집 화면에서 새로 만든 퀘스트·NPC 가 들어가는 파일. */
     public static final String CUSTOM_FILE = "my_quests.json";
@@ -474,6 +480,42 @@ public final class QuestManager {
         if (on ? pr.flags.add(flag) : pr.flags.remove(flag)) {
             QuestData.get(p.server).dirty();
         }
+    }
+
+    /**
+     * 스토리 2판으로 옮기기: 예전 스토리에서 끝낸 장은 새 스토리에서도 끝낸 것으로 친다 (장 중간이면 그 장의 처음부터).
+     * 한 번만 한다 (story_v2 표식).
+     */
+    public static boolean migrateStory(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        if (pr.flags.contains("story_v2")) return false;
+        String[][] rules = {
+                {"order_apprentice", "story_0_"}, {"story_ch1_done", "story_0_", "story_1_"}, {"story_ch2_done", "story_2_"},
+                {"story_ch3_done", "story_3_"}, {"story_done", "story_4_"}, {"story_ch4_done", "story_4_"}};
+        int n = 0;
+        for (String[] r : rules) {
+            if (!pr.flags.contains(r[0])) continue;
+            for (QuestDef q : loaded.quests.values()) {
+                for (int i = 1; i < r.length; i++) {
+                    if (q.id.startsWith(r[i]) && !pr.completed.contains(q.id)) {
+                        pr.completed.add(q.id);
+                        pr.active.remove(q.id);
+                        n++;
+                    }
+                }
+            }
+        }
+        // 예전 스토리 퀘스트(새 정의에 없는 것)는 진행 중 목록에서 뺀다
+        pr.active.keySet().removeIf(id -> id.startsWith("story_") && !loaded.quests.containsKey(id));
+        if (pr.flags.contains("story_done")) pr.flags.add("story_ch4_done");
+        pr.flags.add("story_v2");
+        QuestData.get(p.server).dirty();
+        return n > 0;
+    }
+
+    @SubscribeEvent
+    public static void onLoginMigrate(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer p && loaded.quests.containsKey("story_1_01")) migrateStory(p);
     }
 
     /** 받을 수 있는 조건(선행 퀘스트·표식)을 만족하는가. 이미 완료했거나 진행 중이면 false. */
