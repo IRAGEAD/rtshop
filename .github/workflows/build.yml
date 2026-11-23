@@ -217,6 +217,15 @@ jobs:
             echo "== grep Cullable users"; grep -rl "entityculling" /tmp/nf --include=*.class | head -40
             echo "== LinkAnimation"; mkdir -p /tmp/ef && (cd /tmp/ef && unzip -q -o "$GITHUB_WORKSPACE/$EFJ" 'yesman/epicfight/api/animation/types/LinkAnimation.class' 'yesman/epicfight/api/animation/types/StaticAnimation.class') && javap -p -constants /tmp/ef/yesman/epicfight/api/animation/types/LinkAnimation.class
           } > /tmp/inspect/nightfall.txt 2>&1
+          # Nightfall 의 '폐허(ruin)' 대검: 아이템 모델·무기 능력치·렌더러
+          {
+            unzip -l "$NFJ" | awk '{print $4}' | grep -iE "ruin" | head -n 80
+            for f in $(unzip -l "$NFJ" | awk '{print $4}' | grep -iE "ruin" | grep -E "\.json$" | head -n 30); do echo "---- $f"; unzip -p "$NFJ" "$f" | head -c 2500; echo; done
+            mkdir -p /tmp/nfr && unzip -o -q "$NFJ" -d /tmp/nfr
+            for c in $(find /tmp/nfr -name "*.class" | grep -iE "ruin" | head -n 20); do echo "======== $c"; javap -p -c -constants "$c" 2>/dev/null | grep -E "^  [a-z]|ldc|invoke|getstatic" | head -n 160; done
+            grep -rl --include=*.class -i "ruin" /tmp/nfr | head -n 40
+            for c in $(grep -rl --include=*.class "ruins_greatsword\|RUINS_GREATSWORD\|ruin_greatsword" /tmp/nfr | head -n 12); do echo "======== $c"; javap -p -c -constants "$c" 2>/dev/null | grep -iE "^  [a-z]|ruin|ldc" | head -n 120; done
+          } > /tmp/inspect/nightfall-ruin.txt 2>&1 || true
           # 스토리 보스 모드: 등록 이름(몹·아이템·블록)과 영어 이름, 구조물 파일 목록
           ls packcache > /tmp/inspect/jars.txt
           # 환술사 모드: 유령 우민이 안 보이는 문제를 찾기 위한 렌더러·엔티티 클래스
