@@ -1424,6 +1424,6 @@
   "rtshop.itemstats.list_empty": "바꾼 장비가 없습니다.",
   "rtshop.itemstats.list_title": "능력치를 바꾼 장비 %s개 (누르면 편집기)",
   "rtshop.qhud.next": "다음 퀘스트",
-  "rtshop.qhud.next_npc": "%s 에게 가 보세요",
+  "rtshop.qhud.next_npc": "→ %s",
   "rtshop.qhud.next_more": "받을 수 있는 퀘스트 %s개 더"
 }

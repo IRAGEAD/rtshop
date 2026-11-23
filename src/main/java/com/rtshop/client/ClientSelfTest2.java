@@ -763,7 +763,7 @@ final class ClientSelfTest2 {
             onServer(mc, sp -> {
                 net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
                 var v = com.rtshop.quest.QuestManager.spawnNpc(sp.serverLevel(), sp.position().add(look.x * 2, 0, look.z * 2), sp.getYRot() + 180,
-                        "quest_order_archivist");
+                        "order_archivist");
                 qnpc = v == null ? -2 : v.getId();
             });
             waitTicks(20);

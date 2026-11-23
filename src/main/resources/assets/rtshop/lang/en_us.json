@@ -1424,6 +1424,6 @@
   "rtshop.itemstats.list_empty": "No equipment has been changed.",
   "rtshop.itemstats.list_title": "%s changed items (click to edit)",
   "rtshop.qhud.next": "Next quest",
-  "rtshop.qhud.next_npc": "Talk to %s",
+  "rtshop.qhud.next_npc": "→ %s",
   "rtshop.qhud.next_more": "%s more quests available"
 }
