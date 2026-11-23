@@ -141,19 +141,35 @@ public final class Ui {
 
     /** 단추: 예전처럼 깔끔한 나무 판 (밝은 윗선·어두운 아랫선), 마우스를 올리면 밝아지고 금테가 둘린다. */
     public static void button(GuiGraphics g, Font font, int x, int y, int w, int h, String label, boolean hover, boolean enabled) {
-        int fill = !enabled ? C_WOOD_DARK : (hover ? C_WOOD_HI : C_WOOD);
-        g.fill(x, y, x + w, y + h, C_SHADOW);
-        g.fill(x, y, x + w - 1, y + h - 1, enabled ? C_WOOD_HI : C_WOOD);
-        g.fill(x + 1, y + 1, x + w - 1, y + h - 1, fill);
-        g.fill(x + 1, y + h - 2, x + w - 1, y + h - 1, 0x40000000);
-        if (hover && enabled) {
-            g.fill(x, y, x + w, y + 1, C_GOLD);
-            g.fill(x, y + h - 1, x + w, y + h, C_GOLD_DARK);
-            g.fill(x, y, x + 1, y + h, C_GOLD);
-            g.fill(x + w - 1, y, x + w, y + h, C_GOLD_DARK);
+        // 바느질한 가죽 버튼 (64x48 텍스처, 3단 16px: 보통 / 마우스 / 꺼짐) 9조각 늘리기
+        int v = !enabled ? 32 : (hover ? 16 : 0);
+        int c = Math.min(4, Math.min(w / 2, h / 2));
+        int midW = 64 - 2 * c, midH = 16 - 2 * c;
+        for (int row = 0; row < 3; row++) {
+            int ty, th, tv;
+            if (row == 0) { ty = y; th = c; tv = v; }
+            else if (row == 2) { ty = y + h - c; th = c; tv = v + 16 - c; }
+            else { ty = y + c; th = h - 2 * c; tv = v + c; }
+            if (th <= 0) continue;
+            for (int yy = 0; yy < th; yy += midH) {
+                int hh = row == 1 ? Math.min(midH, th - yy) : th;
+                g.blit(BUTTON, x, ty + yy, 0, tv, c, hh, 64, 48);
+                g.blit(BUTTON, x + w - c, ty + yy, 64 - c, tv, c, hh, 64, 48);
+                for (int xx = c; xx < w - c; xx += midW) {
+                    int ww = Math.min(midW, w - c - xx);
+                    g.blit(BUTTON, x + xx, ty + yy, c, tv, ww, hh, 64, 48);
+                }
+                if (row != 1) break;
+            }
         }
-        String s = clip(font, label, w - 6);
-        g.drawString(font, s, x + (w - font.width(s)) / 2, y + (h - 8) / 2, enabled ? C_CREAM : C_INK_SOFT, false);
+        String s = clip(font, label, w - 8);
+        int tx = x + (w - font.width(s)) / 2, tyy = y + (h - 8) / 2;
+        if (enabled) {
+            g.drawString(font, s, tx + 1, tyy + 1, 0xFF2A1406, false);
+            g.drawString(font, s, tx, tyy, hover ? 0xFFFFE9B0 : C_CREAM, false);
+        } else {
+            g.drawString(font, s, tx, tyy, 0xFFB8A888, false);
+        }
     }
 
     /** G 금화 아이콘을 size×size 크기로 그립니다. */

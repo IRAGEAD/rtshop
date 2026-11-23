@@ -1323,5 +1323,6 @@
   "item.rtshop.survey_compass.desc2": "Standard storm-survey gear. The needle sometimes points at the southern sky.",
   "item.rtshop.survey_compass.none": "None of your quests is looking for a place.",
   "item.rtshop.survey_compass.far": "%s: nothing nearby. Travel further and try again.",
-  "item.rtshop.survey_compass.found": "%s: about %3$s blocks to the %2$s"
+  "item.rtshop.survey_compass.found": "%s: about %3$s blocks to the %2$s",
+  "rtshop.hunt.goal_kill": "Defeat: %s × %s"
 }

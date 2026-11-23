@@ -957,6 +957,7 @@ NEW = {
  "rtshop.hunt.board_screen": ("현상금 게시판", "Bounty board"),
  "rtshop.hunt.board_quota": ("맡은 의뢰 · 일일 %s/%s · 주간 %s/%s", "Taken · Daily %s/%s · Weekly %s/%s"),
  "rtshop.hunt.take": ("맡기", "Take"),
+ "rtshop.hunt.goal_kill": ("처치: %s × %s", "Defeat: %s × %s"),
  "rtshop.hunt.row_offer": ("게시판에 붙은 의뢰", "Posted on the board"),
  "rtshop.hunt.row_progress": ("맡은 의뢰 · %s/%s", "Taken · %s/%s"),
  "rtshop.hunt.row_done": ("끝낸 의뢰 · 보상을 받았어요", "Done · reward paid"),

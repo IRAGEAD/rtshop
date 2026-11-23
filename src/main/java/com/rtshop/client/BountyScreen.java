@@ -162,7 +162,7 @@ public class BountyScreen extends Screen {
             g.fill(lx + 6, ry + 1, lx + 28, ry + ROW - 3, 0x30000000);
             drawMob(g, r.get("entity").getAsString(), lx + 6, ry + 1, 22, (System.currentTimeMillis() % 7200) / 20F);
             String tag = Component.translatable(weekly ? "rtshop.hunt.tag_weekly" : "rtshop.hunt.tag_daily").getString();
-            String name = r.get("name").getAsString() + " × " + r.get("need").getAsInt();
+            String name = Component.translatable("rtshop.hunt.goal_kill", r.get("name").getAsString(), r.get("need").getAsInt()).getString();
             g.drawString(font, tag, lx + 32, ry + 3, weekly ? 0xFF2F5E8A : 0xFF6A4A1E, false);
             g.drawString(font, Ui.clip(font, name, lw - 134), lx + 32 + font.width(tag) + 4, ry + 3, done ? Ui.C_INK_SOFT : Ui.C_INK, false);
             String sub = done ? Component.translatable("rtshop.hunt.row_done").getString()

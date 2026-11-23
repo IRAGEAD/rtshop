@@ -604,6 +604,33 @@ def mock2(out):
     bg.convert('RGB').save(out)
 
 
+DARK_B = [(146, 90, 50), (168, 106, 60), (98, 68, 44)]
+
+
+def btn_leather(w, h, state, seed=91):
+    """바느질 테두리 가죽 버튼. state 0 보통, 1 마우스, 2 꺼짐"""
+    base = DARK_B[state]
+    b = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    lt = leather(w, h, base, seed=seed + state)
+    mask = Image.new('L', (w, h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w - 1, h - 1], radius=3, fill=255)
+    b.paste(lt, (0, 0), mask)
+    d = ImageDraw.Draw(b)
+    d.rounded_rectangle([0, 0, w - 1, h - 1], radius=3, outline=(34, 16, 6, 255))
+    # 윗면 빛, 아랫면 그늘
+    d.line([(3, 1), (w - 4, 1)], fill=shade(base, 1.3))
+    d.line([(3, h - 2), (w - 4, h - 2)], fill=shade(base, 0.55))
+    sc = (226, 200, 150) if state != 2 else (150, 130, 104)
+    stitch(b, 4, 3, w - 5, 3, sc)
+    stitch(b, 4, h - 4, w - 5, h - 4, sc)
+    stitch(b, 3, 4, 3, h - 5, sc)
+    stitch(b, w - 4, 4, w - 4, h - 5, sc)
+    if state == 1:
+        d.rounded_rectangle([0, 0, w - 1, h - 1], radius=3, outline=(255, 214, 120, 255))
+    return b
+
+
+
 def atlas(out):
     import os
     os.makedirs(out, exist_ok=True)
@@ -630,20 +657,10 @@ def atlas(out):
             lp2 = lp2.transpose(Image.FLIP_TOP_BOTTOM)
         cor.alpha_composite(lp2, (fx * 22, fy * 22))
     cor.save(os.path.join(out, 'leather_corners.png'))
-    # 나무 버튼 3단 (보통 / 마우스 / 꺼짐), 각 64x16
+    # 가죽 버튼 3단 (보통 / 마우스 / 꺼짐), 각 64x16 — 바느질한 밝은 가죽(B)을 살짝 어둡게
     btn = Image.new('RGBA', (64, 48), (0, 0, 0, 0))
-    for i, (base, mb) in enumerate((((132, 86, 48), IRON), ((156, 106, 60), BRASS), ((88, 64, 44), (90, 90, 94)))):
-        b = planks(64, 16, base, board=16, seed=91 + i)
-        outline(b, 0, 0, 63, 15, (30, 16, 6, 255))
-        bevel(b, 1, 1, 62, 14, 1.35, 0.55)
-        band = metal(4, 14, mb)
-        b.alpha_composite(band, (2, 1))
-        b.alpha_composite(band, (58, 1))
-        rivet(b, 4, 8, mb, 1)
-        rivet(b, 59, 8, mb, 1)
-        if i == 1:
-            ImageDraw.Draw(b).rectangle([0, 0, 63, 15], outline=(255, 214, 120, 255))
-        btn.alpha_composite(b, (0, i * 16))
+    for i in range(3):
+        btn.alpha_composite(btn_leather(64, 16, i, seed=91), (0, i * 16))
     btn.save(os.path.join(out, 'button.png'))
     seal = wax_seal(7)
     seal.save(os.path.join(out, 'seal.png'))
