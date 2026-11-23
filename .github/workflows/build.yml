@@ -234,21 +234,21 @@ jobs:
             for J in $(ls packcache/*.jar | grep -i "$pat"); do
               {
                 echo "== $J"
-                unzip -p "$J" 'META-INF/mods.toml' 2>/dev/null | grep -E "modId|version|displayName" | head -n 10
+                unzip -p "$J" 'META-INF/mods.toml' 2>/dev/null | grep -E "modId|version|displayName" | head -n 10 || true
                 echo "== data/minecraft files"
-                unzip -l "$J" | awk '{print $4}' | grep -E "^data/minecraft/" | head -n 300
+                unzip -l "$J" | awk '{print $4}' | grep -E "^data/minecraft/" | head -n 300 || true
                 for f in $(unzip -l "$J" | awk '{print $4}' | grep -E "^data/minecraft/worldgen/(structure_set|structure)/.*json$" | head -n 80); do echo "---- $f"; unzip -p "$J" "$f" | head -c 2500; echo; done
                 echo "== structure_set files of its own (first 40)"
                 for f in $(unzip -l "$J" | awk '{print $4}' | grep -E "worldgen/structure_set/.*json$" | grep -v "^data/minecraft" | head -n 40); do echo "---- $f"; unzip -p "$J" "$f" | head -c 1200; echo; done
                 echo "== config classes"
-                unzip -l "$J" | awk '{print $4}' | grep -i -E "config" | head -n 40
+                unzip -l "$J" | awk '{print $4}' | grep -i -E "config" | head -n 40 || true
               } >> "/tmp/inspect/mod-$pat.txt" 2>&1
             done
           done
           # 바닐라 구조물(무너진 차원문·사막 피라미드 등)을 덮어쓰는 모든 jar
           {
             for J in packcache/*.jar; do
-              L="$(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/minecraft/(worldgen/structure_set/|worldgen/structure/(ruined_portal|desert_pyramid|jungle_pyramid|mansion|ancient_city|monument|trail_ruins|pillager_outpost)|tags/worldgen/biome/has_structure/(ruined_portal|desert_pyramid))")"
+              L="$(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/minecraft/(worldgen/structure_set/|worldgen/structure/(ruined_portal|desert_pyramid|jungle_pyramid|mansion|ancient_city|monument|trail_ruins|pillager_outpost)|tags/worldgen/biome/has_structure/(ruined_portal|desert_pyramid))" || true)"
               [ -z "$L" ] && continue
               echo "== $J"
               echo "$L"

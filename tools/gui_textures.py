@@ -611,7 +611,7 @@ def atlas(out):
     parchment(128, 128, PARCH, seed=72, burnt=False, wrap=True).save(os.path.join(out, 'parchment.png'))
     # 가죽 모서리 4개 (2x2): 왼위, 오른위 / 왼아래, 오른아래
     cor = Image.new('RGBA', (44, 44), (0, 0, 0, 0))
-    col = shade(LEATHER_C, 0.62)
+    col = shade(LEATHER_C, 0.78)
     for i, (fx, fy) in enumerate(((0, 0), (1, 0), (0, 1), (1, 1))):
         lp = leather(22, 22, col, seed=80 + i)
         lp2 = Image.new('RGBA', (22, 22), (0, 0, 0, 0))

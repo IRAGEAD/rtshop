@@ -116,10 +116,10 @@ public final class Ui {
         // 바느질한 가죽 모서리 (놋쇠 리벳)
         if (w >= 60 && h >= 50) {
             RenderSystem.enableBlend();
-            g.blit(CORNERS, x - 2, y - 2, 0.0F, 0.0F, 22, 22, 44, 44);
-            g.blit(CORNERS, x + w - 20, y - 2, 22.0F, 0.0F, 22, 22, 44, 44);
-            g.blit(CORNERS, x - 2, y + h - 20, 0.0F, 22.0F, 22, 22, 44, 44);
-            g.blit(CORNERS, x + w - 20, y + h - 20, 22.0F, 22.0F, 22, 22, 44, 44);
+            g.blit(CORNERS, x - 6, y - 6, 0.0F, 0.0F, 22, 22, 44, 44);
+            g.blit(CORNERS, x + w - 16, y - 6, 22.0F, 0.0F, 22, 22, 44, 44);
+            g.blit(CORNERS, x - 6, y + h - 16, 0.0F, 22.0F, 22, 22, 44, 44);
+            g.blit(CORNERS, x + w - 16, y + h - 16, 22.0F, 22.0F, 22, 22, 44, 44);
         }
     }
 
