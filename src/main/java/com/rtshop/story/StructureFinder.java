@@ -49,7 +49,7 @@ public final class StructureFinder {
     }
 
     /** 확인해 볼 후보 수와 시간 한도 (서버 멈춤 방지). */
-    static final int MAX_CHECKS = 48;
+    static final int MAX_CHECKS = 64;
     static final long MAX_NANOS = 3_000_000_000L;
 
     public static final class Found {
@@ -156,13 +156,22 @@ public final class StructureFinder {
             if (StagedStructures.blocks(id)) staged++;
             else nPl += state.getPlacementsForStructure(h).size();
         }
-        int passed = 0;
+        int passed = 0, prefiltered = 0;
         long t0 = System.nanoTime();
         Found best = null;
         for (Cand c : cands) {
             if (lastChecked >= MAX_CHECKS || System.nanoTime() - t0 > MAX_NANOS) break;
             if (!c.placement.isStructureChunk(state, c.cx, c.cz)) continue;
             passed++;
+            // 바닐라와 같은 빠른 예측(생물군계·지형)으로 먼저 거른다. 예측이 "있다"인 곳만 실제로 만들어 확인한다.
+            try {
+                var pre = level.structureManager().checkStructurePresence(new ChunkPos(c.cx, c.cz), c.h.value(), false);
+                if (pre == net.minecraft.world.level.levelgen.structure.StructureCheckResult.START_NOT_PRESENT) {
+                    prefiltered++;
+                    continue;
+                }
+            } catch (Throwable ignored) {
+            }
             lastChecked++;
             BlockPos at = verify(level, c.h, c.cx, c.cz);
             if (at == null) {
@@ -172,7 +181,7 @@ public final class StructureFinder {
             best = new Found(at, c.h, c.cx, c.cz);
             break;
         }
-        lastInfo = "holders=" + set.size() + " staged=" + staged + " placements=" + nPl + " cands=" + cands.size() + " placementOk=" + passed
+        lastInfo = "holders=" + set.size() + " staged=" + staged + " placements=" + nPl + " cands=" + cands.size() + " placementOk=" + passed + " predictedNo=" + prefiltered
                 + " other=" + other.size() + " genStructures=" + level.getServer().getWorldData().worldGenOptions().generateStructures();
         // 다른 방식으로 놓이는 모드 건축물: 바닐라 계산으로 찾은 뒤 실제로 있는지만 확인
         for (Holder<Structure> h : other) {

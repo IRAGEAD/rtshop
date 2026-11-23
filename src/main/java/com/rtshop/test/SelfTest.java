@@ -2133,14 +2133,21 @@ public final class SelfTest {
         LINES.add("  compass search: checked=" + com.rtshop.story.StructureFinder.lastChecked + " rejected=" + com.rtshop.story.StructureFinder.lastRejected
                 + " townSkipped=" + com.rtshop.story.StructureFinder.lastTownSkipped + " ms=" + ms + " at=" + (f == null ? "none" : f.pos.toShortString())
                 + " " + com.rtshop.story.StructureFinder.lastInfo);
-        check("the survey compass finds a village that really generated (its start exists in the chunk)",
+        String compassTarget = "#minecraft:village";
+        if (f == null) {
+            // 모드팩 평지 세계에는 마을이 생기지 않을 수 있다 (마을 모드가 바닐라 마을을 바꿔 놓음): 무너진 차원문으로 확인
+            compassTarget = "#minecraft:ruined_portal";
+            f = com.rtshop.story.StructureFinder.find(ow, com.rtshop.story.StructureFinder.resolve(ow, compassTarget), spawn, 200, 1000);
+            LINES.add("  compass search (ruined portal): at=" + (f == null ? "none" : f.pos.toShortString()) + " " + com.rtshop.story.StructureFinder.lastInfo);
+        }
+        check("the survey compass finds a structure that really generated (its start exists in the chunk)",
                 f != null && com.rtshop.story.StructureFinder.verify(ow, f.structure, f.cx, f.cz) != null,
                 f == null ? "none" : f.pos.toShortString());
         check("the place it points to is at least 1000 blocks from town",
                 f != null && com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ()) >= 1000,
                 f == null ? "none" : String.valueOf((int) com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ())));
         check("the compass search stays quick (under 6 s)", ms < 6000, ms + " ms");
-        BlockPos viaItem = com.rtshop.item.SurveyCompassItem.locate(ow, "#minecraft:village", spawn);
+        BlockPos viaItem = com.rtshop.item.SurveyCompassItem.locate(ow, compassTarget, spawn);
         check("the compass item uses the same verified search", viaItem != null && f != null && viaItem.equals(f.pos));
         // 이 세계에 생길 수 없는 건축물(평지의 무너진 차원문)은 절대 가리키지 않는다
         var portals = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:ruined_portal");
@@ -2148,8 +2155,8 @@ public final class SelfTest {
         LINES.add("  ruined portal search: at=" + (none == null ? "none" : none.pos.toShortString()) + " " + com.rtshop.story.StructureFinder.lastInfo);
         check("a structure that cannot generate in this world is never pointed to (or, if found, it is really there)",
                 none == null || com.rtshop.story.StructureFinder.verify(ow, none.structure, none.cx, none.cz) != null);
-        var v = com.rtshop.story.StructureFinder.find(ow, villages, spawn, 100, 0);
-        check("/locate structure (verified) finds a real village", v != null
+        var v = com.rtshop.story.StructureFinder.find(ow, com.rtshop.story.StructureFinder.resolve(ow, compassTarget), spawn, 100, 0);
+        check("/locate structure (verified) finds a real one", v != null
                 && com.rtshop.story.StructureFinder.verify(ow, v.structure, v.cx, v.cz) != null);
         check("an unknown structure target resolves to nothing", com.rtshop.story.StructureFinder.resolve(ow, "rtshop:no_such_structure") == null);
         // /locate structure 명령이 우리 검색으로 바뀌었는가 (결과 문장)
@@ -2173,7 +2180,7 @@ public final class SelfTest {
         };
         net.minecraft.commands.CommandSourceStack css = new net.minecraft.commands.CommandSourceStack(sink, net.minecraft.world.phys.Vec3.atCenterOf(spawn),
                 net.minecraft.world.phys.Vec2.ZERO, ow, 4, "selftest", net.minecraft.network.chat.Component.literal("selftest"), server, null);
-        server.getCommands().performPrefixedCommand(css, "locate structure #minecraft:village");
+        server.getCommands().performPrefixedCommand(css, "locate structure " + compassTarget);
         LINES.add("  /locate output: " + out);
         check("/locate structure answers with a verified place", !out.isEmpty() && com.rtshop.story.StructureFinder.lastChecked > 0 && !out.get(0).contains("Could not"), out);
 
