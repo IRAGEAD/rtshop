@@ -1342,5 +1342,9 @@
   "rtshop.hud.font_sans": "Sans (Noto Sans)",
   "rtshop.hud.font_serif": "Serif (Noto Serif)",
   "rtshop.hud.font_serif_bold": "Serif bold",
-  "rtshop.hud.font_title": "Serif title (large)"
+  "rtshop.hud.font_title": "Serif title (large)",
+  "rtshop.scylla.waiting": "Every clue is gathered, yet the storm does not call you. Not until the chronicle's last page is written…",
+  "rtshop.staged.unlocked": "✦ A new place of the story begins to appear somewhere in the world. (Look in lands not yet explored)",
+  "rtshop.staged.unlocked_n": "Unlocked generation of %s story structures.",
+  "rtshop.staged.title": "Staged story structures (%s)"
 }

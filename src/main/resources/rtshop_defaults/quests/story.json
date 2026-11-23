@@ -3932,7 +3932,7 @@
    "giver": "quest_order_archivist",
    "mod": "illusioner",
    "requires": [
-    "story_3_14"
+    "story_5_08"
    ],
    "requiresFlags": [
     "clue_hidden_page",

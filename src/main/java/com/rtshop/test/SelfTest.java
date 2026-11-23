@@ -2149,6 +2149,34 @@ public final class SelfTest {
                 check("the story's vanilla structure can be found in this world: " + sid, found != null, found == null ? "none" : found.getFirst());
             }
         }
+        // 단계적 이야기 건축물: 풀리기 전에는 새 지형에 생기지 않는다
+        {
+            com.rtshop.story.StagedStructures.reload();
+            com.rtshop.story.StagedStructures.resetForTest(server);
+            boolean lockedAtStart = com.rtshop.story.StagedStructures.blocks("minecraft:mansion") && com.rtshop.story.StagedStructures.blocks("cataclysm:burning_arena")
+                    && !com.rtshop.story.StagedStructures.blocks("minecraft:village_plains");
+            long asked0 = com.rtshop.story.StagedStructures.ASKED.get();
+            var nether = server.getLevel(net.minecraft.world.level.Level.NETHER);
+            if (nether != null) {
+                for (int i = 0; i < 6; i++) nether.getChunk(400 + i * 3, 400, net.minecraft.world.level.chunk.ChunkStatus.STRUCTURE_STARTS, true);
+            }
+            long asked = com.rtshop.story.StagedStructures.ASKED.get() - asked0;
+            check("staged story structures: locked at first, plain structures are not, and world generation really asks (mixin applied)",
+                    lockedAtStart && asked > 0, lockedAtStart + " asked=" + asked);
+            QuestManager.reset(a);
+            QuestManager.forceComplete(a, "story_0_03");
+            for (String id : QuestManager.loaded().quests.keySet()) if (id.startsWith("story_1_")) QuestManager.forceComplete(a, id);
+            boolean took = QuestManager.accept(a, "story_2_01", "quest_order_captain");
+            QuestManager.forceComplete(a, "story_2_01");
+            QuestManager.forceComplete(a, "story_2_02");
+            boolean took3 = QuestManager.accept(a, "story_2_03", "quest_order_captain");
+            boolean chamberOpen = !com.rtshop.story.StagedStructures.isLocked("mowziesmobs:wrought_chamber");
+            boolean othersStill = com.rtshop.story.StagedStructures.isLocked("aquamirae:ship") && com.rtshop.story.StagedStructures.isLocked("minecraft:mansion");
+            check("taking the quest that leads to a story structure starts generating it for the whole server; later ones stay locked",
+                    took3 && chamberOpen && othersStill, took + " " + took3 + " " + chamberOpen + " " + othersStill);
+            com.rtshop.story.StagedStructures.resetForTest(server);
+            QuestManager.reset(a);
+        }
         // 기억의 문: 이야기 보스전 전용 공간
         {
             com.rtshop.story.StoryArena.reload();

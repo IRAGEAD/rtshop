@@ -818,7 +818,7 @@ p = q("hidden_illusioner_1", CH + " (1/2)", "빈 쪽의 잉크", ARCH,
       "보랏빛 잉크 말이에요. 항해일지의 숨은 페이지에도 같은 잉크가 묻어 있었어요. 거울 글씨로요. 환술사들이 쓰는 잉크예요. 어두운 숲의 저택에 사는 일리저들이 그런 잉크를 쓴대요. 그 저택은 보랏빛 안개에 싸여 아무도 들어가지 못했대요. 빈 쪽을 찾은 당신이라면… 안개가 길을 열어 줄지도 몰라요.",
       "숲속 저택을 찾아가 보세요.",
       "저택의 안개가 걷혔어요. 지하에서 이상한 음악 소리가 들렸다고요? 이제 거울도 당신을 비출 거예요.",
-      [struct("minecraft:mansion", "숲속 저택")], gold=6000, requires=["story_3_14"], requiresFlags=["clue_hidden_page", "clue_purple_ink"], flags=["seal_illusioner"], mod=I)
+      [struct("minecraft:mansion", "숲속 저택")], gold=6000, requires=["story_5_08"], requiresFlags=["clue_hidden_page", "clue_purple_ink"], flags=["seal_illusioner"], mod=I)
 p = q("hidden_illusioner_2", CH + " (2/2)", "거짓 연대기의 필경사", ARCH,
       "저택 아래의 환술사를 쓰러뜨리세요. 그가 연대기를 고쳐 썼다면, 진짜 페이지를 가지고 있을 거예요.",
       "기억의 문을 열고 환술사를 쓰러뜨리세요.",

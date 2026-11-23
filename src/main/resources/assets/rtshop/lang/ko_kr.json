@@ -1342,5 +1342,9 @@
   "rtshop.hud.font_sans": "고딕 (Noto Sans)",
   "rtshop.hud.font_serif": "명조 (Noto Serif)",
   "rtshop.hud.font_serif_bold": "명조 굵게",
-  "rtshop.hud.font_title": "명조 큰 제목"
+  "rtshop.hud.font_title": "명조 큰 제목",
+  "rtshop.scylla.waiting": "단서는 모두 모였다. 그러나 폭풍은 아직 당신을 부르지 않는다. 연대기의 마지막 장이 쓰인 뒤에…",
+  "rtshop.staged.unlocked": "✦ 이야기의 새 장소가 세상 어딘가에 나타나기 시작했다. (아직 가 보지 않은 땅에서 찾아보세요)",
+  "rtshop.staged.unlocked_n": "이야기 건축물 %s곳의 생성을 풀었습니다.",
+  "rtshop.staged.title": "단계적 이야기 건축물 (%s)"
 }

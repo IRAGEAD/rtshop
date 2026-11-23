@@ -911,6 +911,7 @@ public final class QuestManager {
         pr.active.put(q.id, new int[q.objectives.size()]);
         QuestData.get(p.server).dirty();
         p.sendSystemMessage(Component.translatable("rtshop.quest.accepted", q.title));
+        com.rtshop.story.StagedStructures.scan(p); // 이 퀘스트가 가리키는 이야기 건축물이 새 지형에 생기기 시작한다
         scene(p, q.sceneAccept);
         // 이미 조건을 채운 상태(방문 위치에 서 있음 등)를 바로 반영
         checkVisits(p);

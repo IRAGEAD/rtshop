@@ -81,6 +81,8 @@ public final class ScyllaClues {
     public int needed = 6;
     public String rewardItem = "cataclysm:storm_eye";
     public String grantFlag = "seal_scylla";
+    /** 단서를 다 모아도 이 표식(메인 스토리의 끝)이 있어야 폭풍이 열린다. 그 표식을 주는 퀘스트가 없으면 따지지 않는다. */
+    public String requireFlag = "story_done";
     public final Map<String, Clue> clues = new LinkedHashMap<>();
 
     private static ScyllaClues current;
@@ -157,6 +159,7 @@ public final class ScyllaClues {
                 if (o.has("needed")) s.needed = Math.max(1, o.get("needed").getAsInt());
                 if (o.has("rewardItem")) s.rewardItem = o.get("rewardItem").getAsString();
                 if (o.has("grantFlag")) s.grantFlag = o.get("grantFlag").getAsString();
+                if (o.has("requireFlag")) s.requireFlag = o.get("requireFlag").getAsString();
                 if (o.has("clues")) {
                     for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("clues").entrySet()) {
                         JsonObject x = e.getValue().getAsJsonObject();
@@ -204,6 +207,7 @@ public final class ScyllaClues {
         o.addProperty("needed", needed);
         o.addProperty("rewardItem", rewardItem);
         o.addProperty("grantFlag", grantFlag);
+        o.addProperty("requireFlag", requireFlag);
         JsonObject cs = new JsonObject();
         for (Clue c : clues.values()) {
             JsonObject x = new JsonObject();
@@ -277,6 +281,14 @@ public final class ScyllaClues {
     public static void checkComplete(ServerPlayer p) {
         ScyllaClues s = get();
         if (!s.enabled || count(p) < s.needed || QuestManager.hasFlag(p, s.grantFlag)) return;
+        if (!s.requireFlag.isEmpty() && !QuestManager.hasFlag(p, s.requireFlag) && StorySeals.grantedByAnyQuest(s.requireFlag)) {
+            // 단서는 다 모였지만 폭풍은 연대기의 마지막 장이 쓰인 뒤에야 열린다
+            if (!QuestManager.hasFlag(p, "scylla_waiting")) {
+                QuestManager.setFlag(p, "scylla_waiting", true);
+                p.sendSystemMessage(Component.translatable("rtshop.scylla.waiting").withStyle(ChatFormatting.DARK_AQUA));
+            }
+            return;
+        }
         QuestManager.setFlag(p, s.grantFlag, true);
         ResourceLocation rl = ResourceLocation.tryParse(s.rewardItem);
         if (rl != null && ForgeRegistries.ITEMS.containsKey(rl)) {
