@@ -782,12 +782,14 @@ final class ClientSelfTest2 {
                     mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
                     // 마지막 사진은 가까이서 (시야각을 좁혀 확대)
                     mc.options.fov().set(h[1].endsWith("_zoom") ? 30 : 70);
+                    RenderProbe.reset();
                     waitTicks(30);
                 });
                 add(mc -> {
                     shot(mc, h[1]);
                     com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] held {}: {}", h[0], mc.player == null ? "-" : mc.player.getMainHandItem());
                     com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] EF renderer for {}: {}", h[0], efRendererInfo(mc.player == null ? null : mc.player.getMainHandItem()));
+                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] EF renderer calls while holding {}: {}", h[0], RenderProbe.dump());
                     waitTicks(2);
                 });
             }

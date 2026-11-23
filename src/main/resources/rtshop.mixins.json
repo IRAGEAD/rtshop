@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "CinematicAnvilMixin",
-    "IllusionerGhostMixin"
+    "IllusionerGhostMixin",
+    "EfItemProbeMixin",
+    "ItemLayerProbeMixin"
   ],
   "injectors": {
     "defaultRequire": 0
