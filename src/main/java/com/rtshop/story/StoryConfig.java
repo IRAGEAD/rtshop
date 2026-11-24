@@ -154,6 +154,21 @@ public final class StoryConfig {
                 "회색 망토의 학자가 약속한 \"끝나지 않는 삶\"을 대가로 봉인을 내주었고,",
                 "왕국은 저주로 얼어붙었다.",
                 "그는 아직 약속을 지킬 사람을 기다린다."));
+        m.put("block_factorys_bosses:yeti", in("스코르", "덮지 않는 자", "frost", "BFE6FF",
+                "minecraft:entity.polar_bear.warning,minecraft:block.snow.break", "", 2,
+                "설원의 장의사.",
+                "눈에 덮이면 잊힌다고 믿어, 얼어 죽은 이들을 굴로 데려와 세워 둔다.",
+                "그에게 명패를 거두러 온 자는 도둑이다."));
+        m.put("block_factorys_bosses:sandworm", in("시로크", "물을 부르는 것", "stone", "D8B870",
+                "minecraft:block.sand.break,minecraft:entity.ravager.roar", "", 2,
+                "사막의 왕 아므라트가 수로를 파게 한 짐승.",
+                "왕국이 모래에 묻힌 뒤에도 도면대로 파 내려간다.",
+                "마지막 구간, 왕의 정원에는 천 년째 닿지 못했다."));
+        m.put("block_factorys_bosses:infernal_dragon", in("애쉬로드", "재가 될 때까지 따르는 자", "ember", "FF6A30",
+                "minecraft:entity.ender_dragon.growl,minecraft:item.firecharge.use", "", 3,
+                "불꽃 기사단장 아르덴이 타던 용.",
+                "주인이 \"기다려라\" 하고 떠난 탑을 지킨다.",
+                "천 년 동안 숨결로 안장의 그을음을 태워 냈다. 언제든 탈 수 있게."));
         m.put("block_factorys_bosses:underworld_knight", in("헬바르", "저승의 문턱을 지키는 이", "curse", "58D0E0",
                 "minecraft:entity.wither_skeleton.ambient,minecraft:block.soul_sand.break", "…문은, 내가 지킨다.", 3,
                 "불꽃 기사단의 부단장.",

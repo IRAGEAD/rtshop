@@ -18,7 +18,7 @@ public final class StorySystems {
     /** 허공의 용은 처음부터 잠들어 있고, 출구 받침대의 의식으로 불러낸다. */
     public static boolean dragonRite = true;
     /** 이 표식이 있는 사람만 룬 제단(별빛 수정 구체)을 쓸 수 있다. "" = 누구나. */
-    public static String altarLockFlag = "";
+    public static String altarLockFlag = "story_ch1_done";
     private static boolean loaded;
 
     public static Path path() {
@@ -33,12 +33,20 @@ public final class StorySystems {
                 JsonObject o = JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject();
                 if (o.has("dragonRite")) dragonRite = o.get("dragonRite").getAsBoolean();
                 if (o.has("altarLockFlag")) altarLockFlag = o.get("altarLockFlag").getAsString().trim();
+                // 3.34: 룬 제단은 1장을 끝내면 열린다. 예전 기본값(비어 있음)으로 만들어진 파일은 한 번 새 기본값으로 올린다 (그 뒤로는 고친 대로 둔다)
+                if (!o.has("version")) {
+                    if (altarLockFlag.isEmpty()) altarLockFlag = "story_ch1_done";
+                    o.addProperty("altarLockFlag", altarLockFlag);
+                    o.addProperty("version", 2);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                }
             } else {
                 JsonObject o = new JsonObject();
                 o.addProperty("_help", "이야기 시스템 설정. dragonRite: true 면 허공(엔드)의 용이 처음부터 잠들어 있고, 출구 받침대 네 모서리에 수정을 놓는 의식으로 불러낸다 "
                         + "(파티마다 다시 부를 수 있다). altarLockFlag: 이 표식을 가진 사람만 룬 제단(별빛 수정 구체)을 쓸 수 있다. 비우면 누구나. 고친 뒤 /rtshop reload.");
                 o.addProperty("dragonRite", dragonRite);
                 o.addProperty("altarLockFlag", altarLockFlag);
+                o.addProperty("version", 2);
                 Files.createDirectories(p.getParent());
                 Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
             }

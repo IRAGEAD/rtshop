@@ -1530,5 +1530,7 @@
   "entity.rtshop.companion": "Companion",
   "rtshop.qedit.type_inspect": "Inspect",
   "rtshop.notebook.title": "Field Notebook",
-  "rtshop.notebook.empty": "Nothing examined yet. Traces you look at during story quests are written down here."
+  "rtshop.notebook.empty": "Nothing examined yet. Traces you look at during story quests are written down here.",
+  "item.rtshop.antidote": "Antidote",
+  "item.rtshop.antidote.tip": "Drink to cure poison, wither and hunger."
 }

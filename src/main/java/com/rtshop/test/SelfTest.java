@@ -2201,7 +2201,8 @@ public final class SelfTest {
         }
 
         // 룬 제단 잠금
-        String keep = com.rtshop.story.StorySystems.altarLockFlag;
+        String keep = altarKeep != null ? altarKeep : com.rtshop.story.StorySystems.altarLockFlag;
+        check("by default the rune altar opens once chapter 1 is done", "story_ch1_done".equals(keep) || net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get().resolve("rtshop/story_systems.json").toFile().exists(), keep);
         com.rtshop.story.StorySystems.altarLockFlag = "t_altar_open";
         boolean lockedBefore = com.rtshop.magic.MagicGacha.locked(a);
         QuestManager.setFlag(a, "t_altar_open", true);
@@ -2226,8 +2227,8 @@ public final class SelfTest {
         QuestManager.reset(a);
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
-        QuestDef helvar = l.quests.get("story_1_19"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");
-        check("the rewritten prologue and chapter 1 are installed (lesson at the practice gate, Isabel walks along, Helvar's quest, 41 steps)",
+        QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");
+        check("the rewritten prologue and chapter 1 are installed (lesson at the practice gate, Isabel walks along, the orb after the chapter) and Helvar waits in chapter 2",
                 lesson != null && helvar != null && walk != null && l.quests.containsKey("story_1_41") && walk.companion != null
                         && lesson.objectives.stream().anyMatch(o -> o.type == QuestDef.Type.INSPECT)
                         && helvar.objectives.size() == 1 && helvar.objectives.get(0).type == QuestDef.Type.KILL
@@ -2251,11 +2252,13 @@ public final class SelfTest {
         QuestManager.setFlag(a, "story_ch1_done", true);
         QuestManager.setFlag(a, "story_v4", false);
         QuestManager.migrateStory4(a);
-        boolean fin = QuestManager.isCompleted(a, "story_1_41") && QuestManager.isCompleted(a, "story_1_19") && QuestManager.hasFlag(a, "ch1_three_ends");
+        boolean fin = QuestManager.isCompleted(a, "story_1_41") && QuestManager.isCompleted(a, "story_1_21") && !l.quests.containsKey("story_1_19") && QuestManager.hasFlag(a, "ch1_three_ends");
         check("moving to the rewritten story: mid-chapter players restart chapter 1 (prologue kept), finished players keep chapter 1 done", mid && fin, mid + "/" + fin);
         QuestDef skor = l.quests.get("story_2_13"), rest = l.quests.get("story_2_10"), letter = l.quests.get("story_2_24");
-        check("chapter 2 is rewritten (Roran walks along, the campfire rest, Skor, Kael's letter, 26 steps ending in the written roster)",
-                skor != null && rest != null && letter != null && l.quests.containsKey("story_2_26") && !l.quests.containsKey("story_2_27")
+        check("chapter 2 is rewritten (Roran walks along, those who wait: Helvar, Sirok, Ashlord; Skor; Kael's letter; the roster is written) and the antidote replaces milk",
+                skor != null && rest != null && letter != null && l.quests.containsKey("story_2_26") && !l.quests.containsKey("story_2_21")
+                        && l.quests.containsKey("story_2_09b") && l.quests.containsKey("story_2_18b")
+                        && l.quests.get("story_1_17").objectives.stream().anyMatch(o -> o.target.equals("rtshop:antidote"))
                         && l.quests.get("story_2_02").companion != null && l.quests.get("story_2_25").rewardFlags.contains("ch2_roster_written")
                         && l.quests.get("story_3_01").requires.contains("story_2_26"), skor == null ? "null" : skor.toJson());
         QuestManager.reset(a);
@@ -2274,7 +2277,13 @@ public final class SelfTest {
         QuestManager.reset(a);
     }
 
+    private static String altarKeep = null;
+
     private static void magicGacha(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
+        // 룬 제단은 기본으로 1장을 끝내야 열린다: 뽑기 점검 동안은 잠금을 풀어 둔다 (잠금 자체는 storySystems 에서 본다)
+        com.rtshop.story.StorySystems.ensure();
+        altarKeep = com.rtshop.story.StorySystems.altarLockFlag;
+        com.rtshop.story.StorySystems.altarLockFlag = "";
         section("Magic gacha");
         com.rtshop.magic.MagicConfig real = com.rtshop.magic.MagicConfig.get();
         int realBooks = 0;

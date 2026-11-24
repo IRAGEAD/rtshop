@@ -2,7 +2,7 @@
 # 1장 바닐라(이사벨·위더·워든·엔더 드래곤), 2장 Mowzie's Mobs(로란), 3장 Aquamirae(오스카·코넬리아), 4장 L_Ender's Cataclysm(에르윈), 종장 이그니스. 플레이어는 폭풍 조사대의 수많은 대원 중 한 명.
 # 보스전은 「기억의 문」(전용 공간)에서 치른다: config/rtshop/story_arenas.json 에 있는 보스를 잡는 목표에는 입장 단추가 생긴다.
 # 결과: src/main/resources/rtshop_defaults/quests/story.json
-import json, os
+import json, os, re
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'quests', 'story.json')
 
@@ -490,6 +490,12 @@ for _q in Q:
             _lines.insert(_pos, "▷ " + _text)
         _o["lines"] = _lines
 assert _used == set(REPLIES), set(REPLIES) - _used
+
+# 4판으로 다시 쓴 장: 「장 이름 (i/n)」 번호를 실제 순서대로 다시 매긴다 (퀘스트를 끼워 넣거나 빼도 ID 는 그대로 두려고)
+for _prefix in ("story_0_", "story_1_", "story_2_"):
+    _qs = [x for x in Q if x["id"].startswith(_prefix)]
+    for _i, _x in enumerate(_qs):
+        _x["chain"] = re.sub(r"\(\d+/\d+\)$", "(%d/%d)" % (_i + 1, len(_qs)), _x["chain"])
 
 data = {
     "_help": "메인 스토리 「골디아 연대기」 3판 (서장·1~4장·종장·숨은 이야기). 이 파일은 모드 업데이트 때 새 기본값으로 바뀔 수 있으니, 직접 고쳤다면 이 파일을 계속 고쳐 쓰세요 (고친 파일은 덮어쓰지 않습니다). "

@@ -75,6 +75,9 @@ public final class ModItems {
     public static final RegistryObject<Item> OATH_SCROLL = ITEMS.register("oath_scroll",
             () -> new StoryItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false, 2));
 
+    /** 해독제: 독·시듦·허기를 없앤다. */
+    public static final RegistryObject<Item> ANTIDOTE = ITEMS.register("antidote", () -> new AntidoteItem(new Item.Properties().stacksTo(16)));
+
     // ---- 이야기 물건 (2판 스토리) ----
     public static final RegistryObject<Item> MOTHER_JOURNAL = story("mother_journal", 1, net.minecraft.world.item.Rarity.RARE, true, 3);
     public static final RegistryObject<Item> GREY_COIN = story("grey_coin", 16, net.minecraft.world.item.Rarity.UNCOMMON, false, 2);
