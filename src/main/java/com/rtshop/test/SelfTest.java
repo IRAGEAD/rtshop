@@ -2339,6 +2339,27 @@ public final class SelfTest {
         boolean fin3 = QuestManager.isCompleted(a, "story_3_27") && QuestManager.hasFlag(a, "seal_cornelia") && QuestManager.hasFlag(a, "clue_two_cloaks")
                 && QuestManager.hasFlag(a, "ch3_released") && !QuestManager.hasFlag(a, "ch3_kept_lantern");
         check("chapter 3 progress moves over the same way (the lantern choice is kept)", mid3 && fin3, mid3 + "/" + fin3);
+        QuestDef door = l.quests.get("story_4_26"), glove = l.quests.get("story_4_28");
+        check("chapter 4 is rewritten (six seals walked six ways, the portraits, the council, through the door, under the glove)",
+                door != null && glove != null && l.quests.containsKey("story_4_29") && !l.quests.containsKey("story_4_30")
+                        && l.quests.get("story_4_02").companion != null && l.quests.get("story_4_12").companion != null && door.choices.size() == 2
+                        && glove.choices.size() == 2 && glove.rewardFlags.contains("erwin_betrayal") && l.quests.get("story_4_11").rewardFlags.contains("clue_eighth_king")
+                        && l.quests.get("story_4_29").rewardFlags.contains("story_ch4_done") && l.quests.get("story_5_01").requires.contains("story_4_29"),
+                door == null ? "null" : door.toJson());
+        QuestManager.reset(a);
+        for (String f : List.of("story_v4", "story_v5", "story_v6")) QuestManager.setFlag(a, f, true);
+        QuestManager.forceComplete(a, "story_4_05");
+        QuestManager.setFlag(a, "seal_monstrosity", true);
+        QuestManager.setFlag(a, "story_v7", false);
+        QuestManager.migrateStory7(a);
+        boolean mid4 = !QuestManager.isCompleted(a, "story_4_05") && !QuestManager.hasFlag(a, "seal_monstrosity") && QuestManager.hasFlag(a, "story_v7");
+        QuestManager.reset(a);
+        for (String f : List.of("story_ch4_done", "ch4_feigned")) QuestManager.setFlag(a, f, true);
+        QuestManager.setFlag(a, "story_v7", false);
+        QuestManager.migrateStory7(a);
+        boolean fin4 = QuestManager.isCompleted(a, "story_4_29") && QuestManager.hasFlag(a, "seal_maledictus") && QuestManager.hasFlag(a, "erwin_betrayal")
+                && QuestManager.hasFlag(a, "ch4_feigned") && !QuestManager.hasFlag(a, "ch4_refused");
+        check("chapter 4 progress moves over the same way (the answer to Erwin is kept)", mid4 && fin4, mid4 + "/" + fin4);
         QuestManager.reset(a);
     }
 
@@ -2830,7 +2851,7 @@ public final class SelfTest {
         QuestManager.Loaded l = QuestManager.loaded();
         List<String> story = new ArrayList<>();
         for (String id : l.quests.keySet()) if (id.startsWith("story_") || id.startsWith("hidden_")) story.add(id);
-        check("the main story (3rd edition: prologue, 4 chapters, finale + hidden story) is installed", story.size() >= 100 && l.quests.containsKey("story_5_08") && l.quests.containsKey("story_4_23") && l.quests.containsKey("story_1_29")
+        check("the main story (3rd edition: prologue, 4 chapters, finale + hidden story) is installed", story.size() >= 100 && l.quests.containsKey("story_5_08") && l.quests.containsKey("story_4_29") && l.quests.containsKey("story_1_29")
                 && l.quests.containsKey("hidden_illusioner_2") == net.minecraftforge.fml.ModList.get().isLoaded("illusioner"), story.size());
         check("the story quests load without problems", l.problems.stream().noneMatch(x -> x.contains("story")), l.problems);
         check("the order's three NPCs exist", l.npcs.containsKey("order_elder") && l.npcs.containsKey("order_archivist") && l.npcs.containsKey("order_captain"));
