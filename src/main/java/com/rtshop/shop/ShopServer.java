@@ -527,6 +527,7 @@ public final class ShopServer {
         com.rtshop.story.Dialogue.reload();
         com.rtshop.story.StoryText.reload();
         com.rtshop.story.StorySystems.load();
+        com.rtshop.compat.SpellMana.load();
         com.rtshop.stats.ItemStats.load();
         com.rtshop.stats.ItemStats.syncAll(ctx.getSource().getServer());
         com.rtshop.story.WildSpawns.reload();

@@ -1532,5 +1532,6 @@
   "rtshop.notebook.title": "Field Notebook",
   "rtshop.notebook.empty": "Nothing examined yet. Traces you look at during story quests are written down here.",
   "item.rtshop.antidote": "Antidote",
-  "item.rtshop.antidote.tip": "Drink to cure poison, wither and hunger."
+  "item.rtshop.antidote.tip": "Drink to cure poison, wither and hunger.",
+  "rtshop.spellmana.low": "Not enough mana (need %s / have %s)"
 }

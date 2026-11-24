@@ -688,6 +688,7 @@ NEW = {
  "rtshop.notebook.empty": ("아직 살펴본 흔적이 없다. 이야기 퀘스트가 가리키는 곳에서 빛나는 흔적에 다가가 살펴보면 여기에 적힌다.", "Nothing examined yet. Traces you look at during story quests are written down here."),
  "item.rtshop.antidote": ("해독제", "Antidote"),
  "item.rtshop.antidote.tip": ("마시면 독·시듦·허기가 사라진다.", "Drink to cure poison, wither and hunger."),
+ "rtshop.spellmana.low": ("마나가 부족합니다 (필요 %s / 지금 %s)", "Not enough mana (need %s / have %s)"),
  "rtshop.magic.tab.select": ("분야 선택 뽑기", "Chosen field"),
  "rtshop.magic.tab.random": ("무작위 뽑기", "Random"),
  "rtshop.magic.tab.reroll": ("인챈트 재설정", "Enchant reroll"),

@@ -2225,6 +2225,37 @@ public final class SelfTest {
         QuestManager.loaded().quests.remove("t_inspect");
         QuestManager.loaded().npcs.remove("t_comp");
         QuestManager.reset(a);
+        // 마나 통일 (RPG Series → Iron's Spells 마나)
+        {
+            boolean both = net.minecraftforge.fml.ModList.get().isLoaded("spell_engine") && net.minecraftforge.fml.ModList.get().isLoaded("irons_spellbooks");
+            com.rtshop.compat.SpellMana.SPELL.put("t:free", 0);
+            check("spell mana: cost follows the spell's tier, the highest tier covers anything above, and a per-spell value wins",
+                    com.rtshop.compat.SpellMana.cost("t:x", 2) == com.rtshop.compat.SpellMana.TIER.get(2)
+                            && com.rtshop.compat.SpellMana.cost("t:x", 99) == com.rtshop.compat.SpellMana.TIER.get(4)
+                            && com.rtshop.compat.SpellMana.cost("t:free", 3) == 0, com.rtshop.compat.SpellMana.TIER);
+            com.rtshop.compat.SpellMana.SPELL.remove("t:free");
+            check("spell mana: hooked into Spell Engine when it and Iron's Spells are both present (and idle otherwise)",
+                    com.rtshop.compat.SpellMana.hookedForTest() == both, both + " hooked=" + com.rtshop.compat.SpellMana.hookedForTest());
+            if (both) check("spell mana: a player's Iron's Spells mana can be read", com.rtshop.compat.SpellMana.mana(a) >= 0, com.rtshop.compat.SpellMana.mana(a));
+            if (both && net.minecraftforge.fml.ModList.get().isLoaded("wizards")) {
+                String empty = "?", full = "?";
+                try {
+                    java.lang.reflect.Method at = Class.forName("net.spell_engine.internals.casting.SpellCasting")
+                            .getMethod("attempt", net.minecraft.world.entity.player.Player.class, ItemStack.class, ResourceLocation.class, boolean.class);
+                    ResourceLocation fb = new ResourceLocation("wizards", "fireball");
+                    com.rtshop.compat.SpellMana.setManaForTest(a, 0F);
+                    Object r0 = at.invoke(null, a, ItemStack.EMPTY, fb, false);
+                    empty = String.valueOf(r0.getClass().getMethod("result").invoke(r0));
+                    com.rtshop.compat.SpellMana.setManaForTest(a, 500F);
+                    Object r1 = at.invoke(null, a, ItemStack.EMPTY, fb, false);
+                    full = String.valueOf(r1.getClass().getMethod("result").invoke(r1));
+                } catch (Throwable t) {
+                    empty = String.valueOf(t.getCause() != null ? t.getCause() : t);
+                }
+                check("spell mana: with no mana an RPG Series spell (wizards:fireball) can not be cast, with mana it can",
+                        empty.equals("ON_COOLDOWN") && full.equals("SUCCESS"), empty + " / " + full);
+            }
+        }
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
         QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");

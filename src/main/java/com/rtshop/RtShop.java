@@ -41,6 +41,7 @@ public class RtShop {
         event.enqueueWork(FarmEvents::registerCompat);
         event.enqueueWork(() -> {
             if (net.minecraftforge.fml.ModList.get().isLoaded("cinematic")) com.rtshop.magic.CinematicCompat.register();
+            if (net.minecraftforge.fml.ModList.get().isLoaded("spell_engine") && net.minecraftforge.fml.ModList.get().isLoaded("irons_spellbooks")) com.rtshop.compat.SpellMana.hook();
         });
     }
 
