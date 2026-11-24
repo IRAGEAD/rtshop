@@ -52,7 +52,7 @@ public final class Companions {
 
     /** 플레이어 -> (퀘스트 -> 동행). */
     private static final Map<UUID, Map<String, CompanionEntity>> LIVE = new HashMap<>();
-    private static final Map<UUID, long[]> IDLE = new HashMap<>(); // {마지막으로 움직인 시각, x, z 를 합친 값, 마지막 low 대사}
+    private static final Map<UUID, long[]> IDLE = new HashMap<>(); // {마지막으로 움직인 시각, 서 있는 자리, (안 씀), 마지막 혼잣말}
     public static final long SAY_GAP_MS = 7000;
 
     public static CompanionEntity of(ServerPlayer p, String questId) {
@@ -102,12 +102,9 @@ public final class Companions {
         return c;
     }
 
-    /** 동행이 떠난다. 퀘스트를 마쳐서 떠나는 길이면 작별 한마디. */
+    /** 동행이 떠난다. 퀘스트가 끝났거나 포기됐으면 그 퀘스트에서 한 말의 기록도 지운다. */
     static void leave(CompanionEntity c, ServerPlayer owner) {
-        if (owner != null && QuestManager.isCompleted(owner, c.questId)) {
-            c.lastSaid = 0;
-            say(c, "done");
-        }
+        if (owner != null && !QuestManager.isActive(owner, c.questId)) forget(owner, c.questId);
         if (c.level() instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.POOF, c.getX(), c.getY() + 1, c.getZ(), 10, 0.3, 0.5, 0.3, 0.01);
         if (c.ownerId != null) {
             Map<String, CompanionEntity> m = LIVE.get(c.ownerId);
@@ -116,32 +113,133 @@ public final class Companions {
         c.discard();
     }
 
-    /** 동행의 한마디 (알림 상자에 "이름: 대사"). 같은 동행은 7초에 한 번만 말한다. */
-    public static boolean say(CompanionEntity c, String when) {
-        ServerPlayer o = c.owner();
-        if (o == null) return false;
+    // ------------------------------------------------------------------ 동행의 말 (3.41: 같은 말을 되풀이하지 않고, 자리에 맞는 말만)
+    // 규칙: 도착 인사는 퀘스트마다 한 번. 흔적 한마디는 그 흔적에 붙은 말을 한 번. 쉴 때의 혼잣말은 줄마다 한 번, 싸움이 끝나고 한참 서 있을 때만.
+    //       싸울 때의 외침은 드물게(한 번 외치면 90초 쉼), 같은 줄을 잇달아 하지 않는다. 일이 끝나면(목표를 다 채우면) 작별 한마디를 한 번.
+    public static final long FIGHT_GAP_MS = 90_000, IDLE_FIRST_MS = 45_000, IDLE_GAP_MS = 150_000, LOW_GAP_MS = 60_000, CALM_MS = 20_000;
+    private static final String SAID = "rtshop_comp_said";
+
+    private static net.minecraft.nbt.CompoundTag saidStore(ServerPlayer p, boolean create) {
+        net.minecraft.nbt.CompoundTag pers = p.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG);
+        if (create && !p.getPersistentData().contains(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG)) {
+            p.getPersistentData().put(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG, pers);
+        }
+        if (create && !pers.contains(SAID)) pers.put(SAID, new net.minecraft.nbt.CompoundTag());
+        return pers.getCompound(SAID);
+    }
+
+    /** 이 퀘스트에서 이 말을 이미 했는가. */
+    public static boolean said(ServerPlayer p, String questId, String key) {
+        return saidStore(p, false).getCompound(questId).getBoolean(key);
+    }
+
+    private static void mark(ServerPlayer p, String questId, String key) {
+        net.minecraft.nbt.CompoundTag st = saidStore(p, true);
+        net.minecraft.nbt.CompoundTag qd = st.getCompound(questId);
+        qd.putBoolean(key, true);
+        st.put(questId, qd);
+    }
+
+    /** 퀘스트가 끝났거나 포기됐다: 그 퀘스트에서 한 말의 기록을 지운다 (다시 받으면 처음부터). */
+    static void forget(ServerPlayer p, String questId) {
+        saidStore(p, false).remove(questId);
+    }
+
+    private static JsonObject lines(CompanionEntity c) {
         QuestDef q = QuestManager.loaded().quests.get(c.questId);
-        if (q == null || q.companion == null || !q.companion.has("lines")) return false;
-        JsonObject lines = q.companion.getAsJsonObject("lines");
-        if (!lines.has(when) || !lines.get(when).isJsonArray()) return false;
-        JsonArray pool = lines.getAsJsonArray(when);
-        long now = System.currentTimeMillis();
-        if (pool.size() == 0 || now - c.lastSaid < SAY_GAP_MS) return false;
-        c.lastSaid = now;
-        String line = StoryText.t(o, Loc.pick(o, pool.get(c.getRandom().nextInt(pool.size()))));
+        return q == null || q.companion == null || !q.companion.has("lines") ? null : q.companion.getAsJsonObject("lines");
+    }
+
+    private static void speak(CompanionEntity c, ServerPlayer o, com.google.gson.JsonElement line) {
+        c.lastSaid = System.currentTimeMillis();
+        String text = StoryText.t(o, Loc.pick(o, line));
         com.rtshop.notice.Notice.send(o, Component.literal(c.getName().getString()).withStyle(ChatFormatting.GOLD)
-                .append(Component.literal(": " + line).withStyle(ChatFormatting.WHITE)));
+                .append(Component.literal(": " + text).withStyle(ChatFormatting.WHITE)));
+    }
+
+    /** 줄 묶음에서 아직 안 한 첫 줄을 한다. once 가 아니면 다 한 뒤 처음부터 돌되, 방금 한 줄은 잇달아 하지 않는다. */
+    private static boolean sayNext(CompanionEntity c, ServerPlayer o, String when, boolean once) {
+        JsonObject ls = lines(c);
+        if (ls == null || !ls.has(when) || !ls.get(when).isJsonArray()) return false;
+        JsonArray pool = ls.getAsJsonArray(when);
+        if (pool.size() == 0) return false;
+        for (int i = 0; i < pool.size(); i++) {
+            String key = when + i;
+            if (!said(o, c.questId, key)) {
+                mark(o, c.questId, key);
+                speak(c, o, pool.get(i));
+                return true;
+            }
+        }
+        if (once) return false;
+        int next = (c.lastIndex.getOrDefault(when, -1) + 1) % pool.size();
+        c.lastIndex.put(when, next);
+        speak(c, o, pool.get(next));
         return true;
     }
 
-    /** 살펴볼 흔적이 나타났다: 곁의 동행이 한마디. */
-    static void onSpotNear(ServerPlayer p) {
-        Map<String, CompanionEntity> m = LIVE.get(p.getUUID());
-        if (m == null) return;
-        for (CompanionEntity c : m.values()) if (c.isAlive() && say(c, "spot")) return;
+    /**
+     * 동행의 한마디 (알림 상자에 "이름: 대사"). when: arrive(한 번) · fight(드물게) · low · idle(줄마다 한 번) · done(한 번) · talk(말을 걸었을 때).
+     * 어떤 말이든 7초 안에는 잇달아 하지 않는다.
+     */
+    public static boolean say(CompanionEntity c, String when) {
+        ServerPlayer o = c.owner();
+        if (o == null) return false;
+        long now = System.currentTimeMillis();
+        if (now - c.lastSaid < SAY_GAP_MS && !"talk".equals(when)) return false;
+        switch (when) {
+            case "arrive", "done" -> {
+                if (said(o, c.questId, when)) return false;
+                JsonObject ls = lines(c);
+                if (ls == null || !ls.has(when) || !ls.get(when).isJsonArray() || ls.getAsJsonArray(when).size() == 0) return false;
+                mark(o, c.questId, when);
+                speak(c, o, ls.getAsJsonArray(when).get(0));
+                return true;
+            }
+            case "fight" -> {
+                if (now - c.lastFight < FIGHT_GAP_MS) return false;
+                if (!sayNext(c, o, "fight", false)) return false;
+                c.lastFight = now;
+                return true;
+            }
+            case "low" -> {
+                if (now - c.lastLow < LOW_GAP_MS) return false;
+                if (!sayNext(c, o, "low", false)) return false;
+                c.lastLow = now;
+                return true;
+            }
+            case "idle" -> {
+                return sayNext(c, o, "idle", true);
+            }
+            case "talk" -> {
+                if (now - c.lastSaid < 1500) return false;
+                return sayNext(c, o, "talk", false) || sayNext(c, o, "idle", false);
+            }
+            default -> {
+                return false;
+            }
+        }
     }
 
-    /** 매초: 불러낼 동행이 있는지, 주인이 위태로운지·오래 서 있는지. */
+    /** 살펴볼 흔적이 나타났다: 그 흔적이 동행의 퀘스트 것이면, 그 흔적에 붙은 한마디를 한다 (spot: {흔적 ID: 대사}). */
+    static void onSpotNear(ServerPlayer p, String questId, String spotId) {
+        CompanionEntity c = of(p, questId);
+        if (c == null) return;
+        JsonObject ls = lines(c);
+        if (ls == null || !ls.has("spot") || !ls.get("spot").isJsonObject()) return;
+        JsonObject by = ls.getAsJsonObject("spot");
+        String key = "spot:" + spotId;
+        if (!by.has(spotId) || said(p, questId, key)) return;
+        mark(p, questId, key);
+        speak(c, p, by.get(spotId));
+    }
+
+    private static boolean calm(ServerPlayer p, CompanionEntity c, long now) {
+        return c.getTarget() == null && p.tickCount - p.getLastHurtByMobTimestamp() > 400 && p.tickCount - p.getLastHurtMobTimestamp() > 400
+                && now - c.lastFight > CALM_MS && now - c.lastSaid > CALM_MS;
+    }
+
+    /** 매초: 불러낼 동행이 있는지, 일이 끝났는지, 주인이 위태로운지·오래 서 있는지. */
     static void update(ServerPlayer p) {
         for (QuestDef q : QuestManager.activeQuests(p)) {
             if (q.companion == null || of(p, q.id) != null) continue;
@@ -152,7 +250,7 @@ public final class Companions {
         Map<String, CompanionEntity> m = LIVE.get(p.getUUID());
         if (m == null || m.isEmpty()) return;
         long now = System.currentTimeMillis();
-        long[] st = IDLE.computeIfAbsent(p.getUUID(), k -> new long[]{now, 0, 0});
+        long[] st = IDLE.computeIfAbsent(p.getUUID(), k -> new long[]{now, 0, 0, 0});
         long here = p.blockPosition().asLong();
         if (st[1] != here) {
             st[1] = here;
@@ -160,13 +258,13 @@ public final class Companions {
         }
         for (CompanionEntity c : m.values()) {
             if (!c.isAlive()) continue;
-            if (p.getHealth() < p.getMaxHealth() * 0.35F && now - st[2] > 40_000) {
-                st[2] = now;
-                c.lastSaid = 0;
+            if (p.getHealth() < p.getMaxHealth() * 0.35F) {
                 say(c, "low");
-            } else if (now - st[0] > 30_000) {
+            } else if (QuestManager.objectivesDone(p, c.questId)) {
+                say(c, "done");
+            } else if (now - st[0] > IDLE_FIRST_MS && now - st[3] > IDLE_GAP_MS && calm(p, c, now)) {
+                if (say(c, "idle")) st[3] = now;
                 st[0] = now;
-                say(c, "idle");
             }
         }
     }

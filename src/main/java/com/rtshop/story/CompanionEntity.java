@@ -51,7 +51,8 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
     String style = "melee";
     private int downed;
     private int boltCooldown;
-    long lastSaid;
+    long lastSaid, lastFight, lastLow;
+    final java.util.Map<String, Integer> lastIndex = new java.util.HashMap<>();
     boolean saidFight;
 
     public CompanionEntity(EntityType<? extends CompanionEntity> type, Level level) {
@@ -271,8 +272,7 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && player.getUUID().equals(ownerId)) {
-            lastSaid = 0;
-            Companions.say(this, "idle");
+            Companions.say(this, "talk");
         }
         return InteractionResult.sidedSuccess(level().isClientSide);
     }

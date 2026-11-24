@@ -791,6 +791,13 @@ public final class QuestManager {
         return true;
     }
 
+    /** 진행 중인 퀘스트의 목표를 다 채웠는가 (보고만 남았는가). */
+    public static boolean objectivesDone(ServerPlayer p, String questId) {
+        QuestDef q = loaded.quests.get(questId);
+        int[] pg = prog(p).active.get(questId);
+        return q != null && pg != null && allDone(p, q, pg);
+    }
+
     // ------------------------------------------------------------------ 화면용 정보
 
     private static QuestView view(ServerPlayer p, QuestDef q, int state, int[] progress) {

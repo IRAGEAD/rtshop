@@ -130,7 +130,7 @@ public final class Spots {
                 String lb = label(p, ob);
                 com.rtshop.notice.Notice.send(p, lb.isEmpty() ? Component.translatable("rtshop.spot.appeared_plain")
                         : Component.translatable("rtshop.spot.appeared", lb));
-                Companions.onSpotNear(p);
+                Companions.onSpotNear(p, ((QuestDef) o[0]).id, ob.target);
             }
             if (at == null) continue;
             JsonObject j = new JsonObject();

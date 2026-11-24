@@ -20,16 +20,22 @@ curl -fsSL -o /tmp/cfr.jar https://repo1.maven.org/maven2/org/benf/cfr/0.152/cfr
 } > /tmp/inspect2/spellengine.txt 2>&1 || true
 (SEJ="$PWD/$(ls packcache/*.jar | grep -i "spell_engine" | head -1)"; mkdir -p /tmp/se && cd /tmp/se && unzip -o -q "$SEJ" && \
   java -jar /tmp/cfr.jar "$SEJ" --outputdir /tmp/inspect2/spellengine-src --silent true --jarfilter ".*(SpellHelper|SpellCast|SpellContainer|Spell\$|Spell$|AmmoUtil|SpellCooldown|SpellCasterEntity|SpellCastSyncHelper|ServerNetwork|Packets|SpellEvents|api.event.Event|StagedEvent|SpellExecution|cost.Ammo|SpellRegistry|HudMessages|HudRenderHelper).*" > /tmp/inspect2/spellengine-cfr.log 2>&1) || echo "se cfr failed"
-# 3.41: Qliphoth Awakening / Cinematic Cataclysm / FDLib 조사 (2·3장 마무리 보스와 연출에 쓰려고)
+# 3.41: Qliphoth Awakening 조사 (2·3장 마무리 보스에 쓰려고) + Spiral Abyss 층 입장 흐름 (층 모드를 이야기 때만 열려고)
+QJ=""
+for J in packcache/*.jar; do
+  if unzip -p "$J" META-INF/mods.toml 2>/dev/null | grep -qiE "qliphoth|awakening"; then QJ="$J"; fi
+done
 {
-  for PAT in qliphoth cinematic.cataclysm cinematiccataclysm fdlib; do
-    for J in $(ls packcache/*.jar | grep -iE "$PAT"); do
-      echo "######## $J"; unzip -p "$J" META-INF/mods.toml 2>/dev/null | head -n 50
-      echo "==== files (data/assets, no textures)"; unzip -l "$J" | awk '{print $4}' | grep -E "^(data|assets)/" | grep -vE "\.(png|ogg|mcmeta)$" | head -n 700
-      echo "==== classes"; unzip -l "$J" | awk '{print $4}' | grep -E "\.class$" | grep -v '\$' | head -n 500
-      for L in $(unzip -l "$J" | awk '{print $4}' | grep -E "assets/[^/]+/lang/en_us\.json$"); do echo "==== $L"; unzip -p "$J" "$L" | head -c 30000; echo; done
-      for L in $(unzip -l "$J" | awk '{print $4}' | grep -E "data/.*/(worldgen/structure|worldgen/structure_set|worldgen/biome|dimension|dimension_type|advancements|loot_tables/entities|tags/worldgen)/.*\.json$" | head -n 80); do echo "---- $L"; unzip -p "$J" "$L" | head -c 1800; echo; done
-    done
-  done
+  echo "all jars:"; ls packcache | head -n 200
+  echo "######## qliphoth jar: $QJ"
+  if [ -n "$QJ" ]; then
+    unzip -p "$QJ" META-INF/mods.toml | head -n 60
+    echo "==== files (data/assets, no textures/sounds/models/animations)"; unzip -l "$QJ" | awk '{print $4}' | grep -E "^(data|assets)/" | grep -vE "\.(png|ogg|mcmeta)$|/models/|/animations/|/geo/|/particles/|/blockstates/" | head -n 900
+    echo "==== classes"; unzip -l "$QJ" | awk '{print $4}' | grep -E "\.class$" | grep -v '\$' | head -n 700
+    for L in $(unzip -l "$QJ" | awk '{print $4}' | grep -E "assets/[^/]+/lang/en_us\.json$"); do echo "==== $L"; unzip -p "$QJ" "$L" | head -c 60000; echo; done
+    for L in $(unzip -l "$QJ" | awk '{print $4}' | grep -E "data/.*/(worldgen/structure|worldgen/structure_set|dimension|dimension_type|advancements|loot_tables/entities|tags/worldgen|tags/entity_types)/.*\.json$" | head -n 120); do echo "---- $L"; unzip -p "$QJ" "$L" | head -c 1600; echo; done
+  fi
 } > /tmp/inspect2/qliphoth.txt 2>&1 || true
-(for PAT in qliphoth cinematic.cataclysm cinematiccataclysm; do J="$(ls packcache/*.jar | grep -iE "$PAT" | head -1)"; [ -n "$J" ] && java -jar /tmp/cfr.jar "$PWD/$J" --outputdir "/tmp/inspect2/src-$(basename "$J" .jar | cut -c1-24)" --silent true > /dev/null 2>&1; done) || echo "qliphoth cfr failed"
+if [ -n "$QJ" ]; then java -jar /tmp/cfr.jar "$PWD/$QJ" --outputdir /tmp/inspect2/src-qliphoth --silent true > /dev/null 2>&1 || echo "qliphoth cfr failed"; fi
+SAJ="$(ls packcache/*.jar | grep -iE "spiral.?abyss" | head -1)"
+if [ -n "$SAJ" ]; then java -jar /tmp/cfr.jar "$PWD/$SAJ" --outputdir /tmp/inspect2/src-spiral --silent true --jarfilter ".*(FloorController|PortalParties|AbyssNetwork|AbyssParties|ArenaSession|EndlessWaves|AbyssPlayers|GuestFloorRules|FloorProgress|AbyssCycle|QliphothEncounters|AbyssConfig).*" > /dev/null 2>&1 || echo "spiral cfr failed"; fi
