@@ -21,13 +21,9 @@ curl -fsSL -o /tmp/cfr.jar https://repo1.maven.org/maven2/org/benf/cfr/0.152/cfr
 (SEJ="$PWD/$(ls packcache/*.jar | grep -i "spell_engine" | head -1)"; mkdir -p /tmp/se && cd /tmp/se && unzip -o -q "$SEJ" && \
   java -jar /tmp/cfr.jar "$SEJ" --outputdir /tmp/inspect2/spellengine-src --silent true --jarfilter ".*(SpellHelper|SpellCast|SpellContainer|Spell\$|Spell$|AmmoUtil|SpellCooldown|SpellCasterEntity|SpellCastSyncHelper|ServerNetwork|Packets|SpellEvents|api.event.Event|StagedEvent|SpellExecution|cost.Ammo|SpellRegistry|HudMessages|HudRenderHelper).*" > /tmp/inspect2/spellengine-cfr.log 2>&1) || echo "se cfr failed"
 # 3.41: Qliphoth Awakening 조사 (2·3장 마무리 보스에 쓰려고) + Spiral Abyss 층 입장 흐름 (층 모드를 이야기 때만 열려고)
-QJ=""
-for J in packcache/*.jar; do
-  if unzip -p "$J" META-INF/mods.toml 2>/dev/null | grep -qiE "qliphoth|awakening"; then QJ="$J"; fi
-done
+QJ="$(ls packcache/*.jar | grep -i "fdbosses" | head -1)"
 {
-  echo "all jars:"; ls packcache | head -n 200
-  echo "######## qliphoth jar: $QJ"
+    echo "######## qliphoth jar: $QJ"
   if [ -n "$QJ" ]; then
     unzip -p "$QJ" META-INF/mods.toml | head -n 60
     echo "==== files (data/assets, no textures/sounds/models/animations)"; unzip -l "$QJ" | awk '{print $4}' | grep -E "^(data|assets)/" | grep -vE "\.(png|ogg|mcmeta)$|/models/|/animations/|/geo/|/particles/|/blockstates/" | head -n 900
