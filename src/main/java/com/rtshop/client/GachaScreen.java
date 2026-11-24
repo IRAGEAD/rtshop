@@ -634,7 +634,8 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             double p = c[gi] * e.get("weight").getAsInt() / Math.max(1, sum[gi]);
             int yy = y + 3 + k * 12;
             g.fill(x + 3, yy, x + 5, yy + 9, GachaColors.window(GRADES[gi], true));
-            g.drawString(this.font, Ui.clip(this.font, name(e), W - 130), x + 8, yy + 1, Ui.C_INK, false);
+            boolean hid = gi == com.rtshop.gacha.GachaConfig.YAMATO; // 야마토 등급의 물건은 뽑기 전까지 이름도 숨긴다
+            g.drawString(this.font, hid ? GachaColors.windowName(GRADES[gi]) : Ui.clip(this.font, name(e), W - 130), x + 8, yy + 1, hid ? GachaColors.window(GRADES[gi], true) : Ui.C_INK, false);
             String gp = GachaColors.windowName(GRADES[gi]) + "  " + pct(p);
             g.drawString(this.font, gp, x + W - 24 - this.font.width(gp), yy + 1, gi == com.rtshop.gacha.GachaConfig.YAMATO ? GachaColors.window(GRADES[gi], true) : Ui.C_INK_SOFT, false);
         }

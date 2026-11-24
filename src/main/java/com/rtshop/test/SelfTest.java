@@ -2317,6 +2317,28 @@ public final class SelfTest {
         QuestManager.migrateStory5(a);
         boolean fin2 = QuestManager.isCompleted(a, "story_2_26") && QuestManager.hasFlag(a, "seal_umvuthi");
         check("chapter 2 progress moves over the same way", mid2 && fin2, mid2 + "/" + fin2);
+        QuestDef ner = l.quests.get("story_3_22"), orb = l.quests.get("story_3_23");
+        check("chapter 3 is rewritten (Oscar walks along, the morning star, Nerakyss, the cracked orb under the cabin floor)",
+                ner != null && orb != null && l.quests.containsKey("story_3_27") && l.quests.get("story_3_03").companion != null
+                        && ner.objectives.size() == 1 && ner.objectives.get(0).target.equals(net.minecraftforge.fml.ModList.get().isLoaded("block_factorys_bosses") ? "block_factorys_bosses:kraken" : "minecraft:elder_guardian")
+                        && orb.rewardFlags.contains("clue_two_cloaks") && l.quests.get("story_3_15").rewardFlags.contains("clue_hidden_page")
+                        && l.quests.get("story_3_18").choices.size() == 2 && l.quests.get("story_3_27").rewardFlags.contains("story_ch3_done")
+                        && l.quests.get("story_4_01").requires.contains("story_3_27") && (!l.quests.containsKey("hidden_illusioner_0") || l.quests.get("hidden_illusioner_0").requires.contains("story_3_15")),
+                ner == null ? "null" : ner.toJson());
+        QuestManager.reset(a);
+        for (String f : List.of("story_v4", "story_v5")) QuestManager.setFlag(a, f, true);
+        QuestManager.forceComplete(a, "story_3_05");
+        QuestManager.setFlag(a, "seal_maze_mother", true);
+        QuestManager.setFlag(a, "story_v6", false);
+        QuestManager.migrateStory6(a);
+        boolean mid3 = !QuestManager.isCompleted(a, "story_3_05") && !QuestManager.hasFlag(a, "seal_maze_mother") && QuestManager.hasFlag(a, "story_v6");
+        QuestManager.reset(a);
+        for (String f : List.of("story_ch3_done", "ch3_released")) QuestManager.setFlag(a, f, true);
+        QuestManager.setFlag(a, "story_v6", false);
+        QuestManager.migrateStory6(a);
+        boolean fin3 = QuestManager.isCompleted(a, "story_3_27") && QuestManager.hasFlag(a, "seal_cornelia") && QuestManager.hasFlag(a, "clue_two_cloaks")
+                && QuestManager.hasFlag(a, "ch3_released") && !QuestManager.hasFlag(a, "ch3_kept_lantern");
+        check("chapter 3 progress moves over the same way (the lantern choice is kept)", mid3 && fin3, mid3 + "/" + fin3);
         QuestManager.reset(a);
     }
 
