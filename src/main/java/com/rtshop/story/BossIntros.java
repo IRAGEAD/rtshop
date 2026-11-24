@@ -135,6 +135,20 @@ public final class BossIntros {
         }
     }
 
+    /** 물건 ID → 설명 아래에 붙는 이야기. */
+    public static final Map<String, String[]> ITEM_LORE = new java.util.LinkedHashMap<>();
+
+    static {
+        ITEM_LORE.put("efn:meen_spear", new String[]{
+                "— 황혼불, 저녁의 마지막 불 —",
+                "최초의 불꽃이 아직 아무것도 먹지 않고",
+                "그저 기억하기만 하던 때의 불빛.",
+                "잿빛 해가 오기 전날 저녁, 화로의 백 번째 대장장이가",
+                "불 한 줌을 쇠 안에 식혀 가두었다. 이름은 새기지 않았다.",
+                "이 불은 쥔 사람의 이름을 태우지 않고 붙든다.",
+                "지닌 채 말을 걸면, 불을 아는 이들의 말이 달라진다."});
+    }
+
     public static void sendLore(ServerPlayer p) {
         if (p instanceof FakePlayer || p.connection == null) return;
         JsonObject o = new JsonObject();
@@ -144,6 +158,12 @@ public final class BossIntros {
             a.add("— " + StoryText.t(p, e.getValue().name) + ", " + StoryText.t(p, e.getValue().epithet) + " —");
             for (String l : e.getValue().lore) a.add(l);
             o.add("boss:" + e.getKey(), a);
+        }
+        // 이야기가 얽힌 물건 (물건 ID 로 붙는다)
+        for (Map.Entry<String, String[]> e : ITEM_LORE.entrySet()) {
+            JsonArray a = new JsonArray();
+            for (String l : e.getValue()) a.add(l);
+            o.add(e.getKey(), a);
         }
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.LORE, StoryText.json(p, o).toString()));
     }

@@ -90,14 +90,28 @@ public final class Dialogue {
 
     // ------------------------------------------------------------------ 조건
 
-    /** need: {flags:[], notFlags:[], quests:[] (완료한 퀘스트)} */
+    /** need: {flags:[], notFlags:[], quests:[] (완료한 퀘스트), items:[] (지니고 있는 물건)} */
     static boolean ok(ServerPlayer p, JsonObject o) {
         if (o == null || !o.has("need")) return true;
         JsonObject n = o.getAsJsonObject("need");
         if (n.has("flags")) for (JsonElement e : n.getAsJsonArray("flags")) if (!QuestManager.hasFlag(p, e.getAsString())) return false;
         if (n.has("notFlags")) for (JsonElement e : n.getAsJsonArray("notFlags")) if (QuestManager.hasFlag(p, e.getAsString())) return false;
         if (n.has("quests")) for (JsonElement e : n.getAsJsonArray("quests")) if (!QuestManager.isCompleted(p, e.getAsString())) return false;
+        if (n.has("items")) for (JsonElement e : n.getAsJsonArray("items")) if (!carries(p, e.getAsString())) return false;
         return true;
+    }
+
+    /** 이 물건을 지니고 있는가 (가방·양손·갑옷). */
+    public static boolean carries(ServerPlayer p, String itemId) {
+        net.minecraft.resources.ResourceLocation rl = net.minecraft.resources.ResourceLocation.tryParse(itemId);
+        if (rl == null) return false;
+        net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(rl);
+        if (item == null || item == net.minecraft.world.item.Items.AIR) return false;
+        return p.getInventory().contains(new net.minecraft.world.item.ItemStack(item));
+    }
+
+    public static boolean okForTest(ServerPlayer p, JsonObject o) {
+        return ok(p, o);
     }
 
     static String text(ServerPlayer p, JsonElement e) {

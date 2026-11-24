@@ -2256,6 +2256,18 @@ public final class SelfTest {
                         empty.equals("ON_COOLDOWN") && full.equals("SUCCESS"), empty + " / " + full);
             }
         }
+        // 황혼불: 지니고 있을 때만 열리는 대화 조건
+        {
+            com.google.gson.JsonObject cond = com.google.gson.JsonParser.parseString("{\"need\":{\"items\":[\"minecraft:blaze_rod\"]}}").getAsJsonObject();
+            a.getInventory().clearContent();
+            boolean without = com.rtshop.story.Dialogue.okForTest(a, cond);
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.BLAZE_ROD));
+            boolean with = com.rtshop.story.Dialogue.okForTest(a, cond);
+            a.getInventory().clearContent();
+            check("a conversation can depend on an item being carried (Duskfire's hidden talk) and the item has its story text",
+                    !without && with && com.rtshop.story.BossIntros.ITEM_LORE.containsKey("efn:meen_spear")
+                            && com.rtshop.story.Dialogue.npcForTest("quest_order_elder").toString().contains("duskfire"), without + "/" + with);
+        }
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
         QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");
