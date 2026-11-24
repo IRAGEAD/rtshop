@@ -527,9 +527,43 @@ public final class QuestManager {
         return n > 0;
     }
 
+    /**
+     * 스토리 4판(대개편)으로 옮기기: 서장·1장이 새로 쓰였다. 1장을 끝낸 사람은 새 서장·1장도 끝낸 것으로,
+     * 1장 도중이던 사람은 1장의 처음부터 (서장을 끝냈으면 서장은 끝낸 것으로). 한 번만 한다 (story_v4 표식).
+     */
+    public static boolean migrateStory4(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        if (pr.flags.contains("story_v4")) return false;
+        boolean ch0 = pr.flags.contains("order_apprentice"), ch1 = pr.flags.contains("story_ch1_done");
+        int n = 0;
+        if (!ch1) { // 1장 도중: 예전 번호로 끝낸 1장 퀘스트와 그 표식을 걷어 낸다
+            for (String id : new ArrayList<>(pr.completed)) {
+                if (id.startsWith("story_1_") && pr.completed.remove(id)) n++;
+            }
+            pr.active.keySet().removeIf(id -> id.startsWith("story_1_") || id.startsWith("story_0_"));
+            for (String f : List.of("ch1_three_ends", "clue_grey_coin", "clue_gloved_hand", "ch1_saved_records", "ch1_saved_apprentice",
+                    "ch1_told_all", "ch1_folded")) pr.flags.remove(f);
+        }
+        for (QuestDef q : loaded.quests.values()) {
+            boolean mark = (ch0 && q.id.startsWith("story_0_")) || (ch1 && q.id.startsWith("story_1_"));
+            if (mark && !pr.completed.contains(q.id)) {
+                pr.completed.add(q.id);
+                pr.active.remove(q.id);
+                pr.flags.addAll(q.rewardFlags);
+                n++;
+            }
+        }
+        pr.flags.add("story_v4");
+        QuestData.get(p.server).dirty();
+        return n > 0;
+    }
+
     @SubscribeEvent
     public static void onLoginMigrate(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer p && loaded.quests.containsKey("story_1_01")) migrateStory(p);
+        if (event.getEntity() instanceof ServerPlayer p && loaded.quests.containsKey("story_1_01")) {
+            migrateStory(p);
+            migrateStory4(p);
+        }
     }
 
     /** 받을 수 있는 조건(선행 퀘스트·표식)을 만족하는가. 이미 완료했거나 진행 중이면 false. */
@@ -1217,6 +1251,7 @@ public final class QuestManager {
     /** 지금 이 구조물(ID, #태그, "모드:*") 안이나 곁에 있는가. */
     public static boolean atStructure(ServerPlayer p, String target) {
         if (target == null || target.isBlank()) return true;
+        if (target.startsWith("dim:")) return p.level().dimension().location().toString().equals(target.substring(4).trim()); // 그 차원에 들어서면
         QuestDef.Objective ob = new QuestDef.Objective();
         ob.type = QuestDef.Type.STRUCTURE;
         ob.target = target.trim();

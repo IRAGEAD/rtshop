@@ -70,6 +70,18 @@ public class QuestScreen extends Screen {
         return this.font.width(talkLabel()) + 12;
     }
 
+    private String noteLabel() {
+        return Component.translatable("rtshop.notebook.title").getString();
+    }
+
+    private int noteW() {
+        return this.font.width(noteLabel()) + 12;
+    }
+
+    private int noteX() {
+        return fx + 10 + this.font.width(this.title.getString()) + 10;
+    }
+
     private String arenaLabel() {
         return "\u2694 " + Component.translatable("rtshop.arena.button").getString();
     }
@@ -313,6 +325,9 @@ public class QuestScreen extends Screen {
             int tx0 = tabX(0);
             String t = Ui.clip(this.font, this.title.getString(), tx0 - fx - 18);
             g.drawString(this.font, t, fx + 10, fy + 9, Ui.C_GOLD, true);
+            // [조사 수첩]: 살펴본 흔적 다시 읽기
+            int nx = noteX(), nw = noteW();
+            if (nx + nw + 6 <= tx0) Ui.button(g, this.font, nx, fy + 6, nw, 14, noteLabel(), Ui.inside(mx, my, nx, fy + 6, nw, 14), true);
             for (int i = 0; i < 3; i++) {
                 int tx = tabX(i), tw = this.font.width(tabLabel(i)) + 12;
                 boolean on = i == tab, hov = Ui.inside(mx, my, tx, fy + 6, tw, 14);
@@ -559,6 +574,11 @@ public class QuestScreen extends Screen {
         if (backNpc >= 0 && Ui.inside(mx, my, fx + 8, fy + 6, backW(), 14)) {
             click();
             goBack();
+            return true;
+        }
+        if (data.journal && noteX() + noteW() + 6 <= tabX(0) && Ui.inside(mx, my, noteX(), fy + 6, noteW(), 14)) {
+            click();
+            if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.connection.sendCommand("rtshop notebook");
             return true;
         }
         if (data.journal) {

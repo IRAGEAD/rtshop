@@ -1528,5 +1528,7 @@
   "rtshop.qedit.hint_inspect": "traceid@structure (e.g. old_camp@minecraft:end_city). When the player reaches that structure a trace appears nearby; right-clicking it fills the goal. Leave the structure out and it appears right away.",
   "rtshop.rite.sleeping": "The dragon sleeps on the pedestal, hard as stone. Place crystals on its four sides to wake it.",
   "entity.rtshop.companion": "Companion",
-  "rtshop.qedit.type_inspect": "Inspect"
+  "rtshop.qedit.type_inspect": "Inspect",
+  "rtshop.notebook.title": "Field Notebook",
+  "rtshop.notebook.empty": "Nothing examined yet. Traces you look at during story quests are written down here."
 }

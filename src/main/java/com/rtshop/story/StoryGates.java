@@ -28,8 +28,8 @@ public final class StoryGates {
         if (p instanceof net.minecraftforge.common.util.FakePlayer && !applyToFakeForTest) return null;
         Rarity r = s.getRarity();
         // 3판: 1장이 위더·워든·엔더 드래곤까지 이어지므로 희귀는 '세 끝'을 떠날 때, 영웅은 1장을 마치면
-        if (r == Rarity.EPIC && !passed(p, "story_ch1_done", "story_1_29")) return "1장";
-        if (r == Rarity.RARE && !passed(p, "ch1_three_ends", "story_1_10")) return "1장 중반";
+        if (r == Rarity.EPIC && !passed(p, "story_ch1_done", "story_1_41")) return "1장";
+        if (r == Rarity.RARE && !passed(p, "ch1_three_ends", "story_1_15")) return "1장 중반";
         return null;
     }
 
@@ -37,8 +37,8 @@ public final class StoryGates {
     public static void sync(ServerPlayer p) {
         if (p instanceof net.minecraftforge.common.util.FakePlayer || p.connection == null) return;
         com.google.gson.JsonObject o = new com.google.gson.JsonObject();
-        String rare = enabled && !passed(p, "ch1_three_ends", "story_1_10") ? "1장 중반" : "";
-        String epic = enabled && !passed(p, "story_ch1_done", "story_1_29") ? "1장" : "";
+        String rare = enabled && !passed(p, "ch1_three_ends", "story_1_15") ? "1장 중반" : "";
+        String epic = enabled && !passed(p, "story_ch1_done", "story_1_41") ? "1장" : "";
         o.addProperty("rare", rare);
         o.addProperty("epic", epic);
         com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),

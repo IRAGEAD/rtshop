@@ -154,6 +154,12 @@ public final class StoryConfig {
                 "회색 망토의 학자가 약속한 \"끝나지 않는 삶\"을 대가로 봉인을 내주었고,",
                 "왕국은 저주로 얼어붙었다.",
                 "그는 아직 약속을 지킬 사람을 기다린다."));
+        m.put("block_factorys_bosses:underworld_knight", in("헬바르", "저승의 문턱을 지키는 이", "curse", "58D0E0",
+                "minecraft:entity.wither_skeleton.ambient,minecraft:block.soul_sand.break", "…문은, 내가 지킨다.", 3,
+                "불꽃 기사단의 부단장.",
+                "세 대장이 머리를 내놓아 하나의 무기가 되는 「세 머리의 서약」에",
+                "혼자 반대했다. \"동료를 무기로 만들 수는 없다.\"",
+                "기각된 뒤로 천 년, 서약이 맺어진 자리의 문을 지킨다."));
         m.put("cataclysm:ignis", in("이그니스", "화염의 군주", "ember", "FF5A14",
                 "minecraft:entity.wither.spawn,minecraft:item.firecharge.use,minecraft:entity.blaze.ambient", "또 왔구나, 견습이여.", 3,
                 "불꽃 기사단장 아르덴.",

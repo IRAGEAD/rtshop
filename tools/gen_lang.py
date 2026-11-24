@@ -684,6 +684,8 @@ NEW = {
  "rtshop.qedit.hint_inspect": ("흔적ID@구조물 (예: old_camp@minecraft:end_city). 플레이어가 그 구조물에 닿으면 근처에 흔적이 나타나고, 다가가 우클릭하면 채워진다. 구조물을 비우면 받자마자 곁에 나타난다.", "traceid@structure (e.g. old_camp@minecraft:end_city). When the player reaches that structure a trace appears nearby; right-clicking it fills the goal. Leave the structure out and it appears right away."),
  "rtshop.rite.sleeping": ("용은 받침대 위에서 돌처럼 굳어 잠들어 있다. 받침대 네 모서리에 수정을 놓으면 깨어난다.", "The dragon sleeps on the pedestal, hard as stone. Place crystals on its four sides to wake it."),
  "entity.rtshop.companion": ("동행", "Companion"),
+ "rtshop.notebook.title": ("조사 수첩", "Field Notebook"),
+ "rtshop.notebook.empty": ("아직 살펴본 흔적이 없다. 이야기 퀘스트가 가리키는 곳에서 빛나는 흔적에 다가가 살펴보면 여기에 적힌다.", "Nothing examined yet. Traces you look at during story quests are written down here."),
  "rtshop.magic.tab.select": ("분야 선택 뽑기", "Chosen field"),
  "rtshop.magic.tab.random": ("무작위 뽑기", "Random"),
  "rtshop.magic.tab.reroll": ("인챈트 재설정", "Enchant reroll"),

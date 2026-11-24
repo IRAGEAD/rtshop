@@ -208,6 +208,37 @@ public final class Spots {
         SENT.remove(event.getEntity().getUUID());
     }
 
+    /** 조사 수첩: 지금까지 살펴본 흔적(표식 spot_ID)을 퀘스트 순서대로 모아 보낸다. */
+    public static JsonObject notebook(ServerPlayer p) {
+        JsonArray arr = new JsonArray();
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        List<QuestDef> all = new ArrayList<>(QuestManager.loaded().quests.values());
+        all.sort(java.util.Comparator.comparingInt(q -> q.order));
+        for (QuestDef q : all) {
+            for (QuestDef.Objective ob : q.objectives) {
+                if (ob.type != QuestDef.Type.INSPECT || !QuestManager.hasFlag(p, "spot_" + ob.target)) continue;
+                if (!ob.mod.isEmpty() && !QuestDef.modOk(ob.mod)) continue;
+                if (!seen.add(ob.target)) continue;
+                JsonObject j = new JsonObject();
+                String chap = StoryText.t(p, q.chain).replaceAll("\\s*\\(\\d+/\\d+\\)$", "");
+                j.addProperty("chapter", chap.isEmpty() ? StoryText.t(p, q.title) : chap);
+                j.addProperty("quest", StoryText.t(p, q.title));
+                j.addProperty("label", ob.text.isEmpty() ? ob.target : StoryText.t(p, ob.text));
+                JsonArray lines = new JsonArray();
+                if (ob.lines != null) for (JsonElement e : ob.lines) lines.add(StoryText.t(p, Loc.pick(p, e)));
+                j.add("lines", lines);
+                arr.add(j);
+            }
+        }
+        JsonObject out = new JsonObject();
+        out.add("entries", arr);
+        return out;
+    }
+
+    public static void openNotebook(ServerPlayer p) {
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.NOTEBOOK, notebook(p).toString()));
+    }
+
     /** 점검용: 흔적을 바로 이 자리에 놓는다. */
     public static void placeForTest(ServerPlayer p, String id, BlockPos pos) {
         place(p, id, pos);

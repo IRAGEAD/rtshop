@@ -48,8 +48,27 @@ REPLIES = {
 }
 for k, v in REPLIES.items():
     EXTRA["▷ " + k] = "▷ " + v
+# 4판(대개편)으로 다시 쓴 장: 퀘스트 ID 별 번역 (ch01_en.py) 을 story.json 의 원문과 짝짓는다. 원문이 같아도 새 번역이 이긴다.
+import importlib.util
+story = json.load(open(os.path.join(root, 'src/main/resources/rtshop_defaults/quests/story.json'), encoding='utf-8'))
+byid = {x["id"]: x for x in story["quests"]}
+for mod in ("ch01_en",):
+    spec = importlib.util.spec_from_file_location(mod, os.path.join(here, mod + ".py"))
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    for qid, tr in m.EN.items():
+        qd = byid[qid]
+        for ko, en in zip((qd["title"], qd["intro"], qd["progress"], qd["done"]), tr):
+            out[ko] = en
+    missing = [i for i in byid if i.startswith(("story_0_", "story_1_")) and i not in m.EN]
+    if missing: print("번역 없는 퀘스트:", missing); sys.exit(1)
+EXTRA.update({"지도 제작자 펠릭스": "Felix the Mapmaker", "대장장이 브람": "Bram the Smith", "서장 폭풍 뒤의 부두": "Prologue: The Dock After the Storm",
+              "1장 잿불의 서약": "Chapter 1: The Ember Oath"})
 for k, v in EXTRA.items():
     out.setdefault(k, v)
+for qd in story["quests"]:
+    mm = re.match(r"^(.*) (\(\d+/\d+\))$", qd.get("chain", ""))
+    if mm and qd["chain"] not in out and mm.group(1) in out:
+        out[qd["chain"]] = out[mm.group(1)] + " " + mm.group(2)
 if n != len(src):
     print("번역 수가 원문과 다릅니다:", n, len(src)); sys.exit(1)
 dst = os.path.join(root, 'src/main/resources/rtshop_defaults/story_lang/en_us.json')

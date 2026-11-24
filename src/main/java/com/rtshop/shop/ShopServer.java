@@ -361,6 +361,10 @@ public final class ShopServer {
                             QuestManager.syncHud(sp);
                             return 1;
                         })))
+                .then(Commands.literal("notebook").executes(ctx -> {
+                    com.rtshop.story.Spots.openNotebook(ctx.getSource().getPlayerOrException());
+                    return 1;
+                }))
                 .then(Commands.literal("spot")
                         .then(Commands.literal("look").then(Commands.argument("id", StringArgumentType.word())
                                 .executes(ctx -> com.rtshop.story.Spots.look(ctx.getSource().getPlayerOrException(), StringArgumentType.getString(ctx, "id")) ? 1 : 0)))

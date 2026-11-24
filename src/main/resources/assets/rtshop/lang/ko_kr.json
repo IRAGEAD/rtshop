@@ -1528,5 +1528,7 @@
   "rtshop.qedit.hint_inspect": "흔적ID@구조물 (예: old_camp@minecraft:end_city). 플레이어가 그 구조물에 닿으면 근처에 흔적이 나타나고, 다가가 우클릭하면 채워진다. 구조물을 비우면 받자마자 곁에 나타난다.",
   "rtshop.rite.sleeping": "용은 받침대 위에서 돌처럼 굳어 잠들어 있다. 받침대 네 모서리에 수정을 놓으면 깨어난다.",
   "entity.rtshop.companion": "동행",
-  "rtshop.qedit.type_inspect": "조사"
+  "rtshop.qedit.type_inspect": "조사",
+  "rtshop.notebook.title": "조사 수첩",
+  "rtshop.notebook.empty": "아직 살펴본 흔적이 없다. 이야기 퀘스트가 가리키는 곳에서 빛나는 흔적에 다가가 살펴보면 여기에 적힌다."
 }

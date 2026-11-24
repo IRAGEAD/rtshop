@@ -32,7 +32,12 @@ public final class PartyConfig {
             "aquamirae:captain_cornelia", "aquamirae:maze_mother",
             "cataclysm:ignis", "cataclysm:netherite_monstrosity", "cataclysm:ender_guardian", "cataclysm:the_harbinger",
             "cataclysm:the_leviathan", "cataclysm:ancient_remnant", "cataclysm:maledictus", "cataclysm:scylla",
-            "illusioner:illusioner");
+            "illusioner:illusioner",
+            "block_factorys_bosses:underworld_knight", "block_factorys_bosses:yeti", "block_factorys_bosses:kraken",
+            "block_factorys_bosses:sandworm", "block_factorys_bosses:infernal_dragon");
+    /** 3.33 에서 더한 보스 (Bosses'Rise): 예전 설정 파일에도 한 번 넣어 준다. */
+    private static final List<String> ADDED_333 = List.of("block_factorys_bosses:underworld_knight", "block_factorys_bosses:yeti",
+            "block_factorys_bosses:kraken", "block_factorys_bosses:sandworm", "block_factorys_bosses:infernal_dragon");
 
     private static PartyConfig current;
 
@@ -80,6 +85,11 @@ public final class PartyConfig {
                     c.bosses.clear();
                     for (JsonElement e : o.getAsJsonArray("bosses")) c.bosses.add(e.getAsString());
                 }
+                if (!o.has("bossesAdded") && o.has("bosses")) {
+                    c.bosses.addAll(ADDED_333);
+                    JsonObject w = c.toJson();
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().create().toJson(w), StandardCharsets.UTF_8);
+                }
             } else {
                 Files.createDirectories(f.getParent());
                 Files.writeString(f, new GsonBuilder().setPrettyPrinting().create().toJson(c.toJson()), StandardCharsets.UTF_8);
@@ -101,6 +111,7 @@ public final class PartyConfig {
         JsonArray b = new JsonArray();
         for (String s : bosses) b.add(s);
         o.add("bosses", b);
+        o.addProperty("bossesAdded", 333);
         return o;
     }
 }

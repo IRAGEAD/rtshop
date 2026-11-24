@@ -1298,6 +1298,13 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             check("after the look is finished the trace is gone", SpotClient.countForTest() == 0, SpotClient.countForTest());
+            if (mc.player != null) mc.player.connection.sendCommand("rtshop notebook");
+            waitTicks(15);
+        });
+        add(mc -> {
+            check("the field notebook opens with the trace just examined", mc.screen instanceof NotebookScreen n && n.countForTest() == 1, mc.screen);
+            shot(mc, "124d_notebook");
+            mc.setScreen(null);
             onServer(mc, sp -> {
                 com.rtshop.quest.QuestManager.abandon(sp, "t_inspect");
                 com.rtshop.quest.QuestManager.loaded().quests.remove("t_inspect");

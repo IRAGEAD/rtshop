@@ -2166,6 +2166,10 @@ public final class SelfTest {
                 com.rtshop.story.Spots.done(a, "t_circle") && QuestManager.pendingInspects(a).size() == 1
                         && com.rtshop.story.Spots.placed(a, "t_circle") == null && QuestManager.hasFlag(a, "spot_t_circle"));
         check("the same trace can not be looked at twice", !com.rtshop.story.Spots.done(a, "t_circle"));
+        com.google.gson.JsonArray note = com.rtshop.story.Spots.notebook(a).getAsJsonArray("entries");
+        check("the field notebook lists what was looked at, with its text",
+                note.size() == 1 && note.get(0).getAsJsonObject().get("label").getAsString().equals("Old circle")
+                        && note.get(0).getAsJsonObject().getAsJsonArray("lines").size() == 1, note);
 
         // 동행
         com.rtshop.story.CompanionEntity c = com.rtshop.story.Companions.spawn(a, q);
@@ -2215,6 +2219,36 @@ public final class SelfTest {
         }
         QuestManager.loaded().quests.remove("t_inspect");
         QuestManager.loaded().npcs.remove("t_comp");
+        QuestManager.reset(a);
+        // 4판(대개편) 서장·1장
+        QuestManager.Loaded l = QuestManager.loaded();
+        QuestDef helvar = l.quests.get("story_1_19"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");
+        check("the rewritten prologue and chapter 1 are installed (lesson at the practice gate, Isabel walks along, Helvar's quest, 41 steps)",
+                lesson != null && helvar != null && walk != null && l.quests.containsKey("story_1_41") && walk.companion != null
+                        && lesson.objectives.stream().anyMatch(o -> o.type == QuestDef.Type.INSPECT)
+                        && helvar.objectives.size() == 1 && helvar.objectives.get(0).type == QuestDef.Type.KILL
+                        && l.npcs.containsKey("felix") && l.npcs.containsKey("bram"),
+                helvar == null ? "null" : helvar.toJson());
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        List<String> dup = new ArrayList<>();
+        for (QuestDef q : l.quests.values()) {
+            for (QuestDef.Objective ob : q.objectives) if (ob.type == QuestDef.Type.INSPECT && !ids.add(ob.target)) dup.add(ob.target);
+        }
+        check("every trace in the story has its own id", dup.isEmpty(), dup);
+        // 이주: 1장 도중이던 사람은 1장의 처음부터 (서장은 끝낸 것으로), 1장을 끝낸 사람은 새 1장도 끝낸 것으로
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "order_apprentice", true);
+        QuestManager.forceComplete(a, "story_1_05");
+        QuestManager.setFlag(a, "story_v4", false);
+        QuestManager.migrateStory4(a);
+        boolean mid = !QuestManager.isCompleted(a, "story_1_05") && QuestManager.isCompleted(a, "story_0_02b") && QuestManager.hasFlag(a, "story_v4");
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "order_apprentice", true);
+        QuestManager.setFlag(a, "story_ch1_done", true);
+        QuestManager.setFlag(a, "story_v4", false);
+        QuestManager.migrateStory4(a);
+        boolean fin = QuestManager.isCompleted(a, "story_1_41") && QuestManager.isCompleted(a, "story_1_19") && QuestManager.hasFlag(a, "ch1_three_ends");
+        check("moving to the rewritten story: mid-chapter players restart chapter 1 (prologue kept), finished players keep chapter 1 done", mid && fin, mid + "/" + fin);
         QuestManager.reset(a);
     }
 
@@ -2652,13 +2686,13 @@ public final class SelfTest {
             check("staged story structures: locked at first, plain structures are not, and world generation really asks (mixin applied)",
                     lockedAtStart && asked > 0, lockedAtStart + " asked=" + asked);
             QuestManager.reset(a);
-            // 모드 없이도 시험할 수 있게 이글루를 잠깐 단계적 건축물로 넣는다 (1장 7번 퀘스트가 이글루로 보낸다)
+            // 모드 없이도 시험할 수 있게 이글루를 잠깐 단계적 건축물로 넣는다 (1장 10번 퀘스트가 이글루로 보낸다)
             com.rtshop.story.StagedStructures.get().structures.put("minecraft:igloo", "");
             com.rtshop.story.StagedStructures.recompute(server);
-            for (String id : List.of("story_0_01", "story_0_02", "story_0_03", "story_1_01", "story_1_02", "story_1_03", "story_1_04", "story_1_05", "story_1_06"))
+            for (String id : List.of("story_0_01", "story_0_02", "story_0_02b", "story_0_03", "story_1_01", "story_1_02", "story_1_03", "story_1_04", "story_1_05", "story_1_06", "story_1_07", "story_1_08", "story_1_09"))
                 QuestManager.forceComplete(a, id);
             boolean took = com.rtshop.story.StagedStructures.isLocked("minecraft:igloo");
-            boolean took3 = QuestManager.accept(a, "story_1_07", "quest_order_archivist");
+            boolean took3 = QuestManager.accept(a, "story_1_10", "quest_order_archivist");
             boolean chamberOpen = !com.rtshop.story.StagedStructures.isLocked("minecraft:igloo");
             com.rtshop.story.StagedStructures.get().structures.remove("minecraft:igloo");
             boolean othersStill = com.rtshop.story.StagedStructures.isLocked("aquamirae:ship") && com.rtshop.story.StagedStructures.isLocked("minecraft:mansion");
@@ -2826,6 +2860,7 @@ public final class SelfTest {
         check("every NPC has things to talk about (18+ NPCs)", com.rtshop.story.Dialogue.npcCountForTest() >= 18
                 && com.rtshop.story.Dialogue.npcForTest("quest_order_elder") != null && com.rtshop.story.Dialogue.npcForTest("shop_fisher") != null);
         QuestManager.forceComplete(a, "story_0_02");
+        QuestManager.forceComplete(a, "story_0_02b");
         boolean took2 = QuestManager.accept(a, "story_0_03", "quest_order_elder");
         boolean pending = com.rtshop.story.Dialogue.pendingScene(a, "quest_order_archivist") != null;
         QuestManager.onTalk(a, "quest_order_archivist");
