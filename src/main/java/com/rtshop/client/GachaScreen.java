@@ -574,9 +574,9 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                     continue;
                 }
                 any = true;
-                String line = tr("rtshop.gacha.grade." + GRADES[i]) + "  " + pct(c[i]);
-                g.drawString(this.font, line, px + 8, yy, GachaColors.dark(GRADES[i]), false);
-                g.fill(px + 4, yy + 1, px + 6, yy + 7, GachaColors.argb(GRADES[i]));
+                String line = GachaColors.windowName(GRADES[i]) + "  " + pct(c[i]);
+                g.drawString(this.font, line, px + 8, yy, GachaColors.window(GRADES[i], true), false);
+                g.fill(px + 4, yy + 1, px + 6, yy + 7, GachaColors.window(GRADES[i], true));
                 yy += 10;
             }
             if (cat == 1 && any && c[0] + c[1] > 0) {
@@ -633,10 +633,10 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             int gi = gradeIndex(e.get("grade").getAsString());
             double p = c[gi] * e.get("weight").getAsInt() / Math.max(1, sum[gi]);
             int yy = y + 3 + k * 12;
-            g.fill(x + 3, yy, x + 5, yy + 9, GachaColors.argb(GRADES[gi]));
+            g.fill(x + 3, yy, x + 5, yy + 9, GachaColors.window(GRADES[gi], true));
             g.drawString(this.font, Ui.clip(this.font, name(e), W - 130), x + 8, yy + 1, Ui.C_INK, false);
-            String gp = tr("rtshop.gacha.grade." + GRADES[gi]) + "  " + pct(p);
-            g.drawString(this.font, gp, x + W - 24 - this.font.width(gp), yy + 1, Ui.C_INK_SOFT, false);
+            String gp = GachaColors.windowName(GRADES[gi]) + "  " + pct(p);
+            g.drawString(this.font, gp, x + W - 24 - this.font.width(gp), yy + 1, gi == com.rtshop.gacha.GachaConfig.YAMATO ? GachaColors.window(GRADES[gi], true) : Ui.C_INK_SOFT, false);
         }
         if (rows.isEmpty()) {
             g.drawString(this.font, tr("rtshop.gacha.empty_short"), x + 8, y + 6, Ui.C_INK_SOFT, false);

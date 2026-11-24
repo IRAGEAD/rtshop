@@ -665,9 +665,9 @@ public class MagicGachaScreen extends Screen {
         for (int i = 0; i < GRADES.length; i++) {
             if (d[i] <= 0) continue;
             int yy = y + row * 12;
-            int col = GachaColors.argb(GRADES[i]);
+            int col = GachaColors.window(GRADES[i], false);
             gem(g, x + 3, yy + 5, 3, col);
-            txt(g, clipF(tr("rtshop.gacha.grade." + GRADES[i]), 46), x + 10, yy + 2, col);
+            txt(g, clipF(GachaColors.windowName(GRADES[i]), 46), x + 10, yy + 2, col);
             String p = GachaScreen.pct(d[i]);
             int bx = x + 58, bw = Math.max(10, w - 58 - 44);
             g.fill(bx - 1, yy + 2, bx + bw + 1, yy + 8, 0xFF2A1F48);
