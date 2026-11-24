@@ -494,6 +494,7 @@ jobs:
           rm -f client/saves/rtshoptest/session.lock
           printf 'onboardAccessibility:false\ntutorialStep:none\nskipMultiplayerWarning:true\njoinedFirstServer:true\npauseOnLostFocus:false\nguiScale:3\nrenderDistance:2\nsimulationDistance:5\nmaxFps:30\ngraphicsMode:0\nao:false\nnarrator:0\nsoundCategory_master:0.0\nlang:ko_kr\n' > client/options.txt
           echo "mods: $(ls client/mods | wc -l)"
+          (sleep 1700; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &   # 감시: 시간 제한이 듣지 않고 멈춰 버리는 일이 있었다
           (timeout -k 20 1500 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true" --resolution 1280x720 > client.log 2>&1) || echo "client exit code $?"
           pkill -9 -f "rtshop.clienttest" || true
           echo "----- last lines of the client log -----"
