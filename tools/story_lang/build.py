@@ -63,7 +63,7 @@ for mod in ("ch01_en", "ch02_en", "ch03_en", "ch04_en", "ch05_en", "scylla_en"):
     missing = [i for i in byid if i.startswith(PREFIX[mod]) and i not in m.EN]
     if missing: print("번역 없는 퀘스트:", missing); sys.exit(1)
 EXTRA.update({"지도 제작자 펠릭스": "Felix the Mapmaker", "대장장이 브람": "Bram the Smith", "서장 폭풍 뒤의 부두": "Prologue: The Dock After the Storm",
-              "1장 잿불의 서약": "Chapter 1: The Ember Oath", "2장 녹슨 맹세": "Chapter 2: The Rusted Vow", "3장 얼어붙은 바다의 항해일지": "Chapter 3: Logbook of the Frozen Sea", "어부 오스카": "Oscar the Fisherman", "4장 일곱 봉인": "Chapter 4: The Seven Seals", "종장 연대기의 마지막 장": "Finale: The Last Page of the Chronicle", "숨은 이야기 거울 속의 연대기": "Hidden Story: The Chronicle in the Mirror", "숨은 이야기 마중 나간 사람": "Hidden Story: The One Who Went to Welcome"})
+              "1장 잿불의 서약": "Chapter 1: The Ember Oath", "2장 녹슨 맹세": "Chapter 2: The Rusted Vow", "3장 얼어붙은 바다의 항해일지": "Chapter 3: Logbook of the Frozen Sea", "어부 오스카": "Oscar the Fisherman", "4장 일곱 봉인": "Chapter 4: The Seven Seals", "종장 연대기의 마지막 장": "Finale: The Last Page of the Chronicle", "불의 제단이 당신을 밀어낸다. 여섯 눈이 감기기 전에는 이 문이 열리지 않는다.": "The altar of fire pushes you away. This door will not open until six eyes have closed.", "숨은 이야기 거울 속의 연대기": "Hidden Story: The Chronicle in the Mirror", "숨은 이야기 마중 나간 사람": "Hidden Story: The One Who Went to Welcome"})
 for k, v in EXTRA.items():
     out.setdefault(k, v)
 for qd in story["quests"]:
