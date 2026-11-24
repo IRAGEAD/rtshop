@@ -2253,6 +2253,24 @@ public final class SelfTest {
         QuestManager.migrateStory4(a);
         boolean fin = QuestManager.isCompleted(a, "story_1_41") && QuestManager.isCompleted(a, "story_1_19") && QuestManager.hasFlag(a, "ch1_three_ends");
         check("moving to the rewritten story: mid-chapter players restart chapter 1 (prologue kept), finished players keep chapter 1 done", mid && fin, mid + "/" + fin);
+        QuestDef skor = l.quests.get("story_2_13"), rest = l.quests.get("story_2_10"), letter = l.quests.get("story_2_24");
+        check("chapter 2 is rewritten (Roran walks along, the campfire rest, Skor, Kael's letter, 26 steps ending in the written roster)",
+                skor != null && rest != null && letter != null && l.quests.containsKey("story_2_26") && !l.quests.containsKey("story_2_27")
+                        && l.quests.get("story_2_02").companion != null && l.quests.get("story_2_25").rewardFlags.contains("ch2_roster_written")
+                        && l.quests.get("story_3_01").requires.contains("story_2_26"), skor == null ? "null" : skor.toJson());
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "story_v4", true);
+        QuestManager.forceComplete(a, "story_2_05");
+        QuestManager.setFlag(a, "seal_wroughtnaut", true);
+        QuestManager.setFlag(a, "story_v5", false);
+        QuestManager.migrateStory5(a);
+        boolean mid2 = !QuestManager.isCompleted(a, "story_2_05") && !QuestManager.hasFlag(a, "seal_wroughtnaut") && QuestManager.hasFlag(a, "story_v5");
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "story_ch2_done", true);
+        QuestManager.setFlag(a, "story_v5", false);
+        QuestManager.migrateStory5(a);
+        boolean fin2 = QuestManager.isCompleted(a, "story_2_26") && QuestManager.hasFlag(a, "seal_umvuthi");
+        check("chapter 2 progress moves over the same way", mid2 && fin2, mid2 + "/" + fin2);
         QuestManager.reset(a);
     }
 

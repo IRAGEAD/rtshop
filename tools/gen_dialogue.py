@@ -364,7 +364,7 @@ more("quest_order_archivist",
                                             "엘레나. 기록관 엘레나."], flags=["fin_erased"]),
      ])
 more("quest_order_captain",
-     greet=[g("왔냐. 명단은 태웠다. 이제 너희가 내 명단이다.", flags=["ch2_roster_burned"])],
+     greet=[g("왔냐. 명단은 안 태웠다. 기록관이 적었지. 이제 너희도 거기 적힌다. 돌아온 쪽 칸에.", flags=["ch2_roster_burned"])],
      topics=[
          topic("truth", "카엘에게 한 말", ["카엘에게 진실을 말했다. 버린 게 아니라 살린 거라고.",
                                          "놈이 웃더군. '알아. 처음부터 알았어. 그래도 원망할 사람이 필요했어.'",

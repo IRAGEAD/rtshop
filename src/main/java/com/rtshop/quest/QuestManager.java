@@ -558,11 +558,40 @@ public final class QuestManager {
         return n > 0;
     }
 
+    /** 2장이 새로 쓰였다 (3.34): 2장 도중이던 사람은 2장의 처음부터, 끝낸 사람은 끝낸 것으로. 한 번만 (story_v5 표식). */
+    public static boolean migrateStory5(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        if (pr.flags.contains("story_v5")) return false;
+        boolean ch2 = pr.flags.contains("story_ch2_done");
+        int n = 0;
+        if (!ch2) {
+            for (String id : new ArrayList<>(pr.completed)) {
+                if (id.startsWith("story_2_") && pr.completed.remove(id)) n++;
+            }
+            pr.active.keySet().removeIf(id -> id.startsWith("story_2_"));
+            for (String f : List.of("seal_wroughtnaut", "seal_frostmaw", "seal_sculptor", "seal_umvuthi", "order_member", "clue_eighth_seal", "frost_stolen",
+                    "frost_fought", "ch2_told_truth", "ch2_kept_secret")) pr.flags.remove(f);
+        } else {
+            for (QuestDef q : loaded.quests.values()) {
+                if (q.id.startsWith("story_2_") && !pr.completed.contains(q.id)) {
+                    pr.completed.add(q.id);
+                    pr.active.remove(q.id);
+                    pr.flags.addAll(q.rewardFlags);
+                    n++;
+                }
+            }
+        }
+        pr.flags.add("story_v5");
+        QuestData.get(p.server).dirty();
+        return n > 0;
+    }
+
     @SubscribeEvent
     public static void onLoginMigrate(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer p && loaded.quests.containsKey("story_1_01")) {
             migrateStory(p);
             migrateStory4(p);
+            migrateStory5(p);
         }
     }
 
