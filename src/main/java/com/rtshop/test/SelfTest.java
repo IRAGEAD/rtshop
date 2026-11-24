@@ -1103,7 +1103,8 @@ public final class SelfTest {
                     Economy.wallet(a) + " " + com.rtshop.raid.AbyssWeekly.claimedMask(a));
             QuestManager.reset(a);
             boolean lockedIdle = com.rtshop.raid.AbyssWeekly.floorLocked(a, 1) && com.rtshop.raid.AbyssWeekly.floorLocked(a, 6) && !com.rtshop.raid.AbyssWeekly.floorLocked(a, 7);
-            tempQuest("{\"id\":\"t_abyss\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"FLAG\",\"target\":\"abyss_floor_2\",\"count\":1}],\"reward\":{\"gold\":1}}");
+            QuestDef abyssQ = tempQuest("{\"id\":\"t_abyss\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"FLAG\",\"target\":\"abyss_floor_2\",\"count\":1}],\"reward\":{\"gold\":1}}");
+            QuestManager.loaded().quests.put(abyssQ.id, abyssQ);
             QuestManager.accept(a, "t_abyss", "quest_guide");
             boolean openStory = !com.rtshop.raid.AbyssWeekly.floorLocked(a, 1) && !com.rtshop.raid.AbyssWeekly.floorLocked(a, 2) && com.rtshop.raid.AbyssWeekly.floorLocked(a, 3)
                     && QuestManager.storyAbyssFloor(a) == 2;
