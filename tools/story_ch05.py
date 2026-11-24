@@ -67,7 +67,7 @@ p = q("story_5_05", ch(C5, 5, N5), "천 년 전의 제자", FISHER,
       "기억의 조각 3개를 어부 오스카에게 건네세요.",
       "(오스카가 조각을 쥐고 오래 눈을 감았다.) 아이요. 고아였소. 궁정 필경실에 거둬진. 이름도 없던 것을 왕이 지어 줬소. 에르윈이라고. 글씨도 그 왕이 가르쳤고. 그 다음 조각은 시끄럽소. 회의하던 날이오. 누가 그 아이를 방에서 끌어냈소. 왕이 시켜서. '이 아이는 보지 않게 하라'고. 아이가 왕좌 팔걸이를 붙들고 안 놓으니 망토가 찢어졌소. 마지막 조각. 문을 부수고 다시 들어갔을 때 스승은 이미 불 속이었소. 일곱이 둘러서 있었고. 아이는 손을 넣었소. 꺼내려고. …그게 그 사람이 본 전부요. 일곱이 둘러선 것과, 스승이 타는 것.",
       [deliver("rtshop:memory_shard", 3, "기억의 조각")], gold=8000, requires=[p],
-      sceneDone=vision("젊은 에르윈", "스승님! 손을, 손을 주십시오!\n…이름이. 스승님 이름이 뭐였지. 방금까지 불렀는데.", "B0B0C0", "minecraft:block.amethyst_block.chime"))
+      sceneDone=vision("기억의 조각 · 젊은 에르윈", "스승님! 손을, 손을 주십시오!\n…이름이. 스승님 이름이 뭐였지. 방금까지 불렀는데.", "B0B0C0", "minecraft:block.amethyst_block.chime"))
 p = q("story_5_06", ch(C5, 6, N5), "꺼지지 않는 문", CAPT,
       "불꽃 경기장이다. 문 앞 결계는 최초의 불꽃 그 자체다. 물로는 안 꺼진다. 설원에서 프로스트모가 품고 있던 그 결정. 장로가 '절대 팔지 말라'던. 그때 이미 여기 쓸 생각이었던 거다. 놈이 제 손으로 준비시킨 열쇠를 우리가 쓴다. 결정을 내놔라. 내가 댄다. 대원 셋이 그거 지키다 쓰러졌다. 대는 건 대장이 한다.",
       "불꽃 경기장을 찾아 들어가, 얼음 결정을 탐험대장 로란에게 건네라.",
@@ -85,7 +85,7 @@ p = q("story_5_08", ch(C5, 8, N5), "화염의 군주", CAPT,
       "기사가 쓰러졌다. 눈에서 불이 꺼지고 사람의 눈이 돌아왔다. 몫은 문지방을 넘어 흐르다가, 놈의 손 앞에서 꺾였다. 기록관의 손바닥으로 갔다. 그리고 놈의 낙인에서 여섯 줄기가 따라 나왔다. 심지 없이는 고여 있지 못하는 거다. 여섯 줄기가 기록고 쪽으로 흘러갔다. 적힌 이름들한테로. 제자리로. 놈은 재 위에 앉았다. 손등이 식었다. 천 년 만에. 아르덴이 놈을 보고 말했다. 똑똑히 들었다. 가서 기록관한테 들어라. 그 아이가 받아 적었다.",
       [kill("cataclysm:ignis", 1, "화염의 군주 이그니스", K), kill("minecraft:wither", 1, "불꽃 속의 검은 별", "!" + K)], gold=20000, items=[item("rtshop:grey_ash")], requires=[p], flags=["ignis_raid_story"],
       sceneAccept=title("종장 · 최초의 불꽃", "화염의 군주", "불꽃 기사단장 아르덴", "FF3A10", "ember", "minecraft:entity.wither.spawn"),
-      sceneDone={"kind": "vision", "speaker": "불꽃 기사단장 아르덴", "text": "왔구나, 불씨를 쥔 자들아. 오지 말라 했는데.\n…잘 왔다. 이제 좀 자겠다.", "color": "FFB060",
+      sceneDone={"kind": "vision", "speaker": "잠드는 기사단장 아르덴", "text": "왔구나, 불씨를 쥔 자들아. 오지 말라 했는데.\n…잘 왔다. 이제 좀 자겠다.", "color": "FFB060",
                  "sound": "minecraft:block.respawn_anchor.deplete", "shake": 4, "seconds": 10})
 p = q("story_5_09", ch(C5, 9, N5), "그 문을 지킨 사람", ARCH,
       "아르덴 님이 잠들기 전에 한 말이에요. 장로님한테 한 말이요. 저는 손이 떨려서 두 번 틀렸어요. 그래도 다 적었어요. 같이 읽어 주세요. 장로님은 저기 앉아 계세요. 재 위에. 아직 한 마디도 안 하셨어요.",
@@ -197,7 +197,7 @@ p = q("hidden_illusioner_3", ch(CH, 4, NH), "다정한 거짓말", ARCH,
       "거울이 전부 깨졌어요. 여덟 장이 한꺼번에요. 깨지면서 벨로크가 물었대요. '그 아이가 알았다고? 알고도 서 있다고?' 그리고 한참 있다가 그랬대요. '그럼 나는 천 년 동안 그 아이를 얕본 것이구나.' 깨진 조각 사이에 종이 한 장이 남았어요. 보랏빛이 아니에요. 검은 잉크예요. 고치지 않은 원본이에요. 딱 한 장. 이 사람은 천 장을 고치면서 한 장은 끝내 못 고쳤어요.",
       [kill("illusioner:illusioner", 1, "거울 속의 필경사 벨로크", I)], gold=9000, items=[item("rtshop:chronicle_page", 2)], requires=[p], flags=["clue_true_page"], mod=I,
       sceneAccept=line("거울 속의 필경사", "돌아가라 했다. 너희는 다정하구나. 다정한 것들이 제일 많이 부순다. 나를 보면 안다."),
-      sceneDone=vision("벨로크", "이 이야기는 내가 고쳐 썼다. 한 아이를 살리려고.\n…견뎠다고. 그 울보가. 그럼 됐다. 원본은 네가 가져가라.", "B48CFF", "minecraft:entity.illusioner.mirror_move"))
+      sceneDone=vision("깨지는 거울 속의 벨로크", "이 이야기는 내가 고쳐 썼다. 한 아이를 살리려고.\n…견뎠다고. 그 울보가. 그럼 됐다. 원본은 네가 가져가라.", "B48CFF", "minecraft:entity.illusioner.mirror_move"))
 p = q("hidden_illusioner_4", ch(CH, 5, NH), "고치지 못한 한 장", ARCH,
       "원본이에요. 벨로크가 끝내 못 고친 한 장요. 읽기 전에 손을 씻었어요. 같이 읽어 주세요. 이건 그날 방 안에 있던 사람이 쓴 거예요. 아르덴 님은 문밖에 있었고, 서리의 왕은 겁이 나서 눈을 감았댔죠. 벨로크는 안에서 받아 적고 있었어요. 필경사니까요.",
       "기록관 이사벨과 함께 고치지 않은 원본을 읽으세요.",
@@ -235,5 +235,5 @@ q("hidden_illusioner_6", ch(CH, 7, NH), "이름을 들려줄 것인가", ELDER,
       ])], gold=12000, requires=[p], flags=["illusioner_done"], mod=I,
       choices=[{"text": "이름을 들려준다. 한 번만, 천천히, 또박또박.", "flags": ["name_told"]},
                {"text": "들려주지 않는다. \"연대기에 적혀 있습니다. 놓을 수 있게 된 날, 직접 읽으십시오.\"", "flags": ["name_kept"]}],
-      sceneDone={"kind": "vision", "speaker": "에르윈", "text": "글씨는 천천히. 이름은 또박또박.\n…예, 스승님. 이제야 천천히 씁니다.", "color": "E8C878",
+      sceneDone={"kind": "vision", "speaker": "혼잣말하는 에르윈", "text": "글씨는 천천히. 이름은 또박또박.\n…예, 스승님. 이제야 천천히 씁니다.", "color": "E8C878",
                  "sound": "minecraft:block.amethyst_block.chime", "seconds": 9})

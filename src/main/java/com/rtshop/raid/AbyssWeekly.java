@@ -66,6 +66,11 @@ public final class AbyssWeekly {
         public int resetDay = 1;
         public int resetHour = 6;
         public long[] gold = {500, 1000, 2000, 3500, 5000, 8000};
+        /** 주간 보상을 무한 모드에서 준다 (endlessStep 웨이브마다 한 단계: 10·20·…·60). false 면 예전처럼 1~6층 클리어 때. */
+        public boolean endless = true;
+        public int endlessStep = 10;
+        /** 층 모드(1~6층)는 이야기 퀘스트가 그 층을 부를 때만 들어갈 수 있다. 무한 모드는 언제든. */
+        public boolean storyOnlyFloors = true;
         public final Map<String, String> texts = new LinkedHashMap<>();
         public final List<Reward> rewards = new ArrayList<>();
 
@@ -84,13 +89,17 @@ public final class AbyssWeekly {
         public JsonObject toJson() {
             JsonObject o = new JsonObject();
             JsonArray help = new JsonArray();
-            help.add("Spiral Abyss 주간 보상: 그 주에 각 층을 클리어하면 그 층의 보상을 받습니다 (층마다 주 1회, 매주 resetDay 요일 resetHour 시에 초기화. 1 = 월요일).");
-            help.add("rewards: group 이 floor1~floor6 인 항목이 그 층의 보상. chance 는 받을 확률(%). gold: 층마다 함께 주는 Gold.");
+            help.add("Spiral Abyss 주간 보상: endless 가 true 면 무한 모드에서 endlessStep 웨이브(10·20·…·60)를 넘길 때마다 한 단계씩 받습니다 (단계마다 주 1회, 매주 resetDay 요일 resetHour 시에 초기화. 1 = 월요일). false 면 1~6층 클리어 때.");
+            help.add("storyOnlyFloors: true 면 층 모드(1~6층)는 이야기 퀘스트가 그 층을 부를 때만 들어갈 수 있습니다 (무한 모드는 언제든).");
+            help.add("rewards: group 이 floor1~floor6 인 항목이 1~6단계의 보상. chance 는 받을 확률(%). gold: 단계마다 함께 주는 Gold.");
             help.add("게임 안에서 /rtshop abyss edit (OP) 로 고칠 수 있습니다: 아이템을 손에 들고 [손에 든 아이템 추가], 개수·확률 변경, 삭제.");
             o.add("_설명", help);
             o.addProperty("enabled", enabled);
             o.addProperty("resetDay", resetDay);
             o.addProperty("resetHour", resetHour);
+            o.addProperty("endless", endless);
+            o.addProperty("endlessStep", endlessStep);
+            o.addProperty("storyOnlyFloors", storyOnlyFloors);
             JsonArray g = new JsonArray();
             for (long v : gold) g.add(v);
             o.add("gold", g);
@@ -109,6 +118,9 @@ public final class AbyssWeekly {
         t.put("floor", "%s층 클리어");
         t.put("got", "[주간 보상] %s층 클리어 보상을 받았습니다: %s");
         t.put("gotNothing", "[주간 보상] %s층 클리어! (이번에는 확률 보상이 나오지 않았습니다)");
+        t.put("gotEndless", "[주간 보상] 무한 모드 %s웨이브 보상을 받았습니다: %s");
+        t.put("gotNothingEndless", "[주간 보상] 무한 모드 %s웨이브 돌파! (이번에는 확률 보상이 나오지 않았습니다)");
+        t.put("storyOnly", "이 층은 이야기가 부를 때만 열립니다. 무한 모드는 언제든 들어갈 수 있습니다.");
         t.put("done", "받음");
         return t;
     }
@@ -162,6 +174,9 @@ public final class AbyssWeekly {
         if (o.has("enabled")) c.enabled = o.get("enabled").getAsBoolean();
         if (o.has("resetDay")) c.resetDay = Math.max(1, Math.min(7, o.get("resetDay").getAsInt()));
         if (o.has("resetHour")) c.resetHour = Math.max(0, Math.min(23, o.get("resetHour").getAsInt()));
+        if (o.has("endless")) c.endless = o.get("endless").getAsBoolean();
+        if (o.has("endlessStep")) c.endlessStep = Math.max(1, o.get("endlessStep").getAsInt());
+        if (o.has("storyOnlyFloors")) c.storyOnlyFloors = o.get("storyOnlyFloors").getAsBoolean();
         if (o.has("gold") && o.get("gold").isJsonArray()) {
             JsonArray g = o.getAsJsonArray("gold");
             for (int i = 0; i < FLOORS && i < g.size(); i++) c.gold[i] = Math.max(0, g.get(i).getAsLong());
@@ -259,6 +274,41 @@ public final class AbyssWeekly {
     public static boolean cleared(ServerPlayer p, int f) {
         Config c = config();
         if (f >= 1 && f <= FLOORS) com.rtshop.quest.QuestManager.setFlag(p, "abyss_floor_" + f, true); // 이야기 퀘스트용 (영구)
+        if (c.endless) return false; // 주간 보상은 무한 모드에서 준다
+        return reward(p, f, false);
+    }
+
+    /** 무한 모드에서 wave 웨이브를 넘겼다: endlessStep 의 배수 단계(1~6)마다 이번 주 보상을 한 번 준다. */
+    public static boolean endlessCleared(ServerPlayer p, int wave) {
+        Config c = config();
+        if (!c.endless || wave < c.endlessStep) return false;
+        int tier = Math.min(FLOORS, wave / c.endlessStep);
+        boolean any = false;
+        for (int t = 1; t <= tier; t++) any |= reward(p, t, true); // 건너뛴 단계가 있으면 함께 준다
+        return any;
+    }
+
+    /** 이야기가 부르지 않은 층인가 (층 모드 잠금). floor 7 = 무한 모드는 잠그지 않는다. 운영자의 크리에이티브는 통과. */
+    public static boolean floorLocked(ServerPlayer p, int floor) {
+        Config c = config();
+        if (!c.storyOnlyFloors || floor < 1 || floor > FLOORS) return false;
+        if (p.isCreative() && p.hasPermissions(2)) return false;
+        return com.rtshop.quest.QuestManager.storyAbyssFloor(p) < floor;
+    }
+
+    /** 층 입장을 막아야 하면 알리고 true. (AbyssFloorLockMixin 이 부른다) */
+    public static boolean refuseFloor(ServerPlayer p, int floor) {
+        try {
+            if (!floorLocked(p, floor)) return false;
+            com.rtshop.notice.Notice.send(p, Component.literal(com.rtshop.story.StoryText.t(p, config().text("storyOnly"))).withStyle(ChatFormatting.YELLOW));
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private static boolean reward(ServerPlayer p, int f, boolean endless) {
+        Config c = config();
         if (!c.enabled || f < 1 || f > FLOORS) return false;
         long week = Weekly.id(Weekly.now(), c.resetDay, c.resetHour);
         Data d = Data.get(p.server);
@@ -286,7 +336,9 @@ public final class AbyssWeekly {
         }
         String msg;
         try {
-            msg = names.isEmpty() ? String.format(c.text("gotNothing"), ROMAN[f - 1]) : String.format(c.text("got"), ROMAN[f - 1], String.join(", ", names));
+            String what = endless ? Integer.toString(f * c.endlessStep) : ROMAN[f - 1];
+            msg = names.isEmpty() ? String.format(c.text(endless ? "gotNothingEndless" : "gotNothing"), what)
+                    : String.format(c.text(endless ? "gotEndless" : "got"), what, String.join(", ", names));
         } catch (Exception e) {
             msg = c.text("got");
         }
@@ -299,6 +351,8 @@ public final class AbyssWeekly {
         Config c = config();
         JsonObject o = new JsonObject();
         o.addProperty("enabled", c.enabled);
+        o.addProperty("endless", c.endless);
+        o.addProperty("step", c.endlessStep);
         o.addProperty("mask", claimedMask(p));
         o.addProperty("resetIn", Weekly.untilReset(Weekly.now(), c.resetDay, c.resetHour));
         JsonObject t = new JsonObject();
@@ -323,7 +377,7 @@ public final class AbyssWeekly {
     // ------------------------------------------------------------------ Spiral Abyss 진행 읽기
 
     private static boolean probed, present;
-    private static Method mParties, mSessions, mController, mState, mFloor, mPlayers;
+    private static Method mParties, mSessions, mController, mState, mFloor, mPlayers, mWave;
     private static final Map<Object, String> LAST = new IdentityHashMap<>();
 
     private static boolean probe() {
@@ -340,6 +394,11 @@ public final class AbyssWeekly {
             mPlayers = session.getMethod("players");
             mState = controller.getMethod("state");
             mFloor = controller.getMethod("currentFloor");
+            try {
+                mWave = controller.getMethod("currentWave");
+            } catch (Throwable ignored) {
+                mWave = null;
+            }
             present = true;
             RtShop.LOGGER.info("[rtshop] Spiral Abyss 를 찾았습니다: 층 클리어 시 주간 보상을 줍니다.");
         } catch (Throwable t) {
@@ -362,8 +421,11 @@ public final class AbyssWeekly {
                 String before = LAST.put(s, state);
                 if ("COMPLETED".equals(state) && before != null && !"COMPLETED".equals(before)) {
                     int floor = (Integer) mFloor.invoke(ctl);
+                    int wave = floor == 7 && mWave != null ? (Integer) mWave.invoke(ctl) : 0;
                     for (Object pl : (List<?>) mPlayers.invoke(s)) {
-                        if (pl instanceof ServerPlayer sp) cleared(sp, floor);
+                        if (!(pl instanceof ServerPlayer sp)) continue;
+                        if (floor == 7) endlessCleared(sp, wave); // 무한 모드: 10웨이브마다 COMPLETED(검문소)가 된다
+                        else cleared(sp, floor);
                     }
                 }
             }
@@ -394,14 +456,14 @@ public final class AbyssWeekly {
                 o.addProperty("title", "Spiral Abyss 주간 보상 설정");
                 JsonArray f = new JsonArray();
                 for (int i = 0; i < FLOORS; i++) {
-                    f.add(RewardEditor.field("gold" + i, ROMAN[i] + "층 클리어 Gold", true, Long.toString(c.gold[i])));
+                    f.add(RewardEditor.field("gold" + i, (c.endless ? "무한 " + ((i + 1) * c.endlessStep) + "웨이브" : ROMAN[i] + "층 클리어") + " Gold", true, Long.toString(c.gold[i])));
                 }
                 f.add(RewardEditor.field("resetDay", "주간 초기화 요일 (1 = 월요일 … 7 = 일요일)", true, Integer.toString(c.resetDay)));
                 f.add(RewardEditor.field("resetHour", "주간 초기화 시각 (0~23시)", true, Integer.toString(c.resetHour)));
                 for (String k : defaultTexts().keySet()) f.add(RewardEditor.field("text." + k, RaidConfig.label(k), false, c.text(k)));
                 o.add("fields", f);
                 JsonArray g = new JsonArray();
-                for (int i = 1; i <= FLOORS; i++) g.add(RewardEditor.group("floor" + i, ROMAN[i - 1] + "층", false, true));
+                for (int i = 1; i <= FLOORS; i++) g.add(RewardEditor.group("floor" + i, c.endless ? "무한 " + (i * c.endlessStep) + "웨이브" : ROMAN[i - 1] + "층", false, true));
                 o.add("groups", g);
                 o.add("rewards", RewardEditor.rewardsJson(c.rewards));
                 return o;

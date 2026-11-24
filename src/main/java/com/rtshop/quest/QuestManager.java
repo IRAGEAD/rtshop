@@ -791,6 +791,25 @@ public final class QuestManager {
         return true;
     }
 
+    /** 지금 진행 중인 퀘스트가 부르는 나선의 심연 층 가운데 가장 높은 층 (없으면 0). 표식 목표 abyss_floor_N 을 아직 못 채운 것만. */
+    public static int storyAbyssFloor(ServerPlayer p) {
+        int best = 0;
+        QuestData.Progress pr = prog(p);
+        for (Map.Entry<String, int[]> e : pr.active.entrySet()) {
+            QuestDef q = loaded.quests.get(e.getKey());
+            if (q == null) continue;
+            for (QuestDef.Objective ob : q.objectives) {
+                if (ob.type == QuestDef.Type.FLAG && ob.target.startsWith("abyss_floor_") && !pr.flags.contains(ob.target)) {
+                    try {
+                        best = Math.max(best, Integer.parseInt(ob.target.substring("abyss_floor_".length())));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
     /** 진행 중인 퀘스트의 목표를 다 채웠는가 (보고만 남았는가). */
     public static boolean objectivesDone(ServerPlayer p, String questId) {
         QuestDef q = loaded.quests.get(questId);

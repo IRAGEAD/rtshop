@@ -123,7 +123,7 @@ public final class QuestDef {
     public String mod = "";
     /**
      * 동행: {"npc": NPC ID, "at": 나타날 구조물(비우면 받자마자), "style": none·melee·bolt,
-     * "lines": {"arrive":[..], "fight":[..], "low":[..], "idle":[..], "spot":[..], "done":[..]}}. 없으면 null.
+     * "lines": {"arrive":[..], "fight":[..], "low":[..], "idle":[..], "spot":{흔적 ID: 대사}, "done":[..], "talk":[..]}}. 없으면 null. (말하는 규칙은 Companions 참고)
      */
     public JsonObject companion;
 

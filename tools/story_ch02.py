@@ -81,7 +81,7 @@ p = q("story_2_06", ch(C2, 6, N2), "나선의 심연 1층", ARCH,
       "나선의 심연 1층을 깨고 오세요.",
       "무엇을 보셨어요? …원정대의 마지막 밤이요. 카엘이라는 분이 편지를 불에 비춰 보고 있었다고요. 그러고는 대장님께 지도를 쥐여 줬다고요. 편지요? 무슨 편지죠. …대장님께는 아직 말하지 말아요. 스스로 꺼내실 때까지요.",
       [flag("abyss_floor_1", "나선의 심연 1층")], gold=2600, requires=[p], flags=["order_member"],
-      sceneDone=vision("나선의 심연", "모닥불에 편지를 비춰 보는 사람.\n\"…로란, 이걸 가지고 가. 넌 북쪽으로 돌아가야 해.\"", "C8A060", "minecraft:block.campfire.crackle"))
+      sceneDone=vision("나선의 심연이 보여 준 기억", "모닥불에 편지를 비춰 보는 사람.\n\"…로란, 이걸 가지고 가. 넌 북쪽으로 돌아가야 해.\"", "C8A060", "minecraft:block.campfire.crackle"))
 
 # ---- 기다리는 자들 · 하나: 넷째 대장 (Bosses'Rise)
 p = q("story_2_06h1", ch(C2, 0, N2), "천 년 묵은 외상", SMITH,
@@ -137,7 +137,7 @@ p = q("story_2_06b", ch(C2, 0, N2), "저승의 기사 헬바르", CAPT,
 p = q("story_2_06h3", ch(C2, 0, N2), "외상값", SMITH,
       "돌아왔군. 검은… 그래, 받았다고. 쓰러지기 전에 자네 손에서 그걸 받아 들고 한참 봤다고. 그러고는 바닥에 꽂았다고. 앉게. 장부를 닫아야지. 천 년 묵은 줄 하나를 지우는 건 대장장이 평생에 한 번 있을까 말까 한 일이야. 기록관 아가씨도 불렀네. 지우는 건 내가 하고, 적는 건 그 아가씨가 해야지.",
       "대장장이 브람이 장부를 닫는 것을 지켜보라.",
-      "'값 받음.' 됐네. 뭘로 받았느냐고? 검이 주인한테 돌아갔잖나. 대장장이한테는 그게 값이야. …그런데 말일세. 장부에 줄이 하나 더 있어. 같은 문장이 찍힌. '기사단장 아르덴의 안장, 수선.' 이건 찾아간 걸로 돼 있네. 용 안장이야. 용이 있었다는 얘기지.",
+      "'값 받음.' 됐네. 뭘로 받았느냐고? 검이 주인한테 돌아갔잖나. 대장장이한테는 그게 값이야. …그런데 말일세. 장부에 줄이 하나 더 있어. 같은 문장이 찍힌. '기사단장 아르덴의 안장, 수선.' 이건 찾아간 걸로 돼 있네. 용 안장이야. 용이 있었다는 얘기지. …자네, 불씨 쥔 사람들은 잠들면 그 기사 꿈을 꾼다지. 오늘 밤 꾸거든 귀 기울여 보게. 제 부단장이 잠들었으니 무슨 말이든 하겠지.",
       [talk(SMITH, "장부를 닫는 브람", [
           "대장장이 브람: (장부의 줄 위에 굵게 한 줄을 긋는다.) 부단장 헬바르의 검. 수선. 값 받음.",
           ISA + "(연대기의 빈 줄을 편다.) 부단장 헬바르. 동료를 무기로 만들 수 없다고 한 사람. 검을 꺾고, 문을 닫고, 끝까지 선 사람.",
@@ -146,7 +146,7 @@ p = q("story_2_06h3", ch(C2, 0, N2), "외상값", SMITH,
           "▷ 주군은 왜 서약을 거두러 오지 않았을까요?",
           ISA + "…올 수 없었던 거예요, 아마. 꿈속의 그 기사가 아르덴이라면요. 그는 지금도 불 속에 있어요.",
       ])], gold=1600, requires=[p],
-      sceneDone=dict(vision("꿈속의 불타는 기사", "헬바르. …고집 센 놈.\n네가 옳았다고, 내 입으로 말해 줬어야 했는데.", "FF7A20", "minecraft:block.respawn_anchor.charge"), onSleep=True))
+      sceneDone=dict(vision("그날 밤의 꿈 · 불타는 기사", "헬바르. …고집 센 놈.\n네가 옳았다고, 내 입으로 말해 줬어야 했는데.", "FF7A20", "minecraft:block.respawn_anchor.charge"), onSleep=True))
 
 # ---- 3막: 어둠 숲
 p = q("story_2_07", ch(C2, 7, N2), "어둠 숲의 등불들", CAPT,
@@ -333,8 +333,8 @@ p = q("story_2_18", ch(C2, 18, N2), "이름 없는 돌", ARCH,
       "조각가 통비의 시험을 통과하세요. 솟아오르는 기둥을 오르며 균형을 잃지 마세요. 힘이 아니라 균형을 본대요. 시험을 마치면 여덟째 돌에 대해 물어봐 주세요. 대장님이 아래에서 밧줄을 잡고 계세요.",
       "조각가 통비의 시험을 통과하세요.",
       "\"여덟째 돌은 내 스승의 스승의 스승이 깎았다. 새길 이름을 들었는데, 정을 드는 사이 잊었다고 했다. 그래서 '기다림'이라 적었다. 기억나는 날 새기려고.\" …잊은 거예요. 지운 게 아니라. 그리고 기둥 아래 명패 둘이 포개져 있었다고요. 대장님께 전해 주세요. 내려왔다고요.",
-      [kill("mowziesmobs:sculptor", 1, "조각가 통비", M), kill("minecraft:vindicator", 4, "망루의 변명자", "!" + M)], gold=4400, items=[item("rtshop:chronicle_page"), item("rtshop:expedition_tag", 2)], requires=[p], flags=["clue_eighth_seal"],
-      sceneDone=vision("조각가 통비", "봉인은 일곱이 아니라 여덟이다.\n여덟 번째 돌은 아직 이름을 기다린다.", "D8C090", "minecraft:block.stone.break"))
+      [kill("mowziesmobs:sculptor", 1, "쓰러지는 조각가 통비", M), kill("minecraft:vindicator", 4, "망루의 변명자", "!" + M)], gold=4400, items=[item("rtshop:chronicle_page"), item("rtshop:expedition_tag", 2)], requires=[p], flags=["clue_eighth_seal"],
+      sceneDone=vision("쓰러지는 조각가 통비", "봉인은 일곱이 아니라 여덟이다.\n여덟 번째 돌은 아직 이름을 기다린다.", "D8C090", "minecraft:block.stone.break"))
 
 # ---- 기다리는 자들 · 셋: 주인을 기다리는 용 (Bosses'Rise)
 p = q("story_2_18a", ch(C2, 0, N2), "발톱으로 쓴 이름", ARCH,
@@ -375,7 +375,7 @@ p = q("story_2_18b", ch(C2, 0, N2), "재가 될 때까지", CAPT,
       "싸우는 내내 안장 쪽으로는 한 번도 불을 안 뿜었다고. 우리가 그 뒤로 숨어도. 그리고 마지막에 안장 위로 쓰러졌다고. 날개로 덮고. 태우지 않으려고 숨도 참고. …됐다. 인원 확인은 오늘 안 한다. 그냥 좀 앉아 있자. 그리고 오늘 밤 꿈을 꾸거든 기록관에게 말해 줘라. 그 기사가 뭐라고 하는지.",
       [kill(BR + ":infernal_dragon", 1, "지옥의 용 애쉬로드", BR), kill("minecraft:ravager", 1, "탑 아래의 짐승", "!" + BR)], gold=5200, requires=[p],
       sceneAccept=line("탐험대장 로란", "문 앞의 기사, 서약 자리의 부단장, 탑의 용. 주군 하나에 기다리는 놈이 셋이다. …많이도 남겼군."),
-      sceneDone=dict(vision("꿈속의 불타는 기사", "그 아이를 재워 주었구나.\n…돌아가지 못한다고, 내 입으로 말해 줬어야 했는데.", "FF7A20", "minecraft:block.respawn_anchor.charge"), onSleep=True))
+      sceneDone=dict(vision("그날 밤의 꿈 · 불타는 기사", "그 아이를 재워 주었구나.\n…돌아가지 못한다고, 내 입으로 말해 줬어야 했는데.", "FF7A20", "minecraft:block.respawn_anchor.charge"), onSleep=True))
 
 p = q("story_2_18d2", ch(C2, 0, N2), "돌아가지 못한다는 말", ELDER,
       "탑의 용을 재웠다고 들었네. …앉게. 그 이야기를 처음부터 해 주게. 깃발, 안장, 그리고 창가의 광주리까지. 나는 그 탑에 가 보지 못했네. 책으로만 아네. 그러니 자네가 본 대로 듣고 싶네.",
@@ -426,7 +426,7 @@ p = q("story_2_23", ch(C2, 23, N2), "타오르는 태양", CAPT,
       "가면이 깨졌다. 카엘은… 스무 해 동안 볕 아래 있었다. 몸이 버티지 못했다. 마지막에 나를 보고 웃더군. '세 번 셌냐.' 그러고는 그랬다. '바다를 얼린 건 선장이 아니야.' 무슨 뜻인지 모르겠다. 이 가면은 네가 가져라. 나는 못 들고 다니겠다.",
       [kill("mowziesmobs:umvuthi", 1, "태양조", M), kill("minecraft:evoker", 1, "사바나의 소환사", "!" + M)], gold=6500, items=[item("rtshop:broken_sun_mask")], requires=[p],
       sceneAccept=title("제 2 장 · 두 번째 태양", "타오르는 태양", "스무 해 동안 가면 아래 있던 사람", "FFB040", "sun", "minecraft:block.beacon.power_select"),
-      sceneDone={"kind": "vision", "speaker": "카엘", "text": "로란… 늦었잖아. 세 번 셌냐.\n…바다를 얼린 건 선장이 아니야.", "color": "FFB040",
+      sceneDone={"kind": "vision", "speaker": "가면이 벗겨진 카엘", "text": "로란… 늦었잖아. 세 번 셌냐.\n…바다를 얼린 건 선장이 아니야.", "color": "FFB040",
                  "sound": "minecraft:block.beacon.deactivate", "shake": 2, "seconds": 8})
 p = q("story_2_24", ch(C2, 24, N2), "불에 비춰 본 편지", ARCH,
       "카엘 씨의 서툰 가면이요. 안쪽에 금 열한 줄이 그어진. 그 가면이 걸려 있던 기둥 밑을 봐 주세요. 사원 낙서에 '편지를 불에 비춰 봤다'고 했잖아요. 그 편지를 태웠을 것 같지 않아요. 증거를 남기는 사람이었으니까요. 대장님과 같이 가 주세요. 혼자 읽게 두면 안 될 것 같아요.",

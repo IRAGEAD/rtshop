@@ -76,7 +76,7 @@ p = q("hidden_scylla_2", SC, "마중의 항해일지", ARCH,
           "▷ 바다를 얼린 건 선장이 아니야.",
           ISA + "카엘 씨의 마지막 말이요. …네. 선장이 아니었어요. 폭풍도 아니었고요. 그 배를 거기로 보낸 사람이에요.",
       ])], gold=4000, requiresFlags=["seal_scylla", "story_done"],
-      sceneDone=vision("폭풍 속의 목소리", "배가 온다.\n…맞을 채비를 해라. 이번에는 그 사람일지도 모른다.", "7FD4FF", "minecraft:entity.lightning_bolt.thunder"))
+      sceneDone=vision("폭풍의 눈에서 들린 목소리", "배가 온다.\n…맞을 채비를 해라. 이번에는 그 사람일지도 모른다.", "7FD4FF", "minecraft:entity.lightning_bolt.thunder"))
 p = q("hidden_scylla_3", SC, "내리지 못한 사람들", FISHER,
       "기록관 아가씨한테 들었소. 그 폭풍 안에 사람들이 천 년째 있다고. 내가 본 그 갑판의 사람들이. …난파선을 찾아봅시다. 폭풍 밖으로 밀려난 배가 가끔 있소. 눈 밖으로 나오면 그 배는 그날로 천 년을 한꺼번에 먹지. 삭아서 가라앉소. 그 배에 남은 걸 보면 안에 있는 사람들이 어떻게 사는지 알 거요. 나도 가겠소. 바다에서 기다리는 사람 일은 내가 좀 아오.",
       "오스카와 함께 난파선을 찾아 선실에 남은 것을 살펴보세요.",
@@ -108,7 +108,7 @@ p = q("hidden_scylla_5", SC, "폭풍의 여제", FISHER,
       "폭풍이 걷혔소. 부두에서 다 봤지. 천 년 만에 북쪽 하늘에 별이 떴소. 그리고 배들이 들어왔소. 돛에 번개가 그려진 배들이. 사람들이 내렸소. 한 사람씩. 땅을 밟고는 다들 뒤를 돌아봤지. 제독을 찾느라고. …기록관한테 가 보시오. 명부를 들고 부두에 서 있습디다. '내린 날' 칸을 채우겠다고.",
       [kill("cataclysm:scylla", 1, "폭풍의 여제 스킬라", "cataclysm"), kill("minecraft:elder_guardian", 1, "폭풍 아래의 수호자", "!cataclysm")], gold=20000, requires=[p],
       sceneAccept=title("숨은 이야기", "마중 나간 사람", "폭풍의 여제, 천 년째 누군가를 맞으러 나온 이", "7FD4FF", "storm", "minecraft:entity.lightning_bolt.thunder"),
-      sceneDone={"kind": "vision", "speaker": "폭풍의 여제", "text": "너는 그 사람이 아니구나.\n…그런데 너는, 그 사람이 어디 있는지 아는 얼굴이다.", "color": "7FD4FF",
+      sceneDone={"kind": "vision", "speaker": "잠드는 폭풍의 여제", "text": "너는 그 사람이 아니구나.\n…그런데 너는, 그 사람이 어디 있는지 아는 얼굴이다.", "color": "7FD4FF",
                  "sound": "minecraft:entity.lightning_bolt.thunder", "shake": 3, "seconds": 9})
 q("hidden_scylla_6", SC, "마중", ARCH,
       "부두에 계셨군요. 선원들 이름을 받아 적고 있었어요. 삼백 명이 넘어요. 전부 '내린 날'에 오늘 날짜를 적었어요. 그런데 맨 윗줄이 남았어요. 제독의 줄이요. 그분이 마지막에 물으셨다면서요. 그 사람이 어디 있느냐고. 조사대원님은 아시잖아요. 여덟째 왕이 어디 있는지. 스스로 택했다는 것도요. 뭐라고 하셨어요?",

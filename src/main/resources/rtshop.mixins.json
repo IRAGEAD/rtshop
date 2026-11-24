@@ -17,6 +17,7 @@
     "NightfallCullMixin",
     "NightfallSpeedMixin",
     "StagedStructureMixin",
-    "BetterCombatFallbackMixin"
+    "BetterCombatFallbackMixin",
+    "AbyssFloorLockMixin"
   ]
 }

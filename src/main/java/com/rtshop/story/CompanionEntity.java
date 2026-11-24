@@ -51,7 +51,7 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
     String style = "melee";
     private int downed;
     private int boltCooldown;
-    long lastSaid, lastFight, lastLow;
+    public long lastSaid, lastFight, lastLow;
     final java.util.Map<String, Integer> lastIndex = new java.util.HashMap<>();
     boolean saidFight;
 

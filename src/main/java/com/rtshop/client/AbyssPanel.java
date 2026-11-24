@@ -40,6 +40,12 @@ public final class AbyssPanel {
         return H;
     }
 
+    /** 단계 이름: 무한 모드면 웨이브 수(10, 20, …), 아니면 층의 로마 숫자. */
+    static String label(JsonObject o, int f) {
+        boolean endless = o.has("endless") && o.get("endless").getAsBoolean();
+        return endless ? Integer.toString(f * (o.has("step") ? o.get("step").getAsInt() : 10)) : ROMAN[f - 1];
+    }
+
     static String t(JsonObject o, String k) {
         JsonObject t = o.getAsJsonObject("texts");
         return t.has(k) ? t.get(k).getAsString() : k;
@@ -156,7 +162,7 @@ public final class AbyssPanel {
             g.pose().pushPose();
             g.pose().translate(cx, y + 35, 0);
             g.pose().scale(0.7F, 0.7F, 1F);
-            RaidText.center(g, font, ROMAN[f - 1], RaidText.SERIF, 0, 0, done(o, f) ? RaidFx.GOLD_HI : 0xFF9C8CC8);
+            RaidText.center(g, font, label(o, f), RaidText.SERIF, 0, 0, done(o, f) ? RaidFx.GOLD_HI : 0xFF9C8CC8);
             g.pose().popPose();
         }
         // 자세히 보기

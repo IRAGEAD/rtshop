@@ -1062,6 +1062,7 @@ public final class SelfTest {
         byte[] fileBefore = Files.exists(file) ? Files.readAllBytes(file) : null;
         com.rtshop.raid.AbyssWeekly.Config c = com.rtshop.raid.AbyssWeekly.fresh();
         c.gold[1] = 1234;
+        c.endless = false; // 먼저 예전 방식(층 클리어 보상)을 확인한다
         c.rewards.clear();
         com.rtshop.raid.Reward sure = new com.rtshop.raid.Reward("floor2", 0, "minecraft:diamond", 3);
         com.rtshop.raid.Reward half = new com.rtshop.raid.Reward("floor2", 0, "minecraft:emerald", 2);
@@ -1087,6 +1088,34 @@ public final class SelfTest {
             boolean nextWeek = com.rtshop.raid.AbyssWeekly.claimedMask(a) == 0 && com.rtshop.raid.AbyssWeekly.cleared(a, 2);
             check("after the Monday 06:00 reset the reward can be earned again", nextWeek && Economy.wallet(a) == 2468 && count(a, s -> s.is(Items.EMERALD)) == 2);
             com.rtshop.raid.Weekly.testClockOffset = 0;
+            // 3.41: 주간 보상은 무한 모드에서 (10웨이브마다 한 단계), 층 모드는 이야기가 부를 때만
+            c.endless = true;
+            c.gold[0] = 100;
+            com.rtshop.raid.AbyssWeekly.resetPlayer(a);
+            Economy.setWallet(a, 0);
+            boolean floorPays = com.rtshop.raid.AbyssWeekly.cleared(a, 2);
+            boolean early = com.rtshop.raid.AbyssWeekly.endlessCleared(a, 9);
+            boolean w20 = com.rtshop.raid.AbyssWeekly.endlessCleared(a, 20);
+            boolean w20again = com.rtshop.raid.AbyssWeekly.endlessCleared(a, 20);
+            check("with weekly rewards on the endless mode: a floor clear pays nothing (the story mark is still set), wave 20 pays stages 1 and 2 once",
+                    !floorPays && !early && w20 && !w20again && Economy.wallet(a) == 100 + 1234 && com.rtshop.raid.AbyssWeekly.claimedMask(a) == 3
+                            && QuestManager.hasFlag(a, "abyss_floor_2") && com.rtshop.raid.AbyssWeekly.view(a).get("endless").getAsBoolean(),
+                    Economy.wallet(a) + " " + com.rtshop.raid.AbyssWeekly.claimedMask(a));
+            QuestManager.reset(a);
+            boolean lockedIdle = com.rtshop.raid.AbyssWeekly.floorLocked(a, 1) && com.rtshop.raid.AbyssWeekly.floorLocked(a, 6) && !com.rtshop.raid.AbyssWeekly.floorLocked(a, 7);
+            tempQuest("{\"id\":\"t_abyss\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"FLAG\",\"target\":\"abyss_floor_2\",\"count\":1}],\"reward\":{\"gold\":1}}");
+            QuestManager.accept(a, "t_abyss", "quest_guide");
+            boolean openStory = !com.rtshop.raid.AbyssWeekly.floorLocked(a, 1) && !com.rtshop.raid.AbyssWeekly.floorLocked(a, 2) && com.rtshop.raid.AbyssWeekly.floorLocked(a, 3)
+                    && QuestManager.storyAbyssFloor(a) == 2;
+            QuestManager.setFlag(a, "abyss_floor_2", true);
+            boolean closedAgain = com.rtshop.raid.AbyssWeekly.floorLocked(a, 2);
+            c.storyOnlyFloors = false;
+            boolean off = !com.rtshop.raid.AbyssWeekly.floorLocked(a, 5);
+            c.storyOnlyFloors = true;
+            check("floor modes open only while a story quest calls for that floor (floors below it too); the endless mode is always open",
+                    lockedIdle && openStory && closedAgain && off, lockedIdle + "/" + openStory + "/" + closedAgain + "/" + off);
+            QuestManager.reset(a);
+            QuestManager.loaded().quests.remove("t_abyss");
             // 편집기
             com.rtshop.raid.RewardEditor.Target target = com.rtshop.raid.RewardEditor.TARGETS.get("abyss");
             com.google.gson.JsonObject model = target.model(a);
@@ -2146,7 +2175,8 @@ public final class SelfTest {
                 + "{\"type\":\"INSPECT\",\"target\":\"t_circle\",\"shape\":\"mural\",\"text\":\"Old circle\",\"lines\":[\"A ring of soot.\"]},"
                 + "{\"type\":\"INSPECT\",\"target\":\"t_far@minecraft:end_city\"},"
                 + "{\"type\":\"KILL\",\"target\":\"minecraft:zombie\",\"count\":1}],"
-                + "\"companion\":{\"npc\":\"t_comp\",\"style\":\"melee\",\"lines\":{\"arrive\":[\"Here.\"],\"done\":[\"Bye.\"]}},\"reward\":{\"gold\":1}}");
+                + "\"companion\":{\"npc\":\"t_comp\",\"style\":\"melee\",\"lines\":{\"arrive\":[\"Here.\"],\"idle\":[\"One.\",\"Two.\"],\"fight\":[\"Ha!\",\"Ho!\"],"
+                + "\"spot\":{\"t_far\":\"See that.\"},\"done\":[\"Bye.\"]}},\"reward\":{\"gold\":1}}");
         QuestManager.loaded().quests.put(q.id, q);
         QuestDef back = QuestDef.parse(q.toJson());
         check("an inspect goal keeps its trace id, place, shape and lines through saving (and the companion too)",
@@ -2181,6 +2211,33 @@ public final class SelfTest {
                 && c.getName().getString().equals("Tess") && com.rtshop.story.Companions.of(a, "t_inspect") == c
                 && c.distanceTo(a) < 6, c == null ? "null" : c.getName().getString());
         if (c != null) {
+            // 동행의 말: 도착 인사는 한 번, 혼잣말은 줄마다 한 번, 외침은 드물게, 흔적 한마디는 그 흔적에 붙은 말만 한 번
+            boolean arrived = com.rtshop.story.Companions.said(a, "t_inspect", "arrive");
+            c.lastSaid = 0;
+            boolean arriveAgain = com.rtshop.story.Companions.say(c, "arrive");
+            c.lastSaid = 0;
+            boolean idle1 = com.rtshop.story.Companions.say(c, "idle");
+            boolean tooSoon = com.rtshop.story.Companions.say(c, "idle");
+            c.lastSaid = 0;
+            boolean idle2 = com.rtshop.story.Companions.say(c, "idle");
+            c.lastSaid = 0;
+            boolean idle3 = com.rtshop.story.Companions.say(c, "idle");
+            c.lastSaid = 0;
+            boolean fight1 = com.rtshop.story.Companions.say(c, "fight");
+            c.lastSaid = 0;
+            boolean fight2 = com.rtshop.story.Companions.say(c, "fight");
+            check("a companion greets once, says each idle line once (never two lines within seconds), and shouts in a fight only now and then",
+                    arrived && !arriveAgain && idle1 && !tooSoon && idle2 && !idle3 && fight1 && !fight2,
+                    arrived + "/" + arriveAgain + "/" + idle1 + "/" + tooSoon + "/" + idle2 + "/" + idle3 + "/" + fight1 + "/" + fight2);
+            c.lastSaid = 0;
+            com.rtshop.story.Companions.onSpotNear(a, "t_inspect", "t_circle");
+            boolean otherSpot = c.lastSaid != 0;
+            com.rtshop.story.Companions.onSpotNear(a, "t_inspect", "t_far@minecraft:end_city");
+            boolean ownSpot = c.lastSaid != 0 && com.rtshop.story.Companions.said(a, "t_inspect", "spot:t_far");
+            c.lastSaid = 0;
+            com.rtshop.story.Companions.onSpotNear(a, "t_inspect", "t_far@minecraft:end_city");
+            check("a companion speaks about a trace only when that trace has its own line, and only once", !otherSpot && ownSpot && c.lastSaid == 0,
+                    otherSpot + "/" + ownSpot + "/" + c.lastSaid);
             c.hurt(level.damageSources().generic(), 10000F);
             check("a companion never dies (it only falls back for a moment)", c.isAlive() && !c.isRemoved(), c.getHealth());
             net.minecraft.world.entity.monster.Zombie z = EntityType.ZOMBIE.create(level);
@@ -2196,7 +2253,8 @@ public final class SelfTest {
                 c.tickCount++;
                 c.tick();
             }
-            check("the companion leaves when its quest is no longer active", c.isRemoved() && com.rtshop.story.Companions.count(a) == 0);
+            check("the companion leaves when its quest is no longer active (and what it said there is forgotten)", c.isRemoved() && com.rtshop.story.Companions.count(a) == 0
+                    && !com.rtshop.story.Companions.said(a, "t_inspect", "arrive"));
             if (!c.isRemoved()) c.discard();
         }
 

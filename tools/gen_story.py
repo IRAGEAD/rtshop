@@ -110,6 +110,10 @@ for _prefix in ("story_0_", "story_1_", "story_2_", "story_3_", "story_4_", "sto
     for _i, _x in enumerate(_qs):
         _x["chain"] = re.sub(r"\(\d+/\d+\)$", "(%d/%d)" % (_i + 1, len(_qs)), _x["chain"])
 
+# 동행 NPC 의 말: 퀘스트마다 그 자리에 맞는 말로 (tools/story_walks.py)
+QUESTS = Q
+exec(open(os.path.join(os.path.dirname(__file__), 'story_walks.py'), encoding='utf-8').read())
+
 data = {
     "_help": "메인 스토리 「엠버헤이븐 연대기」 3판 (서장·1~4장·종장·숨은 이야기). 이 파일은 모드 업데이트 때 새 기본값으로 바뀔 수 있으니, 직접 고쳤다면 이 파일을 계속 고쳐 쓰세요 (고친 파일은 덮어쓰지 않습니다). "
              "목표 종류: STRUCTURE(구조물 곁), ADVANCEMENT(발전과제), DIMENSION(차원), FLAG(표식). sceneAccept/sceneDone: 받을 때/끝낼 때 연출. "

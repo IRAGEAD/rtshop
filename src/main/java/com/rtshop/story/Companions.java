@@ -222,16 +222,18 @@ public final class Companions {
     }
 
     /** 살펴볼 흔적이 나타났다: 그 흔적이 동행의 퀘스트 것이면, 그 흔적에 붙은 한마디를 한다 (spot: {흔적 ID: 대사}). */
-    static void onSpotNear(ServerPlayer p, String questId, String spotId) {
+    public static void onSpotNear(ServerPlayer p, String questId, String spotId) {
         CompanionEntity c = of(p, questId);
         if (c == null) return;
         JsonObject ls = lines(c);
         if (ls == null || !ls.has("spot") || !ls.get("spot").isJsonObject()) return;
         JsonObject by = ls.getAsJsonObject("spot");
-        String key = "spot:" + spotId;
-        if (!by.has(spotId) || said(p, questId, key)) return;
+        String sid = spotId.contains("@") ? spotId.substring(0, spotId.indexOf('@')) : spotId; // 흔적 ID 는 "이름@장소" 꼴일 수 있다
+        String key = "spot:" + sid;
+        com.google.gson.JsonElement line = by.has(sid) ? by.get(sid) : by.get(spotId);
+        if (line == null || said(p, questId, key)) return;
         mark(p, questId, key);
-        speak(c, p, by.get(spotId));
+        speak(c, p, line);
     }
 
     private static boolean calm(ServerPlayer p, CompanionEntity c, long now) {

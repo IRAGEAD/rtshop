@@ -38,7 +38,7 @@ public final class BossCredit {
     }
 
     public static boolean isBoss(Entity e) {
-        return e instanceof LivingEntity && PartyConfig.get().bosses.contains(id(e));
+        return e instanceof LivingEntity && (PartyConfig.get().bosses.contains(id(e)) || PartyConfig.get().arenaBosses.contains(id(e)));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -66,6 +66,16 @@ public final class BossCredit {
     /** 처치로 인정받는 사람들 (기준 이상 피해를 입힌 접속 중인 플레이어). */
     public static List<ServerPlayer> qualified(LivingEntity boss, MinecraftServer server) {
         List<ServerPlayer> out = new ArrayList<>();
+        if (PartyConfig.get().arenaBosses.contains(id(boss))) { // 직접 때릴 수 없는 보스: 그 자리에서 함께 싸운 사람 모두
+            double r = PartyConfig.get().arenaRadius;
+            for (net.minecraft.world.entity.player.Player pl : boss.level().players()) {
+                if (pl instanceof ServerPlayer sp && !sp.isSpectator() && sp.isAlive() && sp.distanceToSqr(boss) <= r * r) out.add(sp);
+            }
+            for (ServerPlayer t : com.rtshop.raid.Raid.TEST_PLAYERS) {
+                if (!out.contains(t) && t.level() == boss.level() && t.distanceToSqr(boss) <= r * r) out.add(t);
+            }
+            return out;
+        }
         Map<UUID, Float> m = DAMAGE.get(boss.getUUID());
         if (m == null || server == null) return out;
         double need = boss.getMaxHealth() * PartyConfig.get().bossCreditPercent / 100.0;

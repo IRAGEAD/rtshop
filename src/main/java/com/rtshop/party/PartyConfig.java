@@ -39,6 +39,11 @@ public final class PartyConfig {
     private static final List<String> ADDED_333 = List.of("block_factorys_bosses:underworld_knight", "block_factorys_bosses:yeti",
             "block_factorys_bosses:kraken", "block_factorys_bosses:sandworm", "block_factorys_bosses:infernal_dragon");
 
+    /** 직접 때릴 수 없는 보스(Qliphoth Awakening): 피해량 대신 "그 자리에서 함께 싸운 사람"을 처치로 친다. */
+    public static final List<String> DEFAULT_ARENA_BOSSES = List.of("fdbosses:chesed", "fdbosses:malkuth", "fdbosses:geburah");
+    public final java.util.Set<String> arenaBosses = new java.util.LinkedHashSet<>();
+    public int arenaRadius = 64;
+
     private static PartyConfig current;
 
     public static synchronized PartyConfig get() {
@@ -61,6 +66,7 @@ public final class PartyConfig {
     public static PartyConfig fresh() {
         PartyConfig c = new PartyConfig();
         c.bosses.addAll(DEFAULT_BOSSES);
+        c.arenaBosses.addAll(DEFAULT_ARENA_BOSSES);
         return c;
     }
 
@@ -85,6 +91,14 @@ public final class PartyConfig {
                     c.bosses.clear();
                     for (JsonElement e : o.getAsJsonArray("bosses")) c.bosses.add(e.getAsString());
                 }
+                if (o.has("arenaBosses")) {
+                    c.arenaBosses.clear();
+                    for (JsonElement e : o.getAsJsonArray("arenaBosses")) c.arenaBosses.add(e.getAsString());
+                }
+                if (o.has("arenaRadius")) c.arenaRadius = Math.max(8, o.get("arenaRadius").getAsInt());
+                if (!o.has("arenaBosses")) { // 3.41: 새 항목을 예전 설정 파일에도 적어 준다
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().create().toJson(c.toJson()), StandardCharsets.UTF_8);
+                }
                 if (!o.has("bossesAdded") && o.has("bosses")) {
                     c.bosses.addAll(ADDED_333);
                     JsonObject w = c.toJson();
@@ -102,7 +116,7 @@ public final class PartyConfig {
 
     public JsonObject toJson() {
         JsonObject o = new JsonObject();
-        o.addProperty("_help", "파티: maxMembers 최대 인원, bossCreditPercent 보스 처치로 인정받는 최소 피해(보스 최대 체력의 %), shareRadius 일반 몹 처치를 함께 채우는 파티원 거리, bosses 보스로 다루는 몹 ID. 저장한 뒤 /rtshop reload");
+        o.addProperty("_help", "파티: maxMembers 최대 인원, bossCreditPercent 보스 처치로 인정받는 최소 피해(보스 최대 체력의 %), shareRadius 일반 몹 처치를 함께 채우는 파티원 거리, bosses 보스로 다루는 몹 ID, arenaBosses 직접 때릴 수 없어 피해량 대신 arenaRadius 칸 안에서 함께 싸운 사람을 처치로 치는 보스. 저장한 뒤 /rtshop reload");
         o.addProperty("version", 2);
         o.addProperty("maxMembers", maxMembers);
         o.addProperty("bossCreditPercent", bossCreditPercent);
@@ -112,6 +126,10 @@ public final class PartyConfig {
         for (String s : bosses) b.add(s);
         o.add("bosses", b);
         o.addProperty("bossesAdded", 333);
+        JsonArray ab = new JsonArray();
+        for (String s : arenaBosses) ab.add(s);
+        o.add("arenaBosses", ab);
+        o.addProperty("arenaRadius", arenaRadius);
         return o;
     }
 }

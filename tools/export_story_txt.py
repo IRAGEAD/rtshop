@@ -47,9 +47,9 @@ for q in data["quests"]:
     c = q.get("companion")
     if c:
         w("  ◇ 동행: %s" % npc.get(c["npc"], c["npc"]))
-        WHEN = {"arrive": "도착", "fight": "전투", "low": "위급", "idle": "쉴 때", "spot": "흔적 발견", "done": "작별"}
+        WHEN = {"arrive": "도착", "fight": "전투", "low": "위급", "idle": "쉴 때", "spot": "흔적 발견", "done": "일을 마쳤을 때"}
         for k, v in c.get("lines", {}).items():
-            for t in v: w("      (%s) %s" % (WHEN.get(k, k), t))
+            for t in (v.values() if isinstance(v, dict) else v): w("      (%s) %s" % (WHEN.get(k, k), t))
     w("  [끝낼 때] " + q["done"])
     for ch in q.get("choices", []):
         w("  ▶ 선택: " + ch["text"])

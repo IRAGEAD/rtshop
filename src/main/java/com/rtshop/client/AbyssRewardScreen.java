@@ -87,7 +87,7 @@ public class AbyssRewardScreen extends Screen {
             Fx2D.end();
             g.fill(x + 10, ry + ROWH - 4, x + W - 10, ry + ROWH - 3, 0x307C64E0);
             AbyssPanel.star(g, x + 24, ry + 12, 7F, done, time, f);
-            RaidText.draw(g, this.font, "제 " + AbyssPanel.ROMAN[f - 1] + " 층", RaidText.SERIF, x + 38, ry + 8, done ? RaidFx.GOLD_HI : 0xFFE0D4FF);
+            RaidText.draw(g, this.font, o.has("endless") && o.get("endless").getAsBoolean() ? AbyssPanel.label(o, f) + " 웨이브" : "제 " + AbyssPanel.ROMAN[f - 1] + " 층", RaidText.SERIF, x + 38, ry + 8, done ? RaidFx.GOLD_HI : 0xFFE0D4FF);
             int ix = x + 92;
             for (Reward r : all) {
                 if (!r.group.equals("floor" + f) || ix > x + W - 96) continue;

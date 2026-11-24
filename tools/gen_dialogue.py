@@ -3,7 +3,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
-VERSION = 8
+VERSION = 9
 
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
