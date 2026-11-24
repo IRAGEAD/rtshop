@@ -2231,8 +2231,8 @@ public final class SelfTest {
                 helvar == null ? "null" : helvar.toJson());
         java.util.Set<String> ids = new java.util.HashSet<>();
         List<String> dup = new ArrayList<>();
-        for (QuestDef q : l.quests.values()) {
-            for (QuestDef.Objective ob : q.objectives) if (ob.type == QuestDef.Type.INSPECT && !ids.add(ob.target)) dup.add(ob.target);
+        for (QuestDef sq : l.quests.values()) {
+            for (QuestDef.Objective ob : sq.objectives) if (ob.type == QuestDef.Type.INSPECT && !ids.add(ob.target)) dup.add(ob.target);
         }
         check("every trace in the story has its own id", dup.isEmpty(), dup);
         // 이주: 1장 도중이던 사람은 1장의 처음부터 (서장은 끝낸 것으로), 1장을 끝낸 사람은 새 1장도 끝낸 것으로
