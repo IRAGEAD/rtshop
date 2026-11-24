@@ -104,3 +104,8 @@ dump_structure('cataclysm', r'cataclysm',
                r'(Ignis|Altar_?[Oo]f_?Fire|Altar|Boss_?[Mm]onster|BossMonster|CMConfig|ModEntities|ModItems|ModBlocks|ModSounds|ModTag|Flame_?Eye|ModParticle|Cm_?Boss|Animation_?Monster)',
                os.environ.get('CATACLYSM_CALLS', ''), r'^(entity\.|item\.cataclysm\.[a-z_]*(eye|ashes|ignit)|block\.cataclysm\.[a-z_]*altar|death\.)',
                r'(textures/item/[^/]*(eye|ashes)[^/]*\.png|models/item/[^/]*(eye|ashes)[^/]*\.json|loot_tables/entities/.*\.json|advancements/.*\.json)$')
+
+# 앞 단계(inspect_spell.sh)가 모아 둔 것도 같이 싣는다
+import shutil as _sh, os as _os, sys as _sys
+if _os.path.isdir('/tmp/inspect2'):
+    _sh.copytree('/tmp/inspect2', _sys.argv[2], dirs_exist_ok=True)
