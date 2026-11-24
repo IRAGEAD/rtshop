@@ -886,7 +886,7 @@ final class ClientSelfTest2 {
             onServer(mc, sp -> {
                 if (orbPos != null) com.rtshop.magic.MagicGacha.open(sp, orbPos);
             });
-            waitTicks(5);
+            waitTicks(14);
         });
         add(mc -> {
             check("using the orb first turns the view toward it (approach scene)", MagicClient.approachingForTest() || mc.screen instanceof MagicGachaScreen);
