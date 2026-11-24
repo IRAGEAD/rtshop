@@ -684,6 +684,10 @@ public final class SelfTest {
         level.setBlock(new BlockPos(X + 4, Y + 1, Z + 4), B[4].defaultBlockState(), 2);
         level.setBlock(new BlockPos(X + 4, Y + 2, Z + 4), B[4].defaultBlockState(), 2);
         level.setBlock(new BlockPos(X + 4, Y + 3, Z + 4), B[6].defaultBlockState(), 2);
+        // 토지 밖(둘레)과 토지가 아닌 한 칸에는 흔들리지 않는 표지(판자)를 둔다: 밀은 막 만든 청크의 빛 계산이 늦으면 이웃 갱신만으로도 뽑힌다
+        for (BlockPos mk : new BlockPos[]{new BlockPos(X + 7, Y + 1, Z + 7), new BlockPos(X - 1, Y + 1, Z + 3), new BlockPos(X + 8, Y + 1, Z + 3)}) {
+            level.setBlock(mk, B[6].defaultBlockState(), 2);
+        }
         LandData.Land l = data.createPlot("시험 밭", 1000);
         LandData.Claim c = new LandData.Claim();
         c.dim = LandManager.dim(level);
@@ -711,8 +715,8 @@ public final class SelfTest {
                     level.getBlockState(new BlockPos(X + 1, Y, Z + 1)).is(B[1]) && level.getBlockState(new BlockPos(X + 4, Y, Z + 4)).is(B[3])
                             && level.getBlockState(new BlockPos(X + 2, Y, Z + 2)).is(B[5]) && level.getBlockState(new BlockPos(X + 1, Y - 1, Z + 1)).is(B[0]));
             check("...and touches nothing outside the lot's own cells",
-                    level.getBlockState(new BlockPos(X + 7, Y + 1, Z + 7)).is(B[2]) && level.getBlockState(new BlockPos(X - 1, Y + 1, Z + 3)).is(B[2])
-                            && level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 3)).is(B[2]),
+                    level.getBlockState(new BlockPos(X + 7, Y + 1, Z + 7)).is(B[6]) && level.getBlockState(new BlockPos(X - 1, Y + 1, Z + 3)).is(B[6])
+                            && level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 3)).is(B[6]),
                     level.getBlockState(new BlockPos(X + 7, Y + 1, Z + 7)) + " " + level.getBlockState(new BlockPos(X - 1, Y + 1, Z + 3)) + " "
                             + level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 3)));
             boolean backup = false;

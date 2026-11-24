@@ -553,7 +553,7 @@ public final class ClientSelfTest {
                 EnhancePanel.setDetailForTest(false);
                 var m = mc.player.containerMenu;
                 mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
-                wait = 6;
+                wait = 25; // 결과가 서버에서 돌아올 때까지 (느린 환경에서는 6틱으로 모자랐다)
             }
             case 6 -> {
                 swordWhere = "?";
