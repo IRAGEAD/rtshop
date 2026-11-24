@@ -19,4 +19,4 @@ curl -fsSL -o /tmp/cfr.jar https://repo1.maven.org/maven2/org/benf/cfr/0.152/cfr
   for f in $(unzip -l "$WZJ" | awk '{print $4}' | grep -E "spell_assignments?/.*json$|weapon.*json$" | head -n 3); do echo "---- $f"; unzip -p "$WZJ" "$f" | head -c 800; echo; done
 } > /tmp/inspect2/spellengine.txt 2>&1 || true
 (SEJ="$PWD/$(ls packcache/*.jar | grep -i "spell_engine" | head -1)"; mkdir -p /tmp/se && cd /tmp/se && unzip -o -q "$SEJ" && \
-  java -jar /tmp/cfr.jar "$SEJ" --outputdir /tmp/inspect2/spellengine-src --silent true --jarfilter ".*(SpellHelper|SpellCast|SpellContainer|Spell\$|Spell$|AmmoUtil|SpellCooldown|SpellCasterEntity|SpellCastSyncHelper|ServerNetwork|Packets).*" > /tmp/inspect2/spellengine-cfr.log 2>&1) || echo "se cfr failed"
+  java -jar /tmp/cfr.jar "$SEJ" --outputdir /tmp/inspect2/spellengine-src --silent true --jarfilter ".*(SpellHelper|SpellCast|SpellContainer|Spell\$|Spell$|AmmoUtil|SpellCooldown|SpellCasterEntity|SpellCastSyncHelper|ServerNetwork|Packets|SpellEvents|api.event.Event|StagedEvent|SpellExecution|cost.Ammo|SpellRegistry|HudMessages|HudRenderHelper).*" > /tmp/inspect2/spellengine-cfr.log 2>&1) || echo "se cfr failed"
