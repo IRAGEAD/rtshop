@@ -203,7 +203,7 @@ public final class Hunts {
         h.pools.add(pool("story_ch3_done", a("cataclysm:koboleton"), a("cataclysm:the_watcher"), a("cataclysm:deepling"),
                 a("cataclysm:deepling_brute"), a("cataclysm:draugr"), a("cataclysm:elite_draugr"), a("cataclysm:endermaptera"),
                 a("cataclysm:ignited_revenant"), a("cataclysm:the_prowler")));
-        h.books.add(book("vanilla", "골디아의 들짐승", 3000, "minecraft:zombie", "minecraft:skeleton", "minecraft:spider", "minecraft:creeper",
+        h.books.add(book("vanilla", "엠버헤이븐의 들짐승", 3000, "minecraft:zombie", "minecraft:skeleton", "minecraft:spider", "minecraft:creeper",
                 "minecraft:drowned", "minecraft:husk", "minecraft:stray", "minecraft:witch", "minecraft:enderman", "minecraft:pillager",
                 "minecraft:slime", "minecraft:phantom", "minecraft:blaze", "minecraft:wither_skeleton", "minecraft:piglin_brute"));
         h.books.add(book("guardians", "깨어난 수호자들", 8000, "mowziesmobs:foliaath", "mowziesmobs:lantern", "mowziesmobs:naga",
@@ -342,6 +342,7 @@ public final class Hunts {
                 Book b = new Book();
                 b.id = x.get("id").getAsString();
                 b.name = x.has("name") ? x.get("name").getAsString() : b.id;
+                if ("골디\uC544의 들짐승".equals(b.name)) b.name = "엠버헤이븐의 들짐승"; // 마을 이름이 바뀌었다 (3.40)
                 b.gold = x.has("gold") ? x.get("gold").getAsLong() : 0;
                 for (JsonElement en : x.getAsJsonArray("entities")) b.entities.add(en.getAsString());
                 h.books.add(b);

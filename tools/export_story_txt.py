@@ -54,5 +54,5 @@ for q in data["quests"]:
     for ch in q.get("choices", []):
         w("  ▶ 선택: " + ch["text"])
     scene("끝낸 뒤", q.get("sceneDone"))
-open(out_path, 'w', encoding='utf-8').write("골디아 연대기 — 스토리 대사 모음\n(■ 퀘스트 / ◇ 목표·동행 / ▷ 플레이어의 대답 / ▶ 선택지)\n" + "\n".join(L) + "\n")
+open(out_path, 'w', encoding='utf-8').write("엠버헤이븐 연대기 — 스토리 대사 모음\n(■ 퀘스트 / ◇ 목표·동행 / ▷ 플레이어의 대답 / ▶ 선택지)\n" + "\n".join(L) + "\n")
 print(len(L), "lines ->", out_path)

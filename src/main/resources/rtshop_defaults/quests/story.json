@@ -1,5 +1,5 @@
 {
- "_help": "메인 스토리 「골디아 연대기」 3판 (서장·1~4장·종장·숨은 이야기). 이 파일은 모드 업데이트 때 새 기본값으로 바뀔 수 있으니, 직접 고쳤다면 이 파일을 계속 고쳐 쓰세요 (고친 파일은 덮어쓰지 않습니다). 목표 종류: STRUCTURE(구조물 곁), ADVANCEMENT(발전과제), DIMENSION(차원), FLAG(표식). sceneAccept/sceneDone: 받을 때/끝낼 때 연출. seal_* 표식은 결계(config/rtshop/seals.json)를 연다. 보스를 잡는 목표에는 「기억의 문」 단추가 생긴다 (config/rtshop/story_arenas.json).",
+ "_help": "메인 스토리 「엠버헤이븐 연대기」 3판 (서장·1~4장·종장·숨은 이야기). 이 파일은 모드 업데이트 때 새 기본값으로 바뀔 수 있으니, 직접 고쳤다면 이 파일을 계속 고쳐 쓰세요 (고친 파일은 덮어쓰지 않습니다). 목표 종류: STRUCTURE(구조물 곁), ADVANCEMENT(발전과제), DIMENSION(차원), FLAG(표식). sceneAccept/sceneDone: 받을 때/끝낼 때 연출. seal_* 표식은 결계(config/rtshop/seals.json)를 연다. 보스를 잡는 목표에는 「기억의 문」 단추가 생긴다 (config/rtshop/story_arenas.json).",
  "version": 4,
  "npcs": [
   {
@@ -46,9 +46,9 @@
    "order": 1010,
    "title": "폭풍 뒤의 부두",
    "giver": "quest_guide",
-   "intro": "폭풍을 뚫고 들어온 배, 맞죠? 어서 오세요, 폭풍 조사대 여러분! 저는 안내인 모리스예요. 잿불 수도회가 바다 건너에서 여러분을 불렀어요. 일손이 모자라거든요. 먼저 골디아에서 사는 법부터 알려 드릴게요. '초보 모험가의 길'을 끝까지 따라와 주세요.",
+   "intro": "폭풍을 뚫고 들어온 배, 맞죠? 어서 오세요, 폭풍 조사대 여러분! 저는 안내인 모리스예요. 잿불 수도회가 바다 건너에서 여러분을 불렀어요. 일손이 모자라거든요. 먼저 엠버헤이븐에서 사는 법부터 알려 드릴게요. '초보 모험가의 길'을 끝까지 따라와 주세요.",
    "progress": "모리스의 '초보 모험가의 길'을 모두 마쳐 주세요.",
-   "done": "잘하셨어요! 이제 골디아 사람이에요. 은행도, 상점도, 땅도 여러분 거예요. 그런데 신기하죠. 조사대 배는 올 때마다 폭풍을 만나요. 그런데 돛 하나 안 찢기고 들어와요. 선원들 말로는 폭풍이 배를 한 바퀴 돌고 그냥 갔대요. 구경하듯이요. 아, 수도회 분들이 조사대원들을 찾고 있었어요.",
+   "done": "잘하셨어요! 이제 엠버헤이븐 사람이에요. 은행도, 상점도, 땅도 여러분 거예요. 그런데 신기하죠. 조사대 배는 올 때마다 폭풍을 만나요. 그런데 돛 하나 안 찢기고 들어와요. 선원들 말로는 폭풍이 배를 한 바퀴 돌고 그냥 갔대요. 구경하듯이요. 아, 수도회 분들이 조사대원들을 찾고 있었어요.",
    "objectives": [
     {
      "type": "FLAG",
@@ -63,7 +63,7 @@
     "kind": "title",
     "chapter": "서장",
     "title": "폭풍 뒤의 부두",
-    "subtitle": "폭풍 조사대, 골디아에 닿다",
+    "subtitle": "폭풍 조사대, 엠버헤이븐에 닿다",
     "color": "E8C878",
     "theme": "storm",
     "sound": "minecraft:entity.lightning_bolt.thunder"
@@ -421,7 +421,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 길 위의 이름",
+    "title": "엠버헤이븐 연대기 · 길 위의 이름",
     "text": "도윈, 광부\n마지막에 남은 길잡이",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -606,7 +606,7 @@
    "requires": [
     "story_1_08"
    ],
-   "intro": "조사대원님, 그 금화를 보여 주시겠습니까. 시청에는 지금까지 골디아를 오간 모든 화폐의 견본이 있습니다.",
+   "intro": "조사대원님, 그 금화를 보여 주시겠습니까. 시청에는 지금까지 엠버헤이븐을 오간 모든 화폐의 견본이 있습니다.",
    "progress": "시청 서기 하루에게 회색 금화를 보여 주십시오.",
    "done": "정리하겠습니다. 첫째, 이 금화는 기록에 없습니다. 둘째, 같은 현상금이 두 번, 서로 다른 필체로 붙었습니다. 셋째, 금화의 앞면과 뒷면을 찍은 틀이 다릅니다. 돈을 내는 사람이 하나가 아닐 수 있습니다. 장부는 거짓말을 못 합니다.",
    "objectives": [
@@ -1540,7 +1540,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 받으러 온 이름",
+    "title": "엠버헤이븐 연대기 · 받으러 온 이름",
     "text": "카스, 잿빛 무리의 선장\n우리에겐 왕이 있었다. 이름은 어머니도 몰랐다.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -1705,7 +1705,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "침묵의 왕의 문지기\n그리고 그가 삼켰던 삼백열네 개의 목소리",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -1999,7 +1999,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "허공을 지키던 용\n묶여 있었음. 마지막에 누군가를 불렀음.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -2386,7 +2386,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "호르스, 불꽃 기사단장의 종자\n주군이 돌아올 때까지 등을 비워 둔 사람",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -2671,7 +2671,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "헬바르, 불꽃 기사단 부단장\n서약을 거절하고, 서약의 자리를 끝까지 지킨 사람",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -3092,7 +3092,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "시로크, 물을 부르는 것\n왕의 정원까지 물길을 이으라는 명을 천 년 수행함. 일을 마침.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -3421,7 +3421,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "스코르, 설원의 장의사\n눈에 덮이지 않게, 죽은 이들을 세워 둔 짐승",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -3502,7 +3502,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "얼음을 품은 거인\n서리 왕국의 아이들이 맡긴 결정을 천 년 품고 잔 짐승",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -3904,7 +3904,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "애쉬로드, 기사단장 아르덴의 용\n재가 될 때까지 따르는 자. 사과는 풋것을 좋아함.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -4243,7 +4243,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 스무 해 전의 원정대",
+    "title": "엠버헤이븐 연대기 · 스무 해 전의 원정대",
     "text": "토마스 · 리아 · 브렌 · 마르코 · 이네스\n다닐로 · 요나 · 페이 · 하윤 · 오토\n카엘, 부대장. 친구를 살리려고 사라진 사람\n그리고 로란, 대장. 돌아와서 인원을 센 사람",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -4516,7 +4516,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 얼음 아래의 이름",
+    "title": "엠버헤이븐 연대기 · 얼음 아래의 이름",
     "text": "하산, 그물을 잘 기웠음\n마레, 노래를 못했음",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -4694,7 +4694,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "미로의 어머니\n얼음에 갇혀 굶주린 심해의 물고기. 삼킨 목소리를 모두 돌려줌.\n엘릭, 오스카의 아들",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -4997,7 +4997,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "코넬리아, 선장\n아무도 죽지 않게 하려던 사람. 삼백과 서른둘의 이름을 끝까지 틀리지 않음.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -5289,7 +5289,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 돌아온 이름",
+    "title": "엠버헤이븐 연대기 · 돌아온 이름",
     "text": "네라키스, 배를 품는 것\n배를 사랑해서 가져간 짐승. 품었던 것을 모두 돌려줌.\n아침별의 서른둘. 서른 해 만에 전원 하선.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -5776,7 +5776,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "이름을 받지 못한 아들\n대장장이 백 명이 벼림. 천 년 동안 문을 두드림. 문이 열림.\n아흔아홉의 이름, 그리고 이름을 새기지 않은 한 사람.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -6028,7 +6028,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "정원의 문지기\n물소리가 날 때까지 문을 지킴. 물이 왔고, 문을 열었음.\n아므라트, 사막의 왕. 문 안에서 같이 기다림.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -6526,7 +6526,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "리바이어던\n아이들이 등에 올라타 놀던 짐승. 천 년 동안 자장가를 들음.\n사제 마흔 대. 한 숨도 끊지 않으려 함.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -6767,7 +6767,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 잠든 이름",
+    "title": "엠버헤이븐 연대기 · 잠든 이름",
     "text": "빈 왕좌의 문지기\n묻는 자를 막으라는 명을 받음. 마지막에 그 자리를 가리킴.\n여덟째 자리. 이름 여덟 글자. 아직 적지 못함.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -7199,7 +7199,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 지금까지 적은 이름",
+    "title": "엠버헤이븐 연대기 · 지금까지 적은 이름",
     "text": "하르겐 · 이졸데 · 메르윈\n호르스 · 헬바르 · 시로크 · 스코르\n코넬리아와 삼백서른둘 · 네라키스\n이름을 받지 못한 아들 · 정원의 문지기 · 말레딕투스",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -7450,7 +7450,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 손바닥에 적은 이름",
+    "title": "엠버헤이븐 연대기 · 손바닥에 적은 이름",
     "text": "아르덴, 불꽃 기사단장\n심지를 몸에 받은 사람. 아직 잠들지 않음.\n(종이가 없어 기록관의 왼손바닥에 적음)",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -8017,7 +8017,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 채워진 빈 줄",
+    "title": "엠버헤이븐 연대기 · 채워진 빈 줄",
     "text": "오렐, 새벽의 섬의 왕\n나누는 데 반대했고, 반대한 자가 값을 치르는 것이 맞다 하심.\n제 이름을 스스로 내놓음. 두 제자에게 글씨는 천천히 쓰라 하심.",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"
@@ -8456,7 +8456,7 @@
    },
    "sceneDone": {
     "kind": "names",
-    "title": "골디아 연대기 · 마중 나간 이름",
+    "title": "엠버헤이븐 연대기 · 마중 나간 이름",
     "text": "마중하는 이, 새벽의 섬의 제독\n누구를 맞으러 나왔는지 잊고도 천 년 동안 상을 차림\n내린 날: (비워 둠. 마중을 가심.)",
     "speaker": "기록관 이사벨",
     "sound": "minecraft:item.book.page_turn"

@@ -1,4 +1,4 @@
-# 골디아 연대기 설정집 (스토리 대개편 기준서)
+# 엠버헤이븐 연대기 설정집 (스토리 대개편 기준서)
 
 전체 문서: https://claude.ai/artifact/KW9iD7UHVNE7LCtbuP5QDC  (Docs 문서 id 95d66ee9-183d-48dc-939e-9f4dd1a6127f, 본문 노드 4b2dcec7-19bc)
 

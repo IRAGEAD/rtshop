@@ -1,9 +1,9 @@
 # 서장 + 1장 (4판) 영어판: 퀘스트 ID -> (제목, 받을 때, 진행 중, 끝낼 때). build.py 가 story.json 의 한국어 원문과 짝지어 넣는다.
 EN = {
 "story_0_01": ("The Dock After the Storm",
- "You came in on the ship that beat the storm, right? Welcome, Storm Survey Corps! I'm Morris, the guide. The Ember Order called you from across the sea because we're short of hands. First let me show you how to live in Goldia. Follow the 'Path of the Novice Adventurer' to the end.",
+ "You came in on the ship that beat the storm, right? Welcome, Storm Survey Corps! I'm Morris, the guide. The Ember Order called you from across the sea because we're short of hands. First let me show you how to live in Emberhaven. Follow the 'Path of the Novice Adventurer' to the end.",
  "Finish every step of Morris's 'Path of the Novice Adventurer'.",
- "Well done! You're one of Goldia's people now. The bank, the shops, the land are all yours. Funny thing, though. Every Corps ship meets a storm on the way in. And not one comes in with a torn sail. The sailors say the storm circles the ship once and just leaves. As if it were having a look. Oh, and the Order was looking for the new surveyors."),
+ "Well done! You're one of Emberhaven's people now. The bank, the shops, the land are all yours. Funny thing, though. Every Corps ship meets a storm on the way in. And not one comes in with a torn sail. The sailors say the storm circles the ship once and just leaves. As if it were having a look. Oh, and the Order was looking for the new surveyors."),
 "story_0_02": ("A Surveyor's Trade",
  "So you're off this ship. Captain Roran. …The cane? A twenty-year-old leg. Never mind it. The Corps doesn't run on swords alone: a smith forges, a cook boils the soup, a fisher reads the sea. Go see Albert the job guide and choose your road.",
  "Talk to Albert the job guide and come back.",
@@ -49,7 +49,7 @@ EN = {
  "At a pillager outpost defeat 6 pillagers and examine the tower's banner.",
  "Grey coins. Money I've never seen. And that song… not a song bandits sing. Show the coin at the town hall, they have a nose for money. Take the song to the archivist. I don't understand either."),
 "story_1_09": ("The Grey Coin",
- "Surveyor, may I see that coin. The town hall keeps a specimen of every currency that has ever passed through Goldia.",
+ "Surveyor, may I see that coin. The town hall keeps a specimen of every currency that has ever passed through Emberhaven.",
  "Show the grey coin to Haru the town clerk.",
  "Let me sum up. One, this coin is in no record. Two, the same bounty was posted twice, in two different hands. Three, the front and the back were struck from different dies. There may be more than one person paying. Ledgers cannot lie."),
 "story_1_10": ("The Mapmaker Under the Igloo",

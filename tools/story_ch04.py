@@ -76,7 +76,7 @@ p = q("story_4_05", ch(C4, 5, N4), "이름 없는 아들", ELDER,
       [kill("cataclysm:netherite_monstrosity", 1, "네더라이트 몬스트로시티", K), kill("minecraft:wither_skeleton", 12, "대장간 길목의 기사들", "!" + K)],
       gold=9000, items=[item("rtshop:chronicle_page")], requires=[p],
       sceneAccept=line("대장장이 브람", "화로에 달군 날이야. 한 번은 먹힐 걸세. 두 번째부터는 자네 솜씨고."),
-      sceneDone=names("골디아 연대기 · 잠든 이름", "이름을 받지 못한 아들\n대장장이 백 명이 벼림. 천 년 동안 문을 두드림. 문이 열림.\n아흔아홉의 이름, 그리고 이름을 새기지 않은 한 사람."))
+      sceneDone=names("엠버헤이븐 연대기 · 잠든 이름", "이름을 받지 못한 아들\n대장장이 백 명이 벼림. 천 년 동안 문을 두드림. 문이 열림.\n아흔아홉의 이름, 그리고 이름을 새기지 않은 한 사람."))
 
 # ---- 쉬는 막 1: 초상화
 p = q("story_4_06", ch(C4, 6, N4), "장로들의 초상", ARCH,
@@ -132,7 +132,7 @@ p = q("story_4_10", ch(C4, 10, N4), "문지기", ELDER,
       [kill("cataclysm:ancient_remnant", 1, "고대 잔해", K), kill("minecraft:husk", 14, "정원 길목의 허스크", "!" + K)],
       gold=9500, items=[item("rtshop:chronicle_page")], requires=[p],
       sceneAccept=line("기록관 이사벨", "약속을 지키게 해 주세요. 그러고 나서 재워 주세요. 순서가 중요해요."),
-      sceneDone=names("골디아 연대기 · 잠든 이름", "정원의 문지기\n물소리가 날 때까지 문을 지킴. 물이 왔고, 문을 열었음.\n아므라트, 사막의 왕. 문 안에서 같이 기다림."))
+      sceneDone=names("엠버헤이븐 연대기 · 잠든 이름", "정원의 문지기\n물소리가 날 때까지 문을 지킴. 물이 왔고, 문을 열었음.\n아므라트, 사막의 왕. 문 안에서 같이 기다림."))
 
 # ---- 쉬는 막 2: 여덟 왕의 회의
 CH4_COUNCIL = p = q("story_4_11", ch(C4, 11, N4), "여덟 왕의 회의", ARCH,
@@ -227,7 +227,7 @@ p = q("story_4_19", ch(C4, 19, N4), "자장가의 끝", FISHER,
       [kill("cataclysm:the_leviathan", 1, "리바이어던", K), kill("minecraft:elder_guardian", 2, "깊은 신전의 수호자", "!" + K)],
       gold=10500, items=[item("rtshop:chronicle_page")], requires=[p],
       sceneAccept=line("어부 오스카", "(낮게 여덟 마디를 부른다.) …음은 틀려도 봐주시오. 어부 목청이라."),
-      sceneDone=names("골디아 연대기 · 잠든 이름", "리바이어던\n아이들이 등에 올라타 놀던 짐승. 천 년 동안 자장가를 들음.\n사제 마흔 대. 한 숨도 끊지 않으려 함."))
+      sceneDone=names("엠버헤이븐 연대기 · 잠든 이름", "리바이어던\n아이들이 등에 올라타 놀던 짐승. 천 년 동안 자장가를 들음.\n사제 마흔 대. 한 숨도 끊지 않으려 함."))
 
 # ---- 다섯째 눈: 빈 왕좌 (살펴보기) — 침묵의 왕 벨라스가 떠넘긴 것: 빈자리
 p = q("story_4_20", ch(C4, 20, N4), "자수정의 렌즈", ELDER,
@@ -269,7 +269,7 @@ p = q("story_4_23", ch(C4, 23, N4), "빈 왕좌의 문지기", ELDER,
       [kill("cataclysm:ender_guardian", 1, "엔더 가디언", K), kill("minecraft:shulker", 8, "성채의 셜커", "!" + K)],
       gold=11000, items=[item("rtshop:chronicle_page")], requires=[p],
       sceneAccept=line("기록관 이사벨", "장로님이 대답을 피했어요. 처음이에요. 저한테 대답을 피하신 건."),
-      sceneDone=names("골디아 연대기 · 잠든 이름", "빈 왕좌의 문지기\n묻는 자를 막으라는 명을 받음. 마지막에 그 자리를 가리킴.\n여덟째 자리. 이름 여덟 글자. 아직 적지 못함."))
+      sceneDone=names("엠버헤이븐 연대기 · 잠든 이름", "빈 왕좌의 문지기\n묻는 자를 막으라는 명을 받음. 마지막에 그 자리를 가리킴.\n여덟째 자리. 이름 여덟 글자. 아직 적지 못함."))
 
 # ---- 여섯째 눈: 서리 감옥 (말하기와 고르기) — 서리의 왕 말레딕투스가 떠넘긴 것: 없음. 그는 자기를 가두었다
 p = q("story_4_24", ch(C4, 24, N4), "간수 없는 감옥", ARCH,

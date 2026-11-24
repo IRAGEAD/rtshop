@@ -357,7 +357,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
   음악은 직접 만든 곡(`assets/rtshop/sounds/gacha/yamato.ogg`)이며 리소스팩으로 같은 경로의 파일을 넣으면 바꿀 수 있습니다 (길이·박자가 맞아야 연출과 맞습니다: 0초 시작, 0.32~2.14초 베기, 2.9초 딸깍, 3.0초 깨짐).
 - 예전 gacha.json 은 목록을 그대로 두고 야마토 등급과 Blade of Shadow 만 더합니다.
 
-## 메인 스토리 「골디아 연대기」
+## 메인 스토리 「엠버헤이븐 연대기」
 
 - 4장 45개 퀘스트(+숨은 이야기 2개)가 `config/rtshop/quests/story.json` 으로 깔립니다. 수도회 NPC 세 명은 `/rtshop npc quest_order_elder`, `quest_order_archivist`, `quest_order_captain` 으로 소환합니다.
 - 1장(바닐라·우리 시스템) → 2장(Mowzie's Mobs, 나선의 심연 1~4층) → 3장(Aquamirae, 5~6층) → 4장(Cataclysm 일곱 봉인, 최종 이그니스) → 에필로그.
