@@ -194,7 +194,7 @@ public final class StorySeals {
                 b("cataclysm:maledictus"), "cataclysm:cursed_tombstone");
         s_maledictus.structures.add("cataclysm:frosted_prison");
         m.put("maledictus", s_maledictus);
-        Seal s_ignis = seal("seal_ignis", "불의 제단이 당신을 밀어낸다. 일곱 봉인을 먼저 풀어야 한다.", 32,
+        Seal s_ignis = seal("seal_ignis", "불의 제단이 당신을 밀어낸다. 여섯 눈이 감기기 전에는 이 문이 열리지 않는다.", 32,
                 b("cataclysm:ignis"), "cataclysm:altar_of_fire");
         s_ignis.structures.add("cataclysm:burning_arena");
         m.put("ignis", s_ignis);
