@@ -29,7 +29,8 @@ for q in data["quests"]:
     chap = re.sub(r"\s*\(\d+/\d+\)$", "", q.get("chain", ""))
     if chap != last:
         w(); w("=" * 72); w(chap); w("=" * 72); last = chap
-    w(); w("■ %s  %s" % (re.search(r"\((\d+/\d+)\)$", q.get("chain", "") or "()").group(1) if "(" in q.get("chain", "") else "", q["title"]))
+    _m = re.search(r"\(([^()]*)\)$", q.get("chain", ""))
+    w(); w("■ %s  %s" % (_m.group(1) if _m else "", q["title"]))
     w("  주는 사람: " + npc.get(q["giver"], q["giver"]))
     scene("받을 때", q.get("sceneAccept"))
     w("  [받을 때] " + q["intro"])
