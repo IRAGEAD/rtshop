@@ -46,3 +46,11 @@
 - 스킬라 히든 스토리(3.36): 단서 5개 = 뽑기 극악 확률 / 이야기 선택지 / 스토리 보스 극악 드랍 / 야생 전리품 극악 / (추천 1). 운·선택에 따라 시기는 달라도 결국 모두 얻게(보장 장치). 본편 전체에 떡밥·회수. 기존 구현: story/ScyllaClues.java (단서 6종: fish/kill/loot/storm_height/quest), config/rtshop/scylla.json.
 - Cataclysm 보스 연출: Cinematic Cataclysm 모드(FINDERFEED, 1.20.1 Forge, ARR) 활용. 그 모드의 컷신은 Cataclysm 구조물 안에서만 한 번 재생(엔티티 cinematiccataclysm:*_cutscene: scylla, maledictus, leviathan, ancient_remnant, ignis). 우리는 기억의 문에서 싸우므로 연동 방법 조사가 필요. 모드팩에 아직 없음 → 사용자가 추가해야 함. EntityCulling 화이트리스트 필요.
 - 마나 통일(3.35): compat/SpellMana.java.
+
+3.36 스킬라 「마중 나간 사람」 (tools/story_scylla.py 머리말에 설정 전문):
+- 스킬라 = 오렐의 쌍둥이 누이, 새벽의 섬 제독, 칭호 '마중하는 이'. 폭풍의 눈 안에 함대와 숨어 잊히지 않았으나 누구를 마중 나왔는지는 잊음. 천 년째 지나는 배를 들여다봄 → 폭풍 조사대 배 17척 전부 폭풍 속 입항(서장 모리스의 말, 하루의 장부).
+- 에르윈은 그녀를 안다. 코넬리아에게 판 항로 = 폭풍 한가운데(그녀가 스승의 이름을 말하는지 들으려고). 닻이 봉인을 건드려 바다가 얼었다. 카엘의 유언 회수. → 3장 재작성 때 이 설정에 맞출 것(항해일지의 '여덟 번째 눈' = 폭풍의 눈, 선장실의 받아 적으라는 지시).
+- 잿빛 무리 노래 둘째 절 "우리에겐 배가 있었다. 마중 나간 누이는 돌아오지 않았다" (표식 scylla_song2).
+- 단서 5: storm_coin(뽑기 0.2%, 천장 300) / thunder_scale(이야기 보스 4%, 천장 14) / torn_hymn(안 열린 상자 0.6%, 천장 150) / wet_logbook(바다 낚시 1%, 천장 180) / seal_shard(선택지: 카스를 놓아줬으면 1장 뒤 hidden_scylla_kas_a, 넘겼으면 3장 뒤 hidden_scylla_kas_b). 시도할수록 확률이 오르고 천장에서 확정. config/rtshop/scylla.json (version 2, 예전 파일은 scylla_v1_backup.json).
+- 퀘스트: hidden_scylla_0(하루, 1장 뒤) → _1(오스카, 2장 뒤) → [다섯 단서 + story_done → seal_scylla] → _2 일지 맞추기 → _3 난파선(로란 동행) → _4 에르윈의 자백·빈 연회장 → _5 대면(acropolis 에서, 기억의 문 아님: 약속에 묶인 사람) → _6 대답 선택(scylla_told / scylla_lantern).
+- 4장·종장을 다시 쓸 때: 에르윈이 바다를 보지 못하는 이유에 이 설정을 넣고, scylla_song2 를 가진 사람에게 에르윈의 반응 대사 추가.

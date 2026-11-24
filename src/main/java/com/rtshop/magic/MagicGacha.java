@@ -281,6 +281,7 @@ public final class MagicGacha {
         o.addProperty("mode", mode);
         o.addProperty("resultCat", select ? cat : MagicConfig.RANDOM);
         send(p, MagicPacket.RESULT, o);
+        com.rtshop.story.ScyllaClues.roll(p, "gacha", "", n, null);
         return got;
     }
 

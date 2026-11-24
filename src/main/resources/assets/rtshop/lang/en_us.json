@@ -1153,7 +1153,7 @@
   "rtshop.scylla.found": "You found something: %s",
   "rtshop.scylla.recorded": "Recorded in your clue notebook: %s (%s/%s)",
   "rtshop.scylla.notebook": "— Clue Notebook (%s/%s) —",
-  "rtshop.scylla.complete": "Matched against the torn chronicle, lightning etches the empty last page. The Storm Eye is complete.",
+  "rtshop.scylla.complete": "The five pieces fit into one logbook: the Log of the Welcome. Lightning sears its last page, and the storm eye is left in your hand.",
   "rtshop.hunt.new_entry": "Bestiary: %s (%s)",
   "rtshop.hunt.progress": "Bounty: %s %s/%s",
   "rtshop.hunt.daily_done": "[Bounty done] %s x%s — received %s G.",

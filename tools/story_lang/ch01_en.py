@@ -3,7 +3,7 @@ EN = {
 "story_0_01": ("The Dock After the Storm",
  "You came in on the ship that beat the storm, right? Welcome, Storm Survey Corps! I'm Morris, the guide. The Ember Order called you from across the sea because we're short of hands. First let me show you how to live in Goldia. Follow the 'Path of the Novice Adventurer' to the end.",
  "Finish every step of Morris's 'Path of the Novice Adventurer'.",
- "Well done! You're one of Goldia's people now. The bank, the shops, the land are all yours. Oh, and the Order was looking for the new surveyors."),
+ "Well done! You're one of Goldia's people now. The bank, the shops, the land are all yours. Funny thing, though. Every Corps ship meets a storm on the way in. And not one comes in with a torn sail. The sailors say the storm circles the ship once and just leaves. As if it were having a look. Oh, and the Order was looking for the new surveyors."),
 "story_0_02": ("A Surveyor's Trade",
  "So you're off this ship. Captain Roran. …The cane? A twenty-year-old leg. Never mind it. The Corps doesn't run on swords alone: a smith forges, a cook boils the soup, a fisher reads the sea. Go see Albert the job guide and choose your road.",
  "Talk to Albert the job guide and come back.",

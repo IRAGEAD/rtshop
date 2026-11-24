@@ -1465,7 +1465,10 @@ public final class QuestManager {
         }
         if (com.rtshop.party.BossCredit.isBoss(victim)) {
             // 보스: 최대 체력의 일정 비율(기본 10%) 이상을 직접 입힌 사람만 처치로 인정
-            for (ServerPlayer p : com.rtshop.party.BossCredit.qualified(victim, server)) onKill(p, victim);
+            for (ServerPlayer p : com.rtshop.party.BossCredit.qualified(victim, server)) {
+                onKill(p, victim);
+                com.rtshop.story.ScyllaClues.roll(p, "boss", "", 1, null); // 이야기 보스 한 마리가 시도 한 번
+            }
             return;
         }
         ServerPlayer killer = com.rtshop.pvp.Pvp.attackerOf(event.getSource(), server);

@@ -21,6 +21,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -66,19 +67,22 @@ public final class ScyllaClues {
 
     public static final class Clue {
         public String id = "", name = "", desc = "";
-        /** fish | kill | loot | storm_height | quest */
+        /** gacha(뽑기) | boss(이야기 보스) | wild(야생의 상자) | fish(낚시) | quest(이야기 선택지) | kill | loot | storm_height */
         public String source = "quest";
         /** kill: 몹 ID, loot: 전리품 표 ID, fish: 바이옴 이름에 들어갈 글자(비우면 어디서나) */
         public String target = "";
         public double chance = 0.05;
         public boolean thunder;
         public int minY = 200;
+        /** 천장: 이만큼 시도하고도 못 얻었으면 다음 시도에서 반드시 얻는다 (0 = 없음). 시도할수록 확률도 조금씩 오른다. */
+        public int pity = 0;
         /** 주민 직업(ID 의 끝, 예: fisherman) 또는 "*" -> 들려줄 소문 */
         public final Map<String, List<String>> hints = new LinkedHashMap<>();
     }
 
     public boolean enabled = true;
-    public int needed = 6;
+    public int needed = 5;
+    public int version = 2;
     public String rewardItem = "cataclysm:storm_eye";
     public String grantFlag = "seal_scylla";
     /** 단서를 다 모아도 이 표식(메인 스토리의 끝)이 있어야 폭풍이 열린다. 그 표식을 주는 퀘스트가 없으면 따지지 않는다. */
@@ -114,33 +118,29 @@ public final class ScyllaClues {
 
     static Map<String, Clue> defaults() {
         Map<String, Clue> m = new LinkedHashMap<>();
-        Clue a = clue("wet_logbook", "젖은 항해일지 조각", "따뜻한 바다에서 낚아 올린, 소금에 절은 종이. \"여덟 번째 배는 폭풍 속으로…\"", "fish", "warm", 0.015);
-        hint(a, "fisherman", "따뜻한 바다 쪽 배들은 폭풍이 오기 전날 꼭 노래를 듣는다더군. 누가 부르는지는 아무도 몰라.");
-        hint(a, "cartographer", "그 항로… 내 지도엔 없는 바다로 이어지는군. 지워진 바다라면 모를까.");
-        hint(a, "*", "바다 이야기는 어부한테 물어보게. 난 물이 싫어.");
+        // 다섯 단서 = 폭풍의 여제가 쓴 「마중의 항해일지」의 흩어진 다섯 조각. 얻는 때는 운과 선택에 따라 다르지만, 천장이 있어 결국 모두 얻는다.
+        Clue a = clue("storm_coin", "여덟 갈래 번개가 찍힌 품삯", "행운 상인의 상품 더미에 섞여 있던 낡은 은화. 앞면에 여덟 갈래 번개, 뒷면에 한 줄: \"마중 나간 날의 품삯. 돌아와서 치름.\"", "gacha", "", 0.002);
+        a.pity = 300;
+        hint(a, "*", "그런 돈은 처음 보는데. 품삯을 '돌아와서 치른다'니, 못 돌아온 배의 돈이겠구먼.");
+        hint(a, "cleric", "여덟 갈래라. 일곱이 아니고? …세어 보니 정말 여덟이군.");
         m.put(a.id, a);
-        Clue b = clue("thunder_scale", "번개 맞은 비늘", "뇌우 치는 바다의 드라운드에게서 떨어진, 아직도 찌릿한 비늘.", "kill", "minecraft:drowned", 0.04);
-        b.thunder = true;
-        hint(b, "armorer", "이 비늘, 쇠보다 단단해. 그런데 이건 물고기 비늘이 아니야. 뱀… 아니, 그보다 큰 무언가의 것이지.");
-        hint(b, "cleric", "번개를 품은 비늘이라… 옛날 폭풍을 다스리던 여인이 있었다는 이야기를 들은 적이 있어요.");
-        hint(b, "*", "번쩍이는 비늘이네. 폭풍 치는 날 바다에 나가는 미친 사람이 또 있었군.");
+        Clue b = clue("thunder_scale", "번개 맞은 비늘", "잠든 수호자의 재 속에서 나온 비늘. 아직도 찌릿하다. 수호자의 것이 아니다. 누군가 그 곁을 다녀갔다.", "boss", "", 0.04);
+        b.pity = 14;
+        hint(b, "*", "수호자 곁에서 나왔다고? 그럼 그 폭풍이 봉인마다 들렀다는 얘기 아닌가. 뭘 찾느라고.");
+        hint(b, "fisherman", "이 비늘… 물고기 것이 아니야. 훨씬 큰 것. 폭풍 속에서 딱 한 번 본 적 있네. 번개인 줄 알았지.");
         m.put(b.id, b);
-        Clue c = clue("singing_shell", "노래하는 소라껍데기", "귀에 대면 바다가 아닌 여자의 노랫소리가 들린다.", "kill", "cataclysm:deepling_priest", 0.08);
-        hint(c, "cleric", "이 노래… 성가예요. 일곱 봉인보다 오래된 성가. 첫 소절이 지워져 있네요.");
-        hint(c, "librarian", "가사가 연대기의 문체와 같군요. 같은 사람이 썼거나, 같은 사람을 노래한 거예요.");
-        hint(c, "*", "귀에 대 봤는데 아무 소리도 안 나는데? 너한테만 들리는 거 아니야?");
+        Clue c = clue("torn_hymn", "찢긴 뱃노래", "어느 버려진 상자 바닥에 깔려 있던 악보. 제목만 온전하다: 「마중 가는 노래」. 가사에 사람 이름이 들어갈 자리만 전부 비어 있다.", "wild", "", 0.006);
+        c.pity = 150;
+        hint(c, "*", "이 가락, 들어 본 것 같은데… 폭풍 치는 밤이면 바다 쪽에서 들리는 그거 아닌가?");
+        hint(c, "librarian", "이름 자리만 비어 있네요. 지운 게 아니에요. 잉크가 닿은 적이 없어요. 부르려던 이름을 잊은 사람이 적은 악보예요.");
         m.put(c.id, c);
-        Clue d = clue("torn_hymn", "찢긴 성가 악보", "따뜻한 바다 유적의 모래 속에서 나온 악보. 제목만 남았다: 「폭풍의 여제께」", "loot", "minecraft:archaeology/ocean_ruin_warm", 0.12);
-        hint(d, "librarian", "「폭풍의 여제께」… 연대기에 여제라는 말은 한 번도 안 나와요. 일부러 뺀 거죠.");
-        hint(d, "*", "악보는 못 읽어. 그래도 제목은 무섭게 생겼네.");
+        Clue d = clue("wet_logbook", "젖은 항해일지 조각", "바다에서 낚아 올린, 소금에 절은 종이. \"여덟 번째 함대, 폭풍의 눈 안에 닻을 내림. 제독께서 이르시길, 누가 오는지는 잊었으나 맞을 채비는 풀지 말라 하심.\"", "fish", "ocean", 0.01);
+        d.pity = 180;
+        hint(d, "fisherman", "폭풍의 눈 안에 닻을 내린다고? 미친 소리… 라고 하고 싶은데, 눈 안은 잔잔하긴 하지. 거기 천 년 있을 수 있다면 말이야.");
+        hint(d, "*", "여덟 번째 함대? 왕국은 일곱이었다던데. 여덟째 나라의 배라는 건가.");
         m.put(d.id, d);
-        Clue e = clue("sky_chart", "하늘의 해도", "폭풍이 칠 때 아주 높은 곳에서 바람에 날려 온 해도. 별 대신 번개가 그려져 있다.", "storm_height", "", 0.06);
-        e.minY = 200;
-        hint(e, "cartographer", "이건 바다 지도가 아니라 폭풍의 지도야. 번개가 떨어지는 자리를 이어 보면… 원이 되는군.");
-        hint(e, "*", "하늘에도 지도가 있다고? 별 이상한 걸 다 주워 오는군.");
-        m.put(e.id, e);
-        Clue f = clue("seal_shard", "여제의 인장 조각", "항해일지의 숨은 페이지에 끼어 있던 인장 조각. 여덟 갈래의 번개 문양.", "quest", "", 1);
-        hint(f, "*", "여덟 갈래 번개라… 일곱이 아니고 여덟이야? 세어 보니 정말 여덟이네.");
+        Clue f = clue("seal_shard", "제독의 인장 조각", "여덟 갈래 번개 문양의 인장 조각. 깨진 면에 글자 반 토막: \"…중하는 이\".", "quest", "", 1);
+        hint(f, "*", "'…중하는 이'? 앞 글자가 깨졌네. 존중? 마중? 인장에 그런 말을 새기는 사람도 있나.");
         m.put(f.id, f);
         return m;
     }
@@ -155,6 +155,14 @@ public final class ScyllaClues {
         try {
             if (Files.exists(f)) {
                 JsonObject o = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
+                if (!o.has("version") || o.get("version").getAsInt() < 2) {
+                    // 3.36: 단서가 다섯(뽑기·보스·야생·낚시·선택지)으로 바뀌었다. 예전 파일은 옆에 남기고 새 기본값으로 다시 쓴다
+                    Files.copy(f, f.resolveSibling("scylla_v1_backup.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    s.clues.putAll(defaults());
+                    if (o.has("enabled")) s.enabled = o.get("enabled").getAsBoolean();
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(s.toJson()), StandardCharsets.UTF_8);
+                    return s;
+                }
                 if (o.has("enabled")) s.enabled = o.get("enabled").getAsBoolean();
                 if (o.has("needed")) s.needed = Math.max(1, o.get("needed").getAsInt());
                 if (o.has("rewardItem")) s.rewardItem = o.get("rewardItem").getAsString();
@@ -172,6 +180,7 @@ public final class ScyllaClues {
                         if (x.has("chance")) c.chance = x.get("chance").getAsDouble();
                         if (x.has("thunder")) c.thunder = x.get("thunder").getAsBoolean();
                         if (x.has("minY")) c.minY = x.get("minY").getAsInt();
+                        if (x.has("pity")) c.pity = Math.max(0, x.get("pity").getAsInt());
                         if (x.has("hints")) {
                             for (Map.Entry<String, JsonElement> h : x.getAsJsonObject("hints").entrySet()) {
                                 List<String> lines = new ArrayList<>();
@@ -205,6 +214,7 @@ public final class ScyllaClues {
                 + "hints: 주민 직업(fisherman, librarian…, *=그 밖) -> 단서를 들고 말을 걸면 들려줄 소문. needed 개를 모으면 rewardItem 과 grantFlag(결계)를 준다.");
         o.addProperty("enabled", enabled);
         o.addProperty("needed", needed);
+        o.addProperty("version", 2);
         o.addProperty("rewardItem", rewardItem);
         o.addProperty("grantFlag", grantFlag);
         o.addProperty("requireFlag", requireFlag);
@@ -218,6 +228,7 @@ public final class ScyllaClues {
             x.addProperty("chance", c.chance);
             if (c.thunder) x.addProperty("thunder", true);
             if (c.source.equals("storm_height")) x.addProperty("minY", c.minY);
+            x.addProperty("pity", c.pity);
             JsonObject h = new JsonObject();
             for (Map.Entry<String, List<String>> e : c.hints.entrySet()) {
                 JsonArray a = new JsonArray();
@@ -298,7 +309,7 @@ public final class ScyllaClues {
         JsonObject v = new JsonObject();
         v.addProperty("kind", "vision");
         v.addProperty("speaker", "폭풍의 여제");
-        v.addProperty("text", "일곱은 내 이름을 지웠다.\n너는… 그 이름을 다시 쓰러 왔느냐.");
+        v.addProperty("text", "배가 온다.\n…이번에는, 네가 그 사람이냐.");
         v.addProperty("color", "7FD4FF");
         v.addProperty("sound", "minecraft:entity.lightning_bolt.thunder");
         v.addProperty("shake", 2);
@@ -351,17 +362,76 @@ public final class ScyllaClues {
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.found", c.name).withStyle(ChatFormatting.AQUA), true);
     }
 
+    private static final String TRIES = "rtshop_scylla_tries";
+
+    public static int tries(ServerPlayer p, String clueId) {
+        return p.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).getCompound(TRIES).getInt(clueId);
+    }
+
+    private static void setTries(ServerPlayer p, String clueId, int n) {
+        CompoundTag pers = p.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
+        CompoundTag t = pers.getCompound(TRIES);
+        t.putInt(clueId, n);
+        pers.put(TRIES, t);
+        p.getPersistentData().put(Player.PERSISTED_NBT_TAG, pers);
+    }
+
+    /** 가방에 이 단서 물건을 이미 갖고 있는가 (아직 수첩에 안 적었어도 또 주지는 않는다). */
+    private static boolean carrying(ServerPlayer p, String clueId) {
+        for (ItemStack st : p.getInventory().items) {
+            Clue c = of(st);
+            if (c != null && c.id.equals(clueId)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * 운에 달린 단서를 굴린다 (뽑기 한 번, 보스 한 마리, 상자 하나, 낚시 한 번이 시도 한 번). 시도할수록 확률이 오르고,
+     * 천장에 닿으면 반드시 나온다. 그래서 얻는 때는 사람마다 달라도 결국 모두 얻는다. 얻었으면 true.
+     */
+    public static boolean roll(ServerPlayer p, String source, String where, int attempts, net.minecraft.world.phys.Vec3 at) {
+        ScyllaClues s = get();
+        if (!s.enabled || p instanceof FakePlayer && !testRolls || attempts <= 0) return false;
+        boolean any = false;
+        for (Clue c : s.clues.values()) {
+            if (!c.source.equals(source) || has(p, c.id) || carrying(p, c.id) || !modOk(c.target.contains(":") ? c.target : "")) continue;
+            if (source.equals("fish") && !c.target.isEmpty() && !where.contains(c.target)) continue;
+            if (c.thunder && !p.level().isThundering()) continue;
+            int t = tries(p, c.id);
+            boolean hit = false;
+            for (int i = 0; i < attempts && !hit; i++) {
+                t++;
+                double chance = c.pity > 0 ? c.chance * (1.0 + 3.0 * t / c.pity) : c.chance;
+                hit = (c.pity > 0 && t >= c.pity) || RNG.nextDouble() < chance;
+            }
+            if (hit) {
+                setTries(p, c.id, 0);
+                give(p, c, at);
+                any = true;
+            } else {
+                setTries(p, c.id, t);
+            }
+        }
+        return any;
+    }
+
+    /** 점검용: 가짜 플레이어도 굴릴 수 있게 한다. */
+    public static boolean testRolls = false;
+
     @SubscribeEvent
     public static void onFish(ItemFishedEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || p instanceof FakePlayer) return;
-        ScyllaClues s = get();
-        if (!s.enabled) return;
         String biome = p.level().getBiome(p.blockPosition()).unwrapKey().map(k -> k.location().getPath()).orElse("");
-        for (Clue c : s.clues.values()) {
-            if (!c.source.equals("fish") || has(p, c.id) || !biome.contains(c.target)) continue;
-            if (c.thunder && !p.level().isThundering()) continue;
-            if (RNG.nextDouble() < c.chance) give(p, c, null);
-        }
+        roll(p, "fish", biome, 1, null);
+    }
+
+    /** 야생의 상자: 아직 아무도 열지 않은(전리품이 정해지지 않은) 상자를 여는 것이 시도 한 번. */
+    @SubscribeEvent
+    public static void onOpenChest(PlayerInteractEvent.RightClickBlock event) {
+        if (!(event.getEntity() instanceof ServerPlayer p) || p instanceof FakePlayer || event.getHand() != InteractionHand.MAIN_HAND) return;
+        if (!(p.level().getBlockEntity(event.getPos()) instanceof net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity be)) return;
+        if (!be.saveWithoutMetadata().contains("LootTable")) return;
+        roll(p, "wild", "", 1, null);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

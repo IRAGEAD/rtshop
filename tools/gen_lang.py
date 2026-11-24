@@ -582,7 +582,7 @@ NEW = {
  "rtshop.staged.title": ("단계적 이야기 건축물 (%s)", "Staged story structures (%s)"),
  "rtshop.void.rescued": ("✦ 공허가 당신을 삼키기 전에, 불씨가 당신을 마지막으로 딛은 땅으로 끌어올렸다.", "✦ Before the void could take you, the ember pulled you back to the last ground you stood on."),
  "rtshop.scylla.waiting": ("단서는 모두 모였다. 그러나 폭풍은 아직 당신을 부르지 않는다. 연대기의 마지막 장이 쓰인 뒤에…", "Every clue is gathered, yet the storm does not call you. Not until the chronicle's last page is written…"),
- "rtshop.scylla.complete": ("단서를 찢긴 연대기에 맞추자, 빈 마지막 장에 번개가 새겨졌다. 폭풍의 눈이 완성되었다.", "Matched against the torn chronicle, lightning etches the empty last page. The Storm Eye is complete."),
+ "rtshop.scylla.complete": ("다섯 조각이 한 권의 일지로 맞춰졌다. 「마중의 항해일지」. 마지막 쪽에 번개가 새겨지고, 폭풍의 눈이 손에 남았다.", "The five pieces fit into one logbook: the Log of the Welcome. Lightning sears its last page, and the storm eye is left in your hand."),
 "item.rtshop.mother_journal": ("기록관 엘레나의 일지", "Archivist Elena's Journal"),
  "item.rtshop.mother_journal.desc1": ("열다섯 해 전 사라진 기록관의 마지막 일지.", "The last journal of an archivist who vanished fifteen years ago."),
  "item.rtshop.mother_journal.desc2": ("마지막 장: \"연대기를 자른 것은 불이 아니라 사람의 손이다.\"", "Last page: \"It was a hand, not fire, that cut the chronicle.\""),

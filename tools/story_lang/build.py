@@ -52,8 +52,8 @@ for k, v in REPLIES.items():
 import importlib.util
 story = json.load(open(os.path.join(root, 'src/main/resources/rtshop_defaults/quests/story.json'), encoding='utf-8'))
 byid = {x["id"]: x for x in story["quests"]}
-PREFIX = {"ch01_en": ("story_0_", "story_1_"), "ch02_en": ("story_2_",)}
-for mod in ("ch01_en", "ch02_en"):
+PREFIX = {"ch01_en": ("story_0_", "story_1_"), "ch02_en": ("story_2_",), "scylla_en": ("hidden_scylla_",)}
+for mod in ("ch01_en", "ch02_en", "scylla_en"):
     spec = importlib.util.spec_from_file_location(mod, os.path.join(here, mod + ".py"))
     m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
     for qid, tr in m.EN.items():
@@ -63,7 +63,7 @@ for mod in ("ch01_en", "ch02_en"):
     missing = [i for i in byid if i.startswith(PREFIX[mod]) and i not in m.EN]
     if missing: print("번역 없는 퀘스트:", missing); sys.exit(1)
 EXTRA.update({"지도 제작자 펠릭스": "Felix the Mapmaker", "대장장이 브람": "Bram the Smith", "서장 폭풍 뒤의 부두": "Prologue: The Dock After the Storm",
-              "1장 잿불의 서약": "Chapter 1: The Ember Oath", "2장 녹슨 맹세": "Chapter 2: The Rusted Vow"})
+              "1장 잿불의 서약": "Chapter 1: The Ember Oath", "2장 녹슨 맹세": "Chapter 2: The Rusted Vow", "숨은 이야기 마중 나간 사람": "Hidden Story: The One Who Went to Welcome"})
 for k, v in EXTRA.items():
     out.setdefault(k, v)
 for qd in story["quests"]:

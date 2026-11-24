@@ -2979,8 +2979,35 @@ public final class SelfTest {
         }
         check("every Scylla clue points at a real monster and has villager hints", badClue.isEmpty() && sc.clues.size() >= sc.needed, badClue);
         check("a villager gives a profession-specific rumour, others a general one",
-                com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("sky_chart"), "cartographer").contains("폭풍의 지도")
-                        && com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("sky_chart"), "farmer") != null);
+                com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("wet_logbook"), "fisherman").contains("폭풍의 눈")
+                        && com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("wet_logbook"), "farmer") != null);
+        // 다섯 단서: 뽑기·보스·야생·낚시는 운에 달렸지만 천장이 있어 결국 얻고, 인장은 선택지(카스)에 따라 다른 때에 얻는다
+        {
+            java.util.Set<String> src = new java.util.TreeSet<>();
+            for (com.rtshop.story.ScyllaClues.Clue c : sc.clues.values()) src.add(c.source);
+            check("Scylla has five clues: gacha, story boss, wild chest, fishing and one from story choices",
+                    sc.needed == 5 && sc.clues.size() == 5 && src.equals(new java.util.TreeSet<>(List.of("gacha", "boss", "wild", "fish", "quest"))), src);
+            com.rtshop.story.ScyllaClues.Clue coin = sc.clues.get("storm_coin");
+            double keep = coin.chance;
+            coin.chance = 0;
+            com.rtshop.story.ScyllaClues.testRolls = true;
+            a.getInventory().clearContent();
+            boolean early = com.rtshop.story.ScyllaClues.roll(a, "gacha", "", coin.pity - 1, null);
+            int tries = com.rtshop.story.ScyllaClues.tries(a, "storm_coin");
+            boolean atCap = com.rtshop.story.ScyllaClues.roll(a, "gacha", "", 1, null);
+            boolean held = com.rtshop.story.ScyllaClues.of(a.getInventory().getItem(0)) == coin;
+            boolean noSecond = !com.rtshop.story.ScyllaClues.roll(a, "gacha", "", coin.pity + 5, null);
+            com.rtshop.story.ScyllaClues.testRolls = false;
+            coin.chance = keep;
+            check("an unlucky player still gets a luck clue at the pity cap (tries are counted, and no second copy while one is carried)",
+                    !early && tries == coin.pity - 1 && atCap && held && noSecond, early + " " + tries + " " + atCap + " " + held + " " + noSecond);
+            a.getInventory().clearContent();
+            QuestDef ka = QuestManager.loaded().quests.get("hidden_scylla_kas_a"), kb = QuestManager.loaded().quests.get("hidden_scylla_kas_b");
+            check("the choice clue comes either way: early for those who freed Kas, later for those who handed him over",
+                    ka != null && kb != null && ka.requiresFlags.contains("ch1_kas_spared") && kb.requiresFlags.contains("ch1_kas_held")
+                            && ka.rewardFlags.contains("scylla_clue_seal_shard") && kb.rewardFlags.contains("scylla_clue_seal_shard")
+                            && QuestManager.loaded().quests.containsKey("hidden_scylla_6"));
+        }
         check("the Scylla seal is on because the clues grant its flag",
                 com.rtshop.story.StorySeals.active(com.rtshop.story.StorySeals.get().seals.get("scylla")));
         ItemStack clueItem = com.rtshop.story.ScyllaClues.stack(sc.clues.get("wet_logbook"));

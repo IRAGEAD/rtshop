@@ -1153,7 +1153,7 @@
   "rtshop.scylla.found": "무언가를 발견했다: %s",
   "rtshop.scylla.recorded": "단서 수첩에 적었다: %s (%s/%s)",
   "rtshop.scylla.notebook": "— 단서 수첩 (%s/%s) —",
-  "rtshop.scylla.complete": "단서를 찢긴 연대기에 맞추자, 빈 마지막 장에 번개가 새겨졌다. 폭풍의 눈이 완성되었다.",
+  "rtshop.scylla.complete": "다섯 조각이 한 권의 일지로 맞춰졌다. 「마중의 항해일지」. 마지막 쪽에 번개가 새겨지고, 폭풍의 눈이 손에 남았다.",
   "rtshop.hunt.new_entry": "도감 등록: %s (%s)",
   "rtshop.hunt.progress": "토벌 의뢰: %s %s/%s",
   "rtshop.hunt.daily_done": "[토벌 의뢰 완료] %s %s마리 — %s G를 받았습니다.",

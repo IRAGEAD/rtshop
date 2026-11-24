@@ -162,7 +162,7 @@ p = q("story_3_14", ch(C3, 14, N3), "항해일지", ARCH,
       "기록관 이사벨에게 항해일지를 맡기세요.",
       "\"회색 망토의 학자가 '여덟 번째 눈'이 있는 곳이라며 항로를 팔았다. 그 항로 끝에서 폭풍을 만났고, 바다가 얼었다.\" 그리고 일지 사이에 끼어 있던 이 돌… 폭풍의 문양이 새겨져 있어요. 마지막 장에는 일곱 봉인 구조물의 위치가 적혀 있어요. 한 장은 일부러 숨겨 놓은 것 같아요.",
       [talk(ARCH, "기록관 이사벨")], gold=4400, items=[item("rtshop:chronicle_page"), item("aquamirae:rune_of_the_storm", 1, A)], requires=[p],
-      flags=["clue_hidden_page", "scylla_clue_seal_shard"])
+      flags=["clue_hidden_page"])  # 스킬라의 인장 조각은 이제 선택지(카스)에 따라 다른 때에 얻는다: story_scylla.py
 p = q("story_3_15", ch(C3, 15, N3), "얼음 아래의 노래", FISHER,
       "선장이 그랬다지. 선원들이 얼음 아래에서 아직 노래한다고. …고통받는 영혼들 말일세. 그 노래는 엘릭과 선원들이었어. 내 등불을 들고 가게. 영혼들을 쓰러뜨리면 등불이 그들을 거둬 줄 걸세. 놈들을 미워하진 말게.",
       "얼음 미로의 고통받는 영혼을 10명 물리쳐 등불에 거두게.",
@@ -490,6 +490,9 @@ for _q in Q:
             _lines.insert(_pos, "▷ " + _text)
         _o["lines"] = _lines
 assert _used == set(REPLIES), set(REPLIES) - _used
+
+# 숨은 이야기 「마중 나간 사람」(스킬라)은 tools/story_scylla.py
+exec(open(os.path.join(os.path.dirname(__file__), 'story_scylla.py'), encoding='utf-8').read())
 
 # 4판으로 다시 쓴 장: 「장 이름 (i/n)」 번호를 실제 순서대로 다시 매긴다 (퀘스트를 끼워 넣거나 빼도 ID 는 그대로 두려고)
 for _prefix in ("story_0_", "story_1_", "story_2_"):

@@ -445,6 +445,7 @@ public final class Gacha {
         o.addProperty("resultCat", cat);
         o.addProperty("resultTier", tier);
         send(p, GachaPacket.RESULT, o);
+        com.rtshop.story.ScyllaClues.roll(p, "gacha", "", n, null); // 뽑기 한 번이 시도 한 번
         return got;
     }
 
