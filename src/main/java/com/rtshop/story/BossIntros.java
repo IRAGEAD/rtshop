@@ -140,7 +140,7 @@ public final class BossIntros {
 
     static {
         ITEM_LORE.put("efn:meen_spear", new String[]{
-                "— 황혼불, 황혼의 불 —",
+                "— 황혼의 불꽃 —",
                 "최초의 불꽃이 모든 것을 집어 삼키기 이전,",
                 "기억을 유지하던 때의 불빛.",
                 "잿빛 해가 오기 전날, 당시 왕국 최고의 제련 기술을 가진",
