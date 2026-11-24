@@ -648,6 +648,41 @@ public final class QuestManager {
         return n > 0;
     }
 
+    /** 종장이 새로 쓰였다 (3.39): 종장 도중이던 사람은 종장의 처음부터, 끝낸 사람은 끝낸 것으로. 한 번만 (story_v8 표식). */
+    public static boolean migrateStory8(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        if (pr.flags.contains("story_v8")) return false;
+        boolean fin = pr.flags.contains("story_done");
+        int n = 0;
+        if (!fin) {
+            for (String id : new ArrayList<>(pr.completed)) {
+                if (id.startsWith("story_5_") && pr.completed.remove(id)) n++;
+            }
+            pr.active.keySet().removeIf(id -> id.startsWith("story_5_"));
+            for (String f : List.of("seal_ignis", "ignis_raid_story", "third_line_found", "fin_forgave", "fin_erased", "clue_gate_design", "clue_orel_chose")) pr.flags.remove(f);
+        } else {
+            for (QuestDef q : loaded.quests.values()) {
+                if (q.id.startsWith("story_5_") && !pr.completed.contains(q.id)) {
+                    pr.completed.add(q.id);
+                    pr.active.remove(q.id);
+                    pr.flags.addAll(q.rewardFlags);
+                    n++;
+                }
+            }
+            if (!pr.flags.contains("fin_forgave") && !pr.flags.contains("fin_erased")) pr.flags.add("fin_forgave");
+            // 숨은 이야기(거울 속의 연대기)는 단계가 늘었다: 끝낸 사람도 새 단계(원본 읽기, 여덟 글자, 이름)는 직접 한다
+        }
+        // 예전 판에서 환술사를 이미 잠재운 사람(진짜 쪽을 가짐)은 새 판의 대면 단계까지 끝낸 것으로 한다
+        if (pr.flags.contains("clue_true_page")) {
+            for (String id : List.of("hidden_illusioner_2", "hidden_illusioner_3")) {
+                if (loaded.quests.containsKey(id) && pr.completed.add(id)) pr.active.remove(id);
+            }
+        }
+        pr.flags.add("story_v8");
+        QuestData.get(p.server).dirty();
+        return n > 0;
+    }
+
     @SubscribeEvent
     public static void onLoginMigrate(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer p && loaded.quests.containsKey("story_1_01")) {
@@ -656,6 +691,7 @@ public final class QuestManager {
             migrateStory5(p);
             migrateStory6(p);
             migrateStory7(p);
+            migrateStory8(p);
         }
     }
 

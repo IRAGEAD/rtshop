@@ -2360,6 +2360,28 @@ public final class SelfTest {
         boolean fin4 = QuestManager.isCompleted(a, "story_4_29") && QuestManager.hasFlag(a, "seal_maledictus") && QuestManager.hasFlag(a, "erwin_betrayal")
                 && QuestManager.hasFlag(a, "ch4_feigned") && !QuestManager.hasFlag(a, "ch4_refused");
         check("chapter 4 progress moves over the same way (the answer to Erwin is kept)", mid4 && fin4, mid4 + "/" + fin4);
+        QuestDef ash = l.quests.get("story_5_11"), palm = l.quests.get("story_5_07");
+        boolean ill = net.minecraftforge.fml.ModList.get().isLoaded("illusioner");
+        check("the finale is rewritten (the empty room, ink dots, a name on a palm, the third line, one line of ash) and the mirror story ends with the name",
+                ash != null && palm != null && l.quests.containsKey("story_5_12") && !l.quests.containsKey("story_5_13") && ash.choices.size() == 2
+                        && l.quests.get("story_5_04").companion != null && l.quests.get("story_5_12").rewardFlags.contains("story_done")
+                        && l.quests.get("story_5_10").rewardFlags.contains("third_line_found") && l.quests.get("story_5_08").rewardFlags.contains("ignis_raid_story")
+                        && l.quests.containsKey("hidden_illusioner_6") == ill
+                        && (!ill || (l.quests.get("hidden_illusioner_1").requires.contains("story_5_12") && l.quests.get("hidden_illusioner_6").choices.size() == 2)),
+                ash == null ? "null" : ash.toJson());
+        QuestManager.reset(a);
+        for (String f : List.of("story_v4", "story_v5", "story_v6", "story_v7")) QuestManager.setFlag(a, f, true);
+        QuestManager.forceComplete(a, "story_5_03");
+        QuestManager.setFlag(a, "seal_ignis", true);
+        QuestManager.setFlag(a, "story_v8", false);
+        QuestManager.migrateStory8(a);
+        boolean mid5 = !QuestManager.isCompleted(a, "story_5_03") && !QuestManager.hasFlag(a, "seal_ignis") && QuestManager.hasFlag(a, "story_v8");
+        QuestManager.reset(a);
+        for (String f : List.of("story_done", "fin_erased")) QuestManager.setFlag(a, f, true);
+        QuestManager.setFlag(a, "story_v8", false);
+        QuestManager.migrateStory8(a);
+        boolean fin5 = QuestManager.isCompleted(a, "story_5_12") && QuestManager.hasFlag(a, "seal_ignis") && QuestManager.hasFlag(a, "fin_erased") && !QuestManager.hasFlag(a, "fin_forgave");
+        check("finale progress moves over the same way (the line of ash is kept)", mid5 && fin5, mid5 + "/" + fin5);
         QuestManager.reset(a);
     }
 
