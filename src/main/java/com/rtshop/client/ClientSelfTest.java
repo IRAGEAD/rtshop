@@ -322,7 +322,7 @@ public final class ClientSelfTest {
 
     /** 등급별 뽑기 연출의 장면: {등급, 틱, 사진 이름, 기다릴 틱}. YAMATO 의 깨짐은 실제로 흘려서 화면을 찍어 조각낸다. */
     static final Object[][] FX_SHOTS = {
-            {0, 20, "54a_fx_common_reveal", 2}, {1, 16, "54b_fx_uncommon_pulse", 2}, {1, 28, "54c_fx_uncommon_reveal", 2},
+            {0, 14, "54a_fx_common_reveal", 2}, {1, 16, "54b_fx_uncommon_pulse", 2}, {1, 28, "54c_fx_uncommon_reveal", 2},
             {2, 24, "54d_fx_rare_bells", 2}, {2, 36, "54e_fx_rare_hold", 2}, {2, 46, "54f_fx_rare_reveal", 2},
             {3, 30, "54g_fx_epic_circle", 2}, {3, 52, "54h_fx_epic_lightning", 2}, {3, 74, "54i_fx_epic_reveal", 2},
             {4, 40, "54j_fx_legendary_fake_epic", 2}, {4, 72, "54k_fx_legendary_blackout", 2}, {4, 80, "54l_fx_legendary_pop", 2},
