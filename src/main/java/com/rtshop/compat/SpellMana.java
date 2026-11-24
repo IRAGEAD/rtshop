@@ -127,7 +127,8 @@ public final class SpellMana {
                 if (mClientMana == null) mClientMana = Class.forName("io.redspace.ironsspellbooks.player.ClientMagicData").getMethod("getPlayerMana");
                 return ((Number) mClientMana.invoke(null)).floatValue();
             }
-            return ((Number) mMana.invoke(magic(p))).floatValue();
+            Object md = magic(p); // 먼저 불러야 메서드들이 준비된다
+            return ((Number) mMana.invoke(md)).floatValue();
         } catch (Throwable t) {
             return -1;
         }
