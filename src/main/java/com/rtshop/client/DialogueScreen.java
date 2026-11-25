@@ -163,6 +163,11 @@ public class DialogueScreen extends Screen {
             return out;
         }
         if (data.has("main")) out.add(new String[]{"main", "", Component.translatable(data.get("main").getAsString()).getString()});
+        // 전용 NPC 의 일: 순위 기록원·칭호 관리인·현상금 게시판지기
+        boolean service = data.has("service") && data.get("service").getAsBoolean();
+        if (data.has("ranks")) out.add(new String[]{"ranks", "", Component.translatable("rtshop.talk.ranks").getString()});
+        if (data.has("titles")) out.add(new String[]{"titles", "", Component.translatable("rtshop.talk.titles").getString()});
+        if (service && data.has("bounty")) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
         for (JsonObject t : topics) {
             String title = t.get("title").getAsString();
             boolean isNew = t.has("new") && t.get("new").getAsBoolean();
@@ -172,7 +177,7 @@ public class DialogueScreen extends Screen {
         if (q > 0) out.add(new String[]{"quest", "", Component.translatable("rtshop.talk.quests", q).getString()});
         else if (data.has("questNpc")) out.add(new String[]{"quest", "", Component.translatable("rtshop.talk.quests_none").getString()});
         out.add(new String[]{"history", "", Component.translatable("rtshop.talk.history").getString()});
-        if (data.has("bounty") && data.get("bounty").getAsBoolean()) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
+        if (!service && data.has("bounty") && data.get("bounty").getAsBoolean()) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
         out.add(new String[]{"bye", "", Component.translatable("rtshop.talk.bye").getString()});
         return out;
     }
@@ -228,6 +233,14 @@ public class DialogueScreen extends Screen {
             case "bounty" -> {
                 onClose();
                 if (minecraft.player != null) minecraft.player.connection.sendCommand("bounty board " + entity);
+            }
+            case "ranks" -> {
+                onClose();
+                if (minecraft.player != null) minecraft.player.connection.sendCommand("rtshop rank");
+            }
+            case "titles" -> {
+                onClose();
+                if (minecraft.player != null) minecraft.player.connection.sendCommand("rtshop title");
             }
             default -> onClose();
         }

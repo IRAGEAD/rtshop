@@ -45,6 +45,16 @@ public final class StoryClient {
                 BossMusicClient.receive(JsonParser.parseString(json).getAsJsonObject());
             } catch (Exception ignored) {
             }
+        } else if (kind == StoryPacket.RANKS) {
+            try {
+                RankScreen.open(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
+        } else if (kind == StoryPacket.TITLES) {
+            try {
+                TitleScreen.open(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.READ) {
             // 이야기 물건(서약서·연대기 페이지·일지)을 펼쳐 읽는다
             try {

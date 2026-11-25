@@ -303,6 +303,7 @@ public final class Enhance {
     static void consume(ServerPlayer p, EnhanceConfig cfg, EnhanceConfig.Level l) {
         if (p.getAbilities().instabuild) return;
         Economy.addWallet(p, -l.gold);
+        com.rtshop.rank.Ranks.spent(p, l.gold);
         Inventory inv = p.getInventory();
         for (Need n : needs(cfg, l, p)) {
             int left = n.need;

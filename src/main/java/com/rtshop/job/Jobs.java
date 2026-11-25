@@ -201,6 +201,7 @@ public final class Jobs {
             return new Result(false, Component.translatable("rtshop.job.no_money", String.format("%,d", cost)));
         }
         Economy.addWallet(p, -cost);
+        com.rtshop.rank.Ranks.spent(p, cost);
         JobConfig.JobDef old = cfg.job(current);
         e.set(d.slot, jobId, now());
         data.dirty();

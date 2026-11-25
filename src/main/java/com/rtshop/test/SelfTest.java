@@ -139,6 +139,107 @@ public final class SelfTest {
         RtShop.LOGGER.info("[rtshop-selftest] {}", text);
     }
 
+    /** 기록이 쌓이면 칭호가 열리고, 효과는 둘까지·내거는 것은 하나, 한 주가 끝나면 윗자리에 보상이 맡겨진다. */
+    private static void ranks(MinecraftServer server, FakePlayer a, FakePlayer b) {
+        com.rtshop.rank.Ranks.testFakes = true;
+        try {
+            com.rtshop.rank.Ranks.resetForTest(a);
+            com.rtshop.rank.Ranks.resetForTest(b);
+            com.rtshop.rank.Ranks.Config c = com.rtshop.rank.Ranks.get();
+            check("ranks: every category is on by default and each has titles in rising steps",
+                    c.enabled && c.maxEffectTitles == 2 && java.util.Arrays.stream(com.rtshop.rank.Ranks.CATS).allMatch(cat -> com.rtshop.rank.Ranks.on(cat)
+                            && c.titles.stream().filter(t -> t.category.equals(cat)).count() >= 3), c.titles.size());
+            // 기록 → 칭호
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.KILLS, 9);
+            boolean closed = !com.rtshop.rank.Ranks.has(com.rtshop.rank.Ranks.rec(a), "kills_1");
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.KILLS, 1);
+            boolean open = com.rtshop.rank.Ranks.has(com.rtshop.rank.Ranks.rec(a), "kills_1") && !com.rtshop.rank.Ranks.has(com.rtshop.rank.Ranks.rec(a), "kills_2");
+            String lockedErr = com.rtshop.rank.Ranks.setEffect(a, "kills_2", true);
+            String ok1 = com.rtshop.rank.Ranks.setEffect(a, "kills_1", true);
+            double dmg = com.rtshop.rank.Ranks.effect(a, "mob_damage");
+            check("titles: the first hunter title opens at 10 kills, a locked one can not be used, a used one gives its small effect",
+                    closed && open && lockedErr != null && ok1 == null && dmg == 0.5, closed + "/" + open + "/" + lockedErr + "/" + ok1 + "/" + dmg);
+            // 같은 종목은 바꿔 끼우고, 서로 다른 종목으로 둘까지
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.KILLS, 90);
+            String swap = com.rtshop.rank.Ranks.setEffect(a, "kills_2", true);
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.QUESTS, 10);
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.RAIDS, 1);
+            String second = com.rtshop.rank.Ranks.setEffect(a, "quests_1", true);
+            String third = com.rtshop.rank.Ranks.setEffect(a, "raids_1", true);
+            java.util.List<String> on = new java.util.ArrayList<>(com.rtshop.rank.Ranks.rec(a).effects);
+            check("titles: a higher step replaces the lower one of its category, two different categories can be used at once and a third is refused",
+                    swap == null && second == null && "rtshop.title.err.full".equals(third) && on.equals(java.util.List.of("kills_2", "quests_1"))
+                            && com.rtshop.rank.Ranks.effect(a, "mob_damage") == 1.0 && com.rtshop.rank.Ranks.plus(a, "quest_gold", 1000) == 1010
+                            && com.rtshop.rank.Ranks.plus(a, "bounty_gold", 1000) == 1000 && com.rtshop.rank.Ranks.minus(a, "buy_discount", 1000) == 1000,
+                    swap + "/" + second + "/" + third + "/" + on);
+            // 최대 체력 칭호
+            com.rtshop.rank.Ranks.setEffect(a, "quests_1", false);
+            float hpBefore = a.getMaxHealth();
+            com.rtshop.rank.Ranks.setEffect(a, "raids_1", true);
+            float hpWith = a.getMaxHealth();
+            com.rtshop.rank.Ranks.setEffect(a, "raids_1", false);
+            check("titles: the expedition title adds a little max health while it is used and takes it back when it is not",
+                    hpWith == hpBefore + 1 && a.getMaxHealth() == hpBefore, hpBefore + " -> " + hpWith + " -> " + a.getMaxHealth());
+            // 내걸기: 하나만, 이름 앞에
+            String showLocked = com.rtshop.rank.Ranks.setShow(a, "kills_5");
+            String show = com.rtshop.rank.Ranks.setShow(a, "kills_1");
+            String shownName = a.getDisplayName().getString();
+            com.rtshop.rank.Ranks.setShow(a, "");
+            String plain = a.getDisplayName().getString();
+            check("titles: one opened title can be shown in front of the name (chat, tab list) and taken down again; it need not be one of the used ones",
+                    showLocked != null && show == null && shownName.startsWith("[") && shownName.contains("rtshop_test_a") && !plain.startsWith("["), shownName + " / " + plain);
+            // 주간 순위: 수익·소비는 저마다, 보유 Gold 는 지금 가진 것
+            com.rtshop.rank.Ranks.earned(a, 5000);
+            com.rtshop.rank.Ranks.earned(b, 9000);
+            com.rtshop.rank.Ranks.spent(b, 100);
+            java.util.List<com.rtshop.rank.Ranks.Row> earned = com.rtshop.rank.Ranks.ranking(server, com.rtshop.rank.Ranks.EARNED);
+            int ia = -1, ib = -1;
+            for (int i = 0; i < earned.size(); i++) {
+                if (earned.get(i).id().equals(a.getUUID())) ia = i;
+                if (earned.get(i).id().equals(b.getUUID())) ib = i;
+            }
+            com.google.gson.JsonObject view = com.rtshop.rank.Ranks.ranksView(a);
+            check("ranks: this week's ranking orders players by what they did this week and a player sees their own place",
+                    ia >= 0 && ib >= 0 && ib < ia && view.getAsJsonArray("cats").size() == com.rtshop.rank.Ranks.CATS.length && view.get("resetIn").getAsLong() > 0,
+                    ib + " < " + ia + " / " + view.getAsJsonArray("cats").size());
+            // 주간 마감: 다른 사람의 기록은 치워 두고 a·b 만으로
+            for (java.util.Map.Entry<java.util.UUID, com.rtshop.rank.Ranks.Rec> e : com.rtshop.rank.Ranks.data(server).recs.entrySet()) {
+                if (!e.getKey().equals(a.getUUID()) && !e.getKey().equals(b.getUUID())) {
+                    e.getValue().week.clear();
+                    e.getValue().goldSeen = 0;
+                }
+            }
+            long walletA = Economy.wallet(a), pendingBefore = com.rtshop.rank.Ranks.rec(b).pendingGold;
+            com.rtshop.rank.Ranks.settle(server);
+            com.rtshop.rank.Ranks.Rec ra = com.rtshop.rank.Ranks.rec(a), rb = com.rtshop.rank.Ranks.rec(b);
+            long[] rw = c.rewards;
+            boolean wonB = rb.weekWon.contains(com.rtshop.rank.Ranks.EARNED) && rb.weekWon.contains(com.rtshop.rank.Ranks.SPENT) && !ra.weekWon.contains(com.rtshop.rank.Ranks.EARNED);
+            boolean cleared = ra.week.isEmpty() && rb.week.isEmpty() && ra.life.get(com.rtshop.rank.Ranks.KILLS) == 100;
+            boolean lastKept = com.rtshop.rank.Ranks.data(server).last.get(com.rtshop.rank.Ranks.EARNED).get(0).id().equals(b.getUUID());
+            String weekShow = com.rtshop.rank.Ranks.setShow(b, com.rtshop.rank.Ranks.WEEK + com.rtshop.rank.Ranks.EARNED);
+            String weekNo = com.rtshop.rank.Ranks.setShow(a, com.rtshop.rank.Ranks.WEEK + com.rtshop.rank.Ranks.EARNED);
+            long pendA = ra.pendingGold;
+            long got = com.rtshop.rank.Ranks.claim(a);
+            check("ranks: when the week ends the top places get rewards kept for them, the first place may show the week's title, weekly counts start over and lifetime counts stay",
+                    wonB && cleared && lastKept && weekShow == null && weekNo != null && rb.pendingGold >= pendingBefore + rw[0] * 2 && pendA >= rw[1]
+                            && got == pendA && Economy.wallet(a) == walletA + got && com.rtshop.rank.Ranks.claim(a) == 0,
+                    wonB + "/" + cleared + "/" + lastKept + "/" + weekShow + "/" + weekNo + "/" + rb.pendingGold + "/" + pendA + "/" + got);
+            com.google.gson.JsonObject tv = com.rtshop.rank.Ranks.titlesView(b);
+            check("titles: the keeper's list shows every category with its steps and the week's titles a player won",
+                    tv.getAsJsonArray("cats").size() == com.rtshop.rank.Ranks.CATS.length && tv.getAsJsonArray("week").size() >= 2 && tv.get("max").getAsInt() == 2,
+                    tv.getAsJsonArray("week").size());
+            check("ranks: the three keepers exist (bounty board, weekly ranking, titles) and have their own lines",
+                    QuestManager.loaded().npcs.containsKey("bounty") && QuestManager.loaded().npcs.containsKey("ranks") && QuestManager.loaded().npcs.containsKey("titles")
+                            && com.rtshop.story.Dialogue.npcForTest("quest_ranks") != null && com.rtshop.story.Dialogue.npcForTest("quest_titles") != null
+                            && com.rtshop.story.Dialogue.npcForTest("quest_bounty") != null && com.rtshop.story.Hunts.isBoardKey("quest_bounty"),
+                    QuestManager.loaded().npcs.keySet());
+        } finally {
+            com.rtshop.rank.Ranks.resetForTest(a);
+            com.rtshop.rank.Ranks.resetForTest(b);
+            com.rtshop.rank.Ranks.testFakes = false;
+        }
+    }
+
     private static FakePlayer fake(ServerLevel level, String name) {
         UUID id = UUID.nameUUIDFromBytes(("rtshop:" + name).getBytes(StandardCharsets.UTF_8));
         return FakePlayerFactory.get(level, new GameProfile(id, name));
@@ -2998,6 +3099,8 @@ public final class SelfTest {
                             && com.rtshop.story.Readables.has("rtshop:old_expedition_map") && com.rtshop.story.Readables.has("rtshop:chronicle_last_page"),
                     before + " -> " + after + " / " + (oath == null ? "null" : oath.getAsJsonArray("pages").size()));
         }
+        // 3.53: 기록·주간 순위·칭호
+        ranks(server, a, b);
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
         QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");

@@ -294,8 +294,14 @@ public final class Dialogue {
         if (main != null) out.addProperty("main", main);
         out.addProperty("quests", QuestManager.viewsCount(p, npcKey));
         // 퀘스트를 주는 NPC 는 받을 퀘스트가 없어도 [퀘스트] 를 보인다 (진행 중·지난 퀘스트·다음 안내)
-        if (npcKey.startsWith("quest_") || QuestManager.hasQuests(npcKey)) out.addProperty("questNpc", true);
-        if (com.rtshop.story.Hunts.get().boardNpcs.contains(npcKey)) out.addProperty("bounty", true);
+        boolean service = Hunts.NPC_BOARD.equals(npcKey) || com.rtshop.rank.Ranks.NPC_RANKS.equals(npcKey) || com.rtshop.rank.Ranks.NPC_TITLES.equals(npcKey);
+        if (service) out.addProperty("service", true);   // 맡은 일이 따로 있는 NPC: 줄 퀘스트가 없으면 [퀘스트] 를 보이지 않는다
+        if ((npcKey.startsWith("quest_") && !service) || QuestManager.hasQuests(npcKey)) out.addProperty("questNpc", true);
+        if (com.rtshop.story.Hunts.isBoardKey(npcKey)) out.addProperty("bounty", true);
+        if (com.rtshop.rank.Ranks.get().enabled) {
+            if (com.rtshop.rank.Ranks.NPC_RANKS.equals(npcKey)) out.addProperty("ranks", true);
+            if (com.rtshop.rank.Ranks.NPC_TITLES.equals(npcKey)) out.addProperty("titles", true);
+        }
         return out;
     }
 

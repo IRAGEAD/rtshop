@@ -677,6 +677,7 @@ public final class Raid {
             rewarded = true;
             for (ServerPlayer p : in) {
                 title(p, c.text("successTitle"), c.text("successSub"), ChatFormatting.GOLD);
+                com.rtshop.rank.Ranks.add(p, com.rtshop.rank.Ranks.RAIDS, 1);
                 try {
                     reward(p);
                 } catch (Throwable t) {
@@ -706,7 +707,10 @@ public final class Raid {
                 ItemStack s = r.stack();
                 if (!s.isEmpty()) Reward.give(p, s);
             }
-            if (c.weeklyGold > 0) Economy.addWallet(p, c.weeklyGold);
+            if (c.weeklyGold > 0) {
+                Economy.addWallet(p, c.weeklyGold);
+                com.rtshop.rank.Ranks.earned(p, c.weeklyGold);
+            }
             e.weeklyWeek = week;
             say(p, c.text("weeklyGot"), ChatFormatting.GREEN);
         } else {
