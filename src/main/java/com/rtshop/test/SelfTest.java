@@ -5213,7 +5213,39 @@ public final class SelfTest {
                 && v.getCustomName() != null && v.getCustomName().getString().equals(com.rtshop.shop.NpcNames.display("attendance", c.npcName)));
         check("the attendance NPC also takes part in quests", v != null && "attendance".equals(QuestManager.npcKey(v)));
         if (v != null) {
+            // NPC 의 자리를 기억하고, 오늘 출석을 안 받았으면 퀘스트 HUD 가 알려 준다 (받으면 사라지고, 날짜·시각이 기록된다)
+            com.rtshop.quest.NpcPlaces.note(v);
+            String where = com.rtshop.quest.NpcPlaces.where(level.getServer(), "attendance");
+            com.rtshop.attendance.Attendance.reset(a);
+            boolean due = com.rtshop.attendance.Attendance.dueToday(a);
+            boolean hudDue = QuestManager.hudEntries(a).stream().anyMatch(x -> x.id().equals(QuestManager.ATTEND_ID) && x.where().equals(where));
+            com.rtshop.attendance.Attendance.doCheckIn(a, false);
+            boolean hudGone = QuestManager.hudEntries(a).stream().noneMatch(x -> x.id().equals(QuestManager.ATTEND_ID));
+            int hist = com.rtshop.attendance.Attendance.view(a, -1).getAsJsonArray("history").size();
+            check("the quest HUD reminds a player who has not checked in today (with where the clerk stands) until they do; check-ins are kept with date and time",
+                    where.startsWith(level.dimension().location().toString() + ";") && due && hudDue && hudGone && hist == 1, where + " " + due + " " + hudDue + " " + hudGone + " " + hist);
+            com.rtshop.attendance.Attendance.reset(a);
+            clear(a);
             v.discard();
+        }
+        // 직업 선행 퀘스트: 그 칸의 직업을 이미 가졌거나 그 칸의 선행 퀘스트를 하고 있으면 "받을 수 있는 퀘스트" 셈에서 뺀다 (전투·생활 따로)
+        QuestManager.reset(a);
+        com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.COMBAT, "");
+        com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.LIFE, "");
+        QuestDef jw = QuestManager.loaded().quests.get("job_warrior_1"), jf = QuestManager.loaded().quests.get("job_farmer_1"), js = QuestManager.loaded().quests.get("job_swordsman_1");
+        if (jw != null && jf != null && js != null) {
+            int before = QuestManager.viewsCount(a, "job");
+            boolean free = !QuestManager.jobQuestSettled(a, jw) && !QuestManager.jobQuestSettled(a, jf);
+            com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.COMBAT, "swordsman");
+            boolean combatOut = QuestManager.jobQuestSettled(a, jw) && !QuestManager.jobQuestSettled(a, jf);
+            int withJob = QuestManager.viewsCount(a, "job");
+            com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.COMBAT, "");
+            QuestManager.accept(a, "job_swordsman_1", "job");
+            boolean doing = QuestManager.jobQuestSettled(a, jw) && !QuestManager.jobQuestSettled(a, js) && !QuestManager.jobQuestSettled(a, jf);
+            check("job trial quests stop counting as available once that slot (combat or life, separately) has a job or a trial under way",
+                    free && combatOut && doing && withJob < before && "combat".equals(QuestManager.jobSlotOf(jw)) && "life".equals(QuestManager.jobSlotOf(jf)),
+                    free + " " + combatOut + " " + doing + " " + before + ">" + withJob);
+            QuestManager.reset(a);
         }
     }
 

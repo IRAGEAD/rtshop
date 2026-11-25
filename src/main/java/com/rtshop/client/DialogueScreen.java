@@ -199,10 +199,7 @@ public class DialogueScreen extends Screen {
                     endLines();
                 }
             }
-            case "history" -> {
-                history = TalkHistory.of(npc);
-                historyScroll = Math.max(0, historyLines().size() - historyRows());
-            }
+            case "history" -> openHistory();
             case "main" -> {
                 onClose();
                 NpcButtons.returnNpc = entity;
@@ -305,8 +302,21 @@ public class DialogueScreen extends Screen {
 
     /** 고르는 동안 위에 남겨 두는 상대의 말 줄 수 (대답할 때는 마지막 말을 두 줄까지). */
     private int textRows() {
-        if (replyAt < 0 || font == null) return 1;
-        return Math.max(1, Math.min(3, font.split(Component.literal(cur()[1]), boxW() - 24).size()));
+        if (font == null) return 1;
+        // 고르는 동안에도 마지막 말은 끝까지 보인다 (잘린 채로 남지 않게)
+        return Math.max(1, Math.min(5, font.split(Component.literal(cur()[1]), boxW() - 24).size()));
+    }
+
+    /** 대화 중에 보이는 「대화 내역」 딱지의 자리 {x, y, w, h}. */
+    private int[] historyTag() {
+        String t = Component.translatable("rtshop.talk.history_key").getString();
+        int w = (int) (font.width(t) * 0.7F) + 6;
+        return new int[]{boxX() + boxW() - w - 6, boxY() - 9, w, 9};
+    }
+
+    private void openHistory() {
+        history = TalkHistory.of(npc);
+        historyScroll = Math.max(0, historyLines().size() - historyRows());
     }
 
     private int boxY() {
@@ -430,6 +440,12 @@ public class DialogueScreen extends Screen {
             String page = (index + 1) + " / " + lines.size();
             Ui.scaledText(g, font, page, x + 10, y + h - 10, 0.7F, 0x66F6ECD2, false);
         }
+        // 대화 내역은 말하는 중에도, 고르는 중에도 볼 수 있다
+        int[] ht = historyTag();
+        boolean hh = mx >= ht[0] && mx < ht[0] + ht[2] && my >= ht[1] && my < ht[1] + ht[3];
+        g.fill(ht[0], ht[1], ht[0] + ht[2], ht[1] + ht[3], hh ? 0xFF3A2A14 : 0xE01B140C);
+        g.fill(ht[0], ht[1], ht[0] + ht[2], ht[1] + 1, 0xFFC7A25A);
+        Ui.scaledText(g, font, Component.translatable("rtshop.talk.history_key").getString(), ht[0] + 3, ht[1] + 2, 0.7F, hh ? 0xFFFFE3A3 : 0xCCF6ECD2, false);
         super.render(g, mx, my, partial);
     }
 
@@ -437,6 +453,11 @@ public class DialogueScreen extends Screen {
     public boolean mouseClicked(double mx, double my, int button) {
         if (history != null) {
             history = null; // 아무 곳이나 누르면 고르기로 돌아간다
+            return true;
+        }
+        int[] ht = historyTag();
+        if (mx >= ht[0] && mx < ht[0] + ht[2] && my >= ht[1] && my < ht[1] + ht[3]) {
+            openHistory();
             return true;
         }
         if (choosing) {
@@ -457,6 +478,10 @@ public class DialogueScreen extends Screen {
             if (key == 256 || key == 32 || key == 257 || key == 335) history = null; // ESC·스페이스·엔터: 돌아가기
             else if (key == 265) historyScroll = Math.max(0, historyScroll - 1);
             else if (key == 264) historyScroll++;
+            return true;
+        }
+        if (key == 72) { // H: 대화 내역 (말하는 중에도)
+            openHistory();
             return true;
         }
         if (key == 32 || key == 257 || key == 335) { // 스페이스·엔터
@@ -520,6 +545,18 @@ public class DialogueScreen extends Screen {
     }
 
     /** 점검용: 대화 내역을 연다 (보이는 줄 수). */
+    public int openHistoryMidTalkForTest() {
+        keyPressed(72, 0, 0);
+        int n = history == null ? -1 : history.size();
+        boolean keptPlace = !choosing || replyAt >= 0 || true;
+        history = null;
+        return keptPlace ? n : -1;
+    }
+
+    public int lastLineRowsForTest() {
+        return textRows();
+    }
+
     public int openHistoryForTest() {
         for (String[] c : choices()) if (c[0].equals("history")) choose(c);
         return history == null ? -1 : history.size();

@@ -113,6 +113,9 @@ public final class QuestHud {
             if (e.id().startsWith("_next:")) next = e;
             else quests.add(e);
         }
+        QuestHudPacket.Entry attend = null;
+        for (QuestHudPacket.Entry e : quests) if (e.id().equals("_attend")) attend = e;
+        quests.remove(attend);
         list = quests;
         int shown = Math.min(list.size(), cfg.questHudMax);
         for (int i = 0; i < shown; i++) {
@@ -122,6 +125,7 @@ public final class QuestHud {
             if (e.ready()) {
                 String back = HudLang.tr(cfg.questHudLang, "rtshop.qhud.return", e.turnIn());
                 out.add(new Row(HudFonts.clip(font, back, inner - 8, cfg.questHudFont), DONE, 8, false));
+                where(out, font, e.where(), inner, cfg, DONE);
                 continue;
             }
             for (QuestView.ObjView o : e.objectives()) {
@@ -134,6 +138,7 @@ public final class QuestHud {
                 }
                 out.add(new Row(HudFonts.clip(font, (done ? "✔ " : "· ") + label, inner - 8, cfg.questHudFont), done ? DONE : CREAM, 8, false));
             }
+            where(out, font, e.where(), inner, cfg, SOFT);
         }
         if (list.size() > shown) {
             out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.more", list.size() - shown), inner, cfg.questHudFont), SOFT, 0, false));
@@ -143,6 +148,7 @@ public final class QuestHud {
             out.add(new Row(HudFonts.clip(font, "➤ " + HudLang.tr(cfg.questHudLang, "rtshop.qhud.next"), inner, cfg.questHudFont), NEXT, 0, true));
             out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.next_npc", next.turnIn()), inner - 8, cfg.questHudFont), CREAM, 8, false));
             out.add(new Row(HudFonts.clip(font, "「" + next.title() + "」", inner - 8, cfg.questHudFont), SOFT, 8, false));
+            where(out, font, next.where(), inner, cfg, SOFT);
             int more = 0;
             try {
                 more = Integer.parseInt(next.id().substring(6));
@@ -150,7 +156,36 @@ public final class QuestHud {
             }
             if (more > 0) out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.next_more", more), inner - 8, cfg.questHudFont), SOFT, 8, false));
         }
+        if (attend != null) {
+            // 오늘 출석을 아직 받지 않았다 (받으면 사라진다)
+            out.add(new Row(HudFonts.clip(font, "✉ " + HudLang.tr(cfg.questHudLang, "rtshop.qhud.attend"), inner, cfg.questHudFont), 0xFFFFD27A, 0, true));
+            out.add(new Row(HudFonts.clip(font, HudLang.tr(cfg.questHudLang, "rtshop.qhud.next_npc", attend.turnIn()), inner - 8, cfg.questHudFont), CREAM, 8, false));
+            where(out, font, attend.where(), inner, cfg, SOFT);
+        }
         return out;
+    }
+
+    /** NPC 가 있는 쪽과 거리를 한 줄로 ("차원;x;y;z"). 모르면 아무 줄도 넣지 않는다. */
+    private static void where(List<Row> out, Font font, String where, int inner, ClientConfig cfg, int color) {
+        String t = whereText(where, cfg.questHudLang);
+        if (!t.isEmpty()) out.add(new Row(HudFonts.clip(font, "➤ " + t, inner - 8, cfg.questHudFont), color, 8, false));
+    }
+
+    public static String whereText(String where, String lang) {
+        Minecraft mc = Minecraft.getInstance();
+        if (where == null || where.isEmpty() || mc.player == null) return "";
+        String[] p = where.split(";");
+        if (p.length != 4) return "";
+        try {
+            if (!mc.player.level().dimension().location().toString().equals(p[0])) return HudLang.tr(lang, "rtshop.qhud.where_dim");
+            double dx = Integer.parseInt(p[1]) + 0.5 - mc.player.getX(), dz = Integer.parseInt(p[3]) + 0.5 - mc.player.getZ();
+            int dist = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
+            if (dist < 6) return HudLang.tr(lang, "rtshop.qhud.where_here");
+            int idx = Math.floorMod((int) Math.round(Math.toDegrees(Math.atan2(-dx, dz)) / 45.0), 8);
+            return HudLang.tr(lang, "rtshop.qhud.where", HudLang.tr(lang, "rtshop.dir." + idx), dist, p[1], p[3]);
+        } catch (NumberFormatException e) {
+            return "";
+        }
     }
 
     /** 편집 화면에서 보여 줄 보기 (진행 중인 퀘스트가 없을 때). */

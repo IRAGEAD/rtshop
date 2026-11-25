@@ -13,8 +13,11 @@ import java.util.function.Supplier;
 
 /** 서버 -> 클라이언트: 화면 구석의 퀘스트 HUD 에 보일 진행 중인 퀘스트 (바뀔 때만 보낸다). */
 public final class QuestHudPacket {
-    /** 퀘스트 한 건: 완료할 수 있으면 ready, 그때 돌아갈 NPC 이름이 turnIn. */
-    public record Entry(String id, String title, boolean ready, String turnIn, List<QuestView.ObjView> objectives) {
+    /** 퀘스트 한 건: 완료할 수 있으면 ready, 그때 돌아갈 NPC 이름이 turnIn. where = 지금 찾아갈 NPC 의 자리 ("차원;x;y;z", 모르면 ""). */
+    public record Entry(String id, String title, boolean ready, String turnIn, List<QuestView.ObjView> objectives, String where) {
+        public Entry(String id, String title, boolean ready, String turnIn, List<QuestView.ObjView> objectives) {
+            this(id, title, ready, turnIn, objectives, "");
+        }
     }
 
     public final List<Entry> entries;
@@ -30,6 +33,7 @@ public final class QuestHudPacket {
             buf.writeUtf(e.title(), 256);
             buf.writeBoolean(e.ready());
             buf.writeUtf(e.turnIn(), 256);
+            buf.writeUtf(e.where(), 128);
             buf.writeVarInt(e.objectives().size());
             for (QuestView.ObjView o : e.objectives()) {
                 buf.writeVarInt(o.type());
@@ -49,12 +53,13 @@ public final class QuestHudPacket {
             String title = buf.readUtf(256);
             boolean ready = buf.readBoolean();
             String turnIn = buf.readUtf(256);
+            String where = buf.readUtf(128);
             int on = buf.readVarInt();
             List<QuestView.ObjView> objs = new ArrayList<>();
             for (int j = 0; j < on; j++) {
                 objs.add(new QuestView.ObjView(buf.readVarInt(), buf.readUtf(256), buf.readUtf(512), buf.readVarInt(), buf.readVarInt()));
             }
-            list.add(new Entry(id, title, ready, turnIn, objs));
+            list.add(new Entry(id, title, ready, turnIn, objs, where));
         }
         return new QuestHudPacket(list);
     }

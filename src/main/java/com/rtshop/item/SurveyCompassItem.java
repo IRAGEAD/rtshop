@@ -65,7 +65,8 @@ public class SurveyCompassItem extends Item {
         }
         BlockPos at = locate(p.serverLevel(), target, p.blockPosition());
         if (at == null) {
-            com.rtshop.notice.Notice.send(p, Component.translatable("item.rtshop.survey_compass.far", label).withStyle(ChatFormatting.RED), true);
+            com.rtshop.notice.Notice.send(p, Component.translatable(inThisDimension(p.serverLevel(), target) ? "item.rtshop.survey_compass.far" : "item.rtshop.survey_compass.dim", label)
+                    .withStyle(ChatFormatting.RED), true);
         } else {
             double dx = at.getX() + 0.5 - p.getX(), dz = at.getZ() + 0.5 - p.getZ();
             int dist = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
@@ -78,6 +79,18 @@ public class SurveyCompassItem extends Item {
         return InteractionResultHolder.consume(stack);
     }
 
+    /** 살피는 반경(청크): 차례로 넓힌다. */
+    public static final int[] SEARCH_CHUNKS = {200, 640, 1500};
+
+    /** 이 차원에서 생길 수 있는 건축물인가 (아니면 "다른 차원에서 써 보라"고 알린다). */
+    public static boolean inThisDimension(ServerLevel level, String target) {
+        var set = com.rtshop.story.StructureFinder.resolve(level, target);
+        if (set == null || set.isEmpty()) return false;
+        var state = level.getChunkSource().getGeneratorState();
+        for (var h : set) if (!state.getPlacementsForStructure(h).isEmpty()) return true;
+        return false;
+    }
+
     /** 마을(성 영역)에서 최소 이만큼 떨어진 건축물만 안내한다. */
     public static final double MIN_TOWN = 1000;
 
@@ -88,8 +101,14 @@ public class SurveyCompassItem extends Item {
     public static BlockPos locate(ServerLevel level, String target, BlockPos from) {
         var set = com.rtshop.story.StructureFinder.resolve(level, target);
         if (set == null) return null;
-        var f = com.rtshop.story.StructureFinder.find(level, set, from, 200, MIN_TOWN);
-        return f == null ? null : f.pos;
+        // 가까운 데부터 차례로 넓혀 본다 (약 3천 → 1만 → 2만 4천 칸). 드문 건축물도 찾되, 한 번 쓰는 데 드는 시간은 묶어 둔다.
+        long t0 = System.nanoTime();
+        for (int r : SEARCH_CHUNKS) {
+            var f = com.rtshop.story.StructureFinder.find(level, set, from, r, MIN_TOWN);
+            if (f != null) return f.pos;
+            if (System.nanoTime() - t0 > 4_000_000_000L) break;
+        }
+        return null;
     }
 
     @Override

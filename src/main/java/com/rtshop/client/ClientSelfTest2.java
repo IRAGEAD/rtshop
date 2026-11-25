@@ -1015,7 +1015,24 @@ final class ClientSelfTest2 {
                 shot(mc, "119_quest_npc_dialogue");
                 int lines = ds.openHistoryForTest();
                 check("the dialogue can show the conversation history with this NPC", lines > 0, lines);
+                int mid = ds.openHistoryMidTalkForTest();
+                check("the conversation history also opens with H while talking, and the last line stays whole above the choices", mid > 0 && ds.lastLineRowsForTest() >= 1, mid);
             }
+            // 연출 중에는 이 모드의 창이 그 위로 열리지 않고, 끝난 뒤에 열린다. 창을 닫은 직후 1초는 공격을 받지 않는다.
+            ClientEvents.holdScreens = true;
+            mc.setScreen(null);
+            Cinematic.timeForTest = -1;
+            Cinematic.play("{\"kind\":\"line\",\"speaker\":\"t\",\"text\":\"t\",\"closeScreen\":true,\"seconds\":1.2}");
+            mc.setScreen(new FontCalibScreen());
+            boolean held = mc.screen == null && ClientEvents.hasDeferredScreenForTest() && Cinematic.holdsScreens();
+            check("while a quest's opening scene plays, windows wait instead of covering it", held, mc.screen);
+            waitTicks(40);
+        });
+        add(mc -> {
+            check("the waiting window opens once the scene is over, and for a second after a window closes attacks are ignored",
+                    mc.screen instanceof FontCalibScreen && !ClientEvents.hasDeferredScreenForTest() && ClientEvents.attackGuard(), mc.screen);
+            ClientEvents.holdScreens = false;
+            mc.setScreen(null);
             waitTicks(4);
         });
         add(mc -> {

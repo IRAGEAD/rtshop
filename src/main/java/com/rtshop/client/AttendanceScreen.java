@@ -140,6 +140,8 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
             buttons.add(new Btn(right - 50 - 4 - 50, by, 50, 18, Component.translatable("rtshop.att.btn_edit").getString(), true,
                     () -> send(AttendanceActionPacket.EDIT)));
         }
+        int hx = right - 50 - 4 - 50 - (b("canEdit") ? 54 : 0);
+        buttons.add(new Btn(hx, by, 50, 18, Component.translatable("rtshop.att.btn_history").getString(), true, () -> showHistory = !showHistory));
         if (pages() > 1) {
             int gy = calY() + ROWS * CELL_H + 2;
             buttons.add(new Btn(calX(), gy, 16, 12, "◀", page > 0, () -> {
@@ -225,6 +227,7 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
             String s = Ui.clip(this.font, status.getString(), W - 16);
             g.drawString(this.font, s, fx + W - 8 - this.font.width(s), fy + H - 36, statusOk ? 0xFF8FD67A : 0xFFFF8A7A, false);
         }
+        if (showHistory) renderHistory(g);
         for (Btn bt : buttons) {
             Ui.button(g, this.font, bt.x(), bt.y(), bt.w(), bt.h(), bt.label(), Ui.inside(mx, my, bt.x(), bt.y(), bt.w(), bt.h()), bt.enabled());
         }
@@ -395,6 +398,38 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
             }
             yy += 11;
         }
+    }
+
+    /** 내 출석 기록 판 (달력 자리를 덮는다). */
+    private boolean showHistory;
+
+    private void renderHistory(GuiGraphics g) {
+        int x = fx + 6, y = calY() - 2, w = W - 12, h = fy + H - 40 - y;
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 300);
+        Ui.bevel(g, x, y, w, h, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+        g.drawString(this.font, Component.translatable("rtshop.att.history_title", i("total")).getString(), x + 8, y + 6, Ui.C_INK, false);
+        JsonArray hist = data.has("history") ? data.getAsJsonArray("history") : new JsonArray();
+        if (hist.size() == 0) {
+            g.drawString(this.font, Component.translatable("rtshop.att.history_empty").getString(), x + 8, y + 22, Ui.C_INK_SOFT, false);
+        }
+        int rows = Math.max(1, (h - 26) / 11), cols = Math.max(1, Math.min(3, w / 110)), cw = (w - 16) / cols;
+        DateTimeFormatter f = DateTimeFormatter.ofPattern(Component.translatable("rtshop.att.history_fmt").getString());
+        ZoneId z;
+        try {
+            z = ZoneId.of(data.get("zone").getAsString());
+        } catch (Exception e) {
+            z = ZoneId.systemDefault();
+        }
+        for (int n = 0; n < hist.size() && n < rows * cols; n++) {
+            String t = f.format(Instant.ofEpochMilli(hist.get(n).getAsLong()).atZone(z));
+            g.drawString(this.font, t, x + 8 + (n / rows) * cw, y + 20 + (n % rows) * 11, n == 0 ? Ui.C_INK : Ui.C_INK_SOFT, false);
+        }
+        g.pose().popPose();
+    }
+
+    public boolean historyShownForTest() {
+        return showHistory;
     }
 
     @Override

@@ -119,6 +119,7 @@ public final class ClientSelfTest {
             // 예전 시험들은 NPC 를 우클릭하면 상점이 바로 열리기를 기대한다: 대화 상자에서 [상점]을 곧바로 고르게 한다
             autoMainSet = true;
             DialogueScreen.autoMainForTest = true;
+            ClientEvents.holdScreens = false; // 점검은 연출이 끝나기를 기다리지 않는다 (따로 시험한다)
         }
         if (mc.player == null || mc.level == null || mc.getSingleplayerServer() == null) {
             idle++;

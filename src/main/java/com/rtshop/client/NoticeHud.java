@@ -28,7 +28,7 @@ import java.util.List;
  * <li>창 글꼴(UiFont)로 그림자 없이, 어두운 가죽색 바탕 위에 그린다.</li>
  * <li>화면 폭에 맞춰 줄을 바꾸고(최대 3줄, 넘치면 …), 상자는 화면 밖으로 나가지 않는다.</li>
  * <li>한 번에 4개까지 쌓이고, 나머지는 차례를 기다린다. 같은 알림이 거듭 오면 ×2, ×3 으로 묶는다.</li>
- * <li>창을 열고 있으면 화면 맨 아래에, 연출(뽑기·스토리) 중에는 숨겼다가 끝나면 이어서 보인다.</li>
+ * <li>창을 열고 있으면 화면 맨 위에(대화 상자·버튼을 가리지 않게), 연출(뽑기·스토리) 중에는 숨겼다가 끝나면 이어서 보인다.</li>
  * </ul>
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID, value = Dist.CLIENT)
@@ -178,7 +178,7 @@ public final class NoticeHud {
         if (hidden) return;
         g.pose().pushPose();
         g.pose().translate(0, 0, 260);
-        draw(g, sw, sh, sh - 62, MAX_VISIBLE);
+        draw(g, sw, sh, sh - 62, MAX_VISIBLE, false);
         g.pose().popPose();
     }
 
@@ -190,11 +190,12 @@ public final class NoticeHud {
         GuiGraphics g = e.getGuiGraphics();
         g.pose().pushPose();
         g.pose().translate(0, 0, 450);
-        draw(g, e.getScreen().width, e.getScreen().height, e.getScreen().height - 8, 2); // 창 위에서는 가장 새 알림 2개만
+        draw(g, e.getScreen().width, e.getScreen().height, 4, 2, true); // 창이 열려 있으면 맨 위에, 가장 새 알림 2개만
         g.pose().popPose();
     }
 
-    private static void draw(GuiGraphics g, int sw, int sh, int bottom, int maxCount) {
+    /** fromTop: edge 가 위쪽 시작점이고 아래로 쌓는다 (아니면 edge 가 아래쪽 끝이고 위로 쌓는다). */
+    private static void draw(GuiGraphics g, int sw, int sh, int edge0, int maxCount, boolean fromTop) {
         List<Entry> shown;
         synchronized (ACTIVE) {
             if (ACTIVE.isEmpty()) return;
@@ -204,7 +205,7 @@ public final class NoticeHud {
         int lh = font.lineHeight + 2;
         // 가운데 기둥만 쓴다 (오른쪽·왼쪽 HUD 와 겹치지 않게): 화면 폭의 56%, 160~300
         int maxW = Math.max(Math.min(160, sw - 16), Math.min(MAX_WIDTH, (int) (sw * 0.56)));
-        int y = bottom;
+        int y = edge0;
         boolean inside = true;
         int totalLines = 0;
         boolean was = UiText.pause();
@@ -221,8 +222,8 @@ public final class NoticeHud {
                 int bw = Math.min(maxW, tw + PAD_X * 2);
                 int bh = ls.size() * lh + PAD_Y * 2 - 2;
                 int x0 = (sw - bw) / 2;
-                int y0 = y - bh;
-                if (y0 < 2) break; // 화면 위로 넘치면 더 쌓지 않는다
+                int y0 = fromTop ? y : y - bh;
+                if (y0 < 2 || y0 + bh > sh - 2) break; // 화면 밖으로 넘치면 더 쌓지 않는다
                 if (x0 < 0 || x0 + bw > sw) inside = false;
                 float a = alpha(e);
                 if (a > 0.04f) {
@@ -244,7 +245,7 @@ public final class NoticeHud {
                     }
                     g.flush();
                 }
-                y = y0 - GAP;
+                y = fromTop ? y0 + bh + GAP : y0 - GAP;
             }
         } finally {
             UiText.resume(was);

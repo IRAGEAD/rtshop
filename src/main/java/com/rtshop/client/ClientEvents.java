@@ -171,6 +171,66 @@ public final class ClientEvents {
         ClientEconomy.bank = 0;
     }
 
+    // ------------------------------------------------------------------ 상호작용 뒤 1초: 공격하지 않는다 / 연출 중에는 창을 미룬다
+
+    /** 이 모드의 창이나 연출이 마지막으로 떠 있던 때. */
+    private static long uiSeenAt;
+    /** 연출이 도는 동안 열리려던 창 (연출이 끝나면 연다). */
+    private static net.minecraft.client.gui.screens.Screen deferredScreen;
+    /** 점검용: 끄면 연출 중에도 창이 바로 열린다. */
+    public static boolean holdScreens = true;
+
+    private static boolean ours(net.minecraft.client.gui.screens.Screen s) {
+        return s != null && s.getClass().getName().startsWith("com.rtshop.client.");
+    }
+
+    /** 상호작용 창을 닫은 지 1초가 안 됐는가 (창을 닫는 누름이 그대로 공격이 되어 NPC 나 옆 사람을 때리지 않게). */
+    public static boolean attackGuard() {
+        return System.currentTimeMillis() - uiSeenAt < 1000L;
+    }
+
+    public static boolean hasDeferredScreenForTest() {
+        return deferredScreen != null;
+    }
+
+    @SubscribeEvent
+    public static void onGuardTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (ours(mc.screen) || hideHud()) uiSeenAt = System.currentTimeMillis();
+        if (mc.screen == null && mc.player != null && attackGuard()) {
+            while (mc.options.keyAttack.consumeClick()) {
+            }
+            mc.options.keyAttack.setDown(false);
+        }
+        if (deferredScreen != null && !Cinematic.holdsScreens()) {
+            net.minecraft.client.gui.screens.Screen sc = deferredScreen;
+            deferredScreen = null;
+            if (mc.screen == null && mc.player != null) mc.setScreen(sc);
+        }
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onGuardMouse(net.minecraftforge.client.event.InputEvent.MouseButton.Pre event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen == null && mc.player != null && event.getButton() == 0 && event.getAction() == 1 && attackGuard()) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onGuardAttack(net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
+        if (event.isAttack() && attackGuard()) {
+            event.setSwingHand(false);
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onGuardOpening(ScreenEvent.Opening event) {
+        if (!holdScreens || !Cinematic.holdsScreens() || !ours(event.getNewScreen())) return;
+        deferredScreen = event.getNewScreen();
+        event.setCanceled(true);
+    }
+
     // ------------------------------------------------------------------ 이야기 연출: 화면 흔들림, 보스 아이템 이야기
 
     /** 연출이 도는 동안에는 채팅·체력·핫바 같은 화면 요소를 숨긴다 (영화처럼). */

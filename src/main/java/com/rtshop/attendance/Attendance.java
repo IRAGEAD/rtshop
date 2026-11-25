@@ -265,6 +265,8 @@ public final class Attendance {
             result(p, Component.translatable("rtshop.att.already"), false);
             return false;
         }
+        e.history.add(clock.getAsLong());
+        while (e.history.size() > 90) e.history.remove(0);
         d.dirty();
         if (ci.dayIndex() >= 0) {
             give(p, c.days.get(ci.dayIndex()));
@@ -492,7 +494,18 @@ public final class Attendance {
             weekly.add(wo);
         }
         o.add("weekly", weekly);
+        // 내 출석 기록 (최근 것부터 45번): 날짜와 시각
+        JsonArray hist = new JsonArray();
+        for (int i = e.history.size() - 1; i >= 0 && hist.size() < 45; i--) hist.add(e.history.get(i));
+        o.add("history", hist);
         return o;
+    }
+
+    /** 오늘 출석을 아직 받지 않았는가 (출석 NPC 가 세워져 있을 때만: HUD 안내용). */
+    public static boolean dueToday(ServerPlayer p) {
+        if (com.rtshop.quest.NpcPlaces.where(p.server, "attendance").isEmpty()) return false;
+        AttendanceConfig c = AttendanceConfig.get();
+        return entry(p).lastDay != dayOf(clock.getAsLong(), c);
     }
 
     private static String time(long ms, AttendanceConfig c) {

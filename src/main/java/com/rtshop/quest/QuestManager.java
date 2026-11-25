@@ -528,7 +528,14 @@ public final class QuestManager {
     }
 
     public static int viewsCount(ServerPlayer p, String npcKey) {
-        return viewsFor(p, npcKey).size();
+        QuestData.Progress pr = prog(p);
+        int n = 0;
+        for (QuestView v : viewsFor(p, npcKey)) {
+            QuestDef q = loaded.quests.get(v.id());
+            if (q != null && !pr.active.containsKey(q.id) && jobQuestSettled(p, q)) continue; // 이미 정한 칸의 직업 선행 퀘스트는 세지 않는다
+            n++;
+        }
+        return n;
     }
 
     public static boolean isCompleted(ServerPlayer p, String questId) {
@@ -1858,13 +1865,33 @@ public final class QuestManager {
             }
             boolean ready = allDone(p, q, e.getValue());
             QuestView v = view(p, q, ready ? QuestView.READY : QuestView.ACTIVE, e.getValue());
-            out.add(new com.rtshop.net.QuestHudPacket.Entry(q.id, v.title(), ready, com.rtshop.story.StoryText.t(p, npcName(q.turnInNpc())), v.objectives()));
+            // 지금 찾아갈 NPC: 끝낼 수 있으면 돌아갈 사람, 아니면 아직 말을 걸지 않은 사람
+            String goTo = ready ? q.turnInNpc() : "";
+            if (!ready) {
+                for (int i = 0; i < q.objectives.size(); i++) {
+                    QuestDef.Objective ob = q.objectives.get(i);
+                    if (ob.type == QuestDef.Type.TALK && (i >= e.getValue().length || e.getValue()[i] < Math.max(1, ob.count))) {
+                        goTo = ob.target;
+                        break;
+                    }
+                }
+            }
+            out.add(new com.rtshop.net.QuestHudPacket.Entry(q.id, v.title(), ready, com.rtshop.story.StoryText.t(p, npcName(q.turnInNpc())), v.objectives(),
+                    NpcPlaces.where(p.server, goTo)));
+        }
+        // 오늘 출석을 아직 받지 않았으면 알려 준다 (받으면 사라진다)
+        try {
+            if (com.rtshop.attendance.Attendance.dueToday(p)) {
+                out.add(new com.rtshop.net.QuestHudPacket.Entry(ATTEND_ID, "", false, com.rtshop.attendance.AttendanceConfig.get().npcName, List.of(),
+                        NpcPlaces.where(p.server, "attendance")));
+            }
+        } catch (Throwable ignored) {
         }
         // 받을 수 있는 퀘스트가 있으면 다음에 찾아갈 NPC 를 알려 준다 (메인 스토리 먼저, 숨은 이야기는 알리지 않는다)
         QuestDef next = null;
         int more = 0;
         for (QuestDef q : loaded.quests.values()) {
-            if (q.giver.isEmpty() || q.id.startsWith("hidden") || !QuestDef.modOk(q.mod) || !isAvailable(p, q)) continue;
+            if (q.giver.isEmpty() || q.id.startsWith("hidden") || !QuestDef.modOk(q.mod) || !isAvailable(p, q) || jobQuestSettled(p, q)) continue;
             if (next == null || nextRank(q) < nextRank(next)) {
                 if (next != null) more++;
                 next = q;
@@ -1874,13 +1901,41 @@ public final class QuestManager {
         }
         if (next != null) {
             out.add(new com.rtshop.net.QuestHudPacket.Entry(NEXT_ID + more, com.rtshop.story.StoryText.t(p, next.title), false,
-                    com.rtshop.story.StoryText.t(p, npcName(next.giver)), List.of()));
+                    com.rtshop.story.StoryText.t(p, npcName(next.giver)), List.of(), NpcPlaces.where(p.server, next.giver)));
         }
         return out;
     }
 
     /** HUD 의 "다음 퀘스트" 줄 ID (뒤에 그 밖의 받을 수 있는 퀘스트 수). */
     public static final String NEXT_ID = "_next:";
+    /** HUD 의 "오늘 출석" 줄 ID. */
+    public static final String ATTEND_ID = "_attend";
+
+    /** 직업 선행 퀘스트의 직업 칸(전투·생활). 직업 선행 퀘스트가 아니면 null. */
+    public static String jobSlotOf(QuestDef q) {
+        if (!q.id.startsWith("job_")) return null;
+        int us = q.id.lastIndexOf('_');
+        if (us <= 4) return null;
+        com.rtshop.job.JobConfig.JobDef d = com.rtshop.job.JobConfig.get().job(q.id.substring(4, us));
+        return d == null ? null : d.slot;
+    }
+
+    /**
+     * 셈에서 빼는 직업 선행 퀘스트인가: 그 칸(전투 / 생활)의 직업을 이미 가졌거나, 그 칸의 다른 선행 퀘스트를 이미 하고 있으면
+     * "받을 수 있는 퀘스트" 수에 넣지 않는다. (받는 것 자체는 막지 않는다. 전투와 생활은 따로 본다.)
+     */
+    public static boolean jobQuestSettled(ServerPlayer p, QuestDef q) {
+        String slot = jobSlotOf(q);
+        if (slot == null) return false;
+        com.rtshop.job.JobData.Entry e = com.rtshop.job.Jobs.entry(p);
+        String have = com.rtshop.job.JobConfig.COMBAT.equals(slot) ? e.combat : e.life;
+        if (have != null && !have.isEmpty()) return true;
+        for (String id : prog(p).active.keySet()) {
+            QuestDef a = loaded.quests.get(id);
+            if (a != null && !a.id.equals(q.id) && slot.equals(jobSlotOf(a))) return true;
+        }
+        return false;
+    }
 
     private static long nextRank(QuestDef q) {
         return (q.id.startsWith("story_") ? 0L : 1L << 40) + q.order;
@@ -1891,6 +1946,7 @@ public final class QuestManager {
         StringBuilder sig = new StringBuilder();
         for (com.rtshop.net.QuestHudPacket.Entry e : list) {
             sig.append(e.id()).append(e.ready() ? '!' : ':').append(e.title()).append('|').append(e.turnIn());
+            sig.append('@').append(e.where());
             for (QuestView.ObjView o : e.objectives()) {
                 sig.append(',').append(o.cur()).append('/').append(o.need()).append(o.text());
             }

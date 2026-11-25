@@ -34,6 +34,8 @@ public final class AttendanceData extends SavedData {
         public int weekClaimed;
         /** 마지막으로 '오늘 출석하세요' 안내를 보낸 출석일. */
         public long remindedDay = -1;
+        /** 출석한 시각들 (ms, 오래된 것부터, 최근 90번). 출석 창의 [기록]에서 보인다. */
+        public final java.util.List<Long> history = new java.util.ArrayList<>();
 
         public int weekCount() {
             return Integer.bitCount(weekMask);
@@ -78,6 +80,7 @@ public final class AttendanceData extends SavedData {
             e.week = c.contains("week") ? c.getLong("week") : -1;
             e.weekMask = c.getInt("weekMask");
             e.weekClaimed = c.getInt("weekClaimed");
+            for (long t : c.getLongArray("history")) e.history.add(t);
             e.remindedDay = c.contains("remindedDay") ? c.getLong("remindedDay") : -1;
         }
         return d;
@@ -94,6 +97,7 @@ public final class AttendanceData extends SavedData {
             c.putInt("total", e.total);
             c.putLong("lastDay", e.lastDay);
             c.putBoolean("graceUsed", e.graceUsed);
+            c.putLongArray("history", e.history.stream().mapToLong(Long::longValue).toArray());
             c.putInt("savedStreak", e.savedStreak);
             c.putLong("resetAt", e.resetAt);
             c.putLong("restoreAt", e.restoreAt);

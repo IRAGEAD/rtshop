@@ -51,6 +51,11 @@ public final class Cinematic {
         return cur != null && time() < duration();
     }
 
+    /** 창을 닫고 시작한 연출(퀘스트를 받을 때의 장 제목·환영 등)인가: 도는 동안에는 다른 창이 그 위로 열리지 않게 미룬다. */
+    public static boolean holdsScreens() {
+        return active() && cur.has("closeScreen") && cur.get("closeScreen").getAsBoolean();
+    }
+
     public static String kindForTest() {
         return cur == null ? "" : str("kind", "");
     }

@@ -58,6 +58,7 @@ public class DeedItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tips, TooltipFlag flag) {
         tips.add(Component.translatable("item.rtshop.deed.size", type.size, type.size).withStyle(ChatFormatting.GOLD));
+        tips.add(Component.translatable("item.rtshop.deed.tip0").withStyle(ChatFormatting.YELLOW));
         tips.add(Component.translatable("item.rtshop.deed.tip1").withStyle(ChatFormatting.GRAY));
         tips.add(Component.translatable("item.rtshop.deed.tip2").withStyle(ChatFormatting.GRAY));
         tips.add(Component.translatable("item.rtshop.deed.tip3").withStyle(ChatFormatting.DARK_GRAY));
