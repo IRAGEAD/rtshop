@@ -1195,7 +1195,7 @@ final class ClientSelfTest2 {
         // ------------------------------------------------------------ 이야기 연출: 장 제목, 보스 등장(테마별), 환영
         add(mc -> {
             mc.setScreen(null);
-            Cinematic.play("{\"kind\":\"title\",\"chapter\":\"제 1 장\",\"title\":\"잿불의 서약\",\"subtitle\":\"엠버헤이븐, 수도회의 마지막 거점\",\"color\":\"FF7A20\",\"theme\":\"ember\"}");
+            Cinematic.play("{\"kind\":\"title\",\"chapter\":\"제 1 장\",\"title\":\"잿불의 서약\",\"subtitle\":\"베스탈리아, 수도회의 마지막 거점\",\"color\":\"FF7A20\",\"theme\":\"ember\"}");
             Cinematic.timeForTest = 2.4F;
             waitTicks(6);
         });
@@ -1234,7 +1234,7 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "112_story_vision");
-            Cinematic.play("{\"kind\":\"names\",\"title\":\"엠버헤이븐 연대기 · 잠든 이름\",\"speaker\":\"기록관 이사벨\",\"text\":\"헬바르, 서약을 거절한 기사\\n하르겐 · 이졸데 · 메르윈\\n그리고 이름을 내어 준 여덟째 왕\"}");
+            Cinematic.play("{\"kind\":\"names\",\"title\":\"베스탈리아 연대기 · 잠든 이름\",\"speaker\":\"기록관 이사벨\",\"text\":\"헬바르, 서약을 거절한 기사\\n하르겐 · 이졸데 · 메르윈\\n그리고 이름을 내어 준 여덟째 왕\"}");
             Cinematic.timeForTest = 4.3F;
             waitTicks(6);
         });

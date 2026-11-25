@@ -2526,6 +2526,21 @@ public final class SelfTest {
         boolean fin4 = QuestManager.isCompleted(a, "story_4_29") && QuestManager.hasFlag(a, "seal_maledictus") && QuestManager.hasFlag(a, "erwin_betrayal")
                 && QuestManager.hasFlag(a, "ch4_feigned") && !QuestManager.hasFlag(a, "ch4_refused");
         check("chapter 4 progress moves over the same way (the answer to Erwin is kept)", mid4 && fin4, mid4 + "/" + fin4);
+        QuestManager.reset(a);
+        for (String f : List.of("story_v4", "story_v5", "story_v6", "story_v7", "story_v8", "story_v9")) QuestManager.setFlag(a, f, true);
+        QuestManager.forceComplete(a, "story_4_01");
+        QuestManager.forceComplete(a, "story_4_02");
+        QuestManager.forceComplete(a, "story_4_14");
+        QuestManager.migrateStory10(a);
+        boolean filled = QuestManager.isCompleted(a, "story_4_01a") && QuestManager.isCompleted(a, "story_4_05a") && QuestManager.isCompleted(a, "story_4_13a")
+                && QuestManager.hasFlag(a, "clue_211th") && !QuestManager.isCompleted(a, "story_4_14a") && !QuestManager.isCompleted(a, "story_4_17a") && QuestManager.hasFlag(a, "story_v10");
+        QuestDef scale = l.quests.get("story_4_23c"), pegs = l.quests.get("story_4_02a");
+        boolean ch4more = scale != null && pegs != null && pegs.companion != null && l.quests.get("story_4_24").requires.contains("story_4_23e")
+                && l.quests.get("story_4_28").requires.contains("story_4_27a") && l.quests.get("story_4_03").requires.contains("story_4_02a")
+                && l.quests.values().stream().filter(x -> x.id.startsWith("story_4_")).count() >= 50
+                && l.quests.values().stream().filter(x -> x.companion != null).noneMatch(x -> x.companion.toString().contains("\".\""));
+        check("chapter 4 has its added steps (pegs, canal, drawers, song, the court of the scale, the cells) and steps slipped in behind a player count as walked",
+                filled && ch4more, filled + "/" + ch4more);
         QuestDef ash = l.quests.get("story_5_11"), palm = l.quests.get("story_5_07");
         boolean ill = net.minecraftforge.fml.ModList.get().isLoaded("illusioner");
         check("the finale is rewritten (the empty room, ink dots, a name on a palm, the third line, one line of ash) and the mirror story ends with the name",

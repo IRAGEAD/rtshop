@@ -650,6 +650,31 @@ public final class QuestManager {
         return n > 0;
     }
 
+    /** 4장에 걸음이 끼워졌다 (3.44: 봉인마다 빌드업, 저울의 섬): 이미 지나온 자리에 끼워진 걸음은 끝낸 것으로 친다. 한 번만 (story_v10 표식). */
+    public static boolean migrateStory10(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        if (pr.flags.contains("story_v10")) return false;
+        List<QuestDef> ch = new ArrayList<>();
+        for (QuestDef q : loaded.quests.values()) if (q.id.startsWith("story_4_")) ch.add(q);
+        ch.sort(java.util.Comparator.comparingInt(q -> q.order));
+        int last = pr.flags.contains("story_ch4_done") ? ch.size() : -1;
+        for (int i = 0; i < ch.size() && last < ch.size(); i++) {
+            String id = ch.get(i).id;
+            if (pr.completed.contains(id) || pr.active.containsKey(id)) last = i;
+        }
+        int n = 0;
+        for (int i = 0; i < last && i < ch.size(); i++) {
+            QuestDef q = ch.get(i);
+            if (pr.completed.contains(q.id) || pr.active.containsKey(q.id)) continue;
+            pr.completed.add(q.id);
+            pr.flags.addAll(q.rewardFlags);
+            n++;
+        }
+        pr.flags.add("story_v10");
+        QuestData.get(p.server).dirty();
+        return n > 0;
+    }
+
     /** 4장이 새로 쓰였다 (3.38): 4장 도중이던 사람은 4장의 처음부터, 끝낸 사람은 끝낸 것으로. 한 번만 (story_v7 표식). */
     public static boolean migrateStory7(ServerPlayer p) {
         QuestData.Progress pr = prog(p);
@@ -725,6 +750,7 @@ public final class QuestManager {
             migrateStory7(p);
             migrateStory8(p);
             migrateStory9(p);
+            migrateStory10(p);
         }
     }
 
