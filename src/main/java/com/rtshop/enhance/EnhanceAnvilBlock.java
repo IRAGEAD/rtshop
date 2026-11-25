@@ -27,6 +27,23 @@ public class EnhanceAnvilBlock extends AnvilBlock {
         return new SimpleMenuProvider((id, inv, player) -> new EnhanceMenu(id, inv, ContainerLevelAccess.create(level, pos)), TITLE);
     }
 
+    // 3.49 의 새 모습(점판암 팔각 받침 + 단조 강철 모루)에 맞춘 테두리·충돌 모양. 윗면 높이는 모루와 같다(장면의 장비 자리).
+    private static final net.minecraft.world.phys.shapes.VoxelShape BASE = net.minecraft.world.phys.shapes.Shapes.or(
+            box(0.5, 0, 0.5, 15.5, 3, 15.5), box(1.5, 3, 1.5, 14.5, 4.5, 14.5), box(4.5, 4.5, 4, 11.5, 11.5, 12));
+    private static final net.minecraft.world.phys.shapes.VoxelShape ALONG_Z = net.minecraft.world.phys.shapes.Shapes.or(BASE, box(3, 11.5, 0, 13, 16, 16));
+    private static final net.minecraft.world.phys.shapes.VoxelShape ALONG_X = net.minecraft.world.phys.shapes.Shapes.or(BASE, box(0, 11.5, 3, 16, 16, 13));
+
+    /** 모루의 긴 쪽이 남북(z)으로 놓였는가. */
+    public static boolean alongZ(BlockState state) {
+        return state.getValue(FACING).getAxis() == net.minecraft.core.Direction.Axis.Z;
+    }
+
+    @Override
+    public net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos,
+                                                               net.minecraft.world.phys.shapes.CollisionContext ctx) {
+        return alongZ(state) ? ALONG_Z : ALONG_X;
+    }
+
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         // 떨어지지 않는다
