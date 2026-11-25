@@ -99,6 +99,8 @@ public final class ShopServer {
         com.rtshop.pvp.Pvp.resyncAll(server);
         com.rtshop.rules.LootRules.reload();
         com.rtshop.rules.RecipeRules.reload();
+        com.rtshop.rules.WorldRules.reload();
+        com.rtshop.raid.AbyssFloors.reload();
         if (server != null && server.getPlayerList() != null) {
             com.rtshop.rules.RecipeRules.applyAndSync(server);
         }

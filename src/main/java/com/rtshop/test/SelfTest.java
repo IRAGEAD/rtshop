@@ -1117,6 +1117,68 @@ public final class SelfTest {
                     lockedIdle && openStory && closedAgain && off, lockedIdle + "/" + openStory + "/" + closedAgain + "/" + off);
             QuestManager.reset(a);
             QuestManager.loaded().quests.remove("t_abyss");
+            // 월드 규칙: 생기지 않는 건축물·조합법·전리품, 하나뿐인 문
+            com.rtshop.rules.WorldRules wr0 = com.rtshop.rules.WorldRules.get();
+            com.rtshop.rules.WorldRules wr = com.rtshop.rules.WorldRules.defaults();
+            wr.lootBlockedMods.add("minecraft");
+            com.rtshop.rules.WorldRules.setForTest(wr);
+            boolean neverOk = com.rtshop.story.StagedStructures.blocks("spiral_abyss:ruined_portal") && !com.rtshop.rules.WorldRules.neverStructure("minecraft:village_plains")
+                    && com.rtshop.rules.WorldRules.recipeBlocked(new ResourceLocation("x", "y"), new ResourceLocation("spiral_abyss", "abyss_gate_activate_block"))
+                    && !com.rtshop.rules.WorldRules.recipeBlocked(new ResourceLocation("x", "y"), new ResourceLocation("minecraft", "stick"))
+                    && com.rtshop.rules.WorldRules.lootBlocked(new ItemStack(Items.STICK));
+            boolean freeBefore = com.rtshop.rules.WorldRules.portalAllowed(a);
+            wr.abyssPortalSet = true;
+            wr.abyssPortalDim = a.level().dimension().location().toString();
+            wr.abyssPortalX = a.getBlockX() + 500;
+            wr.abyssPortalY = a.getBlockY();
+            wr.abyssPortalZ = a.getBlockZ();
+            boolean far = !com.rtshop.rules.WorldRules.portalAllowed(a) && com.rtshop.raid.AbyssWeekly.refuseFloor(a, 7);
+            wr.abyssPortalX = a.getBlockX() + 3;
+            boolean near = com.rtshop.rules.WorldRules.portalAllowed(a);
+            com.rtshop.rules.WorldRules.setForTest(wr0);
+            check("world rules: the ruined abyss gate never generates, its key cannot be crafted, blocked mods fall out of loot, and only the one chosen portal lets people in",
+                    neverOk && freeBefore && far && near, neverOk + "/" + freeBefore + "/" + far + "/" + near);
+            // 층 상자 보상
+            com.rtshop.raid.AbyssFloors.Floor[] fl0 = com.rtshop.raid.AbyssFloors.get();
+            com.rtshop.raid.AbyssFloors.Floor[] flT = new com.rtshop.raid.AbyssFloors.Floor[com.rtshop.raid.AbyssFloors.FLOORS];
+            for (int i = 0; i < flT.length; i++) flT[i] = new com.rtshop.raid.AbyssFloors.Floor();
+            com.rtshop.raid.Reward fr = new com.rtshop.raid.Reward("c2", 0, "minecraft:diamond", 3);
+            flT[0].use = true;
+            flT[0].rewards.add(fr);
+            flT[0].weight[1] = 7;
+            net.minecraft.world.level.storage.loot.LootTable built = com.rtshop.raid.AbyssFloors.build(flT[0].rewards);
+            net.minecraft.world.level.storage.loot.LootParams lp = new net.minecraft.world.level.storage.loot.LootParams.Builder(a.serverLevel())
+                    .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, a.position())
+                    .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+            List<ItemStack> rolledF = built.getRandomItems(lp);
+            boolean builtOk = rolledF.size() == 1 && rolledF.get(0).is(Items.DIAMOND) && rolledF.get(0).getCount() == 3;
+            String floorDetail = "no mod";
+            boolean floorOk = true;
+            if (com.rtshop.raid.AbyssWeekly.detected()) {
+                com.rtshop.raid.AbyssFloors.setForTest(flT);
+                boolean ap = com.rtshop.raid.AbyssFloors.apply(server);
+                Object snapF = Class.forName("com.pla.spiral_abyss.encounter.data.FloorCatalog").getMethod("snapshot").invoke(null);
+                java.util.Map<?, ?> fm = (java.util.Map<?, ?>) snapF.getClass().getMethod("floors").invoke(snapF);
+                Object rw = fm.get(1).getClass().getMethod("rewards").invoke(fm.get(1));
+                String entriesF = String.valueOf(rw.getClass().getMethod("entries").invoke(rw));
+                boolean tableIn = server.getLootData().getElement(new net.minecraft.world.level.storage.loot.LootDataId<>(net.minecraft.world.level.storage.loot.LootDataType.TABLE,
+                        com.rtshop.raid.AbyssFloors.tableId(1, 2))) != null;
+                List<ItemStack> viaGame = server.getLootData().getLootTable(com.rtshop.raid.AbyssFloors.tableId(1, 2)).getRandomItems(lp);
+                flT[0].use = false;
+                com.rtshop.raid.AbyssFloors.setForTest(flT);
+                com.rtshop.raid.AbyssFloors.apply(server);
+                Object snapG = Class.forName("com.pla.spiral_abyss.encounter.data.FloorCatalog").getMethod("snapshot").invoke(null);
+                java.util.Map<?, ?> gm = (java.util.Map<?, ?>) snapG.getClass().getMethod("floors").invoke(snapG);
+                Object rw2 = gm.get(1).getClass().getMethod("rewards").invoke(gm.get(1));
+                String back = String.valueOf(rw2.getClass().getMethod("entries").invoke(rw2));
+                floorOk = ap && entriesF.contains("rtshop_abyss:floor_1/chest_2") && entriesF.contains("weight=7") && tableIn && viaGame.size() == 1 && viaGame.get(0).getCount() == 3
+                        && !back.contains("rtshop_abyss") && back.length() > 10;
+                floorDetail = ap + " " + tableIn + " " + viaGame.size() + " " + entriesF.length() + " " + back.length() + " " + com.rtshop.raid.AbyssFloors.lastError;
+            }
+            com.rtshop.raid.AbyssFloors.setForTest(fl0);
+            com.rtshop.raid.AbyssFloors.apply(server);
+            check("abyss floor chests: an edited chest becomes a real loot table the mod rolls and previews, and turning it off brings the mod's own rewards back",
+                    builtOk && floorOk && com.rtshop.raid.RewardEditor.TARGETS.containsKey("abyssfloor6"), builtOk + " " + floorDetail);
             // 편집기
             com.rtshop.raid.RewardEditor.Target target = com.rtshop.raid.RewardEditor.TARGETS.get("abyss");
             com.google.gson.JsonObject model = target.model(a);

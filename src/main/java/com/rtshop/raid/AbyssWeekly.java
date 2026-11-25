@@ -299,6 +299,7 @@ public final class AbyssWeekly {
     /** 층 입장을 막아야 하면 알리고 true. (AbyssFloorLockMixin 이 부른다) */
     public static boolean refuseFloor(ServerPlayer p, int floor) {
         try {
+            if (com.rtshop.rules.WorldRules.refusePortal(p)) return true;
             if (!floorLocked(p, floor)) return false;
             com.rtshop.notice.Notice.send(p, Component.literal(com.rtshop.story.StoryText.t(p, config().text("storyOnly"))).withStyle(ChatFormatting.YELLOW));
             return true;

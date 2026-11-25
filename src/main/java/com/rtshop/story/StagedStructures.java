@@ -156,7 +156,7 @@ public final class StagedStructures {
     /** 지형 생성이 묻는다 (아무 스레드). */
     public static boolean blocks(String structureId) {
         ASKED.incrementAndGet();
-        if (locked.contains(structureId)) {
+        if (com.rtshop.rules.WorldRules.neverStructure(structureId) || locked.contains(structureId)) {
             BLOCKED.incrementAndGet();
             return true;
         }

@@ -233,6 +233,7 @@ public class LootRules extends LootModifier {
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> loot, LootContext ctx) {
         try {
+            loot.removeIf(WorldRules::lootBlocked); // 월드 규칙: 이 서버에 없는 모드의 물건은 전리품에서 뺀다
             Rules r = get();
             if (r.tables.isEmpty()) return loot;
             List<Table> ts = r.matching(ctx.getQueriedLootTableId().toString());

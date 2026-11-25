@@ -145,6 +145,7 @@ public final class RecipeRules {
     public static boolean disabled(Rules rules, ResourceLocation id, ResourceLocation output) {
         if (rules.disabled.contains(id.toString())) return true;
         if (rules.disabled.contains("mod:" + id.getNamespace())) return true;
+        if (WorldRules.recipeBlocked(id, output)) return true; // 월드 규칙: 이 서버에서는 만들 수 없는 것
         if (output != null && com.rtshop.story.StorySeals.recipeLocked(output.toString())) return true; // 이야기: 퀘스트 보상으로만
         return output != null && rules.disabled.contains("item:" + output);
     }

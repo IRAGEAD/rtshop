@@ -37,3 +37,16 @@ SAJ="$(ls packcache/*.jar | grep -iE "spiral.?abyss" | head -1)"
 if [ -n "$SAJ" ]; then java -jar /tmp/cfr.jar "$PWD/$SAJ" --outputdir /tmp/inspect2/src-spiral --silent true > /dev/null 2>&1 || echo "spiral cfr failed"
   { for L in $(unzip -l "$SAJ" | awk '{print $4}' | grep -E "^data/.*\.json$" | grep -vE "/tags/entity_types/|/challenge/"); do echo "---- $L"; unzip -p "$SAJ" "$L" | head -c 6000; echo; done; } > /tmp/inspect2/spiral-json.txt 2>&1 || true
 fi
+# Create 전용 건축물·전리품 찾기: 건축물 조각(nbt) 안의 create: 블록 수, create: 아이템이 든 전리품표
+{
+  for J in packcache/*.jar; do
+    for N in $(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/[^/]+/structures/.*\.nbt$"); do
+      C=$(unzip -p "$J" "$N" | gunzip -c 2>/dev/null | grep -a -o "create:[a-z_]*" | sort -u | wc -l)
+      [ "$C" -gt 0 ] && echo "S $C $(basename "$J") $N"
+    done
+    for N in $(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/[^/]+/loot_tables/.*\.json$"); do
+      C=$(unzip -p "$J" "$N" | grep -o '"create:[a-z_]*"' | sort -u | tr '\n' ' ')
+      [ -n "$C" ] && echo "L $(basename "$J") $N $C"
+    done
+  done
+} > /tmp/inspect2/create-uses.txt 2>&1 || true
