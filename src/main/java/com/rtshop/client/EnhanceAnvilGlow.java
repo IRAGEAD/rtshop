@@ -53,6 +53,13 @@ public final class EnhanceAnvilGlow {
         return GLOW.size();
     }
 
+    /** 지금 가장 밝은 모루의 밝기 (없으면 -1). */
+    public static float brightestForTest() {
+        float best = -1F;
+        for (float[] g : GLOW.values()) best = Math.max(best, g[0]);
+        return best;
+    }
+
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;

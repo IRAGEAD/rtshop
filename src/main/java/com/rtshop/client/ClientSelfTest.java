@@ -516,6 +516,9 @@ public final class ClientSelfTest {
                 var m = mc.player.containerMenu;
                 boolean ready = m instanceof com.rtshop.enhance.EnhanceMenu && m.getSlot(2).hasItem() && m.getSlot(2).mayPickup(mc.player);
                 check("the +5 preview is ready and affordable", ready);
+                check("standing at the enhance anvil its rune band has begun to light up (found by the client, brightness above 0)",
+                        EnhanceAnvilGlow.countForTest() >= 1 && EnhanceAnvilGlow.brightestForTest() > 0F,
+                        EnhanceAnvilGlow.countForTest() + " / " + EnhanceAnvilGlow.brightestForTest());
                 if (m.getSlot(2).hasItem()) {
                     check("hovering the result in the Cinematic anvil scene no longer pops up its description window",
                             EnhanceClient.sceneTooltipForTest(m.getSlot(2).getItem()) == 0, EnhanceClient.sceneTooltipForTest(m.getSlot(2).getItem()));

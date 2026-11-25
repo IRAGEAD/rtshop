@@ -167,3 +167,8 @@
 - 직업 딱지(JobBadge): 가방 창 왼쪽 [직업]. 마우스를 올리면 전투·생활 직업과 패시브(▲ 이점 · ▼ 불리), 누르면 직업 창. JobSyncPacket 이 이름과 설명을 함께 보낸다.
 - 무기 설명서(rtshop:weapon_manual, WeaponManuals): Epic Fight 특수기가 있는 무기를 처음 얻으면 한 권(같은 종류·같은 특수기 묶음은 한 권; 기록 rtshop_manuals). 우클릭 → WeaponManualScreen: 종류, 드는 방식별 연속 공격 타수, 달리며·뛰어서 공격, 특수기 이름·설명, 전투 키(지금 설정된 키 이름). 다시 받기 /rtshop manual. 끄기 world_rules.json 의 weaponManuals. 정보는 EfWeapons(리플렉션)로 무기 능력의 표에서 읽는다.
 - 행운 상인의 [티켓 사기] 없음: 티켓은 티켓 상인에게서만.
+
+3.49 (강화 모루 새 모습 · 진행 중)
+- 블록: tools/gen_enhance_anvil.py 가 모델(상자 56개, UV 는 자리로 자동)과 질감(textures/block/enh_*.png, 64px)을 만든다. 점판암 팔각 받침 두 층 + 놋쇠 띠·못, 단조 강철 모루(뿔·굽) + 놋쇠 상감·마름모 무늬. 윗면 높이 16 그대로. 테두리 모양은 EnhanceAnvilBlock.getShape.
+- 빛: client/EnhanceAnvilGlow — 받침의 룬 띠와 모루 옆면 보석은 평소 꺼져 있고 4.5칸 안으로 오면 2초에 걸쳐 켜진다(멀어지면 3.5초에 걸쳐 꺼짐). 블록 상태를 바꾸지 않고 클라이언트가 덧그린다(enh_glow_side.png, enh_glow_anvil.png).
+- 정보 창(아직): 시안 「하 · 세로 한 장」 + 테두리 놋쇠 장식 살짝. docs/worklist.md 참고.
