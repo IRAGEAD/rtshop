@@ -1888,7 +1888,12 @@ public final class SelfTest {
         ItemStack modThing = ItemStack.EMPTY;
         for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
             net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it);
-            if (rl != null && !rl.getNamespace().equals("minecraft") && !rl.getNamespace().equals("rtshop")) { modThing = new ItemStack(it); break; }
+            if (rl == null || rl.getNamespace().equals("minecraft") || rl.getNamespace().equals("rtshop")) continue;
+            boolean questItem = false;
+            for (QuestDef qd : QuestManager.loaded().quests.values()) {
+                for (QuestDef.Objective ob : qd.objectives) questItem |= ob.type == QuestDef.Type.DELIVER && ob.target.equals(rl.toString());
+            }
+            if (!questItem) { modThing = new ItemStack(it); break; }
         }
         net.minecraft.world.entity.boss.wither.WitherBoss witherProbe = EntityType.WITHER.create(level);
         net.minecraft.world.entity.monster.Zombie zombieProbe = EntityType.ZOMBIE.create(level);

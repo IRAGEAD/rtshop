@@ -257,11 +257,13 @@ public final class MobRules {
         if (s.isEmpty() || !c.dropsEnabled) return true;
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(s.getItem());
         if (id == null) return true;
-        if (c.keepItems.contains(id.toString()) || c.keepItems.contains(id.getNamespace() + ":*") || questItems().contains(id.toString())) return true;
+        if (c.keepItems.contains(id.toString()) || c.keepItems.contains(id.getNamespace() + ":*")) return true;
         if (c.removeSkillBooks && id.toString().equals(com.rtshop.magic.MagicSkills.BOOK)) return false;
         if (c.removeEnchanted && (s.getItem() instanceof EnchantedBookItem || s.isEnchanted())) return false;
         if (c.removeWeapons && weapon(s)) return false;
-        return !(c.removeModItems && !id.getNamespace().equals("minecraft"));
+        // 모드 아이템: 퀘스트가 건네 달라는 재료만은 남긴다 (무기·인챈트 물건은 퀘스트에 쓰여도 몹이 떨어뜨리지 않는다)
+        if (c.removeModItems && !id.getNamespace().equals("minecraft")) return questItems().contains(id.toString());
+        return true;
     }
 
     /** 몹이 주워서 들고 있던 물건 (플레이어가 떨어뜨린 것): 죽을 때 반드시 떨어지는 것이므로 지우지 않는다. */
