@@ -120,38 +120,49 @@ def scroll():
 
 save(scroll(), 'item/enchant_scroll.png')
 
-# 받침 블록: 흑요석 + 보라 빛줄
-def obsidian(seed, veins=True, top=False):
+# 받침 블록 「별빛 천구」: 남빛 돌 받침에 은빛 테, 가는 기둥의 푸른 빛틈. 옆면 그림은 모델이 줄 단위로 나눠 쓴다
+# (0~1 줄 = 받침 접시, 4~8 줄 = 기둥, 12~13 줄 = 둘째 단, 14~15 줄 = 바닥 단).
+NAVY, NAVY2, NAVY3, SILVER, CYAN, CYAN2 = (40, 44, 78), (58, 64, 108), (74, 82, 134), (196, 206, 230), (120, 220, 255), (70, 150, 200)
+def navy(seed, base=NAVY):
     import random
     rnd = random.Random(seed)
     im = Image.new('RGBA', (16, 16))
     px = im.load()
     for y in range(16):
         for x in range(16):
-            v = rnd.randint(0, 22)
-            px[x, y] = (16 + v // 2, 10 + v // 3, 26 + v, 255)
-    if veins:
-        for x in range(16):
-            y = int(8 + 3 * math.sin(x * 0.7 + seed))
-            px[x, y] = (150, 90, 230, 255)
-            if 0 <= y + 1 < 16:
-                px[x, y + 1] = (90, 50, 160, 255)
-    if top:
-        d = ImageDraw.Draw(im)
-        d.ellipse((3, 3, 12, 12), outline=(170, 110, 250, 255))
-        d.point((8, 8), fill=(230, 200, 255, 255))
-    # 테두리
-    for i in range(16):
-        for (x, y) in ((i, 0), (i, 15), (0, i), (15, i)):
-            r, g, b, a = px[x, y]
-            px[x, y] = (max(0, r - 8), max(0, g - 6), max(0, b - 12), 255)
+            v = rnd.randint(-5, 5)
+            px[x, y] = (base[0] + v, base[1] + v, base[2] + v * 2, 255)
     return im
 
-save(obsidian(1), 'block/arcane_pedestal_side.png')
-save(obsidian(2, veins=False, top=True), 'block/arcane_pedestal_top.png')
-save(obsidian(3, veins=False), 'block/arcane_pedestal_bottom.png')
+side = navy(1)
+px = side.load()
+for x in range(16):
+    px[x, 0] = (*SILVER, 255)                      # 받침 접시의 은테
+    px[x, 1] = (*NAVY2, 255)
+    px[x, 12] = (*NAVY3, 255)                      # 둘째 단
+    px[x, 13] = (*NAVY2, 255)
+    px[x, 14] = (*SILVER, 255)                     # 바닥 단의 은테
+for y in range(4, 9):                              # 기둥: 가운데 푸른 빛틈
+    for x in (6, 9):
+        px[x, y] = (*NAVY2, 255)
+for y in (5, 6, 7):
+    px[7, y] = (*CYAN, 255)
+    px[8, y] = (*CYAN2, 255)
+save(side, 'block/arcane_pedestal_side.png')
 
-# 구슬 (가운데가 밝은 자수정)
+top = navy(2, NAVY2)
+d = ImageDraw.Draw(top)
+d.rectangle((2, 2, 13, 13), outline=(*SILVER, 255))      # 바닥 단의 은테
+d.rectangle((4, 4, 11, 11), outline=(*NAVY3, 255))       # 둘째 단
+d.rectangle((5, 5, 10, 10), outline=(*SILVER, 255))      # 받침 접시의 은테
+d.rectangle((7, 7, 8, 8), fill=(*CYAN, 255))             # 접시 가운데의 빛
+save(top, 'block/arcane_pedestal_top.png')
+save(navy(3), 'block/arcane_pedestal_bottom.png')
+
+# 고리(혼천의의 띠)는 색만 입힌 입체로 그린다: 흰 그림 한 장
+save(Image.new('RGBA', (4, 4), (255, 255, 255, 255)), 'entity/white.png')
+
+# 구슬 (푸른 별빛)
 N = 32
 orb = Image.new('RGBA', (N, N))
 px = orb.load()
@@ -162,8 +173,8 @@ for y in range(N):
         if r > 1:
             continue
         hl = max(0, 1 - math.hypot(dx + 0.35, dy + 0.35) * 1.6)
-        k = 1 - r * 0.55
-        c = (int(120 * k + 135 * hl), int(60 * k + 170 * hl), int(210 * k + 45 * hl))
+        k = 1 - r * 0.5
+        c = (int(92 * k + 150 * hl), int(118 * k + 125 * hl), int(240 * k + 15 * hl))
         a = 255 if r < 0.92 else int(255 * (1 - (r - 0.92) / 0.08))
         px[x, y] = (min(255, c[0]), min(255, c[1]), min(255, c[2]), a)
 save(orb, 'entity/arcane_orb.png')
@@ -176,7 +187,7 @@ for y in range(G):
     for x in range(G):
         r = math.hypot((x - 15.5) / 15.5, (y - 15.5) / 15.5)
         if r < 1:
-            px[x, y] = (200, 150, 255, int(150 * (1 - r) ** 2))
+            px[x, y] = (150, 180, 255, int(150 * (1 - r) ** 2))
 save(glow, 'entity/arcane_glow.png')
 
 # 룬 고리: 바깥(굵은 고리 + 룬 눈금), 안쪽(가는 고리 + 점)

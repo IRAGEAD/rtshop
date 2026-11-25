@@ -1168,8 +1168,15 @@ final class ClientSelfTest2 {
             waitTicks(12);
         });
         add(mc -> {
-            check("notices stay inside the screen and long ones wrap to at most 3 lines each", NoticeHud.lastInsideForTest
-                    && NoticeHud.lastLinesForTest > 0 && NoticeHud.lastLinesForTest <= 3 * NoticeHud.MAX_VISIBLE, NoticeHud.lastLinesForTest);
+            check("notices stay inside the screen and long ones wrap to at most 2 lines each", NoticeHud.lastInsideForTest
+                    && NoticeHud.lastLinesForTest > 0 && NoticeHud.lastLinesForTest <= NoticeHud.MAX_LINES * NoticeHud.MAX_VISIBLE, NoticeHud.lastLinesForTest);
+            check("notices are thin strips at the top centre of the screen (under any boss bars), newest below, at most three at a time",
+                    NoticeHud.lastTopForTest >= 4 && NoticeHud.lastTopForTest < mc.getWindow().getGuiScaledHeight() / 3
+                            && NoticeHud.lastCountForTest >= 1 && NoticeHud.lastCountForTest <= 3, NoticeHud.lastTopForTest + " / " + NoticeHud.lastCountForTest);
+            check("a notice takes its dot colour from the message (green success, red failure, gold otherwise)",
+                    NoticeHud.tone(net.minecraft.network.chat.Component.literal("ok").withStyle(net.minecraft.ChatFormatting.GREEN)) == 0x55FF55
+                            && NoticeHud.tone(net.minecraft.network.chat.Component.literal("plain")) == 0xE8B84A
+                            && NoticeHud.tone(net.minecraft.network.chat.Component.literal("white").withStyle(net.minecraft.ChatFormatting.WHITE)) == 0xE8B84A);
             shot(mc, "121_notices");
             mc.player.connection.sendCommand("rtshop quest");
             waitTicks(25);

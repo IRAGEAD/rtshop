@@ -16,9 +16,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** 별빛 수정 구체: 흑요석 받침 위에 자수정 구슬이 떠 있고 룬 고리 두 개가 돈다. 우클릭하면 마법 뽑기 창이 열린다. */
+/** 별빛 수정 구체 「별빛 천구」: 남빛 받침 위에 푸른 구슬이 떠 있고, 금·은 고리 세 겹(혼천의)이 따로 돈다. 우클릭하면 룬 제단이 열린다. */
 public class ArcaneOrbBlock extends BaseEntityBlock {
-    private static final VoxelShape SHAPE = Shapes.or(box(1, 0, 1, 15, 2, 15), box(3, 2, 3, 13, 10, 13), box(2, 10, 2, 14, 12, 14));
+    private static final VoxelShape SHAPE = Shapes.or(box(2, 0, 2, 14, 2, 14), box(4, 2, 4, 12, 4, 12), box(6, 4, 6, 10, 9, 10), box(5, 9, 5, 11, 10, 11));
 
     public ArcaneOrbBlock(Properties p) {
         super(p);
