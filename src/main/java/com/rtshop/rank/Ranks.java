@@ -254,10 +254,10 @@ public final class Ranks {
     }
 
     public static class Data extends SavedData {
-        final Map<UUID, Rec> recs = new LinkedHashMap<>();
+        public final Map<UUID, Rec> recs = new LinkedHashMap<>();
         long weekId = -1;
         /** 지난주 결과: 종목 → 순위대로. */
-        final Map<String, List<Row>> last = new LinkedHashMap<>();
+        public final Map<String, List<Row>> last = new LinkedHashMap<>();
 
         Rec of(UUID id) {
             return recs.computeIfAbsent(id, k -> new Rec());
