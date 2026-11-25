@@ -538,6 +538,14 @@ public final class QuestManager {
         return n;
     }
 
+    /** 시험용: 퀘스트 하나를 끝낸 것으로(또는 안 끝낸 것으로) 적는다. 보상·장면은 없다. 전에 끝나 있었으면 true. */
+    public static boolean setCompletedForTest(ServerPlayer p, String questId, boolean done) {
+        QuestData.Progress pr = prog(p);
+        boolean was = pr.completed.contains(questId);
+        if (done) pr.completed.add(questId); else pr.completed.remove(questId);
+        return was;
+    }
+
     public static boolean isCompleted(ServerPlayer p, String questId) {
         return prog(p).completed.contains(questId);
     }

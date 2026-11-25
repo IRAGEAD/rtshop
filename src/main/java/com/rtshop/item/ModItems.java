@@ -58,6 +58,11 @@ public final class ModItems {
                     "item.rtshop.raid_eye.tip1", "item.rtshop.raid_eye.tip2"));
     public static final RegistryObject<Item> RAID_ESCAPE = ITEMS.register("raid_escape",
             () -> new RaidEscapeItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+    /** 귀환권: 마을의 기준 자리로 돌아간다 (일반 = 가로 10000칸 안, 고급 = 어디서든·하루 5장). */
+    public static final RegistryObject<Item> RETURN_TICKET = ITEMS.register("return_ticket",
+            () -> new ReturnTicketItem(new Item.Properties().stacksTo(16), false));
+    public static final RegistryObject<Item> RETURN_TICKET_PLUS = ITEMS.register("return_ticket_plus",
+            () -> new ReturnTicketItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.RARE), true));
 
     /** 이야기 물건: 서장에서 꿈속의 기사가 건네는 불씨 (버릴 수 있지만 끝까지 필요하다). */
     public static final RegistryObject<Item> UNDYING_EMBER = ITEMS.register("undying_ember",

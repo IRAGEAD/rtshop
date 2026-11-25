@@ -1,0 +1,17 @@
+{
+ "_설명": "잡화점에 덧붙이는 귀환권. 이미 있는 품목은 건드리지 않습니다. 고급 귀환권은 하루에 살 수 있는 수가 정해져 있습니다 (config/rtshop/town_spawn.json).",
+ "items": [
+  {
+   "item": "rtshop:return_ticket",
+   "price": 1500,
+   "category": "misc",
+   "sell": false
+  },
+  {
+   "item": "rtshop:return_ticket_plus",
+   "price": 12000,
+   "category": "misc",
+   "sell": false
+  }
+ ]
+}

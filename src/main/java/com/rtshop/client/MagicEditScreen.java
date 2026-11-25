@@ -24,7 +24,9 @@ import java.util.List;
  * 저장하면 config/rtshop/magic_gacha.json 에 쓰이고 바로 적용된다. [자동 채우기]는 이 세계의 스킬·인챈트로 목록을 다시 만든다.
  */
 public class MagicEditScreen extends Screen {
-    private static final String[] GRADES = MagicGachaScreen.GRADES;
+    private static String[] grades() {
+        return MagicGachaScreen.grades();
+    }
     private static final String[] CATS = MagicGachaScreen.CATS;
     private JsonObject cfg;
     private JsonArray knownSkills = new JsonArray(), knownEnchants = new JsonArray();
@@ -44,6 +46,7 @@ public class MagicEditScreen extends Screen {
 
     public void update(JsonObject o) {
         cfg = o.deepCopy();
+        GachaScreen.readGrades(cfg, "gradeDefs");
         knownSkills = cfg.has("knownSkills") ? cfg.getAsJsonArray("knownSkills") : new JsonArray();
         knownEnchants = cfg.has("knownEnchants") ? cfg.getAsJsonArray("knownEnchants") : new JsonArray();
         cfg.remove("knownSkills");
@@ -123,16 +126,23 @@ public class MagicEditScreen extends Screen {
         return d == Math.rint(d) ? String.valueOf((long) d) : String.valueOf(d);
     }
 
+    /** 확률표의 한 칸 너비: 등급이 여섯이면 58, 더 많으면 창 너비에 맞춰 줄인다. */
+    private int colW() {
+        return Math.max(26, Math.min(58, (W - 96 - 8) / Math.max(1, grades().length)));
+    }
+
     private void initOdds() {
         JsonObject odds = cfg.getAsJsonObject("odds");
         String[] rows = {"select", "random", "enchant"};
         int y = y0 + 70;
         for (int r = 0; r < rows.length; r++) {
             JsonArray a = odds.getAsJsonArray(rows[r]);
-            for (int i = 0; i < GRADES.length; i++) {
+            // 서버가 보낸 줄이 지금 등급 수보다 짧으면 0 으로 채운다 (등급이 막 바뀐 경우)
+            while (a.size() < grades().length) a.add(0);
+            for (int i = 0; i < grades().length; i++) {
                 final int k = i;
-                if (rows[r].equals("enchant") && i == 5) continue; // 인챈트에는 야마토 등급 없음
-                numberBox(x0 + 96 + i * 58, y + r * 22, 50, num(a.get(i).getAsDouble()), v -> {
+                if (rows[r].equals("enchant") && grades()[i].equals("yamato")) continue; // 인챈트에는 야마토 등급 없음
+                numberBox(x0 + 96 + i * colW(), y + r * 22, colW() - 8, num(a.get(i).getAsDouble()), v -> {
                     try {
                         a.set(k, new com.google.gson.JsonPrimitive(v.isEmpty() ? 0 : Double.parseDouble(v)));
                     } catch (NumberFormatException ignored) {
@@ -254,13 +264,13 @@ public class MagicEditScreen extends Screen {
             String grade = e.get("grade").getAsString();
             int gx = px + pw - 200;
             g.fill(gx, y + 1, gx + 70, y + 15, 0xFFE0CDA4);
-            g.drawString(font, Ui.clip(font, tr("rtshop.gacha.grade." + grade) + " ▼", 66), gx + 3, y + 4, GachaColors.dark(grade), false);
+            g.drawString(font, Ui.clip(font, GachaColors.name(grade) + " ▼", 66), gx + 3, y + 4, GachaColors.dark(grade), false);
             hit(gx, y + 1, 70, 14, () -> {
                 List<ChoicePopup.Option> o = new ArrayList<>();
-                for (String gr : GRADES) {
+                for (String gr : grades()) {
                     if (gr.equals("common")) continue; // 일반 등급 자리는 '실패'
                     if (gr.equals("yamato") && (tab != 0)) continue; // 야마토는 공격 분야에만
-                    o.add(new ChoicePopup.Option(gr, tr("rtshop.gacha.grade." + gr)));
+                    o.add(new ChoicePopup.Option(gr, GachaColors.name(gr)));
                 }
                 popup = new ChoicePopup(gx, y + 1, 70, 14, height, font, o, grade, v -> {
                     e.addProperty("grade", v);
@@ -348,9 +358,10 @@ public class MagicEditScreen extends Screen {
 
     private void renderOdds(GuiGraphics g, int mx, int my, int px, int py, int pw) {
         g.drawString(font, tr("rtshop.magic.edit_odds_head"), px + 6, py + 6, Ui.C_INK, false);
-        for (int i = 0; i < GRADES.length; i++) {
-            String s = i == 0 ? tr("rtshop.magic.fail") : tr("rtshop.gacha.grade." + GRADES[i]); // 첫 칸 = 실패 확률
-            g.drawString(font, Ui.clip(font, s, 54), x0 + 96 + i * 58, y0 + 58, GachaColors.dark(GRADES[i]), false);
+        int fail = MagicGachaScreen.failIndex();
+        for (int i = 0; i < grades().length; i++) {
+            String s = i == fail ? tr("rtshop.magic.fail") : GachaColors.name(grades()[i]); // 일반 등급의 자리 = 실패 확률
+            g.drawString(font, Ui.clip(font, s, colW() - 4), x0 + 96 + i * colW(), y0 + 58, GachaColors.dark(grades()[i]), false);
         }
         String[] rows = {tr("rtshop.magic.tab.select"), tr("rtshop.magic.tab.random"), tr("rtshop.magic.tab.reroll")};
         for (int r = 0; r < 3; r++) g.drawString(font, Ui.clip(font, rows[r], 80), px + 6, y0 + 73 + r * 22, Ui.C_INK, false);

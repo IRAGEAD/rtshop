@@ -2077,6 +2077,48 @@ public final class SelfTest {
                     + " staff " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("staff") + " listed " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("listed")
                     + " gear " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("gear"));
         }
+        // 마을의 기준 자리와 귀환권 (3.52)
+        com.rtshop.rules.TownSpawn.Config ts = com.rtshop.rules.TownSpawn.fresh();
+        com.rtshop.rules.TownSpawn.setForTest(ts);
+        try {
+            boolean noSpot = com.rtshop.item.ReturnTicketItem.refusal(a, true) != null;
+            ts.set = true;
+            ts.dim = a.level().dimension().location().toString();
+            ts.x = a.getX() + 9000;
+            ts.y = a.getY();
+            ts.z = a.getZ();
+            boolean near = com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
+            ts.x = a.getX() + 10001;
+            boolean far = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) != null
+                    && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            ts.x = a.getX();
+            ts.dim = "minecraft:the_nether";
+            boolean otherWorld = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            check("return tickets: nothing works until the town point is set; the ordinary one works within 10000 blocks (height ignored) in the town's world, the greater one anywhere",
+                    noSpot && near && far && otherWorld, noSpot + " " + near + " " + far + " " + otherWorld);
+            ItemStack plus = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()), plain = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET.get());
+            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.testDay = "2026-01-01";
+            int d0 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            com.rtshop.rules.TownSpawn.bought(a, plus, 3);
+            int d1 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            com.rtshop.rules.TownSpawn.bought(a, plus, 2);
+            int d2 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            com.rtshop.rules.TownSpawn.testDay = "2026-01-02";
+            int d3 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            check("the greater return ticket can be bought 5 times a day (the count starts again the next day); the ordinary one has no limit",
+                    d0 == 5 && d1 == 2 && d2 == 0 && d3 == 5 && com.rtshop.rules.TownSpawn.dailyLeft(a, plain) > 1000, d0 + " " + d1 + " " + d2 + " " + d3);
+            ShopData gen = ShopServer.shops().get("general");
+            check("the general store sells both return tickets (the greater one costs more)",
+                    gen != null && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()) && e.buyable) >= 0
+                            && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()) && e.buyable) >= 0
+                            && gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()))).price
+                            > gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()))).price);
+        } finally {
+            com.rtshop.rules.TownSpawn.testDay = null;
+            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.reload();
+        }
         witherProbe.discard();
         zombieProbe.discard();
         com.rtshop.rules.MobRules.reload();
@@ -2918,6 +2960,56 @@ public final class SelfTest {
             check("a conversation can depend on an item being carried (Duskfire's hidden talk) and the item has its story text",
                     !without && with && com.rtshop.story.BossIntros.ITEM_LORE.containsKey("efn:meen_spear")
                             && com.rtshop.story.Dialogue.npcForTest("quest_order_elder").toString().contains("duskfire"), without + "/" + with);
+        }
+        // 3.52: 처음 한 번만 하는 인사(once) 와 가끔만 하는 인사(chance). 그 창을 든 사람에게 놀라는 말은 한 번뿐이다
+        {
+            com.google.gson.JsonObject npc = com.google.gson.JsonParser.parseString("{\"greet\":[\"hello\","
+                    + "{\"text\":\"now and then\",\"chance\":0.2,\"need\":{\"items\":[\"minecraft:blaze_rod\"]}},"
+                    + "{\"text\":\"what is that\",\"once\":true,\"need\":{\"items\":[\"minecraft:blaze_rod\"]}}]}").getAsJsonObject();
+            String key = "selftest_greeter";
+            a.getInventory().clearContent();
+            QuestManager.setFlag(a, com.rtshop.story.Dialogue.greetFlag(key, "what is that"), false);
+            com.rtshop.story.Dialogue.forcedRoll = 0.0;
+            String none = com.rtshop.story.Dialogue.greet(a, key, npc, true);
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.BLAZE_ROD));
+            String hidden = com.rtshop.story.Dialogue.greet(a, key, npc, false);   // 장면 중: 아껴 둔다
+            String first = com.rtshop.story.Dialogue.greet(a, key, npc, true);
+            String second = com.rtshop.story.Dialogue.greet(a, key, npc, true);    // 주사위 0.0: 가끔 하는 말
+            com.rtshop.story.Dialogue.forcedRoll = 0.9;
+            String third = com.rtshop.story.Dialogue.greet(a, key, npc, true);     // 주사위 0.9: 보통 인사
+            com.rtshop.story.Dialogue.forcedRoll = -1;
+            a.getInventory().clearContent();
+            String dusk = com.rtshop.story.Dialogue.npcForTest("shop_blacksmith").toString();
+            String lore = String.join(" ", com.rtshop.story.BossIntros.ITEM_LORE.get("efn:meen_spear"));
+            check("a greeting can be said only the first time, and another only now and then; people point at the spear without saying its name and its text says whose name was left off",
+                    none.equals("hello") && hidden.equals("what is that") && first.equals("what is that") && second.equals("now and then") && third.equals("hello")
+                            && dusk.contains("\"once\":true") && dusk.contains("\"chance\"") && dusk.contains("그 창에 대하여") && !dusk.contains("황혼의 불꽃")
+                            && lore.contains("자기 이름을 새기지 않았다"),
+                    none + " / " + hidden + " / " + first + " / " + second + " / " + third);
+        }
+        // 3.52: 이야기 물건을 펼쳐 읽는다 (서약서의 셋째 줄은 종장 뒤에야 보이고, 연대기 페이지에는 기록관이 적은 이름이 쌓인다)
+        {
+            boolean had510 = QuestManager.setCompletedForTest(a, "story_5_10", false), had104 = QuestManager.setCompletedForTest(a, "story_1_04", false);
+            com.google.gson.JsonObject oath = com.rtshop.story.Readables.build(a, "rtshop:oath_scroll");
+            int before = com.rtshop.story.Readables.chronicle(a).size();
+            QuestManager.setCompletedForTest(a, "story_5_10", true);
+            QuestManager.setCompletedForTest(a, "story_1_04", true);
+            com.google.gson.JsonObject oath2 = com.rtshop.story.Readables.build(a, "rtshop:oath_scroll");
+            com.google.gson.JsonObject chron = com.rtshop.story.Readables.build(a, "rtshop:chronicle_page");
+            int after = com.rtshop.story.Readables.chronicle(a).size();
+            QuestManager.setCompletedForTest(a, "story_5_10", had510);
+            QuestManager.setCompletedForTest(a, "story_1_04", had104);
+            String o1 = String.valueOf(oath), o2 = String.valueOf(oath2), c = String.valueOf(chron);
+            ItemStack scroll = new ItemStack(com.rtshop.item.ModItems.OATH_SCROLL.get());
+            check("story papers can be read: the oath shows its third line only after the ending, the chronicle page lists the names written so far, other items are not readable",
+                    oath != null && oath.getAsJsonArray("pages").size() == 1 && o1.contains("지워져 있다") && !o1.contains("때가 되면 놓아준다")
+                            && o2.contains("때가 되면 놓아준다") && oath2.getAsJsonArray("pages").size() == 1
+                            && after == before + 2 && c.contains("도윈, 광부") && c.contains("길 위의 이름")
+                            && com.rtshop.story.Readables.build(a, "minecraft:stick") == null
+                            && com.rtshop.story.Readables.open(a, scroll) && !com.rtshop.story.Readables.open(a, new ItemStack(net.minecraft.world.item.Items.STICK))
+                            && com.rtshop.story.Readables.has("rtshop:mother_journal") && com.rtshop.story.Readables.has("rtshop:frozen_logbook")
+                            && com.rtshop.story.Readables.has("rtshop:old_expedition_map") && com.rtshop.story.Readables.has("rtshop:chronicle_last_page"),
+                    before + " -> " + after + " / " + (oath == null ? "null" : oath.getAsJsonArray("pages").size()));
         }
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
@@ -6196,6 +6288,90 @@ public final class SelfTest {
             refused = true;
         }
         check("an unknown grade in gacha.json is refused", refused);
+
+        // 등급 추가·삭제 (3.52): 직접 만든 등급을 끼워 넣고, 기본 등급을 끄고, 지운 뒤에는 원래대로
+        java.util.List<com.rtshop.gacha.GachaGrades.Def> gradesBefore = com.rtshop.gacha.GachaGrades.all();
+        com.rtshop.magic.MagicConfig magicBefore = com.rtshop.magic.MagicConfig.get();
+        double uncBefore = magicBefore.selectOdds[com.rtshop.gacha.GachaConfig.gradeIndex("uncommon")];
+        double failBefore = magicBefore.enchantOdds[com.rtshop.magic.MagicConfig.failIndex()];
+        try {
+            com.google.gson.JsonObject gj = c.toJson();
+            com.google.gson.JsonArray gdefs = new com.google.gson.JsonArray();
+            for (String gid : new String[]{"common", "uncommon", "rare", "epic", "legendary"}) {
+                com.google.gson.JsonObject d = new com.google.gson.JsonObject();
+                d.addProperty("id", gid);
+                if (gid.equals("rare")) d.addProperty("enabled", false);
+                gdefs.add(d);
+            }
+            com.google.gson.JsonObject myth = new com.google.gson.JsonObject();
+            myth.addProperty("id", "mythic");
+            myth.addProperty("name", "신화");
+            myth.addProperty("color", "E85A6A");
+            myth.addProperty("fx", 4);
+            gdefs.add(myth); // 야마토는 적지 않는다: 빠진 기본 등급은 제자리에 끼워진다
+            gj.add("grades", gdefs);
+            com.google.gson.JsonArray gp = new com.google.gson.JsonArray();
+            String[][] rowsG = {{"minecraft:wooden_sword", "common"}, {"minecraft:iron_sword", "rare"}, {"minecraft:netherite_sword", "mythic"}};
+            for (String[] rg : rowsG) {
+                com.google.gson.JsonObject e = new com.google.gson.JsonObject();
+                e.addProperty("item", rg[0]);
+                e.addProperty("count", 1);
+                e.addProperty("grade", rg[1]);
+                e.addProperty("weight", 10);
+                gp.add(e);
+            }
+            gj.getAsJsonObject("pools").add("weapon", gp);
+            com.google.gson.JsonObject highOdds = new com.google.gson.JsonObject();
+            highOdds.addProperty("common", 50);
+            highOdds.addProperty("rare", 30);
+            highOdds.addProperty("mythic", 20);
+            gj.getAsJsonObject("tiers").add("high", highOdds);
+            com.rtshop.gacha.GachaConfig g7 = com.rtshop.gacha.GachaConfig.fromJson(gj);
+            String[] gradesNow = com.rtshop.gacha.GachaConfig.GRADES;
+            check("a custom grade is added between the built-in ones (and a missing built-in grade is put back in its place): common … legendary, mythic, yamato",
+                    gradesNow.length == 7 && gradesNow[5].equals("mythic") && gradesNow[6].equals("yamato") && com.rtshop.gacha.GachaConfig.yamato() == 6
+                            && com.rtshop.gacha.GachaGrades.fx("mythic") == 4 && com.rtshop.gacha.GachaGrades.color("mythic") == 0xE85A6A
+                            && "신화".equals(com.rtshop.gacha.GachaGrades.customName("mythic")) && g7.dismantle.length == 7
+                            && g7.dismantle[5] >= 150 && g7.dismantle[5] <= 600, java.util.Arrays.toString(gradesNow) + " " + java.util.Arrays.toString(g7.dismantle));
+            double[] chances7 = com.rtshop.gacha.Gacha.gradeChances(g7, "weapon", "high");
+            net.minecraft.util.RandomSource grng = net.minecraft.util.RandomSource.create(7);
+            int rareSeen = 0, mythSeen = 0;
+            for (int k = 0; k < 2000; k++) {
+                String got = com.rtshop.gacha.Gacha.pull(g7, "weapon", "high", 1, grng).get(0).grade;
+                if (got.equals("rare")) rareSeen++;
+                if (got.equals("mythic")) mythSeen++;
+            }
+            check("a switched-off grade never drops and its share goes to the others; the custom grade drops at its own odds (20 of 70)",
+                    chances7.length == 7 && chances7[2] == 0 && Math.abs(chances7[0] - 50.0 / 70) < 1e-9 && Math.abs(chances7[5] - 20.0 / 70) < 1e-9 && rareSeen == 0
+                            && Math.abs(mythSeen / 2000.0 - 20.0 / 70) < 0.04, java.util.Arrays.toString(chances7) + " rare " + rareSeen + " mythic " + mythSeen);
+            com.rtshop.gacha.GachaConfig reread = com.rtshop.gacha.GachaConfig.fromJson(g7.toJson());
+            check("the grade list is written to gacha.json and read back the same",
+                    java.util.Arrays.equals(com.rtshop.gacha.GachaConfig.GRADES, gradesNow) && !com.rtshop.gacha.GachaGrades.enabled("rare")
+                            && reread.tiers.get("high").weights[5] == 20 && reread.pool("weapon").size() == 3);
+            com.rtshop.magic.MagicConfig m7 = com.rtshop.magic.MagicConfig.get();
+            check("the magic gacha follows the new grade list: its odds move with their grades (the fail slot stays on the common grade, the new grade starts at 0)",
+                    m7.selectOdds.length == 7 && m7.selectOdds[com.rtshop.gacha.GachaConfig.gradeIndex("uncommon")] == uncBefore && m7.selectOdds[5] == 0
+                            && m7.enchantOdds[com.rtshop.magic.MagicConfig.failIndex()] == failBefore,
+                    java.util.Arrays.toString(m7.selectOdds));
+            int refusedGrades = 0;
+            String[] badLists = {"[{\"id\":\"a\"},{\"id\":\"a\"}]", "[{\"id\":\"My Grade\"}]", "[{\"id\":\"rare\"},{\"id\":\"uncommon\"}]"};
+            for (String bad : badLists) {
+                try {
+                    com.rtshop.gacha.GachaGrades.parse(bad);
+                } catch (IllegalArgumentException ex) {
+                    refusedGrades++;
+                }
+            }
+            check("a bad grade list is refused: the same ID twice, an ID with capitals or spaces, built-in grades out of order", refusedGrades == 3, refusedGrades);
+        } finally {
+            com.rtshop.gacha.GachaGrades.apply(gradesBefore);
+        }
+        com.rtshop.magic.MagicConfig magicAfter = com.rtshop.magic.MagicConfig.get();
+        check("after the trial the six built-in grades are back, and the magic gacha's odds are where they were",
+                com.rtshop.gacha.GachaConfig.GRADES.length == gradesBefore.size() && magicAfter.selectOdds.length == gradesBefore.size()
+                        && magicAfter.selectOdds[com.rtshop.gacha.GachaConfig.gradeIndex("uncommon")] == uncBefore
+                        && magicAfter.enchantOdds[com.rtshop.magic.MagicConfig.failIndex()] == failBefore,
+                java.util.Arrays.toString(com.rtshop.gacha.GachaConfig.GRADES));
 
         // 시험용 목록: 등급마다 하나씩
         com.google.gson.JsonObject tj = c.toJson();

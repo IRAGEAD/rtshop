@@ -43,20 +43,67 @@ import java.util.Map;
  */
 public final class GachaConfig {
     /** yamato: 무기 뽑기에만 있는 맨 위 등급 (Nightfall 의 야마토 하나를 위한 등급). */
-    public static final String[] GRADES = {"common", "uncommon", "rare", "epic", "legendary", "yamato"};
-    public static final int YAMATO = 5;
+    public static final String[] BASE = GachaGrades.BASE;
+    /**
+     * 지금 쓰는 등급 (낮은 것부터): 기본 여섯에 직접 만든 등급이 끼어 있을 수 있다 (GachaGrades, 3.52).
+     * 설정을 읽을 때 통째로 바뀌므로, 길이나 차례를 따로 적어 두지 말고 그때그때 여기서 읽는다.
+     */
+    public static volatile String[] GRADES = GachaGrades.BASE.clone();
+
+    /** 야마토 등급의 자리 (등급 목록이 바뀌면 달라진다). */
+    public static int yamato() {
+        return gradeIndex("yamato");
+    }
     public static final String[] CATEGORIES = {"weapon", "pet", "accessory"};
     public static final String[] TIERS = {"normal", "mid", "high"};
     /** 자동 분류 때 등급별로 나눌 비율 (성능 순서로 아래부터). */
     private static final double[] AUTO_SPLIT = {0.35, 0.30, 0.22, 0.10, 0.03, 0};
 
     public static int gradeIndex(String g) {
-        for (int i = 0; i < GRADES.length; i++) {
-            if (GRADES[i].equals(g)) {
+        String[] gs = GRADES;
+        for (int i = 0; i < gs.length; i++) {
+            if (gs[i].equals(g)) {
                 return i;
             }
         }
         return -1;
+    }
+
+    /** 이 등급에서 기본 등급 여섯의 값만 뽑는다 (예전 기본값과 견줄 때). */
+    static double[] baseOf(double[] byGrade) {
+        double[] out = new double[BASE.length];
+        for (int i = 0; i < BASE.length; i++) {
+            int gi = gradeIndex(BASE[i]);
+            out[i] = gi >= 0 && gi < byGrade.length ? byGrade[gi] : 0;
+        }
+        return out;
+    }
+
+    /** 직접 만든 등급의 기본 분해 조각: 바로 아래 기본 등급과 바로 위 기본 등급의 사이 값. */
+    private static final int[] BASE_DISMANTLE = {1, 3, 10, 40, 150, 600};
+
+    static int[] defaultDismantle() {
+        String[] gs = GRADES;
+        int[] out = new int[gs.length];
+        int below = BASE_DISMANTLE[0];
+        for (int i = 0; i < gs.length; i++) {
+            int bi = GachaGrades.baseIndex(gs[i]);
+            if (bi >= 0) {
+                out[i] = BASE_DISMANTLE[bi];
+                below = out[i];
+            } else {
+                int above = below * 3;
+                for (int k = i + 1; k < gs.length; k++) {
+                    int bk = GachaGrades.baseIndex(gs[k]);
+                    if (bk >= 0) {
+                        above = BASE_DISMANTLE[bk];
+                        break;
+                    }
+                }
+                out[i] = Math.max(below, (int) Math.round(Math.sqrt((double) below * above)));
+            }
+        }
+        return out;
     }
 
     /** 목록의 한 칸: 아이템(item, count, nbt) 또는 펫(entity). */
@@ -123,7 +170,7 @@ public final class GachaConfig {
     public final Map<String, Tier> tiers = new LinkedHashMap<>();
     public final Map<String, List<Entry>> pools = new LinkedHashMap<>();
     /** 분해하면 받는 조각 (등급별). */
-    public final int[] dismantle = {1, 3, 10, 40, 150, 600};
+    public final int[] dismantle = defaultDismantle();
     /** 조각으로 뽑기 티켓 한 장을 바꿀 때 드는 조각 [종류][단계]. 티켓값의 약 9% 를 돌려받는 셈. */
     public final int[][] ticketCost = {{20, 40, 100}, {15, 30, 75}, {15, 30, 75}};
     public boolean exchangeEnabled = true;
@@ -167,7 +214,10 @@ public final class GachaConfig {
     private static Tier tier(String id, double... w) {
         Tier t = new Tier();
         t.id = id;
-        System.arraycopy(w, 0, t.weights, 0, GRADES.length);
+        for (int i = 0; i < BASE.length && i < w.length; i++) {
+            int gi = gradeIndex(BASE[i]);
+            if (gi >= 0) t.weights[gi] = w[i];
+        }
         return t;
     }
 
@@ -210,7 +260,7 @@ public final class GachaConfig {
         int idx = 0;
         double acc = 0;
         int lastG = 0;
-        for (int g = 0; g < GRADES.length; g++) {
+        for (int g = 0; g < BASE.length; g++) {
             if (split[g] > 0) {
                 lastG = g;
             }
@@ -220,7 +270,7 @@ public final class GachaConfig {
             int until = g == lastG ? n : (int) Math.round(acc * n);
             for (; idx < until && idx < n; idx++) {
                 Entry e = (Entry) scored.get(idx)[0];
-                e.grade = GRADES[g];
+                e.grade = BASE[g]; // 자동 분류는 기본 등급으로만 나눈다
                 out.add(e);
             }
         }
@@ -602,6 +652,7 @@ public final class GachaConfig {
         JsonArray help = new JsonArray();
         help.add("뽑기 설정. 게임 안에서 /rtshop gacha edit (OP) 또는 뽑기 창의 '편집'으로 고칠 수 있습니다.");
         help.add("등급: common(일반) uncommon(고급) rare(희귀) epic(영웅) legendary(전설) yamato(야마토: 무기 뽑기 전용, 맨 위 등급).");
+        help.add("grades: 등급 목록(낮은 것부터). 직접 만든 등급 {id, name, color(RRGGBB), fx(연출 0 일반~5 야마토)} 을 끼워 넣거나, enabled:false 로 등급을 끌 수 있습니다. 편집 창의 [등급] 에서도 고칩니다.");
         help.add("tiers: 뽑기 단계별 등급 확률(비율). 아이템이 하나도 없는 등급은 빼고 나머지 비율로 뽑습니다.");
         help.add("pools: 뽑기 종류별 목록 {item, count, nbt} 또는 {entity} + grade, weight(같은 등급 안에서의 비율).");
         help.add("tenGuarantee: 10회 뽑기에서 하나는 반드시 이 등급 이상. shards.dismantle: 등급별 분해 조각 수, shards.tickets: 티켓 한 장과 바꾸는 데 드는 조각 수.");
@@ -611,6 +662,7 @@ public final class GachaConfig {
         help.add("excludeMods/excludeItems: 자동 분류에서 뺄 모드·아이템 (보스 무기 등). 뽑기 티켓 가격은 config/rtshop/shops/gacha_shop.json.");
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
+        o.add("grades", GachaGrades.toJson());
         o.addProperty("npcName", npcName);
         o.addProperty("shop", shop);
         o.addProperty("tenGuarantee", tenGuarantee);
@@ -665,7 +717,22 @@ public final class GachaConfig {
         return o;
     }
 
+    /**
+     * 설정을 읽는다. 등급 목록(grades)을 먼저 읽어 지금의 등급으로 삼고 나머지를 읽는다.
+     * 읽다가 틀린 곳이 나오면 등급 목록을 읽기 전으로 되돌리고 까닭을 던진다.
+     */
     public static GachaConfig fromJson(JsonObject o) {
+        List<GachaGrades.Def> before = GachaGrades.all();
+        try {
+            GachaGrades.apply(o.has("grades") && o.get("grades").isJsonArray() ? GachaGrades.parse(o.getAsJsonArray("grades")) : GachaGrades.defaults());
+            return read(o);
+        } catch (RuntimeException e) {
+            GachaGrades.apply(before);
+            throw e;
+        }
+    }
+
+    private static GachaConfig read(JsonObject o) {
         GachaConfig c = new GachaConfig();
         c.defaults();
         c.version = o.has("configVersion") ? o.get("configVersion").getAsInt() : 1;
@@ -791,6 +858,9 @@ public final class GachaConfig {
             c.loadError = e.getMessage();
             return c;
         }
+        if (old == null) {
+            GachaGrades.apply(GachaGrades.defaults()); // 파일이 없다: 기본 등급으로 새로 만든다
+        }
         GachaConfig c = new GachaConfig();
         c.defaults();
         if (server == null) {
@@ -806,11 +876,11 @@ public final class GachaConfig {
             c.tiers.putAll(old.tiers);
             for (int i = 0; i < TIERS.length; i++) {
                 Tier t = c.tiers.get(TIERS[i]);
-                if (t == null || java.util.Arrays.equals(t.weights, OLD_ODDS[i])) {
+                if (t == null || java.util.Arrays.equals(baseOf(t.weights), OLD_ODDS[i])) {
                     c.tiers.put(TIERS[i], tier(TIERS[i], NEW_ODDS[i])); // 기본 확률을 쓰던 서버만 새 (낮춘) 확률로
                 }
             }
-            System.arraycopy(old.dismantle, 0, c.dismantle, 0, c.dismantle.length);
+            System.arraycopy(old.dismantle, 0, c.dismantle, 0, Math.min(old.dismantle.length, c.dismantle.length));
             if (old.version >= 2) {
                 for (int i = 0; i < c.ticketCost.length; i++) {
                     System.arraycopy(old.ticketCost[i], 0, c.ticketCost[i], 0, c.ticketCost[i].length);
@@ -883,9 +953,10 @@ public final class GachaConfig {
         }
         addBladeOfShadow(w);
         Tier high = c.tiers.get("high");
-        if (high != null && high.weights[YAMATO] <= 0) {
-            high.weights[YAMATO] = YAMATO_HIGH;
-            if (Math.abs(high.weights[1] - 70) < 1e-9) high.weights[1] = 69.96; // 기본 확률을 쓰던 서버는 합이 100 이 되게
+        int ym = yamato(), un = gradeIndex("uncommon");
+        if (high != null && ym >= 0 && high.weights[ym] <= 0) {
+            high.weights[ym] = YAMATO_HIGH;
+            if (un >= 0 && Math.abs(high.weights[un] - 70) < 1e-9) high.weights[un] = 69.96; // 기본 확률을 쓰던 서버는 합이 100 이 되게
         }
     }
 

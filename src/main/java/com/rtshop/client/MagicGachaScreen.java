@@ -29,7 +29,14 @@ import java.util.List;
  */
 public class MagicGachaScreen extends Screen {
     public static final String[] CATS = {"attack", "guard", "dodge", "passive", "mover"};
-    static final String[] GRADES = {"common", "uncommon", "rare", "epic", "legendary", "yamato"};
+    /** 지금의 등급 목록 (서버가 보낸 것). 첫 칸이 아니라 일반(common) 등급의 자리가 '실패' 칸이다. */
+    static String[] grades() {
+        return com.rtshop.gacha.GachaConfig.GRADES;
+    }
+
+    static int failIndex() {
+        return java.util.Arrays.asList(grades()).indexOf("common");
+    }
 
     private JsonObject data;
     private int tab = 0; // 0 선택, 1 무작위, 2 재설정
@@ -53,12 +60,14 @@ public class MagicGachaScreen extends Screen {
     public MagicGachaScreen(JsonObject data) {
         super(Component.translatable("rtshop.magic.title"));
         this.data = data;
+        GachaScreen.readGrades(data, "gradeDefs");
     }
 
     // ------------------------------------------------------------------ 데이터
 
     public void update(JsonObject o, boolean result) {
         this.data = o;
+        GachaScreen.readGrades(o, "gradeDefs");
         if (result) {
             List<MagicFx.Card> cards = cardsOf(o);
             if (o.has("reroll")) {
@@ -129,8 +138,8 @@ public class MagicGachaScreen extends Screen {
 
     public static String bestGradeOf(List<MagicFx.Card> cards) {
         int best = -1;
-        for (MagicFx.Card c : cards) best = Math.max(best, java.util.Arrays.asList(GRADES).indexOf(c.grade));
-        return best < 0 ? "" : GRADES[best];
+        for (MagicFx.Card c : cards) best = Math.max(best, java.util.Arrays.asList(grades()).indexOf(c.grade));
+        return best < 0 ? "" : grades()[best];
     }
 
     private static MagicFx.Card card(JsonObject e) {
@@ -151,7 +160,7 @@ public class MagicGachaScreen extends Screen {
         if (tab == 0) a = data.getAsJsonObject("cats").getAsJsonObject(CATS[cat]).getAsJsonArray("chances");
         else if (tab == 1) a = data.getAsJsonObject("random").getAsJsonArray("chances");
         else a = data.getAsJsonArray("enchantChances");
-        double[] d = new double[GRADES.length];
+        double[] d = new double[grades().length];
         for (int i = 0; i < d.length && i < a.size(); i++) d[i] = a.get(i).getAsDouble();
         return d;
     }
@@ -454,6 +463,7 @@ public class MagicGachaScreen extends Screen {
 
     public void setData(JsonObject o) {
         this.data = o;
+        GachaScreen.readGrades(o, "gradeDefs");
     }
 
     public JsonObject data() {
@@ -789,7 +799,7 @@ public class MagicGachaScreen extends Screen {
             JsonObject pi = data.getAsJsonObject("pity");
             String pg = pi.get("grade").getAsString();
             gem(g, rx + 3, oy + 6, 3, GachaColors.argb(pg));
-            txt(g, clipF(tr("rtshop.magic.pity", pi.get(mode).getAsInt(), pi.get("count").getAsInt(), tr("rtshop.gacha.grade." + pg)), rw - 10),
+            txt(g, clipF(tr("rtshop.magic.pity", pi.get(mode).getAsInt(), pi.get("count").getAsInt(), GachaColors.name(pg)), rw - 10),
                     rx + 10, oy + 2, C_GOLD);
             oy += 11;
         }
@@ -804,12 +814,13 @@ public class MagicGachaScreen extends Screen {
     private int odds(GuiGraphics g, int x, int y, int w) {
         double[] d = chances();
         int row = 0;
-        for (int i = 0; i < GRADES.length; i++) {
+        int fail = failIndex();
+        for (int i = 0; i < grades().length; i++) {
             if (d[i] <= 0) continue;
             int yy = y + row * 12;
-            int col = i == 0 ? C_FAIL : GachaColors.window(GRADES[i], false);
+            int col = i == fail ? C_FAIL : GachaColors.window(grades()[i], false);
             gem(g, x + 3, yy + 5, 3, col);
-            txt(g, clipF(i == 0 ? tr("rtshop.magic.fail") : GachaColors.windowName(GRADES[i]), 46), x + 10, yy + 2, col);
+            txt(g, clipF(i == fail ? tr("rtshop.magic.fail") : GachaColors.windowName(grades()[i]), 46), x + 10, yy + 2, col);
             String p = GachaScreen.pct(d[i]);
             int bx = x + 58, bw = Math.max(10, w - 58 - 44);
             g.fill(bx - 1, yy + 2, bx + bw + 1, yy + 8, 0xFF2A1F48);
@@ -889,7 +900,7 @@ public class MagicGachaScreen extends Screen {
             if (c.icon.isEmpty()) gem(g, cx + 12, cy + 16, 5, 0xFF4A4060);
             else g.renderItem(c.icon, cx + 4, cy + 8);
             txt(g, clipF(c.name, cw - 26), cx + 23, cy + 6, C_TEXT);
-            txt(g, clipF(tr("rtshop.gacha.grade." + c.grade), cw - 26), cx + 23, cy + 17, col);
+            txt(g, clipF(GachaColors.name(c.grade), cw - 26), cx + 23, cy + 17, col);
         }
         String close = tr("rtshop.magic.click_close");
         txt(g, close, x + w - 4 - tw(close), y + h - 10, C_DIM);

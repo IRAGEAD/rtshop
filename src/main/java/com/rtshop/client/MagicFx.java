@@ -298,7 +298,7 @@ public final class MagicFx {
                 g.pose().popPose();
             }
             net.minecraft.resources.ResourceLocation f = MagicUi.body();
-            String gname = Component.translatable("rtshop.gacha.grade." + c.grade).getString();
+            String gname = GachaColors.name(c.grade);
             MagicUi.draw(g, font, gname, f, -MagicUi.w(font, gname, f) / 2, 6, (a << 24) | col);
             List<net.minecraft.util.FormattedCharSequence> ls = MagicUi.split(font, c.name, f, w - 6);
             for (int i = 0; i < Math.min(2, ls.size()); i++) {

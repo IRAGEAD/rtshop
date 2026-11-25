@@ -337,7 +337,7 @@ public final class ClientEvents {
             int at = Math.min(1, tips.size());
             if (com.rtshop.gacha.Gacha.marked(s)) {
                 String g = com.rtshop.gacha.Gacha.gradeOf(s);
-                tips.add(at++, Component.translatable("rtshop.gacha.tip_mark", Component.translatable("rtshop.gacha.grade." + g))
+                tips.add(at++, Component.translatable("rtshop.gacha.tip_mark", Component.literal(GachaColors.name(g)))
                         .withStyle(st -> st.withColor(GachaColors.of(g))));
                 tips.add(at++, Component.translatable("rtshop.gacha.tip_nosell").withStyle(ChatFormatting.DARK_GRAY));
             }

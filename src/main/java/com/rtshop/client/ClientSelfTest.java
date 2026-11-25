@@ -60,6 +60,7 @@ public final class ClientSelfTest {
     private static final boolean ENABLED = Boolean.getBoolean("rtshop.clienttest");
     private static final List<String> LINES = new ArrayList<>();
     private static int step = 0;
+    private static boolean gradeTabStage = false;
     private static int panelTries = 0, grandTries = 0;
     private static boolean questOfferStage = false;
     static int wait = 0;
@@ -1970,7 +1971,27 @@ public final class ClientSelfTest {
                 wait = 3;
             }
             case LAST + 18 -> {
-                shot(mc, "50_gacha_odds_edit");
+                if (!gradeTabStage) {
+                    shot(mc, "50_gacha_odds_edit");
+                    if (mc.screen instanceof GachaEditScreen s) {
+                        s.showTabForTest(5);
+                        int before = s.gradeCountForTest();
+                        s.addGradeForTest();
+                        check("the gacha editor's [Grades] tab adds a custom grade to the list (a draft until saved)",
+                                s.gradeCountForTest() == before + 1 && s.hasGradeForTest("custom_1") && s.dirtyForTest(), before + " -> " + s.gradeCountForTest());
+                        gradeTabStage = true; // 등급 탭이 그려진 뒤에 한 장 찍는다
+                        wait = 6;
+                        step--;
+                        return;
+                    }
+                } else {
+                    shot(mc, "50b_gacha_grades");
+                    if (mc.screen instanceof GachaEditScreen s) {
+                        int with = s.gradeCountForTest();
+                        s.removeGradeForTest("custom_1");
+                        check("...and deleting it takes it off the list again", !s.hasGradeForTest("custom_1") && s.gradeCountForTest() == with - 1, s.gradeCountForTest());
+                    }
+                }
                 mc.setScreen(null);
                 wait = 5;
             }

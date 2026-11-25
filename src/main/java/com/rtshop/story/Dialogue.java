@@ -118,13 +118,14 @@ public final class Dialogue {
 
     // ------------------------------------------------------------------ 조건
 
-    /** need: {flags:[], notFlags:[], quests:[] (완료한 퀘스트), items:[] (지니고 있는 물건)} */
+    /** need: {flags:[], notFlags:[], quests:[] (완료한 퀘스트), notQuests:[] (아직 끝내지 않은 퀘스트), items:[] (지니고 있는 물건)} */
     static boolean ok(ServerPlayer p, JsonObject o) {
         if (o == null || !o.has("need")) return true;
         JsonObject n = o.getAsJsonObject("need");
         if (n.has("flags")) for (JsonElement e : n.getAsJsonArray("flags")) if (!QuestManager.hasFlag(p, e.getAsString())) return false;
         if (n.has("notFlags")) for (JsonElement e : n.getAsJsonArray("notFlags")) if (QuestManager.hasFlag(p, e.getAsString())) return false;
         if (n.has("quests")) for (JsonElement e : n.getAsJsonArray("quests")) if (!QuestManager.isCompleted(p, e.getAsString())) return false;
+        if (n.has("notQuests")) for (JsonElement e : n.getAsJsonArray("notQuests")) if (QuestManager.isCompleted(p, e.getAsString())) return false;
         if (n.has("items")) for (JsonElement e : n.getAsJsonArray("items")) if (!carries(p, e.getAsString())) return false;
         return true;
     }
@@ -169,7 +170,58 @@ public final class Dialogue {
 
     // ------------------------------------------------------------------ 열기
 
+    /** 시험용: 0 이상이면 '가끔' 인사의 주사위를 이 값으로 고정한다. */
+    public static volatile double forcedRoll = -1;
+
+    /** 처음 한 번만 하는 인사를 이미 했는지 적어 두는 표시. 글이 바뀌면 다시 한 번 한다. */
+    public static String greetFlag(String npc, String text) {
+        return "greeted_" + npc + "_" + Integer.toHexString(text.hashCode());
+    }
+
+    /**
+     * 인사 고르기: 조건이 맞는 것 중 마지막(진행이 더 된 것)을 쓴다.
+     *   "once": true  → 이 사람에게 처음 한 번만 하는 말. 아직 안 했으면 다른 인사보다 먼저 한다.
+     *   "chance": 0.2 → 가끔만 하는 말. 걸렸을 때에만 보통 인사 대신 한다.
+     * shown 이 false 면(장면 중이라 인사가 보이지 않으면) 처음 하는 말을 아껴 둔다.
+     */
+    public static String greet(ServerPlayer p, String npcKey, JsonObject n, boolean shown) {
+        String greet = "";
+        if (!n.has("greet")) return greet;
+        String first = null, firstFlag = null, sometimes = null;
+        JsonArray arr = n.getAsJsonArray("greet");
+        for (int i = 0; i < arr.size(); i++) {
+            JsonElement e = arr.get(i);
+            if (e.isJsonObject() && e.getAsJsonObject().has("text")) {
+                JsonObject g = e.getAsJsonObject();
+                if (!ok(p, g)) continue;
+                if (g.has("once") && g.get("once").getAsBoolean()) {
+                    String flag = greetFlag(npcKey, text(p, g.get("text")));
+                    if (!QuestManager.hasFlag(p, flag)) { first = text(p, g.get("text")); firstFlag = flag; }
+                    continue;
+                }
+                if (g.has("chance")) {
+                    double roll = forcedRoll >= 0 ? forcedRoll : RNG.nextDouble();
+                    if (roll < g.get("chance").getAsDouble()) sometimes = text(p, g.get("text"));
+                    continue;
+                }
+                greet = text(p, g.get("text"));
+            } else {
+                if (greet.isEmpty()) greet = text(p, e);
+            }
+        }
+        if (first != null) {
+            if (shown) QuestManager.setFlag(p, firstFlag, true);
+            return first;
+        }
+        return sometimes != null ? sometimes : greet;
+    }
+
     public static void open(ServerPlayer p, String npcKey, int entityId) {
+        JsonObject out = build(p, npcKey, entityId);
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, StoryText.json(p, out).toString()));
+    }
+
+    static JsonObject build(ServerPlayer p, String npcKey, int entityId) {
         JsonObject all = get();
         JsonObject npcs = all.has("npcs") ? all.getAsJsonObject("npcs") : new JsonObject();
         JsonObject n = npcs.has(npcKey) ? npcs.getAsJsonObject(npcKey) : new JsonObject();
@@ -184,17 +236,7 @@ public final class Dialogue {
         } else {
             out.addProperty("mode", "talk");
         }
-        // 인사: 조건이 맞는 것 중 마지막(진행이 더 된 것)을 쓴다
-        String greet = "";
-        if (n.has("greet")) {
-            for (JsonElement e : n.getAsJsonArray("greet")) {
-                if (e.isJsonObject() && e.getAsJsonObject().has("text")) {
-                    if (ok(p, e.getAsJsonObject())) greet = text(p, e.getAsJsonObject().get("text"));
-                } else {
-                    if (greet.isEmpty()) greet = text(p, e);
-                }
-            }
-        }
+        String greet = greet(p, npcKey, n, scene == null);
         if (greet.isEmpty()) greet = Component.translatable("rtshop.talk.default_greet").getString();
         out.addProperty("greet", greet);
         JsonArray topics = new JsonArray();
@@ -254,7 +296,7 @@ public final class Dialogue {
         // 퀘스트를 주는 NPC 는 받을 퀘스트가 없어도 [퀘스트] 를 보인다 (진행 중·지난 퀘스트·다음 안내)
         if (npcKey.startsWith("quest_") || QuestManager.hasQuests(npcKey)) out.addProperty("questNpc", true);
         if (com.rtshop.story.Hunts.get().boardNpcs.contains(npcKey)) out.addProperty("bounty", true);
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, StoryText.json(p, out).toString()));
+        return out;
     }
 
     /** 이 횟수만큼 일상 이야기를 나누면 가끔 흘리는 말이 섞인다. */

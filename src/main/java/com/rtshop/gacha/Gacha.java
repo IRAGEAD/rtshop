@@ -69,7 +69,9 @@ public final class Gacha {
         }
         for (GachaConfig.Entry e : c.pool(cat)) {
             int gi = GachaConfig.gradeIndex(e.grade);
-            if (gi >= 0 && e.weight > 0 && GachaConfig.valid(e)) {
+            // 꺼 둔 등급(지운 등급)의 물건은 뽑기에 나오지 않는다
+            if (gi >= 0 && gi < g.size() && e.weight > 0 && GachaConfig.valid(e)
+                    && (e == com.rtshop.magic.MagicConfig.FAIL || GachaGrades.enabled(e.grade))) { // 마법 뽑기의 '실패' 칸은 등급을 꺼도 남는다
                 g.get(gi).add(e);
             }
         }
@@ -86,7 +88,7 @@ public final class Gacha {
         List<List<GachaConfig.Entry>> g = byGrade(c, cat);
         double sum = 0;
         for (int i = 0; i < out.length; i++) {
-            out[i] = g.get(i).isEmpty() ? 0 : t.weights[i];
+            out[i] = g.get(i).isEmpty() || i >= t.weights.length ? 0 : t.weights[i];
             sum += out[i];
         }
         for (int i = 0; i < out.length; i++) {
@@ -137,7 +139,7 @@ public final class Gacha {
     public static GachaConfig.Entry pickOfGrade(GachaConfig c, String cat, int minGrade, RandomSource rng) {
         List<List<GachaConfig.Entry>> g = byGrade(c, cat);
         for (int k = Math.max(0, minGrade); k < g.size(); k++) {
-            if (k == GachaConfig.YAMATO && minGrade != GachaConfig.YAMATO) continue;
+            if (k == GachaConfig.yamato() && minGrade != GachaConfig.yamato()) continue;
             if (!g.get(k).isEmpty()) return pickIn(g.get(k), rng);
         }
         return null;
@@ -428,9 +430,10 @@ public final class Gacha {
             }
             pe.history.add(0, e.grade + "|" + cat + "|" + e.key() + "|" + now);
             int gIdx = GachaConfig.gradeIndex(e.grade);
-            if (gIdx >= 4) {
+            int legendary = GachaConfig.gradeIndex("legendary");
+            if (legendary >= 0 && gIdx >= legendary) { // 전설 이상(그 위에 끼워 넣은 등급 포함)은 모두에게 알린다
                 Component name = s.getItem() == ModItems.PET_SUMMON.get() ? petName(e.entity) : s.getHoverName();
-                boolean yamato = gIdx == GachaConfig.YAMATO;
+                boolean yamato = gIdx == GachaConfig.yamato();
                 com.rtshop.notice.Notice.broadcast(p.server, Component.translatable(yamato ? "rtshop.gacha.broadcast_yamato" : "rtshop.gacha.broadcast",
                         p.getDisplayName(), Component.translatable("rtshop.gacha.tier." + tier), name)
                         .withStyle(yamato ? ChatFormatting.AQUA : ChatFormatting.GOLD), false);
@@ -653,6 +656,7 @@ public final class Gacha {
             dm.add(c.dismantle[i]);
         }
         o.add("dismantle", dm);
+        o.add("gradeDefs", GachaGrades.toJson()); // 화면이 등급의 이름·색·연출을 여기서 읽는다
         GachaData.Entry pe = GachaData.get(p.server).of(p.getUUID());
         JsonObject pools = new JsonObject();
         for (String cat : GachaConfig.CATEGORIES) {
@@ -709,10 +713,43 @@ public final class Gacha {
         try {
             c.save();
         } catch (Exception e) {
+            GachaConfig.reload(server); // 등급 목록을 파일에 적힌 것으로 되돌린다
             return "파일에 쓰지 못했습니다: " + e.getMessage();
         }
         GachaConfig.reload(server);
+        // 등급을 지웠다면: 마법 뽑기의 칸도 같은 등급으로 옮긴다
+        try {
+            JsonObject root = JsonParser.parseString(json).getAsJsonObject();
+            if (root.has("gradeRemap") && root.get("gradeRemap").isJsonObject()) {
+                Map<String, String> map = new HashMap<>();
+                for (Map.Entry<String, com.google.gson.JsonElement> e : root.getAsJsonObject("gradeRemap").entrySet()) {
+                    if (GachaConfig.gradeIndex(e.getValue().getAsString()) >= 0) map.put(e.getKey(), e.getValue().getAsString());
+                }
+                com.rtshop.magic.MagicConfig mc = com.rtshop.magic.MagicConfig.get();
+                if (!map.isEmpty() && mc.remapGrades(map)) mc.save();
+            }
+        } catch (Exception e) {
+            RtShop.LOGGER.warn("[rtshop] 마법 뽑기의 등급을 옮기지 못했습니다: {}", e.toString());
+        }
+        syncGrades(server);
         return null;
+    }
+
+    /** 등급 목록(이름·색·연출)을 접속한 사람들에게 보낸다. */
+    public static void syncGrades(net.minecraft.server.MinecraftServer server) {
+        if (server == null || server.getPlayerList() == null) return;
+        for (ServerPlayer sp : server.getPlayerList().getPlayers()) syncGrades(sp);
+    }
+
+    public static void syncGrades(ServerPlayer sp) {
+        if (!real(sp)) return;
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
+                new com.rtshop.net.StoryPacket(com.rtshop.net.StoryPacket.GRADES, GachaGrades.toJson().toString()));
+    }
+
+    @SubscribeEvent
+    public static void onLoginGrades(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer sp) syncGrades(sp);
     }
 
     private static void handleSave(ServerPlayer p, String json) {
