@@ -1,0 +1,10 @@
+RT Shop 강화 정보 창 글꼴 (모두 SIL Open Font License 1.1)
+
+== enhance_ko.ttf <- SongMyung-Regular (https://fonts.google.com/specimen/Song+Myung), 원본 그대로
+Copyright 2018 The SongMyung Project Authors
+License: SIL Open Font License, Version 1.1 — https://openfontlicense.org
+
+== enhance_num.ttf <- Playfair Display (https://fonts.google.com/specimen/Playfair+Display)
+Copyright 2017 The Playfair Display Project Authors (https://github.com/clauseggers/Playfair-Display), with Reserved Font Name "Playfair Display"
+License: SIL Open Font License, Version 1.1 — https://openfontlicense.org
+고친 점: 굵기 700 으로 고정하고 숫자·영문·기호만 남겼습니다(subset). 예약된 글꼴 이름 규정에 따라 파일 안의 글꼴 이름을 "RT Enhance Numerals" 로 바꿨습니다.

@@ -51,11 +51,11 @@ def runes():
     return down(im)
 
 def plate():
-    """닦은 강철 판 (가운데가 늘어나는 9칸 그림): 48x48 화면 픽셀, 모서리 6."""
+    """연한 금빛 판 (가운데가 늘어나는 9칸 그림): 48x48 화면 픽셀, 모서리 6."""
     s = Forge(48, 48); s.im = Image.new('RGB', s.im.size, (0, 0, 0)); s.d = ImageDraw.Draw(s.im, 'RGBA')
     m = s.mask(); s.oct(ImageDraw.Draw(m), (1, 1, 47, 47), 2.5, fill=255)
-    t = steel(S(48), S(48), (214, 219, 228), seed=5); s.im.paste(t, (0, 0), m); s.d = ImageDraw.Draw(s.im, 'RGBA')
-    s.d.line([(S(3.5), S(1) + 1), (S(44.5), S(1) + 1)], fill=(255, 255, 255, 200), width=1); s.d.line([(S(3.5), S(47) - 2), (S(44.5), S(47) - 2)], fill=(90, 96, 110, 160), width=1)
+    t = steel(S(48), S(48), (247, 237, 206), seed=5); s.im.paste(t, (0, 0), m); s.d = ImageDraw.Draw(s.im, 'RGBA')
+    s.d.line([(S(3.5), S(1) + 1), (S(44.5), S(1) + 1)], fill=(255, 248, 220, 200), width=1); s.d.line([(S(3.5), S(47) - 2), (S(44.5), S(47) - 2)], fill=(128, 98, 44, 160), width=1)
     s.brass(lambda d: s.oct(d, (1, 1, 47, 47), 2.5, outline=255, width=max(1, S(.6))), shadow=False)
     out = s.im.convert('RGBA'); a = Image.new('L', s.im.size, 0); s.oct(ImageDraw.Draw(a), (.6, .6, 47.4, 47.4), 2.5, fill=255); out.putalpha(a)
     return down(out)

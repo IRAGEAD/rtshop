@@ -77,6 +77,8 @@ public final class ClientConfig {
     // 룬 제단(마법 뽑기) 화면: 글꼴 sans(고딕)·serif(명조)·batang(바탕, 예전 모습)·pixel(게임 기본), 창 크기 배율, 글자 그림자,
     // 뽑기 연출(0 보통, 1 짧게, 2 끔), 장면 옆 정보 패널 자리(false 오른쪽, true 왼쪽)
     public String magicFont = "sans";
+    /** 강화 정보 창을 전용 글꼴(송명 + Playfair Display)로 그릴까. false 면 게임 글꼴. */
+    public boolean enhanceLuxFont = true;
     public double magicScale = 1.0;
     public boolean magicShadow = false;
     public int magicFx = 0;
@@ -213,6 +215,7 @@ public final class ClientConfig {
             o.addProperty("enhPanelScale", enhPanelScale);
             o.addProperty("hideSidebarButtons", hideSidebarButtons);
             o.addProperty("magicFont", magicFont);
+            o.addProperty("enhanceLuxFont", enhanceLuxFont);
             o.addProperty("magicScale", magicScale);
             o.addProperty("magicShadow", magicShadow);
             o.addProperty("magicFx", magicFx);
@@ -277,6 +280,7 @@ public final class ClientConfig {
                 if (o.has("hideSidebarButtons")) c.hideSidebarButtons = o.get("hideSidebarButtons").getAsBoolean();
                 if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
                 if (o.has("magicFont")) c.magicFont = o.get("magicFont").getAsString();
+                if (o.has("enhanceLuxFont")) c.enhanceLuxFont = o.get("enhanceLuxFont").getAsBoolean();
                 if (o.has("magicScale")) c.magicScale = Math.max(0.7, Math.min(1.3, o.get("magicScale").getAsDouble()));
                 if (o.has("magicShadow")) c.magicShadow = o.get("magicShadow").getAsBoolean();
                 if (o.has("magicFx")) c.magicFx = Math.max(0, Math.min(2, o.get("magicFx").getAsInt()));
