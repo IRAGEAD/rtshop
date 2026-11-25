@@ -1694,5 +1694,21 @@
   "rtshop.gachaedit.grade_delete": "Delete",
   "rtshop.gachaedit.grades_hint1": "Base grades are switched off instead of deleted: an off grade never drops and is not shown.",
   "rtshop.gachaedit.grades_hint2": "Give a new grade its odds in [Odds], then pick it as the grade of items in the lists.",
-  "rtshop.gachaedit.hint_grades": "Name · colour (RRGGBB) · effect · order"
+  "rtshop.gachaedit.hint_grades": "Name · colour (RRGGBB) · effect · order",
+  "item.rtshop.return_ticket": "Return ticket",
+  "item.rtshop.return_ticket_plus": "Greater return ticket",
+  "item.rtshop.return_ticket.tip1": "Hold right-click to return to town.",
+  "item.rtshop.return_ticket.tip2": "Only in the town's own world, within %s blocks (horizontally).",
+  "item.rtshop.return_ticket_plus.tip2": "Works in any world at any distance.",
+  "item.rtshop.return_ticket_plus.tip3": "Only %s can be bought per day.",
+  "rtshop.return.no_spot": "The town's return point is not set yet. (Operator: /rtshop spawn set)",
+  "rtshop.return.in_arena": "A return ticket cannot be used here. Use a raid escape ticket.",
+  "rtshop.return.too_far": "Too far from town. An ordinary return ticket works only within %s blocks in the town's world (a greater one works anywhere).",
+  "rtshop.return.done": "You are back in town.",
+  "rtshop.msg.daily_limit": "%s can be bought only %s times a day (left today: %s).",
+  "rtshop.spawn.set": "Town point set here (%s, %s, %s): where newcomers start and return tickets arrive.",
+  "rtshop.spawn.cleared": "Town point cleared.",
+  "rtshop.spawn.range": "Ordinary return ticket range: %s blocks",
+  "rtshop.spawn.where": "Town point: %s (%s, %s, %s)",
+  "rtshop.spawn.none": "No town point yet. An operator sets it with /rtshop spawn set."
 }

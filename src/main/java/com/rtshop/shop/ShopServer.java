@@ -99,6 +99,7 @@ public final class ShopServer {
         com.rtshop.story.BossMusic.reload();
         com.rtshop.rules.MobRules.reload();
         com.rtshop.rules.FoodRules.reload();
+        com.rtshop.rules.TownSpawn.reload();
         com.rtshop.raid.AbyssWeekly.reload();
         com.rtshop.pvp.Pvp.resyncAll(server);
         com.rtshop.rules.LootRules.reload();
@@ -829,6 +830,12 @@ public final class ShopServer {
             sendResult(player, Component.translatable("rtshop.msg.first_deed_once"), false);
             return;
         }
+        // 하루에 살 수 있는 수가 정해진 물건 (고급 귀환권)
+        int left = com.rtshop.rules.TownSpawn.dailyLeft(player, entry.stack);
+        if (amount > left) {
+            sendResult(player, Component.translatable("rtshop.msg.daily_limit", entry.stack.getHoverName(), com.rtshop.rules.TownSpawn.get().premiumDailyLimit, left), false);
+            return;
+        }
         long total = (long) entry.price * amount;
         if (Economy.wallet(player) < total) {
             sendResult(player, Component.translatable("rtshop.msg.no_money"), false);
@@ -842,6 +849,7 @@ public final class ShopServer {
         }
         InvUtil.apply(player.getInventory(), sim);
         Economy.addWallet(player, -total);
+        com.rtshop.rules.TownSpawn.bought(player, entry.stack, amount);
         if (firstDeed) {
             LandManager.markFirstDeed(player);
         }

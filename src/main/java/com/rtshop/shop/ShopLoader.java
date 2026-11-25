@@ -191,7 +191,7 @@ public final class ShopLoader {
     public static final String[] UPGRADED = {"gacha_shop@2"};
     /** 기존 상점 파일에 품목을 덧붙임: "상점+조각파일@판" (조각의 categories/items 중 없는 것만 추가, 한 번만). */
     public static final String[] APPENDED = {"blacksmith+blacksmith_enhance@1", "blacksmith+blacksmith_enhance@2", "general+general_pshop@1",
-            "gacha_shop+gacha_shop_magic@1"};
+            "gacha_shop+gacha_shop_magic@1", "general+general_return@1"};
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");

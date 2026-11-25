@@ -2064,6 +2064,48 @@ public final class SelfTest {
                     + " staff " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("staff") + " listed " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("listed")
                     + " gear " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("gear"));
         }
+        // 마을의 기준 자리와 귀환권 (3.52)
+        com.rtshop.rules.TownSpawn.Config ts = com.rtshop.rules.TownSpawn.fresh();
+        com.rtshop.rules.TownSpawn.setForTest(ts);
+        try {
+            boolean noSpot = com.rtshop.item.ReturnTicketItem.refusal(a, true) != null;
+            ts.set = true;
+            ts.dim = a.level().dimension().location().toString();
+            ts.x = a.getX() + 9000;
+            ts.y = a.getY();
+            ts.z = a.getZ();
+            boolean near = com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
+            ts.x = a.getX() + 10001;
+            boolean far = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) != null
+                    && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            ts.x = a.getX();
+            ts.dim = "minecraft:the_nether";
+            boolean otherWorld = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            check("return tickets: nothing works until the town point is set; the ordinary one works within 10000 blocks (height ignored) in the town's world, the greater one anywhere",
+                    noSpot && near && far && otherWorld, noSpot + " " + near + " " + far + " " + otherWorld);
+            ItemStack plus = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()), plain = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET.get());
+            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.testDay = "2026-01-01";
+            int d0 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            com.rtshop.rules.TownSpawn.bought(a, plus, 3);
+            int d1 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            com.rtshop.rules.TownSpawn.bought(a, plus, 2);
+            int d2 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            com.rtshop.rules.TownSpawn.testDay = "2026-01-02";
+            int d3 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
+            check("the greater return ticket can be bought 5 times a day (the count starts again the next day); the ordinary one has no limit",
+                    d0 == 5 && d1 == 2 && d2 == 0 && d3 == 5 && com.rtshop.rules.TownSpawn.dailyLeft(a, plain) > 1000, d0 + " " + d1 + " " + d2 + " " + d3);
+            ShopData gen = ShopServer.shops().get("general");
+            check("the general store sells both return tickets (the greater one costs more)",
+                    gen != null && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()) && e.buyable) >= 0
+                            && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()) && e.buyable) >= 0
+                            && gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()))).price
+                            > gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()))).price);
+        } finally {
+            com.rtshop.rules.TownSpawn.testDay = null;
+            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.reload();
+        }
         witherProbe.discard();
         zombieProbe.discard();
         com.rtshop.rules.MobRules.reload();
