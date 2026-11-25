@@ -37,6 +37,7 @@ public final class MagicRegistry {
                                             java.util.List<net.minecraft.network.chat.Component> tip, net.minecraft.world.item.TooltipFlag flag) {
                     tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.arcane_orb.tip1").withStyle(net.minecraft.ChatFormatting.GRAY));
                     tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.arcane_orb.tip2").withStyle(net.minecraft.ChatFormatting.GRAY));
+                    tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.arcane_orb.tip3").withStyle(net.minecraft.ChatFormatting.YELLOW));
                 }
             });
 

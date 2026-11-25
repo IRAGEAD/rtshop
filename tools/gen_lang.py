@@ -627,6 +627,7 @@ NEW = {
  "item.rtshop.survey_compass.found": ("%s: %s쪽으로 약 %s칸", "%s: about %3$s blocks to the %2$s"),
  "block.rtshop.arcane_orb": ("별빛 수정 구체", "Starlight Crystal Orb"),
  "block.rtshop.arcane_orb.tip1": ("우클릭: 마법 뽑기 (스킬북 뽑기 · 인챈트 재설정)", "Right-click: magic gacha (skill books · enchant reroll)"),
+ "block.rtshop.arcane_orb.tip3": ("룬 제단은 마을에 하나뿐이다. 운영자만 세울 수 있다.", "There is only one rune altar, in town. Only an operator can raise it."),
  "block.rtshop.arcane_orb.tip2": ("마법 뽑기 티켓은 뽑기 티켓 상점에서 판다.", "Magic tickets are sold at the gacha ticket shop."),
  "item.rtshop.magic_ticket": ("무작위 마법 뽑기권", "Random Magic Ticket"),
  "item.rtshop.magic_ticket.tip": ("모든 분야에서 스킬북 하나를 뽑는다 (별빛 수정 구체).", "Draws one skill book from any field (Starlight Crystal Orb)."),

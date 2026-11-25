@@ -1135,6 +1135,19 @@ public final class SelfTest {
             boolean far = !com.rtshop.rules.WorldRules.portalAllowed(a) && com.rtshop.raid.AbyssWeekly.refuseFloor(a, 7);
             wr.abyssPortalX = a.getBlockX() + 3;
             boolean near = com.rtshop.rules.WorldRules.portalAllowed(a);
+            boolean altarFree = com.rtshop.rules.WorldRules.altarAllowed(a.level(), a.blockPosition());
+            wr.altarSet = true;
+            wr.altarDim = a.level().dimension().location().toString();
+            wr.altarX = a.getBlockX();
+            wr.altarY = a.getBlockY();
+            wr.altarZ = a.getBlockZ();
+            boolean altarOne = com.rtshop.rules.WorldRules.altarAllowed(a.level(), a.blockPosition()) && !com.rtshop.rules.WorldRules.altarAllowed(a.level(), a.blockPosition().above(3))
+                    && com.rtshop.rules.WorldRules.refuseAltar(a, a.blockPosition().east(9));
+            QuestDef orbQ = QuestManager.loaded().quests.get("story_1_42");
+            boolean orbNotGiven = orbQ != null && orbQ.rewardItems.stream().noneMatch(x -> x.item.equals("rtshop:arcane_orb"))
+                    && server.getRecipeManager().byKey(new ResourceLocation("rtshop", "arcane_orb")).isEmpty();
+            check("the rune altar is one for the whole town: only the chosen orb opens, it is neither handed out by the story nor craftable",
+                    altarFree && altarOne && orbNotGiven, altarFree + "/" + altarOne + "/" + orbNotGiven);
             com.rtshop.rules.WorldRules.setForTest(wr0);
             check("world rules: the ruined abyss gate never generates, its key cannot be crafted, blocked mods fall out of loot, and only the one chosen portal lets people in",
                     neverOk && freeBefore && far && near, neverOk + "/" + freeBefore + "/" + far + "/" + near);

@@ -42,7 +42,10 @@ public class ArcaneOrbBlock extends BaseEntityBlock {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
-        if (!level.isClientSide && player instanceof ServerPlayer sp) MagicGacha.open(sp, pos);
+        if (!level.isClientSide && player instanceof ServerPlayer sp) {
+            if (com.rtshop.rules.WorldRules.refuseAltar(sp, pos)) return InteractionResult.CONSUME; // 마을의 제단 하나만 쓴다
+            MagicGacha.open(sp, pos);
+        }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
@@ -51,6 +54,7 @@ public class ArcaneOrbBlock extends BaseEntityBlock {
     public net.minecraft.world.MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return new net.minecraft.world.SimpleMenuProvider((id, inv, player) -> {
             if (player instanceof ServerPlayer sp) {
+                if (com.rtshop.rules.WorldRules.refuseAltar(sp, pos)) return null;
                 if (MagicGacha.locked(sp)) { // 잠겨 있으면 메뉴(장면)를 열지 않는다
                     com.rtshop.notice.Notice.send(sp, net.minecraft.network.chat.Component.translatable("rtshop.magic.locked"), true);
                     return null;

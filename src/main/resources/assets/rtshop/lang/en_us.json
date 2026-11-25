@@ -1554,5 +1554,6 @@
   "rtshop.att.history_empty": "Nothing recorded yet. Dates and times are kept from your next check-in.",
   "rtshop.att.history_fmt": "MMM d (E) HH:mm",
   "item.rtshop.survey_compass.dim": "%s: that place is not in this dimension. Try it in another one.",
-  "item.rtshop.deed.tip0": "Used on free land outside the town (castle area). Land inside the castle is sold only as plots by the land merchant."
+  "item.rtshop.deed.tip0": "Used on free land outside the town (castle area). Land inside the castle is sold only as plots by the land merchant.",
+  "block.rtshop.arcane_orb.tip3": "There is only one rune altar, in town. Only an operator can raise it."
 }

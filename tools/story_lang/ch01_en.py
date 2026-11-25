@@ -175,5 +175,5 @@ EN = {
 "story_1_42": ("What Is Reflected",
  "Surveyor, look at this. I brought Mother's things back from the camp in the void. There was a cracked crystal orb among them. Mia the apprentice screamed while polishing it. She saw a person in it, she said. Someone swinging a sword. Mia has never held a sword. Look into it with me.",
  "Look into the crystal orb together with Isabel the archivist.",
- "There was a note of Mother's in the cloth around it. 'Handed to me by the people in the boxes of the scribes' tower. I don't know what it is. Hold a light to it and forgotten handiwork shows.' A mirror that reflects the skills of forgotten people, it seems. Who made it and why, I don't know. Set on a stand, anyone can look into it. Take one. Handle it gently. It's cracked."),
+ "There was a note of Mother's in the cloth around it. 'Handed to me by the people in the boxes of the scribes' tower. I don't know what it is. Hold a light to it and forgotten handiwork shows.' A mirror that reflects the skills of forgotten people, it seems. Who made it and why, I don't know. Set on a stand, anyone can look into it. So I had a stand raised in town and put it there. There is only the one, so I can't hand it out. But anyone may go and look. Handle it gently. It's cracked."),
 }

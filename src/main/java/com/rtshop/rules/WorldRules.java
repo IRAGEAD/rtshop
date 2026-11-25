@@ -49,6 +49,14 @@ public final class WorldRules {
     public boolean abyssPortalSet;
     public String abyssPortalDim = "minecraft:overworld";
     public int abyssPortalX, abyssPortalY, abyssPortalZ, abyssPortalRadius = 24;
+    /** 룬 제단(별빛 수정 구체): 운영자만 세우고, 정해 둔 하나만 쓸 수 있다. */
+    public static final String ALTAR_KEY = "rtshop:arcane_orb";
+    public boolean altarOpOnly = true;
+    public boolean altarSet;
+    public String altarDim = "minecraft:overworld";
+    public int altarX, altarY, altarZ;
+    public String textAltarOnly = "룬 제단은 마을에 있는 하나뿐입니다. 그 제단을 이용하세요.";
+    public String textAltarBuild = "룬 제단은 새로 세울 수 없습니다. 마을의 제단을 이용하세요.";
     public String textPortalOnly = "나선 비경으로 가는 문은 마을에 있는 하나뿐입니다.";
     public String textPortalBuild = "나선 비경의 문은 새로 세울 수 없습니다. 마을의 문을 이용하세요.";
 
@@ -111,6 +119,17 @@ public final class WorldRules {
             if (p.has("z")) w.abyssPortalZ = p.get("z").getAsInt();
             if (p.has("radius")) w.abyssPortalRadius = Math.max(4, p.get("radius").getAsInt());
         }
+        if (o.has("runeAltarOpOnly")) w.altarOpOnly = o.get("runeAltarOpOnly").getAsBoolean();
+        if (o.has("runeAltar") && o.get("runeAltar").isJsonObject()) {
+            JsonObject p = o.getAsJsonObject("runeAltar");
+            w.altarSet = p.has("set") && p.get("set").getAsBoolean();
+            if (p.has("dim")) w.altarDim = p.get("dim").getAsString();
+            if (p.has("x")) w.altarX = p.get("x").getAsInt();
+            if (p.has("y")) w.altarY = p.get("y").getAsInt();
+            if (p.has("z")) w.altarZ = p.get("z").getAsInt();
+        }
+        if (o.has("textAltarOnly")) w.textAltarOnly = o.get("textAltarOnly").getAsString();
+        if (o.has("textAltarBuild")) w.textAltarBuild = o.get("textAltarBuild").getAsString();
         if (o.has("textPortalOnly")) w.textPortalOnly = o.get("textPortalOnly").getAsString();
         if (o.has("textPortalBuild")) w.textPortalBuild = o.get("textPortalBuild").getAsString();
         return w;
@@ -121,6 +140,7 @@ public final class WorldRules {
         JsonArray help = new JsonArray();
         help.add("월드 규칙. neverStructures: 새 지형에 절대 생기지 않는 건축물 ID. neverRecipes: 막는 조합법 (item:아이템ID). lootBlockedMods: 전리품에서 빼는 모드 ID.");
         help.add("abyssPortal: 나선 비경으로 들어갈 수 있는 단 하나의 문. 게임 안에서 문 앞에 서서 /rtshop abyss portal here (OP). abyssPortalOpOnly: 문은 운영자(크리에이티브)만 세울 수 있음.");
+        help.add("runeAltar: 쓸 수 있는 단 하나의 룬 제단(별빛 수정 구체). 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 제단 곁에서 /rtshop altar here. runeAltarOpOnly: 운영자(크리에이티브)만 놓을 수 있음.");
         help.add("이미 만들어진 지형에 있는 건축물은 사라지지 않습니다. 고친 뒤 /rtshop reload.");
         o.add("_help", help);
         JsonArray a = new JsonArray();
@@ -141,6 +161,16 @@ public final class WorldRules {
         p.addProperty("z", abyssPortalZ);
         p.addProperty("radius", abyssPortalRadius);
         o.add("abyssPortal", p);
+        o.addProperty("runeAltarOpOnly", altarOpOnly);
+        JsonObject al = new JsonObject();
+        al.addProperty("set", altarSet);
+        al.addProperty("dim", altarDim);
+        al.addProperty("x", altarX);
+        al.addProperty("y", altarY);
+        al.addProperty("z", altarZ);
+        o.add("runeAltar", al);
+        o.addProperty("textAltarOnly", textAltarOnly);
+        o.addProperty("textAltarBuild", textAltarBuild);
         o.addProperty("textPortalOnly", textPortalOnly);
         o.addProperty("textPortalBuild", textPortalBuild);
         return o;
@@ -221,6 +251,34 @@ public final class WorldRules {
         }
     }
 
+    /** 이 자리의 룬 제단을 써도 되는가 (제단을 정해 두었으면 그것만). */
+    public static boolean altarAllowed(Level level, BlockPos pos) {
+        WorldRules w = get();
+        if (!w.altarSet) return true;
+        return level.dimension().location().toString().equals(w.altarDim) && pos.getX() == w.altarX && pos.getY() == w.altarY && pos.getZ() == w.altarZ;
+    }
+
+    /** 막아야 하면 알리고 true. */
+    public static boolean refuseAltar(ServerPlayer p, BlockPos pos) {
+        try {
+            if (altarAllowed(p.level(), pos)) return false;
+            com.rtshop.notice.Notice.send(p, Component.literal(get().textAltarOnly).withStyle(ChatFormatting.YELLOW), true);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public static void setAltar(Level level, BlockPos pos) {
+        WorldRules w = get();
+        w.altarSet = true;
+        w.altarDim = level.dimension().location().toString();
+        w.altarX = pos.getX();
+        w.altarY = pos.getY();
+        w.altarZ = pos.getZ();
+        save(w);
+    }
+
     public static void setPortal(Level level, BlockPos pos) {
         WorldRules w = get();
         w.abyssPortalSet = true;
@@ -237,6 +295,18 @@ public final class WorldRules {
     public static void onPlace(BlockEvent.EntityPlaceEvent event) {
         try {
             ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(event.getPlacedBlock().getBlock());
+            if (rl != null && rl.toString().equals(ALTAR_KEY)) {
+                WorldRules wa = get();
+                boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && pa.hasPermissions(2);
+                if (wa.altarOpOnly && !opA) {
+                    event.setCanceled(true);
+                    if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(wa.textAltarBuild).withStyle(ChatFormatting.YELLOW), true);
+                } else if (opA && !wa.altarSet && event.getLevel() instanceof Level la) {
+                    setAltar(la, event.getPos());
+                    ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal("이 제단을 마을의 단 하나뿐인 룬 제단으로 정했습니다. (바꾸려면 새 제단 곁에서 /rtshop altar here)").withStyle(ChatFormatting.GREEN));
+                }
+                return;
+            }
             if (rl == null || !rl.toString().equals(ABYSS_KEY)) return;
             WorldRules w = get();
             if (!(event.getEntity() instanceof ServerPlayer p)) {
@@ -257,6 +327,25 @@ public final class WorldRules {
         }
     }
 
+    /** 룬 제단은 운영자(크리에이티브)만 치울 수 있다. */
+    @SubscribeEvent
+    public static void onBreak(BlockEvent.BreakEvent event) {
+        try {
+            ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(event.getState().getBlock());
+            if (rl == null || !rl.toString().equals(ALTAR_KEY) || !get().altarOpOnly) return;
+            if (event.getPlayer() instanceof ServerPlayer p && p.isCreative() && p.hasPermissions(2)) {
+                WorldRules w = get();
+                if (w.altarSet && altarAllowed(p.level(), event.getPos())) { // 정해 둔 제단을 치웠다: 지정을 푼다 (다음에 놓는 것이 새 제단이 된다)
+                    w.altarSet = false;
+                    save(w);
+                }
+                return;
+            }
+            event.setCanceled(true);
+        } catch (Throwable ignored) {
+        }
+    }
+
     @SubscribeEvent
     public static void onTravel(EntityTravelToDimensionEvent event) {
         try {
@@ -265,6 +354,40 @@ public final class WorldRules {
             if (refusePortal(p)) event.setCanceled(true);
         } catch (Throwable ignored) {
         }
+    }
+
+    @SubscribeEvent
+    public static void onAltarCommands(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("rtshop").then(Commands.literal("altar").requires(s -> s.hasPermission(2))
+                .executes(ctx -> {
+                    WorldRules w = get();
+                    ctx.getSource().sendSuccess(() -> Component.literal(w.altarSet
+                            ? "룬 제단: " + w.altarDim + " " + w.altarX + " " + w.altarY + " " + w.altarZ + " (이 제단만 쓸 수 있음)"
+                            : "룬 제단이 아직 정해지지 않았습니다. 제단 곁에서 /rtshop altar here"), false);
+                    return 1;
+                })
+                .then(Commands.literal("here").executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    BlockPos found = null;
+                    for (BlockPos b : BlockPos.betweenClosed(p.blockPosition().offset(-5, -3, -5), p.blockPosition().offset(5, 3, 5))) {
+                        ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(p.level().getBlockState(b).getBlock());
+                        if (rl != null && rl.toString().equals(ALTAR_KEY) && (found == null || b.distSqr(p.blockPosition()) < found.distSqr(p.blockPosition()))) found = b.immutable();
+                    }
+                    if (found == null) {
+                        ctx.getSource().sendFailure(Component.literal("5칸 안에 별빛 수정 구체가 없습니다. 제단 곁에서 다시 입력하세요."));
+                        return 0;
+                    }
+                    setAltar(p.level(), found);
+                    ctx.getSource().sendSuccess(() -> Component.literal("이 제단을 단 하나뿐인 룬 제단으로 정했습니다. 다른 제단은 쓸 수 없습니다.").withStyle(ChatFormatting.GREEN), true);
+                    return 1;
+                }))
+                .then(Commands.literal("clear").executes(ctx -> {
+                    WorldRules w = get();
+                    w.altarSet = false;
+                    save(w);
+                    ctx.getSource().sendSuccess(() -> Component.literal("제단 지정을 풀었습니다. 지금은 어느 제단이든 쓸 수 있습니다."), true);
+                    return 1;
+                }))));
     }
 
     @SubscribeEvent
