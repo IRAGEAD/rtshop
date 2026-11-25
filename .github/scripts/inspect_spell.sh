@@ -34,4 +34,6 @@ QJ="$(ls packcache/*.jar | grep -i "fdbosses" | head -1)"
 } > /tmp/inspect2/qliphoth.txt 2>&1 || true
 if [ -n "$QJ" ]; then java -jar /tmp/cfr.jar "$PWD/$QJ" --outputdir /tmp/inspect2/src-qliphoth --silent true > /dev/null 2>&1 || echo "qliphoth cfr failed"; fi
 SAJ="$(ls packcache/*.jar | grep -iE "spiral.?abyss" | head -1)"
-if [ -n "$SAJ" ]; then java -jar /tmp/cfr.jar "$PWD/$SAJ" --outputdir /tmp/inspect2/src-spiral --silent true --jarfilter ".*(FloorController|PortalParties|AbyssNetwork|AbyssParties|ArenaSession|EndlessWaves|AbyssPlayers|GuestFloorRules|FloorProgress|AbyssCycle|QliphothEncounters|AbyssConfig).*" > /dev/null 2>&1 || echo "spiral cfr failed"; fi
+if [ -n "$SAJ" ]; then java -jar /tmp/cfr.jar "$PWD/$SAJ" --outputdir /tmp/inspect2/src-spiral --silent true > /dev/null 2>&1 || echo "spiral cfr failed"
+  { for L in $(unzip -l "$SAJ" | awk '{print $4}' | grep -E "^data/.*\.json$" | grep -vE "/tags/entity_types/|/challenge/"); do echo "---- $L"; unzip -p "$SAJ" "$L" | head -c 6000; echo; done; } > /tmp/inspect2/spiral-json.txt 2>&1 || true
+fi
