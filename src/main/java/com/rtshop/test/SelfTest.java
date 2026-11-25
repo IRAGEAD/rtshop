@@ -2999,12 +2999,12 @@ public final class SelfTest {
             int after = com.rtshop.story.Readables.chronicle(a).size();
             QuestManager.setCompletedForTest(a, "story_5_10", had510);
             QuestManager.setCompletedForTest(a, "story_1_04", had104);
-            String o1 = String.valueOf(oath), o2 = String.valueOf(oath2), c = String.valueOf(chron);
+            String o1 = String.valueOf(oath), o2 = String.valueOf(oath2), chronText = String.valueOf(chron);
             ItemStack scroll = new ItemStack(com.rtshop.item.ModItems.OATH_SCROLL.get());
             check("story papers can be read: the oath shows its third line only after the ending, the chronicle page lists the names written so far, other items are not readable",
                     oath != null && oath.getAsJsonArray("pages").size() == 1 && o1.contains("지워져 있다") && !o1.contains("때가 되면 놓아준다")
                             && o2.contains("때가 되면 놓아준다") && oath2.getAsJsonArray("pages").size() == 1
-                            && after == before + 2 && c.contains("도윈, 광부") && c.contains("길 위의 이름")
+                            && after == before + 2 && chronText.contains("도윈, 광부") && chronText.contains("길 위의 이름")
                             && com.rtshop.story.Readables.build(a, "minecraft:stick") == null
                             && com.rtshop.story.Readables.open(a, scroll) && !com.rtshop.story.Readables.open(a, new ItemStack(net.minecraft.world.item.Items.STICK))
                             && com.rtshop.story.Readables.has("rtshop:mother_journal") && com.rtshop.story.Readables.has("rtshop:frozen_logbook")
