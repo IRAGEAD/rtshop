@@ -1900,6 +1900,12 @@ public final class SelfTest {
                         && com.rtshop.rules.MobRules.dropAllowed(new ItemStack(com.rtshop.item.ModItems.WEAPON_MANUAL.get()))
                         && (modThing.isEmpty() || !com.rtshop.rules.MobRules.dropAllowed(modThing))
                         && com.rtshop.rules.MobRules.boss(witherProbe) && !com.rtshop.rules.MobRules.boss(zombieProbe), modThing);
+        zombieProbe.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_SWORD));
+        boolean ownGear = com.rtshop.rules.MobRules.pickedUp(zombieProbe).isEmpty();
+        zombieProbe.setGuaranteedDrop(net.minecraft.world.entity.EquipmentSlot.MAINHAND);
+        java.util.List<ItemStack> picked = com.rtshop.rules.MobRules.pickedUp(zombieProbe);
+        check("a weapon a mob picked up from the ground (a player's) is still dropped: only the mob's own gear is removed",
+                ownGear && picked.size() == 1 && picked.get(0).is(Items.DIAMOND_SWORD), ownGear + " / " + picked);
         witherProbe.discard();
         zombieProbe.discard();
         com.rtshop.rules.MobRules.reload();

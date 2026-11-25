@@ -264,13 +264,49 @@ public final class MobRules {
         return !(c.removeModItems && !id.getNamespace().equals("minecraft"));
     }
 
+    /** 몹이 주워서 들고 있던 물건 (플레이어가 떨어뜨린 것): 죽을 때 반드시 떨어지는 것이므로 지우지 않는다. */
+    private static final Map<Entity, List<ItemStack>> PICKED = new java.util.WeakHashMap<>();
+
+    /** 주운 물건의 목록: 떨어질 확률이 100% 를 넘게 적힌 칸(몹이 주운 것의 표시)의 물건들. */
+    public static List<ItemStack> pickedUp(net.minecraft.world.entity.Mob m) {
+        List<ItemStack> out = new ArrayList<>();
+        try {
+            net.minecraft.nbt.CompoundTag tag = m.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            net.minecraft.nbt.ListTag hands = tag.getList("HandDropChances", net.minecraft.nbt.Tag.TAG_FLOAT), armor = tag.getList("ArmorDropChances", net.minecraft.nbt.Tag.TAG_FLOAT);
+            net.minecraft.world.entity.EquipmentSlot[] hs = {net.minecraft.world.entity.EquipmentSlot.MAINHAND, net.minecraft.world.entity.EquipmentSlot.OFFHAND};
+            net.minecraft.world.entity.EquipmentSlot[] as = {net.minecraft.world.entity.EquipmentSlot.FEET, net.minecraft.world.entity.EquipmentSlot.LEGS,
+                    net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.HEAD};
+            for (int i = 0; i < hs.length && i < hands.size(); i++) if (hands.getFloat(i) > 1F && !m.getItemBySlot(hs[i]).isEmpty()) out.add(m.getItemBySlot(hs[i]).copy());
+            for (int i = 0; i < as.length && i < armor.size(); i++) if (armor.getFloat(i) > 1F && !m.getItemBySlot(as[i]).isEmpty()) out.add(m.getItemBySlot(as[i]).copy());
+        } catch (Throwable ignored) {
+        }
+        return out;
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
+        if (event.getEntity() instanceof net.minecraft.world.entity.Mob m && !m.level().isClientSide() && get().dropsEnabled) {
+            List<ItemStack> held = pickedUp(m);
+            if (!held.isEmpty()) {
+                synchronized (PICKED) {
+                    PICKED.put(m, held);
+                }
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onDrops(LivingDropsEvent event) {
         try {
             LivingEntity e = event.getEntity();
             if (e.level().isClientSide() || e instanceof Player || !get().dropsEnabled || boss(e)) return;
             if (com.rtshop.shop.NpcGuard.isNpc(e)) return;
-            event.getDrops().removeIf(d -> !dropAllowed(d.getItem()));
+            List<ItemStack> held;
+            synchronized (PICKED) {
+                held = PICKED.remove(e);
+            }
+            final List<ItemStack> mine = held == null ? List.of() : held;
+            event.getDrops().removeIf(d -> !dropAllowed(d.getItem()) && mine.stream().noneMatch(h -> ItemStack.isSameItemSameTags(h, d.getItem())));
         } catch (Throwable ignored) {
         }
     }
