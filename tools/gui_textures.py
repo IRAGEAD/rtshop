@@ -604,30 +604,26 @@ def mock2(out):
     bg.convert('RGB').save(out)
 
 
-DARK_B = [(146, 90, 50), (168, 106, 60), (98, 68, 44)]
+DARK_B = [(126, 82, 50), (146, 98, 60), (92, 68, 50)]
 
 
 def btn_leather(w, h, state, seed=91):
-    """바느질 테두리 가죽 버튼. state 0 보통, 1 마우스, 2 꺼짐"""
+    """깔끔한 가죽 버튼 (바느질 없음, 결은 옅게). state 0 보통, 1 마우스, 2 꺼짐"""
     base = DARK_B[state]
     b = Image.new('RGBA', (w, h), (0, 0, 0, 0))
     lt = leather(w, h, base, seed=seed + state)
+    # 가죽 결은 3분의 1만 남긴다: 얼룩이 글자와 다투지 않게
+    lt = Image.blend(Image.new('RGBA', (w, h), base + (255,)), lt, 0.33)
     mask = Image.new('L', (w, h), 0)
     ImageDraw.Draw(mask).rounded_rectangle([0, 0, w - 1, h - 1], radius=3, fill=255)
     b.paste(lt, (0, 0), mask)
     d = ImageDraw.Draw(b)
-    d.rounded_rectangle([0, 0, w - 1, h - 1], radius=3, outline=(34, 16, 6, 255))
-    # 윗면 빛, 아랫면 그늘
-    d.line([(3, 1), (w - 4, 1)], fill=shade(base, 1.3))
-    d.line([(3, h - 2), (w - 4, h - 2)], fill=shade(base, 0.55))
-    # 바느질은 가장자리 바로 안쪽(2칸)에만: 가운데 글자 자리와 겹치지 않게
-    sc = (206, 176, 128) if state != 2 else (140, 120, 96)
-    stitch(b, 4, 2, w - 4, 2, sc)
-    stitch(b, 4, h - 3, w - 4, h - 3, sc)
-    stitch(b, 2, 4, 2, h - 4, sc)
-    stitch(b, w - 3, 4, w - 3, h - 4, sc)
+    d.rounded_rectangle([0, 0, w - 1, h - 1], radius=3, outline=(40, 22, 10, 255))
+    # 윗면의 옅은 빛, 아랫면의 옅은 그늘 (한 줄씩)
+    d.line([(3, 1), (w - 4, 1)], fill=shade(base, 1.18))
+    d.line([(3, h - 2), (w - 4, h - 2)], fill=shade(base, 0.7))
     if state == 1:
-        d.rounded_rectangle([0, 0, w - 1, h - 1], radius=3, outline=(255, 214, 120, 255))
+        d.rounded_rectangle([0, 0, w - 1, h - 1], radius=3, outline=(214, 176, 104, 255))
     return b
 
 
