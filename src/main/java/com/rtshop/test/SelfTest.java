@@ -2719,8 +2719,8 @@ public final class SelfTest {
             ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
             sword.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 3);
             sword.enchant(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 2);
-            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 3));
             a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword.copy());
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 3));
             check("holding a weapon is not enough any more: with nothing on the altar the reroll is refused",
                     com.rtshop.magic.MagicGacha.reroll(a, false) == null && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 3);
             a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
