@@ -1822,10 +1822,15 @@ public final class QuestManager {
             return;
         }
         ServerPlayer killer = com.rtshop.pvp.Pvp.attackerOf(event.getSource(), server);
-        // 동행이 잡은 것은 함께 다니는 플레이어의 몫으로 센다
-        if (killer == null && event.getSource().getEntity() instanceof com.rtshop.story.CompanionEntity c) killer = c.owner();
+        // 동행이 잡은 것은 함께 다니는 플레이어(앞장선 사람과 일행 모두)의 몫으로 센다
+        java.util.Set<ServerPlayer> walkers = java.util.Set.of();
+        if (killer == null && event.getSource().getEntity() instanceof com.rtshop.story.CompanionEntity c) {
+            killer = c.owner();
+            walkers = c.group().keySet();
+        }
         if (killer == null) return;
         onKill(killer, victim);
+        for (ServerPlayer w : walkers) if (w != killer) onKill(w, victim);
         // 일반 몹: 가까이 있는 파티원도 처치 목표를 함께 채운다
         int r = com.rtshop.party.PartyConfig.get().shareRadius;
         com.rtshop.party.Party.Group g = r > 0 ? com.rtshop.party.Party.of(server, killer.getUUID()) : null;

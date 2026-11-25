@@ -50,3 +50,24 @@ fi
     done
   done
 } > /tmp/inspect2/create-uses.txt 2>&1 || true
+# 3.48: Epic Fight 무기 정보 (무기 설명서를 만들려고): 무기 능력·특수기·조작 키
+EFJ="$(ls packcache/*.jar | grep -iE "/epic-fight-[0-9]" | head -1)"
+if [ -n "$EFJ" ]; then
+  java -jar /tmp/cfr.jar "$PWD/$EFJ" --outputdir /tmp/inspect2/src-epicfight --silent true --jarfilter "yesman\.epicfight\.(world\.capabilities\.EpicFightCapabilities|world\.capabilities\.item\.(CapabilityItem|WeaponCapability|WeaponCategory|Style|RangedWeaponCapability|TagBasedSeparativeCapability|WeaponTypeReloadListener).*|skill\.(Skill|SkillSlots|SkillSlot|SkillCategories|SkillCategory|SkillContainer|CapabilitySkill)|skill\.weaponinnate\.WeaponInnateSkill|client\.input\.EpicFightKeyMappings|api\.data\.reloader\.ItemCapabilityReloadListener|world\.capabilities\.entitypatch\.player\.PlayerPatch|gameasset\.EpicFightSkills)" > /tmp/inspect2/epicfight-cfr.log 2>&1 || echo "ef cfr failed"
+  {
+    echo "######## $EFJ"
+    for L in $(unzip -l "$EFJ" | awk '{print $4}' | grep -E "assets/epicfight/lang/(en_us|ko_kr)\.json$"); do echo "==== $L"; unzip -p "$EFJ" "$L" | grep -E '"(skill\.|key\.|gui\.epicfight\.skill|item\.epicfight|attribute\.|weapon_category|style)' | head -n 400; done
+    echo "==== weapon capability data (all jars)"
+    for J in packcache/*.jar; do
+      N=$(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -cE "^data/[^/]+/capabilities/weapons/.*\.json$")
+      [ "$N" -gt 0 ] && echo "W $N $(basename "$J")"
+    done
+    for J in packcache/*.jar; do
+      for F in $(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/[^/]+/capabilities/weapons/.*\.json$" | head -n 4); do echo "---- $(basename "$J") $F"; unzip -p "$J" "$F" | head -c 1800; echo; done
+    done
+    echo "==== weapon type data"
+    for J in packcache/*.jar; do
+      for F in $(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/[^/]+/capabilities/weapons/types/.*\.json$" | head -n 3); do echo "---- $(basename "$J") $F"; unzip -p "$J" "$F" | head -c 3000; echo; done
+    done
+  } > /tmp/inspect2/epicfight.txt 2>&1 || true
+fi

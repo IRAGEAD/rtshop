@@ -30,6 +30,8 @@ public final class RaidConfig {
     /** 입장 조건: 이 몬스터를 requireKills 번 이상 처치 (레이드 보스는 세지 않음). 빈 값 = 조건 없음. */
     public String requireKill = "cataclysm:ignis";
     public int requireKills = 1;
+    /** 레이드 관련 NPC(안내인·레이드 상점)는 이름 있는 보스를 처음 쓰러뜨린 뒤에야 말을 받아 준다. false 면 처음부터 열려 있다. */
+    public boolean npcsAfterFirstBoss = true;
     /** 일반 보스 대비 체력·공격력 배율. */
     public double healthMultiplier = 2.0;
     public double damageMultiplier = 1.5;
@@ -75,6 +77,8 @@ public final class RaidConfig {
         t.put("confirmYes", "입장한다");
         t.put("confirmNo", "돌아간다");
         t.put("needKill", "입장 조건: 이그니스를 %s번 이상 처치해야 합니다 (현재 %s번).");
+        t.put("npcLocked", "…아직 자네에게 보여 줄 것이 없네. 이름 있는 것을 하나 쓰러뜨리고 오게. 이야기는 그다음일세.");
+        t.put("npcOpened", "이제 레이드 안내인과 레이드 상점이 말을 받아 줍니다.");
         t.put("needTicket", "레이드 참가 티켓이 필요합니다. 레이드 상인에게서 살 수 있습니다.");
         t.put("locked", "이그니스가 이미 깨어났습니다. 레이드가 끝난 뒤에 다시 오세요.");
         t.put("entered", "레이드 구역에 들어왔습니다. 중앙 제단에 소환의 눈을 사용하면 이그니스가 깨어납니다.");
@@ -122,6 +126,8 @@ public final class RaidConfig {
             case "confirmYes" -> "확인 창: 예";
             case "confirmNo" -> "확인 창: 아니오";
             case "needKill" -> "조건 미달 (처치 수)";
+            case "npcLocked" -> "첫 보스 처치 전 (NPC 잠김)";
+            case "npcOpened" -> "첫 보스 처치 알림";
             case "needTicket" -> "티켓 없음";
             case "locked" -> "입장 불가 (진행 중)";
             case "entered" -> "입장 안내";
@@ -244,6 +250,7 @@ public final class RaidConfig {
         help.add("게임 안에서 /rtshop raid edit 로 수치·문구·보상을 고칠 수 있습니다. 위치: /rtshop raid arena here (구역을 지금 서 있는 곳에 다시 지음) · /rtshop raid return here (돌아갈 곳)");
         help.add("boss: 레이드 보스 엔티티 ID (예: cataclysm:ignis, cataclysm:ender_guardian, cataclysm:netherite_monstrosity, cataclysm:the_harbinger, cataclysm:the_leviathan, cataclysm:ancient_remnant)");
         help.add("requireKill / requireKills: 입장 조건 (이 몬스터를 몇 번 처치) · healthMultiplier / damageMultiplier: 일반 보스 대비 체력·공격력 배율");
+        help.add("npcsAfterFirstBoss: true 면 레이드 안내인과 레이드 상점 NPC 는 보스(party.json 의 보스 목록)를 처음 쓰러뜨린 사람에게만 말을 받아 준다. 레이드 자체는 그 레이드의 보스(requireKill)를 쓰러뜨려야 열린다.");
         help.add("chanceFresh / chanceRepeat: 드랍 굴림 한 번에 각 등급이 나올 확률(%) [일반, 고급, 희귀, 영웅, 전설, ???]. Fresh = 이번 주 주간 보상을 아직 안 받은 사람, Repeat = 이미 받은 사람");
         help.add("rewards: group 이 weekly 면 주간 보상(매주 처음 성공할 때 모두 지급), drop 이면 보스 드랍(등급 굴림으로 그 등급의 아이템 중 하나)");
         o.add("_설명", help);
@@ -251,6 +258,7 @@ public final class RaidConfig {
         o.addProperty("boss", boss);
         o.addProperty("requireKill", requireKill);
         o.addProperty("requireKills", requireKills);
+        o.addProperty("npcsAfterFirstBoss", npcsAfterFirstBoss);
         o.addProperty("healthMultiplier", healthMultiplier);
         o.addProperty("damageMultiplier", damageMultiplier);
         o.addProperty("resetDay", resetDay);
@@ -315,6 +323,7 @@ public final class RaidConfig {
         if (o.has("boss")) c.boss = o.get("boss").getAsString();
         if (o.has("requireKill")) c.requireKill = o.get("requireKill").getAsString();
         if (o.has("requireKills")) c.requireKills = Math.max(0, o.get("requireKills").getAsInt());
+        if (o.has("npcsAfterFirstBoss")) c.npcsAfterFirstBoss = o.get("npcsAfterFirstBoss").getAsBoolean();
         if (o.has("healthMultiplier")) c.healthMultiplier = Math.max(0.1, Math.min(1000, o.get("healthMultiplier").getAsDouble()));
         if (o.has("damageMultiplier")) c.damageMultiplier = Math.max(0.1, Math.min(1000, o.get("damageMultiplier").getAsDouble()));
         if (o.has("resetDay")) c.resetDay = Math.max(1, Math.min(7, o.get("resetDay").getAsInt()));

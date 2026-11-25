@@ -39,6 +39,9 @@ import java.util.UUID;
  * 동행 NPC: 동행 퀘스트를 가진 플레이어 곁에 따로 나타나 따라다니고, 함께 싸운다.
  * 마을에 서 있는 NPC 와는 별개의 존재이고, 세계에 저장되지 않는다 (퀘스트가 끝나거나 주인이 떠나면 사라진다).
  * 죽지 않는다: 쓰러질 만큼 맞으면 잠시 무릎을 꿇었다가 다시 일어난다.
+ * <p>여럿이 함께할 때: 한 자리에 같은 사람은 한 명만 선다. 같은 NPC 가 동행하는 퀘스트를 가진 다른 플레이어가 가까이 오면
+ * 새로 불러내지 않고 그 동행의 '일행'(guests)이 된다. 동행은 앞장선 사람(owner)을 따라가되 일행 모두를 지키고, 각자에게 그 사람의
+ * 퀘스트에 맞는 말을 한다. 앞장선 사람이 떠나면 남은 일행이 이어받는다.
  */
 public class CompanionEntity extends PathfinderMob implements VillagerDataHolder {
     private static final EntityDataAccessor<VillagerData> DATA = SynchedEntityData.defineId(CompanionEntity.class, EntityDataSerializers.VILLAGER_DATA);
@@ -46,6 +49,9 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
     public static final int DOWN_TICKS = 120;
 
     UUID ownerId;
+    /** 일행: 이 동행과 함께 걷는 다른 플레이어 -> 그 사람의 (같은 NPC 가 동행하는) 퀘스트. */
+    final java.util.Map<UUID, String> guests = new java.util.LinkedHashMap<>();
+    public static final double GROUP_RANGE = 48;
     String questId = "";
     String npcId = "";
     String style = "melee";
@@ -100,6 +106,34 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
 
     /** 점검용 가짜 플레이어는 접속 목록에 없어서 따로 붙잡아 둔다. */
     ServerPlayer testOwner;
+    final java.util.Map<UUID, ServerPlayer> testGuests = new java.util.HashMap<>();
+
+    ServerPlayer guest(UUID id) {
+        ServerPlayer g = getServer() == null ? null : getServer().getPlayerList().getPlayer(id);
+        return g != null ? g : testGuests.get(id);
+    }
+
+    /** 이 사람이 아직 함께 걷는가: 살아 있고, 같은 세계의 가까운 곳에 있고, 그 퀘스트를 하고 있다. */
+    boolean walksWith(ServerPlayer p, String quest) {
+        return p != null && p.isAlive() && p.level() == level() && QuestManager.isActive(p, quest)
+                && p.distanceToSqr(this) <= GROUP_RANGE * GROUP_RANGE * 4;
+    }
+
+    /** 함께 걷는 사람들과 각자의 퀘스트 (앞장선 사람이 맨 앞). */
+    public java.util.LinkedHashMap<ServerPlayer, String> group() {
+        java.util.LinkedHashMap<ServerPlayer, String> out = new java.util.LinkedHashMap<>();
+        ServerPlayer o = owner();
+        if (o != null) out.put(o, questId);
+        for (java.util.Map.Entry<UUID, String> e : guests.entrySet()) {
+            ServerPlayer g = guest(e.getKey());
+            if (g != null && g != o) out.put(g, e.getValue());
+        }
+        return out;
+    }
+
+    public boolean isGuest(UUID id) {
+        return guests.containsKey(id);
+    }
 
     public boolean isDowned() {
         return entityData.get(DOWNED);
@@ -194,9 +228,14 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
         }
         if (tickCount % 20 == 3) {
             ServerPlayer o = owner();
+            // 떠난 일행은 빼고, 앞장선 사람이 떠났으면 남은 일행이 이어받는다 (아무도 없으면 돌아간다)
+            Companions.pruneGuests(this);
             if (o == null || !o.isAlive() || o.level() != level() || !QuestManager.isActive(o, questId)) {
-                Companions.leave(this, o);
-                return;
+                if (!Companions.handOver(this, o)) {
+                    Companions.leave(this, o);
+                    return;
+                }
+                o = owner();
             }
             double d = distanceToSqr(o);
             if (d > 28 * 28) {
@@ -209,19 +248,32 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
         if ("bolt".equals(style)) boltTick();
     }
 
-    /** 싸울 상대: 주인을 노리는 몬스터, 주인이 방금 때린 것, 주인을 방금 때린 것. */
+    /** 싸울 상대: 일행(앞장선 사람부터)이 방금 때린 것, 일행을 방금 때린 것, 일행이나 동행을 노리는 몬스터. */
     private void pickTarget(ServerPlayer o) {
         if ("none".equals(style)) return;
         LivingEntity cur = getTarget();
         if (cur != null && cur.isAlive() && cur.distanceToSqr(o) < 20 * 20) return;
         LivingEntity best = null;
-        LivingEntity hit = o.getLastHurtMob();
-        if (hit != null && hit.isAlive() && o.tickCount - o.getLastHurtMobTimestamp() < 100 && ok(hit)) best = hit;
-        LivingEntity by = o.getLastHurtByMob();
-        if (best == null && by != null && by.isAlive() && ok(by)) best = by;
+        java.util.Set<ServerPlayer> party = group().keySet();
+        for (ServerPlayer m : party) {
+            LivingEntity hit = m.getLastHurtMob();
+            if (hit != null && hit.isAlive() && m.tickCount - m.getLastHurtMobTimestamp() < 100 && ok(hit) && hit.distanceToSqr(this) < 24 * 24) {
+                best = hit;
+                break;
+            }
+        }
+        if (best == null) {
+            for (ServerPlayer m : party) {
+                LivingEntity by = m.getLastHurtByMob();
+                if (by != null && by.isAlive() && ok(by) && by.distanceToSqr(this) < 24 * 24) {
+                    best = by;
+                    break;
+                }
+            }
+        }
         if (best == null) {
             List<Mob> near = level().getEntitiesOfClass(Mob.class, o.getBoundingBox().inflate(12, 5, 12),
-                    m -> m.isAlive() && m instanceof Enemy && (m.getTarget() == o || m.getTarget() == this) && ok(m));
+                    m -> m.isAlive() && m instanceof Enemy && (m.getTarget() == this || m.getTarget() instanceof ServerPlayer t && party.contains(t)) && ok(m));
             double bd = Double.MAX_VALUE;
             for (Mob m : near) {
                 double dd = m.distanceToSqr(this);
@@ -271,8 +323,9 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
 
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
-        if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && player.getUUID().equals(ownerId)) {
-            Companions.say(this, "talk");
+        if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && player instanceof ServerPlayer sp) {
+            String quest = player.getUUID().equals(ownerId) ? questId : guests.get(player.getUUID());
+            if (quest != null) Companions.sayTo(this, sp, quest, "talk"); // 말을 건 사람에게만, 그 사람의 퀘스트에 맞는 말을
         }
         return InteractionResult.sidedSuccess(level().isClientSide);
     }

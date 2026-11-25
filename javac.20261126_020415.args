@@ -1,0 +1,12 @@
+-proc:none
+-Xmaxerrs
+9000
+-d
+/tmp/jc2
+-sourcepath
+src/main/java:src/stubs/java
+src/main/java/com/rtshop/story/CompanionEntity.java
+src/main/java/com/rtshop/story/Companions.java
+src/main/java/com/rtshop/raid/Raid.java
+src/main/java/com/rtshop/raid/RaidConfig.java
+src/main/java/com/rtshop/test/SelfTest.java

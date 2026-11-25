@@ -1033,6 +1033,26 @@ public final class SelfTest {
                             && !server.getCommands().getDispatcher().parse("rtshop raid edit", server.createCommandSourceStack()).getReader().canRead()
                             && ShopServer.shops().containsKey("raid")
                             && findEntry(ShopServer.shops().get("raid"), e -> e.stack.is(ticket) && e.buyable) >= 0);
+            // 잠금: 레이드 관련 NPC 는 이름 있는 보스를 처음 쓰러뜨린 뒤에야 말을 받아 준다
+            data.of(a.getUUID()).kills.clear();
+            boolean hadBossQuest = com.rtshop.raid.Raid.firstBossDown(a);
+            net.minecraft.world.entity.npc.Villager guide = com.rtshop.raid.Raid.spawnGuide(level, a.position().add(1, 0, 0), 0);
+            net.minecraft.world.entity.npc.Villager seller = ShopServer.spawnNpc(level, a.position().add(-1, 0, 0), 0, "raid");
+            boolean lockedBefore = com.rtshop.raid.Raid.npcLocked(a);
+            String firstBoss = com.rtshop.party.PartyConfig.get().bosses.isEmpty() ? "cataclysm:ignis" : com.rtshop.party.PartyConfig.get().bosses.iterator().next();
+            data.of(a.getUUID()).kills.put("minecraft:zombie", 5); // 보스가 아닌 것은 세지 않는다
+            boolean stillLocked = com.rtshop.raid.Raid.npcLocked(a);
+            data.of(a.getUUID()).kills.put(firstBoss, 1);
+            boolean openAfter = !com.rtshop.raid.Raid.npcLocked(a) && com.rtshop.raid.Raid.bossKills(a, firstBoss) == 1;
+            com.rtshop.raid.RaidConfig.get().npcsAfterFirstBoss = false;
+            data.of(a.getUUID()).kills.clear();
+            boolean offOpen = !com.rtshop.raid.Raid.npcLocked(a);
+            com.rtshop.raid.RaidConfig.get().npcsAfterFirstBoss = true;
+            check("raid NPCs (guide, raid merchant) answer only after a first named boss is down; each boss kill is written per boss",
+                    (hadBossQuest || (lockedBefore && stillLocked)) && openAfter && offOpen && guide != null && seller != null,
+                    hadBossQuest + "/" + lockedBefore + "/" + stillLocked + "/" + openAfter + "/" + offOpen);
+            if (guide != null) guide.discard();
+            if (seller != null) seller.discard();
         } finally {
             com.rtshop.raid.Raid.testRandom = null;
             com.rtshop.raid.Weekly.testClockOffset = 0;
@@ -2350,13 +2370,39 @@ public final class SelfTest {
             check("a kill by the companion counts for its owner's quest", !z.isAlive() && pg != null && pg[2] == 1,
                     pg == null ? "null" : java.util.Arrays.toString(pg));
             if (z.isAlive()) z.discard();
+            // 여럿이 함께: 같은 NPC 가 동행하는 퀘스트를 가진 둘째 플레이어는 새 동행을 부르지 않고 일행이 된다
+            FakePlayer walker = fake(level, "rt_walker");
+            QuestManager.reset(walker);
+            walker.moveTo(a.getX() + 2, a.getY(), a.getZ(), 0, 0);
+            boolean took = QuestManager.accept(walker, "t_inspect", "quest_guide");
+            com.rtshop.story.CompanionEntity there = com.rtshop.story.Companions.nearby(walker, "t_comp");
+            if (there != null) com.rtshop.story.Companions.join(walker, q, there);
+            boolean one = there == c && com.rtshop.story.Companions.of(walker, "t_inspect") == c && c.isGuest(walker.getUUID()) && c.group().size() == 2;
+            boolean greeted = com.rtshop.story.Companions.said(walker, "t_inspect", "arrive");
+            net.minecraft.world.entity.monster.Zombie z2 = EntityType.ZOMBIE.create(level);
+            z2.moveTo(a.getX() + 1, a.getY(), a.getZ(), 0, 0);
+            level.addFreshEntity(z2);
+            z2.hurt(level.damageSources().mobAttack(c), 10000F);
+            int[] pw = QuestData.get(server).peek(walker.getUUID()).active.get("t_inspect");
+            check("playing together: a second player with the same companion joins the one already there (no twin), is greeted once, and shares its kills",
+                    took && one && greeted && pw != null && pw[2] == 1, took + "/" + one + "/" + greeted + "/" + (pw == null ? "null" : java.util.Arrays.toString(pw)));
+            if (z2.isAlive()) z2.discard();
             QuestManager.abandon(a, "t_inspect");
+            for (int i = 0; i < 45 && !c.isRemoved(); i++) {
+                c.tickCount++;
+                c.tick();
+            }
+            check("when the one in front leaves, the companion stays and walks with the rest", !c.isRemoved() && c.owner() == walker
+                    && com.rtshop.story.Companions.of(walker, "t_inspect") == c && com.rtshop.story.Companions.count(a) == 0
+                    && !com.rtshop.story.Companions.said(a, "t_inspect", "arrive"), c.isRemoved() + "/" + (c.owner() == walker));
+            QuestManager.abandon(walker, "t_inspect");
             for (int i = 0; i < 220 && !c.isRemoved(); i++) {
                 c.tickCount++;
                 c.tick();
             }
             check("the companion leaves when its quest is no longer active (and what it said there is forgotten)", c.isRemoved() && com.rtshop.story.Companions.count(a) == 0
-                    && !com.rtshop.story.Companions.said(a, "t_inspect", "arrive"));
+                    && com.rtshop.story.Companions.count(walker) == 0 && !com.rtshop.story.Companions.said(walker, "t_inspect", "arrive"));
+            QuestManager.reset(walker);
             if (!c.isRemoved()) c.discard();
         }
 

@@ -362,6 +362,58 @@ public final class Raid {
         return v;
     }
 
+    // ------------------------------------------------------------------ 잠금: 보스를 쓰러뜨릴 때마다 열린다
+
+    /** 이 사람이 쓰러뜨린 것으로 적힌 보스의 처치 수 (보스 ID 별). */
+    public static int bossKills(ServerPlayer p, String bossId) {
+        return RaidData.get(p.server).of(p.getUUID()).kills.getOrDefault(bossId, 0);
+    }
+
+    /**
+     * 이름 있는 보스를 하나라도 쓰러뜨렸는가. 처치 기록이 없던 예전 세계를 위해, 보스를 잡는 퀘스트를 마친 사람도 그렇게 본다.
+     */
+    public static boolean firstBossDown(ServerPlayer p) {
+        RaidData.Entry e = RaidData.get(p.server).of(p.getUUID());
+        com.rtshop.party.PartyConfig pc = com.rtshop.party.PartyConfig.get();
+        for (Map.Entry<String, Integer> k : e.kills.entrySet()) {
+            if (k.getValue() > 0 && (pc.bosses.contains(k.getKey()) || pc.arenaBosses.contains(k.getKey()) || k.getKey().equals(RaidConfig.get().requireKill))) return true;
+        }
+        com.rtshop.quest.QuestData.Progress pr = com.rtshop.quest.QuestData.get(p.server).peek(p.getUUID());
+        if (pr == null) return false;
+        for (String qid : pr.completed) {
+            com.rtshop.quest.QuestDef q = com.rtshop.quest.QuestManager.loaded().quests.get(qid);
+            if (q == null) continue;
+            for (com.rtshop.quest.QuestDef.Objective ob : q.objectives) {
+                if (ob.type == com.rtshop.quest.QuestDef.Type.KILL && (pc.bosses.contains(ob.target) || pc.arenaBosses.contains(ob.target))) return true;
+            }
+        }
+        return false;
+    }
+
+    /** 레이드 관련 NPC(안내인·레이드 상점)가 아직 이 사람의 말을 받아 주지 않는가. 운영자의 크리에이티브는 통과. */
+    public static boolean npcLocked(ServerPlayer p) {
+        if (!RaidConfig.get().npcsAfterFirstBoss) return false;
+        if (p.isCreative() && p.hasPermissions(2)) return false;
+        return !firstBossDown(p);
+    }
+
+    private static boolean raidNpc(net.minecraft.world.entity.Entity e) {
+        return e.getTags().contains(GUIDE_TAG) || e.getTags().contains(com.rtshop.shop.ShopServer.SHOP_TAG_PREFIX + "raid");
+    }
+
+    /** 레이드 관련 NPC 는 첫 보스를 쓰러뜨리기 전에는 상호작용(대화·상점·입장 창) 자체가 열리지 않는다. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onLockedNpc(PlayerInteractEvent.EntityInteract event) {
+        if (event.getLevel().isClientSide() || !raidNpc(event.getTarget())) return;
+        if (!(event.getEntity() instanceof ServerPlayer sp) || !npcLocked(sp)) return;
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.SUCCESS);
+        if (event.getHand() == InteractionHand.MAIN_HAND) {
+            com.rtshop.notice.Notice.send(sp, Component.literal(event.getTarget().getName().getString()).withStyle(ChatFormatting.GOLD)
+                    .append(Component.literal(": " + com.rtshop.story.StoryText.t(sp, RaidConfig.get().text("npcLocked"))).withStyle(ChatFormatting.WHITE)));
+        }
+    }
+
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if (event.getLevel().isClientSide() || !event.getTarget().getTags().contains(GUIDE_TAG)) {
@@ -794,15 +846,24 @@ public final class Raid {
             }
             return;
         }
-        // 입장 조건: 일반 보스 처치. 보스 목록(party.json)에 있으면 체력의 10% 이상(party.json)을 입힌 사람만, 아니면 죽인 사람과 근처 40칸 안의 사람
+        // 보스 처치 기록 (보스마다): 보스 목록(party.json)에 있으면 체력의 10% 이상(party.json)을 입힌 사람 모두에게 적는다.
+        // 레이드 관련 NPC 는 첫 보스 뒤에, 각 레이드는 그 보스(requireKill)를 쓰러뜨린 뒤에 열린다.
         ResourceLocation id = ForgeRegistries.ENTITY_TYPES.getKey(e.getType());
+        if (id != null && com.rtshop.party.BossCredit.isBoss(e)) {
+            RaidData data = RaidData.get(server);
+            for (ServerPlayer p : com.rtshop.party.BossCredit.qualified(e, server)) {
+                boolean first = !firstBossDown(p);
+                data.of(p.getUUID()).kills.merge(id.toString(), 1, Integer::sum);
+                if (first && c.npcsAfterFirstBoss && !(p instanceof FakePlayer)) {
+                    say(p, c.text("npcOpened"), ChatFormatting.GOLD);
+                }
+            }
+            data.touch();
+            return;
+        }
+        // 보스 목록에 없는 입장 조건 몬스터: 죽인 사람과 근처 40칸 안의 사람
         if (id != null && !c.requireKill.isBlank() && id.toString().equals(c.requireKill)) {
             RaidData data = RaidData.get(server);
-            if (com.rtshop.party.BossCredit.isBoss(e)) {
-                for (ServerPlayer p : com.rtshop.party.BossCredit.qualified(e, server)) data.of(p.getUUID()).kills.merge(c.requireKill, 1, Integer::sum);
-                data.touch();
-                return;
-            }
             ServerPlayer killer = Pvp.attackerOf(event.getSource(), server);
             if (killer != null) {
                 for (ServerPlayer p : server.getPlayerList().getPlayers()) {
