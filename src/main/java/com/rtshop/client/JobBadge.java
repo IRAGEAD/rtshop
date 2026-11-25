@@ -26,9 +26,11 @@ public final class JobBadge {
 
     public static final int W = 34, H = 14;
 
-    /** 딱지의 자리 {x, y}: 가방 창 바로 위 왼쪽 끝 ([퀘스트 수첩] 과 같은 줄의 반대편). 창 옆은 다른 모드의 칸(가방·장신구)이 쓰는 일이 많다. */
+    /** 딱지의 자리 {x, y}: 가방 창 바로 위 오른쪽, [퀘스트 수첩] 의 왼쪽 옆. 왼쪽 위는 비워 둔다 (3.50: 왼쪽 위의 기능 단추를 모두 없앴다). */
     static int[] spot(InventoryScreen s) {
-        return new int[]{s.getGuiLeft(), s.getGuiTop() - 16};
+        Minecraft mc = Minecraft.getInstance();
+        int journal = mc.font.width(Component.translatable("rtshop.quest.journal_button").getString()) + 10;
+        return new int[]{s.getGuiLeft() + s.getXSize() - journal - W - 2, s.getGuiTop() - 16};
     }
 
     /** 마우스를 올렸을 때 보이는 줄들. */

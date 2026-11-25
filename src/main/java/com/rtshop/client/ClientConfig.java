@@ -53,6 +53,8 @@ public final class ClientConfig {
     public double enhPanelY = -1;
     /** 크기 배율 (0.6~1.5). */
     public double enhPanelScale = 1.0;
+    /** 가방 창 왼쪽 위에 다른 모드가 붙이는 기능 단추 묶음을 숨긴다. */
+    public boolean hideSidebarButtons = true;
 
     // PvP 상태 표시 (켜짐/꺼짐 + 지금 있는 곳). 위치·크기는 화면 비율.
     public static final double PDEF_W = 247.0 / 1920.0;
@@ -209,6 +211,7 @@ public final class ClientConfig {
             o.addProperty("enhPanelX", enhPanelX);
             o.addProperty("enhPanelY", enhPanelY);
             o.addProperty("enhPanelScale", enhPanelScale);
+            o.addProperty("hideSidebarButtons", hideSidebarButtons);
             o.addProperty("magicFont", magicFont);
             o.addProperty("magicScale", magicScale);
             o.addProperty("magicShadow", magicShadow);
@@ -271,6 +274,7 @@ public final class ClientConfig {
                 if (o.has("enhPanelEnabled")) c.enhPanelEnabled = o.get("enhPanelEnabled").getAsBoolean();
                 if (o.has("enhPanelX")) c.enhPanelX = o.get("enhPanelX").getAsDouble();
                 if (o.has("enhPanelY")) c.enhPanelY = o.get("enhPanelY").getAsDouble();
+                if (o.has("hideSidebarButtons")) c.hideSidebarButtons = o.get("hideSidebarButtons").getAsBoolean();
                 if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
                 if (o.has("magicFont")) c.magicFont = o.get("magicFont").getAsString();
                 if (o.has("magicScale")) c.magicScale = Math.max(0.7, Math.min(1.3, o.get("magicScale").getAsDouble()));
