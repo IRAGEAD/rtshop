@@ -305,6 +305,8 @@ NEW = {
  "rtshop.att.view_only": ("보기 전용: 출석은 %s 에게 말을 걸어서 할 수 있습니다.", "View only: talk to %s to check in."),
  "rtshop.att.next_day": ("다음 출석일: %s 부터", "Next check-in day starts %s"),
  "rtshop.att.time_fmt": ("M월 d일 HH:mm", "MMM d, HH:mm"),
+ "rtshop.att.cell_today": ("오늘", "Today"),
+ "rtshop.att.legend_got": ("받음", "Claimed"), "rtshop.att.legend_today": ("오늘 받을 날", "Today's"), "rtshop.att.legend_future": ("앞으로", "Ahead"), "rtshop.att.legend_special": ("특별 보상", "Special"),
  "rtshop.att.weekdays": ("월,화,수,목,금,토,일", "Mo,Tu,We,Th,Fr,Sa,Su"),
  "rtshop.att.week_title": ("이번 주 출석 %s/7일", "This week: %s/7 days"),
  "rtshop.att.week_tier": ("%s일 출석", "%s days"),

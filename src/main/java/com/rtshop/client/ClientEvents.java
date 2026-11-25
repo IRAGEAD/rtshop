@@ -155,6 +155,33 @@ public final class ClientEvents {
         }
     }
 
+    /**
+     * 가방 창(크리에이티브 포함)의 왼쪽 위에 다른 모드가 붙이는 기능 단추 묶음(FTB Library 의 옆줄 단추: 팀·지도·날씨·시간 등)을 없앤다 (3.50).
+     * 그 기능들은 저마다의 키로 여전히 쓸 수 있다. client.json 의 hideSidebarButtons 로 끌 수 있다.
+     */
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public static void onScreenInitLast(ScreenEvent.Init.Post event) {
+        try {
+            if (!ClientConfig.get().hideSidebarButtons || !(event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen<?>)) return;
+            int removed = 0;
+            for (net.minecraft.client.gui.components.events.GuiEventListener l : new java.util.ArrayList<>(event.getListenersList())) {
+                if (sidebarButton(l)) {
+                    event.removeListener(l);
+                    removed++;
+                }
+            }
+            sidebarRemovedForTest = removed;
+        } catch (Throwable ignored) {
+        }
+    }
+
+    public static int sidebarRemovedForTest = -1;
+
+    static boolean sidebarButton(Object widget) {
+        String n = widget.getClass().getName();
+        return n.startsWith("dev.ftb.mods.ftblibrary.sidebar.");
+    }
+
     /** 접속하면 내 스토리 언어를 서버에 알린다. */
     @SubscribeEvent
     public static void onLogin(ClientPlayerNetworkEvent.LoggingIn event) {

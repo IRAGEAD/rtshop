@@ -41,6 +41,9 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
     private static final int SIDE_W = 128;
     private static final int C_PURPLE = 0xFF7A3FA0;
     private static final int C_SPECIAL = 0xFFE7D2F2;
+    private static final int C_GOT = 0xFFBFDCA6, C_TODAY = 0xFFFFE9A8, C_FUTURE = 0xFFE2D4B0, C_MISSED = 0xFFE6B4A8;
+    /** 점검용: 마지막으로 그린 달력의 칸 수 {받음, 오늘 받을 날, 앞으로}. */
+    public static final int[] lastStatesForTest = new int[3];
 
     private JsonObject data;
     private int page;
@@ -250,6 +253,7 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
     private void renderCalendar(GuiGraphics g, int mx, int my) {
         int x0 = calX();
         int y0 = calY();
+        java.util.Arrays.fill(lastStatesForTest, 0);
         int done = i("doneInCycle");
         int todayIdx = i("todayIndex");
         boolean checked = b("checkedToday");
@@ -266,10 +270,15 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
             boolean got = idx < done;
             boolean isToday = idx == todayIdx;
             boolean special = r.has("special") && r.get("special").getAsBoolean();
-            int fill = got ? 0xFFCFE3B8 : (special ? C_SPECIAL : Ui.C_PARCH);
+            // 날마다 상태가 한눈에: 받은 날(초록) · 오늘 받을 날(밝은 금빛 + 깜박이는 테) · 앞으로 올 날(바랜 종이) · 특별 보상(보랏빛)
+            boolean waiting = isToday && !checked;
+            boolean future = !got && !isToday;
+            int fill = got ? C_GOT : waiting ? C_TODAY : (special ? C_SPECIAL : C_FUTURE);
             Ui.bevel(g, cx + 1, cy + 1, CELL_W - 2, CELL_H - 2, fill, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+            lastStatesForTest[got ? 0 : waiting ? 1 : 2]++;
             if (isToday) {
-                int c = checked ? Ui.C_GREEN : Ui.C_GOLD;
+                boolean blink = waiting && (System.currentTimeMillis() / 500) % 2 == 0;
+                int c = checked ? Ui.C_GREEN : blink ? 0xFFFFE08A : Ui.C_GOLD;
                 g.fill(cx, cy, cx + CELL_W, cy + 1, c);
                 g.fill(cx, cy + CELL_H - 1, cx + CELL_W, cy + CELL_H, c);
                 g.fill(cx, cy, cx + 1, cy + CELL_H, c);
@@ -287,11 +296,30 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
                 String gs = Ui.compact(gold);
                 Ui.scaledText(g, this.font, gs, cx + 3, cy + CELL_H - 9, 0.75F, Ui.C_GOLD_DARK, false);
             }
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 200);
             if (got) {
-                g.pose().pushPose();
-                g.pose().translate(0, 0, 200);
+                g.fill(cx + 2, cy + 2, cx + CELL_W - 2, cy + CELL_H - 2, 0x66CFE3B8); // 받은 보상은 물 빠진 듯 덮는다
                 g.drawString(this.font, "✔", cx + CELL_W - 10, cy + CELL_H - 11, Ui.C_GREEN, false);
-                g.pose().popPose();
+            } else if (waiting) {
+                String t = Component.translatable("rtshop.att.cell_today").getString();
+                Ui.scaledText(g, this.font, t, cx + CELL_W - 3 - this.font.width(t) * 0.75F, cy + CELL_H - 9, 0.75F, 0xFF9A5A00, false);
+            } else if (future) {
+                g.fill(cx + 2, cy + 2, cx + CELL_W - 2, cy + CELL_H - 2, 0x30504030); // 아직 오지 않은 날은 조금 어둡게
+            }
+            g.pose().popPose();
+        }
+        // 범례: 칸 빛깔의 뜻
+        int lx = x0, ly = y0 + ROWS * CELL_H + 4;
+        int[] lc = {C_GOT, C_TODAY, C_FUTURE, C_SPECIAL};
+        String[] lk = {"rtshop.att.legend_got", "rtshop.att.legend_today", "rtshop.att.legend_future", "rtshop.att.legend_special"};
+        if (pages() <= 1) {
+            for (int i = 0; i < 4; i++) {
+                String t = Component.translatable(lk[i]).getString();
+                g.fill(lx, ly + 1, lx + 6, ly + 7, 0xFF3A2814);
+                g.fill(lx + 1, ly + 2, lx + 5, ly + 6, lc[i]);
+                Ui.scaledText(g, this.font, t, lx + 8, ly + 1, 0.75F, Ui.C_CREAM, false);
+                lx += 12 + (int) (this.font.width(t) * 0.75F) + 6;
             }
         }
         if (pages() > 1) {
@@ -315,9 +343,16 @@ public class AttendanceScreen extends Screen implements NpcButtons.Host {
         for (int d = 0; d < 7; d++) {
             int dx = x + 4 + d * dw;
             boolean on = (mask & (1 << d)) != 0;
-            Ui.bevel(g, dx, y + 15, dw - 2, 12, on ? 0xFF9FD08A : Ui.C_PARCH_DARK, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+            // 이번 주의 요일: 출석한 날(초록) · 지나갔는데 빠진 날(붉은빛) · 오늘 아직(금빛 테) · 앞으로 올 날(바랜 종이)
+            int wt = data.has("weekToday") ? i("weekToday") : 7;
+            boolean missed = !on && d < wt, todayCell = d == wt;
+            Ui.bevel(g, dx, y + 15, dw - 2, 12, on ? 0xFF9FD08A : missed ? C_MISSED : Ui.C_PARCH_DARK, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+            if (todayCell && !on) {
+                g.fill(dx, y + 15, dx + dw - 2, y + 16, Ui.C_GOLD);
+                g.fill(dx, y + 26, dx + dw - 2, y + 27, Ui.C_GOLD);
+            }
             String n = names.length == 7 ? names[(start + d) % 7] : Integer.toString(d + 1);
-            g.drawString(this.font, n, dx + (dw - 2 - this.font.width(n)) / 2, y + 17, on ? Ui.C_GREEN : Ui.C_INK_SOFT, false);
+            g.drawString(this.font, n, dx + (dw - 2 - this.font.width(n)) / 2, y + 17, on ? Ui.C_GREEN : missed ? Ui.C_RED : Ui.C_INK_SOFT, false);
         }
         int yy = y + 32;
         JsonArray weekly = data.getAsJsonArray("weekly");

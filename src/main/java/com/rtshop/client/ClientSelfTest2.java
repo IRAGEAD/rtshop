@@ -43,6 +43,8 @@ final class ClientSelfTest2 {
     private static volatile int dishIdx = -1;
     private static volatile String lifeJob = "";
     static volatile String permResult = "";
+    static volatile String stackResult = "";
+    static volatile ItemStack stackKeep = ItemStack.EMPTY;
 
     static int count() {
         return STEPS.size();
@@ -1188,6 +1190,51 @@ final class ClientSelfTest2 {
             NoticeHud.clearForTest();
             waitTicks(5);
         });
+        // 무기를 바꿔도 특수기의 스택이 남는다: 검을 들었다가 다른 것을 들고, 다시 검을 들면 기억해 둔 스택이 돌아온다
+        add(mc -> {
+            stackResult = "";
+            if (!net.minecraftforge.fml.ModList.get().isLoaded("epicfight")) return;
+            onServer(mc, sp -> {
+                stackKeep = sp.getMainHandItem().copy();
+                sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            });
+            waitTicks(12);
+        });
+        add(mc -> {
+            if (!net.minecraftforge.fml.ModList.get().isLoaded("epicfight")) return;
+            onServer(mc, sp -> {
+                String first = com.rtshop.compat.EfStacks.probe(sp);
+                stackResult = first;
+                String id = first.contains("|") ? first.substring(0, first.indexOf('|')) : "";
+                if (!id.isEmpty()) com.rtshop.compat.EfStacks.rememberForTest(sp, id, 1);
+                sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE));
+            });
+            waitTicks(12);
+        });
+        add(mc -> {
+            if (!net.minecraftforge.fml.ModList.get().isLoaded("epicfight")) return;
+            onServer(mc, sp -> {
+                String id = stackResult.contains("|") ? stackResult.substring(0, stackResult.indexOf('|')) : "";
+                if (!id.isEmpty()) com.rtshop.compat.EfStacks.rememberForTest(sp, id, 1);
+                sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            });
+            waitTicks(12);
+        });
+        add(mc -> {
+            if (!net.minecraftforge.fml.ModList.get().isLoaded("epicfight")) return;
+            onServer(mc, sp -> {
+                stackResult = stackResult + " -> " + com.rtshop.compat.EfStacks.probe(sp);
+                sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stackKeep);
+            });
+            waitTicks(6);
+        });
+        add(mc -> {
+            if (!net.minecraftforge.fml.ModList.get().isLoaded("epicfight")) return;
+            String[] parts = stackResult.split(" -> ");
+            boolean had = parts.length == 2 && parts[0].contains("|") && !parts[0].startsWith("|");
+            boolean back = had && parts[1].startsWith(parts[0].substring(0, parts[0].indexOf('|')) + "|1|");
+            check("switching weapons keeps the innate skill's stack: back on the sword, the remembered stack returns", had && back, stackResult);
+        });
         // 운영자 기능은 크리에이티브일 때만: 서바이벌의 OP 는 OP 전용 명령어도 편집 창도 쓸 수 없다 (/gamemode 는 남는다)
         add(mc -> {
             permResult = "";
@@ -1221,6 +1268,16 @@ final class ClientSelfTest2 {
         add(mc -> {
             java.util.List<net.minecraft.network.chat.Component> jl = JobBadge.lines();
             boolean named = com.rtshop.job.ClientJobCache.combat.isEmpty() || jl.get(0).getString().contains(com.rtshop.job.ClientJobCache.combat);
+            if (net.minecraftforge.fml.ModList.get().isLoaded("ftblibrary")) {
+                boolean left = false;
+                StringBuilder kinds = new StringBuilder();
+                for (net.minecraft.client.gui.components.events.GuiEventListener l : mc.screen.children()) {
+                    left |= ClientEvents.sidebarButton(l);
+                    kinds.append(l.getClass().getName()).append(' ');
+                }
+                check("the function buttons other mods put at the top-left of the inventory (FTB sidebar) are gone (at least one was removed)",
+                        !left && ClientEvents.sidebarRemovedForTest >= 1, ClientEvents.sidebarRemovedForTest + " | " + kinds);
+            }
             check("the job badge lists the combat and life job with their passives (no job = 'none', never empty)",
                     mc.screen instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen && jl.size() >= 4 && named
                             && !jl.get(0).getString().isBlank(), jl.size() + " / " + jl.get(0).getString());

@@ -1944,6 +1944,31 @@ public final class SelfTest {
             com.rtshop.job.MagicLock.testFake = false;
             com.rtshop.job.Jobs.force(a, "combat", combatWas == null ? "" : combatWas);
         }
+        check("the skill-stack keeper can reach Epic Fight's innate-skill slot whenever Epic Fight is installed (also on a dedicated server)",
+                com.rtshop.compat.EfStacks.ready() == net.minecraftforge.fml.ModList.get().isLoaded("epicfight"), com.rtshop.compat.EfStacks.failure);
+        // 뽑기의 고급 무기(영웅 등급 이상)는 직업의 무기 분류에 들지 않는다: 보정도 불이익도 없다
+        ItemStack plainSword = new ItemStack(Items.DIAMOND_SWORD), prizeSword = new ItemStack(Items.DIAMOND_SWORD), rareSword = new ItemStack(Items.DIAMOND_SWORD);
+        net.minecraft.nbt.CompoundTag mk1 = new net.minecraft.nbt.CompoundTag(), mk2 = new net.minecraft.nbt.CompoundTag();
+        mk1.putString("g", "epic");
+        mk2.putString("g", "rare");
+        prizeSword.getOrCreateTag().put(com.rtshop.gacha.Gacha.MARK, mk1);
+        rareSword.getOrCreateTag().put(com.rtshop.gacha.Gacha.MARK, mk2);
+        com.rtshop.job.JobConfig jcfg = com.rtshop.job.JobConfig.get();
+        String combatWas2 = com.rtshop.job.Jobs.entry(a).combat;
+        com.rtshop.job.Jobs.force(a, "combat", "tank");
+        double[] onPlain = com.rtshop.job.Jobs.weapon(a, jcfg.weaponType(plainSword)), onPrize = com.rtshop.job.Jobs.weapon(a, jcfg.weaponType(prizeSword));
+        com.rtshop.job.Jobs.force(a, "combat", combatWas2 == null ? "" : combatWas2);
+        check("a premium gacha weapon (epic or above) is outside the jobs' weapon classes: no bonus and no penalty, while a rare one is classed as usual",
+                jcfg.weaponType(prizeSword).equals(com.rtshop.job.WeaponTypes.PREMIUM) && jcfg.weaponType(rareSword).equals(jcfg.weaponType(plainSword))
+                        && onPrize[0] == 0 && onPrize[1] == 0, jcfg.weaponType(plainSword) + " " + java.util.Arrays.toString(onPlain) + " / " + jcfg.weaponType(prizeSword) + " " + java.util.Arrays.toString(onPrize));
+        // 양산 음식은 배고픔이 적게 찬다 (빵 5칸 → 3칸, 쿠키 2칸 → 1칸; 스테이크는 그대로)
+        com.rtshop.rules.FoodRules.setForTest(com.rtshop.rules.FoodRules.fresh());
+        check("mass-produced food fills less: bread and cookies are on the list (bread 5 -> 3, cookie 2 -> 1, never below 1), steak is not",
+                com.rtshop.rules.FoodRules.weak(new ItemStack(Items.BREAD)) && com.rtshop.rules.FoodRules.weak(new ItemStack(Items.COOKIE))
+                        && !com.rtshop.rules.FoodRules.weak(new ItemStack(Items.COOKED_BEEF)) && com.rtshop.rules.FoodRules.cut(5) == 2
+                        && com.rtshop.rules.FoodRules.cut(2) == 1 && com.rtshop.rules.FoodRules.cut(1) == 0,
+                com.rtshop.rules.FoodRules.cut(5) + " / " + com.rtshop.rules.FoodRules.cut(2));
+        com.rtshop.rules.FoodRules.reload();
         // 스킬북으로 배운 기술은 죽어도 남는다: Epic Fight 의 keepSkills 규칙을 켠다 (Epic Fight 가 없으면 규칙도 없다)
         boolean efHere = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
         boolean ruleFound = com.rtshop.rules.KeepSkills.apply(server);

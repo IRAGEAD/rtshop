@@ -34,6 +34,8 @@ public final class WeaponTypes {
     public static final String MAGIC = "magic";
     public static final String FIST = "fist";
     public static final String NONE = "none";
+    /** 뽑기의 고급 무기(야마토·무라사마 등): 어느 직업의 무기 분류에도 들지 않는다 — 직업의 보정도 불이익도 받지 않는다 (3.50). */
+    public static final String PREMIUM = "premium";
 
     /** 무기 종류 하나: 화면 이름, 아이콘, 근접인지(공격 속도 적용 여부), 분류 규칙. */
     public static final class Type {
