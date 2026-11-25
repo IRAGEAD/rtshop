@@ -3181,7 +3181,7 @@ public final class SelfTest {
                     before + " -> " + after + " / " + (oath == null ? "null" : oath.getAsJsonArray("pages").size()));
         }
         // 3.53: 기록·주간 순위·칭호
-        ranks(server, a, b);
+        ranks(server, a, fake(level, "rtshop_test_b"));
         // 3.54: 도감
         codex(server, level, a);
         // 3.53: 아이템 쓰임새 설명 (상점·강화·퀘스트에서 저절로)
