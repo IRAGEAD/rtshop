@@ -43,9 +43,9 @@ def runes():
         for i in range(MAXLV):
             u = 1.9; ox, oy = i * cw + cw / 2 - u, row * ch + ch / 2 - 2 * u
             for (a, b, c, e) in RUNES[i]: d.line([(S(ox + a * u), S(oy + b * u)), (S(ox + c * u), S(oy + e * u))], fill=255, width=S(w))
-        glow = layer.filter(ImageFilter.GaussianBlur(S(1.3 if row == 0 else 1.9)))
-        im.paste(Image.new('RGBA', im.size, halo + (0,)), (0, 0), None) if False else None
-        g = Image.new('RGBA', im.size, halo + (255,)); g.putalpha(glow.point(lambda q: int(q * (.75 if row == 0 else .95))))
+        # 빛무리는 옅게 (작은 화면에서 룬이 뭉개진 덩어리로 보이지 않게): 글자 선이 또렷이 남아야 한다
+        glow = layer.filter(ImageFilter.GaussianBlur(S(0.8 if row == 0 else 1.1)))
+        g = Image.new('RGBA', im.size, halo + (255,)); g.putalpha(glow.point(lambda q: int(q * (.30 if row == 0 else .45))))
         im = Image.alpha_composite(im, g)
         c = Image.new('RGBA', im.size, core + (255,)); c.putalpha(layer); im = Image.alpha_composite(im, c)
     return down(im)
