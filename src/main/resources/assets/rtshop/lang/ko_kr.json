@@ -1652,5 +1652,10 @@
   "rtshop.enhance.safe_note": "이 장비는 강화로 파괴되지 않습니다 (전설 이상·히든 장비). 그 확률은 유지와 손상으로 나뉩니다.",
   "rtshop.enhui.guard_safe": "없음 · 파괴 없음",
   "rtshop.perm.survival_op": "서바이벌 모드에서는 운영자 기능을 쓸 수 없습니다. /gamemode creative 로 바꾼 뒤 다시 해 주세요.",
-  "rtshop.job.magic_locked": "마법은 마법사만 쓸 수 있습니다."
+  "rtshop.job.magic_locked": "마법은 마법사만 쓸 수 있습니다.",
+  "rtshop.att.cell_today": "오늘",
+  "rtshop.att.legend_got": "받음",
+  "rtshop.att.legend_today": "오늘 받을 날",
+  "rtshop.att.legend_future": "앞으로",
+  "rtshop.att.legend_special": "특별 보상"
 }

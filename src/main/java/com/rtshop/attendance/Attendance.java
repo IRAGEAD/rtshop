@@ -485,6 +485,7 @@ public final class Attendance {
         long w = weekOf(today, c);
         boolean sameWeek = e.week == w;
         o.addProperty("weekMask", sameWeek ? e.weekMask : 0);
+        o.addProperty("weekToday", (int) Math.max(0, Math.min(6, today - w))); // 이번 주의 몇째 날인가 (0 = 주의 첫날): 지나간 날 가운데 빠진 날을 표시하려고
         o.addProperty("weekStartDay", c.weekStartDay().getValue());
         JsonArray weekly = new JsonArray();
         for (AttendanceConfig.Weekly t : c.weekly) {
