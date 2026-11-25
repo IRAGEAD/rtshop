@@ -122,9 +122,24 @@ def last_page():
     return im
 
 
+def weapon_manual():
+    im = img(); d = ImageDraw.Draw(im)
+    # 가죽 표지의 얇은 책 + 표지에 칼 한 자루
+    d.rectangle([3, 2, 12, 13], fill=(96, 58, 34, 255), outline=(44, 24, 12, 255))
+    d.line([(3, 2), (3, 13)], fill=(60, 34, 18, 255))
+    d.line([(13, 3), (13, 13)], fill=(230, 220, 190, 255))
+    d.line([(4, 14), (13, 14)], fill=(200, 188, 156, 255))
+    d.line([(10, 4), (6, 10)], fill=(214, 220, 230, 255))
+    d.point((10, 4), fill=(255, 255, 255, 255))
+    d.line([(5, 9), (7, 11)], fill=(214, 170, 70, 255))
+    d.point((5, 11), fill=(150, 100, 40, 255))
+    d.point((11, 12), fill=(214, 170, 70, 255))
+    return im
+
+
 if __name__ == '__main__':
     for n, f in [('mother_journal', journal), ('grey_coin', coin), ('old_expedition_map', old_map), ('expedition_tag', tag),
                  ('broken_sun_mask', mask), ('crew_name_tag', name_tag), ('frozen_logbook', frozen_log), ('survey_compass', compass),
-                 ('grey_ash', ash), ('memory_shard', memory), ('chronicle_last_page', last_page)]:
+                 ('grey_ash', ash), ('memory_shard', memory), ('chronicle_last_page', last_page), ('weapon_manual', weapon_manual)]:
         save(n, f())
     print('ok')

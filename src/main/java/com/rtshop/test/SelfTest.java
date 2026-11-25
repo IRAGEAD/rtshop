@@ -1053,6 +1053,64 @@ public final class SelfTest {
                     hadBossQuest + "/" + lockedBefore + "/" + stillLocked + "/" + openAfter + "/" + offOpen);
             if (guide != null) guide.discard();
             if (seller != null) seller.discard();
+            // 보스 음악: 싸우고 있는 보스의 곡을 고른다 (곡이 없는 보스는 조용하고, 싸우지 않으면 흐르지 않는다)
+            com.rtshop.story.BossMusic.Config mc0 = com.rtshop.story.BossMusic.fresh();
+            mc0.tracks.put("minecraft:husk", "husk_theme");
+            com.rtshop.story.BossMusic.setForTest(mc0);
+            boolean huskWas = com.rtshop.party.PartyConfig.get().bosses.add("minecraft:husk");
+            net.minecraft.world.entity.monster.Husk husk = EntityType.HUSK.create(level);
+            husk.moveTo(a.getX() + 3, a.getY(), a.getZ(), 0, 0);
+            husk.setNoAi(true);
+            level.addFreshEntity(husk);
+            Object[] quiet = com.rtshop.story.BossMusic.wanted(a);
+            com.rtshop.party.BossCredit.record(husk, a, 4F);
+            Object[] fight = com.rtshop.story.BossMusic.wanted(a);
+            mc0.tracks.put("minecraft:husk", "");
+            Object[] silent = com.rtshop.story.BossMusic.wanted(a);
+            mc0.tracks.remove("minecraft:husk");
+            Object[] common = com.rtshop.story.BossMusic.wanted(a);
+            check("boss music: nothing plays before the fight, the boss's own track plays while fighting, '' silences a boss, '*' is the common track",
+                    quiet[0].equals("") && fight[0].equals("husk_theme") && (int) fight[1] == husk.getId() && silent[0].equals("") && common[0].equals("boss"),
+                    quiet[0] + "/" + fight[0] + "/" + silent[0] + "/" + common[0]);
+            com.rtshop.party.BossCredit.forget(husk);
+            husk.discard();
+            if (huskWas) com.rtshop.party.PartyConfig.get().bosses.remove("minecraft:husk");
+            com.rtshop.story.BossMusic.reload();
+
+            // 무기 설명서: 특수기가 있는 무기를 처음 얻으면 한 권, 같은 종류·같은 특수기는 다시 주지 않는다
+            ItemStack ironSword = new ItemStack(net.minecraft.world.item.Items.IRON_SWORD);
+            ItemStack manual0 = com.rtshop.item.WeaponManualItem.of(ironSword);
+            check("a weapon manual remembers its weapon and is named after it",
+                    com.rtshop.item.WeaponManualItem.weapon(manual0).is(net.minecraft.world.item.Items.IRON_SWORD)
+                            && manual0.getHoverName().getString().length() > 0, manual0.getHoverName().getString());
+            com.rtshop.item.WeaponManuals.forgetAll(a);
+            a.getInventory().clearContent();
+            if (com.rtshop.compat.EfWeapons.present()) {
+                com.rtshop.compat.EfWeapons.Info wi = com.rtshop.compat.EfWeapons.info(a, ironSword);
+                check("Epic Fight weapon data is readable: an iron sword is a sword with an innate skill",
+                        wi != null && wi.category().equals("sword") && !wi.skill().isEmpty(), wi);
+                ItemStack first = com.rtshop.item.WeaponManuals.offer(a, ironSword);
+                ItemStack again = com.rtshop.item.WeaponManuals.offer(a, new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD));
+                ItemStack stick = com.rtshop.item.WeaponManuals.offer(a, new ItemStack(net.minecraft.world.item.Items.STICK));
+                ItemStack axe = com.rtshop.item.WeaponManuals.offer(a, new ItemStack(net.minecraft.world.item.Items.IRON_AXE));
+                check("a weapon manual is given once per weapon kind (iron sword yes, diamond sword not again, a stick never, an axe is its own book)",
+                        !first.isEmpty() && again.isEmpty() && stick.isEmpty() && !axe.isEmpty()
+                                && a.getInventory().countItem(com.rtshop.item.ModItems.WEAPON_MANUAL.get()) == 2,
+                        first + " / " + again + " / " + stick + " / " + axe);
+                com.rtshop.rules.WorldRules.get().weaponManuals = false;
+                com.rtshop.item.WeaponManuals.forgetAll(a);
+                a.getInventory().clearContent();
+                a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                int off = com.rtshop.item.WeaponManuals.scan(a);
+                com.rtshop.rules.WorldRules.get().weaponManuals = true;
+                int on = com.rtshop.item.WeaponManuals.scan(a);
+                check("weaponManuals=false gives nothing; turned on, the bag scan hands out the sword's manual", off == 0 && on == 1, off + " / " + on);
+            } else {
+                a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                check("without Epic Fight no weapon manuals are handed out", com.rtshop.item.WeaponManuals.scan(a) == 0
+                        && com.rtshop.compat.EfWeapons.info(a, ironSword) == null);
+            }
+            com.rtshop.item.WeaponManuals.forgetAll(a);
         } finally {
             com.rtshop.raid.Raid.testRandom = null;
             com.rtshop.raid.Weekly.testClockOffset = 0;
@@ -2388,7 +2446,7 @@ public final class SelfTest {
                     took && one && greeted && pw != null && pw[2] == 1, took + "/" + one + "/" + greeted + "/" + (pw == null ? "null" : java.util.Arrays.toString(pw)));
             if (z2.isAlive()) z2.discard();
             QuestManager.abandon(a, "t_inspect");
-            for (int i = 0; i < 45 && !c.isRemoved(); i++) {
+            for (int i = 0; i < 220 && !c.isRemoved() && c.owner() != walker; i++) { // 쓰러져 있던 동행이 일어난 뒤에 알아챈다
                 c.tickCount++;
                 c.tick();
             }

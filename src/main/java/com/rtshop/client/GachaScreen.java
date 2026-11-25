@@ -377,9 +377,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             buttons.add(new Btn(fx + 142, by, 130, 16, tr("rtshop.gacha.dismantle_rare"), at && !inv.isEmpty(), () -> dismantleAll(2)));
         }
         int by = fy + H - 24;
-        if (at && b("shop")) {
-            buttons.add(new Btn(fx + 8, by, 80, 18, tr("rtshop.gacha.buy_tickets"), true, () -> send(GachaActionPacket.SHOP, null)));
-        }
+        // 티켓은 티켓 상인에게서만 산다: 행운 상인의 [티켓 사기] 는 없앴다 (3.48)
         int right = fx + W - 8;
         buttons.add(new Btn(right - 50, by, 50, 18, tr("rtshop.att.btn_close"), true, this::onClose));
         if (b("canEdit")) {

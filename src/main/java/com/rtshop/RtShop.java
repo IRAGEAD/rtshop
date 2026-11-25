@@ -69,6 +69,7 @@ public class RtShop {
             event.accept(ModItems.GUARD_FULL);
             event.accept(ModItems.RAID_TICKET);
             event.accept(ModItems.SURVEY_COMPASS);
+            event.accept(ModItems.WEAPON_MANUAL);
             event.accept(com.rtshop.magic.MagicRegistry.ORB_ITEM);
             event.accept(com.rtshop.magic.MagicRegistry.TICKET);
             event.accept(com.rtshop.magic.MagicRegistry.TICKET_SELECT);

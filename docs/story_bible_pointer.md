@@ -159,3 +159,11 @@
 - 블록 모습 「별빛 천구」: 남빛 받침·은테·가는 기둥, 푸른 구슬, 금·은 고리 세 겹(입체 띠, ArcaneOrbRenderer.band).
 - JEI: RtShopJeiPlugin 이 강화 창·제단 창에서 JEI 목록을 끄고, CinematicGuideMixin 이 RT Shop 메뉴가 열린 장면에서 조합법 안내 책을 끈다.
 - 알림(NoticeHud): 화면 위 가운데의 얇은 띠(보스 체력 줄 아래), 오래된 것이 위·새 것이 아래, 한 번에 3개·2줄까지, 왼쪽 점과 테두리가 알림의 빛깔.
+
+3.48 (동행 함께 걷기 · 레이드 잠금 · 보스 음악 · 직업 딱지 · 무기 설명서)
+- 동행 NPC 를 여럿이 함께: 같은 NPC 가 40칸 안에 이미 있으면 새로 부르지 않고 그 NPC 와 함께 걷는다(CompanionEntity.guests: 플레이어 → 자기 퀘스트). 퀘스트가 같든 다르든 NPC 가 같으면 하나, 말은 저마다 자기 퀘스트의 대사를 듣는다(Companions.sayTo). 앞장선 사람이 떠나거나 끝내면 남은 사람에게 넘어간다(handOver). NPC 가 다르면 각자 따로. 동행의 처치는 함께 걷는 모두의 퀘스트에 센다.
+- 레이드 NPC(안내인·레이드 상인)는 이름 있는 보스를 처음 잡기 전까지 응하지 않는다(RaidConfig.npcsAfterFirstBoss, Raid.npcLocked). 보스별 레이드는 그 보스를 잡아야 열리고, 처치는 보스 ID 별로 적힌다(BossCredit 로 인정된 모두).
+- 보스·레이드 음악(BossMusic / BossMusicClient): config/rtshop/boss_music.json 의 tracks(보스 ID → 곡 이름, "*" = 공통 "boss", "" = 무음)와 raid("raid"). 곡은 소리 rtshop:music.<이름>; 파일이 없으면 아무것도 틀지 않는다. 넣기: python3 tools/add_music.py <이름> <파일>. 미리 듣기 /rtshop music play <이름>. 곡이 흐르는 동안 바닐라 음악과 다른 모드의 보스 음악은 끈다(muteOtherBossMusic). 음악은 사용자가 주는 파일만 쓴다(원작 게임 음악 금지).
+- 직업 딱지(JobBadge): 가방 창 왼쪽 [직업]. 마우스를 올리면 전투·생활 직업과 패시브(▲ 이점 · ▼ 불리), 누르면 직업 창. JobSyncPacket 이 이름과 설명을 함께 보낸다.
+- 무기 설명서(rtshop:weapon_manual, WeaponManuals): Epic Fight 특수기가 있는 무기를 처음 얻으면 한 권(같은 종류·같은 특수기 묶음은 한 권; 기록 rtshop_manuals). 우클릭 → WeaponManualScreen: 종류, 드는 방식별 연속 공격 타수, 달리며·뛰어서 공격, 특수기 이름·설명, 전투 키(지금 설정된 키 이름). 다시 받기 /rtshop manual. 끄기 world_rules.json 의 weaponManuals. 정보는 EfWeapons(리플렉션)로 무기 능력의 표에서 읽는다.
+- 행운 상인의 [티켓 사기] 없음: 티켓은 티켓 상인에게서만.

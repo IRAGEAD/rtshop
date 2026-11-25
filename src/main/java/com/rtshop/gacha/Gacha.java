@@ -544,14 +544,7 @@ public final class Gacha {
                 send(p, GachaPacket.VIEW, view(p));
             }
             case GachaActionPacket.SHOP -> {
-                GachaConfig c = GachaConfig.get();
-                if (!nearNpc(p)) {
-                    result(p, Component.translatable("rtshop.gacha.need_npc", c.npcName), false);
-                } else if (ShopServer.shops().get(c.shop) == null) {
-                    result(p, Component.translatable("rtshop.msg.unknown_shop", c.shop), false);
-                } else {
-                    ShopServer.openShop(p, c.shop, SESSIONS.get(p.getUUID()));
-                }
+                // 티켓은 티켓 상인에게서만 산다: 행운 상인은 티켓 상점을 열어 주지 않는다 (3.48)
             }
             case GachaActionPacket.EDIT -> openEditor(p);
             case GachaActionPacket.SAVE -> handleSave(p, a.has("json") ? a.get("json").getAsString() : "");

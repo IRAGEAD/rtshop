@@ -93,6 +93,10 @@ public final class ModItems {
     public static final RegistryObject<Item> SURVEY_COMPASS = ITEMS.register("survey_compass",
             () -> new SurveyCompassItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
 
+    /** 무기 설명서: 특수기가 있는 무기를 처음 얻으면 한 권씩 받는다. 우클릭하면 그 무기의 사용법이 펼쳐진다. */
+    public static final RegistryObject<Item> WEAPON_MANUAL = ITEMS.register("weapon_manual",
+            () -> new WeaponManualItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+
     private static RegistryObject<Item> story(String id, int stack, net.minecraft.world.item.Rarity r, boolean foil, int lines) {
         return ITEMS.register(id, () -> new StoryItem(new Item.Properties().stacksTo(stack).rarity(r), foil, lines));
     }

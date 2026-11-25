@@ -34,6 +34,11 @@ public final class StoryClient {
             } catch (Exception ignored) {
             }
             Cinematic.play(json);
+        } else if (kind == StoryPacket.MUSIC) {
+            try {
+                BossMusicClient.receive(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.NOTEBOOK) {
             try {
                 net.minecraft.client.Minecraft.getInstance().setScreen(new NotebookScreen(JsonParser.parseString(json).getAsJsonObject()));

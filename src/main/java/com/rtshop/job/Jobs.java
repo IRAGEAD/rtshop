@@ -361,17 +361,23 @@ public final class Jobs {
             modifier(p, attribute("spell_power:" + school), MAGE_POWER, "mage", power, AttributeModifier.Operation.MULTIPLY_TOTAL);
         }
         // 채굴 속도는 클라이언트도 알아야 블록이 빨리 깨진다
+        // 지금 직업의 이름과 패시브 설명도 함께 보낸다 (가방 창의 직업 딱지)
         double mine = stat(p, "mineSpeed");
-        Double sent = SENT_MINE.get(p.getUUID());
-        if (sent == null || sent != mine) {
-            SENT_MINE.put(p.getUUID(), mine);
+        JobData.Entry je = entry(p);
+        JobConfig.JobDef cd = cfg.jobs.get(je.combat), ld = cfg.jobs.get(je.life);
+        double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;
+        List<String> cDesc = cd == null ? List.of() : cfg.describe(cd, margin), lDesc = ld == null ? List.of() : cfg.describe(ld, margin);
+        String key = mine + "|" + (cd == null ? "" : cd.name) + cDesc + "|" + (ld == null ? "" : ld.name) + lDesc;
+        if (!key.equals(SENT_MINE.get(p.getUUID()))) {
+            SENT_MINE.put(p.getUUID(), key);
             if (p.connection != null) {
-                ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new com.rtshop.net.JobSyncPacket(mine));
+                ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
+                        new com.rtshop.net.JobSyncPacket(mine, cd == null ? "" : cd.name, cDesc, ld == null ? "" : ld.name, lDesc));
             }
         }
     }
 
-    private static final Map<UUID, Double> SENT_MINE = new HashMap<>();
+    private static final Map<UUID, String> SENT_MINE = new HashMap<>();
 
     // ------------------------------------------------------------------ 이벤트
 

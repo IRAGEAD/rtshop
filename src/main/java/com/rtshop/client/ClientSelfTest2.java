@@ -1192,6 +1192,58 @@ final class ClientSelfTest2 {
             NoticeHud.clearForTest();
             waitTicks(5);
         });
+        // 직업 딱지: 가방 창 왼쪽의 [직업] 에 마우스를 올리면 전투·생활 직업의 패시브가 보인다
+        add(mc -> {
+            mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+            waitTicks(10);
+        });
+        add(mc -> {
+            java.util.List<net.minecraft.network.chat.Component> jl = JobBadge.lines();
+            boolean named = com.rtshop.job.ClientJobCache.combat.isEmpty() || jl.get(0).getString().contains(com.rtshop.job.ClientJobCache.combat);
+            check("the job badge lists the combat and life job with their passives (no job = 'none', never empty)",
+                    mc.screen instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen && jl.size() >= 4 && named
+                            && !jl.get(0).getString().isBlank(), jl.size() + " / " + jl.get(0).getString());
+            shot(mc, "122_job_badge");
+            mc.setScreen(null);
+            waitTicks(5);
+        });
+        // 보스 음악: 곡 파일이 아직 없으면 조용히 아무것도 틀지 않는다 (오류 없이)
+        add(mc -> {
+            com.google.gson.JsonObject mo = new com.google.gson.JsonObject();
+            mo.addProperty("track", "no_such_track_for_test");
+            mo.addProperty("entity", -1);
+            BossMusicClient.receive(mo);
+            waitTicks(5);
+        });
+        add(mc -> {
+            check("boss music: a track with no sound file plays nothing and breaks nothing",
+                    BossMusicClient.playingForTest().isEmpty() && !BossMusicClient.has("no_such_track_for_test"), BossMusicClient.playingForTest());
+            com.google.gson.JsonObject mo = new com.google.gson.JsonObject();
+            mo.addProperty("track", "");
+            BossMusicClient.receive(mo);
+            waitTicks(2);
+        });
+        // 무기 설명서: 펼치면 그 무기의 연속 공격과 특수기가 나온다
+        add(mc -> {
+            ClientHooks.openWeaponManual(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            waitTicks(10);
+        });
+        add(mc -> {
+            boolean ef = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
+            if (mc.screen instanceof WeaponManualScreen w) {
+                check("the weapon manual opens and has text", w.linesForTest() >= 1, w.linesForTest());
+                if (ef) {
+                    check("the iron sword's manual names its type, its combo and its special skill (read from Epic Fight)",
+                            w.categoryForTest().equals("sword") && !w.skillForTest().isEmpty() && w.comboForTest() >= 1 && w.linesForTest() >= 10,
+                            w.categoryForTest() + " / " + w.skillForTest() + " / " + w.comboForTest() + " / " + w.linesForTest());
+                }
+            } else {
+                check("the weapon manual opens and has text", false, mc.screen);
+            }
+            shot(mc, "123_weapon_manual");
+            mc.setScreen(null);
+            waitTicks(5);
+        });
         add(mc -> {
             com.rtshop.story.Hunts.testMode = true;
             onServer(mc, sp -> {

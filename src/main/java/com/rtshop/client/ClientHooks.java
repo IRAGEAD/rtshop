@@ -176,6 +176,11 @@ public final class ClientHooks {
         }
     }
 
+    /** 무기 설명서를 펼친다. */
+    public static void openWeaponManual(net.minecraft.world.item.ItemStack weapon) {
+        Minecraft.getInstance().setScreen(new WeaponManualScreen(weapon));
+    }
+
     public static void openHudEditor() {
         Minecraft.getInstance().setScreen(new HudEditScreen());
     }

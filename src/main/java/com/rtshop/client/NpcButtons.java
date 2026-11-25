@@ -91,7 +91,7 @@ public final class NpcButtons {
 
     /** 행운 상인의 티켓 상점인가 (뽑기 화면으로 돌아가는 단추를 붙인다) */
     private static boolean ticketShop(Screen s) {
-        return s instanceof ShopScreen ss && ss.shopIdForEdit() != null && ss.shopIdForEdit().contains("gacha");
+        return false; // 티켓 상점은 이제 티켓 상인에게서만 열린다: 뽑기로 돌아가는 단추는 쓰지 않는다 (3.48)
     }
 
     private static String gachaBackLabel() {

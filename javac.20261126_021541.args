@@ -1,0 +1,11 @@
+-proc:none
+-Xmaxerrs
+9000
+-d
+/tmp/jc
+-sourcepath
+src/main/java:src/stubs/java
+src/main/java/com/rtshop/compat/EfWeapons.java
+src/main/java/com/rtshop/client/WeaponManualScreen.java
+src/main/java/com/rtshop/item/WeaponManualItem.java
+src/main/java/com/rtshop/item/WeaponManuals.java

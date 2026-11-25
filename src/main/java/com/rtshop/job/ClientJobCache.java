@@ -7,4 +7,7 @@ public final class ClientJobCache {
 
     /** 광부 채굴 속도 보너스 (0.08 = +8%). */
     public static volatile double mineSpeed = 0;
+    /** 지금 직업의 이름 (없으면 "") 과 패시브 설명 줄 ("+…" 버프, "-…" 디버프, " …" 덧붙임). */
+    public static volatile String combat = "", life = "";
+    public static volatile java.util.List<String> combatDesc = java.util.List.of(), lifeDesc = java.util.List.of();
 }
