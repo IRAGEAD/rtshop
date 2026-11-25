@@ -118,13 +118,14 @@ public final class Dialogue {
 
     // ------------------------------------------------------------------ 조건
 
-    /** need: {flags:[], notFlags:[], quests:[] (완료한 퀘스트), items:[] (지니고 있는 물건)} */
+    /** need: {flags:[], notFlags:[], quests:[] (완료한 퀘스트), notQuests:[] (아직 끝내지 않은 퀘스트), items:[] (지니고 있는 물건)} */
     static boolean ok(ServerPlayer p, JsonObject o) {
         if (o == null || !o.has("need")) return true;
         JsonObject n = o.getAsJsonObject("need");
         if (n.has("flags")) for (JsonElement e : n.getAsJsonArray("flags")) if (!QuestManager.hasFlag(p, e.getAsString())) return false;
         if (n.has("notFlags")) for (JsonElement e : n.getAsJsonArray("notFlags")) if (QuestManager.hasFlag(p, e.getAsString())) return false;
         if (n.has("quests")) for (JsonElement e : n.getAsJsonArray("quests")) if (!QuestManager.isCompleted(p, e.getAsString())) return false;
+        if (n.has("notQuests")) for (JsonElement e : n.getAsJsonArray("notQuests")) if (QuestManager.isCompleted(p, e.getAsString())) return false;
         if (n.has("items")) for (JsonElement e : n.getAsJsonArray("items")) if (!carries(p, e.getAsString())) return false;
         return true;
     }

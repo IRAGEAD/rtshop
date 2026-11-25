@@ -21,6 +21,10 @@ import static com.rtshop.client.ClientSelfTest.shot;
  * ClientSelfTest 가 순서대로 부른다.
  */
 final class ClientSelfTest2 {
+    /** 읽기 화면 점검에서 잠깐 끝낸 것으로 적어 두는 퀘스트 (점검이 끝나면 되돌린다). */
+    private static final String[] READ_QUESTS = {"story_1_04", "story_1_30", "story_2_25", "story_3_33", "story_3_36"};
+    private static final java.util.Map<String, Boolean> READ_HAD = new java.util.HashMap<>();
+
     private ClientSelfTest2() {
     }
 
@@ -1320,6 +1324,65 @@ final class ClientSelfTest2 {
             }
             shot(mc, "123_weapon_manual");
             mc.setScreen(null);
+            waitTicks(5);
+        });
+        // 이야기 물건 읽기: 연대기 페이지를 펼치면 기록관이 적은 이름들이 쪽마다 나온다
+        add(mc -> {
+            onServer(mc, sp -> {
+                for (String q : READ_QUESTS) READ_HAD.put(q, com.rtshop.quest.QuestManager.setCompletedForTest(sp, q, true));
+                com.rtshop.story.Readables.open(sp, new ItemStack(com.rtshop.item.ModItems.CHRONICLE_PAGE.get()));
+            });
+            waitTicks(15);
+        });
+        add(mc -> {
+            if (mc.screen instanceof ReadScreen r) {
+                boolean fits = true;
+                int n = r.pagesForTest();
+                for (int i = 0; i < n; i++) {
+                    fits &= r.fitsForTest();
+                    r.turnForTest(1);
+                }
+                boolean end = r.pageForTest() == n - 1;
+                for (int i = 0; i < n; i++) r.turnForTest(-1);
+                boolean start = r.pageForTest() == 0;
+                r.turnForTest(1);
+                check("a chronicle page opens as a sheet to read: one page per name written, every page fits, pages turn", n >= 3 && r.headingForTest().contains("연대기") && fits && end && start, n + " / " + fits + " / " + end + " / " + r.headingForTest());
+            } else {
+                check("a chronicle page opens as a sheet to read: one page per name written, every page fits, pages turn", false, mc.screen);
+            }
+            shot(mc, "126a_read_chronicle");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.story.Readables.open(sp, new ItemStack(com.rtshop.item.ModItems.FROZEN_LOGBOOK.get())));
+            waitTicks(15);
+        });
+        add(mc -> {
+            if (mc.screen instanceof ReadScreen r) {
+                boolean fits = true;
+                int n = r.pagesForTest();
+                for (int i = 0; i < n; i++) {
+                    fits &= r.fitsForTest();
+                    r.turnForTest(1);
+                }
+                boolean end = r.pageForTest() == n - 1;
+                for (int i = 0; i < n; i++) r.turnForTest(-1);
+                boolean start = r.pageForTest() == 0;
+                r.turnForTest(1);
+                check("the thawed logbook reads over several pages and each fits the sheet", n >= 4 && fits && end && start, n + " / " + fits + " / " + end + " / " + r.headingForTest());
+            } else {
+                check("the thawed logbook reads over several pages and each fits the sheet", false, mc.screen);
+            }
+            shot(mc, "126b_read_logbook");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.story.Readables.open(sp, new ItemStack(com.rtshop.item.ModItems.OATH_SCROLL.get())));
+            waitTicks(15);
+        });
+        add(mc -> {
+            check("the oath scroll opens to read", mc.screen instanceof ReadScreen r && r.pagesForTest() == 1 && r.fitsForTest(), mc.screen);
+            shot(mc, "126c_read_oath");
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                for (String q : READ_QUESTS) com.rtshop.quest.QuestManager.setCompletedForTest(sp, q, Boolean.TRUE.equals(READ_HAD.get(q)));
+            });
             waitTicks(5);
         });
         add(mc -> {

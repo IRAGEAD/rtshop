@@ -45,6 +45,12 @@ public final class StoryClient {
                 BossMusicClient.receive(JsonParser.parseString(json).getAsJsonObject());
             } catch (Exception ignored) {
             }
+        } else if (kind == StoryPacket.READ) {
+            // 이야기 물건(서약서·연대기 페이지·일지)을 펼쳐 읽는다
+            try {
+                net.minecraft.client.Minecraft.getInstance().setScreen(new ReadScreen(JsonParser.parseString(json).getAsJsonObject()));
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.NOTEBOOK) {
             try {
                 net.minecraft.client.Minecraft.getInstance().setScreen(new NotebookScreen(JsonParser.parseString(json).getAsJsonObject()));

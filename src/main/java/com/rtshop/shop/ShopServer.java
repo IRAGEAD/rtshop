@@ -537,6 +537,7 @@ public final class ShopServer {
         com.rtshop.story.ScyllaClues.reload();
         com.rtshop.story.Hunts.reload();
         com.rtshop.story.Dialogue.reload();
+        com.rtshop.story.Readables.reload();
         com.rtshop.story.StoryText.reload();
         com.rtshop.story.StorySystems.load();
         com.rtshop.compat.SpellMana.load();

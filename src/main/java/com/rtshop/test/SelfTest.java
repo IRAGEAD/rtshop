@@ -2974,6 +2974,30 @@ public final class SelfTest {
                             && lore.contains("자기 이름을 새기지 않았다"),
                     none + " / " + hidden + " / " + first + " / " + second + " / " + third);
         }
+        // 3.52: 이야기 물건을 펼쳐 읽는다 (서약서의 셋째 줄은 종장 뒤에야 보이고, 연대기 페이지에는 기록관이 적은 이름이 쌓인다)
+        {
+            boolean had510 = QuestManager.setCompletedForTest(a, "story_5_10", false), had104 = QuestManager.setCompletedForTest(a, "story_1_04", false);
+            com.google.gson.JsonObject oath = com.rtshop.story.Readables.build(a, "rtshop:oath_scroll");
+            int before = com.rtshop.story.Readables.chronicle(a).size();
+            QuestManager.setCompletedForTest(a, "story_5_10", true);
+            QuestManager.setCompletedForTest(a, "story_1_04", true);
+            com.google.gson.JsonObject oath2 = com.rtshop.story.Readables.build(a, "rtshop:oath_scroll");
+            com.google.gson.JsonObject chron = com.rtshop.story.Readables.build(a, "rtshop:chronicle_page");
+            int after = com.rtshop.story.Readables.chronicle(a).size();
+            QuestManager.setCompletedForTest(a, "story_5_10", had510);
+            QuestManager.setCompletedForTest(a, "story_1_04", had104);
+            String o1 = String.valueOf(oath), o2 = String.valueOf(oath2), c = String.valueOf(chron);
+            ItemStack scroll = new ItemStack(com.rtshop.item.ModItems.OATH_SCROLL.get());
+            check("story papers can be read: the oath shows its third line only after the ending, the chronicle page lists the names written so far, other items are not readable",
+                    oath != null && oath.getAsJsonArray("pages").size() == 1 && o1.contains("지워져 있다") && !o1.contains("때가 되면 놓아준다")
+                            && o2.contains("때가 되면 놓아준다") && oath2.getAsJsonArray("pages").size() == 1
+                            && after == before + 2 && c.contains("도윈, 광부") && c.contains("길 위의 이름")
+                            && com.rtshop.story.Readables.build(a, "minecraft:stick") == null
+                            && com.rtshop.story.Readables.open(a, scroll) && !com.rtshop.story.Readables.open(a, new ItemStack(net.minecraft.world.item.Items.STICK))
+                            && com.rtshop.story.Readables.has("rtshop:mother_journal") && com.rtshop.story.Readables.has("rtshop:frozen_logbook")
+                            && com.rtshop.story.Readables.has("rtshop:old_expedition_map") && com.rtshop.story.Readables.has("rtshop:chronicle_last_page"),
+                    before + " -> " + after + " / " + (oath == null ? "null" : oath.getAsJsonArray("pages").size()));
+        }
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
         QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");
