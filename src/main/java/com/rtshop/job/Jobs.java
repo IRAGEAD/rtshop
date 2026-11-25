@@ -94,7 +94,7 @@ public final class Jobs {
     public static double[] weapon(ServerPlayer p, String type) {
         JobConfig cfg = JobConfig.get();
         JobConfig.JobDef c = cfg.job(entry(p).combat);
-        if (c == null) {
+        if (c == null || WeaponTypes.PREMIUM.equals(type)) { // 뽑기의 고급 무기는 직업의 보정도 불이익도 받지 않는다
             return new double[]{0, 0};
         }
         return new double[]{c.weaponDamage(type), c.weaponSpeed(type)};

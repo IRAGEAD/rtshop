@@ -85,7 +85,18 @@ public final class JobConfig {
         return id == null ? null : jobs.get(id);
     }
 
+    /** 이 뽑기 등급 이상의 무기는 직업의 무기 분류에서 뺀다 ("" = 끔). */
+    public String premiumFromGrade = "epic";
+
+    /** 뽑기에서 나온 고급 무기인가 (등급 표시가 premiumFromGrade 이상). */
+    public boolean premium(ItemStack stack) {
+        if (stack == null || stack.isEmpty() || premiumFromGrade == null || premiumFromGrade.isEmpty()) return false;
+        int from = com.rtshop.gacha.GachaConfig.gradeIndex(premiumFromGrade);
+        return from >= 0 && com.rtshop.gacha.GachaConfig.gradeIndex(com.rtshop.gacha.Gacha.gradeOf(stack)) >= from;
+    }
+
     public synchronized String weaponType(ItemStack stack) {
+        if (premium(stack)) return WeaponTypes.PREMIUM;
         return WeaponTypes.categoryOf(stack, weaponTypes, weaponOverrides, cache);
     }
 
@@ -101,6 +112,9 @@ public final class JobConfig {
     public String typeName(String id) {
         if (WeaponTypes.MAGIC.equals(id)) {
             return "주문";
+        }
+        if (WeaponTypes.PREMIUM.equals(id)) {
+            return "고급 무기 · 직업 보정 없음";
         }
         WeaponTypes.Type t = type(id);
         return t == null ? id : t.name;
@@ -353,6 +367,7 @@ public final class JobConfig {
         } else {
             c.weaponTypes.addAll(defs.weaponTypes);
         }
+        if (o.has("premiumFromGrade")) c.premiumFromGrade = o.get("premiumFromGrade").getAsString();
         if (o.has("weaponOverrides") && o.get("weaponOverrides").isJsonObject()) {
             for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("weaponOverrides").entrySet()) {
                 c.weaponOverrides.put(e.getKey(), e.getValue().getAsString());
@@ -466,6 +481,7 @@ public final class JobConfig {
         JsonObject over = new JsonObject();
         weaponOverrides.forEach(over::addProperty);
         o.add("weaponOverrides", over);
+        o.addProperty("premiumFromGrade", premiumFromGrade);
         return o;
     }
 }
