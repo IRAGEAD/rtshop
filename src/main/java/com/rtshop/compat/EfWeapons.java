@@ -5,8 +5,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.ModList;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -47,8 +49,14 @@ public final class EfWeapons {
     private static final List<String> ORDER = List.of("one_hand", "common", "two_hand", "sheath", "ochs", "ranged");
 
     private static Boolean present;
-    private static Method getCap, getPatch, isEmpty, getCategory, getInnate, getAuto, registryName;
+    private static MethodHandle getCap, getPatch, isEmpty, getCategory, getInnate, getAuto, registryName;
+    /** 준비하다가 난 오류 (점검이 보여 준다). */
+    public static String failure = "";
 
+    /**
+     * Epic Fight 의 메서드를 하나씩 직접 찾는다. Class.getMethod 는 그 클래스의 모든 메서드 서명을 한꺼번에 읽어서,
+     * 전용 서버에서는 화면 쪽 클래스(LocalPlayer)를 쓰는 메서드 하나 때문에 통째로 실패한다 (3.48 점검에서 드러남).
+     */
     public static boolean present() {
         if (present == null) {
             try {
@@ -56,29 +64,49 @@ public final class EfWeapons {
                     present = false;
                     return false;
                 }
+                MethodHandles.Lookup look = MethodHandles.publicLookup();
                 Class<?> caps = Class.forName("yesman.epicfight.world.capabilities.EpicFightCapabilities");
                 Class<?> cap = Class.forName("yesman.epicfight.world.capabilities.item.CapabilityItem");
                 Class<?> patchClass = Class.forName("yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch");
-                getCap = caps.getMethod("getItemStackCapability", ItemStack.class);
-                getPatch = caps.getMethod("getPlayerPatch", Player.class);
-                isEmpty = cap.getMethod("isEmpty");
-                getCategory = cap.getMethod("getWeaponCategory");
-                getInnate = cap.getMethod("getInnateSkill", patchClass, ItemStack.class);
-                getAuto = cap.getMethod("getAutoAttackMotion", patchClass);
-                registryName = Class.forName("yesman.epicfight.skill.Skill").getMethod("getRegistryName");
+                Class<?> category = Class.forName("yesman.epicfight.world.capabilities.item.WeaponCategory");
+                Class<?> skill = Class.forName("yesman.epicfight.skill.Skill");
+                getCap = find(look, caps, "getItemStackCapability", true, cap, ItemStack.class);
+                isEmpty = find(look, cap, "isEmpty", false, boolean.class);
+                getCategory = find(look, cap, "getWeaponCategory", false, category);
+                registryName = find(look, skill, "getRegistryName", false, ResourceLocation.class);
+                // 아래 셋은 표(드는 방식 → 특수기·연속 공격)를 읽지 못하는 무기에서만 쓴다: 없어도 설명서는 된다
+                try {
+                    getPatch = find(look, caps, "getPlayerPatch", true, patchClass, Player.class);
+                    getInnate = find(look, cap, "getInnateSkill", false, skill, patchClass, ItemStack.class);
+                    getAuto = find(look, cap, "getAutoAttackMotion", false, List.class, patchClass);
+                } catch (Throwable t) {
+                    failure = "fallback: " + t;
+                }
                 present = true;
             } catch (Throwable t) {
+                failure = String.valueOf(t);
+                com.rtshop.RtShop.LOGGER.warn("[rtshop] Epic Fight 의 무기 정보를 읽을 준비를 하지 못했습니다 (무기 설명서가 꺼집니다): {}", t.toString());
                 present = false;
             }
         }
         return present;
     }
 
+    /** 메서드 하나를 직접 찾고, 그렇게 못 찾으면(모듈 접근 등) 리플렉션으로 한 번 더 찾는다. */
+    private static MethodHandle find(MethodHandles.Lookup look, Class<?> owner, String name, boolean isStatic, Class<?> ret, Class<?>... args) throws Throwable {
+        try {
+            MethodType type = MethodType.methodType(ret, args);
+            return isStatic ? look.findStatic(owner, name, type) : look.findVirtual(owner, name, type);
+        } catch (ReflectiveOperationException e) {
+            return look.unreflect(owner.getMethod(name, args));
+        }
+    }
+
     /** Epic Fight 의 무기 능력 객체 (없으면 null). */
     public static Object capability(ItemStack s) {
         if (s == null || s.isEmpty() || !present()) return null;
         try {
-            Object cap = getCap.invoke(null, s);
+            Object cap = getCap.invoke(s);
             return cap == null || (boolean) isEmpty.invoke(cap) ? null : cap;
         } catch (Throwable t) {
             return null;
@@ -86,9 +114,9 @@ public final class EfWeapons {
     }
 
     public static Object patch(Player p) {
-        if (p == null || !present()) return null;
+        if (p == null || !present() || getPatch == null) return null;
         try {
-            return getPatch.invoke(null, p);
+            return getPatch.invoke(p);
         } catch (Throwable t) {
             return null;
         }
@@ -147,7 +175,7 @@ public final class EfWeapons {
         Object cap = capability(s);
         if (cap == null) return null;
         try {
-            String cat = String.valueOf(getCategory.invoke(cap)).toLowerCase(Locale.ROOT);
+            String cat = String.valueOf((Object) getCategory.invoke(cap)).toLowerCase(Locale.ROOT);
             Map<?, ?> skills = table(cap, "innateSkill"), motions = table(cap, "autoAttackMotions");
             List<Form> forms = new ArrayList<>();
             boolean extra = false;
@@ -176,7 +204,7 @@ public final class EfWeapons {
             if (forms.isEmpty()) {
                 // 표가 없는 무기 능력(다른 모드가 따로 만든 것): 지금 든 자세의 것을 물어본다
                 Object patch = patch(p);
-                if (patch != null) {
+                if (patch != null && getInnate != null && getAuto != null) {
                     Object skill = null, motion = null;
                     try {
                         skill = getInnate.invoke(cap, patch, s);

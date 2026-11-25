@@ -1055,26 +1055,40 @@ public final class SelfTest {
             if (seller != null) seller.discard();
             // 보스 음악: 싸우고 있는 보스의 곡을 고른다 (곡이 없는 보스는 조용하고, 싸우지 않으면 흐르지 않는다)
             com.rtshop.story.BossMusic.Config mc0 = com.rtshop.story.BossMusic.fresh();
-            mc0.tracks.put("minecraft:husk", "husk_theme");
             com.rtshop.story.BossMusic.setForTest(mc0);
-            boolean huskWas = com.rtshop.party.PartyConfig.get().bosses.add("minecraft:husk");
-            net.minecraft.world.entity.monster.Husk husk = EntityType.HUSK.create(level);
+            // 임시 보스: 허스크 (모드팩에서 다른 모드가 허스크를 막거나 바꾸면 갑옷 거치대로)
+            net.minecraft.world.entity.LivingEntity husk = EntityType.HUSK.create(level);
             husk.moveTo(a.getX() + 3, a.getY(), a.getZ(), 0, 0);
-            husk.setNoAi(true);
-            level.addFreshEntity(husk);
+            if (husk instanceof net.minecraft.world.entity.Mob hm) hm.setNoAi(true);
+            boolean huskIn = level.addFreshEntity(husk) && !husk.isRemoved()
+                    && level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, a.getBoundingBox().inflate(16)).contains(husk);
+            if (!huskIn) {
+                husk.discard();
+                husk = EntityType.ARMOR_STAND.create(level);
+                husk.moveTo(a.getX() + 3, a.getY(), a.getZ(), 0, 0);
+                level.addFreshEntity(husk);
+            }
+            boolean aWasAlive = a.isAlive();
+            if (!aWasAlive) a.setHealth(a.getMaxHealth()); // 앞의 레이드 점검에서 쓰러진 채면 일으켜 세운다
+            String foeId = com.rtshop.party.BossCredit.id(husk);
+            mc0.tracks.put(foeId, "husk_theme");
+            boolean huskWas = com.rtshop.party.PartyConfig.get().bosses.add(foeId);
             Object[] quiet = com.rtshop.story.BossMusic.wanted(a);
             com.rtshop.party.BossCredit.record(husk, a, 4F);
             Object[] fight = com.rtshop.story.BossMusic.wanted(a);
-            mc0.tracks.put("minecraft:husk", "");
+            mc0.tracks.put(foeId, "");
             Object[] silent = com.rtshop.story.BossMusic.wanted(a);
-            mc0.tracks.remove("minecraft:husk");
+            mc0.tracks.remove(foeId);
             Object[] common = com.rtshop.story.BossMusic.wanted(a);
+            final net.minecraft.world.entity.LivingEntity foe = husk;
             check("boss music: nothing plays before the fight, the boss's own track plays while fighting, '' silences a boss, '*' is the common track",
                     quiet[0].equals("") && fight[0].equals("husk_theme") && (int) fight[1] == husk.getId() && silent[0].equals("") && common[0].equals("boss"),
-                    quiet[0] + "/" + fight[0] + "/" + silent[0] + "/" + common[0]);
+                    quiet[0] + "/" + fight[0] + "/" + silent[0] + "/" + common[0] + " | " + foeId + " husk=" + huskIn + " gone=" + husk.isRemoved() + " alive=" + aWasAlive
+                            + " raid=" + com.rtshop.raid.Raid.state() + " near=" + level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, a.getBoundingBox().inflate(48), e -> e == foe).size()
+                            + " boss=" + com.rtshop.party.BossCredit.isBoss(husk) + " dealt=" + com.rtshop.party.BossCredit.dealt(husk, a));
             com.rtshop.party.BossCredit.forget(husk);
             husk.discard();
-            if (huskWas) com.rtshop.party.PartyConfig.get().bosses.remove("minecraft:husk");
+            if (huskWas) com.rtshop.party.PartyConfig.get().bosses.remove(foeId);
             com.rtshop.story.BossMusic.reload();
 
             // 무기 설명서: 특수기가 있는 무기를 처음 얻으면 한 권, 같은 종류·같은 특수기는 다시 주지 않는다
@@ -1085,6 +1099,9 @@ public final class SelfTest {
                             && manual0.getHoverName().getString().length() > 0, manual0.getHoverName().getString());
             com.rtshop.item.WeaponManuals.forgetAll(a);
             a.getInventory().clearContent();
+            boolean efLoaded = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
+            check("Epic Fight's weapon data can be reached whenever Epic Fight is installed (also on a dedicated server)",
+                    com.rtshop.compat.EfWeapons.present() == efLoaded, efLoaded + " / " + com.rtshop.compat.EfWeapons.failure);
             if (com.rtshop.compat.EfWeapons.present()) {
                 com.rtshop.compat.EfWeapons.Info wi = com.rtshop.compat.EfWeapons.info(a, ironSword);
                 check("Epic Fight weapon data is readable: an iron sword is a sword with an innate skill",
