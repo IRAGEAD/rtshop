@@ -1943,6 +1943,8 @@ public final class SelfTest {
             com.rtshop.job.MagicLock.testFake = false;
             com.rtshop.job.Jobs.force(a, "combat", combatWas == null ? "" : combatWas);
         }
+        check("the skill-stack keeper can reach Epic Fight's innate-skill slot whenever Epic Fight is installed (also on a dedicated server)",
+                com.rtshop.compat.EfStacks.ready() == net.minecraftforge.fml.ModList.get().isLoaded("epicfight"), com.rtshop.compat.EfStacks.failure);
         // 스킬북으로 배운 기술은 죽어도 남는다: Epic Fight 의 keepSkills 규칙을 켠다 (Epic Fight 가 없으면 규칙도 없다)
         boolean efHere = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
         boolean ruleFound = com.rtshop.rules.KeepSkills.apply(server);
