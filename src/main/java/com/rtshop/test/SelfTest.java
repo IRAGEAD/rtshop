@@ -1051,6 +1051,14 @@ public final class SelfTest {
             check("raid NPCs (guide, raid merchant) answer only after a first named boss is down; each boss kill is written per boss",
                     (hadBossQuest || (lockedBefore && stillLocked)) && openAfter && offOpen && guide != null && seller != null,
                     hadBossQuest + "/" + lockedBefore + "/" + stillLocked + "/" + openAfter + "/" + offOpen);
+            if (guide != null) {
+                net.minecraft.world.entity.vehicle.Boat boat = EntityType.BOAT.create(level);
+                boat.moveTo(guide.getX(), guide.getY(), guide.getZ(), 0, 0);
+                level.addFreshEntity(boat);
+                boolean rode = guide.startRiding(boat, true);
+                check("NPCs do not get into boats or minecarts (they cannot be carried off)", !rode && !guide.isPassenger(), rode);
+                boat.discard();
+            }
             if (guide != null) guide.discard();
             if (seller != null) seller.discard();
             // 보스 음악: 싸우고 있는 보스의 곡을 고른다 (곡이 없는 보스는 조용하고, 싸우지 않으면 흐르지 않는다)

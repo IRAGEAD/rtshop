@@ -41,6 +41,23 @@ public final class NpcGuard {
         return false;
     }
 
+    /** NPC 는 보트·광산 수레 같은 탈것에 타지 않는다 (밀려서 실려 가는 일이 없게). 동행 NPC 도 같다. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onMount(net.minecraftforge.event.entity.EntityMountEvent e) {
+        if (e.isMounting() && !e.getLevel().isClientSide() && (isNpc(e.getEntityMounting()) || e.getEntityMounting() instanceof com.rtshop.story.CompanionEntity)) {
+            e.setCanceled(true);
+        }
+    }
+
+    /** 이미 탈것에 실려 있는 NPC 는 내려놓는다 (이 규칙이 생기기 전에 탄 경우). */
+    @SubscribeEvent
+    public static void onNpcTick(LivingEvent.LivingTickEvent e) {
+        LivingEntity v = e.getEntity();
+        if (!v.level().isClientSide() && v.tickCount % 40 == 17 && v.isPassenger() && isNpc(v)) {
+            v.stopRiding();
+        }
+    }
+
     private static boolean allowed(DamageSource src) {
         return src != null && (src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD));
     }
