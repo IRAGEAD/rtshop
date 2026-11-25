@@ -1270,8 +1270,13 @@ final class ClientSelfTest2 {
             boolean named = com.rtshop.job.ClientJobCache.combat.isEmpty() || jl.get(0).getString().contains(com.rtshop.job.ClientJobCache.combat);
             if (net.minecraftforge.fml.ModList.get().isLoaded("ftblibrary")) {
                 boolean left = false;
-                for (net.minecraft.client.gui.components.events.GuiEventListener l : mc.screen.children()) left |= ClientEvents.sidebarButton(l);
-                check("the function buttons other mods put at the top-left of the inventory (FTB sidebar) are gone", !left, ClientEvents.sidebarRemovedForTest);
+                StringBuilder kinds = new StringBuilder();
+                for (net.minecraft.client.gui.components.events.GuiEventListener l : mc.screen.children()) {
+                    left |= ClientEvents.sidebarButton(l);
+                    kinds.append(l.getClass().getName()).append(' ');
+                }
+                check("the function buttons other mods put at the top-left of the inventory (FTB sidebar) are gone (at least one was removed)",
+                        !left && ClientEvents.sidebarRemovedForTest >= 1, ClientEvents.sidebarRemovedForTest + " | " + kinds);
             }
             check("the job badge lists the combat and life job with their passives (no job = 'none', never empty)",
                     mc.screen instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen && jl.size() >= 4 && named
