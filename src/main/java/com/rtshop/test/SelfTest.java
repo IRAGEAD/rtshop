@@ -2219,14 +2219,14 @@ public final class SelfTest {
         com.rtshop.story.Spots.placeForTest(a, "t_wick", a.blockPosition().offset(1, 0, 0));
         boolean refused = !com.rtshop.story.Spots.done(a, "t_wick");
         a.getInventory().add(new ItemStack(Items.COAL, 2));
-        boolean did = com.rtshop.story.Spots.done(a, "t_wick");
-        int coalLeft = count(a, st -> st.is(Items.COAL));
+        boolean wickDone = com.rtshop.story.Spots.done(a, "t_wick");
+        int coalLeft = (int) count(a, st -> st.is(Items.COAL));
         com.rtshop.story.Spots.update(a);
         boolean nextShown = com.rtshop.story.Spots.placed(a, "t_next") != null;
         check("a trace can be a thing to do: it needs its item (taken when done), and the next trace shows only after it",
                 actBack != null && actBack.objectives.get(0).verb.equals("Change the wick") && actBack.objectives.get(0).use.equals("minecraft:coal")
-                        && actBack.objectives.get(1).after.equals("t_wick") && firstOnly && refused && did && coalLeft == 1 && nextShown,
-                firstOnly + "/" + refused + "/" + did + "/" + coalLeft + "/" + nextShown);
+                        && actBack.objectives.get(1).after.equals("t_wick") && firstOnly && refused && wickDone && coalLeft == 1 && nextShown,
+                firstOnly + "/" + refused + "/" + wickDone + "/" + coalLeft + "/" + nextShown);
         QuestManager.abandon(a, "t_act");
         QuestManager.loaded().quests.remove("t_act");
         QuestManager.setFlag(a, "spot_t_wick", false);
