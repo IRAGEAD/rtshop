@@ -144,7 +144,8 @@ public final class ClientEvents {
         // 인벤토리 위의 [퀘스트 수첩]: 어디서든 퀘스트 내용을 본다 (받기·완료·포기는 NPC 앞에서)
         if (event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen inv) {
             String label = net.minecraft.network.chat.Component.translatable("rtshop.quest.journal_button").getString();
-            int w = UiFont.get().width(label) + 10;
+            // 바닐라 단추는 게임 기본 글꼴로 그린다: 폭도 그 글꼴로 잰다 (창 글꼴로 재면 글자가 잘렸다)
+            int w = Minecraft.getInstance().font.width(label) + 10;
             event.addListener(net.minecraft.client.gui.components.Button.builder(net.minecraft.network.chat.Component.literal(label), b -> {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.player != null) {

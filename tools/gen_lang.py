@@ -640,6 +640,7 @@ NEW = {
  "rtshop.manual.style_note": ("드는 방식은 반대 손에 든 것(비었는지, 방패인지, 같은 무기인지)이나 배운 기술에 따라 바뀐다.", "The form depends on your other hand (empty, shield, or a matching weapon) or on learned skills."),
  "rtshop.manual.h.skill": ("특수기", "Special Skill"),
  "rtshop.manual.skill_use": ("쓰는 법: 전투 모드에서 %s", "How to use: press %s in battle mode"),
+ "rtshop.manual.skill_hold": ("쓰는 법: 전투 모드에서 %s 를 길게 누른다 (짧게 누르면 기본 공격). 특수기 키는 설정 > 조작에서 따로 정할 수 있다.", "How to use: hold %s in battle mode (a short press is a basic attack). You can give the skill its own key in Options > Controls."),
  "rtshop.manual.skill_gauge": ("화면의 특수기 칸이 차 있어야 쓸 수 있다. 다 쓰면 적을 때려서 다시 채운다. 누르고 있으면 힘을 모으는 특수기도 있다.", "The skill slot on screen must be charged. Refill it by hitting enemies. Some skills can be held to charge."),
  "rtshop.manual.h.keys": ("전투 조작", "Combat Controls"),
  "rtshop.manual.k.mode": ("전투·채굴 모드 바꾸기: %s", "Toggle battle / mining mode: %s"),

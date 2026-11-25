@@ -17,7 +17,7 @@ import java.util.List;
  * 내용은 Epic Fight 가 가진 실제 무기 정보와 지금 설정된 키에서 읽어 온다 (그래서 키를 바꾸면 설명서의 키 이름도 따라 바뀐다).
  */
 public class WeaponManualScreen extends Screen {
-    private static final int W = 300, H = 222;
+    private static final int W = 300, H = 236;
 
     /** 글줄 하나: 제목(금색 띠) 또는 본문. */
     private record Line(FormattedCharSequence text, int color, boolean head) {
@@ -74,11 +74,20 @@ public class WeaponManualScreen extends Screen {
         body(Component.translatable(key, args), 0xFF4A3520);
     }
 
-    /** 특수기 설명글: Epic Fight 의 번역글(skill.<모드>.<이름>.tooltip)에 그 기술의 수치를 채워 넣는다. */
-    private static String skillText(Object skill, String id) {
+    /** 특수기의 번역 키 (skill.<모드>.<이름>). 다른 모드가 같은 기술을 제 이름표로 바꿔 등록했으면(epicfightx:sweeping_edge) 원래 것(epicfight)의 글을 쓴다. */
+    private static String skillKey(String id, String suffix) {
         int c = id.indexOf(':');
-        String k = "skill." + (c < 0 ? id : id.substring(0, c) + "." + id.substring(c + 1)) + ".tooltip";
-        if (!I18n.exists(k)) return "";
+        String ns = c < 0 ? "epicfight" : id.substring(0, c), path = c < 0 ? id : id.substring(c + 1);
+        String k = "skill." + ns + "." + path + suffix;
+        if (I18n.exists(k)) return k;
+        String base = "skill.epicfight." + path + suffix;
+        return I18n.exists(base) ? base : "";
+    }
+
+    /** 특수기 설명글: Epic Fight 의 번역글(….tooltip)에 그 기술의 수치를 채워 넣는다. */
+    private static String skillText(Object skill, String id) {
+        String k = skillKey(id, ".tooltip");
+        if (k.isEmpty()) return "";
         List<Object> args = new ArrayList<>();
         try {
             Object r = skill.getClass().getMethod("getTooltipArgsOfScreen", List.class).invoke(skill, args);
@@ -95,10 +104,25 @@ public class WeaponManualScreen extends Screen {
         return I18n.get(k).replace("%s", "?").replace("%d", "?");
     }
 
-    private static String skillName(String id) {
+    private static String skillName(Object skill, String id) {
+        String k = skillKey(id, "");
+        if (!k.isEmpty()) return I18n.get(k);
+        try {
+            if (skill != null && skill.getClass().getMethod("getDisplayName").invoke(skill) instanceof Component c) {
+                String s = c.getString();
+                if (!s.isBlank() && !s.startsWith("skill.")) return s;
+            }
+        } catch (Throwable ignored) {
+        }
+        // 번역글이 없으면 이름표를 읽기 좋게: sweeping_edge → Sweeping Edge
         int c = id.indexOf(':');
-        String k = "skill." + (c < 0 ? id : id.substring(0, c) + "." + id.substring(c + 1));
-        return I18n.exists(k) ? I18n.get(k) : id;
+        StringBuilder out = new StringBuilder();
+        for (String w : (c < 0 ? id : id.substring(c + 1)).split("_")) {
+            if (w.isEmpty()) continue;
+            if (out.length() > 0) out.append(' ');
+            out.append(Character.toUpperCase(w.charAt(0))).append(w.substring(1));
+        }
+        return out.toString();
     }
 
     private void build() {
@@ -119,8 +143,9 @@ public class WeaponManualScreen extends Screen {
         // 드는 방식(한 손·양손·쌍수…)마다 연속 공격과 특수기가 다를 수 있다: 같은 것끼리는 묶어서 적는다
         List<EfWeapons.Form> forms = info.forms();
         boolean many = forms.stream().map(f -> f.combo() + "|" + f.skill()).distinct().count() > 1;
+        boolean combos = forms.stream().filter(f -> f.combo() > 0).map(EfWeapons.Form::combo).distinct().count() > 1;
         head("rtshop.manual.h.basic");
-        if (many) {
+        if (combos) {
             body("rtshop.manual.basic0", key("key.epicfight.attack"));
             for (EfWeapons.Form f : forms) {
                 if (f.combo() > 0) body("rtshop.manual.basic_style", style(f.style()), f.combo());
@@ -145,14 +170,16 @@ public class WeaponManualScreen extends Screen {
                 objs.putIfAbsent(f.skill(), f.skillObject());
             }
             for (var e : by.entrySet()) {
-                String name = "◆ " + skillName(e.getKey());
+                Object skill = objs.get(e.getKey());
+                String name = "◆ " + skillName(skill, e.getKey());
                 if (by.size() > 1) name += "  (" + String.join(" · ", e.getValue()) + ")";
                 body(Component.literal(name), 0xFF7A3B12);
-                Object skill = objs.get(e.getKey());
                 String text = skill == null ? "" : skillText(skill, e.getKey());
                 if (!text.isEmpty()) body(Component.literal(text), 0xFF4A3520);
             }
-            body("rtshop.manual.skill_use", key("key.epicfight.weapon_innate_skill"));
+            // Epic Fight 의 기본 설정은 특수기와 공격이 같은 키다: 그때는 길게 누르는 것이 특수기
+            boolean sameKey = QuestText.keyLabel("key.epicfight.weapon_innate_skill").equals(QuestText.keyLabel("key.epicfight.attack"));
+            body(sameKey ? "rtshop.manual.skill_hold" : "rtshop.manual.skill_use", key("key.epicfight.weapon_innate_skill"));
             body(Component.translatable("rtshop.manual.skill_gauge"), Ui.C_INK_SOFT);
         }
         if (many) body(Component.translatable("rtshop.manual.style_note"), Ui.C_INK_SOFT);

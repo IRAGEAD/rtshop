@@ -24,11 +24,11 @@ public final class JobBadge {
     private JobBadge() {
     }
 
-    public static final int W = 34, H = 16;
+    public static final int W = 34, H = 14;
 
-    /** 딱지의 자리 {x, y}: 가방 창 왼쪽 바깥, 위에서 조금 아래. */
+    /** 딱지의 자리 {x, y}: 가방 창 바로 위 왼쪽 끝 ([퀘스트 수첩] 과 같은 줄의 반대편). 창 옆은 다른 모드의 칸(가방·장신구)이 쓰는 일이 많다. */
     static int[] spot(InventoryScreen s) {
-        return new int[]{s.getGuiLeft() - W - 3, s.getGuiTop() + 4};
+        return new int[]{s.getGuiLeft(), s.getGuiTop() - 16};
     }
 
     /** 마우스를 올렸을 때 보이는 줄들. */
@@ -69,7 +69,7 @@ public final class JobBadge {
         if (mc.player == null || mc.player.isSpectator()) return;
         GuiGraphics g = e.getGuiGraphics();
         int[] p = spot(s);
-        if (p[0] < 2) return; // 창이 화면 왼쪽 끝에 붙어 있으면(제작법 책이 열린 작은 화면) 그리지 않는다
+        if (p[1] < 2) return; // 창 위에 자리가 없는 아주 작은 화면에서는 그리지 않는다
         boolean hov = over(s, e.getMouseX(), e.getMouseY());
         boolean was = UiText.flat;
         UiText.flat = true;
@@ -87,7 +87,7 @@ public final class JobBadge {
     public static void onClick(ScreenEvent.MouseButtonPressed.Pre e) {
         if (!(e.getScreen() instanceof InventoryScreen s) || e.getButton() != 0) return;
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.player.isSpectator() || spot(s)[0] < 2 || !over(s, e.getMouseX(), e.getMouseY())) return;
+        if (mc.player == null || mc.player.isSpectator() || spot(s)[1] < 2 || !over(s, e.getMouseX(), e.getMouseY())) return;
         if (!mc.player.containerMenu.getCarried().isEmpty()) return;
         e.setCanceled(true);
         mc.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK, 1F));
