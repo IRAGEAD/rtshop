@@ -3171,6 +3171,19 @@ public final class SelfTest {
         ranks(server, a, b);
         // 3.54: 도감
         codex(server, level, a);
+        // 3.53: 아이템 쓰임새 설명 (상점·강화·퀘스트에서 저절로)
+        {
+            java.util.List<String[]> wheat = com.rtshop.rules.ItemNotes.of("minecraft:wheat");
+            boolean sold = false, bought = false;
+            for (String[] ln : wheat) {
+                sold |= ln[0].equals("rtshop.note.sold_by");
+                bought |= ln[0].equals("rtshop.note.bought_by") && Long.parseLong(ln[2]) >= 1;
+            }
+            boolean bossNote = com.rtshop.rules.ItemNotes.of("minecraft:nether_star").stream().anyMatch(ln -> ln[0].equals("rtshop.note.boss"));
+            check("item notes: an item says who buys it (wheat), boss loot says shops do not trade it, and things with no use have no note",
+                    bought && bossNote && com.rtshop.rules.ItemNotes.of("minecraft:bedrock").isEmpty() && com.rtshop.rules.ItemNotes.countForTest() > 50,
+                    com.rtshop.rules.ItemNotes.countForTest() + " items, wheat " + wheat.size() + " sold " + sold + " bought " + bought + " boss " + bossNote);
+        }
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
         QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");

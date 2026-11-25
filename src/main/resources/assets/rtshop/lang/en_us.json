@@ -1839,5 +1839,14 @@
   "item.rtshop.guidebook.tip2": "If lost, the general store sells another.",
   "rtshop.guide.title": "Surveyor's Guidebook",
   "rtshop.guide.search": "Search",
-  "rtshop.guide.none": "No page contains that word."
+  "rtshop.guide.none": "No page contains that word.",
+  "rtshop.note.hint": "[Shift] Uses",
+  "rtshop.note.sold_by": "Sold by: %s (%s G)",
+  "rtshop.note.bought_by": "Bought by: %s (from %s G)",
+  "rtshop.note.enhance": "Enhancing material (+%s to +%s)",
+  "rtshop.note.enhance_one": "Enhancing material (+%s)",
+  "rtshop.note.gacha": "Comes from the gacha (%s)",
+  "rtshop.note.quest": "Needed for quests (%s)",
+  "rtshop.note.boss": "Boss loot · not traded by shops",
+  "rtshop.note.no_recipe": "Cannot be crafted · get it from shops or the gacha"
 }

@@ -424,6 +424,12 @@ public final class ItemPolicy {
         return st().boss.contains(item);
     }
 
+    /** 상점·뽑기에 올라 있어 조합법이 막힌 장비인가 (아이템 쓰임새 설명에 쓴다). */
+    public static boolean shopOnly(Item item) {
+        State s = st();
+        return s.c.enabled && s.c.recipeBanListedGear && s.listed.contains(item);
+    }
+
     // ------------------------------------------------------------------ 묻는 곳
 
     /** NPC 상점에 오르면 안 되는가. */

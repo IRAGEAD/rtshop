@@ -117,6 +117,7 @@ public final class ShopServer {
         }
         loaded = ShopLoader.loadAll(server);
         com.rtshop.rules.ItemPolicy.afterShops(server, loaded);
+        com.rtshop.rules.ItemNotes.rebuild(server);   // 아이템 쓰임새 설명 (상점·강화·뽑기·퀘스트에서)
         SESSIONS.clear();
         return loaded;
     }

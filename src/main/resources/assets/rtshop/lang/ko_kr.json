@@ -1839,5 +1839,14 @@
   "item.rtshop.guidebook.tip2": "잃어버리면 잡화점에서 다시 살 수 있다.",
   "rtshop.guide.title": "조사대 안내서",
   "rtshop.guide.search": "낱말로 찾기",
-  "rtshop.guide.none": "찾는 낱말이 든 쪽이 없습니다."
+  "rtshop.guide.none": "찾는 낱말이 든 쪽이 없습니다.",
+  "rtshop.note.hint": "[Shift] 쓰임새",
+  "rtshop.note.sold_by": "파는 곳: %s (%s G)",
+  "rtshop.note.bought_by": "사 주는 곳: %s (%s G 부터)",
+  "rtshop.note.enhance": "강화 재료 (+%s ~ +%s)",
+  "rtshop.note.enhance_one": "강화 재료 (+%s)",
+  "rtshop.note.gacha": "뽑기에서 나옴 (%s)",
+  "rtshop.note.quest": "퀘스트에 내는 물건 (%s곳)",
+  "rtshop.note.boss": "보스 전리품 · 상점에서 사고팔 수 없음",
+  "rtshop.note.no_recipe": "조합할 수 없음 · 상점이나 뽑기에서 얻음"
 }
