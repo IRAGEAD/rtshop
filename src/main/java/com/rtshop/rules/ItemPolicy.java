@@ -500,7 +500,7 @@ public final class ItemPolicy {
                 if (id == null || item == Items.AIR || ours(id)) continue;
                 if (s.c.bossMods.contains(id.getNamespace()) || s.bossItems.hit(id)) out.add(item);
             }
-            if (s.c.sampleBossDrops && server != null) sampleBosses(server, out);
+            if (s.c.sampleBossDrops && server != null) out.addAll(sampledBossDrops(server, out, s.c.bossMods));
             if (server != null) derive(server, out);
             out.removeIf(i -> s.notBoss.hit(id(i)));
         } catch (Throwable t) {
@@ -514,6 +514,30 @@ public final class ItemPolicy {
      * 같은 모드의 다른 몹·상자에서도 나오는 것(흔한 재료·두루마리)과, 보스 아이템 없이도 만들 수 있는 것은 뺀다.
      * (통째로 보스 모드인 bossMods 는 이미 전부 보스 아이템이라 여기서 다루지 않는다.)
      */
+    private static Set<Item> sampledBossDrops(MinecraftServer server, Set<Item> known, Set<String> bossMods) {
+        // 전리품을 열어 보는 일은 주사위라서, 할 때마다 결과가 조금씩 달라질 수 있다. 서버를 켠 동안에는 한 번 센 것을 그대로 쓴다
+        // (상점을 다시 읽을 때마다 보스 아이템이 들락날락하지 않게). 보스 모드 목록이 바뀌면 다시 센다.
+        String key = System.identityHashCode(server) + ":" + bossMods;
+        Set<Item> cached = sampledKey.equals(key) ? sampled : null;
+        if (cached == null) {
+            Set<Item> all = new HashSet<>(known);
+            sampleBosses(server, all);
+            all.removeAll(known);
+            cached = Set.copyOf(all);
+            sampled = cached;
+            sampledKey = key;
+        }
+        return cached;
+    }
+
+    private static volatile Set<Item> sampled = Set.of();
+    private static volatile String sampledKey = "";
+
+    /** 시험용·/rtshop reload 용: 보스 전리품을 다음에 다시 센다. */
+    public static void forgetSampled() {
+        sampledKey = "";
+    }
+
     private static void sampleBosses(MinecraftServer server, Set<Item> out) {
         State s = st();
         Set<String> ids = new LinkedHashSet<>();
@@ -532,7 +556,7 @@ public final class ItemPolicy {
         ids.addAll(MobRules.get().extraBosses);
         Map<String, Set<Item>> found = new HashMap<>();          // 보스의 모드 → 그 보스들이 떨어뜨린 그 모드의 아이템
         Set<ResourceLocation> bossTables = new HashSet<>();
-        long until = System.currentTimeMillis() + 4000;
+        long until = System.currentTimeMillis() + 15000;
         for (String bid : ids) {
             if (System.currentTimeMillis() > until) break;
             try {
@@ -552,7 +576,7 @@ public final class ItemPolicy {
         }
         if (found.isEmpty()) return;
         // 같은 모드의 다른 몹·상자에서도 나오면 보스만의 것이 아니다
-        until = System.currentTimeMillis() + 4000;
+        until = System.currentTimeMillis() + 15000;
         try {
             for (ResourceLocation table : server.getLootData().getKeys(net.minecraft.world.level.storage.loot.LootDataType.TABLE)) {
                 if (System.currentTimeMillis() > until) break;
