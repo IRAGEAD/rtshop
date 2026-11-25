@@ -100,7 +100,7 @@ public final class EnhancePanel {
             out.add(new int[]{r[0] + r[2] - w, r[1], w, B_SHOW});
             return out;
         }
-        boolean op = mc.player != null && mc.player.hasPermissions(2);
+        boolean op = mc.player != null && com.rtshop.util.Perm.op(mc.player);
         int gear = 18, gap = 2;
         int n = op ? 3 : 2;
         int rest = r[2] - gear - gap * n;

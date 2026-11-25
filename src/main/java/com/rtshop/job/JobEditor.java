@@ -16,7 +16,7 @@ public final class JobEditor {
     }
 
     public static void open(ServerPlayer p) {
-        if (!p.hasPermissions(2)) {
+        if (!com.rtshop.util.Perm.op(p)) {
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }
@@ -42,7 +42,7 @@ public final class JobEditor {
     }
 
     public static void handleSave(ServerPlayer p, String json) {
-        if (!p.hasPermissions(2)) {
+        if (!com.rtshop.util.Perm.op(p)) {
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }

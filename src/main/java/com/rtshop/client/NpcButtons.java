@@ -64,7 +64,7 @@ public final class NpcButtons {
 
     private static boolean editButton(Screen s) {
         Minecraft mc = Minecraft.getInstance();
-        return s instanceof ShopScreen && mc.player != null && mc.player.hasPermissions(2);
+        return s instanceof ShopScreen && mc.player != null && com.rtshop.util.Perm.op(mc.player);
     }
 
     /** 상인 화면이 제목 줄에서 단추를 놓을 자리(제목 글자 바로 오른쪽)를 알려 준다. */

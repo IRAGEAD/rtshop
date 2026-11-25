@@ -274,7 +274,7 @@ public final class WorldRules {
         if (!w.abyssPortalSet) return true;
         String dim = p.level().dimension().location().toString();
         if (dim.equals(ABYSS_DIM)) return true; // 이미 안에 있다 (층 이동)
-        if (p.isCreative() && p.hasPermissions(2)) return true;
+        if (p.isCreative() && com.rtshop.util.Perm.op(p)) return true;
         if (!dim.equals(w.abyssPortalDim)) return false;
         double dx = p.getX() - (w.abyssPortalX + 0.5), dy = p.getY() - w.abyssPortalY, dz = p.getZ() - (w.abyssPortalZ + 0.5);
         return dx * dx + dz * dz <= (double) w.abyssPortalRadius * w.abyssPortalRadius && Math.abs(dy) <= w.abyssPortalRadius;
@@ -371,7 +371,7 @@ public final class WorldRules {
             ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(event.getPlacedBlock().getBlock());
             if (rl != null && rl.toString().equals(ALTAR_KEY)) {
                 WorldRules wa = get();
-                boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && pa.hasPermissions(2);
+                boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && com.rtshop.util.Perm.op(pa);
                 if (wa.altarOpOnly && !opA) {
                     event.setCanceled(true);
                     if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(wa.textAltarBuild).withStyle(ChatFormatting.YELLOW), true);
@@ -383,7 +383,7 @@ public final class WorldRules {
             }
             if (rl != null && rl.toString().equals(ANVIL_KEY)) {
                 WorldRules wa = get();
-                boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && pa.hasPermissions(2);
+                boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && com.rtshop.util.Perm.op(pa);
                 if (wa.anvilOpOnly && !opA) {
                     event.setCanceled(true);
                     if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(wa.textAnvilBuild).withStyle(ChatFormatting.YELLOW), true);
@@ -399,7 +399,7 @@ public final class WorldRules {
                 if (w.abyssPortalOpOnly) event.setCanceled(true);
                 return;
             }
-            boolean op = p.isCreative() && p.hasPermissions(2);
+            boolean op = p.isCreative() && com.rtshop.util.Perm.op(p);
             if (w.abyssPortalOpOnly && !op) {
                 event.setCanceled(true);
                 com.rtshop.notice.Notice.send(p, Component.literal(w.textPortalBuild).withStyle(ChatFormatting.YELLOW));
@@ -419,7 +419,7 @@ public final class WorldRules {
         try {
             ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(event.getState().getBlock());
             if (rl != null && rl.toString().equals(ANVIL_KEY) && get().anvilOpOnly) { // 강화 모루도 운영자(크리에이티브)만 치운다
-                if (event.getPlayer() instanceof ServerPlayer p && p.isCreative() && p.hasPermissions(2)) {
+                if (event.getPlayer() instanceof ServerPlayer p && p.isCreative() && com.rtshop.util.Perm.op(p)) {
                     WorldRules w = get();
                     if (w.anvilSet && anvilAllowed(p.level(), event.getPos())) {
                         w.anvilSet = false;
@@ -431,7 +431,7 @@ public final class WorldRules {
                 return;
             }
             if (rl == null || !rl.toString().equals(ALTAR_KEY) || !get().altarOpOnly) return;
-            if (event.getPlayer() instanceof ServerPlayer p && p.isCreative() && p.hasPermissions(2)) {
+            if (event.getPlayer() instanceof ServerPlayer p && p.isCreative() && com.rtshop.util.Perm.op(p)) {
                 WorldRules w = get();
                 if (w.altarSet && altarAllowed(p.level(), event.getPos())) { // 정해 둔 제단을 치웠다: 지정을 푼다 (다음에 놓는 것이 새 제단이 된다)
                     w.altarSet = false;

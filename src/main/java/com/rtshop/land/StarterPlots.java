@@ -52,7 +52,7 @@ public final class StarterPlots {
             if (free == null) {
                 com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.starter_none").withStyle(ChatFormatting.GOLD));
                 for (ServerPlayer op : p.server.getPlayerList().getPlayers()) {
-                    if (op.hasPermissions(2) && op != p) {
+                    if (com.rtshop.util.Perm.op(op) && op != p) {
                         com.rtshop.notice.Notice.send(op, Component.translatable("rtshop.plot.starter_none_op", p.getGameProfile().getName())
                                 .withStyle(ChatFormatting.GOLD));
                     }

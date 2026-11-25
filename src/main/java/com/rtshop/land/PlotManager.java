@@ -166,7 +166,7 @@ public final class PlotManager {
     }
 
     static boolean isOp(ServerPlayer p) {
-        return p.hasPermissions(2);
+        return com.rtshop.util.Perm.op(p);
     }
 
     static boolean holdsWand(ServerPlayer p) {
@@ -491,7 +491,7 @@ public final class PlotManager {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (!event.getItemStack().is(ModItems.PLOT_WAND.get()) || event.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND
-                || !event.getEntity().hasPermissions(2)) {
+                || !com.rtshop.util.Perm.op(event.getEntity())) {
             return;
         }
         event.setCanceled(true);

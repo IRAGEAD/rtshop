@@ -85,7 +85,7 @@ public final class ShopEditor {
     }
 
     public static void handle(ServerPlayer p, int action, String id, String json) {
-        if (!p.hasPermissions(2) || !validId(id)) {
+        if (!com.rtshop.util.Perm.op(p) || !validId(id)) {
             return;
         }
         try {

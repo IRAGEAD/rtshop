@@ -49,7 +49,7 @@ public final class PlayerShops {
     }
 
     static boolean isOwner(ServerPlayer p, PlayerShopBlockEntity be) {
-        return be.owner.equals(p.getUUID()) || (!be.hasOwner() && p.hasPermissions(2));
+        return be.owner.equals(p.getUUID()) || (!be.hasOwner() && com.rtshop.util.Perm.op(p));
     }
 
     public static void open(ServerPlayer p, BlockPos pos) {

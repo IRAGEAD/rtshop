@@ -1909,6 +1909,14 @@ public final class SelfTest {
         witherProbe.discard();
         zombieProbe.discard();
         com.rtshop.rules.MobRules.reload();
+        // 운영자 기능은 크리에이티브(관전)일 때만: 서바이벌의 OP 는 보통 플레이어와 같다
+        com.rtshop.util.Perm.enforceForTest = true;
+        try {
+            boolean plain = !com.rtshop.util.Perm.op(a) && !com.rtshop.util.Perm.lockedOp(a);
+            check("operator features need creative mode: a non-operator has none either way (and is not 'a locked operator')", plain || a.hasPermissions(2), a.hasPermissions(2));
+        } finally {
+            com.rtshop.util.Perm.enforceForTest = false;
+        }
         // 스킬북으로 배운 기술은 죽어도 남는다: Epic Fight 의 keepSkills 규칙을 켠다 (Epic Fight 가 없으면 규칙도 없다)
         boolean efHere = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
         boolean ruleFound = com.rtshop.rules.KeepSkills.apply(server);

@@ -374,7 +374,7 @@ public final class Attendance {
 
     /** 출석부 편집은 OP(서버 관리자 목록에 있는 사람, 싱글플레이에서는 치트를 켠 주인)만 할 수 있다. */
     public static boolean canEdit(ServerPlayer p) {
-        return !(p instanceof FakePlayer) && p.server.getPlayerList().isOp(p.getGameProfile());
+        return !(p instanceof FakePlayer) && p.server.getPlayerList().isOp(p.getGameProfile()) && com.rtshop.util.Perm.op(p); // 서바이벌의 OP 는 편집할 수 없다
     }
 
     public static void openEditor(ServerPlayer p) {

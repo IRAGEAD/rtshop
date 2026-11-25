@@ -32,7 +32,7 @@ public final class RulesEditor {
     }
 
     public static void handle(ServerPlayer p, int action, String key, String json) {
-        if (!p.hasPermissions(2)) {
+        if (!com.rtshop.util.Perm.op(p)) {
             return;
         }
         try {

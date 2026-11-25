@@ -117,6 +117,7 @@ NEW = {
  "rtshop.enhui.detail_title": ("장비 상세 정보", "Item details"),
  "rtshop.enhui.odds_success": ("성공", "Success"), "rtshop.enhui.odds_maintain": ("유지", "Keep"), "rtshop.enhui.odds_damage": ("손상", "Damage"), "rtshop.enhui.odds_destroy": ("파괴", "Destroy"),
  "rtshop.enhui.guard": ("보호권", "Protection"), "rtshop.enhui.guard_none": ("없음", "None"), "rtshop.enhui.guard_risk": ("없음 · 파괴 주의", "None · may break"),
+ "rtshop.perm.survival_op": ("서바이벌 모드에서는 운영자 기능을 쓸 수 없습니다. /gamemode creative 로 바꾼 뒤 다시 해 주세요.", "Operator features are off in survival mode. Switch with /gamemode creative and try again."),
  "rtshop.enhui.detail_empty": ("장비를 올리면 상세 정보가 여기에 보입니다.", "Put an item on the anvil to see its details here."),
  "rtshop.enhui.detail_scroll": ("휠로 넘기기", "scroll"),
  "rtshop.enhui.stat_attack_pct": ("공격력 보너스", "Attack bonus"),

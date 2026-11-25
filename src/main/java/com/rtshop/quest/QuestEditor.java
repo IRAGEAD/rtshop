@@ -47,7 +47,7 @@ public final class QuestEditor {
     }
 
     public static boolean allowed(ServerPlayer p) {
-        return p.hasPermissions(PERMISSION);
+        return com.rtshop.util.Perm.op(p);
     }
 
     // ------------------------------------------------------------------ 편집기 열기

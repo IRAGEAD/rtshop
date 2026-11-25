@@ -393,7 +393,7 @@ public final class Raid {
     /** 레이드 관련 NPC(안내인·레이드 상점)가 아직 이 사람의 말을 받아 주지 않는가. 운영자의 크리에이티브는 통과. */
     public static boolean npcLocked(ServerPlayer p) {
         if (!RaidConfig.get().npcsAfterFirstBoss) return false;
-        if (p.isCreative() && p.hasPermissions(2)) return false;
+        if (p.isCreative() && com.rtshop.util.Perm.op(p)) return false;
         return !firstBossDown(p);
     }
 
@@ -917,7 +917,7 @@ public final class Raid {
     // ------------------------------------------------------------------ 이벤트: 구역 보호
 
     private static boolean builder(Entity e) {
-        return e instanceof ServerPlayer p && p.getAbilities().instabuild && p.hasPermissions(2);
+        return e instanceof ServerPlayer p && p.getAbilities().instabuild && com.rtshop.util.Perm.op(p);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -1034,7 +1034,7 @@ public final class Raid {
                 if ((state == FAILED || state == DONE) && inArena(p) || downed(p)) sendHome(p);
             }
             case ACT_EDIT_SAVE, ACT_EDIT_ADD -> {
-                if (!p.hasPermissions(2)) return;
+                if (!com.rtshop.util.Perm.op(p)) return;
                 try {
                     JsonObject o = JsonParser.parseString(payload).getAsJsonObject();
                     String id = o.has("id") ? o.get("id").getAsString() : "";

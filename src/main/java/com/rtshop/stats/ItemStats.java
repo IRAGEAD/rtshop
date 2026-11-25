@@ -232,7 +232,7 @@ public final class ItemStats {
 
     /** 편집기에서 저장 (OP). json = {"속성 ID": 값} (빈 객체 = 원래대로). */
     public static void saveFromEditor(ServerPlayer p, String itemId, String json) {
-        if (!p.hasPermissions(2)) return;
+        if (!com.rtshop.util.Perm.op(p)) return;
         try {
             ResourceLocation rl = ResourceLocation.tryParse(itemId);
             if (rl == null || !ForgeRegistries.ITEMS.containsKey(rl)) throw new IllegalArgumentException(itemId);

@@ -813,7 +813,7 @@ public final class QuestManager {
 
     @SubscribeEvent
     public static void onLoginStale(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer p) || !p.hasPermissions(2)) return;
+        if (!(event.getEntity() instanceof ServerPlayer p) || !com.rtshop.util.Perm.op(p)) return;
         List<String> stale = new ArrayList<>(STALE_DEFAULTS);
         if (com.rtshop.story.Dialogue.stale) stale.add("dialogue.json");
         if (!UPDATED_DEFAULTS.isEmpty()) {

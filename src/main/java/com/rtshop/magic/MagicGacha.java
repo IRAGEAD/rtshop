@@ -66,7 +66,7 @@ public final class MagicGacha {
     }
 
     public static boolean canEdit(ServerPlayer p) {
-        return !(p instanceof FakePlayer) && p.server.getPlayerList().isOp(p.getGameProfile());
+        return !(p instanceof FakePlayer) && p.server.getPlayerList().isOp(p.getGameProfile()) && com.rtshop.util.Perm.op(p); // 서바이벌의 OP 는 편집할 수 없다
     }
 
     private static void send(ServerPlayer p, int kind, JsonObject o) {

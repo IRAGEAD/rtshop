@@ -468,13 +468,13 @@ public final class Enhance {
             case com.rtshop.net.EnhanceActionPacket.OPEN_ODDS -> ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
                     EnhancePacket.open(EnhancePacket.ODDS, EnhanceConfig.get().toJson().toString()));
             case com.rtshop.net.EnhanceActionPacket.OPEN_EDITOR -> {
-                if (p.hasPermissions(2)) {
+                if (com.rtshop.util.Perm.op(p)) {
                     ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
                             EnhancePacket.open(EnhancePacket.EDITOR, EnhanceConfig.get().toJson().toString()));
                 }
             }
             case com.rtshop.net.EnhanceActionPacket.SAVE -> {
-                if (!p.hasPermissions(2)) return;
+                if (!com.rtshop.util.Perm.op(p)) return;
                 try {
                     EnhanceConfig.saveFromEditor(json);
                     syncAll(p.server);

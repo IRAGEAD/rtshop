@@ -292,7 +292,7 @@ public final class AbyssWeekly {
     public static boolean floorLocked(ServerPlayer p, int floor) {
         Config c = config();
         if (!c.storyOnlyFloors || floor < 1 || floor > FLOORS) return false;
-        if (p.isCreative() && p.hasPermissions(2)) return false;
+        if (p.isCreative() && com.rtshop.util.Perm.op(p)) return false;
         return com.rtshop.quest.QuestManager.storyAbyssFloor(p) < floor;
     }
 

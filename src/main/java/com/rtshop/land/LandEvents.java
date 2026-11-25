@@ -240,7 +240,7 @@ public final class LandEvents {
         if (!(event.getEntity() instanceof ServerPlayer sp) || !(event.getLevel() instanceof ServerLevel level)) {
             return;
         }
-        if (event.getItemStack().is(com.rtshop.item.ModItems.PLOT_WAND.get()) && sp.hasPermissions(2)) {
+        if (event.getItemStack().is(com.rtshop.item.ModItems.PLOT_WAND.get()) && com.rtshop.util.Perm.op(sp)) {
             return; // 구획 지팡이(OP)는 토지 위에서도 칸을 고를 수 있어야 한다
         }
         BlockPos pos = event.getPos();

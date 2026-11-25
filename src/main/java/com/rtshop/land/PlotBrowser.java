@@ -45,7 +45,7 @@ public final class PlotBrowser {
 
     /** 가까이에 토지 상인(토지 문서를 파는 상인 NPC)이 있는가. OP 는 어디서나. */
     public static boolean nearMerchant(ServerPlayer p) {
-        return p.hasPermissions(2) || merchant(p) != null;
+        return com.rtshop.util.Perm.op(p) || merchant(p) != null;
     }
 
     /** 가까운 토지 상인 NPC 와 그 상점 ID. */
