@@ -222,3 +222,5 @@
 - **조사대 안내서** (`story/Guide`, `guide.json`, 화면 `client/GuideScreen`): 내용은 `tools/gen_guide.py`, 그림은 `tools/gen_guide_images.py` (CI 화면을 줄인 것). 쪽의 `mod` 가 설치되지 않았으면 그 쪽은 보이지 않는다.
 - **아이템 쓰임새 설명** (`rules/ItemNotes`, `item_notes.json`, 화면 `client/ItemNoteTips`): Shift 를 누르면 파는 곳·사 주는 곳·강화 재료·뽑기·보스 전리품·퀘스트. 상점을 읽을 때마다 다시 만든다.
 - **강화 정보 창**: 연한 금빛 판(`tools/gen_enhance_panel.py`), 전용 글꼴 `assets/rtshop/font/enhance.json` (한글 송명, 숫자·영문 Playfair Display Bold). 글자는 `EnhancePanel.fit` 으로 칸 너비에 맞춰 줄인다. `client.json` 의 `enhanceLuxFont`.
+- **아이템 규칙 2판** (`item_policy.json` 의 version 2): Better Nether 도 NPC 상점 금지, 전리품 금지의 `*fruit*:*` → `spmovesets:*`. 예전 파일은 읽을 때 저절로 고쳐 쓴다.
+  `shopBannedKeepOwnWays`: 상점 금지 모드(Arcane Vortex·Better Nether·Nightfall)의 장비는 "상점에서만" 규칙에서 빠져 그 모드의 조합법으로 만든다 (Nightfall 은 전리품 금지가 따로 걸려 있다).

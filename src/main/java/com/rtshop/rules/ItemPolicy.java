@@ -54,13 +54,17 @@ import java.util.regex.Pattern;
  *  - 값: priceFactor 의 묶음은 상점가를 곱한다.
  *  - 전리품: lootBan 의 아이템은 상자·몹·낚시 어디서도 나오지 않는다. 모드 장비는 상점에서만 (보스의 전리품과 보스 아이템은 그대로).
  *  - 조합법: recipeBan, 지팡이, 상점·뽑기에 오른 장비, 모드 장비는 만들 수 없다 (바닐라 장비와 보스 아이템은 그대로).
- * 적는 법: "모드:아이템", "모드:*", 또는 * 가 낀 무늬 ("irons_spellbooks:*_ink", "*fruit*:*").
+ * 적는 법: "모드:아이템", "모드:*", 또는 * 가 낀 무늬 ("irons_spellbooks:*_ink").
  */
 public final class ItemPolicy {
     private ItemPolicy() {
     }
 
     public static final class Config {
+        /** 설정 파일의 판. 2 (3.53): Better Nether 도 상점 금지, 전리품 금지의 "*fruit*:*" 자리에 "spmovesets:*". */
+        public static final int VERSION = 2;
+        /** 읽어 온 파일이 예전 판이라 고쳐 썼는가 (다시 저장한다). */
+        transient boolean migrated;
         public boolean enabled = true;
         public final Set<String> shopBan = new LinkedHashSet<>();
         public boolean shopBanBossItems = true;
@@ -83,6 +87,8 @@ public final class ItemPolicy {
         public int staffPrice = 6000;
         public boolean recipeBanListedGear = true;
         public boolean modGearShopOnly = true;
+        /** 상점 금지(shopBan) 모드의 장비는 "상점에서만" 규칙에서 빼서, 그 모드의 조합법과 전리품을 그대로 둔다. */
+        public boolean shopBannedKeepOwnWays = true;
         public boolean vanillaGearToo = false;
         public final Set<String> keep = new LinkedHashSet<>();
         /** 몬스터를 잡으면 따로 굴리는 드랍 (Iron's Spells 의 잉크): 아이템 → 확률(0~1). */
@@ -91,12 +97,12 @@ public final class ItemPolicy {
 
         public static Config defaults() {
             Config c = new Config();
-            c.shopBan.addAll(List.of("arcanevortex:*", "efn:*", "rtshop:enhance_anvil"));
+            c.shopBan.addAll(List.of("arcanevortex:*", "betternether:*", "efn:*", "rtshop:enhance_anvil"));
             c.gunWords.addAll(List.of("gun", "pistol", "rifle", "revolver", "musket", "shotgun", "blaster", "bullet"));
             c.priceFactor.put("wom:*", 5.0);
             c.bossMods.addAll(List.of("cataclysm", "fdbosses", "block_factorys_bosses", "witherreincarnated", "enderdragonplus"));
             c.bossItems.addAll(List.of("minecraft:nether_star", "minecraft:dragon_egg", "minecraft:dragon_head"));
-            c.lootBan.addAll(List.of("*fruit*:*", "artifacts:*", "relics_rpgs:*", "jewelry:*", "simplehats:*",
+            c.lootBan.addAll(List.of("spmovesets:*", "artifacts:*", "relics_rpgs:*", "jewelry:*", "simplehats:*",
                     "adorablehamsterpets:*", "crittersandcompanions:*", "rpg_companions_tiny_dragons:*", "fantasymounts:*",
                     "efn:*", "tacz:*", "lrtactical:*"));
             c.lootAllow.addAll(List.of("irons_spellbooks:*_ink", "irons_spellbooks:ink_*"));
@@ -120,8 +126,10 @@ public final class ItemPolicy {
             help.add("보스 아이템 = bossMods 의 모든 아이템 + bossItems + 보스가 떨어뜨리는 그 모드의 아이템(sampleBossDrops) + 그것으로만 만드는 물건. notBossItems 는 뺀다.");
             help.add("lootBan: 상자·몹·낚시 전리품에서 빠지는 아이템. lootAllow: 그래도 나오는 것 (잉크). mobDrops: 몬스터를 잡으면 따로 굴리는 드랍(확률 0~1), 보스는 bossDropFactor 배.");
             help.add("recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).");
+            help.add("shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.");
             help.add("recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.");
             o.add("_help", help);
+            o.addProperty("version", VERSION);
             o.addProperty("enabled", enabled);
             o.add("shopBan", arr(shopBan));
             o.addProperty("shopBanBossItems", shopBanBossItems);
@@ -150,6 +158,7 @@ public final class ItemPolicy {
             o.addProperty("staffPrice", staffPrice);
             o.addProperty("recipeBanListedGear", recipeBanListedGear);
             o.addProperty("modGearShopOnly", modGearShopOnly);
+            o.addProperty("shopBannedKeepOwnWays", shopBannedKeepOwnWays);
             o.addProperty("vanillaGearToo", vanillaGearToo);
             o.add("keep", arr(keep));
             return o;
@@ -182,8 +191,15 @@ public final class ItemPolicy {
             if (o.has("staffPrice")) c.staffPrice = Math.max(1, o.get("staffPrice").getAsInt());
             c.recipeBanListedGear = bool(o, "recipeBanListedGear", true);
             c.modGearShopOnly = bool(o, "modGearShopOnly", true);
+            c.shopBannedKeepOwnWays = bool(o, "shopBannedKeepOwnWays", true);
             c.vanillaGearToo = bool(o, "vanillaGearToo", false);
             strings(o, "keep", c.keep, d.keep);
+            int v = o.has("version") ? o.get("version").getAsInt() : 1;
+            if (v < 2) {   // 3.53: 요청대로 기본 규칙을 고친다 (직접 넣은 다른 줄은 그대로)
+                c.shopBan.add("betternether:*");
+                if (c.lootBan.remove("*fruit*:*") | !c.lootBan.contains("spmovesets:*")) c.lootBan.add("spmovesets:*");
+                c.migrated = true;
+            }
             return c;
         }
 
@@ -305,7 +321,12 @@ public final class ItemPolicy {
     private static Config load() {
         try {
             if (Files.exists(path())) {
-                return Config.fromJson(JsonParser.parseString(Files.readString(path(), StandardCharsets.UTF_8)).getAsJsonObject());
+                Config c = Config.fromJson(JsonParser.parseString(Files.readString(path(), StandardCharsets.UTF_8)).getAsJsonObject());
+                if (c.migrated) {
+                    Files.writeString(path(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
+                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다: Better Nether 상점 금지, 전리품 금지에 spmovesets.", Config.VERSION);
+                }
+                return c;
             }
             Config c = Config.defaults();
             Files.createDirectories(path().getParent());
@@ -470,6 +491,7 @@ public final class ItemPolicy {
         if (id == null || s.lootAllow.hit(id)) return false;
         if (s.lootBan.hit(id)) return true;
         if (bossTable || !s.c.modGearShopOnly || ours(id) || s.keep.hit(id) || s.boss.contains(item)) return false;
+        if (s.c.shopBannedKeepOwnWays && s.shopBan.hit(id)) return false;
         if (vanilla(id) && !s.c.vanillaGearToo) return false;
         return gear(item);
     }
@@ -486,7 +508,8 @@ public final class ItemPolicy {
         if (s.c.recipeBanStaffs && staff(item)) return "staff";
         if (ours(output) || (vanilla(output) && !s.c.vanillaGearToo)) return null;
         if (s.c.recipeBanListedGear && s.listed.contains(item)) return "listed";
-        if (s.c.modGearShopOnly && gear(item)) return "gear";
+        // 상점에 올리지 않기로 한 모드(shopBan)의 장비는 "상점에서만" 규칙에서 빠진다: 그 모드의 방식대로(조합·전리품) 얻는다
+        if (s.c.modGearShopOnly && gear(item) && !(s.c.shopBannedKeepOwnWays && s.shopBan.hit(output))) return "gear";
         return null;
     }
 

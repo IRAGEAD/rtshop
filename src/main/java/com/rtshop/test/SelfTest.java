@@ -2213,7 +2213,7 @@ public final class SelfTest {
                 for (ShopData.Entry en : sd.entries) {
                     net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(en.stack.getItem());
                     if (rl == null) continue;
-                    if (rl.getNamespace().equals("efn") || rl.getNamespace().equals("arcanevortex")) { banned++; sample = rl.toString(); }
+                    if (rl.getNamespace().equals("efn") || rl.getNamespace().equals("arcanevortex") || rl.getNamespace().equals("betternether")) { banned++; sample = rl.toString(); }
                     if (rl.getNamespace().equals("wom")) womListed++;
                     if (com.rtshop.rules.ItemPolicy.gun(en.stack.getItem())) { gunsListed++; sample = rl.toString(); }
                     if (com.rtshop.rules.ItemPolicy.bossItem(en.stack.getItem())) { bossListed++; sample = rl.toString(); }
@@ -2224,6 +2224,17 @@ public final class SelfTest {
                 if (rec.getId().getNamespace().equals("tacz") || out != null && out.getNamespace().equals("tacz")) tacz++;
                 if (out != null && !out.getNamespace().equals("minecraft") && !out.getNamespace().equals("rtshop")
                         && com.rtshop.rules.ItemPolicy.recipeReason(rec.getId(), out) != null) { craftableListed++; sample = out.toString(); }
+            }
+            if (net.minecraftforge.fml.ModList.get().isLoaded("betternether")) {
+                // 상점에 올리지 않는 모드의 장비는 그 모드의 조합법으로 만든다 (상점에도 없고 만들 수도 없는 물건이 되지 않게)
+                int netherGear = 0;
+                for (net.minecraft.world.item.crafting.Recipe<?> rec : server.getRecipeManager().getRecipes()) {
+                    ResourceLocation out = com.rtshop.rules.RecipeRules.outputId(rec, server);
+                    if (out == null || !out.getNamespace().equals("betternether")) continue;
+                    net.minecraft.world.item.Item it = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(out);
+                    if (it != null && com.rtshop.rules.ItemPolicy.gear(it)) netherGear++;
+                }
+                check("mod pack: Better Nether is not sold by NPC shops, and its gear keeps its own recipes", netherGear > 0, netherGear + " gear recipes");
             }
             check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
                     banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,
