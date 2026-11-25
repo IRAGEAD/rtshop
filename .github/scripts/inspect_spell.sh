@@ -70,4 +70,12 @@ if [ -n "$EFJ" ]; then
       for F in $(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "^data/[^/]+/capabilities/weapons/types/.*\.json$" | head -n 3); do echo "---- $(basename "$J") $F"; unzip -p "$J" "$F" | head -c 3000; echo; done
     done
   } > /tmp/inspect2/epicfight.txt 2>&1 || true
+  # 3.49: Epic Fight 의 게임 규칙 (죽어도 배운 기술을 지키는 규칙의 이름을 확인)
+  {
+    echo "==== gamerule lang"; for L in $(unzip -l "$EFJ" | awk '{print $4}' | grep -E "assets/epicfight/lang/(en_us|ko_kr)\.json$"); do unzip -p "$EFJ" "$L" | grep -i "gamerule" | head -n 60; done
+    mkdir -p /tmp/efgr && (cd /tmp/efgr && unzip -q -o "$GITHUB_WORKSPACE/$EFJ" 'yesman/epicfight/world/gamerule/*' 2>/dev/null)
+    for c in $(find /tmp/efgr -name "*.class" | head -n 12); do echo "==== $c"; javap -p -constants "$c" | head -n 60; done
+    echo "==== where skills are kept or dropped on death"; mkdir -p /tmp/efsk && (cd /tmp/efsk && unzip -q -o "$GITHUB_WORKSPACE/$EFJ" 'yesman/epicfight/skill/CapabilitySkill*.class' 'yesman/epicfight/events/PlayerEvents*.class' 'yesman/epicfight/events/EntityEvents*.class' 2>/dev/null)
+    for c in $(find /tmp/efsk -name "*.class" | head -n 8); do echo "==== $c"; javap -p -c -constants "$c" | grep -n -i "KEEP_SKILL\|keepSkill\|Clone\|copyFrom\|getRuleValue\|EpicFightGameRules" | head -n 40; done
+  } > /tmp/inspect2/epicfight-gamerules.txt 2>&1 || true
 fi
