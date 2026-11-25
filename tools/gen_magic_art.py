@@ -162,32 +162,35 @@ save(navy(3), 'block/arcane_pedestal_bottom.png')
 # 고리(혼천의의 띠)는 색만 입힌 입체로 그린다: 흰 그림 한 장
 save(Image.new('RGBA', (4, 4), (255, 255, 255, 255)), 'entity/white.png')
 
-# 구슬 (푸른 별빛)
-N = 32
-orb = Image.new('RGBA', (N, N))
-px = orb.load()
-for y in range(N):
-    for x in range(N):
-        dx, dy = (x - 15.5) / 15.5, (y - 15.5) / 15.5
-        r = math.hypot(dx, dy)
-        if r > 1:
-            continue
-        hl = max(0, 1 - math.hypot(dx + 0.35, dy + 0.35) * 1.6)
-        k = 1 - r * 0.5
-        c = (int(92 * k + 150 * hl), int(118 * k + 125 * hl), int(240 * k + 15 * hl))
-        a = 255 if r < 0.92 else int(255 * (1 - (r - 0.92) / 0.08))
-        px[x, y] = (min(255, c[0]), min(255, c[1]), min(255, c[2]), a)
-save(orb, 'entity/arcane_orb.png')
+# 구슬 (푸른 별빛): 가장자리가 어두워지지 않고, 가장자리로 갈수록 하늘빛 빛이 감돈다 (3.51: 검은 테두리 없앰)
+def orb_tex(N, core, mid, rim_light):
+    im = Image.new('RGBA', (N, N)); px = im.load(); h = (N - 1) / 2
+    for y in range(N):
+        for x in range(N):
+            dx, dy = (x - h) / h, (y - h) / h
+            r = math.hypot(dx, dy)
+            if r > 1:
+                continue
+            t = min(1.0, r / 0.6)
+            base = [core[i] + (mid[i] - core[i]) * t for i in range(3)]
+            rim = max(0.0, (r - 0.5) / 0.5) ** 1.6
+            c = [base[i] + (rim_light[i] - base[i]) * rim * 0.85 for i in range(3)]
+            hl = max(0, 1 - math.hypot(dx + 0.34, dy + 0.36) * 1.9) ** 1.3
+            c = [min(255, c[i] + (255 - c[i]) * hl * 0.9) for i in range(3)]
+            a = 255 if r < 0.94 else int(255 * (1 - (r - 0.94) / 0.06))
+            px[x, y] = (int(c[0]), int(c[1]), int(c[2]), a)
+    return im
+save(orb_tex(64, (74, 66, 214), (104, 110, 244), (170, 236, 255)), 'entity/arcane_orb.png')
 
-# 빛무리 (구슬 둘레)
-G = 32
+# 빛무리 (구슬 둘레): 하늘빛
+G = 64
 glow = Image.new('RGBA', (G, G))
 px = glow.load()
 for y in range(G):
     for x in range(G):
-        r = math.hypot((x - 15.5) / 15.5, (y - 15.5) / 15.5)
+        r = math.hypot((x - 31.5) / 31.5, (y - 31.5) / 31.5)
         if r < 1:
-            px[x, y] = (150, 180, 255, int(150 * (1 - r) ** 2))
+            px[x, y] = (150, 222, 255, int(190 * (1 - r) ** 2.1))
 save(glow, 'entity/arcane_glow.png')
 
 # 룬 고리: 바깥(굵은 고리 + 룬 눈금), 안쪽(가는 고리 + 점)
@@ -283,17 +286,7 @@ _save(tick.resize((256, 256), Image.LANCZOS), 'gui/magic/ring_ticks.png')
 
 # 구슬과 빛무리 (크게)
 N = 128
-o = Image.new('RGBA', (N, N)); px = o.load()
-for y in range(N):
-    for x in range(N):
-        dx, dy = (x - 63.5) / 63.5, (y - 63.5) / 63.5; r = math.hypot(dx, dy)
-        if r > 1: continue
-        hl = max(0, 1 - math.hypot(dx + 0.35, dy + 0.38) * 1.7); k = 1 - r * 0.6
-        rim = max(0, (r - 0.8) / 0.2) * 0.5
-        c = (int(110 * k + 140 * hl + 60 * rim), int(52 * k + 180 * hl + 30 * rim), int(205 * k + 50 * hl + 50 * rim))
-        a = 255 if r < 0.96 else int(255 * (1 - (r - 0.96) / 0.04))
-        px[x, y] = (min(255, c[0]), min(255, c[1]), min(255, c[2]), a)
-_save(o, 'gui/magic/orb.png')
+_save(orb_tex(N, (96, 44, 190), (132, 70, 226), (176, 226, 255)), 'gui/magic/orb.png')
 gl = Image.new('RGBA', (N, N)); px = gl.load()
 for y in range(N):
     for x in range(N):
@@ -302,13 +295,15 @@ for y in range(N):
 _save(gl, 'gui/magic/glow.png')
 
 # 룬석 (마름모): 꺼짐 / 켜짐. 5개 룬을 가로로 (각 64x80)
-def stone_sheet(lit):
+def stone_sheet(lit, sel=False):
     S = 2
     im = Image.new('RGBA', (64 * 5 * S, 80 * S)); d = ImageDraw.Draw(im)
     for i, g in enumerate(glyphs):
         ox = i * 64 * S; cx, cy = ox + 32 * S, 40 * S
         body = (58, 34, 96, 255) if lit else (30, 24, 44, 255)
         edge = (246, 208, 128, 255) if lit else (124, 98, 170, 255)
+        if sel:  # 고른 룬석: 금빛 테가 푸른빛으로 바뀐다
+            body = (52, 44, 118, 255); edge = (120, 208, 255, 255)
         pts = [(cx, cy - 37 * S), (cx + 29 * S, cy), (cx, cy + 37 * S), (cx - 29 * S, cy)]
         d.polygon(pts, fill=body, outline=edge)
         d.line(pts + [pts[0]], fill=edge, width=3 * S)
@@ -317,11 +312,13 @@ def stone_sheet(lit):
         d.polygon([(cx, cy + 37 * S), (cx - 29 * S, cy), (cx, cy + 6 * S)], fill=tuple(max(0, v - 10) for v in body[:3]) + (255,))
         d.line(pts + [pts[0]], fill=edge, width=3 * S)
         col = (255, 244, 214, 255) if lit else (168, 150, 204, 255)
+        if sel: col = (226, 246, 255, 255)
         for (x1, y1, x2, y2) in g:
             d.line((cx + (x1 - 8) * 2.2 * S, cy - 26 * S + (y1 - 2) * 1.5 * S, cx + (x2 - 8) * 2.2 * S, cy - 26 * S + (y2 - 2) * 1.5 * S), fill=col, width=2 * S)
     return im.resize((320, 80), Image.LANCZOS)
 _save(stone_sheet(False), 'gui/magic/stones.png')
 _save(stone_sheet(True), 'gui/magic/stones_on.png')
+_save(stone_sheet(True, True), 'gui/magic/stones_sel.png')
 # 오각 별 (소환진 안쪽 선)
 st = Image.new('RGBA', (512, 512)); d = ImageDraw.Draw(st)
 P = [(256 + 206 * math.cos(math.radians(-90 + 72 * i)), 256 + 206 * math.sin(math.radians(-90 + 72 * i))) for i in range(5)]

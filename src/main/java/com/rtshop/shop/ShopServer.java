@@ -109,7 +109,12 @@ public final class ShopServer {
         }
         com.rtshop.enhance.Enhance.syncAll(server);
         QuestManager.reload();
+        com.rtshop.rules.ItemPolicy.reload();
+        if (server != null) {
+            com.rtshop.rules.ItemPolicy.prepare(server); // 보스 아이템을 먼저 셈한다 (상점에 오르지 않게)
+        }
         loaded = ShopLoader.loadAll(server);
+        com.rtshop.rules.ItemPolicy.afterShops(server, loaded);
         SESSIONS.clear();
         return loaded;
     }

@@ -441,11 +441,17 @@ public class JobEditScreen extends Screen {
             addCycle(rx() + rw() - 96, y, id);
         }
         y += 18;
+        // 가방에 없는 무기도: 이름으로 찾아서 바로 종류를 정한다
+        hit(x, y - 2, 150, 14, () -> tr("rtshop.jedit.add_override"), () -> true, b -> searchWeapon(""));
+        y += 17;
         text(x, y, () -> tr("rtshop.jedit.overrides"), Ui.C_GOLD_DARK);
         y += 12;
         JsonObject over = obj(model, "weaponOverrides");
         List<String> ids = new ArrayList<>(over.keySet());
-        int maxRows = Math.max(1, (top() + bodyH() - 36 - y) / 15);
+        int maxRows = Math.max(1, (top() + bodyH() - 20 - y) / 15);
+        if (focusId != null && ids.contains(focusId)) {
+            scroll = Math.max(0, ids.indexOf(focusId) - maxRows + 1); // 방금 찾아 넣은 무기가 보이게
+        }
         scroll = Math.max(0, Math.min(Math.max(0, ids.size() - maxRows), scroll));
         for (int i = scroll; i < Math.min(ids.size(), scroll + maxRows); i++) {
             String id = ids.get(i);
@@ -456,24 +462,52 @@ public class JobEditScreen extends Screen {
                 setOverride(id, "");
                 rebuild();
             });
+            if (id.equals(focusId)) {
+                openTypePopup(rx() + rw() - 112, y - 1, id); // 찾아 넣은 무기: 종류 목록을 바로 펼친다
+            }
             y += 15;
         }
+        focusId = null;
         if (ids.isEmpty()) {
             text(x, y + 2, () -> tr("rtshop.jedit.no_overrides"), Ui.C_INK_SOFT);
             y += 14;
         }
-        int addY = top() + bodyH() - 32;
-        hit(x, addY, 130, 14, () -> tr("rtshop.jedit.add_override"), () -> true, b -> {
-            if (minecraft != null) {
-                minecraft.setScreen(new PickerScreen(this, PickerScreen.Mode.ITEM, v -> {
-                    if (!obj(model, "weaponOverrides").has(v)) {
-                        obj(model, "weaponOverrides").addProperty(v, WeaponTypes.NONE);
-                        dirty = true;
-                    }
-                }));
-            }
-        });
-        text(x, addY + 18, () -> tr("rtshop.jedit.hint_types"), Ui.C_INK_SOFT);
+        text(x, top() + bodyH() - 14, () -> tr("rtshop.jedit.hint_types"), Ui.C_INK_SOFT);
+    }
+
+    /** 방금 검색해서 넣은 아이템 (목록에서 보이게 하고 종류 목록을 펼친다). */
+    private String focusId;
+
+    /**
+     * 무기를 이름으로 찾아 분류에 넣는다 (가방에 없어도 된다).
+     * typeId 가 비어 있으면 자동 분류된 종류로 넣고 종류 목록을 펼치고, 아니면 그 종류로 바로 넣는다.
+     */
+    private void searchWeapon(String typeId) {
+        if (minecraft == null) return;
+        minecraft.setScreen(PickerScreen.weapons(this, v -> addBySearch(v, typeId)));
+    }
+
+    private void addBySearch(String itemId, String typeId) {
+        JsonObject over = obj(model, "weaponOverrides");
+        if (!typeId.isEmpty()) {
+            over.addProperty(itemId, typeId);
+        } else if (!over.has(itemId)) {
+            JobConfig cfg = parsed();
+            Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(itemId));
+            over.addProperty(itemId, cfg == null || item == null ? WeaponTypes.NONE : WeaponTypes.classify(item, cfg.weaponTypes, Map.of()));
+        }
+        if (typeId.isEmpty()) focusId = itemId;
+        dirty = true;
+    }
+
+    /** 점검용: 검색으로 고른 것처럼 넣는다. */
+    public void addBySearchForTest(String itemId, String typeId) {
+        addBySearch(itemId, typeId);
+        rebuild();
+    }
+
+    public String overrideForTest(String itemId) {
+        return currentType(itemId);
     }
 
     private String currentType(String id) {
@@ -730,7 +764,8 @@ public class JobEditScreen extends Screen {
             scroll = 0;
             rebuild();
         });
-        text(x + 66, y + 2, () -> tr("rtshop.jedit.items_title", t.get("name").getAsString(), ids.size()), Ui.C_GOLD_DARK);
+        text(x + 66, y + 2, () -> Ui.clip(this.font, tr("rtshop.jedit.items_title", t.get("name").getAsString(), ids.size()), w - 66 - 126), Ui.C_GOLD_DARK);
+        hit(rx() + rw() - 126, y - 1, 120, 13, () -> tr("rtshop.jedit.items_add"), () -> true, b -> searchWeapon(typeId));
         y += 16;
         int maxRows = Math.max(1, (top() + bodyH() - 20 - y) / 15);
         scroll = Math.max(0, Math.min(Math.max(0, ids.size() - maxRows), scroll));

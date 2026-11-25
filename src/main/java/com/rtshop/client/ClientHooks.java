@@ -78,10 +78,20 @@ public final class ClientHooks {
     /** 퀘스트 창을 열거나, 이미 열려 있으면 내용만 새로 고친다. */
     public static void openQuest(QuestOpenPacket packet) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.screen instanceof QuestScreen screen) {
+        if (packet.journal) {
+            // 수첩: 어디서나 내용만 본다 (/rtshop quest)
+            if (mc.screen instanceof QuestScreen screen) {
+                screen.update(packet);
+            } else {
+                mc.setScreen(new QuestScreen(packet));
+            }
+            return;
+        }
+        // NPC 와의 퀘스트 이야기: 받기·보고·그만두기를 대화 상자에서 한다
+        if (mc.screen instanceof QuestTalkScreen screen) {
             screen.update(packet);
-        } else {
-            mc.setScreen(new QuestScreen(packet));
+        } else if (!(mc.screen instanceof QuestScreen)) {
+            mc.setScreen(new QuestTalkScreen(packet));
         }
     }
 

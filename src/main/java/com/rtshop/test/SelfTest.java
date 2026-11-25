@@ -314,6 +314,7 @@ public final class SelfTest {
         }
         try {
             plotClear(server, level, a);
+            landSweep(level);
         } catch (Throwable t) {
             crash("plot clear", t);
         }
@@ -737,6 +738,60 @@ public final class SelfTest {
             for (int x = X - 2; x <= X + 9; x++)
                 for (int z = Z - 2; z <= Z + 9; z++)
                     for (int y = Y - 3; y <= Y + 8; y++) level.setBlock(new BlockPos(x, y, z), B[7].defaultBlockState(), 2);
+        }
+    }
+
+    // ------------------------------------------------------------------ 토지를 비운 뒤의 뒷정리 (잘린 나무·뜬 조각)
+
+    private static void landSweep(ServerLevel level) {
+        section("land sweep");
+        int X = 3300, Z = 3300, Y = 100;
+        net.minecraft.world.level.block.state.BlockState air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),
+                dirt = net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState(), log = net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState(),
+                leaf = net.minecraft.world.level.block.Blocks.OAK_LEAVES.defaultBlockState().setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true),
+                plank = net.minecraft.world.level.block.Blocks.OAK_PLANKS.defaultBlockState(), fence = net.minecraft.world.level.block.Blocks.OAK_FENCE.defaultBlockState();
+        it.unimi.dsi.fastutil.longs.LongOpenHashSet gone = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
+        try {
+            for (int x = X - 4; x <= X + 25; x++) for (int z = Z - 4; z <= Z + 25; z++) level.setBlock(new BlockPos(x, Y, z), dirt, 2);
+            // 나무 둘 (줄기 5칸 + 잎 5x5x3): 하나는 건드려도 되는 자리, 하나는 남의 토지(touch = false)
+            for (int tz : new int[]{Z + 8, Z - 1}) {
+                for (int y = Y + 1; y <= Y + 5; y++) level.setBlock(new BlockPos(X + 8, y, tz), log, 2);
+                for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) for (int y = Y + 4; y <= Y + 6; y++) {
+                    BlockPos p = new BlockPos(X + 8 + dx, y, tz + dz);
+                    if (level.getBlockState(p).isAir()) level.setBlock(p, leaf, 2);
+                }
+                // 토지(x <= X+6) 안으로 뻗은 잎은 토지를 비울 때 잘려 나갔다
+                for (int dz = -2; dz <= 2; dz++) for (int y = Y + 4; y <= Y + 6; y++) {
+                    BlockPos p = new BlockPos(X + 6, y, tz + dz);
+                    level.setBlock(p, air, 2);
+                    gone.add(p.asLong());
+                }
+            }
+            // 통나무 벽 (너비 13칸, 잎 없음): 나무가 아니다
+            for (int x = X + 10; x <= X + 22; x++) for (int y = Y + 1; y <= Y + 3; y++) level.setBlock(new BlockPos(x, y, Z + 20), log, 2);
+            gone.add(BlockPos.asLong(X + 9, Y + 1, Z + 20));
+            // 공중에 뜬 판자 두 장, 땅에 선 울타리 기둥
+            level.setBlock(new BlockPos(X + 2, Y + 5, Z + 15), plank, 2);
+            level.setBlock(new BlockPos(X + 2, Y + 6, Z + 15), plank, 2);
+            gone.add(BlockPos.asLong(X + 1, Y + 5, Z + 15));
+            for (int y = Y + 1; y <= Y + 3; y++) level.setBlock(new BlockPos(X + 2, y, Z + 2), fence, 2);
+            gone.add(BlockPos.asLong(X + 1, Y + 2, Z + 2));
+            final int line = Z + 2;
+            com.rtshop.land.LandSweep.Result r = com.rtshop.land.LandSweep.run(level, gone, (x, y, z) -> z >= line, 10, null);
+            check("a tree cut by the lot's edge is removed whole (trunk and leaves); the same tree on someone else's land is left alone",
+                    r.trees == 1 && level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 8)).isAir() && level.getBlockState(new BlockPos(X + 8, Y + 5, Z + 8)).isAir()
+                            && level.getBlockState(new BlockPos(X + 10, Y + 4, Z + 10)).isAir() && level.getBlockState(new BlockPos(X + 7, Y + 6, Z + 6)).isAir()
+                            && level.getBlockState(new BlockPos(X + 8, Y + 1, Z - 1)).is(log.getBlock()) && level.getBlockState(new BlockPos(X + 10, Y + 4, Z - 1)).is(leaf.getBlock()),
+                    r + " trunk " + level.getBlockState(new BlockPos(X + 8, Y + 1, Z + 8)) + " leaf " + level.getBlockState(new BlockPos(X + 10, Y + 4, Z + 10))
+                            + " other " + level.getBlockState(new BlockPos(X + 8, Y + 1, Z - 1)));
+            check("a piece left floating beside the cleared space is removed; a log wall, a post standing on the ground and the ground itself stay",
+                    r.floating == 1 && level.getBlockState(new BlockPos(X + 2, Y + 5, Z + 15)).isAir() && level.getBlockState(new BlockPos(X + 2, Y + 6, Z + 15)).isAir()
+                            && level.getBlockState(new BlockPos(X + 10, Y + 1, Z + 20)).is(log.getBlock()) && level.getBlockState(new BlockPos(X + 22, Y + 3, Z + 20)).is(log.getBlock())
+                            && level.getBlockState(new BlockPos(X + 2, Y + 1, Z + 2)).is(fence.getBlock()) && level.getBlockState(new BlockPos(X + 8, Y, Z + 8)).is(dirt.getBlock()),
+                    r + " plank " + level.getBlockState(new BlockPos(X + 2, Y + 5, Z + 15)) + " wall " + level.getBlockState(new BlockPos(X + 10, Y + 1, Z + 20))
+                            + " post " + level.getBlockState(new BlockPos(X + 2, Y + 1, Z + 2)));
+        } finally {
+            for (int x = X - 4; x <= X + 25; x++) for (int z = Z - 4; z <= Z + 25; z++) for (int y = Y; y <= Y + 8; y++) level.setBlock(new BlockPos(x, y, z), air, 2);
         }
     }
 
@@ -1717,8 +1772,8 @@ public final class SelfTest {
         ShopLoader.Price pf = ShopServer.loaded().prices.get("rtshop:enhance_guard_full");
         ShopData bs = ShopServer.shops().get("blacksmith");
         boolean sold = bs != null && findEntry(bs, e -> net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(e.stack.getItem()).toString().equals("rtshop:enhance_guard_full")) >= 0
-                && findEntry(bs, e -> net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(e.stack.getItem()).toString().equals("rtshop:enhance_anvil")) >= 0;
-        check("the equipment merchant sells the enhance anvil and the guard tickets", sold);
+                && findEntry(bs, e -> net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(e.stack.getItem()).toString().equals("rtshop:enhance_anvil")) < 0;
+        check("the equipment merchant sells the guard tickets but not the enhance anvil (there is one in town)", sold);
         check("damage guard is cheaper than destruction guard; protection = both together",
                 pd != null && px != null && pf != null && pd.price < px.price && pf.price == pd.price + px.price,
                 pd == null ? "missing" : pd.price + " / " + (px == null ? "?" : px.price) + " / " + (pf == null ? "?" : pf.price));
@@ -1744,12 +1799,12 @@ public final class SelfTest {
             try {
                 com.google.gson.JsonObject go = com.google.gson.JsonParser.parseString(orig).getAsJsonObject();
                 com.google.gson.JsonObject it = new com.google.gson.JsonObject();
-                it.addProperty("item", "minecraft:dragon_egg");
+                it.addProperty("item", "minecraft:sponge");
                 it.addProperty("price", 12345);
                 it.addProperty("category", go.getAsJsonArray("categories").get(0).getAsJsonObject().get("id").getAsString());
                 go.getAsJsonArray("items").add(it);
                 java.nio.file.Path bak = com.rtshop.shop.ShopEditor.save(server, "general", go.toString());
-                ShopLoader.Price pr = ShopServer.loaded().prices.get("minecraft:dragon_egg");
+                ShopLoader.Price pr = ShopServer.loaded().prices.get("minecraft:sponge");
                 check("the OP shop editor saves items and prices and reloads the shops", pr != null && pr.price == 12345 && Files.exists(bak),
                         pr == null ? "missing" : pr.price);
             } finally {
@@ -1912,6 +1967,103 @@ public final class SelfTest {
         java.util.List<ItemStack> picked = com.rtshop.rules.MobRules.pickedUp(zombieProbe);
         check("a weapon a mob picked up from the ground (a player's) is still dropped: only the mob's own gear is removed",
                 ownGear && picked.size() == 1 && picked.get(0).is(Items.DIAMOND_SWORD), ownGear + " / " + picked);
+        // 아이템 규칙: 상점·전리품·조합법에서 무엇을 얻을 수 있는가 (item_policy.json)
+        com.rtshop.rules.ItemPolicy.Pat pat = new com.rtshop.rules.ItemPolicy.Pat(java.util.List.of("efn:*", "irons_spellbooks:*_ink", "*fruit*:*", "minecraft:tnt"));
+        check("item patterns: a whole mod, a wildcard inside the name, a wildcard in the mod id, one exact item",
+                pat.hit(new ResourceLocation("efn:yamato")) && pat.hit(new ResourceLocation("irons_spellbooks:rare_ink")) && !pat.hit(new ResourceLocation("irons_spellbooks:ink_sac_x"))
+                        && pat.hit(new ResourceLocation("blox_fruits:gomu")) && !pat.hit(new ResourceLocation("minecraft:fruit")) && pat.hit(new ResourceLocation("minecraft:tnt"))
+                        && !pat.hit(new ResourceLocation("minecraft:tnt_minecart")));
+        check("by default the NPC shops never list the enhance anvil or a boss item (nether star); ordinary goods are untouched, and nothing vanilla loses its recipe",
+                com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(com.rtshop.item.ModItems.ENHANCE_ANVIL.get())) && com.rtshop.rules.ItemPolicy.bossItem(Items.NETHER_STAR)
+                        && com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(Items.NETHER_STAR)) && !com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(Items.IRON_SWORD))
+                        && !com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(Items.GUNPOWDER))
+                        && com.rtshop.rules.ItemPolicy.recipeReason(new ResourceLocation("minecraft:iron_sword"), new ResourceLocation("minecraft:iron_sword")) == null
+                        && !com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.IRON_SWORD), false) && com.rtshop.rules.ItemPolicy.priceFactor(new ItemStack(Items.IRON_SWORD)) == 1,
+                com.rtshop.rules.ItemPolicy.bossCountForTest() + " boss items, " + com.rtshop.rules.ItemPolicy.listedCountForTest() + " listed gear");
+        ResourceLocation tntRecipe = new ResourceLocation("minecraft:tnt");
+        ShopLoader.Price swordBefore = ShopServer.loaded().prices.get("minecraft:diamond_sword");
+        int swordPrice = swordBefore == null ? -1 : swordBefore.price;
+        com.rtshop.rules.ItemPolicy.Config ip = com.rtshop.rules.ItemPolicy.Config.defaults();
+        ip.shopBan.add("minecraft:arrow");
+        ip.priceFactor.put("minecraft:diamond_sword", 3.0);
+        ip.lootBan.add("minecraft:saddle");
+        ip.lootBan.add("minecraft:golden_apple");
+        ip.lootAllow.add("minecraft:golden_apple");
+        ip.recipeBan.add("minecraft:tnt");
+        ip.vanillaGearToo = true;
+        ip.keep.add("minecraft:iron_pickaxe");
+        ip.mobDrops.clear();
+        ip.mobDrops.put("minecraft:paper", 0.5);
+        com.rtshop.rules.ItemPolicy.setForTest(ip);
+        try {
+            com.rtshop.rules.ItemPolicy.prepare(server);
+            ShopLoader.Loaded trial = ShopLoader.loadAll(server);
+            com.rtshop.rules.ItemPolicy.afterShops(server, trial);
+            ShopData tb = trial.shops.get("blacksmith");
+            ShopLoader.Price swordNow = trial.prices.get("minecraft:diamond_sword");
+            check("a shop ban removes the item from every NPC shop (arrows), and a price factor multiplies the shop price (diamond sword x3)",
+                    tb != null && findEntry(tb, e -> e.stack.is(Items.ARROW)) < 0 && findEntry(tb, e -> e.stack.is(Items.SPECTRAL_ARROW)) >= 0
+                            && swordNow != null && swordPrice > 0 && Math.abs(swordNow.price - swordPrice * 3.0) <= swordPrice * 0.1,
+                    swordPrice + " -> " + (swordNow == null ? "missing" : swordNow.price) + " skipped " + com.rtshop.rules.ItemPolicy.skippedForTest());
+            net.minecraft.world.item.crafting.RecipeManager prm = server.getRecipeManager();
+            check("gear listed in a shop cannot be crafted (iron sword, with the rule widened to vanilla), a kept item still can (iron pickaxe), ordinary things too (bread), a banned recipe is gone (TNT)",
+                    prm.byKey(new ResourceLocation("minecraft:iron_sword")).isEmpty() && prm.byKey(new ResourceLocation("minecraft:iron_pickaxe")).isPresent()
+                            && prm.byKey(new ResourceLocation("minecraft:bread")).isPresent() && prm.byKey(tntRecipe).isEmpty()
+                            && com.rtshop.rules.ItemPolicy.recipesBlockedForTest("listed") > 5,
+                    "listed " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("listed") + " gear " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("gear")
+                            + " ban " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("ban"));
+            check("loot: a banned item never comes out (saddle), an allowed one does (golden apple), gear comes only from bosses (iron sword), kept items and plain goods are left alone",
+                    com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.SADDLE), false) && com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.SADDLE), true)
+                            && !com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.GOLDEN_APPLE), false)
+                            && com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.IRON_SWORD), false) && !com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.IRON_SWORD), true)
+                            && !com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.IRON_PICKAXE), false) && !com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.IRON_INGOT), false)
+                            && !com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(Items.NETHER_STAR), false));
+            java.util.List<net.minecraft.world.entity.item.ItemEntity> extra = new java.util.ArrayList<>();
+            com.rtshop.rules.ItemPolicy.testRoll = 0.4;
+            com.rtshop.rules.ItemPolicy.mobDrops(zombieProbe, false, a, extra);
+            int byPlayer = extra.size();
+            com.rtshop.rules.ItemPolicy.mobDrops(zombieProbe, false, null, extra);
+            com.rtshop.rules.ItemPolicy.testRoll = 0.6;
+            com.rtshop.rules.ItemPolicy.mobDrops(zombieProbe, false, a, extra);
+            int missed = extra.size();
+            com.rtshop.rules.ItemPolicy.mobDrops(witherProbe, true, a, extra);
+            check("extra monster drops (ink): rolled only when a player made the kill, and bosses roll with a higher chance",
+                    byPlayer == 1 && missed == 1 && extra.size() == 2 && extra.get(0).getItem().is(Items.PAPER), byPlayer + " " + missed + " " + extra.size());
+        } finally {
+            com.rtshop.rules.ItemPolicy.testRoll = -1;
+            com.rtshop.rules.ItemPolicy.reload();
+            com.rtshop.rules.ItemPolicy.prepare(server);
+            com.rtshop.rules.ItemPolicy.afterShops(server, ShopServer.loaded());
+        }
+        check("after the trial the real rules are back: the iron sword and TNT can be crafted again",
+                server.getRecipeManager().byKey(new ResourceLocation("minecraft:iron_sword")).isPresent() && server.getRecipeManager().byKey(tntRecipe).isPresent());
+        if (net.minecraftforge.fml.ModList.get().isLoaded("wom") || net.minecraftforge.fml.ModList.get().isLoaded("efn") || net.minecraftforge.fml.ModList.get().isLoaded("tacz")) {
+            int banned = 0, womListed = 0, gunsListed = 0, bossListed = 0, tacz = 0, craftableListed = 0;
+            String sample = "";
+            for (ShopData sd : ShopServer.shops().values()) {
+                for (ShopData.Entry en : sd.entries) {
+                    net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(en.stack.getItem());
+                    if (rl == null) continue;
+                    if (rl.getNamespace().equals("efn") || rl.getNamespace().equals("arcanevortex")) { banned++; sample = rl.toString(); }
+                    if (rl.getNamespace().equals("wom")) womListed++;
+                    if (com.rtshop.rules.ItemPolicy.gun(en.stack.getItem())) { gunsListed++; sample = rl.toString(); }
+                    if (com.rtshop.rules.ItemPolicy.bossItem(en.stack.getItem())) { bossListed++; sample = rl.toString(); }
+                }
+            }
+            for (net.minecraft.world.item.crafting.Recipe<?> rec : server.getRecipeManager().getRecipes()) {
+                ResourceLocation out = com.rtshop.rules.RecipeRules.outputId(rec, server);
+                if (rec.getId().getNamespace().equals("tacz") || out != null && out.getNamespace().equals("tacz")) tacz++;
+                if (out != null && !out.getNamespace().equals("minecraft") && !out.getNamespace().equals("rtshop")
+                        && com.rtshop.rules.ItemPolicy.recipeReason(rec.getId(), out) != null) { craftableListed++; sample = out.toString(); }
+            }
+            check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
+                    banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,
+                    "banned " + banned + " guns " + gunsListed + " boss " + bossListed + " tacz recipes " + tacz + " craftable " + craftableListed + " " + sample);
+            info("item policy: " + com.rtshop.rules.ItemPolicy.bossCountForTest() + " boss items, " + com.rtshop.rules.ItemPolicy.listedCountForTest() + " listed gear, wom listed " + womListed
+                    + ", recipes blocked: mod " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("mod") + " ban " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("ban")
+                    + " staff " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("staff") + " listed " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("listed")
+                    + " gear " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("gear"));
+        }
         witherProbe.discard();
         zombieProbe.discard();
         com.rtshop.rules.MobRules.reload();

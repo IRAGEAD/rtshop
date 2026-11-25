@@ -258,6 +258,7 @@ public final class MobRules {
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(s.getItem());
         if (id == null) return true;
         if (c.keepItems.contains(id.toString()) || c.keepItems.contains(id.getNamespace() + ":*")) return true;
+        if (ItemPolicy.lootSpared(s)) return true; // 자연 드랍으로 주기로 한 것 (잉크)
         if (c.removeSkillBooks && id.toString().equals(com.rtshop.magic.MagicSkills.BOOK)) return false;
         if (c.removeEnchanted && (s.getItem() instanceof EnchantedBookItem || s.isEnchanted())) return false;
         if (c.removeWeapons && weapon(s)) return false;
@@ -301,8 +302,13 @@ public final class MobRules {
     public static void onDrops(LivingDropsEvent event) {
         try {
             LivingEntity e = event.getEntity();
-            if (e.level().isClientSide() || e instanceof Player || !get().dropsEnabled || boss(e)) return;
-            if (com.rtshop.shop.NpcGuard.isNpc(e)) return;
+            if (e.level().isClientSide() || e instanceof Player || com.rtshop.shop.NpcGuard.isNpc(e)) return;
+            boolean isBoss = boss(e);
+            try {
+                ItemPolicy.mobDrops(e, isBoss, event.getSource().getEntity(), event.getDrops());
+            } catch (Throwable ignored) {
+            }
+            if (!get().dropsEnabled || isBoss) return;
             List<ItemStack> held;
             synchronized (PICKED) {
                 held = PICKED.remove(e);

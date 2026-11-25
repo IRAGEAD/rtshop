@@ -520,7 +520,7 @@ jobs:
         run: |
           mkdir -p /tmp/fpshots && cp -r client/screenshots/. /tmp/fpshots/ 2>/dev/null || true
           cp client/rtshop-clienttest.txt /tmp/fpshots/ 2>/dev/null || true
-          cp server/config/rtshop/export/diag.txt server/config/rtshop/export/audit.txt /tmp/fpshots/ 2>/dev/null || true
+          cp server/config/rtshop/export/diag.txt server/config/rtshop/export/audit.txt server/config/rtshop/export/item_policy.txt /tmp/fpshots/ 2>/dev/null || true
           cp server/rtshop-selftest.txt /tmp/fpshots/ 2>/dev/null || true
           mkdir -p /tmp/fpshots/crash && cp client/crash-reports/*.txt /tmp/fpshots/crash/ 2>/dev/null || true
           tail -n 400 client/logs/latest.log > /tmp/fpshots/client-tail.log 2>/dev/null || true

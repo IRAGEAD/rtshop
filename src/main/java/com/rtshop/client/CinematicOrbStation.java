@@ -49,6 +49,8 @@ import java.util.List;
 public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     private static final ResourceLocation STONES = new ResourceLocation("rtshop", "textures/gui/magic/stones.png");
     private static final ResourceLocation STONES_ON = new ResourceLocation("rtshop", "textures/gui/magic/stones_on.png");
+    /** 고른 룬석: 금빛 테가 푸른빛으로 바뀐 그림. */
+    private static final ResourceLocation STONES_SEL = new ResourceLocation("rtshop", "textures/gui/magic/stones_sel.png");
     private static final String[] CATS = MagicGachaScreen.CATS;
     private static final double RING = 0.37, STONE = 0.10, SIGIL = 0.085;
     public static final double RITUAL = 1.6, PEAK = 0.55;
@@ -525,7 +527,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         EnchantFx.circle(pose, buffers, cam, top.add(0.0, 0.02, 0.0), 0.25, -spin * 1.7, pal, 0.32f * g);
         // 구체 둘레에 서 있는 큰 소환진 (룬석들이 놓인 원)
         EnchantFx.circleBillboard(pose, buffers, camera, orb.subtract(side().scale(0.03)), RING * 1.12, -spin * 0.6, pal, 0.26f * g);
-        EnchantFx.billboard(pose, buffers, camera, orb, 0.26, clock * 0.4, EnchantFx.GLOW, 0.30f * g, 0.18f * g, 0.50f * g);
+        // 구슬 둘레의 빛무리는 구슬 그림(ArcaneOrbRenderer)의 하늘빛 빛무리가 맡는다 (여기서 덧그리던 어두운 보랏빛은 검은 테로 보였다)
         if (t >= 0.0) {
             double peak = PEAK / RITUAL;
             double beam = t < peak ? 0.0 : 1.0 - Anim.smoother((t - peak) / (1.0 - peak));
@@ -550,7 +552,8 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         double clock = Scene.clock();
         double t = ritualTime();
         float appear = (float) Anim.outBack(Anim.clamp01(p), 1.6);
-        // 룬석 다섯: 고르지 않은 룬석도 어두워지지 않는다 (고른 것만 조금 커지고 금빛 고리와 빛으로 표시)
+        // 룬석 다섯: 고르지 않은 룬석도 어두워지지 않는다. 고른 것은 조금 커지고 금빛 테가 푸른빛으로 바뀐다
+        // (뒤에 덧그리던 빛무리는 셰이더·어두운 곳에서 검은 테로 보여서 없앴다)
         for (int i = 0; i < CATS.length; i++) {
             Vec3 at = stonePos(i);
             boolean chosen = cat == i;
@@ -558,12 +561,11 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
             boolean hov = target == Target.STONE && hover == i;
             float size = (float) (STONE * appear * (hov ? 1.18 : 1.0) * (chosen ? 1.16 + 0.03 * Math.sin(clock * 4.0) : cat >= 0 ? 0.92 : 1.0));
             float b = (float) p;
-            if (chosen || hov) EnchantFx.billboard(pose, buffers, camera, at, size * 2.2, 0.0, EnchantFx.GLOW, 0.55f * b, 0.42f * b, 0.18f * b);
-            if (chosen) EnchantFx.circleBillboard(pose, buffers, camera, at, size * 1.25, clock * 0.9, EnchantFx.CirclePalette.VIOLET, 0.9f * b);
+            if (chosen) EnchantFx.circleBillboard(pose, buffers, camera, at, size * 1.25, clock * 0.9, EnchantFx.CirclePalette.LAPIS, 0.9f * b);
             float bright = lit || hov ? 1.0f : 0.86f;
-            quad(pose, buffers, camera, STONES_ON, at, size * 0.8, size, i / 5f, (i + 1) / 5f, bright, (float) p);
+            quad(pose, buffers, camera, chosen ? STONES_SEL : STONES_ON, at, size * 0.8, size, i / 5f, (i + 1) / 5f, bright, (float) p);
             String name = tr("rtshop.magic.cat." + CATS[i]);
-            label(pose, buffers, camera, at.add(0.0, -size - 0.03, 0.0), name, 0.0082f * appear, lit ? 0xFFFFE9B0 : 0xFFCFC2F0, (float) p);
+            label(pose, buffers, camera, at.add(0.0, -size - 0.03, 0.0), name, 0.0082f * appear, chosen ? 0xFFBFE6FF : lit ? 0xFFFFE9B0 : 0xFFCFC2F0, (float) p);
         }
         // 제단 위 칸: 받침대의 푸른 원과, 그 위에 떠서 천천히 도는 장비
         Vec3 spot = itemSpot();
@@ -606,7 +608,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         float b = brightness * (hovered ? 1.35f : 0.85f) * Math.min(1.0f, appear);
         boolean blue = s == Target.REROLL;
         float r = !affordable ? 0.5f : blue ? 0.25f : 0.55f, g = !affordable ? 0.12f : blue ? 0.55f : 0.45f, bl = !affordable ? 0.16f : 1.0f;
-        EnchantFx.billboard(pose, buffers, camera, at, size * 1.8, 0.0, EnchantFx.GLOW, r * b * 0.35f, g * b * 0.35f, bl * b * 0.35f);
+        // 문양 뒤의 빛무리는 그리지 않는다 (셰이더·어두운 곳에서 검은 테로 보였다): 문양의 빛깔과 크기로만 표시한다
         double turn = clock * (hovered ? 1.8 : 0.5);
         EnchantFx.circleBillboard(pose, buffers, camera, at, size, turn,
                 !affordable ? EnchantFx.CirclePalette.RED : blue ? EnchantFx.CirclePalette.LAPIS : EnchantFx.CirclePalette.VIOLET, b);

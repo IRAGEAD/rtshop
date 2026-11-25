@@ -168,10 +168,10 @@ final class ClientSelfTest2 {
             waitTicks(25);
         });
         add(mc -> {
-            boolean ok = mc.screen instanceof QuestScreen qs && qs.hasBackForTest();
-            check("the quest window opened from a merchant has a [Back] button", ok, mc.screen);
+            boolean ok = mc.screen instanceof QuestTalkScreen qs && qs.hasBackForTest();
+            check("the quest talk opened from a merchant has a [Back] choice", ok, mc.screen);
             shot(mc, "95_quest_back_button");
-            if (mc.screen instanceof QuestScreen qs && qs.hasBackForTest()) qs.goBack();
+            if (mc.screen instanceof QuestTalkScreen qs && qs.hasBackForTest()) qs.goBack();
             waitTicks(25);
         });
         add(mc -> {

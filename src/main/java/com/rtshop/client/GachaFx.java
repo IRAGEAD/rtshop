@@ -56,6 +56,8 @@ public final class GachaFx {
     // YAMATO 도 폭발까지 똑같이 간다. 다만 폭발 뒤 상품 대신 뒤집히지 않은 카드가 떠 있다가 YM_START 에 꺼진다
     private static final int LEG_DARK = 64, LEG_STRIKE = 78, LEG_IMPLODE = 136, LEG_BURST = 142;
     private static final int[] LEG_BELLS = {92, 104, 116, 126};
+    /** 전설 카드가 튀어나온 뒤의 잔벼락 (LEG_STRIKE 뒤 틱). */
+    private static final int[] LEG_AFTER = {17, 31};
     // YAMATO: 음악(rtshop:gacha.yamato)이 YM_START 에 시작. 아래는 음악 시간(초) × 20 + YM_START
     public static final int YM_START = LEG_BURST + 34;   // 0.00초 다시 암전 (전설 카드가 충분히 머문 뒤)
     private static final int YM_DRAW = YM_START + 8;     // 0.40초 칼을 뽑는다
@@ -336,13 +338,15 @@ public final class GachaFx {
             }
             case EPIC_IMPLODE -> sfx(SoundEvents.WARDEN_SONIC_CHARGE, 1.5F, 0.8F);
             case EPIC_BURST -> {
+                // 영웅의 공개: 보랏빛 주문이 터지는 소리 (전설의 금빛 팡파르·폭죽, 야마토의 칼 소리와 겹치지 않게 주문·수정 소리로만)
                 sfx(SoundEvents.EVOKER_CAST_SPELL, 1.0F, 1.0F);
-                sfx(SoundEvents.WARDEN_SONIC_BOOM, 1.6F, 0.6F);
+                sfx(SoundEvents.ILLUSIONER_CAST_SPELL, 0.8F, 0.9F);
+                sfx(SoundEvents.WARDEN_SONIC_BOOM, 1.6F, 0.55F);
                 sfx(SoundEvents.AMETHYST_CLUSTER_BREAK, 0.6F, 1.0F);
-                sfx(SoundEvents.FIREWORK_ROCKET_BLAST, 1.0F, 0.9F);
                 burst(90, 4.0F, PURPLE, PURPLE_LIGHT, 0xFFFFFF);
             }
-            case EPIC_BURST + 4 -> sfx(SoundEvents.PLAYER_LEVELUP, 1.2F, 0.8F);
+            case EPIC_BURST + 4 -> sfx(SoundEvents.RESPAWN_ANCHOR_CHARGE, 1.3F, 0.8F);
+            case EPIC_BURST + 9 -> sfx(SoundEvents.AMETHYST_BLOCK_CHIME, 0.7F, 0.9F);
             default -> {
             }
         }
@@ -377,16 +381,21 @@ public final class GachaFx {
                 burst(110, 5.0F, GOLD, 0xFFFFFF, GOLD_LIGHT);
             }
             case LEG_STRIKE + 6 -> sfx(SoundEvents.BEACON_ACTIVATE, 1.1F, 1.0F);
+            case LEG_STRIKE + 17, LEG_STRIKE + 31 -> {
+                sfx(SoundEvents.LIGHTNING_BOLT_IMPACT, 1.3F, 0.5F);
+                sfx(SoundEvents.TRIDENT_THUNDER, 1.5F, 0.3F);
+            }
             case LEG_STRIKE + 26 -> sfx(SoundEvents.WARDEN_SONIC_CHARGE, 0.8F, 0.4F);
             case LEG_IMPLODE -> {
                 sfx(SoundEvents.WARDEN_SONIC_CHARGE, 1.9F, 0.8F);
                 sfx(SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.0F);
             }
             case LEG_BURST -> {
+                // 전설의 공개: 금빛 팡파르와 폭죽 (둔탁한 폭발음은 야마토의 대폭발과 겹쳐서 뺐다)
                 sfx(SoundEvents.TOTEM_USE, 1.0F, 1.0F);
                 sfx(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
                 sfx(SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, 1.0F, 1.0F);
-                sfx(SoundEvents.GENERIC_EXPLODE, 1.4F, 0.5F);
+                sfx(SoundEvents.BELL_RESONATE, 1.2F, 0.8F);
                 burst(180, 6.0F, GOLD, GOLD_LIGHT, 0xFFFFFF);
             }
             case LEG_BURST + 5 -> sfx(SoundEvents.FIREWORK_ROCKET_TWINKLE, 1.0F, 1.0F);
@@ -403,7 +412,13 @@ public final class GachaFx {
             playMusic(); // 이 뒤의 소리는 모두 음악 안에 있다
         }
         if (t == YM_BOOM) {
+            // 야마토의 공개: 음악의 대폭발 위에, 전설에는 없는 깊고 차가운 울림을 얹는다 (차원이 열리는 소리 + 칼바람)
+            sfx(SoundEvents.END_PORTAL_SPAWN, 1.0F, 0.6F);
+            sfx(SoundEvents.TRIDENT_RIPTIDE_3, 0.7F, 0.7F);
             burst(220, 7.0F, YM_BLUE, YM_CYAN, 0xFFFFFF);
+        }
+        if (t == YM_BOOM + 8) {
+            sfx(SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, 0.6F, 0.6F);
         }
     }
 
@@ -623,19 +638,50 @@ public final class GachaFx {
         }
     }
 
-    /** 지그재그 번개 (위에서 카드로). */
+    /** 번개 (위에서 카드로): 꺾이며 내려오고 곁가지가 뻗는다. 바깥 빛 두 겹에 흰 속심, 끝으로 갈수록 가늘어진다. */
     private void bolt(GuiGraphics g, float x0, float y0, float x1, float y1, int rgb, float alpha, long seed, float w) {
-        RandomSource r = RandomSource.create(seed);
-        int n = 9;
+        if (alpha <= 0.01F) return;
+        strike(g, RandomSource.create(seed), x0, y0, x1, y1, rgb, Math.min(1, alpha), w, 2);
+    }
+
+    private void strike(GuiGraphics g, RandomSource r, float x0, float y0, float x1, float y1, int rgb, float alpha, float w, int depth) {
+        float dx = x1 - x0, dy = y1 - y0;
+        float len = Mth.sqrt(dx * dx + dy * dy);
+        if (len < 4) return;
+        int n = Math.max(4, Math.min(18, (int) (len / 13)));
+        float nx = -dy / len, ny = dx / len;
+        float dir = (float) Math.atan2(dy, dx);
         float px = x0, py = y0;
         for (int i = 1; i <= n; i++) {
             float f = i / (float) n;
-            float x = Mth.lerp(f, x0, x1) + (i == n ? 0 : (r.nextFloat() - 0.5F) * 26);
-            float y = Mth.lerp(f, y0, y1) + (i == n ? 0 : (r.nextFloat() - 0.5F) * 10);
-            bar(g, px, py, x, y, w * 3, argb(rgb, alpha * 0.35F));
-            bar(g, px, py, x, y, w, argb(0xFFFFFF, alpha));
+            float sway = i == n ? 0 : (r.nextFloat() - 0.5F) * Math.min(46, len * 0.2F);
+            float along = i == n ? 0 : (r.nextFloat() - 0.5F) * len / n * 0.5F;
+            float x = Mth.lerp(f, x0, x1) + nx * sway + dx / len * along;
+            float y = Mth.lerp(f, y0, y1) + ny * sway + dy / len * along;
+            float ww = w * (1 - 0.5F * f);
+            bar(g, px, py, x, y, ww * 5, argb(rgb, alpha * 0.14F));
+            bar(g, px, py, x, y, ww * 2.4F, argb(rgb, alpha * 0.45F));
+            bar(g, px, py, x, y, Math.max(1, ww), argb(0xFFFFFF, alpha));
+            if (depth > 0 && i < n && r.nextFloat() < 0.34F) {
+                float bl = len * (0.16F + r.nextFloat() * 0.22F);
+                float ang = dir + (r.nextBoolean() ? 1 : -1) * (0.4F + r.nextFloat() * 0.55F);
+                strike(g, r, x, y, x + Mth.cos(ang) * bl, y + Mth.sin(ang) * bl, rgb, alpha * 0.6F, ww * 0.6F, depth - 1);
+            }
             px = x;
             py = y;
+        }
+    }
+
+    /** 카드 둘레에서 튀는 작은 전기 (charge 0~1). */
+    private void crackle(GuiGraphics g, float tt, float radius, int rgb, float alpha, int count) {
+        long tick = (long) (tt / 2);
+        RandomSource r = RandomSource.create(tick * 7919L + 17);
+        for (int i = 0; i < count; i++) {
+            if (r.nextFloat() < 0.45F) continue;
+            float a = r.nextFloat() * Mth.TWO_PI;
+            float r0 = radius * (0.45F + r.nextFloat() * 0.2F), r1 = radius * (0.95F + r.nextFloat() * 0.5F);
+            float a1 = a + (r.nextFloat() - 0.5F) * 0.7F;
+            strike(g, r, Mth.cos(a) * r0, Mth.sin(a) * r0, Mth.cos(a1) * r1, Mth.sin(a1) * r1, rgb, alpha, 1.3F, 1);
         }
     }
 
@@ -648,14 +694,19 @@ public final class GachaFx {
         g.fill(-w + 2, -h + 2, w - 2, h - 2, 0xFF5C3A1E);
         g.fill(-w + 4, -h + 4, w - 4, -h + 6, 0xFF000000 | trim);
         g.fill(-w + 4, h - 6, w - 4, h - 4, 0xFF000000 | trim);
+        // 한가운데의 마름모 문양 (글자는 쓰지 않는다)
         g.pose().pushPose();
         g.pose().translate(0, 0, 10);
-        g.pose().scale(2.5F, 2.5F, 1);
-        // 기본 글꼴의 "?" 를 그림자 없이 카드 한가운데에 (폭·높이로 정확히 가운데를 맞춘다)
-        Component q = Component.literal("?").withStyle(st -> st.withFont(net.minecraft.network.chat.Style.DEFAULT_FONT));
-        var mcFont = net.minecraft.client.Minecraft.getInstance().font;
-        int qw = mcFont.width(q) - 1; // 글자 오른쪽의 빈 한 칸은 빼고
-        g.drawString(mcFont, q, -qw / 2, -3, 0xFF000000 | trim, false);
+        int tc = 0xFF000000 | trim;
+        for (int dy = -9; dy <= 9; dy++) {
+            int half = (9 - Math.abs(dy)) * 6 / 9;
+            g.fill(-half, dy, half + 1, dy + 1, tc);
+        }
+        for (int dy = -5; dy <= 5; dy++) {
+            int half = (5 - Math.abs(dy)) * 3 / 5;
+            g.fill(-half, dy, half + 1, dy + 1, 0xFF5C3A1E);
+        }
+        g.fill(0, -1, 1, 2, tc);
         g.pose().popPose();
         if (crack > 0) {
             int c = 0xFF000000 | crackRgb;
@@ -675,25 +726,11 @@ public final class GachaFx {
         g.pose().popPose();
     }
 
-    /** 등급 글자 + 이름 (아래쪽). */
+    /**
+     * 등급 글자와 이름은 연출에 쓰지 않는다 (3.51: 연출에서 글자를 뺐다). 무엇이 나왔는지는 연출 뒤의 결과 창이 알려 준다.
+     * 부르는 자리는 그대로 두어, 다시 넣고 싶을 때 여기만 고치면 된다.
+     */
     private void label(GuiGraphics g, Font font, String key, int rgb, float since, float base, boolean fancy) {
-        g.flush();
-        g.pose().pushPose();
-        g.pose().translate(0, 54, 400);
-        float ts = base * (since < 8 ? 1 + 0.6F * (1 - ease(since / 8F)) : 1);
-        g.pose().scale(ts, ts, 1);
-        Component label = fancy ? RaidText.c(Component.translatable(key).getString(), RaidText.TITLE) : Component.translatable(key);
-        int lw = font.width(label);
-        if (fancy) {
-            g.drawString(font, label, -lw / 2 + 1, 1, argb(0x000000, 0.6F), false);
-        }
-        g.drawString(font, label, -lw / 2, 0, 0xFF000000 | rgb, !fancy);
-        g.pose().popPose();
-        g.pose().pushPose();
-        g.pose().translate(0, 54 + 9 * ts + 7, 400);
-        g.pose().scale(1.4F, 1.4F, 1);
-        g.drawString(font, name, -font.width(name) / 2, 0, 0xFFFFFFFF, true);
-        g.pose().popPose();
     }
 
     private void particles(GuiGraphics g, float partial) {
@@ -963,12 +1000,32 @@ public final class GachaFx {
                     ring(g, 54, 1.5F, GOLD, 0.45F * (1 - implode), 22, -tt * 0.09F);
                 }
             }
-            if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 8) {
-                float f = 1 - (tt - LEG_STRIKE) / 8F;
-                bolt(g, -10, -height / 2F - 10, 0, 0, GOLD_LIGHT, f, 99, 3F);
-                bolt(g, 30, -height / 2F - 10, 0, 0, 0xFFFFFF, 0.8F * f, 51, 2F);
-                bolt(g, -width / 2F + 20, -height / 2F, 0, 0, GOLD, 0.6F * f, 13, 1.5F);
-                bolt(g, width / 2F - 20, -height / 2F, 0, 0, GOLD, 0.6F * f, 77, 1.5F);
+            // 금빛 벼락: 큰 줄기가 두 틱마다 모양을 바꾸며 내리꽂히고(가지가 뻗는다), 뒤이어 잔벼락이 두 번 더 친다.
+            // 그 사이 카드 둘레에서는 작은 전기가 계속 튄다
+            float top = -height / 2F - 12;
+            if (sinceStrike < 10) {
+                float f = 1 - sinceStrike / 10F;
+                long flick = (long) (sinceStrike / 2);
+                bolt(g, -14 + flick * 5, top, 0, -8, GOLD_LIGHT, f, 99 + flick * 31, 4.2F);
+                bolt(g, 36 - flick * 7, top, 0, -8, 0xFFFFFF, 0.85F * f, 51 + flick * 17, 2.6F);
+                bolt(g, -width / 2F + 30, top, -6, 0, GOLD, 0.7F * f, 13 + flick * 5, 2F);
+                bolt(g, width / 2F - 30, top, 6, 0, GOLD, 0.7F * f, 77 + flick * 3, 2F);
+                bolt(g, -width / 4F, top, 0, 4, GOLD_LIGHT, 0.5F * f, 211 + flick, 1.5F);
+                bolt(g, width / 4F, top, 0, 4, GOLD_LIGHT, 0.5F * f, 307 + flick, 1.5F);
+            }
+            for (int after : LEG_AFTER) {
+                float d = sinceStrike - after;
+                if (d >= 0 && d < 6) {
+                    float f = 1 - d / 6F;
+                    long flick = (long) (d / 2);
+                    float side = after % 2 == 0 ? -1 : 1;
+                    bolt(g, side * width * 0.28F, top, side * 4, -6, GOLD_LIGHT, f, 500 + after * 13L + flick * 7, 3F);
+                    bolt(g, -side * width * 0.12F, top, 0, -4, 0xFFFFFF, 0.6F * f, 900 + after * 5L + flick, 1.6F);
+                }
+            }
+            if (!still && tt < LEG_IMPLODE) {
+                float charge = Mth.clamp(sinceStrike / (float) (LEG_IMPLODE - LEG_STRIKE), 0, 1);
+                crackle(g, tt, 58 + charge * 26, GOLD_LIGHT, 0.55F + 0.35F * charge, 5 + (int) (charge * 6));
             }
             if (sinceStrike < 16) {
                 // 튀어나오는 순간의 충격파
@@ -1020,6 +1077,10 @@ public final class GachaFx {
         particles(g, partial);
         g.pose().popPose();
         if (tt >= LEG_STRIKE && tt < LEG_STRIKE + 7) flash(g, width, height, 0xFFF8E0, 0.9F * (1 - (tt - LEG_STRIKE) / 7F) * (1 - (tt - LEG_STRIKE) / 7F));
+        for (int after : LEG_AFTER) {
+            float d = tt - LEG_STRIKE - after;
+            if (d >= 0 && d < 4 && tt < LEG_IMPLODE) flash(g, width, height, 0xFFF4C0, 0.32F * (1 - d / 4F));
+        }
         if (tt >= LEG_BURST && tt < LEG_BURST + 12) flash(g, width, height, 0xFFF3C8, 1 - (tt - LEG_BURST) / 12F);
         if (grade == YAMATO && tt > YM_START - 6) flash(g, width, height, 0x000000, Mth.clamp((tt - (YM_START - 6)) / 6F, 0, 1) * 0.85F);
     }
@@ -1152,46 +1213,7 @@ public final class GachaFx {
         g.pose().popPose();
         // 터져 나가는 화면 조각 (흑백에서 색이 돌아오며)
         renderShards(g, tt - YM_BREAK, partial, Math.min(1, since / 5F));
-        // 글자: 한 글자씩
-        if (t >= YM_TITLE) {
-            float ts = tt - YM_TITLE;
-            String title = "YAMATO";
-            int shown = Math.min(title.length(), (int) (ts / 2.5F) + 1);
-            g.flush();
-            g.pose().pushPose();
-            float scale = 3.2F;
-            int ty = Math.min(cy + 50, height - 66);
-            g.pose().translate(cx, ty, 500);
-            g.pose().scale(scale, scale, 1);
-            Component full = RaidText.c(title, RaidText.TITLE);
-            int fw = font.width(full);
-            int x = -fw / 2;
-            for (int i = 0; i < shown; i++) {
-                String ch = String.valueOf(title.charAt(i));
-                Component c = RaidText.c(ch, RaidText.TITLE);
-                float age = ts - i * 2.5F;
-                float jitter = age < 4 ? (1 - age / 4F) * 1.5F : 0;
-                // 글자가 칼에 베인 듯 위아래로 어긋났다가 붙는다
-                float split = age < 5 ? (1 - age / 5F) * 2 : 0;
-                g.drawString(font, c, (int) (x + jitter), 0, argb(YM_BLUE, 0.6F), false);
-                g.drawString(font, c, x, (int) -split, 0xFF000000 | lerpRgb(0xFFFFFF, YM_CYAN, 0.5F + 0.5F * Mth.sin(tt * 0.3F + i)), false);
-                x += font.width(c);
-            }
-            g.pose().popPose();
-            if (ts > 16) {
-                float a = Math.min(1, (ts - 16) / 8F);
-                g.pose().pushPose();
-                g.pose().translate(cx, ty + 9 * scale + 6, 500);
-                g.pose().scale(1.5F, 1.5F, 1);
-                g.drawString(font, name, -font.width(name) / 2, 0, argb(0xFFFFFF, a), true);
-                g.pose().popPose();
-                String sub = Component.translatable("rtshop.gacha.fx.yamato_sub").getString();
-                g.pose().pushPose();
-                g.pose().translate(cx, ty + 9 * scale + 22, 500);
-                g.drawString(font, sub, -font.width(sub) / 2, 0, argb(YM_CYAN, a * 0.8F), false);
-                g.pose().popPose();
-            }
-        }
+        // (제목·이름 글자는 그리지 않는다: 연출에는 그림과 소리만)
         g.pose().popPose();
         if (since < 8) flash(g, width, height, 0xFFFFFF, (1 - since / 8F) * 0.95F);
         if (since < 14) flash(g, width, height, 0x9FD8FF, (1 - since / 14F) * 0.25F);
@@ -1266,21 +1288,7 @@ public final class GachaFx {
             bar(g, x0, y0, x1, y1, w * 2.2F, argb(YM_BLUE, 0.18F + 0.25F * fresh));
             bar(g, x0, y0, x1, y1, w, argb(YM_CYAN, 0.35F + 0.4F * fresh));
             bar(g, x0, y0, x1, y1, 1 + (big ? 2.5F : 1.4F) * fresh, argb(0xFFFFFF, 0.95F));
-            // 공간이 둥글게 일그러지는 '차원참' 거품
-            if (s[3] > 0 && age < 10) {
-                float f = 1 - age / 10F;
-                float br = 8 + ease(age / 4F) * 34;
-                g.pose().pushPose();
-                g.pose().translate(px, py, 0);
-                g.fill((int) -br, (int) -br, (int) br, (int) br, argb(0x000814, 0.35F * f));
-                ring(g, br, 2.5F * f + 0.5F, YM_CYAN, f, 40, s[0]);
-                ring(g, br * 0.6F, 1, 0xFFFFFF, 0.7F * f, 30, -s[0]);
-                for (int k = 0; k < 4; k++) {
-                    float ka = s[0] + k * 0.9F;
-                    bar(g, -Mth.cos(ka) * br, -Mth.sin(ka) * br, Mth.cos(ka) * br, Mth.sin(ka) * br, 1.2F, argb(0xFFFFFF, 0.8F * f));
-                }
-                g.pose().popPose();
-            }
+            // (칼이 지난 자리에 뜨던 둥근 문양은 없앴다: 칼빛만 남긴다)
         }
         g.pose().popPose();
         // 벨 때마다 번쩍 (X 자는 크게)

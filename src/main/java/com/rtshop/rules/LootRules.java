@@ -234,7 +234,17 @@ public class LootRules extends LootModifier {
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> loot, LootContext ctx) {
         try {
             // 월드 규칙: 막아 둔 모드의 물건은 상자·몹 전리품에서 뺀다 (블록을 캤을 때 나오는 것은 건드리지 않는다)
-            if (!ctx.getQueriedLootTableId().getPath().startsWith("blocks/")) loot.removeIf(WorldRules::lootBlocked);
+            if (!ctx.getQueriedLootTableId().getPath().startsWith("blocks/")) {
+                loot.removeIf(WorldRules::lootBlocked);
+                // 아이템 규칙: 금지한 모드의 물건과 모드 장비는 전리품에서 뺀다 (보스의 전리품은 금지 목록만 본다)
+                boolean bossTable = false;
+                try {
+                    bossTable = ctx.hasParam(LootContextParams.THIS_ENTITY) && MobRules.boss(ctx.getParam(LootContextParams.THIS_ENTITY));
+                } catch (Throwable ignored) {
+                }
+                final boolean bt = bossTable;
+                loot.removeIf(s -> ItemPolicy.lootBanned(s, bt));
+            }
             Rules r = get();
             if (r.tables.isEmpty()) return loot;
             List<Table> ts = r.matching(ctx.getQueriedLootTableId().toString());

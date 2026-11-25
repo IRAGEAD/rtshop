@@ -304,6 +304,7 @@ public final class ShopLoader {
         long startedAt = System.nanoTime();
         Loaded out = new Loaded();
         List<Raw> raws = new ArrayList<>();
+        com.rtshop.rules.ItemPolicy.beginShops();
         try {
             Path dir = dir();
             installDefaults(dir, out.notes);
@@ -369,6 +370,11 @@ public final class ShopLoader {
         } catch (Throwable t) {
             RtShop.LOGGER.error("[rtshop] 빠진 씨앗을 상점에 올리는 중 오류", t);
         }
+        try {
+            addMissingStaffs(raws, prices, allItems, out.notes);
+        } catch (Throwable t) {
+            RtShop.LOGGER.error("[rtshop] 빠진 지팡이를 상점에 올리는 중 오류", t);
+        }
         if (scan != null && pc.autoListFoodIngredients) {
             try {
                 addMissingFoodIngredients(raws, prices, scan, pc, out.notes);
@@ -403,6 +409,14 @@ public final class ShopLoader {
         for (Price p : prices.values()) {
             if (p.sellUnit < 0) {
                 p.sellUnit = p.price * pc.sellRatio;
+            }
+        }
+        // 아이템 규칙: 묶음별 상점가 배수 (예: Weapons of Miracles x5). 매입가는 그대로 두고 사는 값만 바꾼다.
+        for (Price p : prices.values()) {
+            double factor = com.rtshop.rules.ItemPolicy.priceFactor(p.stack);
+            if (factor != 1) {
+                p.price = (int) Math.max(Math.max(1, Math.ceil(p.sellUnit)), Pricing.nice(p.price * factor));
+                com.rtshop.rules.ItemPolicy.noteRaised(p.stack);
             }
         }
 
@@ -473,7 +487,7 @@ public final class ShopLoader {
         for (Item item : allItems) {
             ItemStack plain = new ItemStack(item);
             String id = itemId(plain);
-            if (sold.contains(id) || !SeedRules.isPlantable(plain)) {
+            if (sold.contains(id) || !SeedRules.isPlantable(plain) || com.rtshop.rules.ItemPolicy.shopBanned(plain)) {
                 continue;
             }
             int colon = id.indexOf(':');
@@ -509,6 +523,80 @@ public final class ShopLoader {
         if (!added.isEmpty()) {
             RtShop.LOGGER.info("[rtshop] 가격표에 없던 씨앗 {}종을 상점 '{}' 에 자동으로 올렸습니다: {}", added.size(), target.id, added);
             notes.add("가격표에 없던 씨앗 " + added.size() + "종을 상점 '" + target.id + "' 에 자동으로 올렸습니다 (farming.json 의 autoListMissingSeeds): "
+                    + String.join(", ", added));
+        }
+    }
+
+    /**
+     * 지팡이는 만들 수 없고 상점에서 사야 하므로(아이템 규칙), 어느 상점도 팔지 않는 지팡이를 대장장이에게 올린다.
+     * 값은 장비 공식(공격력·내구도)의 5배와 희귀도에 따른 기본값 중 큰 쪽.
+     */
+    private static void addMissingStaffs(List<Raw> raws, Map<String, Price> prices, List<Item> allItems, List<String> notes) {
+        com.rtshop.rules.ItemPolicy.Config ic = com.rtshop.rules.ItemPolicy.get();
+        if (!ic.enabled || !ic.recipeBanStaffs || !ic.listStaffs) {
+            return;
+        }
+        Raw target = null;
+        Set<String> sold = new HashSet<>();
+        for (Raw r : raws) {
+            if (r.id.equals(ic.staffShop)) {
+                target = r;
+            }
+            for (Ref ref : r.refs) {
+                Price p = prices.get(ref.key);
+                if (p != null && ref.buy) {
+                    sold.add(itemId(p.stack));
+                }
+            }
+        }
+        if (target == null) {
+            return;
+        }
+        List<String> added = new ArrayList<>();
+        for (Item item : allItems) {
+            if (item == Items.AIR || !com.rtshop.rules.ItemPolicy.staff(item)) {
+                continue;
+            }
+            ItemStack plain = new ItemStack(item);
+            String id = itemId(plain);
+            int colon = id.indexOf(':');
+            if (sold.contains(id) || id.startsWith(RtShop.MODID + ":") || com.rtshop.rules.ItemPolicy.shopBanned(plain)) {
+                continue;
+            }
+            if (target.excludeIds.contains(id) || (colon > 0 && target.excludeNamespaces.contains(id.substring(0, colon)))) {
+                continue;
+            }
+            String key = key(plain);
+            if (!target.keys.add(key)) {
+                continue;
+            }
+            Price p = prices.get(key);
+            if (p == null) {
+                p = new Price();
+                p.stack = plain;
+                double rare = switch (plain.getRarity()) {
+                    case UNCOMMON -> 1.5;
+                    case RARE -> 2.5;
+                    case EPIC -> 4.0;
+                    default -> 1.0;
+                };
+                int g = Pricing.gear(plain);
+                p.price = Math.max(1, Pricing.nice(Math.max(g * 5.0, ic.staffPrice * rare)));
+                p.gear = g > 0;
+                prices.put(key, p);
+            }
+            Ref ref = new Ref();
+            ref.key = key;
+            ref.category = ic.staffCategory;
+            ref.buy = true;
+            ref.sell = true;
+            target.refs.add(ref);
+            added.add(id + "=" + p.price);
+            com.rtshop.rules.ItemPolicy.noteStaff(id + "=" + p.price);
+        }
+        if (!added.isEmpty()) {
+            RtShop.LOGGER.info("[rtshop] 어느 상점도 팔지 않던 지팡이 {}종을 상점 '{}' 에 올렸습니다: {}", added.size(), target.id, added);
+            notes.add("어느 상점도 팔지 않던 지팡이 " + added.size() + "종을 상점 '" + target.id + "' 에 올렸습니다 (item_policy.json 의 listStaffs): "
                     + String.join(", ", added));
         }
     }
@@ -863,6 +951,10 @@ public final class ShopLoader {
                 }
                 Item item = findItem(id);
                 ItemStack stack = new ItemStack(item);
+                if (com.rtshop.rules.ItemPolicy.shopBanned(stack)) {
+                    obtainable.add(id); // 아이템 규칙이 막은 품목: 다시 고르지 않게만 표시
+                    continue;
+                }
                 String key = key(stack);
                 Price p = prices.get(key);
                 if (p == null) {
@@ -1411,6 +1503,11 @@ public final class ShopLoader {
                     CompoundTag tag = TagParser.parseTag(o.get("nbt").getAsString());
                     stack.setTag(tag);
                 }
+                if (com.rtshop.rules.ItemPolicy.shopBanned(stack)) {
+                    com.rtshop.rules.ItemPolicy.noteSkipped(r.id, stack); // 아이템 규칙: NPC 상점에 오르지 않는 물건
+                    notes.add(String.format("%s: 아이템 규칙(item_policy.json)으로 NPC 상점에 올릴 수 없어 상점 '%s'에서 뺐습니다", id, r.id));
+                    continue;
+                }
                 stack = prepare(stack, bool(o, "seed", false));
                 String key = key(stack);
                 if (!r.keys.add(key)) {
@@ -1534,6 +1631,10 @@ public final class ShopLoader {
                     try {
                         plain = new ItemStack(item);
                         if (plain.isEmpty() || !matches(plain, tags, notTags, classes)) {
+                            continue;
+                        }
+                        if (com.rtshop.rules.ItemPolicy.shopBanned(plain)) {
+                            com.rtshop.rules.ItemPolicy.noteSkipped(r.id, plain); // 아이템 규칙: NPC 상점에 오르지 않는 물건
                             continue;
                         }
                         price = computePrice(plain, formula, fixed, rarityScale);

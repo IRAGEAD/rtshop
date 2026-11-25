@@ -314,7 +314,7 @@ public class MagicGachaScreen extends Screen {
 
     private static final ResourceLocation SLAB = tex("slab"), RING_OUT = tex("ring_outer"), RING_IN = tex("ring_inner"),
             TICKS = tex("ring_ticks"), STAR = tex("star"), ORB = tex("orb"), GLOW = tex("glow"),
-            STONES = tex("stones"), STONES_ON = tex("stones_on");
+            STONES = tex("stones"), STONES_ON = tex("stones_on"), STONES_SEL = tex("stones_sel");
     /** 글꼴 (화면 설정에 따라 layout() 이 고른다): 본문 · 머리말 · 제목. */
     private ResourceLocation F = MagicUi.body(), FT = MagicUi.head(), FTITLE = MagicUi.title();
     static final int C_RUNE = 0xFF8FE4FF;
@@ -691,15 +691,15 @@ public class MagicGachaScreen extends Screen {
             boolean chosen = tab == 0 && cat == i;
             boolean lit = chosen || tab == 1;
             boolean hov = !busy && Math.abs(mx - sx) <= 14 && Math.abs(my - sy) <= 19;
-            // 고르지 않은 룬석도 어두워지지 않는다: 고른 것만 조금 커지고, 금빛 고리와 빛으로 표시한다
+            // 고르지 않은 룬석도 어두워지지 않는다: 고른 것은 조금 커지고, 금빛 테가 푸른빛으로 바뀌고 푸른 고리가 돈다
             float scl = (chosen ? 0.56F + 0.012F * (float) Math.sin(t * 4) : 0.48F) + (hov ? 0.04F : 0) + (flashAt == i ? 0.04F : 0);
-            if (lit) spin(g, GLOW, 128, sx, sy, 27, 0, mix(0xFFD890, gc, k), chosen ? 0.55F : flashAt == i ? 0.6F : 0.22F, true);
-            if (chosen) spin(g, RING_IN, 256, sx, sy, 23, t * 14, 0xFFE9B0, 0.9F, false);
-            stone(g, STONES_ON, i, sx, sy, scl, lit || hov ? 1F : 0.82F, 1F);
+            if (lit) spin(g, GLOW, 128, sx, sy, 27, 0, chosen ? 0x70C0FF : mix(0xFFD890, gc, k), chosen ? 0.45F : flashAt == i ? 0.6F : 0.22F, true);
+            if (chosen) spin(g, RING_IN, 256, sx, sy, 23, t * 14, 0x9FD8FF, 0.9F, false);
+            stone(g, chosen ? STONES_SEL : STONES_ON, i, sx, sy, scl, lit || hov ? 1F : 0.82F, 1F);
             String nm = tr("rtshop.magic.cat." + CATS[i]);
             g.fill(sx - tw(nm) / 2 - 4, sy + 22, sx + tw(nm) / 2 + 4, sy + 34, 0x900A0612);
-            txt(g, nm, sx - tw(nm) / 2, sy + 24, lit ? C_GOLD : 0xFFCFC2F0);
-            if (chosen) g.fill(sx - tw(nm) / 2, sy + 34, sx + tw(nm) / 2, sy + 35, C_GOLD);
+            txt(g, nm, sx - tw(nm) / 2, sy + 24, chosen ? 0xFFBFE6FF : lit ? C_GOLD : 0xFFCFC2F0);
+            if (chosen) g.fill(sx - tw(nm) / 2, sy + 34, sx + tw(nm) / 2, sy + 35, 0xFF8FD0FF);
             hits.add(new Object[]{sx - 14, sy - 19, 28, 50, (Runnable) () -> {
                 tab = 0;
                 cat = ci;

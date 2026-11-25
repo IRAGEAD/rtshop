@@ -410,8 +410,21 @@ public final class CastlePlots {
         } catch (Exception e) {
             RtShop.LOGGER.warn("[rtshop] 성 안 토지 {} 백업 실패: {}", land.name, e.toString());
         }
-        changed += removeObjects(level, data, land, removed);
-        changed += flatten(level, data, land);
+        it.unimi.dsi.fastutil.longs.LongOpenHashSet gone = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
+        changed += removeObjects(level, data, land, removed, gone);
+        changed += flatten(level, data, land, gone);
+        // 뒷정리: 토지에 걸쳐 잘린 나무와 공중에 뜬 조각 (남의 토지는 건드리지 않는다)
+        int radius = LandConfig.get().sweepRadius;
+        if (radius > 0) {
+            try {
+                String dim = LandManager.dim(level);
+                LandSweep.Result r = LandSweep.run(level, gone, (x, y, z) -> mayTouch(data, dim, land, x, y, z), radius, removed);
+                changed += r.blocks;
+                if (r.blocks > 0) RtShop.LOGGER.info("[rtshop] 성 안 토지 {} 뒷정리: {}", land.name, r);
+            } catch (Throwable t) {
+                RtShop.LOGGER.warn("[rtshop] 성 안 토지 {} 뒷정리 실패: {}", land.name, t.toString());
+            }
+        }
         try {
             saveRemoved(server, land, removed);
         } catch (Exception e) {
@@ -436,7 +449,7 @@ public final class CastlePlots {
                 || st.is(Blocks.SHROOMLIGHT) || st.is(BlockTags.WART_BLOCKS);
     }
 
-    static int removeObjects(ServerLevel level, LandData data, Land l, ListTag removed) {
+    static int removeObjects(ServerLevel level, LandData data, Land l, ListTag removed, it.unimi.dsi.fastutil.longs.LongOpenHashSet gone) {
         Tile t = tile(l.castleNo);
         if (t == null) return 0;
         String dim = LandManager.dim(level);
@@ -461,6 +474,7 @@ public final class CastlePlots {
                     removed.add(e);
                 }
                 level.setBlock(pos, air, flags);
+                gone.add(BlockPos.asLong(o.x, y, o.z));
                 n++;
             }
         }
@@ -468,7 +482,7 @@ public final class CastlePlots {
     }
 
     /** 이 토지 안만: 지면 위는 비우고, 지면은 풀, 바로 아래는 흙, 토지 바닥까지 빈 곳은 흙으로 메운다. */
-    static int flatten(ServerLevel level, LandData data, Land l) {
+    static int flatten(ServerLevel level, LandData data, Land l, it.unimi.dsi.fastutil.longs.LongOpenHashSet gone) {
         Claim c = PlotManager.plotClaim(l);
         if (c == null) return 0;
         String dim = LandManager.dim(level);
@@ -489,6 +503,7 @@ public final class CastlePlots {
                     pos.set(x, y, z);
                     if (!level.getBlockState(pos).isAir()) {
                         level.setBlock(pos, air, flags);
+                        gone.add(BlockPos.asLong(x, y, z));
                         n++;
                     }
                 }

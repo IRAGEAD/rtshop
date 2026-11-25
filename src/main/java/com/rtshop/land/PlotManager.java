@@ -944,12 +944,14 @@ public final class PlotManager {
         int flags = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
         BlockState air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        it.unimi.dsi.fastutil.longs.LongOpenHashSet gone = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
         for (Claim c : land.claims) {
-            ServerLevel level = null;
+            ServerLevel found = null;
             for (ServerLevel l : server.getAllLevels()) {
-                if (LandManager.dim(l).equals(c.dim)) level = l;
+                if (LandManager.dim(l).equals(c.dim)) found = l;
             }
-            if (level == null) continue;
+            if (found == null) continue;
+            final ServerLevel level = found;
             for (int z = c.z0; z <= c.z1; z++) {
                 for (int x = c.x0; x <= c.x1; x++) {
                     if (!c.hasColumn(x, z)) continue;
@@ -981,10 +983,27 @@ public final class PlotManager {
                         }
                         level.removeBlockEntity(pos);
                         level.setBlock(pos, st.getFluidState().isSource() ? net.minecraft.world.level.block.Blocks.WATER.defaultBlockState() : air, flags);
+                        if (st.getFluidState().isEmpty()) gone.add(BlockPos.asLong(x, y, z));
                         n++;
                     }
                 }
             }
+            // 뒷정리: 구획에 걸쳐 잘린 나무와 공중에 뜬 조각 (다른 토지에 든 칸은 건드리지 않는다)
+            int radius = LandConfig.get().sweepRadius;
+            if (radius > 0 && !gone.isEmpty()) {
+                try {
+                    final String dim = c.dim;
+                    LandSweep.Result r = LandSweep.run(level, gone, (x, y, z) -> {
+                        Claim at = data.claimAt(dim, x, y, z);
+                        return at == null || at.landId == land.id;
+                    }, radius, removed);
+                    n += r.blocks;
+                    if (r.blocks > 0) RtShop.LOGGER.info("[rtshop] 구획 {} 뒷정리: {}", land.name, r);
+                } catch (Throwable t) {
+                    RtShop.LOGGER.warn("[rtshop] 구획 {} 뒷정리 실패: {}", land.name, t.toString());
+                }
+            }
+            gone.clear();
             net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(c.x0, c.y0, c.z0, c.x1 + 1, c.y1 + 1, c.z1 + 1);
             for (net.minecraft.world.entity.Entity e : level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, box,
                     e -> (e instanceof net.minecraft.world.entity.decoration.HangingEntity || e instanceof net.minecraft.world.entity.decoration.ArmorStand

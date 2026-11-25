@@ -150,6 +150,17 @@ public final class RecipeRules {
         return output != null && rules.disabled.contains("item:" + output);
     }
 
+    /** 데이터팩이 읽은 원래 조합법 (아직 적어 두지 않았으면 지금 적는다). */
+    public static synchronized java.util.Collection<Recipe<?>> originals(MinecraftServer server) {
+        RecipeManager rm = server.getRecipeManager();
+        if (lastManager.get() != rm) {
+            original = new LinkedHashMap<>();
+            for (Recipe<?> r : rm.getRecipes()) original.put(r.getId(), r);
+            lastManager = new WeakReference<>(rm);
+        }
+        return new ArrayList<>(original.values());
+    }
+
     /** 원래 조합법(데이터팩)에서 규칙을 적용한 결과로 바꾼다. */
     public static synchronized void apply(MinecraftServer server, Rules rules) {
         RecipeManager rm = server.getRecipeManager();
@@ -160,9 +171,18 @@ public final class RecipeRules {
         }
         List<Recipe<?>> out = new ArrayList<>();
         int off = 0;
+        ItemPolicy.beginRecipes();
         for (Recipe<?> r : original.values()) {
             if (rules.custom.containsKey(r.getId().toString())) continue;
-            if (disabled(rules, r.getId(), outputId(r, server))) {
+            ResourceLocation made = outputId(r, server);
+            if (disabled(rules, r.getId(), made)) {
+                off++;
+                continue;
+            }
+            // 아이템 규칙: 총·지팡이·상점과 뽑기에 오른 장비·모드 장비는 만들 수 없다
+            String why = ItemPolicy.recipeReason(r.getId(), made);
+            if (why != null) {
+                ItemPolicy.noteRecipe(why, r.getId(), made);
                 off++;
                 continue;
             }

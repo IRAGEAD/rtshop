@@ -60,6 +60,8 @@ public final class ClientSelfTest {
     private static final boolean ENABLED = Boolean.getBoolean("rtshop.clienttest");
     private static final List<String> LINES = new ArrayList<>();
     private static int step = 0;
+    private static int panelTries = 0;
+    private static boolean questOfferStage = false;
     static int wait = 0;
     private static boolean barrierPosted;
     private static volatile boolean barrierDone = true;
@@ -385,7 +387,9 @@ public final class ClientSelfTest {
                 int i = k - 4;
                 Object[] prev = FX_SHOTS[i - 1];
                 shot(mc, (String) prev[2]);
-                check("the " + prev[2] + " scene plays", gs != null && gs.fxActiveForTest(), gs == null ? "no screen" : gs.fxTickForTest());
+                // 서버가 밀려 다음 단계가 늦게 오면 짧은 연출은 이미 끝나 있을 수 있다: 그 장면을 지나 끝까지 간 것도 재생된 것으로 본다
+                check("the " + prev[2] + " scene plays", gs != null && (gs.fxActiveForTest() || gs.fxTickForTest() >= (Integer) prev[1]),
+                        gs == null ? "no screen" : gs.fxTickForTest());
                 if (i == 1 && gs != null) {
                     // 연출 중에는 대화 단추가 없고, ESC 같은 키도 먹지 않는다
                     check("no NPC buttons during the gacha scene", NpcButtons.width(gs) == 0, NpcButtons.width(gs));
@@ -514,6 +518,13 @@ public final class ClientSelfTest {
             }
             case 3 -> {
                 var m = mc.player.containerMenu;
+                // 느린 화면(모드팩 전체)에서는 장비가 놓인 뒤의 그림이 아직 한 번도 안 그려졌을 수 있다: 그려질 때까지 조금 더 기다린다
+                boolean panelShown = net.minecraftforge.fml.ModList.get().isLoaded("cinematic") || mc.screen instanceof EnhanceScreen;
+                if (panelShown && EnhancePanel.lastRunesForTest != 4 && panelTries++ < 15) {
+                    wait = 10;
+                    step--;
+                    return;
+                }
                 boolean ready = m instanceof com.rtshop.enhance.EnhanceMenu && m.getSlot(2).hasItem() && m.getSlot(2).mayPickup(mc.player);
                 check("the +5 preview is ready and affordable", ready);
                 check("the new info panel lights one rune per enhancement level (+4 = 4 runes) and shows a slot per material plus the Gold slot",
@@ -1562,8 +1573,26 @@ public final class ClientSelfTest {
                 wait = 20;
             }
             case 44 -> {
-                check("the quest window opens from the guide", mc.screen instanceof QuestScreen, mc.screen);
-                shot(mc, "24_quest_window");
+                if (!questOfferStage) {
+                    check("quests are talked through in the dialogue box: the guide's requests appear as choices",
+                            mc.screen instanceof QuestTalkScreen qt && qt.viewsForTest() > 0 && qt.fitsForTest(), mc.screen);
+                    shot(mc, "24_quest_window");
+                    if (mc.screen instanceof QuestTalkScreen qt) {
+                        boolean picked = qt.chooseForTest("quest");
+                        int pages = qt.pagesForTest();
+                        qt.skipForTest();
+                        check("picking a request plays the giver's words page by page, then shows the request card with the answers to choose from",
+                                picked && pages >= 1 && qt.modeForTest() == 2
+                                        && qt.choiceCountForTest("accept") + qt.choiceCountForTest("turnin") + qt.choiceCountForTest("abandon") >= 1 && qt.fitsForTest(),
+                                pages + " pages, mode " + qt.modeForTest());
+                        questOfferStage = true; // 의뢰서가 그려진 뒤에 한 장 더 찍는다
+                        wait = 6;
+                        step--;
+                        return;
+                    }
+                } else {
+                    shot(mc, "24b_quest_offer");
+                }
                 mc.setScreen(null);
                 onServer(mc, com.rtshop.quest.QuestEditor::open);
                 wait = 20;
@@ -1719,6 +1748,16 @@ public final class ClientSelfTest {
                 shot(mc, "36_jedit_params");
                 if (mc.screen instanceof JobEditScreen s) {
                     s.showForTest("#types", 0);
+                    s.addBySearchForTest("minecraft:netherite_axe", "");
+                    check("a weapon that is not in the inventory can be found by search: it joins the list with its automatic type and the type list opens for it",
+                            !s.overrideForTest("minecraft:netherite_axe").isEmpty() && s.popupForTest() != null, s.overrideForTest("minecraft:netherite_axe"));
+                    PickerScreen ps = PickerScreen.weapons(s, v -> {
+                    });
+                    ps.init(mc, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+                    int weaponsOnly = ps.shownForTest();
+                    ps.narrowForTest(false);
+                    int allItems = ps.shownForTest();
+                    check("the weapon search shows weapons first and can widen to every item", weaponsOnly > 20 && weaponsOnly < allItems, weaponsOnly + " / " + allItems);
                     s.openFirstTypePopupForTest();
                     check("weapon types open as a popup list", s.popupForTest() != null && s.popupForTest().sizeForTest() >= 12);
                 }
@@ -1747,7 +1786,8 @@ public final class ClientSelfTest {
                 wait = 20;
             }
             case LAST + 1 -> {
-                check("the job guide offers the 9 job quest lines", mc.screen instanceof QuestScreen, mc.screen);
+                check("the job guide offers the 9 job quest lines", mc.screen instanceof QuestTalkScreen qt && qt.viewsForTest() >= 9,
+                        mc.screen instanceof QuestTalkScreen qt2 ? qt2.viewsForTest() : mc.screen);
                 shot(mc, "38_job_quests");
                 mc.setScreen(null);
                 onServer(mc, sp -> {
@@ -1758,9 +1798,9 @@ public final class ClientSelfTest {
                 wait = 20;
             }
             case LAST + 2 -> {
-                check("the sword master offers the next job quest", mc.screen instanceof QuestScreen, mc.screen);
+                check("the sword master offers the next job quest", mc.screen instanceof QuestTalkScreen, mc.screen);
                 boolean ef = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
-                if (mc.screen instanceof QuestScreen s) {
+                if (mc.screen instanceof QuestTalkScreen s) {
                     String raw = s.currentTextForTest();
                     long tips = QuestText.lines(raw).stream().filter(QuestText.Line::tip).count();
                     check("mod tips appear only when that mod is installed", ef ? tips > 0 : tips == 0, tips + " " + raw);

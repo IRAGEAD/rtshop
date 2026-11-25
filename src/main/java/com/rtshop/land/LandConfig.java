@@ -46,6 +46,8 @@ public final class LandConfig {
     public int plotRefundPercent = 50;
     /** 구획(농경지)을 사면 그 토지 칸 안의 지면 위 것(작물·구조물·나무)을 치운다. */
     public boolean plotClearOnBuy = true;
+    /** 토지를 비운 뒤, 잘린 채 남는 나무와 공중에 뜬 조각을 토지 둘레 이만큼 안에서 치운다 (0 = 하지 않음). */
+    public int sweepRadius = 10;
     /** 한 사람이 살 수 있는 구획 수 (0 = 제한 없음). */
     public int plotMaxPerPlayer = 0;
     /** 자동 채우기로 한 번에 고를 수 있는 최대 칸 수. 넘으면 경계가 끊긴 것으로 보고 멈춘다. */
@@ -144,6 +146,7 @@ public final class LandConfig {
                 if (o.has("plotDepthBelow")) c.plotDepthBelow = Math.max(0, Math.min(64, o.get("plotDepthBelow").getAsInt()));
                 if (o.has("plotPricePerBlock")) c.plotPricePerBlock = Math.max(0, o.get("plotPricePerBlock").getAsLong());
                 if (o.has("plotClearOnBuy")) c.plotClearOnBuy = o.get("plotClearOnBuy").getAsBoolean();
+                if (o.has("sweepRadius")) c.sweepRadius = Math.max(0, Math.min(24, o.get("sweepRadius").getAsInt()));
                 if (o.has("plotRefundPercent")) c.plotRefundPercent = Math.max(0, Math.min(100, o.get("plotRefundPercent").getAsInt()));
                 if (o.has("plotMaxPerPlayer")) c.plotMaxPerPlayer = Math.max(0, o.get("plotMaxPerPlayer").getAsInt());
                 if (o.has("plotFillMaxArea")) c.plotFillMaxArea = Math.max(16, Math.min(200000, o.get("plotFillMaxArea").getAsInt()));
@@ -245,6 +248,7 @@ public final class LandConfig {
         help.add("구획(칸 단위 모양의 토지): OP 가 /rtshop plot wand 로 받은 구획 지팡이로 모양을 고르고 /rtshop plot create 로 등록");
         help.add("plotDepthBelow: 구획 안 가장 낮은 지면에서 아래로 덮는 깊이 · plotPricePerBlock: 가격을 안 적었을 때 1칸당 가격");
         help.add("plotClearOnBuy: 구획(농경지)을 사면 토지 칸 안의 작물·구조물·나무를 치웁니다 (경작지·흙·물은 그대로, 치운 블록은 world/rtshop/plot_backup 에 저장)");
+        help.add("sweepRadius: 토지를 비운 뒤 둘레 이만큼 안에서, 토지에 걸쳐 잘린 나무(줄기·잎 통째)와 공중에 뜬 조각을 치웁니다 (0 = 끔). 땅과 이어진 건물·길·남의 토지는 건드리지 않습니다");
         help.add("plotRefundPercent: 반환 시 구매가의 몇 %를 돌려줄지 · plotMaxPerPlayer: 1인당 구획 수 (0 = 무제한)");
         help.add("plotFillBlocks: 자동 채우기가 밭으로 보는 지면 블록(ID 또는 #태그) · plotRimStopBlocks: 테두리를 넓힐 때 넘지 않는 블록");
         o.add("_구획_설명", help);
@@ -252,6 +256,7 @@ public final class LandConfig {
         o.addProperty("plotPricePerBlock", c.plotPricePerBlock);
         o.addProperty("plotRefundPercent", c.plotRefundPercent);
         o.addProperty("plotClearOnBuy", c.plotClearOnBuy);
+        o.addProperty("sweepRadius", c.sweepRadius);
         o.addProperty("plotMaxPerPlayer", c.plotMaxPerPlayer);
         o.addProperty("plotFillMaxArea", c.plotFillMaxArea);
         o.addProperty("plotFillGrowRim", c.plotFillGrowRim);

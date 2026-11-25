@@ -66,7 +66,7 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
         ps.popPose();
         // 둘레의 작은 별빛 (장면 동안에는 숨긴다)
         if (k < 0.5F) {
-            VertexConsumer glow = buf.getBuffer(RenderType.entityTranslucent(GLOW));
+            VertexConsumer glow = buf.getBuffer(RenderType.text(GLOW));
             for (int i = 0; i < 4; i++) {
                 float a = time * 0.012F + i * 1.5708F;
                 float tw = 0.5F + 0.5F * Mth.sin(time * 0.11F + i * 2.3F);
@@ -81,9 +81,10 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
         ps.pushPose();
         ps.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
         float s = Mth.lerp(k, 0.20F, 0.12F) + flare * 0.03F * (1F - 0.5F * k);
-        quad(ps, buf.getBuffer(RenderType.entityTranslucent(GLOW)), s * 2.8F, 0.55F + flare * 0.45F);
+        // 구슬과 빛무리는 빛·그림자를 받지 않는 그림으로 그린다 (어두운 곳이나 셰이더에서 가장자리가 검게 보이지 않게)
+        quad(ps, buf.getBuffer(RenderType.text(GLOW)), s * 2.4F, 0.60F + flare * 0.40F);
         ps.translate(0, 0, 0.01);
-        quad(ps, buf.getBuffer(RenderType.entityTranslucent(ORB)), s, 1F);
+        quad(ps, buf.getBuffer(RenderType.text(ORB)), s, 1F);
         ps.popPose();
         ps.popPose();
     }
@@ -140,8 +141,7 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
     }
 
     private static void vertex(VertexConsumer vc, Matrix4f m, Matrix3f n, float x, float y, float u, float v, int a) {
-        vc.vertex(m, x, y, 0).color(255, 255, 255, a).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(FULL_BRIGHT)
-                .normal(n, 0, 0, 1).endVertex();
+        vc.vertex(m, x, y, 0).color(255, 255, 255, a).uv(u, v).uv2(FULL_BRIGHT).endVertex();
     }
 
     @Override

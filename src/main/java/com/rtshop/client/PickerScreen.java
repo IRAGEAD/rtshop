@@ -50,8 +50,22 @@ public class PickerScreen extends Screen {
     private List<Option> shown = new ArrayList<>();
     private EditBox search;
     private boolean monstersOnly = true;
+    /** 아이템 고르기에서 "무기만" 보기 (무기 분류 화면에서 연 경우에만 단추가 보인다). */
+    private java.util.function.Predicate<ItemStack> narrow;
+    private boolean narrowOn = true;
     private int scroll = 0;
     private int fx, fy, W, H;
+
+    /** 무기 분류용: 처음에는 무기처럼 생긴 것만 보이고, 단추로 모든 아이템을 볼 수 있다. */
+    public static PickerScreen weapons(Screen parent, Consumer<String> onPick) {
+        PickerScreen s = new PickerScreen(parent, Mode.ITEM, onPick);
+        s.narrow = st -> com.rtshop.job.WeaponTypes.weaponLike(st.getItem());
+        return s;
+    }
+
+    private boolean toggle() {
+        return mode == Mode.ENTITY || narrow != null;
+    }
 
     public PickerScreen(Screen parent, Mode mode, Consumer<String> onPick) {
         super(Component.translatable(mode == Mode.ITEM ? "rtshop.pick.title_item" : "rtshop.pick.title_entity"));
@@ -133,7 +147,7 @@ public class PickerScreen extends Screen {
         fx = (this.width - W) / 2;
         fy = (this.height - H) / 2;
         String old = search == null ? "" : search.getValue();
-        int sw = W - 16 - (mode == Mode.ENTITY ? 78 : 0);
+        int sw = W - 16 - (toggle() ? 78 : 0);
         search = new EditBox(this.font, fx + 8, fy + 28, sw, 14, Component.empty());
         search.setMaxLength(100);
         search.setValue(old);
@@ -162,6 +176,9 @@ public class PickerScreen extends Screen {
             if (mode == Mode.ENTITY && monstersOnly && !o.monster()) {
                 continue;
             }
+            if (mode == Mode.ITEM && narrow != null && narrowOn && !narrowed(o)) {
+                continue;
+            }
             boolean ok = true;
             for (String w : words) {
                 if (!o.search().contains(w)) {
@@ -174,6 +191,18 @@ public class PickerScreen extends Screen {
             }
         }
         shown = out;
+    }
+
+    private final java.util.Map<String, Boolean> narrowCache = new java.util.HashMap<>();
+
+    private boolean narrowed(Option o) {
+        return narrowCache.computeIfAbsent(o.id(), k -> {
+            try {
+                return narrow.test(o.icon());
+            } catch (Throwable t) {
+                return false;
+            }
+        });
     }
 
     private int gridTop() {
@@ -218,6 +247,10 @@ public class PickerScreen extends Screen {
         if (mode == Mode.ENTITY) {
             Ui.button(g, this.font, fx + W - 8 - 74, fy + 27, 74, 16,
                     Component.translatable(monstersOnly ? "rtshop.pick.monsters_only" : "rtshop.pick.all_mobs").getString(),
+                    Ui.inside(mx, my, fx + W - 82, fy + 27, 74, 16), true);
+        } else if (narrow != null) {
+            Ui.button(g, this.font, fx + W - 8 - 74, fy + 27, 74, 16,
+                    Component.translatable(narrowOn ? "rtshop.pick.weapons_only" : "rtshop.pick.all_items").getString(),
                     Ui.inside(mx, my, fx + W - 82, fy + 27, 74, 16), true);
         }
         int gx = fx + 8;
@@ -323,8 +356,12 @@ public class PickerScreen extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (button == 0) {
-            if (mode == Mode.ENTITY && Ui.inside(mx, my, fx + W - 82, fy + 27, 74, 16)) {
-                monstersOnly = !monstersOnly;
+            if (toggle() && Ui.inside(mx, my, fx + W - 82, fy + 27, 74, 16)) {
+                if (mode == Mode.ENTITY) {
+                    monstersOnly = !monstersOnly;
+                } else {
+                    narrowOn = !narrowOn;
+                }
                 scroll = 0;
                 filter();
                 return true;
@@ -374,6 +411,11 @@ public class PickerScreen extends Screen {
 
     public void searchForTest(String text) {
         search.setValue(text);
+    }
+
+    public void narrowForTest(boolean on) {
+        narrowOn = on;
+        filter();
     }
 
     public int shownForTest() {

@@ -44,7 +44,7 @@ public final class QuestHud {
         Minecraft mc = Minecraft.getInstance();
         ClientConfig cfg = ClientConfig.get();
         if (!cfg.questHudEnabled || mc.options.hideGui || mc.player == null || mc.screen instanceof HudEditScreen
-                || mc.screen instanceof QuestScreen) {
+                || mc.screen instanceof QuestScreen || mc.screen instanceof QuestTalkScreen) {
             return;
         }
         List<QuestHudPacket.Entry> list = ClientQuestHud.entries;
