@@ -1025,11 +1025,6 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "122i_magic_editor_odds");
-            if (mc.screen instanceof MagicEditScreen es) es.tabForTest(7);
-            waitTicks(4);
-        });
-        add(mc -> {
-            shot(mc, "122j_magic_editor_pity_rune");
             mc.setScreen(null);
             // 메뉴로 열리는 길 (Cinematic 은 있지만 장면을 꺼 둔 경우): 같은 룬 제단 창이 떠야 한다
             onServer(mc, sp -> {

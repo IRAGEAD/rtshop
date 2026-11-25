@@ -190,13 +190,7 @@ public final class MagicGacha {
         rnd.add("chances", chances(g, MagicConfig.RANDOM, MagicConfig.MODE_RANDOM));
         rnd.addProperty("cost1", c.cost(MagicConfig.MODE_RANDOM));
         o.add("random", rnd);
-        JsonObject pity = new JsonObject();
-        pity.addProperty("on", c.pityOn && GachaConfig.gradeIndex(c.pityGrade) >= 0);
-        pity.addProperty("count", c.pityCount);
-        pity.addProperty("grade", c.pityGrade);
-        pity.addProperty("select", pityOf(p, c, MagicConfig.MODE_SELECT));
-        pity.addProperty("random", pityOf(p, c, MagicConfig.MODE_RANDOM));
-        o.add("pity", pity);
+        // 천장(확정) 은 3.49 에서 없앴다: 창 내용에도 싣지 않는다
         ItemStack held = altarItem(p);
         o.add("enchantChances", enchantChances(c, held));
         o.addProperty("held", held.isEmpty() ? "" : String.valueOf(ForgeRegistries.ITEMS.getKey(held.getItem())));
@@ -306,27 +300,9 @@ public final class MagicGacha {
         root.put(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG, pers);
     }
 
-    /** 뽑은 것을 차례로 세어, 천장에 닿은 칸을 확정 등급으로 바꾼다. 바꾼 것이 있으면 true. */
+    /** (옛 천장) 지금은 아무것도 하지 않는다. */
     private static boolean applyPity(ServerPlayer p, MagicConfig c, GachaConfig g, String pool, String mode, List<GachaConfig.Entry> got) {
-        int min = GachaConfig.gradeIndex(c.pityGrade);
-        if (!c.pityOn || min < 0 || got.isEmpty()) return false;
-        int cnt = pityOf(p, c, mode);
-        boolean hit = false;
-        for (int i = 0; i < got.size(); i++) {
-            cnt++;
-            if (GachaConfig.gradeIndex(got.get(i).grade) >= min) {
-                cnt = 0;
-            } else if (cnt >= c.pityCount) {
-                GachaConfig.Entry e = Gacha.pickOfGrade(g, pool, min, p.getRandom());
-                if (e != null) {
-                    got.set(i, e);
-                    cnt = 0;
-                    hit = true;
-                }
-            }
-        }
-        setPity(p, c, mode, cnt);
-        return hit;
+        return false; // 천장(확정)은 3.49 에서 없앴다: 세지도 바꾸지도 않는다
     }
 
     /** 이 칸이 들어 있는 분야. */

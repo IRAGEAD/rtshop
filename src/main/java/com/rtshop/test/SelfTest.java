@@ -2968,38 +2968,18 @@ public final class SelfTest {
             var back = com.rtshop.magic.MagicConfig.fromJson(t.toJson());
             check("the magic gacha config survives save and load", back.pool("attack").size() == 2 && back.enchants.size() == t.enchants.size()
                     && back.selectOdds[5] == t.selectOdds[5]);
-            // ---- 천장: 5회 안에 희귀 이상이 없으면 5회째에 확정
+            // ---- 천장(확정)은 없앴다 (3.49): 몇 번을 뽑아도 세지 않고, 옛 설정을 켜 두어도 확정으로 바뀌지 않는다
             String SEL = "select";
             t.pityOn = true;
-            t.pityCount = 5;
+            t.pityCount = 2;
             t.pityGrade = "rare";
-            t.pityShared = true;
             com.rtshop.magic.MagicGacha.setPity(a, t, SEL, 0);
             a.getInventory().clearContent();
             a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 20));
             for (int i = 0; i < 6; i++) com.rtshop.magic.MagicGacha.pull(a, SEL, "passive", 1, false);
-            check("pity counter grows while nothing of the pity grade comes (and waits when the field has none)",
-                    com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 6, com.rtshop.magic.MagicGacha.pityOf(a, t, SEL));
-            check("the pity counter is shared between chosen and random draws when set so",
-                    com.rtshop.magic.MagicGacha.pityOf(a, t, "random") == 6);
-            com.rtshop.magic.MagicGacha.pull(a, SEL, "guard", 1, false);
-            check("a pity-grade prize resets the counter", com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 0);
-            t.pool("dodge").add(mk.apply("minecraft:rabbit_foot", "rare"));
-            double[] keep = t.selectOdds.clone();
-            t.selectOdds[1] = 100;
-            t.selectOdds[2] = 0.0000001;
-            String last = "";
-            for (int i = 0; i < 5; i++) {
-                var one = com.rtshop.magic.MagicGacha.pull(a, SEL, "dodge", 1, false);
-                last = one == null || one.isEmpty() ? "null" : one.get(0).grade;
-            }
-            check("the 5th draw without a rare is turned into a guaranteed rare (pity), and the counter restarts",
-                    last.equals("rare") && com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 0, last + " / " + com.rtshop.magic.MagicGacha.pityOf(a, t, SEL));
-            System.arraycopy(keep, 0, t.selectOdds, 0, keep.length);
-            t.pityShared = false;
-            com.rtshop.magic.MagicGacha.setPity(a, t, SEL, 3);
-            check("with separate counting the random draw has its own pity counter", com.rtshop.magic.MagicGacha.pityOf(a, t, "random") == 0
-                    && com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 3);
+            check("there is no pity any more: draws are not counted and nothing is turned into a guaranteed grade",
+                    com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 0 && !com.rtshop.magic.MagicGacha.view(a).has("pity") && !t.toJson().has("pity")
+                            && !com.rtshop.magic.MagicConfig.fromJson(t.toJson()).pityOn, com.rtshop.magic.MagicGacha.pityOf(a, t, SEL));
             t.pityOn = false;
             // ---- '오늘의 룬' 은 없앴다: 어느 분야든 값과 확률이 같고, 창 내용에도 실리지 않는다
             t.selectCost = 5;
@@ -3007,11 +2987,8 @@ public final class SelfTest {
                     t.cost(SEL) == 5 && t.cost("random") == 1 && !com.rtshop.magic.MagicGacha.view(a).has("blessing")
                             && !t.toJson().has("blessing"));
             t.selectCost = 1;
-            t.pityCount = 77;
-            var back2 = com.rtshop.magic.MagicConfig.fromJson(t.toJson());
-            check("pity settings survive save and load", back2.pityCount == 77 && !back2.pityShared);
             var vw = com.rtshop.magic.MagicGacha.view(a);
-            check("the window data carries the pity gauge and one-ticket prices only (no 10x)", vw.has("pity")
+            check("the window data carries one-ticket prices only (no 10x, no pity gauge)", !vw.has("pity")
                     && vw.getAsJsonObject("cats").getAsJsonObject("attack").get("cost1").getAsInt() == 1
                     && !vw.getAsJsonObject("cats").getAsJsonObject("attack").has("cost10") && !vw.has("tenGuarantee"));
         } finally {

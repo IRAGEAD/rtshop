@@ -99,7 +99,7 @@ public final class MagicConfig {
     public int selectCost = 1, randomCost = 1, rerollCost = 1;
     public String tenGuarantee = "rare";
     /** 천장: pityCount 번째 뽑기까지 pityGrade 이상이 안 나오면 그 등급을 확정으로 준다. shared = 선택·무작위 뽑기를 함께 센다. */
-    public boolean pityOn = true, pityShared = true;
+    public boolean pityOn = false, pityShared = true; // 3.49: 천장은 없앴다 (값은 읽지도 쓰지도 않는다)
     public int pityCount = 80;
     public String pityGrade = "legendary";
     /** 인챈트를 다시 붙일 수 있는 장비: weapon(근접 무기)·bow·crossbow·trident·armor·tool. */
@@ -269,7 +269,7 @@ public final class MagicConfig {
                 + "(item, nbt, grade 등급, weight 같은 등급 안 가중치). odds: 등급별 확률 (실패, uncommon, rare, epic, legendary, yamato 순). "
                 + "첫 칸은 '실패' 확률이다: 스킬북 뽑기는 아무것도 나오지 않고, 인챈트 재설정은 주문서만 쓰이고 장비는 그대로다. 목록에는 일반(common) 등급을 둘 수 없다 (고급으로 올라간다). "
                 + "야마토 등급은 공격 분야에만 둘 수 있다. enchants: 인챈트 재설정 목록 (enchant, level, grade, weight). "
-                + "costs: 한 번에 쓰는 티켓 수. pity(천장): count 번째까지 grade 이상이 안 나오면 확정, shared=선택·무작위를 함께 센다. "
+                + "costs: 한 번에 쓰는 티켓 수. 천장(확정)은 없다. "
                 + "rerollKinds: 제단에 올릴 수 있는 장비 (weapon·bow·crossbow·trident·armor·tool). 게임 안에서는 OP 가 룬 제단의 [편집] 으로 고친다. 고친 뒤 /rtshop reload.");
         o.addProperty("configVersion", version);
         o.addProperty("tenGuarantee", tenGuarantee);
@@ -283,12 +283,7 @@ public final class MagicConfig {
         costs.addProperty("random", randomCost);
         costs.addProperty("reroll", rerollCost);
         o.add("costs", costs);
-        JsonObject pity = new JsonObject();
-        pity.addProperty("enabled", pityOn);
-        pity.addProperty("count", pityCount);
-        pity.addProperty("grade", pityGrade);
-        pity.addProperty("shared", pityShared);
-        o.add("pity", pity);
+        // (천장 설정은 3.49 에서 없앴다)
         JsonArray kinds = new JsonArray();
         rerollKinds.forEach(kinds::add);
         o.add("rerollKinds", kinds);
@@ -332,13 +327,7 @@ public final class MagicConfig {
             if (co.has("random")) c.randomCost = Math.max(1, Math.min(64, co.get("random").getAsInt()));
             if (co.has("reroll")) c.rerollCost = Math.max(1, Math.min(64, co.get("reroll").getAsInt()));
         }
-        if (o.has("pity")) {
-            JsonObject pi = o.getAsJsonObject("pity");
-            if (pi.has("enabled")) c.pityOn = pi.get("enabled").getAsBoolean();
-            if (pi.has("count")) c.pityCount = Math.max(1, Math.min(100000, pi.get("count").getAsInt()));
-            if (pi.has("grade") && GachaConfig.gradeIndex(pi.get("grade").getAsString()) >= 0) c.pityGrade = pi.get("grade").getAsString();
-            if (pi.has("shared")) c.pityShared = pi.get("shared").getAsBoolean();
-        }
+        // 옛 파일의 pity(천장) 설정은 읽지 않는다
         if (o.has("rerollKinds")) {
             c.rerollKinds.clear();
             for (JsonElement e : o.getAsJsonArray("rerollKinds")) c.rerollKinds.add(e.getAsString());
