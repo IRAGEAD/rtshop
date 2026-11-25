@@ -36,7 +36,7 @@ public final class EnhanceAnvilGlow {
     private static final ResourceLocation SIDE = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_side.png");
     private static final ResourceLocation GEM = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_anvil.png");
     /** 이 거리 안으로 오면 켜진다. */
-    public static final double NEAR = 4.5;
+    public static final double NEAR = 5.0;
     private static final float UP = 1F / 40F, DOWN = 1F / 70F;
     private static final int SCAN = 7;
 

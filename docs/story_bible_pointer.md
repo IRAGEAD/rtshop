@@ -170,5 +170,5 @@
 
 3.49 (강화 모루 새 모습 · 진행 중)
 - 블록: tools/gen_enhance_anvil.py 가 모델(상자 56개, UV 는 자리로 자동)과 질감(textures/block/enh_*.png, 64px)을 만든다. 점판암 팔각 받침 두 층 + 놋쇠 띠·못, 단조 강철 모루(뿔·굽) + 놋쇠 상감·마름모 무늬. 윗면 높이 16 그대로. 테두리 모양은 EnhanceAnvilBlock.getShape.
-- 빛: client/EnhanceAnvilGlow — 받침의 룬 띠와 모루 옆면 보석은 평소 꺼져 있고 4.5칸 안으로 오면 2초에 걸쳐 켜진다(멀어지면 3.5초에 걸쳐 꺼짐). 블록 상태를 바꾸지 않고 클라이언트가 덧그린다(enh_glow_side.png, enh_glow_anvil.png).
+- 빛: client/EnhanceAnvilGlow — 받침의 룬 띠와 모루 옆면 보석은 평소 꺼져 있고 5칸 안으로 오면 2초에 걸쳐 켜진다(멀어지면 3.5초에 걸쳐 꺼짐). 블록 상태를 바꾸지 않고 클라이언트가 덧그린다(enh_glow_side.png, enh_glow_anvil.png).
 - 정보 창(아직): 시안 「하 · 세로 한 장」 + 테두리 놋쇠 장식 살짝. docs/worklist.md 참고.
