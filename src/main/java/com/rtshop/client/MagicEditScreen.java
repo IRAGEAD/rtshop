@@ -167,37 +167,19 @@ public class MagicEditScreen extends Screen {
         return o.has(k) ? num(o.get(k).getAsDouble()) : def;
     }
 
-    /** 천장·오늘의 룬 칸 */
+    /** 천장 칸 */
     private void initExtra() {
-        JsonObject pity = section("pity"), bl = section("blessing");
+        JsonObject pity = section("pity");
         numberBox(x0 + 130, y0 + 66, 44, val(pity, "count", "80"), v -> {
             try {
                 pity.addProperty("count", Math.max(1, Math.min(100000, v.isEmpty() ? 1 : (int) Double.parseDouble(v))));
             } catch (NumberFormatException ignored) {
             }
         });
-        numberBox(x0 + 130, y0 + 132, 32, val(bl, "discountPercent", "20"), v -> {
-            try {
-                bl.addProperty("discountPercent", Math.max(0, Math.min(90, v.isEmpty() ? 0 : (int) Double.parseDouble(v))));
-            } catch (NumberFormatException ignored) {
-            }
-        });
-        numberBox(x0 + 232, y0 + 132, 32, val(bl, "periodHours", "24"), v -> {
-            try {
-                bl.addProperty("periodHours", Math.max(1, Math.min(720, v.isEmpty() ? 24 : (int) Double.parseDouble(v))));
-            } catch (NumberFormatException ignored) {
-            }
-        });
-        numberBox(x0 + 340, y0 + 132, 36, val(bl, "oddsBoost", "1"), v -> {
-            try {
-                bl.addProperty("oddsBoost", Math.max(1.0, Math.min(10.0, v.isEmpty() ? 1.0 : Double.parseDouble(v))));
-            } catch (NumberFormatException ignored) {
-            }
-        });
     }
 
     private void renderExtra(GuiGraphics g, int mx, int my, int px, int py, int pw) {
-        JsonObject pity = section("pity"), bl = section("blessing");
+        JsonObject pity = section("pity");
         int ty = y0 + 48;
         for (var line : font.split(Component.translatable("rtshop.magic.edit_pity_head"), pw - 12)) {
             g.drawString(font, line, px + 6, ty, Ui.C_INK, false);
@@ -226,25 +208,6 @@ public class MagicEditScreen extends Screen {
             pity.addProperty("shared", !sh);
             changed();
         });
-        ty = y0 + 110;
-        for (var line : font.split(Component.translatable("rtshop.magic.edit_bless_head"), pw - 12)) {
-            g.drawString(font, line, px + 6, ty, Ui.C_INK, false);
-            ty += 9;
-            if (ty > y0 + 122) break;
-        }
-        boolean bOn = flag(bl, "enabled", true);
-        btn(g, mx, my, x0 + 16, y0 + 131, 60, 16, tr(bOn ? "rtshop.magic.edit_on" : "rtshop.magic.edit_off"), () -> {
-            bl.addProperty("enabled", !bOn);
-            changed();
-        });
-        g.drawString(font, tr("rtshop.magic.edit_bless_discount"), x0 + 90, y0 + 135, Ui.C_INK, false);
-        g.drawString(font, tr("rtshop.magic.edit_bless_hours"), x0 + 172, y0 + 135, Ui.C_INK, false);
-        g.drawString(font, tr("rtshop.magic.edit_bless_boost"), x0 + 274, y0 + 135, Ui.C_INK, false);
-        ty = y0 + 154;
-        for (var line : font.split(Component.translatable("rtshop.magic.edit_bless_note"), pw - 12)) {
-            g.drawString(font, line, px + 6, ty, Ui.C_INK_SOFT, false);
-            ty += 9;
-        }
     }
 
     private void hit(int x, int y, int w, int h, Runnable r) {
@@ -340,6 +303,7 @@ public class MagicEditScreen extends Screen {
             hit(gx, y + 1, 70, 14, () -> {
                 List<ChoicePopup.Option> o = new ArrayList<>();
                 for (String gr : GRADES) {
+                    if (gr.equals("common")) continue; // 일반 등급 자리는 '실패'
                     if (gr.equals("yamato") && (tab != 0)) continue; // 야마토는 공격 분야에만
                     o.add(new ChoicePopup.Option(gr, tr("rtshop.gacha.grade." + gr)));
                 }
@@ -410,7 +374,7 @@ public class MagicEditScreen extends Screen {
                 if (tab == 5) {
                     n.addProperty("enchant", v);
                     n.addProperty("level", 1);
-                    n.addProperty("grade", "common");
+                    n.addProperty("grade", "uncommon");
                 } else {
                     n.addProperty("item", "epicfight:skillbook");
                     n.addProperty("count", 1);
@@ -430,7 +394,7 @@ public class MagicEditScreen extends Screen {
     private void renderOdds(GuiGraphics g, int mx, int my, int px, int py, int pw) {
         g.drawString(font, tr("rtshop.magic.edit_odds_head"), px + 6, py + 6, Ui.C_INK, false);
         for (int i = 0; i < GRADES.length; i++) {
-            String s = tr("rtshop.gacha.grade." + GRADES[i]);
+            String s = i == 0 ? tr("rtshop.magic.fail") : tr("rtshop.gacha.grade." + GRADES[i]); // 첫 칸 = 실패 확률
             g.drawString(font, Ui.clip(font, s, 54), x0 + 96 + i * 58, y0 + 58, GachaColors.dark(GRADES[i]), false);
         }
         String[] rows = {tr("rtshop.magic.tab.select"), tr("rtshop.magic.tab.random"), tr("rtshop.magic.tab.reroll")};
@@ -438,19 +402,6 @@ public class MagicEditScreen extends Screen {
         g.drawString(font, tr("rtshop.magic.edit_costs"), px + 6, y0 + 146, Ui.C_INK, false);
         String[] ck = {tr("rtshop.magic.tab.select"), tr("rtshop.magic.tab.random"), tr("rtshop.magic.tab.reroll")};
         for (int i = 0; i < 3; i++) g.drawString(font, Ui.clip(font, ck[i], 70), x0 + 96 + i * 116 + 44, y0 + 163, Ui.C_INK_SOFT, false);
-        // 10회 보장
-        String gu = cfg.get("tenGuarantee").getAsString();
-        g.drawString(font, tr("rtshop.magic.edit_guarantee"), px + 6, y0 + 190, Ui.C_INK, false);
-        int gx = x0 + 150;
-        btn(g, mx, my, gx, y0 + 186, 100, 16, (gu.isEmpty() ? tr("rtshop.magic.none") : tr("rtshop.gacha.grade." + gu)) + " ▼", () -> {
-            List<ChoicePopup.Option> o = new ArrayList<>();
-            o.add(new ChoicePopup.Option("", tr("rtshop.magic.none")));
-            for (int i = 1; i < 5; i++) o.add(new ChoicePopup.Option(GRADES[i], tr("rtshop.gacha.grade." + GRADES[i])));
-            popup = new ChoicePopup(gx, y0 + 186, 100, 16, height, font, o, gu, v -> {
-                cfg.addProperty("tenGuarantee", v);
-                changed();
-            });
-        });
     }
 
     @Override

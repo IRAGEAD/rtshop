@@ -41,8 +41,9 @@ import java.util.List;
  * <ul>
  * <li>구체 앞으로 걸어가 몸을 숙이고, 두 손이 받침대 위에 놓인다.</li>
  * <li>구체 둘레에 룬석 다섯 개가 오각으로 떠 있다: 만지면 그 분야를 고르고(선택 뽑기), 다시 만지면 풀린다(무작위 뽑기).</li>
- * <li>받침대 앞쪽의 소환 문양 [1회] [10회] 를 만지면 문양이 구체로 날아들어 뽑기 의식이 벌어진다. 오른쪽 모서리의 푸른 문양은 인챈트 재설정.</li>
- * <li>확률·티켓·천장·오늘의 룬은 화면 오른쪽의 룬 제단 패널에 겹쳐 보인다.</li>
+ * <li>받침대 앞쪽의 소환 문양을 만지면 문양이 구체로 날아들어 뽑기 의식이 벌어진다.</li>
+ * <li>인챈트 재설정: 화면 위 가방에서 무기·장비를 집어 받침대 오른쪽 앞의 푸른 원 위에 올려놓고, 그 옆의 푸른 문양을 만진다.</li>
+ * <li>확률·티켓·천장·오늘의 룬은 화면 옆의 룬 제단 패널에 겹쳐 보인다 (자리·글꼴·크기는 [화면 설정]).</li>
  * </ul>
  */
 public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
@@ -53,7 +54,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     public static final double RITUAL = 1.6, PEAK = 0.55;
 
     public enum Target {
-        NONE, STONE, PULL1, PULL10, REROLL, HUD
+        NONE, STONE, PULL1, REROLL, HUD, ITEM, PLACE
     }
 
     public final Vec3 top, orb;
@@ -86,7 +87,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     private double noteAt = -10.0;
 
     public CinematicOrbStation(BlockPos pos, Direction side) {
-        super(pos, side, MagicMenu.class, 0);
+        super(pos, side, MagicMenu.class, 1); // 0번 칸 = 제단 위 (재설정할 장비)
         this.top = new Vec3(pos.getX() + 0.5, pos.getY() + 0.75, pos.getZ() + 0.5);
         this.orb = top.add(0.0, 0.45, 0.0);
         this.data = MagicClient.lastView != null ? MagicClient.lastView : new JsonObject();
@@ -144,8 +145,17 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         if (!ready()) return 1;
         if (t == Target.REROLL) return panel.cost("reroll");
         JsonObject s = source();
-        String k = t == Target.PULL10 ? "cost10" : "cost1";
-        return s.has(k) ? s.get(k).getAsInt() : panel.cost(mode()) * (t == Target.PULL10 ? 10 : 1);
+        return s.has("cost1") ? s.get("cost1").getAsInt() : panel.cost(mode());
+    }
+
+    /** 제단 위에 올려 둔 장비. */
+    public ItemStack onAltar() {
+        return menu() == null ? ItemStack.EMPTY : slot(MagicMenu.ALTAR);
+    }
+
+    private ItemStack carried() {
+        MagicMenu m = menu();
+        return m == null ? ItemStack.EMPTY : m.getCarried();
     }
 
     private int have(Target t) {
@@ -154,12 +164,8 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
 
     private boolean affordable(Target t) {
         if (!ready()) return false;
-        if (t == Target.REROLL) return data.has("heldOk") && data.get("heldOk").getAsBoolean() && have(t) >= cost(t);
+        if (t == Target.REROLL) return !onAltar().isEmpty() && data.has("heldOk") && data.get("heldOk").getAsBoolean() && have(t) >= cost(t);
         return have(t) >= cost(t) && source().get("count").getAsInt() > 0;
-    }
-
-    private String blessed() {
-        return data.has("blessing") ? data.getAsJsonObject("blessing").get("cat").getAsString() : "";
     }
 
     private static String tr(String k, Object... a) {
@@ -178,9 +184,19 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         return SoundEvents.AMETHYST_BLOCK_CHIME;
     }
 
+    /** 화면 위 가방: 재설정할 장비를 집어 제단에 올린다 (의식·결과가 보이는 동안은 숨긴다). */
     @Override
     public boolean showsInventory() {
-        return false;
+        return ritualTime() < 0.0 && !fx.active() && shown.isEmpty();
+    }
+
+    /** 제단 위 칸의 자리: 받침대 오른쪽 앞, 푸른 원 위에 떠 있다. */
+    public Vec3 itemSpot() {
+        double clock = Scene.clock();
+        Vec3 at = top.add(side().scale(0.28)).add(right().scale(0.15)).add(0.0, 0.14 + 0.01 * Math.sin(clock * 1.4), 0.0);
+        double t = ritualTime();
+        if (t >= 0.0 && ritualKind == Target.REROLL) at = Anim.lerp(at, orb, 0.75 * Anim.hump(Anim.window(t, 0.0, 0.9)));
+        return at;
     }
 
     /** 룬석 i 의 자리: 구체를 둘러싼 오각형 (플레이어 쪽을 보는 면). */
@@ -191,10 +207,10 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
                 .add(side().scale(0.05));
     }
 
-    /** 소환 문양의 자리: [1회] [10회] 는 받침대 앞쪽, 재설정은 오른쪽 모서리. */
+    /** 소환 문양의 자리: 소환은 받침대 왼쪽 앞, 재설정은 오른쪽 모서리 (제단 위 칸 옆). */
     public Vec3 sigilPos(Target t) {
         double clock = Scene.clock();
-        double x = t == Target.PULL1 ? -0.15 : t == Target.PULL10 ? 0.15 : 0.36;
+        double x = t == Target.PULL1 ? -0.17 : 0.36;
         double out = t == Target.REROLL ? 0.20 : 0.30;
         Vec3 at = top.add(side().scale(out)).add(right().scale(x)).add(0.0, 0.115 + 0.008 * Math.sin(clock * 1.6 + x * 9.0), 0.0);
         double d = clock - refuseAt;
@@ -214,7 +230,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         Vec3 eye = top.add(side().scale(1.18)).add(0.0, 1.0, 0.0);
         Vec3 look = top.add(0.0, 0.42, 0.0).subtract(eye);
         // 오른쪽으로 조금 돌려, 장면이 화면 왼쪽에 놓이게 한다 (오른쪽에는 룬 제단 패널이 겹친다)
-        float yaw = (float) Math.toDegrees(Math.atan2(-look.x, look.z)) + 10.0f;
+        float yaw = (float) Math.toDegrees(Math.atan2(-look.x, look.z)) + (ClientConfig.get().magicPanelLeft ? -10.0f : 10.0f);
         float pitch = (float) -Math.toDegrees(Math.atan2(look.y, Math.hypot(look.x, look.z)));
         return new CameraRig.Pose(eye, yaw, pitch, 0.0f);
     }
@@ -261,8 +277,17 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
                 return;
             }
         }
-        if (ritualTime() >= 0.0) return;
-        for (Target t : new Target[]{Target.PULL1, Target.PULL10, Target.REROLL}) {
+        if (ritualTime() >= 0.0 || overPanel) return;
+        // 제단 위 칸: 든 것이 있으면 올려놓기, 빈손이면 집어 들기
+        if (under(mouse, itemSpot(), 0.11)) {
+            boolean carrying = !carried().isEmpty();
+            if (carrying || !onAltar().isEmpty()) {
+                target = carrying ? Target.PLACE : Target.ITEM;
+                aim = itemSpot();
+                return;
+            }
+        }
+        for (Target t : new Target[]{Target.PULL1, Target.REROLL}) {
             if (under(mouse, sigilPos(t), SIGIL * 1.25)) {
                 target = t;
                 aim = sigilPos(t);
@@ -333,8 +358,14 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
             case HUD -> {
                 if (hudHover < 0 || ritualTime() >= 0.0) return;
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
-                CinematicOrb.afterLeave = hudHover == 0 ? MagicActionPacket.SHOP : MagicActionPacket.EDIT;
+                if (hudHover == 0) CinematicOrb.afterLeaveClient = () -> mc.setScreen(new MagicUiScreen()); // 화면 설정은 장면에서 물러난 뒤에 뜬다
+                else CinematicOrb.afterLeave = MagicActionPacket.EDIT;
                 Scene.leave();
+            }
+            case ITEM, PLACE -> {
+                if (ritualTime() >= 0.0) return;
+                slotClick(MagicMenu.ALTAR, button, shift);
+                sound(SoundEvents.AMETHYST_BLOCK_PLACE, 0.8f, target == Target.PLACE ? 1.0f : 1.3f);
             }
             case STONE -> {
                 if (ritualTime() >= 0.0 || hover < 0) return;
@@ -343,7 +374,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
                 sound(SoundEvents.AMETHYST_BLOCK_CHIME, 0.9f, cat < 0 ? 0.8f : 1.1f + hover * 0.08f);
                 EnchantFx.sparkle(stonePos(hover), 0.12);
             }
-            case PULL1, PULL10, REROLL -> {
+            case PULL1, REROLL -> {
                 if (ritualTime() >= 0.0) return;
                 CinematicOrb.tap();
                 if (affordable(target)) {
@@ -380,7 +411,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
             JsonObject a = new JsonObject();
             a.addProperty("mode", mode());
             a.addProperty("cat", cat >= 0 ? CATS[cat] : "");
-            a.addProperty("n", t == Target.PULL10 ? 10 : 1);
+            a.addProperty("n", 1);
             ShopNet.CHANNEL.sendToServer(new MagicActionPacket(MagicActionPacket.PULL, a.toString()));
         }
         sound(SoundEvents.ENCHANTMENT_TABLE_USE, 0.45f, 1.7f);
@@ -432,13 +463,14 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     public void tick() {
         if (menu() == null || mc.player == null) return;
         int key = target == Target.STONE ? hover : target == Target.NONE || target == Target.HUD ? -1 : 10 + target.ordinal();
+        if (!onAltar().isEmpty() && mc.player.tickCount % 5 == 0) EnchantFx.sparkle(itemSpot(), 0.08);
         if (key != lastHoverKey && key >= 0) {
             sound(SoundEvents.AMETHYST_BLOCK_STEP, 0.5f, 0.9f + random.nextFloat() * 0.3f);
         }
         lastHoverKey = key;
         if (mc.player.tickCount % 3 == 0) EnchantFx.sparkle(orb, 0.2);
         if (cat >= 0 && mc.player.tickCount % 4 == 0) EnchantFx.stream(stonePos(cat), orb, 1);
-        if (target == Target.PULL1 || target == Target.PULL10 || target == Target.REROLL) {
+        if (target == Target.PULL1 || target == Target.REROLL) {
             Vec3 sigil = sigilPos(target);
             EnchantFx.stream(afar(), sigil, 1);
             EnchantFx.stream(sigil, orb, 1);
@@ -479,7 +511,7 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         MagicClient.sceneAt(pos, (float) presence());
         double clock = Scene.clock();
         double t = ritualTime();
-        boolean sigilHover = target == Target.PULL1 || target == Target.PULL10 || target == Target.REROLL;
+        boolean sigilHover = target == Target.PULL1 || target == Target.REROLL;
         double want = Scene.phase == Scene.Phase.INTRO ? 0.5 * Anim.smoother(Anim.window(Scene.introProgress(), 0.45, 1.0))
                 : Scene.phase == Scene.Phase.ACTIVE ? 0.5 + (cat >= 0 ? 0.15 : 0.0) + (sigilHover ? 0.3 : 0.0) + (t >= 0.0 ? 1.4 * Anim.hump(Anim.window(t, 0.0, 0.75)) : 0.0)
                 : 0.0;
@@ -505,12 +537,9 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         }
     }
 
-    /** 빛기둥 색: 결과가 이미 왔으면 그 최고 등급의 색, 아니면 보랏빛. */
+    /** 빛기둥 색: 언제나 보랏빛 (결과의 등급 색을 쓰면 카드가 뒤집히기 전에 등급이 드러난다). */
     private float[] gradeColor() {
-        List<MagicFx.Card> l = waiting != null ? waiting : shown;
-        if (l == null || l.isEmpty()) return new float[]{0.7f, 0.5f, 1.0f};
-        int c = GachaColors.of(MagicGachaScreen.bestGradeOf(l));
-        return new float[]{Math.max(0.25f, (c >> 16 & 255) / 255f), Math.max(0.25f, (c >> 8 & 255) / 255f), Math.max(0.25f, (c & 255) / 255f)};
+        return new float[]{0.7f, 0.5f, 1.0f};
     }
 
     @Override
@@ -521,25 +550,42 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         double clock = Scene.clock();
         double t = ritualTime();
         float appear = (float) Anim.outBack(Anim.clamp01(p), 1.6);
-        String bl = blessed();
-        // 룬석 다섯
+        // 룬석 다섯: 고르지 않은 룬석도 어두워지지 않는다 (고른 것만 조금 커지고 금빛 고리와 빛으로 표시)
         for (int i = 0; i < CATS.length; i++) {
             Vec3 at = stonePos(i);
             boolean chosen = cat == i;
             boolean lit = chosen || cat < 0;
             boolean hov = target == Target.STONE && hover == i;
-            boolean rune = CATS[i].equals(bl);
-            float size = (float) (STONE * appear * (hov ? 1.18 : 1.0) * (chosen ? 1.12 + 0.03 * Math.sin(clock * 4.0) : 1.0));
+            float size = (float) (STONE * appear * (hov ? 1.18 : 1.0) * (chosen ? 1.16 + 0.03 * Math.sin(clock * 4.0) : cat >= 0 ? 0.92 : 1.0));
             float b = (float) p;
-            if (rune) EnchantFx.billboard(pose, buffers, camera, at, size * 2.4, clock * 0.5, EnchantFx.GLOW, 0.18f * b, 0.42f * b, 0.55f * b);
             if (chosen || hov) EnchantFx.billboard(pose, buffers, camera, at, size * 2.2, 0.0, EnchantFx.GLOW, 0.55f * b, 0.42f * b, 0.18f * b);
-            float bright = lit ? 1.0f : hov ? 0.95f : 0.72f;
-            quad(pose, buffers, camera, lit ? STONES_ON : STONES, at, size * 0.8, size, i / 5f, (i + 1) / 5f, bright, (float) p);
+            if (chosen) EnchantFx.circleBillboard(pose, buffers, camera, at, size * 1.25, clock * 0.9, EnchantFx.CirclePalette.VIOLET, 0.9f * b);
+            float bright = lit || hov ? 1.0f : 0.86f;
+            quad(pose, buffers, camera, STONES_ON, at, size * 0.8, size, i / 5f, (i + 1) / 5f, bright, (float) p);
             String name = tr("rtshop.magic.cat." + CATS[i]);
-            label(pose, buffers, camera, at.add(0.0, -size - 0.03, 0.0), name, 0.0082f * appear, rune ? 0xFF8FE4FF : lit ? 0xFFFFE9B0 : 0xFFB8A8DC, (float) p);
+            label(pose, buffers, camera, at.add(0.0, -size - 0.03, 0.0), name, 0.0082f * appear, lit ? 0xFFFFE9B0 : 0xFFCFC2F0, (float) p);
+        }
+        // 제단 위 칸: 받침대의 푸른 원과, 그 위에 떠서 천천히 도는 장비
+        Vec3 spot = itemSpot();
+        ItemStack on = onAltar();
+        boolean spotHover = target == Target.PLACE || target == Target.ITEM;
+        Vec3 ring = top.add(side().scale(0.28)).add(right().scale(0.15)).add(0.0, 0.016, 0.0);
+        EnchantFx.circle(pose, buffers, cam, ring, spotHover ? 0.105 : 0.09, clock * 0.6, EnchantFx.CirclePalette.LAPIS,
+                (float) p * (spotHover ? 0.95f : on.isEmpty() ? 0.45f : 0.7f));
+        if (!on.isEmpty()) {
+            pose.pushPose();
+            pose.translate(spot.x - cam.x, spot.y - cam.y, spot.z - cam.z);
+            pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees((float) ((clock * 40.0) % 360.0)));
+            float sz = 0.3f * appear * (target == Target.ITEM ? 1.1f : 1.0f);
+            pose.scale(sz, sz, sz);
+            mc.getItemRenderer().renderStatic(on, net.minecraft.world.item.ItemDisplayContext.FIXED, 0xF000F0,
+                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, pose, buffers, mc.level, 0);
+            pose.popPose();
+        } else if (target != Target.PLACE) {
+            label(pose, buffers, camera, ring.add(0.0, 0.07, 0.0), tr("rtshop.magic.altar_slot"), 0.0058f * appear, 0xFF9CC8FF, (float) p * 0.85f);
         }
         // 소환 문양
-        for (Target s : new Target[]{Target.PULL1, Target.PULL10, Target.REROLL}) {
+        for (Target s : new Target[]{Target.PULL1, Target.REROLL}) {
             if (t >= 0.0 && s == ritualKind) continue;
             float dim = t >= 0.0 ? 0.4f : 1.0f;
             sigil(pose, buffers, camera, s, sigilPos(s), appear, target == s, affordable(s), dim * (float) p);
@@ -561,13 +607,13 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         boolean blue = s == Target.REROLL;
         float r = !affordable ? 0.5f : blue ? 0.25f : 0.55f, g = !affordable ? 0.12f : blue ? 0.55f : 0.45f, bl = !affordable ? 0.16f : 1.0f;
         EnchantFx.billboard(pose, buffers, camera, at, size * 1.8, 0.0, EnchantFx.GLOW, r * b * 0.35f, g * b * 0.35f, bl * b * 0.35f);
-        double turn = clock * (hovered ? 1.8 : 0.5) * (s == Target.PULL10 ? -1 : 1);
+        double turn = clock * (hovered ? 1.8 : 0.5);
         EnchantFx.circleBillboard(pose, buffers, camera, at, size, turn,
                 !affordable ? EnchantFx.CirclePalette.RED : blue ? EnchantFx.CirclePalette.LAPIS : EnchantFx.CirclePalette.VIOLET, b);
         float alpha = Math.min(1.0f, brightness) * Math.min(1.0f, appear);
         Vector3f look = camera.getLookVector();
         Vec3 text = at.subtract(look.x() * 0.01, look.y() * 0.01, look.z() * 0.01);
-        String head = s == Target.REROLL ? tr("rtshop.magic.sigil.reroll") : tr("rtshop.magic.sigil.times", s == Target.PULL10 ? 10 : 1);
+        String head = s == Target.REROLL ? tr("rtshop.magic.sigil.reroll") : tr("rtshop.magic.sigil.times");
         label(pose, buffers, camera, text.add(0.0, 0.018, 0.0), head, 0.0088f * appear * (hovered ? 1.2f : 1.0f), affordable ? 0xFFF4EEFF : 0xFFFF6B6B, alpha);
         String sub = "×" + cost(s);
         label(pose, buffers, camera, text.add(0.0, -0.046, 0.0), sub, 0.0062f * appear, affordable ? (blue ? 0xFF9CC8FF : 0xFFB9A6FF) : 0xFF7A4A55, alpha);
@@ -596,12 +642,13 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         if (a < 12 || scale <= 0.0001f) return;
         Vec3 cam = camera.getPosition();
         Font font = mc.font;
-        Component c = RaidText.c(s, RaidText.SANS);
+        Component c = MagicUi.c(s, MagicUi.body());
         pose.pushPose();
         pose.translate(at.x - cam.x, at.y - cam.y, at.z - cam.z);
         pose.mulPose(camera.rotation());
         pose.scale(-scale, -scale, scale);
-        font.drawInBatch(c, -font.width(c) / 2f, -4.5f, (a << 24) | (color & 0xFFFFFF), true, pose.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        // 글자 그림자는 화면 설정에서 켠 경우에만
+        font.drawInBatch(c, -font.width(c) / 2f, -4.5f, (a << 24) | (color & 0xFFFFFF), MagicUi.shadow(), pose.last().pose(), buffers, Font.DisplayMode.NORMAL, 0, 0xF000F0);
         pose.popPose();
     }
 
@@ -611,30 +658,39 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     public void renderScreen(GuiGraphics g, Font font, float alpha) {
         int w = g.guiWidth(), h = g.guiHeight();
         panel.prepare(mc, w, h);
-        boolean reroll = target == Target.REROLL || (ritualTime() >= 0.0 && ritualKind == Target.REROLL);
+        boolean reroll = target == Target.REROLL || target == Target.ITEM || target == Target.PLACE || !onAltar().isEmpty()
+                || (ritualTime() >= 0.0 && ritualKind == Target.REROLL);
         panel.tabForTest(reroll ? 2 : cat >= 0 ? 0 : 1);
         if (cat >= 0) panel.catForTest(cat);
         hudOn[0] = hudOn[1] = false;
         boolean fxOn = fx.active();
         if (Scene.phase == Scene.Phase.ACTIVE && alpha > 0.6f && !fxOn && shown.isEmpty() && ready()) {
-            int pw = Math.min(170, w * 3 / 10), px = w - pw - 10, py = 30;
-            panel.renderHud(g, px, py, pw);
-            int by = py + MagicGachaScreen.HUD_H + 8;
+            // 패널: 크기 배율과 자리(오른쪽·왼쪽)는 화면 설정을 따른다
+            float sc = MagicUi.scale();
+            int pw = Math.min(170, Math.round(w * 0.3f / sc));
+            int real = Math.round(pw * sc);
+            int px = ClientConfig.get().magicPanelLeft ? 10 : w - real - 10, py = 30;
             boolean edit = data.has("canEdit") && data.get("canEdit").getAsBoolean();
             int bw = edit ? (pw - 6) / 2 : pw;
-            hud[0] = new int[]{px, by, bw, 16};
-            hudOn[0] = true;
-            panel.hudButton(g, px, by, bw, 16, tr("rtshop.gacha.buy_tickets"), hudHover == 0);
-            if (edit) {
-                hud[1] = new int[]{px + bw + 6, by, bw, 16};
-                hudOn[1] = true;
-                panel.hudButton(g, px + bw + 6, by, bw, 16, tr("rtshop.magic.edit"), hudHover == 1);
-            }
+            int by = MagicGachaScreen.HUD_H + 8;
+            g.pose().pushPose();
+            g.pose().translate(px, py, 0);
+            g.pose().scale(sc, sc, 1f);
+            panel.renderHud(g, 0, 0, pw);
+            panel.hudButton(g, 0, by, bw, 16, tr("rtshop.magic.ui_settings"), hudHover == 0);
+            if (edit) panel.hudButton(g, bw + 6, by, bw, 16, tr("rtshop.magic.edit"), hudHover == 1);
             if (note != null && Scene.clock() - noteAt < 5.0) {
-                panel.hudLine(g, px, by + 22, pw, note.getString(), noteOk ? 0xFF9FE88A : 0xFFFF9080);
+                panel.hudLine(g, 0, by + 24, pw, note.getString(), noteOk ? 0xFF9FE88A : 0xFFFF9080);
+            }
+            g.pose().popPose();
+            hud[0] = new int[]{px, py + Math.round(by * sc), Math.round(bw * sc), Math.round(16 * sc)};
+            hudOn[0] = true;
+            if (edit) {
+                hud[1] = new int[]{px + Math.round((bw + 6) * sc), py + Math.round(by * sc), Math.round(bw * sc), Math.round(16 * sc)};
+                hudOn[1] = true;
             }
         }
-        if (!fxOn && !shown.isEmpty()) panel.drawResults(g, shown);
+        if (!fxOn && !shown.isEmpty()) panel.drawResults(g, shown, w, h);
         fx.render(g, font, w, h);
     }
 
@@ -648,13 +704,18 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
                 int n = data.getAsJsonObject("cats").getAsJsonObject(CATS[hover]).get("count").getAsInt();
                 lines.add(Component.translatable("rtshop.magic.cat." + CATS[hover]).append(" · ").append(Component.translatable("rtshop.magic.kinds", n))
                         .withStyle(ChatFormatting.WHITE));
-                if (CATS[hover].equals(blessed())) {
-                    lines.add(Component.translatable("rtshop.magic.bless_on", data.getAsJsonObject("blessing").get("discount").getAsInt()).withStyle(ChatFormatting.AQUA));
-                }
                 lines.add(Component.translatable(cat == hover ? "rtshop.magic.tip.unchoose" : "rtshop.magic.tip.choose").withStyle(ChatFormatting.LIGHT_PURPLE));
             }
-            case PULL1, PULL10 -> {
-                lines.add(Component.translatable("rtshop.magic.times", target == Target.PULL10 ? 10 : 1).withStyle(ChatFormatting.WHITE));
+            case ITEM -> {
+                lines.add(onAltar().getHoverName().copy().withStyle(ChatFormatting.WHITE));
+                lines.add(Component.translatable("rtshop.magic.take_tip").withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
+            case PLACE -> {
+                lines.add(Component.translatable("rtshop.magic.altar_slot").withStyle(ChatFormatting.WHITE));
+                lines.add(Component.translatable("rtshop.magic.place_tip").withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
+            case PULL1 -> {
+                lines.add(Component.translatable("rtshop.magic.times").withStyle(ChatFormatting.WHITE));
                 lines.add(Component.translatable(cat >= 0 ? "rtshop.magic.tip.from" : "rtshop.magic.tip.from_all",
                         cat >= 0 ? Component.translatable("rtshop.magic.cat." + CATS[cat]) : Component.empty()).withStyle(ChatFormatting.GRAY));
                 boolean ok = have(target) >= cost(target);
@@ -665,8 +726,10 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
             case REROLL -> {
                 lines.add(Component.translatable("rtshop.magic.reroll_btn").withStyle(ChatFormatting.WHITE));
                 boolean held = data.has("heldOk") && data.get("heldOk").getAsBoolean();
-                if (!held) {
+                if (onAltar().isEmpty()) {
                     lines.add(Component.translatable("rtshop.magic.reroll_hold").withStyle(ChatFormatting.RED));
+                } else if (!held) {
+                    lines.add(Component.translatable("rtshop.magic.reroll_bad_item").withStyle(ChatFormatting.RED));
                 } else {
                     lines.add(Component.translatable("rtshop.magic.reroll_desc").withStyle(ChatFormatting.GRAY));
                 }
@@ -693,11 +756,27 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         cat = c;
     }
 
-    public boolean pullForTest(int n) {
-        Target t = n >= 10 ? Target.PULL10 : Target.PULL1;
-        if (!affordable(t) || ritualTime() >= 0.0) return false;
-        startRitual(t);
+    public boolean pullForTest() {
+        if (!affordable(Target.PULL1) || ritualTime() >= 0.0) return false;
+        startRitual(Target.PULL1);
         return true;
+    }
+
+    /** 가방 칸(0~35)의 물건을 제단 위로 올린다 (가방에서 Shift 클릭한 것과 같다). */
+    public void placeForTest(int inventoryIndex) {
+        MagicMenu m = menu();
+        if (m == null || mc.gameMode == null) return;
+        mc.gameMode.handleInventoryMouseClick(m.containerId, MagicMenu.slotOfInventory(inventoryIndex), 0,
+                net.minecraft.world.inventory.ClickType.QUICK_MOVE, mc.player);
+    }
+
+    public boolean inventoryShownForTest() {
+        return showsInventory();
+    }
+
+    /** 제단 위 칸이 화면 안에 들어오는가 (화면 좌표). */
+    public double[] guiOfItemSpotForTest() {
+        return Picking.toGui(itemSpot());
     }
 
     public boolean rerollForTest() {

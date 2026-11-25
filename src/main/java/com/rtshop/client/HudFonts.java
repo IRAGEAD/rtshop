@@ -35,7 +35,7 @@ public final class HudFonts {
             Minecraft.getInstance().getResourceManager().listResources("font", rl -> rl.getPath().endsWith(".json")).keySet().forEach(rl -> {
                 String path = rl.getPath().substring("font/".length(), rl.getPath().length() - ".json".length());
                 String id = rl.getNamespace() + ":" + path;
-                if (path.startsWith("include/") || (id.startsWith("rtshop:ui_") && !id.equals("rtshop:ui_serif")) || id.equals("minecraft:alt") || id.equals("minecraft:illageralt") || id.equals("rtshop:raid_gothic")
+                if (path.startsWith("include/") || id.startsWith("rtshop:magic_") || (id.startsWith("rtshop:ui_") && !id.equals("rtshop:ui_serif")) || id.equals("minecraft:alt") || id.equals("minecraft:illageralt") || id.equals("rtshop:raid_gothic")
                         || id.equals("minecraft:default") || found.contains(id)) {
                     return;
                 }

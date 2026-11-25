@@ -22,6 +22,8 @@ public final class CinematicOrb {
 
     /** 장면에서 물러난 뒤에 보낼 동작 (티켓 상점·편집기는 장면이 끝난 다음에 연다). */
     static int afterLeave = -1;
+    /** 장면에서 물러난 뒤에 이쪽(클라이언트)에서 할 일 (화면 설정 창). */
+    static Runnable afterLeaveClient;
     private static java.lang.reflect.Method tap;
 
     public static void register() {
@@ -66,6 +68,11 @@ public final class CinematicOrb {
         if (afterLeave >= 0 && !Scene.active()) {
             ShopNet.CHANNEL.sendToServer(new MagicActionPacket(afterLeave, ""));
             afterLeave = -1;
+        }
+        if (afterLeaveClient != null && !Scene.active()) {
+            Runnable r = afterLeaveClient;
+            afterLeaveClient = null;
+            r.run();
         }
     }
 

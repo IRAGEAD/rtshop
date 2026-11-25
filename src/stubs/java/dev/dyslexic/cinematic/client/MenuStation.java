@@ -20,6 +20,13 @@ public abstract class MenuStation<M extends AbstractContainerMenu> extends Clien
         return null;
     }
 
+    public net.minecraft.world.item.ItemStack slot(int index) {
+        return net.minecraft.world.item.ItemStack.EMPTY;
+    }
+
+    protected void slotClick(int slot, int button, boolean shift) {
+    }
+
     protected void deny() {
     }
 

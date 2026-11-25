@@ -31,13 +31,94 @@ def recolor(src, mapping):
             px[x, y] = (*c, a)
     return im
 
-# 티켓 (무작위: 보라 + 흰 별, 선택: 짙은 남보라 + 금 룬)
-t1 = recolor('item/gacha_ticket_high.png', {'edge': (40, 18, 60), 'shade': (112, 62, 170), 'body': (160, 104, 220), 'mark': (250, 240, 255)})
-t2 = recolor('item/gacha_ticket_high.png', {'edge': (24, 14, 48), 'shade': (70, 40, 130), 'body': (104, 66, 186), 'mark': (255, 206, 80)})
+# 티켓: 룬 부적 (세로로 긴 카드). 무작위 = 보랏빛 바탕에 흰 별빛과 다섯 분야의 점, 선택 = 짙은 남보라 바탕에 금테와 금빛 룬.
+def card(edge, body, light, shade, motif, colors, corners=None):
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    for y in range(1, 15):
+        for x in range(3, 14):
+            if (x in (3, 13)) and (y in (1, 14)):
+                continue  # 둥근 모서리
+            rim = x in (3, 13) or y in (1, 14)
+            px[x, y] = (*edge, 255) if rim else (*body, 255)
+    for x in range(4, 13):
+        px[x, 2] = (*light, 255)
+        px[x, 13] = (*shade, 255)
+    for y in range(3, 13):
+        px[12, y] = (*shade, 255)
+    for iy, row in enumerate(motif):
+        for ix, ch in enumerate(row):
+            if ch != '.':
+                px[4 + ix, 2 + iy] = (*colors[ch], 255)
+    if corners:
+        for (x, y) in ((4, 2), (12, 2), (4, 13), (12, 13)):
+            px[x, y] = (*corners, 255)
+    return im
+
+t1 = card((44, 20, 70), (150, 96, 214), (190, 144, 240), (108, 60, 168), [
+    '.........',
+    '.........',
+    '....W....',
+    '....W....',
+    '...WWW...',
+    '.WWWYWWW.',
+    '...WWW...',
+    '....W....',
+    '....W....',
+    '.........',
+    '.r.g.b.y.',
+    '.........',
+], {'W': (250, 244, 255), 'Y': (255, 232, 150), 'r': (255, 150, 150), 'g': (160, 240, 170), 'b': (150, 210, 255), 'y': (255, 226, 130)})
+t2 = card((22, 12, 44), (74, 46, 150), (104, 72, 190), (50, 30, 110), [
+    '.........',
+    '.........',
+    '..G.G.G..',
+    '..G.G.G..',
+    '...GGG...',
+    '....G....',
+    '....H....',
+    '....G....',
+    '....G....',
+    '.........',
+    '...GHG...',
+    '.........',
+], {'G': (255, 206, 80), 'H': (255, 240, 180)}, corners=(255, 206, 80))
 save(t1, 'item/magic_ticket.png')
 save(t2, 'item/magic_ticket_select.png')
-s1 = recolor('item/oath_scroll.png', {'edge': (20, 34, 70), 'shade': (90, 140, 210), 'body': (190, 220, 250), 'mark': (120, 80, 230)})
-save(s1, 'item/enchant_scroll.png')
+
+# 인챈트 재설정 주문서: 금빛 봉이 달린 두루마리, 푸른 종이에 빛나는 룬 글씨와 보랏빛 봉인
+def scroll():
+    im = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    px = im.load()
+    E, ROD, RODL, KNOB = (20, 30, 66), (70, 104, 176), (120, 160, 226), (255, 206, 80)
+    PAPER, PAPERL, PAPERS = (196, 222, 250), (226, 240, 255), (150, 186, 232)
+    for y0 in (1, 12):
+        for x in range(3, 13):
+            px[x, y0] = (*E, 255)
+            px[x, y0 + 1] = (*RODL, 255)
+            px[x, y0 + 2] = (*ROD, 255)
+        for y in (y0 + 1, y0 + 2):
+            px[2, y] = (*KNOB, 255)
+            px[13, y] = (*KNOB, 255)
+        px[2, y0] = px[13, y0] = (*E, 255)
+    for x in range(2, 14):
+        px[x, 15] = (*E, 255)
+    for y in range(4, 12):
+        px[3, y] = (*E, 255)
+        px[12, y] = (*E, 255)
+        for x in range(4, 12):
+            px[x, y] = (*PAPER, 255)
+        px[4, y] = (*PAPERL, 255)
+        px[11, y] = (*PAPERS, 255)
+    C, V, VL = (60, 150, 235), (132, 84, 232), (214, 190, 255)
+    for (x, y) in ((5, 5), (6, 5), (8, 5), (10, 5), (5, 7), (7, 7), (8, 7), (10, 7), (6, 9), (5, 9)):
+        px[x, y] = (*C, 255)
+    for (x, y) in ((8, 9), (9, 9), (10, 9), (8, 10), (10, 10), (9, 10)):
+        px[x, y] = (*V, 255)
+    px[9, 9] = (*VL, 255)
+    return im
+
+save(scroll(), 'item/enchant_scroll.png')
 
 # 받침 블록: 흑요석 + 보라 빛줄
 def obsidian(seed, veins=True, top=False):

@@ -19,11 +19,13 @@ import java.util.List;
 /**
  * 마법 뽑기 연출 「룬석 소환진」.
  * 룬석 다섯 개가 원을 그리며 돌고, 가운데로 빛 입자가 모여 카드가 된다. 카드는 좌우로 돌다가 멈추며 앞면을 보인다.
- * 룬석은 하나씩 등급 색으로 켜져 등급을 미리 알려 준다 (일반 1개 … 전설 5개, 야마토는 다섯 개가 모두 하늘색으로 번쩍).
- * 10회 뽑기는 가장 높은 등급의 카드를 먼저 보여 주고, 열 장을 차례로 뒤집는다. 아무 곳이나 누르면 건너뛴다.
+ * 카드가 앞면을 보이기 전까지는 룬석·빛·카드 테두리가 모두 같은 보랏빛이라 등급이 미리 드러나지 않는다 (길이·소리도 같다).
+ * 실패한 뽑기는 빈 카드가 잿빛으로 나온다. 아무 곳이나 누르면 건너뛴다. 연출의 길이는 화면 설정(보통·짧게·끔)을 따른다.
  */
 public final class MagicFx {
     static final ResourceLocation RUNES = new ResourceLocation(RtShop.MODID, "textures/gui/magic_runes.png");
+    /** 결과가 드러나기 전의 빛깔 (어느 등급이든 같다). */
+    static final int NEUTRAL = 0xB8A0FF;
 
     public static final class Card {
         public final ItemStack icon;
@@ -45,6 +47,8 @@ public final class MagicFx {
     private boolean done = true;
     private int lastLit = -1;
     private boolean soundForm, soundReveal;
+    /** 연출 빠르기 (화면 설정 '짧게' = 2.4 배). */
+    private float speed = 1F;
 
     public boolean active() {
         return !done;
@@ -70,16 +74,13 @@ public final class MagicFx {
                 best = c;
             }
         }
-        if (best == null) {
+        int mode = ClientConfig.get().magicFx;
+        if (best == null || mode >= 2) { // 화면 설정에서 연출을 끄면 바로 결과로
             done = true;
             return;
         }
-        length = switch (bestGrade) {
-            case 5 -> 5200;
-            case 4 -> 4000;
-            case 3 -> 3300;
-            default -> 2600;
-        } + (list.size() > 1 ? 1400 : 0);
+        speed = mode == 1 ? 2.4F : 1F;
+        length = 3300 + (list.size() > 1 ? 1400 : 0); // 등급과 상관없이 같은 길이
         start = System.currentTimeMillis();
         done = false;
         lastLit = -1;
@@ -118,7 +119,7 @@ public final class MagicFx {
     /** 화면 전체에 그린다 (뽑기 창 위). */
     public void render(GuiGraphics g, Font font, int sw, int sh) {
         if (done) return;
-        long t = System.currentTimeMillis() - start;
+        long t = (long) ((System.currentTimeMillis() - start) * speed);
         if (t >= length + 600) {
             done = true;
             return;
@@ -139,7 +140,7 @@ public final class MagicFx {
         g.fill(0, 0, sw, sh, argb(0x0A0614, 0.86F * fadeIn));
         int cx = sw / 2, cy = sh / 2 - 6;
         int R = Math.min(78, Math.min(sw, sh) / 3);
-        int gradeRgb = GachaColors.of(best.grade);
+        int gradeRgb = NEUTRAL; // 앞면이 보이기 전까지 등급 색을 쓰지 않는다
         boolean yamato = bestGrade == 5;
 
         // 소환진: 점선 원 두 겹 (천천히 돈다)
@@ -149,12 +150,11 @@ public final class MagicFx {
 
         // 룬석이 하나씩 켜진다 (등급 예고)
         int lit = 0;
-        int maxLit = yamato ? 5 : Math.min(5, bestGrade + 1);
+        int maxLit = 5;
         if (t > 1100) lit = Math.min(maxLit, 1 + (int) ((t - 1100) / 220));
         if (lit != lastLit && lit > 0) {
             lastLit = lit;
             play(SoundEvents.AMETHYST_BLOCK_CHIME, 0.8F + lit * 0.15F, 1F);
-            if (lit == maxLit && bestGrade >= 4) play(yamato ? SoundEvents.END_PORTAL_FRAME_FILL : SoundEvents.BEACON_POWER_SELECT, 1.0F, 1F);
         }
         float orbit = spin * (1.4F + (t > 1100 ? 1.2F : 0F));
         for (int i = 0; i < 5; i++) {
@@ -162,7 +162,7 @@ public final class MagicFx {
             int rx = cx + (int) (Math.cos(a) * R) - 8;
             int ry = cy + (int) (Math.sin(a) * R * 0.92) - 8;
             boolean on = i < lit;
-            int col = yamato && on ? 0x49B6FF : gradeRgb;
+            int col = gradeRgb;
             if (on) {
                 // 켜진 룬석 둘레의 빛
                 for (int k = 3; k >= 1; k--) g.fill(rx - k * 2, ry - k * 2, rx + 16 + k * 2, ry + 16 + k * 2, argb(col, 0.10F * fadeIn));
@@ -202,7 +202,8 @@ public final class MagicFx {
             boolean front = spinT >= 1F;
             if (front && !soundReveal) {
                 soundReveal = true;
-                play(bestGrade >= 4 ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.PLAYER_LEVELUP, bestGrade >= 4 ? 1F : 1.4F, 0.8F);
+                if ("fail".equals(best.grade)) play(SoundEvents.FIRE_EXTINGUISH, 0.7F, 0.5F);
+                else play(bestGrade >= 4 ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.PLAYER_LEVELUP, bestGrade >= 4 ? 1F : 1.4F, 0.8F);
             }
             float scale = 0.6F + 0.4F * easeOut(formT);
             drawCard(g, font, cx, cy, best, front ? 1F : Math.abs(sx), scale * (cards.size() > 1 && t > revealAt + 300 ? 0.8F : 1F),
@@ -233,7 +234,7 @@ public final class MagicFx {
         }
         // 건너뛰기 안내
         String skip = Component.translatable("rtshop.magic.skip").getString();
-        g.drawString(font, skip, sw - 8 - font.width(skip), sh - 14, argb(0xCFC2E8, 0.6F), false);
+        MagicUi.draw(g, font, skip, MagicUi.body(), sw - 8 - MagicUi.w(font, skip, MagicUi.body()), sh - 14, argb(0xCFC2E8, 0.6F));
         g.pose().popPose();
     }
 
@@ -257,7 +258,7 @@ public final class MagicFx {
     /** 큰 카드. sx = 가로 비율(회전), face = 앞면인가. */
     private void drawCard(GuiGraphics g, Font font, int cx, int cy, Card c, float sx, float scale, boolean face, float alpha) {
         int w = 64, h = 88;
-        int col = GachaColors.of(c.grade);
+        int col = face ? GachaColors.of(c.grade) : NEUTRAL;
         g.pose().pushPose();
         g.pose().translate(cx, cy, 0);
         g.pose().scale(Math.max(0.04F, sx) * scale, scale, 1F);
@@ -280,16 +281,28 @@ public final class MagicFx {
             g.drawString(mf, q, -(mf.width(q) - 1) / 2, -1, (a << 24) | 0xE8DCFF, false);
             g.pose().popPose();
         } else {
-            g.pose().pushPose();
-            g.pose().translate(-16, -32, 0);
-            g.pose().scale(2F, 2F, 1F);
-            g.renderItem(c.icon, 0, 0);
-            g.pose().popPose();
+            if (c.icon.isEmpty()) { // 실패: 꺼진 룬
+                RenderSystem.enableBlend();
+                RenderSystem.setShaderColor(0.5F, 0.46F, 0.6F, alpha * 0.8F);
+                g.pose().pushPose();
+                g.pose().translate(-16, -34, 0);
+                g.pose().scale(2F, 2F, 1F);
+                g.blit(RUNES, 0, 0, 64, 0, 16, 16, 80, 16);
+                g.pose().popPose();
+                RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+            } else {
+                g.pose().pushPose();
+                g.pose().translate(-16, -32, 0);
+                g.pose().scale(2F, 2F, 1F);
+                g.renderItem(c.icon, 0, 0);
+                g.pose().popPose();
+            }
+            net.minecraft.resources.ResourceLocation f = MagicUi.body();
             String gname = Component.translatable("rtshop.gacha.grade." + c.grade).getString();
-            g.drawString(font, gname, -font.width(gname) / 2, 6, (a << 24) | col, false);
-            List<net.minecraft.util.FormattedCharSequence> ls = font.split(Component.literal(c.name), w - 6);
+            MagicUi.draw(g, font, gname, f, -MagicUi.w(font, gname, f) / 2, 6, (a << 24) | col);
+            List<net.minecraft.util.FormattedCharSequence> ls = MagicUi.split(font, c.name, f, w - 6);
             for (int i = 0; i < Math.min(2, ls.size()); i++) {
-                g.drawString(font, ls.get(i), -font.width(ls.get(i)) / 2, 18 + i * (font.lineHeight + 1), (a << 24) | 0xEDE4FF, false);
+                MagicUi.draw(g, font, ls.get(i), -font.width(ls.get(i)) / 2, 18 + i * (font.lineHeight + 1), (a << 24) | 0xEDE4FF);
             }
         }
         g.pose().popPose();

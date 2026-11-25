@@ -30,6 +30,7 @@ import java.util.Map;
  * <li>스킬북 뽑기: 분야(공격·방어·회피·패시브·이동)를 골라 뽑는 '선택 뽑기'(비쌈)와 모든 분야에서 뽑는 '무작위 뽑기'(쌈).
  *     등급·확률은 무기 뽑기와 같고(일반~전설·야마토), 야마토 등급은 공격 분야(와 무작위)에만 있다.</li>
  * <li>인챈트 재설정: 무기에 붙은 인챈트를 모두 지우고 하나를 새로 붙인다 (무기 하나에 인챈트 하나).</li>
+ * <li>(예전의 '오늘의 룬'은 없앴다. 옛 파일의 blessing 항목은 읽지 않고 버린다.)</li>
  * <li>목록·확률·티켓 수는 게임 안 편집기(OP)나 이 파일로 고친다. 처음에는 이 세계의 스킬북을 찾아 자동으로 채운다.</li>
  * </ul>
  * 뽑기 계산은 무기 뽑기와 같은 엔진(GachaConfig + Gacha.pull)을 쓴다: 분야 = 뽑기 종류, 선택/무작위 = 뽑기 단계.
@@ -39,7 +40,20 @@ public final class MagicConfig {
     /** 무작위 뽑기의 목록 이름 (모든 분야를 합친 것). */
     public static final String RANDOM = "random";
     public static final String MODE_SELECT = "select", MODE_RANDOM = "random";
-    public static final int CONFIG_VERSION = 1;
+    public static final int CONFIG_VERSION = 2;
+
+    /** 뽑기 실패 (일반 등급 자리): 스킬북 뽑기에서 이 칸이 뽑히면 아무것도 나오지 않는다. 목록 파일에는 적히지 않는다. */
+    public static final GachaConfig.Entry FAIL = failEntry();
+    /** 인챈트 재설정 실패 (일반 등급 자리): 주문서만 쓰이고 장비는 그대로다. */
+    public static final Ench FAIL_ENCH = new Ench();
+
+    private static GachaConfig.Entry failEntry() {
+        GachaConfig.Entry e = new GachaConfig.Entry();
+        e.item = "minecraft:barrier";
+        e.grade = "common";
+        e.weight = 1;
+        return e;
+    }
 
     /** 인챈트 한 칸. */
     public static final class Ench {
@@ -88,12 +102,8 @@ public final class MagicConfig {
     public boolean pityOn = true, pityShared = true;
     public int pityCount = 80;
     public String pityGrade = "legendary";
-    /** 오늘의 룬: blessHours 시간마다 분야 하나가 축복을 받아, 그 분야 선택 뽑기의 티켓 값이 blessDiscount % 싸지고 영웅 이상 확률이 blessBoost 배가 된다. */
-    public boolean blessOn = true;
-    public int blessDiscount = 20, blessHours = 24;
-    public double blessBoost = 1.0;
     /** 인챈트를 다시 붙일 수 있는 장비: weapon(근접 무기)·bow·crossbow·trident·armor·tool. */
-    public final List<String> rerollKinds = new ArrayList<>(List.of("weapon", "bow", "crossbow", "trident"));
+    public final List<String> rerollKinds = new ArrayList<>(List.of("weapon", "bow", "crossbow", "trident", "armor", "tool"));
     public String loadError;
 
     private static MagicConfig instance;
@@ -123,43 +133,67 @@ public final class MagicConfig {
     // ------------------------------------------------------------------ 기본값
 
     public void defaults() {
-        // 무기 뽑기의 고급 뽑기와 같은 확률 (야마토 0.04%). 무작위 뽑기는 같은 확률에 값이 싸다.
-        double[] high = {0, 69.96, 26.5, 3.2, 0.3, 0.04};
-        System.arraycopy(high, 0, selectOdds, 0, high.length);
-        System.arraycopy(high, 0, randomOdds, 0, high.length);
-        double[] ench = {45, 33, 16, 5, 1, 0};
-        System.arraycopy(ench, 0, enchantOdds, 0, ench.length);
+        defaultOdds();
         for (String c : CATS) pool(c);
     }
 
-    /** 이 세계의 인챈트로 재설정 목록을 만든다 (저주 제외, 무기에 붙는 것만). 단계가 높을수록 높은 등급. */
-    public void autoEnchants() {
-        enchants.clear();
+    /** 기본 확률. 첫 칸(일반 등급 자리)은 '실패': 스킬북은 아무것도 나오지 않고, 인챈트는 주문서만 쓰인다. */
+    public void defaultOdds() {
+        double[] book = {40, 41.98, 15.9, 1.92, 0.18, 0.02};
+        System.arraycopy(book, 0, selectOdds, 0, book.length);
+        System.arraycopy(book, 0, randomOdds, 0, book.length);
+        double[] ench = {50, 32, 13, 4.3, 0.7, 0};
+        System.arraycopy(ench, 0, enchantOdds, 0, ench.length);
+    }
+
+    private static boolean fitsReroll(Enchantment e) {
+        EnchantmentCategory cat = e.category;
+        return cat == EnchantmentCategory.WEAPON || cat == EnchantmentCategory.BOW || cat == EnchantmentCategory.CROSSBOW
+                || cat == EnchantmentCategory.TRIDENT || cat == EnchantmentCategory.BREAKABLE || cat == EnchantmentCategory.DIGGER
+                || cat == EnchantmentCategory.ARMOR || cat == EnchantmentCategory.ARMOR_HEAD || cat == EnchantmentCategory.ARMOR_CHEST
+                || cat == EnchantmentCategory.ARMOR_LEGS || cat == EnchantmentCategory.ARMOR_FEET || cat == EnchantmentCategory.WEARABLE
+                || e.canEnchant(new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD));
+    }
+
+    /** 인챈트 한 단계의 등급 (고급~전설): 단계 비율 + 희귀도 + 보물 인챈트 + 가장 높은 단계. */
+    private static String enchGrade(Enchantment e, int lv) {
+        int max = Math.max(1, e.getMaxLevel());
+        double frac = max == 1 ? 0.5 : (lv - 1) / (double) (max - 1);
+        int g = 1 + (frac < 0.34 ? 0 : frac < 0.67 ? 1 : 2);
+        if (e.getRarity() == Enchantment.Rarity.RARE) g++;
+        if (e.getRarity() == Enchantment.Rarity.VERY_RARE) g += 2;
+        if (e.isTreasureOnly()) g++;
+        if (lv == max && max >= 4) g++;
+        return GachaConfig.GRADES[Math.min(4, g)];
+    }
+
+    /** 목록에 없는 인챈트(방어구·도구용 등)를 덧붙인다. 넣은 수. */
+    public int addMissingEnchants() {
+        java.util.Set<String> have = new java.util.HashSet<>();
+        for (Ench e : enchants) have.add(e.id);
+        int n = 0;
         for (var en : ForgeRegistries.ENCHANTMENTS.getEntries()) {
             Enchantment e = en.getValue();
-            if (e.isCurse()) continue;
-            EnchantmentCategory cat = e.category;
-            boolean fits = cat == EnchantmentCategory.WEAPON || cat == EnchantmentCategory.BOW || cat == EnchantmentCategory.CROSSBOW
-                    || cat == EnchantmentCategory.TRIDENT || cat == EnchantmentCategory.BREAKABLE;
-            if (!fits && !e.canEnchant(new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD))) continue;
             String id = en.getKey().location().toString();
+            if (e.isCurse() || have.contains(id) || !fitsReroll(e)) continue;
             int max = Math.max(1, e.getMaxLevel());
             for (int lv = 1; lv <= max; lv++) {
                 Ench x = new Ench();
                 x.id = id;
                 x.level = lv;
-                // 등급: 단계 비율 + 희귀도 + 보물 인챈트
-                double frac = max == 1 ? 0.5 : (lv - 1) / (double) (max - 1);
-                int g = frac < 0.34 ? 0 : frac < 0.67 ? 1 : 2;
-                if (e.getRarity() == Enchantment.Rarity.RARE) g++;
-                if (e.getRarity() == Enchantment.Rarity.VERY_RARE) g += 2;
-                if (e.isTreasureOnly()) g++;
-                if (lv == max && max >= 4) g++;
-                x.grade = GachaConfig.GRADES[Math.min(4, g)];
+                x.grade = enchGrade(e, lv);
                 x.weight = 10;
                 enchants.add(x);
+                n++;
             }
         }
+        return n;
+    }
+
+    /** 이 세계의 인챈트로 재설정 목록을 만든다 (저주 제외, 무기·방어구·도구에 붙는 것). 단계가 높을수록 높은 등급 (고급~전설). */
+    public void autoEnchants() {
+        enchants.clear();
+        addMissingEnchants();
     }
 
     // ------------------------------------------------------------------ 뽑기 엔진
@@ -181,59 +215,50 @@ public final class MagicConfig {
         for (String c : CATS) {
             g.pool(c).addAll(pool(c));
             all.addAll(pool(c));
+            if (!pool(c).isEmpty()) g.pool(c).add(FAIL); // 실패 칸 (일반 등급 자리)
         }
+        if (!all.isEmpty()) all.add(FAIL);
         return g;
     }
 
-    /** 축복받은 분야의 선택 뽑기용 엔진 (영웅 이상 확률 blessBoost 배). 축복이 아니면 보통 엔진. */
-    public GachaConfig engineFor(String mode, String cat, long nowMs) {
-        GachaConfig g = engine();
-        if (MODE_SELECT.equals(mode) && blessBoost > 1.0 && cat.equals(blessedCat(nowMs))) {
-            double[] w = g.tiers.get(MODE_SELECT).weights;
-            for (int i = 3; i < w.length; i++) w[i] *= blessBoost;
-        }
-        return g;
+    /** 한 번 뽑을 때 쓰는 티켓 수. */
+    public int cost(String mode) {
+        return MODE_SELECT.equals(mode) ? selectCost : randomCost;
     }
 
-    private long period(long nowMs) {
-        return Math.floorDiv(nowMs + java.util.TimeZone.getDefault().getOffset(nowMs), Math.max(1, blessHours) * 3_600_000L);
-    }
-
-    /** 지금 축복받은 분야 (꺼져 있으면 ""). 주기마다 바뀌고, 다섯 주기 안에 모든 분야가 한 번씩 돈다. */
-    public String blessedCat(long nowMs) {
-        if (!blessOn) return "";
-        long p = period(nowMs), cyc = Math.floorDiv(p, 5L);
-        long h = cyc * 0x9E3779B97F4A7C15L;
-        h ^= h >>> 29;
-        int step = 1 + (int) Math.floorMod(h, 4L), off = (int) Math.floorMod(h >>> 7, 5L);
-        return CATS[(int) Math.floorMod(Math.floorMod(p, 5L) * step + off, 5L)];
-    }
-
-    /** 다음 룬으로 바뀔 때까지 남은 초. */
-    public long blessEndsIn(long nowMs) {
-        long len = Math.max(1, blessHours) * 3_600_000L;
-        return ((period(nowMs) + 1) * len - (nowMs + java.util.TimeZone.getDefault().getOffset(nowMs))) / 1000L;
-    }
-
-    /** n 번 뽑을 때 쓰는 티켓 수 (축복받은 분야의 선택 뽑기는 할인, 적어도 1장). */
-    public int cost(String mode, String cat, int n, long nowMs) {
-        boolean select = MODE_SELECT.equals(mode);
-        int base = (select ? selectCost : randomCost) * n;
-        if (select && blessDiscount > 0 && cat.equals(blessedCat(nowMs))) {
-            return Math.max(1, (int) Math.ceil(base * (100 - blessDiscount) / 100.0 - 1e-9));
-        }
-        return base;
-    }
-
-    /** 야마토 등급이 공격 분야 밖에 있으면 공격 분야로 옮긴다 (야마토는 공격 분야에만). */
+    /** 야마토 등급은 공격 분야에만 둔다. 일반 등급은 '실패' 자리라서, 목록에 일반으로 적힌 칸은 고급으로 올린다. */
     public void normalize() {
+        normalize(true);
+    }
+
+    private void normalize(boolean liftCommon) {
         for (String c : CATS) {
-            if (c.equals("attack")) continue;
             for (GachaConfig.Entry e : pool(c)) {
-                if (GachaConfig.gradeIndex(e.grade) == GachaConfig.YAMATO) e.grade = "legendary";
+                int gi = GachaConfig.gradeIndex(e.grade);
+                if (gi == GachaConfig.YAMATO && !c.equals("attack")) e.grade = "legendary";
+                if (gi == 0 && liftCommon) e.grade = "uncommon";
             }
         }
-        for (Ench e : enchants) if (GachaConfig.gradeIndex(e.grade) == GachaConfig.YAMATO) e.grade = "legendary";
+        for (Ench e : enchants) {
+            int gi = GachaConfig.gradeIndex(e.grade);
+            if (gi == GachaConfig.YAMATO) e.grade = "legendary";
+            if (gi == 0 && liftCommon) e.grade = "uncommon";
+        }
+    }
+
+    /**
+     * 옛 설정(1)을 지금 규칙으로: 확률표를 새 기본값으로(첫 칸 = 실패), 인챈트 등급을 한 칸씩 올려 전설까지 쓰고,
+     * 방어구·도구용 인챈트를 덧붙이고, 방어구·도구도 제단에 올릴 수 있게 한다.
+     */
+    public void migrate() {
+        if (version >= 2) return;
+        defaultOdds();
+        for (Ench e : enchants) {
+            int gi = GachaConfig.gradeIndex(e.grade);
+            if (gi >= 0 && gi < 4) e.grade = GachaConfig.GRADES[gi + 1];
+        }
+        for (String k : new String[]{"armor", "tool"}) if (!rerollKinds.contains(k)) rerollKinds.add(k);
+        version = 2;
     }
 
     // ------------------------------------------------------------------ 저장 · 불러오기
@@ -241,10 +266,11 @@ public final class MagicConfig {
     public JsonObject toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("_help", "마법 뽑기 설정. pools: 분야(attack 공격·guard 방어·dodge 회피·passive 패시브·mover 이동)별 스킬북 목록 "
-                + "(item, nbt, grade 등급, weight 같은 등급 안 가중치). odds: 등급별 확률 (common, uncommon, rare, epic, legendary, yamato 순). "
+                + "(item, nbt, grade 등급, weight 같은 등급 안 가중치). odds: 등급별 확률 (실패, uncommon, rare, epic, legendary, yamato 순). "
+                + "첫 칸은 '실패' 확률이다: 스킬북 뽑기는 아무것도 나오지 않고, 인챈트 재설정은 주문서만 쓰이고 장비는 그대로다. 목록에는 일반(common) 등급을 둘 수 없다 (고급으로 올라간다). "
                 + "야마토 등급은 공격 분야에만 둘 수 있다. enchants: 인챈트 재설정 목록 (enchant, level, grade, weight). "
                 + "costs: 한 번에 쓰는 티켓 수. pity(천장): count 번째까지 grade 이상이 안 나오면 확정, shared=선택·무작위를 함께 센다. "
-                + "blessing(오늘의 룬): periodHours 시간마다 바뀌는 분야의 선택 뽑기가 discountPercent % 싸지고 영웅 이상 확률이 oddsBoost 배. 게임 안에서는 OP 가 마법 뽑기 창의 [편집] 으로 고친다. 고친 뒤 /rtshop reload.");
+                + "rerollKinds: 제단에 올릴 수 있는 장비 (weapon·bow·crossbow·trident·armor·tool). 게임 안에서는 OP 가 룬 제단의 [편집] 으로 고친다. 고친 뒤 /rtshop reload.");
         o.addProperty("configVersion", version);
         o.addProperty("tenGuarantee", tenGuarantee);
         JsonObject odds = new JsonObject();
@@ -263,12 +289,6 @@ public final class MagicConfig {
         pity.addProperty("grade", pityGrade);
         pity.addProperty("shared", pityShared);
         o.add("pity", pity);
-        JsonObject bl = new JsonObject();
-        bl.addProperty("enabled", blessOn);
-        bl.addProperty("discountPercent", blessDiscount);
-        bl.addProperty("periodHours", blessHours);
-        bl.addProperty("oddsBoost", blessBoost);
-        o.add("blessing", bl);
         JsonArray kinds = new JsonArray();
         rerollKinds.forEach(kinds::add);
         o.add("rerollKinds", kinds);
@@ -319,13 +339,6 @@ public final class MagicConfig {
             if (pi.has("grade") && GachaConfig.gradeIndex(pi.get("grade").getAsString()) >= 0) c.pityGrade = pi.get("grade").getAsString();
             if (pi.has("shared")) c.pityShared = pi.get("shared").getAsBoolean();
         }
-        if (o.has("blessing")) {
-            JsonObject bl = o.getAsJsonObject("blessing");
-            if (bl.has("enabled")) c.blessOn = bl.get("enabled").getAsBoolean();
-            if (bl.has("discountPercent")) c.blessDiscount = Math.max(0, Math.min(90, bl.get("discountPercent").getAsInt()));
-            if (bl.has("periodHours")) c.blessHours = Math.max(1, Math.min(720, bl.get("periodHours").getAsInt()));
-            if (bl.has("oddsBoost")) c.blessBoost = Math.max(1.0, Math.min(10.0, bl.get("oddsBoost").getAsDouble()));
-        }
         if (o.has("rerollKinds")) {
             c.rerollKinds.clear();
             for (JsonElement e : o.getAsJsonArray("rerollKinds")) c.rerollKinds.add(e.getAsString());
@@ -341,7 +354,7 @@ public final class MagicConfig {
         if (o.has("enchants")) {
             for (JsonElement e : o.getAsJsonArray("enchants")) c.enchants.add(Ench.fromJson(e.getAsJsonObject()));
         }
-        c.normalize();
+        c.normalize(c.version >= CONFIG_VERSION); // 옛 설정은 migrate() 가 등급을 옮긴 뒤에 올린다
         return c;
     }
 
@@ -350,6 +363,20 @@ public final class MagicConfig {
         try {
             if (Files.exists(p)) {
                 MagicConfig c = fromJson(JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject());
+                if (c.version < CONFIG_VERSION) { // 옛 설정: 지금 규칙으로 옮긴다 (서버가 켜진 뒤에 백업하고 저장한다)
+                    int old = c.version;
+                    c.migrate();
+                    c.normalize();
+                    if (server != null) {
+                        try {
+                            Files.copy(p, p.resolveSibling("magic_gacha.json.v" + old + ".bak"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                        } catch (Exception ignored) {
+                        }
+                        c.addMissingEnchants();
+                        c.save();
+                        RtShop.LOGGER.info("[rtshop] magic_gacha.json 을 새 규칙(실패 칸·전설 인챈트·방어구)으로 옮겼습니다. 옛 파일은 .bak 으로 남겼습니다.");
+                    }
+                }
                 // 서버가 켜졌는데 목록이 비어 있으면 (스킬 모드를 나중에 넣은 경우 등) 채운다
                 if (server != null && c.isEmpty()) {
                     MagicSkills.autoFill(c);

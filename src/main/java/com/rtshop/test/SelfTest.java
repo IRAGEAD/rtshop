@@ -2626,23 +2626,64 @@ public final class SelfTest {
         t.pool("dodge").add(mk.apply("minecraft:feather", "uncommon"));
         t.pool("passive").add(mk.apply("minecraft:apple", "uncommon"));
         t.pool("mover").add(mk.apply("minecraft:ender_pearl", "uncommon"));
+        t.pool("mover").add(mk.apply("minecraft:stick", "common")); // 일반 등급은 '실패' 자리라 고급으로 올라가야 한다
         t.autoEnchants();
         t.normalize();
-        t.pityOn = false; // 천장·오늘의 룬은 아래에서 따로 확인
-        t.blessOn = false;
+        t.pityOn = false; // 천장은 아래에서 따로 확인
         check("a yamato prize outside the attack field is moved down to legendary", t.pool("guard").get(1).grade.equals("legendary"));
+        check("the common grade is the 'fail' place: a prize listed as common is lifted to uncommon", t.pool("mover").get(1).grade.equals("uncommon"));
+        check("default odds start with a fail chance (books 40%, enchant 50%) and the enchant list reaches legendary",
+                t.selectOdds[0] == 40 && t.randomOdds[0] == 40 && t.enchantOdds[0] == 50 && t.enchantOdds[4] > 0
+                        && t.enchants.stream().anyMatch(e -> e.grade.equals("legendary")) && t.enchants.stream().noneMatch(e -> e.grade.equals("common")),
+                t.enchants.stream().filter(e -> e.grade.equals("legendary")).count());
+        check("armour and tools can be laid on the altar too, and their enchantments are in the list",
+                t.rerollKinds.contains("armor") && t.rerollKinds.contains("tool")
+                        && com.rtshop.magic.MagicGacha.rerollable(t, new ItemStack(Items.DIAMOND_CHESTPLATE))
+                        && com.rtshop.magic.MagicGacha.rerollable(t, new ItemStack(Items.DIAMOND_PICKAXE))
+                        && !com.rtshop.magic.MagicGacha.rerollable(t, new ItemStack(Items.DIRT)));
+        {
+            // 옛 설정(1)을 읽으면: 확률표는 새 기본값, 인챈트 등급은 한 칸씩 위로
+            com.rtshop.magic.MagicConfig old = new com.rtshop.magic.MagicConfig();
+            old.defaults();
+            old.version = 1;
+            com.rtshop.magic.MagicConfig.Ench c0 = new com.rtshop.magic.MagicConfig.Ench(), c3 = new com.rtshop.magic.MagicConfig.Ench();
+            c0.id = "minecraft:sharpness";
+            c0.grade = "common";
+            c3.id = "minecraft:looting";
+            c3.level = 3;
+            c3.grade = "epic";
+            old.enchants.add(c0);
+            old.enchants.add(c3);
+            old.selectOdds[0] = 0;
+            com.google.gson.JsonObject oj = old.toJson();
+            oj.addProperty("configVersion", 1);
+            com.rtshop.magic.MagicConfig moved = com.rtshop.magic.MagicConfig.fromJson(oj);
+            moved.migrate();
+            moved.normalize();
+            check("an old magic gacha file is moved to the new rules (fail column, enchant grades one step up to legendary)",
+                    moved.version == 2 && moved.selectOdds[0] == 40 && moved.enchants.get(0).grade.equals("uncommon")
+                            && moved.enchants.get(1).grade.equals("legendary"),
+                    moved.enchants.get(0).grade + "/" + moved.enchants.get(1).grade);
+        }
+        // 아래 점검은 결과가 정해져 있어야 하므로 실패 확률을 0 으로 두고, 실패는 따로 확인한다
+        t.selectOdds[0] = 0;
+        t.randomOdds[0] = 0;
+        t.enchantOdds[0] = 0;
         com.rtshop.magic.MagicConfig.set(t);
         try {
             a.getInventory().clearContent();
             a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 10));
             a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET.get(), 1));
-            var got = com.rtshop.magic.MagicGacha.pull(a, "select", "attack", 10, false);
-            check("a 10× chosen-field draw gives 10 prizes, all from the chosen field", got != null && got.size() == 10
+            check("the 10× draw is gone: asking for it is refused and uses no ticket", com.rtshop.magic.MagicGacha.pull(a, "select", "attack", 10, false) == null
+                    && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()) == 10);
+            var got = com.rtshop.magic.MagicGacha.pull(a, "select", "attack", 1, false);
+            check("a chosen-field draw gives one prize from the chosen field", got != null && got.size() == 1
                     && got.stream().allMatch(e -> t.pool("attack").contains(e)), got == null ? "null" : got.size());
-            check("the 10× draw used 10 chosen-field tickets", a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()) == 0);
+            check("the draw used one chosen-field ticket", a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()) == 9);
             int marked = 0;
             for (ItemStack st : a.getInventory().items) if (com.rtshop.gacha.Gacha.marked(st)) marked++;
             check("drawn prizes carry the gacha mark (can be dismantled for shards)", marked > 0, marked);
+            a.getInventory().clearOrCountMatchingItems(st -> st.is(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()), -1, a.inventoryMenu.getCraftSlots());
             var none = com.rtshop.magic.MagicGacha.pull(a, "select", "guard", 1, false);
             check("without a ticket the draw is refused", none == null);
             var rnd = com.rtshop.magic.MagicGacha.pull(a, "random", "", 1, false);
@@ -2653,27 +2694,72 @@ public final class SelfTest {
             double[] att = com.rtshop.gacha.Gacha.gradeChances(g, "attack", "select");
             double[] gua = com.rtshop.gacha.Gacha.gradeChances(g, "guard", "select");
             check("the attack field has the yamato grade, other fields do not", att[5] > 0 && gua[5] == 0, att[5] + " / " + gua[5]);
-            // 10회 보장: 희귀 이상이 하나는 (공격 분야에는 고급·야마토만 있어 야마토가 보장 몫)
-            int best = 0;
-            for (int i = 0; i < 30; i++) {
-                var l = com.rtshop.gacha.Gacha.pull(g, "attack", "select", 10, net.minecraft.util.RandomSource.create(i));
-                int top = l.stream().mapToInt(e -> com.rtshop.gacha.GachaConfig.gradeIndex(e.grade)).max().orElse(0);
-                if (top >= 2) best++;
-            }
-            check("every 10× draw has a rare-or-better prize (guarantee)", best == 30, best);
-            // 인챈트 재설정
+            // 실패: 첫 칸의 확률만큼 아무것도 나오지 않는다 (티켓은 쓰인다)
+            double[] keepSel = t.selectOdds.clone();
+            t.selectOdds[0] = 40;
+            double[] withFail = com.rtshop.gacha.Gacha.gradeChances(t.engine(), "dodge", "select");
+            check("the window's odds show the fail chance first (40% at the default)", Math.abs(withFail[0] - 40 / (40 + 41.98)) < 1e-6, withFail[0]);
+            t.selectOdds[0] = 1e12;
+            a.getInventory().clearContent();
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 3));
+            var failed = com.rtshop.magic.MagicGacha.pull(a, "select", "dodge", 1, false);
+            int things = 0;
+            for (ItemStack st : a.getInventory().items) if (!st.isEmpty()) things++;
+            check("a failed skill-book draw takes the ticket and gives nothing", failed != null && failed.size() == 1
+                    && failed.get(0) == com.rtshop.magic.MagicConfig.FAIL && things == 1
+                    && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()) == 2, things);
+            System.arraycopy(keepSel, 0, t.selectOdds, 0, keepSel.length);
+            com.rtshop.magic.MagicConfig empty = new com.rtshop.magic.MagicConfig();
+            empty.defaults();
+            double sumEmpty = 0;
+            for (double d : com.rtshop.gacha.Gacha.gradeChances(empty.engine(), "attack", "select")) sumEmpty += d;
+            check("a field with no books has no fail entry either (it is simply empty)", sumEmpty == 0, sumEmpty);
+            // 인챈트 재설정: 제단 위에 올려 둔 장비에 한다
+            a.getInventory().clearContent();
             ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
             sword.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 3);
             sword.enchant(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 2);
-            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword);
-            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 2));
+            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.SCROLL.get(), 3));
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword.copy());
+            check("holding a weapon is not enough any more: with nothing on the altar the reroll is refused",
+                    com.rtshop.magic.MagicGacha.reroll(a, false) == null && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 3);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            com.rtshop.magic.MagicMenu menu = new com.rtshop.magic.MagicMenu(99, a.getInventory(), null);
+            check("the altar menu has one altar slot in front of the 36 bag slots, and it takes gear but not dirt",
+                    menu.slots.size() == 37 && menu.getSlot(com.rtshop.magic.MagicMenu.ALTAR).mayPlace(sword)
+                            && !menu.getSlot(com.rtshop.magic.MagicMenu.ALTAR).mayPlace(new ItemStack(Items.DIRT))
+                            && menu.getSlot(com.rtshop.magic.MagicMenu.slotOfInventory(0)).getContainerSlot() == 0
+                            && menu.getSlot(com.rtshop.magic.MagicMenu.slotOfInventory(9)).getContainerSlot() == 9
+                            && menu.getSlot(com.rtshop.magic.MagicMenu.slotOfInventory(35)).getContainerSlot() == 35, menu.slots.size());
+            a.getInventory().setItem(5, sword);
+            a.containerMenu = menu;
+            menu.quickMoveStack(a, com.rtshop.magic.MagicMenu.slotOfInventory(5));
+            check("shift-clicking gear in the bag lays it on the altar", menu.altarItem().is(Items.DIAMOND_SWORD) && a.getInventory().getItem(5).isEmpty());
+            check("the window data follows what lies on the altar", com.rtshop.magic.MagicGacha.view(a).get("heldOk").getAsBoolean()
+                    && com.rtshop.magic.MagicGacha.view(a).get("held").getAsString().equals("minecraft:diamond_sword"));
             var e1 = com.rtshop.magic.MagicGacha.reroll(a, false);
-            var ench = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(a.getMainHandItem());
-            check("enchant reroll leaves exactly one enchantment that fits the weapon", e1 != null && ench.size() == 1
-                    && ench.keySet().iterator().next().canEnchant(a.getMainHandItem()), ench);
-            check("enchant reroll used one scroll", a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 1);
-            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.DIRT));
-            check("enchant reroll refuses things that are not weapons", com.rtshop.magic.MagicGacha.reroll(a, false) == null
+            var ench = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(menu.altarItem());
+            check("enchant reroll leaves exactly one enchantment that fits the gear on the altar", e1 != null && e1 != com.rtshop.magic.MagicConfig.FAIL_ENCH
+                    && ench.size() == 1 && ench.keySet().iterator().next().canEnchant(menu.altarItem()), ench);
+            check("enchant reroll used one scroll", a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 2);
+            t.enchantOdds[0] = 1e12;
+            var beforeFail = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(menu.altarItem());
+            var e2 = com.rtshop.magic.MagicGacha.reroll(a, false);
+            check("a failed reroll takes the scroll and leaves the gear as it was", e2 == com.rtshop.magic.MagicConfig.FAIL_ENCH
+                    && net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(menu.altarItem()).equals(beforeFail)
+                    && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 1);
+            t.enchantOdds[0] = 0;
+            menu.quickMoveStack(a, com.rtshop.magic.MagicMenu.ALTAR);
+            check("shift-clicking the altar slot takes the gear back into the bag", menu.altarItem().isEmpty() && a.getInventory().countItem(Items.DIAMOND_SWORD) == 1);
+            int swordAt = -1;
+            for (int i = 0; i < 36; i++) if (a.getInventory().getItem(i).is(Items.DIAMOND_SWORD)) swordAt = i;
+            if (swordAt >= 0) menu.quickMoveStack(a, com.rtshop.magic.MagicMenu.slotOfInventory(swordAt));
+            boolean laid = menu.altarItem().is(Items.DIAMOND_SWORD);
+            menu.removed(a);
+            a.containerMenu = a.inventoryMenu;
+            check("closing the altar gives back what was left on it", laid && a.getInventory().countItem(Items.DIAMOND_SWORD) == 1,
+                    laid + "/" + a.getInventory().countItem(Items.DIAMOND_SWORD));
+            check("enchant reroll refuses things that are not gear", com.rtshop.magic.MagicGacha.reroll(a, new ItemStack(Items.DIRT), false) == null
                     && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 1);
             // 저장·불러오기 그대로
             var back = com.rtshop.magic.MagicConfig.fromJson(t.toJson());
@@ -2712,39 +2798,19 @@ public final class SelfTest {
             check("with separate counting the random draw has its own pity counter", com.rtshop.magic.MagicGacha.pityOf(a, t, "random") == 0
                     && com.rtshop.magic.MagicGacha.pityOf(a, t, SEL) == 3);
             t.pityOn = false;
-            // ---- 오늘의 룬: 축복받은 분야의 선택 뽑기 할인
-            t.blessOn = true;
-            t.blessDiscount = 20;
-            t.blessHours = 24;
-            long now = System.currentTimeMillis();
-            String bc = t.blessedCat(now);
-            String other = bc.equals("attack") ? "guard" : "attack";
-            check("today's rune is one of the five fields", java.util.List.of(com.rtshop.magic.MagicConfig.CATS).contains(bc), bc);
-            check("the blessed field's 10× chosen draw costs 20% fewer tickets (8), single stays 1; other fields and random stay full",
-                    t.cost(SEL, bc, 10, now) == 8 && t.cost(SEL, bc, 1, now) == 1 && t.cost(SEL, other, 10, now) == 10 && t.cost("random", "", 10, now) == 10,
-                    t.cost(SEL, bc, 10, now) + "/" + t.cost(SEL, bc, 1, now) + "/" + t.cost(SEL, other, 10, now));
-            java.util.Set<String> seen = new java.util.HashSet<>();
-            for (int i = 0; i < 10; i++) seen.add(t.blessedCat(now + i * 86_400_000L));
-            check("the rune changes each period and every field gets its turn", seen.size() == 5 && t.blessEndsIn(now) > 0 && t.blessEndsIn(now) <= 86_400, seen);
-            a.getInventory().clearContent();
-            a.getInventory().add(new ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 10));
-            var bl = com.rtshop.magic.MagicGacha.pull(a, SEL, bc, 10, false);
-            check("a blessed 10× draw really takes only 8 tickets", bl != null && bl.size() == 10
-                    && a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()) == 2,
-                    a.getInventory().countItem(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get()));
-            t.blessBoost = 2;
-            check("the rune's odds boost doubles epic-and-better weights only in the blessed field",
-                    t.engineFor(SEL, bc, now).tiers.get(SEL).weights[3] == t.selectOdds[3] * 2
-                            && t.engineFor(SEL, other, now).tiers.get(SEL).weights[3] == t.selectOdds[3]
-                            && t.engineFor(SEL, bc, now).tiers.get(SEL).weights[1] == t.selectOdds[1]);
+            // ---- '오늘의 룬' 은 없앴다: 어느 분야든 값과 확률이 같고, 창 내용에도 실리지 않는다
+            t.selectCost = 5;
+            check("today's rune is gone: every field costs the same and the window data carries no blessing",
+                    t.cost(SEL) == 5 && t.cost("random") == 1 && !com.rtshop.magic.MagicGacha.view(a).has("blessing")
+                            && !t.toJson().has("blessing"));
+            t.selectCost = 1;
             t.pityCount = 77;
             var back2 = com.rtshop.magic.MagicConfig.fromJson(t.toJson());
-            check("pity and rune settings survive save and load", back2.pityCount == 77 && !back2.pityShared && back2.blessBoost == 2 && back2.blessDiscount == 20);
+            check("pity settings survive save and load", back2.pityCount == 77 && !back2.pityShared);
             var vw = com.rtshop.magic.MagicGacha.view(a);
-            check("the window data carries the pity gauge and today's rune", vw.has("pity") && vw.getAsJsonObject("blessing").get("cat").getAsString().equals(bc)
-                    && vw.getAsJsonObject("cats").getAsJsonObject(bc).get("cost10").getAsInt() == 8);
-            t.blessOn = false;
-            check("with the rune turned off nothing is blessed and prices are full", t.blessedCat(now).isEmpty() && t.cost(SEL, bc, 10, now) == 10);
+            check("the window data carries the pity gauge and one-ticket prices only (no 10x)", vw.has("pity")
+                    && vw.getAsJsonObject("cats").getAsJsonObject("attack").get("cost1").getAsInt() == 1
+                    && !vw.getAsJsonObject("cats").getAsJsonObject("attack").has("cost10") && !vw.has("tenGuarantee"));
         } finally {
             com.rtshop.magic.MagicConfig.set(real);
             a.getInventory().clearContent();

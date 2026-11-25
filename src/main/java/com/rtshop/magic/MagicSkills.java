@@ -150,7 +150,7 @@ public final class MagicSkills {
         if (path.contains("judgement") || path.contains("judgment")) return "attack".equals(cat) ? "yamato" : "legendary";
         // 단계가 붙은 보상 스킬 (…1 ~ …4): 단계대로
         char last = path.isEmpty() ? ' ' : path.charAt(path.length() - 1);
-        if (last >= '1' && last <= '4' && ns.equals("dodge_parry_reward")) return new String[]{"common", "uncommon", "rare", "epic"}[last - '1'];
+        if (last >= '1' && last <= '4' && ns.equals("dodge_parry_reward")) return new String[]{"uncommon", "uncommon", "rare", "epic"}[last - '1'];
         return switch (ns) {
             case "epicfight", "epicfightx" -> "attack".equals(cat) || "mover".equals(cat) ? "epic" : "rare";
             case "efs_iss" -> "passive".equals(cat) ? "rare" : "epic";

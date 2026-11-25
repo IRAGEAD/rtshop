@@ -126,18 +126,20 @@ public final class MagicGacha {
         return !com.rtshop.quest.QuestManager.hasFlag(p, f);
     }
 
+    /** 제단을 연다: 언제나 메뉴로 (0번 칸에 장비를 올려놓을 수 있어야 하므로). 잠금·마을 제단 검사는 메뉴 제공자가 한다. */
     public static void open(ServerPlayer p, BlockPos pos) {
-        if (locked(p)) {
-            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.magic.locked"), true);
-            return;
-        }
-        SESSIONS.put(p.getUUID(), pos.immutable());
-        JsonObject o = view(p);
-        o.addProperty("open", true);
-        o.addProperty("x", pos.getX());
-        o.addProperty("y", pos.getY());
-        o.addProperty("z", pos.getZ());
-        send(p, MagicPacket.VIEW, o);
+        net.minecraft.world.MenuProvider prov = p.level().getBlockState(pos).getMenuProvider(p.level(), pos);
+        if (prov != null) p.openMenu(prov);
+    }
+
+    /** 제단 위에 올려 둔 장비 (제단 창이 열려 있지 않으면 빈 것). */
+    public static ItemStack altarItem(ServerPlayer p) {
+        return p.containerMenu instanceof MagicMenu m ? m.altarItem() : ItemStack.EMPTY;
+    }
+
+    /** 창 내용을 다시 보낸다 (제단 위 장비가 바뀌었을 때). */
+    public static void refresh(ServerPlayer p) {
+        if (SESSIONS.containsKey(p.getUUID())) send(p, MagicPacket.VIEW, view(p));
     }
 
     /** 메뉴로 열렸을 때 (Cinematic 장면 또는 그 대신 뜨는 창): 자리를 기억하고 창 내용을 먼저 보낸다. */
@@ -157,12 +159,10 @@ public final class MagicGacha {
         return a;
     }
 
-    /** 창 내용: 티켓 수, 분야별 확률과 목록 수, 손에 든 무기와 재설정 확률. */
+    /** 창 내용: 티켓 수, 분야별 확률(첫 칸 = 실패)과 목록 수, 제단 위 장비와 재설정 확률. */
     public static JsonObject view(ServerPlayer p) {
         MagicConfig c = MagicConfig.get();
         GachaConfig g = c.engine();
-        long now = System.currentTimeMillis();
-        String blessed = c.blessedCat(now);
         JsonObject o = new JsonObject();
         JsonObject tickets = new JsonObject();
         tickets.addProperty("select", count(p, MagicRegistry.TICKET_SELECT.get()));
@@ -175,20 +175,20 @@ public final class MagicGacha {
         costs.addProperty("reroll", c.rerollCost);
         o.add("costs", costs);
         JsonObject cats = new JsonObject();
+        int total = 0;
         for (String cat : MagicConfig.CATS) {
             JsonObject x = new JsonObject();
-            x.addProperty("count", g.pool(cat).size());
-            x.add("chances", chances(cat.equals(blessed) ? c.engineFor(MagicConfig.MODE_SELECT, cat, now) : g, cat, MagicConfig.MODE_SELECT));
-            x.addProperty("cost1", c.cost(MagicConfig.MODE_SELECT, cat, 1, now));
-            x.addProperty("cost10", c.cost(MagicConfig.MODE_SELECT, cat, 10, now));
+            x.addProperty("count", c.pool(cat).size());
+            x.add("chances", chances(g, cat, MagicConfig.MODE_SELECT));
+            x.addProperty("cost1", c.cost(MagicConfig.MODE_SELECT));
+            total += c.pool(cat).size();
             cats.add(cat, x);
         }
         o.add("cats", cats);
         JsonObject rnd = new JsonObject();
-        rnd.addProperty("count", g.pool(MagicConfig.RANDOM).size());
+        rnd.addProperty("count", total);
         rnd.add("chances", chances(g, MagicConfig.RANDOM, MagicConfig.MODE_RANDOM));
-        rnd.addProperty("cost1", c.cost(MagicConfig.MODE_RANDOM, "", 1, now));
-        rnd.addProperty("cost10", c.cost(MagicConfig.MODE_RANDOM, "", 10, now));
+        rnd.addProperty("cost1", c.cost(MagicConfig.MODE_RANDOM));
         o.add("random", rnd);
         JsonObject pity = new JsonObject();
         pity.addProperty("on", c.pityOn && GachaConfig.gradeIndex(c.pityGrade) >= 0);
@@ -197,17 +197,10 @@ public final class MagicGacha {
         pity.addProperty("select", pityOf(p, c, MagicConfig.MODE_SELECT));
         pity.addProperty("random", pityOf(p, c, MagicConfig.MODE_RANDOM));
         o.add("pity", pity);
-        JsonObject bl = new JsonObject();
-        bl.addProperty("cat", blessed);
-        bl.addProperty("discount", c.blessDiscount);
-        bl.addProperty("boost", c.blessBoost);
-        bl.addProperty("ends", c.blessEndsIn(now));
-        o.add("blessing", bl);
-        o.add("enchantChances", enchantChances(c, p.getMainHandItem()));
-        ItemStack held = p.getMainHandItem();
+        ItemStack held = altarItem(p);
+        o.add("enchantChances", enchantChances(c, held));
         o.addProperty("held", held.isEmpty() ? "" : String.valueOf(ForgeRegistries.ITEMS.getKey(held.getItem())));
         o.addProperty("heldOk", rerollable(c, held));
-        o.addProperty("tenGuarantee", c.tenGuarantee);
         o.addProperty("canEdit", canEdit(p));
         if (c.loadError != null) o.addProperty("error", c.loadError);
         return o;
@@ -215,7 +208,10 @@ public final class MagicGacha {
 
     // ------------------------------------------------------------------ 스킬북 뽑기
 
-    /** 뽑기. 성공하면 뽑은 칸들, 실패하면 null. needOrb=false 는 점검용. */
+    /**
+     * 뽑기 (한 번에 한 장). 뽑은 칸들을 돌려주고, 뽑을 수 없었으면 null. 실패 칸(MagicConfig.FAIL)이 나오면 티켓만 쓰이고 아무것도 받지 못한다.
+     * needOrb=false 는 점검용.
+     */
     public static List<GachaConfig.Entry> pull(ServerPlayer p, String mode, String cat, int n, boolean needOrb) {
         MagicConfig c = MagicConfig.get();
         if (needOrb && !near(p)) {
@@ -224,21 +220,21 @@ public final class MagicGacha {
         }
         boolean select = MagicConfig.MODE_SELECT.equals(mode);
         String pool = select ? cat : MagicConfig.RANDOM;
-        if ((n != 1 && n != 10) || (select && !List.of(MagicConfig.CATS).contains(cat))) return null;
+        if (n != 1 || (select && !List.of(MagicConfig.CATS).contains(cat))) return null;
         if (c.loadError != null) {
             fail(p, Component.translatable("rtshop.gacha.broken"));
             return null;
         }
-        long now = System.currentTimeMillis();
-        GachaConfig g = c.engineFor(mode, select ? cat : "", now);
+        GachaConfig g = c.engine();
         double sum = 0;
-        for (double x : Gacha.gradeChances(g, pool, mode)) sum += x;
+        double[] ch = Gacha.gradeChances(g, pool, mode);
+        for (int i = 1; i < ch.length; i++) sum += ch[i]; // 실패 칸만 있는 목록은 빈 목록이다
         if (sum <= 0) {
             fail(p, Component.translatable("rtshop.magic.empty"));
             return null;
         }
         Item t = ticketFor(mode);
-        int cost = c.cost(mode, select ? cat : "", n, now);
+        int cost = c.cost(mode);
         if (count(p, t) < cost) {
             fail(p, Component.translatable("rtshop.gacha.no_ticket", new ItemStack(t).getHoverName(), cost));
             return null;
@@ -253,6 +249,13 @@ public final class MagicGacha {
         boolean pityHit = applyPity(p, c, g, pool, mode, got);
         JsonArray res = new JsonArray();
         for (GachaConfig.Entry e : got) {
+            if (e == MagicConfig.FAIL) { // 실패: 아무것도 나오지 않는다
+                JsonObject r = new JsonObject();
+                r.addProperty("fail", true);
+                r.addProperty("grade", "fail");
+                res.add(r);
+                continue;
+            }
             String ecat = catOf(c, e);
             ItemStack s = Gacha.stackOf(e, "magic_" + ecat);
             JsonObject r = e.toJson();
@@ -376,34 +379,44 @@ public final class MagicGacha {
         return g;
     }
 
-    public static JsonArray enchantChances(MagicConfig c, ItemStack s) {
-        List<List<MagicConfig.Ench>> g = enchByGrade(c, s);
+    /** 등급별 가중치: 첫 칸은 실패(붙을 인챈트가 하나라도 있을 때만), 나머지는 이 장비에 붙을 것이 있는 등급만. */
+    private static double[] enchantWeights(MagicConfig c, List<List<MagicConfig.Ench>> g) {
         double[] w = new double[GachaConfig.GRADES.length];
-        double sum = 0;
-        for (int i = 0; i < w.length; i++) {
+        double real = 0;
+        for (int i = 1; i < w.length; i++) {
             w[i] = g.get(i).isEmpty() ? 0 : c.enchantOdds[i];
-            sum += w[i];
+            real += w[i];
         }
+        w[0] = real > 0 ? c.enchantOdds[0] : 0;
+        return w;
+    }
+
+    public static JsonArray enchantChances(MagicConfig c, ItemStack s) {
+        double[] w = enchantWeights(c, enchByGrade(c, s));
+        double sum = 0;
+        for (double v : w) sum += v;
         JsonArray a = new JsonArray();
         for (double v : w) a.add(sum <= 0 ? 0 : v / sum);
         return a;
     }
 
-    /** 한 번 굴린다 (계산만). 이 장비에 붙을 것이 없으면 null. */
+    /** 한 번 굴린다 (계산만). 이 장비에 붙을 것이 없으면 null, 실패 칸이 나오면 MagicConfig.FAIL_ENCH. */
     public static MagicConfig.Ench rollEnchant(MagicConfig c, ItemStack s, RandomSource rng) {
         List<List<MagicConfig.Ench>> g = enchByGrade(c, s);
+        double[] w = enchantWeights(c, g);
         double sum = 0;
-        for (int i = 0; i < g.size(); i++) if (!g.get(i).isEmpty()) sum += c.enchantOdds[i];
+        for (double v : w) sum += v;
         if (sum <= 0) return null;
         double r = rng.nextDouble() * sum;
         int gi = -1;
-        for (int i = 0; i < g.size(); i++) {
-            if (g.get(i).isEmpty() || c.enchantOdds[i] <= 0) continue;
-            r -= c.enchantOdds[i];
+        for (int i = 0; i < w.length; i++) {
+            if (w[i] <= 0) continue;
+            r -= w[i];
             gi = i;
             if (r < 0) break;
         }
         if (gi < 0) return null;
+        if (gi == 0) return MagicConfig.FAIL_ENCH;
         List<MagicConfig.Ench> list = g.get(gi);
         int total = 0;
         for (MagicConfig.Ench e : list) total += e.weight;
@@ -415,14 +428,25 @@ public final class MagicGacha {
         return list.get(list.size() - 1);
     }
 
-    /** 손에 든 무기의 인챈트를 모두 지우고 하나를 새로 붙인다. 붙인 칸 (실패 null). */
+    /** 제단 위에 올려 둔 장비의 인챈트를 다시 붙인다. */
     public static MagicConfig.Ench reroll(ServerPlayer p, boolean needOrb) {
+        return reroll(p, altarItem(p), needOrb);
+    }
+
+    /**
+     * 이 장비의 인챈트를 모두 지우고 하나를 새로 붙인다. 붙인 칸을 돌려준다.
+     * 실패 칸이 나오면 주문서만 쓰이고 장비는 그대로이며 MagicConfig.FAIL_ENCH 를 돌려준다. 할 수 없었으면 null.
+     */
+    public static MagicConfig.Ench reroll(ServerPlayer p, ItemStack s, boolean needOrb) {
         MagicConfig c = MagicConfig.get();
         if (needOrb && !near(p)) {
             fail(p, Component.translatable("rtshop.magic.need_orb"));
             return null;
         }
-        ItemStack s = p.getMainHandItem();
+        if (s.isEmpty()) {
+            fail(p, Component.translatable("rtshop.magic.reroll_hold"));
+            return null;
+        }
         if (!rerollable(c, s)) {
             fail(p, Component.translatable("rtshop.magic.reroll_bad_item"));
             return null;
@@ -438,13 +462,24 @@ public final class MagicGacha {
             return null;
         }
         take(p, t, c.rerollCost);
+        boolean failed = e == MagicConfig.FAIL_ENCH;
         Map<Enchantment, Integer> before = EnchantmentHelper.getEnchantments(s);
-        Map<Enchantment, Integer> now = new LinkedHashMap<>();
-        now.put(e.enchantment(), e.level);
-        EnchantmentHelper.setEnchantments(now, s);
+        if (!failed) {
+            Map<Enchantment, Integer> now = new LinkedHashMap<>();
+            now.put(e.enchantment(), e.level);
+            EnchantmentHelper.setEnchantments(now, s);
+            if (p.containerMenu instanceof MagicMenu m) m.broadcastChanges();
+        }
         JsonObject o = view(p);
-        JsonObject r = e.toJson();
-        r.addProperty("name", e.enchantment().getFullname(e.level).getString());
+        JsonObject r = new JsonObject();
+        if (failed) {
+            r.addProperty("fail", true);
+            r.addProperty("grade", "fail");
+            r.addProperty("name", "");
+        } else {
+            r = e.toJson();
+            r.addProperty("name", e.enchantment().getFullname(e.level).getString());
+        }
         JsonArray old = new JsonArray();
         before.forEach((en, lv) -> old.add(en.getFullname(lv).getString()));
         r.add("before", old);
@@ -452,7 +487,7 @@ public final class MagicGacha {
         o.add("reroll", r);
         o.addProperty("mode", "reroll");
         send(p, MagicPacket.RESULT, o);
-        if (GachaConfig.gradeIndex(e.grade) >= 4) {
+        if (!failed && GachaConfig.gradeIndex(e.grade) >= 4) {
             com.rtshop.notice.Notice.broadcast(p.server, Component.translatable("rtshop.magic.broadcast_enchant", p.getDisplayName(),
                     e.enchantment().getFullname(e.level)).withStyle(ChatFormatting.LIGHT_PURPLE), false);
         }
@@ -511,8 +546,7 @@ public final class MagicGacha {
             case com.rtshop.net.MagicActionPacket.REROLL -> reroll(p, true);
             case com.rtshop.net.MagicActionPacket.REFRESH -> send(p, MagicPacket.VIEW, view(p));
             case com.rtshop.net.MagicActionPacket.SHOP -> {
-                if (!near(p)) return;
-                com.rtshop.shop.ShopServer.openShop(p, com.rtshop.gacha.GachaConfig.get().shop, -1);
+                // 티켓은 티켓 상인에게서만 산다: 제단에서는 상점을 열지 않는다
             }
             case com.rtshop.net.MagicActionPacket.EDIT -> {
                 if (canEdit(p)) send(p, MagicPacket.EDITOR, editorJson());

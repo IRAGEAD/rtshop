@@ -72,6 +72,22 @@ public final class ClientConfig {
     public String uiFont = "sans";
     /** RT Shop 창 글자 크기: 0 작게, 1 보통, 2 크게 */
     public int uiFontSize = 1;
+    // 룬 제단(마법 뽑기) 화면: 글꼴 sans(고딕)·serif(명조)·batang(바탕, 예전 모습)·pixel(게임 기본), 창 크기 배율, 글자 그림자,
+    // 뽑기 연출(0 보통, 1 짧게, 2 끔), 장면 옆 정보 패널 자리(false 오른쪽, true 왼쪽)
+    public String magicFont = "sans";
+    public double magicScale = 1.0;
+    public boolean magicShadow = false;
+    public int magicFx = 0;
+    public boolean magicPanelLeft = false;
+
+    public void resetMagic() {
+        magicFont = "sans";
+        magicScale = 1.0;
+        magicShadow = false;
+        magicFx = 0;
+        magicPanelLeft = false;
+    }
+
     public double pvpHudX = PDEF_X;
     public double pvpHudY = PDEF_Y;
     public double pvpHudWidth = PDEF_W;
@@ -193,6 +209,11 @@ public final class ClientConfig {
             o.addProperty("enhPanelX", enhPanelX);
             o.addProperty("enhPanelY", enhPanelY);
             o.addProperty("enhPanelScale", enhPanelScale);
+            o.addProperty("magicFont", magicFont);
+            o.addProperty("magicScale", magicScale);
+            o.addProperty("magicShadow", magicShadow);
+            o.addProperty("magicFx", magicFx);
+            o.addProperty("magicPanelLeft", magicPanelLeft);
             Path p = path();
             Files.createDirectories(p.getParent());
             Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -251,6 +272,11 @@ public final class ClientConfig {
                 if (o.has("enhPanelX")) c.enhPanelX = o.get("enhPanelX").getAsDouble();
                 if (o.has("enhPanelY")) c.enhPanelY = o.get("enhPanelY").getAsDouble();
                 if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
+                if (o.has("magicFont")) c.magicFont = o.get("magicFont").getAsString();
+                if (o.has("magicScale")) c.magicScale = Math.max(0.7, Math.min(1.3, o.get("magicScale").getAsDouble()));
+                if (o.has("magicShadow")) c.magicShadow = o.get("magicShadow").getAsBoolean();
+                if (o.has("magicFx")) c.magicFx = Math.max(0, Math.min(2, o.get("magicFx").getAsInt()));
+                if (o.has("magicPanelLeft")) c.magicPanelLeft = o.get("magicPanelLeft").getAsBoolean();
                 c.clamp();
                 c.clampQuest();
                 if (!o.has("questHudEnabled")) {

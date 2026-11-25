@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
+import com.rtshop.magic.MagicMenu;
 import com.rtshop.net.MagicActionPacket;
 import com.rtshop.net.ShopNet;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 마법 뽑기 창 (별빛 수정 구체): [분야 선택 뽑기] [무작위 뽑기] [인챈트 재설정].
- * 「룬 제단」 모습: 흑요석 판 위에 빛나는 소환진, 가운데 구슬, 오각으로 놓인 룬석 다섯(분야 단추). 뽑으면 「룬석 소환진」 연출(MagicFx) 뒤에 결과 목록을 보여 준다.
+ * 룬 제단 창: [분야 선택 뽑기] [무작위 뽑기] [인챈트 재설정].
+ * 흑요석 판 위에 빛나는 소환진, 가운데 구슬, 오각으로 놓인 룬석 다섯(분야 단추). 뽑으면 「룬석 소환진」 연출(MagicFx) 뒤에 결과를 보여 준다.
+ * 인챈트 재설정은 무기·장비를 제단 위 칸에 올려놓고 한다 (가방 칸이 함께 보인다). 글꼴·크기·그림자·연출은 [화면 설정] 에서 고른다.
  */
 public class MagicGachaScreen extends Screen {
     public static final String[] CATS = {"attack", "guard", "dodge", "passive", "mover"};
@@ -36,6 +38,12 @@ public class MagicGachaScreen extends Screen {
     private List<MagicFx.Card> shown = new ArrayList<>();
     private String rerollText = "";
     private String rerollGrade = "";
+    private boolean rerollFailed;
+    /** 화면 설정 패널 (열려 있으면 그 위에 뜬다). */
+    private MagicUiPanel settings;
+    /** 창 크기 배율과, 그 배율로 본 화면 크기. */
+    private float sc = 1F;
+    private int vw, vh;
     private Component status;
     private boolean statusOk;
     private int statusTicks;
@@ -55,7 +63,8 @@ public class MagicGachaScreen extends Screen {
             List<MagicFx.Card> cards = cardsOf(o);
             if (o.has("reroll")) {
                 JsonObject r = o.getAsJsonObject("reroll");
-                rerollText = r.get("name").getAsString();
+                rerollFailed = r.has("fail");
+                rerollText = rerollFailed ? tr("rtshop.magic.reroll_failed") : r.get("name").getAsString();
                 rerollGrade = r.get("grade").getAsString();
             }
             shown = cards;
@@ -104,11 +113,16 @@ public class MagicGachaScreen extends Screen {
     public static List<MagicFx.Card> cardsOf(JsonObject o) {
         List<MagicFx.Card> cards = new ArrayList<>();
         if (o.has("results")) {
-            for (JsonElement e : o.getAsJsonArray("results")) cards.add(card(e.getAsJsonObject()));
+            for (JsonElement e : o.getAsJsonArray("results")) {
+                JsonObject r = e.getAsJsonObject();
+                if (r.has("fail")) cards.add(new MagicFx.Card(ItemStack.EMPTY, tr("rtshop.magic.fail_book"), "fail")); // 실패: 빈 카드
+                else cards.add(card(r));
+            }
         }
         if (o.has("reroll")) {
             JsonObject r = o.getAsJsonObject("reroll");
-            cards.add(new MagicFx.Card(new ItemStack(Items.ENCHANTED_BOOK), r.get("name").getAsString(), r.get("grade").getAsString()));
+            if (r.has("fail")) cards.add(new MagicFx.Card(ItemStack.EMPTY, tr("rtshop.magic.fail_enchant"), "fail"));
+            else cards.add(new MagicFx.Card(new ItemStack(Items.ENCHANTED_BOOK), r.get("name").getAsString(), r.get("grade").getAsString()));
         }
         return cards;
     }
@@ -170,8 +184,25 @@ public class MagicGachaScreen extends Screen {
         cat = c;
     }
 
-    public void pullForTest(int n) {
-        pull(n);
+    public void pullForTest() {
+        pull();
+    }
+
+    public boolean settingsOpenForTest() {
+        return settings != null;
+    }
+
+    public void settingsForTest(boolean open) {
+        settings = open ? new MagicUiPanel(() -> settings = null) : null;
+    }
+
+    /** 가방 칸(0~35)의 물건을 제단 위로 올린다 (칸을 누른 것과 같다). */
+    public void placeForTest(int inventoryIndex) {
+        slotClick(MagicMenu.slotOfInventory(inventoryIndex), 0, true);
+    }
+
+    public ItemStack altarForTest() {
+        return altarStack();
     }
 
     public void rerollForTest() {
@@ -188,24 +219,85 @@ public class MagicGachaScreen extends Screen {
 
     // ------------------------------------------------------------------ 동작
 
-    private void pull(int n) {
+    private void pull() {
         JsonObject a = new JsonObject();
         a.addProperty("mode", tab == 0 ? "select" : "random");
         a.addProperty("cat", CATS[cat]);
-        a.addProperty("n", n);
+        a.addProperty("n", 1);
         ShopNet.CHANNEL.sendToServer(new MagicActionPacket(MagicActionPacket.PULL, a.toString()));
+    }
+
+    // ------------------------------------------------------------------ 제단 위 칸 · 가방
+
+    /** 열려 있는 제단 메뉴 (없으면 null). */
+    protected MagicMenu altarMenu() {
+        return minecraft != null && minecraft.player != null && minecraft.player.containerMenu instanceof MagicMenu m ? m : null;
+    }
+
+    /** 제단 위에 올려 둔 장비. */
+    public ItemStack altarStack() {
+        MagicMenu m = altarMenu();
+        return m == null ? ItemStack.EMPTY : m.getSlot(MagicMenu.ALTAR).getItem();
+    }
+
+    private ItemStack carried() {
+        MagicMenu m = altarMenu();
+        return m == null ? ItemStack.EMPTY : m.getCarried();
+    }
+
+    private void slotClick(int slot, int button, boolean shift) {
+        MagicMenu m = altarMenu();
+        if (m == null || minecraft.gameMode == null || slot < 0 || slot >= m.slots.size()) return;
+        minecraft.gameMode.handleInventoryMouseClick(m.containerId, slot, button,
+                shift ? net.minecraft.world.inventory.ClickType.QUICK_MOVE : net.minecraft.world.inventory.ClickType.PICKUP, minecraft.player);
+    }
+
+    /** 가방 칸 그림의 자리 {x, y} (재설정 탭 왼쪽 아래). */
+    private int[] bagOrigin() {
+        return new int[]{fx0 + 104 - 81, fy0 + H - 108};
+    }
+
+    /** 이 자리에 있는 메뉴 칸 번호 (제단 위 = 0, 가방 = 1~36, 없으면 -1). */
+    private int slotAt(int mx, int my) {
+        if (tab != 2 || altarMenu() == null) return -1;
+        int[] a = altarSpot();
+        if (Math.abs(mx - a[0]) <= 17 && Math.abs(my - a[1]) <= 17) return MagicMenu.ALTAR;
+        int[] b = bagOrigin();
+        int col = Math.floorDiv(mx - b[0], 18);
+        if (col < 0 || col >= 9) return -1;
+        int ry = my - b[1];
+        if (ry >= 0 && ry < 54) return 1 + (ry / 18) * 9 + col;
+        if (ry >= 58 && ry < 76) return 28 + col;
+        return -1;
+    }
+
+    /** 재설정 탭에서 제단 위 칸의 가운데 {x, y}. */
+    private int[] altarSpot() {
+        int top = fy0 + 34, bottom = bagOrigin()[1] - 14;
+        return new int[]{fx0 + 104, (top + bottom) / 2};
     }
 
     private void reroll() {
         ShopNet.CHANNEL.sendToServer(new MagicActionPacket(MagicActionPacket.REROLL, ""));
     }
 
+    /** 창 크기 배율(화면 설정)에 맞춰 자리를 잡는다. */
+    private void layout() {
+        sc = MagicUi.scale();
+        vw = Math.round(width / sc);
+        vh = Math.round(height / sc);
+        W = Math.min(vw - 8, 430);
+        H = Math.min(vh - 8, 252);
+        fx0 = (vw - W) / 2;
+        fy0 = (vh - H) / 2;
+        F = MagicUi.body();
+        FT = MagicUi.head();
+        FTITLE = MagicUi.title();
+    }
+
     @Override
     protected void init() {
-        W = Math.min(width - 8, 430);
-        H = Math.min(height - 8, 252);
-        fx0 = (width - W) / 2;
-        fy0 = (height - H) / 2;
+        layout();
         ShopNet.CHANNEL.sendToServer(new MagicActionPacket(MagicActionPacket.REFRESH, ""));
     }
 
@@ -223,15 +315,20 @@ public class MagicGachaScreen extends Screen {
     private static final ResourceLocation SLAB = tex("slab"), RING_OUT = tex("ring_outer"), RING_IN = tex("ring_inner"),
             TICKS = tex("ring_ticks"), STAR = tex("star"), ORB = tex("orb"), GLOW = tex("glow"),
             STONES = tex("stones"), STONES_ON = tex("stones_on");
-    private static final ResourceLocation F = RaidText.SANS, FT = RaidText.SERIF;
-    private static final int C_RUNE = 0xFF8FE4FF;
-    private static final int C_TEXT = 0xFFEDE4FF, C_DIM = 0xFF9C8CC8, C_GOLD = 0xFFFFE9B0, C_EDGE = 0xFFD8B060;
+    /** 글꼴 (화면 설정에 따라 layout() 이 고른다): 본문 · 머리말 · 제목. */
+    private ResourceLocation F = MagicUi.body(), FT = MagicUi.head(), FTITLE = MagicUi.title();
+    static final int C_RUNE = 0xFF8FE4FF;
+    static final int C_TEXT = 0xFFEDE4FF, C_DIM = 0xFF9C8CC8, C_GOLD = 0xFFFFE9B0, C_EDGE = 0xFFD8B060, C_FAIL = 0xFF9A90B0;
     private final long born = System.currentTimeMillis();
     private String bestGrade = "";
     private long tintOff = 0;
 
     private void txt(GuiGraphics g, String s, int x, int y, int color) {
-        RaidText.draw(g, font, s, F, x, y, color);
+        MagicUi.draw(g, font, s, F, x, y, color);
+    }
+
+    private void txt(GuiGraphics g, String s, ResourceLocation f, int x, int y, int color) {
+        MagicUi.draw(g, font, s, f, x, y, color);
     }
 
     private int tw(String s) {
@@ -254,11 +351,6 @@ public class MagicGachaScreen extends Screen {
         return data.has("pity") && data.getAsJsonObject("pity").get("on").getAsBoolean();
     }
 
-    /** 오늘의 룬(축복받은 분야). 없으면 "". */
-    private String blessed() {
-        return data.has("blessing") ? data.getAsJsonObject("blessing").get("cat").getAsString() : "";
-    }
-
     /** 천장 게이지: 소환진 바깥 눈금 48개가 횟수만큼 금빛으로 찬다. */
     private static void gauge(GuiGraphics g, int cx, int cy, int r, float frac, int cOn, int cOff) {
         g.flush();
@@ -275,8 +367,8 @@ public class MagicGachaScreen extends Screen {
 
     /** 방금 뽑은 최고 등급의 빛이 제단에 남는 세기 (0~1). */
     private float tint() {
-        if (bestGrade.isEmpty()) return 0;
-        if (fx.active() || !shown.isEmpty()) return 1;
+        if (bestGrade.isEmpty() || fx.active()) return 0; // 연출이 끝나기 전에는 등급 색을 비추지 않는다
+        if (!shown.isEmpty()) return 1;
         float k = 1 - (System.currentTimeMillis() - tintOff) / 4000F;
         if (k <= 0) {
             bestGrade = "";
@@ -302,26 +394,26 @@ public class MagicGachaScreen extends Screen {
         if (add) RenderSystem.defaultBlendFunc();
     }
 
-    private static void stone(GuiGraphics g, ResourceLocation sheet, int i, float cx, float cy, float scale, float alpha) {
+    private static void stone(GuiGraphics g, ResourceLocation sheet, int i, float cx, float cy, float scale, float bright, float alpha) {
         g.flush();
         RenderSystem.enableBlend();
         g.pose().pushPose();
         g.pose().translate(cx, cy, 0);
         g.pose().scale(scale, scale, 1);
-        g.setColor(1, 1, 1, alpha);
+        g.setColor(bright, bright, bright, alpha);
         g.blit(sheet, -32, -40, i * 64F, 0F, 64, 80, 320, 80);
         g.setColor(1, 1, 1, 1);
         g.pose().popPose();
     }
 
-    private static void box(GuiGraphics g, int x, int y, int w, int h, int c) {
+    static void box(GuiGraphics g, int x, int y, int w, int h, int c) {
         g.fill(x, y, x + w, y + 1, c);
         g.fill(x, y + h - 1, x + w, y + h, c);
         g.fill(x, y + 1, x + 1, y + h - 1, c);
         g.fill(x + w - 1, y + 1, x + w, y + h - 1, c);
     }
 
-    private static void gem(GuiGraphics g, int cx, int cy, int r, int c) {
+    static void gem(GuiGraphics g, int cx, int cy, int r, int c) {
         for (int dy = -r; dy <= r; dy++) {
             int w = r - Math.abs(dy);
             g.fill(cx - w, cy + dy, cx + w + 1, cy + dy + 1, c);
@@ -330,7 +422,7 @@ public class MagicGachaScreen extends Screen {
     }
 
     /** 흑요석 판: 어두운 돌결 · 보랏빛 겹테 · 금빛 속테 · 모서리 보석. */
-    private static void slab(GuiGraphics g, int x, int y, int w, int h) {
+    static void slab(GuiGraphics g, int x, int y, int w, int h) {
         g.fill(x - 3, y - 3, x + w + 3, y + h + 3, 0xFF07050C);
         g.setColor(1, 1, 1, 1);
         Ui.tile(g, SLAB, x, y, w, h, 64);
@@ -355,6 +447,9 @@ public class MagicGachaScreen extends Screen {
         this.font = mc.font;
         this.width = w;
         this.height = h;
+        F = MagicUi.body();
+        FT = MagicUi.head();
+        FTITLE = MagicUi.title();
     }
 
     public void setData(JsonObject o) {
@@ -367,16 +462,12 @@ public class MagicGachaScreen extends Screen {
 
     public static final int HUD_H = 150;
 
-    /** 장면 옆에 겹쳐 보이는 룬 제단 패널: 제목 · 티켓 수 · 등급 확률 · 천장 · 오늘의 룬. */
+    /** 장면 옆에 겹쳐 보이는 룬 제단 패널: 제목 · 티켓 수 · 등급 확률 · 천장. */
     public void renderHud(GuiGraphics g, int x, int y, int w) {
         if (!data.has("cats")) return;
         slab(g, x, y, w, HUD_H);
         String head = tr("rtshop.magic.altar");
-        RaidText.engraved(g, font, head, FT, x + 8, y + 6, 9);
-        String sub = "Altare Runarum";
-        if (x + 16 + RaidText.w(font, head, FT) + RaidText.w(font, sub, RaidText.GOTHIC) < x + w - 6) {
-            RaidText.draw(g, font, sub, RaidText.GOTHIC, x + 16 + RaidText.w(font, head, FT), y + 5, 0xFF8C74C8);
-        }
+        txt(g, head, FT, x + 8, y + 6, C_GOLD);
         int tx = x + 8;
         String[][] tk = {{"select", "rtshop:magic_ticket_select"}, {"random", "rtshop:magic_ticket"}, {"reroll", "rtshop:enchant_scroll"}};
         for (String[] k : tk) {
@@ -389,9 +480,9 @@ public class MagicGachaScreen extends Screen {
         g.fill(x + 6, y + 38, x + w - 6, y + 39, 0xFF3A2A66);
         int rx = x + 8, rw = w - 16, py = y + 44, limit = y + HUD_H - 4;
         if (tab == 2) {
-            ItemStack s = minecraft != null && minecraft.player != null ? minecraft.player.getMainHandItem() : ItemStack.EMPTY;
+            ItemStack s = altarStack();
             boolean ok = data.has("heldOk") && data.get("heldOk").getAsBoolean();
-            txt(g, clipF(s.isEmpty() ? tr("rtshop.magic.reroll_hold") : stripCodes(s.getHoverName().getString()), rw), rx, py, ok ? C_GOLD : 0xFFFF9080);
+            txt(g, clipF(s.isEmpty() ? tr("rtshop.magic.reroll_hold") : stripCodes(s.getHoverName().getString()), rw), rx, py, ok ? C_GOLD : s.isEmpty() ? C_DIM : 0xFFFF9080);
             txt(g, clipF(tr("rtshop.magic.odds_of", tr("rtshop.magic.tab.reroll")), rw), rx, py + 13, C_TEXT);
             g.fill(rx, py + 24, rx + rw, py + 25, 0xFF3A2A66);
             odds(g, rx, py + 28, rw);
@@ -410,8 +501,9 @@ public class MagicGachaScreen extends Screen {
 
     /** 장면 패널 아래 한 줄 알림. */
     public void hudLine(GuiGraphics g, int x, int y, int w, String s, int color) {
-        String c = clipF(s, w);
-        RaidText.outlined(g, font, c, F, x + (w - tw(c)) / 2, y, color, 0xFF0A0612);
+        String c = clipF(s, w - 8);
+        g.fill(x, y - 3, x + w, y + 11, 0xD00A0612);
+        txt(g, c, x + (w - tw(c)) / 2, y, color);
     }
 
     /** 수정 단추 (양 끝이 뾰족한 육각): 윗줄 큰 글자, 아랫줄 값. */
@@ -434,8 +526,8 @@ public class MagicGachaScreen extends Screen {
         }
         int in1 = Math.round(Math.abs(1 - (h - 1) / 2F) * 0.55F);
         g.fill(x + in1 + 3, y + 2, x + w - in1 - 3, y + 3, enabled ? 0x50FFFFFF : 0x18FFFFFF);
-        String a = RaidText.clip(font, top, FT, w - 18);
-        RaidText.outlined(g, font, a, FT, x + (w - RaidText.w(font, a, FT)) / 2, y + 5, enabled ? C_GOLD : 0xFF7A7090, 0xFF140A28);
+        String a = MagicUi.clip(font, top, FT, w - 18);
+        txt(g, a, FT, x + (w - MagicUi.w(font, a, FT)) / 2, y + 5, enabled ? C_GOLD : 0xFF7A7090);
         String b = clipF(sub, w - 18);
         txt(g, b, x + (w - tw(b)) / 2, y + h - 10, enabled ? 0xFFD8CCF8 : 0xFF6A6080);
         hits.add(new Object[]{x, y, w, h, r, enabled});
@@ -454,21 +546,29 @@ public class MagicGachaScreen extends Screen {
     @Override
     public void render(GuiGraphics g, int mx, int my, float partial) {
         renderBackground(g);
+        layout();
+        int vmx = Math.round(mx / sc), vmy = Math.round(my / sc);
+        g.pose().pushPose();
+        g.pose().scale(sc, sc, 1F);
+        draw(g, vmx, vmy);
+        g.pose().popPose();
+        super.render(g, mx, my, partial);
+        fx.render(g, font, width, height);
+    }
+
+    /** 창 전체 (크기 배율이 걸린 좌표로 그린다). */
+    private void draw(GuiGraphics g, int mx, int my) {
         hits.clear();
         boolean fxOn = fx.active();
+        boolean busy = fxOn || settings != null;
         float t = (System.currentTimeMillis() - born) / 1000F;
         int x0 = fx0, y0 = fy0;
         slab(g, x0, y0, W, H);
-        if (!data.has("cats")) { // 아직 서버 답이 오지 않음
-            RaidText.engraved(g, font, tr("rtshop.magic.altar"), RaidText.TITLE, x0 + 14, y0 + 8, 13);
-            super.render(g, mx, my, partial);
-            return;
-        }
-
-        // ---- 머리: 제목 · 고딕 부제 · 티켓
         String head = tr("rtshop.magic.altar");
-        RaidText.engraved(g, font, head, RaidText.TITLE, x0 + 14, y0 + 8, 13);
-        RaidText.draw(g, font, "Altare Runarum", RaidText.GOTHIC, x0 + 22 + RaidText.w(font, head, RaidText.TITLE), y0 + 11, 0xFF8C74C8);
+        txt(g, head, FTITLE, x0 + 14, y0 + 8, C_GOLD);
+        if (!data.has("cats")) return; // 아직 서버 답이 오지 않음
+
+        // ---- 머리: 제목 · 티켓
         int tx = x0 + W - 12;
         String[][] tk = {{"reroll", "rtshop:enchant_scroll"}, {"random", "rtshop:magic_ticket"}, {"select", "rtshop:magic_ticket_select"}};
         for (String[] k : tk) {
@@ -485,80 +585,9 @@ public class MagicGachaScreen extends Screen {
         gem(g, x0 + 10, y0 + 28, 2, C_EDGE);
         gem(g, x0 + W - 11, y0 + 28, 2, C_EDGE);
 
-        // ---- 왼쪽: 소환진 · 구슬 · 룬석 다섯
-        int R = Math.max(40, Math.min(66, (H - 62) / 2 - 22));
-        int cx = x0 + 104, cy = y0 + 30 + (H - 60) / 2;
-        float k = tint();
-        int gc = bestGrade.isEmpty() ? 0 : GachaColors.of(bestGrade);
-        int cOut = mix(0xB080FF, gc, k), cIn = mix(0xECC478, gc, k), cGlow = mix(tab == 1 ? 0xC8A0FF : 0x9060F0, gc, k);
-        float sp = tab == 1 ? 24 : tab == 2 ? 5 : 9;
-        float pulse = (float) Math.sin(t * 2.2F);
-        spin(g, GLOW, 128, cx, cy, R * 1.55F, 0, cGlow, 0.30F + 0.06F * pulse + 0.2F * k, true);
-        spin(g, STAR, 256, cx, cy, R, 0, cOut, 0.50F + 0.2F * k, false);
-        if (pityOn() && tab != 2) {
-            JsonObject pi = data.getAsJsonObject("pity");
-            float frac = Math.min(1F, pi.get(tab == 0 ? "select" : "random").getAsInt() / (float) Math.max(1, pi.get("count").getAsInt()));
-            gauge(g, cx, cy, R + 5, frac, 0xFF000000 | mix(0xFFD070, gc, k), 0x80000000 | cOut);
-        } else {
-            spin(g, TICKS, 256, cx, cy, R + 7, 0, cOut, 0.55F, false);
-        }
-        spin(g, RING_OUT, 256, cx, cy, R, t * sp, cOut, 1F, false);
-        spin(g, RING_IN, 256, cx, cy, R * 0.62F, -t * sp * 1.5F, cIn, 0.9F, false);
-        // 떠오르는 마력 알갱이
-        for (int i = 0; i < 18; i++) {
-            float ph = (t * (0.10F + (i % 5) * 0.025F) + i * 0.173F) % 1F;
-            float px = cx + (float) Math.sin(i * 7.31F) * R * 1.05F + (float) Math.sin(t * 1.3F + i) * 3F;
-            float py = cy + R - ph * R * 2.1F;
-            int al = (int) (Math.sin(ph * Math.PI) * 190);
-            if (al <= 8) continue;
-            int col = (al << 24) | (i % 3 == 0 ? mix(0xFFE0A0, gc, k) : mix(0xC0A0FF, gc, k));
-            int sz = i % 4 == 0 ? 2 : 1;
-            g.fill((int) px, (int) py, (int) px + sz, (int) py + sz, col);
-        }
-        float bob = (float) Math.sin(t * 1.6F) * 1.5F;
-        if (tab != 2) {
-            spin(g, GLOW, 128, cx, cy + bob, 40 + 3 * pulse, 0, cGlow, 0.55F, true);
-            spin(g, ORB, 128, cx, cy + bob, 21, 0, mix(0xFFFFFF, gc, k * 0.55F), 1F, false);
-            spin(g, GLOW, 128, cx - 5, cy + bob - 6, 12, 0, 0xFFFFFF, 0.25F + 0.1F * pulse, true);
-        } else {
-            ItemStack s = minecraft != null && minecraft.player != null ? minecraft.player.getMainHandItem() : ItemStack.EMPTY;
-            spin(g, GLOW, 128, cx, cy + bob, 36 + 3 * pulse, 0, cGlow, 0.5F, true);
-            spin(g, ORB, 128, cx, cy + bob, 24, 0, 0xFFFFFF, 0.28F, false);
-            if (!s.isEmpty()) {
-                g.flush();
-                g.pose().pushPose();
-                g.pose().translate(cx, cy + bob, 50);
-                g.pose().scale(2.2F, 2.2F, 1);
-                g.renderItem(s, -8, -8);
-                g.pose().popPose();
-            } else {
-                RaidText.outlined(g, font, "?", RaidText.TITLE, cx - RaidText.w(font, "?", RaidText.TITLE) / 2, cy - 6, C_GOLD, 0xFF140A28);
-            }
-        }
-        int flashAt = tab == 1 ? (int) (t * 5) % 5 : -1;
-        for (int i = 0; i < CATS.length; i++) {
-            final int ci = i;
-            double a = Math.toRadians(-90 + 72 * i);
-            int sx = cx + (int) Math.round(Math.cos(a) * R), sy = cy + (int) Math.round(Math.sin(a) * R);
-            boolean chosen = tab == 0 && cat == i;
-            boolean lit = chosen || tab == 1;
-            boolean hov = !fxOn && tab != 2 && Math.abs(mx - sx) <= 14 && Math.abs(my - sy) <= 19;
-            float sc = 0.5F + (chosen ? 0.05F + 0.012F * (float) Math.sin(t * 4) : 0) + (hov ? 0.04F : 0) + (flashAt == i ? 0.04F : 0);
-            boolean rune = tab != 2 && CATS[i].equals(blessed());
-            if (rune) spin(g, GLOW, 128, sx, sy, 30 + 2 * pulse, 0, 0x8FE4FF, 0.5F + 0.12F * pulse, true);
-            if (lit) spin(g, GLOW, 128, sx, sy, 27, 0, mix(0xFFD890, gc, k), chosen ? 0.55F : flashAt == i ? 0.6F : 0.22F, true);
-            stone(g, lit ? STONES_ON : STONES, i, sx, sy, sc, tab == 2 ? 0.5F : 1F);
-            String nm = tr("rtshop.magic.cat." + CATS[i]);
-            g.fill(sx - tw(nm) / 2 - 3, sy + 21, sx + tw(nm) / 2 + 3, sy + 33, 0xB00A0612);
-            RaidText.outlined(g, font, nm, F, sx - tw(nm) / 2, sy + 24, tab == 2 ? 0xFF6A6080 : rune ? C_RUNE : lit ? C_GOLD : 0xFFB8A8DC, 0xFF0A0612);
-            if (rune) gem(g, sx - tw(nm) / 2 - 7, sy + 28, 2, C_RUNE);
-            if (tab != 2) {
-                hits.add(new Object[]{sx - 14, sy - 19, 28, 50, (Runnable) () -> {
-                    tab = 0;
-                    cat = ci;
-                }, true});
-            }
-        }
+        // ---- 왼쪽: 소환진 (뽑기) 또는 제단 위 칸과 가방 (재설정)
+        if (tab == 2) altarAndBag(g, mx, my, t, busy);
+        else circle(g, mx, my, t, busy);
 
         // ---- 오른쪽: 탭 · 확률 · 수정 단추
         int rx = x0 + 212, rw = W - 212 - 14;
@@ -568,7 +597,7 @@ public class MagicGachaScreen extends Screen {
             final int ti = i;
             int bx = rx + i * tbw;
             boolean sel = tab == i;
-            boolean hov = !fxOn && mx >= bx && mx < bx + tbw - 3 && my >= y0 + 34 && my < y0 + 49;
+            boolean hov = !busy && mx >= bx && mx < bx + tbw - 3 && my >= y0 + 34 && my < y0 + 49;
             g.fill(bx, y0 + 34, bx + tbw - 3, y0 + 49, sel ? 0xFF34225E : hov ? 0xFF221838 : 0xFF151024);
             if (sel) g.fill(bx, y0 + 34, bx + tbw - 3, y0 + 35, 0xFF8A6AD8);
             g.fill(bx, y0 + 48, bx + tbw - 3, y0 + 49, sel ? 0xFFE8C070 : 0xFF4A3A7A);
@@ -579,42 +608,173 @@ public class MagicGachaScreen extends Screen {
         int py = y0 + 56;
         int by2 = y0 + H - 60;
         if (tab == 2) {
-            rerollPanel(g, mx, my, rx, py, rw, by2);
+            rerollPanel(g, mx, my, rx, py, rw, by2, busy);
         } else {
             String mode = tab == 0 ? "select" : "random";
             infoLines(g, rx, py, rw, by2);
             int have = tickets(mode);
             JsonObject src = tab == 0 ? data.getAsJsonObject("cats").getAsJsonObject(CATS[cat]) : data.getAsJsonObject("random");
             int c1 = src.has("cost1") ? src.get("cost1").getAsInt() : cost(mode);
-            int c10 = src.has("cost10") ? src.get("cost10").getAsInt() : cost(mode) * 10;
-            int bw = (rw - 6) / 2;
-            crystal(g, mx, my, rx, by2, bw, 28, tr("rtshop.magic.times", 1), tr("rtshop.magic.cost." + mode, c1), !fxOn && have >= c1, () -> pull(1));
-            crystal(g, mx, my, rx + bw + 6, by2, bw, 28, tr("rtshop.magic.times", 10), tr("rtshop.magic.cost." + mode, c10),
-                    !fxOn && have >= c10, () -> pull(10));
+            crystal(g, mx, my, rx, by2, rw, 28, tr("rtshop.magic.times"), tr("rtshop.magic.cost." + mode, c1),
+                    !busy && have >= c1 && src.get("count").getAsInt() > 0, this::pull);
         }
 
         // ---- 아래 단추
         int by = y0 + H - 24;
-        slate(g, mx, my, x0 + 12, by, 72, 16, tr("rtshop.gacha.buy_tickets"), !fxOn,
-                () -> ShopNet.CHANNEL.sendToServer(new MagicActionPacket(MagicActionPacket.SHOP, "")));
+        slate(g, mx, my, x0 + 12, by, 72, 16, tr("rtshop.magic.ui_settings"), !busy, () -> settings = new MagicUiPanel(() -> settings = null));
         if (data.has("canEdit") && data.get("canEdit").getAsBoolean()) {
-            slate(g, mx, my, x0 + W - 130, by, 54, 16, tr("rtshop.magic.edit"), !fxOn,
+            slate(g, mx, my, x0 + W - 130, by, 54, 16, tr("rtshop.magic.edit"), !busy,
                     () -> ShopNet.CHANNEL.sendToServer(new MagicActionPacket(MagicActionPacket.EDIT, "")));
         }
-        slate(g, mx, my, x0 + W - 72, by, 60, 16, tr("rtshop.enhodds.close"), !fxOn, this::onClose);
+        slate(g, mx, my, x0 + W - 72, by, 60, 16, tr("rtshop.enhodds.close"), !busy, this::onClose);
         if (status != null) {
             String s = clipF(status.getString(), W - 92 - 136);
             txt(g, s, x0 + 90, by + 4, statusOk ? 0xFF9FE88A : 0xFFFF9080);
         } else if (data.has("error")) {
             txt(g, clipF(tr("rtshop.gacha.broken"), W - 92 - 136), x0 + 90, by + 4, 0xFFFF9080);
         }
-        // 결과 목록 (연출이 끝난 뒤)
-        if (!fxOn && !shown.isEmpty()) drawResults(g, shown);
-        super.render(g, mx, my, partial);
-        fx.render(g, font, width, height);
+        // 결과 (연출이 끝난 뒤)
+        if (!fxOn && !shown.isEmpty()) drawResults(g, shown, vw, vh);
+        // 들고 있는 물건 · 칸 설명
+        ItemStack carried = carried();
+        if (!carried.isEmpty()) {
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 350);
+            g.renderItem(carried, mx - 8, my - 8);
+            g.renderItemDecorations(font, carried, mx - 8, my - 8);
+            g.pose().popPose();
+        } else if (!busy && shown.isEmpty()) {
+            int sl = slotAt(mx, my);
+            MagicMenu m = altarMenu();
+            if (sl >= 0 && m != null && m.getSlot(sl).hasItem()) g.renderTooltip(font, m.getSlot(sl).getItem(), mx, my);
+        }
+        if (settings != null) {
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 420);
+            g.fill(0, 0, vw, vh, 0x90000000);
+            settings.render(g, font, mx, my, vw, vh);
+            g.pose().popPose();
+        }
     }
 
-    /** 확률 머리말 · 등급 확률 · 천장 · 오늘의 룬 · 10회 보장 · 도움말 (limit 아래로는 그리지 않는다). */
+    /** 소환진 · 구슬 · 룬석 다섯 (분야 단추). */
+    private void circle(GuiGraphics g, int mx, int my, float t, boolean busy) {
+        int x0 = fx0, y0 = fy0;
+        int R = Math.max(40, Math.min(66, (H - 62) / 2 - 22));
+        int cx = x0 + 104, cy = y0 + 30 + (H - 60) / 2;
+        float k = tint();
+        int gc = bestGrade.isEmpty() ? 0 : GachaColors.of(bestGrade);
+        int cOut = mix(0xB080FF, gc, k), cIn = mix(0xECC478, gc, k), cGlow = mix(tab == 1 ? 0xC8A0FF : 0x9060F0, gc, k);
+        float sp = tab == 1 ? 24 : 9;
+        float pulse = (float) Math.sin(t * 2.2F);
+        spin(g, GLOW, 128, cx, cy, R * 1.55F, 0, cGlow, 0.30F + 0.06F * pulse + 0.2F * k, true);
+        spin(g, STAR, 256, cx, cy, R, 0, cOut, 0.50F + 0.2F * k, false);
+        if (pityOn()) {
+            JsonObject pi = data.getAsJsonObject("pity");
+            float frac = Math.min(1F, pi.get(tab == 0 ? "select" : "random").getAsInt() / (float) Math.max(1, pi.get("count").getAsInt()));
+            gauge(g, cx, cy, R + 5, frac, 0xFF000000 | mix(0xFFD070, gc, k), 0x80000000 | cOut);
+        } else {
+            spin(g, TICKS, 256, cx, cy, R + 7, 0, cOut, 0.55F, false);
+        }
+        spin(g, RING_OUT, 256, cx, cy, R, t * sp, cOut, 1F, false);
+        spin(g, RING_IN, 256, cx, cy, R * 0.62F, -t * sp * 1.5F, cIn, 0.9F, false);
+        motes(g, cx, cy, R, t, gc, k);
+        float bob = (float) Math.sin(t * 1.6F) * 1.5F;
+        spin(g, GLOW, 128, cx, cy + bob, 40 + 3 * pulse, 0, cGlow, 0.55F, true);
+        spin(g, ORB, 128, cx, cy + bob, 21, 0, mix(0xFFFFFF, gc, k * 0.55F), 1F, false);
+        spin(g, GLOW, 128, cx - 5, cy + bob - 6, 12, 0, 0xFFFFFF, 0.25F + 0.1F * pulse, true);
+        int flashAt = tab == 1 ? (int) (t * 5) % 5 : -1;
+        for (int i = 0; i < CATS.length; i++) {
+            final int ci = i;
+            double a = Math.toRadians(-90 + 72 * i);
+            int sx = cx + (int) Math.round(Math.cos(a) * R), sy = cy + (int) Math.round(Math.sin(a) * R);
+            boolean chosen = tab == 0 && cat == i;
+            boolean lit = chosen || tab == 1;
+            boolean hov = !busy && Math.abs(mx - sx) <= 14 && Math.abs(my - sy) <= 19;
+            // 고르지 않은 룬석도 어두워지지 않는다: 고른 것만 조금 커지고, 금빛 고리와 빛으로 표시한다
+            float scl = (chosen ? 0.56F + 0.012F * (float) Math.sin(t * 4) : 0.48F) + (hov ? 0.04F : 0) + (flashAt == i ? 0.04F : 0);
+            if (lit) spin(g, GLOW, 128, sx, sy, 27, 0, mix(0xFFD890, gc, k), chosen ? 0.55F : flashAt == i ? 0.6F : 0.22F, true);
+            if (chosen) spin(g, RING_IN, 256, sx, sy, 23, t * 14, 0xFFE9B0, 0.9F, false);
+            stone(g, STONES_ON, i, sx, sy, scl, lit || hov ? 1F : 0.82F, 1F);
+            String nm = tr("rtshop.magic.cat." + CATS[i]);
+            g.fill(sx - tw(nm) / 2 - 4, sy + 22, sx + tw(nm) / 2 + 4, sy + 34, 0x900A0612);
+            txt(g, nm, sx - tw(nm) / 2, sy + 24, lit ? C_GOLD : 0xFFCFC2F0);
+            if (chosen) g.fill(sx - tw(nm) / 2, sy + 34, sx + tw(nm) / 2, sy + 35, C_GOLD);
+            hits.add(new Object[]{sx - 14, sy - 19, 28, 50, (Runnable) () -> {
+                tab = 0;
+                cat = ci;
+            }, true});
+        }
+    }
+
+    /** 떠오르는 마력 알갱이. */
+    private static void motes(GuiGraphics g, int cx, int cy, int R, float t, int gc, float k) {
+        for (int i = 0; i < 18; i++) {
+            float ph = (t * (0.10F + (i % 5) * 0.025F) + i * 0.173F) % 1F;
+            float px = cx + (float) Math.sin(i * 7.31F) * R * 1.05F + (float) Math.sin(t * 1.3F + i) * 3F;
+            float py = cy + R - ph * R * 2.1F;
+            int al = (int) (Math.sin(ph * Math.PI) * 190);
+            if (al <= 8) continue;
+            int col = (al << 24) | (i % 3 == 0 ? mix(0xFFE0A0, gc, k) : mix(0xC0A0FF, gc, k));
+            int sz = i % 4 == 0 ? 2 : 1;
+            g.fill((int) px, (int) py, (int) px + sz, (int) py + sz, col);
+        }
+    }
+
+    private void cell(GuiGraphics g, int x, int y, ItemStack s, boolean hov) {
+        g.fill(x, y, x + 18, y + 18, 0xFF2A1F48);
+        g.fill(x + 1, y + 1, x + 17, y + 17, hov ? 0xFF2E2250 : 0xFF120C22);
+        if (!s.isEmpty()) {
+            g.renderItem(s, x + 1, y + 1);
+            g.renderItemDecorations(font, s, x + 1, y + 1);
+        }
+    }
+
+    /** 재설정 탭의 왼쪽: 작은 소환진 가운데의 '제단 위' 칸과, 그 아래 가방 칸. 칸을 눌러 집고 놓는다 (Shift 클릭 = 바로 올리기·내리기). */
+    private void altarAndBag(GuiGraphics g, int mx, int my, float t, boolean busy) {
+        MagicMenu m = altarMenu();
+        int[] a = altarSpot();
+        int[] b = bagOrigin();
+        int cx = a[0], cy = a[1];
+        int R = Math.max(22, Math.min(36, (b[1] - 14 - (fy0 + 34)) / 2 - 9));
+        float k = tint();
+        int gc = bestGrade.isEmpty() ? 0 : GachaColors.of(bestGrade);
+        int cOut = mix(0x80B0FF, gc, k), cIn = mix(0xECC478, gc, k);
+        float pulse = (float) Math.sin(t * 2.2F);
+        ItemStack on = altarStack();
+        int hovSlot = busy ? -1 : slotAt(mx, my);
+        spin(g, GLOW, 128, cx, cy, R * 1.6F, 0, mix(0x6090F0, gc, k), 0.30F + 0.06F * pulse + (on.isEmpty() ? 0 : 0.12F), true);
+        spin(g, TICKS, 256, cx, cy, R + 7, 0, cOut, 0.55F, false);
+        spin(g, RING_OUT, 256, cx, cy, R, t * 5, cOut, 1F, false);
+        spin(g, RING_IN, 256, cx, cy, R * 0.62F, -t * 7.5F, cIn, 0.9F, false);
+        motes(g, cx, cy, R, t, gc, k);
+        // 제단 위 칸
+        boolean hovA = hovSlot == MagicMenu.ALTAR;
+        g.fill(cx - 15, cy - 15, cx + 15, cy + 15, hovA ? 0xE02E2250 : 0xC0120C22);
+        box(g, cx - 15, cy - 15, 30, 30, hovA ? C_EDGE : 0xFF6A4AB8);
+        if (!on.isEmpty()) {
+            g.flush();
+            g.pose().pushPose();
+            g.pose().translate(cx, cy, 50);
+            g.pose().scale(1.5F, 1.5F, 1);
+            g.renderItem(on, -8, -8);
+            g.pose().popPose();
+        } else {
+            gem(g, cx, cy, 4, 0xFF4A3A7A);
+        }
+        String lab = tr("rtshop.magic.altar_slot");
+        txt(g, lab, cx - tw(lab) / 2, cy + R + 10, on.isEmpty() ? C_DIM : C_GOLD);
+        // 가방
+        txt(g, tr("rtshop.magic.bag"), b[0], b[1] - 11, C_DIM);
+        if (m == null) return;
+        for (int i = 0; i < 27; i++) {
+            int x = b[0] + (i % 9) * 18, y = b[1] + (i / 9) * 18;
+            cell(g, x, y, m.getSlot(1 + i).getItem(), hovSlot == 1 + i);
+        }
+        for (int i = 0; i < 9; i++) cell(g, b[0] + i * 18, b[1] + 58, m.getSlot(28 + i).getItem(), hovSlot == 28 + i);
+    }
+
+    /** 확률 머리말 · 등급 확률(첫 줄 = 실패) · 천장 · 도움말 (limit 아래로는 그리지 않는다). */
     private void infoLines(GuiGraphics g, int rx, int py, int rw, int by2) {
         String mode = tab == 0 ? "select" : "random";
         String name = tab == 0 ? tr("rtshop.magic.cat." + CATS[cat]) : tr("rtshop.magic.all_fields");
@@ -633,41 +793,23 @@ public class MagicGachaScreen extends Screen {
                     rx + 10, oy + 2, C_GOLD);
             oy += 11;
         }
-        String bc = blessed();
-        if (!bc.isEmpty() && tab == 0 && oy + 11 < by2) {
-            JsonObject bl = data.getAsJsonObject("blessing");
-            String line;
-            if (bc.equals(CATS[cat])) {
-                line = tr("rtshop.magic.bless_on", bl.get("discount").getAsInt());
-                double boost = bl.get("boost").getAsDouble();
-                if (boost > 1) line = tr("rtshop.magic.bless_boost", line, boost == Math.rint(boost) ? String.valueOf((long) boost) : String.valueOf(boost));
-            } else {
-                long sec = bl.get("ends").getAsLong();
-                String left = sec >= 3600 ? tr("rtshop.magic.hours", sec / 3600) : tr("rtshop.magic.minutes", Math.max(1, sec / 60));
-                line = tr("rtshop.magic.bless_other", tr("rtshop.magic.cat." + bc), left);
-            }
-            gem(g, rx + 3, oy + 6, 3, C_RUNE);
-            txt(g, clipF(line, rw - 10), rx + 10, oy + 2, C_RUNE);
-            oy += 11;
-        }
-        String gu = data.has("tenGuarantee") ? data.get("tenGuarantee").getAsString() : "";
-        if (!gu.isEmpty() && oy + 11 < by2) {
-            txt(g, clipF(tr("rtshop.gacha.guarantee_short", tr("rtshop.gacha.grade." + gu)), rw), rx, oy + 2, 0xFFC8B8F0);
+        if (oy + 11 < by2) {
+            txt(g, clipF(tr("rtshop.magic.fail_note"), rw), rx, oy + 2, C_DIM);
             oy += 11;
         }
         if (oy + 11 < by2) txt(g, clipF(tr(tab == 0 ? "rtshop.magic.select_hint" : "rtshop.magic.random_short"), rw), rx, oy + 2, C_DIM);
     }
 
-    /** 등급 확률 줄. 마지막 줄 아래 y 를 돌려준다. */
+    /** 등급 확률 줄 (첫 줄은 실패 확률). 마지막 줄 아래 y 를 돌려준다. */
     private int odds(GuiGraphics g, int x, int y, int w) {
         double[] d = chances();
         int row = 0;
         for (int i = 0; i < GRADES.length; i++) {
             if (d[i] <= 0) continue;
             int yy = y + row * 12;
-            int col = GachaColors.window(GRADES[i], false);
+            int col = i == 0 ? C_FAIL : GachaColors.window(GRADES[i], false);
             gem(g, x + 3, yy + 5, 3, col);
-            txt(g, clipF(GachaColors.windowName(GRADES[i]), 46), x + 10, yy + 2, col);
+            txt(g, clipF(i == 0 ? tr("rtshop.magic.fail") : GachaColors.windowName(GRADES[i]), 46), x + 10, yy + 2, col);
             String p = GachaScreen.pct(d[i]);
             int bx = x + 58, bw = Math.max(10, w - 58 - 44);
             g.fill(bx - 1, yy + 2, bx + bw + 1, yy + 8, 0xFF2A1F48);
@@ -678,10 +820,10 @@ public class MagicGachaScreen extends Screen {
             txt(g, p, x + w - tw(p), yy + 2, C_TEXT);
             row++;
         }
-        if (row == 0) {
+        if (row == 0 || (row == 1 && d[0] > 0)) {
             int yy = y;
-            for (var line : RaidText.split(font, tr("rtshop.magic.empty"), F, w)) {
-                g.drawString(font, line, x, yy, 0xFFFF9080, false);
+            for (var line : MagicUi.split(font, tr("rtshop.magic.empty"), F, w)) {
+                MagicUi.draw(g, font, line, x, yy, 0xFFFF9080);
                 yy += 10;
             }
             return yy;
@@ -689,15 +831,15 @@ public class MagicGachaScreen extends Screen {
         return y + row * 12;
     }
 
-    private void rerollPanel(GuiGraphics g, int mx, int my, int x, int y, int w, int by2) {
-        String held = data.has("held") ? data.get("held").getAsString() : "";
+    private void rerollPanel(GuiGraphics g, int mx, int my, int x, int y, int w, int by2, boolean busy) {
         boolean ok = data.has("heldOk") && data.get("heldOk").getAsBoolean();
-        ItemStack s = minecraft != null && minecraft.player != null ? minecraft.player.getMainHandItem() : ItemStack.EMPTY;
-        if (held.isEmpty() || s.isEmpty()) {
+        ItemStack s = altarStack();
+        if (s.isEmpty()) {
             int yy = y;
-            for (var line : RaidText.split(font, tr("rtshop.magic.reroll_hold"), F, w)) {
-                g.drawString(font, line, x, yy, C_DIM, false);
-                yy += 10;
+            for (var line : MagicUi.split(font, tr("rtshop.magic.reroll_hold"), F, w)) {
+                if (yy > y + 11) break;
+                MagicUi.draw(g, font, line, x, yy, C_DIM);
+                yy += 11;
             }
         } else {
             txt(g, clipF(stripCodes(s.getHoverName().getString()), w), x, y, C_GOLD);
@@ -708,7 +850,7 @@ public class MagicGachaScreen extends Screen {
             else txt(g, clipF(tr("rtshop.magic.reroll_bad_item"), w), x, y + 11, 0xFFFF9080);
         }
         if (!rerollText.isEmpty()) {
-            txt(g, clipF(tr("rtshop.magic.reroll_got", rerollText), w), x, y + 22, GachaColors.argb(rerollGrade));
+            txt(g, clipF(rerollFailed ? rerollText : tr("rtshop.magic.reroll_got", rerollText), w), x, y + 22, rerollFailed ? C_FAIL : GachaColors.argb(rerollGrade));
         }
         int hy = y + 36;
         txt(g, clipF(tr("rtshop.magic.odds_of", tr("rtshop.magic.tab.reroll")), w), x, hy, C_TEXT);
@@ -716,23 +858,23 @@ public class MagicGachaScreen extends Screen {
         odds(g, x, hy + 15, w);
         int c = cost("reroll");
         crystal(g, mx, my, x, by2, w, 28, tr("rtshop.magic.reroll_btn"), tr("rtshop.magic.cost.reroll", c),
-                !fx.active() && ok && tickets("reroll") >= c, this::reroll);
+                !busy && ok && !s.isEmpty() && tickets("reroll") >= c, this::reroll);
     }
 
-    /** 뽑은 것 목록 (화면 한가운데). Cinematic 장면에서도 쓴다. */
-    public void drawResults(GuiGraphics g, List<MagicFx.Card> shown) {
+    /** 뽑은 것 (화면 한가운데). Cinematic 장면에서도 쓴다. w·h = 그리는 화면의 크기. */
+    public void drawResults(GuiGraphics g, List<MagicFx.Card> shown, int sw, int sh) {
         int n = shown.size();
         int cols = n > 5 ? 5 : n;
         int rows = (n + cols - 1) / cols;
-        int cw = 78, ch = 30;
-        int w = Math.max(cols * (cw + 4) + 8, 120), h = rows * (ch + 4) + 34;
-        int x = (width - w) / 2, y = (height - h) / 2;
+        int cw = 96, ch = 30;
+        int w = Math.max(cols * (cw + 4) + 8, 130), h = rows * (ch + 4) + 34;
+        int x = (sw - w) / 2, y = (sh - h) / 2;
         g.flush();
         g.pose().pushPose();
         g.pose().translate(0, 0, 400);
-        g.fill(0, 0, width, height, 0xA0000000);
+        g.fill(0, 0, sw, sh, 0xA0000000);
         slab(g, x - 6, y - 6, w + 12, h + 12);
-        RaidText.engraved(g, font, tr("rtshop.magic.results"), FT, x + 4, y + 2, 9);
+        txt(g, tr("rtshop.magic.results"), FT, x + 4, y + 2, C_GOLD);
         g.fill(x + 2, y + 15, x + w - 2, y + 16, 0xFF3A2A66);
         int gx = x + (w - (cols * (cw + 4) - 4)) / 2;
         for (int i = 0; i < n; i++) {
@@ -743,7 +885,8 @@ public class MagicGachaScreen extends Screen {
             g.fillGradient(cx, cy, cx + cw, cy + ch, (col & 0xFFFFFF) | 0x50000000, 0x00000000);
             box(g, cx, cy, cw, ch, (col & 0xFFFFFF) | 0xB0000000);
             g.fill(cx, cy, cx + cw, cy + 2, col);
-            g.renderItem(c.icon, cx + 4, cy + 8);
+            if (c.icon.isEmpty()) gem(g, cx + 12, cy + 16, 5, 0xFF4A4060);
+            else g.renderItem(c.icon, cx + 4, cy + 8);
             txt(g, clipF(c.name, cw - 26), cx + 23, cy + 6, C_TEXT);
             txt(g, clipF(tr("rtshop.gacha.grade." + c.grade), cw - 26), cx + 23, cy + 17, col);
         }
@@ -753,7 +896,7 @@ public class MagicGachaScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mx, double my, int button) {
+    public boolean mouseClicked(double rmx, double rmy, int button) {
         if (fx.active()) {
             fx.skip();
             return true;
@@ -761,6 +904,16 @@ public class MagicGachaScreen extends Screen {
         if (!shown.isEmpty()) {
             shown = new ArrayList<>();
             tintOff = System.currentTimeMillis();
+            return true;
+        }
+        int mx = Math.round((float) rmx / sc), my = Math.round((float) rmy / sc);
+        if (settings != null) {
+            settings.click(mx, my);
+            return true;
+        }
+        int sl = slotAt(mx, my);
+        if (sl >= 0 && (button == 0 || button == 1)) {
+            slotClick(sl, button, hasShiftDown());
             return true;
         }
         for (Object[] h : hits) {
@@ -772,13 +925,21 @@ public class MagicGachaScreen extends Screen {
                 return true;
             }
         }
-        return super.mouseClicked(mx, my, button);
+        return super.mouseClicked(rmx, rmy, button);
     }
 
     @Override
     public boolean keyPressed(int key, int scan, int mods) {
         if (fx.active() && key != 256) {
             fx.skip();
+            return true;
+        }
+        if (settings != null && key == 256) {
+            settings = null;
+            return true;
+        }
+        if (minecraft != null && minecraft.options.keyInventory.matches(key, scan)) {
+            onClose();
             return true;
         }
         return super.keyPressed(key, scan, mods);

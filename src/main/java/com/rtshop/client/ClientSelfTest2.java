@@ -33,6 +33,8 @@ final class ClientSelfTest2 {
     static volatile int qnpc = -1;
     static volatile net.minecraft.core.BlockPos orbPos;
     static volatile int magicSkills;
+    static volatile double[] magicFail;
+    static volatile String magicBefore = "";
     static volatile int prevSel;
     static volatile ItemStack prevSlot8 = ItemStack.EMPTY;
     static final java.util.List<ItemStack> savedInv = new java.util.ArrayList<>();
@@ -780,6 +782,9 @@ final class ClientSelfTest2 {
                 sp.serverLevel().setBlockAndUpdate(at.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 sp.serverLevel().setBlockAndUpdate(at, com.rtshop.magic.MagicRegistry.ORB.get().defaultBlockState());
                 com.rtshop.magic.MagicConfig c = com.rtshop.magic.MagicConfig.get();
+                // 결과가 정해져 있어야 하므로 실패 확률을 잠시 0 으로 둔다 (끝나면 되돌린다; 실패는 아래에서 따로 본다)
+                magicFail = new double[]{c.selectOdds[0], c.randomOdds[0], c.enchantOdds[0]};
+                c.selectOdds[0] = c.randomOdds[0] = c.enchantOdds[0] = 0;
                 magicSkills = 0;
                 for (String cat : com.rtshop.magic.MagicConfig.CATS) magicSkills += c.pool(cat).size();
                 // 가방을 잠시 비워 둔다 (뽑은 스킬북 10권이 들어갈 자리) — 끝나면 되돌린다
@@ -810,7 +815,7 @@ final class ClientSelfTest2 {
             }
             waitTicks(com.rtshop.magic.MagicRegistry.cinematic ? 30 : 4);
         });
-        // ---- Cinematic Interactions 가 있으면: 구체는 1인칭 장면으로 열린다 (걸어가 몸을 숙이고, 룬석·소환 문양을 손으로 만진다)
+        // ---- Cinematic Interactions 가 있으면: 제단은 1인칭 장면으로 열린다 (걸어가 몸을 숙이고, 룬석·소환 문양을 손으로 만진다)
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             check("with Cinematic Interactions the orb starts a first-person scene instead of a window", CinematicOrb.sceneActive(), CinematicOrb.phaseForTest());
@@ -823,11 +828,15 @@ final class ClientSelfTest2 {
             check("the scene becomes active and the altar data has arrived", st != null && "ACTIVE".equals(CinematicOrb.phaseForTest()) && st.readyForTest(),
                     CinematicOrb.phaseForTest());
             double[] g0 = st == null ? null : st.guiOfForTest(0), g3 = st == null ? null : st.guiOfForTest(3), gs = st == null ? null : st.guiOfForTest(-1);
+            double[] gi = st == null ? null : st.guiOfItemSpotForTest();
             int sw = mc.getWindow().getGuiScaledWidth(), sh = mc.getWindow().getGuiScaledHeight();
             boolean in = g0 != null && g3 != null && gs != null && g0[1] > 4 && g0[1] < sh && g3[1] < sh - 4 && gs[1] < sh - 4 && g3[0] > 4 && g3[0] < sw;
-            check("the five rune stones and the summoning sigils are inside the view", in,
+            check("the five rune stones and the summoning sigil are inside the view", in,
                     (g0 == null ? "?" : (int) g0[0] + "," + (int) g0[1]) + " " + (g3 == null ? "?" : (int) g3[0] + "," + (int) g3[1]) + " "
                             + (gs == null ? "?" : (int) gs[0] + "," + (int) gs[1]) + " of " + sw + "x" + sh);
+            check("the place for gear on the altar is inside the view, and the bag is shown so gear can be picked up",
+                    gi != null && gi[0] > 4 && gi[0] < sw - 4 && gi[1] > 4 && gi[1] < sh - 4 && st.inventoryShownForTest(),
+                    gi == null ? "?" : (int) gi[0] + "," + (int) gi[1]);
             shot(mc, "123b_orb_scene");
             if (st != null) st.chooseForTest(0);
             waitTicks(14);
@@ -836,7 +845,7 @@ final class ClientSelfTest2 {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();
             shot(mc, "123c_orb_scene_attack");
-            check("touching the 10× sigil starts the summoning ritual", st != null && st.pullForTest(10));
+            check("touching the summoning sigil starts the ritual (one draw at a time)", st != null && st.pullForTest());
             waitTicks(9);
         });
         add(mc -> {
@@ -847,7 +856,7 @@ final class ClientSelfTest2 {
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();
-            check("at the ritual's peak the rune summoning cards play over the scene", st != null && (st.fxActiveForTest() || st.shownForTest() == 10),
+            check("at the ritual's peak the rune summoning card plays over the scene", st != null && (st.fxActiveForTest() || st.shownForTest() == 1),
                     st == null ? "no scene" : st.shownForTest());
             shot(mc, "123e_orb_fx");
             waitTicks(170);
@@ -855,60 +864,82 @@ final class ClientSelfTest2 {
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();
-            check("after the cards the 10 skill books are listed (scene)", st != null && !st.fxActiveForTest() && st.shownForTest() == 10,
+            check("after the card the drawn skill book is shown (scene)", st != null && !st.fxActiveForTest() && st.shownForTest() == 1,
                     st == null ? "no scene" : st.shownForTest());
             shot(mc, "123f_orb_results");
             if (st != null) {
                 st.dismissForTest();
                 st.chooseForTest(-1);
+                st.placeForTest(8); // 가방의 검을 제단 위로
             }
-            waitTicks(12);
+            waitTicks(14);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();
-            shot(mc, "123g_orb_scene_random");
-            check("touching the blue sigil rerolls the held weapon's enchantment (scene)", st != null && st.rerollForTest());
+            check("gear picked from the bag lies on the altar (scene), not in the hand", st != null && st.onAltar().is(net.minecraft.world.item.Items.DIAMOND_SWORD)
+                    && mc.player.getInventory().getItem(8).isEmpty(), st == null ? "no scene" : st.onAltar());
+            shot(mc, "123g_orb_scene_gear");
+            check("touching the blue sigil rerolls the enchantment of the gear on the altar (scene)", st != null && st.rerollForTest());
             waitTicks(90);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();
-            int n = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(mc.player.getMainHandItem()).size();
-            check("the scene reroll leaves exactly one enchantment on the weapon", n == 1, n);
+            int n = st == null ? -1 : net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(st.onAltar()).size();
+            check("the scene reroll leaves exactly one enchantment on the gear", n == 1, n);
             shot(mc, "123h_orb_reroll");
             if (st != null) st.dismissForTest();
+            onServer(mc, sp -> com.rtshop.magic.MagicConfig.get().enchantOdds[0] = 1e12); // 이번에는 반드시 실패
+            waitTicks(10);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            magicBefore = st == null ? "" : String.valueOf(st.onAltar().getTag());
+            if (st != null) st.rerollForTest();
+            waitTicks(90);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            check("a failed reroll shows the fail card and leaves the gear as it was (scene)", st != null && st.shownForTest() == 1
+                    && magicBefore.equals(String.valueOf(st.onAltar().getTag()))
+                    && mc.player.getInventory().countItem(com.rtshop.magic.MagicRegistry.SCROLL.get()) == 4, st == null ? "no scene" : st.shownForTest());
+            shot(mc, "123i_orb_reroll_fail");
+            if (st != null) st.dismissForTest();
+            onServer(mc, sp -> com.rtshop.magic.MagicConfig.get().enchantOdds[0] = 0);
             CinematicOrb.leaveForTest();
             waitTicks(220);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
-            check("stepping back ends the scene", !CinematicOrb.sceneActive(), CinematicOrb.phaseForTest());
-            // 아래의 창 점검을 위해 보통 창으로 다시 연다 (Cinematic 이 없을 때의 길)
+            check("stepping back ends the scene and the gear left on the altar comes back to the bag", !CinematicOrb.sceneActive()
+                    && mc.player.getInventory().countItem(net.minecraft.world.item.Items.DIAMOND_SWORD) == 1,
+                    CinematicOrb.phaseForTest() + " / " + mc.player.getInventory().countItem(net.minecraft.world.item.Items.DIAMOND_SWORD));
+        });
+        // ---- 창으로 여는 길 (Cinematic 이 없거나 장면을 꺼 둔 경우): 같은 메뉴가 룬 제단 창으로 뜬다
+        add(mc -> {
             onServer(mc, sp -> {
                 if (orbPos != null) com.rtshop.magic.MagicGacha.open(sp, orbPos);
             });
-            waitTicks(14);
-        });
-        add(mc -> {
-            check("using the orb first turns the view toward it (approach scene)", MagicClient.approachingForTest() || mc.screen instanceof MagicGachaScreen);
-            shot(mc, "122_magic_approach");
-            waitTicks(25);
+            waitTicks(20);
         });
         add(mc -> {
             MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
-            check("then the magic gacha window opens", ms != null, mc.screen);
+            check("the rune altar window opens on its menu (one altar slot + the bag)", ms instanceof MagicMenuScreen
+                    && mc.player.containerMenu instanceof com.rtshop.magic.MagicMenu, mc.screen);
             shot(mc, "122b_magic_gacha");
             if (ms != null) {
                 ms.tabForTest(0);
                 ms.catForTest(0);
-                ms.pullForTest(10);
+                ms.pullForTest();
             }
             waitTicks(30);
         });
         add(mc -> {
             MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
-            check("a 10× chosen-field draw plays the rune summoning scene", ms != null && ms.fxActiveForTest(), mc.screen);
+            check("a chosen-field draw plays the rune summoning scene", ms != null && ms.fxActiveForTest(), mc.screen);
             shot(mc, "122c_magic_fx");
             waitTicks(40);
         });
@@ -918,7 +949,7 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
-            check("after the scene the 10 skill books are listed", ms != null && !ms.fxActiveForTest() && ms.shownForTest() == 10,
+            check("after the scene the drawn skill book is shown", ms != null && !ms.fxActiveForTest() && ms.shownForTest() == 1,
                     ms == null ? mc.screen : ms.shownForTest());
             int books = 0;
             for (ItemStack st : mc.player.getInventory().items) if (com.rtshop.gacha.Gacha.marked(st)) books++;
@@ -932,19 +963,56 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "122f_magic_reroll_tab");
-            if (mc.screen instanceof MagicGachaScreen ms) ms.rerollForTest();
+            int at = -1;
+            for (int i = 0; i < 36; i++) if (mc.player.getInventory().getItem(i).is(net.minecraft.world.item.Items.DIAMOND_SWORD)) at = i;
+            if (mc.screen instanceof MagicGachaScreen ms && at >= 0) ms.placeForTest(at);
+            waitTicks(10);
+        });
+        add(mc -> {
+            MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
+            check("shift-clicking gear in the bag lays it on the altar slot of the window", ms != null && ms.altarForTest().is(net.minecraft.world.item.Items.DIAMOND_SWORD)
+                    && ms.dataForTest().get("heldOk").getAsBoolean(), ms == null ? mc.screen : ms.altarForTest());
+            shot(mc, "122f2_magic_reroll_gear");
+            if (ms != null) ms.rerollForTest();
             waitTicks(20);
         });
         add(mc -> {
-            ItemStack held = mc.player.getMainHandItem();
-            int n = net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(held).size();
-            check("enchant reroll clears the weapon's enchantments and puts exactly one new one on it", n == 1
-                    && mc.screen instanceof MagicGachaScreen ms && !ms.rerollTextForTest().isEmpty(), n);
+            MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
+            int n = ms == null ? -1 : net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(ms.altarForTest()).size();
+            check("enchant reroll clears the enchantments of the gear on the altar and puts exactly one new one on it", n == 1
+                    && !ms.rerollTextForTest().isEmpty(), n);
             waitTicks(100);
         });
         add(mc -> {
             shot(mc, "122g_magic_reroll_result");
-            if (mc.screen instanceof MagicGachaScreen ms) ms.mouseClicked(5, 5, 0);
+            MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
+            if (ms != null) {
+                ms.mouseClicked(5, 5, 0);
+                ms.settingsForTest(true);
+            }
+            waitTicks(4);
+        });
+        add(mc -> {
+            MagicGachaScreen ms = mc.screen instanceof MagicGachaScreen x ? x : null;
+            check("the rune altar has its own display settings (font, size, shadow, animation, panel side)", ms != null && ms.settingsOpenForTest());
+            shot(mc, "122g2_magic_settings");
+            ClientConfig cfg = ClientConfig.get();
+            String f0 = cfg.magicFont;
+            double s0 = cfg.magicScale;
+            MagicUiPanel.cycle(0);
+            MagicUiPanel.cycle(1);
+            MagicUiPanel.cycle(2);
+            check("pressing a settings row moves it to the next value (sans -> serif, 100% -> 110%, shadow on) and the fonts follow",
+                    f0.equals("sans") && cfg.magicFont.equals("serif") && s0 == 1.0 && cfg.magicScale == 1.1 && cfg.magicShadow
+                            && MagicUi.body().getPath().equals("ui_serif") && MagicUi.shadow(), cfg.magicFont + " " + cfg.magicScale);
+            waitTicks(4);
+        });
+        add(mc -> {
+            shot(mc, "122g3_magic_settings_serif");
+            ClientConfig.get().resetMagic();
+            ClientConfig.get().save();
+            check("the defaults are a clean sans font with no text shadow", MagicUi.body().getPath().equals("ui_sans") && !MagicUi.shadow() && MagicUi.scale() == 1F);
+            if (mc.screen instanceof MagicGachaScreen ms) ms.settingsForTest(false);
             com.rtshop.net.ShopNet.CHANNEL.sendToServer(new com.rtshop.net.MagicActionPacket(com.rtshop.net.MagicActionPacket.EDIT, ""));
             waitTicks(20);
         });
@@ -981,6 +1049,12 @@ final class ClientSelfTest2 {
             onServer(mc, sp -> {
                 if (orbPos != null) sp.serverLevel().setBlockAndUpdate(orbPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                 for (int i = 0; i < savedInv.size() && i < sp.getInventory().items.size(); i++) sp.getInventory().items.set(i, savedInv.get(i));
+                if (magicFail != null) {
+                    com.rtshop.magic.MagicConfig mcfg = com.rtshop.magic.MagicConfig.get();
+                    mcfg.selectOdds[0] = magicFail[0];
+                    mcfg.randomOdds[0] = magicFail[1];
+                    mcfg.enchantOdds[0] = magicFail[2];
+                }
                 sp.getInventory().selected = prevSel;
                 sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(prevSel));
             });
