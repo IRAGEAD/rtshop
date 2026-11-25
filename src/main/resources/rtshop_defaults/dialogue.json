@@ -1,5 +1,5 @@
 {
- "version": 14,
+ "version": 15,
  "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), chatter: 일상 이야기 (무작위 한 마디), topics: 이야기 주제 (need: flags·notFlags·quests 조건). 문장은 \"이름: 대사\" 로 말하는 사람을 바꿀 수 있고, {\"ko\": \"...\", \"en\": \"...\"} 로 두 언어를 적을 수 있습니다. 직접 고쳤다면 \"edited\": true 로 두세요 (모드 업데이트 때 덮어쓰지 않습니다).",
  "edited": false,
  "npcs": {
