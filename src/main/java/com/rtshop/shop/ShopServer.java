@@ -92,6 +92,7 @@ public final class ShopServer {
         com.rtshop.job.JobConfig.reload();
         com.rtshop.attendance.AttendanceConfig.reload();
         com.rtshop.gacha.GachaConfig.reload(server);
+        com.rtshop.gacha.Gacha.syncGrades(server); // 등급 목록(이름·색·연출)을 접속한 사람들에게 다시 보낸다
         com.rtshop.enhance.EnhanceConfig.reload();
         com.rtshop.pvp.PvpConfig.reload();
         com.rtshop.raid.RaidConfig.reload();

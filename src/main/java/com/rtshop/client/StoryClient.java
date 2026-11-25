@@ -34,6 +34,12 @@ public final class StoryClient {
             } catch (Exception ignored) {
             }
             Cinematic.play(json);
+        } else if (kind == StoryPacket.GRADES) {
+            // 서버의 뽑기 등급 목록 (이름·색·연출): 화면과 아이템 설명이 이 목록으로 그린다
+            try {
+                com.rtshop.gacha.GachaGrades.apply(com.rtshop.gacha.GachaGrades.parse(json));
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.MUSIC) {
             try {
                 BossMusicClient.receive(JsonParser.parseString(json).getAsJsonObject());

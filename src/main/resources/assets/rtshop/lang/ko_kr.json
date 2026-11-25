@@ -1683,5 +1683,16 @@
   "rtshop.qtalk.turned_in": "〔 의뢰 완료 · %s 〕",
   "rtshop.qtalk.abandoned": "〔 의뢰를 그만두었습니다 · %s 〕",
   "rtshop.qtalk.hint": "클릭·스페이스: 다음",
-  "rtshop.qtalk.scroll": "휠: 더 보기"
+  "rtshop.qtalk.scroll": "휠: 더 보기",
+  "rtshop.gachaedit.tab_grades": "등급",
+  "rtshop.gachaedit.grades_head": "등급 목록 (낮은 등급부터)",
+  "rtshop.gachaedit.grade_add": "+ 등급 추가",
+  "rtshop.gachaedit.grade_new": "새 등급 %s",
+  "rtshop.gachaedit.grade_fx": "연출: %s",
+  "rtshop.gachaedit.grade_on": "켜짐",
+  "rtshop.gachaedit.grade_off": "꺼짐",
+  "rtshop.gachaedit.grade_delete": "삭제",
+  "rtshop.gachaedit.grades_hint1": "기본 등급은 지우는 대신 끕니다: 꺼진 등급은 뽑기에 나오지 않고 창에도 보이지 않습니다.",
+  "rtshop.gachaedit.grades_hint2": "새 등급은 [확률·조각] 에서 확률을 주고, 목록에서 아이템의 등급으로 고르면 쓰입니다.",
+  "rtshop.gachaedit.hint_grades": "이름 · 색(RRGGBB) · 연출 · 차례"
 }

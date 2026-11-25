@@ -6184,6 +6184,90 @@ public final class SelfTest {
         }
         check("an unknown grade in gacha.json is refused", refused);
 
+        // 등급 추가·삭제 (3.52): 직접 만든 등급을 끼워 넣고, 기본 등급을 끄고, 지운 뒤에는 원래대로
+        java.util.List<com.rtshop.gacha.GachaGrades.Def> gradesBefore = com.rtshop.gacha.GachaGrades.all();
+        com.rtshop.magic.MagicConfig magicBefore = com.rtshop.magic.MagicConfig.get();
+        double uncBefore = magicBefore.selectOdds[com.rtshop.gacha.GachaConfig.gradeIndex("uncommon")];
+        double failBefore = magicBefore.enchantOdds[com.rtshop.magic.MagicConfig.failIndex()];
+        try {
+            com.google.gson.JsonObject gj = c.toJson();
+            com.google.gson.JsonArray gdefs = new com.google.gson.JsonArray();
+            for (String gid : new String[]{"common", "uncommon", "rare", "epic", "legendary"}) {
+                com.google.gson.JsonObject d = new com.google.gson.JsonObject();
+                d.addProperty("id", gid);
+                if (gid.equals("rare")) d.addProperty("enabled", false);
+                gdefs.add(d);
+            }
+            com.google.gson.JsonObject myth = new com.google.gson.JsonObject();
+            myth.addProperty("id", "mythic");
+            myth.addProperty("name", "신화");
+            myth.addProperty("color", "E85A6A");
+            myth.addProperty("fx", 4);
+            gdefs.add(myth); // 야마토는 적지 않는다: 빠진 기본 등급은 제자리에 끼워진다
+            gj.add("grades", gdefs);
+            com.google.gson.JsonArray gp = new com.google.gson.JsonArray();
+            String[][] rowsG = {{"minecraft:wooden_sword", "common"}, {"minecraft:iron_sword", "rare"}, {"minecraft:netherite_sword", "mythic"}};
+            for (String[] rg : rowsG) {
+                com.google.gson.JsonObject e = new com.google.gson.JsonObject();
+                e.addProperty("item", rg[0]);
+                e.addProperty("count", 1);
+                e.addProperty("grade", rg[1]);
+                e.addProperty("weight", 10);
+                gp.add(e);
+            }
+            gj.getAsJsonObject("pools").add("weapon", gp);
+            com.google.gson.JsonObject highOdds = new com.google.gson.JsonObject();
+            highOdds.addProperty("common", 50);
+            highOdds.addProperty("rare", 30);
+            highOdds.addProperty("mythic", 20);
+            gj.getAsJsonObject("tiers").add("high", highOdds);
+            com.rtshop.gacha.GachaConfig g7 = com.rtshop.gacha.GachaConfig.fromJson(gj);
+            String[] gradesNow = com.rtshop.gacha.GachaConfig.GRADES;
+            check("a custom grade is added between the built-in ones (and a missing built-in grade is put back in its place): common … legendary, mythic, yamato",
+                    gradesNow.length == 7 && gradesNow[5].equals("mythic") && gradesNow[6].equals("yamato") && com.rtshop.gacha.GachaConfig.yamato() == 6
+                            && com.rtshop.gacha.GachaGrades.fx("mythic") == 4 && com.rtshop.gacha.GachaGrades.color("mythic") == 0xE85A6A
+                            && "신화".equals(com.rtshop.gacha.GachaGrades.customName("mythic")) && g7.dismantle.length == 7
+                            && g7.dismantle[5] >= 150 && g7.dismantle[5] <= 600, java.util.Arrays.toString(gradesNow) + " " + java.util.Arrays.toString(g7.dismantle));
+            double[] chances7 = com.rtshop.gacha.Gacha.gradeChances(g7, "weapon", "high");
+            net.minecraft.util.RandomSource grng = net.minecraft.util.RandomSource.create(7);
+            int rareSeen = 0, mythSeen = 0;
+            for (int k = 0; k < 2000; k++) {
+                String got = com.rtshop.gacha.Gacha.pull(g7, "weapon", "high", 1, grng).get(0).grade;
+                if (got.equals("rare")) rareSeen++;
+                if (got.equals("mythic")) mythSeen++;
+            }
+            check("a switched-off grade never drops and its share goes to the others; the custom grade drops at its own odds (20 of 70)",
+                    chances7.length == 7 && chances7[2] == 0 && Math.abs(chances7[0] - 50.0 / 70) < 1e-9 && Math.abs(chances7[5] - 20.0 / 70) < 1e-9 && rareSeen == 0
+                            && Math.abs(mythSeen / 2000.0 - 20.0 / 70) < 0.04, java.util.Arrays.toString(chances7) + " rare " + rareSeen + " mythic " + mythSeen);
+            com.rtshop.gacha.GachaConfig reread = com.rtshop.gacha.GachaConfig.fromJson(g7.toJson());
+            check("the grade list is written to gacha.json and read back the same",
+                    java.util.Arrays.equals(com.rtshop.gacha.GachaConfig.GRADES, gradesNow) && !com.rtshop.gacha.GachaGrades.enabled("rare")
+                            && reread.tiers.get("high").weights[5] == 20 && reread.pool("weapon").size() == 3);
+            com.rtshop.magic.MagicConfig m7 = com.rtshop.magic.MagicConfig.get();
+            check("the magic gacha follows the new grade list: its odds move with their grades (the fail slot stays on the common grade, the new grade starts at 0)",
+                    m7.selectOdds.length == 7 && m7.selectOdds[com.rtshop.gacha.GachaConfig.gradeIndex("uncommon")] == uncBefore && m7.selectOdds[5] == 0
+                            && m7.enchantOdds[com.rtshop.magic.MagicConfig.failIndex()] == failBefore,
+                    java.util.Arrays.toString(m7.selectOdds));
+            int refusedGrades = 0;
+            String[] badLists = {"[{\"id\":\"a\"},{\"id\":\"a\"}]", "[{\"id\":\"My Grade\"}]", "[{\"id\":\"rare\"},{\"id\":\"uncommon\"}]"};
+            for (String bad : badLists) {
+                try {
+                    com.rtshop.gacha.GachaGrades.parse(bad);
+                } catch (IllegalArgumentException ex) {
+                    refusedGrades++;
+                }
+            }
+            check("a bad grade list is refused: the same ID twice, an ID with capitals or spaces, built-in grades out of order", refusedGrades == 3, refusedGrades);
+        } finally {
+            com.rtshop.gacha.GachaGrades.apply(gradesBefore);
+        }
+        com.rtshop.magic.MagicConfig magicAfter = com.rtshop.magic.MagicConfig.get();
+        check("after the trial the six built-in grades are back, and the magic gacha's odds are where they were",
+                com.rtshop.gacha.GachaConfig.GRADES.length == gradesBefore.size() && magicAfter.selectOdds.length == gradesBefore.size()
+                        && magicAfter.selectOdds[com.rtshop.gacha.GachaConfig.gradeIndex("uncommon")] == uncBefore
+                        && magicAfter.enchantOdds[com.rtshop.magic.MagicConfig.failIndex()] == failBefore,
+                java.util.Arrays.toString(com.rtshop.gacha.GachaConfig.GRADES));
+
         // 시험용 목록: 등급마다 하나씩
         com.google.gson.JsonObject tj = c.toJson();
         com.google.gson.JsonArray tp = new com.google.gson.JsonArray();

@@ -36,7 +36,20 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
 
     public static final String[] CATS = {"weapon", "pet", "accessory"};
     public static final String[] TIERS = {"normal", "mid", "high"};
-    public static final String[] GRADES = com.rtshop.gacha.GachaConfig.GRADES;
+    /** 지금의 등급 목록 (서버가 보낸 것: 직접 만든 등급이 끼어 있을 수 있다). */
+    public static String[] grades() {
+        return com.rtshop.gacha.GachaConfig.GRADES;
+    }
+
+    /** 서버가 창 내용에 실어 보낸 등급 목록을 받아 둔다. */
+    static void readGrades(JsonObject data, String key) {
+        try {
+            if (data.has(key) && data.get(key).isJsonArray()) {
+                com.rtshop.gacha.GachaGrades.apply(com.rtshop.gacha.GachaGrades.parse(data.getAsJsonArray(key)));
+            }
+        } catch (Exception ignored) {
+        }
+    }
     private static final int ROW = 18;
     private static final int BANNER = 20;
 
@@ -81,6 +94,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
 
     public void update(String json, boolean result) {
         data = JsonParser.parseString(json).getAsJsonObject();
+        readGrades(data, "gradeDefs");
         if (result && data.has("results")) {
             results = data.getAsJsonArray("results");
             resultTicks = 0;
@@ -101,7 +115,8 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                 }
             }
             if (best >= 0 && bestE != null) {
-                anim.start(best, icon(bestE), name(bestE));
+                // 연출의 모습은 등급이 정해 둔 것 (직접 만든 등급은 여섯 모습 가운데 하나를 빌린다)
+                anim.start(GachaColors.fx(bestE.get("grade").getAsString()), icon(bestE), name(bestE));
             } else {
                 anim.skip();
             }
@@ -154,7 +169,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             resultTicks++;
             for (int i = 0; i < results.size(); i++) {
                 if (resultTicks == i * 3 + 4) {
-                    flipSound(gradeIndex(results.get(i).getAsJsonObject().get("grade").getAsString()));
+                    flipSound(GachaColors.fx(results.get(i).getAsJsonObject().get("grade").getAsString()));
                 }
             }
         }
@@ -222,16 +237,18 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
 
     private double[] chances(int tier) {
         JsonArray a = data.getAsJsonObject("chances").getAsJsonObject(TIERS[tier]).getAsJsonArray(CATS[cat]);
-        double[] out = new double[GRADES.length];
-        for (int i = 0; i < out.length; i++) {
+        double[] out = new double[grades().length];
+        for (int i = 0; i < out.length && i < a.size(); i++) {
             out[i] = a.get(i).getAsDouble();
         }
         return out;
     }
 
+    /** 등급의 자리. 모르는 등급(지워진 등급의 표식 등)은 맨 아래 등급으로 본다 (-1 을 돌려주지 않는다). */
     static int gradeIndex(String g) {
-        for (int i = 0; i < GRADES.length; i++) {
-            if (GRADES[i].equals(g)) {
+        String[] gs = grades();
+        for (int i = 0; i < gs.length; i++) {
+            if (gs[i].equals(g)) {
                 return i;
             }
         }
@@ -567,14 +584,14 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             double[] c = chances(t);
             int yy = py + 27;
             boolean any = false;
-            for (int i = GRADES.length - 1; i >= 0; i--) {
+            for (int i = grades().length - 1; i >= 0; i--) {
                 if (c[i] <= 0) {
                     continue;
                 }
                 any = true;
-                String line = GachaColors.windowName(GRADES[i]) + "  " + pct(c[i]);
-                g.drawString(this.font, line, px + 8, yy, GachaColors.window(GRADES[i], true), false);
-                g.fill(px + 4, yy + 1, px + 6, yy + 7, GachaColors.window(GRADES[i], true));
+                String line = GachaColors.windowName(grades()[i]) + "  " + pct(c[i]);
+                g.drawString(this.font, line, px + 8, yy, GachaColors.window(grades()[i], true), false);
+                g.fill(px + 4, yy + 1, px + 6, yy + 7, GachaColors.window(grades()[i], true));
                 yy += 10;
             }
             if (cat == 1 && any && c[0] + c[1] > 0) {
@@ -585,7 +602,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             }
             String gu = data.get("tenGuarantee").getAsString();
             if (!gu.isEmpty() && any) {
-                String s = tr("rtshop.gacha.guarantee_short", tr("rtshop.gacha.grade." + gu));
+                String s = tr("rtshop.gacha.guarantee_short", GachaColors.name(gu));
                 g.drawString(this.font, Ui.clip(this.font, s, pw - 8), px + 4, py + bodyH() - 50, Ui.C_INK_SOFT, false);
             }
         }
@@ -605,7 +622,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
     /** 확률표: 이 단계에서 아이템 하나하나가 나올 확률. */
     private void renderOdds(GuiGraphics g) {
         double[] c = chances(probTier);
-        double[] sum = new double[GRADES.length];
+        double[] sum = new double[grades().length];
         List<JsonObject> rows = new ArrayList<>();
         for (JsonElement el : pool()) {
             JsonObject e = el.getAsJsonObject();
@@ -631,11 +648,11 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             int gi = gradeIndex(e.get("grade").getAsString());
             double p = c[gi] * e.get("weight").getAsInt() / Math.max(1, sum[gi]);
             int yy = y + 3 + k * 12;
-            g.fill(x + 3, yy, x + 5, yy + 9, GachaColors.window(GRADES[gi], true));
-            boolean hid = gi == com.rtshop.gacha.GachaConfig.YAMATO; // 야마토 등급의 물건은 뽑기 전까지 이름도 숨긴다
-            g.drawString(this.font, hid ? GachaColors.windowName(GRADES[gi]) : Ui.clip(this.font, name(e), W - 130), x + 8, yy + 1, hid ? GachaColors.window(GRADES[gi], true) : Ui.C_INK, false);
-            String gp = GachaColors.windowName(GRADES[gi]) + "  " + pct(p);
-            g.drawString(this.font, gp, x + W - 24 - this.font.width(gp), yy + 1, gi == com.rtshop.gacha.GachaConfig.YAMATO ? GachaColors.window(GRADES[gi], true) : Ui.C_INK_SOFT, false);
+            g.fill(x + 3, yy, x + 5, yy + 9, GachaColors.window(grades()[gi], true));
+            boolean hid = gi == com.rtshop.gacha.GachaConfig.yamato(); // 야마토 등급의 물건은 뽑기 전까지 이름도 숨긴다
+            g.drawString(this.font, hid ? GachaColors.windowName(grades()[gi]) : Ui.clip(this.font, name(e), W - 130), x + 8, yy + 1, hid ? GachaColors.window(grades()[gi], true) : Ui.C_INK, false);
+            String gp = GachaColors.windowName(grades()[gi]) + "  " + pct(p);
+            g.drawString(this.font, gp, x + W - 24 - this.font.width(gp), yy + 1, gi == com.rtshop.gacha.GachaConfig.yamato() ? GachaColors.window(grades()[gi], true) : Ui.C_INK_SOFT, false);
         }
         if (rows.isEmpty()) {
             g.drawString(this.font, tr("rtshop.gacha.empty_short"), x + 8, y + 6, Ui.C_INK_SOFT, false);
@@ -668,10 +685,10 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             int y = bodyY() + k * ROW;
             Theme th = theme(cat);
             Ui.bevel(g, fx + 8, y, W - 16 - 64, ROW - 1, th.panel(), th.panelHi(), th.panelShade());
-            g.fill(fx + 9, y + 1, fx + 11, y + ROW - 2, GachaColors.argb(GRADES[gi]));
+            g.fill(fx + 9, y + 1, fx + 11, y + ROW - 2, GachaColors.argb(grades()[gi]));
             g.renderItem(icon(e), fx + 13, y);
             g.drawString(this.font, Ui.clip(this.font, name(e), W - 220), fx + 32, y + 5, Ui.C_INK, false);
-            String c = tr("rtshop.gacha.grade." + GRADES[gi]) + " · " + tr("rtshop.gacha.gives", dm.get(gi).getAsInt() * e.get("count").getAsInt());
+            String c = GachaColors.name(grades()[gi]) + " · " + tr("rtshop.gacha.gives", (gi < dm.size() ? dm.get(gi).getAsInt() : 0) * e.get("count").getAsInt());
             g.drawString(this.font, c, fx + W - 76 - this.font.width(c), y + 5, Ui.C_INK_SOFT, false);
         }
         if (inv.isEmpty()) {
@@ -715,7 +732,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             g.pose().translate(cx + cw / 2F, cy + ch / 2F, 0);
             g.pose().scale(Math.max(0.05F, flip), 1, 1);
             g.pose().translate(-(cx + cw / 2F), -(cy + ch / 2F), 0);
-            int col = GachaColors.argb(GRADES[gi]);
+            int col = GachaColors.argb(grades()[gi]);
             if (gi >= 3) {
                 int pulse = (int) (60 + 40 * Math.sin(time * 0.3));
                 g.fill(cx - 3, cy - 3, cx + cw + 3, cy + ch + 3, (pulse << 24) | (col & 0xFFFFFF));
@@ -754,8 +771,8 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             g.flush();
             g.pose().pushPose();
             g.pose().translate(0, 0, 300);
-            String gn = tr("rtshop.gacha.grade." + GRADES[gi]);
-            g.drawString(this.font, gn, cx + (cw - this.font.width(gn)) / 2, cy + 46, GachaColors.dark(GRADES[gi]), false);
+            String gn = GachaColors.name(grades()[gi]);
+            g.drawString(this.font, gn, cx + (cw - this.font.width(gn)) / 2, cy + 46, GachaColors.dark(grades()[gi]), false);
             String nm = Ui.clip(this.font, name(e), cw - 6);
             g.drawString(this.font, nm, cx + (cw - this.font.width(nm)) / 2, cy + 58, Ui.C_INK, false);
             if (e.has("new") && e.get("new").getAsBoolean()) {

@@ -91,6 +91,8 @@ public final class MagicConfig {
     /** 분야별 스킬북 목록 (무기 뽑기와 같은 칸 형식: item, nbt, grade, weight). */
     public final Map<String, List<GachaConfig.Entry>> pools = new LinkedHashMap<>();
     /** 등급별 확률 [선택, 무작위, 인챈트]. */
+    /** 이 설정을 만들 때의 등급 목록 (확률 줄의 자리는 이 차례를 따른다). 등급 목록이 바뀌면 get() 이 새 차례로 다시 만든다. */
+    public final String[] builtFor = GachaConfig.GRADES;
     public final double[] selectOdds = new double[GachaConfig.GRADES.length];
     public final double[] randomOdds = new double[GachaConfig.GRADES.length];
     public final double[] enchantOdds = new double[GachaConfig.GRADES.length];
@@ -111,6 +113,16 @@ public final class MagicConfig {
 
     public static synchronized MagicConfig get() {
         if (instance == null) instance = load(null);
+        if (!java.util.Arrays.equals(instance.builtFor, GachaConfig.GRADES)) {
+            // 뽑기의 등급 목록이 바뀌었다: 확률을 등급 이름으로 옮겨 새 차례에 맞춘다
+            try {
+                MagicConfig moved = fromJson(instance.toJson());
+                moved.loadError = instance.loadError;
+                instance = moved;
+            } catch (Exception e) {
+                com.rtshop.RtShop.LOGGER.warn("[rtshop] 마법 뽑기의 확률을 새 등급 목록에 맞추지 못했습니다: {}", e.toString());
+            }
+        }
         return instance;
     }
 
@@ -140,10 +152,24 @@ public final class MagicConfig {
     /** 기본 확률. 첫 칸(일반 등급 자리)은 '실패': 스킬북은 아무것도 나오지 않고, 인챈트는 주문서만 쓰인다. */
     public void defaultOdds() {
         double[] book = {40, 41.98, 15.9, 1.92, 0.18, 0.02};
-        System.arraycopy(book, 0, selectOdds, 0, book.length);
-        System.arraycopy(book, 0, randomOdds, 0, book.length);
+        setBase(selectOdds, book);
+        setBase(randomOdds, book);
         double[] ench = {50, 32, 13, 4.3, 0.7, 0};
-        System.arraycopy(ench, 0, enchantOdds, 0, ench.length);
+        setBase(enchantOdds, ench);
+    }
+
+    /** 기본 등급 여섯의 값을 지금 등급의 자리에 넣는다 (직접 만든 등급의 자리는 0). */
+    private static void setBase(double[] target, double[] base) {
+        java.util.Arrays.fill(target, 0);
+        for (int i = 0; i < GachaConfig.BASE.length && i < base.length; i++) {
+            int gi = GachaConfig.gradeIndex(GachaConfig.BASE[i]);
+            if (gi >= 0 && gi < target.length) target[gi] = base[i];
+        }
+    }
+
+    /** '실패' 칸의 자리: 일반(common) 등급의 자리. */
+    public static int failIndex() {
+        return GachaConfig.gradeIndex("common");
     }
 
     private static boolean fitsReroll(Enchantment e) {
@@ -164,7 +190,7 @@ public final class MagicConfig {
         if (e.getRarity() == Enchantment.Rarity.VERY_RARE) g += 2;
         if (e.isTreasureOnly()) g++;
         if (lv == max && max >= 4) g++;
-        return GachaConfig.GRADES[Math.min(4, g)];
+        return GachaConfig.BASE[Math.min(4, g)];
     }
 
     /** 목록에 없는 인챈트(방어구·도구용 등)를 덧붙인다. 넣은 수. */
@@ -204,10 +230,10 @@ public final class MagicConfig {
         g.tiers.clear();
         GachaConfig.Tier s = new GachaConfig.Tier();
         s.id = MODE_SELECT;
-        System.arraycopy(selectOdds, 0, s.weights, 0, selectOdds.length);
+        System.arraycopy(selectOdds, 0, s.weights, 0, Math.min(selectOdds.length, s.weights.length));
         GachaConfig.Tier r = new GachaConfig.Tier();
         r.id = MODE_RANDOM;
-        System.arraycopy(randomOdds, 0, r.weights, 0, randomOdds.length);
+        System.arraycopy(randomOdds, 0, r.weights, 0, Math.min(randomOdds.length, r.weights.length));
         g.tiers.put(MODE_SELECT, s);
         g.tiers.put(MODE_RANDOM, r);
         g.tenGuarantee = tenGuarantee;
@@ -234,15 +260,13 @@ public final class MagicConfig {
     private void normalize(boolean liftCommon) {
         for (String c : CATS) {
             for (GachaConfig.Entry e : pool(c)) {
-                int gi = GachaConfig.gradeIndex(e.grade);
-                if (gi == GachaConfig.YAMATO && !c.equals("attack")) e.grade = "legendary";
-                if (gi == 0 && liftCommon) e.grade = "uncommon";
+                if (e.grade.equals("yamato") && !c.equals("attack")) e.grade = "legendary";
+                if (e.grade.equals("common") && liftCommon) e.grade = "uncommon";
             }
         }
         for (Ench e : enchants) {
-            int gi = GachaConfig.gradeIndex(e.grade);
-            if (gi == GachaConfig.YAMATO) e.grade = "legendary";
-            if (gi == 0 && liftCommon) e.grade = "uncommon";
+            if (e.grade.equals("yamato")) e.grade = "legendary";
+            if (e.grade.equals("common") && liftCommon) e.grade = "uncommon";
         }
     }
 
@@ -254,8 +278,8 @@ public final class MagicConfig {
         if (version >= 2) return;
         defaultOdds();
         for (Ench e : enchants) {
-            int gi = GachaConfig.gradeIndex(e.grade);
-            if (gi >= 0 && gi < 4) e.grade = GachaConfig.GRADES[gi + 1];
+            int gi = com.rtshop.gacha.GachaGrades.baseIndex(e.grade);
+            if (gi >= 0 && gi < 4) e.grade = GachaConfig.BASE[gi + 1];
         }
         for (String k : new String[]{"armor", "tool"}) if (!rerollKinds.contains(k)) rerollKinds.add(k);
         version = 2;
@@ -273,6 +297,10 @@ public final class MagicConfig {
                 + "rerollKinds: 제단에 올릴 수 있는 장비 (weapon·bow·crossbow·trident·armor·tool). 게임 안에서는 OP 가 룬 제단의 [편집] 으로 고친다. 고친 뒤 /rtshop reload.");
         o.addProperty("configVersion", version);
         o.addProperty("tenGuarantee", tenGuarantee);
+        // 확률은 등급의 차례대로 적는다. 어느 등급의 값인지는 oddsGrades 가 알려 준다 (등급을 끼워 넣거나 지워도 값이 제 등급을 따라가게)
+        JsonArray og = new JsonArray();
+        for (String gid : builtFor) og.add(gid);
+        o.add("oddsGrades", og);
         JsonObject odds = new JsonObject();
         odds.add("select", arr(selectOdds));
         odds.add("random", arr(randomOdds));
@@ -306,20 +334,69 @@ public final class MagicConfig {
         return a;
     }
 
-    private static void read(JsonArray a, double[] out) {
-        for (int i = 0; i < out.length && i < a.size(); i++) out[i] = Math.max(0, a.get(i).getAsDouble());
+    /** 확률 줄을 읽는다. order = 그 줄이 적힌 등급의 차례 (없으면 기본 여섯 등급의 차례). */
+    private static void read(JsonArray a, double[] out, List<String> order) {
+        java.util.Arrays.fill(out, 0);
+        for (int i = 0; i < a.size() && i < order.size(); i++) {
+            int gi = GachaConfig.gradeIndex(order.get(i));
+            if (gi >= 0 && gi < out.length) out[gi] = Math.max(0, a.get(i).getAsDouble());
+        }
+    }
+
+    /** 없어진 등급(지운 직접 만든 등급)이 적힌 칸은 고급(uncommon)으로 읽는다: 등급 하나 때문에 설정 전체가 안 읽히지 않게. */
+    private static void knownGrades(JsonObject o) {
+        java.util.function.Consumer<JsonArray> fix = arr -> {
+            for (JsonElement e : arr) {
+                if (!e.isJsonObject()) continue;
+                JsonObject x = e.getAsJsonObject();
+                if (x.has("grade") && GachaConfig.gradeIndex(x.get("grade").getAsString()) < 0) x.addProperty("grade", "uncommon");
+            }
+        };
+        if (o.has("pools") && o.get("pools").isJsonObject()) {
+            for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("pools").entrySet()) if (e.getValue().isJsonArray()) fix.accept(e.getValue().getAsJsonArray());
+        }
+        if (o.has("enchants") && o.get("enchants").isJsonArray()) fix.accept(o.getAsJsonArray("enchants"));
+    }
+
+    /** 등급을 지울 때: 그 등급의 칸을 다른 등급으로 옮긴다 (바뀐 것이 있으면 true). */
+    public boolean remapGrades(Map<String, String> map) {
+        boolean changed = false;
+        for (List<GachaConfig.Entry> l : pools.values()) {
+            for (GachaConfig.Entry e : l) {
+                String to = map.get(e.grade);
+                if (to != null && !to.equals(e.grade)) {
+                    e.grade = to;
+                    changed = true;
+                }
+            }
+        }
+        for (Ench e : enchants) {
+            String to = map.get(e.grade);
+            if (to != null && !to.equals(e.grade)) {
+                e.grade = to;
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     public static MagicConfig fromJson(JsonObject o) {
+        knownGrades(o);
         MagicConfig c = new MagicConfig();
         c.defaults();
         c.version = o.has("configVersion") ? o.get("configVersion").getAsInt() : 1;
         if (o.has("tenGuarantee")) c.tenGuarantee = o.get("tenGuarantee").getAsString().trim();
         if (o.has("odds")) {
             JsonObject od = o.getAsJsonObject("odds");
-            if (od.has("select")) read(od.getAsJsonArray("select"), c.selectOdds);
-            if (od.has("random")) read(od.getAsJsonArray("random"), c.randomOdds);
-            if (od.has("enchant")) read(od.getAsJsonArray("enchant"), c.enchantOdds);
+            List<String> order = new ArrayList<>();
+            if (o.has("oddsGrades")) {
+                for (JsonElement e : o.getAsJsonArray("oddsGrades")) order.add(e.getAsString());
+            } else {
+                order.addAll(List.of(GachaConfig.BASE));
+            }
+            if (od.has("select")) read(od.getAsJsonArray("select"), c.selectOdds, order);
+            if (od.has("random")) read(od.getAsJsonArray("random"), c.randomOdds, order);
+            if (od.has("enchant")) read(od.getAsJsonArray("enchant"), c.enchantOdds, order);
         }
         if (o.has("costs")) {
             JsonObject co = o.getAsJsonObject("costs");

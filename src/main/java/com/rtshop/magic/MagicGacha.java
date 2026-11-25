@@ -196,6 +196,7 @@ public final class MagicGacha {
         o.addProperty("held", held.isEmpty() ? "" : String.valueOf(ForgeRegistries.ITEMS.getKey(held.getItem())));
         o.addProperty("heldOk", rerollable(c, held));
         o.addProperty("canEdit", canEdit(p));
+        o.add("gradeDefs", com.rtshop.gacha.GachaGrades.toJson()); // 화면이 등급의 이름·색·차례를 여기서 읽는다
         if (c.loadError != null) o.addProperty("error", c.loadError);
         return o;
     }
@@ -258,9 +259,9 @@ public final class MagicGacha {
             r.addProperty("skill", skillName(e));
             res.add(r);
             give(p, s);
-            int gi = GachaConfig.gradeIndex(e.grade);
-            if (gi >= 4) {
-                boolean yamato = gi == GachaConfig.YAMATO;
+            int gi = GachaConfig.gradeIndex(e.grade), legendary = GachaConfig.gradeIndex("legendary");
+            if (legendary >= 0 && gi >= legendary) {
+                boolean yamato = gi == GachaConfig.yamato();
                 com.rtshop.notice.Notice.broadcast(p.server, Component.translatable(yamato ? "rtshop.magic.broadcast_yamato" : "rtshop.magic.broadcast",
                         p.getDisplayName(), Component.literal(skillName(e).isEmpty() ? s.getHoverName().getString() : skillName(e)))
                         .withStyle(yamato ? ChatFormatting.AQUA : ChatFormatting.LIGHT_PURPLE), false);
@@ -349,7 +350,8 @@ public final class MagicGacha {
         for (MagicConfig.Ench e : c.enchants) {
             Enchantment en = e.enchantment();
             int gi = GachaConfig.gradeIndex(e.grade);
-            if (en == null || gi < 0 || e.weight <= 0 || (!s.isEmpty() && !en.canEnchant(s))) continue;
+            if (en == null || gi < 0 || gi >= g.size() || e.weight <= 0 || (!s.isEmpty() && !en.canEnchant(s))) continue;
+            if (!com.rtshop.gacha.GachaGrades.enabled(e.grade)) continue; // 꺼 둔 등급
             g.get(gi).add(e);
         }
         return g;
@@ -357,13 +359,15 @@ public final class MagicGacha {
 
     /** 등급별 가중치: 첫 칸은 실패(붙을 인챈트가 하나라도 있을 때만), 나머지는 이 장비에 붙을 것이 있는 등급만. */
     private static double[] enchantWeights(MagicConfig c, List<List<MagicConfig.Ench>> g) {
-        double[] w = new double[GachaConfig.GRADES.length];
+        double[] w = new double[g.size()];
+        int fail = MagicConfig.failIndex();
         double real = 0;
-        for (int i = 1; i < w.length; i++) {
-            w[i] = g.get(i).isEmpty() ? 0 : c.enchantOdds[i];
+        for (int i = 0; i < w.length; i++) {
+            if (i == fail) continue;
+            w[i] = g.get(i).isEmpty() || i >= c.enchantOdds.length ? 0 : c.enchantOdds[i];
             real += w[i];
         }
-        w[0] = real > 0 ? c.enchantOdds[0] : 0;
+        if (fail >= 0 && fail < w.length && fail < c.enchantOdds.length) w[fail] = real > 0 ? c.enchantOdds[fail] : 0;
         return w;
     }
 
@@ -392,7 +396,7 @@ public final class MagicGacha {
             if (r < 0) break;
         }
         if (gi < 0) return null;
-        if (gi == 0) return MagicConfig.FAIL_ENCH;
+        if (gi == MagicConfig.failIndex()) return MagicConfig.FAIL_ENCH;
         List<MagicConfig.Ench> list = g.get(gi);
         int total = 0;
         for (MagicConfig.Ench e : list) total += e.weight;
@@ -463,7 +467,7 @@ public final class MagicGacha {
         o.add("reroll", r);
         o.addProperty("mode", "reroll");
         send(p, MagicPacket.RESULT, o);
-        if (!failed && GachaConfig.gradeIndex(e.grade) >= 4) {
+        if (!failed && GachaConfig.gradeIndex("legendary") >= 0 && GachaConfig.gradeIndex(e.grade) >= GachaConfig.gradeIndex("legendary")) {
             com.rtshop.notice.Notice.broadcast(p.server, Component.translatable("rtshop.magic.broadcast_enchant", p.getDisplayName(),
                     e.enchantment().getFullname(e.level)).withStyle(ChatFormatting.LIGHT_PURPLE), false);
         }
@@ -475,6 +479,7 @@ public final class MagicGacha {
     public static JsonObject editorJson() {
         MagicConfig c = MagicConfig.get();
         JsonObject o = c.toJson();
+        o.add("gradeDefs", com.rtshop.gacha.GachaGrades.toJson());
         JsonArray skills = new JsonArray();
         for (MagicSkills.Skill s : MagicSkills.discover()) {
             String cat = MagicSkills.categoryOf(s);

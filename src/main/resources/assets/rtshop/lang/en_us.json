@@ -1683,5 +1683,16 @@
   "rtshop.qtalk.turned_in": "[ Request complete · %s ]",
   "rtshop.qtalk.abandoned": "[ Request given up · %s ]",
   "rtshop.qtalk.hint": "Click/Space: next",
-  "rtshop.qtalk.scroll": "Wheel: more"
+  "rtshop.qtalk.scroll": "Wheel: more",
+  "rtshop.gachaedit.tab_grades": "Grades",
+  "rtshop.gachaedit.grades_head": "Grades (lowest first)",
+  "rtshop.gachaedit.grade_add": "+ Add a grade",
+  "rtshop.gachaedit.grade_new": "New grade %s",
+  "rtshop.gachaedit.grade_fx": "Effect: %s",
+  "rtshop.gachaedit.grade_on": "On",
+  "rtshop.gachaedit.grade_off": "Off",
+  "rtshop.gachaedit.grade_delete": "Delete",
+  "rtshop.gachaedit.grades_hint1": "Base grades are switched off instead of deleted: an off grade never drops and is not shown.",
+  "rtshop.gachaedit.grades_hint2": "Give a new grade its odds in [Odds], then pick it as the grade of items in the lists.",
+  "rtshop.gachaedit.hint_grades": "Name · colour (RRGGBB) · effect · order"
 }

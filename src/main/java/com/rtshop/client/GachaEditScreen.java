@@ -30,7 +30,55 @@ import java.util.function.Supplier;
 public class GachaEditScreen extends Screen {
     private static final String[] CATS = GachaScreen.CATS;
     private static final String[] TIERS = GachaScreen.TIERS;
-    private static final String[] GRADES = GachaScreen.GRADES;
+    /** 등급 목록의 초안 (cfg.grades): 저장하기 전에도 표·목록이 고친 등급을 따라가게 여기서 읽는다. */
+    private JsonArray gradeDefs() {
+        if (!cfg.has("grades") || !cfg.get("grades").isJsonArray()) cfg.add("grades", com.rtshop.gacha.GachaGrades.toJson());
+        return cfg.getAsJsonArray("grades");
+    }
+
+    private String[] grades() {
+        JsonArray a = gradeDefs();
+        String[] out = new String[a.size()];
+        for (int i = 0; i < out.length; i++) out[i] = a.get(i).getAsJsonObject().get("id").getAsString();
+        return out;
+    }
+
+    private JsonObject gradeDef(String id) {
+        for (JsonElement e : gradeDefs()) if (e.getAsJsonObject().get("id").getAsString().equals(id)) return e.getAsJsonObject();
+        return null;
+    }
+
+    /** 등급의 자리 (모르는 등급은 0). */
+    private int gi(String id) {
+        String[] gs = grades();
+        for (int i = 0; i < gs.length; i++) if (gs[i].equals(id)) return i;
+        return 0;
+    }
+
+    private String gradeName(String id) {
+        JsonObject d = gradeDef(id);
+        String n = d != null && d.has("name") ? d.get("name").getAsString() : "";
+        if (!n.isEmpty()) return n;
+        String key = "rtshop.gacha.grade." + id;
+        return net.minecraft.client.resources.language.I18n.exists(key) ? tr(key) : id;
+    }
+
+    private int gradeRgb(String id) {
+        JsonObject d = gradeDef(id);
+        try {
+            if (d != null && d.has("color")) return Integer.parseInt(d.get("color").getAsString().replace("#", ""), 16) & 0xFFFFFF;
+        } catch (NumberFormatException ignored) {
+        }
+        return GachaColors.of(id);
+    }
+
+    private int gradeArgb(String id) {
+        return 0xFF000000 | gradeRgb(id);
+    }
+
+    private static boolean baseGrade(String id) {
+        return com.rtshop.gacha.GachaGrades.baseIndex(id) >= 0;
+    }
     private static final int LIST_W = 160;
     private static final int ROW = 13;
 
@@ -157,7 +205,7 @@ public class GachaEditScreen extends Screen {
         List<Integer> out = new ArrayList<>();
         JsonArray p = pool(tab);
         for (int i = 0; i < p.size(); i++) {
-            if (filter < 0 || GachaScreen.gradeIndex(p.get(i).getAsJsonObject().get("grade").getAsString()) == filter) {
+            if (filter < 0 || gi(p.get(i).getAsJsonObject().get("grade").getAsString()) == filter) {
                 out.add(i);
             }
         }
@@ -184,9 +232,10 @@ public class GachaEditScreen extends Screen {
         clearWidgets();
         hits.clear();
         labels.clear();
-        String[] tabs = {"rtshop.gacha.cat.weapon", "rtshop.gacha.cat.pet", "rtshop.gacha.cat.accessory", "rtshop.gachaedit.tab_odds", "rtshop.gachaedit.tab_settings"};
-        int tw = (W - 16 - 16) / 5;
-        for (int i = 0; i < 5; i++) {
+        String[] tabs = {"rtshop.gacha.cat.weapon", "rtshop.gacha.cat.pet", "rtshop.gacha.cat.accessory", "rtshop.gachaedit.tab_odds", "rtshop.gachaedit.tab_settings",
+                "rtshop.gachaedit.tab_grades"};
+        int tw = (W - 16 - 20) / 6;
+        for (int i = 0; i < 6; i++) {
             final int t = i;
             hit(fx + 8 + i * (tw + 4), fy + 24, tw, 14, () -> tr(tabs[t]) + (t < 3 ? " (" + pool(t).size() + ")" : ""), () -> tab != t, b -> {
                 tab = t;
@@ -203,8 +252,10 @@ public class GachaEditScreen extends Screen {
             buildPool(top);
         } else if (tab == 3) {
             buildOdds(top);
-        } else {
+        } else if (tab == 4) {
             buildSettings(top);
+        } else {
+            buildGrades(top);
         }
         hit(fx + W - 8 - 60, fy + H - 22, 60, 16, () -> tr("rtshop.qedit.save"), () -> dirty, b -> save());
         hit(fx + W - 8 - 124, fy + H - 22, 60, 16, () -> tr("rtshop.qedit.revert"), () -> dirty, b -> update(original));
@@ -216,12 +267,12 @@ public class GachaEditScreen extends Screen {
         int x = fx + 8;
         JsonArray p = pool(tab);
         final int ty = top;
-        hit(x, top, LIST_W, 13, () -> tr("rtshop.gachaedit.filter", filter < 0 ? tr("rtshop.gachaedit.all") : tr("rtshop.gacha.grade." + GRADES[filter])) + " ▼",
+        hit(x, top, LIST_W, 13, () -> tr("rtshop.gachaedit.filter", filter < 0 ? tr("rtshop.gachaedit.all") : gradeName(grades()[filter])) + " ▼",
                 () -> true, b -> {
                     List<ChoicePopup.Option> o = new ArrayList<>();
                     o.add(new ChoicePopup.Option("-1", tr("rtshop.gachaedit.all")));
-                    for (int i = 0; i < GRADES.length; i++) {
-                        o.add(new ChoicePopup.Option(Integer.toString(i), tr("rtshop.gacha.grade." + GRADES[i])));
+                    for (int i = 0; i < grades().length; i++) {
+                        o.add(new ChoicePopup.Option(Integer.toString(i), gradeName(grades()[i])));
                     }
                     popup = new ChoicePopup(x, ty, LIST_W, 13, this.height, this.font, o, Integer.toString(filter), v -> {
                         filter = Integer.parseInt(v);
@@ -236,18 +287,18 @@ public class GachaEditScreen extends Screen {
         for (int k = 0; k < rows && listScroll + k < vis.size(); k++) {
             final int idx = vis.get(listScroll + k);
             JsonObject e = p.get(idx).getAsJsonObject();
-            int gi = GachaScreen.gradeIndex(e.get("grade").getAsString());
+            int gi = gi(e.get("grade").getAsString());
             hits.add(new Hit(x, listTop + k * ROW, LIST_W, ROW - 1, () -> GachaScreen.name(e), () -> idx != selected, b -> {
                 selected = idx;
                 popup = null;
                 rebuild();
-            }, () -> GachaScreen.icon(e), GachaColors.argb(GRADES[gi])));
+            }, () -> GachaScreen.icon(e), gradeArgb(grades()[gi])));
         }
         boolean pet = CATS[tab].equals("pet");
         int by = fy + H - 26 - 32;
         hit(x, by, LIST_W, 14, () -> tr(pet ? "rtshop.gachaedit.add_pet" : "rtshop.gachaedit.add_item"), () -> true, b -> {
             JsonObject e = new JsonObject();
-            e.addProperty("grade", filter >= 0 ? GRADES[filter] : "common");
+            e.addProperty("grade", filter >= 0 ? grades()[filter] : "common");
             e.addProperty("weight", 10);
             if (pet) {
                 pick(PickerScreen.Mode.ENTITY, v -> {
@@ -302,10 +353,10 @@ public class GachaEditScreen extends Screen {
         label(x, y + 2, tr("rtshop.gachaedit.grade"), Ui.C_CREAM);
         final int gy = y;
         int gx = x + 60;
-        hit(gx, y - 1, 90, 14, () -> tr("rtshop.gacha.grade." + e.get("grade").getAsString()) + " ▼", () -> true, b -> {
+        hit(gx, y - 1, 90, 14, () -> gradeName(e.get("grade").getAsString()) + " ▼", () -> true, b -> {
             List<ChoicePopup.Option> o = new ArrayList<>();
-            for (String gname : GRADES) {
-                o.add(new ChoicePopup.Option(gname, tr("rtshop.gacha.grade." + gname)));
+            for (String gname : grades()) {
+                o.add(new ChoicePopup.Option(gname, gradeName(gname)));
             }
             popup = new ChoicePopup(gx, gy - 1, 90, 14, this.height, this.font, o, e.get("grade").getAsString(), v -> {
                 e.addProperty("grade", v);
@@ -341,13 +392,13 @@ public class GachaEditScreen extends Screen {
             y += 11;
         }
         y += 6;
-        int[] counts = new int[GRADES.length];
+        int[] counts = new int[grades().length];
         for (JsonElement el : p) {
-            counts[GachaScreen.gradeIndex(el.getAsJsonObject().get("grade").getAsString())]++;
+            counts[gi(el.getAsJsonObject().get("grade").getAsString())]++;
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < GRADES.length; i++) {
-            sb.append(i == 0 ? "" : " · ").append(tr("rtshop.gacha.grade." + GRADES[i])).append(' ').append(counts[i]);
+        for (int i = 0; i < grades().length; i++) {
+            sb.append(i == 0 ? "" : " · ").append(gradeName(grades()[i])).append(' ').append(counts[i]);
         }
         label(x, y, Ui.clip(this.font, sb.toString(), w), Ui.C_PARCH_DARK);
     }
@@ -355,22 +406,22 @@ public class GachaEditScreen extends Screen {
     /** 이 칸이 이 뽑기 단계에서 나올 확률 (아이템이 없는 등급은 빼고 계산). */
     private double chance(int c, int tier, JsonObject target) {
         JsonObject w = cfg.getAsJsonObject("tiers").getAsJsonObject(TIERS[tier]);
-        double[] gw = new double[GRADES.length];
-        double[] sumW = new double[GRADES.length];
+        double[] gw = new double[grades().length];
+        double[] sumW = new double[grades().length];
         for (JsonElement el : pool(c)) {
             JsonObject e = el.getAsJsonObject();
-            int gi = GachaScreen.gradeIndex(e.get("grade").getAsString());
+            int gi = gi(e.get("grade").getAsString());
             int wt = e.get("weight").getAsInt();
             if (wt > 0 && exists(e)) {
                 sumW[gi] += wt;
             }
         }
         double total = 0;
-        for (int i = 0; i < GRADES.length; i++) {
-            gw[i] = sumW[i] > 0 && w != null && w.has(GRADES[i]) ? w.get(GRADES[i]).getAsDouble() : 0;
+        for (int i = 0; i < grades().length; i++) {
+            gw[i] = sumW[i] > 0 && w != null && w.has(grades()[i]) ? w.get(grades()[i]).getAsDouble() : 0;
             total += gw[i];
         }
-        int gi = GachaScreen.gradeIndex(target.get("grade").getAsString());
+        int gi = gi(target.get("grade").getAsString());
         int wt = target.get("weight").getAsInt();
         if (total <= 0 || sumW[gi] <= 0 || wt <= 0 || !exists(target)) {
             return 0;
@@ -417,23 +468,201 @@ public class GachaEditScreen extends Screen {
         }));
     }
 
+    // ------------------------------------------------------------------ 등급 탭 (3.52)
+
+    private static final String[] PRESET_COLORS = {"B8B8B8", "55C24A", "4A9BE8", "B45AE8", "F0A030", "49B6FF", "E85A6A", "F2E66B", "5AE8D0", "FF8AD0", "FFFFFF", "8A6A4A"};
+
+    /** 등급 목록: 직접 만든 등급을 넣고 · 지우고 · 차례를 옮기고, 기본 등급은 끄고 켠다. */
+    private void buildGrades(int top) {
+        int x = fx + 8, y = top;
+        JsonArray defs = gradeDefs();
+        label(x, y + 2, tr("rtshop.gachaedit.grades_head"), Ui.C_GOLD);
+        hit(fx + W - 8 - 110, y - 1, 110, 14, () -> tr("rtshop.gachaedit.grade_add"), () -> defs.size() < com.rtshop.gacha.GachaGrades.MAX, b -> addGrade());
+        y += 17;
+        int nameW = Math.min(120, W - 16 - 18 - 250);
+        for (int i = 0; i < defs.size(); i++) {
+            final int idx = i;
+            JsonObject d = defs.get(i).getAsJsonObject();
+            String id = d.get("id").getAsString();
+            boolean base = baseGrade(id);
+            boolean on = !d.has("enabled") || d.get("enabled").getAsBoolean();
+            final int ry = y;
+            label(x + 3, y + 2, "\u25A0", gradeArgb(id));
+            int cx = x + 16;
+            if (base) {
+                label(cx, y + 2, Ui.clip(this.font, gradeName(id), nameW), on ? gradeArgb(id) : Ui.C_PARCH_DARK);
+            } else {
+                box(cx, y, nameW, d.has("name") ? d.get("name").getAsString() : id, 24, v -> d.addProperty("name", v.trim()));
+            }
+            cx += nameW + 4;
+            // 색 (RRGGBB) + 고르기
+            box(cx, y, 46, d.has("color") ? d.get("color").getAsString() : "B8B8B8", 6, v -> {
+                if (v.trim().matches("[0-9a-fA-F]{6}")) d.addProperty("color", v.trim().toUpperCase(java.util.Locale.ROOT));
+            });
+            final int px = cx + 48;
+            hit(px, y - 1, 14, 14, () -> "▼", () -> true, b -> {
+                List<ChoicePopup.Option> o = new ArrayList<>();
+                for (String c : PRESET_COLORS) o.add(new ChoicePopup.Option(c, "■ " + c));
+                popup = new ChoicePopup(px - 60, ry - 1, 74, 14, this.height, this.font, o, d.has("color") ? d.get("color").getAsString() : "", v -> {
+                    d.addProperty("color", v);
+                    markDirty();
+                    rebuild();
+                });
+            });
+            cx += 66;
+            // 연출 (직접 만든 등급만 고른다)
+            final int ex = cx;
+            hit(cx, y - 1, 74, 14, () -> tr("rtshop.gachaedit.grade_fx", fxName(d.has("fx") ? d.get("fx").getAsInt() : 0)) + (base ? "" : " ▼"), () -> !base, b -> {
+                List<ChoicePopup.Option> o = new ArrayList<>();
+                for (int k = 0; k < com.rtshop.gacha.GachaGrades.BASE.length; k++) o.add(new ChoicePopup.Option(Integer.toString(k), fxName(k)));
+                popup = new ChoicePopup(ex, ry - 1, 74, 14, this.height, this.font, o, Integer.toString(d.has("fx") ? d.get("fx").getAsInt() : 0), v -> {
+                    d.addProperty("fx", Integer.parseInt(v));
+                    markDirty();
+                });
+            });
+            cx += 78;
+            if (base) {
+                hit(cx, y - 1, 44, 14, () -> tr(on ? "rtshop.gachaedit.grade_on" : "rtshop.gachaedit.grade_off"), () -> true, b -> {
+                    d.addProperty("enabled", !on);
+                    markDirty();
+                    rebuild();
+                });
+            } else {
+                hit(cx, y - 1, 44, 14, () -> tr("rtshop.gachaedit.grade_delete"), () -> true, b -> removeGrade(idx));
+            }
+            cx += 48;
+            if (!base) {
+                hit(cx, y - 1, 14, 14, () -> "▲", () -> idx > 0, b -> moveGrade(idx, -1));
+                hit(cx + 16, y - 1, 14, 14, () -> "▼", () -> idx < defs.size() - 1, b -> moveGrade(idx, 1));
+            }
+            y += 15;
+        }
+        y += 3;
+        label(x, y, Ui.clip(this.font, tr("rtshop.gachaedit.grades_hint1"), W - 16), Ui.C_PARCH_DARK);
+        label(x, y + 11, Ui.clip(this.font, tr("rtshop.gachaedit.grades_hint2"), W - 16), Ui.C_PARCH_DARK);
+    }
+
+    private String fxName(int fx) {
+        String id = com.rtshop.gacha.GachaGrades.BASE[Math.max(0, Math.min(com.rtshop.gacha.GachaGrades.BASE.length - 1, fx))];
+        return tr("rtshop.gacha.grade." + id);
+    }
+
+    private void addGrade() {
+        JsonArray defs = gradeDefs();
+        if (defs.size() >= com.rtshop.gacha.GachaGrades.MAX) return;
+        int n = 1;
+        while (gradeDef("custom_" + n) != null) n++;
+        JsonObject d = new JsonObject();
+        d.addProperty("id", "custom_" + n);
+        d.addProperty("name", tr("rtshop.gachaedit.grade_new", n));
+        d.addProperty("color", PRESET_COLORS[6 + (n - 1) % 5]);
+        d.addProperty("fx", 4);
+        d.addProperty("enabled", true);
+        // 야마토 바로 아래(전설 위)에 넣는다. 야마토가 없으면 맨 위
+        JsonArray next = new JsonArray();
+        boolean put = false;
+        for (JsonElement e : defs) {
+            if (!put && e.getAsJsonObject().get("id").getAsString().equals("yamato")) {
+                next.add(d);
+                put = true;
+            }
+            next.add(e);
+        }
+        if (!put) next.add(d);
+        cfg.add("grades", next);
+        markDirty();
+        rebuild();
+    }
+
+    /** 직접 만든 등급을 지운다: 그 등급의 칸은 바로 아래 등급(없으면 바로 위)으로 옮긴다. */
+    private void removeGrade(int idx) {
+        JsonArray defs = gradeDefs();
+        if (idx < 0 || idx >= defs.size()) return;
+        String id = defs.get(idx).getAsJsonObject().get("id").getAsString();
+        if (baseGrade(id) || defs.size() <= 1) return;
+        String to = defs.get(idx > 0 ? idx - 1 : idx + 1).getAsJsonObject().get("id").getAsString();
+        JsonArray next = new JsonArray();
+        for (int i = 0; i < defs.size(); i++) if (i != idx) next.add(defs.get(i));
+        cfg.add("grades", next);
+        for (int c = 0; c < CATS.length; c++) {
+            for (JsonElement el : pool(c)) {
+                JsonObject e = el.getAsJsonObject();
+                if (id.equals(e.get("grade").getAsString())) e.addProperty("grade", to);
+            }
+        }
+        for (String t : TIERS) {
+            JsonObject w = cfg.getAsJsonObject("tiers").getAsJsonObject(t);
+            if (w != null) w.remove(id);
+        }
+        JsonObject sh = cfg.getAsJsonObject("shards");
+        if (sh != null && sh.has("dismantle")) sh.getAsJsonObject("dismantle").remove(id);
+        for (String key : new String[]{"tenGuarantee", "unbreakableFrom"}) {
+            if (cfg.has(key) && id.equals(cfg.get(key).getAsString())) cfg.addProperty(key, to);
+        }
+        // 서버가 마법 뽑기의 칸도 같은 등급으로 옮기도록 적어 둔다
+        JsonObject remap = cfg.has("gradeRemap") && cfg.get("gradeRemap").isJsonObject() ? cfg.getAsJsonObject("gradeRemap") : new JsonObject();
+        for (String k : new ArrayList<>(remap.keySet())) if (id.equals(remap.get(k).getAsString())) remap.addProperty(k, to);
+        remap.addProperty(id, to);
+        cfg.add("gradeRemap", remap);
+        filter = -1;
+        markDirty();
+        rebuild();
+    }
+
+    private void moveGrade(int idx, int dir) {
+        JsonArray defs = gradeDefs();
+        int j = idx + dir;
+        if (idx < 0 || idx >= defs.size() || j < 0 || j >= defs.size()) return;
+        JsonArray next = new JsonArray();
+        for (int i = 0; i < defs.size(); i++) next.add(defs.get(i == idx ? j : i == j ? idx : i));
+        cfg.add("grades", next);
+        markDirty();
+        rebuild();
+    }
+
+    /** 점검용 */
+    public int gradeCountForTest() {
+        return grades().length;
+    }
+
+    public void addGradeForTest() {
+        addGrade();
+    }
+
+    public void removeGradeForTest(String id) {
+        removeGrade(gi(id));
+    }
+
+    public boolean hasGradeForTest(String id) {
+        return gradeDef(id) != null;
+    }
+
+    public boolean dirtyForTest() {
+        return dirty;
+    }
+
+    public void showTabForTest(int t) {
+        tab = t;
+        rebuild();
+    }
+
     // ------------------------------------------------------------------ 확률·조각 탭
 
     private void buildOdds(int top) {
         int x = fx + 8;
         int y = top;
-        int cw = Math.min(54, (W - 16 - 70) / GRADES.length - 4);
+        int cw = Math.min(54, (W - 16 - 70) / grades().length - 4);
         label(x, y + 2, tr("rtshop.gachaedit.odds_head"), Ui.C_GOLD);
-        for (int i = 0; i < GRADES.length; i++) {
-            label(x + 70 + i * (cw + 4), y + 2, Ui.clip(this.font, tr("rtshop.gacha.grade." + GRADES[i]), cw + 2), GachaColors.argb(GRADES[i]));
+        for (int i = 0; i < grades().length; i++) {
+            label(x + 70 + i * (cw + 4), y + 2, Ui.clip(this.font, gradeName(grades()[i]), cw + 2), gradeArgb(grades()[i]));
         }
         y += 14;
         JsonObject tiers = cfg.getAsJsonObject("tiers");
         for (String t : TIERS) {
             JsonObject w = tiers.getAsJsonObject(t);
             label(x, y + 2, tr("rtshop.gacha.tier." + t), Ui.C_CREAM);
-            for (int i = 0; i < GRADES.length; i++) {
-                final String gname = GRADES[i];
+            for (int i = 0; i < grades().length; i++) {
+                final String gname = grades()[i];
                 box(x + 70 + i * (cw + 4), y, cw, w.has(gname) ? fmt(w.get(gname).getAsDouble()) : "0", 8,
                         v -> w.addProperty(gname, Math.max(0, dnum(v, 0))));
             }
@@ -444,12 +673,12 @@ public class GachaEditScreen extends Screen {
         final int gy = y;
         hit(x + 140, y - 1, 100, 14, () -> {
             String g = cfg.get("tenGuarantee").getAsString();
-            return (g.isEmpty() ? tr("rtshop.gachaedit.none") : tr("rtshop.gacha.grade." + g)) + " ▼";
+            return (g.isEmpty() ? tr("rtshop.gachaedit.none") : gradeName(g)) + " ▼";
         }, () -> true, b -> {
             List<ChoicePopup.Option> o = new ArrayList<>();
             o.add(new ChoicePopup.Option("", tr("rtshop.gachaedit.none")));
-            for (String gname : GRADES) {
-                o.add(new ChoicePopup.Option(gname, tr("rtshop.gacha.grade." + gname)));
+            for (String gname : grades()) {
+                o.add(new ChoicePopup.Option(gname, gradeName(gname)));
             }
             popup = new ChoicePopup(x + 140, gy - 1, 100, 14, this.height, this.font, o, cfg.get("tenGuarantee").getAsString(), v -> {
                 cfg.addProperty("tenGuarantee", v);
@@ -467,8 +696,8 @@ public class GachaEditScreen extends Screen {
         {
             JsonObject m = sh.getAsJsonObject("dismantle");
             label(x, y + 2, tr("rtshop.gachaedit.dismantle"), Ui.C_CREAM);
-            for (int i = 0; i < GRADES.length; i++) {
-                final String gname = GRADES[i];
+            for (int i = 0; i < grades().length; i++) {
+                final String gname = grades()[i];
                 box(x + 70 + i * (cw + 4), y, cw, m.has(gname) ? m.get(gname).getAsString() : "0", 7,
                         v -> m.addProperty(gname, (int) Math.max(0, num(v, 0))));
             }
@@ -533,8 +762,8 @@ public class GachaEditScreen extends Screen {
             label(x, y, sb.toString(), Ui.C_GOLD);
             y += 11;
             StringBuilder line = new StringBuilder();
-            for (int i = 0; i < GRADES.length; i++) {
-                line.append(i == 0 ? "" : " · ").append(tr("rtshop.gacha.grade." + GRADES[i])).append(' ').append(g.get(i).getAsInt());
+            for (int i = 0; i < grades().length; i++) {
+                line.append(i == 0 ? "" : " · ").append(gradeName(grades()[i])).append(' ').append(g.get(i).getAsInt());
             }
             label(x, y, Ui.clip(this.font, line.toString(), W - 16), Ui.C_CREAM);
             y += 11;
@@ -622,7 +851,7 @@ public class GachaEditScreen extends Screen {
         this.renderBackground(g);
         Ui.woodFrame(g, fx, fy, W, H);
         g.drawString(this.font, this.title.getString() + (dirty ? " *" : ""), fx + 10, fy + 8, Ui.C_GOLD, true);
-        String hint = Ui.clip(this.font, tr(tab < 3 ? "rtshop.gachaedit.hint_pool" : "rtshop.gachaedit.hint_odds"), W - 140);
+        String hint = Ui.clip(this.font, tr(tab < 3 ? "rtshop.gachaedit.hint_pool" : tab == 5 ? "rtshop.gachaedit.hint_grades" : "rtshop.gachaedit.hint_odds"), W - 140);
         g.drawString(this.font, hint, fx + W - 10 - this.font.width(hint), fy + 8, Ui.C_PARCH_DARK, false);
         for (Hit h : hits) {
             boolean hov = Ui.inside(mx, my, h.x(), h.y(), h.w(), h.h());
