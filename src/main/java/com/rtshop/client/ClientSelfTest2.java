@@ -630,7 +630,9 @@ final class ClientSelfTest2 {
             mc.setScreen(null);
             onServer(mc, sp -> {
                 com.rtshop.raid.AbyssWeekly.resetPlayer(sp);
-                com.rtshop.raid.AbyssWeekly.cleared(sp, 1);
+                // 주간 보상이 무한 모드에 걸려 있으면 첫 단계(endlessStep 웨이브)를, 아니면 1층 클리어를 흉내 낸다
+                if (com.rtshop.raid.AbyssWeekly.config().endless) com.rtshop.raid.AbyssWeekly.endlessCleared(sp, com.rtshop.raid.AbyssWeekly.config().endlessStep);
+                else com.rtshop.raid.AbyssWeekly.cleared(sp, 1);
                 com.rtshop.raid.AbyssWeekly.sendView(sp);
             });
             waitTicks(20);
