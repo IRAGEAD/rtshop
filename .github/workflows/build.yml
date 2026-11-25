@@ -412,6 +412,25 @@ jobs:
               for f in $(unzip -l "$J" | awk '{print $4}' | grep -i -E "(\.toml|quest.*\.json|settings.*\.json)$" | head -n 10); do echo "---- $f"; unzip -p "$J" "$f" | head -c 4000; echo; done
             } > /tmp/inspect/mod-fantasy.txt 2>&1
           fi
+          # A-10: Diorama 맵에 표시를 더할 수 있는지 조사 (클래스 목록과 공개 멤버의 모양만; 코드는 올리지 않는다)
+          cd "$GITHUB_WORKSPACE"
+          DJ="$(ls packcache/*.jar | grep -i "diorama" | head -1)"
+          if [ -n "$DJ" ]; then
+            {
+              echo "jar: $DJ"
+              unzip -l "$DJ" | awk '{print $4}' | grep -E "\.class$" | sed 's/\.class$//' | sort > /tmp/diorama-classes.txt
+              echo "classes: $(wc -l < /tmp/diorama-classes.txt)"
+              echo "== mods.toml"; unzip -p "$DJ" META-INF/mods.toml | head -n 60
+              echo "== packages"; sed 's#/[^/]*$##' /tmp/diorama-classes.txt | sort | uniq -c | sort -rn | head -n 80
+              echo "== classes that look like an API, markers, labels, waypoints"
+              grep -i -E "api|marker|waypoint|label|poi|pin|icon|overlay|layer|annotation|landmark|event" /tmp/diorama-classes.txt | head -n 300
+            } > /tmp/inspect/diorama.txt 2>&1
+            mkdir -p /tmp/dj && (cd /tmp/dj && unzip -q -o "$GITHUB_WORKSPACE/$DJ")
+            (cd /tmp/dj && for c in $(grep -i -E "api|marker|waypoint|label|poi|pin|landmark|annotation" /tmp/diorama-classes.txt | grep -v '\$' | head -n 120); do
+              echo "######## $c"; javap -p "$c.class" 2>&1 | head -n 120
+            done) > /tmp/inspect/diorama-api.txt 2>&1
+            cp /tmp/diorama-classes.txt /tmp/inspect/diorama-classes.txt
+          fi
           cd /tmp/inspect
           git init -q -b ci-inspect
           git config user.name "github-actions"
