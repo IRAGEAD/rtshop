@@ -29,7 +29,7 @@ EN = [
 "The eighth stone. In place of a name, one word: Chesed (mercy)\nSpace for a name of eight letters, left empty\nBefore it, two helmets. Thomas, Lia. Standing back to back.",
 "Chronicle of Vestalia · The Expedition of Twenty Years Ago",
 "Thomas · Lia · Bren · Marco · Ines\nDanilo · Jonah · Fei · Hayun · Otto\nKael, second in command. The one who vanished to save a friend\nAnd Roran, captain. The one who came back and counted heads",
-"Elder Erwin: You gathered all eleven. …And Roran walked it himself, I hear. On that leg. A remarkable man. Truly.",
+"Elder Erwin: You gathered every name tag. All ten. …And Roran walked it himself, I hear. On that leg. A remarkable man. Truly.",
 "Elder Erwin: Did you burn the roster? It is the custom to burn it when an expedition ends.",
 "▷ Isabel wrote it into the Chronicle.",
 "Elder Erwin: …Did she. (He adjusts his glove.) That child writes everything down. I taught her to. It was well done. Probably.",
