@@ -728,7 +728,7 @@
   "item.rtshop.enhance_guard_destroy.tip": "If the attempt would destroy the item, it is only damaged (level drops) instead.",
   "item.rtshop.enhance_guard_full": "Enhancement Protection",
   "item.rtshop.enhance_guard_full.tip": "Blocks both damage and destruction: the level is kept.",
-  "item.rtshop.enhance_guard.tip": "Right-click to use it in advance. It covers your next enhancement and is used up whatever the result.",
+  "item.rtshop.enhance_guard.tip": "Put it on the enhancement anvil next to the item: one is used on that attempt, whatever the result. One kind at a time.",
   "rtshop.enhance.odds_success": "Success %s",
   "rtshop.enhance.odds_maintain": "Keep %s",
   "rtshop.enhance.odds_damage": "Damage %s",
@@ -737,7 +737,7 @@
   "rtshop.enhance.try": "Enhance +%s → +%s",
   "rtshop.enhance.guard_used": "Guard used: %s",
   "rtshop.enhance.destroy_warn": "The item can be destroyed at this level!",
-  "rtshop.enhance.no_guard": "No protection · right-click a guard ticket to use it",
+  "rtshop.enhance.no_guard": "No protection · put a guard ticket on the anvil with the item to use it on this attempt (one at a time)",
   "rtshop.enhance.creative": "Creative mode: no materials or Gold needed",
   "rtshop.enhance.bonus_weapon": "Enhanced +%s/%s · Attack +%s",
   "rtshop.enhance.bonus_armor": "Enhanced +%s/%s · Armor +%s",
@@ -973,7 +973,7 @@
   "rtshop.rules.stat_base": "base %s ×%s",
   "rtshop.rules.stat_none": "not in the table",
   "rtshop.rules.stat_now": "now %s",
-  "rtshop.enhance.guard_active": "Protected: %s (used on this attempt)",
+  "rtshop.enhance.guard_active": "Protected: %s (one used on this attempt)",
   "rtshop.enhance.guard_on": "Guard ready — your next enhancement has %s.",
   "rtshop.enhance.guard_already": "That protection is already active (used on your next attempt).",
   "rtshop.enhance.guard_name_damage": "damage protection",
@@ -1647,5 +1647,8 @@
   "rtshop.enhui.odds_destroy": "Destroy",
   "rtshop.enhui.guard": "Protection",
   "rtshop.enhui.guard_none": "None",
-  "rtshop.enhui.guard_risk": "None · may break"
+  "rtshop.enhui.guard_risk": "None · may break",
+  "rtshop.enhance.guard_howto": "Put the guard ticket on the enhancement anvil next to the item: one is used on that attempt.",
+  "rtshop.enhance.safe_note": "This item cannot be destroyed by enhancing (legendary or above, or hidden gear). That chance is split between keep and damage.",
+  "rtshop.enhui.guard_safe": "None · cannot break"
 }

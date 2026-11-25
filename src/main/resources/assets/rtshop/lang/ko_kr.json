@@ -728,7 +728,7 @@
   "item.rtshop.enhance_guard_destroy.tip": "강화가 '파괴'로 끝나도 장비가 사라지지 않고 손상(단계 하락)으로 바뀝니다.",
   "item.rtshop.enhance_guard_full": "강화 보호권",
   "item.rtshop.enhance_guard_full.tip": "손상과 파괴를 모두 막아 단계가 그대로 유지됩니다.",
-  "item.rtshop.enhance_guard.tip": "손에 들고 우클릭해 미리 사용합니다. 다음 강화 1번에 적용되고, 결과와 상관없이 사라집니다.",
+  "item.rtshop.enhance_guard.tip": "강화 모루 위에 장비와 함께 올려 두면 그 강화에 한 장이 쓰이고, 결과와 상관없이 사라집니다. 한 번에 한 가지만.",
   "rtshop.enhance.odds_success": "성공 %s",
   "rtshop.enhance.odds_maintain": "유지 %s",
   "rtshop.enhance.odds_damage": "손상 %s",
@@ -737,7 +737,7 @@
   "rtshop.enhance.try": "강화 +%s → +%s",
   "rtshop.enhance.guard_used": "방지권 사용: %s",
   "rtshop.enhance.destroy_warn": "이 단계부터는 장비가 파괴될 수 있습니다!",
-  "rtshop.enhance.no_guard": "보호 없음 · 보호권을 손에 들고 우클릭해 미리 사용",
+  "rtshop.enhance.no_guard": "보호 없음 · 보호권을 모루 위에 장비와 함께 올리면 이번 강화에 쓰입니다 (한 번에 한 장)",
   "rtshop.enhance.creative": "창작 모드: 재료와 Gold 가 들지 않습니다",
   "rtshop.enhance.bonus_weapon": "강화 +%s/%s · 공격력 +%s",
   "rtshop.enhance.bonus_armor": "강화 +%s/%s · 방어력 +%s",
@@ -973,7 +973,7 @@
   "rtshop.rules.stat_base": "기본 %s ×%s",
   "rtshop.rules.stat_none": "원래 없음",
   "rtshop.rules.stat_now": "지금 %s",
-  "rtshop.enhance.guard_active": "보호 적용 중: %s (이번 강화에 사용)",
+  "rtshop.enhance.guard_active": "보호 적용: %s (이번 강화에 한 장 사용)",
   "rtshop.enhance.guard_on": "보호권을 사용했습니다 — 다음 강화에 %s 이(가) 적용됩니다.",
   "rtshop.enhance.guard_already": "이미 그 보호가 걸려 있습니다 (다음 강화 때 쓰입니다).",
   "rtshop.enhance.guard_name_damage": "손상 방지",
@@ -1647,5 +1647,8 @@
   "rtshop.enhui.odds_destroy": "파괴",
   "rtshop.enhui.guard": "보호권",
   "rtshop.enhui.guard_none": "없음",
-  "rtshop.enhui.guard_risk": "없음 · 파괴 주의"
+  "rtshop.enhui.guard_risk": "없음 · 파괴 주의",
+  "rtshop.enhance.guard_howto": "보호권은 강화 모루 위에 장비와 함께 올려 두면 그 강화에 한 장이 쓰입니다.",
+  "rtshop.enhance.safe_note": "이 장비는 강화로 파괴되지 않습니다 (전설 이상·히든 장비). 그 확률은 유지와 손상으로 나뉩니다.",
+  "rtshop.enhui.guard_safe": "없음 · 파괴 없음"
 }

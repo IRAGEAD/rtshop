@@ -1830,8 +1830,8 @@ public final class SelfTest {
         dmgGuard.getItem().use(level, a, net.minecraft.world.InteractionHand.MAIN_HAND);
         int afterUse = a.getMainHandItem().getCount();
         dmgGuard.getItem().use(level, a, net.minecraft.world.InteractionHand.MAIN_HAND);
-        check("a guard ticket is used in advance by right-clicking (one ticket, not twice for the same protection)",
-                com.rtshop.enhance.Enhance.activeGuard(a) == com.rtshop.enhance.Enhance.G_DAMAGE && afterUse == 2 && a.getMainHandItem().getCount() == 2,
+        check("right-clicking a guard ticket no longer uses it (it only says to put it on the anvil): nothing is spent, nothing is armed",
+                com.rtshop.enhance.Enhance.activeGuard(a) == 0 && afterUse == dmgGuard.getCount() && a.getMainHandItem().getCount() == dmgGuard.getCount(),
                 com.rtshop.enhance.Enhance.activeGuard(a) + " " + afterUse + " " + a.getMainHandItem().getCount());
         a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         a.getInventory().selected = handSlot;
@@ -1839,11 +1839,36 @@ public final class SelfTest {
         ItemStack g6 = sword.copy();
         com.rtshop.enhance.Enhance.setLevel(g6, 6);
         gm.getSlot(0).set(g6);
+        // 3.49: 보호권은 모루 위(1번 칸)에 장비와 함께 올린다 — 한 번에 한 장이 쓰인다
+        ItemStack twoTickets = dmgGuard.copy();
+        twoTickets.setCount(2);
+        boolean onlyTickets = !gm.getSlot(1).mayPlace(new ItemStack(Items.IRON_SWORD)) && gm.getSlot(1).mayPlace(twoTickets)
+                && gm.getSlotToQuickMoveTo(twoTickets) == 1 && gm.getSlotToQuickMoveTo(new ItemStack(Items.IRON_SWORD)) == 0;
+        gm.getSlot(1).set(twoTickets);
         com.rtshop.enhance.Enhance.testRoll = 0.60;
         gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
         com.rtshop.enhance.Enhance.testRoll = null;
-        check("damage guard: damage becomes keep, and the protection is used up", com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6
-                && com.rtshop.enhance.Enhance.activeGuard(a) == 0);
+        check("damage guard on the anvil: only guard tickets fit the second slot, damage becomes keep, and exactly one ticket is used",
+                onlyTickets && com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6 && gm.getSlot(1).getItem().getCount() == 1
+                        && com.rtshop.enhance.Enhance.activeGuard(a) == 0, onlyTickets + " " + com.rtshop.enhance.Enhance.level(gm.getCarried()) + " " + gm.getSlot(1).getItem().getCount());
+        gm.getSlot(1).set(ItemStack.EMPTY);
+        // 전설 이상의 장비는 파괴되지 않는다: 파괴가 나올 자리의 굴림이 유지·손상으로 바뀐다
+        gm.setCarried(ItemStack.EMPTY);
+        ItemStack legend = g6.copy();
+        net.minecraft.nbt.CompoundTag gmark = new net.minecraft.nbt.CompoundTag();
+        gmark.putString("g", "legendary");
+        legend.getOrCreateTag().put(com.rtshop.gacha.Gacha.MARK, gmark);
+        com.rtshop.enhance.EnhanceConfig.Level raw = cfg.level(7), safeLv = com.rtshop.enhance.Enhance.levelFor(cfg, raw, legend);
+        giveMaterials(a, cfg, 7, 1);
+        gm.getSlot(0).set(legend);
+        com.rtshop.enhance.Enhance.testRoll = 0.999;
+        gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        com.rtshop.enhance.Enhance.testRoll = null;
+        check("legendary (or higher) gear cannot be destroyed: the destroy chance is split between keep and damage, and the worst roll only damages it",
+                com.rtshop.enhance.Enhance.unbreakable(cfg, legend) && !com.rtshop.enhance.Enhance.unbreakable(cfg, g6) && safeLv.destroy == 0
+                        && Math.abs(safeLv.maintain - (raw.maintain + raw.destroy / 2)) < 1e-9 && Math.abs(safeLv.damage - (raw.damage + raw.destroy / 2)) < 1e-9
+                        && !gm.getCarried().isEmpty() && com.rtshop.enhance.Enhance.level(gm.getCarried()) == (raw.destroy > 0 ? 6 - cfg.damageDrop : com.rtshop.enhance.Enhance.level(gm.getCarried())),
+                raw.destroy + " " + safeLv.maintain + "/" + safeLv.damage + " -> " + gm.getCarried());
         gm.setCarried(ItemStack.EMPTY);
         gm.getSlot(0).set(g6.copy());
         com.rtshop.enhance.Enhance.setActiveGuard(a, com.rtshop.enhance.Enhance.G_DAMAGE);

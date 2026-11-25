@@ -10,9 +10,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-/** 강화 보호권: 손에 들고 우클릭하면 미리 사용 (1장 소모) → 다음 강화 1번에 적용되고 결과와 상관없이 사라진다. */
+/**
+ * 강화 보호권 (3.49 부터): 강화 모루 위에 장비와 함께 올려 두면(보호권 칸) 그 강화 한 번에 한 장이 쓰이고, 결과와 상관없이 사라진다.
+ * 한 번에 한 가지만 쓸 수 있다. 손에 들고 우클릭하는 옛 방식은 없앴다 (누르면 쓰는 법을 알려 준다).
+ */
 public class GuardItem extends TooltipItem {
     private final Enhance.Guard guard;
+
+    public Enhance.Guard guard() {
+        return guard;
+    }
 
     public GuardItem(Properties props, boolean foil, Enhance.Guard guard, String... tips) {
         super(props, foil, tips);
@@ -25,10 +32,8 @@ public class GuardItem extends TooltipItem {
         if (level.isClientSide) {
             return InteractionResultHolder.success(stack);
         }
-        if (player instanceof ServerPlayer sp && Enhance.useGuardItem(sp, guard)) {
-            if (!sp.getAbilities().instabuild) stack.shrink(1);
-            level.playSound(null, sp.blockPosition(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.8F, 1.3F);
-            return InteractionResultHolder.consume(stack);
+        if (player instanceof ServerPlayer sp) {
+            com.rtshop.notice.Notice.send(sp, net.minecraft.network.chat.Component.translatable("rtshop.enhance.guard_howto").withStyle(net.minecraft.ChatFormatting.YELLOW), true);
         }
         return InteractionResultHolder.fail(stack);
     }

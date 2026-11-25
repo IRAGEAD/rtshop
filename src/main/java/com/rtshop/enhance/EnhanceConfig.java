@@ -61,6 +61,10 @@ public final class EnhanceConfig {
     /** 이 단계부터 방어구에 방어 강도(toughness)가 단계마다 이만큼 붙는다. */
     public int toughnessFrom = 6;
     public double toughnessPerLevel = 0.5;
+    /** 이 뽑기 등급 이상의 장비는 강화로 파괴되지 않는다 (그 확률은 유지·손상에 반씩). "" = 끔. */
+    public String safeFromGrade = "legendary";
+    /** 파괴되지 않는 히든 장비 (아이템 ID). */
+    public final List<String> safeItems = new ArrayList<>();
     /** 손상 결과일 때 내려가는 단계 수. */
     public int damageDrop = 1;
     /** 이 단계 이상 성공하면 서버 전체에 알리고 특별 연출을 보인다. */
@@ -158,6 +162,10 @@ public final class EnhanceConfig {
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
         o.addProperty("damageDrop", damageDrop);
+        o.addProperty("safeFromGrade", safeFromGrade);
+        com.google.gson.JsonArray safe = new com.google.gson.JsonArray();
+        safeItems.forEach(safe::add);
+        o.add("safeItems", safe);
         o.addProperty("broadcastFrom", broadcastFrom);
         JsonObject g = new JsonObject();
         for (Map.Entry<String, List<String>> e : groups.entrySet()) {
@@ -209,6 +217,11 @@ public final class EnhanceConfig {
         EnhanceConfig c = new EnhanceConfig();
         c.defaults();
         if (o.has("broadcastFrom")) c.broadcastFrom = Math.max(1, Math.min(MAX_LEVEL + 1, o.get("broadcastFrom").getAsInt()));
+        if (o.has("safeFromGrade")) c.safeFromGrade = o.get("safeFromGrade").getAsString();
+        if (o.has("safeItems")) {
+            c.safeItems.clear();
+            o.getAsJsonArray("safeItems").forEach(e -> c.safeItems.add(e.getAsString()));
+        }
         if (o.has("damageDrop")) c.damageDrop = Math.max(0, Math.min(MAX_LEVEL, o.get("damageDrop").getAsInt()));
         if (o.has("groups")) {
             c.groups.clear();

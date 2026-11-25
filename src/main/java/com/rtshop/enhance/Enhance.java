@@ -107,7 +107,44 @@ public final class Enhance {
         }
     }
 
-    /** 보호권을 손에 들고 우클릭: 미리 사용한다 (이미 걸린 보호면 쓰지 않음). */
+    /** 모루의 보호권 칸에 올린 것이 주는 보호 (보호권이 아니면 없음). */
+    public static Guard guardOf(ItemStack ticket) {
+        return !ticket.isEmpty() && ticket.getItem() instanceof GuardItem g ? g.guard() : Guard.NONE;
+    }
+
+    /**
+     * 이번 강화에 적용되는 보호: 모루에 올린 보호권이 먼저다. 올린 것이 없으면, 옛 방식(우클릭)으로 미리 써 둔 보호가 남아 있을 때 그것을 쓴다
+     * (3.49 전에 써 둔 보호권이 사라지지 않게).
+     */
+    public static Guard guardFor(Player p, ItemStack ticket) {
+        Guard g = guardOf(ticket);
+        return g != Guard.NONE ? g : fromMask(activeGuard(p));
+    }
+
+    /** 파괴되지 않는 장비인가: 뽑기 등급이 safeFromGrade(기본 전설) 이상이거나, safeItems 에 적힌 히든 장비. */
+    public static boolean unbreakable(EnhanceConfig cfg, ItemStack s) {
+        if (s.isEmpty()) return false;
+        int from = com.rtshop.gacha.GachaConfig.gradeIndex(cfg.safeFromGrade);
+        if (from >= 0 && com.rtshop.gacha.GachaConfig.gradeIndex(com.rtshop.gacha.Gacha.gradeOf(s)) >= from) return true;
+        net.minecraft.resources.ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(s.getItem());
+        return id != null && cfg.safeItems.contains(id.toString());
+    }
+
+    /** 이 장비에 맞춘 단계 확률: 파괴되지 않는 장비는 파괴 확률을 유지와 손상에 반씩 나눠 준다. */
+    public static EnhanceConfig.Level levelFor(EnhanceConfig cfg, EnhanceConfig.Level l, ItemStack s) {
+        if (l == null || l.destroy <= 0 || !unbreakable(cfg, s)) return l;
+        EnhanceConfig.Level c = new EnhanceConfig.Level();
+        c.level = l.level;
+        c.success = l.success;
+        c.maintain = l.maintain + l.destroy / 2.0;
+        c.damage = l.damage + l.destroy / 2.0;
+        c.destroy = 0;
+        c.gold = l.gold;
+        c.materials.addAll(l.materials);
+        return c;
+    }
+
+    /** 보호권을 손에 들고 우클릭: 미리 사용한다 (이미 걸린 보호면 쓰지 않음). 3.49 부터는 부르지 않는다 (옛 저장 값과 점검용). */
     public static boolean useGuardItem(ServerPlayer p, Guard g) {
         int cur = activeGuard(p);
         int add = maskOf(g);

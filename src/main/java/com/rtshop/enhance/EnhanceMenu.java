@@ -12,7 +12,7 @@ import java.util.UUID;
 
 /**
  * 강화 모루 창. 바닐라 모루 창(AnvilMenu)을 이어받아서 Cinematic Interactions 의 모루 장면(망치질)이 그대로 동작한다.
- *  - 0번 칸: 강화할 장비 · 1번 칸: 방지권(선택) · 결과 칸: +1 단계 미리보기
+ *  - 0번 칸: 강화할 장비 · 1번 칸: 보호권(선택; 한 번에 한 장, 한 가지) · 결과 칸: +1 단계 미리보기
  *  - 결과를 꺼내는 순간(망치질) 재료·Gold 를 쓰고 결과(성공·유지·손상·파괴)를 굴려서 꺼낸 장비에 적용한다.
  */
 public class EnhanceMenu extends AnvilMenu {
@@ -68,15 +68,30 @@ public class EnhanceMenu extends AnvilMenu {
         broadcastChanges();
     }
 
+    /** 칸마다 놓을 수 있는 것: 0 = 무엇이든(강화할 수 없으면 결과가 안 나올 뿐), 1 = 보호권만. */
     @Override
-    protected boolean canMoveIntoInputSlots(ItemStack s) {
-        return Enhance.enhanceable(s);
+    protected net.minecraft.world.inventory.ItemCombinerMenuSlotDefinition createInputSlotDefinitions() {
+        return net.minecraft.world.inventory.ItemCombinerMenuSlotDefinition.create()
+                .withSlot(0, 27, 47, s -> true)
+                .withSlot(1, 76, 47, s -> s.getItem() instanceof GuardItem)
+                .withResultSlot(2, 134, 47)
+                .build();
     }
 
-    /** Shift 클릭: 방지권은 1번 칸, 장비는 0번 칸으로. */
+    @Override
+    protected boolean canMoveIntoInputSlots(ItemStack s) {
+        return Enhance.enhanceable(s) || s.getItem() instanceof GuardItem;
+    }
+
+    /** Shift 클릭: 보호권은 1번 칸, 장비는 0번 칸으로. */
     @Override
     public int getSlotToQuickMoveTo(ItemStack s) {
-        return 0;
+        return s.getItem() instanceof GuardItem ? 1 : 0;
+    }
+
+    /** 지금 올린 장비에 맞춘 다음 단계 확률 (전설 이상·히든 장비는 파괴 없음). */
+    public EnhanceConfig.Level oddsLevel() {
+        return Enhance.levelFor(Enhance.config(player), nextLevel(), equipment());
     }
 
     @Override
@@ -112,13 +127,20 @@ public class EnhanceMenu extends AnvilMenu {
             return;
         }
         Enhance.consume(sp, cfg, l);
-        // 미리 사용한 보호권: 이번 강화에 쓰이고, 결과와 상관없이 사라진다
-        int mask = Enhance.activeGuard(sp);
-        Enhance.Guard guard = Enhance.fromMask(mask);
-        boolean useGuard = mask != 0;
-        if (useGuard) {
+        // 모루에 올린 보호권 한 장: 이번 강화에 쓰이고, 결과와 상관없이 사라진다 (올린 것이 없으면 옛 방식으로 미리 써 둔 보호)
+        ItemStack ticket = guardStack();
+        Enhance.Guard guard = Enhance.guardFor(sp, ticket);
+        boolean useGuard = guard != Enhance.Guard.NONE;
+        if (Enhance.guardOf(ticket) != Enhance.Guard.NONE) {
+            if (!sp.getAbilities().instabuild) {
+                ticket.shrink(1);
+                inputSlots.setItem(1, ticket.isEmpty() ? ItemStack.EMPTY : ticket);
+            }
+        } else if (useGuard) {
             Enhance.setActiveGuard(sp, 0);
         }
+        // 전설 이상·히든 장비는 파괴되지 않는다: 그 확률은 유지와 손상에 반씩
+        l = Enhance.levelFor(cfg, l, in);
         Enhance.Outcome rolled = Enhance.roll(l, Enhance.testRoll != null ? Enhance.testRoll : sp.getRandom().nextDouble());
         Enhance.Outcome o = useGuard ? Enhance.protect(rolled, guard) : rolled;
         if (o == Enhance.Outcome.DAMAGE && cur == 0) {

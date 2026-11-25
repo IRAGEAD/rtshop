@@ -296,8 +296,10 @@ public final class EnhancePanel {
             return;
         }
         // 확률: 성공은 크게, 나머지 셋은 작게
-        int mask = Enhance.activeGuard(player);
-        Enhance.Guard guard = Enhance.fromMask(mask);
+        Enhance.Guard guard = Enhance.guardFor(player, menu.guardStack());
+        int mask = Enhance.maskOf(guard);
+        boolean safe = Enhance.unbreakable(cfg, eq);
+        l = Enhance.levelFor(cfg, l, eq);
         double[] e = EnhanceClient.effective(l, guard, cur);
         String[] names = {"rtshop.enhui.odds_success", "rtshop.enhui.odds_maintain", "rtshop.enhui.odds_damage", "rtshop.enhui.odds_destroy"};
         int[] cols = {0xFF1E8C4C, 0xFF606878, 0xFFCE7C1A, C_BAD_PLATE};
@@ -353,12 +355,12 @@ public final class EnhancePanel {
         plate(g, gx, my0, gw, size);
         boolean guarded = guard != Enhance.Guard.NONE;
         String g1 = Component.translatable("rtshop.enhui.guard").getString();
-        String g2 = guarded ? Enhance.guardName(mask).getString() : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : "rtshop.enhui.guard_none").getString();
+        String g2 = guarded ? Enhance.guardName(mask).getString() : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : safe ? "rtshop.enhui.guard_safe" : "rtshop.enhui.guard_none").getString();
         g.drawString(font, Ui.clip(font, g1, gw - 8), gx + 5, my0 + 4, C_PLATE_INK, false);
         g.drawString(font, Ui.clip(font, g2, gw - 8), gx + 5, my0 + 14, guarded ? 0xFF1F6F8B : l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, false);
         if (over(gx, my0, gw, size)) {
             tip = guarded ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
-                    : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : "rtshop.enhance.no_guard");
+                    : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : safe ? "rtshop.enhance.safe_note" : "rtshop.enhance.no_guard");
         }
         // 맨 아래 한마디: 누르면 강화 / 무엇이 모자란지
         boolean ok = menu.getSlot(2).hasItem() && menu.getSlot(2).mayPickup(player);
