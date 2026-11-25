@@ -1591,7 +1591,7 @@
   "item.rtshop.weapon_manual": "Weapon Manual",
   "item.rtshop.weapon_manual.named": "How to Use: %s",
   "item.rtshop.weapon_manual.tip1": "Right-click while holding it to read this weapon's combo and special skill.",
-  "item.rtshop.weapon_manual.tip2": "Lost it? Hold the weapon and type /rtshop manual",
+  "item.rtshop.weapon_manual.tip2": "Need another weapon's manual? Hold it and type /rtshop manual",
   "rtshop.manual.got": "New weapon manual: How to Use %s (hold and right-click)",
   "rtshop.manual.cmd_none": "The item in your hand has no special skill to explain. Hold a weapon that has one and try again.",
   "rtshop.manual.cmd_have": "You already carry this weapon's manual.",

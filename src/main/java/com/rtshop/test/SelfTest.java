@@ -1106,22 +1106,48 @@ public final class SelfTest {
                 com.rtshop.compat.EfWeapons.Info wi = com.rtshop.compat.EfWeapons.info(a, ironSword);
                 check("Epic Fight weapon data is readable: an iron sword is a sword with an innate skill",
                         wi != null && wi.category().equals("sword") && !wi.skill().isEmpty(), wi);
-                ItemStack first = com.rtshop.item.WeaponManuals.offer(a, ironSword);
-                ItemStack again = com.rtshop.item.WeaponManuals.offer(a, new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD));
-                ItemStack stick = com.rtshop.item.WeaponManuals.offer(a, new ItemStack(net.minecraft.world.item.Items.STICK));
-                ItemStack axe = com.rtshop.item.WeaponManuals.offer(a, new ItemStack(net.minecraft.world.item.Items.IRON_AXE));
-                check("a weapon manual is given once per weapon kind (iron sword yes, diamond sword not again, a stick never, an axe is its own book)",
-                        !first.isEmpty() && again.isEmpty() && stick.isEmpty() && !axe.isEmpty()
-                                && a.getInventory().countItem(com.rtshop.item.ModItems.WEAPON_MANUAL.get()) == 2,
-                        first + " / " + again + " / " + stick + " / " + axe);
-                com.rtshop.rules.WorldRules.get().weaponManuals = false;
-                com.rtshop.item.WeaponManuals.forgetAll(a);
-                a.getInventory().clearContent();
-                a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
-                int off = com.rtshop.item.WeaponManuals.scan(a);
-                com.rtshop.rules.WorldRules.get().weaponManuals = true;
-                int on = com.rtshop.item.WeaponManuals.scan(a);
-                check("weaponManuals=false gives nothing; turned on, the bag scan hands out the sword's manual", off == 0 && on == 1, off + " / " + on);
+                // 스스로 주는 것은 "특별한 조작이 있는 모드 무기"뿐: 바닐라 무기와 흔한 특수기만 가진 무기는 주지 않는다
+                ItemStack vanilla = com.rtshop.item.WeaponManuals.offer(a, ironSword);
+                java.util.List<com.rtshop.compat.EfWeapons.Form> noForms = java.util.List.of();
+                boolean rule = !com.rtshop.item.WeaponManuals.special(new com.rtshop.compat.EfWeapons.Info("sword", "epicfight:sweeping_edge", 4, true, noForms))
+                        && !com.rtshop.item.WeaponManuals.special(new com.rtshop.compat.EfWeapons.Info("sword", "epicfightx:dancing_edge", 4, true, noForms))
+                        && !com.rtshop.item.WeaponManuals.special(new com.rtshop.compat.EfWeapons.Info("fist", "", 3, true, noForms))
+                        && com.rtshop.item.WeaponManuals.special(new com.rtshop.compat.EfWeapons.Info("uchigatana", "somemod:judgement_cut", 5, true, noForms))
+                        && com.rtshop.item.WeaponManuals.special(new com.rtshop.compat.EfWeapons.Info("sword", "epicfight:sweeping_edge", 4, true,
+                        java.util.List.of(new com.rtshop.compat.EfWeapons.Form("two_hand", "somemod:spin", 4, null))));
+                check("weapon manuals are handed out only for mod weapons with a skill of their own (a vanilla iron sword gets none; the common sword skill is not 'special')",
+                        vanilla.isEmpty() && rule && a.getInventory().countItem(com.rtshop.item.ModItems.WEAPON_MANUAL.get()) == 0, vanilla + " / " + rule);
+                // 모드팩의 무기 가운데 특별한 조작이 있는 것을 하나 찾아 실제로 받아 본다
+                ItemStack modWeapon = ItemStack.EMPTY;
+                for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+                    net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it);
+                    if (rl == null || rl.getNamespace().equals("minecraft") || rl.getNamespace().equals("rtshop")) continue;
+                    ItemStack cand = new ItemStack(it);
+                    if (com.rtshop.item.WeaponManuals.handedOut(cand, com.rtshop.compat.EfWeapons.info(a, cand))) {
+                        modWeapon = cand;
+                        break;
+                    }
+                }
+                if (!modWeapon.isEmpty()) {
+                    ItemStack first = com.rtshop.item.WeaponManuals.offer(a, modWeapon);
+                    ItemStack again = com.rtshop.item.WeaponManuals.offer(a, modWeapon.copy());
+                    check("a mod weapon with its own skill gives its manual the first time only",
+                            !first.isEmpty() && again.isEmpty() && a.getInventory().countItem(com.rtshop.item.ModItems.WEAPON_MANUAL.get()) == 1,
+                            net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(modWeapon.getItem()) + " " + com.rtshop.compat.EfWeapons.info(a, modWeapon));
+                    com.rtshop.rules.WorldRules.get().weaponManuals = false;
+                    com.rtshop.item.WeaponManuals.forgetAll(a);
+                    a.getInventory().clearContent();
+                    a.getInventory().add(modWeapon.copy());
+                    a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                    int off = com.rtshop.item.WeaponManuals.scan(a);
+                    com.rtshop.rules.WorldRules.get().weaponManuals = true;
+                    int on = com.rtshop.item.WeaponManuals.scan(a);
+                    int later = com.rtshop.item.WeaponManuals.scan(a);
+                    check("weaponManuals=false gives nothing; turned on, the bag scan hands out that weapon's manual once (and nothing for the iron sword)",
+                            off == 0 && on == 1 && later == 0, off + " / " + on + " / " + later);
+                } else {
+                    RtShop.LOGGER.info("[rtshop-selftest] no mod weapon with a skill of its own in this pack: the hand-out check is skipped");
+                }
             } else {
                 a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
                 check("without Epic Fight no weapon manuals are handed out", com.rtshop.item.WeaponManuals.scan(a) == 0

@@ -521,6 +521,15 @@ public final class ClientSelfTest {
                             EnhanceClient.sceneTooltipForTest(m.getSlot(2).getItem()) == 0, EnhanceClient.sceneTooltipForTest(m.getSlot(2).getItem()));
                     check("...nor the equipment on the anvil", EnhanceClient.sceneTooltipForTest(m.getSlot(0).getItem()) == 0);
                     check("other items still show their description", EnhanceClient.sceneTooltipForTest(new ItemStack(net.minecraft.world.item.Items.APPLE)) > 0);
+                    check("the scene's own way of drawing (text lines only, no item) is blocked too for the equipment and the result, not for other items",
+                            EnhanceClient.sceneLinesHiddenForTest(m.getSlot(0).getItem()) && EnhanceClient.sceneLinesHiddenForTest(m.getSlot(2).getItem())
+                                    && !EnhanceClient.sceneLinesHiddenForTest(new ItemStack(net.minecraft.world.item.Items.APPLE)));
+                    if (net.minecraftforge.fml.ModList.get().isLoaded("cinematic") && dev.dyslexic.cinematic.client.Scene.station != null) {
+                        int before = EnhanceClient.sceneTooltipBlocked;
+                        List<net.minecraft.network.chat.Component> tip = dev.dyslexic.cinematic.client.Scene.station.tooltip(ItemStack.EMPTY);
+                        check("the Cinematic anvil scene hands out no description lines at the enhance anvil",
+                                tip == null && EnhanceClient.sceneTooltipBlocked > before, tip + " / " + (EnhanceClient.sceneTooltipBlocked - before));
+                    }
                     List<EnhancePanel.Stat> st = EnhancePanel.stats(m.getSlot(0).getItem(), 4, true, com.rtshop.enhance.EnhanceConfig.client());
                     check("the info panel shows the real numbers now -> next (bonus % and attack damage)", st.size() >= 2
                             && st.get(1).next().contains("\u2192") && !st.get(1).now().equals(st.get(1).next().replace(" \u2192 ", "")),

@@ -151,10 +151,61 @@ public final class EnhanceClient {
                 mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), mc.font).size();
     }
 
+    /** 장면의 모루 믹스인이 설명 창을 막은 횟수 (점검용). */
+    public static int sceneTooltipBlocked;
+
+    /** 설명 창의 글줄 하나를 글자로 (글줄 부품 안의 글을 꺼내 읽는다; 못 읽으면 ""). */
+    private static String textOf(net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent c) {
+        try {
+            for (java.lang.reflect.Field f : c.getClass().getDeclaredFields()) {
+                if (!net.minecraft.util.FormattedCharSequence.class.isAssignableFrom(f.getType())) continue;
+                f.setAccessible(true);
+                Object v = f.get(c);
+                if (v instanceof net.minecraft.util.FormattedCharSequence seq) {
+                    StringBuilder sb = new StringBuilder();
+                    seq.accept((i, style, cp) -> {
+                        sb.appendCodePoint(cp);
+                        return true;
+                    });
+                    return sb.toString();
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return "";
+    }
+
+    /**
+     * 아이템 없이 글줄만으로 그려지는 설명 창(Cinematic 장면의 방식)이 강화 모루 위의 장비·결과의 것인가.
+     * 첫 줄이 그 장비의 이름이면 그렇다.
+     */
+    public static boolean hidesLines(java.util.List<net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent> parts) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || parts == null || parts.isEmpty()) return false;
+        if (!(mc.player.containerMenu instanceof com.rtshop.enhance.EnhanceMenu menu)) return false;
+        String first = textOf(parts.get(0));
+        return !first.isEmpty() && (named(first, menu.equipment()) || named(first, menu.getSlot(2).getItem()));
+    }
+
+    /** 시험용: 장면이 실제로 쓰는 방식(글줄 부품)으로 그 아이템의 설명 창을 그리려 할 때 막히는가. */
+    public static boolean sceneLinesHiddenForTest(ItemStack s) {
+        Minecraft mc = Minecraft.getInstance();
+        List<net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent> parts = new ArrayList<>();
+        for (Component c : net.minecraft.client.gui.screens.Screen.getTooltipFromItem(mc, s)) {
+            parts.add(net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent.create(c.getVisualOrderText()));
+        }
+        parts.add(net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent.create(Component.literal("LMB - forge").getVisualOrderText()));
+        return hidesLines(parts);
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onTooltipRender(net.minecraftforge.client.event.RenderTooltipEvent.Pre e) {
         ItemStack s = e.getItemStack();
-        if (s.isEmpty()) return;
+        if (s.isEmpty()) {
+            // 아이템 없이 글줄만 그리는 설명 창: 강화 모루 위 장비의 것이면 막는다 (장면의 모루가 이렇게 그린다)
+            if (hidesLines(e.getComponents())) e.setCanceled(true);
+            return;
+        }
         if (Enhance.isPreview(s)) {
             e.setCanceled(true);
             return;

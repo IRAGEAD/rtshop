@@ -1591,7 +1591,7 @@
   "item.rtshop.weapon_manual": "무기 설명서",
   "item.rtshop.weapon_manual.named": "「%s」 사용법",
   "item.rtshop.weapon_manual.tip1": "들고 우클릭하면 이 무기의 연속 공격과 특수기 쓰는 법이 펼쳐진다.",
-  "item.rtshop.weapon_manual.tip2": "잃어버렸다면 그 무기를 들고 /rtshop manual",
+  "item.rtshop.weapon_manual.tip2": "다른 무기의 설명서가 필요하면 그 무기를 들고 /rtshop manual",
   "rtshop.manual.got": "새 무기 설명서를 받았습니다: 「%s」 사용법 (들고 우클릭)",
   "rtshop.manual.cmd_none": "손에 든 물건에는 따로 설명할 특수기가 없습니다. 특수기가 있는 무기를 들고 다시 입력해 주세요.",
   "rtshop.manual.cmd_have": "이 무기의 설명서는 이미 가방에 있습니다.",

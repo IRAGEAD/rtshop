@@ -622,7 +622,7 @@ NEW = {
  "item.rtshop.weapon_manual": ("무기 설명서", "Weapon Manual"),
  "item.rtshop.weapon_manual.named": ("「%s」 사용법", "How to Use: %s"),
  "item.rtshop.weapon_manual.tip1": ("들고 우클릭하면 이 무기의 연속 공격과 특수기 쓰는 법이 펼쳐진다.", "Right-click while holding it to read this weapon's combo and special skill."),
- "item.rtshop.weapon_manual.tip2": ("잃어버렸다면 그 무기를 들고 /rtshop manual", "Lost it? Hold the weapon and type /rtshop manual"),
+ "item.rtshop.weapon_manual.tip2": ("다른 무기의 설명서가 필요하면 그 무기를 들고 /rtshop manual", "Need another weapon's manual? Hold it and type /rtshop manual"),
  "rtshop.manual.got": ("새 무기 설명서를 받았습니다: 「%s」 사용법 (들고 우클릭)", "New weapon manual: How to Use %s (hold and right-click)"),
  "rtshop.manual.cmd_none": ("손에 든 물건에는 따로 설명할 특수기가 없습니다. 특수기가 있는 무기를 들고 다시 입력해 주세요.", "The item in your hand has no special skill to explain. Hold a weapon that has one and try again."),
  "rtshop.manual.cmd_have": ("이 무기의 설명서는 이미 가방에 있습니다.", "You already carry this weapon's manual."),

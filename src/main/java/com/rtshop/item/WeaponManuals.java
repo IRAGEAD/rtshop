@@ -14,8 +14,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
- * 무기 설명서 지급: 특수기(기본 공격 말고 따로 쓰는 기술)가 있는 무기를 처음 손에 넣으면 그 무기의 설명서를 한 권 준다.
- * 같은 종류·같은 특수기의 무기(나무 검과 철 검 등)는 한 권으로 친다. 받은 기록은 플레이어에게 남아 죽어도 다시 주지 않는다.
+ * 무기 설명서 지급: 특별한 조작(그 무기만의 특수기)이 있는 모드 무기를 처음 손에 넣었을 때만 그 무기의 설명서를 한 권 준다.
+ * <ul>
+ * <li>바닐라 무기(minecraft:)와, 검·도끼·창 같은 흔한 무기 종류의 기본 특수기만 가진 모드 무기는 받지 않는다.</li>
+ * <li>같은 종류·같은 특수기의 무기는 한 권으로 친다. 받은 기록은 플레이어에게 남아 죽어도, 다시 얻어도 또 주지 않는다.</li>
+ * <li>어떤 무기든 손에 들고 /rtshop manual 을 치면 그 무기의 설명서를 받을 수 있다 (특수기가 있는 무기라면).</li>
+ * </ul>
  * 끄기: config/rtshop/world_rules.json 의 weaponManuals.
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID)
@@ -43,10 +47,36 @@ public final class WeaponManuals {
         p.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).remove(KEY);
     }
 
+    /** Epic Fight 가 흔한 무기 종류(검·도끼·창·대검·태도…)에 기본으로 붙이는 특수기들: 이것만 가진 무기는 "특별한 조작"으로 치지 않는다. */
+    private static final java.util.Set<String> COMMON_SKILLS = java.util.Set.of(
+            "sweeping_edge", "dancing_edge", "the_guillotine", "heartpiercer", "grasping_spire", "steel_whirlwind", "battojutsu",
+            "rushing_tempo", "relentless_combo", "sharp_stab", "liechtenauer", "eviscerate", "blade_rush", "tsunami",
+            "wrathful_lighting", "everlasting_allegiance");
+
+    private static boolean commonSkill(String id) {
+        int c = id.indexOf(':');
+        String ns = c < 0 ? "epicfight" : id.substring(0, c), path = c < 0 ? id : id.substring(c + 1);
+        return (ns.equals("epicfight") || ns.equals("epicfightx")) && COMMON_SKILLS.contains(path);
+    }
+
+    /** 그 무기만의 특수기가 하나라도 있는가. */
+    public static boolean special(EfWeapons.Info info) {
+        if (info == null) return false;
+        if (!info.skill().isEmpty() && !commonSkill(info.skill())) return true;
+        for (EfWeapons.Form f : info.forms()) if (!f.skill().isEmpty() && !commonSkill(f.skill())) return true;
+        return false;
+    }
+
+    /** 스스로 설명서를 주는 무기인가: 모드가 더한 무기이고, 그 무기만의 특수기가 있다. */
+    public static boolean handedOut(ItemStack weapon, EfWeapons.Info info) {
+        net.minecraft.resources.ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(weapon.getItem());
+        return id != null && !"minecraft".equals(id.getNamespace()) && special(info);
+    }
+
     /** 이 무기의 설명서를 아직 받지 않았으면 준다. 준 설명서(없으면 빈 것). */
     public static ItemStack offer(ServerPlayer p, ItemStack weapon) {
         EfWeapons.Info info = EfWeapons.info(p, weapon);
-        if (info == null || info.skill().isEmpty()) return ItemStack.EMPTY; // 특수기가 없는 물건은 설명서가 없다
+        if (!handedOut(weapon, info)) return ItemStack.EMPTY; // 바닐라 무기, 특별한 조작이 없는 무기는 설명서를 주지 않는다
         if (has(p, info.key())) return ItemStack.EMPTY;
         store(p, true).putBoolean(info.key(), true);
         ItemStack manual = WeaponManualItem.of(weapon);

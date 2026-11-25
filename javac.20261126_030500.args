@@ -1,0 +1,11 @@
+-proc:none
+-Xmaxerrs
+9000
+-d
+/tmp/jc
+-sourcepath
+src/main/java:src/stubs/java
+src/main/java/com/rtshop/client/EnhanceClient.java
+src/main/java/com/rtshop/mixin/CinematicAnvilMixin.java
+src/main/java/com/rtshop/item/WeaponManuals.java
+src/main/java/com/rtshop/client/ClientSelfTest.java
