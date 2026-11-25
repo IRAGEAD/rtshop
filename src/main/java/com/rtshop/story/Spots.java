@@ -123,7 +123,8 @@ public final class Spots {
         for (Object[] o : pend) {
             QuestDef.Objective ob = (QuestDef.Objective) o[1];
             BlockPos at = placed(p, ob.target);
-            if (at == null && !store(p, false).contains(ob.target) && QuestManager.atStructure(p, ob.at)) {
+            if (at == null && !store(p, false).contains(ob.target) && QuestManager.atStructure(p, ob.at)
+                    && (ob.after.isEmpty() || QuestManager.hasFlag(p, "spot_" + ob.after))) {
                 at = choose(p, have);
                 place(p, ob.target, at);
                 have.add(at);
@@ -140,6 +141,7 @@ public final class Spots {
             j.addProperty("z", at.getZ());
             j.addProperty("shape", ob.shape.isEmpty() ? "circle" : ob.shape);
             j.addProperty("label", label(p, ob));
+            if (!ob.verb.isEmpty()) j.addProperty("verb", StoryText.t(p, ob.verb));
             arr.add(j);
         }
         String sig = p.level().dimension().location() + arr.toString();
@@ -160,6 +162,16 @@ public final class Spots {
         return null;
     }
 
+    /** 그 일을 하는 데 드는 아이템이 모자라면 알리고 true. */
+    private static boolean lacks(ServerPlayer p, QuestDef.Objective ob) {
+        if (ob.use.isEmpty() || QuestManager.countItems(p, ob.use) >= ob.useCount) return false;
+        net.minecraft.world.item.Item it = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(net.minecraft.resources.ResourceLocation.tryParse(ob.use));
+        Component name = ob.use.startsWith("#") ? Component.translatable("rtshop.spot.tag." + ob.use.substring(ob.use.indexOf(':') + 1))
+                : it == null || it == net.minecraft.world.item.Items.AIR ? Component.literal(ob.use) : it.getDescription();
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.spot.need", name, ob.useCount));
+        return true;
+    }
+
     private static boolean inReach(ServerPlayer p, String id) {
         BlockPos at = placed(p, id);
         return at != null && p.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= LOOK_RANGE * LOOK_RANGE;
@@ -169,6 +181,7 @@ public final class Spots {
     public static boolean look(ServerPlayer p, String id) {
         QuestDef.Objective ob = find(p, id);
         if (ob == null || !inReach(p, id)) return false;
+        if (lacks(p, ob)) return false;
         if (ob.lines == null || ob.lines.size() == 0) return done(p, id);
         JsonObject out = new JsonObject();
         out.addProperty("npc", "_spot");
@@ -186,9 +199,11 @@ public final class Spots {
 
     /** 끝까지 살펴봤다: 목표를 채우고 흔적을 지운다. 본 것은 표식(spot_ID)으로 남아 조사 수첩에 적힌다. */
     public static boolean done(ServerPlayer p, String id) {
-        if (find(p, id) == null || !inReach(p, id)) return false;
+        QuestDef.Objective need = find(p, id);
+        if (need == null || !inReach(p, id) || lacks(p, need)) return false;
         boolean ok = QuestManager.completeInspect(p, id);
         if (ok) {
+            if (!need.use.isEmpty()) QuestManager.takeItems(p, need.use, need.useCount);
             forget(p, id);
             QuestManager.setFlag(p, "spot_" + id, true);
             p.playNotifySound(net.minecraft.sounds.SoundEvents.BOOK_PAGE_TURN, net.minecraft.sounds.SoundSource.PLAYERS, 0.9F, 0.9F);

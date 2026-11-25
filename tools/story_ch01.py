@@ -11,6 +11,20 @@ def inspect(sid, label, lines, at="", shape="circle", mod=""):
     return {"type": "INSPECT", "target": sid + ("@" + at if at else ""), "text": label, "shape": shape, "lines": lines, **({"mod": mod} if mod else {})}
 
 
+def act(sid, label, verb, lines, at="", shape="circle", use="", n=1, after="", mod=""):
+    """살펴보는 대신 '무언가를 하는' 목표: verb = 하는 일(놓는다·붓는다·건다…), use = 드는 아이템(끝낼 때 가져감), after = 먼저 끝내야 할 흔적."""
+    o = inspect(sid, label, lines, at, shape, mod)
+    if verb:
+        o["verb"] = verb
+    if use:
+        o["use"] = use
+        if n != 1:
+            o["useCount"] = n
+    if after:
+        o["after"] = after
+    return o
+
+
 def comp(npc, style, at="", **lines):
     return {"npc": npc, "style": style, **({"at": at} if at else {}), "lines": {k: v for k, v in lines.items()}}
 

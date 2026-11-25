@@ -1533,5 +1533,7 @@
   "rtshop.notebook.empty": "Nothing examined yet. Traces you look at during story quests are written down here.",
   "item.rtshop.antidote": "Antidote",
   "item.rtshop.antidote.tip": "Drink to cure poison, wither and hunger.",
-  "rtshop.spellmana.low": "Not enough mana (need %s / have %s)"
+  "rtshop.spellmana.low": "Not enough mana (need %s / have %s)",
+  "rtshop.spot.need": "You need %s ×%s to do this.",
+  "rtshop.spot.tag.small_flowers": "flowers"
 }

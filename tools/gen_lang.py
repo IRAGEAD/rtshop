@@ -678,6 +678,8 @@ NEW = {
  "rtshop.magic.locked": ("거울이 아무것도 비추지 않는다. 아직 때가 아닌 듯하다.", "The mirror shows nothing. It is not time yet."),
  "rtshop.spot.trace": ("흔적", "Trace"),
  "rtshop.spot.prompt": ("[%s] 살펴보기", "[%s] Look closer"),
+ "rtshop.spot.tag.small_flowers": ("꽃", "flowers"),
+ "rtshop.spot.need": ("이 일을 하려면 %s ×%s 이(가) 필요하다.", "You need %s ×%s to do this."),
  "rtshop.spot.appeared": ("근처에 살펴볼 것이 있다: %s", "Something nearby is worth a closer look: %s"),
  "rtshop.spot.appeared_plain": ("근처에 살펴볼 흔적이 있다.", "There is a trace nearby worth a closer look."),
  "rtshop.quest.obj.inspect": ("살펴보기: %s", "Look closer: %s"),

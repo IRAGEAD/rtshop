@@ -618,6 +618,38 @@ public final class QuestManager {
         return n > 0;
     }
 
+    /** 3장이 다시 짜였다 (3.42: 코넬리아가 장의 끝, 가라앉은 성채가 더해짐): 3장 도중이던 사람은 3장의 처음부터, 끝낸 사람은 끝낸 것으로. 한 번만 (story_v9 표식). */
+    public static boolean migrateStory9(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        if (pr.flags.contains("story_v9")) return false;
+        boolean ch3 = pr.flags.contains("story_ch3_done");
+        int n = 0;
+        if (!ch3) {
+            for (String id : new ArrayList<>(pr.completed)) {
+                if (id.startsWith("story_3_") && pr.completed.remove(id)) n++;
+            }
+            pr.active.keySet().removeIf(id -> id.startsWith("story_3_"));
+            for (String f : List.of("clue_grey_cloak", "seal_maze_mother", "ch3_found_elric", "seal_cornelia", "clue_hidden_page", "ch3_released",
+                    "ch3_kept_lantern", "clue_two_cloaks", "clue_mirror_maker", "ch3_oscar_boat", "ch3_morning_star", "ch3_gift_withdrawn")) pr.flags.remove(f);
+        } else {
+            for (QuestDef q : loaded.quests.values()) {
+                if (q.id.startsWith("story_3_") && !pr.completed.contains(q.id)) {
+                    pr.completed.add(q.id);
+                    pr.active.remove(q.id);
+                    for (String f : q.rewardFlags) {
+                        if (!f.startsWith("ch3_")) pr.flags.add(f); // 선택 표식은 본인이 고른 것만 남긴다
+                    }
+                    n++;
+                }
+            }
+            if (!pr.flags.contains("ch3_released") && !pr.flags.contains("ch3_kept_lantern")) pr.flags.add("ch3_kept_lantern");
+            pr.flags.add("ch3_found_elric");
+        }
+        pr.flags.add("story_v9");
+        QuestData.get(p.server).dirty();
+        return n > 0;
+    }
+
     /** 4장이 새로 쓰였다 (3.38): 4장 도중이던 사람은 4장의 처음부터, 끝낸 사람은 끝낸 것으로. 한 번만 (story_v7 표식). */
     public static boolean migrateStory7(ServerPlayer p) {
         QuestData.Progress pr = prog(p);
@@ -692,6 +724,7 @@ public final class QuestManager {
             migrateStory6(p);
             migrateStory7(p);
             migrateStory8(p);
+            migrateStory9(p);
         }
     }
 
@@ -732,7 +765,7 @@ public final class QuestManager {
         return key != null && key.toString().equals(target);
     }
 
-    private static int countItems(ServerPlayer p, String target) {
+    public static int countItems(ServerPlayer p, String target) {
         long n = 0;
         for (ItemStack s : p.getInventory().items) {
             if (itemMatches(s, target)) {
@@ -747,7 +780,7 @@ public final class QuestManager {
         return (int) Math.min(Integer.MAX_VALUE, n);
     }
 
-    private static void takeItems(ServerPlayer p, String target, int amount) {
+    public static void takeItems(ServerPlayer p, String target, int amount) {
         int left = amount;
         for (ItemStack s : p.getInventory().items) {
             if (left <= 0) {

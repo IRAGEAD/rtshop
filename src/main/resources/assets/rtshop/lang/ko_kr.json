@@ -1533,5 +1533,7 @@
   "rtshop.notebook.empty": "아직 살펴본 흔적이 없다. 이야기 퀘스트가 가리키는 곳에서 빛나는 흔적에 다가가 살펴보면 여기에 적힌다.",
   "item.rtshop.antidote": "해독제",
   "item.rtshop.antidote.tip": "마시면 독·시듦·허기가 사라진다.",
-  "rtshop.spellmana.low": "마나가 부족합니다 (필요 %s / 지금 %s)"
+  "rtshop.spellmana.low": "마나가 부족합니다 (필요 %s / 지금 %s)",
+  "rtshop.spot.need": "이 일을 하려면 %s ×%s 이(가) 필요하다.",
+  "rtshop.spot.tag.small_flowers": "꽃"
 }

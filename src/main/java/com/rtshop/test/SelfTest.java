@@ -2206,6 +2206,32 @@ public final class SelfTest {
                 note.size() == 1 && note.get(0).getAsJsonObject().get("label").getAsString().equals("Old circle")
                         && note.get(0).getAsJsonObject().getAsJsonArray("lines").size() == 1, note);
 
+        // 하는 일(verb)·드는 아이템(use)·이어지는 흔적(after)
+        QuestDef actQ = tempQuest("{\"id\":\"t_act\",\"giver\":\"quest_guide\",\"objectives\":["
+                + "{\"type\":\"INSPECT\",\"target\":\"t_wick\",\"verb\":\"Change the wick\",\"use\":\"minecraft:coal\"},"
+                + "{\"type\":\"INSPECT\",\"target\":\"t_next\",\"after\":\"t_wick\"}],\"reward\":{\"gold\":1}}");
+        QuestManager.loaded().quests.put(actQ.id, actQ);
+        QuestDef actBack = QuestDef.parse(actQ.toJson());
+        clear(a);
+        QuestManager.accept(a, "t_act", "quest_guide");
+        com.rtshop.story.Spots.update(a);
+        boolean firstOnly = com.rtshop.story.Spots.placed(a, "t_wick") != null && com.rtshop.story.Spots.placed(a, "t_next") == null;
+        com.rtshop.story.Spots.placeForTest(a, "t_wick", a.blockPosition().offset(1, 0, 0));
+        boolean refused = !com.rtshop.story.Spots.done(a, "t_wick");
+        a.getInventory().add(new ItemStack(Items.COAL, 2));
+        boolean did = com.rtshop.story.Spots.done(a, "t_wick");
+        int coalLeft = count(a, st -> st.is(Items.COAL));
+        com.rtshop.story.Spots.update(a);
+        boolean nextShown = com.rtshop.story.Spots.placed(a, "t_next") != null;
+        check("a trace can be a thing to do: it needs its item (taken when done), and the next trace shows only after it",
+                actBack != null && actBack.objectives.get(0).verb.equals("Change the wick") && actBack.objectives.get(0).use.equals("minecraft:coal")
+                        && actBack.objectives.get(1).after.equals("t_wick") && firstOnly && refused && did && coalLeft == 1 && nextShown,
+                firstOnly + "/" + refused + "/" + did + "/" + coalLeft + "/" + nextShown);
+        QuestManager.abandon(a, "t_act");
+        QuestManager.loaded().quests.remove("t_act");
+        QuestManager.setFlag(a, "spot_t_wick", false);
+        clear(a);
+
         // 동행
         com.rtshop.story.CompanionEntity c = com.rtshop.story.Companions.spawn(a, q);
         check("the companion appears beside the player with the npc's name", c != null && c.isAlive()
@@ -2376,14 +2402,26 @@ public final class SelfTest {
         QuestManager.migrateStory5(a);
         boolean fin2 = QuestManager.isCompleted(a, "story_2_26") && QuestManager.hasFlag(a, "seal_umvuthi");
         check("chapter 2 progress moves over the same way", mid2 && fin2, mid2 + "/" + fin2);
-        QuestDef ner = l.quests.get("story_3_22"), orb = l.quests.get("story_3_23");
-        check("chapter 3 is rewritten (Oscar walks along, the morning star, Nerakyss, the cracked orb under the cabin floor)",
-                ner != null && orb != null && l.quests.containsKey("story_3_27") && l.quests.get("story_3_03").companion != null
+        QuestDef ner = l.quests.get("story_3_20"), orb = l.quests.get("story_3_36"), king = l.quests.get("story_3_28"), capt = l.quests.get("story_3_32");
+        boolean fd = net.minecraftforge.fml.ModList.get().isLoaded("fdbosses");
+        check("chapter 3 is rebuilt (the village's night, the twentieth boat, Nerakyss, the giving king under the sea, and the captain last)",
+                ner != null && orb != null && king != null && capt != null && l.quests.containsKey("story_3_39") && !l.quests.containsKey("story_3_40")
+                        && l.quests.get("story_3_06").companion != null && l.quests.get("story_3_25").companion != null
                         && ner.objectives.size() == 1 && ner.objectives.get(0).target.equals(net.minecraftforge.fml.ModList.get().isLoaded("block_factorys_bosses") ? "block_factorys_bosses:kraken" : "minecraft:elder_guardian")
-                        && orb.rewardFlags.contains("clue_two_cloaks") && l.quests.get("story_3_15").rewardFlags.contains("clue_hidden_page")
-                        && l.quests.get("story_3_18").choices.size() == 2 && l.quests.get("story_3_27").rewardFlags.contains("story_ch3_done")
-                        && l.quests.get("story_4_01").requires.contains("story_3_27") && (!l.quests.containsKey("hidden_illusioner_0") || l.quests.get("hidden_illusioner_0").requires.contains("story_3_15")),
+                        && king.objectives.size() == 1 && king.objectives.get(0).target.equals(fd ? "fdbosses:malkuth" : "minecraft:elder_guardian")
+                        && king.order < capt.order && capt.order < orb.order
+                        && orb.rewardFlags.contains("clue_two_cloaks") && l.quests.get("story_3_33").rewardFlags.contains("clue_hidden_page")
+                        && l.quests.get("story_3_35").choices.size() == 2 && l.quests.get("story_3_39").rewardFlags.contains("story_ch3_done")
+                        && l.quests.get("story_4_01").requires.contains("story_3_39") && (!l.quests.containsKey("hidden_illusioner_0") || l.quests.get("hidden_illusioner_0").requires.contains("story_3_33")),
                 ner == null ? "null" : ner.toJson());
+        QuestDef stone = l.quests.get("story_2_24f"), lamp = l.quests.get("story_3_03");
+        check("chapter 2 ends under the first cave (Chesed), and some goals are things to do rather than look at (a verb, an item used, one trace after another)",
+                stone != null && stone.objectives.size() == 1 && stone.objectives.get(0).target.equals(fd ? "fdbosses:chesed" : "minecraft:warden")
+                        && l.quests.get("story_2_25").requires.contains("story_2_24f")
+                        && lamp.objectives.get(0).verb.equals("심지를 간다") && lamp.objectives.get(0).use.equals("minecraft:coal")
+                        && l.quests.get("story_3_08").objectives.stream().anyMatch(o -> o.after.equals("c3_wall1"))
+                        && com.rtshop.party.PartyConfig.get().arenaBosses.contains("fdbosses:chesed"),
+                stone == null ? "null" : stone.toJson());
         QuestManager.reset(a);
         for (String f : List.of("story_v4", "story_v5")) QuestManager.setFlag(a, f, true);
         QuestManager.forceComplete(a, "story_3_05");
@@ -2395,9 +2433,16 @@ public final class SelfTest {
         for (String f : List.of("story_ch3_done", "ch3_released")) QuestManager.setFlag(a, f, true);
         QuestManager.setFlag(a, "story_v6", false);
         QuestManager.migrateStory6(a);
-        boolean fin3 = QuestManager.isCompleted(a, "story_3_27") && QuestManager.hasFlag(a, "seal_cornelia") && QuestManager.hasFlag(a, "clue_two_cloaks")
+        boolean fin3 = QuestManager.isCompleted(a, "story_3_39") && QuestManager.hasFlag(a, "seal_cornelia") && QuestManager.hasFlag(a, "clue_two_cloaks")
                 && QuestManager.hasFlag(a, "ch3_released") && !QuestManager.hasFlag(a, "ch3_kept_lantern");
         check("chapter 3 progress moves over the same way (the lantern choice is kept)", mid3 && fin3, mid3 + "/" + fin3);
+        QuestManager.reset(a);
+        for (String f : List.of("story_v4", "story_v5", "story_v6", "story_v7", "story_v8")) QuestManager.setFlag(a, f, true);
+        QuestManager.forceComplete(a, "story_3_12");
+        QuestManager.setFlag(a, "ch3_found_elric", true);
+        QuestManager.migrateStory9(a);
+        boolean mid9 = !QuestManager.isCompleted(a, "story_3_12") && !QuestManager.hasFlag(a, "ch3_found_elric") && QuestManager.hasFlag(a, "story_v9");
+        check("a player in the middle of the old chapter 3 starts the rebuilt chapter from its beginning", mid9, mid9);
         QuestDef door = l.quests.get("story_4_26"), glove = l.quests.get("story_4_28");
         check("chapter 4 is rewritten (six seals walked six ways, the portraits, the council, through the door, under the glove)",
                 door != null && glove != null && l.quests.containsKey("story_4_29") && !l.quests.containsKey("story_4_30")

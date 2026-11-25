@@ -61,6 +61,13 @@ public final class QuestDef {
         public String at = "";
         /** INSPECT: 흔적의 모양 (circle 마법진 · mural 벽화 · scrawl 낙서 · board 명령판 · camp 야영지 · relic 유품 · bones 유해 · book 기록). */
         public String shape = "";
+        /** INSPECT: 살펴보는 대신 "하는 일"의 이름 (예: 놓는다, 붓는다, 건다, 불을 붙인다). 비우면 살펴보기. */
+        public String verb = "";
+        /** INSPECT: 그 일을 하는 데 드는 아이템 (끝낼 때 가져간다). 비우면 필요 없음. */
+        public String use = "";
+        public int useCount = 1;
+        /** INSPECT: 이 흔적(ID)을 먼저 끝내야 나타난다 (발자국·잉크 점처럼 하나씩 이어지는 흔적). */
+        public String after = "";
     }
 
     public static final String[] SHAPES = {"circle", "mural", "scrawl", "board", "camp", "relic", "bones", "book"};
@@ -202,6 +209,10 @@ public final class QuestDef {
             if (ob.lines != null && ob.lines.size() > 0) jo.add("lines", ob.lines);
             putText(jo, "at", ob.at);
             putText(jo, "shape", ob.shape);
+            putText(jo, "verb", ob.verb);
+            putText(jo, "use", ob.use);
+            if (!ob.use.isEmpty() && ob.useCount != 1) jo.addProperty("useCount", ob.useCount);
+            putText(jo, "after", ob.after);
             objs.add(jo);
         }
         o.add("objectives", objs);
@@ -279,6 +290,10 @@ public final class QuestDef {
                 if (jo.has("lines") && jo.get("lines").isJsonArray()) ob.lines = jo.getAsJsonArray("lines");
                 ob.at = str(jo, "at", "").trim();
                 ob.shape = str(jo, "shape", "").trim();
+                ob.verb = str(jo, "verb", "").trim();
+                ob.use = str(jo, "use", "").trim();
+                ob.useCount = Math.max(1, jo.has("useCount") ? jo.get("useCount").getAsInt() : 1);
+                ob.after = str(jo, "after", "").trim();
                 if (ob.type == Type.INSPECT) {
                     int cut = ob.target.indexOf('@');
                     if (cut > 0) { // "id@구조물" 로 한 줄에 적은 경우

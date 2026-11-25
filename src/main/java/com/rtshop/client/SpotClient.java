@@ -37,7 +37,7 @@ public final class SpotClient {
     private SpotClient() {
     }
 
-    public record Spot(String id, BlockPos pos, int shape, String label) {
+    public record Spot(String id, BlockPos pos, int shape, String label, String verb) {
     }
 
     private static final ResourceLocation RING = new ResourceLocation("rtshop", "textures/gui/magic/ring_outer.png");
@@ -56,7 +56,7 @@ public final class SpotClient {
             JsonObject j = e.getAsJsonObject();
             int shape = Math.max(0, Arrays.asList(QuestDef.SHAPES).indexOf(j.get("shape").getAsString()));
             SPOTS.add(new Spot(j.get("id").getAsString(), new BlockPos(j.get("x").getAsInt(), j.get("y").getAsInt(), j.get("z").getAsInt()), shape,
-                    j.has("label") ? j.get("label").getAsString() : ""));
+                    j.has("label") ? j.get("label").getAsString() : "", j.has("verb") ? j.get("verb").getAsString() : ""));
         }
     }
 
@@ -166,7 +166,7 @@ public final class SpotClient {
         int sw = g.guiWidth(), sh = g.guiHeight();
         String key = mc.options.keyUse.getTranslatedKeyMessage().getString();
         String name = s.label.isEmpty() ? Component.translatable("rtshop.spot.trace").getString() : s.label;
-        String line = Component.translatable("rtshop.spot.prompt", key).getString();
+        String line = s.verb.isEmpty() ? Component.translatable("rtshop.spot.prompt", key).getString() : "[" + key + "] " + s.verb;
         int w = Math.max(RaidText.w(mc.font, line, RaidText.SANS), RaidText.w(mc.font, name, RaidText.SERIF)) + 18;
         // 조준점 왼쪽: 아래쪽 가운데의 알림 상자, 오른쪽의 퀘스트 목록과 겹치지 않는다
         int x = sw / 2 - 14 - w, y = sh / 2 - 13, cx = x + w / 2;
