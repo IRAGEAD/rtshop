@@ -96,7 +96,7 @@ public final class EnhancePanel {
         g.drawString(font, t, 0, 0, 0xFFFFE9A8, true);
         g.pose().popPose();
         // 아래 절반은 짙은 금으로 덧그린다 (가위질)
-        int mid = y + 5;
+        int mid = y + 4;
         org.joml.Vector4f p0 = g.pose().last().pose().transform(new org.joml.Vector4f(x0 - 2, mid, 0, 1)), p1 = g.pose().last().pose().transform(new org.joml.Vector4f(x0 + w + 2, y + 14, 0, 1));
         g.enableScissor((int) p0.x(), (int) p0.y(), (int) Math.ceil(p1.x()), (int) Math.ceil(p1.y()));
         g.pose().pushPose();
