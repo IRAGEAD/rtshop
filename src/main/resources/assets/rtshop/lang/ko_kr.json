@@ -1536,7 +1536,7 @@
   "rtshop.spellmana.low": "마나가 부족합니다 (필요 %s / 지금 %s)",
   "rtshop.spot.need": "이 일을 하려면 %s ×%s 이(가) 필요하다.",
   "rtshop.spot.tag.small_flowers": "꽃",
-  "rtshop.qhud.attend": "오늘 출석을 아직 받지 않았습니다",
+  "rtshop.qhud.attend": "오늘 출석 보상 받기",
   "rtshop.qhud.where": "%1$s쪽 약 %2$s칸 (%3$s, %4$s)",
   "rtshop.qhud.where_here": "바로 근처에 있음",
   "rtshop.qhud.where_dim": "다른 차원에 있음",

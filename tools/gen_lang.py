@@ -760,7 +760,7 @@ NEW = {
  "rtshop.qhud.next": ("다음 퀘스트", "Next quest"),
  "rtshop.qhud.next_npc": ("→ %s", "→ %s"),
  "rtshop.qhud.next_more": ("받을 수 있는 퀘스트 %s개 더", "%s more quests available"),
- "rtshop.qhud.attend": ("오늘 출석을 아직 받지 않았습니다", "Today's attendance is not checked yet"),
+ "rtshop.qhud.attend": ("오늘 출석 보상 받기", "Today's attendance reward"),
  "rtshop.qhud.where": ("%1$s쪽 약 %2$s칸 (%3$s, %4$s)", "about %2$s blocks %1$s (%3$s, %4$s)"),
  "rtshop.qhud.where_here": ("바로 근처에 있음", "right here"),
  "rtshop.qhud.where_dim": ("다른 차원에 있음", "in another dimension"),

@@ -1536,7 +1536,7 @@
   "rtshop.spellmana.low": "Not enough mana (need %s / have %s)",
   "rtshop.spot.need": "You need %s ×%s to do this.",
   "rtshop.spot.tag.small_flowers": "flowers",
-  "rtshop.qhud.attend": "Today's attendance is not checked yet",
+  "rtshop.qhud.attend": "Today's attendance reward",
   "rtshop.qhud.where": "about %2$s blocks %1$s (%3$s, %4$s)",
   "rtshop.qhud.where_here": "right here",
   "rtshop.qhud.where_dim": "in another dimension",
