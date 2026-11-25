@@ -1960,6 +1960,14 @@ public final class SelfTest {
         check("a premium gacha weapon (epic or above) is outside the jobs' weapon classes: no bonus and no penalty, while a rare one is classed as usual",
                 jcfg.weaponType(prizeSword).equals(com.rtshop.job.WeaponTypes.PREMIUM) && jcfg.weaponType(rareSword).equals(jcfg.weaponType(plainSword))
                         && onPrize[0] == 0 && onPrize[1] == 0, jcfg.weaponType(plainSword) + " " + java.util.Arrays.toString(onPlain) + " / " + jcfg.weaponType(prizeSword) + " " + java.util.Arrays.toString(onPrize));
+        // 양산 음식은 배고픔이 적게 찬다 (빵 5칸 → 3칸, 쿠키 2칸 → 1칸; 스테이크는 그대로)
+        com.rtshop.rules.FoodRules.setForTest(com.rtshop.rules.FoodRules.fresh());
+        check("mass-produced food fills less: bread and cookies are on the list (bread 5 -> 3, cookie 2 -> 1, never below 1), steak is not",
+                com.rtshop.rules.FoodRules.weak(new ItemStack(Items.BREAD)) && com.rtshop.rules.FoodRules.weak(new ItemStack(Items.COOKIE))
+                        && !com.rtshop.rules.FoodRules.weak(new ItemStack(Items.COOKED_BEEF)) && com.rtshop.rules.FoodRules.cut(5) == 2
+                        && com.rtshop.rules.FoodRules.cut(2) == 1 && com.rtshop.rules.FoodRules.cut(1) == 0,
+                com.rtshop.rules.FoodRules.cut(5) + " / " + com.rtshop.rules.FoodRules.cut(2));
+        com.rtshop.rules.FoodRules.reload();
         // 스킬북으로 배운 기술은 죽어도 남는다: Epic Fight 의 keepSkills 규칙을 켠다 (Epic Fight 가 없으면 규칙도 없다)
         boolean efHere = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
         boolean ruleFound = com.rtshop.rules.KeepSkills.apply(server);

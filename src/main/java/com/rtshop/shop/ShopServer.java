@@ -97,6 +97,7 @@ public final class ShopServer {
         com.rtshop.raid.RaidConfig.reload();
         com.rtshop.story.BossMusic.reload();
         com.rtshop.rules.MobRules.reload();
+        com.rtshop.rules.FoodRules.reload();
         com.rtshop.raid.AbyssWeekly.reload();
         com.rtshop.pvp.Pvp.resyncAll(server);
         com.rtshop.rules.LootRules.reload();
