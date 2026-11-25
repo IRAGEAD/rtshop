@@ -1860,6 +1860,49 @@ public final class SelfTest {
                 onlyTickets && com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6 && gm.getSlot(1).getItem().getCount() == 1
                         && com.rtshop.enhance.Enhance.activeGuard(a) == 0, onlyTickets + " " + com.rtshop.enhance.Enhance.level(gm.getCarried()) + " " + gm.getSlot(1).getItem().getCount());
         gm.getSlot(1).set(ItemStack.EMPTY);
+        // 몹 규칙: 모드 몹의 자연 스폰은 줄이고(기사 hollow 는 그대로, lycanth 는 더 많이), 보스가 아닌 몹은 무기·스킬북·인챈트·모드 아이템을 떨어뜨리지 않는다
+        com.rtshop.rules.MobRules.Config mr = com.rtshop.rules.MobRules.fresh();
+        com.rtshop.rules.MobRules.setForTest(mr);
+        String hollowId = "", lycanId = "", otherId = "";
+        double hollowKeep = -1, lycanKeep = -1, otherKeep = -1;
+        for (EntityType<?> et : net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES) {
+            net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.getKey(et);
+            if (rl == null || rl.getNamespace().equals("minecraft") || rl.getNamespace().equals("rtshop") || et.getCategory() != net.minecraft.world.entity.MobCategory.MONSTER) continue;
+            String nm = (rl + " " + et.getDescription().getString()).toLowerCase(java.util.Locale.ROOT);
+            double k = com.rtshop.rules.MobRules.keepChance(et);
+            if (nm.contains("hollow")) {
+                if (hollowId.isEmpty()) { hollowId = rl.toString(); hollowKeep = k; }
+            } else if (nm.contains("lycanth")) {
+                if (lycanId.isEmpty()) { lycanId = rl.toString(); lycanKeep = k; }
+            } else if (otherId.isEmpty() && k < 1) {
+                otherId = rl.toString();
+                otherKeep = k;
+            }
+        }
+        check("spawn rule: vanilla mobs spawn as before; a mod monster keeps 20% of its natural spawns, a hollow (knight) all of them, a lycanth 10%",
+                com.rtshop.rules.MobRules.keepChance(EntityType.ZOMBIE) == 1 && (otherId.isEmpty() || Math.abs(otherKeep - 0.2) < 1e-9)
+                        && (hollowId.isEmpty() || hollowKeep == 1) && (lycanId.isEmpty() || Math.abs(lycanKeep - 0.1) < 1e-9),
+                "other " + otherId + "=" + otherKeep + " hollow " + hollowId + "=" + hollowKeep + " lycanth " + lycanId + "=" + lycanKeep);
+        ItemStack enchSword = new ItemStack(Items.GOLDEN_HELMET);
+        enchSword.enchant(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 1);
+        ItemStack modThing = ItemStack.EMPTY;
+        for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+            net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it);
+            if (rl != null && !rl.getNamespace().equals("minecraft") && !rl.getNamespace().equals("rtshop")) { modThing = new ItemStack(it); break; }
+        }
+        net.minecraft.world.entity.boss.wither.WitherBoss witherProbe = EntityType.WITHER.create(level);
+        net.minecraft.world.entity.monster.Zombie zombieProbe = EntityType.ZOMBIE.create(level);
+        check("drop rule: a common mob keeps its ordinary drops but loses weapons, enchanted things, enchanted books and mod items (RT Shop's own items stay); bosses are left alone",
+                com.rtshop.rules.MobRules.dropAllowed(new ItemStack(Items.ROTTEN_FLESH)) && com.rtshop.rules.MobRules.dropAllowed(new ItemStack(Items.IRON_INGOT))
+                        && !com.rtshop.rules.MobRules.dropAllowed(new ItemStack(Items.IRON_SWORD)) && !com.rtshop.rules.MobRules.dropAllowed(new ItemStack(Items.BOW))
+                        && !com.rtshop.rules.MobRules.dropAllowed(new ItemStack(Items.IRON_AXE)) && !com.rtshop.rules.MobRules.dropAllowed(enchSword)
+                        && !com.rtshop.rules.MobRules.dropAllowed(new ItemStack(Items.ENCHANTED_BOOK))
+                        && com.rtshop.rules.MobRules.dropAllowed(new ItemStack(com.rtshop.item.ModItems.WEAPON_MANUAL.get()))
+                        && (modThing.isEmpty() || !com.rtshop.rules.MobRules.dropAllowed(modThing))
+                        && com.rtshop.rules.MobRules.boss(witherProbe) && !com.rtshop.rules.MobRules.boss(zombieProbe), modThing);
+        witherProbe.discard();
+        zombieProbe.discard();
+        com.rtshop.rules.MobRules.reload();
         // 스킬북으로 배운 기술은 죽어도 남는다: Epic Fight 의 keepSkills 규칙을 켠다 (Epic Fight 가 없으면 규칙도 없다)
         boolean efHere = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
         boolean ruleFound = com.rtshop.rules.KeepSkills.apply(server);
