@@ -92,7 +92,7 @@ public final class Ui {
         }
     }
 
-    /** 창 틀: 눌러 새긴 무늬와 바느질이 있는 짙은 가죽 장정 + 바느질한 가죽 모서리. */
+    /** 창 틀: 눌러 새긴 테두리 홈만 있는 짙은 가죽 장정 (바느질·모서리 장식 없이 깔끔하게). */
     public static void woodFrame(GuiGraphics g, int x, int y, int w, int h) {
         g.fill(x - 3, y - 2, x + w + 3, y + h + 4, 0x66000000);
         g.fill(x - 2, y - 2, x + w + 2, y + h + 2, C_SHADOW);
@@ -108,40 +108,20 @@ public final class Ui {
         g.fill(x + k, y + h - k - 1, x + w - k, y + h - k, 0x30FFD9A0);
         g.fill(x + k, y + k, x + k + 1, y + h - k, 0x70000000);
         g.fill(x + w - k - 1, y + k, x + w - k, y + h - k, 0x30FFD9A0);
-        // 바느질
-        stitchH(g, x + 4, x + w - 4, y + 2);
-        stitchH(g, x + 4, x + w - 4, y + h - 4);
-        stitchV(g, x + 2, y + 4, y + h - 4);
-        stitchV(g, x + w - 4, y + 4, y + h - 4);
-        // 바느질한 가죽 모서리 (놋쇠 리벳)
-        if (w >= 60 && h >= 50) {
-            RenderSystem.enableBlend();
-            g.blit(CORNERS, x - 6, y - 6, 0.0F, 0.0F, 22, 22, 44, 44);
-            g.blit(CORNERS, x + w - 16, y - 6, 22.0F, 0.0F, 22, 22, 44, 44);
-            g.blit(CORNERS, x - 6, y + h - 16, 0.0F, 22.0F, 22, 22, 44, 44);
-            g.blit(CORNERS, x + w - 16, y + h - 16, 22.0F, 22.0F, 22, 22, 44, 44);
-        }
     }
 
-    /** 제목 띠: 더 짙은 가죽에 바느질, 양끝 놋쇠 징, 아래 금박 선. */
+    /** 제목 띠: 더 짙은 가죽, 아래 금박 선 (바느질·징 없이). */
     public static void titleBand(GuiGraphics g, int x0, int y0, int x1, int y1) {
         RenderSystem.setShaderColor(0.62F, 0.58F, 0.55F, 1F);
         tile(g, LEATHER, x0, y0, x1 - x0, y1 - y0, 128);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         g.fill(x0, y0, x1, y0 + 1, 0x90000000);
         g.fill(x0, y1 - 1, x1, y1, 0x40FFD9A0);
-        stitchH(g, x0 + 3, x1 - 3, y0 + 2);
-        stitchH(g, x0 + 3, x1 - 3, y1 - 4);
-        for (int rx : new int[]{x0 + 4, x1 - 7}) {
-            int ry = (y0 + y1) / 2 - 1;
-            g.fill(rx, ry, rx + 3, ry + 3, 0xFF7A5214);
-            g.fill(rx, ry, rx + 2, ry + 2, 0xFFE8C060);
-        }
     }
 
     /** 단추: 예전처럼 깔끔한 나무 판 (밝은 윗선·어두운 아랫선), 마우스를 올리면 밝아지고 금테가 둘린다. */
     public static void button(GuiGraphics g, Font font, int x, int y, int w, int h, String label, boolean hover, boolean enabled) {
-        // 바느질한 가죽 버튼 (64x48 텍스처, 3단 16px: 보통 / 마우스 / 꺼짐) 9조각 늘리기
+        // 깔끔한 가죽 버튼 (64x48 텍스처, 3단 16px: 보통 / 마우스 / 꺼짐) 9조각 늘리기
         int v = !enabled ? 32 : (hover ? 16 : 0);
         int c = Math.min(4, Math.min(w / 2, h / 2));
         int midW = 64 - 2 * c, midH = 16 - 2 * c;
