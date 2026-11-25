@@ -241,6 +241,59 @@ public final class SelfTest {
     }
 
     /** 도감: 마주치면 모습만, 잡으면 능력치·전리품까지, 장비는 지니면 적힌다. */
+    /** 지도 표시 (3.54): 말을 건 NPC 와 가 본 장소가 사람마다 적히고, 같은 것은 다시 보내지 않는다. */
+    private static void mapMarks(MinecraftServer server, ServerLevel level, FakePlayer a) {
+        com.rtshop.story.MapMarks.Config mc = com.rtshop.story.MapMarks.fresh();
+        com.rtshop.story.MapMarks.setForTest(mc);
+        Villager banker = null;
+        try {
+            com.rtshop.story.MapMarks.forgetAll(a);
+            com.rtshop.story.MapMarks.Place pl = new com.rtshop.story.MapMarks.Place();
+            pl.name = "점검 광장";
+            pl.dim = a.level().dimension().location().toString();
+            pl.x = a.blockPosition().getX() + 30;
+            pl.y = a.blockPosition().getY();
+            pl.z = a.blockPosition().getZ();
+            pl.radius = 10;
+            mc.places.add(pl);
+            int far = com.rtshop.story.MapMarks.visit(a);
+            pl.x = a.blockPosition().getX() + 6;
+            int near = com.rtshop.story.MapMarks.visit(a), again = com.rtshop.story.MapMarks.visit(a);
+            String sent = com.rtshop.story.MapMarks.lastSentForTest;
+            check("map marks: a place is noted once when the player steps inside its radius (not from outside, not twice)",
+                    far == 0 && near == 1 && again == 0 && com.rtshop.story.MapMarks.knows(a, "place:점검 광장") && sent.contains("점검 광장") && sent.contains("\"notify\":true"),
+                    far + " " + near + " " + again + " " + sent);
+            banker = ShopServer.spawnNpc(level, a.position().add(2, 0, 0), 0F, "bank");
+            boolean t1 = banker != null && com.rtshop.story.MapMarks.talked(a, banker), t2 = banker != null && com.rtshop.story.MapMarks.talked(a, banker);
+            String sentNpc = com.rtshop.story.MapMarks.lastSentForTest;
+            boolean moved = false, movedSilently = false;
+            if (banker != null) {
+                banker.setPos(banker.getX() + 12, banker.getY(), banker.getZ());
+                moved = com.rtshop.story.MapMarks.talked(a, banker);
+                movedSilently = com.rtshop.story.MapMarks.lastSentForTest.contains("\"notify\":false");
+            }
+            net.minecraft.world.entity.animal.Cow cow = net.minecraft.world.entity.EntityType.COW.create(level);
+            boolean notNpc = cow != null && !com.rtshop.story.MapMarks.talked(a, cow);
+            if (cow != null) cow.discard();
+            check("map marks: talking to an NPC notes its name and place once; a moved NPC is corrected without a new notice; other creatures are not noted",
+                    t1 && !t2 && moved && movedSilently && notNpc && com.rtshop.story.MapMarks.known(a) == 2 && banker.getCustomName() != null
+                            && sentNpc.contains(banker.getCustomName().getString()),
+                    t1 + " " + t2 + " " + moved + " " + movedSilently + " " + notNpc + " " + com.rtshop.story.MapMarks.known(a));
+            mc.places.clear();
+            com.rtshop.story.MapMarks.sendAll(a, false);
+            String afterRemove = com.rtshop.story.MapMarks.lastSentForTest;
+            check("map marks: a place the operator removed leaves the player's record and is sent as gone",
+                    !com.rtshop.story.MapMarks.knows(a, "place:점검 광장") && com.rtshop.story.MapMarks.known(a) == 1 && afterRemove.contains("\"gone\":[\"place:점검 광장\"]"), afterRemove);
+            mc.enabled = false;
+            boolean off = banker != null && !com.rtshop.story.MapMarks.mark(a, "npc:x", "x", pl.dim, 0, 0, 0, -1);
+            check("map marks can be switched off in map_marks.json", off);
+        } finally {
+            if (banker != null) banker.discard();
+            com.rtshop.story.MapMarks.forgetAll(a);
+            com.rtshop.story.MapMarks.reload();
+        }
+    }
+
     private static void codex(MinecraftServer server, ServerLevel level, FakePlayer a) {
         com.rtshop.story.Codex.testFakes = true;
         try {
@@ -3238,6 +3291,7 @@ public final class SelfTest {
         ranks(server, a, fake(level, "rtshop_test_b"));
         // 3.54: 도감
         codex(server, level, a);
+        mapMarks(server, level, a);
         // 3.53: 아이템 쓰임새 설명 (상점·강화·퀘스트에서 저절로)
         {
             java.util.List<String[]> wheat = com.rtshop.rules.ItemNotes.of("minecraft:wheat");

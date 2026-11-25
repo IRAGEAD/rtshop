@@ -1854,5 +1854,13 @@
   "rtshop.return.left_m": "%s min",
   "rtshop.return.left_s": "%s s",
   "item.rtshop.return_ticket.tip_cd": "After one use it can be used again in %s minutes.",
-  "rtshop.spawn.cd_cleared": "Cleared %s's return ticket cooldown."
+  "rtshop.spawn.cd_cleared": "Cleared %s's return ticket cooldown.",
+  "rtshop.mapmark.added": "\"%s\" is now marked on your map.",
+  "rtshop.mapmark.place_added": "Map place \"%s\": (%s, %s, %s), radius %s. Anyone who steps inside gets it marked on their map.",
+  "rtshop.mapmark.place_removed": "Map place \"%s\" removed.",
+  "rtshop.mapmark.place_unknown": "There is no map place called \"%s\".",
+  "rtshop.mapmark.place_none": "No map places yet. Add the spot you stand on with /rtshop mapmark add <radius> <name>.",
+  "rtshop.mapmark.place_line": "· %s — %s (%s, %s, %s), radius %s",
+  "rtshop.mapmark.resent": "Put your %s known marks back on the map.",
+  "rtshop.mapmark.forgot": "Map mark records cleared. Talk to them or visit again to mark them anew."
 }

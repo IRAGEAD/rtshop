@@ -45,6 +45,11 @@ public final class StoryClient {
                 BossMusicClient.receive(JsonParser.parseString(json).getAsJsonObject());
             } catch (Exception ignored) {
             }
+        } else if (kind == StoryPacket.MAP_MARKS) {
+            try {
+                MapMarkClient.receive(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.ITEM_NOTES) {
             try {
                 ItemNoteTips.receive(JsonParser.parseString(json).getAsJsonObject());

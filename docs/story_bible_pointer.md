@@ -224,3 +224,8 @@
 - **강화 정보 창**: 연한 금빛 판(`tools/gen_enhance_panel.py`), 전용 글꼴 `assets/rtshop/font/enhance.json` (한글 송명, 숫자·영문 Playfair Display Bold). 글자는 `EnhancePanel.fit` 으로 칸 너비에 맞춰 줄인다. `client.json` 의 `enhanceLuxFont`. 숫자는 높이가 고른 라이닝 모양(`tools/gen_enhance_font.py`). 글꼴의 기준선은 게임 글꼴과 같은 y+7 에 맞춘다: TTF 의 기준선 = 어센트(px) - 3 + shift.
 - **아이템 규칙 2판** (`item_policy.json` 의 version 2): Better Nether 도 NPC 상점 금지, 전리품 금지의 `*fruit*:*` → `spmovesets:*`. 예전 파일은 읽을 때 저절로 고쳐 쓴다.
   `shopBannedKeepOwnWays`: 상점 금지 모드(Arcane Vortex·Better Nether·Nightfall)의 장비는 "상점에서만" 규칙에서 빠져 그 모드의 조합법으로 만든다 (Nightfall 은 전리품 금지가 따로 걸려 있다).
+
+## 3.54 에서 더한 것
+
+- **귀환권 (3.53 끝에 조정)**: 일반 3,000칸 · 60분 · 5,000 G / 고급 30분 · 30,000 G. 쿨타임은 실제 시간(`TownSpawn.cooldownLeft/used`, PlayerPersisted 의 `rtshop_return_cd`). 물건 칸의 쿨타임 표시는 쓰지 않는다 (걸린 물건은 우클릭이 서버에 닿지 않아 남은 시간 안내를 띄울 수 없다). 값 고치기: `ShopLoader.REPRICED` ("상점:품목=옛값>새값@판", 옛 기본값 그대로일 때만).
+- **지도 표시**: `story/MapMarks` (`map_marks.json`) → `StoryPacket.MAP_MARKS`(16) → `client/MapMarkClient` 가 Diorama 의 `dev.diorama.waypoint.WaypointStore.get()` / `add(Waypoint)` / `addFolder(이름)` / `remove` / `changed()` 를 리플렉션으로 부른다. `Waypoint(이름, x, y, z, 차원, 색 ARGB)`, `folder` 필드에는 폴더의 이름을 넣는다. 넣은 것의 기록은 `config/rtshop/map_marks_client.json` (세계별).

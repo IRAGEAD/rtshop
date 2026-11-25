@@ -542,6 +542,7 @@ public final class ShopServer {
         com.rtshop.rank.Ranks.reload();
         com.rtshop.story.Codex.reload();
         com.rtshop.story.Guide.reload();
+        com.rtshop.story.MapMarks.reload();
         com.rtshop.story.StoryText.reload();
         com.rtshop.story.StorySystems.load();
         com.rtshop.compat.SpellMana.load();

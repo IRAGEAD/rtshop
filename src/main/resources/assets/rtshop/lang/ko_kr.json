@@ -1854,5 +1854,13 @@
   "rtshop.return.left_m": "%s분",
   "rtshop.return.left_s": "%s초",
   "item.rtshop.return_ticket.tip_cd": "한 번 쓰면 %s분 뒤에 다시 쓸 수 있습니다.",
-  "rtshop.spawn.cd_cleared": "%s 님의 귀환권 대기 시간을 지웠습니다."
+  "rtshop.spawn.cd_cleared": "%s 님의 귀환권 대기 시간을 지웠습니다.",
+  "rtshop.mapmark.added": "지도에 「%s」의 자리가 적혔습니다.",
+  "rtshop.mapmark.place_added": "지도 장소 「%s」: (%s, %s, %s), 반경 %s칸. 이 안에 들어선 사람의 지도에 이름이 남습니다.",
+  "rtshop.mapmark.place_removed": "지도 장소 「%s」을(를) 지웠습니다.",
+  "rtshop.mapmark.place_unknown": "「%s」(이)라는 지도 장소가 없습니다.",
+  "rtshop.mapmark.place_none": "정해 둔 지도 장소가 없습니다. /rtshop mapmark add <반경> <이름> 으로 서 있는 자리를 더합니다.",
+  "rtshop.mapmark.place_line": "· %s — %s (%s, %s, %s), 반경 %s칸",
+  "rtshop.mapmark.resent": "알게 된 표시 %s개를 지도에 다시 넣었습니다.",
+  "rtshop.mapmark.forgot": "지도 표시의 기록을 지웠습니다. 다시 말을 걸거나 찾아가면 새로 적힙니다."
 }

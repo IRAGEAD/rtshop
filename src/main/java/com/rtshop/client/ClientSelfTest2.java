@@ -58,6 +58,8 @@ final class ClientSelfTest2 {
         STEPS.get(k).run(mc);
     }
 
+    private static int MAP_FIRST = -9;
+
     private static void waitTicks(int n) {
         ClientSelfTest.wait = n;
     }
@@ -1477,6 +1479,57 @@ final class ClientSelfTest2 {
         add(mc -> {
             shot(mc, "129b_guide_tools");
             mc.setScreen(null);
+            waitTicks(5);
+        });
+        // 지도 표시 (3.54): 서버가 알려 준 NPC·장소가 지도 모드(Diorama)의 웨이포인트로 들어간다. 지도 모드가 없으면 아무 일도 없다.
+        add(mc -> {
+            onServer(mc, sp -> {
+                com.rtshop.story.MapMarks.forgetAll(sp);
+                com.rtshop.story.MapMarks.mark(sp, "test:mark", "RT 점검 표시", sp.level().dimension().location().toString(),
+                        sp.blockPosition().getX() + 5, sp.blockPosition().getY(), sp.blockPosition().getZ(), 0xFFE8C56A);
+            });
+            waitTicks(70);
+        });
+        add(mc -> {
+            String folder = com.rtshop.story.MapMarks.get().folder;
+            int first = MapMarkClient.countForTest(folder, "RT 점검 표시");
+            MAP_FIRST = first;
+            // 같은 표시를 다시 받아도 늘지 않고, 자리가 바뀌면 있던 것을 고친다
+            onServer(mc, sp -> {
+                com.rtshop.story.MapMarks.sendAll(sp, false);
+                com.rtshop.story.MapMarks.mark(sp, "test:mark", "RT 점검 표시", sp.level().dimension().location().toString(),
+                        sp.blockPosition().getX() + 40, sp.blockPosition().getY(), sp.blockPosition().getZ(), 0xFFE8C56A);
+            });
+            waitTicks(50);
+        });
+        add(mc -> {
+            String folder = com.rtshop.story.MapMarks.get().folder;
+            boolean has = net.minecraftforge.fml.ModList.get().isLoaded("diorama");
+            int second = MapMarkClient.countForTest(folder, "RT 점검 표시");
+            if (has) {
+                check("map marks land in the map mod's waypoint list (folder " + folder + "): added once, not doubled when sent again, moved in place",
+                        MAP_FIRST == 1 && second == 1 && MapMarkClient.addedForTest >= 1 && MapMarkClient.movedForTest >= 1 && MapMarkClient.errorForTest.isEmpty(),
+                        MAP_FIRST + " " + second + " added " + MapMarkClient.addedForTest + " moved " + MapMarkClient.movedForTest + " " + MapMarkClient.errorForTest);
+            } else {
+                check("without the map mod, map marks are ignored quietly", !MapMarkClient.available() && second == -1 && MapMarkClient.addedForTest == 0);
+            }
+            // 점검용 표시를 지도에서 다시 뺀다
+            onServer(mc, sp -> {
+                com.rtshop.story.MapMarks.Config c = com.rtshop.story.MapMarks.get();
+                com.rtshop.story.MapMarks.forgetAll(sp);
+                try {
+                    com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> sp), new com.rtshop.net.StoryPacket(
+                            com.rtshop.net.StoryPacket.MAP_MARKS, "{\"folder\":\"" + c.folder + "\",\"marks\":[],\"gone\":[\"test:mark\"],\"notify\":false,\"force\":false}"));
+                } catch (Throwable ignored) {
+                }
+            });
+            waitTicks(40);
+        });
+        add(mc -> {
+            if (net.minecraftforge.fml.ModList.get().isLoaded("diorama")) {
+                int left = MapMarkClient.countForTest(com.rtshop.story.MapMarks.get().folder, "RT 점검 표시");
+                check("a mark the server reports as gone is taken off the map again", left == 0 && MapMarkClient.removedForTest >= 1, left + " removed " + MapMarkClient.removedForTest);
+            }
             waitTicks(5);
         });
         // 칭호: 쌓은 기록만큼 열리고, 힘 쓰는 칭호와 내거는 칭호를 고른다

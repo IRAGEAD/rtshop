@@ -94,3 +94,10 @@
   - 쿨타임은 실제 시간, 종류마다 따로, 죽거나 나갔다 와도 남음 (`town_spawn.json` 의 normalCooldownMinutes / premiumCooldownMinutes). 운영자: `/rtshop spawn resetcd [사람]`
   - 이미 깔린 서버: `town_spawn.json` 은 거리 10000 → 3000 으로 자동 고침(따로 바꾼 값은 그대로), 잡화점의 값은 옛 기본값(1500 / 12000) 그대로일 때만 새 값으로 고침
   - 함께 고친 것: 고급 귀환권의 하루 구매 수가 죽으면 지워지던 문제
+
+## 3.54 (작업 가지 v5-next4)
+
+- A-10 지도 표시 ◐: 말을 걸어 본 NPC 와 가 본 장소의 이름이 Diorama 지도의 웨이포인트(폴더 「베스탈리아」)로 남는다.
+  - 서버 `story/MapMarks` (`map_marks.json`): NPC 는 말을 걸 때, 장소는 운영자가 정한 자리(`/rtshop mapmark add <반경> <이름>` · `remove <이름>` · `list`)에 들어설 때 적힌다. 사람마다 따로, 죽어도 남는다.
+  - 클라이언트 `client/MapMarkClient`: Diorama 에는 공개 API 가 없어 웨이포인트 저장소를 리플렉션으로 쓴다 (없으면 아무 일도 없음). 플레이어가 지도에서 지운 표시는 다시 넣지 않는다 (`/rtshop mapmark resend` 로 되살림, `forget` 으로 기록 지움).
+  - 건물 이름은 운영자가 자리를 정해 줘야 한다 (A-9 NPC 배치와 함께 사용자가 정할 일).
