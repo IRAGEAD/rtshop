@@ -1,7 +1,0 @@
--proc:none
--d
-/tmp/jc
--sourcepath
-src/main/java:src/stubs/java
-src/main/java/com/rtshop/client/ClientSelfTest2.java
-src/main/java/com/rtshop/test/SelfTest.java
