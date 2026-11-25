@@ -2445,6 +2445,10 @@ public final class SelfTest {
             check("playing together: a second player with the same companion joins the one already there (no twin), is greeted once, and shares its kills",
                     took && one && greeted && pw != null && pw[2] == 1, took + "/" + one + "/" + greeted + "/" + (pw == null ? "null" : java.util.Arrays.toString(pw)));
             if (z2.isAlive()) z2.discard();
+            // 점검에서는 동행을 손으로 틱한다: 발밑 청크가 없어 아래로 떨어지지 않게 띄워 두고 제자리에 다시 세운다
+            c.setNoGravity(true);
+            c.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+            c.moveTo(a.getX() + 1, a.getY(), a.getZ(), 0, 0);
             QuestManager.abandon(a, "t_inspect");
             for (int i = 0; i < 220 && !c.isRemoved() && c.owner() != walker; i++) { // 쓰러져 있던 동행이 일어난 뒤에 알아챈다
                 c.tickCount++;
