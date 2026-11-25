@@ -5,3 +5,4 @@ run/
 *.iml
 eclipse/
 javac.*.args
+__pycache__/

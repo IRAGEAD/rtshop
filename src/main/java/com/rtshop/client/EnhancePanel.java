@@ -31,7 +31,24 @@ public final class EnhancePanel {
     private EnhancePanel() {
     }
 
-    public static final int W = 168, H = 196, BTN = 16;
+    /** 3.49: 「세로 한 장」 — 모루 블록과 같은 재료(점판암 바탕 · 팔각 강철 테 · 놋쇠 상감). 그림은 tools/gen_enhance_panel.py. */
+    public static final int W = 204, H = 280, BTN = 16;
+    private static final net.minecraft.resources.ResourceLocation T_PANEL = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "textures/gui/enhance/panel.png");
+    private static final net.minecraft.resources.ResourceLocation T_RUNES = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "textures/gui/enhance/runes.png");
+    private static final net.minecraft.resources.ResourceLocation T_PLATE = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "textures/gui/enhance/plate.png");
+    // 색: 점판암 위의 글자(밝음) · 강철 판 위의 글자(어두움) · 놋쇠
+    static final int C_ON_SLATE = 0xFFEEF0F6, C_ON_SLATE_SOFT = 0xFFC8CEDC, C_BRASS = 0xFFF0CC7A, C_PLATE_INK = 0xFF1A1E28, C_PLATE_SOFT = 0xFF545C6C,
+            C_UP = 0xFF147A42, C_OK_SLATE = 0xFF8CE89A, C_BAD_SLATE = 0xFFFF9A8A, C_BAD_PLATE = 0xFFBE2C2C;
+    /** 마지막으로 그릴 때의 마우스 자리 (창 안의 좌표; 재료 칸에 올리면 이름을 보여 준다). */
+    private static double hoverX = -1, hoverY = -1;
+    /** 점검용: 마지막으로 그린 재료 칸의 수(Gold 칸 포함), 켜진 룬의 수. */
+    public static int lastSlotsForTest, lastRunesForTest;
+
+    /** 화면에 다 들어오게 줄인 배율. */
+    public static double scale(Screen s) {
+        double sc = ClientConfig.get().enhPanelScale;
+        return Math.max(0.5, Math.min(sc, Math.min((s.height - BTN - 9.0) / H, (s.width - 8.0) / W)));
+    }
     /** 단추 종류. */
     public static final int B_ODDS = 0, B_SETTINGS = 1, B_EDIT = 2, B_SHOW = 3, B_DETAIL = 4;
 
@@ -57,7 +74,7 @@ public final class EnhancePanel {
     /** {x, y, w(화면), h(화면), 배율×100}. auto = 강화 창이면 창 오른쪽, 아니면 화면 오른쪽 가운데. */
     public static int[] rect(Screen s, int autoX, int autoY) {
         ClientConfig c = ClientConfig.get();
-        double sc = c.enhPanelScale;
+        double sc = scale(s);
         int w = (int) Math.round(W * sc), h = (int) Math.round(H * sc);
         int x, y;
         if (c.enhPanelX < 0 || c.enhPanelY < 0) {
@@ -114,11 +131,14 @@ public final class EnhancePanel {
         Minecraft mc = Minecraft.getInstance();
         if (ClientConfig.get().enhPanelEnabled) {
             float sc = r[4] / 100F;
+            hoverX = (mx - r[0]) / sc;
+            hoverY = (my - r[1]) / sc;
             g.pose().pushPose();
             g.pose().translate(r[0], r[1], 0);
             g.pose().scale(sc, sc, 1);
             draw(g, font, menu, mc.player, 0, 0, W, H);
             g.pose().popPose();
+            hoverX = hoverY = -1;
         }
         for (int[] b : buttons(r)) {
             Ui.button(g, font, b[0], b[1], b[2], BTN, Ui.clip(font, label(b[3], tableOpen), b[2] - 4),
@@ -161,8 +181,8 @@ public final class EnhancePanel {
     // ------------------------------------------------------------------ 그리기
 
     public static void draw(GuiGraphics g, Font font, EnhanceMenu menu, Player player, int x, int y, int w, int h) {
-        Ui.woodFrame(g, x, y, w, h);
-        Ui.bevel(g, x + 5, y + 5, w - 10, h - 10, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        g.blit(T_PANEL, x, y, W, H, 0, 0, W * 2, H * 2, W * 2, H * 2);
         ItemStack eq = menu.equipment();
         if (detail) {
             drawDetail(g, font, eq, x, y, w, h);
@@ -171,105 +191,211 @@ public final class EnhancePanel {
         }
     }
 
+    /** 점판암 위의 글자: 밝은 색 + 그림자. */
+    private static void slate(GuiGraphics g, Font font, String t, int x, int y, int col) {
+        g.drawString(font, t, x, y, col, true);
+    }
+
+    private static void slateCentered(GuiGraphics g, Font font, String t, int cx, int y, int col) {
+        g.drawString(font, t, cx - font.width(t) / 2, y, col, true);
+    }
+
+    /** 닦은 강철 판 (가운데가 늘어나는 9칸 그림; 그림은 화면 48칸 = 96픽셀, 모서리 6칸). */
+    static void plate(GuiGraphics g, int x, int y, int w, int h) {
+        int c = 6, t = 96, cc = 12, mid = 96 - 24;
+        int[][] cols = {{x, c, 0, cc}, {x + c, w - 2 * c, cc, mid}, {x + w - c, c, t - cc, cc}};
+        int[][] rows = {{y, c, 0, cc}, {y + c, h - 2 * c, cc, mid}, {y + h - c, c, t - cc, cc}};
+        for (int[] ry : rows) {
+            for (int[] cx : cols) {
+                if (cx[1] > 0 && ry[1] > 0) g.blit(T_PLATE, cx[0], ry[0], cx[1], ry[1], cx[2], ry[2], cx[3], ry[3], t, t);
+            }
+        }
+    }
+
     private static void help(GuiGraphics g, Font font, int tx, int ty, int tw, int bottom, String... keys) {
         for (String k : keys) {
             for (FormattedCharSequence line : font.split(Component.translatable(k), tw)) {
                 if (ty > bottom) return;
-                g.drawString(font, line, tx, ty, Ui.C_INK_SOFT, false);
+                g.drawString(font, line, tx, ty, C_ON_SLATE_SOFT, true);
                 ty += 10;
             }
             ty += 3;
         }
     }
 
-    /** 장비 이름 줄: 아이콘 + 이름, 오른쪽에 단계. 다음 줄의 y 를 돌려준다. */
-    private static int header(GuiGraphics g, Font font, ItemStack eq, String right, int tx, int ty, int tw) {
-        g.renderItem(eq, tx - 1, ty - 2);
-        int rw = font.width(right);
-        g.drawString(font, right, tx + tw - rw, ty + 3, 0xFF8A5A00, false);
-        String name = Ui.clip(font, eq.getHoverName().getString(), tw - 20 - rw - 4);
-        g.drawString(font, name, tx + 18, ty + 3, Ui.C_INK, false);
-        return ty + 18;
+    /** 글자를 가운데에 두고 키워 그린다. */
+    private static void big(GuiGraphics g, Font font, String t, float cx, float y, float sc, int col, boolean shadow) {
+        g.pose().pushPose();
+        g.pose().translate(cx - font.width(t) * sc / 2F, y, 0);
+        g.pose().scale(sc, sc, 1);
+        g.drawString(font, t, 0, 0, col, shadow);
+        g.pose().popPose();
+    }
+
+    private static boolean over(int x, int y, int w, int h) {
+        return hoverX >= x && hoverX < x + w && hoverY >= y && hoverY < y + h;
     }
 
     private static void drawMain(GuiGraphics g, Font font, EnhanceMenu menu, Player player, ItemStack eq, int x, int y, int w, int h) {
-        int tx = x + 10, ty = y + 10, tw = w - 20;
+        int cx = x + w / 2;
         EnhanceConfig cfg = EnhanceConfig.client();
+        slateCentered(g, font, Component.translatable("rtshop.enhance.panel").getString(), cx, y + 15, C_BRASS);
+        lastSlotsForTest = 0;
+        lastRunesForTest = 0;
         if (eq.isEmpty() || !Enhance.enhanceable(eq)) {
-            g.drawString(font, Component.translatable("rtshop.enhance.panel"), tx, ty, Ui.C_INK, false);
-            help(g, font, tx, ty + 13, tw, y + h - 24, "rtshop.enhance.help1", "rtshop.enhance.help2", "rtshop.enhance.help3", "rtshop.enhance.help4");
+            help(g, font, x + 16, y + 132, w - 32, y + h - 24, "rtshop.enhance.help1", "rtshop.enhance.help2", "rtshop.enhance.help3", "rtshop.enhance.help4");
             return;
         }
         int cur = Enhance.level(eq);
         EnhanceConfig.Level l = cfg.level(cur + 1);
-        ty = header(g, font, eq, l == null ? "+" + cur + " MAX" : "+" + cur + " → +" + (cur + 1), tx, ty, tw);
-        // 능력치: 지금 → 다음
-        for (Stat st : stats(eq, cur, l != null, cfg)) {
-            g.drawString(font, Ui.clip(font, st.label, tw - font.width(st.now + st.next) - 4), tx, ty, Ui.C_INK_SOFT, false);
-            int vx = tx + tw - font.width(st.now + st.next);
-            g.drawString(font, st.now, vx, ty, Ui.C_INK, false);
-            if (!st.next.isEmpty()) g.drawString(font, st.next, vx + font.width(st.now), ty, 0xFF1E7A2E, false);
-            ty += 10;
+        // 팔각 메달 속의 장비 (두 배 크기)
+        g.pose().pushPose();
+        g.pose().translate(cx - 16, y + 42, 0);
+        g.pose().scale(2F, 2F, 1F);
+        g.renderItem(eq, 0, 0);
+        g.pose().popPose();
+        slateCentered(g, font, Ui.clip(font, eq.getHoverName().getString(), w - 30), cx, y + 91, C_ON_SLATE);
+        // 룬 띠: 강화 단계만큼 불이 들어온다 (다음 단계의 룬이 가장 밝다)
+        float step = (W - 28 - 16) / (float) (EnhanceConfig.MAX_LEVEL - 1);
+        for (int i = 0; i < EnhanceConfig.MAX_LEVEL && i < 11; i++) {
+            boolean lit = i < cur, next = i == cur && l != null;
+            if (!lit && !next) continue;
+            int rx = Math.round(x + 14 + 8 + i * step) - 8;
+            g.blit(T_RUNES, rx, y + 108, 16, 15, i * 32, next ? 30 : 0, 32, 30, 352, 60);
+            if (lit) lastRunesForTest++;
         }
-        ty += 3;
-        g.fill(tx, ty - 2, tx + tw, ty - 1, Ui.C_PARCH_SHADE);
+        // +지금 ▶ +다음
         if (l == null) {
-            help(g, font, tx, ty + 2, tw, y + h - 14, "rtshop.enhance.max_note");
+            big(g, font, "+" + cur + " MAX", cx, y + 128, 1.25F, C_BRASS, true);
+        } else {
+            String a = "+" + cur, b = "+" + (cur + 1);
+            g.drawString(font, a, cx - 12 - font.width(a), y + 130, C_ON_SLATE_SOFT, true);
+            g.drawString(font, "▶", cx - 4, y + 130, C_BRASS, true);
+            g.pose().pushPose();
+            g.pose().translate(cx + 10, y + 127, 0);
+            g.pose().scale(1.4F, 1.4F, 1);
+            g.drawString(font, b, 0, 0, C_BRASS, true);
+            g.pose().popPose();
+        }
+        // 능력치: 지금 → 다음 (강철 판)
+        List<Stat> stats = stats(eq, cur, l != null, cfg);
+        int px = x + 14, pw = w - 28, py = y + 146, ph = 8 + stats.size() * 11;
+        plate(g, px, py, pw, ph);
+        int ty = py + 5;
+        for (Stat st : stats) {
+            int vw = font.width(st.now + st.next);
+            g.drawString(font, Ui.clip(font, st.label, pw - 14 - vw), px + 6, ty, C_PLATE_SOFT, false);
+            int vx = px + pw - 6 - vw;
+            g.drawString(font, st.now, vx, ty, C_PLATE_INK, false);
+            if (!st.next.isEmpty()) g.drawString(font, st.next, vx + font.width(st.now), ty, C_UP, false);
+            ty += 11;
+        }
+        int oy = py + ph + 4;
+        if (l == null) {
+            help(g, font, x + 16, oy + 4, w - 32, y + h - 14, "rtshop.enhance.max_note");
             return;
         }
+        // 확률: 성공은 크게, 나머지 셋은 작게
         int mask = Enhance.activeGuard(player);
         Enhance.Guard guard = Enhance.fromMask(mask);
         double[] e = EnhanceClient.effective(l, guard, cur);
-        String[] keys = {"rtshop.enhance.odds_success", "rtshop.enhance.odds_maintain", "rtshop.enhance.odds_damage", "rtshop.enhance.odds_destroy"};
-        int[] cols = {Ui.C_GREEN, 0xFF4A4A4A, 0xFFB86A10, Ui.C_RED};
-        ty += 1;
-        for (int i = 0; i < 4; i++) {
-            int cx = tx + (i % 2) * (tw / 2), cy = ty + (i / 2) * 11;
-            g.drawString(font, Component.translatable(keys[i], EnhanceClient.pct(e[i])), cx, cy, cols[i], false);
+        String[] names = {"rtshop.enhui.odds_success", "rtshop.enhui.odds_maintain", "rtshop.enhui.odds_damage", "rtshop.enhui.odds_destroy"};
+        int[] cols = {0xFF1E8C4C, 0xFF606878, 0xFFCE7C1A, C_BAD_PLATE};
+        int oh = 38, bigW = 58, smW = (pw - bigW - 9) / 3;
+        plate(g, px, oy, bigW, oh);
+        big(g, font, EnhanceClient.pct(e[0]), px + bigW / 2F, oy + 7, 1.6F, cols[0], false);
+        String sl = Component.translatable(names[0]).getString();
+        g.drawString(font, sl, px + (bigW - font.width(sl)) / 2, oy + 25, C_PLATE_SOFT, false);
+        for (int i = 1; i < 4; i++) {
+            int bx = px + bigW + 3 + (i - 1) * (smW + 3);
+            plate(g, bx, oy, smW, oh);
+            boolean on = e[i] > 0;
+            g.fill(bx + smW / 2 - 2, oy + 5, bx + smW / 2 + 2, oy + 9, on ? cols[i] : 0xFFB0B6C2);
+            String pc = EnhanceClient.pct(e[i]);
+            g.drawString(font, pc, bx + (smW - font.width(pc)) / 2, oy + 13, on ? cols[i] : 0xFF969CAA, false);
+            String nm = Ui.clip(font, Component.translatable(names[i]).getString(), smW - 4);
+            g.drawString(font, nm, bx + (smW - font.width(nm)) / 2, oy + 25, C_PLATE_SOFT, false);
         }
-        ty += 25;
-        g.fill(tx, ty - 2, tx + tw, ty - 1, Ui.C_PARCH_SHADE);
+        // 재료 칸 + Gold 칸 + 보호권 칸
+        int my0 = oy + oh + 5, size = 26, gap = 29;
         boolean free = player.getAbilities().instabuild;
         long tick = System.currentTimeMillis() / 1000;
-        for (Enhance.Need n : Enhance.needs(cfg, l, player)) {
-            Item icon = n.items.get((int) (tick % n.items.size()));
-            g.renderItem(new ItemStack(icon), tx, ty);
-            String name = Ui.clip(font, EnhanceClient.materialName(cfg, n).getString(), tw - 52);
-            g.drawString(font, name, tx + 19, ty + 4, Ui.C_INK, false);
-            String cnt = n.have + "/" + n.need;
-            g.drawString(font, cnt, tx + tw - font.width(cnt), ty + 4, n.ok() || free ? Ui.C_GREEN : Ui.C_RED, false);
-            ty += 17;
-        }
-        Ui.coin(g, tx + 2, ty + 1, 12);
-        String gold = Ui.num(l.gold) + " G";
-        boolean goldOk = free || ClientEconomy.wallet >= l.gold;
-        g.drawString(font, gold, tx + 19, ty + 3, goldOk ? Ui.C_GOLD_DARK : Ui.C_RED, false);
-        String have = "(" + Ui.num(ClientEconomy.wallet) + ")";
-        g.drawString(font, have, tx + tw - font.width(have), ty + 3, Ui.C_INK_SOFT, false);
-        ty += 16;
-        boolean ok = menu.getSlot(2).hasItem() && menu.getSlot(2).mayPickup(player);
-        Component hint = Component.translatable(ok ? "rtshop.enhance.click_hint" : "rtshop.enhance.missing");
-        List<FormattedCharSequence> hl = font.split(hint, tw);
-        int hy = y + h - 10 - hl.size() * 10;
-        Component gl = guard != Enhance.Guard.NONE ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
-                : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : "rtshop.enhance.no_guard");
-        for (FormattedCharSequence line : font.split(gl, tw)) {
-            if (ty + 9 > hy) break;
-            g.drawString(font, line, tx, ty, guard != Enhance.Guard.NONE ? 0xFF1F6F8B : l.destroy > 0 ? Ui.C_RED : Ui.C_INK_SOFT, false);
-            ty += 10;
-        }
-        if (hy >= ty) {
-            for (FormattedCharSequence line : hl) {
-                g.drawString(font, line, tx, hy, ok ? Ui.C_GREEN : Ui.C_RED, false);
-                hy += 10;
+        List<Enhance.Need> needs = Enhance.needs(cfg, l, player);
+        int shown = Math.min(3, needs.size());
+        Component tip = null;
+        for (int i = 0; i <= shown; i++) {
+            int bx = px + i * gap;
+            plate(g, bx, my0, size, size);
+            String cnt;
+            boolean ok;
+            Component name;
+            if (i < shown) {
+                Enhance.Need n = needs.get(i);
+                g.renderItem(new ItemStack(n.items.get((int) (tick % n.items.size()))), bx + 5, my0 + 3);
+                cnt = n.have + "/" + n.need;
+                ok = n.ok() || free;
+                name = EnhanceClient.materialName(cfg, n);
+            } else {
+                Ui.coin(g, bx + 7, my0 + 4, 12);
+                cnt = Ui.compact(l.gold);
+                ok = free || ClientEconomy.wallet >= l.gold;
+                name = Component.literal(Ui.num(l.gold) + " G  (" + Ui.num(ClientEconomy.wallet) + ")");
             }
+            g.pose().pushPose();
+            g.pose().translate(bx + size - 2 - font.width(cnt) * 0.75F, my0 + size - 8, 200);
+            g.pose().scale(0.75F, 0.75F, 1);
+            g.drawString(font, cnt, 0, 0, ok ? C_UP : C_BAD_PLATE, false);
+            g.pose().popPose();
+            if (over(bx, my0, size, size)) tip = name.copy().append(Component.literal("  " + cnt).withStyle(ok ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED));
+            lastSlotsForTest++;
+        }
+        int gx = px + (shown + 1) * gap, gw = px + pw - gx;
+        plate(g, gx, my0, gw, size);
+        boolean guarded = guard != Enhance.Guard.NONE;
+        String g1 = Component.translatable("rtshop.enhui.guard").getString();
+        String g2 = guarded ? Enhance.guardName(mask).getString() : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : "rtshop.enhui.guard_none").getString();
+        g.drawString(font, Ui.clip(font, g1, gw - 8), gx + 5, my0 + 4, C_PLATE_INK, false);
+        g.drawString(font, Ui.clip(font, g2, gw - 8), gx + 5, my0 + 14, guarded ? 0xFF1F6F8B : l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, false);
+        if (over(gx, my0, gw, size)) {
+            tip = guarded ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
+                    : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : "rtshop.enhance.no_guard");
+        }
+        // 맨 아래 한마디: 누르면 강화 / 무엇이 모자란지
+        boolean ok = menu.getSlot(2).hasItem() && menu.getSlot(2).mayPickup(player);
+        List<FormattedCharSequence> hl = font.split(Component.translatable(ok ? "rtshop.enhance.click_hint" : "rtshop.enhance.missing"), w - 30);
+        int hy = y + h - 12 - Math.min(2, hl.size()) * 10;
+        for (int i = 0; i < hl.size() && i < 2; i++) {
+            g.drawString(font, hl.get(i), cx - font.width(hl.get(i)) / 2, hy + i * 10, ok ? C_OK_SLATE : C_BAD_SLATE, true);
+        }
+        if (tip != null) {
+            // 재료·보호권 칸에 마우스를 올리면 그 이름을 창 안에 띠로 보여 준다 (설명 창은 쓰지 않는다)
+            List<FormattedCharSequence> tl = font.split(tip, w - 36);
+            int th = tl.size() * 10 + 6, ty0 = my0 - th - 2;
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 300);
+            g.fill(x + 14, ty0, x + w - 14, ty0 + th, 0xF0101420);
+            g.fill(x + 14, ty0, x + w - 14, ty0 + 1, 0xFFC8A050);
+            for (int i = 0; i < tl.size(); i++) g.drawString(font, tl.get(i), x + 18, ty0 + 4 + i * 10, 0xFFFFFFFF, false);
+            g.pose().popPose();
         }
     }
 
     private static void drawDetail(GuiGraphics g, Font font, ItemStack eq, int x, int y, int w, int h) {
         int tx = x + 10, ty = y + 10, tw = w - 20;
-        g.drawString(font, Component.translatable("rtshop.enhui.detail_title"), tx, ty, Ui.C_INK, false);
-        int bx0 = x + 8, by0 = y + 22, bx1 = x + w - 8, by1 = y + h - 8;
+        ty = y + 124;
+        tx = x + 16;
+        tw = w - 32;
+        if (!eq.isEmpty()) {
+            g.pose().pushPose();
+            g.pose().translate(x + w / 2F - 16, y + 42, 0);
+            g.pose().scale(2F, 2F, 1F);
+            g.renderItem(eq, 0, 0);
+            g.pose().popPose();
+            slateCentered(g, font, Ui.clip(font, eq.getHoverName().getString(), w - 30), x + w / 2, y + 91, C_ON_SLATE);
+        }
+        slateCentered(g, font, Component.translatable("rtshop.enhance.panel").getString(), x + w / 2, y + 15, C_BRASS);
+        g.drawString(font, Component.translatable("rtshop.enhui.detail_title"), tx, ty, C_ON_SLATE, true);
+        int bx0 = x + 14, by0 = y + 136, bx1 = x + w - 14, by1 = y + h - 14;
         // 설명 창과 같은 어두운 바탕 (글자 색이 어두운 바탕용이라서)
         g.fill(bx0, by0, bx1, by1, 0xF0100010);
         g.fill(bx0, by0, bx1, by0 + 1, 0xFF5000FF);
@@ -311,7 +437,7 @@ public final class EnhancePanel {
             int barY = by0 + 2 + (trackH - barH) * detailScroll / max;
             g.fill(bx1 - 3, barY, bx1 - 1, barY + barH, 0xFFB0A0FF);
             String more = Component.translatable("rtshop.enhui.detail_scroll").getString();
-            g.drawString(font, more, x + w - 10 - font.width(more), ty, Ui.C_INK_SOFT, false);
+            g.drawString(font, more, x + w - 16 - font.width(more), ty, C_ON_SLATE_SOFT, true);
         }
     }
 

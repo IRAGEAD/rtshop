@@ -37,7 +37,7 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
         super.init();
         // 패널이 자동 자리(창 오른쪽)에 들어갈 만큼 창을 왼쪽으로 민다
         if (ClientConfig.get().enhPanelX < 0 && ClientConfig.get().enhPanelEnabled) {
-            int total = imageWidth + 6 + (int) Math.round(EnhancePanel.W * ClientConfig.get().enhPanelScale);
+            int total = imageWidth + 6 + (int) Math.round(EnhancePanel.W * EnhancePanel.scale(this));
             this.leftPos = Math.max(2, (this.width - total) / 2);
         }
     }
@@ -52,7 +52,7 @@ public class EnhanceScreen extends AbstractContainerScreen<EnhanceMenu> {
 
     /** 정보 창이 강화 창보다 길어서, 둘의 가운데를 맞춘다. */
     int autoY() {
-        int ph = (int) Math.round(EnhancePanel.H * ClientConfig.get().enhPanelScale) + EnhancePanel.BTN + 3;
+        int ph = (int) Math.round(EnhancePanel.H * EnhancePanel.scale(this)) + EnhancePanel.BTN + 3;
         return Math.max(2, topPos - (ph - imageHeight) / 2);
     }
 

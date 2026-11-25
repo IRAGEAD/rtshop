@@ -1640,5 +1640,12 @@
   "rtshop.manual.style.ochs": "Ochs stance",
   "rtshop.manual.style.ranged": "Ranged",
   "rtshop.manual.style_note": "The form depends on your other hand (empty, shield, or a matching weapon) or on learned skills.",
-  "rtshop.manual.skill_hold": "How to use: hold %s in battle mode (a short press is a basic attack). You can give the skill its own key in Options > Controls."
+  "rtshop.manual.skill_hold": "How to use: hold %s in battle mode (a short press is a basic attack). You can give the skill its own key in Options > Controls.",
+  "rtshop.enhui.odds_success": "Success",
+  "rtshop.enhui.odds_maintain": "Keep",
+  "rtshop.enhui.odds_damage": "Damage",
+  "rtshop.enhui.odds_destroy": "Destroy",
+  "rtshop.enhui.guard": "Protection",
+  "rtshop.enhui.guard_none": "None",
+  "rtshop.enhui.guard_risk": "None · may break"
 }
