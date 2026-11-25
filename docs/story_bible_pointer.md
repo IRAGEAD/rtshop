@@ -181,3 +181,10 @@
 - 몹 규칙(rules/MobRules, config/rtshop/mob_rules.json): 모드 몹의 자연 스폰은 20%만 남김(lycanth 10%, hollow=기사·보스·구조물 안·스포너·소환은 그대로). 보스가 아닌 몹은 무기·스킬북·인챈트 물건·모드 아이템을 떨어뜨리지 않는다(RT Shop 아이템, 퀘스트가 건네 달라는 아이템, 몹이 주운 물건, keepItems 는 남김).
 - 운영자 기능은 크리에이티브(관전)에서만 (util/Perm): 서바이벌의 OP 는 편집 창·[편집] 단추·OP 전용 명령어를 쓸 수 없다. /gamemode 는 남는다. 코드에서는 hasPermissions(2) 대신 Perm.op(p).
 - 마법은 마법사만 (job/MagicLock, world_rules.json 의 magicOnlyForMage): Iron's Spells 의 모든 주문, Spell Engine 의 마법 계열 주문. 근접·활 계열(무기 기술)은 누구나. 크리에이티브는 언제나.
+
+3.50 (스택 유지 · 고급 무기 · 양산 음식 · 가방 창 정리 · 출석 달력)
+- 무기를 바꿔도 특수기의 스택·게이지가 남는다 (compat/EfStacks, world_rules.json 의 keepSkillStacks): 기술마다 따로 기억했다가 그 무기를 다시 들면 돌려준다. 죽거나 나가면 지운다.
+- 고급 무기(job/WeaponTypes.PREMIUM): 뽑기 표식이 있고 등급이 jobs.json 의 premiumFromGrade(기본 epic) 이상인 무기는 어느 직업의 무기 분류에도 들지 않는다(이점·불리 모두 없음).
+- 양산 음식(rules/FoodRules, config/rtshop/food_rules.json): 빵·케이크·쿠키·호박 파이·구운 감자·말린 켈프·날 작물은 배고픔을 절반만 채운다. 손수 만든 요리(요리 표식)는 그대로.
+- 가방 창 왼쪽 위의 다른 모드 기능 단추(FTB 사이드바)를 없앤다 (client.json 의 hideSidebarButtons). 직업 딱지는 오른쪽 위, 퀘스트 저널 단추 옆.
+- 출석 달력: 받은 날(초록)·오늘 받을 날(금빛, 깜빡이는 테)·남은 날(어둡게)·놓친 요일(붉게)을 칸 빛깔로 구분하고 아래에 범례.
