@@ -864,6 +864,7 @@ public class MagicGachaScreen extends Screen {
     /** 뽑은 것 (화면 한가운데). Cinematic 장면에서도 쓴다. w·h = 그리는 화면의 크기. */
     public void drawResults(GuiGraphics g, List<MagicFx.Card> shown, int sw, int sh) {
         int n = shown.size();
+        if (n == 0) return; // 보여 줄 카드가 없으면 그리지 않는다 (0 으로 나누지 않게)
         int cols = n > 5 ? 5 : n;
         int rows = (n + cols - 1) / cols;
         int cw = 96, ch = 30;
