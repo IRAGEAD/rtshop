@@ -22,9 +22,17 @@ def walk(x, key=None):
 for name in ('dialogue.json', 'readables.json', 'guide.json', 'quests/npcs.json', 'quests/tutorial.json', 'quests/job_quests.json'):
     data = json.load(open(os.path.join(R, name), encoding='utf-8'))
     walk(data['items'] if name == 'readables.json' else data)   # 읽을 물건은 'items' 아래에 글이 있다
+    if name in ('quests/tutorial.json', 'quests/job_quests.json'):
+        # 'quests' 는 조건 목록의 열쇠라 위에서 건너뛴다: 퀘스트 파일의 본문은 여기서 따로 모은다
+        for qd in data.get('quests', []): walk(qd)
 path = os.path.join(here, 'source2.json')
 old = json.load(open(path, encoding='utf-8')) if os.path.exists(path) else []
 have = set(old)
 add = [s for s in dict.fromkeys(found) if s not in have and s not in done]
 json.dump(old + add, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
 print(len(old), '+', len(add), '=', len(old) + len(add), 'lines,', sum(len(s) for s in old + add), 'chars')
+import sys
+if '--show' in sys.argv:
+    a, b = int(sys.argv[sys.argv.index('--show') + 1]), int(sys.argv[sys.argv.index('--show') + 2])
+    allv = old + add
+    for i in range(a, min(b, len(allv))): print(i, json.dumps(allv[i], ensure_ascii=False))
