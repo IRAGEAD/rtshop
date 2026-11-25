@@ -1508,6 +1508,7 @@ public final class QuestManager {
     public static void onKill(ServerPlayer p, LivingEntity victim) {
         com.rtshop.story.Hunts.onKill(p, victim); // 토벌 의뢰·몹 도감 (처치 인정은 퀘스트와 같다)
         com.rtshop.rank.Ranks.onKill(p, victim);  // 기록·칭호 (같은 기준)
+        com.rtshop.story.Codex.onKill(p, victim); // 도감 (같은 기준)
         QuestData.Progress pr = prog(p);
         if (pr.active.isEmpty()) {
             return;

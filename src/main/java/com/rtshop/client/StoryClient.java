@@ -45,6 +45,16 @@ public final class StoryClient {
                 BossMusicClient.receive(JsonParser.parseString(json).getAsJsonObject());
             } catch (Exception ignored) {
             }
+        } else if (kind == StoryPacket.CODEX) {
+            try {
+                CodexScreen.open(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
+        } else if (kind == StoryPacket.CODEX_MOB) {
+            try {
+                CodexScreen.detail(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.RANKS) {
             try {
                 RankScreen.open(JsonParser.parseString(json).getAsJsonObject());

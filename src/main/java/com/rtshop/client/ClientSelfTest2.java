@@ -1385,6 +1385,67 @@ final class ClientSelfTest2 {
             });
             waitTicks(5);
         });
+        // 도감: 마주친 몹·잡은 몹·지닌 장비가 적힌다
+        add(mc -> {
+            onServer(mc, sp -> {
+                com.rtshop.story.Codex.resetForTest(sp);
+                net.minecraft.server.level.ServerLevel lv = sp.serverLevel();
+                for (net.minecraft.world.entity.EntityType<?> t : java.util.List.of(net.minecraft.world.entity.EntityType.ZOMBIE, net.minecraft.world.entity.EntityType.SKELETON,
+                        net.minecraft.world.entity.EntityType.CREEPER, net.minecraft.world.entity.EntityType.COW, net.minecraft.world.entity.EntityType.WITHER)) {
+                    if (t.create(lv) instanceof net.minecraft.world.entity.LivingEntity le) {
+                        com.rtshop.story.Codex.meet(sp, le);
+                        if (t != net.minecraft.world.entity.EntityType.CREEPER) com.rtshop.story.Codex.onKill(sp, le);
+                    }
+                }
+                sp.getInventory().add(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                com.rtshop.story.Codex.open(sp);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            if (mc.screen instanceof CodexScreen c) {
+                boolean picked = c.selectForTest("minecraft:zombie");
+                check("the codex opens with every mob, boss and piece of gear listed; what was met or slain is known and the rest is locked",
+                        c.totalForTest(0) >= 30 && c.totalForTest(1) >= 2 && c.totalForTest(2) >= 50 && c.knownForTest(0) >= 4 && c.knownForTest(1) >= 1
+                                && c.knownForTest(2) >= 1 && c.stateForTest("minecraft:creeper") == 1 && c.stateForTest("minecraft:zombie") == 2
+                                && c.stateForTest("minecraft:spider") == 0 && picked,
+                        c.totalForTest(0) + "/" + c.totalForTest(1) + "/" + c.totalForTest(2) + " known " + c.knownForTest(0) + "/" + c.knownForTest(1) + "/" + c.knownForTest(2));
+            } else {
+                check("the codex opens with every mob, boss and piece of gear listed; what was met or slain is known and the rest is locked", false, mc.screen);
+            }
+            waitTicks(20);
+        });
+        add(mc -> {
+            check("picking a slain mob shows its stats and drops", CodexScreen.hasDetailForTest("minecraft:zombie"));
+            shot(mc, "128a_codex_mob");
+            if (mc.screen instanceof CodexScreen c) {
+                c.knownOnlyForTest(true);
+                int knownShown = c.shownForTest();
+                c.searchForTest("zzzz-no-such-name");
+                int none = c.shownForTest();
+                c.searchForTest("");
+                c.knownOnlyForTest(false);
+                c.tabForTest(2);
+                boolean sword = c.selectForTest("minecraft:iron_sword");
+                check("the codex can show only what is known, search by name and list gear", knownShown >= 4 && knownShown < c.totalForTest(0) && none == 0 && sword && c.modsForTest() >= 1,
+                        knownShown + " / " + none + " / " + sword);
+            }
+            waitTicks(10);
+        });
+        add(mc -> {
+            shot(mc, "128b_codex_gear");
+            if (mc.screen instanceof CodexScreen c) {
+                c.tabForTest(1);
+                c.selectForTest("minecraft:wither");
+            }
+            waitTicks(20);
+        });
+        add(mc -> {
+            shot(mc, "128c_codex_boss");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.story.Codex.resetForTest(sp));
+            waitTicks(5);
+        });
         // 칭호: 쌓은 기록만큼 열리고, 힘 쓰는 칭호와 내거는 칭호를 고른다
         add(mc -> {
             com.rtshop.rank.Ranks.testAnywhere = true;

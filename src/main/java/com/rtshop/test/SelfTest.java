@@ -240,6 +240,50 @@ public final class SelfTest {
         }
     }
 
+    /** 도감: 마주치면 모습만, 잡으면 능력치·전리품까지, 장비는 지니면 적힌다. */
+    private static void codex(MinecraftServer server, ServerLevel level, FakePlayer a) {
+        com.rtshop.story.Codex.testFakes = true;
+        try {
+            com.rtshop.story.Codex.resetForTest(a);
+            java.util.Map<String, Boolean> mobs = com.rtshop.story.Codex.mobs();
+            java.util.List<String> gear = com.rtshop.story.Codex.gear();
+            check("codex: the list holds monsters, animals and bosses (not armor stands or players), and every kind of gear",
+                    mobs.containsKey("minecraft:zombie") && mobs.containsKey("minecraft:cow") && Boolean.TRUE.equals(mobs.get("minecraft:wither"))
+                            && Boolean.FALSE.equals(mobs.get("minecraft:zombie")) && !mobs.containsKey("minecraft:armor_stand") && !mobs.containsKey("minecraft:player")
+                            && !mobs.containsKey("minecraft:arrow") && gear.contains("minecraft:iron_sword") && gear.contains("minecraft:diamond_chestplate")
+                            && !gear.contains("minecraft:apple"), mobs.size() + " mobs, " + gear.size() + " gear");
+            net.minecraft.world.entity.monster.Zombie z = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
+            com.rtshop.story.Codex.Rec r = com.rtshop.story.Codex.rec(a);
+            int s0 = com.rtshop.story.Codex.state(r, "minecraft:zombie");
+            boolean metNew = com.rtshop.story.Codex.meet(a, z), metAgain = com.rtshop.story.Codex.meet(a, z);
+            int s1 = com.rtshop.story.Codex.state(r, "minecraft:zombie");
+            com.google.gson.JsonObject before = com.rtshop.story.Codex.detail(a, "minecraft:zombie");
+            com.rtshop.story.Codex.onKill(a, z);
+            com.rtshop.story.Codex.onKill(a, z);
+            int s2 = com.rtshop.story.Codex.state(r, "minecraft:zombie");
+            com.google.gson.JsonObject after = com.rtshop.story.Codex.detail(a, "minecraft:zombie");
+            check("codex: a mob is unknown, then met (look and name only), then slain (stats and drops are written)",
+                    s0 == 0 && metNew && !metAgain && s1 == 1 && !before.has("hp") && s2 == 2 && after.get("hp").getAsDouble() == 20.0
+                            && after.get("kills").getAsInt() == 2 && after.has("drops") && after.has("atk"),
+                    s0 + "/" + s1 + "/" + s2 + " " + after);
+            a.getInventory().clearContent();
+            a.getInventory().add(new ItemStack(Items.IRON_SWORD));
+            a.getInventory().add(new ItemStack(Items.APPLE));
+            int added = com.rtshop.story.Codex.scanGear(a), again = com.rtshop.story.Codex.scanGear(a);
+            a.getInventory().clearContent();
+            com.google.gson.JsonObject view = com.rtshop.story.Codex.view(a);
+            check("codex: gear is written once it is carried (food is not gear), and the whole book is sent with what is known",
+                    added == 1 && again == 0 && r.gear.contains("minecraft:iron_sword") && view.getAsJsonArray("mobs").size() == mobs.size()
+                            && view.getAsJsonArray("gear").size() == gear.size(), added + "/" + again);
+            check("codex: the book is an item that the general store sells again",
+                    com.rtshop.item.ModItems.CODEX.get() != null && ShopServer.shops().get("general") != null
+                            && ShopServer.shops().get("general").entries.stream().anyMatch(en -> en.stack.is(com.rtshop.item.ModItems.CODEX.get()) && en.buyable));
+        } finally {
+            com.rtshop.story.Codex.resetForTest(a);
+            com.rtshop.story.Codex.testFakes = false;
+        }
+    }
+
     private static FakePlayer fake(ServerLevel level, String name) {
         UUID id = UUID.nameUUIDFromBytes(("rtshop:" + name).getBytes(StandardCharsets.UTF_8));
         return FakePlayerFactory.get(level, new GameProfile(id, name));
@@ -3101,6 +3145,8 @@ public final class SelfTest {
         }
         // 3.53: 기록·주간 순위·칭호
         ranks(server, a, b);
+        // 3.54: 도감
+        codex(server, level, a);
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
         QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");
