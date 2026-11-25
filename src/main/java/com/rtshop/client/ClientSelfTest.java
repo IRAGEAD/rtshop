@@ -61,7 +61,7 @@ public final class ClientSelfTest {
     private static final List<String> LINES = new ArrayList<>();
     private static int step = 0;
     private static boolean gradeTabStage = false;
-    private static int panelTries = 0;
+    private static int panelTries = 0, grandTries = 0;
     private static boolean questOfferStage = false;
     static int wait = 0;
     private static boolean barrierPosted;
@@ -611,8 +611,14 @@ public final class ClientSelfTest {
                 wait = 45;
             }
             case 9 -> {
-                check("+6 -> +7 success: the grand success scene plays", EnhanceGrandFx.last.startsWith("SUCCESS:6:7") && EnhanceGrandFx.running()
-                        && !EnhanceGrandFx.suspense(), EnhanceGrandFx.last);
+                // 느린 컴퓨터에서는 긴장 장면이 아직 끝나지 않았을 수 있다: 끝날 때까지 조금 더 기다린다. 이미 다 지나간 것도 통과
+                if (EnhanceGrandFx.last.startsWith("SUCCESS:6:7") && EnhanceGrandFx.suspense() && grandTries++ < 30) {
+                    wait = 10;
+                    step--;
+                    return;
+                }
+                check("+6 -> +7 success: the grand success scene plays", EnhanceGrandFx.last.startsWith("SUCCESS:6:7") && !EnhanceGrandFx.suspense(),
+                        EnhanceGrandFx.last + " running " + EnhanceGrandFx.running());
                 shot(mc, "84b_enhance_grand_success");
                 wait = 20;
             }

@@ -2228,6 +2228,19 @@ public final class SelfTest {
             check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
                     banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,
                     "banned " + banned + " guns " + gunsListed + " boss " + bossListed + " tacz recipes " + tacz + " craftable " + craftableListed + " " + sample);
+            if (net.minecraftforge.fml.ModList.get().isLoaded("irons_spellbooks")) {
+                // 보스가 떨어뜨리기는 해도 흔한 재료(비전 정수·두루마리)와 그것으로 만드는 마법사 장비는 보스 아이템이 아니다
+                int irons = 0;
+                for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+                    net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it);
+                    if (rl != null && rl.getNamespace().equals("irons_spellbooks") && com.rtshop.rules.ItemPolicy.bossItem(it)) irons++;
+                }
+                net.minecraft.world.item.Item essence = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation("irons_spellbooks", "arcane_essence"));
+                net.minecraft.world.item.Item robe = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation("irons_spellbooks", "wizard_chestplate"));
+                check("mod pack: common materials a boss also drops (arcane essence) and the gear made from them are not boss items",
+                        essence != null && !com.rtshop.rules.ItemPolicy.bossItem(essence) && robe != null && !com.rtshop.rules.ItemPolicy.bossItem(robe) && irons <= 30,
+                        irons + " irons_spellbooks boss items");
+            }
             info("item policy: " + com.rtshop.rules.ItemPolicy.bossCountForTest() + " boss items, " + com.rtshop.rules.ItemPolicy.listedCountForTest() + " listed gear, wom listed " + womListed
                     + ", recipes blocked: mod " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("mod") + " ban " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("ban")
                     + " staff " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("staff") + " listed " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("listed")
@@ -3155,12 +3168,12 @@ public final class SelfTest {
             int after = com.rtshop.story.Readables.chronicle(a).size();
             QuestManager.setCompletedForTest(a, "story_5_10", had510);
             QuestManager.setCompletedForTest(a, "story_1_04", had104);
-            String o1 = String.valueOf(oath), o2 = String.valueOf(oath2), c = String.valueOf(chron);
+            String o1 = String.valueOf(oath), o2 = String.valueOf(oath2), chronText = String.valueOf(chron);
             ItemStack scroll = new ItemStack(com.rtshop.item.ModItems.OATH_SCROLL.get());
             check("story papers can be read: the oath shows its third line only after the ending, the chronicle page lists the names written so far, other items are not readable",
                     oath != null && oath.getAsJsonArray("pages").size() == 1 && o1.contains("지워져 있다") && !o1.contains("때가 되면 놓아준다")
                             && o2.contains("때가 되면 놓아준다") && oath2.getAsJsonArray("pages").size() == 1
-                            && after == before + 2 && c.contains("도윈, 광부") && c.contains("길 위의 이름")
+                            && after == before + 2 && chronText.contains("도윈, 광부") && chronText.contains("길 위의 이름")
                             && com.rtshop.story.Readables.build(a, "minecraft:stick") == null
                             && com.rtshop.story.Readables.open(a, scroll) && !com.rtshop.story.Readables.open(a, new ItemStack(net.minecraft.world.item.Items.STICK))
                             && com.rtshop.story.Readables.has("rtshop:mother_journal") && com.rtshop.story.Readables.has("rtshop:frozen_logbook")
