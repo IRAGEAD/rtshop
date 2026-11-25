@@ -156,8 +156,14 @@ public final class BossMusic {
         if (com.rtshop.raid.Raid.state() == com.rtshop.raid.Raid.ACTIVE && com.rtshop.raid.Raid.inArena(p) && !c.raid.isBlank()) {
             return new Object[]{c.raid.trim(), -1};
         }
-        List<LivingEntity> near = p.level().getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(c.range),
-                e -> e.isAlive() && BossCredit.isBoss(e) && fighting(e, p));
+        return pick(p, p.level().getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(c.range)));
+    }
+
+    /** 가까이 있는 것들 가운데 지금 싸우고 있는 보스의 곡을 고른다 (곡이 없는 보스는 건너뛴다). */
+    public static Object[] pick(ServerPlayer p, List<? extends LivingEntity> around) {
+        Config c = get();
+        List<LivingEntity> near = new java.util.ArrayList<>();
+        for (LivingEntity e : around) if (e.isAlive() && BossCredit.isBoss(e) && fighting(e, p)) near.add(e);
         LivingEntity best = null;
         double bd = Double.MAX_VALUE;
         for (LivingEntity e : near) {

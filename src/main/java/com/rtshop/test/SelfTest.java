@@ -1081,13 +1081,14 @@ public final class SelfTest {
             String foeId = com.rtshop.party.BossCredit.id(husk);
             mc0.tracks.put(foeId, "husk_theme");
             boolean huskWas = com.rtshop.party.PartyConfig.get().bosses.add(foeId);
-            Object[] quiet = com.rtshop.story.BossMusic.wanted(a);
+            // (가까운 것 찾기는 청크가 불려 있어야 해서 점검에서는 후보를 직접 넘긴다)
+            Object[] quiet = com.rtshop.story.BossMusic.pick(a, java.util.List.of(husk));
             com.rtshop.party.BossCredit.record(husk, a, 4F);
-            Object[] fight = com.rtshop.story.BossMusic.wanted(a);
+            Object[] fight = com.rtshop.story.BossMusic.pick(a, java.util.List.of(husk));
             mc0.tracks.put(foeId, "");
-            Object[] silent = com.rtshop.story.BossMusic.wanted(a);
+            Object[] silent = com.rtshop.story.BossMusic.pick(a, java.util.List.of(husk));
             mc0.tracks.remove(foeId);
-            Object[] common = com.rtshop.story.BossMusic.wanted(a);
+            Object[] common = com.rtshop.story.BossMusic.pick(a, java.util.List.of(husk));
             final net.minecraft.world.entity.LivingEntity foe = husk;
             check("boss music: nothing plays before the fight, the boss's own track plays while fighting, '' silences a boss, '*' is the common track",
                     quiet[0].equals("") && fight[0].equals("husk_theme") && (int) fight[1] == husk.getId() && silent[0].equals("") && common[0].equals("boss"),
