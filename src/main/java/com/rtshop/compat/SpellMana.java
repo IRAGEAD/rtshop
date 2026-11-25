@@ -177,6 +177,15 @@ public final class SpellMana {
             if (!enabled) return null;
             Player p = (Player) call(args, "caster");
             if (p.getAbilities().instabuild) return null;
+            // 마법은 마법사만 (3.49): 마법 계열 주문은 마법사가 아니면 시전되지 않는다. 근접·활 계열(무기 기술)은 그대로.
+            if (!com.rtshop.job.MagicLock.canCast(p)) {
+                Object holder = call(args, "spell");
+                Object spell = holder instanceof Holder<?> hh ? hh.value() : holder;
+                if (com.rtshop.job.MagicLock.magicSchool(spell)) {
+                    com.rtshop.job.MagicLock.warn(p);
+                    return attemptClass.getMethod("failOnCooldown", cooldownInfo).invoke(null, cooldownInfo.getDeclaredConstructor().newInstance());
+                }
+            }
             int cost = costOf(call(args, "spell"));
             if (cost <= 0) return null;
             float mana = mana(p);

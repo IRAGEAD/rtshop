@@ -16,8 +16,11 @@ public final class JobSyncPacket {
     private final double mineSpeed;
     private final String combat, life;
     private final List<String> combatDesc, lifeDesc;
+    /** 마법사가 아니라서 마법을 쓸 수 없는가 (3.49). */
+    private final boolean spellLocked;
 
-    public JobSyncPacket(double mineSpeed, String combat, List<String> combatDesc, String life, List<String> lifeDesc) {
+    public JobSyncPacket(double mineSpeed, String combat, List<String> combatDesc, String life, List<String> lifeDesc, boolean spellLocked) {
+        this.spellLocked = spellLocked;
         this.mineSpeed = mineSpeed;
         this.combat = combat;
         this.life = life;
@@ -43,6 +46,7 @@ public final class JobSyncPacket {
         write(buf, msg.combatDesc);
         buf.writeUtf(msg.life, 128);
         write(buf, msg.lifeDesc);
+        buf.writeBoolean(msg.spellLocked);
     }
 
     public static JobSyncPacket decode(FriendlyByteBuf buf) {
@@ -51,7 +55,7 @@ public final class JobSyncPacket {
         List<String> cd = read(buf);
         String l = buf.readUtf(128);
         List<String> ld = read(buf);
-        return new JobSyncPacket(mine, c, cd, l, ld);
+        return new JobSyncPacket(mine, c, cd, l, ld, buf.readBoolean());
     }
 
     public static void handle(JobSyncPacket msg, Supplier<NetworkEvent.Context> ctx) {
@@ -61,6 +65,7 @@ public final class JobSyncPacket {
             ClientJobCache.life = msg.life;
             ClientJobCache.combatDesc = msg.combatDesc;
             ClientJobCache.lifeDesc = msg.lifeDesc;
+            ClientJobCache.spellLocked = msg.spellLocked;
         });
         ctx.get().setPacketHandled(true);
     }

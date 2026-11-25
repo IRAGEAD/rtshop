@@ -1651,5 +1651,6 @@
   "rtshop.enhance.guard_howto": "Put the guard ticket on the enhancement anvil next to the item: one is used on that attempt.",
   "rtshop.enhance.safe_note": "This item cannot be destroyed by enhancing (legendary or above, or hidden gear). That chance is split between keep and damage.",
   "rtshop.enhui.guard_safe": "None · cannot break",
-  "rtshop.perm.survival_op": "Operator features are off in survival mode. Switch with /gamemode creative and try again."
+  "rtshop.perm.survival_op": "Operator features are off in survival mode. Switch with /gamemode creative and try again.",
+  "rtshop.job.magic_locked": "Only a Mage can cast magic."
 }

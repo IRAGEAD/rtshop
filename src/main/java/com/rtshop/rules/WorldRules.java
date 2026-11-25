@@ -52,6 +52,8 @@ public final class WorldRules {
     /** 룬 제단(별빛 수정 구체): 운영자만 세우고, 정해 둔 하나만 쓸 수 있다. */
     public static final String ALTAR_KEY = "rtshop:arcane_orb";
     public boolean altarOpOnly = true;
+    /** 마법(Iron's Spells 의 주문, Spell Engine 의 마법 계열 주문)은 마법사 직업만 쓴다. */
+    public boolean magicOnlyForMage = true;
     /** 스킬북으로 배운 기술(Epic Fight)은 죽어도 남는다: 서버가 켜질 때 게임 규칙 keepSkills 를 켠다. */
     public boolean keepSkillsOnDeath = true;
     /** 특수기가 있는 무기를 처음 얻으면 그 무기의 설명서를 준다. */
@@ -124,6 +126,7 @@ public final class WorldRules {
         if (o.has("abyssPortalOpOnly")) w.abyssPortalOpOnly = o.get("abyssPortalOpOnly").getAsBoolean();
         if (o.has("weaponManuals")) w.weaponManuals = o.get("weaponManuals").getAsBoolean();
         if (o.has("keepSkillsOnDeath")) w.keepSkillsOnDeath = o.get("keepSkillsOnDeath").getAsBoolean();
+        if (o.has("magicOnlyForMage")) w.magicOnlyForMage = o.get("magicOnlyForMage").getAsBoolean();
         if (o.has("abyssPortal") && o.get("abyssPortal").isJsonObject()) {
             JsonObject p = o.getAsJsonObject("abyssPortal");
             w.abyssPortalSet = p.has("set") && p.get("set").getAsBoolean();
@@ -164,6 +167,7 @@ public final class WorldRules {
         JsonObject o = new JsonObject();
         JsonArray help = new JsonArray();
         help.add("월드 규칙. neverStructures: 새 지형에 절대 생기지 않는 건축물 ID. neverRecipes: 막는 조합법 (item:아이템ID). lootBlockedMods: 전리품에서 빼는 모드 ID.");
+        help.add("magicOnlyForMage: true 면 마법사 직업만 마법을 쓴다 (Iron's Spells 의 모든 주문, Spell Engine 의 마법 계열 주문; 근접·활 계열의 무기 기술은 누구나). 크리에이티브는 언제나 쓸 수 있다.");
         help.add("keepSkillsOnDeath: true 면 스킬북으로 배운 기술이 죽어도 사라지지 않는다 (서버가 켜질 때 Epic Fight 의 게임 규칙 keepSkills 를 켠다).");
         help.add("weaponManuals: true 면 특수기가 있는 무기(Epic Fight)를 처음 얻었을 때 그 무기의 설명서를 한 권 준다 (같은 종류·같은 특수기는 한 권).");
         help.add("abyssPortal: 나선 비경으로 들어갈 수 있는 단 하나의 문. 게임 안에서 문 앞에 서서 /rtshop abyss portal here (OP). abyssPortalOpOnly: 문은 운영자(크리에이티브)만 세울 수 있음.");
@@ -183,6 +187,7 @@ public final class WorldRules {
         o.addProperty("abyssPortalOpOnly", abyssPortalOpOnly);
         o.addProperty("weaponManuals", weaponManuals);
         o.addProperty("keepSkillsOnDeath", keepSkillsOnDeath);
+        o.addProperty("magicOnlyForMage", magicOnlyForMage);
         JsonObject p = new JsonObject();
         p.addProperty("set", abyssPortalSet);
         p.addProperty("dim", abyssPortalDim);

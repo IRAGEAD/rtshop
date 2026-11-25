@@ -1917,6 +1917,27 @@ public final class SelfTest {
         } finally {
             com.rtshop.util.Perm.enforceForTest = false;
         }
+        // 마법은 마법사만: 다른 전투 직업(과 직업이 없는 사람)은 주문을 쓸 수 없다
+        String combatWas = com.rtshop.job.Jobs.entry(a).combat;
+        com.rtshop.job.MagicLock.testFake = true;
+        try {
+            com.rtshop.job.Jobs.force(a, "combat", "warrior");
+            boolean warriorNo = !com.rtshop.job.MagicLock.canCast(a);
+            com.rtshop.job.Jobs.force(a, "combat", "mage");
+            boolean mageYes = com.rtshop.job.MagicLock.canCast(a);
+            com.rtshop.job.Jobs.force(a, "combat", "");
+            boolean noneNo = !com.rtshop.job.MagicLock.canCast(a);
+            com.rtshop.rules.WorldRules.get().magicOnlyForMage = false;
+            boolean offYes = com.rtshop.job.MagicLock.canCast(a);
+            com.rtshop.rules.WorldRules.get().magicOnlyForMage = true;
+            check("only a mage can cast magic (a warrior and a jobless player cannot; with the rule off anyone can); Iron's Spells is hooked when installed",
+                    warriorNo && mageYes && noneNo && offYes
+                            && com.rtshop.job.MagicLock.hookedForTest() == net.minecraftforge.fml.ModList.get().isLoaded("irons_spellbooks"),
+                    warriorNo + "/" + mageYes + "/" + noneNo + "/" + offYes + " hooked=" + com.rtshop.job.MagicLock.hookedForTest());
+        } finally {
+            com.rtshop.job.MagicLock.testFake = false;
+            com.rtshop.job.Jobs.force(a, "combat", combatWas == null ? "" : combatWas);
+        }
         // 스킬북으로 배운 기술은 죽어도 남는다: Epic Fight 의 keepSkills 규칙을 켠다 (Epic Fight 가 없으면 규칙도 없다)
         boolean efHere = net.minecraftforge.fml.ModList.get().isLoaded("epicfight");
         boolean ruleFound = com.rtshop.rules.KeepSkills.apply(server);

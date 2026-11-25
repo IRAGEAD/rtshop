@@ -367,12 +367,13 @@ public final class Jobs {
         JobConfig.JobDef cd = cfg.jobs.get(je.combat), ld = cfg.jobs.get(je.life);
         double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;
         List<String> cDesc = cd == null ? List.of() : cfg.describe(cd, margin), lDesc = ld == null ? List.of() : cfg.describe(ld, margin);
-        String key = mine + "|" + (cd == null ? "" : cd.name) + cDesc + "|" + (ld == null ? "" : ld.name) + lDesc;
+        boolean spellLocked = !MagicLock.canCast(p);
+        String key = mine + "|" + (cd == null ? "" : cd.name) + cDesc + "|" + (ld == null ? "" : ld.name) + lDesc + "|" + spellLocked;
         if (!key.equals(SENT_MINE.get(p.getUUID()))) {
             SENT_MINE.put(p.getUUID(), key);
             if (p.connection != null) {
                 ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
-                        new com.rtshop.net.JobSyncPacket(mine, cd == null ? "" : cd.name, cDesc, ld == null ? "" : ld.name, lDesc));
+                        new com.rtshop.net.JobSyncPacket(mine, cd == null ? "" : cd.name, cDesc, ld == null ? "" : ld.name, lDesc, spellLocked));
             }
         }
     }
