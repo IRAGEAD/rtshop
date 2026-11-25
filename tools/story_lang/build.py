@@ -64,6 +64,17 @@ for mod in ("ch01_en", "ch02_en", "ch03_en", "ch04_en", "ch05_en", "scylla_en"):
     if missing: print("번역 없는 퀘스트:", missing); sys.exit(1)
 EXTRA.update({"지도 제작자 펠릭스": "Felix the Mapmaker", "대장장이 브람": "Bram the Smith", "서장 폭풍 뒤의 부두": "Prologue: The Dock After the Storm",
               "1장 잿불의 서약": "Chapter 1: The Ember Oath", "2장 녹슨 맹세": "Chapter 2: The Rusted Vow", "3장 얼어붙은 바다의 항해일지": "Chapter 3: Logbook of the Frozen Sea", "어부 오스카": "Oscar the Fisherman", "4장 일곱 봉인": "Chapter 4: The Seven Seals", "종장 연대기의 마지막 장": "Finale: The Last Page of the Chronicle", "심지를 간다": "Change the wick", "이름표를 건다": "Hang the name tag", "배를 띄운다": "Launch the boat", "꽃을 놓는다": "Lay flowers", "얹는다": "Lay it on", "등불을 든다": "Hold up the lantern", "빵을 놓고 앉는다": "Set down the bread and sit", "등을 단다": "Hang the lamp", "탁본을 뜬다": "Take a rubbing", "이 층은 이야기가 부를 때만 열립니다. 무한 모드는 언제든 들어갈 수 있습니다.": "This floor opens only when the story calls for it. The endless mode is always open.", "불의 제단이 당신을 밀어낸다. 여섯 눈이 감기기 전에는 이 문이 열리지 않는다.": "The altar of fire pushes you away. This door will not open until six eyes have closed.", "숨은 이야기 거울 속의 연대기": "Hidden Story: The Chronicle in the Mirror", "숨은 이야기 마중 나간 사람": "Hidden Story: The One Who Went to Welcome"})
+# 대화·읽을 물건·안내서·NPC 인사 (extract2.py 가 모은 source2.json 과 en2/p<시작번호>.py 의 번역을 같은 순서로 짝짓는다)
+src2 = json.load(open(os.path.join(here, 'source2.json'), encoding='utf-8'))
+n2 = 0
+for f in sorted(glob.glob(os.path.join(here, 'en2', 'p*.py'))):
+    spec = importlib.util.spec_from_file_location(os.path.basename(f)[:-3], f)
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    for i, tr in enumerate(m.EN):
+        out.setdefault(src2[m.START + i], tr)
+        n2 += 1
+if n2 != len(src2):
+    print("source2 의 번역 수가 원문과 다릅니다:", n2, len(src2)); sys.exit(1)
 for k, v in EXTRA.items():
     out.setdefault(k, v)
 for qd in story["quests"]:

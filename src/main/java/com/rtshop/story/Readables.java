@@ -109,7 +109,7 @@ public final class Readables {
         for (QuestDef q : qs) {
             JsonObject s = q.sceneDone;
             if (s == null || !"names".equals(str(s, "kind")) || !QuestManager.isCompleted(p, q.id)) continue;
-            String title = str(s, "title");
+            String title = StoryText.t(p, str(s, "title"));   // 번역은 제목 전체로 찾는다 (자르기 전에)
             int cut = title.indexOf(" · ");
             out.add(page(cut >= 0 ? title.substring(cut + 3) : title, str(s, "text"), str(s, "speaker")));
         }
