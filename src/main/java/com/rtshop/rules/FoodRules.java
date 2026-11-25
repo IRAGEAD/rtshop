@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * 양산 음식 규칙 (config/rtshop/food_rules.json, 3.50): 빵·케이크·쿠키처럼 밭과 화로만으로 쉽게 쌓아 둘 수 있는 음식은 배고픔이 적게 찬다.
- * 요리사가 손으로 조리하는 요리(상점이 '손으로 만든 요리'로 치는 것)는 목록에 있어도 줄이지 않는다 — 요리사의 요리가 값어치를 갖게 하려는 규칙이다.
+ * 목록(items)에 적힌 음식만 줄어든다. 요리사가 조리 도구로 만드는 요리는 목록에 없으니 그대로다 — 요리사의 요리가 값어치를 갖게 하려는 규칙이다.
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID)
 public final class FoodRules {
@@ -46,7 +46,7 @@ public final class FoodRules {
         public JsonObject toJson() {
             JsonObject o = new JsonObject();
             o.addProperty("_설명", "양산 음식: items 에 적은 음식은 배고픔과 포만감이 factor 배만 찬다 (0.5 = 절반, 적어도 1칸). "
-                    + "요리사가 손으로 조리하는 요리는 목록에 있어도 줄이지 않는다. 케이크(minecraft:cake)는 조각마다 적용된다. 고친 뒤 /rtshop reload.");
+                    + "목록에 없는 음식(요리사가 조리 도구로 만드는 요리)은 그대로다. 케이크(minecraft:cake)는 조각마다 적용된다. 고친 뒤 /rtshop reload.");
             o.addProperty("enabled", enabled);
             o.addProperty("factor", factor);
             JsonArray a = new JsonArray();
@@ -111,12 +111,7 @@ public final class FoodRules {
         Config c = get();
         if (!c.enabled || s.isEmpty() || c.factor >= 1) return false;
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(s.getItem());
-        if (id == null || !c.items.contains(id.toString())) return false;
-        try {
-            if (com.rtshop.shop.ShopLoader.handCooked(com.rtshop.shop.ShopServer.loaded(), s)) return false; // 요리사가 손으로 만드는 요리는 그대로
-        } catch (Throwable ignored) {
-        }
-        return true;
+        return id != null && c.items.contains(id.toString());
     }
 
     /** 원래 nutrition 칸이 찰 음식에서 덜어 낼 칸 수 (적어도 1칸은 차게 둔다). */
