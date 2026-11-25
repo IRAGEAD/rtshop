@@ -107,11 +107,6 @@ public final class Enhance {
         }
     }
 
-    /** 모루의 보호권 칸에 올린 것이 주는 보호 (보호권이 아니면 없음). */
-    public static Guard guardOf(ItemStack ticket) {
-        return !ticket.isEmpty() && ticket.getItem() instanceof GuardItem g ? g.guard() : Guard.NONE;
-    }
-
     /**
      * 이번 강화에 적용되는 보호: 모루에 올린 보호권이 먼저다. 올린 것이 없으면, 옛 방식(우클릭)으로 미리 써 둔 보호가 남아 있을 때 그것을 쓴다
      * (3.49 전에 써 둔 보호권이 사라지지 않게).
