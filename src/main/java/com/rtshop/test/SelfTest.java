@@ -1799,12 +1799,12 @@ public final class SelfTest {
             try {
                 com.google.gson.JsonObject go = com.google.gson.JsonParser.parseString(orig).getAsJsonObject();
                 com.google.gson.JsonObject it = new com.google.gson.JsonObject();
-                it.addProperty("item", "minecraft:sponge");
+                it.addProperty("item", "minecraft:end_crystal");
                 it.addProperty("price", 12345);
                 it.addProperty("category", go.getAsJsonArray("categories").get(0).getAsJsonObject().get("id").getAsString());
                 go.getAsJsonArray("items").add(it);
                 java.nio.file.Path bak = com.rtshop.shop.ShopEditor.save(server, "general", go.toString());
-                ShopLoader.Price pr = ShopServer.loaded().prices.get("minecraft:sponge");
+                ShopLoader.Price pr = ShopServer.loaded().prices.get("minecraft:end_crystal");
                 check("the OP shop editor saves items and prices and reloads the shops", pr != null && pr.price == 12345 && Files.exists(bak),
                         pr == null ? "missing" : pr.price);
             } finally {
