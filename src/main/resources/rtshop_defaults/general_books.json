@@ -6,6 +6,12 @@
    "price": 3000,
    "category": "misc",
    "sell": false
+  },
+  {
+   "item": "rtshop:guidebook",
+   "price": 2000,
+   "category": "misc",
+   "sell": false
   }
  ]
 }

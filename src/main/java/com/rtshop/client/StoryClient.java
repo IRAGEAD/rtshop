@@ -45,6 +45,11 @@ public final class StoryClient {
                 BossMusicClient.receive(JsonParser.parseString(json).getAsJsonObject());
             } catch (Exception ignored) {
             }
+        } else if (kind == StoryPacket.GUIDE) {
+            try {
+                net.minecraft.client.Minecraft.getInstance().setScreen(new GuideScreen(JsonParser.parseString(json).getAsJsonObject()));
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.CODEX) {
             try {
                 CodexScreen.open(JsonParser.parseString(json).getAsJsonObject());

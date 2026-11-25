@@ -1833,5 +1833,11 @@
   "rtshop.codex.met": "Codex: recorded the look of %s.",
   "rtshop.codex.killed": "Codex: recorded everything about %s.",
   "rtshop.codex.gear": "Codex: recorded %s.",
-  "rtshop.codex.need_item": "You need to carry the Surveyor's Codex to open it."
+  "rtshop.codex.need_item": "You need to carry the Surveyor's Codex to open it.",
+  "item.rtshop.guidebook": "Surveyor's Guidebook",
+  "item.rtshop.guidebook.tip1": "Right-click while holding it to open. Explains the pack's systems and how to use them, by topic.",
+  "item.rtshop.guidebook.tip2": "If lost, the general store sells another.",
+  "rtshop.guide.title": "Surveyor's Guidebook",
+  "rtshop.guide.search": "Search",
+  "rtshop.guide.none": "No page contains that word."
 }

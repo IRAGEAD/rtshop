@@ -1446,6 +1446,39 @@ final class ClientSelfTest2 {
             onServer(mc, sp -> com.rtshop.story.Codex.resetForTest(sp));
             waitTicks(5);
         });
+        // 안내서(가이드북): 갈래별 쪽, 그림과 글, 낱말로 찾기
+        add(mc -> {
+            onServer(mc, sp -> com.rtshop.story.Guide.open(sp));
+            waitTicks(15);
+        });
+        add(mc -> {
+            if (mc.screen instanceof GuideScreen gs) {
+                int all = gs.pagesForTest();
+                boolean bank = gs.selectForTest("Gold 와 은행");
+                gs.searchForTest("귀환권");
+                int found = gs.rowsForTest();
+                gs.searchForTest("zzzz-no-such-word");
+                int none = gs.rowsForTest();
+                gs.searchForTest("");
+                gs.selectForTest("장비 강화");
+                check("the guidebook opens with its pages by topic, the titles fit the list, and a word search narrows the pages",
+                        all >= 20 && bank && found >= 1 && found < all && none == 0 && gs.rowsForTest() == all && gs.fitsForTest(),
+                        all + " / " + found + " / " + none + " / " + gs.fitsForTest());
+            } else {
+                check("the guidebook opens with its pages by topic, the titles fit the list, and a word search narrows the pages", false, mc.screen);
+            }
+            waitTicks(10);
+        });
+        add(mc -> {
+            shot(mc, "129a_guide_enhance");
+            if (mc.screen instanceof GuideScreen gs) gs.selectForTest("조사대의 도구");
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "129b_guide_tools");
+            mc.setScreen(null);
+            waitTicks(5);
+        });
         // 칭호: 쌓은 기록만큼 열리고, 힘 쓰는 칭호와 내거는 칭호를 고른다
         add(mc -> {
             com.rtshop.rank.Ranks.testAnywhere = true;

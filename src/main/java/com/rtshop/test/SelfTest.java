@@ -275,6 +275,30 @@ public final class SelfTest {
             check("codex: gear is written once it is carried (food is not gear), and the whole book is sent with what is known",
                     added == 1 && again == 0 && r.gear.contains("minecraft:iron_sword") && view.getAsJsonArray("mobs").size() == mobs.size()
                             && view.getAsJsonArray("gear").size() == gear.size(), added + "/" + again);
+            com.google.gson.JsonObject guide = com.rtshop.story.Guide.get();
+            boolean texts = true, images = true;
+            int pages = 0;
+            for (com.google.gson.JsonElement ce : guide.getAsJsonArray("categories")) {
+                for (com.google.gson.JsonElement pe : ce.getAsJsonObject().getAsJsonArray("pages")) {
+                    com.google.gson.JsonObject pg = pe.getAsJsonObject();
+                    pages++;
+                    texts &= pg.get("title").getAsString().length() > 1 && pg.get("text").getAsString().length() > 20;
+                    if (pg.has("image")) {
+                        String path = pg.get("image").getAsString().replace("rtshop:", "/assets/rtshop/");
+                        images &= SelfTest.class.getResource(path) != null;
+                    }
+                    if (pg.has("icons")) {
+                        for (com.google.gson.JsonElement ie : pg.getAsJsonArray("icons")) {
+                            String iid = ie.getAsString();
+                            if (iid.startsWith("rtshop:")) texts &= net.minecraftforge.registries.ForgeRegistries.ITEMS.containsKey(new ResourceLocation(iid));
+                        }
+                    }
+                }
+            }
+            check("guidebook: every page has a title and text, its picture exists and its rtshop item icons are real items; the store sells the book again",
+                    pages >= 30 && texts && images && guide.getAsJsonArray("categories").size() >= 7
+                            && ShopServer.shops().get("general").entries.stream().anyMatch(en -> en.stack.is(com.rtshop.item.ModItems.GUIDEBOOK.get()) && en.buyable),
+                    pages + " pages / texts " + texts + " / images " + images);
             check("codex: the book is an item that the general store sells again",
                     com.rtshop.item.ModItems.CODEX.get() != null && ShopServer.shops().get("general") != null
                             && ShopServer.shops().get("general").entries.stream().anyMatch(en -> en.stack.is(com.rtshop.item.ModItems.CODEX.get()) && en.buyable));

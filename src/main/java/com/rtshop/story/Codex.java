@@ -193,7 +193,7 @@ public final class Codex {
         public final Set<String> met = new LinkedHashSet<>(), gear = new LinkedHashSet<>();
         public final Map<String, Integer> kills = new LinkedHashMap<>();
         public final Map<String, Long> first = new LinkedHashMap<>();
-        public boolean given;
+        public boolean given, guideGiven;
     }
 
     public static class Data extends SavedData {
@@ -215,6 +215,7 @@ public final class Codex {
                 for (String key : k.getAllKeys()) r.kills.put(key, k.getInt(key));
                 for (String key : f.getAllKeys()) r.first.put(key, f.getLong(key));
                 r.given = c.getBoolean("given");
+                r.guideGiven = c.getBoolean("guide");
                 d.recs.put(c.getUUID("id"), r);
             }
             return d;
@@ -238,6 +239,7 @@ public final class Codex {
                 c.put("kills", k);
                 c.put("first", f);
                 c.putBoolean("given", r.given);
+                c.putBoolean("guide", r.guideGiven);
                 ps.add(c);
             }
             t.put("players", ps);

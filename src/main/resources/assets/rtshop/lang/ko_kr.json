@@ -1833,5 +1833,11 @@
   "rtshop.codex.met": "도감: %s 의 모습을 적었습니다.",
   "rtshop.codex.killed": "도감: %s 의 모든 것을 적었습니다.",
   "rtshop.codex.gear": "도감: %s 을(를) 적었습니다.",
-  "rtshop.codex.need_item": "조사대 도감을 지니고 있어야 펼칠 수 있습니다."
+  "rtshop.codex.need_item": "조사대 도감을 지니고 있어야 펼칠 수 있습니다.",
+  "item.rtshop.guidebook": "조사대 안내서",
+  "item.rtshop.guidebook.tip1": "들고 우클릭하면 펼쳐진다. 모드팩의 시스템과 쓰는 법이 갈래별로 적혀 있다.",
+  "item.rtshop.guidebook.tip2": "잃어버리면 잡화점에서 다시 살 수 있다.",
+  "rtshop.guide.title": "조사대 안내서",
+  "rtshop.guide.search": "낱말로 찾기",
+  "rtshop.guide.none": "찾는 낱말이 든 쪽이 없습니다."
 }
