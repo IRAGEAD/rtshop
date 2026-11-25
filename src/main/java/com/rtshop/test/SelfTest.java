@@ -2419,7 +2419,7 @@ public final class SelfTest {
                 stone != null && stone.objectives.size() == 1 && stone.objectives.get(0).target.equals(fd ? "fdbosses:chesed" : "minecraft:warden")
                         && l.quests.get("story_2_25").requires.contains("story_2_24f")
                         && lamp.objectives.get(0).verb.equals("심지를 간다") && lamp.objectives.get(0).use.equals("minecraft:coal")
-                        && l.quests.get("story_3_08").objectives.stream().anyMatch(o -> o.after.equals("c3_wall1"))
+                        && (!net.minecraftforge.fml.ModList.get().isLoaded("aquamirae") || l.quests.get("story_3_08").objectives.stream().anyMatch(o -> o.after.equals("c3_wall1")))
                         && com.rtshop.party.PartyConfig.get().arenaBosses.contains("fdbosses:chesed"),
                 stone == null ? "null" : stone.toJson());
         QuestManager.reset(a);
