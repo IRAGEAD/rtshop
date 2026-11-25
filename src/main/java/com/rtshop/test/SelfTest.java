@@ -4131,6 +4131,32 @@ public final class SelfTest {
                     else if (miss.size() < 5) miss.add(s.length() > 30 ? s.substring(0, 30) : s);
                 }
             }
+            // 3.54: 모드에 든 퀘스트 파일의 모든 글(목표 이름 · 조사 글 · 대사 · 선택지 · 연출)에 영어판이 있다
+            int deepAll = 0, deepHas = 0;
+            List<String> deepMiss = new ArrayList<>();
+            for (String file : new String[]{"story.json", "tutorial.json", "job_quests.json"}) {
+                try (java.io.InputStream in = SelfTest.class.getResourceAsStream("/rtshop_defaults/quests/" + file)) {
+                    com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8)).getAsJsonObject();
+                    java.util.ArrayDeque<com.google.gson.JsonElement> todo = new java.util.ArrayDeque<>();
+                    todo.add(root.get("quests"));
+                    while (!todo.isEmpty()) {
+                        com.google.gson.JsonElement e = todo.poll();
+                        if (e.isJsonArray()) e.getAsJsonArray().forEach(todo::add);
+                        else if (e.isJsonObject()) {
+                            for (var en2 : e.getAsJsonObject().entrySet()) if (!en2.getKey().startsWith("_")) todo.add(en2.getValue());
+                        } else if (e.isJsonPrimitive() && e.getAsJsonPrimitive().isString()) {
+                            String t = e.getAsString();
+                            if (!t.matches("(?s).*[가-힣].*")) continue;
+                            deepAll++;
+                            if (!com.rtshop.story.StoryText.t(a, t).equals(t)) deepHas++;
+                            else if (deepMiss.size() < 5) deepMiss.add(file + ": " + (t.length() > 30 ? t.substring(0, 30) : t));
+                        }
+                    }
+                } catch (Exception ex) {
+                    deepMiss.add(file + ": " + ex);
+                }
+            }
+            check("every text in the bundled quest files has an English version (" + deepHas + "/" + deepAll + ")", deepAll > 1500 && deepHas == deepAll, deepMiss);
             com.rtshop.story.StoryText.setLang(a, "ko_kr");
             String ko = com.rtshop.story.StoryText.t(a, q101.title);
             check("story language: English players get the English story, Korean players the original (and ids stay untouched)",
