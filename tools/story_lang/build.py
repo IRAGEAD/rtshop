@@ -75,6 +75,19 @@ for f in sorted(glob.glob(os.path.join(here, 'en2', 'p*.py'))):
         n2 += 1
 if n2 != len(src2):
     print("source2 의 번역 수가 원문과 다릅니다:", n2, len(src2)); sys.exit(1)
+# 스토리의 남은 글 (extract3.py 가 모은 source3.json 과 en3/p<시작번호>.py). 번역이 끝난 데까지만 들어가고, 나머지는 한국어로 나간다.
+p3 = os.path.join(here, 'source3.json')
+src3 = json.load(open(p3, encoding='utf-8')) if os.path.exists(p3) else []
+n3 = 0
+for f in sorted(glob.glob(os.path.join(here, 'en3', 'p*.py'))):
+    spec = importlib.util.spec_from_file_location(os.path.basename(f)[:-3], f)
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    if m.START != n3:
+        print("en3 의 번역이 이어지지 않습니다:", os.path.basename(f), "START", m.START, "앞의 끝", n3); sys.exit(1)
+    for i, tr in enumerate(m.EN):
+        out.setdefault(src3[m.START + i], tr)
+        n3 += 1
+print("story lines (source3): %d / %d translated" % (n3, len(src3)))
 for k, v in EXTRA.items():
     out.setdefault(k, v)
 for qd in story["quests"]:
