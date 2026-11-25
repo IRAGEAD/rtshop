@@ -1848,5 +1848,11 @@
   "rtshop.note.gacha": "Comes from the gacha (%s)",
   "rtshop.note.quest": "Needed for quests (%s)",
   "rtshop.note.boss": "Boss loot · not traded by shops",
-  "rtshop.note.no_recipe": "Cannot be crafted · get it from shops or the gacha"
+  "rtshop.note.no_recipe": "Cannot be crafted · get it from shops or the gacha",
+  "rtshop.return.cooldown": "This return ticket cannot be used again yet. Time left: %s",
+  "rtshop.return.left_ms": "%s min %s s",
+  "rtshop.return.left_m": "%s min",
+  "rtshop.return.left_s": "%s s",
+  "item.rtshop.return_ticket.tip_cd": "After one use it can be used again in %s minutes.",
+  "rtshop.spawn.cd_cleared": "Cleared %s's return ticket cooldown."
 }

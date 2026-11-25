@@ -1848,5 +1848,11 @@
   "rtshop.note.gacha": "뽑기에서 나옴 (%s)",
   "rtshop.note.quest": "퀘스트에 내는 물건 (%s곳)",
   "rtshop.note.boss": "보스 전리품 · 상점에서 사고팔 수 없음",
-  "rtshop.note.no_recipe": "조합할 수 없음 · 상점이나 뽑기에서 얻음"
+  "rtshop.note.no_recipe": "조합할 수 없음 · 상점이나 뽑기에서 얻음",
+  "rtshop.return.cooldown": "이 귀환권은 아직 다시 쓸 수 없습니다. 남은 시간: %s",
+  "rtshop.return.left_ms": "%s분 %s초",
+  "rtshop.return.left_m": "%s분",
+  "rtshop.return.left_s": "%s초",
+  "item.rtshop.return_ticket.tip_cd": "한 번 쓰면 %s분 뒤에 다시 쓸 수 있습니다.",
+  "rtshop.spawn.cd_cleared": "%s 님의 귀환권 대기 시간을 지웠습니다."
 }

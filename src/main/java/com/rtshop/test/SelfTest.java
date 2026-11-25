@@ -2264,20 +2264,49 @@ public final class SelfTest {
             boolean noSpot = com.rtshop.item.ReturnTicketItem.refusal(a, true) != null;
             ts.set = true;
             ts.dim = a.level().dimension().location().toString();
-            ts.x = a.getX() + 9000;
+            ts.x = a.getX() + 2900;
             ts.y = a.getY();
             ts.z = a.getZ();
             boolean near = com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
-            ts.x = a.getX() + 10001;
+            ts.x = a.getX() + 3001;
             boolean far = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) != null
                     && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
             ts.x = a.getX();
             ts.dim = "minecraft:the_nether";
             boolean otherWorld = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
-            check("return tickets: nothing works until the town point is set; the ordinary one works within 10000 blocks (height ignored) in the town's world, the greater one anywhere",
-                    noSpot && near && far && otherWorld, noSpot + " " + near + " " + far + " " + otherWorld);
+            check("return tickets: nothing works until the town point is set; the ordinary one works within 3000 blocks (height ignored) in the town's world, the greater one anywhere",
+                    noSpot && near && far && otherWorld && ts.normalRange == 3000, noSpot + " " + near + " " + far + " " + otherWorld);
+            // 3.53: 다시 쓰기까지의 시간 (실제 시간, 일반 60분 / 고급 30분, 종류마다 따로)
+            ts.dim = a.level().dimension().location().toString();
+            ts.x = a.getX();
+            com.rtshop.rules.TownSpawn.clearCooldown(a);
+            long t0 = 1_800_000_000_000L;
+            com.rtshop.rules.TownSpawn.testNow = t0;
+            boolean cdFree = com.rtshop.item.ReturnTicketItem.refusal(a, false) == null && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            com.rtshop.rules.TownSpawn.used(a, false);
+            boolean cdNormal = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null
+                    && com.rtshop.rules.TownSpawn.cooldownLeft(a, false) == 60 * 60000L && com.rtshop.rules.TownSpawn.cooldownLeft(a, true) == 0;
+            com.rtshop.rules.TownSpawn.used(a, true);
+            com.rtshop.rules.TownSpawn.testNow = t0 + 29 * 60000L;
+            boolean cdBoth = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null && com.rtshop.item.ReturnTicketItem.refusal(a, true) != null
+                    && com.rtshop.rules.TownSpawn.cooldownLeft(a, true) == 60000L;
+            com.rtshop.rules.TownSpawn.testNow = t0 + 30 * 60000L;
+            boolean cdPlusDone = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            com.rtshop.rules.TownSpawn.testNow = t0 + 59 * 60000L + 59000L;
+            boolean cdAlmost = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null;
+            com.rtshop.rules.TownSpawn.testNow = t0 + 60 * 60000L;
+            boolean cdDone = com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
+            // 죽어도(되살아나도) 남는 자리에 적힌다
+            com.rtshop.rules.TownSpawn.used(a, false);
+            boolean cdKept = a.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG).getCompound("rtshop_return_cd").getLong("normal") == t0 + 60 * 60000L;
+            com.rtshop.rules.TownSpawn.clearCooldown(a);
+            boolean cdCleared = com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
+            check("return ticket cooldowns run on real time and per kind: the ordinary one 60 minutes, the greater one 30 minutes, kept through death and relog",
+                    cdFree && cdNormal && cdBoth && cdPlusDone && cdAlmost && cdDone && cdKept && cdCleared && ts.normalCooldownMinutes == 60 && ts.premiumCooldownMinutes == 30,
+                    cdFree + " " + cdNormal + " " + cdBoth + " " + cdPlusDone + " " + cdAlmost + " " + cdDone + " " + cdKept + " " + cdCleared);
+            com.rtshop.rules.TownSpawn.testNow = 0;
             ItemStack plus = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()), plain = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET.get());
-            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.clearBought(a);
             com.rtshop.rules.TownSpawn.testDay = "2026-01-01";
             int d0 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
             com.rtshop.rules.TownSpawn.bought(a, plus, 3);
@@ -2289,14 +2318,28 @@ public final class SelfTest {
             check("the greater return ticket can be bought 5 times a day (the count starts again the next day); the ordinary one has no limit",
                     d0 == 5 && d1 == 2 && d2 == 0 && d3 == 5 && com.rtshop.rules.TownSpawn.dailyLeft(a, plain) > 1000, d0 + " " + d1 + " " + d2 + " " + d3);
             ShopData gen = ShopServer.shops().get("general");
-            check("the general store sells both return tickets (the greater one costs more)",
-                    gen != null && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()) && e.buyable) >= 0
-                            && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()) && e.buyable) >= 0
-                            && gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()))).price
-                            > gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()))).price);
+            int ti = gen == null ? -1 : findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()) && e.buyable);
+            int tj = gen == null ? -1 : findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()) && e.buyable);
+            check("the general store sells both return tickets: 5000 G and 30000 G (3.53; an installed shop still at the old default price is updated)",
+                    ti >= 0 && tj >= 0 && gen.entries.get(ti).price == 5000 && gen.entries.get(tj).price == 30000,
+                    ti < 0 || tj < 0 ? "missing" : gen.entries.get(ti).price + " " + gen.entries.get(tj).price);
+            // 옛 값으로 깔린 상점 파일의 값 고치기: 기본값 그대로인 것만 고치고, 운영자가 바꾼 값은 그대로 둔다
+            try {
+                java.nio.file.Path tmp = java.nio.file.Files.createTempFile("rtshop_reprice", ".json");
+                java.nio.file.Files.writeString(tmp, "{\"items\":[{\"item\":\"rtshop:return_ticket\",\"price\":1500},{\"item\":\"rtshop:return_ticket_plus\",\"price\":9999}]}");
+                int n1 = com.rtshop.shop.ShopLoader.reprice(tmp, "rtshop:return_ticket", 1500, 5000);
+                int n2 = com.rtshop.shop.ShopLoader.reprice(tmp, "rtshop:return_ticket_plus", 12000, 30000);
+                String after = java.nio.file.Files.readString(tmp);
+                java.nio.file.Files.deleteIfExists(tmp);
+                check("repricing touches only entries still at the old default price", n1 == 1 && n2 == 0 && after.contains("5000") && after.contains("9999"), n1 + " " + n2 + " " + after);
+            } catch (Exception ex) {
+                check("repricing touches only entries still at the old default price", false, ex.toString());
+            }
         } finally {
             com.rtshop.rules.TownSpawn.testDay = null;
-            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.testNow = 0;
+            com.rtshop.rules.TownSpawn.clearBought(a);
+            com.rtshop.rules.TownSpawn.clearCooldown(a);
             com.rtshop.rules.TownSpawn.reload();
         }
         witherProbe.discard();
