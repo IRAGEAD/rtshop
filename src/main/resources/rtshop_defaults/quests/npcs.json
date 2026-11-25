@@ -6,6 +6,24 @@
       "name": "모험 안내인 모리스",
       "profession": "librarian",
       "greeting": "어서 오게, 새내기 모험가. 이 땅에서 살아남는 법을 하나씩 알려 주지."
+    },
+    {
+      "id": "bounty",
+      "name": "현상금 게시판지기 가렛",
+      "profession": "fletcher",
+      "greeting": "게시판은 저쪽이오. 떼어 간 종이의 일은 끝내고 오시오."
+    },
+    {
+      "id": "ranks",
+      "name": "순위 기록원 테오",
+      "profession": "cartographer",
+      "greeting": "이번 주 기록 보러 오셨어요? 장부는 거짓말을 안 해요. 한 주가 끝나면 윗자리 셋한테 상이 나가요!"
+    },
+    {
+      "id": "titles",
+      "name": "칭호 관리인 아델",
+      "profession": "cleric",
+      "greeting": "이름 앞에 무엇을 걸지는 스스로 정하시는 겁니다. 다만 하신 일만큼만 걸 수 있습니다."
     }
   ]
 }

@@ -139,6 +139,175 @@ public final class SelfTest {
         RtShop.LOGGER.info("[rtshop-selftest] {}", text);
     }
 
+    /** 기록이 쌓이면 칭호가 열리고, 효과는 둘까지·내거는 것은 하나, 한 주가 끝나면 윗자리에 보상이 맡겨진다. */
+    private static void ranks(MinecraftServer server, FakePlayer a, FakePlayer b) {
+        com.rtshop.rank.Ranks.testFakes = true;
+        try {
+            com.rtshop.rank.Ranks.resetForTest(a);
+            com.rtshop.rank.Ranks.resetForTest(b);
+            com.rtshop.rank.Ranks.Config c = com.rtshop.rank.Ranks.get();
+            check("ranks: every category is on by default and each has titles in rising steps",
+                    c.enabled && c.maxEffectTitles == 2 && java.util.Arrays.stream(com.rtshop.rank.Ranks.CATS).allMatch(cat -> com.rtshop.rank.Ranks.on(cat)
+                            && c.titles.stream().filter(t -> t.category.equals(cat)).count() >= 3), c.titles.size());
+            // 기록 → 칭호
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.KILLS, 9);
+            boolean closed = !com.rtshop.rank.Ranks.has(com.rtshop.rank.Ranks.rec(a), "kills_1");
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.KILLS, 1);
+            boolean open = com.rtshop.rank.Ranks.has(com.rtshop.rank.Ranks.rec(a), "kills_1") && !com.rtshop.rank.Ranks.has(com.rtshop.rank.Ranks.rec(a), "kills_2");
+            String lockedErr = com.rtshop.rank.Ranks.setEffect(a, "kills_2", true);
+            String ok1 = com.rtshop.rank.Ranks.setEffect(a, "kills_1", true);
+            double dmg = com.rtshop.rank.Ranks.effect(a, "mob_damage");
+            check("titles: the first hunter title opens at 10 kills, a locked one can not be used, a used one gives its small effect",
+                    closed && open && lockedErr != null && ok1 == null && dmg == 0.5, closed + "/" + open + "/" + lockedErr + "/" + ok1 + "/" + dmg);
+            // 같은 종목은 바꿔 끼우고, 서로 다른 종목으로 둘까지
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.KILLS, 90);
+            String swap = com.rtshop.rank.Ranks.setEffect(a, "kills_2", true);
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.QUESTS, 10);
+            com.rtshop.rank.Ranks.add(a, com.rtshop.rank.Ranks.RAIDS, 1);
+            String second = com.rtshop.rank.Ranks.setEffect(a, "quests_1", true);
+            String third = com.rtshop.rank.Ranks.setEffect(a, "raids_1", true);
+            java.util.List<String> on = new java.util.ArrayList<>(com.rtshop.rank.Ranks.rec(a).effects);
+            check("titles: a higher step replaces the lower one of its category, two different categories can be used at once and a third is refused",
+                    swap == null && second == null && "rtshop.title.err.full".equals(third) && on.equals(java.util.List.of("kills_2", "quests_1"))
+                            && com.rtshop.rank.Ranks.effect(a, "mob_damage") == 1.0 && com.rtshop.rank.Ranks.plus(a, "quest_gold", 1000) == 1010
+                            && com.rtshop.rank.Ranks.plus(a, "bounty_gold", 1000) == 1000 && com.rtshop.rank.Ranks.minus(a, "buy_discount", 1000) == 1000,
+                    swap + "/" + second + "/" + third + "/" + on);
+            // 최대 체력 칭호
+            com.rtshop.rank.Ranks.setEffect(a, "quests_1", false);
+            float hpBefore = a.getMaxHealth();
+            com.rtshop.rank.Ranks.setEffect(a, "raids_1", true);
+            float hpWith = a.getMaxHealth();
+            com.rtshop.rank.Ranks.setEffect(a, "raids_1", false);
+            check("titles: the expedition title adds a little max health while it is used and takes it back when it is not",
+                    hpWith == hpBefore + 1 && a.getMaxHealth() == hpBefore, hpBefore + " -> " + hpWith + " -> " + a.getMaxHealth());
+            // 내걸기: 하나만, 이름 앞에
+            String showLocked = com.rtshop.rank.Ranks.setShow(a, "kills_5");
+            String show = com.rtshop.rank.Ranks.setShow(a, "kills_1");
+            String shownName = a.getDisplayName().getString();
+            com.rtshop.rank.Ranks.setShow(a, "");
+            String plain = a.getDisplayName().getString();
+            check("titles: one opened title can be shown in front of the name (chat, tab list) and taken down again; it need not be one of the used ones",
+                    showLocked != null && show == null && shownName.startsWith("[") && shownName.contains("rtshop_test_a") && !plain.startsWith("["), shownName + " / " + plain);
+            // 주간 순위: 수익·소비는 저마다, 보유 Gold 는 지금 가진 것
+            com.rtshop.rank.Ranks.earned(a, 5000);
+            com.rtshop.rank.Ranks.earned(b, 9000);
+            com.rtshop.rank.Ranks.spent(b, 100);
+            java.util.List<com.rtshop.rank.Ranks.Row> earned = com.rtshop.rank.Ranks.ranking(server, com.rtshop.rank.Ranks.EARNED);
+            int ia = -1, ib = -1;
+            for (int i = 0; i < earned.size(); i++) {
+                if (earned.get(i).id().equals(a.getUUID())) ia = i;
+                if (earned.get(i).id().equals(b.getUUID())) ib = i;
+            }
+            com.google.gson.JsonObject view = com.rtshop.rank.Ranks.ranksView(a);
+            check("ranks: this week's ranking orders players by what they did this week and a player sees their own place",
+                    ia >= 0 && ib >= 0 && ib < ia && view.getAsJsonArray("cats").size() == com.rtshop.rank.Ranks.CATS.length && view.get("resetIn").getAsLong() > 0,
+                    ib + " < " + ia + " / " + view.getAsJsonArray("cats").size());
+            // 주간 마감: 다른 사람의 기록은 치워 두고 a·b 만으로
+            for (java.util.Map.Entry<java.util.UUID, com.rtshop.rank.Ranks.Rec> e : com.rtshop.rank.Ranks.data(server).recs.entrySet()) {
+                if (!e.getKey().equals(a.getUUID()) && !e.getKey().equals(b.getUUID())) {
+                    e.getValue().week.clear();
+                    e.getValue().goldSeen = 0;
+                }
+            }
+            long walletA = Economy.wallet(a), pendingBefore = com.rtshop.rank.Ranks.rec(b).pendingGold;
+            com.rtshop.rank.Ranks.settle(server);
+            com.rtshop.rank.Ranks.Rec ra = com.rtshop.rank.Ranks.rec(a), rb = com.rtshop.rank.Ranks.rec(b);
+            long[] rw = c.rewards;
+            boolean wonB = rb.weekWon.contains(com.rtshop.rank.Ranks.EARNED) && rb.weekWon.contains(com.rtshop.rank.Ranks.SPENT) && !ra.weekWon.contains(com.rtshop.rank.Ranks.EARNED);
+            boolean cleared = ra.week.isEmpty() && rb.week.isEmpty() && ra.life.get(com.rtshop.rank.Ranks.KILLS) == 100;
+            boolean lastKept = com.rtshop.rank.Ranks.data(server).last.get(com.rtshop.rank.Ranks.EARNED).get(0).id().equals(b.getUUID());
+            String weekShow = com.rtshop.rank.Ranks.setShow(b, com.rtshop.rank.Ranks.WEEK + com.rtshop.rank.Ranks.EARNED);
+            String weekNo = com.rtshop.rank.Ranks.setShow(a, com.rtshop.rank.Ranks.WEEK + com.rtshop.rank.Ranks.EARNED);
+            long pendA = ra.pendingGold;
+            long got = com.rtshop.rank.Ranks.claim(a);
+            check("ranks: when the week ends the top places get rewards kept for them, the first place may show the week's title, weekly counts start over and lifetime counts stay",
+                    wonB && cleared && lastKept && weekShow == null && weekNo != null && rb.pendingGold >= pendingBefore + rw[0] * 2 && pendA >= rw[1]
+                            && got == pendA && Economy.wallet(a) == walletA + got && com.rtshop.rank.Ranks.claim(a) == 0,
+                    wonB + "/" + cleared + "/" + lastKept + "/" + weekShow + "/" + weekNo + "/" + rb.pendingGold + "/" + pendA + "/" + got);
+            com.google.gson.JsonObject tv = com.rtshop.rank.Ranks.titlesView(b);
+            check("titles: the keeper's list shows every category with its steps and the week's titles a player won",
+                    tv.getAsJsonArray("cats").size() == com.rtshop.rank.Ranks.CATS.length && tv.getAsJsonArray("week").size() >= 2 && tv.get("max").getAsInt() == 2,
+                    tv.getAsJsonArray("week").size());
+            check("ranks: the three keepers exist (bounty board, weekly ranking, titles) and have their own lines",
+                    QuestManager.loaded().npcs.containsKey("bounty") && QuestManager.loaded().npcs.containsKey("ranks") && QuestManager.loaded().npcs.containsKey("titles")
+                            && com.rtshop.story.Dialogue.npcForTest("quest_ranks") != null && com.rtshop.story.Dialogue.npcForTest("quest_titles") != null
+                            && com.rtshop.story.Dialogue.npcForTest("quest_bounty") != null && com.rtshop.story.Hunts.isBoardKey("quest_bounty"),
+                    QuestManager.loaded().npcs.keySet());
+        } finally {
+            com.rtshop.rank.Ranks.resetForTest(a);
+            com.rtshop.rank.Ranks.resetForTest(b);
+            com.rtshop.rank.Ranks.testFakes = false;
+        }
+    }
+
+    /** 도감: 마주치면 모습만, 잡으면 능력치·전리품까지, 장비는 지니면 적힌다. */
+    private static void codex(MinecraftServer server, ServerLevel level, FakePlayer a) {
+        com.rtshop.story.Codex.testFakes = true;
+        try {
+            com.rtshop.story.Codex.resetForTest(a);
+            java.util.Map<String, Boolean> mobs = com.rtshop.story.Codex.mobs();
+            java.util.List<String> gear = com.rtshop.story.Codex.gear();
+            check("codex: the list holds monsters, animals and bosses (not armor stands or players), and every kind of gear",
+                    mobs.containsKey("minecraft:zombie") && mobs.containsKey("minecraft:cow") && Boolean.TRUE.equals(mobs.get("minecraft:wither"))
+                            && Boolean.FALSE.equals(mobs.get("minecraft:zombie")) && !mobs.containsKey("minecraft:armor_stand") && !mobs.containsKey("minecraft:player")
+                            && !mobs.containsKey("minecraft:arrow") && gear.contains("minecraft:iron_sword") && gear.contains("minecraft:diamond_chestplate")
+                            && !gear.contains("minecraft:apple"), mobs.size() + " mobs, " + gear.size() + " gear");
+            net.minecraft.world.entity.monster.Zombie z = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
+            com.rtshop.story.Codex.Rec r = com.rtshop.story.Codex.rec(a);
+            int s0 = com.rtshop.story.Codex.state(r, "minecraft:zombie");
+            boolean metNew = com.rtshop.story.Codex.meet(a, z), metAgain = com.rtshop.story.Codex.meet(a, z);
+            int s1 = com.rtshop.story.Codex.state(r, "minecraft:zombie");
+            com.google.gson.JsonObject before = com.rtshop.story.Codex.detail(a, "minecraft:zombie");
+            com.rtshop.story.Codex.onKill(a, z);
+            com.rtshop.story.Codex.onKill(a, z);
+            int s2 = com.rtshop.story.Codex.state(r, "minecraft:zombie");
+            com.google.gson.JsonObject after = com.rtshop.story.Codex.detail(a, "minecraft:zombie");
+            check("codex: a mob is unknown, then met (look and name only), then slain (stats and drops are written)",
+                    s0 == 0 && metNew && !metAgain && s1 == 1 && !before.has("hp") && s2 == 2 && after.get("hp").getAsDouble() == 20.0
+                            && after.get("kills").getAsInt() == 2 && after.has("drops") && after.has("atk"),
+                    s0 + "/" + s1 + "/" + s2 + " " + after);
+            a.getInventory().clearContent();
+            a.getInventory().add(new ItemStack(Items.IRON_SWORD));
+            a.getInventory().add(new ItemStack(Items.APPLE));
+            int added = com.rtshop.story.Codex.scanGear(a), again = com.rtshop.story.Codex.scanGear(a);
+            a.getInventory().clearContent();
+            com.google.gson.JsonObject view = com.rtshop.story.Codex.view(a);
+            check("codex: gear is written once it is carried (food is not gear), and the whole book is sent with what is known",
+                    added == 1 && again == 0 && r.gear.contains("minecraft:iron_sword") && view.getAsJsonArray("mobs").size() == mobs.size()
+                            && view.getAsJsonArray("gear").size() == gear.size(), added + "/" + again);
+            com.google.gson.JsonObject guide = com.rtshop.story.Guide.get();
+            boolean texts = true, images = true;
+            int pages = 0;
+            for (com.google.gson.JsonElement ce : guide.getAsJsonArray("categories")) {
+                for (com.google.gson.JsonElement pe : ce.getAsJsonObject().getAsJsonArray("pages")) {
+                    com.google.gson.JsonObject pg = pe.getAsJsonObject();
+                    pages++;
+                    texts &= pg.get("title").getAsString().length() > 1 && pg.get("text").getAsString().length() > 20;
+                    if (pg.has("image")) {
+                        String path = pg.get("image").getAsString().replace("rtshop:", "/assets/rtshop/");
+                        images &= SelfTest.class.getResource(path) != null;
+                    }
+                    if (pg.has("icons")) {
+                        for (com.google.gson.JsonElement ie : pg.getAsJsonArray("icons")) {
+                            String iid = ie.getAsString();
+                            if (iid.startsWith("rtshop:")) texts &= net.minecraftforge.registries.ForgeRegistries.ITEMS.containsKey(new ResourceLocation(iid));
+                        }
+                    }
+                }
+            }
+            check("guidebook: every page has a title and text, its picture exists and its rtshop item icons are real items; the store sells the book again",
+                    pages >= 30 && texts && images && guide.getAsJsonArray("categories").size() >= 7
+                            && ShopServer.shops().get("general").entries.stream().anyMatch(en -> en.stack.is(com.rtshop.item.ModItems.GUIDEBOOK.get()) && en.buyable),
+                    pages + " pages / texts " + texts + " / images " + images);
+            check("codex: the book is an item that the general store sells again",
+                    com.rtshop.item.ModItems.CODEX.get() != null && ShopServer.shops().get("general") != null
+                            && ShopServer.shops().get("general").entries.stream().anyMatch(en -> en.stack.is(com.rtshop.item.ModItems.CODEX.get()) && en.buyable));
+        } finally {
+            com.rtshop.story.Codex.resetForTest(a);
+            com.rtshop.story.Codex.testFakes = false;
+        }
+    }
+
     private static FakePlayer fake(ServerLevel level, String name) {
         UUID id = UUID.nameUUIDFromBytes(("rtshop:" + name).getBytes(StandardCharsets.UTF_8));
         return FakePlayerFactory.get(level, new GameProfile(id, name));
@@ -2044,7 +2213,7 @@ public final class SelfTest {
                 for (ShopData.Entry en : sd.entries) {
                     net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(en.stack.getItem());
                     if (rl == null) continue;
-                    if (rl.getNamespace().equals("efn") || rl.getNamespace().equals("arcanevortex")) { banned++; sample = rl.toString(); }
+                    if (rl.getNamespace().equals("efn") || rl.getNamespace().equals("arcanevortex") || rl.getNamespace().equals("betternether")) { banned++; sample = rl.toString(); }
                     if (rl.getNamespace().equals("wom")) womListed++;
                     if (com.rtshop.rules.ItemPolicy.gun(en.stack.getItem())) { gunsListed++; sample = rl.toString(); }
                     if (com.rtshop.rules.ItemPolicy.bossItem(en.stack.getItem())) { bossListed++; sample = rl.toString(); }
@@ -2055,6 +2224,17 @@ public final class SelfTest {
                 if (rec.getId().getNamespace().equals("tacz") || out != null && out.getNamespace().equals("tacz")) tacz++;
                 if (out != null && !out.getNamespace().equals("minecraft") && !out.getNamespace().equals("rtshop")
                         && com.rtshop.rules.ItemPolicy.recipeReason(rec.getId(), out) != null) { craftableListed++; sample = out.toString(); }
+            }
+            if (net.minecraftforge.fml.ModList.get().isLoaded("betternether")) {
+                // 상점에 올리지 않는 모드의 장비는 그 모드의 조합법으로 만든다 (상점에도 없고 만들 수도 없는 물건이 되지 않게)
+                int netherGear = 0;
+                for (net.minecraft.world.item.crafting.Recipe<?> rec : server.getRecipeManager().getRecipes()) {
+                    ResourceLocation out = com.rtshop.rules.RecipeRules.outputId(rec, server);
+                    if (out == null || !out.getNamespace().equals("betternether")) continue;
+                    net.minecraft.world.item.Item it = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(out);
+                    if (it != null && com.rtshop.rules.ItemPolicy.gear(it)) netherGear++;
+                }
+                check("mod pack: Better Nether is not sold by NPC shops, and its gear keeps its own recipes", netherGear > 0, netherGear + " gear recipes");
             }
             check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
                     banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,
@@ -2084,20 +2264,49 @@ public final class SelfTest {
             boolean noSpot = com.rtshop.item.ReturnTicketItem.refusal(a, true) != null;
             ts.set = true;
             ts.dim = a.level().dimension().location().toString();
-            ts.x = a.getX() + 9000;
+            ts.x = a.getX() + 2900;
             ts.y = a.getY();
             ts.z = a.getZ();
             boolean near = com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
-            ts.x = a.getX() + 10001;
+            ts.x = a.getX() + 3001;
             boolean far = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, false) != null
                     && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
             ts.x = a.getX();
             ts.dim = "minecraft:the_nether";
             boolean otherWorld = !com.rtshop.rules.TownSpawn.inNormalRange(a) && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
-            check("return tickets: nothing works until the town point is set; the ordinary one works within 10000 blocks (height ignored) in the town's world, the greater one anywhere",
-                    noSpot && near && far && otherWorld, noSpot + " " + near + " " + far + " " + otherWorld);
+            check("return tickets: nothing works until the town point is set; the ordinary one works within 3000 blocks (height ignored) in the town's world, the greater one anywhere",
+                    noSpot && near && far && otherWorld && ts.normalRange == 3000, noSpot + " " + near + " " + far + " " + otherWorld);
+            // 3.53: 다시 쓰기까지의 시간 (실제 시간, 일반 60분 / 고급 30분, 종류마다 따로)
+            ts.dim = a.level().dimension().location().toString();
+            ts.x = a.getX();
+            com.rtshop.rules.TownSpawn.clearCooldown(a);
+            long t0 = 1_800_000_000_000L;
+            com.rtshop.rules.TownSpawn.testNow = t0;
+            boolean cdFree = com.rtshop.item.ReturnTicketItem.refusal(a, false) == null && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            com.rtshop.rules.TownSpawn.used(a, false);
+            boolean cdNormal = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null
+                    && com.rtshop.rules.TownSpawn.cooldownLeft(a, false) == 60 * 60000L && com.rtshop.rules.TownSpawn.cooldownLeft(a, true) == 0;
+            com.rtshop.rules.TownSpawn.used(a, true);
+            com.rtshop.rules.TownSpawn.testNow = t0 + 29 * 60000L;
+            boolean cdBoth = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null && com.rtshop.item.ReturnTicketItem.refusal(a, true) != null
+                    && com.rtshop.rules.TownSpawn.cooldownLeft(a, true) == 60000L;
+            com.rtshop.rules.TownSpawn.testNow = t0 + 30 * 60000L;
+            boolean cdPlusDone = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null && com.rtshop.item.ReturnTicketItem.refusal(a, true) == null;
+            com.rtshop.rules.TownSpawn.testNow = t0 + 59 * 60000L + 59000L;
+            boolean cdAlmost = com.rtshop.item.ReturnTicketItem.refusal(a, false) != null;
+            com.rtshop.rules.TownSpawn.testNow = t0 + 60 * 60000L;
+            boolean cdDone = com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
+            // 죽어도(되살아나도) 남는 자리에 적힌다
+            com.rtshop.rules.TownSpawn.used(a, false);
+            boolean cdKept = a.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG).getCompound("rtshop_return_cd").getLong("normal") == t0 + 60 * 60000L;
+            com.rtshop.rules.TownSpawn.clearCooldown(a);
+            boolean cdCleared = com.rtshop.item.ReturnTicketItem.refusal(a, false) == null;
+            check("return ticket cooldowns run on real time and per kind: the ordinary one 60 minutes, the greater one 30 minutes, kept through death and relog",
+                    cdFree && cdNormal && cdBoth && cdPlusDone && cdAlmost && cdDone && cdKept && cdCleared && ts.normalCooldownMinutes == 60 && ts.premiumCooldownMinutes == 30,
+                    cdFree + " " + cdNormal + " " + cdBoth + " " + cdPlusDone + " " + cdAlmost + " " + cdDone + " " + cdKept + " " + cdCleared);
+            com.rtshop.rules.TownSpawn.testNow = 0;
             ItemStack plus = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()), plain = new ItemStack(com.rtshop.item.ModItems.RETURN_TICKET.get());
-            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.clearBought(a);
             com.rtshop.rules.TownSpawn.testDay = "2026-01-01";
             int d0 = com.rtshop.rules.TownSpawn.dailyLeft(a, plus);
             com.rtshop.rules.TownSpawn.bought(a, plus, 3);
@@ -2109,14 +2318,28 @@ public final class SelfTest {
             check("the greater return ticket can be bought 5 times a day (the count starts again the next day); the ordinary one has no limit",
                     d0 == 5 && d1 == 2 && d2 == 0 && d3 == 5 && com.rtshop.rules.TownSpawn.dailyLeft(a, plain) > 1000, d0 + " " + d1 + " " + d2 + " " + d3);
             ShopData gen = ShopServer.shops().get("general");
-            check("the general store sells both return tickets (the greater one costs more)",
-                    gen != null && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()) && e.buyable) >= 0
-                            && findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()) && e.buyable) >= 0
-                            && gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()))).price
-                            > gen.entries.get(findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()))).price);
+            int ti = gen == null ? -1 : findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()) && e.buyable);
+            int tj = gen == null ? -1 : findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()) && e.buyable);
+            check("the general store sells both return tickets: 5000 G and 30000 G (3.53; an installed shop still at the old default price is updated)",
+                    ti >= 0 && tj >= 0 && gen.entries.get(ti).price == 5000 && gen.entries.get(tj).price == 30000,
+                    ti < 0 || tj < 0 ? "missing" : gen.entries.get(ti).price + " " + gen.entries.get(tj).price);
+            // 옛 값으로 깔린 상점 파일의 값 고치기: 기본값 그대로인 것만 고치고, 운영자가 바꾼 값은 그대로 둔다
+            try {
+                java.nio.file.Path priceFile = java.nio.file.Files.createTempFile("rtshop_reprice", ".json");
+                java.nio.file.Files.writeString(priceFile, "{\"items\":[{\"item\":\"rtshop:return_ticket\",\"price\":1500},{\"item\":\"rtshop:return_ticket_plus\",\"price\":9999}]}");
+                int n1 = com.rtshop.shop.ShopLoader.reprice(priceFile, "rtshop:return_ticket", 1500, 5000);
+                int n2 = com.rtshop.shop.ShopLoader.reprice(priceFile, "rtshop:return_ticket_plus", 12000, 30000);
+                String after = java.nio.file.Files.readString(priceFile);
+                java.nio.file.Files.deleteIfExists(priceFile);
+                check("repricing touches only entries still at the old default price", n1 == 1 && n2 == 0 && after.contains("5000") && after.contains("9999"), n1 + " " + n2 + " " + after);
+            } catch (Exception ex) {
+                check("repricing touches only entries still at the old default price", false, ex.toString());
+            }
         } finally {
             com.rtshop.rules.TownSpawn.testDay = null;
-            a.getPersistentData().remove("rtshop_return_buys");
+            com.rtshop.rules.TownSpawn.testNow = 0;
+            com.rtshop.rules.TownSpawn.clearBought(a);
+            com.rtshop.rules.TownSpawn.clearCooldown(a);
             com.rtshop.rules.TownSpawn.reload();
         }
         witherProbe.discard();
@@ -3010,6 +3233,23 @@ public final class SelfTest {
                             && com.rtshop.story.Readables.has("rtshop:mother_journal") && com.rtshop.story.Readables.has("rtshop:frozen_logbook")
                             && com.rtshop.story.Readables.has("rtshop:old_expedition_map") && com.rtshop.story.Readables.has("rtshop:chronicle_last_page"),
                     before + " -> " + after + " / " + (oath == null ? "null" : oath.getAsJsonArray("pages").size()));
+        }
+        // 3.53: 기록·주간 순위·칭호
+        ranks(server, a, fake(level, "rtshop_test_b"));
+        // 3.54: 도감
+        codex(server, level, a);
+        // 3.53: 아이템 쓰임새 설명 (상점·강화·퀘스트에서 저절로)
+        {
+            java.util.List<String[]> wheat = com.rtshop.rules.ItemNotes.of("minecraft:wheat");
+            boolean sold = false, bought = false;
+            for (String[] ln : wheat) {
+                sold |= ln[0].equals("rtshop.note.sold_by");
+                bought |= ln[0].equals("rtshop.note.bought_by") && Long.parseLong(ln[2]) >= 1;
+            }
+            boolean bossNote = com.rtshop.rules.ItemNotes.of("minecraft:nether_star").stream().anyMatch(ln -> ln[0].equals("rtshop.note.boss"));
+            check("item notes: an item says who buys it (wheat), boss loot says shops do not trade it, and things with no use have no note",
+                    bought && bossNote && com.rtshop.rules.ItemNotes.of("minecraft:bedrock").isEmpty() && com.rtshop.rules.ItemNotes.countForTest() > 50,
+                    com.rtshop.rules.ItemNotes.countForTest() + " items, wheat " + wheat.size() + " sold " + sold + " bought " + bought + " boss " + bossNote);
         }
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();

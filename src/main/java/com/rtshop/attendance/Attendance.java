@@ -325,6 +325,7 @@ public final class Attendance {
     public static void give(ServerPlayer p, AttendanceConfig.Reward r) {
         if (r.gold > 0) {
             Economy.addWallet(p, r.gold);
+            com.rtshop.rank.Ranks.earned(p, r.gold);
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_gold", String.format("%,d", r.gold)));
         }
         for (AttendanceConfig.Item it : r.items) {

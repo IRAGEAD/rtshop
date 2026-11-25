@@ -471,6 +471,8 @@ public final class Hunts {
                 b.putBoolean("done", true);
                 long gold = reward(p, b.getLong("gold"));
                 Economy.addWallet(p, gold);
+                com.rtshop.rank.Ranks.earned(p, gold);
+                com.rtshop.rank.Ranks.add(p, com.rtshop.rank.Ranks.BOUNTIES, 1);
                 com.rtshop.notice.Notice.send(p, Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.weekly_done" : "rtshop.hunt.daily_done",
                         victim.getType().getDescription(), need, String.format("%,d", gold)).withStyle(ChatFormatting.GOLD));
                 p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.7F, 1.2F);
@@ -500,8 +502,14 @@ public final class Hunts {
         if (testMode && entity == -1) return true;
         net.minecraft.world.entity.Entity e = p.level().getEntity(entity);
         if (e == null || e.distanceTo(p) > 8) return false;
-        String key = QuestManager.npcKey(e);
-        return key != null && get().boardNpcs.contains(key);
+        return isBoardKey(QuestManager.npcKey(e));
+    }
+
+    /** 현상금 게시판을 맡은 NPC 인가: 설정의 boardNpcs, 그리고 전용 NPC (quest_bounty: 현상금 게시판지기). */
+    public static final String NPC_BOARD = "quest_bounty";
+
+    public static boolean isBoardKey(String key) {
+        return key != null && (NPC_BOARD.equals(key) || get().boardNpcs.contains(key));
     }
 
     /** 게시판에서 의뢰 하나를 맡는다. 0 = 맡음, 1 = 이미/끝남, 2 = 그 종류는 더 못 맡음, 3 = 게시판 곁이 아님. */
@@ -557,7 +565,7 @@ public final class Hunts {
 
     public static long reward(ServerPlayer p, long base) {
         boolean fighter = !Jobs.entry(p).combat.isEmpty();
-        return Math.round(base * (fighter ? 1 + get().jobBonus : 1));
+        return com.rtshop.rank.Ranks.plus(p, "bounty_gold", Math.round(base * (fighter ? 1 + get().jobBonus : 1)));   // 칭호 효과
     }
 
     static int[] progress(ServerPlayer p, Book b) {
@@ -579,6 +587,7 @@ public final class Hunts {
         done.putBoolean(b.id, true);
         d.put("books", done);
         Economy.addWallet(p, b.gold);
+        com.rtshop.rank.Ranks.earned(p, b.gold);
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.book_done", b.name, String.format("%,d", b.gold)).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         p.level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1F, 1F);
     }

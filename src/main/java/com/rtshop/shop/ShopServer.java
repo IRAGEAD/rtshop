@@ -117,6 +117,7 @@ public final class ShopServer {
         }
         loaded = ShopLoader.loadAll(server);
         com.rtshop.rules.ItemPolicy.afterShops(server, loaded);
+        com.rtshop.rules.ItemNotes.rebuild(server);   // 아이템 쓰임새 설명 (상점·강화·뽑기·퀘스트에서)
         SESSIONS.clear();
         return loaded;
     }
@@ -538,6 +539,9 @@ public final class ShopServer {
         com.rtshop.story.Hunts.reload();
         com.rtshop.story.Dialogue.reload();
         com.rtshop.story.Readables.reload();
+        com.rtshop.rank.Ranks.reload();
+        com.rtshop.story.Codex.reload();
+        com.rtshop.story.Guide.reload();
         com.rtshop.story.StoryText.reload();
         com.rtshop.story.StorySystems.load();
         com.rtshop.compat.SpellMana.load();
@@ -837,7 +841,7 @@ public final class ShopServer {
             sendResult(player, Component.translatable("rtshop.msg.daily_limit", entry.stack.getHoverName(), com.rtshop.rules.TownSpawn.get().premiumDailyLimit, left), false);
             return;
         }
-        long total = (long) entry.price * amount;
+        long total = com.rtshop.rank.Ranks.minus(player, "buy_discount", (long) entry.price * amount);   // 칭호 효과: 단골 할인
         if (Economy.wallet(player) < total) {
             sendResult(player, Component.translatable("rtshop.msg.no_money"), false);
             return;
@@ -850,6 +854,7 @@ public final class ShopServer {
         }
         InvUtil.apply(player.getInventory(), sim);
         Economy.addWallet(player, -total);
+        com.rtshop.rank.Ranks.spent(player, total);
         com.rtshop.rules.TownSpawn.bought(player, entry.stack, amount);
         if (firstDeed) {
             LandManager.markFirstDeed(player);
@@ -867,6 +872,7 @@ public final class ShopServer {
         if (ShopLoader.handCooked(loaded, entry.stack)) {
             m += com.rtshop.job.Jobs.stat(player, "dishSell");
         }
+        m *= 1.0 + com.rtshop.rank.Ranks.effect(player, "sell_bonus") / 100.0;   // 칭호 효과: 장사 수완
         return m;
     }
 
@@ -912,6 +918,7 @@ public final class ShopServer {
         }
         player.getInventory().setChanged();
         Economy.addWallet(player, revenue);
+        com.rtshop.rank.Ranks.earned(player, revenue);
         if (restaurant) {
             try {
                 Restaurant.onSold(player, d, index);

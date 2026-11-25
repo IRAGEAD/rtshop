@@ -98,6 +98,14 @@ public final class ModItems {
     public static final RegistryObject<Item> SURVEY_COMPASS = ITEMS.register("survey_compass",
             () -> new SurveyCompassItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
 
+    /** 조사대 도감: 마주친 몹·잡은 몹·손에 넣은 장비가 적힌다 (story/Codex). 처음 들어올 때 한 권 받고, 잃어버리면 잡화점에서 다시 산다. */
+    public static final RegistryObject<Item> CODEX = ITEMS.register("codex",
+            () -> new CodexItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false));
+
+    /** 조사대 안내서(가이드북): 모드팩의 시스템과 쓰는 법을 갈래별로 적은 책 (story/Guide). */
+    public static final RegistryObject<Item> GUIDEBOOK = ITEMS.register("guidebook",
+            () -> new CodexItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON), true));
+
     /** 무기 설명서: 특수기가 있는 무기를 처음 얻으면 한 권씩 받는다. 우클릭하면 그 무기의 사용법이 펼쳐진다. */
     public static final RegistryObject<Item> WEAPON_MANUAL = ITEMS.register("weapon_manual",
             () -> new WeaponManualItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));

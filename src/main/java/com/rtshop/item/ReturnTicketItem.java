@@ -47,6 +47,8 @@ public class ReturnTicketItem extends Item {
         } catch (Throwable ignored) {
         }
         if (!premium && !TownSpawn.inNormalRange(sp)) return Component.translatable("rtshop.return.too_far", c.normalRange);
+        long left = sp.getAbilities().instabuild ? 0 : TownSpawn.cooldownLeft(sp, premium);
+        if (left > 0) return Component.translatable("rtshop.return.cooldown", TownSpawn.leftText(left));
         return null;
     }
 
@@ -85,8 +87,7 @@ public class ReturnTicketItem extends Item {
             level.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.8F, 1.2F);
             if (TownSpawn.send(sp)) {
                 if (!sp.getAbilities().instabuild) stack.shrink(1);
-                sp.getCooldowns().addCooldown(ModItems.RETURN_TICKET.get(), TownSpawn.get().cooldownTicks);
-                sp.getCooldowns().addCooldown(ModItems.RETURN_TICKET_PLUS.get(), TownSpawn.get().cooldownTicks);
+                if (!sp.getAbilities().instabuild) TownSpawn.used(sp, premium);
                 sp.level().playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.8F, 1.0F);
                 com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.return.done").withStyle(ChatFormatting.GREEN));
             }
@@ -104,6 +105,8 @@ public class ReturnTicketItem extends Item {
         tip.add(Component.translatable("item.rtshop.return_ticket.tip1").withStyle(ChatFormatting.GRAY));
         tip.add(Component.translatable(premium ? "item.rtshop.return_ticket_plus.tip2" : "item.rtshop.return_ticket.tip2", TownSpawn.get().normalRange)
                 .withStyle(ChatFormatting.DARK_GRAY));
+        int cd = TownSpawn.get().cooldownMinutes(premium);
+        if (cd > 0) tip.add(Component.translatable("item.rtshop.return_ticket.tip_cd", cd).withStyle(ChatFormatting.DARK_GRAY));
         if (premium) tip.add(Component.translatable("item.rtshop.return_ticket_plus.tip3", TownSpawn.get().premiumDailyLimit).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

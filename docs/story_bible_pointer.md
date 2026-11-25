@@ -211,3 +211,16 @@
 - **귀환권 · 마을 기준 자리**: `rules/TownSpawn` (`town_spawn.json`). `/rtshop spawn set|clear|range <n>`. 처음 들어온 사람의 시작 자리이자 침대 없는 사람의 리스폰 자리. 귀환권은 3초 들고 있기. 고급 귀환권은 하루 구매 수 제한.
 - **인사의 once / chance** (`story/Dialogue.greet`): `"once": true` = 그 사람에게 처음 한 번만 (표시: `greeted_<npc>_<글 해시>`), `"chance": 0.2` = 가끔만. 그 창(efn:meen_spear)을 든 사람에게 쓰는 인사에 쓴다. NPC 는 창의 이름을 부르지 않고 "그 창 · 저물녘 빛"으로 가리킨다.
 - **읽을 수 있는 물건** (`story/Readables`, `readables.json`, 화면 `client/ReadScreen`): 글은 `tools/gen_readables.py` 가 스토리의 문장을 그대로 옮긴다 (스토리에 없는 문장이면 스크립트가 멈춘다). 쪽마다 need 로 이야기 진행에 맞춰 열린다. 연대기 페이지는 끝낸 퀘스트의 `names` 장면을 모아 보여 준다.
+
+
+## 3.53
+
+- **기록·주간 순위·칭호** (`rank/Ranks`, `ranks.json`, 저장 `rtshop_ranks`): 종목 kills·bosses·earned·spent·gold·quests·bounties·raids. 수익·소비는 NPC·시스템과의 거래만 센다(`Ranks.earned/spent` 를 부르는 곳만). 처치 인정은 `QuestManager.onKill` 과 같다. 주간 마감 `Ranks.settle` (운영자: `/rtshop rank settle`).
+  칭호 효과: mob_damage·boss_damage·sell_bonus·buy_discount·death_keep·quest_gold·bounty_gold·max_health. 효과는 2개까지(종목이 달라야 함), 내거는 칭호 1개(채팅·탭 목록: `PlayerEvent.NameFormat`).
+- **전용 NPC 셋** (`quests/npcs.json`): `quest_bounty` 현상금 게시판지기 가렛(하오체) · `quest_ranks` 순위 기록원 테오(해요체) · `quest_titles` 칭호 관리인 아델(합쇼체). 대화 상자 맨 위에 맡은 일이 나오고, 줄 퀘스트가 없으면 [퀘스트]는 보이지 않는다. 소환: `/rtshop npc quest_bounty` 등.
+- **조사대 도감** (`story/Codex`, `codex.json`, 저장 `rtshop_codex`, 화면 `client/CodexScreen`): 몹은 모름 → 마주침(가까이에서 눈에 보임) → 잡음. 장비는 지니면 적힌다. Starcatcher 는 뺀다(excludeMods). 보스 설명은 story.json 의 등장 연출 글(intros)에서 온다.
+- **조사대 안내서** (`story/Guide`, `guide.json`, 화면 `client/GuideScreen`): 내용은 `tools/gen_guide.py`, 그림은 `tools/gen_guide_images.py` (CI 화면을 줄인 것). 쪽의 `mod` 가 설치되지 않았으면 그 쪽은 보이지 않는다.
+- **아이템 쓰임새 설명** (`rules/ItemNotes`, `item_notes.json`, 화면 `client/ItemNoteTips`): Shift 를 누르면 파는 곳·사 주는 곳·강화 재료·뽑기·보스 전리품·퀘스트. 상점을 읽을 때마다 다시 만든다.
+- **강화 정보 창**: 연한 금빛 판(`tools/gen_enhance_panel.py`), 전용 글꼴 `assets/rtshop/font/enhance.json` (한글 송명, 숫자·영문 Playfair Display Bold). 글자는 `EnhancePanel.fit` 으로 칸 너비에 맞춰 줄인다. `client.json` 의 `enhanceLuxFont`. 숫자는 높이가 고른 라이닝 모양(`tools/gen_enhance_font.py`). 글꼴의 기준선은 게임 글꼴과 같은 y+7 에 맞춘다: TTF 의 기준선 = 어센트(px) - 3 + shift.
+- **아이템 규칙 2판** (`item_policy.json` 의 version 2): Better Nether 도 NPC 상점 금지, 전리품 금지의 `*fruit*:*` → `spmovesets:*`. 예전 파일은 읽을 때 저절로 고쳐 쓴다.
+  `shopBannedKeepOwnWays`: 상점 금지 모드(Arcane Vortex·Better Nether·Nightfall)의 장비는 "상점에서만" 규칙에서 빠져 그 모드의 조합법으로 만든다 (Nightfall 은 전리품 금지가 따로 걸려 있다).

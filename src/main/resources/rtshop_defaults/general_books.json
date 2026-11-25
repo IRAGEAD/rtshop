@@ -1,0 +1,17 @@
+{
+ "_설명": "잡화점에 덧붙이는 조사대 도구. 처음에 한 번 받는 것들을 잃어버렸을 때 다시 살 수 있습니다 (조금 비싸게).",
+ "items": [
+  {
+   "item": "rtshop:codex",
+   "price": 3000,
+   "category": "misc",
+   "sell": false
+  },
+  {
+   "item": "rtshop:guidebook",
+   "price": 2000,
+   "category": "misc",
+   "sell": false
+  }
+ ]
+}

@@ -322,6 +322,10 @@ public final class ClientEvents {
             StoryClient.onTooltip(event);
         } catch (Throwable ignored) {
         }
+        try {
+            ItemNoteTips.onTooltip(event);
+        } catch (Throwable ignored) {
+        }
     }
 
     // ------------------------------------------------------------------ 아이템 설명

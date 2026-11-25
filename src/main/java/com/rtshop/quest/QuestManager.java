@@ -1377,6 +1377,7 @@ public final class QuestManager {
                 takeItems(p, ob.target, ob.count);
             } else if (ob.type == QuestDef.Type.PAY) {
                 Economy.addWallet(p, -ob.count);
+                com.rtshop.rank.Ranks.spent(p, ob.count);
             }
         }
         pr.active.remove(q.id);
@@ -1431,9 +1432,12 @@ public final class QuestManager {
     }
 
     private static void giveRewards(ServerPlayer p, QuestDef q) {
+        com.rtshop.rank.Ranks.add(p, com.rtshop.rank.Ranks.QUESTS, 1);
         if (q.rewardGold > 0) {
-            Economy.addWallet(p, q.rewardGold);
-            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_gold", String.format("%,d", q.rewardGold)));
+            long gold = com.rtshop.rank.Ranks.plus(p, "quest_gold", q.rewardGold);   // 칭호 효과
+            Economy.addWallet(p, gold);
+            com.rtshop.rank.Ranks.earned(p, gold);
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_gold", String.format("%,d", gold)));
         }
         for (QuestDef.ItemReward ir : q.rewardItems) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ir.item));
@@ -1503,6 +1507,8 @@ public final class QuestManager {
     /** 처치 목표 진행. */
     public static void onKill(ServerPlayer p, LivingEntity victim) {
         com.rtshop.story.Hunts.onKill(p, victim); // 토벌 의뢰·몹 도감 (처치 인정은 퀘스트와 같다)
+        com.rtshop.rank.Ranks.onKill(p, victim);  // 기록·칭호 (같은 기준)
+        com.rtshop.story.Codex.onKill(p, victim); // 도감 (같은 기준)
         QuestData.Progress pr = prog(p);
         if (pr.active.isEmpty()) {
             return;

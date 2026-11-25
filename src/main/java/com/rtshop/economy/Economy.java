@@ -176,7 +176,7 @@ public final class Economy {
         EconomyConfig c = EconomyConfig.get();
         double pct = c.deathLossMinPercent + sp.getRandom().nextDouble() * (c.deathLossMaxPercent - c.deathLossMinPercent);
         long w = wallet(sp);
-        long loss = Math.min(w, Math.round(w * pct / 100.0D));
+        long loss = com.rtshop.rank.Ranks.minus(sp, "death_keep", Math.min(w, Math.round(w * pct / 100.0D)));   // 칭호 효과: 덜 잃는다
         if (loss > 0) {
             setWallet(sp, w - loss);
             com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.msg.death_loss",

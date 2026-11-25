@@ -1385,6 +1385,171 @@ final class ClientSelfTest2 {
             });
             waitTicks(5);
         });
+        // 도감: 마주친 몹·잡은 몹·지닌 장비가 적힌다
+        add(mc -> {
+            onServer(mc, sp -> {
+                com.rtshop.story.Codex.resetForTest(sp);
+                net.minecraft.server.level.ServerLevel lv = sp.serverLevel();
+                for (net.minecraft.world.entity.EntityType<?> t : java.util.List.of(net.minecraft.world.entity.EntityType.ZOMBIE, net.minecraft.world.entity.EntityType.SKELETON,
+                        net.minecraft.world.entity.EntityType.CREEPER, net.minecraft.world.entity.EntityType.COW, net.minecraft.world.entity.EntityType.WITHER)) {
+                    if (t.create(lv) instanceof net.minecraft.world.entity.LivingEntity le) {
+                        com.rtshop.story.Codex.meet(sp, le);
+                        if (t != net.minecraft.world.entity.EntityType.CREEPER) com.rtshop.story.Codex.onKill(sp, le);
+                    }
+                }
+                sp.getInventory().add(new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                com.rtshop.story.Codex.open(sp);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            if (mc.screen instanceof CodexScreen c) {
+                boolean picked = c.selectForTest("minecraft:zombie");
+                check("the codex opens with every mob, boss and piece of gear listed; what was met or slain is known and the rest is locked",
+                        c.totalForTest(0) >= 30 && c.totalForTest(1) >= 2 && c.totalForTest(2) >= 50 && c.knownForTest(0) >= 4 && c.knownForTest(1) >= 1
+                                && c.knownForTest(2) >= 1 && c.stateForTest("minecraft:creeper") == 1 && c.stateForTest("minecraft:zombie") == 2
+                                && c.stateForTest("minecraft:spider") == 0 && picked,
+                        c.totalForTest(0) + "/" + c.totalForTest(1) + "/" + c.totalForTest(2) + " known " + c.knownForTest(0) + "/" + c.knownForTest(1) + "/" + c.knownForTest(2));
+            } else {
+                check("the codex opens with every mob, boss and piece of gear listed; what was met or slain is known and the rest is locked", false, mc.screen);
+            }
+            waitTicks(20);
+        });
+        add(mc -> {
+            check("picking a slain mob shows its stats and drops", CodexScreen.hasDetailForTest("minecraft:zombie"));
+            shot(mc, "128a_codex_mob");
+            if (mc.screen instanceof CodexScreen c) {
+                c.knownOnlyForTest(true);
+                int knownShown = c.shownForTest();
+                c.searchForTest("zzzz-no-such-name");
+                int none = c.shownForTest();
+                c.searchForTest("");
+                c.knownOnlyForTest(false);
+                c.tabForTest(2);
+                boolean sword = c.selectForTest("minecraft:iron_sword");
+                check("the codex can show only what is known, search by name and list gear", knownShown >= 4 && knownShown < c.totalForTest(0) && none == 0 && sword && c.modsForTest() >= 1,
+                        knownShown + " / " + none + " / " + sword);
+            }
+            waitTicks(10);
+        });
+        add(mc -> {
+            shot(mc, "128b_codex_gear");
+            if (mc.screen instanceof CodexScreen c) {
+                c.tabForTest(1);
+                c.selectForTest("minecraft:wither");
+            }
+            waitTicks(20);
+        });
+        add(mc -> {
+            shot(mc, "128c_codex_boss");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.story.Codex.resetForTest(sp));
+            waitTicks(5);
+        });
+        // 안내서(가이드북): 갈래별 쪽, 그림과 글, 낱말로 찾기
+        add(mc -> {
+            onServer(mc, sp -> com.rtshop.story.Guide.open(sp));
+            waitTicks(15);
+        });
+        add(mc -> {
+            if (mc.screen instanceof GuideScreen gs) {
+                int all = gs.pagesForTest();
+                boolean bank = gs.selectForTest("Gold 와 은행");
+                gs.searchForTest("귀환권");
+                int found = gs.rowsForTest();
+                gs.searchForTest("zzzz-no-such-word");
+                int none = gs.rowsForTest();
+                gs.searchForTest("");
+                gs.selectForTest("장비 강화");
+                check("the guidebook opens with its pages by topic, the titles fit the list, and a word search narrows the pages",
+                        all >= 20 && bank && found >= 1 && found < all && none == 0 && gs.rowsForTest() == all && gs.fitsForTest(),
+                        all + " / " + found + " / " + none + " / " + gs.fitsForTest());
+            } else {
+                check("the guidebook opens with its pages by topic, the titles fit the list, and a word search narrows the pages", false, mc.screen);
+            }
+            waitTicks(10);
+        });
+        add(mc -> {
+            shot(mc, "129a_guide_enhance");
+            if (mc.screen instanceof GuideScreen gs) gs.selectForTest("조사대의 도구");
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "129b_guide_tools");
+            mc.setScreen(null);
+            waitTicks(5);
+        });
+        // 칭호: 쌓은 기록만큼 열리고, 힘 쓰는 칭호와 내거는 칭호를 고른다
+        add(mc -> {
+            com.rtshop.rank.Ranks.testAnywhere = true;
+            onServer(mc, sp -> {
+                com.rtshop.rank.Ranks.resetForTest(sp);
+                com.rtshop.rank.Ranks.add(sp, com.rtshop.rank.Ranks.KILLS, 120);
+                com.rtshop.rank.Ranks.add(sp, com.rtshop.rank.Ranks.BOSSES, 3);
+                com.rtshop.rank.Ranks.earned(sp, 34500);
+                com.rtshop.rank.Ranks.spent(sp, 12000);
+                com.rtshop.rank.Ranks.add(sp, com.rtshop.rank.Ranks.QUESTS, 12);
+                com.rtshop.rank.Ranks.openTitles(sp);
+            });
+            waitTicks(15);
+        });
+        add(mc -> {
+            if (mc.screen instanceof TitleScreen t) {
+                check("the title keeper's screen lists every category, shows the titles earned so far as open and nothing is cut off",
+                        t.catsForTest() == com.rtshop.rank.Ranks.CATS.length && t.openForTest() >= 6 && t.fitsForTest() && t.effectsForTest() == 0,
+                        t.catsForTest() + " / " + t.openForTest() + " / " + t.fitsForTest());
+                t.selectForTest("kills");
+                t.effectForTest("kills_2");
+                t.showForTest("bosses_1");
+            } else {
+                check("the title keeper's screen lists every category, shows the titles earned so far as open and nothing is cut off", false, mc.screen);
+            }
+            waitTicks(15);
+        });
+        add(mc -> {
+            check("a title can be put to use and another one shown in front of the name from the screen",
+                    mc.screen instanceof TitleScreen t && t.effectsForTest() == 1 && t.shownForTest().equals("bosses_1"), mc.screen);
+            shot(mc, "127a_titles");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.rank.Ranks.openRanks(sp));
+            waitTicks(15);
+        });
+        add(mc -> {
+            if (mc.screen instanceof RankScreen r) {
+                r.selectForTest("kills");
+                check("the ranking clerk's screen lists every category with this week's ranking and nothing is cut off",
+                        r.catsForTest() == com.rtshop.rank.Ranks.CATS.length && r.rowsForTest() >= 1 && r.fitsForTest() && r.pendingForTest() == 0,
+                        r.catsForTest() + " / " + r.rowsForTest() + " / " + r.fitsForTest());
+            } else {
+                check("the ranking clerk's screen lists every category with this week's ranking and nothing is cut off", false, mc.screen);
+            }
+            shot(mc, "127b_ranks");
+            onServer(mc, sp -> {
+                com.rtshop.rank.Ranks.settle(sp.server);
+                com.rtshop.rank.Ranks.openRanks(sp);
+            });
+            waitTicks(15);
+        });
+        add(mc -> {
+            if (mc.screen instanceof RankScreen r) {
+                r.selectForTest("kills");
+                r.lastWeekForTest(true);
+                check("after the week closes the clerk shows last week's ranking and holds a reward to collect",
+                        r.rowsForTest() >= 1 && r.pendingForTest() > 0, r.rowsForTest() + " / " + r.pendingForTest());
+                shot(mc, "127c_ranks_last_week");
+                r.claimForTest();
+            } else {
+                check("after the week closes the clerk shows last week's ranking and holds a reward to collect", false, mc.screen);
+            }
+            waitTicks(15);
+        });
+        add(mc -> {
+            check("the weekly reward is collected from the clerk", mc.screen instanceof RankScreen r && r.pendingForTest() == 0, mc.screen);
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.rank.Ranks.resetForTest(sp));
+            com.rtshop.rank.Ranks.testAnywhere = false;
+            waitTicks(5);
+        });
         add(mc -> {
             com.rtshop.story.Hunts.testMode = true;
             onServer(mc, sp -> {

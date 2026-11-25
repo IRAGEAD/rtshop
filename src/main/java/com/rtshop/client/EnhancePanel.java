@@ -36,9 +36,81 @@ public final class EnhancePanel {
     private static final net.minecraft.resources.ResourceLocation T_PANEL = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "textures/gui/enhance/panel.png");
     private static final net.minecraft.resources.ResourceLocation T_RUNES = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "textures/gui/enhance/runes.png");
     private static final net.minecraft.resources.ResourceLocation T_PLATE = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "textures/gui/enhance/plate.png");
-    // 색: 점판암 위의 글자(밝음) · 강철 판 위의 글자(어두움) · 놋쇠
-    static final int C_ON_SLATE = 0xFFEEF0F6, C_ON_SLATE_SOFT = 0xFFC8CEDC, C_BRASS = 0xFFF0CC7A, C_PLATE_INK = 0xFF1A1E28, C_PLATE_SOFT = 0xFF545C6C,
-            C_UP = 0xFF147A42, C_OK_SLATE = 0xFF8CE89A, C_BAD_SLATE = 0xFFFF9A8A, C_BAD_PLATE = 0xFFBE2C2C;
+    // 색: 점판암 위의 글자(밝음) · 연한 금빛 판 위의 글자(따뜻한 먹빛) · 놋쇠
+    static final int C_ON_SLATE = 0xFFF2EEE2, C_ON_SLATE_SOFT = 0xFFCFCAB8, C_BRASS = 0xFFF0CC7A, C_PLATE_INK = 0xFF2E2412, C_PLATE_SOFT = 0xFF705C3A,
+            C_UP = 0xFF1E7C46, C_OK_SLATE = 0xFF8CE89A, C_BAD_SLATE = 0xFFFF9A8A, C_BAD_PLATE = 0xFFA8382A;
+    /** 3.53: 이 창의 글꼴 — 한글 송명, 숫자·영문 Playfair Display (assets/rtshop/font/enhance.json). client.json 의 enhanceLuxFont=false 면 게임 글꼴. */
+    private static final net.minecraft.resources.ResourceLocation FONT_ID = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "enhance");
+    /** 금빛 판 위 글자의 새김 빛 (글자 바로 아래의 밝은 선). */
+    private static final int C_CARVE = 0xD0FFFCEC;
+
+    static boolean lux() {
+        return ClientConfig.get().enhanceLuxFont;
+    }
+
+    /** 금빛 판 위의 글자: 아래에 밝은 선을 한 번 깔아 새긴 것처럼 보이게 한다. */
+    private static void carved(GuiGraphics g, Font font, String t, int x, int y, int col) {
+        if (lux()) {
+            g.pose().pushPose();
+            g.pose().translate(0, 0.5F, 0);
+            g.drawString(font, t, x, y, C_CARVE, false);
+            g.pose().popPose();
+        }
+        g.drawString(font, t, x, y, col, false);
+    }
+
+    /** 칸의 너비(maxW)를 넘으면 줄여서 그린다 (칸 밖으로 나가지 않게). anchor: 0 왼쪽, 1 가운데, 2 오른쪽 기준. carve: 새김 빛. */
+    static void fit(GuiGraphics g, Font font, String t, float x, float y, int maxW, float scale, int col, int anchor, boolean shadow, boolean carve) {
+        float w = font.width(t) * scale;
+        float sc = w > maxW && w > 0 ? scale * maxW / w : scale;
+        if (sc < scale * 0.6F) {                       // 너무 작아지면 줄임표로 자른다
+            sc = scale * 0.6F;
+            t = Ui.clip(font, t, (int) (maxW / sc));
+        }
+        float tw = font.width(t) * sc;
+        float ox = anchor == 1 ? x - tw / 2F : anchor == 2 ? x - tw : x;
+        g.pose().pushPose();
+        g.pose().translate(ox, y + (scale - sc) * 4F, 0);   // 줄어든 만큼 아래로 내려 줄을 맞춘다
+        g.pose().scale(sc, sc, 1);
+        if (carve && lux()) {
+            g.pose().pushPose();
+            g.pose().translate(0, 0.5F / sc, 0);
+            g.drawString(font, t, 0, 0, C_CARVE, false);
+            g.pose().popPose();
+        }
+        g.drawString(font, t, 0, 0, col, shadow);
+        g.pose().popPose();
+    }
+
+    /** 제목: 금박(위는 밝은 금, 아래는 짙은 금) + 양옆의 가는 장식 선. */
+    private static void title(GuiGraphics g, Font font, String t, int cx, int y) {
+        if (!lux()) {
+            slateCentered(g, font, t, cx, y, C_BRASS);
+            return;
+        }
+        float sc = 1.2F;
+        int w = Math.round(font.width(t) * sc), x0 = cx - w / 2;
+        g.pose().pushPose();
+        g.pose().translate(x0, y - 1, 0);
+        g.pose().scale(sc, sc, 1);
+        g.drawString(font, t, 0, 0, 0xFFFFE9A8, true);
+        g.pose().popPose();
+        // 아래 절반은 짙은 금으로 덧그린다 (가위질)
+        int mid = y + 4;
+        org.joml.Vector4f p0 = g.pose().last().pose().transform(new org.joml.Vector4f(x0 - 2, mid, 0, 1)), p1 = g.pose().last().pose().transform(new org.joml.Vector4f(x0 + w + 2, y + 14, 0, 1));
+        g.enableScissor((int) p0.x(), (int) p0.y(), (int) Math.ceil(p1.x()), (int) Math.ceil(p1.y()));
+        g.pose().pushPose();
+        g.pose().translate(x0, y - 1, 0);
+        g.pose().scale(sc, sc, 1);
+        g.drawString(font, t, 0, 0, 0xFFD9A94E, false);
+        g.pose().popPose();
+        g.disableScissor();
+        for (int s = -1; s <= 1; s += 2) {
+            int a = cx + s * (w / 2 + 5), b = cx + s * (w / 2 + 24);
+            g.fill(Math.min(a, b), y + 5, Math.max(a, b), y + 6, 0xC0D6AA54);
+            g.fill(a - 1, y + 4, a + 1, y + 7, 0xFFF0CC7A);
+        }
+    }
     /** 마지막으로 그릴 때의 마우스 자리 (창 안의 좌표; 재료 칸에 올리면 이름을 보여 준다). */
     private static double hoverX = -1, hoverY = -1;
     /** 점검용: 마지막으로 그린 재료 칸의 수(Gold 칸 포함), 켜진 룬의 수. */
@@ -184,10 +256,11 @@ public final class EnhancePanel {
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.blit(T_PANEL, x, y, W, H, 0, 0, W * 2, H * 2, W * 2, H * 2);
         ItemStack eq = menu.equipment();
+        Font lf = lux() ? UiFont.of(FONT_ID) : font;
         if (detail) {
-            drawDetail(g, font, eq, x, y, w, h);
+            drawDetail(g, lf, font, eq, x, y, w, h);
         } else {
-            drawMain(g, font, menu, player, eq, x, y, w, h);
+            drawMain(g, lf, menu, player, eq, x, y, w, h);
         }
     }
 
@@ -239,7 +312,7 @@ public final class EnhancePanel {
     private static void drawMain(GuiGraphics g, Font font, EnhanceMenu menu, Player player, ItemStack eq, int x, int y, int w, int h) {
         int cx = x + w / 2;
         EnhanceConfig cfg = EnhanceConfig.client();
-        slateCentered(g, font, Component.translatable("rtshop.enhance.panel").getString(), cx, y + 15, C_BRASS);
+        title(g, font, Component.translatable("rtshop.enhance.panel").getString(), cx, y + 15);
         lastSlotsForTest = 0;
         lastRunesForTest = 0;
         if (eq.isEmpty() || !Enhance.enhanceable(eq)) {
@@ -254,7 +327,7 @@ public final class EnhancePanel {
         g.pose().scale(2F, 2F, 1F);
         g.renderItem(eq, 0, 0);
         g.pose().popPose();
-        slateCentered(g, font, Ui.clip(font, eq.getHoverName().getString(), w - 30), cx, y + 91, C_ON_SLATE);
+        fit(g, font, eq.getHoverName().getString(), cx, y + 91, w - 30, 1F, C_ON_SLATE, 1, true, false);
         // 룬 띠: 강화 단계만큼 불이 들어온다 (다음 단계의 룬이 가장 밝다)
         float step = (W - 28 - 16) / (float) (EnhanceConfig.MAX_LEVEL - 1);
         for (int i = 0; i < EnhanceConfig.MAX_LEVEL && i < 11; i++) {
@@ -283,11 +356,14 @@ public final class EnhancePanel {
         plate(g, px, py, pw, ph);
         int ty = py + 5;
         for (Stat st : stats) {
+            // 값이 너무 길면 값부터 줄이고, 남은 자리에 이름을 맞춘다 (판 밖으로 나가지 않게)
             int vw = font.width(st.now + st.next);
-            g.drawString(font, Ui.clip(font, st.label, pw - 14 - vw), px + 6, ty, C_PLATE_SOFT, false);
-            int vx = px + pw - 6 - vw;
-            g.drawString(font, st.now, vx, ty, C_PLATE_INK, false);
-            if (!st.next.isEmpty()) g.drawString(font, st.next, vx + font.width(st.now), ty, C_UP, false);
+            float vs = vw > pw * 0.62F ? pw * 0.62F / vw : 1F;
+            int vwS = Math.round(vw * vs);
+            fit(g, font, st.label, px + 6, ty, pw - 16 - vwS, 1F, C_PLATE_SOFT, 0, false, true);
+            float vx = px + pw - 6 - vwS;
+            fit(g, font, st.now, vx, ty, pw, vs, C_PLATE_INK, 0, false, true);
+            if (!st.next.isEmpty()) fit(g, font, st.next, vx + font.width(st.now) * vs, ty, pw, vs, C_UP, 0, false, true);
             ty += 11;
         }
         int oy = py + ph + 4;
@@ -302,21 +378,18 @@ public final class EnhancePanel {
         l = Enhance.levelFor(cfg, l, eq);
         double[] e = EnhanceClient.effective(l, guard, cur);
         String[] names = {"rtshop.enhui.odds_success", "rtshop.enhui.odds_maintain", "rtshop.enhui.odds_damage", "rtshop.enhui.odds_destroy"};
-        int[] cols = {0xFF1E8C4C, 0xFF606878, 0xFFCE7C1A, C_BAD_PLATE};
+        int[] cols = {0xFF1E7C46, 0xFF6A5E48, 0xFFC46E12, C_BAD_PLATE};
         int oh = 38, bigW = 58, smW = (pw - bigW - 9) / 3;
         plate(g, px, oy, bigW, oh);
-        big(g, font, EnhanceClient.pct(e[0]), px + bigW / 2F, oy + 7, 1.6F, cols[0], false);
-        String sl = Component.translatable(names[0]).getString();
-        g.drawString(font, sl, px + (bigW - font.width(sl)) / 2, oy + 25, C_PLATE_SOFT, false);
+        fit(g, font, EnhanceClient.pct(e[0]), px + bigW / 2F, oy + 7, bigW - 8, 1.6F, cols[0], 1, false, true);
+        fit(g, font, Component.translatable(names[0]).getString(), px + bigW / 2F, oy + 25, bigW - 6, 1F, C_PLATE_SOFT, 1, false, false);
         for (int i = 1; i < 4; i++) {
             int bx = px + bigW + 3 + (i - 1) * (smW + 3);
             plate(g, bx, oy, smW, oh);
             boolean on = e[i] > 0;
-            g.fill(bx + smW / 2 - 2, oy + 5, bx + smW / 2 + 2, oy + 9, on ? cols[i] : 0xFFB0B6C2);
-            String pc = EnhanceClient.pct(e[i]);
-            g.drawString(font, pc, bx + (smW - font.width(pc)) / 2, oy + 13, on ? cols[i] : 0xFF969CAA, false);
-            String nm = Ui.clip(font, Component.translatable(names[i]).getString(), smW - 4);
-            g.drawString(font, nm, bx + (smW - font.width(nm)) / 2, oy + 25, C_PLATE_SOFT, false);
+            g.fill(bx + smW / 2 - 2, oy + 5, bx + smW / 2 + 2, oy + 9, on ? cols[i] : 0xFFCDBE96);
+            fit(g, font, EnhanceClient.pct(e[i]), bx + smW / 2F, oy + 13, smW - 6, 1F, on ? cols[i] : 0xFFA89870, 1, false, on);
+            fit(g, font, Component.translatable(names[i]).getString(), bx + smW / 2F, oy + 25, smW - 6, 1F, C_PLATE_SOFT, 1, false, false);
         }
         // 재료 칸 + Gold 칸 + 보호권 칸
         int my0 = oy + oh + 5, size = 26, gap = 29;
@@ -344,9 +417,8 @@ public final class EnhancePanel {
                 name = Component.literal(Ui.num(l.gold) + " G  (" + Ui.num(ClientEconomy.wallet) + ")");
             }
             g.pose().pushPose();
-            g.pose().translate(bx + size - 2 - font.width(cnt) * 0.75F, my0 + size - 8, 200);
-            g.pose().scale(0.75F, 0.75F, 1);
-            g.drawString(font, cnt, 0, 0, ok ? C_UP : C_BAD_PLATE, false);
+            g.pose().translate(0, 0, 200);
+            fit(g, font, cnt, bx + size / 2F, my0 + size - 9, size - 5, 0.75F, ok ? C_UP : C_BAD_PLATE, 1, false, false);   // 칸 안 가운데 아래
             g.pose().popPose();
             if (over(bx, my0, size, size)) tip = name.copy().append(Component.literal("  " + cnt).withStyle(ok ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED));
             lastSlotsForTest++;
@@ -356,8 +428,8 @@ public final class EnhancePanel {
         boolean guarded = guard != Enhance.Guard.NONE;
         String g1 = Component.translatable("rtshop.enhui.guard").getString();
         String g2 = guarded ? Enhance.guardName(mask).getString() : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : safe ? "rtshop.enhui.guard_safe" : "rtshop.enhui.guard_none").getString();
-        g.drawString(font, Ui.clip(font, g1, gw - 8), gx + 5, my0 + 4, C_PLATE_INK, false);
-        g.drawString(font, Ui.clip(font, g2, gw - 8), gx + 5, my0 + 14, guarded ? 0xFF1F6F8B : l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, false);
+        fit(g, font, g1, gx + 5, my0 + 4, gw - 10, 1F, C_PLATE_INK, 0, false, true);
+        fit(g, font, g2, gx + 5, my0 + 14, gw - 10, 1F, guarded ? 0xFF1F6F8B : l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, 0, false, false);
         if (over(gx, my0, gw, size)) {
             tip = guarded ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
                     : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : safe ? "rtshop.enhance.safe_note" : "rtshop.enhance.no_guard");
@@ -382,7 +454,7 @@ public final class EnhancePanel {
         }
     }
 
-    private static void drawDetail(GuiGraphics g, Font font, ItemStack eq, int x, int y, int w, int h) {
+    private static void drawDetail(GuiGraphics g, Font lf, Font font, ItemStack eq, int x, int y, int w, int h) {
         int tx = x + 10, ty = y + 10, tw = w - 20;
         ty = y + 124;
         tx = x + 16;
@@ -393,10 +465,10 @@ public final class EnhancePanel {
             g.pose().scale(2F, 2F, 1F);
             g.renderItem(eq, 0, 0);
             g.pose().popPose();
-            slateCentered(g, font, Ui.clip(font, eq.getHoverName().getString(), w - 30), x + w / 2, y + 91, C_ON_SLATE);
+            fit(g, lf, eq.getHoverName().getString(), x + w / 2F, y + 91, w - 30, 1F, C_ON_SLATE, 1, true, false);
         }
-        slateCentered(g, font, Component.translatable("rtshop.enhance.panel").getString(), x + w / 2, y + 15, C_BRASS);
-        g.drawString(font, Component.translatable("rtshop.enhui.detail_title"), tx, ty, C_ON_SLATE, true);
+        title(g, lf, Component.translatable("rtshop.enhance.panel").getString(), x + w / 2, y + 15);
+        g.drawString(lf, Component.translatable("rtshop.enhui.detail_title"), tx, ty, C_ON_SLATE, true);
         int bx0 = x + 14, by0 = y + 136, bx1 = x + w - 14, by1 = y + h - 14;
         // 설명 창과 같은 어두운 바탕 (글자 색이 어두운 바탕용이라서)
         g.fill(bx0, by0, bx1, by1, 0xF0100010);

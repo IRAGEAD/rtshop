@@ -880,6 +880,7 @@ public final class PlotManager {
             return false;
         }
         Economy.addWallet(p, -land.price);
+        com.rtshop.rank.Ranks.spent(p, land.price);
         land.owner = p.getUUID();
         land.ownerName = p.getGameProfile().getName();
         land.paid = land.price;

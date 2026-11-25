@@ -70,6 +70,38 @@ public final class UiFont {
         }
     }
 
+    private static final java.util.Map<String, Font> BY_ID = new java.util.HashMap<>();
+
+    /** 게임 기본 글꼴 자리에 이 글꼴(assets/…/font/<id>.json)을 넣은 Font. 만들지 못하면 게임 기본 글꼴. */
+    @SuppressWarnings("unchecked")
+    public static Font of(ResourceLocation id) {
+        Minecraft mc = Minecraft.getInstance();
+        if (id == null || broken || mc.font == null) return mc.font;
+        String key = id + "@" + System.identityHashCode(mc.font);
+        Font f = BY_ID.get(key);
+        if (f != null) return f;
+        try {
+            if (fontsField == null) {
+                for (Field fd : Font.class.getDeclaredFields()) {
+                    if (Function.class.isAssignableFrom(fd.getType())) {
+                        fd.setAccessible(true);
+                        fontsField = fd;
+                        break;
+                    }
+                }
+            }
+            Function<ResourceLocation, FontSet> base = (Function<ResourceLocation, FontSet>) fontsField.get(mc.font);
+            f = new Font(rl -> base.apply(Style.DEFAULT_FONT.equals(rl) ? id : rl), false);
+            if (BY_ID.size() > 16) BY_ID.clear();
+            BY_ID.put(key, f);
+            return f;
+        } catch (Exception ex) {
+            broken = true;
+            RtShop.LOGGER.warn("[rtshop] 글꼴 {} 을(를) 만들지 못해 기본 글꼴을 씁니다: {}", id, ex.toString());
+            return mc.font;
+        }
+    }
+
     /** 설정을 바꾸면 다시 만든다. */
     public static void changed() {
         cached = null;

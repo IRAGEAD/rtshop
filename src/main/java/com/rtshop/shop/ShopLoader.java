@@ -191,7 +191,10 @@ public final class ShopLoader {
     public static final String[] UPGRADED = {"gacha_shop@2"};
     /** 기존 상점 파일에 품목을 덧붙임: "상점+조각파일@판" (조각의 categories/items 중 없는 것만 추가, 한 번만). */
     public static final String[] APPENDED = {"blacksmith+blacksmith_enhance@1", "blacksmith+blacksmith_enhance@2", "general+general_pshop@1",
-            "gacha_shop+gacha_shop_magic@1", "general+general_return@1"};
+            "gacha_shop+gacha_shop_magic@1", "general+general_return@1", "general+general_books@1"};
+
+    /** 기본값이 바뀐 품목: "상점:품목=옛값>새값@판". 설치된 파일의 값이 옛 기본값 그대로일 때만 새 값으로 고친다 (한 번만). */
+    public static final String[] REPRICED = {"general:rtshop:return_ticket=1500>5000@1", "general:rtshop:return_ticket_plus=12000>30000@1"};
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");
@@ -252,9 +255,54 @@ public final class ShopLoader {
             }
             changed = true;
         }
+        for (String mark : REPRICED) {
+            if (done.contains(mark)) {
+                continue;
+            }
+            try {
+                String shop = mark.substring(0, mark.indexOf(':'));
+                String item = mark.substring(mark.indexOf(':') + 1, mark.indexOf('='));
+                long from = Long.parseLong(mark.substring(mark.indexOf('=') + 1, mark.indexOf('>')));
+                long to = Long.parseLong(mark.substring(mark.indexOf('>') + 1, mark.indexOf('@')));
+                reprice(dir.resolve(shop + ".json"), item, from, to);
+            } catch (Exception ex) {
+                RtShop.LOGGER.error("[rtshop] 품목 값 고치기 {} 실패: {}", mark, ex.toString());
+            }
+            done.add(mark);
+            changed = true;
+        }
         if (changed) {
             Files.write(list, done, StandardCharsets.UTF_8);
         }
+    }
+
+    /** 상점 파일에서 이 품목의 값이 옛 기본값(from) 그대로면 새 값(to)으로 고친다. 고친 수를 돌려준다. */
+    public static int reprice(Path file, String item, long from, long to) throws IOException {
+        if (!Files.exists(file)) {
+            return 0;
+        }
+        com.google.gson.JsonObject shop = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+        if (!shop.has("items") || !shop.get("items").isJsonArray()) {
+            return 0;
+        }
+        int n = 0;
+        for (com.google.gson.JsonElement e : shop.getAsJsonArray("items")) {
+            if (!e.isJsonObject()) {
+                continue;
+            }
+            com.google.gson.JsonObject o = e.getAsJsonObject();
+            if (o.has("item") && item.equals(o.get("item").getAsString()) && o.has("price") && o.get("price").isJsonPrimitive()
+                    && o.get("price").getAsJsonPrimitive().isNumber() && o.get("price").getAsLong() == from) {
+                o.addProperty("price", to);
+                n++;
+            }
+        }
+        if (n > 0) {
+            Files.writeString(file, new com.google.gson.GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(shop),
+                    StandardCharsets.UTF_8);
+            RtShop.LOGGER.info("[rtshop] 상점 {} 의 {} 값을 {} -> {} 로 고쳤습니다.", file.getFileName(), item, from, to);
+        }
+        return n;
     }
 
     /** 상점 파일에 조각 파일(rtshop_defaults/조각.json)의 카테고리·품목 중 없는 것만 덧붙인다. */
