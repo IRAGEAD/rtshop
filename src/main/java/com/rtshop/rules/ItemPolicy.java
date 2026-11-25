@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -508,8 +509,13 @@ public final class ItemPolicy {
         s.boss = Set.copyOf(out);
     }
 
-    /** 보스들의 전리품표를 여러 번 열어, 그 보스의 모드가 만든 아이템을 보스 아이템으로 친다. */
+    /**
+     * 보스들의 전리품표를 여러 번 열어, 그 보스의 모드가 만든 아이템 가운데 "보스에게서만 나오는 것"을 보스 아이템으로 친다.
+     * 같은 모드의 다른 몹·상자에서도 나오는 것(흔한 재료·두루마리)과, 보스 아이템 없이도 만들 수 있는 것은 뺀다.
+     * (통째로 보스 모드인 bossMods 는 이미 전부 보스 아이템이라 여기서 다루지 않는다.)
+     */
     private static void sampleBosses(MinecraftServer server, Set<Item> out) {
+        State s = st();
         Set<String> ids = new LinkedHashSet<>();
         try {
             var tag = ForgeRegistries.ENTITY_TYPES.tags();
@@ -524,27 +530,82 @@ public final class ItemPolicy {
         ids.addAll(com.rtshop.party.PartyConfig.get().bosses);
         ids.addAll(com.rtshop.party.PartyConfig.get().arenaBosses);
         ids.addAll(MobRules.get().extraBosses);
+        Map<String, Set<Item>> found = new HashMap<>();          // 보스의 모드 → 그 보스들이 떨어뜨린 그 모드의 아이템
+        Set<ResourceLocation> bossTables = new HashSet<>();
         long until = System.currentTimeMillis() + 4000;
         for (String bid : ids) {
             if (System.currentTimeMillis() > until) break;
             try {
                 ResourceLocation rl = ResourceLocation.tryParse(bid);
                 EntityType<?> type = rl == null || !ForgeRegistries.ENTITY_TYPES.containsKey(rl) ? null : ForgeRegistries.ENTITY_TYPES.getValue(rl);
-                if (type == null || rl.getNamespace().equals("minecraft")) continue;
+                if (type == null || rl.getNamespace().equals("minecraft") || s.c.bossMods.contains(rl.getNamespace())) continue;
+                bossTables.add(type.getDefaultLootTable());
                 Map<String, LootRules.Stat> got = LootRules.sample(server.overworld(), type.getDefaultLootTable(), 24, true);
                 for (String key : got.keySet()) {
                     ResourceLocation iid = ResourceLocation.tryParse(key);
                     if (iid == null || !iid.getNamespace().equals(rl.getNamespace())) continue;
                     Item item = ForgeRegistries.ITEMS.getValue(iid);
-                    if (item != null && item != Items.AIR) out.add(item);
+                    if (item != null && item != Items.AIR) found.computeIfAbsent(rl.getNamespace(), k -> new HashSet<>()).add(item);
                 }
             } catch (Throwable ignored) {
             }
         }
+        if (found.isEmpty()) return;
+        // 같은 모드의 다른 몹·상자에서도 나오면 보스만의 것이 아니다
+        until = System.currentTimeMillis() + 4000;
+        try {
+            for (ResourceLocation table : server.getLootData().getKeys(net.minecraft.world.level.storage.loot.LootDataType.TABLE)) {
+                if (System.currentTimeMillis() > until) break;
+                Set<Item> cand = found.get(table.getNamespace());
+                if (cand == null || cand.isEmpty() || bossTables.contains(table)) continue;
+                String path = table.getPath();
+                if (!path.startsWith("entities/") && !path.startsWith("chests/")) continue;
+                Map<String, LootRules.Stat> got;
+                try {
+                    got = LootRules.sample(server.overworld(), table, 12, true);
+                } catch (Throwable t) {
+                    continue;
+                }
+                for (String key : got.keySet()) {
+                    ResourceLocation iid = ResourceLocation.tryParse(key);
+                    Item item = iid == null ? null : ForgeRegistries.ITEMS.getValue(iid);
+                    if (item != null) cand.remove(item);
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        Set<Item> all = new HashSet<>(out);
+        for (Set<Item> c : found.values()) all.addAll(c);
+        // 보스 아이템이 하나도 들지 않는 조합법으로 만들 수 있으면 보스만의 것이 아니다
+        Set<Item> craftable = new HashSet<>();
+        for (Recipe<?> r : RecipeRules.originals(server)) {
+            try {
+                ItemStack res = r.getResultItem(server.registryAccess());
+                if (res.isEmpty() || out.contains(res.getItem()) || !all.contains(res.getItem()) || r.getIngredients().isEmpty()) continue;
+                boolean needsBoss = false;
+                for (Ingredient ing : r.getIngredients()) {
+                    ItemStack[] opts = ing.getItems();
+                    if (opts.length == 0) continue;
+                    boolean only = true;
+                    for (ItemStack o : opts) only &= all.contains(o.getItem());
+                    needsBoss |= only;
+                }
+                if (!needsBoss) craftable.add(res.getItem());
+            } catch (Throwable ignored) {
+            }
+        }
+        for (Set<Item> c : found.values()) {
+            c.removeAll(craftable);
+            out.addAll(c);
+        }
     }
 
-    /** 보스 아이템으로만 채워지는 재료 칸이 있는 조합법의 결과물도 보스 아이템이다 (바닐라 것은 빼고). */
+    /**
+     * 보스 아이템으로만 채워지는 재료 칸이 있는 조합법의 결과물도 보스 아이템이다. 다만 결과물이 그 보스 재료와 같은 모드의 것이거나
+     * 보스 모드(bossMods)의 것일 때만 (남의 모드의 안내서·기술서·장식까지 번지지 않게). 바닐라 것은 뺀다.
+     */
     private static void derive(MinecraftServer server, Set<Item> out) {
+        State s = st();
         Collection<Recipe<?>> recipes = RecipeRules.originals(server);
         for (int pass = 0; pass < 4; pass++) {
             boolean grew = false;
@@ -554,12 +615,17 @@ public final class ItemPolicy {
                     if (res.isEmpty() || out.contains(res.getItem())) continue;
                     ResourceLocation rid = id(res.getItem());
                     if (rid == null || vanilla(rid) || ours(rid)) continue;
+                    boolean bossMod = s.c.bossMods.contains(rid.getNamespace());
                     for (Ingredient ing : r.getIngredients()) {
                         ItemStack[] opts = ing.getItems();
                         if (opts.length == 0) continue;
-                        boolean all = true;
-                        for (ItemStack o : opts) all &= out.contains(o.getItem());
-                        if (all) {
+                        boolean all = true, kin = bossMod;
+                        for (ItemStack o : opts) {
+                            all &= out.contains(o.getItem());
+                            ResourceLocation oid = id(o.getItem());
+                            kin |= oid != null && oid.getNamespace().equals(rid.getNamespace());
+                        }
+                        if (all && kin) {
                             out.add(res.getItem());
                             grew = true;
                             break;

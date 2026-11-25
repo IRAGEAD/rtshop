@@ -2059,6 +2059,19 @@ public final class SelfTest {
             check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
                     banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,
                     "banned " + banned + " guns " + gunsListed + " boss " + bossListed + " tacz recipes " + tacz + " craftable " + craftableListed + " " + sample);
+            if (net.minecraftforge.fml.ModList.get().isLoaded("irons_spellbooks")) {
+                // 보스가 떨어뜨리기는 해도 흔한 재료(비전 정수·두루마리)와 그것으로 만드는 마법사 장비는 보스 아이템이 아니다
+                int irons = 0;
+                for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+                    net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it);
+                    if (rl != null && rl.getNamespace().equals("irons_spellbooks") && com.rtshop.rules.ItemPolicy.bossItem(it)) irons++;
+                }
+                net.minecraft.world.item.Item essence = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation("irons_spellbooks", "arcane_essence"));
+                net.minecraft.world.item.Item robe = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation("irons_spellbooks", "wizard_chestplate"));
+                check("mod pack: common materials a boss also drops (arcane essence) and the gear made from them are not boss items",
+                        essence != null && !com.rtshop.rules.ItemPolicy.bossItem(essence) && robe != null && !com.rtshop.rules.ItemPolicy.bossItem(robe) && irons <= 30,
+                        irons + " irons_spellbooks boss items");
+            }
             info("item policy: " + com.rtshop.rules.ItemPolicy.bossCountForTest() + " boss items, " + com.rtshop.rules.ItemPolicy.listedCountForTest() + " listed gear, wom listed " + womListed
                     + ", recipes blocked: mod " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("mod") + " ban " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("ban")
                     + " staff " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("staff") + " listed " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("listed")
