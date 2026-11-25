@@ -71,7 +71,7 @@ EN = [
 "The Paper Isabel Left Behind",
 "Uncle Oscar's lantern. Haven't yet asked who he is waiting for. Must ask.",
 "The Empty Shelf in the Library",
-"Seven rows of shelves hold books. Each row is carved with a kingdom's crest. Flame, forge, sand, cog, wave, silence, frost.",
+"Seven rows of shelves hold books. Each row is carved with a kingdom's crest. Flame, furnace, sand, cog, wave, silence, frost.",
 "The eighth row is empty. There is not even dust. Where a crest should be, the wood is smooth. It was not shaved away. It is as if it was never there.",
 "It feels strange to lay a hand on the empty shelf. You are surely looking at it, and yet it seems that if you look away you will forget this row was ever here.",
 "A single round ink dot in the inner corner of the shelf. Someone pressed it there so as not to forget this place.",

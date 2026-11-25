@@ -27,7 +27,7 @@ EN = [
 "The giant that holds the ice\nThe beast that slept a thousand years holding the crystal the children of the Frost Kingdom left in its care",
 "The Old Watchtower on the Mountain",
 "The Stones in the Yard",
-"Stones as tall as a person stand in a ring in the yard. Each is carved with a crest and a name. Flame, forge, sand, cog, wave, silence, frost.",
+"Stones as tall as a person stand in a ring in the yard. Each is carved with a crest and a name. Flame, furnace, sand, cog, wave, silence, frost.",
 "Count them and there are eight. The eighth stone is dressed just like the others. Its edges, its base. A stone made with care. And yet its face is blank.",
 "Run a hand over the blank face and there is not one chisel mark. It was not carved and then erased. The mason finished cutting the stone, and forgot what was to be carved.",
 "At the foot of each stone is the mason's mark, very small. On seven stones: 'carved.' On the eighth: 'waiting.'",
