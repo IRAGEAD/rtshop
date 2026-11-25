@@ -139,6 +139,7 @@ public final class QuestManager {
             RtShop.LOGGER.error("[rtshop] 기본 퀘스트 파일을 설치하지 못했습니다", e);
             l.problems.add("기본 퀘스트 파일 설치 실패: " + e);
         }
+        com.rtshop.util.ConfigNames.dir(dir()); // 직접 고친 퀘스트 파일에 남은 옛 마을 이름
         List<QuestDef> all = new ArrayList<>();
         Map<QuestDef, String> fileOf = new HashMap<>();
         try (Stream<Path> files = Files.list(dir())) {
@@ -316,6 +317,7 @@ public final class QuestManager {
         if (changed) {
             Files.write(list, installed, StandardCharsets.UTF_8);
         }
+        refreshDefaults(d, null);
         for (Map.Entry<String, Set<String>> e : OLD_DEFAULTS.entrySet()) {
             Path f = d.resolve(e.getKey());
             if (!Files.exists(f) || !e.getValue().contains(sha256(Files.readAllBytes(f)))) {
@@ -333,6 +335,68 @@ public final class QuestManager {
             }
         }
         Files.deleteIfExists(d.resolve(".defaults_version")); // 3.1.0 의 옛 표시 파일
+    }
+
+    /** 새 판을 받은 기본 파일 / 직접 고쳐서 새 판을 받지 못한 기본 파일 (운영자에게 알린다). */
+    public static final List<String> UPDATED_DEFAULTS = new java.util.concurrent.CopyOnWriteArrayList<>(), STALE_DEFAULTS = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static final String HASH_LIST = ".bundled_hashes";
+
+    /**
+     * 기본 파일을 새 판으로: 깔아 둔 뒤로 손대지 않은 파일(깔 때의 지문과 같음)은 모드가 올라가면 새 판으로 바꾼다. 이전 파일은 backup 에 둔다.
+     * 손댄 파일은 그대로 두고 STALE_DEFAULTS 에 적는다. force 에 이름을 주면 손댄 파일도 바꾼다 (/rtshop defaults update).
+     * 지문 기록이 없던 예전 설치: 한 번은 모두 새 판으로 맞춘다 (그동안 새 판을 못 받고 있었으므로). 그 뒤로는 손댄 파일을 건드리지 않는다.
+     */
+    public static synchronized int refreshDefaults(Path d, String force) throws IOException {
+        Path hf = d.resolve(HASH_LIST);
+        Map<String, String> rec = new java.util.LinkedHashMap<>();
+        if (Files.exists(hf)) {
+            for (String line : Files.readAllLines(hf, StandardCharsets.UTF_8)) {
+                int i = line.indexOf('=');
+                if (i > 0) rec.put(line.substring(0, i).trim(), line.substring(i + 1).trim());
+            }
+        }
+        boolean changed = false;
+        int n = 0;
+        UPDATED_DEFAULTS.clear();
+        STALE_DEFAULTS.clear();
+        for (String name : DEFAULT_FILES) {
+            Path f = d.resolve(name);
+            if (!Files.exists(f)) continue;
+            byte[] bundled;
+            try (InputStream in = QuestManager.class.getResourceAsStream("/rtshop_defaults/quests/" + name)) {
+                if (in == null) continue;
+                bundled = in.readAllBytes();
+            }
+            String bh = sha256(bundled), cur = sha256(Files.readAllBytes(f)), r = rec.get(name);
+            if (cur.equals(bh)) {
+                if (!bh.equals(r)) {
+                    rec.put(name, bh);
+                    changed = true;
+                }
+                continue;
+            }
+            boolean untouched = r == null || cur.equals(r); // 지문 기록이 없던 예전 설치는 한 번 새 판으로 맞춘다 (이전 파일은 backup 에 남는다)
+            if (untouched || name.equals(force) || "all".equals(force)) {
+                Path backup = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("backup").resolve("quests_" + System.currentTimeMillis()).resolve(name);
+                Files.createDirectories(backup.getParent());
+                Files.copy(f, backup, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                Files.write(f, bundled);
+                rec.put(name, bh);
+                changed = true;
+                n++;
+                UPDATED_DEFAULTS.add(name);
+                RtShop.LOGGER.info("[rtshop] 기본 퀘스트 파일 {} 을 새 판으로 바꿨습니다 (이전 파일: {}).", name, backup);
+            } else {
+                STALE_DEFAULTS.add(name);
+                RtShop.LOGGER.warn("[rtshop] 기본 퀘스트 파일 {} 은 직접 고친 파일이라 새 판으로 바꾸지 않았습니다. 새 판을 받으려면 /rtshop defaults update {}", name, name);
+            }
+        }
+        if (changed) {
+            List<String> out = new ArrayList<>();
+            rec.forEach((k, v) -> out.add(k + "=" + v));
+            Files.write(hf, out, StandardCharsets.UTF_8);
+        }
+        return n;
     }
 
     public static String sha256(byte[] data) {
@@ -738,6 +802,49 @@ public final class QuestManager {
         pr.flags.add("story_v8");
         QuestData.get(p.server).dirty();
         return n > 0;
+    }
+
+    @SubscribeEvent
+    public static void onLoginStale(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer p) || !p.hasPermissions(2)) return;
+        List<String> stale = new ArrayList<>(STALE_DEFAULTS);
+        if (com.rtshop.story.Dialogue.stale) stale.add("dialogue.json");
+        if (!UPDATED_DEFAULTS.isEmpty()) {
+            p.sendSystemMessage(Component.literal("[RT Shop] 기본 퀘스트 파일을 새 판으로 바꿨습니다: " + String.join(", ", UPDATED_DEFAULTS)
+                    + " (이전 파일은 config/rtshop/backup 에 있습니다)").withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
+        if (stale.isEmpty()) return;
+        p.sendSystemMessage(Component.literal("[RT Shop] 직접 고친 파일이라 새 판이 적용되지 않은 기본 파일: " + String.join(", ", stale)
+                + "  →  /rtshop defaults update all (고친 내용은 config/rtshop/backup 에 보관)").withStyle(net.minecraft.ChatFormatting.YELLOW));
+    }
+
+    @SubscribeEvent
+    public static void onDefaultsCommand(net.minecraftforge.event.RegisterCommandsEvent event) {
+        event.getDispatcher().register(net.minecraft.commands.Commands.literal("rtshop").then(net.minecraft.commands.Commands.literal("defaults").requires(s -> s.hasPermission(2))
+                .executes(ctx -> {
+                    List<String> stale = new ArrayList<>(STALE_DEFAULTS);
+                    if (com.rtshop.story.Dialogue.stale) stale.add("dialogue.json");
+                    ctx.getSource().sendSuccess(() -> Component.literal(stale.isEmpty() ? "기본 퀘스트·대화 파일이 모두 이 판의 것입니다."
+                            : "직접 고쳐서 새 판을 받지 못한 파일: " + String.join(", ", stale) + "  (/rtshop defaults update all)"), false);
+                    return 1;
+                })
+                .then(net.minecraft.commands.Commands.literal("update").then(net.minecraft.commands.Commands.argument("file", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .suggests((ctx, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(List.of("all", "story.json", "npcs.json", "tutorial.json", "job_quests.json", "dialogue.json"), b))
+                        .executes(ctx -> {
+                            String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "file");
+                            int n = 0;
+                            try {
+                                if (!name.equals("dialogue.json")) n += refreshDefaults(dir(), name);
+                                if (name.equals("dialogue.json") || name.equals("all")) n += com.rtshop.story.Dialogue.forceDefault() ? 1 : 0;
+                            } catch (Exception e) {
+                                ctx.getSource().sendFailure(Component.literal("바꾸지 못했습니다: " + e));
+                                return 0;
+                            }
+                            reload();
+                            int fn = n;
+                            ctx.getSource().sendSuccess(() -> Component.literal("기본 파일 " + fn + "개를 새 판으로 바꿨습니다. 이전 파일은 config/rtshop/backup 에 있습니다."), true);
+                            return n;
+                        })))));
     }
 
     @SubscribeEvent
@@ -1267,6 +1374,7 @@ public final class QuestManager {
         giveRewards(p, q);
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.completed", com.rtshop.story.StoryText.t(p, q.title)));
         scene(p, q.sceneDone);
+        if (q.sceneDream != null) queueDream(p, q.sceneDream);
         nextHint(p, q, npcKey);
         if (!q.rewardFlags.isEmpty()) {
             com.rtshop.story.StoryGates.sync(p);
@@ -1293,8 +1401,7 @@ public final class QuestManager {
     public static void scene(ServerPlayer p, com.google.gson.JsonObject o) {
         if (o == null) return;
         if (o.has("onSleep") && o.get("onSleep").getAsBoolean()) {
-            // 꿈 장면: 다음에 침대에서 잠들 때 보여 준다
-            p.getPersistentData().putString(SLEEP_SCENE, o.toString());
+            queueDream(p, o); // 꿈 장면: 다음에 침대에서 잠들 때 보여 준다
             return;
         }
         com.google.gson.JsonObject c = o.deepCopy();
@@ -1619,22 +1726,73 @@ public final class QuestManager {
         }
     }
 
+    /** 옛 자리(죽으면 사라지고 하나만 담기던): 남아 있으면 새 자리로 옮긴다. */
     public static final String SLEEP_SCENE = "rtshop_sleep_scene";
+    /** 아직 꾸지 않은 꿈들 (오래된 것부터). 죽어도 남는 자리에 둔다. */
+    public static final String DREAMS = "rtshop_dreams";
+    private static final int DREAMS_MAX = 12;
 
-    /** 침대에서 잠이 들면(잠든 지 1.5초) 미뤄 둔 꿈 장면을 보여 준다. 잠자는 화면은 닫지 않는다 (닫으면 깨어난다). */
+    private static net.minecraft.nbt.CompoundTag persisted(ServerPlayer p) {
+        net.minecraft.nbt.CompoundTag root = p.getPersistentData();
+        if (!root.contains(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG)) {
+            root.put(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG, new net.minecraft.nbt.CompoundTag());
+        }
+        return root.getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG);
+    }
+
+    /** 꿈을 쌓아 둔다: 잠들 때마다 오래된 것부터 하나씩 꾼다. 같은 꿈은 두 번 쌓지 않는다. */
+    public static void queueDream(ServerPlayer p, com.google.gson.JsonObject o) {
+        if (o == null) return;
+        net.minecraft.nbt.CompoundTag pers = persisted(p);
+        net.minecraft.nbt.ListTag l = pers.getList(DREAMS, net.minecraft.nbt.Tag.TAG_STRING);
+        String s = o.toString();
+        for (int i = 0; i < l.size(); i++) if (l.getString(i).equals(s)) return;
+        while (l.size() >= DREAMS_MAX) l.remove(0);
+        l.add(net.minecraft.nbt.StringTag.valueOf(s));
+        pers.put(DREAMS, l);
+    }
+
+    /** 쌓인 꿈의 수 (점검·명령용). */
+    public static int dreamsWaiting(ServerPlayer p) {
+        moveOldDream(p);
+        return persisted(p).getList(DREAMS, net.minecraft.nbt.Tag.TAG_STRING).size();
+    }
+
+    private static void moveOldDream(ServerPlayer p) {
+        if (!p.getPersistentData().contains(SLEEP_SCENE)) return;
+        try {
+            queueDream(p, com.google.gson.JsonParser.parseString(p.getPersistentData().getString(SLEEP_SCENE)).getAsJsonObject());
+        } catch (Exception ignored) {
+        }
+        p.getPersistentData().remove(SLEEP_SCENE);
+    }
+
+    /** 가장 오래된 꿈 하나를 꺼내 보여 준다. 없으면 false. */
+    public static boolean showDream(ServerPlayer p) {
+        moveOldDream(p);
+        net.minecraft.nbt.CompoundTag pers = persisted(p);
+        net.minecraft.nbt.ListTag l = pers.getList(DREAMS, net.minecraft.nbt.Tag.TAG_STRING);
+        if (l.isEmpty()) return false;
+        String s = l.getString(0);
+        l.remove(0);
+        pers.put(DREAMS, l);
+        try {
+            com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString(s).getAsJsonObject();
+            o.remove("onSleep");
+            o.addProperty("closeScreen", false); // 잠자는 화면은 닫지 않는다 (닫으면 깨어난다)
+            com.rtshop.story.BossIntros.send(p, o);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** 침대에서 잠이 들면(잠든 지 1.5초) 쌓아 둔 꿈을 하나 꾼다. 하룻밤에 하나. */
     @SubscribeEvent
     public static void onSleepTick(net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
         if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || !(event.player instanceof ServerPlayer p)) return;
-        if (!p.isSleeping() || p.getSleepTimer() < 30 || !p.getPersistentData().contains(SLEEP_SCENE)) return;
-        try {
-            com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString(p.getPersistentData().getString(SLEEP_SCENE)).getAsJsonObject();
-            o.remove("onSleep");
-            o.addProperty("closeScreen", false);
-            p.getPersistentData().remove(SLEEP_SCENE);
-            com.rtshop.story.BossIntros.send(p, o);
-        } catch (Exception e) {
-            p.getPersistentData().remove(SLEEP_SCENE);
-        }
+        if (!p.isSleeping() || p.getSleepTimer() != 30) return;
+        showDream(p);
     }
 
     @SubscribeEvent

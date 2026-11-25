@@ -123,7 +123,7 @@ EN = {
 "story_2_18b": ("Until It Turns to Ash",
  "Ashlord. A dragon guarding the tower where its master said 'wait' and left. To it we are thieves in its master's tower. It has nothing to do with the seals either. We fight it in the tower. Its throat swells before it breathes fire. Get behind a pillar. The guards keep rising. Don't drag it out. …Whether it's right to put it to rest, I don't know. But I don't know that it's right to leave it waiting for someone who will never come, either. I say that as a man who did it for twenty years.",
  "In the dragon's tower, put Ashlord the infernal dragon to rest. (Deal at least 10% of its health.)",
- "At the end it fell across the saddle, you say. Covered it with a wing. Held its breath so as not to burn it. …Enough. No head count today. Let's just sit a while. And if you dream tonight, tell the archivist what that knight says."),
+ "At the end it fell across the saddle, you say. Covered it with a wing. Held its breath so as not to burn it. …Enough. No head count today. Let's just sit a while. Then sleep. Everyone turns in early tonight."),
 "story_2_06h1": ("A Thousand-Year Tab",
  "That ledger line you saw. 'Sword of Vice-Captain Helvar, repair. Payment when his lord returns.' It kept me up all night, so I went through the storeroom. It's there. The sword he left. A thousand years at the bottom of my family's storeroom. In two pieces. Not broken. Snapped on purpose. You can tell by the edge. I want to join it again. It's steel forged in hellfire, an ordinary forge won't heat it. Bring gold and blaze rods.",
  "Bring 4 gold ingots and 2 blaze rods to Bram the smith.",

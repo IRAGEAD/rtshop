@@ -40,7 +40,7 @@ Q = []
 order = [1000]
 
 def q(id, chain, t, giver, intro, progress, done, objs, gold=0, items=None, flags=None, requires=None,
-      requiresFlags=None, turnIn=None, sceneAccept=None, sceneDone=None, choices=None, mod=None, blockedByFlags=None, companion=None):
+      requiresFlags=None, turnIn=None, sceneAccept=None, sceneDone=None, choices=None, mod=None, blockedByFlags=None, companion=None, dream=None):
     order[0] += 10
     o = {"id": id, "chain": chain, "order": order[0], "title": t, "giver": giver}
     if mod: o["mod"] = mod
@@ -59,6 +59,7 @@ def q(id, chain, t, giver, intro, progress, done, objs, gold=0, items=None, flag
     if sceneDone: o["sceneDone"] = sceneDone
     if choices: o["choices"] = choices
     if companion: o["companion"] = companion
+    if dream: o["sceneDream"] = dream
     Q.append(o)
     return id
 

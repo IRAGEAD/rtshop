@@ -214,6 +214,7 @@ public final class QuestEditor {
         if (old != null) {
             if (q.sceneAccept == null) q.sceneAccept = old.sceneAccept;
             if (q.sceneDone == null) q.sceneDone = old.sceneDone;
+            if (q.sceneDream == null) q.sceneDream = old.sceneDream;
             if (q.mod.isEmpty()) q.mod = old.mod;
             if (q.companion == null) q.companion = old.companion;
             // 목표의 장면 글·조사 위치·모양: 같은 자리의 같은 목표면 그대로 둔다

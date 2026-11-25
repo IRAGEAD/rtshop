@@ -2900,11 +2900,48 @@ public final class SelfTest {
         // 꿈속의 기사: 퀘스트를 끝낼 때가 아니라 침대에서 잠들 때 나온다
         var dream = com.rtshop.quest.QuestManager.loaded().quests.get("story_0_03");
         com.google.gson.JsonObject dj = dream == null ? null : dream.sceneDone;
-        a.getPersistentData().remove(com.rtshop.quest.QuestManager.SLEEP_SCENE);
+        while (com.rtshop.quest.QuestManager.showDream(a)) {
+        }
         if (dj != null) com.rtshop.quest.QuestManager.scene(a, dj);
-        check("the first dream-knight scene waits for the player to sleep in a bed (not shown on finishing the quest)",
-                dj != null && dj.has("onSleep") && a.getPersistentData().contains(com.rtshop.quest.QuestManager.SLEEP_SCENE));
-        a.getPersistentData().remove(com.rtshop.quest.QuestManager.SLEEP_SCENE);
+        if (dj != null) com.rtshop.quest.QuestManager.scene(a, dj); // 같은 꿈은 두 번 쌓이지 않는다
+        var dream2 = com.rtshop.quest.QuestManager.loaded().quests.get("story_4_29");
+        if (dream2 != null && dream2.sceneDream != null) com.rtshop.quest.QuestManager.queueDream(a, dream2.sceneDream);
+        a.getPersistentData().putString(com.rtshop.quest.QuestManager.SLEEP_SCENE, "{\"kind\":\"vision\",\"text\":\"old\"}"); // 옛 자리의 꿈도 옮겨진다
+        int waiting = com.rtshop.quest.QuestManager.dreamsWaiting(a);
+        boolean survives = a.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG).contains(com.rtshop.quest.QuestManager.DREAMS)
+                && !a.getPersistentData().contains(com.rtshop.quest.QuestManager.SLEEP_SCENE);
+        boolean one = com.rtshop.quest.QuestManager.showDream(a) && com.rtshop.quest.QuestManager.dreamsWaiting(a) == waiting - 1;
+        while (com.rtshop.quest.QuestManager.showDream(a)) {
+        }
+        long dreams = com.rtshop.quest.QuestManager.loaded().quests.values().stream().filter(x -> x.sceneDream != null || (x.sceneDone != null && x.sceneDone.has("onSleep"))).count();
+        check("dream-knight scenes wait for a bed, pile up instead of replacing each other, survive death, come one a night, and run through chapters 3 and 4",
+                dj != null && dj.has("onSleep") && waiting == 3 && survives && one && dreams >= 10 && com.rtshop.quest.QuestManager.dreamsWaiting(a) == 0,
+                waiting + " " + survives + " " + one + " " + dreams);
+
+        // 설정 파일 돌보기: 옛 마을 이름, 손대지 않은 기본 파일은 새 판으로
+        try {
+            boolean renamed = com.rtshop.util.ConfigNames.rename("엠버헤이븐을 떠나 골디아로, 엠버헤이븐은 Emberhaven").equals("베스탈리아를 떠나 베스탈리아로, 베스탈리아는 Vestalia")
+                    && com.rtshop.util.ConfigNames.rename("그대로").equals("그대로");
+            java.nio.file.Path td = java.nio.file.Files.createTempDirectory("rtshop_defaults_test");
+            java.nio.file.Files.writeString(td.resolve("story.json"), "{\"quests\":[]}");
+            java.nio.file.Files.writeString(td.resolve("npcs.json"), "{\"npcs\":[],\"mine\":true}");
+            int first = QuestManager.refreshDefaults(td, null); // 지문 기록이 없던 설치: 한 번은 모두 새 판으로
+            boolean storyNew = java.nio.file.Files.size(td.resolve("story.json")) > 10000 && QuestManager.UPDATED_DEFAULTS.contains("npcs.json");
+            int again = QuestManager.refreshDefaults(td, null);
+            java.nio.file.Files.writeString(td.resolve("story.json"), "{\"quests\":[],\"edited\":1}");
+            int edited = QuestManager.refreshDefaults(td, null); // 손댄 파일은 그대로
+            boolean kept = QuestManager.STALE_DEFAULTS.contains("story.json") && java.nio.file.Files.size(td.resolve("story.json")) < 100;
+            int forced = QuestManager.refreshDefaults(td, "all");
+            boolean done = QuestManager.STALE_DEFAULTS.isEmpty() && java.nio.file.Files.size(td.resolve("story.json")) > 10000;
+            QuestManager.refreshDefaults(QuestManager.dir(), null); // 진짜 폴더 기준으로 목록을 되돌린다
+            var cornelia = com.rtshop.story.StoryConfig.defaults().get("aquamirae:captain_cornelia");
+            check("config care: old town names are rewritten, untouched default files move to the new edition (edited ones wait for the operator), boss lore matches the rewritten story",
+                    renamed && first == 2 && storyNew && again == 0 && edited == 0 && kept && forced == 1 && done && cornelia != null
+                            && com.rtshop.story.StoryConfig.defaults().containsKey("fdbosses:geburah"),
+                    renamed + " " + first + " " + storyNew + " " + again + " " + edited + " " + kept + " " + forced + " " + done);
+        } catch (Exception e) {
+            check("config care: old town names are rewritten, untouched default files move to the new edition", false, e.toString());
+        }
 
         // 직업 스승 다섯도 일상 이야기와 스토리 이야기를 한다
         int mentors = 0;

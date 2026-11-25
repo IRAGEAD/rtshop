@@ -211,5 +211,5 @@ EN = {
 "story_4_27a": ("Before the Order's Door",
  "You're here. The Elder passed an hour ago. He didn't run. He walked. He saw me and bowed his head. First time in thirty years that man has bowed to me. I didn't stop him. It isn't a thing to stop. He went into the archive. Didn't lock it. He's waiting. Before you go in, count what you carry. One who goes to ask should know what they're bringing.",
  "Count what you have gathered with Captain Roran and Isabel the archivist.",
- "Counted? Then go. I stand outside the door. I won't draw. I hope I needn't. That man is the only one who took my side in the inquiry twelve years ago. Whether it was heart or reckoning, I don't want to know today. You find out. (Roran ties his bootlace. Slowly. And doesn't stand even when it's tied.)"),
+ "Counted? Then go. I stand outside the door. I won't draw. I hope I needn't. That man is the only one who took my side in the inquiry twenty years ago. Whether it was heart or reckoning, I don't want to know today. You find out. (Roran ties his bootlace. Slowly. And doesn't stand even when it's tied.)"),
 }

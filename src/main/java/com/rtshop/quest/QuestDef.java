@@ -126,6 +126,8 @@ public final class QuestDef {
     public int order;
     /** 받을 때 / 끝낼 때 보여 줄 연출 (StoryPacket CINEMA 형식). 없으면 null. */
     public JsonObject sceneAccept, sceneDone;
+    /** 이 퀘스트를 끝낸 뒤 침대에서 잠들 때 보이는 꿈 장면 (sceneDone 과 따로 둔다). */
+    public JsonObject sceneDream;
     /** 퀘스트 전체의 모드 조건 ("" = 항상). 맞지 않으면 퀘스트를 아예 불러오지 않는다. */
     public String mod = "";
     /**
@@ -189,6 +191,7 @@ public final class QuestDef {
         putText(o, "mod", mod);
         if (sceneAccept != null) o.add("sceneAccept", sceneAccept);
         if (sceneDone != null) o.add("sceneDone", sceneDone);
+        if (sceneDream != null) o.add("sceneDream", sceneDream);
         if (companion != null) o.add("companion", companion);
         JsonArray objs = new JsonArray();
         for (Objective ob : objectives) {
@@ -264,6 +267,7 @@ public final class QuestDef {
         q.mod = str(o, "mod", "").trim();
         if (o.has("sceneAccept") && o.get("sceneAccept").isJsonObject()) q.sceneAccept = o.getAsJsonObject("sceneAccept");
         if (o.has("sceneDone") && o.get("sceneDone").isJsonObject()) q.sceneDone = o.getAsJsonObject("sceneDone");
+        if (o.has("sceneDream") && o.get("sceneDream").isJsonObject()) q.sceneDream = o.getAsJsonObject("sceneDream");
         if (o.has("companion") && o.get("companion").isJsonObject() && o.getAsJsonObject("companion").has("npc")) q.companion = o.getAsJsonObject("companion");
         if (q.giver.isEmpty()) {
             throw new IllegalArgumentException("퀘스트 '" + q.id + "' 에 giver(퀘스트를 주는 NPC)가 없습니다");

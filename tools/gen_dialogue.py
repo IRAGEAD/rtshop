@@ -3,7 +3,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
-VERSION = 11
+VERSION = 12
 
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
@@ -62,7 +62,7 @@ N["quest_order_elder"] = {
     "topics": [
         topic("order", "잿불 수도회에 대해", [
             "잿불 수도회는 '불을 지키는 자들'이 세운 곳일세.",
-            "천 년 전, 일곱 세력이 세계의 힘을 '눈'에 담아 봉인했지. 그 봉인을 지켜보는 것이 우리 일이네.",
+            "천 년 전, 일곱 왕이 불을 일곱 눈에 나누어 봉인했지. 그 봉인을 지켜보는 것이 우리 일이네.",
             "…지금은 나와 기록관, 탐험대장 셋뿐이지만 말일세.",
         ]),
         topic("chronicle", "잿빛 연대기에 대해", [
@@ -71,9 +71,9 @@ N["quest_order_elder"] = {
             "기록관이 너무 깊이 파고들지 않았으면 좋겠군. 진실은 때로 사람을 태우네.",
         ], flags=["order_apprentice"]),
         topic("ember", "꺼지지 않는 불씨에 대해", [
-            "그 불씨를 꿈에서 받았다고?",
-            "…흥미롭군. 아주 흥미로워. 그 불씨를 잘 간직하게. 절대 남에게 주지 말고.",
-            "특히… 아니, 아무것도 아닐세.",
+            "그 불씨는 잘 있나. 주머니 안쪽이 따뜻하면 잘 있는 걸세.",
+            "불씨는 쥔 사람의 이름을 한 번 붙들어 주네. 한 번뿐일세. 그러니 아끼게.",
+            "남에게 주지는 말게. 특히… 아니, 아무것도 아닐세.",
         ], flags=["order_apprentice"]),
         topic("age", "장로님의 나이", [
             "내 나이 말인가? 하하, 세다가 잊어버렸네.",
@@ -85,7 +85,7 @@ N["quest_order_elder"] = {
 N["quest_order_archivist"] = {
     "greet": [
         "어서 오세요. 기록관 이사벨이에요. 책장 사이로 조심해서 오세요.",
-        g("견습님! 새로 알아낸 게 있으면 꼭 저한테 먼저 말해 주세요.", flags=["order_apprentice"]),
+        g("조사대원님! 새로 알아낸 게 있으면 꼭 저한테 먼저 말해 주세요.", flags=["order_apprentice"]),
         g("…아직도 믿기지 않아요. 그분이 우리 곁에 그렇게 오래 있었다니.", flags=["erwin_betrayal"]),
     ],
     "chatter": [
@@ -96,15 +96,15 @@ N["quest_order_archivist"] = {
         g("페이지를 모을수록 무서워져요. 퍼즐이 완성되는 게 아니라, 그림이 점점 어두워지거든요.", flags=["clue_eighth_seal"]),
     ],
     "topics": [
-        topic("seven", "일곱 세력과 눈", [
-            "일곱 세력은 각자 세계의 힘 하나씩을 '눈'에 담았어요.",
-            "대장간의 불, 사막의 모래, 기계의 끝, 심연의 바다, 공허의 왕좌, 서리의 저주… 그리고 최초의 불꽃.",
-            "그 눈들이 봉인의 열쇠예요. 눈을 모으면 봉인을 열 수도, 더 단단히 잠글 수도 있죠.",
+        topic("seven", "일곱 왕과 눈", [
+            "연대기에는 일곱 왕이 불을 일곱 눈에 나누어 담았다고 적혀 있어요.",
+            "화로, 물길, 톱니, 물결, 눈꽃, 닫힌 입, 그리고 불꽃. 왕마다 문장이 하나씩이에요.",
+            "눈이 어디 있는지는 연대기에 없어요. 잊은 게 아니라 일부러 안 적은 것 같아요.",
         ], flags=["order_apprentice"]),
-        topic("eighth", "여덟 번째 봉인", [
-            "통비님이 '봉인은 여덟'이라고 했다면서요.",
-            "연대기에는 일곱뿐이에요. 그런데 목차를 보면… 여덟 번째 장이 있었던 흔적이 있어요.",
-            "누군가 그 장을 통째로 지웠어요. 그리고 그 사람은 지우는 데 익숙했던 것 같아요.",
+        topic("eighth", "여덟째 자리", [
+            "조각가 통비가 '봉인은 여덟'이라고 했다면서요.",
+            "연대기에는 일곱뿐이에요. 그런데 왕의 문장을 그린 쪽을 보면 자리가 여덟 칸이에요. 한 칸이 비었어요.",
+            "긁어낸 자국이 없어요. 처음부터 비워 둔 것처럼 매끈해요. 그게 더 이상해요.",
         ], flags=["clue_eighth_seal"]),
         topic("grey", "회색 망토의 학자", [
             "회색 망토는 수도회 초기 학자들이 입던 옷이에요.",
@@ -121,13 +121,13 @@ N["quest_order_captain"] = {
     "greet": [
         "탐험대장 로란이다. 볼일이 있으면 짧게 말해라.",
         g("왔냐, 견습. 신발 끈은 단단히 맸겠지?", flags=["order_apprentice"]),
-        g("수호자. …그 호칭이 아직 어색하군. 그래도 네가 해냈다.", flags=["story_done"]),
+        g("왔냐. …이제 견습이라고는 못 부르겠군. 그래도 인원 확인은 한다. 하나.", flags=["story_done"]),
     ],
     "chatter": [
         "지도는 발로 그리는 거다. 책상에서 그린 지도는 사람을 죽인다.",
         "원정대에 필요한 건 세 가지다. 식량, 칼, 그리고 돌아올 이유.",
         "북쪽 바다엔 가 봤냐? 숨 쉴 때마다 폐가 어는 곳이다.",
-        "부상? 이건 사막에서 모래벌레한테 물린 거다. 멋지지?",
+        "다리? 스무 해 묵은 거다. 비 오기 전날은 내가 구름보다 먼저 안다.",
         g("장로가… 아니, 그 녀석 이야기는 하지 마라. 아직 화가 안 풀렸다.", flags=["erwin_betrayal"]),
     ],
     "topics": [
@@ -137,13 +137,14 @@ N["quest_order_captain"] = {
             "그러니 너는 꼭 살아 돌아와라. 명령이다.",
         ], flags=["story_ch1_done"]),
         topic("guardians", "깨어난 수호자들", [
-            "녹슨 기사, 얼음 거인, 산꼭대기 석공, 태양의 사제.",
-            "놈들은 원래 봉인을 지키는 쪽이었다. 그런데 불이 깨어나자 미쳐 버렸지.",
-            "아니면… 처음부터 누군가를 기다리고 있었거나.",
+            "녹슨 기사, 얼음 거인, 산꼭대기 석공, 태양의 사제. 스무 해 전 내 원정이 지나간 자리들이다.",
+            "그때는 괴물인 줄만 알았다. 벽에 뭐가 적혀 있는지 읽어 볼 생각도 안 했다.",
+            "이번에는 읽고 간다. 싸우기 전에 상대가 어떻게 사는 놈인지 아는 건 대장 일이다.",
         ], flags=["story_ch1_done"]),
         topic("sea", "얼어붙은 바다", [
             "얼음 위에서 싸워라. 물에 빠지면 갑옷이 널 끌어내린다.",
-            "유령선 선장 코르넬리아. 천 년 동안 같은 항해를 반복하는 여자다.",
+            "유령선 선장 코넬리아. 열다섯 해 전 삼백 명을 태운 채 얼음에 멈춘 배다.",
+            "선장을 욕하는 사람은 이 마을에 없다. 그 배를 구하러 나간 어선들도 못 돌아왔으니.",
         ], flags=["story_ch2_done"]),
     ],
 }
@@ -213,19 +214,19 @@ merchant("shop_food", ["어서 와요. 배고프죠? 얼굴에 다 써 있어요
         "원정 갈 때는 익힌 고기를 넉넉히 챙겨요. 날고기는 배탈 나요.",
     ]),
 ])
-merchant("shop_blacksmith", ["뭘 찾냐. 칼이냐, 갑옷이냐."], [
-    "좋은 칼은 손에 붙는다. 나쁜 칼은 손을 문다.",
-    "강화는 운이다. 근데 운도 준비한 놈한테 온다.",
-    "불 앞에 삼십 년. 덕분에 눈썹이 없다.",
-    g("희귀 장비 말이냐? 원정대에 들어간 놈한테만 판다. 규칙이다.", notFlags=["story_ch1_done"]),
+merchant("shop_blacksmith", ["뭘 찾나. 칼인가, 갑옷인가."], [
+    "좋은 칼은 손에 붙네. 나쁜 칼은 손을 물지.",
+    "강화는 운일세. 그런데 운도 준비한 사람한테 오더군.",
+    "불 앞에 삼십 년일세. 덕분에 눈썹이 없네.",
+    g("희귀 장비 말인가? 원정대에 든 사람한테만 파네. 규칙일세.", notFlags=["story_ch1_done"]),
 ], [
     topic("forge", "대장간 이야기", [
-        "쇠는 거짓말을 안 한다. 두드린 만큼 단단해진다.",
-        "강화하다 깨진 칼? 다시 녹이면 된다. 사람도 마찬가지다.",
+        "쇠는 거짓말을 안 하네. 두드린 만큼 단단해지지.",
+        "강화하다 깨진 칼? 다시 녹이면 되네. 사람도 마찬가질세.",
     ]),
     topic("old_knight", "녹슨 기사의 문장", [
-        "그 투구 문장, 나도 봤다. 불꽃 기사단 문장이다.",
-        "우리 할아버지의 할아버지가 그 기사단 칼을 벼렸다고 했지. 전설인 줄 알았다.",
+        "그 투구 문장, 나도 봤네. 불꽃 기사단 문장일세.",
+        "우리 할아버지의 할아버지가 그 기사단 칼을 벼렸다고 했지. 옛날얘긴 줄 알았네.",
     ], quests=["story_2_04"]),
 ])
 merchant("shop_general", ["어서 오세요, 손님! 없는 것 빼고 다 있습니다… 아니 있어요!"], [
@@ -305,12 +306,12 @@ N["attendance"] = {"greet": ["시청 서기 하루입니다. 오늘 출석 도�
 ], "topics": [
     topic("records", "시청 기록", [
         "시청에는 폭풍 이후 모든 이주민의 이름이 있습니다.",
-        "단 한 사람, 수도회 장로의 이주 기록만 없습니다. 처음부터 여기 계셨다고 하더군요.",
+        "단 한 사람, 수도회 장로님의 기록만 출발지 칸이 비어 있습니다. '먼 지부에서 부임'이라고만 돼 있습니다.",
     ], flags=["clue_grey_cloak"]),
 ]}
 N["gacha"] = {"greet": ["행운 상인 럭키라구! 오늘은 뭐가 나올까~?"], "chatter": [
     "전설은 기다리는 자에게 온다지! 아마도!",
-    "YAMATO? 그거 본 사람은 손에 꼽는다구. 근데 너라면 혹시?",
+    "제일 깊은 데 숨은 그거? 본 사람은 손에 꼽는다구. 이름도 안 알려 줄 거야. 근데 너라면 혹시?",
     "꽝도 분해하면 조각이 된다구. 버릴 건 하나도 없지!",
 ], "topics": []}
 
@@ -439,8 +440,8 @@ N["quest_sword_master"] = {
             b("다른 무기를 들면 손이 어색해질 거다. 그게 검사의 대가다.", "Pick up another weapon and your hands will feel wrong. That is the price of the sword."),
         ]),
         tb("leon_past", "레온의 옛날", "Leon's past", [
-            b("나도 한때는 원정대에 들어가고 싶었다. 로란이 사람을 고를 때 말이다.", "I once wanted to join the expedition too. Back when Loran was choosing people."),
-            b("떨어졌다. 그 덕에 살아 있지. …돌아오지 못한 열두 명 중에 내 동기가 둘 있었다.", "I wasn't picked. That's why I'm alive. …Two of my classmates were among the twelve who never came back."),
+            b("나도 한때는 원정대에 들어가고 싶었다. 로란이 사람을 고를 때 말이다.", "I once wanted to join the expedition too. Back when Roran was choosing people."),
+            b("떨어졌다. 그 덕에 살아 있지. …돌아오지 못한 열한 명 중에 내 동기가 둘 있었다.", "I wasn't picked. That's why I'm alive. …Two of my classmates were among the eleven who never came back."),
         ], flags=["story_ch1_done"]),
         tb("leon_guardians", "깨어나는 수호자들", "The waking guardians", [
             b("녹슨 기사와 싸웠다고? 그놈의 검은 무겁지만 느리다. 첫 휘두름을 피하면 길이 보인다.", "You fought the rusted knight? Its blade is heavy but slow. Dodge the first swing and you'll see the way in."),
@@ -473,7 +474,7 @@ N["quest_war_chief"] = {
         ]),
         tb("bron_sea", "바다 이야기", "Sea stories", [
             b("얼음 바다에 다녀왔다고? 나는 배 멀미가 심해서 못 간다! …비밀이다!", "You went to the frozen sea? I get terribly seasick, so I can't! …That's a secret!"),
-            b("오스카 영감님 동생 얘기는 들었다. 그 집 등불, 마을에서 제일 오래 켜져 있었지.", "I heard about old Oscar's brother. That lantern of his burned longer than any in town."),
+            b("오스카 영감님 아들 얘기는 들었다. 그 집 등불, 마을에서 제일 오래 켜져 있었지.", "I heard about old Oscar's son. That lantern of his burned longer than any in town."),
         ], flags=["story_ch3_done"]),
         tb("bron_fight", "같이 싸우기", "Fighting together", [
             b("혼자 싸우는 놈은 강해 보여도 오래 못 간다! 파티를 짜라! 최대 열두 명이다!", "Lone fighters look strong but don't last! Form a party! Up to twelve people!"),
@@ -506,8 +507,8 @@ N["quest_shield_keeper"] = {
             b("…갔으면 막을 수 있었을까. 매일 생각한다.", "…Could I have shielded them if I'd gone? I think about it every day."),
         ], flags=["story_ch1_done"]),
         tb("garen_tags", "명패", "The name plates", [
-            b("로란이 명패를 받을 때마다 나도 이름을 외운다.", "Every time Loran takes back a name plate, I memorize the name too."),
-            b("열두 개. …다 모이면 성벽에 새길 거다.", "Twelve. …When they're all back, I'll carve them into the wall."),
+            b("로란이 명패를 받을 때마다 나도 이름을 외운다.", "Every time Roran takes back a name plate, I memorize the name too."),
+            b("열 개. …다 모이면 성벽에 새길 거다.", "Ten. …When they're all back, I'll carve them into the wall."),
         ], flags=["story_ch2_done"]),
     ],
 }
@@ -516,7 +517,7 @@ N["quest_hunter"] = {
     "greet": [
         b("쉿, 바람 소리를 들어 봐. …응, 이제 말해도 돼. 무슨 일이야?", "Shh, listen to the wind. …Okay, you can talk now. What's up?"),
         gb("견습이 됐구나! 수도회 사람들은 숲을 잘 안 오던데, 너는 자주 와.", "So you're an apprentice now! Order people rarely come to the woods, but you do.", flags=["order_apprentice"]),
-        gb("폭풍이 그쳤어. 새들이 돌아왔더라. 네 덕이지?", "The storms stopped. The birds came back. That was you, wasn't it?", flags=["story_done"]),
+        gb("하늘 색이 돌아왔어. 새들이 먼저 알더라. 네 덕이지?", "The sky's colour came back. The birds knew first. That was you, wasn't it?", flags=["story_done"]),
     ],
     "chatter": [
         b("활은 눈보다 귀로 쏘는 거야. 바람이 어디로 부는지 먼저 들어.", "You shoot a bow with your ears more than your eyes. Listen to where the wind blows first."),
@@ -552,7 +553,7 @@ N["quest_archmage"] = {
         b("마나가 바닥나면 차 한 잔 하렴. 진짜로 도움이 된단다.", "When your mana runs dry, have a cup of tea. It truly helps."),
         b("주문은 외우는 게 아니라 이해하는 거란다. 이해한 주문은 잊히지 않아.", "Spells aren't memorized, they're understood. An understood spell is never forgotten."),
         b("오늘 밤엔 남쪽 별자리가 흐리구나. …폭풍이 오려나.", "The southern constellations are faint tonight. …A storm coming, perhaps."),
-        gb("이그니스의 불꽃 속에 회색 연기가 섞여 있었다고? …그건 불의 것이 아니란다.", "Grey smoke mixed into Ignis's flames? …That doesn't belong to fire, dear.", flags=["story_ch4_done"]),
+        gb("이그니스의 불꽃 속에 회색 연기가 섞여 있었다고? …그건 불의 것이 아니란다.", "Grey smoke mixed into Ignis's flames? …That doesn't belong to fire, dear.", flags=["story_done"]),
     ],
     "topics": [
         tb("mage_way", "마법사의 길", "The way of the mage", [
@@ -580,7 +581,7 @@ N["quest_archmage"] = {
 more("quest_order_archivist", hints=[
     "…이건 그냥 혼잣말이에요. 잘린 연대기 자리마다 아주 옅은 보랏빛이 묻어 있어요. 우리 잉크는 검은색인데요.",
     "어머니 일지에 이런 낙서가 있었어요. '거울은 거짓말을 한다. 거울 속 필경사는 더하다.' 무슨 뜻일까요.",
-    "연대기에는 일곱 왕이 나와요. 그런데 왕관 그림은 여덟 개예요. 한 개는 번개 모양이고요.",
+    "옛 뱃노래에 이런 절이 있어요. '우리에겐 배가 있었다. 마중 나간 누이는 돌아오지 않았다.' 연대기에는 그 누이가 한 줄도 없어요.",
 ])
 more("quest_order_captain", hints=[
     "남쪽 따뜻한 바다엔 가라앉은 유적이 많다. 거기서 붓질을 하던 놈이 이상한 악보를 주웠다더군. 제목만 남은.",
@@ -588,11 +589,11 @@ more("quest_order_captain", hints=[
     "원정 중에 소환사를 셋 잡은 적이 있다. 셋 다 보랏빛 잉크병을 품고 있었지. 습격 때만 나오는 놈들이다.",
 ])
 more("shop_fisher", hints=[
-    "따뜻한 바다에서 낚시를 하다 보면 소금에 절은 종이가 걸려 올라올 때가 있지. 대개는 버리지만, 한 번은 '여덟 번째 배'라고 적혀 있었네.",
-    "뇌우 치는 밤엔 드라운드들이 이상한 비늘을 떨군다는 얘기가 있어. 아직도 찌릿하다던가.",
+    "따뜻한 바다에서 낚시를 하다 보면 소금에 절은 종이가 걸려 올라올 때가 있소. 대개는 버리오. 한 번은 인장이 찍혀 있었소. '마중하는 이'라고.",
+    "뇌우 치는 밤엔 드라운드들이 이상한 비늘을 떨군다는 얘기가 있소. 아직도 찌릿하다던가.",
 ])
 more("attendance", hints=[
-    "시청 기록에 이상한 항목이 하나 있습니다. '폭풍의 여제께 바치는 세금, 미납.' 날짜는 천 년 전입니다.",
+    "시청 옛 장부에 이상한 항목이 하나 있습니다. '새벽의 섬 함대 입항 예정. 마중 준비.' 날짜가 없습니다. 취소했다는 기록도 없습니다.",
     "숲속 저택 주변의 안개 민원이 들어온 적이 있습니다. 담당자는 '거울이 사람을 비추지 않는다'고 적고 조사를 그만뒀습니다.",
 ])
 more("gacha", hints=[
@@ -602,9 +603,11 @@ more("gacha", hints=[
 more("quest_order_elder", hints=[
     "…여덟. 아니, 일곱이라고 했나? 나이를 먹으니 숫자가 헷갈리는군.",
 ])
-for key in ("shop_general", "shop_blacksmith", "bank"):
+for key, hint in (("shop_general", "손님, 바다 위 신전 얘기 들어 보셨어요? 폭풍이 그치지 않는 데 있대요. 누가 거기서 천 년째 배를 기다린다나요."),
+                  ("shop_blacksmith", "바다 위에 신전이 있다더군. 폭풍이 안 그치는 데. 거기 쇠는 천 년이 돼도 녹이 안 슨다던데, 한번 보고 싶네."),
+                  ("bank", "바다 위 신전에 관한 소문이 있습니다. 폭풍이 그치지 않는 곳이라 합니다. 저희 금고에 그곳 주화가 한 닢 맡겨져 있습니다. 찾아가신 분은 없습니다.")):
     if key in N:
-        more(key, hints=["바다 위 신전 얘기 들어 봤나? 폭풍이 그치지 않는 곳에 있다던데. 신전 기둥이 여덟 개라나."])
+        more(key, hints=[hint])
 
 
 # ================================================================ 황혼의 불꽃 (Duskfire, efn:meen_spear): 지니고 있으면 몇몇 사람의 말이 달라진다

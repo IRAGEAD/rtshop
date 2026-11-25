@@ -47,6 +47,8 @@ public final class Dialogue {
     /** 기본 파일의 판 (이보다 낮고 직접 고치지 않은 파일은 새 기본값으로 바꾼다). */
     public static final int DEFAULT_VERSION = 4;
     private static JsonObject config;
+    /** 직접 고친 대화 파일이라 새 판을 받지 못했는가 (운영자에게 알린다). */
+    public static volatile boolean stale;
     private static final Random RNG = new Random();
 
     static Path file() {
@@ -70,11 +72,20 @@ public final class Dialogue {
                 JsonObject cur = Files.exists(f) ? JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject() : null;
                 int v = cur != null && cur.has("version") ? cur.get("version").getAsInt() : -1;
                 boolean edited = cur != null && cur.has("edited") && cur.get("edited").getAsBoolean();
-                if (cur == null || (!edited && v < DEFAULT_VERSION)) {
+                int bundledV = def.has("version") ? def.get("version").getAsInt() : DEFAULT_VERSION;
+                if (cur != null && !edited && v < bundledV) { // 고치지 않은 예전 기본 대화: 이전 파일을 남기고 새 판으로
+                    Path b = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("backup").resolve("dialogue_v" + v + "_" + System.currentTimeMillis() + ".json");
+                    Files.createDirectories(b.getParent());
+                    Files.copy(f, b, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    RtShop.LOGGER.info("[rtshop] 고치지 않은 예전 기본 대화(판 {})를 새 판({})으로 바꿨습니다 (이전 파일: {}).", v, bundledV, b);
+                }
+                stale = cur != null && edited && v < bundledV;
+                if (cur == null || (!edited && v < bundledV)) {
                     Files.createDirectories(f.getParent());
                     Files.writeString(f, new com.google.gson.GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(def), StandardCharsets.UTF_8);
                     cur = def;
                 }
+                if (com.rtshop.util.ConfigNames.file(f)) cur = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
                 config = cur;
             } catch (Exception e) {
                 RtShop.LOGGER.warn("[rtshop] dialogue.json 을 읽지 못해 기본 대화를 씁니다: {}", e.toString());
@@ -86,6 +97,23 @@ public final class Dialogue {
 
     public static synchronized void reload() {
         config = null;
+    }
+
+    /** 직접 고친 대화 파일도 새 기본 대화로 바꾼다 (이전 파일은 backup 에). 바꿨으면 true. */
+    public static synchronized boolean forceDefault() throws java.io.IOException {
+        Path f = file();
+        JsonObject def = bundled();
+        if (def.size() == 0) return false;
+        if (Files.exists(f)) {
+            Path b = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("backup").resolve("dialogue_" + System.currentTimeMillis() + ".json");
+            Files.createDirectories(b.getParent());
+            Files.copy(f, b, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+        Files.createDirectories(f.getParent());
+        Files.writeString(f, new com.google.gson.GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(def), StandardCharsets.UTF_8);
+        config = null;
+        stale = false;
+        return true;
     }
 
     // ------------------------------------------------------------------ 조건

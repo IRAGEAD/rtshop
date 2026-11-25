@@ -24,6 +24,7 @@ public class RtShop {
 
     public RtShop() {
         com.rtshop.compat.LogNoise.install(); // 지형 생성 경고 폭주 걸러 내기
+        com.rtshop.util.ConfigNames.sweep(); // 저장된 설정 파일 안의 옛 마을 이름을 새 이름으로
         com.rtshop.compat.BetterCombatEpicFight.patch(); // Epic Fight 무기가 납작한 아이템으로 보이던 문제
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         com.rtshop.enhance.ModEnhance.register(bus);
