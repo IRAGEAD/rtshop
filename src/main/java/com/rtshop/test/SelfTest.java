@@ -2948,6 +2948,32 @@ public final class SelfTest {
                     !without && with && com.rtshop.story.BossIntros.ITEM_LORE.containsKey("efn:meen_spear")
                             && com.rtshop.story.Dialogue.npcForTest("quest_order_elder").toString().contains("duskfire"), without + "/" + with);
         }
+        // 3.52: 처음 한 번만 하는 인사(once) 와 가끔만 하는 인사(chance). 그 창을 든 사람에게 놀라는 말은 한 번뿐이다
+        {
+            com.google.gson.JsonObject npc = com.google.gson.JsonParser.parseString("{\"greet\":[\"hello\","
+                    + "{\"text\":\"now and then\",\"chance\":0.2,\"need\":{\"items\":[\"minecraft:blaze_rod\"]}},"
+                    + "{\"text\":\"what is that\",\"once\":true,\"need\":{\"items\":[\"minecraft:blaze_rod\"]}}]}").getAsJsonObject();
+            String key = "selftest_greeter";
+            a.getInventory().clearContent();
+            QuestManager.setFlag(a, com.rtshop.story.Dialogue.greetFlag(key, "what is that"), false);
+            com.rtshop.story.Dialogue.forcedRoll = 0.0;
+            String none = com.rtshop.story.Dialogue.greet(a, key, npc, true);
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.BLAZE_ROD));
+            String hidden = com.rtshop.story.Dialogue.greet(a, key, npc, false);   // 장면 중: 아껴 둔다
+            String first = com.rtshop.story.Dialogue.greet(a, key, npc, true);
+            String second = com.rtshop.story.Dialogue.greet(a, key, npc, true);    // 주사위 0.0: 가끔 하는 말
+            com.rtshop.story.Dialogue.forcedRoll = 0.9;
+            String third = com.rtshop.story.Dialogue.greet(a, key, npc, true);     // 주사위 0.9: 보통 인사
+            com.rtshop.story.Dialogue.forcedRoll = -1;
+            a.getInventory().clearContent();
+            String dusk = com.rtshop.story.Dialogue.npcForTest("shop_blacksmith").toString();
+            String lore = String.join(" ", com.rtshop.story.BossIntros.ITEM_LORE.get("efn:meen_spear"));
+            check("a greeting can be said only the first time, and another only now and then; people point at the spear without saying its name and its text says whose name was left off",
+                    none.equals("hello") && hidden.equals("what is that") && first.equals("what is that") && second.equals("now and then") && third.equals("hello")
+                            && dusk.contains("\"once\":true") && dusk.contains("\"chance\"") && dusk.contains("그 창에 대하여") && !dusk.contains("황혼의 불꽃")
+                            && lore.contains("자기 이름을 새기지 않았다"),
+                    none + " / " + hidden + " / " + first + " / " + second + " / " + third);
+        }
         // 4판(대개편) 서장·1장
         QuestManager.Loaded l = QuestManager.loaded();
         QuestDef helvar = l.quests.get("story_2_06b"), lesson = l.quests.get("story_0_02b"), walk = l.quests.get("story_1_02");
