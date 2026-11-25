@@ -168,7 +168,16 @@
 - 무기 설명서(rtshop:weapon_manual, WeaponManuals): Epic Fight 특수기가 있는 무기를 처음 얻으면 한 권(같은 종류·같은 특수기 묶음은 한 권; 기록 rtshop_manuals). 우클릭 → WeaponManualScreen: 종류, 드는 방식별 연속 공격 타수, 달리며·뛰어서 공격, 특수기 이름·설명, 전투 키(지금 설정된 키 이름). 다시 받기 /rtshop manual. 끄기 world_rules.json 의 weaponManuals. 정보는 EfWeapons(리플렉션)로 무기 능력의 표에서 읽는다.
 - 행운 상인의 [티켓 사기] 없음: 티켓은 티켓 상인에게서만.
 
-3.49 (강화 모루 새 모습 · 진행 중)
+3.49 (강화 모루 새 모습 · 규칙 묶음)
 - 블록: tools/gen_enhance_anvil.py 가 모델(상자 56개, UV 는 자리로 자동)과 질감(textures/block/enh_*.png, 64px)을 만든다. 점판암 팔각 받침 두 층 + 놋쇠 띠·못, 단조 강철 모루(뿔·굽) + 놋쇠 상감·마름모 무늬. 윗면 높이 16 그대로. 테두리 모양은 EnhanceAnvilBlock.getShape.
 - 빛: client/EnhanceAnvilGlow — 받침의 룬 띠와 모루 옆면 보석은 평소 꺼져 있고 5칸 안으로 오면 2초에 걸쳐 켜진다(멀어지면 3.5초에 걸쳐 꺼짐). 블록 상태를 바꾸지 않고 클라이언트가 덧그린다(enh_glow_side.png, enh_glow_anvil.png).
-- 정보 창(아직): 시안 「하 · 세로 한 장」 + 테두리 놋쇠 장식 살짝. docs/worklist.md 참고.
+- 정보 창: 「하 · 세로 한 장」(204x280). 그림은 tools/gen_enhance_panel.py (panel.png 바탕·테·메달·룬 띠, runes.png 켜진 룬 11자 x 2모습, plate.png 강철 판 9칸). 글자·숫자·아이템은 EnhancePanel 이 그린다: 룬 띠 = 강화 단계, 재료 칸 + Gold 칸 + 보호권 칸(마우스를 올리면 이름 띠). 화면이 작으면 EnhancePanel.scale 이 줄인다.
+- 보호권: 모루의 1번 칸에 장비와 함께 올린다(보호권만 들어감). 강화 한 번에 한 장, 결과와 상관없이 사라짐. 우클릭 사용은 없앰(쓰는 법만 알려 줌). 옛 방식으로 미리 써 둔 보호는 칸이 비었을 때 한 번 쓰인다(Enhance.guardFor).
+- 파괴 없음: 뽑기 등급이 enhance.json 의 safeFromGrade(기본 legendary) 이상이거나 safeItems 에 적힌 장비는 파괴 확률을 유지·손상에 반씩 나눈다(Enhance.levelFor).
+- 강화 모루는 마을에 하나: world_rules.json 의 enhanceAnvil / enhanceAnvilOpOnly. 운영자(크리에이티브)만 놓고 치움, 처음 놓은 것이 "그 모루", /rtshop anvil [here|clear]. 다른 모루는 열리지 않는다.
+- 천장(확정) 없음: 마법 뽑기의 천장을 세지도 보이지도 설정하지도 않는다 (MagicGacha.applyPity = false). 행운 상인의 10회 보장과 스킬라 단서의 보장 횟수는 그대로.
+- NPC·동행은 보트·수레에 타지 않는다 (NpcGuard.onMount).
+- 스킬북으로 배운 기술은 죽어도 남는다: rules/KeepSkills 가 서버가 켜질 때 Epic Fight 의 게임 규칙 keepSkills 를 켠다 (world_rules.json 의 keepSkillsOnDeath).
+- 몹 규칙(rules/MobRules, config/rtshop/mob_rules.json): 모드 몹의 자연 스폰은 20%만 남김(lycanth 10%, hollow=기사·보스·구조물 안·스포너·소환은 그대로). 보스가 아닌 몹은 무기·스킬북·인챈트 물건·모드 아이템을 떨어뜨리지 않는다(RT Shop 아이템, 퀘스트가 건네 달라는 아이템, 몹이 주운 물건, keepItems 는 남김).
+- 운영자 기능은 크리에이티브(관전)에서만 (util/Perm): 서바이벌의 OP 는 편집 창·[편집] 단추·OP 전용 명령어를 쓸 수 없다. /gamemode 는 남는다. 코드에서는 hasPermissions(2) 대신 Perm.op(p).
+- 마법은 마법사만 (job/MagicLock, world_rules.json 의 magicOnlyForMage): Iron's Spells 의 모든 주문, Spell Engine 의 마법 계열 주문. 근접·활 계열(무기 기술)은 누구나. 크리에이티브는 언제나.
