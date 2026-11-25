@@ -1117,6 +1117,25 @@ public final class SelfTest {
                         java.util.List.of(new com.rtshop.compat.EfWeapons.Form("two_hand", "somemod:spin", 4, null))));
                 check("weapon manuals are handed out only for mod weapons with a skill of their own (a vanilla iron sword gets none; the common sword skill is not 'special')",
                         vanilla.isEmpty() && rule && a.getInventory().countItem(com.rtshop.item.ModItems.WEAPON_MANUAL.get()) == 0, vanilla + " / " + rule);
+                // 바닐라 철 도끼와 똑같이 쓰는 모드 도끼(다른 모드가 도끼 전체에 기술을 덧붙였더라도)는 받지 않는다
+                com.rtshop.compat.EfWeapons.Info axeInfo = com.rtshop.compat.EfWeapons.info(a, new ItemStack(net.minecraft.world.item.Items.IRON_AXE));
+                String twin = "";
+                boolean twinGiven = false;
+                if (axeInfo != null) {
+                    for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+                        net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it);
+                        if (rl == null || rl.getNamespace().equals("minecraft") || rl.getNamespace().equals("rtshop")) continue;
+                        ItemStack cand = new ItemStack(it);
+                        com.rtshop.compat.EfWeapons.Info ci = com.rtshop.compat.EfWeapons.info(a, cand);
+                        if (ci != null && ci.key().equals(axeInfo.key())) {
+                            twin = rl.toString();
+                            twinGiven = com.rtshop.item.WeaponManuals.handedOut(cand, ci);
+                            break;
+                        }
+                    }
+                }
+                check("a mod axe that works exactly like the vanilla iron axe gets no manual (skills every axe has are not 'special')",
+                        axeInfo != null && !com.rtshop.item.WeaponManuals.special(axeInfo) && !twinGiven, twin + " " + axeInfo);
                 // 모드팩의 무기 가운데 특별한 조작이 있는 것을 하나 찾아 실제로 받아 본다
                 ItemStack modWeapon = ItemStack.EMPTY;
                 for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {

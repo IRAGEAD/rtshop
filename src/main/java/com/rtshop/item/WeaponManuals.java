@@ -53,10 +53,51 @@ public final class WeaponManuals {
             "rushing_tempo", "relentless_combo", "sharp_stab", "liechtenauer", "eviscerate", "blade_rush", "tsunami",
             "wrathful_lighting", "everlasting_allegiance");
 
+    /**
+     * 바닐라 무기(minecraft:)와 Epic Fight 기본 무기(epicfight:)가 지금 이 모드팩에서 가진 특수기 전부.
+     * 다른 모드가 검·도끼 같은 흔한 무기 종류 전체에 기술을 덧붙여도(쌍수 확장 등) 그것은 "그 무기만의 조작"이 아니다:
+     * 철 도끼와 똑같이 쓰는 모드 도끼는 설명서를 받지 않는다.
+     */
+    private static java.util.Set<String> baseline;
+
+    private static synchronized java.util.Set<String> baseline() {
+        if (baseline == null) {
+            java.util.Set<String> out = new java.util.HashSet<>();
+            for (net.minecraft.world.item.Item it : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+                net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it);
+                if (rl == null || !(rl.getNamespace().equals("minecraft") || rl.getNamespace().equals("epicfight"))) continue;
+                EfWeapons.Info info = EfWeapons.info(null, new ItemStack(it));
+                if (info == null) continue;
+                if (!info.skill().isEmpty()) out.add(info.skill());
+                for (EfWeapons.Form f : info.forms()) if (!f.skill().isEmpty()) out.add(f.skill());
+            }
+            baseline = out;
+        }
+        return baseline;
+    }
+
+    /** 무기 정보(데이터 팩)가 다시 읽히면 기준도 다시 센다. */
+    @SubscribeEvent
+    public static void onServerStarted(net.minecraftforge.event.server.ServerStartedEvent event) {
+        synchronized (WeaponManuals.class) {
+            baseline = null;
+        }
+    }
+
+    @SubscribeEvent
+    public static void onDatapackSync(net.minecraftforge.event.OnDatapackSyncEvent event) {
+        if (event.getPlayer() == null) {
+            synchronized (WeaponManuals.class) {
+                baseline = null;
+            }
+        }
+    }
+
     private static boolean commonSkill(String id) {
         int c = id.indexOf(':');
         String ns = c < 0 ? "epicfight" : id.substring(0, c), path = c < 0 ? id : id.substring(c + 1);
-        return (ns.equals("epicfight") || ns.equals("epicfightx")) && COMMON_SKILLS.contains(path);
+        if ((ns.equals("epicfight") || ns.equals("epicfightx")) && COMMON_SKILLS.contains(path)) return true;
+        return EfWeapons.present() && baseline().contains(id);
     }
 
     /** 그 무기만의 특수기가 하나라도 있는가. */
