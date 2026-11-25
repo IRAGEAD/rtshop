@@ -897,8 +897,8 @@ final class ClientSelfTest2 {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();
             magicBefore = st == null ? "" : String.valueOf(st.onAltar().getTag());
-            if (st != null) st.rerollForTest();
-            waitTicks(90);
+            check("the blue sigil can be touched again once the first ritual is over", st != null && st.rerollForTest());
+            waitTicks(120);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;

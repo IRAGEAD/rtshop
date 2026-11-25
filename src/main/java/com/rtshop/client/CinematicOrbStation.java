@@ -793,9 +793,12 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         return shown.size();
     }
 
+    /** 결과를 닫고, 아직 돌고 있는 의식도 끝낸다 (장면의 시계는 화면이 느리면 실제 시간보다 느리게 간다). */
     public void dismissForTest() {
         fx.skip();
         shown = new ArrayList<>();
+        ritualAt = -10.0;
+        waiting = null;
     }
 
     public boolean readyForTest() {
