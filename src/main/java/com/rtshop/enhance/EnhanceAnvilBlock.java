@@ -24,7 +24,11 @@ public class EnhanceAnvilBlock extends AnvilBlock {
 
     @Override
     public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
-        return new SimpleMenuProvider((id, inv, player) -> new EnhanceMenu(id, inv, ContainerLevelAccess.create(level, pos)), TITLE);
+        return new SimpleMenuProvider((id, inv, player) -> {
+            // 마을의 모루 하나만 쓴다 (정해 두었을 때): 다른 모루는 열리지 않는다
+            if (player instanceof net.minecraft.server.level.ServerPlayer sp && com.rtshop.rules.WorldRules.refuseAnvil(sp, pos)) return null;
+            return new EnhanceMenu(id, inv, ContainerLevelAccess.create(level, pos));
+        }, TITLE);
     }
 
     // 3.49 의 새 모습(점판암 팔각 받침 + 단조 강철 모루)에 맞춘 테두리·충돌 모양. 윗면 높이는 모루와 같다(장면의 장비 자리).

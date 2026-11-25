@@ -54,6 +54,14 @@ public final class WorldRules {
     public boolean altarOpOnly = true;
     /** 특수기가 있는 무기를 처음 얻으면 그 무기의 설명서를 준다. */
     public boolean weaponManuals = true;
+    /** 강화 모루도 마을에 하나뿐 (3.49): 운영자(크리에이티브)만 놓고 치울 수 있고, 정해 둔 모루만 열린다. */
+    public static final String ANVIL_KEY = "rtshop:enhance_anvil";
+    public boolean anvilOpOnly = true;
+    public boolean anvilSet;
+    public String anvilDim = "minecraft:overworld";
+    public int anvilX, anvilY, anvilZ;
+    public String textAnvilOnly = "강화 모루는 마을에 있는 하나뿐입니다. 그 모루를 이용하세요.";
+    public String textAnvilBuild = "강화 모루는 새로 놓을 수 없습니다. 마을의 모루를 이용하세요.";
     public boolean altarSet;
     public String altarDim = "minecraft:overworld";
     public int altarX, altarY, altarZ;
@@ -131,6 +139,17 @@ public final class WorldRules {
             if (p.has("y")) w.altarY = p.get("y").getAsInt();
             if (p.has("z")) w.altarZ = p.get("z").getAsInt();
         }
+        if (o.has("enhanceAnvilOpOnly")) w.anvilOpOnly = o.get("enhanceAnvilOpOnly").getAsBoolean();
+        if (o.has("enhanceAnvil") && o.get("enhanceAnvil").isJsonObject()) {
+            JsonObject p = o.getAsJsonObject("enhanceAnvil");
+            w.anvilSet = p.has("set") && p.get("set").getAsBoolean();
+            if (p.has("dim")) w.anvilDim = p.get("dim").getAsString();
+            if (p.has("x")) w.anvilX = p.get("x").getAsInt();
+            if (p.has("y")) w.anvilY = p.get("y").getAsInt();
+            if (p.has("z")) w.anvilZ = p.get("z").getAsInt();
+        }
+        if (o.has("textAnvilOnly")) w.textAnvilOnly = o.get("textAnvilOnly").getAsString();
+        if (o.has("textAnvilBuild")) w.textAnvilBuild = o.get("textAnvilBuild").getAsString();
         if (o.has("textAltarOnly")) w.textAltarOnly = o.get("textAltarOnly").getAsString();
         if (o.has("textAltarBuild")) w.textAltarBuild = o.get("textAltarBuild").getAsString();
         if (o.has("textPortalOnly")) w.textPortalOnly = o.get("textPortalOnly").getAsString();
@@ -144,6 +163,7 @@ public final class WorldRules {
         help.add("월드 규칙. neverStructures: 새 지형에 절대 생기지 않는 건축물 ID. neverRecipes: 막는 조합법 (item:아이템ID). lootBlockedMods: 전리품에서 빼는 모드 ID.");
         help.add("weaponManuals: true 면 특수기가 있는 무기(Epic Fight)를 처음 얻었을 때 그 무기의 설명서를 한 권 준다 (같은 종류·같은 특수기는 한 권).");
         help.add("abyssPortal: 나선 비경으로 들어갈 수 있는 단 하나의 문. 게임 안에서 문 앞에 서서 /rtshop abyss portal here (OP). abyssPortalOpOnly: 문은 운영자(크리에이티브)만 세울 수 있음.");
+        help.add("enhanceAnvil: 쓸 수 있는 단 하나의 강화 모루. 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 모루 곁에서 /rtshop anvil here (풀기: /rtshop anvil clear). enhanceAnvilOpOnly: 운영자(크리에이티브)만 놓고 치울 수 있음.");
         help.add("runeAltar: 쓸 수 있는 단 하나의 룬 제단(별빛 수정 구체). 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 제단 곁에서 /rtshop altar here. runeAltarOpOnly: 운영자(크리에이티브)만 놓을 수 있음.");
         help.add("이미 만들어진 지형에 있는 건축물은 사라지지 않습니다. 고친 뒤 /rtshop reload.");
         o.add("_help", help);
@@ -174,6 +194,16 @@ public final class WorldRules {
         al.addProperty("y", altarY);
         al.addProperty("z", altarZ);
         o.add("runeAltar", al);
+        o.addProperty("enhanceAnvilOpOnly", anvilOpOnly);
+        JsonObject an = new JsonObject();
+        an.addProperty("set", anvilSet);
+        an.addProperty("dim", anvilDim);
+        an.addProperty("x", anvilX);
+        an.addProperty("y", anvilY);
+        an.addProperty("z", anvilZ);
+        o.add("enhanceAnvil", an);
+        o.addProperty("textAnvilOnly", textAnvilOnly);
+        o.addProperty("textAnvilBuild", textAnvilBuild);
         o.addProperty("textAltarOnly", textAltarOnly);
         o.addProperty("textAltarBuild", textAltarBuild);
         o.addProperty("textPortalOnly", textPortalOnly);
@@ -274,6 +304,40 @@ public final class WorldRules {
         }
     }
 
+    /** 이 자리의 강화 모루를 써도 되는가 (모루를 정해 두었으면 그것만). */
+    public static boolean anvilAllowed(Level level, BlockPos pos) {
+        WorldRules w = get();
+        if (!w.anvilSet) return true;
+        return level.dimension().location().toString().equals(w.anvilDim) && pos.getX() == w.anvilX && pos.getY() == w.anvilY && pos.getZ() == w.anvilZ;
+    }
+
+    /** 막아야 하면 알리고 true. */
+    public static boolean refuseAnvil(ServerPlayer p, BlockPos pos) {
+        try {
+            if (anvilAllowed(p.level(), pos)) return false;
+            com.rtshop.notice.Notice.send(p, Component.literal(get().textAnvilOnly).withStyle(ChatFormatting.YELLOW), true);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public static void setAnvil(Level level, BlockPos pos) {
+        WorldRules w = get();
+        w.anvilSet = true;
+        w.anvilDim = level.dimension().location().toString();
+        w.anvilX = pos.getX();
+        w.anvilY = pos.getY();
+        w.anvilZ = pos.getZ();
+        save(w);
+    }
+
+    public static void clearAnvil() {
+        WorldRules w = get();
+        w.anvilSet = false;
+        save(w);
+    }
+
     public static void setAltar(Level level, BlockPos pos) {
         WorldRules w = get();
         w.altarSet = true;
@@ -312,6 +376,18 @@ public final class WorldRules {
                 }
                 return;
             }
+            if (rl != null && rl.toString().equals(ANVIL_KEY)) {
+                WorldRules wa = get();
+                boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && pa.hasPermissions(2);
+                if (wa.anvilOpOnly && !opA) {
+                    event.setCanceled(true);
+                    if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(wa.textAnvilBuild).withStyle(ChatFormatting.YELLOW), true);
+                } else if (opA && !wa.anvilSet && event.getLevel() instanceof Level la) {
+                    setAnvil(la, event.getPos());
+                    ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal("이 모루를 마을의 단 하나뿐인 강화 모루로 정했습니다. (바꾸려면 새 모루 곁에서 /rtshop anvil here)").withStyle(ChatFormatting.GREEN));
+                }
+                return;
+            }
             if (rl == null || !rl.toString().equals(ABYSS_KEY)) return;
             WorldRules w = get();
             if (!(event.getEntity() instanceof ServerPlayer p)) {
@@ -337,6 +413,18 @@ public final class WorldRules {
     public static void onBreak(BlockEvent.BreakEvent event) {
         try {
             ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(event.getState().getBlock());
+            if (rl != null && rl.toString().equals(ANVIL_KEY) && get().anvilOpOnly) { // 강화 모루도 운영자(크리에이티브)만 치운다
+                if (event.getPlayer() instanceof ServerPlayer p && p.isCreative() && p.hasPermissions(2)) {
+                    WorldRules w = get();
+                    if (w.anvilSet && anvilAllowed(p.level(), event.getPos())) {
+                        w.anvilSet = false;
+                        save(w);
+                    }
+                    return;
+                }
+                event.setCanceled(true);
+                return;
+            }
             if (rl == null || !rl.toString().equals(ALTAR_KEY) || !get().altarOpOnly) return;
             if (event.getPlayer() instanceof ServerPlayer p && p.isCreative() && p.hasPermissions(2)) {
                 WorldRules w = get();
@@ -359,6 +447,40 @@ public final class WorldRules {
             if (refusePortal(p)) event.setCanceled(true);
         } catch (Throwable ignored) {
         }
+    }
+
+    @SubscribeEvent
+    public static void onAnvilCommands(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("rtshop").then(Commands.literal("anvil").requires(s -> s.hasPermission(2))
+                .executes(ctx -> {
+                    WorldRules w = get();
+                    ctx.getSource().sendSuccess(() -> Component.literal(w.anvilSet
+                            ? "강화 모루: " + w.anvilDim + " " + w.anvilX + " " + w.anvilY + " " + w.anvilZ + " (이 모루만 쓸 수 있음)"
+                            : "강화 모루가 아직 정해지지 않았습니다. 모루 곁에서 /rtshop anvil here (정하기 전에는 어느 모루든 열립니다)"), false);
+                    return 1;
+                })
+                .then(Commands.literal("here").executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    BlockPos found = null;
+                    for (BlockPos b : BlockPos.betweenClosed(p.blockPosition().offset(-5, -3, -5), p.blockPosition().offset(5, 3, 5))) {
+                        ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(p.level().getBlockState(b).getBlock());
+                        if (rl != null && rl.toString().equals(ANVIL_KEY) && (found == null || b.distSqr(p.blockPosition()) < found.distSqr(p.blockPosition()))) found = b.immutable();
+                    }
+                    if (found == null) {
+                        ctx.getSource().sendFailure(Component.literal("5칸 안에 강화 모루가 없습니다. 모루 곁에서 다시 입력하세요."));
+                        return 0;
+                    }
+                    setAnvil(p.level(), found);
+                    ctx.getSource().sendSuccess(() -> Component.literal("이 모루를 단 하나뿐인 강화 모루로 정했습니다. 다른 모루는 쓸 수 없습니다.").withStyle(ChatFormatting.GREEN), true);
+                    return 1;
+                }))
+                .then(Commands.literal("clear").executes(ctx -> {
+                    WorldRules w = get();
+                    w.anvilSet = false;
+                    save(w);
+                    ctx.getSource().sendSuccess(() -> Component.literal("모루 지정을 풀었습니다. 지금은 어느 강화 모루든 쓸 수 있습니다."), true);
+                    return 1;
+                }))));
     }
 
     @SubscribeEvent

@@ -1860,6 +1860,15 @@ public final class SelfTest {
                 onlyTickets && com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6 && gm.getSlot(1).getItem().getCount() == 1
                         && com.rtshop.enhance.Enhance.activeGuard(a) == 0, onlyTickets + " " + com.rtshop.enhance.Enhance.level(gm.getCarried()) + " " + gm.getSlot(1).getItem().getCount());
         gm.getSlot(1).set(ItemStack.EMPTY);
+        // 강화 모루는 마을에 하나뿐: 정해 둔 모루만 열린다
+        com.rtshop.rules.WorldRules.setAnvil(level, pos.above(30));
+        boolean otherRefused = level.getBlockState(pos).getMenuProvider(level, pos).createMenu(7, a.getInventory(), a) == null;
+        com.rtshop.rules.WorldRules.setAnvil(level, pos);
+        boolean theOneOpens = level.getBlockState(pos).getMenuProvider(level, pos).createMenu(7, a.getInventory(), a) != null;
+        com.rtshop.rules.WorldRules.clearAnvil();
+        check("only the one enhance anvil of the town opens once it is set (any anvil opens while none is set)",
+                otherRefused && theOneOpens && com.rtshop.rules.WorldRules.anvilAllowed(level, pos.above(30)), otherRefused + " / " + theOneOpens);
+        a.containerMenu = gm;
         // 전설 이상의 장비는 파괴되지 않는다: 파괴가 나올 자리의 굴림이 유지·손상으로 바뀐다
         gm.setCarried(ItemStack.EMPTY);
         ItemStack legend = g6.copy();
