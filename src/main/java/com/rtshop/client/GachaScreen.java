@@ -688,6 +688,7 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
             return;
         }
         int n = results.size();
+        if (n == 0) return; // 보여 줄 카드가 없다 (연출만 미리 본 경우): 0 으로 나누지 않게
         int cols = Math.min(5, n);
         int rows = (n + cols - 1) / cols;
         int cw = 74;
