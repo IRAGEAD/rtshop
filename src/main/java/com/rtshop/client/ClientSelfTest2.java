@@ -42,6 +42,7 @@ final class ClientSelfTest2 {
     private static volatile int farmA = -1, farmB = -1;
     private static volatile int dishIdx = -1;
     private static volatile String lifeJob = "";
+    static volatile String permResult = "";
 
     static int count() {
         return STEPS.size();
@@ -1186,6 +1187,31 @@ final class ClientSelfTest2 {
             mc.setScreen(null);
             NoticeHud.clearForTest();
             waitTicks(5);
+        });
+        // 운영자 기능은 크리에이티브일 때만: 서바이벌의 OP 는 OP 전용 명령어도 편집 창도 쓸 수 없다 (/gamemode 는 남는다)
+        add(mc -> {
+            permResult = "";
+            onServer(mc, sp -> {
+                com.rtshop.util.Perm.enforceForTest = true;
+                try {
+                    net.minecraft.world.level.GameType was = sp.gameMode.getGameModeForPlayer();
+                    sp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                    boolean locked = com.rtshop.util.Perm.lockedOp(sp) && !com.rtshop.util.Perm.op(sp);
+                    boolean timeOnly = com.rtshop.util.Perm.opOnly(sp, "time set day"), balanceFree = !com.rtshop.util.Perm.opOnly(sp, "rtshop balance");
+                    sp.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+                    boolean open = com.rtshop.util.Perm.op(sp) && !com.rtshop.util.Perm.lockedOp(sp);
+                    sp.setGameMode(was);
+                    permResult = sp.hasPermissions(2) ? locked + "/" + timeOnly + "/" + balanceFree + "/" + open : "not-op";
+                } finally {
+                    com.rtshop.util.Perm.enforceForTest = false;
+                }
+            });
+            waitTicks(10);
+        });
+        add(mc -> {
+            check("an operator in survival is locked out of operator features (operator-only commands are told apart from ordinary ones), in creative they are back",
+                    permResult.equals("true/true/true/true") || permResult.equals("not-op"), permResult);
+            waitTicks(2);
         });
         // 직업 딱지: 가방 창 왼쪽의 [직업] 에 마우스를 올리면 전투·생활 직업의 패시브가 보인다
         add(mc -> {
