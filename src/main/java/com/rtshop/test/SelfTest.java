@@ -2483,6 +2483,12 @@ public final class SelfTest {
                 check("mod pack: common materials a boss also drops (arcane essence) and the gear made from them are not boss items",
                         essence != null && !com.rtshop.rules.ItemPolicy.bossItem(essence) && robe != null && !com.rtshop.rules.ItemPolicy.bossItem(robe) && irons <= 30,
                         irons + " irons_spellbooks boss items");
+                net.minecraft.world.item.Item wander = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation("irons_spellbooks", "wandering_magician_chestplate"));
+                net.minecraft.world.item.Item graybeard = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation("irons_spellbooks", "graybeard_staff"));
+                check("3.64.2 the Wandering Magician armour is armour, not a staff (its class name has 'wand' in 'wandering'), while a real staff still is",
+                        wander != null && wander != net.minecraft.world.item.Items.AIR && !com.rtshop.rules.ItemPolicy.staff(wander)
+                                && (graybeard == null || graybeard == net.minecraft.world.item.Items.AIR || com.rtshop.rules.ItemPolicy.staff(graybeard)),
+                        wander + " " + graybeard);
             }
             info("item policy: " + com.rtshop.rules.ItemPolicy.bossCountForTest() + " boss items, " + com.rtshop.rules.ItemPolicy.listedCountForTest() + " listed gear, wom listed " + womListed
                     + ", recipes blocked: mod " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("mod") + " ban " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("ban")

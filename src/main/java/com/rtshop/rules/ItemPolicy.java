@@ -445,11 +445,13 @@ public final class ItemPolicy {
         if (hit != null) return hit;
         boolean g = false;
         try {
-            if (!(item instanceof BlockItem) && !item.isEdible() && new ItemStack(item).getMaxStackSize() == 1) {
+            // 갑옷은 지팡이가 아니다 (3.64.2: Iron's Spells 의 '떠돌이 마법사(Wandering Magician)' 갑옷이 갈래 이름의 "wand" 에 걸려
+            // 지팡이로 잡혀서, 조합법이 막히고 지팡이 값으로 상점에 올라 있었다)
+            if (!(item instanceof BlockItem) && !(item instanceof net.minecraft.world.item.ArmorItem) && !item.isEdible() && new ItemStack(item).getMaxStackSize() == 1) {
                 g = word(item, s.c.staffWords);
                 for (Class<?> k = item.getClass(); !g && k != null && k != Item.class; k = k.getSuperclass()) {
                     String n = k.getSimpleName().toLowerCase(Locale.ROOT);
-                    g = n.contains("staff") || n.contains("wand");
+                    g = n.contains("staff") || n.contains("wand") && !n.contains("wander");
                 }
             }
         } catch (Throwable ignored) {
