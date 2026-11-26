@@ -1361,6 +1361,13 @@ public final class ShopLoader {
             if (n.value() > 0 && n.cheapest() > 0 && n.value() > n.cheapest() * 1.3) {
                 out.add(String.format(Locale.ROOT, "%s | 매입가 %.1f | 싼 조리법 재료비 %.1f | 비싼 조리법 재료비 %.1f (%s)",
                         id, p.sellUnit, n.cheapest(), n.value(), n.by() == null ? "" : n.by().type));
+                // 조리법마다의 재료비와 재료 (어느 조리법이 싸고 비싼지 보고 고칠 수 있게)
+                List<RecipeCost> detail = new ArrayList<>(n.costs());
+                detail.sort((x, y) -> Double.compare(x.cost(), y.cost()));
+                for (RecipeCost rc : detail) {
+                    out.add(String.format(Locale.ROOT, "    · %s [%s] 재료비 %.1f : %s", rc.recipe().id, rc.recipe().type, rc.cost(),
+                            String.join(", ", new java.util.TreeSet<>(rc.items()))));
+                }
             }
             for (RecipeSolver.Recipe r : n.skipped()) {
                 out.add(String.format(Locale.ROOT, "%s | 보호 안 함: %s [%s] (상점 재료를 화로에 바로 넣어 더 싸게 만들 수 있음)", id, r.id, r.type));
@@ -1841,7 +1848,7 @@ public final class ShopLoader {
         for (String line : spread) {
             audit.append(line).append('\n');
         }
-        audit.append("재료비 차이가 큰 음식: ").append(spread.size()).append("종\n");
+        audit.append("재료비 차이가 큰 음식: ").append(spread.stream().filter(l -> l.contains("| 매입가 ")).count()).append("종\n");
         // 요리 재료로 쓰이는데 상점에서 사는 것보다 직접 만드는 편이 싼 품목: 사서 쓰면 차액만큼 손해를 본다
         audit.append("\n# 요리 재료 중 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)\n");
         audit.append("# 음식값은 가장 싼 방법 기준으로 매겨지므로, 아래 품목을 상점에서 사서 재료로 쓰면 차액만큼 손해입니다.\n");
