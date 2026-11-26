@@ -370,6 +370,25 @@
   - 손대지 않은 것: Cinematic Interactions 가 없을 때 뜨는 2D 마법 뽑기 창의 구슬 그림(`MagicGachaScreen`, 모드팩에서는 쓰이지 않음)은 예전 푸른 그림 그대로.
 - 자체 점검: 화면 "3.64.1 the rune altar orb is moonlight silver by default …"(옛 파일 옮기기 포함), 모드팩 전체의 "3.64 the rune altar has a glowing orb …" 의 기본 색 조건을 ice 로.
 
+## 3.65.0 (2026-11-27 아침, 가지 v5-next17)
+
+요청 (06:45): "C, M, D, I, K를 해결하고, 다른 문제가 더 있진 않은지 확인해줘." (밸런스 검토 `docs/balance_review.md` 의 제안 기호)
+
+- N-1. **C 원거리 · 마법 무기 강화** ✔: `Enhance.Kind` 에 RANGED(활 · 쇠뇌 · 총) · MAGIC(지팡이 · 완드)를 더함. 근접 무기와 같은 표(weaponBonus, +7 = 28%, +11 = 62%)로
+  쏜 것(화살 · 총알)과 주문의 피해가 오른다 (`EnhanceRanged`: 쏜 것이 세상에 나올 때 쏜 사람이 든 원거리 무기의 단계를 적어 두고, 맞힐 때 그만큼 키움. 주문 피해는 든 지팡이 · 완드의 단계).
+  - 판별(설정 없이 서버 · 클라이언트 같게): RANGED = 발사 무기(BowItem · CrossbowItem 계열) + TaCZ 의 총 + 갈래 이름이 …Gun. MAGIC = 이름이나 갈래가 지팡이 · 완드이면서 **주문력 속성**이 붙은 것
+    (Weapons of Miracles 의 전투용 봉 · Create 의 대칭 지팡이는 마법 무기가 아님). 강화 정보 창 · 설명 문구 · 안내서(7판) · 모루 설명.
+- N-2. **M 터무니없는 장비 막기** ✔: `ItemPolicy.extreme` = 공격력 25 이상 또는 갑옷 한 조각 방어력 20 이상 (item_policy.json 의 extremeAttack / extremeArmor, 모드팩의 다른 장비는 17 / 13 이 최고).
+  전리품(보스 · lootAllow 보다 먼저) · 몹과 보스의 드롭(MobRules) · 조합법(결과를 알려 주지 않는 모드 전용 조합법도 필드에서 결과를 찾아서, `RecipeRules.hiddenOutput`)에서 뺀다.
+  마지막 그물 `ExtremeGuard`: 땅에서 줍지 못하고, 서바이벌 플레이어의 가방은 5초마다 살펴 치운다(알림 rtshop.rules.extreme_removed). 창작 · 관전은 그대로.
+- N-3. **D 완드 값** ✔: 어느 상점도 팔지 않던 지팡이로 올린 품목(listStaffs)을 장비로 보고, 레시피 원가를 알면 그 값의 2배로 다시 매긴다 (`Price.staffFallback`). 전에는 공격력이 낮은 완드가 장비로 잡히지 않아 모두 6,000 G.
+- N-4. **I 희귀 재료 값** ✔: pricing.json 의 `ingredientValues` (네더의 별 20,000 · 겉날개 15,000 · 불사의 토템 3,000 · 메아리 조각 600 · 드래곤 숨결 300 … 모드 보스 재료 포함, 레시피 원가에만 쓰고 상점에는 안 오름).
+  광석의 돌 변형(Spelunkery 의 안산암 철광석 등)은 같은 바닐라 광석의 값.
+- N-5. **K 상점가 이상** ✔: 플레이어가 직접 만들 수 있고(조합법이 막히지 않음) 가격표에 있는 재료만으로 만드는 물건인데 상점가가 만드는 값의 6배를 넘으면 2배로 내린다 (나무 삽 205 → 7 G, 벽돌 10 → 2 G 등).
+  가격 점검의 메모에 내린 품목이 적힌다 ("만들면 훨씬 싼데 비싸게 팔던 품목").
+- N-6. 추가 점검에서 찾아 고친 것: Spelunkery 의 돌 변형 광석은 팔 곳이 없었다(바닐라 광석은 매입) → 같은 상점 · 같은 값의 매입 품목으로 (`ShopLoader.addOreVariants`).
+- N-7. 추가 점검 도구: `diag.txt` 에 `== money loops`(같은 물건 사고팔기 · 상점 재료로 만들어 팔기), `== gacha items you can also buy in a shop`, `== enhance ranged / magic`, Arcane Vortex 전용 조합법의 숨은 결과.
+
 ## 3.64.2 (2026-11-27 새벽, 가지 v5-next16)
 
 요청 (01:39): "룬 제단 가운데의 구슬의 빛 번짐 효과가 다른 디자인을 가리지 않도록 하고, 강화 모루의 빛이 들어오지 않는 문제를 해결해줘.(photon shader 기준)"

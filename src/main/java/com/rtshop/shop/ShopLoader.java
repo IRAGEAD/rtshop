@@ -89,6 +89,8 @@ public final class ShopLoader {
         public boolean gear;
         /** 3.65.0: 어느 상점도 팔지 않던 지팡이로 올린 품목 (값은 임시 고정가: 레시피 원가를 알면 그것으로 바꾼다). */
         public boolean staffFallback;
+        /** 상점 파일에 값을 직접 적은 품목 (관리자가 정한 값: "만들면 훨씬 싼데 비싸게 파는" 규칙으로 내리지 않는다). */
+        public boolean explicitPrice;
         public String basis = "";
         public double cost = -1;
         /** 매입가를 계산한 조리법의 재료(가장 싼 것 기준)와 1회 생산량. */
@@ -199,7 +201,8 @@ public final class ShopLoader {
 
     /** 기본값이 바뀐 품목: "상점:품목=옛값>새값@판". 설치된 파일의 값이 옛 기본값 그대로일 때만 새 값으로 고친다 (한 번만). */
     public static final String[] REPRICED = {"general:rtshop:return_ticket=1500>5000@1", "general:rtshop:return_ticket_plus=12000>30000@1",
-            "general:rtshop:return_ticket=5000>10000@2"};   // 3.55: 일반 귀환권 5,000 → 10,000 G (위의 @1 다음에 차례로 적용된다)
+            "general:rtshop:return_ticket=5000>10000@2",   // 3.55: 일반 귀환권 5,000 → 10,000 G (위의 @1 다음에 차례로 적용된다)
+            "general:minecraft:bricks=10>2@1"};            // 3.65.0: 벽돌은 만들면 1~4 G
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");
@@ -871,10 +874,10 @@ public final class ShopLoader {
                     + String.join(", ", zeroCost.subList(0, Math.min(20, zeroCost.size()))));
         }
         // 3.65.0: 플레이어가 직접 만들 수 있는 물건(가격표에 있는 재료만으로)인데 상점가가 만드는 값의 6배를 넘으면, 만드는 값의 2배로 내린다
-        // (나무 삽 205 G · 벽돌 10 G 처럼 만들면 몇 G 인 것을 비싸게 파는 일). 앵커 · 음식 · 지팡이 임시가 · 막힌 조합법은 그대로.
+        // (나무 삽 205 G 처럼 만들면 몇 G 인 것을 공식 가격으로 비싸게 팔던 일). 앵커 · 음식 · 지팡이 임시가 · 막힌 조합법 · 상점 파일에 직접 적은 값은 그대로.
         List<String> lowered = new ArrayList<>();
         for (Price p : prices.values()) {
-            if (!isPlain(p.stack) || !p.buyableSomewhere || p.dynamicFood || p.staffFallback || p.stack.isEdible()) {
+            if (!isPlain(p.stack) || !p.buyableSomewhere || p.dynamicFood || p.staffFallback || p.explicitPrice || p.stack.isEdible()) {
                 continue;
             }
             String id = itemId(p.stack);
@@ -883,7 +886,7 @@ public final class ShopLoader {
                 continue;
             }
             int fair = buyPrice(c, 1.0 / ratio);
-            if (p.price <= fair * 3 || p.price - fair < 10) {
+            if (p.price <= fair * 3 || p.price - fair < 5) {
                 continue;
             }
             String recipe = String.valueOf(res.costRecipe.get(id));
@@ -1771,6 +1774,7 @@ public final class ShopLoader {
                     p = new Price();
                     p.stack = stack;
                     p.price = price;
+                    p.explicitPrice = o.has("price");
                     if (o.has("sellPrice") && !o.get("sellPrice").isJsonNull()) {
                         p.sellUnit = Math.max(0, o.get("sellPrice").getAsDouble());
                         p.fixedSell = true;
