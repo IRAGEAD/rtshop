@@ -220,6 +220,24 @@ jobs:
             done) > /tmp/inspect/diorama-radar.txt 2>&1
             (cd /tmp/dj && javap -p dev/diorama/MinimapHud.class 2>&1 | head -n 200) >> /tmp/inspect/diorama-radar.txt 2>&1
           fi
+      - name: Inspect Cinematic Cataclysm
+        run: |
+          mkdir -p /tmp/inspect
+          # 보스 컷신 모드: 컷신 엔티티가 무엇을 하고(카메라·보스 소환), 어디서 불리는지, 글(언어 파일)은 무엇인지 — 기억의 문 안에서 그 컷신을 틀려고
+          CC="$(ls packcache/*.jar | grep -i "cinematiccataclysm" | head -1)"
+          if [ -n "$CC" ]; then
+            mkdir -p /tmp/ccj && (cd /tmp/ccj && unzip -q -o "$GITHUB_WORKSPACE/$CC")
+            {
+              echo "######## files"; (cd /tmp/ccj && find . -type f | grep -v "\.png$\|\.ogg$" | sort | head -n 400)
+              echo "######## sizes"; (cd /tmp/ccj && find . -name '*.ogg' -o -name '*.png' | wc -l)
+              echo "######## mods.toml"; cat /tmp/ccj/META-INF/mods.toml 2>/dev/null | head -n 60
+              for f in $(cd /tmp/ccj && find assets -path '*lang*' -name '*.json'); do echo "######## $f"; cat "/tmp/ccj/$f"; echo; done
+              for f in $(cd /tmp/ccj && find assets -name 'sounds.json'); do echo "######## $f"; head -c 3000 "/tmp/ccj/$f"; echo; done
+              for f in $(cd /tmp/ccj && find data -name '*.json' | head -n 40); do echo "######## $f"; head -c 1200 "/tmp/ccj/$f"; echo; done
+            } > /tmp/inspect/cincat-files.txt 2>&1
+            (cd /tmp/ccj && for c in $(find . -name '*.class' | sort); do echo "######## $c"; javap -p "$c" 2>&1 | head -n 120; done) > /tmp/inspect/cincat-sigs.txt 2>&1
+            (cd /tmp/ccj && for c in $(find . -name '*.class' | grep -v '\$[0-9]' | sort); do echo "######## $c"; javap -p -c "$c" 2>&1 | head -n 900; done) > /tmp/inspect/cincat-code.txt 2>&1
+          fi
       - name: Inspect cooking recipes
         run: |
           mkdir -p /tmp/inspect
