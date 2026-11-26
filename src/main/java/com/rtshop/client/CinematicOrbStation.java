@@ -552,6 +552,20 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         double clock = Scene.clock();
         double t = ritualTime();
         float appear = (float) Anim.outBack(Anim.clamp01(p), 1.6);
+        // 3.64: 가운데의 빛나는 구슬. 고리(혼천의) 한가운데에 떠서 숨 쉬듯 밝아지고, 분야를 고르거나 소환 문양에 손을 대면 더 밝아지며, 의식 동안에는 크게 부푼다.
+        // 받침 위의 구슬(ArcaneOrbRenderer)은 장면이 펼쳐지는 만큼 옅어지고 이 구슬이 그 자리를 잇는다.
+        {
+            float gl = (float) Math.min(2.0, glow);                       // 0.5 평소 · 0.65 분야를 고름 · 0.8~ 문양에 손을 댐 · ~1.9 의식
+            float br = ArcaneOrbRenderer.breath((float) (clock * 20.0));
+            double os = 0.105 * appear * (1.0 + 0.10 * (gl - 0.5) + 0.03 * br);
+            Vec3 toCam = cam.subtract(orb);
+            toCam = toCam.lengthSqr() < 1.0e-6 ? Vec3.ZERO : toCam.normalize();
+            double halo = os * (3.4 + 0.5 * br + 1.2 * (gl - 0.5));
+            quad(pose, buffers, camera, ArcaneOrbRenderer.tex("_halo"), orb, halo, halo, 0f, 1f, 1f, (float) (p * Math.min(1.0, 0.50 + 0.25 * br + 0.35 * (gl - 0.5))));
+            quad(pose, buffers, camera, ArcaneOrbRenderer.tex("_glow"), orb.add(toCam.scale(0.004)), os * 2.4, os * 2.4, 0f, 1f, 1f, (float) (p * Math.min(1.0, 0.65 + 0.15 * br + 0.30 * (gl - 0.5))));
+            quad(pose, buffers, camera, ArcaneOrbRenderer.tex(""), orb.add(toCam.scale(0.008)), os, os, 0f, 1f, 1f, (float) p);
+            ArcaneOrbRenderer.sceneOrbDrawnForTest++;
+        }
         // 룬석 다섯: 고르지 않은 룬석도 어두워지지 않는다. 고른 것은 조금 커지고 금빛 테가 푸른빛으로 바뀐다
         // (뒤에 덧그리던 빛무리는 셰이더·어두운 곳에서 검은 테로 보여서 없앴다)
         for (int i = 0; i < CATS.length; i++) {

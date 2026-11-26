@@ -4563,6 +4563,26 @@ public final class SelfTest {
                 }
             }
             check("every text in the bundled quest files has an English version (" + deepHas + "/" + deepAll + ")", deepAll > 1500 && deepHas == deepAll, deepMiss);
+            // 3.64: NPC 대사의 언어 — 두 언어를 나란히 적은 글({"ko","en"}: 직업 사범들 · 몇몇 이야기 주제)도 이야기 언어를 따른다.
+            // 영어로 하는 사람(지금 a)에게는 어떤 NPC 의 인사 · 일상 이야기 · 주제에도 한글이 남지 않아야 한다.
+            Object[] audEn364 = com.rtshop.story.Dialogue.languageAuditForTest(a);
+            @SuppressWarnings("unchecked") List<String> leftKo364 = (List<String>) audEn364[1];
+            com.google.gson.JsonObject master364 = com.rtshop.story.Dialogue.buildForTest(a, "quest_sword_master");
+            String greetEn364 = master364.get("greet").getAsString(), noNpcEn364 = com.rtshop.story.Dialogue.buildForTest(a, "quest_no_such_npc_364").get("greet").getAsString();
+            boolean langEn364 = "en".equals(com.rtshop.story.Loc.lang(a));
+            com.rtshop.story.StoryText.setLang(a, "ko_kr");
+            String greetKo364 = com.rtshop.story.Dialogue.buildForTest(a, "quest_sword_master").get("greet").getAsString();
+            String noNpcKo364 = com.rtshop.story.Dialogue.buildForTest(a, "quest_no_such_npc_364").get("greet").getAsString();
+            boolean langKo364 = "ko".equals(com.rtshop.story.Loc.lang(a));
+            com.rtshop.story.Loc.set(a, "en");
+            boolean oldCmd364 = com.rtshop.story.StoryText.en(a);
+            com.rtshop.story.StoryText.setLang(a, "en_us");
+            check("3.64 NPC talk follows the story language everywhere: an English player sees no Korean in any NPC's greeting, small talk or topic (the job masters and the two-language topics included), "
+                            + "a Korean player gets the original, the fallback greeting is the player's language and not the server's, and the old language command sets the same setting",
+                    (int) audEn364[0] > 400 && leftKo364.isEmpty() && langEn364 && langKo364 && oldCmd364
+                            && !greetEn364.isEmpty() && greetEn364.chars().noneMatch(c364 -> c364 >= 0xAC00 && c364 <= 0xD7A3) && greetKo364.chars().anyMatch(c364 -> c364 >= 0xAC00 && c364 <= 0xD7A3)
+                            && "What can I do for you?".equals(noNpcEn364) && "무슨 일이세요?".equals(noNpcKo364),
+                    audEn364[0] + " lines, korean left: " + (leftKo364.size() > 6 ? leftKo364.subList(0, 6) + " … " + leftKo364.size() : leftKo364) + " / " + greetEn364 + " / " + greetKo364 + " / " + noNpcEn364 + " / " + noNpcKo364);
             com.rtshop.story.StoryText.setLang(a, "ko_kr");
             String ko = com.rtshop.story.StoryText.t(a, q101.title);
             check("story language: English players get the English story, Korean players the original (and ids stay untouched)",

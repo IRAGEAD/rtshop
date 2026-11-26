@@ -1193,7 +1193,7 @@ public final class QuestManager {
         if (s != null && s.npcKey() != null) {
             sendDialog(p, s.npcKey());
         } else {
-            send(p, null, Component.translatable("rtshop.quest.journal").getString(), "", journalViews(p), true);
+            send(p, null, com.rtshop.story.StoryText.pick(p, "퀘스트 수첩", "Quest Journal"), "", journalViews(p), true);
         }
     }
 
@@ -1239,7 +1239,7 @@ public final class QuestManager {
 
     public static void openJournal(ServerPlayer p) {
         SESSIONS.put(p.getUUID(), new Session(null, -1));
-        send(p, null, Component.translatable("rtshop.quest.journal").getString(), "", journalViews(p), true);
+        send(p, null, com.rtshop.story.StoryText.pick(p, "퀘스트 수첩", "Quest Journal"), "", journalViews(p), true);
     }
 
     private static boolean sessionOk(ServerPlayer p, Session s) {

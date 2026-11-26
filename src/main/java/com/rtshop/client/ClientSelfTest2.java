@@ -854,6 +854,16 @@ final class ClientSelfTest2 {
             check("the place for gear on the altar is inside the view, and the bag is shown so gear can be picked up",
                     gi != null && gi[0] > 4 && gi[0] < sw - 4 && gi[1] > 4 && gi[1] < sh - 4 && st.inventoryShownForTest(),
                     gi == null ? "?" : (int) gi[0] + "," + (int) gi[1]);
+            // 3.64: 가운데의 빛나는 구슬 — 색마다 그림 셋이 있고, 장면 속에서 실제로 그려진다
+            StringBuilder orbMissing = new StringBuilder();
+            for (String oc : ArcaneOrbRenderer.COLORS) {
+                for (String part : new String[]{"", "_glow", "_halo"}) {
+                    if (mc.getResourceManager().getResource(new net.minecraft.resources.ResourceLocation("rtshop", "textures/entity/orb/" + oc + part + ".png")).isEmpty()) orbMissing.append(oc).append(part).append(' ');
+                }
+            }
+            check("3.64 the rune altar has a glowing orb at its centre: every colour has its three pictures, the default is blue, and the scene really draws it",
+                    orbMissing.length() == 0 && ArcaneOrbRenderer.COLORS.size() == 6 && ArcaneOrbRenderer.color().equals("blue") && ArcaneOrbRenderer.sceneOrbDrawnForTest > 0,
+                    orbMissing + "scene=" + ArcaneOrbRenderer.sceneOrbDrawnForTest + " block=" + ArcaneOrbRenderer.orbDrawnForTest + " " + ArcaneOrbRenderer.color());
             shot(mc, "123b_orb_scene");
             if (st != null) st.chooseForTest(0);
             waitTicks(14);

@@ -63,6 +63,8 @@ public final class ClientConfig {
     public boolean oneBossMusic = true;
     /** RT Shop NPC 의 이름표를 이 거리(칸) 안에서만 그린다 (3.64, 프레임). 0 이면 예전처럼 멀리서도(64칸) 그린다. */
     public int npcNameDistance = 16;
+    /** 룬 제단 가운데의 빛나는 구슬의 색 (3.64): blue(별빛 푸른색) · ice(달빛 은백) · gold(황금빛) · violet(자수정 보라) · jade(비취 청록) · rose(장미빛). */
+    public String altarOrbColor = "blue";
 
     // PvP 상태 표시 (켜짐/꺼짐 + 지금 있는 곳). 위치·크기는 화면 비율.
     public static final double PDEF_W = 247.0 / 1920.0;
@@ -229,6 +231,7 @@ public final class ClientConfig {
             o.addProperty("npcLooks", npcLooks);
             o.addProperty("oneBossMusic", oneBossMusic);
             o.addProperty("npcNameDistance", npcNameDistance);
+            o.addProperty("altarOrbColor", altarOrbColor);
             o.addProperty("magicFont", magicFont);
             o.addProperty("enhanceLuxFont", enhanceLuxFont);
             o.addProperty("magicScale", magicScale);
@@ -297,6 +300,7 @@ public final class ClientConfig {
                 if (o.has("bossCamera")) c.bossCamera = o.get("bossCamera").getAsBoolean();
                 if (o.has("npcLooks")) c.npcLooks = o.get("npcLooks").getAsBoolean();
                 if (o.has("oneBossMusic")) c.oneBossMusic = o.get("oneBossMusic").getAsBoolean();
+                if (o.has("altarOrbColor")) c.altarOrbColor = o.get("altarOrbColor").getAsString().trim().toLowerCase(java.util.Locale.ROOT);
                 if (o.has("npcNameDistance")) c.npcNameDistance = Math.max(0, Math.min(64, o.get("npcNameDistance").getAsInt()));
                 if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
                 if (o.has("magicFont")) c.magicFont = o.get("magicFont").getAsString();

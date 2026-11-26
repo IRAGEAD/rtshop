@@ -356,3 +356,49 @@ def spot_sheet():
     return im.resize((256, 32), Image.LANCZOS)
 save(spot_sheet(), 'gui/spots.png')
 print('spots ok')
+
+
+# ---------------------------------------------------------------- 3.64: 룬 제단 가운데의 빛나는 구슬 (색을 고를 수 있게 색마다 한 벌)
+# 색 이름 → (깊은 색, 몸통 색, 가장자리 빛, 빛무리 색). 이름은 client/ArcaneOrbRenderer.COLORS 와 같아야 한다.
+ORB_COLORS = {
+    'blue':   ((36, 78, 226), (78, 136, 255), (176, 232, 255), (120, 200, 255)),   # 별빛 푸른색 (기본)
+    'ice':    ((136, 180, 232), (196, 222, 250), (255, 255, 255), (214, 236, 255)), # 달빛 은백
+    'gold':   ((226, 140, 24), (250, 194, 76), (255, 244, 190), (255, 212, 116)),   # 황금빛
+    'violet': ((112, 44, 206), (158, 94, 245), (232, 190, 255), (196, 140, 255)),   # 자수정 보라
+    'jade':   ((12, 142, 134), (56, 202, 178), (190, 255, 236), (110, 240, 210)),   # 비취 청록
+    'rose':   ((206, 44, 104), (245, 102, 150), (255, 204, 220), (255, 140, 180)),  # 장미빛
+}
+
+def orb_lit(N, deep, body, rim_light):
+    """속에서 빛이 나는 구슬: 가운데는 환하고, 그 둘레가 가장 짙고, 가장자리에는 다시 빛이 감돈다. 왼쪽 위에 반짝임. 어두운(검은) 빛깔은 쓰지 않는다."""
+    im = Image.new('RGBA', (N, N)); px = im.load(); h = (N - 1) / 2
+    for y in range(N):
+        for x in range(N):
+            dx, dy = (x - h) / h, (y - h) / h
+            r = math.hypot(dx, dy)
+            if r > 1:
+                continue
+            core = max(0.0, 1 - r / 0.50) ** 1.4                 # 가운데의 환한 빛
+            c = [body[i] + (deep[i] - body[i]) * min(1.0, max(0.0, (r - 0.15) / 0.45)) for i in range(3)]
+            c = [c[i] + (255 - c[i]) * core * 0.80 for i in range(3)]
+            rim = max(0.0, (r - 0.58) / 0.42) ** 1.5             # 가장자리에 감도는 빛
+            c = [c[i] + (rim_light[i] - c[i]) * rim * 0.90 for i in range(3)]
+            hl = max(0, 1 - math.hypot(dx + 0.36, dy + 0.38) * 2.6) ** 1.2
+            c = [min(255, c[i] + (255 - c[i]) * hl * 0.95) for i in range(3)]
+            a = 255 if r < 0.94 else int(255 * (1 - (r - 0.94) / 0.06))
+            px[x, y] = (int(c[0]), int(c[1]), int(c[2]), a)
+    return im
+
+def orb_halo(N, color, peak, power):
+    """빛무리: 빛깔은 어디서나 같고 투명도만 바깥으로 옅어진다 (어두운 빛깔이 섞이면 셰이더·어두운 곳에서 검은 테로 보인다)."""
+    im = Image.new('RGBA', (N, N)); px = im.load(); h = (N - 1) / 2
+    for y in range(N):
+        for x in range(N):
+            r = math.hypot((x - h) / h, (y - h) / h)
+            px[x, y] = (*color, int(peak * (1 - r) ** power) if r < 1 else 0)
+    return im
+
+for _name, (_deep, _body, _rim, _glow) in ORB_COLORS.items():
+    save(orb_lit(64, _deep, _body, _rim), 'entity/orb/%s.png' % _name)
+    save(orb_halo(64, _glow, 205, 2.0), 'entity/orb/%s_glow.png' % _name)     # 구슬 바로 둘레의 짙은 빛
+    save(orb_halo(64, _glow, 120, 1.35), 'entity/orb/%s_halo.png' % _name)    # 넓게 퍼지는 옅은 빛 (숨 쉬듯 커졌다 작아진다)

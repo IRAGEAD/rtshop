@@ -22,9 +22,27 @@ import org.joml.Matrix4f;
  * 플레이어가 제단을 쓰면 구슬이 밝아지고 고리가 빨라진다.
  */
 public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEntity> {
-    static final ResourceLocation ORB = new ResourceLocation(RtShop.MODID, "textures/entity/arcane_orb.png");
-    static final ResourceLocation GLOW = new ResourceLocation(RtShop.MODID, "textures/entity/arcane_glow.png");
     static final ResourceLocation WHITE = new ResourceLocation(RtShop.MODID, "textures/entity/white.png");
+    /** 구슬의 색 (3.64): client.json 의 altarOrbColor. 그림은 tools/gen_magic_art.py 의 ORB_COLORS 가 색마다 한 벌(구슬 · 짙은 빛 · 옅은 빛무리)씩 만든다. */
+    public static final java.util.List<String> COLORS = java.util.List.of("blue", "ice", "gold", "violet", "jade", "rose");
+    private static final java.util.Map<String, ResourceLocation> TEX = new java.util.HashMap<>();
+    /** 점검용: 구슬을 그린 횟수 (받침 위의 구슬 / 장면 속의 구슬). */
+    public static long orbDrawnForTest, sceneOrbDrawnForTest;
+
+    public static String color() {
+        String c = ClientConfig.get().altarOrbColor;
+        return c != null && COLORS.contains(c) ? c : "blue";
+    }
+
+    /** part: "" 구슬 · "_glow" 구슬 둘레의 짙은 빛 · "_halo" 넓게 퍼지는 옅은 빛무리. */
+    public static ResourceLocation tex(String part) {
+        return TEX.computeIfAbsent(color() + part, k -> new ResourceLocation(RtShop.MODID, "textures/entity/orb/" + k + ".png"));
+    }
+
+    /** 숨 쉬듯 밝아졌다 어두워지는 정도 (0~1). */
+    public static float breath(float time) {
+        return 0.5F + 0.5F * Mth.sin(time * 0.07F);
+    }
     private static final int FULL_BRIGHT = 0xF000F0;
     private static final int SEGMENTS = 40;
     /** 고리 색: 금 · 밝은 금 · 은. */
@@ -65,27 +83,37 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
         band(ps, solid, 0.35F * shrink, 0.022F * shrink, 0.014F * shrink, SILVER);
         ps.popPose();
         // 둘레의 작은 별빛 (장면 동안에는 숨긴다)
+        // 3.64: 카메라를 보는 그림은 게임 카메라의 방향을 그대로 쓰고 앞뒤 두 면으로 그린다
+        // (전에는 그림의 앞면이 카메라 반대쪽을 향해서 구슬 · 빛무리 · 별빛이 하나도 보이지 않았다).
+        org.joml.Quaternionf face = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
         if (k < 0.5F) {
-            VertexConsumer glow = buf.getBuffer(RenderType.text(GLOW));
+            VertexConsumer glow = buf.getBuffer(RenderType.text(tex("_glow")));
             for (int i = 0; i < 4; i++) {
                 float a = time * 0.012F + i * 1.5708F;
                 float tw = 0.5F + 0.5F * Mth.sin(time * 0.11F + i * 2.3F);
                 ps.pushPose();
                 ps.translate(Mth.cos(a) * 0.52F, 0.16F * Mth.sin(time * 0.03F + i * 1.9F) + (i % 2 == 0 ? 0.22F : -0.05F), Mth.sin(a) * 0.52F);
-                ps.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+                ps.mulPose(face);
                 quad(ps, glow, 0.035F + 0.02F * tw, (0.35F + 0.65F * tw) * (1F - k * 2F));
                 ps.popPose();
             }
         }
-        // 구슬 (카메라를 본다)
-        ps.pushPose();
-        ps.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
-        float s = Mth.lerp(k, 0.20F, 0.12F) + flare * 0.03F * (1F - 0.5F * k);
-        // 구슬과 빛무리는 빛·그림자를 받지 않는 그림으로 그린다 (어두운 곳이나 셰이더에서 가장자리가 검게 보이지 않게)
-        quad(ps, buf.getBuffer(RenderType.text(GLOW)), s * 2.4F, 0.60F + flare * 0.40F);
-        ps.translate(0, 0, 0.01);
-        quad(ps, buf.getBuffer(RenderType.text(ORB)), s, 1F);
-        ps.popPose();
+        // 구슬 (카메라를 본다). Cinematic 장면이 펼쳐지면 장면 쪽(CinematicOrbStation)이 같은 구슬을 그리므로 여기서는 옅어진다.
+        float show = 1F - k;
+        if (show > 0.02F) {
+            ps.pushPose();
+            ps.mulPose(face);
+            float s = Mth.lerp(k, 0.20F, 0.12F) + flare * 0.03F * (1F - 0.5F * k);
+            float br = breath(time);
+            // 구슬과 빛무리는 빛·그림자를 받지 않는 그림으로 그린다 (어두운 곳이나 셰이더에서 가장자리가 검게 보이지 않게)
+            quad(ps, buf.getBuffer(RenderType.text(tex("_halo"))), s * (3.6F + 0.5F * br + flare), (0.55F + 0.30F * br + flare * 0.15F) * show);
+            ps.translate(0, 0, -0.004);
+            quad(ps, buf.getBuffer(RenderType.text(tex("_glow"))), s * 2.4F, (0.70F + 0.15F * br + flare * 0.15F) * show);
+            ps.translate(0, 0, -0.004);
+            quad(ps, buf.getBuffer(RenderType.text(tex(""))), s * (1F + 0.03F * br), show);
+            ps.popPose();
+            orbDrawnForTest++;
+        }
         ps.popPose();
     }
 
@@ -138,6 +166,11 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
         vertex(vc, m, n, half, -half, 1, 1, a);
         vertex(vc, m, n, half, half, 1, 0, a);
         vertex(vc, m, n, -half, half, 0, 0, a);
+        // 뒷면 (같은 네모를 반대 순서로): 어느 쪽에서 보아도 한 면은 앞이다
+        vertex(vc, m, n, -half, half, 0, 0, a);
+        vertex(vc, m, n, half, half, 1, 0, a);
+        vertex(vc, m, n, half, -half, 1, 1, a);
+        vertex(vc, m, n, -half, -half, 0, 1, a);
     }
 
     private static void vertex(VertexConsumer vc, Matrix4f m, Matrix3f n, float x, float y, float u, float v, int a) {

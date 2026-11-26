@@ -147,6 +147,44 @@ public final class Dialogue {
         return Loc.pick(p, e);
     }
 
+    private static boolean hangul(String s) {
+        for (int i = 0; i < s.length(); i++) if (s.charAt(i) >= 0xAC00 && s.charAt(i) <= 0xD7A3) return true;
+        return false;
+    }
+
+    private static void collect(ServerPlayer p, String where, JsonElement e, List<String> all, List<String> korean) {
+        if (e == null || e.isJsonNull()) return;
+        if (e.isJsonArray()) {
+            for (JsonElement x : e.getAsJsonArray()) collect(p, where, x, all, korean);
+            return;
+        }
+        if (e.isJsonObject() && e.getAsJsonObject().has("text")) e = e.getAsJsonObject().get("text");
+        String s = StoryText.t(p, text(p, e));
+        all.add(s);
+        if (hangul(s)) korean.add(where + ": " + (s.length() > 40 ? s.substring(0, 40) : s));
+    }
+
+    /**
+     * 점검용: 모든 NPC 의 인사 · 일상 이야기 · 흘리는 말 · 이야기 주제(조건과 상관없이 전부)를 이 플레이어의 언어로 풀어 본다.
+     * 돌려주는 것: {푼 글의 수, 한글이 남은 글의 목록}. 영어로 하는 사람에게는 목록이 비어야 한다.
+     */
+    public static Object[] languageAuditForTest(ServerPlayer p) {
+        List<String> all = new ArrayList<>(), korean = new ArrayList<>();
+        JsonObject npcs = get().has("npcs") ? get().getAsJsonObject("npcs") : new JsonObject();
+        for (Map.Entry<String, JsonElement> en : npcs.entrySet()) {
+            JsonObject n = en.getValue().getAsJsonObject();
+            for (String part : new String[]{"greet", "chatter", "hints"}) if (n.has(part)) collect(p, en.getKey() + " " + part, n.get(part), all, korean);
+            if (n.has("topics")) {
+                for (JsonElement t : n.getAsJsonArray("topics")) {
+                    JsonObject x = t.getAsJsonObject();
+                    collect(p, en.getKey() + " topic " + x.get("id").getAsString(), x.get("title"), all, korean);
+                    collect(p, en.getKey() + " topic " + x.get("id").getAsString(), x.get("lines"), all, korean);
+                }
+            }
+        }
+        return new Object[]{all.size(), korean};
+    }
+
     static JsonArray texts(ServerPlayer p, JsonArray in) {
         JsonArray out = new JsonArray();
         if (in != null) for (JsonElement e : in) out.add(text(p, e));
@@ -221,6 +259,10 @@ public final class Dialogue {
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, StoryText.json(p, out).toString()));
     }
 
+    public static JsonObject buildForTest(ServerPlayer p, String npcKey) {
+        return build(p, npcKey, -1);
+    }
+
     static JsonObject build(ServerPlayer p, String npcKey, int entityId) {
         JsonObject all = get();
         JsonObject npcs = all.has("npcs") ? all.getAsJsonObject("npcs") : new JsonObject();
@@ -237,7 +279,8 @@ public final class Dialogue {
             out.addProperty("mode", "talk");
         }
         String greet = greet(p, npcKey, n, scene == null);
-        if (greet.isEmpty()) greet = Component.translatable("rtshop.talk.default_greet").getString();
+        // 3.64: 서버가 제 언어로 풀어 보내던 글(서버의 언어는 플레이어의 언어와 다를 수 있다)을 그 사람의 이야기 언어로 고른다
+        if (greet.isEmpty()) greet = StoryText.pick(p, "무슨 일이세요?", "What can I do for you?");
         out.addProperty("greet", greet);
         JsonArray topics = new JsonArray();
         // 일상 이야기: 무작위 한 마디
@@ -251,7 +294,7 @@ public final class Dialogue {
             if (!pool.isEmpty()) {
                 JsonObject t = new JsonObject();
                 t.addProperty("id", "_chatter");
-                t.addProperty("title", Component.translatable("rtshop.talk.chatter").getString());
+                t.addProperty("title", StoryText.pick(p, "요즘 어떠세요?", "How are things?"));
                 JsonArray l = new JsonArray();
                 l.add(pool.get(RNG.nextInt(pool.size())));
                 t.add("lines", l);
