@@ -1310,6 +1310,18 @@ final class ClientSelfTest2 {
         add(mc -> {
             check("boss music: a track with no sound file plays nothing and breaks nothing",
                     BossMusicClient.playingForTest().isEmpty() && !BossMusicClient.has("no_such_track_for_test"), BossMusicClient.playingForTest());
+            // 3.63: 음악이 겹치지 않게 — 0 그대로 틀기 · 1 틀지 않기 · 2 틀고 먼저 흐르던 배경 음악 멈추기
+            String m363 = "" + BossMusicClient.decideForTest("cataclysm:ignis_music", "MUSIC", false, false, false, true)      // 첫 보스 음악: 틀고 배경은 멈춤
+                    + BossMusicClient.decideForTest("mowziesmobs:music.frostmaw_theme", "MUSIC", false, false, true, true)        // 보스 음악이 이미 흐름: 둘째는 틀지 않음
+                    + BossMusicClient.decideForTest("somemod:ambient_music.cave", "MUSIC", true, false, true, true)              // 보스 음악 중의 배경 음악: 틀지 않음
+                    + BossMusicClient.decideForTest("somemod:ambient_music.cave", "MUSIC", true, false, false, true)             // 평소의 배경 음악: 틀고 앞의 배경은 멈춤
+                    + BossMusicClient.decideForTest("cataclysm:ignis_music", "MUSIC", false, true, false, true)                  // 우리 곡이 흐름: 틀지 않음
+                    + BossMusicClient.decideForTest("cataclysm:ignis_music", "MUSIC", false, false, true, false)                 // 설정을 끔: 손대지 않음
+                    + BossMusicClient.decideForTest("cataclysm:music_disc_x", "RECORDS", true, false, true, true)                // 주크박스: 손대지 않음
+                    + BossMusicClient.decideForTest("minecraft:music.game", "MUSIC", true, false, true, true)                    // 게임 본래의 음악: 여기서는 손대지 않음 (음악 관리자를 쉬게 한다)
+                    + BossMusicClient.decideForTest("cataclysm:ignis_roar", "HOSTILE", false, false, true, true);                // 음악이 아닌 소리
+            check("3.63 boss music never overlaps: one boss theme at a time (the first one keeps playing), background music gives way to it, jukeboxes and ordinary sounds are left alone, and client.json can switch it off",
+                    m363.equals("211210000") && ClientConfig.get().oneBossMusic, m363);
             com.google.gson.JsonObject mo = new com.google.gson.JsonObject();
             mo.addProperty("track", "");
             BossMusicClient.receive(mo);

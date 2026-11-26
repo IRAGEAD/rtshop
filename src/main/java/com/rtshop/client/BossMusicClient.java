@@ -95,13 +95,104 @@ public final class BossMusicClient {
         Track t = new Track(track, id(track));
         t.step = step;
         current = t;
+        if (muteOthers) stopOthers(BACKGROUND); // 3.63: 우리 곡이 시작될 때 이미 흐르던 다른 모드의 보스 음악도 멈춘다 (전에는 새로 트는 것만 막았다)
         mc.getSoundManager().play(t);
+    }
+
+    // ------------------------------------------------------------------ 3.63: 음악이 겹치지 않게
+    /** 다른 모드가 트는 소리의 갈래: 음악 아님 / 배경 음악(게임의 음악 관리자가 트는 식의 평범한 소리) / 보스 음악(그 밖의 음악). */
+    static final int NOT_MUSIC = 0, BACKGROUND = 1, BOSS = 2;
+
+    private static final class Other {
+        final SoundInstance sound;
+        final int kind;
+        final long born;
+
+        Other(SoundInstance sound, int kind, long born) {
+            this.sound = sound;
+            this.kind = kind;
+            this.born = born;
+        }
+    }
+
+    /** 지금 흐르는 다른 모드의 음악들 (끝난 것은 틱마다 치운다). */
+    private static final java.util.List<Other> OTHERS = new java.util.ArrayList<>();
+    private static long ticks;
+    /** 점검용: 겹치지 않게 하려고 틀지 않은 음악 수 / 멈춘 음악 수. */
+    public static int deniedForTest, stoppedForTest;
+
+    /**
+     * 이 소리가 어떤 음악인가. 이름에 music · theme · bgm 이 든 다른 모드의 소리만 음악으로 본다.
+     * 주크박스(RECORDS)와 게임 본래의 소리, 우리 소리는 건드리지 않는다. plain = 게임의 음악 관리자가 쓰는 평범한 소리(SimpleSoundInstance)인가.
+     */
+    static int kindOf(ResourceLocation loc, SoundSource source, boolean plain) {
+        if (loc == null || source == SoundSource.RECORDS) return NOT_MUSIC;
+        if (loc.getNamespace().equals(RtShop.MODID) || loc.getNamespace().equals("minecraft")) return NOT_MUSIC;
+        String path = loc.getPath();
+        if (!path.contains("music") && !path.contains("theme") && !path.contains("bgm")) return NOT_MUSIC;
+        return plain && source == SoundSource.MUSIC ? BACKGROUND : BOSS;
+    }
+
+    /**
+     * 새로 틀려는 음악을 어떻게 할지: 0 = 그대로 튼다, 1 = 틀지 않는다, 2 = 틀고, 먼저 흐르던 배경 음악은 멈춘다.
+     * ours = 우리 보스 곡이 흐르는 중(그리고 다른 음악을 막기로 함), bossPlaying = 다른 모드의 보스 음악이 이미 흐르는 중, one = 한 번에 하나만(client.json 의 oneBossMusic).
+     * 보스 음악은 먼저 시작한 쪽이 이긴다: 나중 것을 틀고 먼저 것을 끄면, 틱마다 다시 틀려는 모드 둘이 서로를 끄며 번갈아 끊긴다.
+     */
+    static int decide(int kind, boolean ours, boolean bossPlaying, boolean one) {
+        if (kind == NOT_MUSIC) return 0;
+        if (ours) return 1;
+        if (!one) return 0;
+        return bossPlaying ? 1 : 2;
+    }
+
+    public static int decideForTest(String sound, String source, boolean plain, boolean ours, boolean bossPlaying, boolean one) {
+        return decide(kindOf(ResourceLocation.tryParse(sound), SoundSource.valueOf(source), plain), ours, bossPlaying, one);
+    }
+
+    private static void prune() {
+        Minecraft mc = Minecraft.getInstance();
+        OTHERS.removeIf(o -> ticks - o.born > 5 && !mc.getSoundManager().isActive(o.sound));
+    }
+
+    private static boolean otherBossPlaying(SoundInstance except) {
+        for (Other o : OTHERS) if (o.kind == BOSS && o.sound != except) return true;
+        return false;
+    }
+
+    /** 흐르고 있는 다른 모드의 음악 가운데 이 갈래 이상인 것을 멈춘다 (BACKGROUND = 전부, BOSS = 보스 음악만). */
+    private static void stopOthers(int least) {
+        Minecraft mc = Minecraft.getInstance();
+        for (Other o : new java.util.ArrayList<>(OTHERS)) {
+            if (o.kind < least) continue;
+            mc.getSoundManager().stop(o.sound);
+            OTHERS.remove(o);
+            stoppedForTest++;
+        }
+    }
+
+    private static void stopBackgrounds(SoundInstance except) {
+        Minecraft mc = Minecraft.getInstance();
+        for (Other o : new java.util.ArrayList<>(OTHERS)) {
+            if (o.kind != BACKGROUND || o.sound == except) continue;
+            mc.getSoundManager().stop(o.sound);
+            OTHERS.remove(o);
+            stoppedForTest++;
+        }
     }
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
+        ticks++;
+        if (!OTHERS.isEmpty()) {
+            if (mc.level == null) OTHERS.clear();
+            else {
+                prune();
+                // 다른 모드의 보스 음악이 흐르는 동안 게임의 배경 음악은 쉰다 (그 모드가 스스로 멈추지 않는 경우가 있다)
+                if (ClientConfig.get().oneBossMusic && otherBossPlaying(null)) mc.getMusicManager().stopPlaying();
+            }
+        }
         if (current == null) return;
         if (mc.level == null || mc.player == null || current.isStopped()) {
             if (mc.level == null) mc.getSoundManager().stop(current);
@@ -120,13 +211,42 @@ public final class BossMusicClient {
         }
     }
 
-    /** 우리 곡이 흐르는 동안에는 다른 모드의 보스 음악(이름에 music·theme 가 든 소리)을 틀지 않게 한다. */
+    /**
+     * 음악이 겹치지 않게 한다 (3.63).
+     * 우리 곡이 흐르는 동안에는 다른 모드의 음악을 틀지 않게 하고(예전부터), 우리 곡이 없을 때에도 다른 모드의 보스 음악은 한 번에 하나만 흐르게 한다:
+     * 보스 음악이 흐르는 중이면 새 음악(다른 보스 음악 · 배경 음악)은 틀지 않고, 보스 음악이 시작될 때 흐르던 배경 음악은 멈춘다.
+     */
     @SubscribeEvent
     public static void onOtherMusic(PlaySoundEvent e) {
-        if (!muteOthers || current == null || current.isStopped() || e.getSound() == null || e.getSound() == current) return;
-        ResourceLocation loc = e.getSound().getLocation();
-        if (loc.getNamespace().equals(RtShop.MODID) || loc.getNamespace().equals("minecraft")) return;
-        String path = loc.getPath();
-        if (path.contains("music") || path.contains("theme") || path.contains("bgm")) e.setSound(null);
+        SoundInstance snd = e.getSound();
+        if (snd == null || snd == current) return;
+        try {
+            boolean ours = muteOthers && current != null && !current.isStopped();
+            int kind = kindOf(snd.getLocation(), snd.getSource(), snd instanceof net.minecraft.client.resources.sounds.SimpleSoundInstance);
+            if (kind == NOT_MUSIC) {
+                // 예전 규칙 그대로: 우리 곡이 흐르는 동안에는 이름이 음악인 다른 모드의 소리를 (주크박스라도) 틀지 않는다
+                if (ours && snd.getLocation() != null && !snd.getLocation().getNamespace().equals(RtShop.MODID) && !snd.getLocation().getNamespace().equals("minecraft")) {
+                    String path = snd.getLocation().getPath();
+                    if (path.contains("music") || path.contains("theme") || path.contains("bgm")) e.setSound(null);
+                }
+                return;
+            }
+            prune();
+            for (Other o : OTHERS) if (o.sound == snd) return; // 이미 흐르는 것을 다시 튼 것
+            int what = decide(kind, ours, otherBossPlaying(snd), ClientConfig.get().oneBossMusic);
+            if (what == 1) {
+                e.setSound(null);
+                deniedForTest++;
+                return;
+            }
+            if (what == 2) {
+                stopBackgrounds(snd);
+                // 보스 음악이 시작되면 게임의 배경 음악도 멈춘다. (배경 음악 갈래일 때는 부르지 않는다: 음악 관리자가 지금 틀려는 것이 바로 그 소리일 수 있다)
+                if (kind == BOSS) Minecraft.getInstance().getMusicManager().stopPlaying();
+            }
+            OTHERS.add(new Other(snd, kind, ticks));
+        } catch (Throwable t) {
+            RtShop.LOGGER.debug("[rtshop] boss music guard", t);
+        }
     }
 }
