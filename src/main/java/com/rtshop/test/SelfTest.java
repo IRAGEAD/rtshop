@@ -3111,14 +3111,34 @@ public final class SelfTest {
                         && back.objectives.get(1).at.equals("minecraft:end_city") && back.companion != null
                         && back.companion.get("npc").getAsString().equals("t_comp"),
                 back == null ? "null" : back.toJson());
+        QuestDef qAgain = tempQuest("{\"id\":\"t_inspect_again\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"INSPECT\",\"target\":\"t_again\"}],\"reward\":{\"gold\":1}}");
+        QuestManager.loaded().quests.put(qAgain.id, qAgain);
+        boolean againTaken = QuestManager.accept(a, "t_inspect_again", "quest_guide");
+        com.rtshop.story.Spots.update(a);
+        com.rtshop.story.Spots.placeForTest(a, "t_again", a.blockPosition().offset(40, 0, 0));
+        boolean againGone = QuestManager.abandon(a, "t_inspect_again") && com.rtshop.story.Spots.placed(a, "t_again") == null;
+        boolean againBack = QuestManager.accept(a, "t_inspect_again", "quest_guide");
+        com.rtshop.story.Spots.update(a);
+        BlockPos againAt = com.rtshop.story.Spots.placed(a, "t_again");
+        check("giving a quest up clears its waiting trace; taking it again puts the trace next to the player anew",
+                againTaken && againGone && againBack && againAt != null && againAt.distSqr(a.blockPosition()) <= 20 * 20,
+                againTaken + " " + againGone + " " + againBack + " " + againAt);
+        QuestManager.abandon(a, "t_inspect_again");
+        QuestManager.loaded().quests.remove("t_inspect_again");
         check("inspect quest is accepted", QuestManager.accept(a, "t_inspect", "quest_guide"));
         check("two traces wait to be looked at", QuestManager.pendingInspects(a).size() == 2, QuestManager.pendingInspects(a).size());
         com.rtshop.story.Spots.update(a);
         BlockPos sp = com.rtshop.story.Spots.placed(a, "t_circle");
         check("a trace with no place appears next to the player right away; one tied to a structure waits until the player gets there",
                 sp != null && sp.distSqr(a.blockPosition()) <= 20 * 20 && com.rtshop.story.Spots.placed(a, "t_far") == null, sp);
+        check("the quest HUD points to a trace that is waiting to be looked at (so a player who walked off can find it again)",
+                sp != null && QuestManager.hudWhere(a, "t_inspect").equals(a.level().dimension().location() + ";" + sp.getX() + ";" + sp.getY() + ";" + sp.getZ()),
+                QuestManager.hudWhere(a, "t_inspect"));
         com.rtshop.story.Spots.placeForTest(a, "t_circle", a.blockPosition().offset(30, 0, 0));
         check("a trace can not be looked at from far away", !com.rtshop.story.Spots.done(a, "t_circle"));
+        check("the quest HUD follows the trace when it is somewhere else",
+                QuestManager.hudWhere(a, "t_inspect").equals(a.level().dimension().location() + ";" + (a.blockPosition().getX() + 30) + ";" + a.blockPosition().getY() + ";" + a.blockPosition().getZ()),
+                QuestManager.hudWhere(a, "t_inspect"));
         com.rtshop.story.Spots.placeForTest(a, "t_circle", a.blockPosition().offset(2, 0, 0));
         check("looking closer opens the text first (the goal is not filled yet)",
                 com.rtshop.story.Spots.look(a, "t_circle") && QuestManager.pendingInspects(a).size() == 2);

@@ -71,6 +71,15 @@ public final class Spots {
         s.remove(id + "@");
     }
 
+    /** 퀘스트를 포기하면 아직 살펴보지 않은 흔적의 자리를 잊는다: 다시 받으면 곁에 새로 나타난다 (갈 수 없는 곳에 놓였을 때의 되돌림). */
+    public static void forgetQuest(ServerPlayer p, QuestDef q) {
+        if (q == null) return;
+        for (QuestDef.Objective ob : q.objectives) {
+            if (ob.type == QuestDef.Type.INSPECT && store(p, false).contains(ob.target)) forget(p, ob.target);
+        }
+        update(p);
+    }
+
     private static boolean standable(ServerLevel level, BlockPos pos) {
         BlockState below = level.getBlockState(pos.below());
         return below.isFaceSturdy(level, pos.below(), net.minecraft.core.Direction.UP)

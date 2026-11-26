@@ -1,0 +1,13 @@
+# 안내서 3.57: 이야기 장소로 가는 법 · 흔적 살펴보기 · 기억의 문 (B-20)
+START = 750
+EN = [
+"Story places",
+"Story places come in three kinds. Each one opens only while you are on the quest that sends you there.\n\n· Traces: things to look at. A pillar of light and a ring on the ground that only you can see. (See 'Looking at traces'.)\n· The Memory Gate: the room where you fight a story boss. It is not a door you walk through; you enter with a button. (See 'The Memory Gate'.)\n· Far-off structures: hold the Survey Compass and right-click for the direction and distance. It only points to places that really exist, more than 1000 blocks from town.\n\nThe '➤ about N blocks to the …' line on the quest display is where the person or trace you should go to now is.\n\nA boss the story has not reached yet is behind a ward. If you are pushed back, do the quests before it first.",
+"place structure enter trace memory gate compass ward",
+"Looking at traces",
+"A goal such as 'take a look' means finding a trace and looking into it. The practice Memory Gate from your first lesson is a trace too.\n\n· When you take the quest, a notice says 'Something nearby is worth a closer look' and the trace appears 5 to 12 blocks away.\n· A trace that belongs to a structure appears when you reach that structure.\n· Traces that come in order appear after you have looked at the one before.\n· Walk to the pillar of light and look at it from within 4 blocks: 'Look closer' shows up. Right-click.\n· The goal is filled only when you turn the text to its end.\n· A trace stays where it first appeared. If you have wandered off, follow the '➤' on the quest display back to it.\n· If it landed somewhere you cannot reach, give the quest up and take it again: the trace appears next to you anew.\n· Nobody else can see it, and it cannot be broken or moved.\n\nWhat you have looked at stays in the field notebook: /rtshop notebook",
+"trace look inspect practice memory gate pillar notebook",
+"The Memory Gate",
+"Story bosses do not stand somewhere in the world. You fight them in a room set apart, beyond the Memory Gate.\n\n· You must be on the quest that asks you to defeat that boss.\n· To enter: in the quest journal (/rtshop quest) or in an NPC's quest talk, pick that quest and press the 'Memory Gate · Boss fight' button.\n· It works wherever you are. Party members near you (within 64 blocks) come along.\n· The boss awakens after a short wait. When it falls, its drops go to your bag and you return to where you were.\n· You do not lose Gold if you fall inside. Press the button again to retry.\n· Return tickets cannot be used inside.\n\nSome opponents are met without the Memory Gate. For those, go to the structure the quest names.",
+"memory gate boss fight enter boss party",
+]

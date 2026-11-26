@@ -1,0 +1,466 @@
+"""B-15 NPC 외형 시안: 주민 대신 인물마다 다른 모습을 그림으로 미리 본다 (보여 주기용. 게임 파일은 만들지 않는다).
+python3 tools/mock/npc_mock.py <out_dir>   →  npc_looks_1_methods.png · _2_story.png · _3_merchants.png · _4_masters.png
+치수는 마인크래프트 픽셀(사람 = 머리 8×8×8, 몸 8×12×4, 팔·다리 4×12×4). 한 픽셀을 U×U×U 로 쪼개 반 픽셀짜리 장식(겉옷 층)까지 그린다."""
+import math, os, sys
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+U = 2
+def hsh(x, y, z): return ((x * 73856093) ^ (y * 19349663) ^ (z * 83492791)) & 0xFFFF
+def cl(v): return max(0, min(255, int(v)))
+def sh(c, f): return (cl(c[0] * f), cl(c[1] * f), cl(c[2] * f))
+
+class Fig:
+    def __init__(s): s.v = {}; s.base = []
+    def box(s, x0, y0, z0, x1, y1, z1, col, n=5):
+        fn = col if callable(col) else None
+        for x in range(round(x0 * U), round(x1 * U)):
+            for y in range(round(y0 * U), round(y1 * U)):
+                for z in range(round(z0 * U), round(z1 * U)):
+                    c = fn((x + .5) / U, (y + .5) / U, (z + .5) / U) if fn else col
+                    if c is None: continue
+                    if n:
+                        r = hsh(x // U, y // U, z // U) % (2 * n + 1) - n
+                        c = (cl(c[0] + r), cl(c[1] + r), cl(c[2] + r))
+                    s.v[(x, y, z)] = c
+    def box2(s, x0, y0, z0, x1, y1, z1, col, n=5):
+        s.box(x0, y0, z0, x1, y1, z1, col, n); s.box(-x1, y0, z0, -x0, y1, z1, col, n)
+    def cut(s, x0, y0, z0, x1, y1, z1):
+        for x in range(round(x0 * U), round(x1 * U)):
+            for y in range(round(y0 * U), round(y1 * U)):
+                for z in range(round(z0 * U), round(z1 * U)): s.v.pop((x, y, z), None)
+    def flat(s):
+        """겉옷 층(반 픽셀)까지만 남긴다 = 스킨 한 장으로 되는 모습"""
+        o = Fig(); o.base = s.base
+        for (x, y, z), c in s.v.items():
+            px, py, pz = (x + .5) / U, (y + .5) / U, (z + .5) / U
+            if any(a - .5 <= px <= d + .5 and b - .5 <= py <= e + .5 and cc - .5 <= pz <= f + .5 for (a, b, cc, d, e, f) in s.base): o.v[(x, y, z)] = c
+        return o
+
+# ── 그리기 ─────────────────────────────────────────────────────────────
+def render(g, W=360, H=400, S=8.4, yaw=27, pitch=13, foot=44, k=2):
+    a, p = math.radians(yaw), math.radians(pitch); s = S * k / U
+    rx, rz = math.cos(a), -math.sin(a)
+    ux, uy, uz = -math.sin(a) * math.sin(p), math.cos(p), -math.cos(a) * math.sin(p)
+    dx, dy, dz = math.sin(a) * math.cos(p), math.sin(p), math.cos(a) * math.cos(p)
+    im = Image.new('RGBA', (W * k, H * k), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    cx, cy = W * k / 2, (H - foot) * k
+    def P(x, y, z): return (cx + (x * rx + z * rz) * s, cy - (x * ux + y * uy + z * uz) * s)
+    v = g.v
+    for (x, y, z) in sorted(v, key=lambda q: q[0] * dx + q[1] * dy + q[2] * dz):
+        top = (x, y + 1, z) not in v; fr = (x, y, z + 1) not in v; sd = (x + 1, y, z) not in v
+        if not (top or fr or sd): continue
+        col = v[(x, y, z)]
+        if fr:
+            f = 1.0
+            if (x, y + 1, z + 1) in v: f *= .74
+            elif (x, y + 2, z + 1) in v or (x, y + 3, z + 2) in v: f *= .87
+            if (x - 1, y, z + 1) in v or (x + 1, y, z + 1) in v: f *= .9
+            if top: f *= 1.05
+            d.polygon([P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], fill=sh(col, f) + (255,))
+        if sd:
+            f = .68
+            if (x + 1, y + 1, z) in v: f *= .78
+            elif (x + 1, y + 2, z) in v: f *= .9
+            d.polygon([P(x + 1, y, z), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x + 1, y + 1, z)], fill=sh(col, f) + (255,))
+        if top:
+            f = 1.1
+            if (x, y + 1, z - 1) in v or (x - 1, y + 1, z) in v: f *= .84
+            d.polygon([P(x, y + 1, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], fill=sh(col, f) + (255,))
+    im = im.resize((W, H), Image.LANCZOS)
+    al = im.split()[3]; edge = al.filter(ImageFilter.MaxFilter(5))
+    out = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    shd = Image.new('L', (W, H), 0); ImageDraw.Draw(shd).ellipse([W / 2 - 78, H - foot - 14, W / 2 + 78, H - foot + 18], fill=110)
+    out.paste((70, 50, 30, 255), mask=shd.filter(ImageFilter.GaussianBlur(7)))
+    out.paste((58, 42, 30, 255), mask=edge); out.alpha_composite(im)
+    return out
+
+# ── 몸 ─────────────────────────────────────────────────────────────────
+WHITE = (246, 246, 240)
+def face(g, skin, eye=(70, 50, 40), brow=None, y=27):
+    g.box(-3, y, 3.5, -2, y + 1, 4, WHITE, 0); g.box(-2, y, 3.5, -1, y + 1, 4, eye, 0)
+    g.box(2, y, 3.5, 3, y + 1, 4, WHITE, 0); g.box(1, y, 3.5, 2, y + 1, 4, eye, 0)
+    g.box(-1, y - 2, 3.5, 1, y - 1.5, 4, sh(skin, .7), 0)
+    g.box(-.5, y - 1, 3.5, .5, y, 4, sh(skin, .9), 0)
+    if brow: g.box2(1, y + 1, 3.5, 3, y + 1.5, 4, brow, 0)
+
+def human(g, skin, shirt, pants, boots, sleeve=None, hands=None, eye=(70, 50, 40), brow=None, boot_h=3):
+    sleeve = sleeve or shirt; hands = hands or skin
+    g.box(-4, 0, -2, 0, 12, 2, pants); g.box(0, 0, -2, 4, 12, 2, sh(pants, .93))
+    g.box(-4, 0, -2, 4, boot_h, 2, boots); g.box(-4, 0, 2, 4, 1.5, 2.5, sh(boots, .9))
+    g.box(-4, 12, -2, 4, 24, 2, shirt)
+    g.box2(4, 12, -2, 8, 24, 2, sleeve); g.box2(4, 12, -2, 8, 14.5, 2, hands)
+    g.box(-4, 24, -4, 4, 32, 4, skin); face(g, skin, eye, brow)
+    g.base = [(-4, 0, -2, 4, 12, 2), (-8, 12, -2, 8, 24, 2), (-4, 24, -4, 4, 32, 4)]
+
+def hair(g, c, kind='short', fringe=1.5):
+    if kind == 'none': return
+    d = sh(c, .88); bald = kind == 'balding'; top = 30 if bald else 32.5
+    if not bald:
+        g.box(-4.5, 31.5, -4.5, 4.5, 32.5, 4.5, c); g.box(-4.5, 32 - fringe, 4, 4.5, 32.5, 4.5, c)
+    g.box(-4.5, 26, -4.5, 4.5, top, -4, d); g.box2(4, 28, -4.5, 4.5, top, 2, d); g.box2(4, 29.5, 2, 4.5, top, 3.5, d)
+    if kind in ('long', 'bob', 'tail', 'braid'):
+        low = {'long': 17, 'bob': 23, 'tail': 24, 'braid': 24}[kind]
+        g.box(-4.5, low, -4.5, 4.5, 27, -3.5, d); g.box2(4, max(low, 20), -4.5, 4.5, 29, -1, d)
+    if kind == 'tail': g.box(-1, 17, -6, 1, 29, -4.5, c)
+    if kind == 'braid': g.box(4.5, 15, 0, 6, 26, 1.5, lambda x, y, z: c if int(y) % 2 else d)
+    if kind == 'bun': g.box(-2, 30, -6.5, 2, 34, -4.5, c)
+
+def beard(g, c, kind='short'):
+    if kind == 'stubble':
+        t = tuple((c[i] + 2 * b) // 3 for i, b in enumerate((206, 156, 120)))
+        g.box(-4, 24, 3.5, 4, 26, 4, t, 3); g.box(-1, 25, 3.5, 1, 25.5, 4, sh(t, .7), 0); g.box2(4, 24, 1, 4.01, 27, 4, t, 3); return
+    if kind == 'mustache': g.box(-2.5, 25.5, 4, 2.5, 26.5, 4.6, c); return
+    low = {'short': 23, 'full': 20.5, 'long': 16.5}[kind]
+    g.box2(3, 24, 1, 4.6, 27, 4.4, c); g.box(-4.5, low + 1.5, 2, 4.5, 26, 4.6, c); g.box(-3.5, low, 2.2, 3.5, 26.5, 5, c)
+    g.box(-1, 25, 4.6, 1, 25.5, 5.1, sh(c, .55), 0)
+
+def glasses(g, c=(60, 50, 40), one=False):
+    for sx in ((1,) if one else (1, -1)):
+        a, b = (.5, 3.5) if sx > 0 else (-3.5, -.5)
+        g.box(a, 28.5, 4, b, 29, 4.4, c, 0); g.box(a, 26.5, 4, b, 27, 4.4, c, 0)
+        g.box(a, 26.5, 4, a + .5, 29, 4.4, c, 0); g.box(b - .5, 26.5, 4, b, 29, 4.4, c, 0)
+    if not one: g.box(-.5, 28, 4, .5, 28.5, 4.4, c, 0)
+    else: g.box(3.5, 22, 4, 4, 26.5, 4.4, (200, 170, 80), 0)
+
+# ── 모자 ───────────────────────────────────────────────────────────────
+def hat_brim(g, c, band=None, brim=2.5, h=3.5, feather=None):
+    g.box(-4 - brim, 31.5, -4 - brim, 4 + brim, 32.5, 4 + brim, sh(c, .9)); g.box(-4.6, 32.5, -4.6, 4.6, 32.5 + h, 4.6, c)
+    if band: g.box(-4.8, 32.5, -4.8, 4.8, 33.5, 4.8, band)
+    if feather: g.box(4.8, 33, -1.5, 5.3, 38, -.5, feather); g.box(4.8, 36, -2.5, 5.3, 39.5, -1.5, sh(feather, 1.1))
+def hood(g, c):
+    g.box(-5, 32, -5, 5, 33, 4.5, c); g.box(-5, 23, -5, 5, 33, -4, sh(c, .9)); g.box2(4, 23, -5, 5, 33, 4.5, sh(c, .92)); g.box(-5, 31.5, 4, 5, 33, 5, c)
+def hood_down(g, c): g.box(-4.6, 21.5, -4.5, 4.6, 25.5, -2, c)
+def furhat(g, c, fur):
+    g.box(-5, 31, -5, 5, 34, 5, c); g.box(-5.3, 30, -5.3, 5.3, 32, 5.3, fur, 9); g.box2(4, 25, -3.5, 5.3, 30, 3, fur, 9)
+def toque(g):
+    g.box(-4.6, 31.5, -4.6, 4.6, 34, 4.6, sh(WHITE, .93)); g.box(-5.5, 34, -5.5, 5.5, 37.5, 5.5, WHITE, 3)
+def wizhat(g, c, band):
+    g.box(-7, 31.5, -7, 7, 32.5, 7, sh(c, .88))
+    for i in range(7):
+        r = 4.6 - i * .6; g.box(-r + i * .3, 32.5 + i * 1.6, -r - i * .4, r + i * .3, 34.1 + i * 1.6, r - i * .4, c)
+    g.box(-4.8, 32.5, -4.8, 4.8, 33.7, 4.8, band)
+def beret(g, c): g.box(-5, 31.5, -5, 5.5, 33.5, 5, c); g.box(0, 33.5, -1, 1, 34.2, 0, sh(c, .75))
+def bandana(g, c): g.box(-4.7, 29.5, -4.7, 4.7, 31.5, 4.7, c); g.box(-1.5, 27, -6, 1.5, 31, -4.7, sh(c, .9))
+def circlet(g, c, gem): g.box(-4.7, 30.3, -4.7, 4.7, 31.2, 4.7, c); g.box(-.5, 30, 4.7, .5, 31.5, 5.1, gem, 0)
+def cap(g, c): g.box(-4.7, 31, -4.7, 4.7, 33.5, 4.7, c); g.box(-4, 31, 4.7, 4, 31.8, 7, sh(c, .82))
+
+# ── 옷·소품 ────────────────────────────────────────────────────────────
+GOLD, STEEL, LEATHER = (212, 172, 78), (168, 174, 182), (112, 76, 48)
+def coat(g, c, low=6, opened=True, trim=None, sleeves=True, collar=None):
+    g.box(-4.5, low, -2.5, 4.5, 24.5, 2.5, c)
+    if sleeves: g.box2(4, 14.5, -2.5, 8.5, 24.5, 2.5, c)
+    if trim:
+        g.box2(1, low, 2.5, 1.7, 24.5, 2.8, trim); g.box(-4.6, low, -2.6, 4.6, low + 1, 2.7, trim)
+        if sleeves: g.box2(4, 14.5, -2.6, 8.6, 15.5, 2.6, trim)
+    if opened: g.cut(-1, low, 2, 1, 23, 2.8)
+    if collar: g.box(-4.7, 22.8, -2.7, 4.7, 24.8, 2.9, collar); g.cut(-1.5, 22.8, 2, 1.5, 24.8, 3)
+def skirt(g, c, low=2, top=13): g.box(-4.6, low, -2.6, 4.6, top, 2.6, c); g.box(-5, low, -3, 5, low + 3, 3, sh(c, .95))
+def apron(g, c, low=7, top=22, strap=True):
+    g.box(-3.5, low, 2, 3.5, top, 2.7, c); g.box(-4.3, 12, 2, 4.3, 13, 2.8, sh(c, .72))
+    if strap: g.box2(2, top, 2, 3, 24, 2.7, sh(c, .8))
+def belt(g, c=(70, 48, 32), buckle=GOLD, y=11.5):
+    g.box(-4.7, y, -2.7, 4.7, y + 1.5, 2.7, c); g.box(-1, y - .2, 2.7, 1, y + 1.7, 3.1, buckle, 0)
+def cloak(g, c, low=3, clasp=None):
+    g.box(-8.6, low, -3.6, 8.6, 24.5, -2.5, c); g.box(-8.7, 21.5, -3.6, 8.7, 24.8, 2.9, sh(c, 1.06))
+    if clasp: g.box(-1, 22, 2.9, 1, 24, 3.3, clasp, 0)
+def mantle(g, c, fur=False): g.box(-8.7, 21, -3, 8.7, 25, 3, c, 9 if fur else 5)
+def scarf(g, c, stripe=None):
+    f = (lambda x, y, z: stripe if int(y) % 2 == 0 else c) if stripe else c
+    g.box(-4.8, 22.5, -3, 4.8, 25.2, 3.3, f); g.box(1.5, 15, 2.6, 4, 23, 3.4, f)
+def pouch(g, c=LEATHER, x=1.8): g.box(x, 8.5, 2.6, x + 2.6, 11.5, 4, c); g.box(x, 10.8, 2.6, x + 2.6, 11.6, 4.2, sh(c, .72))
+def strap(g, c=(80, 56, 36)):
+    for i in range(24): g.box(-4.4 + i / 3, 23.4 - i / 2, 2, -3.2 + i / 3, 24.4 - i / 2, 2.6, c, 2)
+def satchel(g, c=LEATHER): g.box(4.2, 5.5, -2.5, 6.8, 12, 3, c); g.box(4.2, 9.5, -2.6, 7, 12.2, 3.2, sh(c, .78)); g.box(6.8, 10, 0, 7.2, 11, 1, GOLD, 0)
+def pack(g, c, roll=None, pots=False):
+    g.box(-4.6, 12.5, -7, 4.6, 24, -2, c); g.box(-5.6, 13, -6, 5.6, 19, -3, sh(c, .85))
+    if roll: g.box(-6.5, 24, -6.5, 6.5, 27, -3.5, roll)
+    if pots: g.box(5.6, 14, -5, 8.6, 17.5, -3, (150, 110, 60)); g.box(-9, 9, -4.5, -6, 13, -2.5, STEEL); g.box(-7.8, 13, -3.8, -7.2, 15, -3.2, (60, 50, 40))
+def pauldron(g, c, sides=(1, -1)):
+    for s in sides:
+        a, b = (3.5, 9) if s > 0 else (-9, -3.5)
+        g.box(a, 21.5, -3, b, 25, 3, c); g.box(a + .5, 25, -2, b - .5, 25.8, 2, sh(c, 1.08))
+def staff(g, c=(110, 80, 50), h=36, top=None, x=5.5, low=0):
+    g.box(x, low, 2, x + 1, h, 3, c)
+    if top: g.box(x - 1, h, 1, x + 2, h + 3, 4, top, 0); g.box(x - .5, h + 3, 1.5, x + 1.5, h + 4, 3.5, sh(top, 1.15), 0)
+def held(g, c, x0=4.5, y0=8, x1=7.5, y1=13, z0=2, z1=3): g.box(x0, y0, z0, x1, y1, z1, c)
+def quill(g, c=WHITE): g.box(4.5, 29, -.5, 5, 34.5, .5, c, 0); g.box(4.5, 33, -1.5, 5, 36, -.5, c, 0)
+def buttons(g, c=GOLD, x=1.5, ys=(15, 18, 21), z=2.6): [g.box2(x, y, z, x + .7, y + .7, z + .3, c, 0) for y in ys]
+def plate(g, c, low=12):
+    g.box(-4.5, low, -2.5, 4.5, 24.5, 2.5, c); g.box(-4.6, 17.5, -2.6, 4.6, 18.3, 2.7, sh(c, .78)); g.box(-.4, 18.3, 2.5, .4, 24.5, 2.8, sh(c, 1.1))
+
+S1, S2, S3, S4 = (236, 190, 152), (216, 164, 124), (178, 126, 90), (242, 208, 180)
+def new(): return Fig()
+
+# ── 이야기의 사람들 ────────────────────────────────────────────────────
+def erwin():
+    g = new(); human(g, S4, (232, 222, 200), (150, 140, 124), (70, 60, 52), hands=(44, 40, 40), eye=(120, 130, 140), brow=(225, 225, 220))
+    coat(g, (234, 225, 204), low=1, opened=False, trim=(196, 92, 44)); g.box2(4, 12, -2.3, 8.3, 16, 2.3, (44, 40, 40))
+    mantle(g, (128, 52, 40)); g.box(-1, 21.5, 3, 1, 24, 3.4, GOLD, 0); g.box(-.5, 22, 3.4, .5, 23.5, 3.7, (240, 120, 40), 0)
+    belt(g, (120, 50, 40), GOLD, 11); hair(g, (232, 232, 226), 'long', 1); beard(g, (232, 232, 226), 'full'); return g
+def isabel():
+    g = new(); human(g, S1, (240, 232, 214), (60, 80, 90), (80, 56, 40), eye=(70, 100, 80))
+    skirt(g, (52, 76, 88)); coat(g, (44, 58, 96), low=12, sleeves=False, trim=GOLD); strap(g); satchel(g)
+    g.box(5, 12.8, 1.6, 7, 14, 2.1, (40, 40, 70), 0); held(g, (120, 44, 40), -8.5, 12, -4, 18.5, 2, 3.4); g.box(-8.5, 12.5, 3.4, -4, 18, 3.6, (232, 222, 196), 0)
+    g.box(-7.5, 14, 3.4, -5, 16.5, 3.8, GOLD, 0)
+    hair(g, (112, 72, 44), 'bun', 2); glasses(g); quill(g); return g
+def roran():
+    g = new(); human(g, S2, (196, 184, 160), (78, 70, 58), (60, 44, 32), eye=(60, 50, 40), brow=(50, 40, 34), boot_h=3)
+    g.box(0, 3, -2.3, 4.3, 8.5, 2.4, lambda x, y, z: (230, 224, 208) if int(y * 2) % 3 else (186, 176, 156)); g.box(4.3, 2.5, -1, 4.9, 9.5, 1, (130, 96, 60)); g.box(1.5, 2.5, 2.4, 2.5, 9.5, 2.9, (130, 96, 60))
+    coat(g, (110, 80, 52), low=9, collar=(84, 60, 40)); belt(g); pouch(g, x=-4.4); g.box(1.8, 9.5, 2.7, 3.6, 11.3, 3.3, GOLD, 0)
+    cloak(g, (72, 92, 62), low=6, clasp=GOLD); staff(g, (90, 64, 40), h=15); g.box(4.5, 15, 1.8, 8, 16.2, 3.2, (60, 44, 30))
+    hair(g, (60, 46, 36), 'short', 1); beard(g, (60, 46, 36), 'stubble'); hat_brim(g, (104, 84, 56), band=(60, 44, 32), brim=2.5, h=3); return g
+def felix():
+    g = new(); human(g, S4, (222, 212, 190), (96, 84, 70), (70, 52, 38), eye=(90, 100, 110), brow=(190, 190, 186))
+    coat(g, (176, 148, 104), low=4, trim=(120, 92, 60)); belt(g, y=12); strap(g, (96, 70, 44))
+    for i, x in enumerate((-7, -5.2, 5, 6.8)): g.box(x, 13, -4.6, x + 1.6, 31 + (i % 2) * 2.5, -3, (206, 190, 150)); g.box(x, 29 + (i % 2) * 2.5, -4.7, x + 1.6, 30 + (i % 2) * 2.5, -2.9, (150, 60, 50), 0)
+    g.box(-8, 12, -5, 8, 20, -2.5, (120, 86, 56)); held(g, (232, 222, 196), 4.2, 12.5, 8.4, 14.5, 2, 6); g.box(4.2, 12.5, 2, 4.8, 14.5, 6, (150, 60, 50), 0)
+    hair(g, (196, 196, 190), 'balding'); beard(g, (206, 206, 200), 'mustache'); beret(g, (62, 92, 70)); glasses(g, GOLD, one=True); return g
+def bram():
+    g = new(); human(g, S3, (86, 78, 70), (70, 62, 56), (48, 40, 36), sleeve=S3, hands=(54, 44, 40), eye=(60, 44, 30), brow=(70, 46, 30))
+    g.box2(4, 20, -2.2, 8.2, 24.2, 2.2, (86, 78, 70)); g.box2(4, 12, -2.3, 8.3, 15.5, 2.3, (60, 48, 42)); g.box2(4, 15, -2.4, 8.4, 16, 2.4, (90, 70, 56))
+    apron(g, (104, 68, 42), low=5, top=22.5); g.box(-2, 14, 2.7, 2, 17, 3, (84, 54, 34)); belt(g, (50, 38, 30), STEEL, 11.5)
+    staff(g, (110, 80, 50), h=17, low=9); g.box(4, 16.5, 1.2, 8.5, 20, 3.8, (120, 124, 130)); g.box(4, 16.5, 1.2, 8.5, 17.2, 3.8, (96, 100, 106))
+    g.box(-3.5, 26, 3.5, -2, 27, 4, (120, 90, 70), 0)
+    beard(g, (92, 58, 36), 'full'); g.box(-1.5, 21, 2.2, 1.5, 22, 5.2, STEEL, 0); bandana(g, (120, 44, 36)); return g
+def oscar():
+    g = new(); human(g, S2, (60, 80, 88), (52, 60, 68), (40, 44, 50), hands=(120, 96, 70), eye=(80, 110, 130), brow=(200, 200, 196), boot_h=6)
+    coat(g, (44, 78, 90), low=5, opened=False, trim=(30, 56, 66)); buttons(g, (190, 180, 150), x=-.35, ys=(8, 12, 16, 20)); belt(g, (60, 44, 32), STEEL)
+    scarf(g, (176, 62, 48), stripe=(232, 220, 196)); beard(g, (204, 204, 198), 'full'); furhat(g, (50, 62, 80), (196, 190, 178))
+    staff(g, (120, 96, 66), h=37); g.box(5.5, 37, 2, 6.5, 41, 3, STEEL, 0); g.box(4.5, 37, 2, 7.5, 38, 3, STEEL, 0); g.box(4.5, 38, 2, 5, 39.5, 3, STEEL, 0); g.box(7, 38, 2, 7.5, 39.5, 3, STEEL, 0)
+    g.box(-8.5, 10, 2, -6, 12.5, 2.6, (150, 170, 180), 0); g.box(-7.6, 12.5, 2.2, -7, 14, 2.5, (220, 220, 210), 0); return g
+def haru():
+    g = new(); human(g, S1, (240, 236, 226), (58, 60, 70), (40, 36, 36), eye=(50, 44, 40), brow=(30, 28, 30))
+    coat(g, (58, 96, 80), low=11.5, sleeves=False, trim=(40, 70, 58)); buttons(g, GOLD, x=1.9, ys=(14, 17, 20))
+    g.box2(4, 15, -2.3, 8.3, 20, 2.3, (40, 40, 46)); g.box(-1, 22.3, 2.1, 1, 23.6, 2.9, (170, 50, 46), 0)
+    held(g, (150, 110, 70), 3.8, 12, 8.6, 20, 2, 2.8); g.box(4.3, 12.8, 2.8, 8.1, 19.2, 3, (240, 234, 216), 2); g.box(5, 19, 2.8, 7.4, 20.3, 3.3, STEEL, 0)
+    for y in (14, 15.5, 17): g.box(4.8, y, 3, 7.6, y + .5, 3.1, (90, 90, 100), 0)
+    hair(g, (34, 32, 36), 'short', 2); g.box(-4.5, 30.5, 4, -1, 32.5, 4.5, (34, 32, 36)); quill(g, (232, 226, 210)); return g
+def morris():
+    g = new(); human(g, S2, (96, 124, 84), (92, 76, 58), (64, 46, 34), eye=(70, 60, 50), brow=(170, 170, 166), boot_h=5)
+    coat(g, (88, 118, 80), low=8, opened=False, trim=(60, 84, 56)); belt(g); pouch(g, x=-4.4); pack(g, (128, 96, 60), roll=(170, 70, 56)); hood_down(g, (70, 96, 66))
+    g.box2(3, 12.5, 2, 4, 24, 2.7, (84, 60, 40)); staff(g, (110, 84, 54), h=34)
+    g.box(-7.5, 8, 2.2, -5, 12, 4.6, (70, 60, 50)); g.box(-7, 8.6, 2.6, -5.5, 11, 4.9, (255, 214, 110), 0); g.box(-6.5, 12, 3, -6, 13, 3.8, (70, 60, 50), 0)
+    hair(g, (176, 176, 170), 'short', 1); beard(g, (190, 190, 184), 'short'); return g
+def lucky():
+    P, Y = (124, 72, 160), (238, 198, 80)
+    g = new(); human(g, S1, (240, 236, 226), (70, 52, 100), (60, 40, 70), eye=(60, 130, 110), brow=(200, 110, 50))
+    coat(g, lambda x, y, z: P if (int(x // 2) + int(y // 2)) % 2 else Y, low=10, sleeves=False); g.box2(4, 17, -2.4, 8.4, 24.4, 2.4, lambda x, y, z: Y if int(y) % 2 else P)
+    belt(g, (60, 40, 70), Y, 10.5); g.box(-1.2, 22, 2.2, 1.2, 23.8, 3, (220, 70, 70), 0)
+    for i in range(4): g.box(4.2 + i, 9 - i * .6, 2, 5 + i, 14, 2.4 + i * .1, (250, 240, 200) if i % 2 else (236, 180, 90), 2)
+    hair(g, (226, 124, 54), 'bob', 2); cap(g, P); g.box(-1, 32, 4.7, 1, 33.5, 5.1, Y, 0); g.box(-.5, 33.5, 4.7, .5, 34.2, 5.1, Y, 0)
+    g.box(-1.5, 24.6, 3.5, 1.5, 25.2, 4, (150, 70, 60), 0); return g
+
+# ── 상인들 ─────────────────────────────────────────────────────────────
+def m_farmer():
+    R, D = (184, 70, 56), (140, 50, 44)
+    g = new(); human(g, S2, lambda x, y, z: R if (int(x) + int(y)) % 2 else D, (64, 92, 136), (92, 66, 44), eye=(70, 90, 60), brow=(120, 84, 50))
+    g.box(-3.5, 12, 2, 3.5, 21, 2.7, (64, 92, 136)); g.box2(2, 21, 2, 3.2, 24.3, 2.7, (54, 80, 120)); g.box2(2.1, 20, 2.7, 2.9, 20.8, 3, GOLD, 0); pouch(g, (54, 80, 120), x=-1.3)
+    g.box2(4, 17, -2.2, 8.2, 18.5, 2.2, (232, 220, 196)); held(g, (176, 140, 84), -9, 6, -3.8, 11, 2, 6); g.box(-8.5, 11, 2.5, -4.3, 12.2, 5.5, (232, 130, 50), 2); g.box(-7, 12.2, 3, -5.5, 13.2, 4.5, (90, 150, 70), 0)
+    hair(g, (150, 104, 60), 'short', 1); hat_brim(g, (216, 184, 100), band=(150, 60, 50), brim=3.5, h=2.5); g.box(4.8, 33, 1, 5.2, 37, 1.5, (214, 190, 90), 0); return g
+def m_food():
+    g = new(); human(g, S1, WHITE, (70, 70, 80), (50, 44, 44), eye=(70, 50, 40), brow=(70, 50, 40))
+    coat(g, (244, 242, 236), low=11, opened=False); buttons(g, (60, 60, 70), x=1.2, ys=(14.5, 17.5, 20.5)); apron(g, (226, 214, 190), low=4, top=13, strap=False)
+    g.box(-4.8, 22.6, -3, 4.8, 24.8, 3.2, (190, 54, 48)); g.box(-1.5, 20.5, 2.6, 1.5, 23, 3.2, (190, 54, 48))
+    staff(g, (150, 120, 80), h=20, low=10); g.box(4.6, 19.5, 1.5, 7.4, 22, 3.5, STEEL)
+    hair(g, (70, 50, 40), 'short', 1); beard(g, (70, 50, 40), 'mustache'); toque(g); return g
+def m_fish():
+    Y = (228, 186, 62)
+    g = new(); human(g, S2, (90, 110, 130), (70, 80, 96), (44, 60, 70), eye=(60, 90, 110), brow=(110, 80, 60), boot_h=7)
+    coat(g, Y, low=6, opened=False, trim=sh(Y, .8)); buttons(g, (60, 70, 80), x=-.35, ys=(9, 13, 17, 21))
+    hat_brim(g, Y, band=sh(Y, .75), brim=2, h=2.5); g.box(-6, 31, -8, 6, 32, -6, sh(Y, .88)); hair(g, (110, 80, 60), 'short', 0)
+    g.box(-6.5, 9, 2, -6, 12.5, 2.5, (60, 50, 40), 0); g.box(-7.5, 3, 2, -5, 9, 3, (150, 176, 190)); g.box(-7.5, 3, 2, -5, 4.5, 3, (110, 140, 160)); g.box(-7, 7.5, 3, -6.5, 8, 3.2, (30, 30, 30), 0)
+    g.box(5.5, 2, 2, 6.5, 14, 3, (150, 176, 190)); g.box(5, 3, 2.2, 7, 5, 2.8, (110, 140, 160)); beard(g, (110, 80, 60), 'short'); return g
+def m_gear():
+    g = new(); human(g, S2, (120, 84, 56), (72, 62, 54), (56, 42, 34), sleeve=(150, 150, 156), hands=(84, 60, 44), eye=(70, 60, 50), brow=(60, 44, 36), boot_h=5)
+    plate(g, (124, 86, 56)); pauldron(g, STEEL); belt(g, (60, 42, 30), STEEL); strap(g, (60, 42, 30)); g.box2(4, 12, -2.3, 8.3, 17, 2.3, (96, 68, 46))
+    g.box(-9.6, 2, -1, -8.4, 14, .6, (70, 50, 36)); g.box(-10, 14, -1.3, -8, 15, .9, GOLD, 0); g.box(-9.5, 15, -.8, -8.5, 18.5, .4, (60, 44, 34))
+    g.box(8.3, 13, -2.5, 9.2, 21, 2.5, (150, 150, 158)); g.box(9.2, 16, -.8, 9.6, 18, .8, GOLD, 0)
+    hair(g, (60, 44, 36), 'short', 1); beard(g, (60, 44, 36), 'stubble'); bandana(g, (170, 56, 46)); return g
+def m_general():
+    A, B, C = (150, 96, 60), (84, 120, 110), (196, 150, 70)
+    g = new(); human(g, S1, (226, 214, 190), (96, 78, 60), (70, 50, 36), eye=(80, 70, 50), brow=(130, 90, 50))
+    coat(g, lambda x, y, z: B if (y > 15 and x < 0) or (y < 12 and x > 1) else (C if 12 <= y <= 15 and x > 0 else A), low=6); belt(g); pouch(g); pouch(g, (90, 110, 60), x=-4.4)
+    pack(g, (140, 104, 64), roll=(90, 120, 150), pots=True); g.box2(3, 12.5, 2, 4, 24, 2.7, (84, 60, 40))
+    hair(g, (150, 96, 50), 'short', 2); cap(g, (84, 120, 110)); g.box(4.7, 33, -1.5, 5.2, 38, -.5, (220, 80, 60), 0); return g
+def m_land():
+    V = (86, 50, 78)
+    g = new(); human(g, S4, WHITE, (50, 46, 56), (34, 30, 34), eye=(60, 60, 80), brow=(60, 50, 50))
+    coat(g, V, low=4, trim=GOLD, collar=sh(V, .8)); buttons(g, GOLD, x=2.2, ys=(15, 18, 21)); g.box(-1, 21.5, 2.1, 1, 23.4, 2.8, (40, 90, 80), 0)
+    held(g, (236, 226, 200), 4.2, 12.5, 8.4, 14.5, 2, 6.5); g.box(5.5, 12, 5, 7, 13.2, 6.7, (176, 44, 40), 0)
+    hair(g, (80, 70, 70), 'short', 1); beard(g, (80, 70, 70), 'mustache'); hat_brim(g, (44, 40, 48), band=V, brim=1.5, h=5); return g
+def m_bank():
+    N = (40, 72, 66)
+    g = new(); human(g, S1, WHITE, (44, 48, 56), (30, 30, 34), eye=(50, 70, 60), brow=(110, 110, 110))
+    coat(g, N, low=10, sleeves=True, trim=GOLD, collar=sh(N, .85)); buttons(g, GOLD, x=2.2, ys=(13, 16, 19)); g.box2(4, 14.5, -2.6, 8.6, 16.5, 2.6, GOLD)
+    g.box(-3.8, 9.5, 2.6, -2.8, 11.5, 3, (200, 170, 80), 0); g.box(-3.6, 7, 2.6, -3, 9.5, 2.9, STEEL, 0); g.box(-4.2, 6, 2.6, -2.4, 7, 2.9, STEEL, 0)
+    held(g, (120, 90, 56), 4.2, 9, 8.2, 13, 1.5, 4.5); g.box(4.2, 12.3, 1.5, 8.2, 13, 4.5, GOLD); g.box(5.6, 10, 4.5, 6.8, 11.4, 4.8, (60, 50, 40), 0)
+    hair(g, (150, 150, 150), 'balding'); glasses(g, GOLD); g.box(-4.7, 30, -1, 4.7, 30.8, 4.7, (40, 40, 44)); g.box(-4.4, 30, 4.7, 4.4, 30.6, 6.6, (40, 110, 90)); return g
+def m_ticket():
+    R = (190, 56, 52)
+    g = new(); human(g, S1, WHITE, (52, 52, 64), (36, 34, 38), eye=(70, 60, 110), brow=(70, 50, 40))
+    coat(g, lambda x, y, z: R if int(x + 8) % 2 else (244, 240, 230), low=11.5, sleeves=False); g.box(-1.2, 22, 2.2, 1.2, 23.6, 3, (40, 40, 60), 0)
+    g.box2(4, 16, -2.3, 8.3, 17.2, 2.3, (40, 40, 60)); belt(g, (40, 40, 60), GOLD)
+    held(g, (236, 190, 90), 4, 11, 8.5, 15, 2, 3.2); g.box(8.5, 5, 2.2, 9, 15, 3, lambda x, y, z: (236, 190, 90) if int(y) % 2 else (250, 236, 190)); g.box(5.5, 12.3, 3.2, 7, 13.7, 3.5, R, 0)
+    hair(g, (70, 50, 40), 'tail', 2); cap(g, R); return g
+def m_raid():
+    g = new(); human(g, S3, (70, 70, 80), (54, 54, 62), (36, 34, 38), sleeve=(96, 98, 106), hands=(60, 50, 44), eye=(190, 120, 50), brow=(40, 36, 36), boot_h=5)
+    plate(g, (86, 88, 98)); belt(g, (50, 38, 30), (190, 80, 40)); cloak(g, (92, 36, 36), low=4, clasp=(190, 80, 40)); hood(g, (92, 36, 36))
+    g.box(-9.5, 6, 2, -4.5, 12, 3, (70, 50, 36)); g.box(-9, 10, 3, -5, 11, 3.3, GOLD, 0); g.box(-7.6, 7, 3, -6.4, 8.2, 3.3, (190, 80, 40), 0)
+    beard(g, (40, 36, 36), 'short'); g.box(-3.5, 25, 3.5, -3, 29.5, 4, (200, 130, 110), 0); return g
+
+# ── 직업 교관·기록 담당 ────────────────────────────────────────────────
+def leon():
+    B = (52, 84, 150)
+    g = new(); human(g, S1, (150, 154, 162), (64, 66, 78), (60, 62, 70), sleeve=(150, 154, 162), hands=(90, 70, 50), eye=(60, 100, 150), brow=(170, 140, 70), boot_h=6)
+    plate(g, (176, 180, 188)); g.box(-2.5, 4, 2.5, 2.5, 24, 2.9, B); g.box(-2.5, 4, -2.9, 2.5, 24, -2.5, B); g.box(-.6, 15, 2.9, .6, 21, 3.1, GOLD, 0); g.box(-1.8, 18, 2.9, 1.8, 19.2, 3.1, GOLD, 0)
+    pauldron(g, (176, 180, 188)); belt(g, (150, 50, 46), GOLD, 11); g.box(-4.7, 6, 2.6, -3, 11.5, 3, (150, 50, 46))
+    g.box(4.5, 20, -4.5, 6, 34, -3, (70, 50, 36)); g.box(3.5, 27, -4.8, 7, 28.2, -2.7, GOLD, 0); g.box(4.7, 34, -4.3, 5.8, 35.2, -3.2, GOLD, 0)
+    hair(g, (206, 170, 90), 'short', 1.5); return g
+def bron():
+    H = (176, 72, 40)
+    g = new(); human(g, S2, (110, 76, 50), (84, 64, 48), (60, 44, 34), sleeve=S2, hands=S2, eye=(70, 90, 70), brow=H, boot_h=5)
+    g.box(-5, 12, -3, 5, 24.5, 3, (116, 80, 52)); g.box(-5.2, 12, -3.2, 5.2, 14, 3.2, (70, 48, 34)); g.box(-1.3, 12, 3.2, 1.3, 14.2, 3.6, STEEL, 0)
+    g.box2(4, 12, -2.6, 9, 24.4, 2.6, S2); g.box2(4, 15, -2.8, 9.2, 16.5, 2.8, GOLD); g.box2(4, 12, -2.8, 9.2, 13, 2.8, (70, 48, 34))
+    mantle(g, (150, 130, 104), fur=True); g.box(-9.2, 23, -3.4, 9.2, 26, 3.4, (166, 146, 118), 9); g.cut(-4, 24, -4, 4, 26.2, 4)
+    staff(g, (100, 70, 44), h=35, x=6.5); g.box(7.5, 26, 2, 12, 34, 3, (170, 176, 184)); g.box(11, 25, 2, 12.5, 35, 3, (206, 210, 216)); g.box(4.5, 28, 2, 6.5, 32, 3, (140, 146, 154))
+    hair(g, H, 'long', 2); beard(g, H, 'long'); g.box2(1.5, 17, 4.6, 2.5, 21, 5.2, sh(H, .85)); return g
+def garen():
+    D = (88, 92, 104)
+    g = new(); human(g, S2, D, (60, 62, 72), (50, 52, 60), sleeve=D, hands=(64, 66, 76), eye=(80, 80, 90), brow=(120, 120, 120), boot_h=7)
+    plate(g, (104, 108, 120)); g.box(-4.6, 4, -2.6, 4.6, 12, 2.6, lambda x, y, z: (96, 100, 112) if int(y) % 3 else (70, 72, 84)); g.cut(-.5, 4, 2, .5, 10, 2.8)
+    pauldron(g, (120, 124, 136)); g.box2(3.5, 25.8, -1.5, 9, 26.6, 1.5, (140, 144, 156)); cloak(g, (56, 70, 110), low=3); belt(g, (40, 40, 50), GOLD)
+    g.box(8.4, 6, -4.5, 9.4, 25, 4.5, (150, 154, 168)); g.box(9.4, 6, -4.5, 9.7, 25, -3.7, GOLD, 0); g.box(9.4, 6, 3.7, 9.7, 25, 4.5, GOLD, 0); g.box(9.4, 24.2, -4.5, 9.7, 25, 4.5, GOLD, 0); g.box(9.4, 6, -4.5, 9.7, 6.8, 4.5, GOLD, 0)
+    g.box(9.4, 13, -1.5, 9.8, 19, 1.5, (56, 70, 110), 0); g.box(9.8, 15, -.6, 10, 17, .6, GOLD, 0)
+    hair(g, (130, 130, 130), 'short', 1); beard(g, (130, 130, 130), 'stubble'); g.box(1.5, 24.5, 3.5, 2, 30.5, 4.1, (196, 120, 106), 0); g.box(1, 28.5, 3.5, 2.5, 29, 4.1, (196, 120, 106), 0); return g
+def lia():
+    G = (64, 98, 64)
+    g = new(); human(g, S1, (120, 96, 64), (84, 70, 52), (70, 50, 36), sleeve=(84, 110, 76), hands=(96, 70, 48), eye=(80, 130, 80), brow=(120, 70, 40), boot_h=6)
+    coat(g, (124, 92, 58), low=9, opened=False, sleeves=False, trim=(90, 64, 40)); belt(g, (60, 44, 30), STEEL); strap(g, (70, 50, 34)); pouch(g, x=-4.2)
+    g.box2(4, 12, -2.3, 8.3, 17.5, 2.3, (96, 70, 48)); cloak(g, G, low=8, clasp=(200, 200, 190)); hair(g, (150, 80, 44), 'braid', 2); hood(g, G)
+    g.box(-7.5, 17, -5, -5, 31, -3.2, (110, 76, 46))
+    for i, x in enumerate((-7.3, -6.4, -5.6)): g.box(x, 31, -4.6, x + .5, 33.5 + i % 2, -3.8, (230, 226, 210), 0); g.box(x, 33.5 + i % 2, -4.6, x + .5, 34.5 + i % 2, -3.8, (190, 60, 50), 0)
+    g.box(6, 9, 2.6, 6.8, 27, 3.4, (130, 90, 50)); g.box(6, 4, 2, 6.8, 9, 2.8, (130, 90, 50)); g.box(6, 27, 2, 6.8, 32, 2.8, (130, 90, 50)); g.box(6.2, 16, 2.6, 6.9, 20, 3.6, (70, 50, 34), 0)
+    return g
+def elis():
+    V = (98, 70, 150)
+    g = new(); human(g, S4, V, (70, 54, 110), (60, 46, 80), eye=(110, 90, 170), brow=(226, 226, 232))
+    coat(g, V, low=1, opened=False, trim=GOLD); g.box2(4, 12, -3, 9, 17, 3, sh(V, 1.08)); g.box2(4, 12, -3.1, 9.1, 13, 3.1, GOLD); mantle(g, (70, 52, 116)); g.box(-1, 22, 3, 1, 24, 3.4, (110, 220, 230), 0)
+    belt(g, (70, 52, 116), GOLD, 11); g.box(1.8, 5, 2.8, 2.6, 11.5, 3.1, GOLD, 0); g.box(-3.5, 8, 2.6, -1, 11.5, 3.6, (150, 60, 60)); g.box(-3.5, 8, 3.6, -1, 11.5, 3.8, GOLD, 0)
+    staff(g, (120, 90, 60), h=35, top=(110, 220, 230)); hair(g, (232, 232, 238), 'long', 1); wizhat(g, V, GOLD)
+    g.box(-.5, 33, 4.8, .5, 34, 5.2, (110, 220, 230), 0); return g
+def garret():
+    g = new(); human(g, S3, (150, 140, 120), (60, 54, 50), (44, 36, 32), eye=(60, 50, 40), brow=(40, 34, 30), boot_h=5)
+    coat(g, (98, 72, 54), low=4, collar=(70, 50, 40)); belt(g, (60, 42, 32), STEEL); g.box(-4, 12.5, 2.5, -1.5, 20, 2.8, (232, 220, 190), 3); g.box(-3.5, 17, 2.8, -2, 19, 2.9, (90, 70, 60), 0); g.box(-3.6, 14, 2.8, -1.9, 14.5, 2.9, (90, 70, 60), 0); g.box(-3, 20, 2.8, -2.5, 20.6, 3, (190, 60, 50), 0)
+    for i, x in enumerate((4.3, 5.6, 6.9)): g.box(x, 9 + i, 2, x + 1.1, 19 + i * 1.5, 3.1, (226, 212, 180) if i != 1 else (206, 190, 150))
+    g.box(4.2, 12.5, 3.1, 8.2, 13.5, 3.4, (150, 50, 44), 0)
+    hair(g, (70, 56, 46), 'short', 1.5); beard(g, (70, 56, 46), 'stubble')
+    g.box(.5, 26.5, 4, 3.5, 28.8, 4.4, (30, 28, 28), 0); g.box(-4.6, 28.5, 4, 4.6, 29, 4.4, (30, 28, 28), 0); return g
+def theo():
+    O = (220, 130, 60)
+    g = new(); human(g, S1, (240, 234, 220), (84, 96, 120), (90, 62, 40), eye=(80, 110, 60), brow=(130, 86, 50))
+    coat(g, O, low=11.5, sleeves=False, trim=sh(O, .75)); g.box2(4, 19, -2.3, 8.3, 20.5, 2.3, sh((240, 234, 220), .85)); belt(g); g.box(-4.4, 8.5, 2.6, -2.6, 11.5, 4, (40, 40, 60)); g.box(-4, 11.5, 2.9, -3, 12.3, 3.7, (200, 190, 170), 0)
+    held(g, (70, 100, 150), 3.6, 11.5, 8.8, 21, 2, 3.2); g.box(4, 12, 3.2, 8.4, 20.5, 3.4, (244, 238, 220), 2)
+    for i, w in enumerate((3.6, 2.6, 3.2, 1.8)): g.box(4.5, 18.5 - i * 1.7, 3.4, 4.5 + w, 19.3 - i * 1.7, 3.5, (220, 130, 60) if i == 0 else (120, 130, 150), 0)
+    scarf(g, (90, 130, 170)); hair(g, (130, 86, 50), 'short', 2.5); g.box(-3, 32.5, -2, 1, 33.5, 2, (130, 86, 50)); g.box(-5, 30, -3, -4.5, 33, -1, (130, 86, 50))
+    g.box(4.5, 29, 0, 5, 33, .6, (230, 190, 70), 0); g.box(4.5, 33, 0, 5, 33.6, .6, (60, 50, 40), 0); return g
+def adel():
+    Wt = (240, 236, 226)
+    g = new(); human(g, S4, Wt, (200, 196, 186), (120, 110, 96), eye=(90, 110, 130), brow=(196, 196, 200))
+    coat(g, Wt, low=1, opened=False, trim=GOLD, collar=GOLD); g.box(-4.6, 23, 2.5, 4.6, 24.6, 2.9, GOLD)
+    for i in range(22): g.box(3.6 - i / 3, 23.8 - i / 2, 2.5, 5.2 - i / 3, 24.8 - i / 2, 2.9, (64, 80, 150), 2)
+    for i, c in enumerate(((190, 60, 50), (64, 130, 90), (220, 180, 70))): g.box(-3.8 + i * 1.2, 19, 2.9, -2.9 + i * 1.2, 21, 3.1, c, 0); g.box(-3.8 + i * 1.2, 18, 2.9, -2.9 + i * 1.2, 19, 3.2, GOLD, 0)
+    belt(g, (64, 80, 150), GOLD, 11); g.box2(4, 12, -2.3, 8.3, 14.6, 2.3, Wt)
+    hair(g, (206, 208, 216), 'bun', 1.5); circlet(g, GOLD, (64, 80, 150)); return g
+def raid_guide():
+    g = new(); human(g, S2, (84, 80, 76), (64, 58, 54), (44, 38, 36), sleeve=(110, 112, 118), hands=(70, 54, 44), eye=(70, 60, 50), brow=(60, 40, 30), boot_h=6)
+    plate(g, (120, 122, 130)); pauldron(g, (130, 132, 140), sides=(1,)); cloak(g, (70, 70, 64), low=5); belt(g, (60, 44, 32), STEEL); strap(g, (60, 44, 32))
+    staff(g, (90, 64, 40), h=27, low=9); g.box(5, 27, 1.5, 7, 29, 3.5, (70, 50, 36)); g.box(5, 29, 1.5, 7, 31.5, 3.5, (250, 170, 50), 0); g.box(5.5, 31.5, 2, 6.5, 33.5, 3, (255, 220, 110), 0)
+    g.box(-8.6, 13, -2.6, -3.8, 17, 2.6, lambda x, y, z: (226, 220, 204) if int(y * 2) % 3 else (196, 186, 166))
+    hair(g, (90, 54, 36), 'tail', 1.5); beard(g, (90, 54, 36), 'stubble'); g.box(-4.7, 29.5, -4.7, 4.7, 30.8, 4.7, (150, 50, 44)); return g
+
+# ── 주민 몸 (지금 모습 · 시안 A) ───────────────────────────────────────
+def villager(robe, apron_c=None, sleeve=None, skin=(190, 138, 110), eye=(60, 110, 60)):
+    g = new(); sleeve = sleeve or sh(robe, .9)
+    g.box(-4, 0, -2, 0, 12, 2, sh(robe, .7)); g.box(0, 0, -2, 4, 12, 2, sh(robe, .66)); g.box(-4, 0, -2, 4, 2, 2, (70, 54, 44))
+    g.box(-4.5, 5, -3.5, 4.5, 24.5, 3.5, robe)
+    if apron_c: g.box(-3.5, 6, 3.5, 3.5, 22, 4, apron_c)
+    g.box2(4, 17, -2, 8, 24, 3, sleeve); g.box(-8, 15, 2.5, 8, 19, 6.5, sleeve); g.box(-4, 15.5, 3, 4, 18.5, 6.6, sh(sleeve, .85))
+    g.box(-4, 24, -4, 4, 34, 4, skin); g.box(-1, 23, 4, 1, 27, 6, sh(skin, .92))
+    face(g, skin, eye, y=29); g.box(-3, 30, 3.5, 3, 31, 4, (70, 46, 34), 0)
+    g.base = [(-4, 0, -2, 4, 12, 2), (-4.5, 5, -3.5, 4.5, 24.5, 3.5), (-8, 15, -2, 8, 24, 6.5), (-4, 24, -4, 4, 34, 6)]
+    return g
+def v_now_smith():
+    g = villager((118, 84, 60), apron_c=(46, 42, 42)); g.box(.5, 28.5, 4, 3.5, 30.5, 4.4, (34, 30, 30), 0); g.box(-4.5, 30, 4, 4.5, 30.5, 4.4, (34, 30, 30), 0); return g
+def v_now_lib():
+    g = villager((226, 220, 206), sleeve=(206, 200, 186)); g.box(-4.5, 32.5, -4.5, 4.5, 35, 4.5, (170, 50, 46)); g.box(-3, 35, -3, 3, 36, 3, (232, 226, 210))
+    for sx in (1, -1):
+        a, b = (.5, 3.5) if sx > 0 else (-3.5, -.5); g.box(a, 30.5, 4, b, 31, 4.4, (60, 50, 40), 0); g.box(a, 28.5, 4, b, 29, 4.4, (60, 50, 40), 0)
+    return g
+def v_bram():
+    g = villager((86, 78, 70), apron_c=(104, 68, 42), sleeve=(178, 126, 90), skin=(178, 126, 90), eye=(60, 44, 30))
+    g.box(-4.5, 22.5, 2, 4.5, 28, 4.5, (92, 58, 36)); g.box(-3.5, 21, 3.5, 3.5, 27, 4.5, (92, 58, 36)); g.box(-1, 23, 4, 1, 27, 6, sh((178, 126, 90), .92))
+    g.box(-4.5, 31, -4.5, 4.5, 33, 4.5, (120, 44, 36)); g.box(-8.2, 15, 2.4, 8.2, 19, 6.6, (60, 48, 42)); g.box(-4.6, 11.5, 3.5, 4.6, 12.7, 4.1, (50, 38, 30)); return g
+def v_isabel():
+    g = villager((44, 58, 96), sleeve=(240, 232, 214), skin=(236, 190, 152), eye=(70, 100, 80))
+    g.box(-4.5, 5, -3.5, 4.5, 13, 3.6, (52, 76, 88)); g.box(-1, 13, 3.5, 1, 24, 3.6, (240, 232, 214)); g.box2(1, 13, 3.5, 1.6, 24.5, 3.8, GOLD)
+    g.box(-4.5, 33.5, -4.5, 4.5, 34.5, 4.5, (112, 72, 44)); g.box(-4.5, 32, 4, 4.5, 34.5, 4.5, (112, 72, 44)); g.box(-4.5, 27, -4.5, 4.5, 34.5, -4, (100, 64, 40)); g.box2(4, 29, -4.5, 4.5, 34.5, 2, (100, 64, 40))
+    for sx in (1, -1):
+        a, b = (.5, 3.5) if sx > 0 else (-3.5, -.5); g.box(a, 30.5, 4, b, 31, 4.4, (60, 50, 40), 0); g.box(a, 28.5, 4, b, 29, 4.4, (60, 50, 40), 0)
+    g.box(-3, 30, 3.5, 3, 31, 4, (236, 190, 152), 0); g.box2(1, 30.2, 3.5, 3, 30.6, 4, (112, 72, 44), 0); return g
+
+# ── 종이에 늘어놓기 ────────────────────────────────────────────────────
+CJK = '/usr/share/fonts/opentype/noto/NotoSansCJK-%s.ttc'
+def font(sz, bold=False): return ImageFont.truetype(CJK % ('Bold' if bold else 'Regular'), sz, index=1)
+BG, INK, SUB, LINE = (240, 231, 210), (66, 46, 30), (120, 96, 70), (206, 190, 158)
+def wrap(d, text, f, w):
+    out = []
+    for para in text.split('\n'):
+        cur = ''
+        for word in para.split(' '):
+            t = (cur + ' ' + word).strip()
+            if d.textlength(t, font=f) <= w: cur = t
+            else: out.append(cur); cur = word
+        out.append(cur)
+    return out
+def sheet(path, title, sub, cells, cols=3, cw=360, ch=400, foot=None, tag_h=128):
+    rows = (len(cells) + cols - 1) // cols; W = cols * cw; top = 150; H = top + rows * (ch + tag_h) + (70 if foot else 20)
+    im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, W, 104], fill=(92, 64, 42)); d.text((30, 20), title, font=font(40, True), fill=(250, 240, 214)); d.text((32, 112), sub, font=font(22), fill=SUB)
+    for i, (name, note, fig, kw) in enumerate(cells):
+        x, y = (i % cols) * cw, top + (i // cols) * (ch + tag_h)
+        d.rounded_rectangle([x + 8, y + 6, x + cw - 8, y + ch + tag_h - 8], 14, fill=(248, 241, 224), outline=LINE, width=2)
+        r = render(fig, cw, ch, **kw); im.paste(r, (x, y), r)
+        d.text((x + cw / 2, y + ch + 2), name, font=font(27, True), fill=INK, anchor='ma')
+        for j, ln in enumerate(wrap(d, note, font(19), cw - 44)[:3]): d.text((x + cw / 2, y + ch + 40 + j * 25), ln, font=font(19), fill=SUB, anchor='ma')
+    if foot: d.text((30, H - 52), foot, font=font(20), fill=SUB)
+    im.save(path); print(path, im.size)
+
+def main(out):
+    os.makedirs(out, exist_ok=True); K = {}; K1 = dict(S=7.6)
+    b, i = bram(), isabel()
+    sheet(os.path.join(out, 'npc_looks_1_methods.png'), 'NPC 외형 시안 ① 만드는 방식 비교', '같은 두 사람(대장장이 브람 · 기록관 이사벨)을 네 가지 방식으로', [
+        ('지금', '바닐라 주민 + 직업 옷\n(대장장이 브람)', v_now_smith(), K1), ('시안 A', '주민 몸 + 전용 옷\n옷·얼굴 그림만 인물마다', v_bram(), K1),
+        ('시안 B', '사람 몸 + 전용 스킨\n스킨 한 장 (겉옷 층까지)', b.flat(), K1), ('시안 C', '사람 몸 + 입체 장식\n수염·모자·도구가 입체로', b, K1),
+        ('지금', '바닐라 주민 + 직업 옷\n(기록관 이사벨)', v_now_lib(), K1), ('시안 A', '팔짱 낀 자세와 큰 코는\n그대로 남음', v_isabel(), K1),
+        ('시안 B', '팔다리가 움직이고\n물건을 들 수 있음', i.flat(), K1), ('시안 C', '가장 인물다움\n(②~④ 는 이 방식)', i, K1)],
+          cols=4, cw=300, ch=380, tag_h=112, foot='A: 그림 파일만 바꿈 (가장 가벼움)  ·  B: 사람 모델 + 인물별 스킨  ·  C: B + 인물별 입체 부품 (가장 손이 많이 감)')
+    sheet(os.path.join(out, 'npc_looks_2_story.png'), 'NPC 외형 시안 ② 이야기의 사람들', '베스탈리아 연대기의 주요 인물 (시안 C 방식)', [
+        ('수도회 장로 에르윈', '상아색 장로복에 불씨빛 영대,\n늘 끼고 있는 검은 장갑', erwin(), K), ('기록관 이사벨', '올림머리·둥근 안경·깃펜,\n연대기 책과 손등의 잉크 자국', isabel(), K),
+        ('탐험대장 로란', '챙 넓은 모자와 가죽 외투,\n다친 다리의 붕대와 지팡이', roran(), K), ('지도 제작자 펠릭스', '베레모·외알 안경,\n등에 진 지도통 묶음', felix(), K),
+        ('대장장이 브람', '덥수룩한 수염·맨팔·가죽 앞치마,\n그을린 장갑과 망치', bram(), K), ('어부 오스카', '털모자·줄무늬 목도리,\n얼음낚시 외투와 작살', oscar(), K),
+        ('시청 서기 하루', '단정한 조끼·토시·나비 넥타이,\n출석 장부와 깃펜', haru(), K), ('모험 안내인 모리스', '큰 배낭과 침낭·등불,\n여행자 지팡이', morris(), K),
+        ('행운 상인 럭키', '보라·금빛 마름모 조끼,\n손에 쥔 뽑기 티켓 부채', lucky(), K)])
+    sheet(os.path.join(out, 'npc_looks_3_merchants.png'), 'NPC 외형 시안 ③ 상인들', '무엇을 파는지 멀리서도 알아보게 (시안 C 방식)', [
+        ('농작물 상인', '밀짚모자·멜빵바지,\n당근이 담긴 바구니', m_farmer(), K), ('식품 상인', '요리사 모자·흰 조리복,\n붉은 목수건과 국자', m_food(), K),
+        ('수산물 상인', '노란 비옷과 비모자,\n손에 든 생선과 장화', m_fish(), K), ('장비 상인', '가죽 흉갑·강철 견갑,\n허리의 검과 팔 방패', m_gear(), K),
+        ('잡화 상인', '조각 천 외투,\n냄비까지 매단 큰 봇짐', m_general(), K), ('토지 상인', '자줏빛 예복과 높은 모자,\n봉랍 찍힌 땅문서', m_land(), K),
+        ('은행원', '금테 안경·초록 제복,\n금고 열쇠와 금화 상자', m_bank(), K), ('티켓 판매원', '붉은 줄무늬 조끼와 모자,\n티켓 두루마리', m_ticket(), K),
+        ('레이드 상인', '검붉은 두건 망토와 흉갑,\n전리품 상자', m_raid(), K)])
+    sheet(os.path.join(out, 'npc_looks_4_masters.png'), 'NPC 외형 시안 ④ 직업 교관 · 기록 담당', '직업의 무기와 성격이 한눈에 (시안 C 방식)', [
+        ('검술 교관 레온', '강철 흉갑·푸른 겉옷,\n등에 멘 대검', leon(), K), ('전사 대장 브론', '붉은 수염·털가죽 어깨,\n큰 양손 도끼', bron(), dict(S=7.4)),
+        ('방패 수호자 가렌', '짙은 판금 갑옷과 큰 방패,\n스무 해 된 흉터', garen(), K), ('사냥꾼 리아', '초록 두건 망토·땋은 머리,\n활과 화살통', lia(), K),
+        ('대마법사 엘리스', '보라 로브와 뾰족 모자,\n수정 지팡이', elis(), dict(S=7.4)), ('현상금 게시판지기 가렛', '안대·낡은 가죽 외투,\n가슴의 수배서와 벽보 뭉치', garret(), K),
+        ('순위 기록원 테오', '주황 조끼·삐친 머리,\n순위 장부와 귀의 연필', theo(), K), ('칭호 관리인 아델', '흰 예복·금테·푸른 띠,\n가슴의 약장(略章)', adel(), K),
+        ('레이드 안내인', '판금과 회색 망토,\n횃불과 붕대 감은 팔', raid_guide(), K)])
+
+if __name__ == '__main__': main(sys.argv[1] if len(sys.argv) > 1 else '/tmp/npc_looks')

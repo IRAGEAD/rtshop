@@ -1297,6 +1297,10 @@ public final class QuestManager {
         }
         QuestDef q = loaded.quests.get(questId);
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.abandoned", q == null ? questId : com.rtshop.story.StoryText.t(p, q.title)));
+        try {
+            com.rtshop.story.Spots.forgetQuest(p, q);
+        } catch (Throwable ignored) {
+        }
         String jobId = jobOf(questId);
         if (jobId != null) {
             // 이 직업의 선행 퀘스트를 그만둔다: 다른 직업의 선행 퀘스트를 받을 수 있다 (다시 받으면 이어서 진행)
@@ -1895,8 +1899,21 @@ public final class QuestManager {
                     }
                 }
             }
+            String whereNow = NpcPlaces.where(p.server, goTo);
+            // 말을 걸 사람이 없고 살펴볼 흔적이 이미 나타나 있으면 그 흔적의 자리를 알려 준다 (멀리 와 버린 사람이 되찾아가게)
+            if (!ready && goTo.isEmpty()) {
+                for (int i = 0; i < q.objectives.size() && i < e.getValue().length; i++) {
+                    QuestDef.Objective ob = q.objectives.get(i);
+                    if (ob.type != QuestDef.Type.INSPECT || e.getValue()[i] >= ob.count) continue;
+                    net.minecraft.core.BlockPos trace = com.rtshop.story.Spots.placed(p, ob.target);
+                    if (trace != null) {
+                        whereNow = p.level().dimension().location() + ";" + trace.getX() + ";" + trace.getY() + ";" + trace.getZ();
+                        break;
+                    }
+                }
+            }
             out.add(new com.rtshop.net.QuestHudPacket.Entry(q.id, v.title(), ready, com.rtshop.story.StoryText.t(p, npcName(q.turnInNpc())), v.objectives(),
-                    NpcPlaces.where(p.server, goTo)));
+                    whereNow));
         }
         // 오늘 출석을 아직 받지 않았으면 알려 준다 (받으면 사라진다)
         try {
@@ -1923,6 +1940,14 @@ public final class QuestManager {
                     com.rtshop.story.StoryText.t(p, npcName(next.giver)), List.of(), NpcPlaces.where(p.server, next.giver)));
         }
         return out;
+    }
+
+    /** 그 퀘스트의 HUD 가 가리키는 자리 ("차원;x;y;z", 없으면 ""). 점검용. */
+    public static String hudWhere(ServerPlayer p, String questId) {
+        for (com.rtshop.net.QuestHudPacket.Entry row : hudEntries(p)) {
+            if (row.id().equals(questId)) return row.where();
+        }
+        return "";
     }
 
     /** HUD 의 "다음 퀘스트" 줄 ID (뒤에 그 밖의 받을 수 있는 퀘스트 수). */
