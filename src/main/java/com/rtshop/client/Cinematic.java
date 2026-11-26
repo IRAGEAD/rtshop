@@ -37,6 +37,14 @@ public final class Cinematic {
             return;
         }
         startAt = System.currentTimeMillis();
+        // 보스 등장: 서버가 보스의 엔티티 번호를 보냈으면 카메라가 보스 곁에서 움직인다 (3.61, client.json 의 bossCamera)
+        BossCam.stop();
+        if ("boss".equals(str("kind", "")) && cur.has("entity")) {
+            try {
+                BossCam.start(cur.get("entity").getAsInt(), duration());
+            } catch (Throwable ignored) {
+            }
+        }
         String snd = str("sound", "");
         Minecraft mc = Minecraft.getInstance();
         for (String s : snd.split(",")) {

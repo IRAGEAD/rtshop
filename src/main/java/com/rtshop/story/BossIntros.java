@@ -77,6 +77,7 @@ public final class BossIntros {
         boss.getPersistentData().putBoolean(SEEN_TAG, true);
         SHOWN.add(boss.getUUID());
         JsonObject o = cinema(in);
+        o.addProperty("entity", boss.getId());   // 화면 쪽의 3D 카메라 연출(client/BossCam)이 이 보스를 따라간다
         double r = c.introRadius + 12;
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, boss.getBoundingBox().inflate(r))) {
             send(p, o);
