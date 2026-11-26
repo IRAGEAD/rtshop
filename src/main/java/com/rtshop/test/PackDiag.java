@@ -399,27 +399,28 @@ final class PackDiag {
             }
         }
         out.add("same-item loops: " + n1);
-        out.add("== money loops: make from shop materials, sell for more than they cost (item | sell | material cost | recipe | food?)");
+        // 3.65.0: 재료를 모두 상점에서 사서 '게임에 있는' 조합법으로 만들 때의 값과 견준다 (값 계산의 원가는 게임에서 지운 Create 조합법 같은 길도 읽어서 돈 불리기를 잘못 보였다)
+        out.add("== money loops: buy every material in the shops, make it with a recipe that exists in game, sell (item | sell | buy-materials cost | x | food?)");
+        out.add("   (food is meant to leave the 10% hand-cooked margin + up to 15% between recipes + the cooking labour fee: pot 80, stockpot 60, barrel 50, shaker 40, teapot 20, steamer 10 G a batch)");
         int n2 = 0;
         int food = 0;
-        if (l.solved != null) {
-            List<String> rows = new ArrayList<>();
-            for (java.util.Map.Entry<String, Double> e : maxSell.entrySet()) {
-                String id = e.getKey();
-                Double c = l.solved.cost.get(id);
-                if (c == null || c < 0.005 || !l.solved.exact.contains(id)) continue;
-                double gain = e.getValue() - c;
-                if (gain <= Math.max(0.5, c * 0.02)) continue;
-                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
-                boolean isFood = item != null && (item.isEdible() || l.solved.processed.contains(id));
-                if (isFood) food++;
-                else n2++;
-                rows.add(String.format(Locale.ROOT, "%08.1f|%s | sell %.2f | cost %.2f | %s | %s", gain, id, e.getValue(), c, l.solved.costRecipe.get(id), isFood ? "food" : "NOT FOOD"));
-            }
-            rows.sort(java.util.Comparator.reverseOrder());
-            for (int i = 0; i < Math.min(80, rows.size()); i++) out.add(rows.get(i).substring(rows.get(i).indexOf('|') + 1));
+        java.util.Map<String, Double> buyCost = ShopLoader.cheapestPurchaseCosts(l);
+        List<String> rows = new ArrayList<>();
+        for (java.util.Map.Entry<String, Double> e : maxSell.entrySet()) {
+            String id = e.getKey();
+            Double c = buyCost.get(id);
+            if (c == null || c < 0.005) continue;
+            double gain = e.getValue() - c;
+            if (gain <= Math.max(1.0, c * 0.3)) continue;
+            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
+            boolean isFood = item != null && (item.isEdible() || (l.solved != null && l.solved.processed.contains(id)));
+            if (isFood) food++;
+            else n2++;
+            rows.add(String.format(Locale.ROOT, "%010.1f|%s | sell %.2f | cost %.2f | x%.2f | %s", gain, id, e.getValue(), c, e.getValue() / c, isFood ? "food" : "NOT FOOD"));
         }
-        out.add("craft loops: " + n2 + " non-food, " + food + " food (food has the cook's margin by design)");
+        rows.sort(java.util.Comparator.reverseOrder());
+        for (int i = 0; i < Math.min(60, rows.size()); i++) out.add(rows.get(i).substring(rows.get(i).indexOf('|') + 1));
+        out.add("craft loops (sell > 1.3 x materials bought in the shops): " + n2 + " non-food, " + food + " food; items with a buy route: " + buyCost.size());
         // 뽑기에 든 물건을 상점에서도 살 수 있으면 뽑기가 헛일이 된다
         out.add("== gacha items you can also buy in a shop (item | grade | shop price)");
         int n3 = 0;

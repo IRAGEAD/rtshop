@@ -6478,6 +6478,19 @@ public final class SelfTest {
             check("3.65.0 a golden carrot is bought back near what its gold costs (no buy-gold, craft, sell loop)",
                     goldenCarrot.sellUnit <= (viaIngots + 60) * 1.3, goldenCarrot.sellUnit + " vs gold " + viaIngots);
         }
+        {
+            // 값 계산이 읽는 조합법 파일에는 게임에서 지운 조합법(Create 전체 등)도 있다 → 음식 매입가의 하한에서는 뺀다
+            com.rtshop.shop.RecipeSolver.Recipe createCake = new com.rtshop.shop.RecipeSolver.Recipe();
+            createCake.id = "create:crafting/curiosities/cake";
+            createCake.type = "minecraft:crafting_shaped";
+            createCake.outputs.add(new com.rtshop.shop.RecipeSolver.Out("minecraft:cake", 1));
+            com.rtshop.shop.RecipeSolver.Recipe vanillaCake = new com.rtshop.shop.RecipeSolver.Recipe();
+            vanillaCake.id = "minecraft:cake";
+            vanillaCake.type = "minecraft:crafting_shaped";
+            vanillaCake.outputs.add(new com.rtshop.shop.RecipeSolver.Out("minecraft:cake", 1));
+            check("3.65.0 food price floors only use recipes that exist in game (Create's cake recipe is removed by the pack, the vanilla one is not)",
+                    !ShopLoader.inGameForTest(createCake) && ShopLoader.inGameForTest(vanillaCake));
+        }
         List<String> buyLoss = ShopLoader.purchaseDeficits(l);
         check("buying ingredients from the shops and cooking never loses money, and a hopper-fed furnace cannot farm money",
                 buyLoss.isEmpty(), buyLoss.isEmpty() ? null : buyLoss.size() + ": " + String.join(" / ", buyLoss.subList(0, Math.min(8, buyLoss.size()))));

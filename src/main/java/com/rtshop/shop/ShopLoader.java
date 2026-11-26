@@ -1391,6 +1391,37 @@ public final class ShopLoader {
         return blockedByOperator(r, blocked);
     }
 
+    /**
+     * 게임에 실제로 남는 조합법인가: item_policy 가 지우는 조합법(Create 전체 · 막은 장비 등)은 값 계산이 읽는 조합법 파일에는 그대로 있어서,
+     * 음식 매입가의 하한이 게임에 없는 조합법을 '가장 싼 길'로 치지 않게 뺀다 (3.65.0).
+     */
+    static boolean inGame(RecipeSolver.Recipe r) {
+        if (r == null || r.id == null) {
+            return true;
+        }
+        try {
+            ResourceLocation rid = ResourceLocation.tryParse(r.id);
+            ResourceLocation out = r.outputs.isEmpty() ? null : ResourceLocation.tryParse(r.outputs.get(0).item);
+            return rid == null || !com.rtshop.rules.ItemPolicy.recipeBanned(rid, out);
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    public static boolean inGameForTest(RecipeSolver.Recipe r) {
+        return inGame(r);
+    }
+
+    private static List<RecipeSolver.Recipe> inGameRecipes(RecipeScan.Scan scan) {
+        List<RecipeSolver.Recipe> l = new ArrayList<>();
+        for (RecipeSolver.Recipe r : scan.recipes) {
+            if (inGame(r)) {
+                l.add(r);
+            }
+        }
+        return l;
+    }
+
     private static Map<String, List<RecipeSolver.Recipe>> byOutput(RecipeScan.Scan scan, Set<RecipeSolver.Recipe> skip) {
         Map<String, List<RecipeSolver.Recipe>> m = new HashMap<>();
         Set<String> blocked = Set.of();
@@ -1399,7 +1430,7 @@ public final class ShopLoader {
         } catch (Throwable ignored) {
         }
         for (RecipeSolver.Recipe r : scan.recipes) {
-            if (skip.contains(r) || blockedByOperator(r, blocked)) {
+            if (skip.contains(r) || blockedByOperator(r, blocked) || !inGame(r)) {
                 continue;
             }
             for (RecipeSolver.Out o : r.outputs) {
@@ -1427,7 +1458,7 @@ public final class ShopLoader {
         // 3.65.0: 재료를 사서 마련하는 길에는 보관용 조리법(주괴 → 조각 9개 등)도 넣는다. 빼면 금 조각을 '금 장비를 녹여서'처럼 터무니없이
         // 비싼 길로만 마련할 수 있다고 계산해, 황금 당근의 매입가가 5,585 G 가 되었다 (주괴로 만들면 300 G 안팎 → 사서 만들어 팔면 큰돈).
         // 매입가 하한을 걸 음식의 조리법(makers)에서는 그대로 뺀다.
-        List<RecipeSolver.Recipe> usable = new ArrayList<>(scan.recipes);
+        List<RecipeSolver.Recipe> usable = inGameRecipes(scan);
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(scan, storage);
         double ratio = pc.sellRatio > 0 ? pc.sellRatio : 0.5;
         int raised = 0;
@@ -1548,7 +1579,7 @@ public final class ShopLoader {
         RecipeSolver.Config cfg = new RecipeSolver.Config();
         cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
-        List<RecipeSolver.Recipe> usable = new ArrayList<>(loaded.scan.recipes);   // 3.65.0: applyPurchaseFloor 와 같게 (보관용 조리법도 재료 마련에)
+        List<RecipeSolver.Recipe> usable = inGameRecipes(loaded.scan);   // 3.65.0: applyPurchaseFloor 와 같게 (보관용 조리법도 재료 마련에, 게임에 없는 조합법은 빼고)
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
         RecipeSolver.setRefunds(refunds(loaded.prices, pc));
         Map<String, Double> sup = supply(loaded.prices);
@@ -1583,6 +1614,41 @@ public final class ShopLoader {
         return out;
     }
 
+    /**
+     * 점검용(diag): 재료를 모두 상점에서 사서 게임에 있는 조합법(보관용 포함, 자유 조리법 제외)으로 만들 때 가장 싼 재료비.
+     * 사서 만들어 팔면 남는 길(돈 불리기)을 찾는 데 쓴다. 만들 길이 없거나 재료를 살 수 없으면 맵에 없다.
+     */
+    public static Map<String, Double> cheapestPurchaseCosts(Loaded loaded) {
+        Map<String, Double> res = new HashMap<>();
+        if (loaded.scan == null || loaded.scan.env == null) {
+            return res;
+        }
+        PricingConfig pc = PricingConfig.get();
+        RecipeSolver.Config cfg = new RecipeSolver.Config();
+        cfg.flatExtra.putAll(pc.flatExtra);
+        List<RecipeSolver.Recipe> usable = inGameRecipes(loaded.scan);
+        Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, Set.of());
+        RecipeSolver.setRefunds(refunds(loaded.prices, pc));
+        Map<String, Double> sup = supply(loaded.prices);
+        Map<String, Double> pcost = RecipeSolver.purchaseCosts(sup, usable, loaded.scan.env, cfg);
+        for (Map.Entry<String, List<RecipeSolver.Recipe>> e : makers.entrySet()) {
+            double best = -1;
+            for (RecipeSolver.Recipe r : e.getValue()) {
+                if (pc.flexDishPricing && isFlexRecipe(r)) {
+                    continue;
+                }
+                double c = RecipeSolver.purchaseRequirement(r, e.getKey(), pcost, loaded.scan.env, cfg, null);
+                if (c > 0 && (best < 0 || c < best)) {
+                    best = c;
+                }
+            }
+            if (best > 0) {
+                res.put(e.getKey(), best);
+            }
+        }
+        return res;
+    }
+
     /** 결과 점검: 재료를 상점에서 사서 어떤 조리법으로 만들어도 매입가가 재료비 이상인가. 손해인 경우의 설명 목록. */
     public static List<String> purchaseDeficits(Loaded loaded) {
         List<String> out = new ArrayList<>();
@@ -1593,7 +1659,7 @@ public final class ShopLoader {
         RecipeSolver.Config cfg = new RecipeSolver.Config();
         cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
-        List<RecipeSolver.Recipe> usable = new ArrayList<>(loaded.scan.recipes);   // 3.65.0: applyPurchaseFloor 와 같게 (보관용 조리법도 재료 마련에)
+        List<RecipeSolver.Recipe> usable = inGameRecipes(loaded.scan);   // 3.65.0: applyPurchaseFloor 와 같게 (보관용 조리법도 재료 마련에, 게임에 없는 조합법은 빼고)
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
         RecipeSolver.setRefunds(refunds(loaded.prices, pc));
         Map<String, Double> sup = supply(loaded.prices);
