@@ -1510,6 +1510,10 @@ final class ClientSelfTest2 {
                 check("map marks land in the map mod's waypoint list (folder " + folder + "): added once, not doubled when sent again, moved in place",
                         MAP_FIRST == 1 && second == 1 && MapMarkClient.addedForTest >= 1 && MapMarkClient.movedForTest >= 1 && MapMarkClient.errorForTest.isEmpty(),
                         MAP_FIRST + " " + second + " added " + MapMarkClient.addedForTest + " moved " + MapMarkClient.movedForTest + " " + MapMarkClient.errorForTest);
+                // C-8: 이 폴더의 표시는 세계 안에는 그리지 않는다 (M 지도에서만). Diorama 의 세계 안 표시가 우리 것을 건너뛴 횟수로 확인한다
+                check("the town's map marks are left out of the map mod's in-world display (they show on the M map only)",
+                        MapMarkClient.hiddenInWorldForTest > 0 && !MapMarkClient.hideInWorld("다른 폴더") && MapMarkClient.hideInWorld(folder),
+                        MapMarkClient.hiddenInWorldForTest);
             } else {
                 check("without the map mod, map marks are ignored quietly", !MapMarkClient.available() && second == -1 && MapMarkClient.addedForTest == 0);
             }

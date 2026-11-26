@@ -9,7 +9,8 @@
     "IllusionerGhostMixin",
     "EfItemProbeMixin",
     "ItemLayerProbeMixin",
-    "GuiGraphicsTextMixin"
+    "GuiGraphicsTextMixin",
+    "DioramaWorldPinsMixin"
   ],
   "injectors": {
     "defaultRequire": 0

@@ -58,16 +58,19 @@ public final class MapMarks {
         public String folder = "베스탈리아";
         /** NPC 에게 말을 걸면 그 이름을 적는다. */
         public boolean npcs = true;
+        /** true 면 이 표시들이 세계 안에도(이름표·빛기둥) 뜬다. 기본은 M 지도에서만 (NPC 앞·연출 화면과 겹치지 않게). */
+        public boolean showInWorld = false;
         public String npcColor = "#E8C56A", placeColor = "#8FC7F0";
         public final List<Place> places = new ArrayList<>();
 
         JsonObject toJson() {
             JsonObject o = new JsonObject();
-            o.addProperty("_help", "지도 표시. 말을 걸어 본 NPC 와 가 본 장소의 이름이 지도 모드(Diorama)의 웨이포인트로 남습니다. folder = 웨이포인트 폴더 이름, npcs = NPC 표시 켜기, "
+            o.addProperty("_help", "지도 표시. 말을 걸어 본 NPC 와 가 본 장소의 이름이 지도 모드(Diorama)의 웨이포인트로 남습니다. folder = 웨이포인트 폴더 이름, npcs = NPC 표시 켜기, showInWorld = 이 표시들을 세계 안에도 띄우기(기본 false: M 지도에서만 보임), "
                     + "npcColor / placeColor = 표시 색(#RRGGBB). places = 장소 목록 (게임 안에서 /rtshop mapmark add <반경> <이름> 으로 서 있는 자리를 더하고, remove <이름> 으로 지웁니다).");
             o.addProperty("enabled", enabled);
             o.addProperty("folder", folder);
             o.addProperty("npcs", npcs);
+            o.addProperty("showInWorld", showInWorld);
             o.addProperty("npcColor", npcColor);
             o.addProperty("placeColor", placeColor);
             JsonArray a = new JsonArray();
@@ -90,6 +93,7 @@ public final class MapMarks {
             if (o.has("enabled")) c.enabled = o.get("enabled").getAsBoolean();
             if (o.has("folder") && !o.get("folder").getAsString().isBlank()) c.folder = o.get("folder").getAsString().trim();
             if (o.has("npcs")) c.npcs = o.get("npcs").getAsBoolean();
+            if (o.has("showInWorld")) c.showInWorld = o.get("showInWorld").getAsBoolean();
             if (o.has("npcColor")) c.npcColor = o.get("npcColor").getAsString();
             if (o.has("placeColor")) c.placeColor = o.get("placeColor").getAsString();
             if (o.has("places") && o.get("places").isJsonArray()) {
@@ -209,6 +213,7 @@ public final class MapMarks {
     private static void send(ServerPlayer p, JsonArray marks, JsonArray gone, boolean notify, boolean force) {
         JsonObject o = new JsonObject();
         o.addProperty("folder", get().folder);
+        o.addProperty("world", get().showInWorld);
         o.add("marks", marks);
         o.add("gone", gone);
         o.addProperty("notify", notify);

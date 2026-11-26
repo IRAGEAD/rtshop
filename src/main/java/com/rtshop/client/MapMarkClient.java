@@ -45,7 +45,28 @@ public final class MapMarkClient {
         return !broken && ModList.get().isLoaded("diorama");
     }
 
+    /** 서버가 알려 준 RT Shop 웨이포인트 폴더. 세계 안에서는 이 폴더의 표시를 그리지 않는다 (M 지도에서만 보인다). */
+    private static volatile String townFolder = "베스탈리아";
+    /** 서버 설정(map_marks.json 의 showInWorld)이 켜져 있으면 세계 안에도 그대로 둔다. */
+    private static volatile boolean showInWorld;
+    /** 점검용: 세계 안 표시에서 뺀 횟수 (그릴 때마다 는다). */
+    public static volatile int hiddenInWorldForTest;
+
+    /** Diorama 의 세계 안 웨이포인트 표시가 이 폴더의 것을 그리려 할 때: 감출 것이면 true (DioramaWorldPinsMixin 이 부른다). */
+    public static boolean hideInWorld(String folder) {
+        if (showInWorld || folder == null) return false;
+        String mine = townFolder;
+        if (mine.isEmpty() || !mine.equalsIgnoreCase(folder.trim())) return false;
+        hiddenInWorldForTest++;
+        return true;
+    }
+
     public static void receive(JsonObject o) {
+        try {
+            if (o.has("folder") && !o.get("folder").getAsString().isBlank()) townFolder = o.get("folder").getAsString().trim();
+            showInWorld = o.has("world") && o.get("world").getAsBoolean();
+        } catch (Exception ignored) {
+        }
         if (!available()) return;
         synchronized (PENDING) {
             PENDING.add(o);
