@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 4
+VERSION = 5
 CATS = []
 
 
@@ -134,7 +134,7 @@ page(c, "commands", "자주 쓰는 명령어", """
 · /pc <말> : 파티 채팅
 · /pvp : PvP 켜기·끄기
 · /bounty : 맡은 현상금 보기
-· /rtshop report write <내용> : 운영자에게 민원 남기기 (버그·건의·토지나 거래 문제). 내 민원과 답변은 /rtshop report list
+· 민원(버그·건의·신고·토지나 거래 문제): 시청 서기 하루에게 말을 걸어 「민원 접수」를 고릅니다. 내 민원과 답변은 그 창이나 /rtshop report list
 """, keys="명령어 커맨드 민원 신고 건의")
 
 # ================================================================ 돈과 거래

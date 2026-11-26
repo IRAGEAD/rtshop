@@ -1,5 +1,5 @@
 {
- "version": 4,
+ "version": 5,
  "_help": "조사대 안내서(가이드북). categories → pages. page: title, text(\\n 줄바꿈, '· ' 로 시작하면 항목), image(그림 경로)·iw·ih(그림의 원래 크기), icons(아이템 ID 목록), mod(이 모드가 있을 때만 보인다. 쉼표로 여럿), keys(찾기에 걸릴 낱말). 직접 고쳤으면 \"edited\": true 를 넣으세요. /rtshop reload 로 다시 읽습니다.",
  "edited": false,
  "categories": [
@@ -87,7 +87,7 @@
     {
      "id": "commands",
      "title": "자주 쓰는 명령어",
-     "text": "· /rtshop quest : 퀘스트 수첩\n· /rtshop hud : 화면 표시 옮기기\n· /rtshop balance : 지갑과 예금 보기\n· /rtshop check <금액> : Gold 수표 만들기\n· /rtshop land : 내 토지 설정\n· /rtshop job : 직업 보기\n· /party : 파티 (만들기·초대·나가기)\n· /pc <말> : 파티 채팅\n· /pvp : PvP 켜기·끄기\n· /bounty : 맡은 현상금 보기\n· /rtshop report write <내용> : 운영자에게 민원 남기기 (버그·건의·토지나 거래 문제). 내 민원과 답변은 /rtshop report list",
+     "text": "· /rtshop quest : 퀘스트 수첩\n· /rtshop hud : 화면 표시 옮기기\n· /rtshop balance : 지갑과 예금 보기\n· /rtshop check <금액> : Gold 수표 만들기\n· /rtshop land : 내 토지 설정\n· /rtshop job : 직업 보기\n· /party : 파티 (만들기·초대·나가기)\n· /pc <말> : 파티 채팅\n· /pvp : PvP 켜기·끄기\n· /bounty : 맡은 현상금 보기\n· 민원(버그·건의·신고·토지나 거래 문제): 시청 서기 하루에게 말을 걸어 「민원 접수」를 고릅니다. 내 민원과 답변은 그 창이나 /rtshop report list",
      "keys": "명령어 커맨드 민원 신고 건의"
     }
    ]

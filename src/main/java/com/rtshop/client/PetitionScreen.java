@@ -255,4 +255,9 @@ public class PetitionScreen extends Screen {
     public int rowsForTest() {
         return rows.size();
     }
+
+    public void tabForTest(int t) {
+        tab = t;
+        this.rebuildWidgets();
+    }
 }

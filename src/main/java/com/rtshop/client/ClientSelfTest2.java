@@ -1873,7 +1873,76 @@ final class ClientSelfTest2 {
             });
             waitTicks(30);
         });
+        // 3.61: NPC 외형(사람 모습) · 보스 등장의 3D 카메라 · 민원 창
+        add(mc -> {
+            LOOK_IDS.clear();
+            onServer(mc, sp -> {
+                net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
+                double fx = look.x, fz = look.z, len = Math.max(0.01, Math.sqrt(fx * fx + fz * fz));
+                fx /= len;
+                fz /= len;
+                net.minecraft.world.phys.Vec3 front = sp.position().add(fx * 3.2, 0, fz * 3.2);
+                String[] who = {"order_archivist", "bram", "order_elder"};
+                for (int i361 = 0; i361 < who.length; i361++) {
+                    double side = (i361 - 1) * 1.6;
+                    var v361 = com.rtshop.quest.QuestManager.spawnNpc(sp.serverLevel(), front.add(-fz * side, 0, fx * side), sp.getYRot() + 180, who[i361]);
+                    if (v361 != null) LOOK_IDS.add(v361.getId());
+                }
+            });
+            waitTicks(60);
+        });
+        add(mc -> {
+            LOOK_DRAWN = NpcLookClient.drawnForTest;
+            check("3.61 npc looks: the server tells the screen which NPC wears which look, and the look files load",
+                    LOOK_IDS.size() == 3 && NpcLookClient.knownForTest() >= 3 && NpcLookClient.quadsForTest("isabel") > 500 && NpcLookClient.quadsForTest("no_such_look") == -1,
+                    LOOK_IDS + " known=" + NpcLookClient.knownForTest() + " isabel=" + NpcLookClient.quadsForTest("isabel"));
+            waitTicks(10);
+        });
+        add(mc -> {
+            check("3.61 npc looks: those NPCs are drawn as people instead of villagers", NpcLookClient.drawnForTest > LOOK_DRAWN, NpcLookClient.drawnForTest - LOOK_DRAWN);
+            shot(mc, "131_npc_looks");
+            int cam361 = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(LOOK_IDS.size() - 1);
+            Cinematic.play("{\"kind\":\"boss\",\"name\":\"카메라 점검\",\"epithet\":\"3D 등장 연출\",\"color\":\"FF7A20\",\"shake\":0,\"seconds\":4,\"entity\":" + cam361 + "}");
+            waitTicks(30);
+        });
+        add(mc -> {
+            check("3.61 boss camera: during a boss entrance the camera leaves the player's eyes and stands near the boss",
+                    BossCam.active() && mc.getCameraEntity() != mc.player && BossCam.startsForTest > 0, BossCam.active() + " " + BossCam.lastForTest);
+            shot(mc, "132_boss_cam");
+            waitTicks(75);
+        });
+        add(mc -> {
+            check("3.61 boss camera: when the entrance ends the camera is back in the player's eyes", !BossCam.active() && mc.getCameraEntity() == mc.player, mc.getCameraEntity());
+            onServer(mc, sp -> {
+                for (int id361 : LOOK_IDS) {
+                    net.minecraft.world.entity.Entity e361 = sp.serverLevel().getEntity(id361);
+                    if (e361 != null) e361.discard();
+                }
+                com.rtshop.petition.Petitions.forTestReset(sp.server);
+                int first361 = com.rtshop.petition.Petitions.file(sp, "bug", "상점 창을 닫았다 열면 검색어가 남아 있어요.");
+                com.rtshop.petition.Petitions.answer(sp.server, first361, "운영자", "확인했습니다. 다음 판에서 고치겠습니다.");
+                com.rtshop.petition.Petitions.forTestNoCooldown();
+                com.rtshop.petition.Petitions.file(sp, "land", "옆 토지와 경계가 한 칸 겹칩니다.");
+                com.rtshop.petition.Petitions.open(sp, "", false);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            check("3.61 reports: the clerk's window opens with the categories and a place to write", mc.screen instanceof PetitionScreen ps361 && ps361.rowsForTest() >= 5, mc.screen);
+            shot(mc, "133_petition_new");
+            if (mc.screen instanceof PetitionScreen pt361) pt361.tabForTest(1);
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "133b_petition_mine");
+            mc.setScreen(null);
+            onServer(mc, sp -> com.rtshop.petition.Petitions.forTestReset(sp.server));
+            waitTicks(10);
+        });
     }
+
+    private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static volatile long LOOK_DRAWN;
 
     /** Epic Fight 가 이 아이템에 쓰는 렌더러 (Avalon mesh_item 이면 메쉬가 실제로 읽혔는지도). */
     static String efRendererInfo(net.minecraft.world.item.ItemStack st) {
