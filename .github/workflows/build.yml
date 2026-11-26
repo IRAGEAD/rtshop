@@ -210,6 +210,16 @@ jobs:
             # 설정 항목의 이름만 (세계 안의 웨이포인트 표시를 끄는 항목이 있는지 보려고)
             (cd /tmp/dj && javap -p 'dev/diorama/Settings.class' 2>&1 | head -n 400; javap -p -c 'dev/diorama/waypoint/WaypointBeams.class' 2>&1 | grep -n -A40 'static boolean has(' | head -n 80) > /tmp/inspect/diorama-settings.txt 2>&1
           fi
+      - name: Inspect Diorama radar
+        run: |
+          mkdir -p /tmp/inspect
+          # 미니맵의 몹 표시(레이더)가 어디서 몹을 고르는지 (RT Shop NPC 는 말을 걸어 본 것만 보이게 하려고)
+          if [ -d /tmp/dj ]; then
+            (cd /tmp/dj && for c in dev/diorama/render/Radar 'dev/diorama/render/Radar$Blip' 'dev/diorama/render/Radar$Kind' 'dev/diorama/render/Radar$Pile' dev/diorama/RadarCategories 'dev/diorama/RadarCategories$Mob'; do
+              echo "######## $c"; javap -c -p "$c.class" 2>&1 | head -n 3000
+            done) > /tmp/inspect/diorama-radar.txt 2>&1
+            (cd /tmp/dj && javap -p dev/diorama/MinimapHud.class 2>&1 | head -n 200) >> /tmp/inspect/diorama-radar.txt 2>&1
+          fi
       - name: Inspect cooking recipes
         run: |
           mkdir -p /tmp/inspect
