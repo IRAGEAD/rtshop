@@ -1,4 +1,4 @@
-# 이어받기 안내 (2026-11-26 밤, 3.60.0 올린 직후)
+# 이어받기 안내 (2026-11-26 밤, 3.61.0 올린 직후)
 
 새 세션은 이 파일 하나만 읽으면 이어서 일할 수 있게 적었습니다. 더 자세한 것은 `docs/worklist.md`(요청 목록·진행), `docs/story_bible_pointer.md`(코드 지도), `docs/review_checklist.md`(사용자가 직접 볼 것) 에 있습니다.
 
@@ -56,14 +56,23 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
-- **3.60.0 을 올렸고(릴리스 latest = RT Shop 3.60.0) jar 와 요약을 사용자에게 보냈습니다.** 같은 날 3.55.0 ~ 3.59.0 도 올렸습니다.
+- **3.61.0 을 올렸고(릴리스 latest = RT Shop 3.61.0) jar 와 요약을 사용자에게 보냈습니다.** 같은 날 3.55.0 ~ 3.60.0 도 올렸습니다.
+- 3.61.0 (worklist 의 "3.61.0", G-1 ~ G-5): 민원을 시청 서기 하루의 창으로 + 분류(`client/PetitionScreen`, `net/PetitionPacket`) / 보스 등장 3D 카메라(`client/BossCam`) / NPC 외형 C 방식 27명(`npc/NpcLooks`, `client/NpcLookClient`, `tools/gen_npc_looks.py`) / 이사벨을 더 예쁘게 / 이전 요청 전체 대조.
 - 3.60.0 (worklist 의 "3.60.0", F-1 ~ F-4): 모드 목록의 버전 표기(`${file.jarVersion}`) / 스토리·진행 전체 검토에서 다섯 곳 고침(우유 말, '오늘의 룬' 언급, 이글루 걸음, 프로스트모의 옛 선택, 받지 않던 선택 둘의 뒷이야기) / 민원 첫 판(`/rtshop report`, `petition/Petitions`) / 주식·히든 직업 제안서와 NPC 외형 시안을 다시 보여 줌(고른 것 없음).
 - 3.59.0 (worklist 의 "3.59.0" · "추가 요청 15:03" · "추가 요청 15:19"):
   흔들리던 시험 두 개 손질 / 강화 정보 창의 "+13%" 글자(더하기표가 세로 줄로 보이던 것) / 영어판에 남은 한국어 / Create 를 상점 · 뽑기에서도 제외(item_policy.json 4판, gachaBan) / 상점 설정을 기본값으로 · 내 설정으로 되돌리는 명령(`/rtshop shop defaults|mine|status`).
 - 3.58.0: 기억의 문을 걸어 들어가는 문으로 + 보스 구역의 대기·불씨·깨어남 연출 / 요리 권장안 / Create 조합법·전리품·블록 드랍 금지 / NPC 자리 배치 파일 / 미니맵 NPC 아이콘 / 주식·히든 직업 제안서 / 마을 이식 설명.
-- 가지 이름: v5-next ~ v5-next10 은 이미 쓰였습니다. 다음 작업 가지는 **v5-next11** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
+- 가지 이름: v5-next ~ v5-next11 은 이미 쓰였습니다. 다음 작업 가지는 **v5-next12** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
 
-## 5. 사용자에게 보낸 3.60.0 요약 (참고)
+## 5. 사용자에게 보낸 3.61.0 요약 (참고)
+
+1. 민원: 시청 서기 하루에게 말을 걸어 「민원 접수 · 내 민원 보기」 → 창에서 분류 다섯 가운데 하나를 고르고 글을 써 접수. 운영자 명령은 그대로(분류로 거르기 추가).
+2. 보스 등장: 카메라가 보스 곁에서 움직이는 3D 연출 (끄기 client.json 의 bossCamera). Cinematic Cataclysm 의 컷신 연동은 아니라고 알림.
+3. NPC 외형 C: 27명. 엔티티는 주민 그대로, 모습만 바뀜. 머리가 플레이어를 바라봄. 팔다리는 안 움직임. 알버트·로렌초는 다른 인물의 모습을 빌림.
+4. 이사벨 새 모습 (비교 그림을 보냄).
+5. 이전 요청 대조: 아직 없는 것 여섯(주식·히든 직업 / 음악 / 마을 이식 명령 / 히든 아이템 / Cinematic Cataclysm 컷신 / 스킬라 다섯째 단서의 종류)을 알림. 스토리 대사 합본 txt 를 보냄.
+
+### 그 앞 판: 3.60.0 요약
 
 1. 버전 표기: 게임의 모드 목록에 3.0.0 으로 보이던 것이 jar 의 판 번호로.
 2. 스토리·진행 검토: 고친 다섯 곳(위 4절)과 "이상 없던 것", 그리고 본 방법(짜임·낱말은 전부, 본문은 걸린 곳만)을 알림.
@@ -85,10 +94,11 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 2. (3.60.0 에서 끝냄) 모드 목록의 버전 표기. 판을 올릴 때는 `build.gradle` 의 `version` 만 고치면 jar 이름 · MANIFEST · 모드 목록이 함께 바뀐다. (개발 실행에서는 jar 가 없어 0.0NONE 으로 보이는 것이 정상.)
 
 사용자의 답·자료를 기다리는 것 (**고르기 전에는 만들지 않는다**):
-2-1. **민원 시스템의 다음 걸음** (3.60.0 에 첫 판을 넣음, 명령어 방식): 사용자의 반응을 듣고 — 창으로 접수·열람(시청 서기 하루), 분류, 한도·간격을 설정 파일로, 서바이벌의 운영자도 답하게 할지.
-2-2. **보스·스토리 연출을 3D 로** (3.60.0 에서 사용자가 "3D 연출을 썼는지" 물어 설명함 — worklist F-5): 지금은 2D 화면 연출 + 세계 안의 입자·블록. Cinematic Cataclysm 컷신 연동(사용자가 예전에 원한 것)과 카메라가 움직이는 등장 장면은 아직 없다. 사용자가 하자고 하면: inspect job 으로 `cinematiccataclysm:*_cutscene` 엔티티가 컷신을 트는 조건을 보고, 기억의 문 안 `wake` 때 그 컷신을 부르는 길을 찾는다 (안 되면 자체 카메라 연출: `ViewportEvent.ComputeCameraAngles` + 카메라 엔티티).
+2-1. **민원** (3.61.0 에서 하루의 창 + 분류까지 끝냄). 남은 생각거리: 한도·간격(300자 · 5건 · 30초)을 설정 파일로, 운영자용 창(지금은 명령어와 채팅 단추), 서바이벌의 운영자도 답하게 할지.
+2-2. **3D 연출의 다음 걸음** (3.61.0 에서 보스 등장의 카메라 연출 `client/BossCam` 을 넣음): 사용자가 직접 보고 고칠 것을 말하면 — 길이(지금은 등장 연출 시간 그대로, 기본 5초), 도는 각도·거리(`BossCam.place`), 보스별로 다른 움직임. Cinematic Cataclysm 의 컷신을 그대로 트는 연동은 아직 없다 (inspect job 으로 `cinematiccataclysm:*_cutscene` 엔티티가 컷신을 트는 조건부터 봐야 한다).
+2-3. **NPC 외형의 다음 걸음** (3.61.0 에서 C 방식 27명): 사용자가 인물별로 고칠 곳을 말하면 `tools/mock/npc_mock.py` 의 그 인물 함수를 고치고 → `python3 tools/gen_npc_looks.py` → (그림으로 먼저 보여 주려면 `m.render(m.<인물>())`). 직업 안내인 알버트 · 식당 주인 로렌초의 전용 모습, 팔다리 움직임(지금은 머리만 돎), 동행 NPC(`CompanionRenderer`)에게도 같은 모습을 입히는 일은 아직.
 3. **주식 시스템 · 히든 직업(위조자 · 조사관)**: (3.60.0 에서 제안서를 다시 보여 줌. 아직 고르지 않음.) `docs/ideas_hidden_jobs_stock.md` 의 가·나·다 가운데 고르고 "정해 주실 것" 네 가지에 답하면 단계별로 만든다 (① 증서·시세·배당 → ② 위조·감정 → ③ 숨은 퀘스트). 예전 약속: 직업·퀘스트·주식은 단계별로 하나씩 만들어 전달.
-4. **B-15 NPC 외형 실제로 만들기**: (3.60.0 에서 시안 넷을 다시 보여 줌. 아직 고르지 않음.) 사용자가 "나중에 얘기"하기로 함. 시안은 `docs/design/npc_looks_*.png`, 치수·색은 `tools/mock/npc_mock.py`. 만들 때: 주민 엔티티는 그대로 두고 RT Shop NPC 만 클라이언트에서 사람 모델로 그리는 렌더러 + 인물별 스킨(+입체 부품). 이야기 인물부터 나눠서. (화면 쪽에서 RT Shop NPC 를 알아보는 법은 지금 "NoAI + 이름 붙은 주민"뿐 — `MapMarkClient.looksLikeNpc`. 외형을 만들 때는 서버가 NPC 의 열쇠를 화면에 알려 주는 길이 필요하다.)
+4. (3.61.0 에서 끝냄: C 방식 — 위 2-3) ~~B-15 NPC 외형 실제로 만들기~~: 사용자가 "나중에 얘기"하기로 함. 시안은 `docs/design/npc_looks_*.png`, 치수·색은 `tools/mock/npc_mock.py`. 만들 때: 주민 엔티티는 그대로 두고 RT Shop NPC 만 클라이언트에서 사람 모델로 그리는 렌더러 + 인물별 스킨(+입체 부품). 이야기 인물부터 나눠서. (화면 쪽에서 RT Shop NPC 를 알아보는 법은 지금 "NoAI + 이름 붙은 주민"뿐 — `MapMarkClient.looksLikeNpc`. 외형을 만들 때는 서버가 NPC 의 열쇠를 화면에 알려 주는 길이 필요하다.)
 5. **A-22 음악**: 사용자가 "나중에 얘기". 틀은 있음. 곡 파일을 받으면 넣는다 (게임 원곡은 넣지 않는다).
 6. **NPC 배치 파일을 jar 기본값으로**: 사용자가 `npc_layout.json` 을 보내면 `src/main/resources/rtshop_defaults/npc_layout.json` 으로 넣는다 (`NpcLayout.read` 가 config 에 파일이 없을 때 꺼내 쓴다).
 7. **A-12 마을 이식 명령** (`/rtshop town export|import`): 설명만 했다. 요청하면 만든다 (2~3일분).
@@ -146,3 +156,6 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 - 선택지를 더하면 그 표식을 받는 곳(대화 주제라도)을 같이 만든다. 점검: 선택지의 표식이 story.json · dialogue.json · readables.json · 자바 어디에도 안 나오면 받지 않는 선택이다.
 - 민원(`Petitions`)의 글은 언어 파일이 아니라 코드의 `StoryText.pick` 에 있다. 운영자 명령은 `requires(hasPermission(2))` 라서 `Perm` 의 "서바이벌 OP 는 못 씀" 규칙을 그대로 따른다.
 - 안내서는 4판, 대화는 16판. source2 는 763줄(`en2/p761.py` 까지), source3 는 1558줄(`en3/p1548.py` 까지).
+- **화면 쪽 새 코드(3.61)의 함정**: ① `ClientSelfTest2` 의 걸음(add(...))에서 쓰는 static 필드는 그 static 블록보다 **위에** 선언해야 한다 ("illegal forward reference" — 여기서는 문법 점검으로 안 잡히고 CI 에서만 잡힌다). ② `RenderLivingEvent.Pre` 를 취소하면 이름표도 안 그려지므로 `NpcLookClient.nameTag` 가 직접 그린다. ③ 카메라를 다른 엔티티에 태우면 내 몸은 그려지지 않는다 (바닐라 규칙). ④ 화면 쪽은 NPC 의 열쇠(엔티티 태그)를 모른다 — 서버가 `StoryPacket.NPC_LOOKS` 로 알려 준 엔티티 번호만 안다.
+- NPC 모습 파일(.bin)은 **만들어진 파일**이다: 손으로 고치지 말고 `npc_mock.py` 를 고친 뒤 `python3 tools/gen_npc_looks.py`. 머리/몸 나눔은 gen_npc_looks.py 의 HEAD_FN · BODY_FN 과 "목 위(y ≥ 23.9) · 머리 둘레 안" 규칙, 낱 상자는 `g.head = 1 … g.head = None` 으로 직접 정한다.
+- 안내서는 5판, source2 는 764줄(`en2/p763.py` 까지). StoryPacket 종류: PETITIONS 17 · NPC_LOOKS 18 · BOSS_CAM 19(아직 안 씀).
