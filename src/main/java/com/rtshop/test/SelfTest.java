@@ -3735,6 +3735,25 @@ public final class SelfTest {
         boolean mwRound = com.rtshop.petition.Petitions.Data.load(mwTag).list.size() == com.rtshop.petition.Petitions.MAX_OPEN + 1;
         boolean mwCmd = a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "report", "write")) != null
                 && a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "report", "answer")) != null;
+        // 3.61: 민원의 분류 · 창에 보낼 내용 / NPC 외형: 열쇠 → 모습, 모습 파일
+        com.rtshop.petition.Petitions.forTestReset(a.server);
+        int mwCatId = com.rtshop.petition.Petitions.file(a, "land", "옆 땅과 경계가 겹쳐요");
+        com.rtshop.petition.Petitions.forTestNoCooldown();
+        int mwBadCat = com.rtshop.petition.Petitions.file(a, "nonsense", "분류가 없는 글");
+        com.google.gson.JsonObject mwView = com.rtshop.petition.Petitions.view(a, "", false);
+        com.rtshop.petition.Petitions.Entry mwCatE = com.rtshop.petition.Petitions.find(a.server, mwCatId), mwBadE = com.rtshop.petition.Petitions.find(a.server, mwBadCat);
+        check("3.61 reports: a category is kept (an unknown one becomes 'etc'), and the clerk's window gets the categories, my reports (newest first) and the open count",
+                mwCatE != null && mwCatE.cat.equals("land") && mwBadE != null && mwBadE.cat.equals("etc") && mwView.getAsJsonArray("cats").size() == 5
+                        && mwView.getAsJsonArray("mine").size() == 2 && mwView.getAsJsonArray("mine").get(0).getAsJsonObject().get("id").getAsInt() == mwBadCat
+                        && mwView.get("open").getAsInt() == 2 && !com.rtshop.petition.Petitions.nearClerk(a),
+                mwCatId + " " + mwBadCat + " " + mwView);
+        String lkMissing = "";
+        for (String lk361 : com.rtshop.npc.NpcLooks.ALL) if (com.rtshop.npc.NpcLooks.quadsOf(lk361) < 500) lkMissing += lk361 + " ";
+        check("3.61 npc looks: every look has its model file, and NPC keys find their look (exact first, then the longest prefix; unknown keys stay villagers)",
+                lkMissing.isEmpty() && com.rtshop.npc.NpcLooks.lookOf("quest_order_archivist").equals("isabel") && com.rtshop.npc.NpcLooks.lookOf("shop_general_books").equals("m_general")
+                        && com.rtshop.npc.NpcLooks.lookOf("shop_blacksmith").equals("bram") && com.rtshop.npc.NpcLooks.lookOf("attendance").equals("haru")
+                        && com.rtshop.npc.NpcLooks.lookOf("shop_no_such_shop").isEmpty() && com.rtshop.npc.NpcLooks.lookOf(null).isEmpty(),
+                lkMissing + "/" + com.rtshop.npc.NpcLooks.lookOf("quest_order_archivist") + "/" + com.rtshop.npc.NpcLooks.lookOf("shop_general_books"));
         com.rtshop.petition.Petitions.forTestReset(a.server);
         check("3.60 reports: filing trims the text and records the place, the cooldown, empty and long texts and the open limit refuse, an answer and a close change the state, an answered one cannot be withdrawn, the data survives saving, the commands exist",
                 mwA > 0 && mwSoon == com.rtshop.petition.Petitions.ERR_SOON && mwEmpty == com.rtshop.petition.Petitions.ERR_EMPTY && mwLong == com.rtshop.petition.Petitions.ERR_LONG
