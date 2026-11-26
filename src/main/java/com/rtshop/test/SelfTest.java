@@ -2315,6 +2315,47 @@ public final class SelfTest {
                             && !com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("minecraft:diamond")) && com.rtshop.gacha.GachaConfig.valid(crProbe)
                             && crLeft.isEmpty(),
                     crLeft + " " + crOld3.shopBan + " " + crOld3.gachaBan + " " + crKeep4.shopBan);
+            // 3.59: 상점 설정을 기본값으로 / 내 설정으로 (/rtshop shop defaults · mine)
+            java.nio.file.Path sdFile = com.rtshop.shop.ShopLoader.dir().resolve("farmer.json");
+            java.nio.file.Path sdMineFile = com.rtshop.shop.ShopDefaults.mineDir().resolve("farmer.json");
+            String sdOrig = Files.exists(sdFile) ? Files.readString(sdFile, java.nio.charset.StandardCharsets.UTF_8) : null;
+            String sdTrace = "";
+            boolean sdOk = false;
+            try {
+                if (sdOrig != null) {
+                    com.google.gson.JsonObject sdEdit = JsonParser.parseString(sdOrig).getAsJsonObject();
+                    sdEdit.addProperty("_selftest_note", "mine");
+                    String sdMine = sdEdit.toString();
+                    Files.writeString(sdFile, sdMine, java.nio.charset.StandardCharsets.UTF_8);
+                    boolean sdEdited = !com.rtshop.shop.ShopDefaults.isDefault("farmer");
+                    com.rtshop.shop.ShopDefaults.Outcome sd1 = com.rtshop.shop.ShopDefaults.toDefaults("farmer");
+                    boolean sdNowDef = com.rtshop.shop.ShopDefaults.isDefault("farmer") && com.rtshop.shop.ShopDefaults.hasMine("farmer")
+                            && com.rtshop.shop.ShopDefaults.same(Files.readString(sdMineFile, java.nio.charset.StandardCharsets.UTF_8), sdMine);
+                    com.rtshop.shop.ShopDefaults.Outcome sd2 = com.rtshop.shop.ShopDefaults.toDefaults("farmer");
+                    com.rtshop.shop.ShopDefaults.Outcome sd3 = com.rtshop.shop.ShopDefaults.toMine("farmer");
+                    boolean sdBack = com.rtshop.shop.ShopDefaults.same(Files.readString(sdFile, java.nio.charset.StandardCharsets.UTF_8), sdMine)
+                            && com.rtshop.shop.ShopDefaults.hasMine("farmer");
+                    com.rtshop.shop.ShopDefaults.Outcome sd4 = com.rtshop.shop.ShopDefaults.toMine("farmer");
+                    com.rtshop.shop.ShopDefaults.Outcome sd5 = com.rtshop.shop.ShopDefaults.toDefaults("no_such_shop");
+                    com.rtshop.shop.ShopDefaults.Outcome sd6 = com.rtshop.shop.ShopDefaults.toMine("no_such_shop");
+                    String sdGeneral = com.rtshop.shop.ShopDefaults.defaultJson("general");
+                    sdTrace = sdEdited + " " + sd1 + " " + sdNowDef + " " + sd2 + " " + sd3 + " " + sdBack + " " + sd4 + " " + sd5 + " " + sd6;
+                    sdOk = sdEdited && sd1 == com.rtshop.shop.ShopDefaults.Outcome.RESET && sdNowDef && sd2 == com.rtshop.shop.ShopDefaults.Outcome.ALREADY
+                            && sd3 == com.rtshop.shop.ShopDefaults.Outcome.RESTORED && sdBack && sd4 == com.rtshop.shop.ShopDefaults.Outcome.SAME
+                            && sd5 == com.rtshop.shop.ShopDefaults.Outcome.NO_DEFAULT && sd6 == com.rtshop.shop.ShopDefaults.Outcome.NO_SAVED
+                            && sdGeneral != null && sdGeneral.contains("rtshop:return_ticket") && com.rtshop.shop.ShopDefaults.known().contains("gacha_shop");
+                }
+            } catch (Exception sdEx) {
+                sdTrace = sdTrace + " " + sdEx;
+            } finally {
+                try {
+                    if (sdOrig != null) Files.writeString(sdFile, sdOrig, java.nio.charset.StandardCharsets.UTF_8);
+                    Files.deleteIfExists(sdMineFile);
+                } catch (Exception sdIgnored) {
+                }
+            }
+            check("/rtshop shop defaults puts a shop back on the bundled defaults and keeps the operator's file; /rtshop shop mine brings that file back, as often as wanted",
+                    sdOk, sdTrace);
         }
         check("by default the NPC shops never list the enhance anvil or a boss item (nether star); ordinary goods are untouched, and nothing vanilla loses its recipe",
                 com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(com.rtshop.item.ModItems.ENHANCE_ANVIL.get())) && com.rtshop.rules.ItemPolicy.bossItem(Items.NETHER_STAR)

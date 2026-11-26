@@ -1908,5 +1908,19 @@
   "rtshop.hud.minimap_npc.on": "Minimap NPC icons: ON",
   "rtshop.hud.minimap_npc.off": "Minimap NPC icons: OFF",
   "rtshop.gate.ch1": "Chapter 1",
-  "rtshop.gate.ch1_mid": "mid-Chapter 1"
+  "rtshop.gate.ch1_mid": "mid-Chapter 1",
+  "rtshop.shopdef.reset": "Shop %s: back to the RT Shop defaults. Your own settings were kept (to bring them back: /rtshop shop mine %s).",
+  "rtshop.shopdef.already": "Shop %s: already at the defaults.",
+  "rtshop.shopdef.no_default": "Shop %s: there is no default for it (a custom shop is left as it is).",
+  "rtshop.shopdef.restored": "Shop %s: your saved settings are back (to the defaults: /rtshop shop defaults %s).",
+  "rtshop.shopdef.no_saved": "Shop %s: no saved settings (it was never reset to the defaults).",
+  "rtshop.shopdef.same": "Shop %s: already on your settings.",
+  "rtshop.shopdef.failed": "Shop %s: could not change it (%s).",
+  "rtshop.shopdef.none_saved": "No saved settings yet. They are saved when you reset with /rtshop shop defaults <shop|all>.",
+  "rtshop.shopdef.done": "Changed %s shop(s) and reloaded the shops.",
+  "rtshop.shopdef.status_head": "[Shop settings] to the defaults: /rtshop shop defaults <shop|all> · to yours: /rtshop shop mine <shop|all>",
+  "rtshop.shopdef.st_default": "· %s — defaults",
+  "rtshop.shopdef.st_edited": "· %s — edited by you",
+  "rtshop.shopdef.st_custom": "· %s — custom shop (no default)",
+  "rtshop.shopdef.st_saved": " / saved settings on file"
 }

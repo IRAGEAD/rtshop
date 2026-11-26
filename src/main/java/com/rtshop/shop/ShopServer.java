@@ -464,6 +464,7 @@ public final class ShopServer {
                                             QuestManager.setFlag(t, StringArgumentType.getString(ctx, "flag"), false);
                                             return 1;
                                         }))))))
+                .then(ShopDefaults.command())
                 .then(Commands.literal("reload").requires(src -> src.hasPermission(2))
                         .executes(ShopServer::cmdReload))
                 .then(Commands.literal("export").requires(src -> src.hasPermission(2))

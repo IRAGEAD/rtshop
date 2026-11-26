@@ -184,7 +184,7 @@
 - D-9 ✔ 미니맵 NPC 아이콘: Diorama 의 레이더(`dev.diorama.render.Radar.collect` 가 `Radar.kind` 를 묻는 자리)에 `mixin/DioramaRadarMixin`. 서버가 지도 표시와 함께 "말을 걸어 본 NPC"의 UUID 목록을 보내고(`MAP_MARKS` 의 radar · marks 의 "npc:UUID"), 화면 쪽이 NoAI + 이름 붙은 주민 가운데 목록에 없는 것을 뺀다. `/rtshop hud` 의 「미니맵 NPC 아이콘」 단추로 모두 끔 (client.json 의 minimapNpcIcons). 서버 설정 map_marks.json 의 radarKnownOnly.
 - D-6 ✔ 제안: `docs/ideas_hidden_jobs_stock.md` (사용자가 안을 고르면 만든다). D-8 ✔ 설명 (계획 문서 `docs/town_transplant.md` 그대로).
 
-## 3.58.1 (11-26 오후, 새 세션 · 작업 가지 v5-next9) — HANDOFF 6절의 "바로 할 수 있는 것"
+## 3.59.0 (11-26 오후, 새 세션 · 작업 가지 v5-next9. 작업 중에는 3.58.1 이라 불렀다) — HANDOFF 6절의 "바로 할 수 있는 것"
 
 - 흔들리던 시험 두 개 (시험 코드만):
   - 서버 "buying a farmland lot removes the crops and structures standing on it": 시험 자리(3200, 100, 3200)가 산속이면 Y+8 위에 지형이 남아 `clearPlot` 이 그 꼭대기를 땅으로 보고 아무것도 치우지 않았다 (밀은 어두워서 저절로 뽑혀 "치워진 것처럼" 보였음). → 시험이 그 칸의 지표면까지 전부 비운다. 실패 줄에 surface 높이도 적는다.
@@ -196,7 +196,7 @@
   - 플레이어가 보는 것 (찾다가 나온 것): 상점의 "1장 이후" 잠금 표시(언어 파일 `rtshop.gate.*` · `StoryGates.chapterName`), 직업 변경 쿨타임의 "3시간 20분"(`Jobs.durationText`), 출석 복구 안내의 날짜(`Attendance.time`), 주간 보상 창의 "제 Ⅲ 층 · 받음 · 닫기".
   - 그대로 둔 것: 설정 파일 안의 `_help` 설명, 퀘스트 파일을 읽다 생긴 문제 목록(로그), NPC 머리 위 이름, 운영자가 직접 고친 설정 문구.
 
-## 추가 요청 (11-26 15:03) → 3.58.1
+## 추가 요청 (11-26 15:03) → 3.59.0
 
 - E-1. Create 모드 전용 아이템을 상점과 뽑기에서 삭제. (주식 · 히든 직업 · NPC 외형은 예시였을 뿐 고른 것이 아님 — 그대로 대기.)
   - ✔ item_policy.json 4판: shopBan 에 `create:*`, 새 항목 **gachaBan**(`create:*`). 깔린 3판 파일은 저절로 4판으로 (운영자가 넣은 줄은 그대로).
@@ -204,3 +204,12 @@
   - 뽑기: `GachaConfig.valid` 가 gachaBan 에 걸린 칸을 "없는 것"으로 친다 → 굴림·확률표·화면에서 빠지고, 편집 화면에는 꺼진 칸으로 보인다. 새로 만드는 목록(`excluded`)에도 들어가지 않는다. gacha.json 은 지우지 않는다 (gachaBan 에서 빼면 되돌아옴).
   - 마법 뽑기의 인챈트: `MagicConfig.Ench.enchantment()` 가 gachaBan 에 걸린 인챈트(create:capacity · create:potato_recovery)를 없는 것으로 친다. 자동 채우기와 편집 화면의 고를 수 있는 목록에서도 빠진다.
   - 자체 점검 "Create: nothing of it is sold in an NPC shop or comes out of a gacha …" (모드팩 전체에서는 실제 상점·뽑기 목록을 훑는다).
+
+## 추가 요청 (11-26 15:19) → 3.59.0
+
+- E-2. 상점 설정에서 직접 고친 것을 RT Shop 기본 설정으로 되돌리는 명령 + 내가 고친 값으로 다시 되돌리는 명령.
+  - ✔ `shop/ShopDefaults` — `/rtshop shop status` · `/rtshop shop defaults <상점|all>` · `/rtshop shop mine <상점|all>` (OP).
+  - 기본 설정 = 이 판을 처음 깔았을 때의 상점 파일 (모드 안의 기본 파일 + `APPENDED` 조각 + `REPRICED`). 임시 폴더에서 같은 순서로 만들어 견준다 (JSON 내용으로 비교).
+  - 기본값으로 돌릴 때 지금 파일을 `config/rtshop/backup/shop_mine/<상점>.json` 에 보관. 보관본을 덮어쓰게 되면 옛 것은 `backup/shop_mine_old/` 로 옮긴다. 내 설정으로 돌릴 때 지금 파일이 기본값도 보관본도 아니면 그것도 `shop_mine_old` 에 남긴다 → 몇 번을 오가도 지워지는 설정이 없다.
+  - 범위는 상점 파일(`config/rtshop/shops/*.json`: 품목 · 가격 · 분류)뿐. 직접 만든 상점(기본 설정이 없는 파일)은 건드리지 않는다. 가격 규칙(pricing.json) · 뽑기 · 강화 등 다른 설정은 포함하지 않는다.
+  - 문구는 언어 파일 `rtshop.shopdef.*` (한·영).

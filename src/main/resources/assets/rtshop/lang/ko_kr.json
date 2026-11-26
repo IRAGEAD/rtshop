@@ -1908,5 +1908,19 @@
   "rtshop.hud.minimap_npc.on": "미니맵 NPC 아이콘: 켜짐",
   "rtshop.hud.minimap_npc.off": "미니맵 NPC 아이콘: 꺼짐",
   "rtshop.gate.ch1": "1장",
-  "rtshop.gate.ch1_mid": "1장 중반"
+  "rtshop.gate.ch1_mid": "1장 중반",
+  "rtshop.shopdef.reset": "상점 %s: RT Shop 기본 설정으로 되돌렸습니다. 직접 고친 설정은 보관해 두었습니다 (되돌리기: /rtshop shop mine %s).",
+  "rtshop.shopdef.already": "상점 %s: 이미 기본 설정 그대로입니다.",
+  "rtshop.shopdef.no_default": "상점 %s: 기본 설정이 없는 상점입니다 (직접 만든 상점은 그대로 둡니다).",
+  "rtshop.shopdef.restored": "상점 %s: 보관해 둔 내 설정으로 되돌렸습니다 (기본값으로: /rtshop shop defaults %s).",
+  "rtshop.shopdef.no_saved": "상점 %s: 보관된 내 설정이 없습니다 (기본값으로 되돌린 적이 없는 상점입니다).",
+  "rtshop.shopdef.same": "상점 %s: 이미 내 설정 그대로입니다.",
+  "rtshop.shopdef.failed": "상점 %s: 바꾸지 못했습니다 (%s).",
+  "rtshop.shopdef.none_saved": "보관된 내 설정이 하나도 없습니다. 먼저 /rtshop shop defaults <상점|all> 로 기본값으로 되돌려야 보관됩니다.",
+  "rtshop.shopdef.done": "상점 %s곳의 설정을 바꾸고 상점을 다시 읽었습니다.",
+  "rtshop.shopdef.status_head": "[상점 설정] 기본값으로: /rtshop shop defaults <상점|all> · 내 설정으로: /rtshop shop mine <상점|all>",
+  "rtshop.shopdef.st_default": "· %s — 기본 설정 그대로",
+  "rtshop.shopdef.st_edited": "· %s — 직접 고침",
+  "rtshop.shopdef.st_custom": "· %s — 직접 만든 상점 (기본 설정 없음)",
+  "rtshop.shopdef.st_saved": " / 보관된 내 설정 있음"
 }
