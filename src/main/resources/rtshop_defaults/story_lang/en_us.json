@@ -2669,6 +2669,8 @@
  "마지막은 잔칫상이야. 케이크 2개와 황금 당근 4개를 만들어 오게. 손님들이 기다리고 있다네.": "The last is a feast table. Make 2 cakes and 4 golden carrots. The guests are waiting.",
  "케이크 2개와 황금 당근 4개를 가져와라.": "Bring 2 cakes and 4 golden carrots.",
  "훌륭한 솜씨야! 이제 자네는 요리사일세. 직업 안내인에게 가서 요리사를 고르게.": "Fine work! Now you are a Cook. Go to the Job Guide and choose Cook.",
+ "식품 상인은 식재료를 팔고, 만든 음식을 사 줍니다.\n\n· 팬·찜기·주전자처럼 손이 가는 조리로 만든 음식일수록 값을 더 쳐 줍니다.\n· 재료를 모두 상점에서 사서 만들어 팔아도 손해는 나지 않습니다.\n· 상점에서 음식에 마우스를 올리면 값을 매긴 기준 재료가 보입니다.\n· 요리사 직업은 손으로 만든 요리를 더 비싸게 팝니다.\n· 냄비에 재료를 조리법대로 다 넣지 않고 한 벌만 넣어 만든 요리(품질이 적힌 요리)는 넣은 재료만큼의 값으로 삽니다. 품질이 '최상급'이면 제값을 받습니다.": "The food merchant sells ingredients and buys finished food.\n\n· Food made by hands-on cooking (pan, steamer, kettle) is bought for more.\n· Even if you buy every ingredient at the shops and sell what you make, you do not lose money.\n· Hover over a food in the shop to see the ingredients its price is based on.\n· The cook job sells hand-made dishes for more.\n· A dish cooked in a pot with just one of each ingredient instead of the full recipe (a dish that shows a quality) is bought for what went into it. A 'Superb' dish gets the full price.",
+ "음식 조리 식재료 요리사 품질": "food cooking ingredients cook quality",
  "길은 기억보다 정직하오. …잠깐, 이 선이 틀렸군.": "A road is more honest than memory. …Hold on, this line is wrong.",
  "쇠는 거짓말을 안 하네. 두드린 만큼만 버티지.": "Iron tells no lies. It holds exactly as much as you hammered it.",
  "바다는 묻는 말에 대답 안 하오. 그래도 묻는 거요.": "The sea doesn't answer what you ask it. You ask anyway.",

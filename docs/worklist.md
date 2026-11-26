@@ -135,3 +135,15 @@
 - C-7. 음악 재생 HUD: 사용자가 그 모드의 설정으로 자리·크기를 조정한다 (RT Shop 은 손대지 않음)
 - C-8. NPC 웨이포인트: 세계 안에서는 뜨지 않고 M 지도에서만 보이게 한다 → 3.56
 
+## 3.56.0 (11-26 오전, 같은 세션)
+
+- C-5 ✔: 조합법 편집 창 — 넓은 검색 칸(이름·ID·모드 이름), 왼쪽 묶음에 「상점에서 파는 것/없는 것」「아이템 종류(무기·방어구·도구·음식·블록·그 밖)」 추가, 분류를 겹쳐 쓰고 개수가 바로 바뀜, 줄마다 종류·상점 꼬리표, ✕ 로 모두 풀기. 전리품 편집 창 — 아이템으로 전리품표 찾기(서버가 표 파일을 읽어 색인: `RulesEditor.LOOT_FIND`), 표 가리기(전체/상자/몹, 고친 것만), 줄 검색·종류·상점 가리기. 표 검색 칸에 글자를 칠 때마다 초점이 풀리던 것도 고침.
+  - 서버가 창을 열 때 "상점에서 파는 아이템" 목록을 함께 보냄(`sold`). 아이템 종류는 클라이언트가 가름(`RulesScreens.kind`: 무기 분류는 직업의 무기 종류 규칙을 그대로 씀).
+- C-8 ✔: Diorama 의 세계 안 웨이포인트 표시에서 RT Shop 폴더의 것만 뺌 (`mixin/DioramaWorldPinsMixin`: `WaypointHud.render` 가 `WaypointStore.isNear` 를 묻는 자리). 지도 화면·목록·미니맵은 그대로. `map_marks.json` 의 `showInWorld`(기본 false).
+- C-6 ◐: `docs/cooking_gaps.md`.
+  - 47종 = Kaleidoscope Cookery 의 자유 조리법(flex_pot · flex_stockpot). 품질 꼬리표(`kaleidoscope_cookery:quality`)가 붙은 요리는 `ShopData.Entry.flexUnit`(자유 조리법 재료 한 벌 값 × (1 + handCookedMargin))로 삼. 최상급(0)은 제값. `pricing.json` 의 `flexDishPricing`.
+  - 운영자가 조합법 편집기에서 막은 조리법은 음식 매입가의 기준에서 빠짐 (`ShopLoader.blockedByOperator`) → 한쪽 조리법을 막아 차이를 없앨 수 있음.
+  - 남은 9종(빵·호박 파이·케이크·회·비트 수프·토끼 스튜 등)은 어느 조리법을 막을지 사용자가 정함.
+  - 점검 파일(`audit.txt`)에 음식마다 조리법별 재료비·재료가 나옴.
+- C-7: 음악 재생 HUD 는 사용자가 직접 조정.
+

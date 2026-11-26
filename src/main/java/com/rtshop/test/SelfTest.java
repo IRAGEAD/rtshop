@@ -1836,6 +1836,51 @@ public final class SelfTest {
         boolean soldTicketC5 = false;
         for (com.google.gson.JsonElement seC5 : soldC5) if (seC5.getAsString().equals("rtshop:return_ticket")) soldTicketC5 = true;
         check("the editors are told which items the NPC shops sell (the return ticket is one of them)", soldC5.size() > 20 && soldTicketC5, soldC5.size());
+        // C-6: 자유 조리법(flex)으로 만든 요리(품질 꼬리표)는 재료 한 벌 값 기준으로 따로 산다. 정식 조리법 기준의 매입가는 그대로다
+        {
+            ShopData anyShopC6 = ShopServer.shops().get("food");
+            ShopData.Entry dishC6 = new ShopData.Entry(new ItemStack(Items.RABBIT_STEW), 300, 200.0, "dish", true, false, true, false).withFlex(60.0);
+            ItemStack plainC6 = new ItemStack(Items.RABBIT_STEW);
+            ItemStack poorC6 = new ItemStack(Items.RABBIT_STEW);
+            poorC6.getOrCreateTag().putInt(ShopData.CUISINE_QUALITY_TAG, 3);
+            ItemStack excellentC6 = new ItemStack(Items.RABBIT_STEW);
+            excellentC6.getOrCreateTag().putInt(ShopData.CUISINE_QUALITY_TAG, 1);
+            ItemStack superbC6 = new ItemStack(Items.RABBIT_STEW);
+            superbC6.getOrCreateTag().putInt(ShopData.CUISINE_QUALITY_TAG, 0);
+            ShopData.Entry noFlexC6 = new ShopData.Entry(new ItemStack(Items.RABBIT_STEW), 300, 200.0, "dish", true, false, true, false);
+            check("a dish from a free-form pot recipe (it carries a quality tag) is bought for its own ingredient cost; the standard dish and a Superb one keep the full price",
+                    anyShopC6 != null && anyShopC6.sellUnitFor(dishC6, plainC6) == 200.0 && anyShopC6.sellUnitFor(dishC6, poorC6) == 60.0
+                            && anyShopC6.sellUnitFor(dishC6, excellentC6) == 60.0 && anyShopC6.sellUnitFor(dishC6, superbC6) == 200.0
+                            && anyShopC6.variantKey(dishC6, poorC6) != anyShopC6.variantKey(dishC6, plainC6)
+                            && anyShopC6.sellUnitFor(noFlexC6, poorC6) == 200.0 && dishC6.matchesLoose(poorC6)
+                            && ShopData.cuisineQuality(plainC6) == -1 && ShopData.cuisineQuality(poorC6) == 3,
+                    anyShopC6 == null ? "no food shop" : anyShopC6.sellUnitFor(dishC6, plainC6) + " " + anyShopC6.sellUnitFor(dishC6, poorC6) + " " + anyShopC6.sellUnitFor(dishC6, superbC6));
+            // 운영자가 막은 조리법은 매입가의 기준에서 빠진다 (ID · mod: · item: 세 가지 적는 법)
+            com.rtshop.shop.RecipeSolver.Recipe rcpC6 = new com.rtshop.shop.RecipeSolver.Recipe();
+            rcpC6.id = "create:smelting/bread";
+            rcpC6.type = "minecraft:smelting";
+            rcpC6.outputs.add(new com.rtshop.shop.RecipeSolver.Out("minecraft:bread", 1));
+            check("a recipe the operator blocked (by id, by mod or by item) is left out of the food price basis; others stay in",
+                    com.rtshop.shop.ShopLoader.blockedForTest(rcpC6, java.util.Set.of("create:smelting/bread"))
+                            && com.rtshop.shop.ShopLoader.blockedForTest(rcpC6, java.util.Set.of("mod:create"))
+                            && com.rtshop.shop.ShopLoader.blockedForTest(rcpC6, java.util.Set.of("item:minecraft:bread"))
+                            && !com.rtshop.shop.ShopLoader.blockedForTest(rcpC6, java.util.Set.of("minecraft:bread", "mod:farmersdelight", "item:minecraft:cake"))
+                            && !com.rtshop.shop.ShopLoader.blockedForTest(rcpC6, java.util.Set.of()));
+            if (net.minecraftforge.fml.ModList.get().isLoaded("kaleidoscope_cookery")) {
+                net.minecraft.world.item.Item beefC6 = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new ResourceLocation("kaleidoscope_cookery", "braised_beef"));
+                ShopData.Entry beC6 = null;
+                for (ShopData shopC6 : ShopServer.shops().values()) {
+                    for (ShopData.Entry enC6 : shopC6.entries) {
+                        if (beC6 == null && beefC6 != null && enC6.sellable && enC6.stack.is(beefC6)) beC6 = enC6;
+                    }
+                }
+                // 어느 상점도 그 요리를 사지 않으면(상점 파일을 고친 서버) 볼 것이 없다
+                if (beC6 != null) {
+                    check("with the cooking mod: braised beef keeps its full-recipe price, and the free-form version is bought for well under it",
+                            beC6.flexUnit > 0 && beC6.flexUnit < beC6.sellUnit * 0.7 && beC6.looseSell, beC6.sellUnit + " / flex " + beC6.flexUnit);
+                }
+            }
+        }
         com.rtshop.rules.LootRules.Rules lr = new com.rtshop.rules.LootRules.Rules();
         com.rtshop.rules.LootRules.Table t = new com.rtshop.rules.LootRules.Table();
         t.remove.add("minecraft:saddle");

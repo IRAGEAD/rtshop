@@ -92,6 +92,8 @@ public final class ShopLoader {
         /** 매입가를 계산한 조리법의 재료(가장 싼 것 기준)와 1회 생산량. */
         public List<ShopData.Part> parts = List.of();
         public float partsOut = 1.0F;
+        /** 자유 조리법(flex)으로 만든 요리의 매입가: 그 조리법의 재료 한 벌 값 + 손 조리 이익. 0 = 자유 조리법이 없음. */
+        public double flexUnit;
         /** 만들 수 있는데 상점가가 원가보다 비싼 품목(완제품)인가. */
         public boolean finished;
         /** 어느 상점이 '재료'(요리·음료가 아닌 구분)로 파는 품목: 사서 쓰는 원재료이므로 매입가 하한을 걸지 않는다. */
@@ -476,7 +478,7 @@ public final class ShopLoader {
                 Price p = prices.get(ref.key);
                 boolean loose = ref.loose != null ? ref.loose : defaultLoose(p.stack);
                 entries.add(new ShopData.Entry(p.stack, p.price, p.sellUnit, ref.category, loose, ref.buy, ref.sell, ref.fish,
-                        p.parts, p.partsOut));
+                        p.parts, p.partsOut).withFlex(p.flexUnit));
             }
             JsonObject o = r.json;
             out.shops.put(r.id, new ShopData(r.id, versionCounter, str(o, "title", r.id), str(o, "npcName", r.id),
@@ -1106,6 +1108,11 @@ public final class ShopLoader {
                         double autoMin, double fullMax, List<AutoRoute> autoRoutes, List<RecipeCost> costs) {
     }
 
+    /** 재료의 수를 정하지 않은 자유 조리법인가 (Kaleidoscope Cookery 의 flex_pot · flex_stockpot: 재료 한 벌만 넣어도 음식이 나온다). */
+    static boolean isFlexRecipe(RecipeSolver.Recipe r) {
+        return r != null && r.type != null && r.type.contains(":flex_");
+    }
+
     /** 조리법 하나의 재료비와 쓰인 재료. */
     private record RecipeCost(RecipeSolver.Recipe recipe, double cost, Set<String> items) {
     }
@@ -1196,10 +1203,42 @@ public final class ShopLoader {
         return m;
     }
 
+    /**
+     * 운영자가 조합법 편집기(/rtshop recipes)에서 막은 조리법인가: 그 조리법 하나(ID) · 그 모드 전부(mod:) · 그 아이템을 만드는 것 전부(item:).
+     * 막힌 조리법으로는 만들 수 없으므로 음식 매입가의 기준("남은 조리법 가운데 가장 비싼 것")에서 뺀다 (C-6).
+     */
+    static boolean blockedByOperator(RecipeSolver.Recipe r, Set<String> blocked) {
+        if (blocked == null || blocked.isEmpty() || r == null || r.id == null) {
+            return false;
+        }
+        if (blocked.contains(r.id)) {
+            return true;
+        }
+        int c = r.id.indexOf(':');
+        if (c > 0 && blocked.contains("mod:" + r.id.substring(0, c))) {
+            return true;
+        }
+        for (RecipeSolver.Out o : r.outputs) {
+            if (blocked.contains("item:" + o.item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean blockedForTest(RecipeSolver.Recipe r, Set<String> blocked) {
+        return blockedByOperator(r, blocked);
+    }
+
     private static Map<String, List<RecipeSolver.Recipe>> byOutput(RecipeScan.Scan scan, Set<RecipeSolver.Recipe> skip) {
         Map<String, List<RecipeSolver.Recipe>> m = new HashMap<>();
+        Set<String> blocked = Set.of();
+        try {
+            blocked = com.rtshop.rules.RecipeRules.get().disabled;   // 운영자가 조합법 편집기에서 막은 것
+        } catch (Throwable ignored) {
+        }
         for (RecipeSolver.Recipe r : scan.recipes) {
-            if (skip.contains(r)) {
+            if (skip.contains(r) || blockedByOperator(r, blocked)) {
                 continue;
             }
             for (RecipeSolver.Out o : r.outputs) {
@@ -1286,6 +1325,14 @@ public final class ShopLoader {
                 }
                 p.purchaseNeed = n.value();
                 p.autoMin = n.autoMin();
+                // C-6: 자유 조리법(flex)으로 만든 요리는 그 조리법의 재료 한 벌 값을 기준으로 따로 산다 (정식 조리법 기준의 매입가는 그대로)
+                double flexCost = -1;
+                if (pc.flexDishPricing) {
+                    for (RecipeCost rc : n.costs()) {
+                        if (isFlexRecipe(rc.recipe())) flexCost = Math.max(flexCost, rc.cost());
+                    }
+                }
+                p.flexUnit = flexCost > 0 ? flexCost * (1.0 + pc.handCookedMargin) : 0;
                 if (n.value() <= 0) {
                     continue;
                 }
@@ -1358,9 +1405,15 @@ public final class ShopLoader {
             }
             String id = itemId(p.stack);
             Need n = need(id, makers, pcost, loaded.scan.env, cfg, pc, sup);
-            if (n.value() > 0 && n.cheapest() > 0 && n.value() > n.cheapest() * 1.3) {
+            // 자유 조리법(flex)으로 만든 요리는 따로 값을 매기므로(Price.flexUnit) 차이로 치지 않는다
+            double cheapestFixed = -1;
+            for (RecipeCost rc : n.costs()) {
+                if (pc.flexDishPricing && isFlexRecipe(rc.recipe())) continue;
+                if (cheapestFixed < 0 || rc.cost() < cheapestFixed) cheapestFixed = rc.cost();
+            }
+            if (n.value() > 0 && cheapestFixed > 0 && n.value() > cheapestFixed * 1.3) {
                 out.add(String.format(Locale.ROOT, "%s | 매입가 %.1f | 싼 조리법 재료비 %.1f | 비싼 조리법 재료비 %.1f (%s)",
-                        id, p.sellUnit, n.cheapest(), n.value(), n.by() == null ? "" : n.by().type));
+                        id, p.sellUnit, cheapestFixed, n.value(), n.by() == null ? "" : n.by().type));
                 // 조리법마다의 재료비와 재료 (어느 조리법이 싸고 비싼지 보고 고칠 수 있게)
                 List<RecipeCost> detail = new ArrayList<>(n.costs());
                 detail.sort((x, y) -> Double.compare(x.cost(), y.cost()));
@@ -1844,7 +1897,8 @@ public final class ShopLoader {
         audit.append("재료를 사서 만들면 손해인 조리법: ").append(buyLoss.size()).append("개\n");
         List<String> spread = purchaseSpread(loaded);
         audit.append("\n# 같은 음식인데 조리법에 따라 재료비 차이가 큰 경우 (음식 | 매입가 | 가장 싼 조리법 재료비 | 조리법)\n");
-        audit.append("# 매입가는 가장 비싼 조리법 기준이라, 싼 조리법으로 만들면 차액만큼 남습니다.\n");
+        audit.append("# 매입가는 가장 비싼 조리법 기준이라, 싼 조리법으로 만들면 차액만큼 남습니다. 한쪽 조리법을 /rtshop recipes 에서 막으면 기준에서 빠집니다.\n");
+        audit.append("# (Kaleidoscope Cookery 의 자유 조리법 flex_pot · flex_stockpot 은 따로 값을 매기므로 여기에 넣지 않습니다: pricing.json 의 flexDishPricing)\n");
         for (String line : spread) {
             audit.append(line).append('\n');
         }

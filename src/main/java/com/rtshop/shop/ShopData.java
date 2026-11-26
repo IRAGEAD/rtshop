@@ -52,6 +52,18 @@ public final class ShopData {
         /** 만들 수 있는 품목이면: 매입가를 계산한 조리법의 재료(가장 싼 것 기준)와 1회 생산량. 없으면 빈 목록. */
         public final List<Part> recipe;
         public final float recipeOut;
+        /**
+         * 0 보다 크면: 자유 조리법(Kaleidoscope Cookery 의 flex 냄비 조리법)으로 만든 요리의 1개당 매입가 (C-6).
+         * 자유 조리법은 재료를 한 벌(종류마다 1개)만 넣어도 같은 음식이 나오고, 그렇게 만든 음식에는 품질 꼬리표가 붙는다.
+         * 정식 조리법 기준의 매입가(sellUnit)로 사 주면 차액이 그대로 남으므로, 꼬리표가 붙은 요리는 재료 한 벌 값 기준으로 산다.
+         * 최상급(Superb)만은 냄비를 거의 채워야 나오므로 정식 조리법과 같은 값(sellUnit)이다.
+         */
+        public double flexUnit;
+
+        public Entry withFlex(double unit) {
+            this.flexUnit = unit;
+            return this;
+        }
 
         public Entry(ItemStack stack, int price, double sellUnit, String category, boolean looseSell,
                      boolean buyable, boolean sellable, boolean fish) {
@@ -159,8 +171,20 @@ public final class ShopData {
         return e.fish ? fishNoInfo : 1.0;
     }
 
+    /** Kaleidoscope Cookery 가 자유 조리법으로 만든 요리에 붙이는 품질 꼬리표 (정수: 0 최상급 · 1 우수 · 2 보통 · 3 미흡). */
+    public static final String CUISINE_QUALITY_TAG = "kaleidoscope_cookery:quality";
+
+    /** 요리의 품질 꼬리표. 없으면 -1 (정식 조리법으로 만든 것). */
+    public static int cuisineQuality(ItemStack s) {
+        CompoundTag t = s.getTag();
+        return t != null && t.contains(CUISINE_QUALITY_TAG, 99) ? t.getInt(CUISINE_QUALITY_TAG) : -1;
+    }
+
     /** 이 아이템 1개의 매입가. */
     public double sellUnitFor(Entry e, ItemStack s) {
+        if (e.flexUnit > 0 && e.flexUnit < e.sellUnit && cuisineQuality(s) > 0) {
+            return e.flexUnit;   // 자유 조리법으로 만든 요리 (최상급 = 0 은 제값)
+        }
         return e.sellUnit * qualityMultiplier(e, s);
     }
 
@@ -196,8 +220,11 @@ public final class ShopData {
             buf.writeVarInt(e.price);
             buf.writeDouble(e.sellUnit);
             buf.writeUtf(e.category);
-            int flags = (e.looseSell ? 1 : 0) | (e.buyable ? 2 : 0) | (e.sellable ? 4 : 0) | (e.fish ? 8 : 0);
+            int flags = (e.looseSell ? 1 : 0) | (e.buyable ? 2 : 0) | (e.sellable ? 4 : 0) | (e.fish ? 8 : 0) | (e.flexUnit > 0 ? 16 : 0);
             buf.writeByte(flags);
+            if (e.flexUnit > 0) {
+                buf.writeDouble(e.flexUnit);
+            }
             int parts = Math.min(e.recipe.size(), 12);
             buf.writeVarInt(parts);
             if (parts > 0) {
@@ -242,6 +269,7 @@ public final class ShopData {
             double sellUnit = buf.readDouble();
             String cat = buf.readUtf();
             int flags = buf.readByte();
+            double flexUnit = (flags & 16) != 0 ? buf.readDouble() : 0;
             int parts = buf.readVarInt();
             List<Part> recipe = List.of();
             float recipeOut = 1.0F;
@@ -257,7 +285,7 @@ public final class ShopData {
                 }
             }
             ents.add(new Entry(st, price, sellUnit, cat, (flags & 1) != 0, (flags & 2) != 0, (flags & 4) != 0, (flags & 8) != 0,
-                    recipe, recipeOut));
+                    recipe, recipeOut).withFlex(flexUnit));
         }
         ShopData d = new ShopData(id, version, title, "", "", cats, ents, star, fishBase, fishBonus, fishGolden, fishNoInfo);
         d.emptyNote = buf.readUtf();

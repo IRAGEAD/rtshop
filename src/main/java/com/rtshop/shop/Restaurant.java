@@ -231,7 +231,7 @@ public final class Restaurant {
             long price = Math.max(Math.round(e.price * c.priceMultiplier), (long) Math.ceil(e.sellUnit * worst + 1.0e-6) + 1);
             price = Math.max(1, Math.min(2_000_000_000L, price));
             entries.add(new ShopData.Entry(e.stack, (int) price, sell, e.category, e.looseSell,
-                    unlocked.containsKey(ShopLoader.key(e.stack)), true, false, e.recipe, e.recipeOut));
+                    unlocked.containsKey(ShopLoader.key(e.stack)), true, false, e.recipe, e.recipeOut).withFlex(e.flexUnit * (1 + c.bonus)));
         }
         ShopData d = new ShopData(ID, version, c.title, c.npcName, c.profession, cats, entries,
                 src.starMult, src.fishBase, src.fishBonus, src.fishGolden, src.fishNoInfo);
@@ -252,7 +252,7 @@ public final class Restaurant {
             List<ShopData.Entry> entries = new ArrayList<>();
             for (ShopData.Entry e : src.entries) {
                 entries.add(c.categories.contains(e.category) && e.buyable
-                        ? new ShopData.Entry(e.stack, e.price, e.sellUnit, e.category, e.looseSell, false, e.sellable, e.fish, e.recipe, e.recipeOut) : e);
+                        ? new ShopData.Entry(e.stack, e.price, e.sellUnit, e.category, e.looseSell, false, e.sellable, e.fish, e.recipe, e.recipeOut).withFlex(e.flexUnit) : e);
             }
             out.shops.put(src.id, new ShopData(src.id, src.version, src.title, src.npcName, src.profession, src.categories, entries,
                     src.starMult, src.fishBase, src.fishBonus, src.fishGolden, src.fishNoInfo));

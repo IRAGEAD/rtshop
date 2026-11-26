@@ -41,6 +41,11 @@ public final class PricingConfig {
      */
     public boolean purchaseFloor = true;
     /**
+     * 자유 조리법(Kaleidoscope Cookery 의 flex 냄비: 재료 한 벌만 넣어도 같은 음식이 나오고 품질 꼬리표가 붙는다)으로 만든 요리를
+     * 그 조리법의 재료 한 벌 값 기준으로 따로 산다. 끄면 정식 조리법 기준의 매입가로 똑같이 산다 (차액이 그대로 남는다).
+     */
+    public boolean flexDishPricing = true;
+    /**
      * 보스 모드의 장비·재료는 상점이 팔지 않는다 (보스를 잡아서 얻는 것이 스토리의 보상이므로). 플레이어가 상점에 파는 것은 된다.
      */
     public final java.util.Set<String> notForSaleMods = new java.util.LinkedHashSet<>(java.util.List.of("cataclysm", "mowziesmobs", "aquamirae"));
@@ -163,6 +168,7 @@ public final class PricingConfig {
                 if (o.has("defaultIngredientValue")) c.defaultIngredientValue = Math.max(0.01, o.get("defaultIngredientValue").getAsDouble());
                 if (o.has("edibleEstimateFactor")) c.edibleEstimateFactor = Math.max(0, o.get("edibleEstimateFactor").getAsDouble());
                 if (o.has("purchaseFloor")) c.purchaseFloor = o.get("purchaseFloor").getAsBoolean();
+                if (o.has("flexDishPricing")) c.flexDishPricing = o.get("flexDishPricing").getAsBoolean();
                 if (o.has("notForSaleMods") && o.get("notForSaleMods").isJsonArray()) {
                     c.notForSaleMods.clear();
                     for (com.google.gson.JsonElement e : o.getAsJsonArray("notForSaleMods")) c.notForSaleMods.add(e.getAsString());
@@ -201,6 +207,7 @@ public final class PricingConfig {
                 help.add("음식 매입가 = (재료 원가 + flatExtra) × (1 + margin) + labor, 음식 판매가 = 매입가 × foodBuyMultiplier");
                 help.add("notForSaleMods: 이 모드들의 아이템은 상점이 팔지 않습니다 (보스를 잡아서 얻는 스토리 보상). 플레이어가 파는 것은 됩니다");
                 help.add("purchaseFloor 가 켜져 있으면 어떤 조리법으로 만들든 재료를 상점에서 산 값 이상으로 매입합니다");
+                help.add("flexDishPricing: 자유 조리법(Kaleidoscope Cookery 의 flex 냄비, 품질 꼬리표가 붙는 요리)으로 만든 요리는 재료 한 벌 값 + 손 조리 이익으로 삽니다. 최상급(Superb)만 정식 조리법과 같은 값");
                 help.add("defaultIngredientValue: 가격표에 없는 재료의 추정가(낮게 유지 권장) · edibleEstimateFactor: 먹을 수 있는 재료의 추정가 배율");
                 help.add("handCookedMargin: 손으로 만든 요리를 팔 때 재료비 위로 더 받는 몫 (0.10 = 10%). 화로에 바로 구울 수 있는 음식은 자동화 때문에 본전");
                 help.add("purchaseFloor: 재료를 모두 상점에서 사서 만들어 팔아도 손해가 없도록 음식 매입가를 올림 · autoListFoodIngredients/autoIngredientPrice: 상점에 없는 요리 재료를 식품 상인에 자동으로 올림");
@@ -214,6 +221,7 @@ public final class PricingConfig {
                 o.addProperty("defaultIngredientValue", c.defaultIngredientValue);
                 o.addProperty("edibleEstimateFactor", c.edibleEstimateFactor);
                 o.addProperty("purchaseFloor", c.purchaseFloor);
+                o.addProperty("flexDishPricing", c.flexDishPricing);
             com.google.gson.JsonArray nfs = new com.google.gson.JsonArray();
             for (String m : c.notForSaleMods) nfs.add(m);
             o.add("notForSaleMods", nfs);

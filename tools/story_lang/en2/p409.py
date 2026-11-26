@@ -4,6 +4,7 @@
 import json, os, re
 
 START = 409
+END = 748
 
 JOBS = {"검사": "Swordsman", "전사": "Warrior", "탱커": "Tank", "궁수": "Archer", "마법사": "Mage", "농부": "Farmer", "어부": "Fisher", "광부": "Miner", "요리사": "Cook"}
 NPCS = {"검술 교관 레온": "Leon the Sword Instructor", "전사 대장 브론": "Bron the War Chief", "방패 수호자 가렌": "Garen the Shield Keeper", "사냥꾼 리아": "Lia the Hunter",
@@ -313,7 +314,7 @@ def _base(ko, table):
 
 def _build():
     here = os.path.dirname(os.path.abspath(__file__))
-    src = json.load(open(os.path.join(os.path.dirname(here), 'source2.json'), encoding='utf-8'))[START:]
+    src = json.load(open(os.path.join(os.path.dirname(here), 'source2.json'), encoding='utf-8'))[START:END]   # 이 파일이 맡은 범위만 (뒤에 붙는 글은 p748.py 부터)
     bases, hints = [], []
     for s in src:
         parts = s.split('\n')
