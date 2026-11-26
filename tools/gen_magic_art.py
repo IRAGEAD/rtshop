@@ -410,6 +410,19 @@ def orb_rim_add(N, color, power=1.3):
             px[x, y] = (int(color[0] * k), int(color[1] * k), int(color[2] * k), int(255 * k))
     return im
 
+def orb_core_add(lit):
+    """구슬 몸통의 더하기 섞기 판 (3.64.2): 셰이더를 켰을 때만 몸통 위에 한 번 더 그린다 (RenderType.eyes = 셰이더의 발광 단계).
+    셰이더는 빛을 받지 않게 그린 몸통도 그늘에서 어둡게 칠하므로, 구슬이 스스로 빛나 보이게 한다. 빛깔에 투명도를 미리 곱해 둔다."""
+    im = Image.new('RGBA', lit.size); src = lit.load(); px = im.load()
+    for y in range(lit.size[1]):
+        for x in range(lit.size[0]):
+            r, g, b, a = src[x, y]
+            k = a / 255.0
+            px[x, y] = (int(r * k), int(g * k), int(b * k), a)
+    return im
+
 for _name, (_deep, _body, _rim, _glow) in ORB_COLORS.items():
-    save(orb_lit(64, _deep, _body, _rim), 'entity/orb/%s.png' % _name)
+    _lit = orb_lit(64, _deep, _body, _rim)
+    save(_lit, 'entity/orb/%s.png' % _name)
     save(orb_rim_add(64, _glow), 'entity/orb/%s_rim.png' % _name)            # 구슬 바로 둘레의 빛 (더하기 섞기)
+    save(orb_core_add(_lit), 'entity/orb/%s_core.png' % _name)               # 셰이더를 켰을 때 몸통에 더하는 빛

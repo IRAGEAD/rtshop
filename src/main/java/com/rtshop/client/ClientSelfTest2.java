@@ -860,16 +860,18 @@ final class ClientSelfTest2 {
             // 3.64: 가운데의 빛나는 구슬 — 색마다 그림 셋이 있고, 장면 속에서 실제로 그려진다
             StringBuilder orbMissing = new StringBuilder();
             for (String oc : ArcaneOrbRenderer.COLORS) {
-                for (String part : new String[]{"", "_rim"}) {
+                for (String part : new String[]{"", "_rim", "_core"}) {
                     if (mc.getResourceManager().getResource(new net.minecraft.resources.ResourceLocation("rtshop", "textures/entity/orb/" + oc + part + ".png")).isEmpty()) orbMissing.append(oc).append(part).append(' ');
                 }
             }
             check("3.64 the rune altar has a glowing orb at its centre: every colour has its pictures, the default is moonlight silver (3.64.1), the scene really draws it, "
-                            + "and its glow stays close around the orb, well inside the ring of rune stones (3.64.2)",
+                            + "and its glow stays close around the orb, well inside the ring of rune stones (3.64.2); without a shader pack no extra glowing layer is drawn",
                     orbMissing.length() == 0 && ArcaneOrbRenderer.COLORS.size() == 6 && ArcaneOrbRenderer.color().equals("ice") && ArcaneOrbRenderer.sceneOrbDrawnForTest > 0
-                            && CinematicOrbStation.sceneRimForTest > 0 && CinematicOrbStation.sceneRimForTest < CinematicOrbStation.ringForTest() * 0.65,
+                            && CinematicOrbStation.sceneRimForTest > 0 && CinematicOrbStation.sceneRimForTest < CinematicOrbStation.ringForTest() * 0.65
+                            && (ShaderState.on() || ArcaneOrbRenderer.coreGlowForTest == 0),
                     orbMissing + "scene=" + ArcaneOrbRenderer.sceneOrbDrawnForTest + " block=" + ArcaneOrbRenderer.orbDrawnForTest + " " + ArcaneOrbRenderer.color()
-                            + " rim=" + String.format(java.util.Locale.ROOT, "%.3f", CinematicOrbStation.sceneRimForTest) + " ring=" + CinematicOrbStation.ringForTest());
+                            + " rim=" + String.format(java.util.Locale.ROOT, "%.3f", CinematicOrbStation.sceneRimForTest) + " ring=" + CinematicOrbStation.ringForTest()
+                            + " core=" + ArcaneOrbRenderer.coreGlowForTest + " shader=" + ShaderState.on());
             shot(mc, "123b_orb_scene");
             if (st != null) st.chooseForTest(0);
             waitTicks(14);

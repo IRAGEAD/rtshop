@@ -27,20 +27,22 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
     public static final java.util.List<String> COLORS = java.util.List.of("blue", "ice", "gold", "violet", "jade", "rose");
     private static final java.util.Map<String, ResourceLocation> TEX = new java.util.HashMap<>();
     /** 점검용: 구슬을 그린 횟수 (받침 위의 구슬 / 장면 속의 구슬). */
-    public static long orbDrawnForTest, sceneOrbDrawnForTest;
+    public static long orbDrawnForTest, sceneOrbDrawnForTest, coreGlowForTest;
 
     public static String color() {
         String c = ClientConfig.get().altarOrbColor;
         return c != null && COLORS.contains(c) ? c : ClientConfig.DEFAULT_ORB;   // 모르는 이름이면 기본 색 (3.64.1: 달빛 은백)
     }
 
-    /** part: "" 구슬 · "_rim" 구슬 둘레의 빛 (더하기 섞기용, 3.64.2). */
+    /** part: "" 구슬 · "_rim" 구슬 둘레의 빛 · "_core" 셰이더를 켰을 때 몸통에 더하는 빛 (둘 다 더하기 섞기용, 3.64.2). */
     public static ResourceLocation tex(String part) {
         return TEX.computeIfAbsent(color() + part, k -> new ResourceLocation(RtShop.MODID, "textures/entity/orb/" + k + ".png"));
     }
 
     /** 구슬 둘레 빛의 크기 (구슬 반지름의 배수, 3.64.2). 받침 위에서는 0.20 × 1.7 = 0.34 로 가장 안쪽 고리(0.35) 안에 머문다. */
     public static final float RIM = 1.7F;
+    /** 셰이더를 켰을 때: 몸통에 더하는 빛의 세기, 둘레 빛의 배수 (셰이더는 빛을 받지 않게 그린 그림도 그늘에서 어둡게 칠한다). */
+    public static final float SHADER_CORE = 0.85F, SHADER_RIM = 1.5F;
 
     /** 숨 쉬듯 밝아졌다 어두워지는 정도 (0~1). */
     public static float breath(float time) {
@@ -111,8 +113,13 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
             float s = Mth.lerp(k, 0.20F, 0.12F) + flare * 0.03F * (1F - 0.5F * k);
             float br = breath(time);
             // 둘레의 빛(가장 안쪽 은빛 고리 0.35 안쪽까지만) → 그 위에 구슬. 구슬은 빛·그림자를 받지 않는 그림 (어두운 곳이나 셰이더에서 가장자리가 검게 보이지 않게)
-            glowQuad(ps, buf.getBuffer(RenderType.eyes(tex("_rim"))), s * RIM, (0.55F + 0.15F * br + flare * 0.30F) * show);
+            boolean shader = ShaderState.on();
+            glowQuad(ps, buf.getBuffer(RenderType.eyes(tex("_rim"))), s * RIM, (0.55F + 0.15F * br + flare * 0.30F) * show * (shader ? SHADER_RIM : 1F));
             quad(ps, buf.getBuffer(RenderType.text(tex(""))), s * (1F + 0.03F * br), show);
+            if (shader) {   // 셰이더에서는 몸통이 그늘에서 어둡게 칠해진다 → 같은 자리에 발광 층을 한 번 더
+                glowQuad(ps, buf.getBuffer(RenderType.eyes(tex("_core"))), s * (1F + 0.03F * br), SHADER_CORE * show);
+                coreGlowForTest++;
+            }
             ps.popPose();
             orbDrawnForTest++;
         }

@@ -569,9 +569,14 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
             double os = ORB_R * appear * (1.0 + 0.10 * (gl - 0.5) + 0.03 * br);
             Vec3 toCam = cam.subtract(orb);
             toCam = toCam.lengthSqr() < 1.0e-6 ? Vec3.ZERO : toCam.normalize();
-            float rimStrength = (float) (p * Math.min(1.0, 0.50 + 0.15 * br + 0.30 * Math.min(1.5, gl - 0.5)));
+            boolean shader = ShaderState.on();
+            float rimStrength = (float) (p * Math.min(1.0, 0.50 + 0.15 * br + 0.30 * Math.min(1.5, gl - 0.5))) * (shader ? ArcaneOrbRenderer.SHADER_RIM : 1f);
             glowQuad(pose, buffers, camera, ArcaneOrbRenderer.tex("_rim"), orb, os * ArcaneOrbRenderer.RIM, rimStrength);
             quad(pose, buffers, camera, ArcaneOrbRenderer.tex(""), orb.add(toCam.scale(0.008)), os, os, 0f, 1f, 1f, (float) p);
+            if (shader) {   // 셰이더에서는 몸통이 그늘에서 어둡게 칠해진다 → 같은 자리에 발광 층을 한 번 더 (받침 위의 구슬과 같다)
+                glowQuad(pose, buffers, camera, ArcaneOrbRenderer.tex("_core"), orb.add(toCam.scale(0.009)), os, ArcaneOrbRenderer.SHADER_CORE * (float) p);
+                ArcaneOrbRenderer.coreGlowForTest++;
+            }
             ArcaneOrbRenderer.sceneOrbDrawnForTest++;
             sceneRimForTest = os * ArcaneOrbRenderer.RIM;
         }

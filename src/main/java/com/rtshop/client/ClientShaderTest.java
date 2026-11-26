@@ -176,7 +176,9 @@ final class ClientShaderTest {
             waitTicks(80);
         });
         add(mc -> {
-            check("with the shader on, the orb on its pedestal is drawn (orb, rim glow and rings)", ArcaneOrbRenderer.orbDrawnForTest > 0, ArcaneOrbRenderer.orbDrawnForTest);
+            check("with the shader on, the orb on its pedestal is drawn (orb, rim glow and rings) with the extra glowing layer the shader needs",
+                    ArcaneOrbRenderer.orbDrawnForTest > 0 && ArcaneOrbRenderer.coreGlowForTest > 0,
+                    ArcaneOrbRenderer.orbDrawnForTest + " core=" + ArcaneOrbRenderer.coreGlowForTest);
             shot(mc, "152_" + LABEL + "_orb");
             if (orb != null) {
                 mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
@@ -186,9 +188,19 @@ final class ClientShaderTest {
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            RtShop.LOGGER.info("[rtshop-clienttest] altar scene after the click: {}", CinematicOrb.phaseForTest());
             shot(mc, "153_" + LABEL + "_orb_scene_intro");
-            waitTicks(160);
+            waitTicks(40);
         });
+        // 셰이더를 켠 소프트웨어 그리기는 아주 느리다: 장면이 펼쳐질 때까지(ACTIVE) 조금씩 기다린다
+        for (int i = 0; i < 8; i++) {
+            add(mc -> {
+                if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+                String ph = CinematicOrb.phaseForTest();
+                RtShop.LOGGER.info("[rtshop-clienttest] altar scene: {}", ph);
+                waitTicks("ACTIVE".equals(ph) || "NONE".equals(ph) ? 1 : 40);
+            });
+        }
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             CinematicOrbStation st = CinematicOrb.station();

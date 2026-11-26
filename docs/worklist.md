@@ -370,6 +370,25 @@
   - 손대지 않은 것: Cinematic Interactions 가 없을 때 뜨는 2D 마법 뽑기 창의 구슬 그림(`MagicGachaScreen`, 모드팩에서는 쓰이지 않음)은 예전 푸른 그림 그대로.
 - 자체 점검: 화면 "3.64.1 the rune altar orb is moonlight silver by default …"(옛 파일 옮기기 포함), 모드팩 전체의 "3.64 the rune altar has a glowing orb …" 의 기본 색 조건을 ice 로.
 
+## 3.64.2 (2026-11-27 새벽, 가지 v5-next16)
+
+요청 (01:39): "룬 제단 가운데의 구슬의 빛 번짐 효과가 다른 디자인을 가리지 않도록 하고, 강화 모루의 빛이 들어오지 않는 문제를 해결해줘.(photon shader 기준)"
+요청 (01:43): "작업이 완료되면 강화의 보호권 사용 방식을 모루 위에 장비와 함께 올려 두고 사용하면 소모되는 방식으로 변경해줘. 모드팩의 전체적인 경제와 무기 밸런스를 검토하고 수정할 부분이나 제안할 부분이 있으면 정리해서 알려줘."
+
+- M-1. 룬 제단 구슬의 빛 번짐 ✔: 넓은 빛무리(halo)를 없애고, 구슬 바로 둘레의 좁은 가장자리 빛(`entity/orb/<색>_rim.png`, 반지름 = 구슬의 1.7배)만 더하기 혼합(`RenderType.eyes`)으로 그린다.
+  장면 안에서도 빛의 반지름이 룬 고리의 0.65배 안 (`CinematicOrbStation.sceneRimForTest < ringForTest()*0.65`). 알파 섞기 빛은 Photon 에서 탁한 유리처럼 보였다 → 더하기 혼합.
+  옛 `*_glow.png` · `*_halo.png` 는 지움 (`tools/gen_magic_art.py` 의 `orb_rim_add`).
+- M-2. 강화 모루의 빛 (Photon) ✔: 그리는 단계를 AFTER_TRANSLUCENT_BLOCKS → **AFTER_ENTITIES** (`EnhanceAnvilGlow`). Embeddium + Oculus 로 셰이더를 켜면 반투명 블록 뒤 단계에 그린 것이 화면에 남지 않는다
+  (같은 셰이더에서 보이는 Cinematic Interactions 장면이 AFTER_ENTITIES 에 그린다). 흔적 표시(`SpotClient`) · 땅 경계(`BorderRenderer`)도 같은 단계로 옮김.
+- M-3. CI 에서 셰이더를 켠 사진 ✔ (`ClientShaderTest`, 모드팩 전체 job 의 "Shader pictures" 단계): 화면 점검을 마친 세계에서 셰이더 팩을 Oculus 로 켜고 다시 띄워 150~155 사진(모루 · 흔적 · 제단 · 장면)을 찍는다.
+  CI 의 소프트웨어 그리기(llvmpipe)는 계산 셰이더 공유 메모리가 32KB 라 Photon 의 deferred4_a(36KB)가 안 만들어져 셰이더가 통째로 꺼진다 → 그 패스만 끈 Photon 사본(`.github/scripts/shaderpacks.py`)을 먼저 쓰고,
+  그래도 안 켜지면 Complementary · BSL 순서. 결과 `rtshop-shadertest-<팩>.txt`, 로그 줄 `shader-log.txt` (ci-fullpack-screenshots).
+  - 장면 점검이 처음에 "NONE" 이던 까닭: 마을의 룬 제단은 하나뿐이라 앞 화면 점검에서 놓은 제단이 정해져 있어 새 제단을 거절했다 → 시험 제단을 마을 제단으로 정한다(`WorldRules.setAltar`).
+- M-4. 보호권 ✔: 보호권은 3.49 부터 이미 "모루 위 장비 옆 칸에 올려 두면 그 강화에 한 장이 쓰이는" 방식이었는데, 강화 창 도움말(`rtshop.enhance.help2`)과 확률표 아래 설명(`enhodds.footer`)에 옛 "우클릭으로 미리 사용" 안내가 남아 있었다 → 고침 (안내서 강화 쪽도, `gen_guide` VERSION 6).
+  예전 방식으로 걸어 둔 보호가 남아 있던 사람은 접속할 때 그 보호권 한 장으로 돌려받는다(`Enhance.refundLegacyGuard`, 알림 `rtshop.enhance.guard_refund`). 화면 점검의 보호권 시험도 칸에 올리는 방식으로.
+- M-5. 경제 · 무기 밸런스 검토 ✔ (숫자는 안 바꿈): `docs/balance_review.md`. 근거를 위해 모드팩 전체 점검의 `diag.txt` 에 무기 · 방어구 비교표(`== weapons` · `== armor`: 공격력 · 초당 공격 · DPS · 상점가 · 뽑기 등급 · 조합 · 보스 전리품)를 더함 (`PackDiag.gear`).
+  사용자가 고른 제안만 다음 판에서 고친다 — 검토의 제안 A~K.
+
 ## 다음 작업 (사용자가 3.64.0 작업 중에 목록에 넣어 달라고 한 것 — **아직 하지 않음**)
 
 - K-1. **Diorama 지도(M 키)의 NPC 표시**: 이름표(웨이포인트 이름) 대신 NPC 마다 서로 다른 아이콘으로 위치를 보이기.
