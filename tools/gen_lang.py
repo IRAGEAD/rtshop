@@ -7,6 +7,27 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ # ---- 3.61: 민원 창 (시청 서기 하루)
+ "rtshop.talk.petition": ("민원 접수 · 내 민원 보기", "File a report · see my reports"),
+ "rtshop.petition.title": ("민원 창구 — 시청 서기 하루", "Reports — Haru the Town Clerk"),
+ "rtshop.petition.tab_new": ("새 민원", "New report"),
+ "rtshop.petition.tab_mine": ("내 민원 (%s)", "My reports (%s)"),
+ "rtshop.petition.pick_cat": ("분류를 고르고 아래에 내용을 적어 주세요", "Pick a category, then write below"),
+ "rtshop.petition.cat.bug": ("버그·오류", "Bug"),
+ "rtshop.petition.cat.idea": ("건의", "Suggestion"),
+ "rtshop.petition.cat.player": ("신고", "Player"),
+ "rtshop.petition.cat.land": ("토지·거래", "Land · trade"),
+ "rtshop.petition.cat.etc": ("기타", "Other"),
+ "rtshop.petition.state.0": ("접수됨", "Open"),
+ "rtshop.petition.state.1": ("답변함", "Answered"),
+ "rtshop.petition.state.2": ("종결", "Closed"),
+ "rtshop.petition.count": ("%s / %s자", "%s / %s"),
+ "rtshop.petition.open_left": ("처리 전 민원 %s / %s건", "Open reports %s / %s"),
+ "rtshop.petition.submit": ("접수", "File"),
+ "rtshop.petition.hint": ("지금 서 있는 자리가 함께 적힙니다. 답이 달리면 알려 드립니다.", "Where you stand is recorded with it. You will be told when it is answered."),
+ "rtshop.petition.none": ("접수한 민원이 없습니다.", "You have no reports."),
+ "rtshop.petition.answer": ("답변", "Answer"),
+ "rtshop.petition.withdraw": ("거두기", "Withdraw"),
  # ---- 3.23: 직업 선행 퀘스트 제한, 파티
  "rtshop.quest.job_busy": ("이미 %s 선행 퀘스트를 진행 중입니다. 다른 직업으로 바꾸려면 퀘스트 수첩에서 진행 중인 선행 퀘스트를 포기하세요. (직업 선행 퀘스트는 전투·생활 직업마다 하나씩만 진행할 수 있습니다)", "You are already doing the %s job quests. Abandon that quest in your quest book to switch (one combat and one life job line at a time)."),
  "rtshop.quest.job_paused": ("이 직업의 선행 퀘스트를 그만두었습니다. 이제 다른 직업의 선행 퀘스트를 받을 수 있습니다. (나중에 다시 받으면 깬 단계부터 이어집니다)", "You stopped this job's quest line. You can now take another job's quests (you'll resume where you left off if you come back)."),

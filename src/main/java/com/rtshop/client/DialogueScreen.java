@@ -165,6 +165,7 @@ public class DialogueScreen extends Screen {
         if (data.has("main")) out.add(new String[]{"main", "", Component.translatable(data.get("main").getAsString()).getString()});
         // 전용 NPC 의 일: 순위 기록원·칭호 관리인·현상금 게시판지기
         boolean service = data.has("service") && data.get("service").getAsBoolean();
+        if (data.has("petition")) out.add(new String[]{"petition", "", Component.translatable("rtshop.talk.petition").getString()});
         if (data.has("ranks")) out.add(new String[]{"ranks", "", Component.translatable("rtshop.talk.ranks").getString()});
         if (data.has("titles")) out.add(new String[]{"titles", "", Component.translatable("rtshop.talk.titles").getString()});
         if (service && data.has("bounty")) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
@@ -233,6 +234,10 @@ public class DialogueScreen extends Screen {
             case "bounty" -> {
                 onClose();
                 if (minecraft.player != null) minecraft.player.connection.sendCommand("bounty board " + entity);
+            }
+            case "petition" -> {
+                onClose();
+                if (minecraft.player != null) minecraft.player.connection.sendCommand("rtshop report open");
             }
             case "ranks" -> {
                 onClose();

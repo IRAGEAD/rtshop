@@ -40,8 +40,10 @@ import java.util.UUID;
 /**
  * 민원 (3.60): 플레이어가 운영자에게 글을 남기고, 운영자가 답하고 종결한다.
  * <ul>
- * <li>플레이어: /rtshop report write &lt;글&gt; · /rtshop report list · /rtshop report cancel &lt;번호&gt;</li>
- * <li>운영자: /rtshop report all [done] · answer &lt;번호&gt; &lt;글&gt; · close &lt;번호&gt; · delete &lt;번호&gt; · tp &lt;번호&gt;</li>
+ * <li>플레이어: 시청 서기 하루(NPC 열쇠 attendance)에게 말을 걸어 [민원] → 창(client/PetitionScreen)에서 분류를 고르고 글을 써 접수, 내 민원과 답변 보기.
+ *     명령: /rtshop report list · /rtshop report cancel &lt;번호&gt; (3.60 의 write 는 하루에게 가라는 안내로 바뀜)</li>
+ * <li>운영자: /rtshop report all [done|분류] · answer &lt;번호&gt; &lt;글&gt; · close &lt;번호&gt; · delete &lt;번호&gt; · tp &lt;번호&gt;</li>
+ * <li>분류: bug(버그·오류) · idea(건의) · player(신고) · land(토지·거래) · etc(기타)</li>
  * </ul>
  * 접수한 자리(차원·좌표)가 함께 적힌다. 새 민원은 접속 중인 운영자에게, 답변·종결은 그 플레이어에게 알린다 (없으면 다음 접속 때).
  * 저장: 월드 데이터 rtshop_petitions. 운영자 명령은 다른 운영자 기능처럼 크리에이티브·관전에서만 된다 (util/Perm).
@@ -56,6 +58,27 @@ public final class Petitions {
     public static final int OPEN = 0, ANSWERED = 1, CLOSED = 2;
     /** file 의 실패 값. */
     public static final int ERR_EMPTY = -1, ERR_LONG = -2, ERR_MANY = -3, ERR_SOON = -4;
+    /** 분류 (저장되는 이름). 화면의 이름은 언어 파일 rtshop.petition.cat.<이름>. */
+    public static final List<String> CATS = List.of("bug", "idea", "player", "land", "etc");
+    private static final String[] CAT_KO = {"버그·오류", "건의", "신고", "토지·거래", "기타"}, CAT_EN = {"bug", "suggestion", "player report", "land/trade", "other"};
+    /** 민원 창구가 되는 NPC 의 열쇠 (시청 서기 하루) 와, 창구로 치는 거리. */
+    public static final String CLERK = "attendance";
+    public static final double CLERK_RANGE = 12.0;
+
+    public static String catName(boolean en, String cat) {
+        int i = CATS.indexOf(cat);
+        if (i < 0) i = CATS.size() - 1;
+        return en ? CAT_EN[i] : CAT_KO[i];
+    }
+
+    /** 시청 서기가 곁에 있는가 (민원 창은 서기 앞에서만 열리고 접수된다). */
+    public static boolean nearClerk(ServerPlayer p) {
+        try {
+            return !p.level().getEntities(p, p.getBoundingBox().inflate(CLERK_RANGE), e -> CLERK.equals(com.rtshop.quest.QuestManager.npcKey(e))).isEmpty();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 
     private static final Map<UUID, Long> LAST = new HashMap<>();
     private static final DateTimeFormatter WHEN = DateTimeFormatter.ofPattern("MM-dd HH:mm").withZone(ZoneId.systemDefault());
@@ -63,7 +86,7 @@ public final class Petitions {
     public static final class Entry {
         public int id, state, x, y, z;
         public UUID player;
-        public String name = "", text = "", dim = "", answer = "", answeredBy = "";
+        public String name = "", text = "", dim = "", answer = "", answeredBy = "", cat = "etc";
         public long time, answeredAt;
         /** 답변·종결을 그 플레이어가 보았는가 (접속해 있지 않을 때 달린 답은 다음 접속 때 알린다). */
         public boolean seen = true;
@@ -79,6 +102,7 @@ public final class Petitions {
             t.putString("name", name);
             t.putString("text", text);
             t.putString("dim", dim);
+            t.putString("cat", cat);
             t.putString("answer", answer);
             t.putString("answeredBy", answeredBy);
             t.putLong("time", time);
@@ -98,6 +122,7 @@ public final class Petitions {
             e.name = t.getString("name");
             e.text = t.getString("text");
             e.dim = t.getString("dim");
+            e.cat = CATS.contains(t.getString("cat")) ? t.getString("cat") : "etc";
             e.answer = t.getString("answer");
             e.answeredBy = t.getString("answeredBy");
             e.time = t.getLong("time");
@@ -159,6 +184,10 @@ public final class Petitions {
 
     /** 민원을 접수한다. 번호(1 이상)를 돌려주고, 안 되면 ERR_* (0 보다 작다). */
     public static int file(ServerPlayer p, String raw) {
+        return file(p, "etc", raw);
+    }
+
+    public static int file(ServerPlayer p, String cat, String raw) {
         String text = clean(raw);
         if (text.isEmpty()) return ERR_EMPTY;
         if (text.length() > MAX_LEN) return ERR_LONG;
@@ -175,6 +204,7 @@ public final class Petitions {
         e.player = p.getUUID();
         e.name = p.getGameProfile().getName();
         e.text = text;
+        e.cat = CATS.contains(cat) ? cat : "etc";
         e.time = now;
         e.dim = p.level().dimension().location().toString();
         e.x = p.blockPosition().getX();
@@ -184,7 +214,7 @@ public final class Petitions {
         d.setDirty();
         for (ServerPlayer op : p.server.getPlayerList().getPlayers()) {
             if (op == p || !op.hasPermissions(2)) continue;
-            op.sendSystemMessage(Component.literal(StoryText.pick(op, "[민원] 새 민원 #" + e.id + " (" + e.name + "): ", "[Report] New report #" + e.id + " (" + e.name + "): ") + e.text)
+            op.sendSystemMessage(Component.literal(StoryText.pick(op, "[민원] 새 민원 #" + e.id + " [" + catName(false, e.cat) + "] (" + e.name + "): ", "[Report] New report #" + e.id + " [" + catName(true, e.cat) + "] (" + e.name + "): ") + e.text)
                     .withStyle(ChatFormatting.GOLD).append(button(op, "목록", "list", "/rtshop report all", true)));
         }
         return e.id;
@@ -280,7 +310,7 @@ public final class Petitions {
     public static MutableComponent line(ServerPlayer to, Entry e, boolean forOp) {
         boolean en = to != null && StoryText.en(to);
         ChatFormatting color = e.state == OPEN ? ChatFormatting.YELLOW : e.state == ANSWERED ? ChatFormatting.GREEN : ChatFormatting.GRAY;
-        String head = (en ? "[Report] #" : "[민원] #") + e.id + " [" + stateName(en, e.state) + "] " + WHEN.format(Instant.ofEpochMilli(e.time));
+        String head = (en ? "[Report] #" : "[민원] #") + e.id + " [" + catName(en, e.cat) + "] [" + stateName(en, e.state) + "] " + WHEN.format(Instant.ofEpochMilli(e.time));
         if (forOp) head += " " + e.name + " (" + e.dim.replace("minecraft:", "") + " " + e.x + ", " + e.y + ", " + e.z + ")";
         MutableComponent out = Component.literal(head + ": ").withStyle(color).append(Component.literal(e.text).withStyle(ChatFormatting.WHITE));
         if (!e.answer.isEmpty()) {
@@ -297,6 +327,74 @@ public final class Petitions {
             out.append(button(to, "거두기", "withdraw", "/rtshop report cancel " + e.id, false));
         }
         return out;
+    }
+
+    // ------------------------------------------------------------------ 창 (시청 서기 하루)
+
+    /** 민원 창에 보낼 내용: 분류 목록, 한도, 내 민원(새 것이 위), 알림 한 줄. */
+    public static com.google.gson.JsonObject view(ServerPlayer p, String msg, boolean filed) {
+        com.google.gson.JsonObject o = new com.google.gson.JsonObject();
+        o.addProperty("max", MAX_LEN);
+        o.addProperty("maxOpen", MAX_OPEN);
+        com.google.gson.JsonArray cats = new com.google.gson.JsonArray();
+        for (String c : CATS) cats.add(c);
+        o.add("cats", cats);
+        com.google.gson.JsonArray mine = new com.google.gson.JsonArray();
+        List<Entry> all = data(p.server).list;
+        int open = 0;
+        for (int i = all.size() - 1; i >= 0; i--) {
+            Entry e = all.get(i);
+            if (!p.getUUID().equals(e.player)) continue;
+            if (e.state == OPEN) open++;
+            com.google.gson.JsonObject j = new com.google.gson.JsonObject();
+            j.addProperty("id", e.id);
+            j.addProperty("cat", e.cat);
+            j.addProperty("state", e.state);
+            j.addProperty("when", WHEN.format(Instant.ofEpochMilli(e.time)));
+            j.addProperty("text", e.text);
+            j.addProperty("answer", e.answer);
+            j.addProperty("by", e.answeredBy);
+            mine.add(j);
+        }
+        o.add("mine", mine);
+        o.addProperty("open", open);
+        o.addProperty("msg", msg == null ? "" : msg);
+        o.addProperty("filed", filed);
+        return o;
+    }
+
+    public static void open(ServerPlayer p, String msg, boolean filed) {
+        com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
+                new com.rtshop.net.StoryPacket(com.rtshop.net.StoryPacket.PETITIONS, view(p, msg, filed).toString()));
+    }
+
+    /** 실패 값을 그 사람의 말로. */
+    public static String errorText(ServerPlayer p, int r) {
+        if (r == ERR_EMPTY) return StoryText.pick(p, "내용이 비어 있습니다.", "The report is empty.");
+        if (r == ERR_LONG) return StoryText.pick(p, "글이 너무 깁니다 (" + MAX_LEN + "자까지).", "That is too long (up to " + MAX_LEN + " characters).");
+        if (r == ERR_MANY) return StoryText.pick(p, "처리를 기다리는 민원이 이미 " + MAX_OPEN + "건 있습니다. 답을 받거나 거둔 뒤에 접수해 주세요.",
+                "You already have " + MAX_OPEN + " open reports. Wait for an answer or withdraw one first.");
+        if (r == ERR_SOON) return StoryText.pick(p, "방금 접수했습니다. " + COOLDOWN_SEC + "초 뒤에 다시 해 주세요.", "You just filed one. Try again in " + COOLDOWN_SEC + " seconds.");
+        return "";
+    }
+
+    /** 창에서 온 일: 0 = 접수(arg = 분류 번호), 1 = 거두기(arg = 민원 번호), 2 = 다시 보기. 서기 곁에서만. */
+    public static void fromScreen(ServerPlayer p, int action, int arg, String text) {
+        if (!nearClerk(p)) {
+            p.sendSystemMessage(Component.literal(StoryText.pick(p, "[민원] 시청 서기 하루 곁에서만 접수할 수 있습니다.", "[Report] Reports are filed at Haru the Town Clerk's desk.")).withStyle(ChatFormatting.YELLOW));
+            return;
+        }
+        if (action == 0) {
+            int r = file(p, arg >= 0 && arg < CATS.size() ? CATS.get(arg) : "etc", text);
+            if (r > 0) open(p, StoryText.pick(p, "#" + r + " 접수했습니다. 답이 달리면 알려 드립니다.", "#" + r + " filed. You will be told when it is answered."), true);
+            else open(p, errorText(p, r), false);
+        } else if (action == 1) {
+            boolean ok = cancel(p, arg);
+            open(p, ok ? StoryText.pick(p, "#" + arg + " 을(를) 거뒀습니다.", "#" + arg + " withdrawn.")
+                    : StoryText.pick(p, "거둘 수 없습니다: 이미 답이 달렸습니다.", "That cannot be withdrawn: it already has an answer."), false);
+        } else {
+            open(p, "", false);
+        }
     }
 
     // ------------------------------------------------------------------ 접속할 때
@@ -337,32 +435,30 @@ public final class Petitions {
     }
 
     private static int help(CommandContext<CommandSourceStack> ctx) {
-        say(ctx, "[민원] 운영자에게 글을 남깁니다 (버그 · 건의 · 토지나 거래 문제 등). 지금 서 있는 자리가 함께 적힙니다.\n"
-                        + "  /rtshop report write <내용>  : 접수 (" + MAX_LEN + "자까지, 처리 전 민원은 " + MAX_OPEN + "건까지)\n"
+        say(ctx, "[민원] 운영자에게 글을 남깁니다 (버그 · 건의 · 신고 · 토지나 거래 문제 등).\n"
+                        + "  접수: 시청 서기 하루에게 말을 걸어 [민원] 을 고릅니다 (" + MAX_LEN + "자까지, 처리 전 민원은 " + MAX_OPEN + "건까지, 접수한 자리가 함께 적힘)\n"
                         + "  /rtshop report list  : 내 민원과 답변 보기\n"
                         + "  /rtshop report cancel <번호>  : 아직 답이 없는 내 민원 거두기",
-                "[Report] Leave a note for the operators (bugs, suggestions, land or trade trouble). Where you stand is recorded with it.\n"
-                        + "  /rtshop report write <text>  : file one (up to " + MAX_LEN + " characters, " + MAX_OPEN + " open at a time)\n"
+                "[Report] Leave a note for the operators (bugs, suggestions, player reports, land or trade trouble).\n"
+                        + "  To file one: talk to Haru the Town Clerk and choose [Reports] (up to " + MAX_LEN + " characters, " + MAX_OPEN + " open at a time; where you stand is recorded)\n"
                         + "  /rtshop report list  : your reports and their answers\n"
                         + "  /rtshop report cancel <number>  : withdraw one of yours that has no answer yet");
         if (ctx.getSource().hasPermission(2)) {
-            say(ctx, "  (운영자) /rtshop report all [done] · answer <번호> <글> · close <번호> · delete <번호> · tp <번호>",
-                    "  (operators) /rtshop report all [done] · answer <number> <text> · close <number> · delete <number> · tp <number>");
+            say(ctx, "  (운영자) /rtshop report all [done|bug|idea|player|land|etc] · answer <번호> <글> · close <번호> · delete <번호> · tp <번호>",
+                    "  (operators) /rtshop report all [done|bug|idea|player|land|etc] · answer <number> <text> · close <number> · delete <number> · tp <number>");
         }
         return 1;
     }
 
+    /** 3.61: 접수는 시청 서기의 창에서 한다. 명령으로는 길을 알려 주기만 한다 (서기 곁이면 창을 연다). */
     private static int write(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         ServerPlayer p = ctx.getSource().getPlayerOrException();
-        int r = file(p, StringArgumentType.getString(ctx, "text"));
-        if (r == ERR_EMPTY) return fail(ctx, "내용이 비어 있습니다.", "The report is empty.");
-        if (r == ERR_LONG) return fail(ctx, "글이 너무 깁니다 (" + MAX_LEN + "자까지). 나눠서 접수해 주세요.", "That is too long (up to " + MAX_LEN + " characters). Please split it up.");
-        if (r == ERR_MANY) return fail(ctx, "처리를 기다리는 민원이 이미 " + MAX_OPEN + "건 있습니다. 답을 받거나 /rtshop report cancel 로 거둔 뒤에 접수해 주세요.",
-                "You already have " + MAX_OPEN + " open reports. Wait for an answer or withdraw one with /rtshop report cancel.");
-        if (r == ERR_SOON) return fail(ctx, "방금 접수했습니다. " + COOLDOWN_SEC + "초 뒤에 다시 해 주세요.", "You just filed one. Try again in " + COOLDOWN_SEC + " seconds.");
-        say(ctx, "[민원] #" + r + " 접수했습니다. 답이 달리면 알려 드립니다 (/rtshop report list 로도 볼 수 있습니다).",
-                "[Report] #" + r + " filed. You will be told when it is answered (see also /rtshop report list).");
-        return 1;
+        if (nearClerk(p)) {
+            open(p, "", false);
+            return 1;
+        }
+        return fail(ctx, "민원은 시청 서기 하루에게 말을 걸어 [민원] 에서 접수합니다. (내 민원 보기: /rtshop report list)",
+                "Reports are filed with Haru the Town Clerk: talk to him and choose [Reports]. (Your reports: /rtshop report list)");
     }
 
     private static int mine(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
@@ -374,15 +470,19 @@ public final class Petitions {
             ctx.getSource().sendSuccess(() -> line(p, shown, false), false);
             n++;
         }
-        if (n == 0) say(ctx, "[민원] 접수한 민원이 없습니다. /rtshop report write <내용> 으로 접수합니다.", "[Report] You have no reports. File one with /rtshop report write <text>.");
+        if (n == 0) say(ctx, "[민원] 접수한 민원이 없습니다. 시청 서기 하루에게 말을 걸어 접수합니다.", "[Report] You have no reports. Talk to Haru the Town Clerk to file one.");
         return n;
     }
 
     private static int all(CommandContext<CommandSourceStack> ctx, boolean done) {
+        return all(ctx, done, null);
+    }
+
+    private static int all(CommandContext<CommandSourceStack> ctx, boolean done, String cat) {
         ServerPlayer to = ctx.getSource().getEntity() instanceof ServerPlayer sp ? sp : null;
         int n = 0;
         for (Entry e : data(ctx.getSource().getServer()).list) {
-            if ((e.state == CLOSED) != done) continue;
+            if ((e.state == CLOSED) != done || (cat != null && !cat.equals(e.cat))) continue;
             Entry shown = e;
             ctx.getSource().sendSuccess(() -> line(to, shown, true), false);
             n++;
@@ -409,7 +509,8 @@ public final class Petitions {
     public static void onCommands(RegisterCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> report = Commands.literal("report")
                 .executes(Petitions::help)
-                .then(Commands.literal("write").then(Commands.argument("text", StringArgumentType.greedyString()).executes(Petitions::write)))
+                .then(Commands.literal("write").executes(Petitions::write).then(Commands.argument("text", StringArgumentType.greedyString()).executes(Petitions::write)))
+                .then(Commands.literal("open").executes(Petitions::write))
                 .then(Commands.literal("list").executes(Petitions::mine))
                 .then(Commands.literal("cancel").then(Commands.argument("id", IntegerArgumentType.integer(1)).executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
@@ -419,7 +520,12 @@ public final class Petitions {
                     return 1;
                 })))
                 .then(Commands.literal("all").requires(s -> s.hasPermission(2)).executes(ctx -> all(ctx, false))
-                        .then(Commands.literal("done").executes(ctx -> all(ctx, true))))
+                        .then(Commands.literal("done").executes(ctx -> all(ctx, true)))
+                        .then(Commands.literal("bug").executes(ctx -> all(ctx, false, "bug")))
+                        .then(Commands.literal("idea").executes(ctx -> all(ctx, false, "idea")))
+                        .then(Commands.literal("player").executes(ctx -> all(ctx, false, "player")))
+                        .then(Commands.literal("land").executes(ctx -> all(ctx, false, "land")))
+                        .then(Commands.literal("etc").executes(ctx -> all(ctx, false, "etc"))))
                 .then(Commands.literal("answer").requires(s -> s.hasPermission(2)).then(Commands.argument("id", IntegerArgumentType.integer(1))
                         .then(Commands.argument("text", StringArgumentType.greedyString()).executes(ctx -> {
                             int id = IntegerArgumentType.getInteger(ctx, "id");

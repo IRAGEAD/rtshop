@@ -70,6 +70,11 @@ public final class StoryClient {
                 CodexScreen.detail(JsonParser.parseString(json).getAsJsonObject());
             } catch (Exception ignored) {
             }
+        } else if (kind == StoryPacket.PETITIONS) {
+            try {
+                PetitionScreen.open(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.RANKS) {
             try {
                 RankScreen.open(JsonParser.parseString(json).getAsJsonObject());
