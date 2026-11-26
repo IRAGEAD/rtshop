@@ -33,7 +33,9 @@ import java.util.Optional;
 
 /**
  * NPC 외형 그리기 (3.61, 시안 C): 서버가 알려 준 NPC(엔티티 번호 → 모습 이름)를 주민 대신 그 인물의 모습으로 그린다.
- * 모습은 빛깔 있는 네모들의 묶음이다 (assets/rtshop/npc_looks/&lt;이름&gt;.bin, 형식은 tools/gen_npc_looks.py 머리말).
+ * 모습은 그림을 입힌 네모들의 묶음이다 (네모 = assets/rtshop/npc_looks/&lt;이름&gt;.bin, 빛깔 = textures/npc_looks/&lt;이름&gt;.png, 형식은 tools/gen_npc_looks.py 머리말).
+ * 3.63: 빛깔을 그림에 구워 넣어 네모를 인물당 2천여 개 → 2~3백 개로 줄였고, 카메라 반대쪽을 보는 네모는 넘기지 않는다
+ * (3.61 · 3.62 에서는 NPC 가 모인 곳에서 프레임이 크게 떨어졌다).
  * 몸은 엔티티가 보는 쪽으로 서고, 머리(얼굴·머리카락·수염·모자)는 8칸 안의 플레이어를 천천히 바라본다. 이름표는 예전처럼 머리 위에.
  * client.json 의 npcLooks 를 false 로 하면 예전의 주민 모습.
  */
@@ -42,17 +44,18 @@ public final class NpcLookClient {
     private NpcLookClient() {
     }
 
-    /** 네모 하나 = 꼭짓점 넷(12) + 법선(3) + 빛깔(3). */
-    private static final int STRIDE = 18;
+    /** 네모 하나 = 꼭짓점 넷(12) + 방향(1) + 그림 속 자리 넷(8). */
+    private static final int STRIDE = 21;
+    private static final float[][] NORMALS = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}};
     /** 반 픽셀 한 칸의 크기: 사람 키 32픽셀 = 1.875칸. */
     private static final float UNIT = 0.9375F / 32F;
     /** 머리가 도는 축의 높이 (반 픽셀): 목. */
     private static final float NECK = 48F;
-    private static final ResourceLocation WHITE = new ResourceLocation("minecraft", "textures/misc/white.png");
 
     private static final class Model {
         float[] body = new float[0], head = new float[0];
         float top;
+        ResourceLocation texture;
     }
 
     private static final Model MISSING = new Model();
@@ -61,6 +64,8 @@ public final class NpcLookClient {
     private static final Map<Integer, float[]> HEADS = new HashMap<>();
     /** 점검용: 지금까지 사람 모습으로 그린 횟수. */
     public static long drawnForTest;
+    /** 점검용: 마지막으로 그린 NPC 하나에서 실제로 넘긴 네모 수 / 카메라 반대쪽이라 넘기지 않은 네모 수. */
+    public static int lastQuadsForTest, lastCulledForTest;
 
     /** 서버가 보낸 것: {"reset": true} 또는 {"looks": {"엔티티 번호": "모습 이름"}}. */
     public static void receive(String json) {
@@ -108,39 +113,47 @@ public final class NpcLookClient {
             try (InputStream in = res.get().open()) {
                 b = in.readAllBytes();
             }
-            if (b.length < 9 || b[0] != 'R' || b[1] != 'T' || b[2] != 'N' || b[3] != 'L') return null;
+            if (b.length < 13 || b[0] != 'R' || b[1] != 'T' || b[2] != 'N' || b[3] != 'L' || b[4] != 2) return null;
             int n = ((b[5] & 0xFF) << 24) | ((b[6] & 0xFF) << 16) | ((b[7] & 0xFF) << 8) | (b[8] & 0xFF);
-            if (n < 0 || n > 60000 || b.length < 9 + n * 10) return null;
+            float tw = ((b[9] & 0xFF) << 8) | (b[10] & 0xFF), th = ((b[11] & 0xFF) << 8) | (b[12] & 0xFF);
+            if (n < 0 || n > 20000 || tw <= 0 || th <= 0 || b.length < 13 + n * 11) return null;
+            ResourceLocation tex = ResourceLocation.tryParse("rtshop:textures/npc_looks/" + look + ".png");
+            if (tex == null || Minecraft.getInstance().getResourceManager().getResource(tex).isEmpty()) return null;
             int heads = 0;
-            for (int i = 0; i < n; i++) if (b[9 + i * 10] == 1) heads++;
+            for (int i = 0; i < n; i++) if (b[13 + i * 11] == 1) heads++;
             Model m = new Model();
+            m.texture = tex;
             m.body = new float[(n - heads) * STRIDE];
             m.head = new float[heads * STRIDE];
             int ib = 0, ih = 0;
             for (int i = 0; i < n; i++) {
-                int o = 9 + i * 10;
+                int o = 13 + i * 11;
                 boolean head = b[o] == 1;
-                int dir = b[o + 1];
+                int dir = Math.max(0, Math.min(5, b[o + 1]));
                 float p = b[o + 2], a0 = b[o + 3], b0 = b[o + 4], a1 = b[o + 5], b1 = b[o + 6];
+                float u = ((b[o + 7] & 0xFF) << 8) | (b[o + 8] & 0xFF), v = ((b[o + 9] & 0xFF) << 8) | (b[o + 10] & 0xFF);
                 float[] q = head ? m.head : m.body;
                 int at = head ? ih : ib;
-                float sign = (dir & 1) == 0 ? 1F : -1F;
                 if (dir < 2) {            // ±x: a = y, b = z
                     put(q, at, p, a0, b0, p, a1, b0, p, a1, b1, p, a0, b1);
-                    q[at + 12] = sign;
                     m.top = Math.max(m.top, a1);
                 } else if (dir < 4) {     // ±y: a = x, b = z
                     put(q, at, a0, p, b0, a1, p, b0, a1, p, b1, a0, p, b1);
-                    q[at + 13] = sign;
                     m.top = Math.max(m.top, p);
                 } else {                  // ±z: a = x, b = y
                     put(q, at, a0, b0, p, a1, b0, p, a1, b1, p, a0, b1, p);
-                    q[at + 14] = sign;
                     m.top = Math.max(m.top, b1);
                 }
-                q[at + 15] = b[o + 7] & 0xFF;
-                q[at + 16] = b[o + 8] & 0xFF;
-                q[at + 17] = b[o + 9] & 0xFF;
+                q[at + 12] = dir;
+                float u0 = u / tw, v0 = v / th, u1 = (u + (a1 - a0)) / tw, v1 = (v + (b1 - b0)) / th;
+                q[at + 13] = u0;
+                q[at + 14] = v0;
+                q[at + 15] = u1;
+                q[at + 16] = v0;
+                q[at + 17] = u1;
+                q[at + 18] = v1;
+                q[at + 19] = u0;
+                q[at + 20] = v1;
                 if (head) ih += STRIDE;
                 else ib += STRIDE;
             }
@@ -155,18 +168,35 @@ public final class NpcLookClient {
         System.arraycopy(v, 0, q, at, 12);
     }
 
-    private static void emit(float[] q, PoseStack ps, VertexConsumer vc, int light) {
+    private static final org.joml.Vector3f TMP = new org.joml.Vector3f();
+    private static final float[][] VIEW_NORMALS = new float[6][3];
+
+    /** 네모들을 넘긴다. 카메라 반대쪽을 보는 네모(카메라에서 그 면의 앞이 보이지 않는 것)는 건너뛴다. 넘긴 수를 돌려준다. */
+    private static int emit(float[] q, PoseStack ps, VertexConsumer vc, int light) {
         PoseStack.Pose last = ps.last();
         Matrix4f pose = last.pose();
         Matrix3f normal = last.normal();
-        for (int i = 0; i + STRIDE <= q.length; i += STRIDE) {
-            float nx = q[i + 12], ny = q[i + 13], nz = q[i + 14];
-            int r = (int) q[i + 15], g = (int) q[i + 16], b = (int) q[i + 17];
-            for (int v = 0; v < 4; v++) {
-                int k = i + v * 3;
-                vc.vertex(pose, q[k], q[k + 1], q[k + 2]).color(r, g, b, 255).uv(0F, 0F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, nx, ny, nz).endVertex();
-            }
+        for (int d = 0; d < 6; d++) {
+            normal.transform(NORMALS[d][0], NORMALS[d][1], NORMALS[d][2], TMP);
+            VIEW_NORMALS[d][0] = TMP.x;
+            VIEW_NORMALS[d][1] = TMP.y;
+            VIEW_NORMALS[d][2] = TMP.z;
         }
+        int sent = 0;
+        for (int i = 0; i + STRIDE <= q.length; i += STRIDE) {
+            int d = (int) q[i + 12];
+            float[] vn = VIEW_NORMALS[d];
+            // 이 자리의 좌표는 카메라가 원점이다: 면 위의 한 점과 법선의 곱이 0 이상이면 뒷면이 보이는 것
+            pose.transformPosition(q[i], q[i + 1], q[i + 2], TMP);
+            if (TMP.x * vn[0] + TMP.y * vn[1] + TMP.z * vn[2] >= 0F) continue;
+            float nx = NORMALS[d][0], ny = NORMALS[d][1], nz = NORMALS[d][2];
+            for (int v = 0; v < 4; v++) {
+                int k = i + v * 3, t = i + 13 + v * 2;
+                vc.vertex(pose, q[k], q[k + 1], q[k + 2]).color(255, 255, 255, 255).uv(q[t], q[t + 1]).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, nx, ny, nz).endVertex();
+            }
+            sent++;
+        }
+        return sent;
     }
 
     /** 머리가 몸에 대해 돌아갈 각 (좌우, 위아래): 8칸 안의 플레이어를 천천히 바라보고, 멀어지거나 등 뒤로 가면 앞을 본다. */
@@ -209,16 +239,18 @@ public final class NpcLookClient {
             ps.pushPose();
             ps.mulPose(Axis.YP.rotationDegrees(-bodyYaw));
             ps.scale(UNIT, UNIT, UNIT);
-            VertexConsumer vc = buf.getBuffer(RenderType.entityCutoutNoCull(WHITE));
-            emit(m.body, ps, vc, light);
+            VertexConsumer vc = buf.getBuffer(RenderType.entityCutoutNoCull(m.texture));
+            int sent = emit(m.body, ps, vc, light);
             float[] h = headAngles(e, bodyYaw);
             ps.translate(0F, NECK, 0F);
             ps.mulPose(Axis.YP.rotationDegrees(-h[0]));
             ps.mulPose(Axis.XP.rotationDegrees(h[1]));
             ps.translate(0F, -NECK, 0F);
-            emit(m.head, ps, vc, light);
+            sent += emit(m.head, ps, vc, light);
             ps.popPose();
             drawnForTest++;
+            lastQuadsForTest = sent;
+            lastCulledForTest = (m.body.length + m.head.length) / STRIDE - sent;
             nameTag(e, ps, buf, light, Math.max(e.getBbHeight() + 0.5F, m.top * UNIT + 0.35F));
         } catch (Throwable t) {
             RtShop.LOGGER.debug("[rtshop] npc look", t);

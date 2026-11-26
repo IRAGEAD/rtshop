@@ -3762,7 +3762,10 @@ public final class SelfTest {
                         && com.rtshop.story.BossIntros.camOf("cataclysm:netherite_monstrosity").equals("rise") && com.rtshop.story.BossIntros.camOf("no:such_boss").equals("orbit"),
                 cc362 + " " + ccTrace);
         String lkMissing = "";
-        for (String lk361 : com.rtshop.npc.NpcLooks.ALL) if (com.rtshop.npc.NpcLooks.quadsOf(lk361) < 500) lkMissing += lk361 + " ";
+        for (String lk361 : com.rtshop.npc.NpcLooks.ALL) {
+            int n363 = com.rtshop.npc.NpcLooks.quadsOf(lk361);   // 3.63: 인물당 네모 수는 프레임을 지키려고 600 을 넘기지 않는다
+            if (n363 < 50 || n363 > 600 || com.rtshop.npc.NpcLooks.class.getResource("/assets/rtshop/textures/npc_looks/" + lk361 + ".png") == null) lkMissing += lk361 + "(" + n363 + ") ";
+        }
         check("3.61 npc looks: every look has its model file, and NPC keys find their look (exact first, then the longest prefix; unknown keys stay villagers)",
                 lkMissing.isEmpty() && com.rtshop.npc.NpcLooks.lookOf("quest_order_archivist").equals("isabel") && com.rtshop.npc.NpcLooks.lookOf("shop_general_books").equals("m_general")
                         && com.rtshop.npc.NpcLooks.lookOf("shop_blacksmith").equals("bram") && com.rtshop.npc.NpcLooks.lookOf("attendance").equals("haru")

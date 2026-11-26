@@ -1896,12 +1896,15 @@ final class ClientSelfTest2 {
         add(mc -> {
             LOOK_DRAWN = NpcLookClient.drawnForTest;
             check("3.61 npc looks: the server tells the screen which NPC wears which look, and the look files load",
-                    LOOK_IDS.size() == 3 && NpcLookClient.knownForTest() >= 3 && NpcLookClient.quadsForTest("isabel") > 500 && NpcLookClient.quadsForTest("no_such_look") == -1,
+                    LOOK_IDS.size() == 3 && NpcLookClient.knownForTest() >= 3 && NpcLookClient.quadsForTest("isabel") > 100 && NpcLookClient.quadsForTest("isabel") < 600 && NpcLookClient.quadsForTest("no_such_look") == -1,
                     LOOK_IDS + " known=" + NpcLookClient.knownForTest() + " isabel=" + NpcLookClient.quadsForTest("isabel"));
             waitTicks(10);
         });
         add(mc -> {
             check("3.61 npc looks: those NPCs are drawn as people instead of villagers", NpcLookClient.drawnForTest > LOOK_DRAWN, NpcLookClient.drawnForTest - LOOK_DRAWN);
+            check("3.63 npc looks are cheap to draw: a figure sends at most a few hundred quads, and the faces turned away from the camera are skipped",
+                    NpcLookClient.lastQuadsForTest > 20 && NpcLookClient.lastQuadsForTest < 400 && NpcLookClient.lastCulledForTest > 20,
+                    NpcLookClient.lastQuadsForTest + " sent / " + NpcLookClient.lastCulledForTest + " skipped");
             shot(mc, "131_npc_looks");
             int cam361 = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(LOOK_IDS.size() - 1);
             Cinematic.play("{\"kind\":\"boss\",\"name\":\"카메라 점검\",\"epithet\":\"3D 등장 연출\",\"color\":\"FF7A20\",\"shake\":0,\"seconds\":4,\"cam\":\"spiral\",\"entity\":" + cam361 + "}");
