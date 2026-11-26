@@ -52,6 +52,56 @@ public final class MapMarkClient {
     /** 점검용: 세계 안 표시에서 뺀 횟수 (그릴 때마다 는다). */
     public static volatile int hiddenInWorldForTest;
 
+    /** 말을 걸어 본 NPC (서버가 알려 준 지도 표시 "npc:<UUID>"). 미니맵의 몹 아이콘은 이 NPC 들만 보인다. */
+    private static final java.util.Set<java.util.UUID> KNOWN_NPCS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    /** 서버가 "말을 걸어 본 NPC 만" 을 켜 두었는가 (지도 표시가 꺼진 서버에서는 가리지 않는다). */
+    private static volatile boolean radarKnownOnly;
+    /** 점검용: 미니맵 아이콘에서 감춘 횟수. */
+    public static volatile int hiddenOnRadarForTest;
+
+    /** RT Shop NPC 로 보이는가 (화면 쪽에서는 꼬리표를 알 수 없다): 움직이지 않게 해 둔, 이름 붙은 주민. */
+    public static boolean looksLikeNpc(net.minecraft.world.entity.Entity e) {
+        return e instanceof net.minecraft.world.entity.npc.Villager v && v.isNoAi() && v.hasCustomName();
+    }
+
+    /** 미니맵·지도의 몹 아이콘에서 이 개체를 감출 것인가 (DioramaRadarMixin 이 부른다). */
+    public static boolean hideOnRadar(net.minecraft.world.entity.Entity e) {
+        if (!looksLikeNpc(e)) return false;
+        boolean hide = !ClientConfig.get().minimapNpcIcons || (radarKnownOnly && !KNOWN_NPCS.contains(e.getUUID()));
+        if (hide) hiddenOnRadarForTest++;
+        return hide;
+    }
+
+    public static void learnForTest(String json) {
+        learn(JsonParser.parseString(json).getAsJsonObject());
+    }
+
+    public static int knownNpcsForTest() {
+        return KNOWN_NPCS.size();
+    }
+
+    @SubscribeEvent
+    public static void onLogout(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
+        KNOWN_NPCS.clear();
+        radarKnownOnly = false;
+    }
+
+    private static void learn(JsonObject o) {
+        radarKnownOnly = o.has("radar") && o.get("radar").getAsBoolean();
+        if (o.has("marks")) {
+            for (JsonElement e : o.getAsJsonArray("marks")) {
+                String id = e.getAsJsonObject().get("id").getAsString();
+                if (id.startsWith("npc:")) KNOWN_NPCS.add(java.util.UUID.fromString(id.substring(4)));
+            }
+        }
+        if (o.has("gone")) {
+            for (JsonElement e : o.getAsJsonArray("gone")) {
+                String id = e.getAsString();
+                if (id.startsWith("npc:")) KNOWN_NPCS.remove(java.util.UUID.fromString(id.substring(4)));
+            }
+        }
+    }
+
     /** Diorama 의 세계 안 웨이포인트 표시가 이 폴더의 것을 그리려 할 때: 감출 것이면 true (DioramaWorldPinsMixin 이 부른다). */
     public static boolean hideInWorld(String folder) {
         if (showInWorld || folder == null) return false;
@@ -65,6 +115,10 @@ public final class MapMarkClient {
         try {
             if (o.has("folder") && !o.get("folder").getAsString().isBlank()) townFolder = o.get("folder").getAsString().trim();
             showInWorld = o.has("world") && o.get("world").getAsBoolean();
+        } catch (Exception ignored) {
+        }
+        try {
+            learn(o);
         } catch (Exception ignored) {
         }
         if (!available()) return;

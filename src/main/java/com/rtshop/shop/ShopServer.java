@@ -364,7 +364,8 @@ public final class ShopServer {
                                     String b = StringArgumentType.getString(ctx, "boss").trim();
                                     boolean force = b.endsWith(" force") && ctx.getSource().hasPermission(2);
                                     if (b.endsWith(" force")) b = b.substring(0, b.length() - 6).trim();
-                                    return com.rtshop.story.StoryArena.enter(p, b, force) ? 1 : 0;
+                                    if (b.equals("start")) return com.rtshop.story.StoryArena.wake(p) ? 1 : 0;   // 보스 구역 안에서: 불씨를 건드린다
+                                    return com.rtshop.story.StoryArena.openGate(p, b, force) ? 1 : 0;
                                 })))
                 .then(Commands.literal("storylang").then(Commands.argument("lang", StringArgumentType.word())
                         .executes(ctx -> {
@@ -625,7 +626,13 @@ public final class ShopServer {
     /** 상인(또는 은행원) NPC 를 소환한다. 알 수 없는 종류면 null. 상인은 개인 이름이 붙는다 (NpcNames). */
     public static Villager spawnNpc(ServerLevel level, Vec3 pos, float yaw, String type) {
         Villager v = spawnNpc0(level, pos, yaw, type);
-        if (v != null) NpcNames.refresh(v);
+        if (v != null) {
+            NpcNames.refresh(v);
+            try {
+                com.rtshop.quest.NpcLayout.note(v);   // 자리 배치(npc_layout.json)에 적는다
+            } catch (Throwable ignored) {
+            }
+        }
         return v;
     }
 

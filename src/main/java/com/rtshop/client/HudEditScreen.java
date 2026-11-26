@@ -82,6 +82,19 @@ public class HudEditScreen extends Screen {
         return new int[][]{{x, 130}, {x + 134, 110}, {x + 248, 150}};
     }
 
+    // ---- 그 아랫줄: 미니맵(지도 모드)의 NPC 아이콘 켜고 끄기
+    private int mapRowY() {
+        return uiRowY() + 22;
+    }
+
+    private int[] mapRow() {
+        return new int[]{this.width / 2 - 90, 180};
+    }
+
+    private String mapRowLabel() {
+        return Ui.clip(this.font, Component.translatable(ClientConfig.get().minimapNpcIcons ? "rtshop.hud.minimap_npc.on" : "rtshop.hud.minimap_npc.off").getString(), 180 - 8);
+    }
+
     private String uiRowLabel(int i) {
         ClientConfig cfg = ClientConfig.get();
         if (i == 0) {
@@ -257,6 +270,8 @@ public class HudEditScreen extends Screen {
         for (int i = 0; i < ur.length; i++) {
             Ui.button(g, this.font, ur[i][0], uiRowY(), ur[i][1], 18, uiRowLabel(i), Ui.inside(mx, my, ur[i][0], uiRowY(), ur[i][1], 18), true);
         }
+        int[] mr = mapRow();
+        Ui.button(g, this.font, mr[0], mapRowY(), mr[1], 18, mapRowLabel(), Ui.inside(mx, my, mr[0], mapRowY(), mr[1], 18), true);
         int[][] r3 = row3();
         for (int i = 0; i < r3.length; i++) {
             Ui.button(g, this.font, r3[i][0], row3Y(), r3[i][1], 18, row3Label(i), Ui.inside(mx, my, r3[i][0], row3Y(), r3[i][1], 18), true);
@@ -370,6 +385,12 @@ public class HudEditScreen extends Screen {
                 uiRowClick(i);
                 return true;
             }
+        }
+        int[] mr = mapRow();
+        if (Ui.inside(mx, my, mr[0], mapRowY(), mr[1], 18)) {
+            ClientConfig.get().minimapNpcIcons = !ClientConfig.get().minimapNpcIcons;
+            ClientConfig.get().save();
+            return true;
         }
         int[][] r3 = row3();
         for (int i = 0; i < r3.length; i++) {

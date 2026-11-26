@@ -1892,5 +1892,19 @@
   "rtshop.rules.row_shop.0": "상점: 전체",
   "rtshop.rules.row_shop.1": "§a상점: 파는 것",
   "rtshop.rules.row_shop.2": "§c상점: 없는 것",
-  "rtshop.tip.flex_dish": "재료를 한 벌만 넣어 만든 요리 · 넣은 재료 값 기준 (가격표 가격의 %s)"
+  "rtshop.tip.flex_dish": "재료를 한 벌만 넣어 만든 요리 · 넣은 재료 값 기준 (가격표 가격의 %s)",
+  "rtshop.arena.gate_open": "기억의 문이 열렸습니다. 문 안으로 걸어 들어가면 %s의 방으로 넘어갑니다. (%s초 뒤 닫힘)",
+  "rtshop.arena.gate_closed": "기억의 문이 닫혔습니다.",
+  "rtshop.arena.inside": "기억의 문 너머 — %s(이)가 잠들어 있다",
+  "rtshop.arena.wait": "가운데의 불씨를 우클릭하면 싸움이 시작됩니다 · %s초 뒤 저절로 깨어납니다",
+  "rtshop.arena.wait_touch": "가운데의 불씨를 우클릭하면 싸움이 시작됩니다",
+  "rtshop.npclayout.status": "NPC 배치 — 이 세계에 선 NPC %s명 · 파일에 적힌 자리 %s곳 · 세우기를 기다리는 자리 %s곳 (그중 막힌 곳 %s)",
+  "rtshop.npclayout.waiting": " · %s (%s, %s, %s): 누가 가까이 가면 섭니다",
+  "rtshop.npclayout.blocked": " · %s (%s, %s, %s): 바닥이 없거나 막혀 있어 세우지 못했습니다",
+  "rtshop.npclayout.saved": "NPC 배치를 config/rtshop/npc_layout.json 에 적었습니다 (%s곳).",
+  "rtshop.npclayout.save_failed": "npc_layout.json 을 쓰지 못했습니다.",
+  "rtshop.npclayout.applied": "NPC 배치를 다시 적용했습니다: 새로 세울 자리 %s곳 (지금 세운 NPC %s명).",
+  "rtshop.npclayout.no_file": "config/rtshop/npc_layout.json 이 없습니다.",
+  "rtshop.hud.minimap_npc.on": "미니맵 NPC 아이콘: 켜짐",
+  "rtshop.hud.minimap_npc.off": "미니맵 NPC 아이콘: 꺼짐"
 }

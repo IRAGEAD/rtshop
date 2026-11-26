@@ -61,8 +61,8 @@ public final class ItemPolicy {
     }
 
     public static final class Config {
-        /** 설정 파일의 판. 2 (3.53): Better Nether 도 상점 금지, 전리품 금지의 "*fruit*:*" 자리에 "spmovesets:*". */
-        public static final int VERSION = 2;
+        /** 설정 파일의 판. 2 (3.53): Better Nether 도 상점 금지, 전리품 금지의 "*fruit*:*" 자리에 "spmovesets:*". 3 (3.58): Create 의 조합법·전리품·블록 드랍 금지. */
+        public static final int VERSION = 3;
         /** 읽어 온 파일이 예전 판이라 고쳐 썼는가 (다시 저장한다). */
         transient boolean migrated;
         public boolean enabled = true;
@@ -77,6 +77,8 @@ public final class ItemPolicy {
         public boolean sampleBossDrops = true;
         public final Set<String> lootBan = new LinkedHashSet<>();
         public final Set<String> lootAllow = new LinkedHashSet<>();
+        /** 블록을 캤을 때도 나오지 않는 아이템 (던전에 장식으로 놓인 Create 블록을 캐서 얻지 못하게). */
+        public final Set<String> blockDropBan = new LinkedHashSet<>();
         public final Set<String> recipeBan = new LinkedHashSet<>();
         public final Set<String> recipeBanMods = new LinkedHashSet<>();
         public boolean recipeBanStaffs = true;
@@ -104,10 +106,11 @@ public final class ItemPolicy {
             c.bossItems.addAll(List.of("minecraft:nether_star", "minecraft:dragon_egg", "minecraft:dragon_head"));
             c.lootBan.addAll(List.of("spmovesets:*", "artifacts:*", "relics_rpgs:*", "jewelry:*", "simplehats:*",
                     "adorablehamsterpets:*", "crittersandcompanions:*", "rpg_companions_tiny_dragons:*", "fantasymounts:*",
-                    "efn:*", "tacz:*", "lrtactical:*"));
+                    "efn:*", "tacz:*", "lrtactical:*", "create:*"));
+            c.blockDropBan.add("create:*");
             c.lootAllow.addAll(List.of("irons_spellbooks:*_ink", "irons_spellbooks:ink_*"));
-            c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil"));
-            c.recipeBanMods.add("tacz");
+            c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil", "create:*"));
+            c.recipeBanMods.addAll(List.of("tacz", "create"));
             c.staffWords.addAll(List.of("staff", "wand", "scepter", "sceptre"));
             c.mobDrops.put("irons_spellbooks:common_ink", 0.03);
             c.mobDrops.put("irons_spellbooks:uncommon_ink", 0.012);
@@ -125,6 +128,7 @@ public final class ItemPolicy {
             help.add("priceFactor: 이 묶음의 상점가에 곱하는 수 (예: \"wom:*\": 5).");
             help.add("보스 아이템 = bossMods 의 모든 아이템 + bossItems + 보스가 떨어뜨리는 그 모드의 아이템(sampleBossDrops) + 그것으로만 만드는 물건. notBossItems 는 뺀다.");
             help.add("lootBan: 상자·몹·낚시 전리품에서 빠지는 아이템. lootAllow: 그래도 나오는 것 (잉크). mobDrops: 몬스터를 잡으면 따로 굴리는 드랍(확률 0~1), 보스는 bossDropFactor 배.");
+            help.add("blockDropBan: 블록을 캤을 때도 나오지 않는 아이템 (Create: 던전의 건축물에 놓인 블록을 캐서 얻지 못하게). 비우면 캐서 얻을 수 있다.");
             help.add("recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).");
             help.add("shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.");
             help.add("recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.");
@@ -144,6 +148,7 @@ public final class ItemPolicy {
             o.addProperty("sampleBossDrops", sampleBossDrops);
             o.add("lootBan", arr(lootBan));
             o.add("lootAllow", arr(lootAllow));
+            o.add("blockDropBan", arr(blockDropBan));
             JsonObject md = new JsonObject();
             mobDrops.forEach(md::addProperty);
             o.add("mobDrops", md);
@@ -179,6 +184,7 @@ public final class ItemPolicy {
             c.sampleBossDrops = bool(o, "sampleBossDrops", true);
             strings(o, "lootBan", c.lootBan, d.lootBan);
             strings(o, "lootAllow", c.lootAllow, d.lootAllow);
+            strings(o, "blockDropBan", c.blockDropBan, v0(o) < 3 ? Set.<String>of() : d.blockDropBan);
             numbers(o, "mobDrops", c.mobDrops, d.mobDrops);
             if (o.has("bossDropFactor")) c.bossDropFactor = Math.max(0, o.get("bossDropFactor").getAsDouble());
             strings(o, "recipeBan", c.recipeBan, d.recipeBan);
@@ -194,13 +200,24 @@ public final class ItemPolicy {
             c.shopBannedKeepOwnWays = bool(o, "shopBannedKeepOwnWays", true);
             c.vanillaGearToo = bool(o, "vanillaGearToo", false);
             strings(o, "keep", c.keep, d.keep);
-            int v = o.has("version") ? o.get("version").getAsInt() : 1;
+            int v = v0(o);
+            if (v < 3) {   // 3.58: Create 는 던전 모드(IDAS)가 건축물에 쓰는 것만 남기고, 만들거나 줍거나 캐서 얻는 길을 막는다
+                c.recipeBanMods.add("create");
+                c.recipeBan.add("create:*");
+                c.lootBan.add("create:*");
+                c.blockDropBan.add("create:*");
+                c.migrated = true;
+            }
             if (v < 2) {   // 3.53: 요청대로 기본 규칙을 고친다 (직접 넣은 다른 줄은 그대로)
                 c.shopBan.add("betternether:*");
                 if (c.lootBan.remove("*fruit*:*") | !c.lootBan.contains("spmovesets:*")) c.lootBan.add("spmovesets:*");
                 c.migrated = true;
             }
             return c;
+        }
+
+        private static int v0(JsonObject o) {
+            return o.has("version") ? o.get("version").getAsInt() : 1;
         }
 
         private static JsonArray arr(Collection<String> c) {
@@ -278,7 +295,7 @@ public final class ItemPolicy {
     /** 한 번 읽은 규칙과 거기서 셈한 것. 바꿀 때는 통째로 갈아 끼운다 (전리품은 다른 스레드에서도 묻는다). */
     private static final class State {
         final Config c;
-        final Pat shopBan, bossItems, notBoss, lootBan, lootAllow, recipeBan, keep;
+        final Pat shopBan, bossItems, notBoss, lootBan, lootAllow, recipeBan, keep, blockDropBan;
         final List<Map.Entry<Pat, Double>> factors = new ArrayList<>();
         volatile Set<Item> boss = Set.of();
         volatile Set<Item> listed = Set.of();
@@ -291,6 +308,7 @@ public final class ItemPolicy {
             notBoss = new Pat(c.notBossItems);
             lootBan = new Pat(c.lootBan);
             lootAllow = new Pat(c.lootAllow);
+            blockDropBan = new Pat(c.blockDropBan);
             recipeBan = new Pat(c.recipeBan);
             keep = new Pat(c.keep);
             for (Map.Entry<String, Double> e : c.priceFactor.entrySet()) factors.add(Map.entry(new Pat(List.of(e.getKey())), e.getValue()));
@@ -324,7 +342,7 @@ public final class ItemPolicy {
                 Config c = Config.fromJson(JsonParser.parseString(Files.readString(path(), StandardCharsets.UTF_8)).getAsJsonObject());
                 if (c.migrated) {
                     Files.writeString(path(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
-                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다: Better Nether 상점 금지, 전리품 금지에 spmovesets.", Config.VERSION);
+                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지).", Config.VERSION);
                 }
                 return c;
             }
@@ -494,6 +512,14 @@ public final class ItemPolicy {
         if (s.c.shopBannedKeepOwnWays && s.shopBan.hit(id)) return false;
         if (vanilla(id) && !s.c.vanillaGearToo) return false;
         return gear(item);
+    }
+
+    /** 블록을 캤을 때 나오면 안 되는 아이템인가 (blockDropBan). */
+    public static boolean blockDropBanned(ItemStack stack) {
+        State s = st();
+        if (!s.c.enabled || stack.isEmpty()) return false;
+        ResourceLocation id = id(stack.getItem());
+        return id != null && s.blockDropBan.hit(id);
     }
 
     /** 이 조합법을 막는 까닭 (막지 않으면 null). */

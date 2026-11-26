@@ -60,6 +60,8 @@ final class ClientSelfTest2 {
 
     private static int MAP_FIRST = -9;
 
+    private static net.minecraft.world.entity.Entity RADAR_NPC;
+
     private static void waitTicks(int n) {
         ClientSelfTest.wait = n;
     }
@@ -1535,6 +1537,46 @@ final class ClientSelfTest2 {
                 check("a mark the server reports as gone is taken off the map again", left == 0 && MapMarkClient.removedForTest >= 1, left + " removed " + MapMarkClient.removedForTest);
             }
             waitTicks(5);
+        });
+        // 미니맵의 NPC 아이콘 (3.58): 말을 걸어 본 NPC 만 뜨고, 설정으로 모두 끈다
+        add(mc -> {
+            net.minecraft.world.entity.npc.Villager rv = net.minecraft.world.entity.EntityType.VILLAGER.create(mc.level);
+            net.minecraft.world.entity.npc.Villager wild = net.minecraft.world.entity.EntityType.VILLAGER.create(mc.level);
+            if (rv != null && wild != null) {
+                rv.setNoAi(true);
+                rv.setCustomName(net.minecraft.network.chat.Component.literal("RT radar test"));
+                MapMarkClient.learnForTest("{\"radar\":false,\"marks\":[],\"gone\":[]}");
+                boolean before = MapMarkClient.hideOnRadar(rv);          // 서버가 "말을 걸어 본 NPC 만" 을 켜지 않았으면 가리지 않는다
+                MapMarkClient.learnForTest("{\"radar\":true,\"marks\":[],\"gone\":[]}");
+                boolean unmet = MapMarkClient.hideOnRadar(rv);
+                MapMarkClient.learnForTest("{\"radar\":true,\"marks\":[{\"id\":\"npc:" + rv.getUUID() + "\"}],\"gone\":[]}");
+                boolean met = !MapMarkClient.hideOnRadar(rv);
+                ClientConfig.get().minimapNpcIcons = false;
+                boolean off = MapMarkClient.hideOnRadar(rv);
+                ClientConfig.get().minimapNpcIcons = true;
+                boolean others = !MapMarkClient.hideOnRadar(wild) && !MapMarkClient.hideOnRadar(mc.player);
+                MapMarkClient.learnForTest("{\"radar\":true,\"marks\":[],\"gone\":[\"npc:" + rv.getUUID() + "\"]}");
+                check("minimap icons: an RT Shop NPC shows only after it has been talked to, the setting hides them all, and ordinary villagers and players are never hidden",
+                        !before && unmet && met && off && others && MapMarkClient.hideOnRadar(rv), before + " " + unmet + " " + met + " " + off + " " + others);
+                // 지도 모드가 있으면: 말을 걸지 않은 NPC 를 곁에 세워 두고, 미니맵이 그 아이콘을 그리려 할 때 우리에게 묻는지 본다
+                if (net.minecraftforge.fml.ModList.get().isLoaded("diorama") && mc.player != null) {
+                    rv.setPos(mc.player.getX() + 3, mc.player.getY(), mc.player.getZ());
+                    mc.level.putNonPlayerEntity(rv.getId(), rv);
+                    RADAR_NPC = rv;
+                    MapMarkClient.hiddenOnRadarForTest = 0;
+                }
+            }
+            waitTicks(40);
+        });
+        add(mc -> {
+            if (RADAR_NPC != null) {
+                // 지도 모드의 설정(미니맵·몹 표시)이 꺼져 있으면 0 일 수 있어, 횟수만 적어 둔다
+                check("info: the map mod's minimap asked RT Shop about an NPC icon this many times while an unmet NPC stood near", true, MapMarkClient.hiddenOnRadarForTest);
+                mc.level.removeEntity(RADAR_NPC.getId(), net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
+                RADAR_NPC = null;
+            }
+            MapMarkClient.learnForTest("{\"radar\":false,\"marks\":[],\"gone\":[]}");
+            waitTicks(2);
         });
         // 칭호: 쌓은 기록만큼 열리고, 힘 쓰는 칭호와 내거는 칭호를 고른다
         add(mc -> {

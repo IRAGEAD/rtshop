@@ -46,6 +46,8 @@ public final class RecipeRules {
 
     public static final class Rules {
         public final Set<String> disabled = new LinkedHashSet<>();
+        /** 이미 한 번 덧붙인 기본 금지 묶음의 이름 (운영자가 그 뒤에 푼 것을 다시 막지 않으려고). */
+        public final Set<String> applied = new LinkedHashSet<>();
         /** id -> 조합법 JSON. */
         public final Map<String, JsonObject> custom = new LinkedHashMap<>();
 
@@ -68,6 +70,9 @@ public final class RecipeRules {
                 c.add(x);
             }
             o.add("custom", c);
+            JsonArray ap = new JsonArray();
+            applied.forEach(ap::add);
+            o.add("_applied", ap);
             return o;
         }
 
@@ -78,6 +83,9 @@ public final class RecipeRules {
                     String s = e.getAsString().trim();
                     if (!s.isEmpty()) r.disabled.add(s);
                 }
+            }
+            if (o.has("_applied")) {
+                for (JsonElement e : o.getAsJsonArray("_applied")) r.applied.add(e.getAsString().trim());
             }
             if (o.has("custom")) {
                 for (JsonElement e : o.getAsJsonArray("custom")) {
@@ -100,13 +108,37 @@ public final class RecipeRules {
         return rules;
     }
 
+    /** 3.58 (C-6): 같은 음식을 훨씬 싸게 만드는 조리법 — 모드의 조리법이라 그 모드가 없으면 아무 일도 없다. */
+    public static final List<String> COOK_GAPS = List.of("create:smelting/bread", "create:smoking/bread", "create:campfire_cooking/bread",
+            "farmersdelight:pumpkin_pie_from_pie_crust", "create:crafting/curiosities/cake", "kaleidoscope_cookery:chopping_board/sashimi_from_tropical_fish");
+    /** 바닐라 조합법: Farmer's Delight 의 냄비 조리법이 남을 때만 막는다 (그 모드가 없으면 만들 길이 없어지므로). */
+    public static final List<String> COOK_GAPS_FD = List.of("minecraft:beetroot_soup", "minecraft:rabbit_stew_from_brown_mushroom", "minecraft:rabbit_stew_from_red_mushroom");
+
+    /** 기본 금지 묶음을 한 번만 덧붙인다 (깔린 서버의 recipes.json 은 운영자 것: 뒤에 푼 것은 다시 막지 않는다). 덧붙였으면 true. */
+    public static boolean addDefaults(Rules r, boolean farmersDelight) {
+        boolean changed = false;
+        if (r.applied.add("cook_gaps@1")) {
+            r.disabled.addAll(COOK_GAPS);
+            changed = true;
+        }
+        if (farmersDelight && r.applied.add("cook_gaps_fd@1")) {
+            r.disabled.addAll(COOK_GAPS_FD);
+            changed = true;
+        }
+        return changed;
+    }
+
     private static Rules load() {
         Path p = path();
         try {
+            boolean fd = net.minecraftforge.fml.ModList.get().isLoaded("farmersdelight");
             if (Files.exists(p)) {
-                return Rules.fromJson(JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject());
+                Rules old = Rules.fromJson(JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject());
+                if (addDefaults(old, fd)) save(old);
+                return old;
             }
             Rules r = new Rules();
+            addDefaults(r, fd);
             save(r);
             return r;
         } catch (Exception e) {
@@ -116,6 +148,7 @@ public final class RecipeRules {
     }
 
     public static synchronized void save(Rules r) throws Exception {
+        if (r.applied.isEmpty() && rules != null && rules != r) r.applied.addAll(rules.applied);   // 편집 화면에서 온 규칙에는 이 기록이 없다
         Files.createDirectories(path().getParent());
         Files.writeString(path(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(r.toJson()), StandardCharsets.UTF_8);
         rules = r;

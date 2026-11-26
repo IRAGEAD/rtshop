@@ -277,7 +277,8 @@ public final class SelfTest {
             if (cow != null) cow.discard();
             check("map marks: talking to an NPC notes its name and place once; a moved NPC is corrected without a new notice; other creatures are not noted",
                     t1 && !t2 && moved && movedSilently && notNpc && com.rtshop.story.MapMarks.known(a) == 2 && banker.getCustomName() != null
-                            && sentNpc.contains(banker.getCustomName().getString()),
+                            && sentNpc.contains(banker.getCustomName().getString())
+                            && sentNpc.contains("\"radar\":true") && sentNpc.contains("npc:" + banker.getUUID()),   // 화면 쪽은 이 목록으로 미니맵의 NPC 아이콘을 고른다
                     t1 + " " + t2 + " " + moved + " " + movedSilently + " " + notNpc + " " + com.rtshop.story.MapMarks.known(a));
             mc.places.clear();
             com.rtshop.story.MapMarks.sendAll(a, false);
@@ -286,7 +287,9 @@ public final class SelfTest {
                     !com.rtshop.story.MapMarks.knows(a, "place:점검 광장") && com.rtshop.story.MapMarks.known(a) == 1 && afterRemove.contains("\"gone\":[\"place:점검 광장\"]"), afterRemove);
             mc.enabled = false;
             boolean off = banker != null && !com.rtshop.story.MapMarks.mark(a, "npc:x", "x", pl.dim, 0, 0, 0, -1);
-            check("map marks can be switched off in map_marks.json", off);
+            com.rtshop.story.MapMarks.sendAll(a, false);
+            check("map marks can be switched off in map_marks.json (then the minimap shows every NPC icon again)",
+                    off && com.rtshop.story.MapMarks.lastSentForTest.contains("\"radar\":false"), com.rtshop.story.MapMarks.lastSentForTest);
         } finally {
             if (banker != null) banker.discard();
             com.rtshop.story.MapMarks.forgetAll(a);
@@ -577,6 +580,7 @@ public final class SelfTest {
         }
         try {
             storySystems(server, level, a);
+            npcLayout(server, level);
         } catch (Throwable t) {
             crash("story systems", t);
         }
@@ -2256,6 +2260,28 @@ public final class SelfTest {
                 pat.hit(new ResourceLocation("efn:yamato")) && pat.hit(new ResourceLocation("irons_spellbooks:rare_ink")) && !pat.hit(new ResourceLocation("irons_spellbooks:ink_sac_x"))
                         && pat.hit(new ResourceLocation("blox_fruits:gomu")) && !pat.hit(new ResourceLocation("minecraft:fruit")) && pat.hit(new ResourceLocation("minecraft:tnt"))
                         && !pat.hit(new ResourceLocation("minecraft:tnt_minecart")));
+        {
+            com.rtshop.rules.RecipeRules.Rules cg = new com.rtshop.rules.RecipeRules.Rules();
+            boolean cgFirst = com.rtshop.rules.RecipeRules.addDefaults(cg, false);
+            boolean cgNoVanilla = !cg.disabled.contains("minecraft:beetroot_soup") && cg.disabled.contains("create:smelting/bread") && cg.disabled.size() == 6;
+            cg.disabled.remove("create:crafting/curiosities/cake");
+            boolean cgOnce = !com.rtshop.rules.RecipeRules.addDefaults(cg, false) && !cg.disabled.contains("create:crafting/curiosities/cake");
+            boolean cgFd = com.rtshop.rules.RecipeRules.addDefaults(cg, true) && cg.disabled.contains("minecraft:beetroot_soup") && cg.disabled.contains("minecraft:rabbit_stew_from_red_mushroom");
+            com.rtshop.rules.RecipeRules.Rules cgBack = com.rtshop.rules.RecipeRules.Rules.fromJson(cg.toJson());
+            check("the cheap duplicate cooking recipes are blocked by default, once: what the operator opens again stays open, and the vanilla soups are blocked only with Farmer's Delight",
+                    cgFirst && cgNoVanilla && cgOnce && cgFd && cgBack.applied.size() == 2 && !com.rtshop.rules.RecipeRules.addDefaults(cgBack, true),
+                    cgFirst + " " + cgNoVanilla + " " + cgOnce + " " + cgFd + " " + cgBack.applied);
+            com.rtshop.rules.ItemPolicy.Config crOld = com.rtshop.rules.ItemPolicy.Config.fromJson(JsonParser.parseString(
+                    "{\"version\":2,\"lootBan\":[\"efn:*\"],\"recipeBan\":[],\"recipeBanMods\":[\"tacz\"]}").getAsJsonObject());
+            com.rtshop.rules.ItemPolicy.Config crDef = com.rtshop.rules.ItemPolicy.Config.defaults();
+            check("Create: its recipes, loot and block drops are banned by default, and an installed item_policy.json (version 2) is brought up to that",
+                    crDef.recipeBanMods.contains("create") && crDef.lootBan.contains("create:*") && crDef.recipeBan.contains("create:*") && crDef.blockDropBan.contains("create:*")
+                            && crOld.recipeBanMods.contains("create") && crOld.recipeBanMods.contains("tacz") && crOld.lootBan.contains("create:*") && crOld.lootBan.contains("efn:*")
+                            && crOld.blockDropBan.contains("create:*") && crOld.recipeBan.contains("create:*")
+                            && com.rtshop.rules.ItemPolicy.recipeReason(new ResourceLocation("create:crafting/kinetics/shaft"), null) != null
+                            && !com.rtshop.rules.ItemPolicy.blockDropBanned(new ItemStack(Items.COBBLESTONE)),
+                    crOld.recipeBanMods + " " + crOld.lootBan + " " + crOld.blockDropBan);
+        }
         check("by default the NPC shops never list the enhance anvil or a boss item (nether star); ordinary goods are untouched, and nothing vanilla loses its recipe",
                 com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(com.rtshop.item.ModItems.ENHANCE_ANVIL.get())) && com.rtshop.rules.ItemPolicy.bossItem(Items.NETHER_STAR)
                         && com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(Items.NETHER_STAR)) && !com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(Items.IRON_SWORD))
@@ -3090,6 +3116,67 @@ public final class SelfTest {
 
     /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
     /** 마법 뽑기: 분야 선택/무작위 스킬북 뽑기, 야마토는 공격 분야에만, 10회 보장, 티켓, 인챈트 재설정(하나만). */
+    /** NPC 자리 배치: 세운 자리가 파일에 적히고, 그 파일을 가진 다른 세계에서는 같은 자리에 저절로 선다. */
+    private static void npcLayout(MinecraftServer server, ServerLevel level) throws Exception {
+        section("npc layout");
+        java.nio.file.Path lf = com.rtshop.quest.NpcLayout.file();
+        byte[] lfKeep = java.nio.file.Files.exists(lf) ? java.nio.file.Files.readAllBytes(lf) : null;
+        BlockPos lp = new BlockPos(40, 150, 60);
+        net.minecraft.world.phys.AABB lbox = new net.minecraft.world.phys.AABB(lp).inflate(6.0);
+        com.rtshop.quest.NpcLayout.forceForTest = true;
+        try {
+            com.rtshop.quest.NpcLayout.resetForTest(server);
+            level.getChunk(lp.getX() >> 4, lp.getZ() >> 4);
+            for (int dx = -1; dx <= 4; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    level.setBlockAndUpdate(lp.offset(dx, -1, dz), Blocks.STONE.defaultBlockState());
+                    level.setBlockAndUpdate(lp.offset(dx, 0, dz), Blocks.AIR.defaultBlockState());
+                    level.setBlockAndUpdate(lp.offset(dx, 1, dz), Blocks.AIR.defaultBlockState());
+                }
+            }
+            for (net.minecraft.world.entity.Entity e : level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> com.rtshop.quest.NpcLayout.keyOf(x) != null)) e.discard();
+            com.rtshop.quest.NpcLayout.resetForTest(server);
+            net.minecraft.world.entity.npc.Villager lv = ShopServer.spawnNpc(level, new net.minecraft.world.phys.Vec3(40.5, 150, 60.5), 90F, "bank");
+            int wrote = com.rtshop.quest.NpcLayout.export(server);
+            String text = java.nio.file.Files.readString(lf);
+            check("an NPC set down in the game is written to npc_layout.json with its key and place",
+                    lv != null && wrote == 1 && com.rtshop.quest.NpcLayout.knownForTest(server, "bank") == 1 && text.contains("\"bank\"") && text.contains("40.5") && text.contains("60.5"),
+                    wrote + " " + text.length());
+            // 다른 서버: 같은 파일, NPC 가 하나도 없는 세계
+            if (lv != null) lv.discard();
+            com.rtshop.quest.NpcLayout.resetForTest(server);
+            int want = com.rtshop.quest.NpcLayout.apply(server, false);
+            int made = com.rtshop.quest.NpcLayout.settle(server);
+            List<net.minecraft.world.entity.Entity> stand = level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> "bank".equals(com.rtshop.quest.NpcLayout.keyOf(x)));
+            check("a server that gets the file sets the NPC down at the same place by itself, once (the same file is not applied twice)",
+                    want == 1 && made == 1 && stand.size() == 1 && Math.abs(stand.get(0).getX() - 40.5) < 0.01 && Math.abs(stand.get(0).getZ() - 60.5) < 0.01
+                            && com.rtshop.quest.NpcLayout.apply(server, false) < 0 && com.rtshop.quest.NpcLayout.pendingForTest(server) == 0,
+                    want + " " + made + " " + stand.size());
+            // 배치를 고친 파일: 두 칸 옆으로
+            java.nio.file.Files.writeString(lf, java.nio.file.Files.readString(lf).replace("40.5", "42.5").replace("\"id\": \"", "\"id\": \"moved-"));
+            int moved = com.rtshop.quest.NpcLayout.apply(server, false);
+            int made2 = com.rtshop.quest.NpcLayout.settle(server);
+            stand = level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> "bank".equals(com.rtshop.quest.NpcLayout.keyOf(x)));
+            check("a changed file moves the NPC: the old one is taken away and a new one stands at the new place",
+                    moved == 1 && made2 == 1 && stand.size() == 1 && Math.abs(stand.get(0).getX() - 42.5) < 0.01, moved + " " + made2 + " " + stand.size());
+            // 바닥이 없는 자리(지형이 다른 세계)에는 세우지 않는다
+            java.nio.file.Files.writeString(lf, java.nio.file.Files.readString(lf).replace("42.5", "52.5").replace("\"id\": \"", "\"id\": \"air-"));
+            int moved2 = com.rtshop.quest.NpcLayout.apply(server, false);
+            int made3 = com.rtshop.quest.NpcLayout.settle(server);
+            check("where there is no floor (a world with other terrain) the NPC is not set down; the place keeps waiting",
+                    moved2 == 1 && made3 == 0 && com.rtshop.quest.NpcLayout.pendingForTest(server) == 1, moved2 + " " + made3 + " " + com.rtshop.quest.NpcLayout.pendingForTest(server));
+        } finally {
+            for (net.minecraft.world.entity.Entity e : level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> com.rtshop.quest.NpcLayout.keyOf(x) != null)) e.discard();
+            com.rtshop.quest.NpcLayout.resetForTest(server);
+            com.rtshop.quest.NpcLayout.forceForTest = false;
+            if (lfKeep != null) java.nio.file.Files.write(lf, lfKeep);
+            else java.nio.file.Files.deleteIfExists(lf);
+            for (int dx = -1; dx <= 4; dx++) {
+                for (int dz = -1; dz <= 1; dz++) level.setBlockAndUpdate(lp.offset(dx, -1, dz), Blocks.AIR.defaultBlockState());
+            }
+        }
+    }
+
     /** 장소 조사 · 동행 · 룬 제단 잠금 · 용 소환식 */
     private static void storySystems(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         QuestManager.reset(a);
@@ -4088,14 +4175,41 @@ public final class SelfTest {
             com.rtshop.story.StoryArena.testOverworld = true;
             com.rtshop.story.StoryArena.addTestPlayer(a);
             a.setPos(0.5, 120, 0.5);
-            boolean noQuest = !com.rtshop.story.StoryArena.enter(a, "minecraft:evoker", false);
-            boolean in = com.rtshop.story.StoryArena.enter(a, "minecraft:evoker", true);
+            boolean noQuest = !com.rtshop.story.StoryArena.openGate(a, "minecraft:evoker", false);
+            boolean mgOpened = com.rtshop.story.StoryArena.openGate(a, "minecraft:evoker", true);
+            var mgGate = com.rtshop.story.StoryArena.gatesForTest().get(a.getUUID());
+            com.rtshop.story.StoryArena.forceTick(server, 5);
+            boolean mgStayed = mgGate != null && com.rtshop.story.StoryArena.sessionsForTest().isEmpty();
+            check("pressing the Memory Gate button only opens a gate in front of the player (only with the quest, or OP force); nobody is moved yet",
+                    noQuest && mgOpened && mgStayed, noQuest + " " + mgOpened + " " + mgStayed);
+            if (mgGate != null) {
+                mgGate.x = 0.5;
+                mgGate.y = 120;
+                mgGate.z = 0.5;
+                a.setPos(6.5, 120, 0.5);
+                com.rtshop.story.StoryArena.forceTick(server, 2);   // 문 밖에 한 번 서야 문이 켜진다
+                a.setPos(0.5, 120, 0.5);
+            }
+            com.rtshop.story.StoryArena.forceTick(server, 2);
+            boolean in = !com.rtshop.story.StoryArena.sessionsForTest().isEmpty();
             var s0 = com.rtshop.story.StoryArena.sessionsForTest().get(0);
             boolean moved = s0 != null && com.rtshop.story.StoryArena.inSlot(a, s0);
-            com.rtshop.story.StoryArena.forceTick(server, 80);
+            com.rtshop.story.StoryArena.forceTick(server, 120);
+            boolean mgAsleep = s0 != null && s0.state == com.rtshop.story.StoryArena.WAIT && com.rtshop.story.StoryArena.bossForTest(server, 0) == null;
+            BlockPos mgC = com.rtshop.story.StoryArena.center(server, 0);
+            boolean mgEmber = com.rtshop.story.StoryArena.level(server).getBlockState(mgC.above(2)).is(net.minecraft.world.level.block.Blocks.CAMPFIRE);
+            boolean mgWoke = com.rtshop.story.StoryArena.wake(a) && !com.rtshop.story.StoryArena.wake(a);
+            com.rtshop.story.StoryArena.forceTick(server, com.rtshop.story.StoryArena.WAKE_TICKS - 10);
+            boolean mgStillWaking = com.rtshop.story.StoryArena.bossForTest(server, 0) == null;
+            com.rtshop.story.StoryArena.forceTick(server, 20);
             net.minecraft.world.entity.LivingEntity boss = com.rtshop.story.StoryArena.bossForTest(server, 0);
-            check("the Memory Gate takes the player to a private arena and wakes the boss there (only with the quest, or OP force)",
-                    noQuest && in && moved && boss != null && boss.isAlive(), noQuest + " " + in + " " + moved + " " + boss);
+            check("walking into the gate takes the player to a private arena; the boss sleeps there until the ember is touched, then wakes after a short scene",
+                    in && moved && mgAsleep && mgEmber && mgWoke && mgStillWaking && boss != null && boss.isAlive()
+                            && com.rtshop.story.StoryArena.level(server).getBlockState(mgC.above(2)).isAir() && com.rtshop.story.StoryArena.gatesForTest().isEmpty(),
+                    in + " " + moved + " " + mgAsleep + " " + mgEmber + " " + mgWoke + " " + mgStillWaking + " " + boss + " gates " + com.rtshop.story.StoryArena.gatesForTest().size());
+            check("party members come along only from within 16 blocks of the one who walks in (story_arenas.json: partyRange), and the wait is set there too",
+                    com.rtshop.story.StoryArena.partyRange == 16 && com.rtshop.story.StoryArena.waitSeconds == 45 && com.rtshop.story.StoryArena.walkIn,
+                    com.rtshop.story.StoryArena.partyRange + " " + com.rtshop.story.StoryArena.waitSeconds);
             if (boss != null) boss.kill();
             com.rtshop.story.StoryArena.forceTick(server, 2);
             boolean won = s0 != null && s0.state == com.rtshop.story.StoryArena.WON;

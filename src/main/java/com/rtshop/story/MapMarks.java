@@ -60,6 +60,8 @@ public final class MapMarks {
         public boolean npcs = true;
         /** true 면 이 표시들이 세계 안에도(이름표·빛기둥) 뜬다. 기본은 M 지도에서만 (NPC 앞·연출 화면과 겹치지 않게). */
         public boolean showInWorld = false;
+        /** true 면 미니맵의 몹 아이콘(레이더)에 RT Shop NPC 는 말을 걸어 본 것만 뜬다. false 면 모두 뜬다. */
+        public boolean radarKnownOnly = true;
         public String npcColor = "#E8C56A", placeColor = "#8FC7F0";
         public final List<Place> places = new ArrayList<>();
 
@@ -71,6 +73,7 @@ public final class MapMarks {
             o.addProperty("folder", folder);
             o.addProperty("npcs", npcs);
             o.addProperty("showInWorld", showInWorld);
+            o.addProperty("radarKnownOnly", radarKnownOnly);
             o.addProperty("npcColor", npcColor);
             o.addProperty("placeColor", placeColor);
             JsonArray a = new JsonArray();
@@ -94,6 +97,7 @@ public final class MapMarks {
             if (o.has("folder") && !o.get("folder").getAsString().isBlank()) c.folder = o.get("folder").getAsString().trim();
             if (o.has("npcs")) c.npcs = o.get("npcs").getAsBoolean();
             if (o.has("showInWorld")) c.showInWorld = o.get("showInWorld").getAsBoolean();
+            if (o.has("radarKnownOnly")) c.radarKnownOnly = o.get("radarKnownOnly").getAsBoolean();
             if (o.has("npcColor")) c.npcColor = o.get("npcColor").getAsString();
             if (o.has("placeColor")) c.placeColor = o.get("placeColor").getAsString();
             if (o.has("places") && o.get("places").isJsonArray()) {
@@ -214,6 +218,7 @@ public final class MapMarks {
         JsonObject o = new JsonObject();
         o.addProperty("folder", get().folder);
         o.addProperty("world", get().showInWorld);
+        o.addProperty("radar", get().enabled && get().npcs && get().radarKnownOnly);
         o.add("marks", marks);
         o.add("gone", gone);
         o.addProperty("notify", notify);
@@ -256,7 +261,10 @@ public final class MapMarks {
     /** 알게 된 표시를 모두 다시 보낸다 (들어올 때). 운영자가 지운 장소는 이 사람의 기록에서도 지우고 지도에서 빼게 한다. force: 플레이어가 지도에서 지운 것도 다시 넣는다. */
     public static void sendAll(ServerPlayer p, boolean force) {
         Config c = get();
-        if (!c.enabled) return;
+        if (!c.enabled) {
+            send(p, new JsonArray(), new JsonArray(), false, false);   // 미니맵 아이콘을 가리지 말라는 것만 알린다
+            return;
+        }
         CompoundTag marks = kept(p).getCompound(KEY);
         JsonArray a = new JsonArray(), gone = new JsonArray();
         boolean changed = false;
@@ -281,7 +289,7 @@ public final class MapMarks {
             a.add(json(id, marks.getCompound(id)));
         }
         if (changed) keep(p, marks);
-        if (a.size() > 0 || gone.size() > 0) send(p, a, gone, false, force);
+        send(p, a, gone, false, force);   // 아는 것이 없어도 보낸다: 화면 쪽이 "말을 걸어 본 NPC" 목록(미니맵 아이콘)을 맞춘다
     }
 
     private static Place place(Config c, String name) {

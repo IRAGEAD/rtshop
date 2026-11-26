@@ -76,6 +76,17 @@ public final class StoryArena {
 
     private static Map<String, Spec> specs;
 
+    /** 문을 연 사람이 들어갈 때 함께 데려가는 파티원의 거리 (칸). */
+    public static int partyRange = 16;
+    /** 세계에 열린 문이 아무도 들어가지 않은 채 열려 있는 시간 (초). */
+    public static int gateSeconds = 60;
+    /** 보스 구역에 들어선 뒤 불씨를 건드리지 않아도 보스가 깨어나기까지의 시간 (초). 0 = 불씨를 건드려야만 깨어난다. */
+    public static int waitSeconds = 45;
+    /** false 면 예전처럼 단추를 누르는 즉시 보스 구역으로 간다. */
+    public static boolean walkIn = true;
+    /** 깨어나는 연출의 길이 (틱). */
+    public static final int WAKE_TICKS = 80;
+
     private static Spec spec(String theme, int radius, int height, boolean water) {
         Spec s = new Spec();
         s.theme = theme;
@@ -120,10 +131,23 @@ public final class StoryArena {
 
     public static synchronized void reload() {
         Map<String, Spec> m = defaults();
+        partyRange = 16;
+        gateSeconds = 60;
+        waitSeconds = 45;
+        walkIn = true;
         try {
             Path f = file();
             if (Files.exists(f)) {
                 JsonObject o = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
+                if (o.has("partyRange")) partyRange = Math.max(1, Math.min(64, o.get("partyRange").getAsInt()));
+                if (o.has("gateSeconds")) gateSeconds = Math.max(10, Math.min(600, o.get("gateSeconds").getAsInt()));
+                if (o.has("waitSeconds")) waitSeconds = Math.max(0, Math.min(600, o.get("waitSeconds").getAsInt()));
+                if (o.has("walkIn")) walkIn = o.get("walkIn").getAsBoolean();
+                if (!o.has("partyRange") || !o.has("waitSeconds")) {
+                    // 3.58: 새 항목을 예전 파일에 덧붙인다 (보스별 설정은 그대로)
+                    gateKeys(o);
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                }
                 if (o.has("bosses")) {
                     for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("bosses").entrySet()) {
                         JsonObject b = e.getValue().getAsJsonObject();
@@ -150,12 +174,23 @@ public final class StoryArena {
                     bs.add(e.getKey(), b);
                 }
                 o.add("bosses", bs);
+                gateKeys(o);
                 Files.writeString(f, new GsonBuilder().setPrettyPrinting().create().toJson(o), StandardCharsets.UTF_8);
             }
         } catch (Exception ex) {
             RtShop.LOGGER.warn("[rtshop] story_arenas.json 을 읽지 못했습니다: {}", ex.toString());
         }
         specs = m;
+    }
+
+    private static void gateKeys(JsonObject o) {
+        o.addProperty("_help_gate", "walkIn: 단추를 누르면 그 자리 앞에 문이 열리고 걸어 들어가야 넘어간다 (false = 누르는 즉시 이동). gateSeconds: 문이 열려 있는 시간(초). "
+                + "partyRange: 문을 연 사람이 들어갈 때 함께 넘어가는 파티원의 거리(칸); 그 뒤에도 보스가 깨어나기 전까지는 파티원이 문으로 걸어 들어와 합류할 수 있다. "
+                + "waitSeconds: 보스 구역에서 가운데의 불씨를 우클릭하면 보스가 깨어나고, 건드리지 않아도 이 시간(초)이 지나면 깨어난다 (0 = 건드려야만).");
+        if (!o.has("walkIn")) o.addProperty("walkIn", walkIn);
+        if (!o.has("gateSeconds")) o.addProperty("gateSeconds", gateSeconds);
+        if (!o.has("partyRange")) o.addProperty("partyRange", partyRange);
+        if (!o.has("waitSeconds")) o.addProperty("waitSeconds", waitSeconds);
     }
 
     /** 이 보스는 기억의 문에서 싸울 수 있는가 (모드가 설치돼 있어야). */
@@ -175,6 +210,30 @@ public final class StoryArena {
         public int state = WAIT;
         public long spawnAt, endAt;
         public Spec spec;
+        /** 불씨를 건드렸거나 기다리는 시간이 다 되어, 깨어나는 연출이 돌고 있다. */
+        public boolean waking;
+    }
+
+    /** 세계에 열린 문: 문을 연 사람이 걸어 들어가면 보스 구역이 열리고, 보스가 깨어나기 전까지 파티원이 뒤따라 들어올 수 있다. */
+    public static final class Gate {
+        public UUID owner;
+        public String boss;
+        public boolean force;
+        public ResourceKey<Level> dim;
+        public double x, y, z;
+        public float yaw;
+        public long closeAt;
+        /** 문을 연 사람이 들어가 열린 보스 구역의 칸 번호 (아직이면 -1). */
+        public int slot = -1;
+        Session session;
+        /** 문을 연 사람이 문 밖에 한 번 서야 켜진다 (문이 발밑에 열렸을 때 곧바로 넘어가지 않게). */
+        public boolean armed;
+    }
+
+    private static final Map<UUID, Gate> GATES = new HashMap<>();
+
+    public static Map<UUID, Gate> gatesForTest() {
+        return GATES;
     }
 
     private static final Map<Integer, Session> SESSIONS = new HashMap<>();
@@ -238,7 +297,159 @@ public final class StoryArena {
         return null;
     }
 
-    /** 기억의 문을 연다: 그 사람과 곁(64칸)에 있는 같은 파티원을 함께 데려간다. */
+    private static ServerPlayer player(MinecraftServer server, UUID id) {
+        ServerPlayer p = server.getPlayerList().getPlayer(id);
+        return p != null ? p : testPlayer(id);
+    }
+
+    private static boolean standable(ServerLevel level, BlockPos pos) {
+        BlockState below = level.getBlockState(pos.below());
+        return below.isFaceSturdy(level, pos.below(), net.minecraft.core.Direction.UP) && level.getFluidState(pos).isEmpty()
+                && level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()
+                && level.getBlockState(pos.above()).getCollisionShape(level, pos.above()).isEmpty()
+                && level.getBlockState(pos.above(2)).getCollisionShape(level, pos.above(2)).isEmpty();
+    }
+
+    /** 문이 열릴 자리: 바라보는 쪽 서너 칸 앞의 디딜 수 있는 바닥. 없으면 발밑. */
+    private static net.minecraft.world.phys.Vec3 gateSpot(ServerPlayer p) {
+        ServerLevel level = p.serverLevel();
+        double yaw = Math.toRadians(p.getYRot());
+        for (double dist : new double[]{3.0, 4.0, 2.5}) {
+            for (int turn : new int[]{0, 30, -30, 60, -60, 90, -90, 150, -150}) {
+                double a = yaw + Math.toRadians(turn);
+                double x = p.getX() - Math.sin(a) * dist, z = p.getZ() + Math.cos(a) * dist;
+                for (int dy = 1; dy >= -2; dy--) {
+                    BlockPos c = BlockPos.containing(x, p.getY() + dy, z);
+                    if (level.isLoaded(c) && standable(level, c)) return new net.minecraft.world.phys.Vec3(c.getX() + 0.5, c.getY(), c.getZ() + 0.5);
+                }
+            }
+        }
+        return p.position();
+    }
+
+    /**
+     * 단추(또는 /rtshop arena <보스>)를 눌렀다: 그 사람 앞에 문을 연다. 문 안으로 걸어 들어가야 보스 구역으로 넘어간다.
+     * walkIn 이 꺼져 있으면 예전처럼 곧바로 넘어간다.
+     */
+    public static boolean openGate(ServerPlayer p, String boss, boolean force) {
+        String why = cannotEnter(p, boss, force);
+        if (why != null) {
+            com.rtshop.notice.Notice.send(p, Component.translatable(why).withStyle(ChatFormatting.RED), false);
+            return false;
+        }
+        if (!walkIn) return enter(p, boss, force);
+        net.minecraft.world.phys.Vec3 at = gateSpot(p);
+        Gate g = new Gate();
+        g.owner = p.getUUID();
+        g.boss = boss;
+        g.force = force;
+        g.dim = p.level().dimension();
+        g.x = at.x;
+        g.y = at.y;
+        g.z = at.z;
+        g.yaw = p.getYRot();
+        g.closeAt = now + gateSeconds * 20L;
+        GATES.put(p.getUUID(), g);
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.arena.gate_open", Hunts.name(boss), gateSeconds).withStyle(ChatFormatting.GOLD), false);
+        p.serverLevel().playSound(null, BlockPos.containing(at), SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 0.9F, 0.8F);
+        return true;
+    }
+
+    private static boolean inGate(ServerPlayer p, ServerLevel level, Gate g, double reach) {
+        if (p == null || p.level() != level || !p.isAlive()) return false;
+        double dx = p.getX() - g.x, dz = p.getZ() - g.z;
+        return dx * dx + dz * dz <= reach * reach && Math.abs(p.getY() - g.y) < 2.0;
+    }
+
+    private static void closeGate(MinecraftServer server, Gate g, boolean tell) {
+        GATES.remove(g.owner);
+        ServerPlayer owner = player(server, g.owner);
+        if (tell && owner != null) com.rtshop.notice.Notice.send(owner, Component.translatable("rtshop.arena.gate_closed").withStyle(ChatFormatting.GRAY), false);
+        ServerLevel level = server.getLevel(g.dim);
+        if (level != null) level.playSound(null, BlockPos.containing(g.x, g.y, g.z), SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 0.8F);
+    }
+
+    /** 문의 모습 (누구에게나 보인다): 바닥에 재로 그린 원, 가운데의 불씨, 그 위에서 문처럼 일렁이는 공기. */
+    private static void gateParticles(ServerLevel level, Gate g) {
+        for (int i = 0; i < 16; i++) {
+            double a = Math.PI * 2 * i / 16 + (now % 80) * 0.02;
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.WHITE_ASH, g.x + Math.cos(a) * 1.5, g.y + 0.08, g.z + Math.sin(a) * 1.5, 1, 0.03, 0.0, 0.03, 0.0);
+            if (i % 4 == 0) level.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE, g.x + Math.cos(a) * 1.5, g.y + 0.1, g.z + Math.sin(a) * 1.5, 1, 0.02, 0.02, 0.02, 0.0);
+        }
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.SMALL_FLAME, g.x, g.y + 0.15, g.z, 2, 0.08, 0.05, 0.08, 0.0);
+        // 문틀: 문을 연 사람이 바라보던 쪽을 마주 보게 선 너비 1.6 · 높이 2.6 의 테
+        double side = Math.toRadians(g.yaw), sx = Math.cos(side), sz = Math.sin(side);
+        for (int i = 0; i <= 6; i++) {
+            double h = 0.3 + i * 0.4;
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, g.x - sx * 0.8, g.y + h, g.z - sz * 0.8, 1, 0.0, 0.0, 0.0, 0.0);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, g.x + sx * 0.8, g.y + h, g.z + sz * 0.8, 1, 0.0, 0.0, 0.0, 0.0);
+        }
+        for (int i = -1; i <= 1; i++) level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, g.x + sx * 0.4 * i, g.y + 2.9, g.z + sz * 0.4 * i, 1, 0.0, 0.0, 0.0, 0.0);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT, g.x, g.y + 1.6, g.z, 6, sx * 0.35 + 0.05, 0.7, sz * 0.35 + 0.05, 0.02);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, g.x, g.y + 1.5, g.z, 1, Math.abs(sx) * 0.3, 0.8, Math.abs(sz) * 0.3, 0.0);
+    }
+
+    private static void tickGates(MinecraftServer server) {
+        for (Gate g : new ArrayList<>(GATES.values())) {
+            ServerPlayer owner = player(server, g.owner);
+            ServerLevel level = testOverworld ? server.overworld() : server.getLevel(g.dim);
+            Session s = g.slot >= 0 && SESSIONS.get(g.slot) == g.session ? g.session : null;   // 칸 번호는 다시 쓰이므로 같은 싸움인지 본다
+            if (owner == null || level == null) {
+                closeGate(server, g, false);
+                continue;
+            }
+            if (g.slot >= 0 ? (s == null || s.state != WAIT || s.waking) : now >= g.closeAt) {
+                closeGate(server, g, g.slot < 0);
+                continue;
+            }
+            if (now % 4 == 0) gateParticles(level, g);
+            if (now % 60 == 0) level.playSound(null, BlockPos.containing(g.x, g.y, g.z), SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 0.7F, 0.7F);
+            if (g.slot < 0) {
+                if (!g.armed) {
+                    if (!inGate(owner, level, g, 1.5)) g.armed = true;
+                } else if (inGate(owner, level, g, 1.0)) {
+                    if (enter(owner, g.boss, g.force)) {
+                        for (Session x : SESSIONS.values()) {
+                            if (x.members.contains(g.owner)) {
+                                g.slot = x.slot;
+                                g.session = x;
+                            }
+                        }
+                    }
+                    if (g.slot < 0) closeGate(server, g, false);
+                }
+                continue;
+            }
+            // 보스가 깨어나기 전까지: 같은 파티원이 문으로 걸어 들어오면 합류한다
+            Party.Group grp = Party.of(server, g.owner);
+            if (grp == null) continue;
+            for (ServerPlayer m : Party.online(server, grp)) {
+                if (s.members.contains(m.getUUID()) || !inGate(m, level, g, 1.0)) continue;
+                boolean busy = false;
+                for (Session o : SESSIONS.values()) busy |= o.members.contains(m.getUUID());
+                if (busy) continue;
+                s.members.add(m.getUUID());
+                place(server, s, m, s.members.size() - 1, Math.max(6, s.members.size()));
+            }
+        }
+    }
+
+    /** 그 사람을 보스 구역의 가장자리에 세운다 (들어오기 전 자리를 기억해 둔다). */
+    private static void place(MinecraftServer server, Session s, ServerPlayer m, int i, int n) {
+        ServerLevel level = level(server);
+        BlockPos c = center(server, s.slot);
+        remember(m);
+        double a = Math.PI * 2 * i / Math.max(1, n) + Math.PI / 2;
+        double r = s.spec.radius - 4;
+        double x = c.getX() + 0.5 + Math.cos(a) * r, z = c.getZ() + 0.5 + Math.sin(a) * r;
+        float yaw = (float) Math.toDegrees(Math.atan2(c.getZ() + 0.5 - z, c.getX() + 0.5 - x)) - 90F;
+        if (m.isPassenger()) m.stopRiding();
+        if (m instanceof net.minecraftforge.common.util.FakePlayer) m.setPos(x, c.getY() + 1, z);
+        else m.teleportTo(level, x, c.getY() + 1, z, yaw, 0F);
+        com.rtshop.notice.Notice.send(m, Component.translatable("rtshop.arena.inside", Hunts.name(s.boss)).withStyle(ChatFormatting.GOLD), true);
+    }
+
+    /** 보스 구역을 열고 넘어간다: 그 사람과 곁(partyRange 칸)에 있는 같은 파티원을 함께 데려간다. 보스는 아직 잠들어 있다. */
     public static boolean enter(ServerPlayer p, String boss, boolean force) {
         String why = cannotEnter(p, boss, force);
         if (why != null) {
@@ -256,7 +467,7 @@ public final class StoryArena {
         Party.Group g = Party.of(server, p.getUUID());
         if (g != null) {
             for (ServerPlayer m : Party.online(server, g)) {
-                if (m == p || m.level() != p.level() || m.distanceTo(p) > 64) continue;
+                if (m == p || m.level() != p.level() || m.distanceTo(p) > partyRange) continue;
                 boolean busy = false;
                 for (Session o : SESSIONS.values()) busy |= o.members.contains(m.getUUID());
                 if (!busy) s.members.add(m.getUUID());
@@ -265,26 +476,97 @@ public final class StoryArena {
         ServerLevel level = level(server);
         BlockPos c = center(server, slot);
         build(level, c, s.spec);
+        // 가운데의 불씨: 건드리면 보스가 깨어난다
+        level.setBlock(c.above(1), Blocks.CHISELED_POLISHED_BLACKSTONE.defaultBlockState(), 2);
+        level.setBlock(c.above(2), Blocks.CAMPFIRE.defaultBlockState(), 2);
         SESSIONS.put(slot, s);
         int i = 0;
-        for (UUID id : s.members) {
-            ServerPlayer m = server.getPlayerList().getPlayer(id);
-            if (m == null) m = testPlayer(id);
+        for (UUID id : new ArrayList<>(s.members)) {
+            ServerPlayer m = player(server, id);
             if (m == null) continue;
-            remember(m);
-            double a = Math.PI * 2 * i / Math.max(1, s.members.size()) + Math.PI / 2;
-            double r = s.spec.radius - 4;
-            double x = c.getX() + 0.5 + Math.cos(a) * r, z = c.getZ() + 0.5 + Math.sin(a) * r;
-            float yaw = (float) Math.toDegrees(Math.atan2(c.getZ() + 0.5 - z, c.getX() + 0.5 - x)) - 90F;
-            if (m.isPassenger()) m.stopRiding();
-            if (m instanceof net.minecraftforge.common.util.FakePlayer) m.setPos(x, c.getY() + 1, z);
-            else m.teleportTo(level, x, c.getY() + 1, z, yaw, 0F);
-            com.rtshop.notice.Notice.send(m, Component.translatable("rtshop.arena.entered", Hunts.name(boss)).withStyle(ChatFormatting.GOLD), true);
+            place(server, s, m, i, s.members.size());
             i++;
         }
         level.playSound(null, c, SoundEvents.END_PORTAL_SPAWN, SoundSource.HOSTILE, 0.6F, 0.8F);
-        s.spawnAt = now + 70;
+        s.spawnAt = waitSeconds > 0 ? now + Math.max(waitSeconds * 20L, WAKE_TICKS + 20L) : Long.MAX_VALUE;
         return true;
+    }
+
+    /** 불씨를 건드렸다(또는 기다리는 시간이 다 됐다): 깨어나는 연출을 시작한다. 연출이 끝나면 보스가 나타난다. */
+    public static boolean wake(MinecraftServer server, Session s) {
+        if (s == null || s.state != WAIT || s.waking) return false;
+        s.waking = true;
+        s.spawnAt = now + WAKE_TICKS;
+        BlockPos c = center(server, s.slot);
+        level(server).playSound(null, c, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.HOSTILE, 1.0F, 0.6F);
+        for (ServerPlayer p : present(server, s)) {
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.arena.entered", Hunts.name(s.boss)).withStyle(ChatFormatting.GOLD), true);
+        }
+        return true;
+    }
+
+    /** 이 사람이 들어와 있는 보스 구역의 불씨를 건드린다 (/rtshop arena start 와 불씨 우클릭). */
+    public static boolean wake(ServerPlayer p) {
+        for (Session s : SESSIONS.values()) {
+            if (s.members.contains(p.getUUID()) && inSlot(p, s)) return wake(p.server, s);
+        }
+        return false;
+    }
+
+    private static boolean ember(MinecraftServer server, Session s, BlockPos at) {
+        BlockPos c = center(server, s.slot);
+        return at.getX() == c.getX() && at.getZ() == c.getZ() && at.getY() >= c.getY() + 1 && at.getY() <= c.getY() + 2;
+    }
+
+    @SubscribeEvent
+    public static void onUseBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+        if (SESSIONS.isEmpty() || event.getLevel().isClientSide() || !(event.getEntity() instanceof ServerPlayer p)) return;
+        Session s = sessionOf(p);
+        if (s == null || s.state != WAIT || !s.members.contains(p.getUUID()) || !ember(p.server, s, event.getPos())) return;
+        event.setCanceled(true);
+        event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+        wake(p.server, s);
+    }
+
+    /** 불씨와 받침은 부술 수 없다 (부수려 해도 건드린 것으로 친다). */
+    @SubscribeEvent
+    public static void onBreakBlock(net.minecraftforge.event.level.BlockEvent.BreakEvent event) {
+        if (SESSIONS.isEmpty() || !(event.getPlayer() instanceof ServerPlayer p)) return;
+        Session s = sessionOf(p);
+        if (s == null || s.state != WAIT || !ember(p.server, s, event.getPos())) return;
+        event.setCanceled(true);
+        wake(p.server, s);
+    }
+
+    /** 깨어나는 연출: 불씨의 불꽃이 원을 그리며 가운데로 모이고, 소리가 점점 높아진다. */
+    private static void wakeFx(ServerLevel level, BlockPos c, Session s) {
+        long t = WAKE_TICKS - (s.spawnAt - now);
+        double prog = Math.max(0, Math.min(1, t / (double) WAKE_TICKS));
+        double cx = c.getX() + 0.5, cy = c.getY() + 1.0, cz = c.getZ() + 0.5;
+        if (t % 2 == 0) {
+            double r = 1.5 + (s.spec.radius * 0.8 - 1.5) * (1 - prog);
+            int n = 28;
+            for (int i = 0; i < n; i++) {
+                double a = Math.PI * 2 * i / n + t * 0.09;
+                level.sendParticles(i % 2 == 0 ? net.minecraft.core.particles.ParticleTypes.FLAME : net.minecraft.core.particles.ParticleTypes.SOUL_FIRE_FLAME,
+                        cx + Math.cos(a) * r, cy + 0.15 + prog * 0.6, cz + Math.sin(a) * r, 1, 0.0, 0.02, 0.0, 0.0);
+            }
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.LAVA, cx, cy + 1.6, cz, 1 + (int) (prog * 3), 0.2, 0.2, 0.2, 0.0);
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.LARGE_SMOKE, cx, cy + 1.8 + prog * 2.5, cz, 2, 0.25, 0.6, 0.25, 0.01);
+        }
+        if (t > 0 && t % 20 == 0) level.playSound(null, c, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.HOSTILE, 1.0F, 0.6F + (float) prog * 0.9F);
+    }
+
+    /** 불씨가 타오르는 순간: 받침을 치우고 번쩍임과 함께 보스가 나타난다. */
+    private static void burst(ServerLevel level, BlockPos c, Session s) {
+        BlockState fill = s.spec.water ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+        level.setBlock(c.above(2), fill, 2);
+        level.setBlock(c.above(1), fill, 2);
+        double cx = c.getX() + 0.5, cy = c.getY() + 1.5, cz = c.getZ() + 0.5;
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLASH, cx, cy + 0.5, cz, 1, 0.0, 0.0, 0.0, 0.0);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION_EMITTER, cx, cy, cz, 1, 0.0, 0.0, 0.0, 0.0);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, cx, cy, cz, 120, 0.6, 0.8, 0.6, 0.25);
+        level.playSound(null, c, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.HOSTILE, 0.8F, 0.7F);
     }
 
     private static final List<ServerPlayer> TEST_PLAYERS = new ArrayList<>();
@@ -436,12 +718,13 @@ public final class StoryArena {
     public static void onTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         now++;
-        if (SESSIONS.isEmpty()) return;
+        if (SESSIONS.isEmpty() && GATES.isEmpty()) return;
         tick(event.getServer());
     }
 
     public static void tick(MinecraftServer server) {
         ServerLevel level = level(server);
+        if (!GATES.isEmpty()) tickGates(server);
         for (Session s : new ArrayList<>(SESSIONS.values())) {
             BlockPos c = center(server, s.slot);
             List<ServerPlayer> inside = present(server, s);
@@ -449,8 +732,20 @@ public final class StoryArena {
                 case WAIT -> {
                     if (inside.isEmpty()) {
                         finish(server, s);
+                    } else if (!s.waking) {
+                        if (now >= s.spawnAt - WAKE_TICKS) {
+                            wake(server, s);
+                        } else if (now % 20 == 0) {
+                            long left = (s.spawnAt - WAKE_TICKS - now) / 20;
+                            for (ServerPlayer p : inside) {
+                                p.displayClientMessage(waitSeconds > 0 ? Component.translatable("rtshop.arena.wait", left) : Component.translatable("rtshop.arena.wait_touch"), true);
+                            }
+                        }
                     } else if (now >= s.spawnAt) {
+                        burst(level, c, s);
                         spawnBoss(level, c, s);
+                    } else {
+                        wakeFx(level, c, s);
                     }
                 }
                 case FIGHT -> {
@@ -548,6 +843,7 @@ public final class StoryArena {
 
     /** 점검용: 모든 싸움을 끝낸다. */
     public static void clearForTest(MinecraftServer server) {
+        GATES.clear();
         for (Session s : new ArrayList<>(SESSIONS.values())) finish(server, s);
         TEST_PLAYERS.clear();
     }

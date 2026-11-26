@@ -68,6 +68,15 @@ public final class NpcPlaces extends SavedData {
         return p == null ? "" : p.encode();
     }
 
+    /** 아직 서 있지 않은 NPC 의 자리를 미리 적어 둔다 (배치 파일에서 온 자리: 퀘스트 HUD 가 그쪽을 가리키게). */
+    public void put(String key, String dim, int x, int y, int z) {
+        Place now = new Place(dim, x, y, z);
+        if (!now.equals(places.get(key))) {
+            places.put(key, now);
+            setDirty();
+        }
+    }
+
     public static Map<String, Place> all(MinecraftServer server) {
         return java.util.Collections.unmodifiableMap(get(server).places);
     }

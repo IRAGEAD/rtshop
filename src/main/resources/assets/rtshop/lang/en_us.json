@@ -1892,5 +1892,19 @@
   "rtshop.rules.row_shop.0": "Shop: all",
   "rtshop.rules.row_shop.1": "§aShop: sold",
   "rtshop.rules.row_shop.2": "§cShop: not sold",
-  "rtshop.tip.flex_dish": "Cooked with one set of ingredients - priced by what went in (%s of the list price)"
+  "rtshop.tip.flex_dish": "Cooked with one set of ingredients - priced by what went in (%s of the list price)",
+  "rtshop.arena.gate_open": "The Memory Gate is open. Walk into it to cross over to %s. (Closes in %s s)",
+  "rtshop.arena.gate_closed": "The Memory Gate has closed.",
+  "rtshop.arena.inside": "Beyond the Memory Gate — %s is asleep",
+  "rtshop.arena.wait": "Right-click the ember in the middle to begin · it wakes by itself in %s s",
+  "rtshop.arena.wait_touch": "Right-click the ember in the middle to begin",
+  "rtshop.npclayout.status": "NPC layout — %s standing in this world · %s places in the file · %s waiting to be set down (%s of them blocked)",
+  "rtshop.npclayout.waiting": " · %s (%s, %s, %s): will be set down when someone comes near",
+  "rtshop.npclayout.blocked": " · %s (%s, %s, %s): no floor or no room there, not set down",
+  "rtshop.npclayout.saved": "NPC layout written to config/rtshop/npc_layout.json (%s places).",
+  "rtshop.npclayout.save_failed": "Could not write npc_layout.json.",
+  "rtshop.npclayout.applied": "NPC layout applied again: %s places to set down (%s set down now).",
+  "rtshop.npclayout.no_file": "There is no config/rtshop/npc_layout.json.",
+  "rtshop.hud.minimap_npc.on": "Minimap NPC icons: ON",
+  "rtshop.hud.minimap_npc.off": "Minimap NPC icons: OFF"
 }

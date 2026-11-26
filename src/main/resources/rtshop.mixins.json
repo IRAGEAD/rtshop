@@ -10,7 +10,8 @@
     "EfItemProbeMixin",
     "ItemLayerProbeMixin",
     "GuiGraphicsTextMixin",
-    "DioramaWorldPinsMixin"
+    "DioramaWorldPinsMixin",
+    "DioramaRadarMixin"
   ],
   "injectors": {
     "defaultRequire": 0

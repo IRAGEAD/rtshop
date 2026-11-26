@@ -244,6 +244,8 @@ public class LootRules extends LootModifier {
                 }
                 final boolean bt = bossTable;
                 loot.removeIf(s -> ItemPolicy.lootBanned(s, bt));
+            } else {
+                loot.removeIf(ItemPolicy::blockDropBanned);   // 캐서 얻는 길도 막아 둔 것 (Create)
             }
             Rules r = get();
             if (r.tables.isEmpty()) return loot;
