@@ -1584,6 +1584,12 @@ public final class ClientSelfTest {
             case 35 -> {
                 onServer(mc, sp -> {
                     BlockPos crop = sp.blockPosition().relative(sp.getDirection().getOpposite(), 2);
+                    // 모드팩 전체의 세계는 지형이 매번 다르다: 작물 자리가 언덕 속이나 나무 밑(어두운 곳)이면 밀이 버티지 못해
+                    // 다시 심은 것이 곧 뽑힌다 ("block after harvest: air"). 그 칸 위를 하늘까지 비워 둔다.
+                    int cropSkyTop = sp.serverLevel().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, crop.getX(), crop.getZ());
+                    for (int cropSkyY = Math.max(cropSkyTop, crop.getY() + 1); cropSkyY >= crop.getY(); cropSkyY--) {
+                        sp.serverLevel().setBlock(new BlockPos(crop.getX(), cropSkyY, crop.getZ()), Blocks.AIR.defaultBlockState(), 3);
+                    }
                     sp.serverLevel().setBlock(crop.below(), Blocks.FARMLAND.defaultBlockState().setValue(FarmBlock.MOISTURE, 7), 3);
                     sp.serverLevel().setBlock(crop, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 7), 3);
                     CropData.get(sp.serverLevel()).mark(CropData.dim(sp.serverLevel()), crop);
