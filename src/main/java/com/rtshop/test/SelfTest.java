@@ -1825,6 +1825,17 @@ public final class SelfTest {
         java.util.Map<String, com.rtshop.rules.LootRules.Stat> zombie = com.rtshop.rules.LootRules.sample(level, new ResourceLocation("minecraft:entities/zombie"), 200, true);
         check("the loot editor also lists mob drops and samples them (zombie drops rotten flesh)",
                 editable.contains("minecraft:entities/zombie") && zombie.containsKey("minecraft:rotten_flesh"), zombie.keySet());
+        // C-5: 아이템으로 전리품표 찾기 · 상점에서 파는 아이템 목록 (편집 창의 검색·분류가 쓰는 것)
+        java.util.List<String> bySaddleC5 = com.rtshop.rules.RulesEditor.findTables(server, java.util.Set.of("minecraft:saddle"));
+        java.util.List<String> byFleshC5 = com.rtshop.rules.RulesEditor.findTables(server, java.util.Set.of("minecraft:rotten_flesh"));
+        java.util.List<String> byNothingC5 = com.rtshop.rules.RulesEditor.findTables(server, java.util.Set.of("rtshop:no_such_item_c5"));
+        check("loot tables can be found by item (saddle -> dungeon chest, rotten flesh -> zombie, an unknown item -> none)",
+                bySaddleC5.contains("minecraft:chests/simple_dungeon") && byFleshC5.contains("minecraft:entities/zombie") && byNothingC5.isEmpty()
+                        && bySaddleC5.size() < editable.size(), bySaddleC5.size() + " " + byFleshC5.size() + " " + byNothingC5.size() + " of " + editable.size());
+        com.google.gson.JsonArray soldC5 = com.rtshop.rules.RulesEditor.soldJson();
+        boolean soldTicketC5 = false;
+        for (com.google.gson.JsonElement seC5 : soldC5) if (seC5.getAsString().equals("rtshop:return_ticket")) soldTicketC5 = true;
+        check("the editors are told which items the NPC shops sell (the return ticket is one of them)", soldC5.size() > 20 && soldTicketC5, soldC5.size());
         com.rtshop.rules.LootRules.Rules lr = new com.rtshop.rules.LootRules.Rules();
         com.rtshop.rules.LootRules.Table t = new com.rtshop.rules.LootRules.Table();
         t.remove.add("minecraft:saddle");

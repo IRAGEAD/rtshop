@@ -98,7 +98,7 @@ public final class ClientSelfTest {
     private static final int PLOT_END = ENH_END + PLOT_STEPS;
     private static final int PS_STEPS = 9;
     private static final int PS_END = PLOT_END + PS_STEPS;
-    private static final int RULE_STEPS = 12;
+    private static final int RULE_STEPS = 17;
     private static final int RULE_END = PS_END + RULE_STEPS;
     /** 3.19 부터 덧붙인 시험들 (ClientSelfTest2): 단계 수는 그쪽 목록의 길이. */
     private static final int X_END = RULE_END + ClientSelfTest2.count();
@@ -983,6 +983,87 @@ public final class ClientSelfTest {
                         RtShop.LOGGER.warn("[rtshop-clienttest] could not reset loot rules", e);
                     }
                 });
+                wait = 10;
+            }
+            // ---- C-5: 편집 창의 검색과 분류
+            case 10 -> {
+                LootEditScreen ls = mc.screen instanceof LootEditScreen l ? l : null;
+                if (ls != null) {
+                    int allRows = ls.rowsShownForTest();
+                    ls.rowFilterForTest("saddle", "", 0);
+                    int saddleRows = ls.rowsShownForTest();
+                    ls.rowFilterForTest("", "", 1);
+                    int soldRows = ls.rowsShownForTest();
+                    ls.rowFilterForTest("", "", 2);
+                    int unsoldRows = ls.rowsShownForTest();
+                    ls.rowFilterForTest("", "food", 0);
+                    int foodRows = ls.rowsShownForTest();
+                    check("loot editor: a table's rows can be searched and narrowed by item kind and by 'sold in shops'",
+                            allRows > 5 && saddleRows == 1 && soldRows + unsoldRows == allRows && foodRows >= 1 && foodRows < allRows,
+                            allRows + " saddle " + saddleRows + " sold " + soldRows + " unsold " + unsoldRows + " food " + foodRows);
+                } else {
+                    check("loot editor: a table's rows can be searched and narrowed by item kind and by 'sold in shops'", false, mc.screen);
+                }
+                wait = 8;
+            }
+            case 11 -> {
+                shot(mc, "95b_loot_row_filters");
+                LootEditScreen ls = mc.screen instanceof LootEditScreen l ? l : null;
+                if (ls != null) {
+                    ls.rowFilterForTest("", "", 0);
+                    int allTables = ls.tablesForTest();
+                    ls.tableFilterForTest(1, false);
+                    int chestTables = ls.shownTablesForTest();
+                    ls.tableFilterForTest(2, false);
+                    int mobTables = ls.shownTablesForTest();
+                    ls.tableFilterForTest(0, true);
+                    int editedTables = ls.shownTablesForTest();
+                    check("loot editor: the table list splits into chests and mobs, and 'edited only' hides untouched tables",
+                            chestTables > 10 && mobTables > 10 && chestTables + mobTables == allTables && editedTables < allTables,
+                            chestTables + " + " + mobTables + " of " + allTables + ", edited " + editedTables);
+                    ls.tableFilterForTest(0, false);
+                    ls.findItemForTest("saddle");
+                }
+                wait = 40;
+            }
+            case 12 -> {
+                LootEditScreen ls = mc.screen instanceof LootEditScreen l ? l : null;
+                check("loot editor: searching by item lists only the loot tables that contain it (saddle: the dungeon chest is there, most tables are not)",
+                        ls != null && ls.foundReadyForTest() && ls.shownHasForTest("minecraft:chests/simple_dungeon")
+                                && ls.shownTablesForTest() < ls.tablesForTest(),
+                        ls == null ? mc.screen : ls.shownTablesForTest() + " of " + ls.tablesForTest());
+                wait = 8;
+            }
+            case 13 -> {
+                shot(mc, "95c_loot_find_by_item");
+                mc.setScreen(null);
+                onServer(mc, sp -> com.rtshop.rules.RulesEditor.handle(sp, com.rtshop.rules.RulesEditor.RECIPE_OPEN, "", ""));
+                wait = 40;
+            }
+            case 14 -> {
+                RecipeEditScreen rs = mc.screen instanceof RecipeEditScreen r ? r : null;
+                if (rs != null) {
+                    int total = rs.totalForTest();
+                    rs.filterForTest("sold", "", "", "");
+                    int soldN = rs.rowsForTest();
+                    boolean soldOk = rs.rowsAllForTest("", 1);
+                    rs.filterForTest("unsold", "", "", "");
+                    int unsoldN = rs.rowsForTest();
+                    rs.filterForTest("", "weapon", "", "minecraft");
+                    int weaponN = rs.rowsForTest();
+                    boolean weaponOk = rs.rowsAllForTest("weapon", -1);
+                    int sideN = rs.sideCountForTest("kind:weapon");
+                    check("recipe editor: 'sold in shops' / 'not in shops' split the whole list, filters combine (vanilla + weapons) and the side counts match",
+                            rs.soldKnownForTest() > 20 && soldN > 0 && soldOk && soldN + unsoldN == total && weaponN > 3 && weaponOk && sideN == weaponN,
+                            "sold " + soldN + " + " + unsoldN + " of " + total + ", weapons " + weaponN + " side " + sideN + " known " + rs.soldKnownForTest());
+                } else {
+                    check("recipe editor: 'sold in shops' / 'not in shops' split the whole list, filters combine (vanilla + weapons) and the side counts match", false, mc.screen);
+                }
+                wait = 8;
+            }
+            case 15 -> {
+                shot(mc, "90b_recipes_filters");
+                mc.setScreen(null);
                 wait = 10;
             }
             default -> {

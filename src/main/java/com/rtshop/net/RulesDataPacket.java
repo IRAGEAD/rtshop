@@ -12,6 +12,8 @@ public final class RulesDataPacket {
     public static final int RECIPES = 0;
     public static final int LOOT_LIST = 1;
     public static final int LOOT_TABLE = 2;
+    /** 아이템으로 찾은 전리품표 목록 (C-5). */
+    public static final int LOOT_FOUND = 3;
 
     public final int kind;
     public final String json;

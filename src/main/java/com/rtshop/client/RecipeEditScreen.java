@@ -38,8 +38,10 @@ public class RecipeEditScreen extends Screen {
     private final List<String> errors = new ArrayList<>();
     private String search = "";
     private int view = 0; // 0 전체, 1 막힌 것, 2 직접 만든 것
-    /** 왼쪽 묶음: "view:0" / "mod:<id>" / "type:<id>" */
+    /** 왼쪽 묶음에서 고른 보기: "view:0" · "view:1" · "view:2" */
     private String group = "view:0";
+    /** 겹쳐 쓰는 분류 (비어 있으면 가리지 않음): 상점 판매(sold/unsold) · 아이템 종류 · 만드는 곳 · 모드 */
+    private String fShop = "", fKind = "", fType = "", fMod = "";
     private final SideList side = new SideList();
     private int lx, rx0;
     private int scroll;
@@ -111,20 +113,45 @@ public class RecipeEditScreen extends Screen {
         return disabled.contains(r.id) || (!r.custom && (disabled.contains("item:" + r.out) || disabled.contains("mod:" + r.id.split(":")[0])));
     }
 
+    private static String modOf(Row r) {
+        return r.id.substring(0, Math.max(0, r.id.indexOf(':')));
+    }
+
+    /** 검색어: 조합법 ID · 결과 아이템 ID · 아이템 이름 · 모드 이름. */
+    private boolean matchesText(Row r, String q) {
+        return q.isEmpty() || r.id.contains(q) || r.out.contains(q) || RulesScreens.nameLc(r.out).contains(q)
+                || LootEditScreen.modName(modOf(r)).toLowerCase(Locale.ROOT).contains(q);
+    }
+
+    private boolean anyFilter() {
+        return view != 0 || !fShop.isEmpty() || !fKind.isEmpty() || !fType.isEmpty() || !fMod.isEmpty() || !search.trim().isEmpty();
+    }
+
+    private void clearFilters() {
+        view = 0;
+        group = "view:0";
+        fShop = "";
+        fKind = "";
+        fType = "";
+        fMod = "";
+        search = "";
+        scroll = 0;
+    }
+
     private void filter() {
         rows.clear();
         String q = search.toLowerCase(Locale.ROOT).trim();
         for (Row r : all) {
             if (view == 1 && !blocked(r)) continue;
             if (view == 2 && !custom.containsKey(r.id)) continue;
-            if (group.startsWith("mod:") && !r.id.startsWith(group.substring(4) + ":")) continue;
-            if (group.startsWith("type:") && !shortType(r).equals(group.substring(5))) continue;
-            if (!q.isEmpty()) {
-                String name = RulesScreens.name(r.out).toLowerCase(Locale.ROOT);
-                if (!r.id.contains(q) && !r.out.contains(q) && !name.contains(q)) continue;
-            }
+            if (!fShop.isEmpty() && RulesScreens.SOLD.contains(r.out) != fShop.equals("sold")) continue;
+            if (!fKind.isEmpty() && !RulesScreens.kind(r.out).equals(fKind)) continue;
+            if (!fType.isEmpty() && !shortType(r).equals(fType)) continue;
+            if (!fMod.isEmpty() && !modOf(r).equals(fMod)) continue;
+            if (!matchesText(r, q)) continue;
             rows.add(r);
         }
+        buildSide();
     }
 
     /** 조합 종류의 짧은 ID (crafting, smelting, …). */
@@ -155,19 +182,55 @@ public class RecipeEditScreen extends Screen {
         };
     }
 
+    /** 왼쪽 묶음을 다시 만든다. 개수는 "검색어 + 다른 분류"를 적용했을 때 그 항목에 남는 수다 (골라 보기 전에 몇 개인지 알 수 있게). */
     private void buildSide() {
         side.items.clear();
         side.selected = group;
-        side.header(Component.translatable("rtshop.rules.side_view").getString());
-        side.item("view:0", Component.translatable("rtshop.rules.view_all").getString(), all.size(), 0);
-        side.item("view:1", Component.translatable("rtshop.rules.view_blocked").getString(), (int) all.stream().filter(this::blocked).count(), 0xB03A2E);
-        side.item("view:2", Component.translatable("rtshop.rules.view_custom").getString(), custom.size(), 0x2F6EA8);
+        side.marks.clear();
+        if (!fShop.isEmpty()) side.marks.add("shop:" + fShop);
+        if (!fKind.isEmpty()) side.marks.add("kind:" + fKind);
+        if (!fType.isEmpty()) side.marks.add("type:" + fType);
+        if (!fMod.isEmpty()) side.marks.add("mod:" + fMod);
+        String q = search.toLowerCase(Locale.ROOT).trim();
+        int[] views = new int[3];
+        Map<String, Integer> shops = new java.util.HashMap<>();
+        Map<String, Integer> kinds = new java.util.HashMap<>();
         Map<String, Integer> types = new java.util.TreeMap<>();
         Map<String, Integer> mods = new java.util.TreeMap<>((a, b) -> a.equals(b) ? 0 : a.equals("minecraft") ? -1 : b.equals("minecraft") ? 1 : a.compareTo(b));
         for (Row r : all) {
-            types.merge(shortType(r), 1, Integer::sum);
-            mods.merge(r.id.substring(0, Math.max(0, r.id.indexOf(':'))), 1, Integer::sum);
+            if (!matchesText(r, q)) continue;
+            boolean isBlocked = blocked(r), isCustom = custom.containsKey(r.id);
+            String kind = RulesScreens.kind(r.out), type = shortType(r), mod = modOf(r);
+            String shop = RulesScreens.SOLD.contains(r.out) ? "sold" : "unsold";
+            boolean okView = view == 0 || (view == 1 && isBlocked) || (view == 2 && isCustom);
+            boolean okShop = fShop.isEmpty() || fShop.equals(shop);
+            boolean okKind = fKind.isEmpty() || fKind.equals(kind);
+            boolean okType = fType.isEmpty() || fType.equals(type);
+            boolean okMod = fMod.isEmpty() || fMod.equals(mod);
+            if (okShop && okKind && okType && okMod) {
+                views[0]++;
+                if (isBlocked) views[1]++;
+                if (isCustom) views[2]++;
+            }
+            if (okView && okKind && okType && okMod) shops.merge(shop, 1, Integer::sum);
+            if (okView && okShop && okType && okMod) kinds.merge(kind, 1, Integer::sum);
+            if (okView && okShop && okKind && okMod) types.merge(type, 1, Integer::sum);
+            if (okView && okShop && okKind && okType) mods.merge(mod, 1, Integer::sum);
         }
+        side.header(Component.translatable("rtshop.rules.side_view").getString());
+        side.item("view:0", Component.translatable("rtshop.rules.view_all").getString(), views[0], 0);
+        side.item("view:1", Component.translatable("rtshop.rules.view_blocked").getString(), views[1], 0xB03A2E);
+        side.item("view:2", Component.translatable("rtshop.rules.view_custom").getString(), views[2], 0x2F6EA8);
+        side.header(Component.translatable("rtshop.rules.side_shop").getString());
+        side.item("shop:sold", Component.translatable("rtshop.rules.shop.sold").getString(), shops.getOrDefault("sold", 0), 0x3D8B3D);
+        side.item("shop:unsold", Component.translatable("rtshop.rules.shop.unsold").getString(), shops.getOrDefault("unsold", 0), 0);
+        side.header(Component.translatable("rtshop.rules.side_kind").getString());
+        for (String k : RulesScreens.KINDS) {
+            int n = kinds.getOrDefault(k, 0);
+            if (n > 0 || k.equals(fKind)) side.item("kind:" + k, RulesScreens.kindName(k), n, RulesScreens.kindColor(k));
+        }
+        if (!fType.isEmpty()) types.putIfAbsent(fType, 0);
+        if (!fMod.isEmpty()) mods.putIfAbsent(fMod, 0);
         side.header(Component.translatable("rtshop.rules.side_type").getString());
         for (Map.Entry<String, Integer> e : types.entrySet()) side.item("type:" + e.getKey(), typeName(e.getKey()), e.getValue(), typeColor(e.getKey()));
         side.header(Component.translatable("rtshop.rules.side_mod").getString());
@@ -184,12 +247,16 @@ public class RecipeEditScreen extends Screen {
         int lw = Math.min(130, W / 4);
         rx0 = lx + lw + 8;
         side.x = lx;
-        side.y = fy + 46;
+        side.y = fy + 28;
         side.w = lw - 4;
         side.h = fy + H - 14 - side.y;
-        buildSide();
         filter();
-        EditBox sb = new EditBox(font, fx + 10, fy + 26, lw - 2, 14, Component.empty());
+        int nw = font.width(Component.translatable("rtshop.rules.new_recipe")) + 12;
+        int newX = Math.max(rx0 + 4, fx + W - 8 - nw);
+        // 검색 칸: 목록 바로 위에 넓게 (이름 · ID · 모드 이름으로 찾는다). 오른쪽의 ✕ 는 검색어와 분류를 모두 푼다
+        int sw = Math.max(60, newX - 24 - rx0);
+        EditBox sb = new EditBox(font, rx0, fy + 26, sw, 14, Component.empty());
+        sb.setMaxLength(60);
         sb.setValue(search);
         sb.setHint(Component.translatable("rtshop.rules.search_recipe"));
         sb.setResponder(v -> {
@@ -201,10 +268,14 @@ public class RecipeEditScreen extends Screen {
             }
         });
         addRenderableWidget(sb);
-        int vx = rx0;
-        int nw = font.width(Component.translatable("rtshop.rules.new_recipe")) + 12;
+        Button clr = MButton.of(Component.literal("✕"), b -> {
+            clearFilters();
+            rebuildWidgets();
+        }).bounds(rx0 + sw + 3, fy + 25, 16, 16).build();
+        clr.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("rtshop.rules.clear_filters")));
+        addRenderableWidget(clr);
         addRenderableWidget(MButton.of(Component.translatable("rtshop.rules.new_recipe"), b -> minecraft.setScreen(new RecipeMakeScreen(this, null, null)))
-                .bounds(Math.max(vx + 4, fx + W - 8 - nw), fy + 25, nw, 16).build());
+                .bounds(newX, fy + 25, nw, 16).build());
         listY = fy + 47;
         visible = (fy + H - 30 - listY) / ROW;
         rebuildRows();
@@ -240,6 +311,7 @@ public class RecipeEditScreen extends Screen {
                 Button ib = MButton.of(Component.translatable(itemOff ? "rtshop.rules.item_on" : "rtshop.rules.item_off"), b -> {
                     if (!disabled.remove("item:" + r.out)) disabled.add("item:" + r.out);
                     dirty = true;
+                    buildSide();
                     rebuildRows();
                 }).bounds(bx, y, 48, 18).build();
                 ib.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("rtshop.rules.item_tip", RulesScreens.name(r.out))));
@@ -250,6 +322,7 @@ public class RecipeEditScreen extends Screen {
             add(MButton.of(Component.translatable(off ? "rtshop.rules.unblock" : "rtshop.rules.block"), b -> {
                 if (!disabled.remove(r.id)) disabled.add(r.id);
                 dirty = true;
+                buildSide();
                 rebuildRows();
             }).bounds(bx, y, 44, 18).build());
         }
@@ -269,8 +342,18 @@ public class RecipeEditScreen extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (side.click(mx, my, k -> {
-            group = k;
-            view = k.startsWith("view:") ? Integer.parseInt(k.substring(5)) : 0;
+            if (k.startsWith("view:")) {
+                group = k;
+                view = Integer.parseInt(k.substring(5));
+            } else if (k.startsWith("shop:")) {
+                fShop = fShop.equals(k.substring(5)) ? "" : k.substring(5);
+            } else if (k.startsWith("kind:")) {
+                fKind = fKind.equals(k.substring(5)) ? "" : k.substring(5);
+            } else if (k.startsWith("type:")) {
+                fType = fType.equals(k.substring(5)) ? "" : k.substring(5);
+            } else if (k.startsWith("mod:")) {
+                fMod = fMod.equals(k.substring(4)) ? "" : k.substring(4);
+            }
             scroll = 0;
             filter();
             rebuildRows();
@@ -316,6 +399,11 @@ public class RecipeEditScreen extends Screen {
             int cx = ix + 22;
             String st = shortType(r);
             cx = chip(g, cx, y + 11, typeName(st), typeColor(st));
+            if (!r.out.isEmpty()) {
+                String kd = RulesScreens.kind(r.out);
+                if (!kd.equals("other")) cx = chip(g, cx, y + 11, RulesScreens.kindName(kd), RulesScreens.kindColor(kd));
+                if (RulesScreens.SOLD.contains(r.out)) cx = chip(g, cx, y + 11, Component.translatable("rtshop.rules.sold_tag").getString(), 0x3D8B3D);
+            }
             if (off) cx = chip(g, cx, y + 11, Component.translatable("rtshop.rules.blocked_tag").getString(), 0xB03A2E);
             Ui.scaledText(g, font, Ui.clip(font, r.id, (int) ((ix + 22 + textW - cx) / 0.7F)), cx + 2, y + 12, 0.7F, Ui.C_INK_SOFT, false);
             g.fill(rx0, y + ROW - 2, fx + W - 8, y + ROW - 1, 0x20000000);
@@ -349,11 +437,40 @@ public class RecipeEditScreen extends Screen {
     }
 
     public void searchForTest(String q, int v) {
+        clearFilters();
         search = q;
         view = v;
         group = "view:" + v;
+        rebuildWidgets();
+    }
+
+    /** 분류를 겹쳐 건다 (빈 글자 = 가리지 않음). */
+    public void filterForTest(String shop, String kind, String type, String mod) {
+        fShop = shop;
+        fKind = kind;
+        fType = type;
+        fMod = mod;
         scroll = 0;
         rebuildWidgets();
+    }
+
+    /** 왼쪽 묶음에 이 항목이 있으면 그 개수, 없으면 -1. */
+    public int sideCountForTest(String key) {
+        for (SideList.Item it : side.items) if (!it.header && it.key.equals(key)) return it.count;
+        return -1;
+    }
+
+    /** 지금 보이는 줄이 모두 이 조건에 맞는가 (sold: 1 파는 것, 0 없는 것, -1 안 봄). */
+    public boolean rowsAllForTest(String kind, int sold) {
+        for (Row r : rows) {
+            if (!kind.isEmpty() && !RulesScreens.kind(r.out).equals(kind)) return false;
+            if (sold >= 0 && RulesScreens.SOLD.contains(r.out) != (sold == 1)) return false;
+        }
+        return true;
+    }
+
+    public int soldKnownForTest() {
+        return RulesScreens.SOLD.size();
     }
 
     public void toggleFirstForTest() {

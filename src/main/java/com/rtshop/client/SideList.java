@@ -29,6 +29,8 @@ final class SideList {
 
     final List<Item> items = new ArrayList<>();
     String selected = "";
+    /** 함께 골라진 것으로 보일 항목들 (분류를 여러 개 겹쳐 쓸 때). */
+    final java.util.Set<String> marks = new java.util.HashSet<>();
     int scroll;
     int x, y, w, h;
     static final int ROW = 13;
@@ -72,7 +74,7 @@ final class SideList {
                 g.drawString(font, Ui.clip(font, it.label, w - 6), x + 3, ry + 3, Ui.C_CREAM, false);
                 continue;
             }
-            boolean sel = it.key.equals(selected);
+            boolean sel = it.key.equals(selected) || marks.contains(it.key);
             boolean hover = mx >= x && mx < x + w && my >= ry && my < ry + ROW;
             if (sel) {
                 g.fill(x, ry, x + w, ry + ROW, 0xFFF2E4BD);
