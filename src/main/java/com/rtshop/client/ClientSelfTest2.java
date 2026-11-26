@@ -34,6 +34,9 @@ final class ClientSelfTest2 {
 
     private static final List<Step> STEPS = new ArrayList<>();
     private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static volatile net.minecraft.core.BlockPos ANVIL_364;
+    private static volatile float[] ANVIL_ROT_364;
+    private static long ANVIL_DRAWN_364;
     private static volatile long LOOK_DRAWN;
     private static volatile int npc = -1;
     static volatile int qnpc = -1;
@@ -1896,6 +1899,32 @@ final class ClientSelfTest2 {
                 com.rtshop.quest.QuestManager.loaded().npcs.remove("t_comp");
             });
             waitTicks(30);
+        });
+        // 3.64: 강화 모루의 빛 — 다가가 서 있으면 받침의 룬 띠와 옆면의 보석이 켜진다 (그림으로 확인: 130_anvil_glow)
+        add(mc -> {
+            onServer(mc, sp -> {
+                net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
+                double fx = look.x, fz = look.z, len = Math.max(0.01, Math.sqrt(fx * fx + fz * fz));
+                net.minecraft.core.BlockPos at364 = net.minecraft.core.BlockPos.containing(sp.getX() + fx / len * 2.6, sp.getY(), sp.getZ() + fz / len * 2.6);
+                for (int dy364 = 0; dy364 <= 2; dy364++) sp.serverLevel().setBlockAndUpdate(at364.above(dy364), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                sp.serverLevel().setBlockAndUpdate(at364, com.rtshop.enhance.ModEnhance.ANVIL.get().defaultBlockState());
+                ANVIL_364 = at364;
+                ANVIL_ROT_364 = new float[]{sp.getYRot(), sp.getXRot()};
+                sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), sp.getYRot(), 32F);
+            });
+            ANVIL_DRAWN_364 = EnhanceAnvilGlow.drawnForTest;
+            waitTicks(70);
+        });
+        add(mc -> {
+            float lv364 = ANVIL_364 == null ? -1F : EnhanceAnvilGlow.levelForTest(ANVIL_364);
+            check("3.64 the enhance anvil lights up when someone stands near it: its glow is fully on and is really being drawn (rune band and gem, two layers)",
+                    lv364 > 0.95F && EnhanceAnvilGlow.drawnForTest > ANVIL_DRAWN_364, lv364 + " drawn=" + (EnhanceAnvilGlow.drawnForTest - ANVIL_DRAWN_364));
+            shot(mc, "130_anvil_glow");
+            onServer(mc, sp -> {
+                if (ANVIL_364 != null) sp.serverLevel().setBlockAndUpdate(ANVIL_364, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                if (ANVIL_ROT_364 != null) sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), ANVIL_ROT_364[0], ANVIL_ROT_364[1]);
+            });
+            waitTicks(15);
         });
         // 3.61: NPC 외형(사람 모습) · 보스 등장의 3D 카메라 · 민원 창
         add(mc -> {

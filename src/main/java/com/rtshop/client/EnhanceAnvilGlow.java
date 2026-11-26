@@ -35,6 +35,11 @@ public final class EnhanceAnvilGlow {
 
     private static final ResourceLocation SIDE = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_side.png");
     private static final ResourceLocation GEM = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_anvil.png");
+    /** 3.64: 빛을 한 겹 더 — 거미 눈처럼 스스로 빛나는 그리기(더하기 섞기)로 덧그린다. 셰이더는 이 그리기를 "빛나는 것"으로 다뤄 번지는 빛을 준다. */
+    private static final ResourceLocation SIDE_ADD = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_side_add.png");
+    private static final ResourceLocation GEM_ADD = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_anvil_add.png");
+    /** 점검용: 빛을 그린 횟수 (모루 하나에 한 번). */
+    public static long drawnForTest;
     /** 이 거리 안으로 오면 켜진다. */
     public static final double NEAR = 5.0;
     private static final float UP = 1F / 40F, DOWN = 1F / 70F;
@@ -137,7 +142,25 @@ public final class EnhanceAnvilGlow {
                 gemQuad(gem, m, g0, y0, n, g1, y1, n, g0, g1, a);
                 gemQuad(gem, m, g1, y0, f, g0, y1, f, g1, g0, a);
             }
+            // 둘째 겹: 스스로 빛나는 그리기. 같은 자리에서 조금 더 바깥에 (먼저 그린 겹과 겹쳐 깜빡이지 않게).
+            int c = Mth.clamp(Math.round(a * 0.75F), 0, 255);
+            VertexConsumer sideAdd = buf.getBuffer(RenderType.eyes(SIDE_ADD));
+            float d0 = e0 - 0.002F, d1 = e1 + 0.002F;
+            lit(sideAdd, m, lo, 0, d0, hi, top, d0, 1 - lo, 1 - hi, c, 0, 0, -1);
+            lit(sideAdd, m, hi, 0, d1, lo, top, d1, hi, lo, c, 0, 0, 1);
+            lit(sideAdd, m, d0, 0, hi, d0, top, lo, hi, lo, c, -1, 0, 0);
+            lit(sideAdd, m, d1, 0, lo, d1, top, hi, 1 - lo, 1 - hi, c, 1, 0, 0);
+            VertexConsumer gemAdd = buf.getBuffer(RenderType.eyes(GEM_ADD));
+            float n2 = n - 0.002F, f2 = f + 0.002F;
+            if (EnhanceAnvilBlock.alongZ(st)) {
+                lit(gemAdd, m, n2, y0, g1, n2, y1, g0, g1, g0, c, -1, 0, 0);
+                lit(gemAdd, m, f2, y0, g0, f2, y1, g1, g0, g1, c, 1, 0, 0);
+            } else {
+                lit(gemAdd, m, g0, y0, n2, g1, y1, n2, g0, g1, c, 0, 0, -1);
+                lit(gemAdd, m, g1, y0, f2, g0, y1, f2, g1, g0, c, 0, 0, 1);
+            }
             ps.popPose();
+            drawnForTest++;
             any = true;
         }
         if (any) buf.endBatch();
@@ -154,6 +177,23 @@ public final class EnhanceAnvilGlow {
         put(vc, m, x1, y1, z1, u1, v1, a);
         put(vc, m, x1, y0, z1, u1, v0, a);
         put(vc, m, x0, y0, z0, u0, v0, a);
+    }
+
+    /** 스스로 빛나는 네모 (앞뒤 두 번). 밝기는 빛깔로 조절한다 — 더하기 섞기는 투명도를 보지 않는다. */
+    private static void lit(VertexConsumer vc, Matrix4f m, float x0, float y0, float z0, float x1, float y1, float z1, float u0, float u1, int c, float nx, float ny, float nz) {
+        float v0 = 1F - y0, v1 = 1F - y1;
+        litPut(vc, m, x0, y0, z0, u0, v0, c, nx, ny, nz);
+        litPut(vc, m, x1, y0, z1, u1, v0, c, nx, ny, nz);
+        litPut(vc, m, x1, y1, z1, u1, v1, c, nx, ny, nz);
+        litPut(vc, m, x0, y1, z0, u0, v1, c, nx, ny, nz);
+        litPut(vc, m, x0, y1, z0, u0, v1, c, nx, ny, nz);
+        litPut(vc, m, x1, y1, z1, u1, v1, c, nx, ny, nz);
+        litPut(vc, m, x1, y0, z1, u1, v0, c, nx, ny, nz);
+        litPut(vc, m, x0, y0, z0, u0, v0, c, nx, ny, nz);
+    }
+
+    private static void litPut(VertexConsumer vc, Matrix4f m, float x, float y, float z, float u, float v, int c, float nx, float ny, float nz) {
+        vc.vertex(m, x, y, z).color(c, c, c, 255).uv(u, v).overlayCoords(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(nx, ny, nz).endVertex();
     }
 
     private static void gemQuad(VertexConsumer vc, Matrix4f m, float x0, float y0, float z0, float x1, float y1, float z1, float u0, float u1, int a) {

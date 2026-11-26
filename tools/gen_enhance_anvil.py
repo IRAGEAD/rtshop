@@ -96,6 +96,22 @@ def make_textures():
     for z in range(z0, z1 + 1): px[x0, z] = shade(BRASS, 1); px[x1, z] = shade(BRASS, .92)
     for (x, z) in ((x0, z0), (x1, z0), (x0, z1), (x1, z1)): px[x, z] = shade(BRASS_L, 1)
     out['enh_anvil_top'] = t
+    # 3.64: 빛을 한 겹 더 (더하기 섞기로 그리는 그림): 빛깔에 투명도를 미리 곱해 둔다 — 더하기 섞기는 투명도를 보지 않는다.
+    # 룬 · 보석의 둘레로 두 칸까지 옅게 번지는 빛을 넣어, 멀리서도(그리고 셰이더에서도) 켜진 것이 보이게 한다.
+    def additive(src, spread=2):
+        w, h = src.size; sp = src.load(); o = Image.new('RGBA', (w, h), (0, 0, 0, 0)); op = o.load()
+        core = [(x, y) for y in range(h) for x in range(w) if sp[x, y][3] == 255]
+        for (x, y) in core:
+            for dx in range(-spread, spread + 1):
+                for dy in range(-spread, spread + 1):
+                    d = abs(dx) + abs(dy)
+                    if d == 0 or d > spread or not (0 <= x + dx < w and 0 <= y + dy < h): continue
+                    a = 120 if d == 1 else 55
+                    if op[x + dx, y + dy][3] < a: op[x + dx, y + dy] = tuple(int(v * a / 255) for v in EMBER) + (a,)
+        for (x, y) in core: op[x, y] = EMBER_H + (255,)
+        return o
+    out['enh_glow_side_add'] = additive(out['enh_glow_side'])
+    out['enh_glow_anvil_add'] = additive(out['enh_glow_anvil'])
     for n, im in out.items(): im.save(os.path.join(ASSETS, 'textures', 'block', n + '.png'))
     return out
 
