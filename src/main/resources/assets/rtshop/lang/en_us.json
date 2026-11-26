@@ -1891,5 +1891,6 @@
   "rtshop.rules.row_kind": "Kind: %s",
   "rtshop.rules.row_shop.0": "Shop: all",
   "rtshop.rules.row_shop.1": "§aShop: sold",
-  "rtshop.rules.row_shop.2": "§cShop: not sold"
+  "rtshop.rules.row_shop.2": "§cShop: not sold",
+  "rtshop.tip.flex_dish": "Cooked with one set of ingredients - priced by what went in (%s of the list price)"
 }

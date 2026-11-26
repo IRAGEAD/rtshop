@@ -403,7 +403,8 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
                     shown.setCount(1);
                     r = new Row(idx, e, shown, name);
                     r.key = key;
-                    r.mult = data.qualityMultiplier(e, s);
+                    // 기준 매입가 대비 배율: 별·무게 보정과, 자유 조리 요리(재료 한 벌 값 기준)의 낮은 값까지 함께 본다
+                    r.mult = e.sellUnit > 0 ? data.sellUnitFor(e, s) / e.sellUnit : data.qualityMultiplier(e, s);
                     r.unit = key / 100.0;
                     groups.put(gk, r);
                 }
@@ -943,6 +944,9 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         String pct = listPercent(r);
         if (star > 0) {
             return Component.translatable("rtshop.tip.star_bonus", SeedRules.starText(star), pct).withStyle(ChatFormatting.YELLOW);
+        }
+        if (ShopData.cuisineQuality(r.shown) >= 0) {
+            return Component.translatable("rtshop.tip.flex_dish", pct).withStyle(ChatFormatting.RED);
         }
         CompoundTag tag = r.shown.getTag();
         if (tag != null && tag.contains(ShopData.FISH_INFO_TAG, 10)) {

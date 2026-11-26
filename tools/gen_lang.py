@@ -562,6 +562,7 @@ NEW = {
  "rtshop.tip.fish_weight": ("무게 %s · 가격표 가격의 %s", "Weight %s - %s of the list price"),
  "rtshop.tip.fish_golden": ("황금 물고기 · 가격표 가격의 %s", "Golden fish - %s of the list price"),
  "rtshop.tip.fish_noinfo": ("무게 정보 없음 · 가격표 가격의 %s", "No weight data - %s of the list price"),
+ "rtshop.tip.flex_dish": ("재료를 한 벌만 넣어 만든 요리 · 넣은 재료 값 기준 (가격표 가격의 %s)", "Cooked with one set of ingredients - priced by what went in (%s of the list price)"),
  "rtshop.tip.recipe_head": ("매입가 기준 재료 (가장 싼 조리법, 1회에 %s개):", "Buy-back price is based on (cheapest recipe, makes %s):"),
  "rtshop.tip.recipe_line": (" · %s ×%s", " - %s x%s"),
  "rtshop.msg.villager_blocked": ("이 서버에서는 주민과 거래할 수 없습니다.", "Villager trading is disabled on this server."),

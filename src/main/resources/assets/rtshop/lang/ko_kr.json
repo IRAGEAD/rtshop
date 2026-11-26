@@ -1891,5 +1891,6 @@
   "rtshop.rules.row_kind": "종류: %s",
   "rtshop.rules.row_shop.0": "상점: 전체",
   "rtshop.rules.row_shop.1": "§a상점: 파는 것",
-  "rtshop.rules.row_shop.2": "§c상점: 없는 것"
+  "rtshop.rules.row_shop.2": "§c상점: 없는 것",
+  "rtshop.tip.flex_dish": "재료를 한 벌만 넣어 만든 요리 · 넣은 재료 값 기준 (가격표 가격의 %s)"
 }
