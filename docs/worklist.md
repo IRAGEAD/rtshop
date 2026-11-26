@@ -156,3 +156,30 @@
 - B-20 ✔: 이야기 장소로 들어가는 법 → `docs/story_places.md` + 안내서 세 쪽(시작하기: 「이야기 장소로 가는 법」 · 「흔적 살펴보기」 · 「기억의 문」, guide.json 2판, 영어 `en2/p750.py`).
   - 연습용 기억의 문 = 흔적(살펴보기 표식). 들어가는 곳이 아니라 다가가 우클릭하는 것. 기억의 문(보스전)은 퀘스트 수첩·퀘스트 이야기의 단추로 들어간다.
   - 함께 고친 것: ① 퀘스트 표시(HUD)의 「➤ 어느 쪽 약 몇 칸」 이 나타나 있는 흔적의 자리도 가리킨다 (말을 걸 사람이 남아 있으면 그 사람이 먼저; `QuestManager.hudEntries` · 점검용 `hudWhere`). ② 퀘스트를 포기하면 아직 살펴보지 않은 흔적의 자리를 잊는다 → 다시 받으면 곁에 새로 나타남 (`Spots.forgetQuest`).
+
+## 추가 요청 (11-26 13:16) → 3.58.0
+
+- D-1. 기억의 문에 파티원이 함께 들어가는 거리를 16칸으로.
+- D-2. 진짜 기억의 문(연습용 제외): 단추를 누르면 바로 넘어가지 않고 문이 나타나고, 걸어 들어가야 보스 구역으로 간다.
+- D-3. 보스 구역에 들어서자마자 싸우지 않게: 대기 시간 또는 상호작용 뒤에 시작, 그 시간에 연출.
+- D-4. 요리: 권장안대로 진행하고 자세히 설명.
+- D-5. 던전 모드와 관계없는 Create 관련 조합법·전리품 전부 금지.
+- D-6. 히든 직업·주식 시스템: 좋은 아이디어 제시 (만들지는 않음).
+- D-7. NPC 자리 배치: 게임 안에서 정한 자리가 다른 서버에도 자동 적용.
+- D-8. 마을 이식 명령: 설명.
+- D-9. 미니맵의 NPC 아이콘: 한 번 이상 대화한 NPC 만, 설정에서 켜고 끄기.
+- NPC 외형과 음악은 나중에 말해 주기로 함. 끝나면 다음 세션용 지시사항 정리.
+
+## 3.58.0 (11-26 오후, 같은 세션 · 작업 가지 v5-next8)
+
+- D-1·2·3 ✔ 기억의 문 (`story/StoryArena`, 설정 `story_arenas.json` 의 walkIn · gateSeconds 60 · partyRange 16 · waitSeconds 45 — 예전 파일에는 저절로 덧붙임)
+  - `/rtshop arena <보스>`(단추) = `openGate`: 바라보던 쪽 서너 칸 앞의 디딜 수 있는 바닥에 문을 연다 (`Gate`: 주인 · 자리 · 닫히는 때). 문의 모습은 서버가 보내는 입자(재의 원 · 불씨 · 불빛 문틀 · 글자)라 누구에게나 보이고 블록을 놓지 않는다.
+  - 주인이 문 안(반경 1칸)에 들어서면 `enter` → 보스 구역. 그 순간 partyRange 안의 파티원이 함께 가고, 그 뒤에는 보스가 깨어나기 전까지 파티원이 문으로 걸어 들어와 합류(`place`). 문은 주인이 한 번 문 밖에 서야 켜진다(`armed`: 발밑에 열렸을 때 곧바로 넘어가지 않게).
+  - 보스 구역: 가운데에 받침(조각된 흑암) + 모닥불 = 불씨. 우클릭(또는 부수려 함 · `/rtshop arena start`)하면 `wake` → 80틱의 깨어남 연출(`wakeFx`: 불꽃의 원이 가운데로, 소리가 높아짐) → `burst`(번쩍임, 받침을 치움) → 보스. waitSeconds 가 지나면 저절로 `wake`. 보스가 나타난 뒤의 등장 연출(BossIntros)은 그대로 이어진다.
+  - 문과 싸움은 `Gate.session` 으로 묶는다 (칸 번호는 다시 쓰이므로 번호만으로 보면 남의 싸움에 붙을 수 있음).
+- D-4 ✔ 요리 권장안: `RecipeRules.COOK_GAPS`(모드 조리법 6개) + `COOK_GAPS_FD`(바닐라 3개, Farmer's Delight 가 있을 때만)를 recipes.json 에 한 번만 덧붙임 (`_applied`). 설명은 `docs/cooking_gaps.md` 끝.
+- D-5 ✔ Create 금지: item_policy.json 3판 — recipeBanMods 에 create, recipeBan · lootBan 에 create:*, 새 항목 blockDropBan(create:* : 블록을 캤을 때도 안 나옴). 깔린 2판 파일은 저절로 3판으로.
+  - Create 는 던전 모드 IDAS 가 건축물에 쓰느라 들어 있다 (ci-inspect 의 create-uses.txt). 건축물에 놓인 블록은 그대로이고, 만들기 · 상자에서 줍기 · 캐서 얻기가 막힌다.
+- D-7 ✔ NPC 자리 배치: `quest/NpcLayout` (월드 데이터 rtshop_npc_layout, 파일 `config/rtshop/npc_layout.json`). 쓰는 법 `docs/npc_layout.md`. 명령 `/rtshop npc layout [save|apply]`.
+- D-9 ✔ 미니맵 NPC 아이콘: Diorama 의 레이더(`dev.diorama.render.Radar.collect` 가 `Radar.kind` 를 묻는 자리)에 `mixin/DioramaRadarMixin`. 서버가 지도 표시와 함께 "말을 걸어 본 NPC"의 UUID 목록을 보내고(`MAP_MARKS` 의 radar · marks 의 "npc:UUID"), 화면 쪽이 NoAI + 이름 붙은 주민 가운데 목록에 없는 것을 뺀다. `/rtshop hud` 의 「미니맵 NPC 아이콘」 단추로 모두 끔 (client.json 의 minimapNpcIcons). 서버 설정 map_marks.json 의 radarKnownOnly.
+- D-6 ✔ 제안: `docs/ideas_hidden_jobs_stock.md` (사용자가 안을 고르면 만든다). D-8 ✔ 설명 (계획 문서 `docs/town_transplant.md` 그대로).
