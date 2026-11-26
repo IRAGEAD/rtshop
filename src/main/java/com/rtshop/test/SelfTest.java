@@ -3702,6 +3702,44 @@ public final class SelfTest {
                         && l.quests.containsKey("hidden_illusioner_6") == ill
                         && (!ill || (l.quests.get("hidden_illusioner_1").requires.contains("story_5_12") && l.quests.get("hidden_illusioner_6").choices.size() == 2)),
                 ash == null ? "null" : ash.toJson());
+        // 3.60: 이글루 걸음은 사람마다 따로 받아야 하는 발전과제 대신 흔적에 황금 사과를 건넨다 / 프로스트모의 뜻 없는 선택지는 없앴다
+        QuestDef ig360 = l.quests.get("story_1_10"), fr360 = l.quests.get("story_2_15");
+        boolean adv360 = false, gold360 = false;
+        if (ig360 != null) {
+            for (QuestDef.Objective ob360 : ig360.objectives) {
+                if (ob360.type == QuestDef.Type.ADVANCEMENT) adv360 = true;
+                if (ob360.type == QuestDef.Type.INSPECT && ob360.use.equals("minecraft:golden_apple") && ob360.after.equals("c1_igloo")) gold360 = true;
+            }
+        }
+        check("3.60: the igloo step needs no personal advancement (a golden apple at a trace instead) and the frost giant's leftover choice is gone",
+                ig360 != null && !adv360 && gold360 && (fr360 == null || fr360.choices.isEmpty()), adv360 + " " + gold360);
+        // 3.60: 민원 — 접수(글 다듬기 · 자리) · 간격 · 빈 글 · 긴 글 · 답변 · 답 달린 것은 못 거둠 · 종결 · 한도 · 저장 · 명령
+        com.rtshop.petition.Petitions.forTestReset(a.server);
+        int mwA = com.rtshop.petition.Petitions.file(a, "  땅 경계가   이상해요  ");
+        int mwSoon = com.rtshop.petition.Petitions.file(a, "바로 또");
+        com.rtshop.petition.Petitions.forTestNoCooldown();
+        int mwEmpty = com.rtshop.petition.Petitions.file(a, "   ");
+        int mwLong = com.rtshop.petition.Petitions.file(a, "가".repeat(com.rtshop.petition.Petitions.MAX_LEN + 1));
+        com.rtshop.petition.Petitions.Entry mwE = com.rtshop.petition.Petitions.find(a.server, mwA);
+        boolean mwText = mwE != null && mwE.text.equals("땅 경계가 이상해요") && mwE.state == com.rtshop.petition.Petitions.OPEN && !mwE.dim.isEmpty();
+        boolean mwAns = com.rtshop.petition.Petitions.answer(a.server, mwA, "op", "확인했습니다") && mwE != null
+                && mwE.state == com.rtshop.petition.Petitions.ANSWERED && mwE.answer.equals("확인했습니다");
+        boolean mwKeep = !com.rtshop.petition.Petitions.cancel(a, mwA);
+        boolean mwClose = com.rtshop.petition.Petitions.close(a.server, mwA) && !com.rtshop.petition.Petitions.close(a.server, mwA);
+        int mwMany = 0;
+        for (int mwI = 0; mwI < com.rtshop.petition.Petitions.MAX_OPEN + 1; mwI++) {
+            com.rtshop.petition.Petitions.forTestNoCooldown();
+            mwMany = com.rtshop.petition.Petitions.file(a, "민원 " + mwI);
+        }
+        net.minecraft.nbt.CompoundTag mwTag = com.rtshop.petition.Petitions.data(a.server).save(new net.minecraft.nbt.CompoundTag());
+        boolean mwRound = com.rtshop.petition.Petitions.Data.load(mwTag).list.size() == com.rtshop.petition.Petitions.MAX_OPEN + 1;
+        boolean mwCmd = a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "report", "write")) != null
+                && a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "report", "answer")) != null;
+        com.rtshop.petition.Petitions.forTestReset(a.server);
+        check("3.60 reports: filing trims the text and records the place, the cooldown, empty and long texts and the open limit refuse, an answer and a close change the state, an answered one cannot be withdrawn, the data survives saving, the commands exist",
+                mwA > 0 && mwSoon == com.rtshop.petition.Petitions.ERR_SOON && mwEmpty == com.rtshop.petition.Petitions.ERR_EMPTY && mwLong == com.rtshop.petition.Petitions.ERR_LONG
+                        && mwText && mwAns && mwKeep && mwClose && mwMany == com.rtshop.petition.Petitions.ERR_MANY && mwRound && mwCmd,
+                mwA + " " + mwSoon + " " + mwEmpty + " " + mwLong + " " + mwText + " " + mwAns + " " + mwKeep + " " + mwClose + " " + mwMany + " " + mwRound + " " + mwCmd);
         QuestManager.reset(a);
         for (String f : List.of("story_v4", "story_v5", "story_v6", "story_v7")) QuestManager.setFlag(a, f, true);
         QuestManager.forceComplete(a, "story_5_03");

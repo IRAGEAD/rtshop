@@ -33,7 +33,7 @@ RT1 - 2 모드팩(Forge 1.20.1, 47.4.x)용 독립 모드입니다. 중세풍 NPC
 
 ## 설치
 
-1. [Releases](../../releases) 의 `rtshop-forge-1.20.1-3.0.0.jar` 를 받아 프로필의 `mods` 폴더에 넣습니다. 이전 버전 jar 는 지웁니다.
+1. [Releases](../../releases) 의 최신 `rtshop-forge-1.20.1-<판 번호>.jar` 를 받아 프로필의 `mods` 폴더에 넣습니다. 이전 버전 jar 는 지웁니다.
 2. 서버에도 같은 jar 를 넣습니다.
 3. 처음 실행하면 `config/rtshop/` 아래에 설정 파일이 만들어집니다.
 

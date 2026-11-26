@@ -3,7 +3,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
-VERSION = 15
+VERSION = 16
 
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
@@ -811,6 +811,42 @@ more("shop_fisher", topics=[
 more("quest_guide", topics=[
     topic("habit_haru", "서기 하루 씨", ["하루 씨는 누가 한 말을 꼭 한 번 되받아 말해요. '그러니까 이러이러하다는 말씀입니까' 하고요. 받아 적는 사람 버릇이래요.",
                                        "그리고 무슨 일이든 '기록이 있습니다'로 시작해요. 없을 때는 '기록이 없습니다'로 시작하고요."], flags=["order_apprentice"]),
+])
+
+# 3.60: 고른 뒤에 아무 말도 돌아오지 않던 선택 둘의 뒷이야기 (1장 마녀의 잉크, 숨은 이야기 「마중」의 대답)
+more("quest_order_archivist", topics=[
+    tb("ch1_witch_paid", "마녀의 잉크 값", "The price of the witch's ink", [
+        b("늪의 마녀에게 값을 치르고 받아 오셨죠. 그래서 꼬리표를 한 장 써서 보냈어요. '한 단지 값 치름. 조사대.' 어머니 꼬리표 옆에 붙여 달라고요.",
+          "You paid the witch in the swamp for it. So I wrote out a tag and sent it to her. 'One jar, paid for. The Survey Corps.' I asked her to hang it beside Mother's."),
+        b("열다섯 해 전에도 지금도, 그 선반 앞에서 우리는 손님이었던 거예요. 저는 그게 좋아요. 연대기에는 그런 것도 적거든요. 누가 값을 치렀는지.",
+          "Fifteen years ago and now, we stood at that shelf as customers. I like that. The Chronicle keeps that kind of thing too: who paid what they owed."),
+    ], flags=["ch1_witch_trade"]),
+    tb("ch1_witch_owed", "마녀의 잉크 값", "The price of the witch's ink", [
+        b("늪에서는 마녀가 먼저 병을 던졌다고 하셨죠. 다친 데가 없어서 다행이에요. 그런데 잉크는 받아 왔고, 값은 못 치렀잖아요.",
+          "You said the witch threw the first bottle, out in the swamp. I'm glad you weren't hurt. But we came home with the ink, and we never paid for it."),
+        b("그래서 장부에 적어 뒀어요. '마녀의 잉크 한 단지. 외상.' 어머니는 값을 치르고 가셨거든요. 같은 선반에 우리 이름만 빚으로 남는 건 싫어요.",
+          "So I put it in the ledger. 'One jar of the witch's ink. Owed.' Mother paid before she left. I don't want ours to be the only name on that shelf left as a debt."),
+        b("다음 보급 편에 먹물 주머니를 실어 보낼게요. 받을지는 모르겠어요. 그래도 빚은 진 쪽이 기억하는 거니까요.",
+          "I'll send ink sacs out with the next supply run. I don't know if she'll take them. Still, a debt is for the one who owes it to remember."),
+    ], flags=["ch1_witch_fight"]),
+])
+more("shop_fisher", topics=[
+    tb("scylla_answer_told", "제독에게 한 대답", "The answer you gave the Admiral", [
+        b("기록관한테 들었소. 그분께 사실대로 말했다면서. 그 사람은 허공에 있고, 제 발로 간 길이라고.",
+          "The archivist told me. You gave her the truth, she says. That he is in the Void, and that he walked there on his own feet."),
+        b("기다리는 사람한테 제일 무서운 말은 '안 온다'가 아니오. '너를 잊었다'요. 그게 아니라고 말해 준 거 아니오. 잊은 건 세상이지, 그 사람이 아니라고.",
+          "The worst thing you can tell someone who waits isn't 'he's not coming.' It's 'he forgot you.' And you told her it wasn't so. That the world forgot, not him."),
+        b("나도 얼음 앞에서 그 말을 기다려 본 사람이오. 그분이 웃었다니, 그걸로 됐소.",
+          "I stood in front of the ice waiting to hear that myself. She smiled, they say. That will do."),
+    ], flags=["scylla_told"]),
+    tb("scylla_answer_lantern", "제독 앞에 둔 등불", "The lantern you left with the Admiral", [
+        b("내 등불을 그분 앞에 두고 왔다면서. 아무 말도 안 하고.",
+          "I hear you set my lantern down in front of her. And said nothing at all."),
+        b("잘했소. 등불은 말보다 먼저 닿소. '여기 있다, 돌아오라'는 뜻도 되고, '이제 됐다, 가도 된다'는 뜻도 되지. 어느 쪽인지는 받는 사람이 정하는 거요.",
+          "You did right. A lantern gets there before words do. It can mean 'here I am, come back.' It can mean 'that's enough now, you can go.' Which one it is, the one who receives it decides."),
+        b("돌려받을 생각은 없소. 그건 원래 마중 나가는 사람 물건이오. 이제야 임자를 찾아간 거요.",
+          "I don't want it back. A lantern like that belongs to whoever goes out to meet someone. It has only now found its owner."),
+    ], flags=["scylla_lantern"]),
 ])
 
 data = {"version": VERSION,

@@ -303,8 +303,6 @@ p = q("story_2_15", ch(C2, 15, N2), "얼음을 품은 거인", ELDER,
       "결정이 손 안에서 떨리는군. 불을 느끼는 게야. 잘 간직하게. 절대 팔아서는 안 되네. …둥지에 검은 없었지? 그럴 줄 알았네. 카엘은 설원에 오지 않았으니까. (장로는 그 말을 하고 나서 잠깐 입을 다물었다. 너무 많이 말한 사람처럼.)",
       [kill("mowziesmobs:frostmaw", 1, "얼음을 품은 거인 (프로스트모)", M), kill("minecraft:stray", 10, "설원의 스트레이", "!" + M)], gold=4200, items=[item("rtshop:frost_heart")], requires=[p],
       sceneAccept=line("탐험대장 로란", "이번엔 내가 기다리는 쪽이 아니다."),
-      choices=[{"text": "거인이 잠든 사이 결정을 살짝 가져왔다고 말한다.", "flags": ["frost_stolen"]},
-               {"text": "정정당당히 싸워 얻었다고 말한다.", "flags": ["frost_fought"]}],
       sceneDone=names("베스탈리아 연대기 · 잠든 이름", "얼음을 품은 거인\n서리 왕국의 아이들이 맡긴 결정을 천 년 품고 잔 짐승"))
 
 # ---- 5막: 석공의 산
