@@ -182,6 +182,11 @@ public final class RaidConfig {
         }
     }
 
+    /** 그 플레이어의 이야기 언어로 (기본 문구는 영어 표에 있고, 운영자가 고친 문구는 그대로 나간다). */
+    public String textFor(net.minecraft.server.level.ServerPlayer p, String key, Object... args) {
+        return com.rtshop.story.StoryText.f(p, text(key), args);
+    }
+
     public List<Reward> group(String g) {
         List<Reward> out = new ArrayList<>();
         for (Reward r : rewards) {

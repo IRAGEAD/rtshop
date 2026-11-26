@@ -38,7 +38,7 @@ public final class PartyHud {
         g.pose().pushPose();
         g.pose().translate(0, 0, 150);
         g.fill(x - 2, y - 13, x + w + 2, y + n * rowH + 1, 0x70000000);
-        RaidText.draw(g, mc.font, "파티 " + members.size(), RaidText.SANS, x + 1, y - 11, 0xFF9FE0F0);
+        RaidText.draw(g, mc.font, (HudLang.storyEn() ? "Party " : "파티 ") + members.size(), RaidText.SANS, x + 1, y - 11, 0xFF9FE0F0);
         for (JsonElement e : members) {
             JsonObject m = e.getAsJsonObject();
             if (me.equals(m.get("id").getAsString())) continue;

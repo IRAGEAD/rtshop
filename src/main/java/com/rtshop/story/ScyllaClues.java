@@ -252,6 +252,13 @@ public final class ScyllaClues {
         return s;
     }
 
+    /** 그 플레이어의 이야기 언어로 이름을 붙인 단서. */
+    public static ItemStack stack(Clue c, ServerPlayer p) {
+        ItemStack s = stack(c);
+        s.setHoverName(Component.literal(StoryText.t(p, c.name)).withStyle(ChatFormatting.AQUA));
+        return s;
+    }
+
     public static Clue of(ItemStack s) {
         if (s.isEmpty() || !s.is(ModItems.SCYLLA_CLUE.get()) || !s.hasTag()) return null;
         return get().clues.get(s.getTag().getString(TAG));
@@ -283,7 +290,7 @@ public final class ScyllaClues {
         QuestManager.setFlag(p, FLAG_PREFIX + c.id, true);
         ScyllaClues s = get();
         int n = count(p);
-        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.recorded", c.name, n, s.needed).withStyle(ChatFormatting.AQUA));
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.recorded", StoryText.t(p, c.name), n, s.needed).withStyle(ChatFormatting.AQUA));
         p.level().playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1F, 0.8F);
         checkComplete(p);
         return true;
@@ -326,10 +333,10 @@ public final class ScyllaClues {
         CompoundTag heard = p.getPersistentData().getCompound("rtshop_clue_heard");
         for (Clue c : s.clues.values()) {
             if (has(p, c.id)) {
-                p.sendSystemMessage(Component.literal(" ✦ " + c.name).withStyle(ChatFormatting.AQUA));
-                if (!c.desc.isEmpty()) p.sendSystemMessage(Component.literal("    " + c.desc).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                p.sendSystemMessage(Component.literal(" ✦ " + StoryText.t(p, c.name)).withStyle(ChatFormatting.AQUA));
+                if (!c.desc.isEmpty()) p.sendSystemMessage(Component.literal("    " + StoryText.t(p, c.desc)).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
                 String h = heard.getString(c.id);
-                if (!h.isEmpty()) p.sendSystemMessage(Component.literal("    \"" + h + "\"").withStyle(ChatFormatting.DARK_AQUA));
+                if (!h.isEmpty()) p.sendSystemMessage(Component.literal("    \"" + StoryText.t(p, h) + "\"").withStyle(ChatFormatting.DARK_AQUA));
             } else {
                 p.sendSystemMessage(Component.literal(" ✧ ???").withStyle(ChatFormatting.DARK_GRAY));
             }
@@ -353,13 +360,13 @@ public final class ScyllaClues {
     }
 
     public static void give(ServerPlayer p, Clue c, net.minecraft.world.phys.Vec3 at) {
-        ItemStack st = stack(c);
+        ItemStack st = stack(c, p);
         if (at != null) {
             p.level().addFreshEntity(new ItemEntity(p.level(), at.x, at.y, at.z, st));
         } else if (!p.getInventory().add(st)) {
             p.drop(st, false);
         }
-        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.found", c.name).withStyle(ChatFormatting.AQUA), true);
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.scylla.found", StoryText.t(p, c.name)).withStyle(ChatFormatting.AQUA), true);
     }
 
     private static final String TRIES = "rtshop_scylla_tries";
@@ -490,7 +497,7 @@ public final class ScyllaClues {
         String line = hintFor(c, prof == null ? "none" : prof.getPath());
         if (line == null) return;
         com.rtshop.notice.Notice.send(p, Component.literal("[" + v.getDisplayName().getString() + "] ").withStyle(ChatFormatting.YELLOW)
-                .append(Component.literal(line).withStyle(ChatFormatting.WHITE)));
+                .append(Component.literal(StoryText.t(p, line)).withStyle(ChatFormatting.WHITE)));
         CompoundTag heard = p.getPersistentData().getCompound("rtshop_clue_heard");
         heard.putString(c.id, line);
         p.getPersistentData().put("rtshop_clue_heard", heard);

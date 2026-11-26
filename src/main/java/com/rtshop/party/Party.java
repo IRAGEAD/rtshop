@@ -145,21 +145,26 @@ public final class Party {
     // ------------------------------------------------------------------ 행동
 
     private static void say(ServerPlayer p, Component c) {
-        com.rtshop.notice.Notice.send(p, Component.literal("[파티] ").withStyle(ChatFormatting.AQUA).append(c));
+        com.rtshop.notice.Notice.send(p, Component.literal(L(p, "[파티] ", "[Party] ")).withStyle(ChatFormatting.AQUA).append(c));
     }
 
-    private static void say(ServerPlayer p, String s, ChatFormatting color) {
-        say(p, Component.literal(s).withStyle(color));
+    /** 알림 글: 한국어와 영어를 함께 적고, 받는 사람의 언어로 보낸다. */
+    private static String L(ServerPlayer p, String ko, String en) {
+        return com.rtshop.story.StoryText.pick(p, ko, en);
     }
 
-    private static void tellAll(MinecraftServer server, Group g, String s, ChatFormatting color) {
-        for (ServerPlayer p : online(server, g)) say(p, s, color);
+    private static void say(ServerPlayer p, String ko, String en, ChatFormatting color) {
+        say(p, Component.literal(L(p, ko, en)).withStyle(color));
+    }
+
+    private static void tellAll(MinecraftServer server, Group g, String ko, String en, ChatFormatting color) {
+        for (ServerPlayer p : online(server, g)) say(p, ko, en, color);
     }
 
     public static Group create(ServerPlayer p) {
         Data d = Data.get(p.server);
         if (of(p.server, p.getUUID()) != null) {
-            say(p, "이미 파티에 들어 있습니다. 먼저 /party leave 로 나가세요.", ChatFormatting.RED);
+            say(p, "이미 파티에 들어 있습니다. 먼저 /party leave 로 나가세요.", "You are already in a party. Leave it first with /party leave.", ChatFormatting.RED);
             return null;
         }
         Group g = new Group();
@@ -168,39 +173,40 @@ public final class Party {
         g.names.put(p.getUUID(), p.getGameProfile().getName());
         d.groups.put(g.id, g);
         d.touch();
-        say(p, "파티를 만들었습니다. /party invite <이름> 으로 초대하세요 (최대 " + PartyConfig.get().maxMembers + "명).", ChatFormatting.GREEN);
+        say(p, "파티를 만들었습니다. /party invite <이름> 으로 초대하세요 (최대 " + PartyConfig.get().maxMembers + "명).",
+                "Party created. Invite others with /party invite <name> (up to " + PartyConfig.get().maxMembers + " members).", ChatFormatting.GREEN);
         sync(p.server, g);
         return g;
     }
 
     public static boolean invite(ServerPlayer from, ServerPlayer to) {
         if (from == to) {
-            say(from, "자기 자신은 초대할 수 없습니다.", ChatFormatting.RED);
+            say(from, "자기 자신은 초대할 수 없습니다.", "You cannot invite yourself.", ChatFormatting.RED);
             return false;
         }
         Group g = of(from.server, from.getUUID());
         if (g == null) g = create(from);
         if (g == null) return false;
         if (!g.leader.equals(from.getUUID())) {
-            say(from, "파티장만 초대할 수 있습니다.", ChatFormatting.RED);
+            say(from, "파티장만 초대할 수 있습니다.", "Only the party leader can invite.", ChatFormatting.RED);
             return false;
         }
         if (g.members.size() >= PartyConfig.get().maxMembers) {
-            say(from, "파티가 가득 찼습니다 (최대 " + PartyConfig.get().maxMembers + "명).", ChatFormatting.RED);
+            say(from, "파티가 가득 찼습니다 (최대 " + PartyConfig.get().maxMembers + "명).", "The party is full (up to " + PartyConfig.get().maxMembers + " members).", ChatFormatting.RED);
             return false;
         }
         if (of(from.server, to.getUUID()) != null) {
-            say(from, to.getGameProfile().getName() + " 님은 이미 다른 파티에 있습니다.", ChatFormatting.RED);
+            say(from, to.getGameProfile().getName() + " 님은 이미 다른 파티에 있습니다.", to.getGameProfile().getName() + " is already in another party.", ChatFormatting.RED);
             return false;
         }
         INVITES.put(to.getUUID(), new Object[]{g.id, System.currentTimeMillis() + INVITE_MS});
-        say(from, to.getGameProfile().getName() + " 님을 초대했습니다.", ChatFormatting.GREEN);
-        MutableComponent msg = Component.literal(from.getGameProfile().getName() + " 님이 파티에 초대했습니다 (60초). ").withStyle(ChatFormatting.WHITE)
-                .append(Component.literal("[수락]").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withBold(true)
+        say(from, to.getGameProfile().getName() + " 님을 초대했습니다.", "Invited " + to.getGameProfile().getName() + ".", ChatFormatting.GREEN);
+        MutableComponent msg = Component.literal(L(to, from.getGameProfile().getName() + " 님이 파티에 초대했습니다 (60초). ", from.getGameProfile().getName() + " invited you to a party (60 s). ")).withStyle(ChatFormatting.WHITE)
+                .append(Component.literal(L(to, "[수락]", "[Accept]")).withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withBold(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("파티에 들어갑니다")))))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(L(to, "파티에 들어갑니다", "Join the party"))))))
                 .append(Component.literal(" "))
-                .append(Component.literal("[거절]").withStyle(Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)
+                .append(Component.literal(L(to, "[거절]", "[Decline]")).withStyle(Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party decline"))));
         say(to, msg);
         return true;
@@ -209,48 +215,49 @@ public final class Party {
     public static boolean accept(ServerPlayer p) {
         Object[] inv = INVITES.remove(p.getUUID());
         if (inv == null || System.currentTimeMillis() > (Long) inv[1]) {
-            say(p, "받은 파티 초대가 없습니다 (초대는 60초 동안만 유효합니다).", ChatFormatting.RED);
+            say(p, "받은 파티 초대가 없습니다 (초대는 60초 동안만 유효합니다).", "You have no party invitation (an invitation lasts 60 seconds).", ChatFormatting.RED);
             return false;
         }
         if (of(p.server, p.getUUID()) != null) {
-            say(p, "이미 파티에 들어 있습니다.", ChatFormatting.RED);
+            say(p, "이미 파티에 들어 있습니다.", "You are already in a party.", ChatFormatting.RED);
             return false;
         }
         Data d = Data.get(p.server);
         Group g = d.groups.get((UUID) inv[0]);
         if (g == null) {
-            say(p, "그 파티는 이미 해산되었습니다.", ChatFormatting.RED);
+            say(p, "그 파티는 이미 해산되었습니다.", "That party has already been disbanded.", ChatFormatting.RED);
             return false;
         }
         if (g.members.size() >= PartyConfig.get().maxMembers) {
-            say(p, "파티가 가득 찼습니다.", ChatFormatting.RED);
+            say(p, "파티가 가득 찼습니다.", "The party is full.", ChatFormatting.RED);
             return false;
         }
         g.members.add(p.getUUID());
         g.names.put(p.getUUID(), p.getGameProfile().getName());
         d.touch();
-        tellAll(p.server, g, p.getGameProfile().getName() + " 님이 파티에 들어왔습니다. (" + g.members.size() + "/" + PartyConfig.get().maxMembers + ")", ChatFormatting.GREEN);
+        tellAll(p.server, g, p.getGameProfile().getName() + " 님이 파티에 들어왔습니다. (" + g.members.size() + "/" + PartyConfig.get().maxMembers + ")",
+                p.getGameProfile().getName() + " joined the party. (" + g.members.size() + "/" + PartyConfig.get().maxMembers + ")", ChatFormatting.GREEN);
         sync(p.server, g);
         return true;
     }
 
     public static void decline(ServerPlayer p) {
-        if (INVITES.remove(p.getUUID()) != null) say(p, "파티 초대를 거절했습니다.", ChatFormatting.GRAY);
+        if (INVITES.remove(p.getUUID()) != null) say(p, "파티 초대를 거절했습니다.", "You declined the party invitation.", ChatFormatting.GRAY);
     }
 
     public static boolean leave(ServerPlayer p) {
         Group g = of(p.server, p.getUUID());
         if (g == null) {
-            say(p, "파티에 들어 있지 않습니다.", ChatFormatting.RED);
+            say(p, "파티에 들어 있지 않습니다.", "You are not in a party.", ChatFormatting.RED);
             return false;
         }
-        remove(p.server, g, p.getUUID(), p.getGameProfile().getName() + " 님이 파티를 나갔습니다.");
-        say(p, "파티를 나갔습니다.", ChatFormatting.GRAY);
+        remove(p.server, g, p.getUUID(), p.getGameProfile().getName() + " 님이 파티를 나갔습니다.", p.getGameProfile().getName() + " left the party.");
+        say(p, "파티를 나갔습니다.", "You left the party.", ChatFormatting.GRAY);
         sendEmpty(p);
         return true;
     }
 
-    private static void remove(MinecraftServer server, Group g, UUID who, String notice) {
+    private static void remove(MinecraftServer server, Group g, UUID who, String notice, String noticeEn) {
         Data d = Data.get(server);
         g.members.remove(who);
         if (g.members.isEmpty()) {
@@ -259,8 +266,9 @@ public final class Party {
             if (g.leader.equals(who)) {
                 g.leader = g.members.get(0);
                 notice += " 새 파티장: " + g.names.getOrDefault(g.leader, "?");
+                noticeEn += " New leader: " + g.names.getOrDefault(g.leader, "?");
             }
-            tellAll(server, g, notice, ChatFormatting.YELLOW);
+            tellAll(server, g, notice, noticeEn, ChatFormatting.YELLOW);
             sync(server, g);
         }
         d.touch();
@@ -269,7 +277,7 @@ public final class Party {
     public static boolean kick(ServerPlayer leader, String name) {
         Group g = of(leader.server, leader.getUUID());
         if (g == null || !g.leader.equals(leader.getUUID())) {
-            say(leader, "파티장만 내보낼 수 있습니다.", ChatFormatting.RED);
+            say(leader, "파티장만 내보낼 수 있습니다.", "Only the party leader can remove members.", ChatFormatting.RED);
             return false;
         }
         UUID target = null;
@@ -277,13 +285,13 @@ public final class Party {
             if (g.members.contains(e.getKey()) && e.getValue().equalsIgnoreCase(name)) target = e.getKey();
         }
         if (target == null || target.equals(leader.getUUID())) {
-            say(leader, "그런 파티원이 없습니다.", ChatFormatting.RED);
+            say(leader, "그런 파티원이 없습니다.", "There is no such party member.", ChatFormatting.RED);
             return false;
         }
-        remove(leader.server, g, target, g.names.get(target) + " 님을 파티에서 내보냈습니다.");
+        remove(leader.server, g, target, g.names.get(target) + " 님을 파티에서 내보냈습니다.", g.names.get(target) + " was removed from the party.");
         ServerPlayer t = leader.server.getPlayerList().getPlayer(target);
         if (t != null) {
-            say(t, "파티에서 내보내졌습니다.", ChatFormatting.RED);
+            say(t, "파티에서 내보내졌습니다.", "You were removed from the party.", ChatFormatting.RED);
             sendEmpty(t);
         }
         return true;
@@ -292,30 +300,30 @@ public final class Party {
     public static boolean promote(ServerPlayer leader, String name) {
         Group g = of(leader.server, leader.getUUID());
         if (g == null || !g.leader.equals(leader.getUUID())) {
-            say(leader, "파티장만 넘길 수 있습니다.", ChatFormatting.RED);
+            say(leader, "파티장만 넘길 수 있습니다.", "Only the party leader can hand over leadership.", ChatFormatting.RED);
             return false;
         }
         for (UUID u : g.members) {
             if (g.names.getOrDefault(u, "").equalsIgnoreCase(name) && !u.equals(leader.getUUID())) {
                 g.leader = u;
                 Data.get(leader.server).touch();
-                tellAll(leader.server, g, g.names.get(u) + " 님이 새 파티장이 되었습니다.", ChatFormatting.GOLD);
+                tellAll(leader.server, g, g.names.get(u) + " 님이 새 파티장이 되었습니다.", g.names.get(u) + " is the new party leader.", ChatFormatting.GOLD);
                 sync(leader.server, g);
                 return true;
             }
         }
-        say(leader, "그런 파티원이 없습니다.", ChatFormatting.RED);
+        say(leader, "그런 파티원이 없습니다.", "There is no such party member.", ChatFormatting.RED);
         return false;
     }
 
     public static void disband(ServerPlayer leader) {
         Group g = of(leader.server, leader.getUUID());
         if (g == null || !g.leader.equals(leader.getUUID())) {
-            say(leader, "파티장만 해산할 수 있습니다.", ChatFormatting.RED);
+            say(leader, "파티장만 해산할 수 있습니다.", "Only the party leader can disband the party.", ChatFormatting.RED);
             return;
         }
         for (ServerPlayer p : online(leader.server, g)) {
-            say(p, "파티가 해산되었습니다.", ChatFormatting.YELLOW);
+            say(p, "파티가 해산되었습니다.", "The party has been disbanded.", ChatFormatting.YELLOW);
             sendEmpty(p);
         }
         Data d = Data.get(leader.server);
@@ -326,25 +334,26 @@ public final class Party {
     public static void chat(ServerPlayer p, String msg) {
         Group g = of(p.server, p.getUUID());
         if (g == null) {
-            say(p, "파티에 들어 있지 않습니다.", ChatFormatting.RED);
+            say(p, "파티에 들어 있지 않습니다.", "You are not in a party.", ChatFormatting.RED);
             return;
         }
-        Component line = Component.literal("[파티] ").withStyle(ChatFormatting.AQUA)
-                .append(Component.literal(p.getGameProfile().getName() + ": ").withStyle(ChatFormatting.WHITE))
-                .append(Component.literal(msg).withStyle(ChatFormatting.AQUA));
-        for (ServerPlayer o : online(p.server, g)) o.sendSystemMessage(line);
+        for (ServerPlayer o : online(p.server, g)) {
+            o.sendSystemMessage(Component.literal(L(o, "[파티] ", "[Party] ")).withStyle(ChatFormatting.AQUA)
+                    .append(Component.literal(p.getGameProfile().getName() + ": ").withStyle(ChatFormatting.WHITE))
+                    .append(Component.literal(msg).withStyle(ChatFormatting.AQUA)));
+        }
     }
 
     public static void info(ServerPlayer p) {
         Group g = of(p.server, p.getUUID());
         if (g == null) {
-            say(p, "파티에 들어 있지 않습니다. /party create 로 만들거나 초대를 받으세요.", ChatFormatting.GRAY);
+            say(p, "파티에 들어 있지 않습니다. /party create 로 만들거나 초대를 받으세요.", "You are not in a party. Create one with /party create, or get invited.", ChatFormatting.GRAY);
             return;
         }
-        say(p, "파티원 " + g.members.size() + "/" + PartyConfig.get().maxMembers, ChatFormatting.AQUA);
+        say(p, "파티원 " + g.members.size() + "/" + PartyConfig.get().maxMembers, "Members " + g.members.size() + "/" + PartyConfig.get().maxMembers, ChatFormatting.AQUA);
         for (UUID u : g.members) {
             boolean on = p.server.getPlayerList().getPlayer(u) != null;
-            p.sendSystemMessage(Component.literal("  " + (u.equals(g.leader) ? "★ " : "· ") + g.names.getOrDefault(u, "?") + (on ? "" : " (접속 안 함)"))
+            p.sendSystemMessage(Component.literal("  " + (u.equals(g.leader) ? "★ " : "· ") + g.names.getOrDefault(u, "?") + (on ? "" : L(p, " (접속 안 함)", " (offline)")))
                     .withStyle(on ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY));
         }
     }

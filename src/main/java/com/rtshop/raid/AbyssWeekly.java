@@ -339,8 +339,8 @@ public final class AbyssWeekly {
         String msg;
         try {
             String what = endless ? Integer.toString(f * c.endlessStep) : ROMAN[f - 1];
-            msg = names.isEmpty() ? String.format(c.text(endless ? "gotNothingEndless" : "gotNothing"), what)
-                    : String.format(c.text(endless ? "gotEndless" : "got"), what, String.join(", ", names));
+            msg = names.isEmpty() ? String.format(com.rtshop.story.StoryText.t(p, c.text(endless ? "gotNothingEndless" : "gotNothing")), what)
+                    : String.format(com.rtshop.story.StoryText.t(p, c.text(endless ? "gotEndless" : "got")), what, String.join(", ", names));
         } catch (Exception e) {
             msg = c.text("got");
         }
@@ -358,7 +358,7 @@ public final class AbyssWeekly {
         o.addProperty("mask", claimedMask(p));
         o.addProperty("resetIn", Weekly.untilReset(Weekly.now(), c.resetDay, c.resetHour));
         JsonObject t = new JsonObject();
-        for (String k : defaultTexts().keySet()) t.addProperty(k, c.text(k));
+        for (String k : defaultTexts().keySet()) t.addProperty(k, com.rtshop.story.StoryText.t(p, c.text(k)));
         o.add("texts", t);
         JsonArray g = new JsonArray();
         for (long v : c.gold) g.add(v);

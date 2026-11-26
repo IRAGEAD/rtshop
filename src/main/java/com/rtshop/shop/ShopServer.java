@@ -372,6 +372,10 @@ public final class ShopServer {
                             com.rtshop.story.StoryText.setLang(sp, StringArgumentType.getString(ctx, "lang"));
                             com.rtshop.story.BossIntros.sendLore(sp);
                             QuestManager.syncHud(sp);
+                            try {
+                                com.rtshop.job.Jobs.applyAttributes(sp);   // 직업 딱지의 이름·설명도 고른 언어로 다시 보낸다
+                            } catch (Throwable ignored) {
+                            }
                             return 1;
                         })))
                 .then(Commands.literal("notebook").executes(ctx -> {

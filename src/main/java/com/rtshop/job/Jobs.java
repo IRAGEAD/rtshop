@@ -175,14 +175,14 @@ public final class Jobs {
         }
         if (!unlocked(p, d)) {
             QuestDef q = questGiving(d.unlockFlag);
-            return new Result(false, q == null ? Component.translatable("rtshop.job.locked", d.name)
-                    : Component.translatable("rtshop.job.locked_quest", d.name, chainName(q)));
+            return new Result(false, q == null ? Component.translatable("rtshop.job.locked", com.rtshop.story.StoryText.t(p, d.name))
+                    : Component.translatable("rtshop.job.locked_quest", com.rtshop.story.StoryText.t(p, d.name), com.rtshop.story.StoryText.t(p, chainName(q))));
         }
         JobData data = JobData.get(p.server);
         JobData.Entry e = data.of(p.getUUID());
         String current = e.get(d.slot);
         if (jobId.equals(current)) {
-            return new Result(false, Component.translatable("rtshop.job.already", d.name));
+            return new Result(false, Component.translatable("rtshop.job.already", com.rtshop.story.StoryText.t(p, d.name)));
         }
         if (current.isEmpty()) {
             e.set(d.slot, jobId, 0);
@@ -190,7 +190,7 @@ public final class Jobs {
             applyAttributes(p);
             RtShop.LOGGER.info("[rtshop] {} 이(가) 직업 '{}' 을(를) 골랐습니다", p.getGameProfile().getName(), d.name);
             com.rtshop.land.StarterPlots.check(p);
-            return new Result(true, Component.translatable("rtshop.job.chosen", d.name));
+            return new Result(true, Component.translatable("rtshop.job.chosen", com.rtshop.story.StoryText.t(p, d.name)));
         }
         long left = cooldownLeft(p, d.slot);
         if (left > 0) {
@@ -209,7 +209,7 @@ public final class Jobs {
         com.rtshop.land.StarterPlots.check(p);
         RtShop.LOGGER.info("[rtshop] {} 이(가) 직업을 '{}' -> '{}' 로 바꿨습니다 ({} G)", p.getGameProfile().getName(),
                 old == null ? current : old.name, d.name, cost);
-        return new Result(true, Component.translatable("rtshop.job.changed", old == null ? current : old.name, d.name,
+        return new Result(true, Component.translatable("rtshop.job.changed", old == null ? current : com.rtshop.story.StoryText.t(p, old.name), com.rtshop.story.StoryText.t(p, d.name),
                 String.format("%,d", cost), duration(cfg.cooldownMillis(d.slot))));
     }
 
@@ -245,9 +245,9 @@ public final class Jobs {
             String lock = "";
             if (!open) {
                 QuestDef q = questGiving(d.unlockFlag);
-                lock = q == null ? "" : chainName(q);
+                lock = q == null ? "" : com.rtshop.story.StoryText.t(p, chainName(q));
             }
-            list.add(new JobOpenPacket.JobView(d.id, d.slot, d.name, d.icon, cfg.describe(d, com.rtshop.shop.PricingConfig.get().handCookedMargin), state, lock));
+            list.add(new JobOpenPacket.JobView(d.id, d.slot, com.rtshop.story.StoryText.t(p, d.name), d.icon, cfg.describe(d, com.rtshop.shop.PricingConfig.get().handCookedMargin, p), state, lock));
         }
         return new JobOpenPacket(atNpc, e.combat, e.life, cooldownLeft(p, JobConfig.COMBAT), cooldownLeft(p, JobConfig.LIFE),
                 cfg.changeCostCombat, cfg.changeCostLife, cfg.cooldownHoursCombat, cfg.cooldownHoursLife, list);
@@ -367,14 +367,14 @@ public final class Jobs {
         JobData.Entry je = entry(p);
         JobConfig.JobDef cd = cfg.jobs.get(je.combat), ld = cfg.jobs.get(je.life);
         double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;
-        List<String> cDesc = cd == null ? List.of() : cfg.describe(cd, margin), lDesc = ld == null ? List.of() : cfg.describe(ld, margin);
+        List<String> cDesc = cd == null ? List.of() : cfg.describe(cd, margin, p), lDesc = ld == null ? List.of() : cfg.describe(ld, margin, p);
         boolean spellLocked = !MagicLock.canCast(p);
         String key = mine + "|" + (cd == null ? "" : cd.name) + cDesc + "|" + (ld == null ? "" : ld.name) + lDesc + "|" + spellLocked;
         if (!key.equals(SENT_MINE.get(p.getUUID()))) {
             SENT_MINE.put(p.getUUID(), key);
             if (p.connection != null) {
                 ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
-                        new com.rtshop.net.JobSyncPacket(mine, cd == null ? "" : cd.name, cDesc, ld == null ? "" : ld.name, lDesc, spellLocked));
+                        new com.rtshop.net.JobSyncPacket(mine, cd == null ? "" : com.rtshop.story.StoryText.t(p, cd.name), cDesc, ld == null ? "" : com.rtshop.story.StoryText.t(p, ld.name), lDesc, spellLocked));
             }
         }
     }

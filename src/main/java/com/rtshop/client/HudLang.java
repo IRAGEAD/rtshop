@@ -80,6 +80,21 @@ public final class HudLang {
         }
     }
 
+    /** 지금 고른 이야기 언어 코드 (서버에 알리는 것과 같은 기준: 비어 있으면 게임 언어). */
+    public static String storyCode() {
+        String l = normalize(ClientConfig.get().storyLang);
+        if (l.isEmpty()) {
+            Minecraft mc = Minecraft.getInstance();
+            l = mc.options == null || mc.options.languageCode == null ? "ko_kr" : mc.options.languageCode.toLowerCase(Locale.ROOT);
+        }
+        return l;
+    }
+
+    /** 이야기 언어가 한국어가 아닌가. */
+    public static boolean storyEn() {
+        return !storyCode().startsWith("ko");
+    }
+
     /** 서버에 내 스토리 언어를 알린다 (접속할 때와 바꿀 때). */
     public static void sendStoryLang() {
         Minecraft mc = Minecraft.getInstance();

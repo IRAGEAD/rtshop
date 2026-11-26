@@ -312,7 +312,7 @@ public final class ClientEvents {
                 String type = jc.weaponType(event.getItemStack());
                 if (!type.equals(com.rtshop.job.WeaponTypes.NONE) && !type.equals(com.rtshop.job.WeaponTypes.FIST)) {
                     event.getToolTip().add(Math.min(1, event.getToolTip().size()),
-                            net.minecraft.network.chat.Component.translatable("rtshop.job.weapon_type_line", jc.typeName(type))
+                            net.minecraft.network.chat.Component.translatable("rtshop.job.weapon_type_line", com.rtshop.story.StoryText.tl(HudLang.storyCode(), jc.typeName(type)))
                                     .withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
                 }
             }

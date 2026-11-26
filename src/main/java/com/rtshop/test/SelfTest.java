@@ -4163,6 +4163,60 @@ public final class SelfTest {
                     "The Torn Chronicle".equals(en) && q101.title.equals(ko) && pj.getAsJsonObject().get("id").getAsString().equals("story_1_01")
                             && !pj.getAsJsonObject().get("text").getAsString().equals(q101.intro), en + " / " + ko);
             check("almost every story line has an English version (" + has + "/" + all + ")", all > 0 && has >= all * 0.97, miss);
+            // A-25 2차: 설정 기본 문구(레이드·주간 보상·보스 소개·결계·스킬라 단서·직업·무기 종류·세계 규칙)의 영어판
+            {
+                java.util.List<String> cfgTexts4 = new java.util.ArrayList<>();
+                cfgTexts4.addAll(com.rtshop.raid.RaidConfig.defaultTexts().values());
+                cfgTexts4.addAll(com.rtshop.raid.AbyssWeekly.defaultTexts().values());
+                for (com.rtshop.story.StoryConfig.Intro in4 : com.rtshop.story.StoryConfig.defaults().values()) {
+                    cfgTexts4.add(in4.name);
+                    cfgTexts4.add(in4.epithet);
+                    cfgTexts4.add(in4.quote);
+                    cfgTexts4.addAll(in4.lore);
+                }
+                for (com.rtshop.story.StorySeals.Seal se4 : com.rtshop.story.StorySeals.defaults().values()) cfgTexts4.add(se4.message);
+                for (com.rtshop.story.ScyllaClues.Clue cl4 : com.rtshop.story.ScyllaClues.get().clues.values()) {
+                    cfgTexts4.add(cl4.name);
+                    cfgTexts4.add(cl4.desc);
+                    for (java.util.List<String> hl4 : cl4.hints.values()) cfgTexts4.addAll(hl4);
+                }
+                for (String jid4 : new String[]{"swordsman", "warrior", "tank", "archer", "mage", "farmer", "fisher", "miner", "cook"}) {
+                    com.rtshop.job.JobConfig.JobDef jd4 = com.rtshop.job.JobConfig.get().job(jid4);
+                    if (jd4 != null) cfgTexts4.add(jd4.name);
+                }
+                for (com.rtshop.job.WeaponTypes.Type wt4 : com.rtshop.job.WeaponTypes.defaults()) cfgTexts4.add(wt4.name);
+                cfgTexts4.add(com.rtshop.job.JobConfig.get().typeName(com.rtshop.job.WeaponTypes.MAGIC));
+                cfgTexts4.add(com.rtshop.job.JobConfig.get().typeName(com.rtshop.job.WeaponTypes.PREMIUM));
+                com.rtshop.rules.WorldRules wr4 = com.rtshop.rules.WorldRules.defaults();
+                cfgTexts4.addAll(java.util.List.of(wr4.textAnvilOnly, wr4.textAnvilBuild, wr4.textAltarOnly, wr4.textAltarBuild, wr4.textPortalOnly, wr4.textPortalBuild));
+                java.util.List<String> cfgMiss4 = new java.util.ArrayList<>();
+                int cfgAll4 = 0;
+                for (String s4 : cfgTexts4) {
+                    if (s4 == null || s4.isEmpty()) continue;
+                    boolean hangul4 = false;
+                    for (int ci4 = 0; ci4 < s4.length() && !hangul4; ci4++) hangul4 = s4.charAt(ci4) >= 0xAC00 && s4.charAt(ci4) <= 0xD7A3;
+                    if (!hangul4) continue;
+                    cfgAll4++;
+                    if (!com.rtshop.story.StoryText.hasEnglish(s4)) cfgMiss4.add(s4.length() > 40 ? s4.substring(0, 40) : s4);
+                }
+                check("every default config text (raid, weekly reward, boss intros, seals, Scylla clues, jobs, weapon types, world rules) has an English version ("
+                        + (cfgAll4 - cfgMiss4.size()) + "/" + cfgAll4 + ")", cfgAll4 > 200 && cfgMiss4.isEmpty(), cfgMiss4);
+                com.rtshop.job.JobConfig.JobDef sw4 = com.rtshop.job.JobConfig.get().job("swordsman");
+                String koDesc4 = sw4 == null ? "" : String.join(" | ", com.rtshop.job.JobConfig.get().describe(sw4, 0.1, a));
+                com.rtshop.story.StoryText.setLang(a, "en_us");
+                String enDesc4 = sw4 == null ? "" : String.join(" | ", com.rtshop.job.JobConfig.get().describe(sw4, 0.1, a));
+                String enRaid4 = com.rtshop.raid.RaidConfig.get().textFor(a, "needKill", 3, 1);
+                String enPick4 = com.rtshop.story.StoryText.pick(a, "한국어", "English");
+                com.rtshop.story.StoryText.setLang(a, "ko_kr");
+                String koRaid4 = com.rtshop.raid.RaidConfig.get().textFor(a, "needKill", 3, 1);
+                boolean noHangul4 = true;
+                for (int ci4 = 0; ci4 < enDesc4.length() && noHangul4; ci4++) noHangul4 = !(enDesc4.charAt(ci4) >= 0xAC00 && enDesc4.charAt(ci4) <= 0xD7A3);
+                check("English players get job passives, weapon lines and raid notices in English; Korean players keep the original",
+                        sw4 != null && noHangul4 && enDesc4.contains("Sword") && !koDesc4.equals(enDesc4) && koDesc4.contains("검")
+                                && enRaid4.contains("3") && !enRaid4.equals(koRaid4) && koRaid4.contains("이그니스") && "English".equals(enPick4)
+                                && "한국어".equals(com.rtshop.story.StoryText.pick(a, "한국어", "English")),
+                        enDesc4 + " // " + enRaid4 + " // " + koRaid4);
+            }
             com.rtshop.story.StoryText.setLang(a, "");
         }
         // 새 목표 종류: 표식(FLAG) / 차원(DIMENSION) 은 받자마자 맞으면 바로 채워진다

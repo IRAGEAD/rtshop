@@ -294,7 +294,7 @@ public final class WorldRules {
     public static boolean refusePortal(ServerPlayer p) {
         try {
             if (portalAllowed(p)) return false;
-            com.rtshop.notice.Notice.send(p, Component.literal(get().textPortalOnly).withStyle(ChatFormatting.YELLOW));
+            com.rtshop.notice.Notice.send(p, Component.literal(com.rtshop.story.StoryText.t(p, get().textPortalOnly)).withStyle(ChatFormatting.YELLOW));
             return true;
         } catch (Throwable t) {
             return false;
@@ -312,7 +312,7 @@ public final class WorldRules {
     public static boolean refuseAltar(ServerPlayer p, BlockPos pos) {
         try {
             if (altarAllowed(p.level(), pos)) return false;
-            com.rtshop.notice.Notice.send(p, Component.literal(get().textAltarOnly).withStyle(ChatFormatting.YELLOW), true);
+            com.rtshop.notice.Notice.send(p, Component.literal(com.rtshop.story.StoryText.t(p, get().textAltarOnly)).withStyle(ChatFormatting.YELLOW), true);
             return true;
         } catch (Throwable t) {
             return false;
@@ -330,7 +330,7 @@ public final class WorldRules {
     public static boolean refuseAnvil(ServerPlayer p, BlockPos pos) {
         try {
             if (anvilAllowed(p.level(), pos)) return false;
-            com.rtshop.notice.Notice.send(p, Component.literal(get().textAnvilOnly).withStyle(ChatFormatting.YELLOW), true);
+            com.rtshop.notice.Notice.send(p, Component.literal(com.rtshop.story.StoryText.t(p, get().textAnvilOnly)).withStyle(ChatFormatting.YELLOW), true);
             return true;
         } catch (Throwable t) {
             return false;
@@ -384,7 +384,7 @@ public final class WorldRules {
                 boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && com.rtshop.util.Perm.op(pa);
                 if (wa.altarOpOnly && !opA) {
                     event.setCanceled(true);
-                    if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(wa.textAltarBuild).withStyle(ChatFormatting.YELLOW), true);
+                    if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(com.rtshop.story.StoryText.t(pa, wa.textAltarBuild)).withStyle(ChatFormatting.YELLOW), true);
                 } else if (opA && !wa.altarSet && event.getLevel() instanceof Level la) {
                     setAltar(la, event.getPos());
                     ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal("이 제단을 마을의 단 하나뿐인 룬 제단으로 정했습니다. (바꾸려면 새 제단 곁에서 /rtshop altar here)").withStyle(ChatFormatting.GREEN));
@@ -396,7 +396,7 @@ public final class WorldRules {
                 boolean opA = event.getEntity() instanceof ServerPlayer pa && pa.isCreative() && com.rtshop.util.Perm.op(pa);
                 if (wa.anvilOpOnly && !opA) {
                     event.setCanceled(true);
-                    if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(wa.textAnvilBuild).withStyle(ChatFormatting.YELLOW), true);
+                    if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(com.rtshop.story.StoryText.t(pa, wa.textAnvilBuild)).withStyle(ChatFormatting.YELLOW), true);
                 } else if (opA && !wa.anvilSet && event.getLevel() instanceof Level la) {
                     setAnvil(la, event.getPos());
                     ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal("이 모루를 마을의 단 하나뿐인 강화 모루로 정했습니다. (바꾸려면 새 모루 곁에서 /rtshop anvil here)").withStyle(ChatFormatting.GREEN));
@@ -412,7 +412,7 @@ public final class WorldRules {
             boolean op = p.isCreative() && com.rtshop.util.Perm.op(p);
             if (w.abyssPortalOpOnly && !op) {
                 event.setCanceled(true);
-                com.rtshop.notice.Notice.send(p, Component.literal(w.textPortalBuild).withStyle(ChatFormatting.YELLOW));
+                com.rtshop.notice.Notice.send(p, Component.literal(com.rtshop.story.StoryText.t(p, w.textPortalBuild)).withStyle(ChatFormatting.YELLOW));
                 return;
             }
             if (op && !w.abyssPortalSet && event.getLevel() instanceof Level l) {

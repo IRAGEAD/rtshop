@@ -298,10 +298,10 @@ public final class Raid {
     /** 지금 들어갈 수 없는 이유 (없으면 null). */
     public static String cannotEnter(ServerPlayer p) {
         RaidConfig c = RaidConfig.get();
-        if (!c.enabled) return "레이드가 꺼져 있습니다.";
-        if (state != IDLE) return c.text("locked");
-        if (!c.requireKill.isBlank() && c.requireKills > 0 && kills(p) < c.requireKills) return c.text("needKill", c.requireKills, kills(p));
-        if (countItem(p, ModItems.RAID_TICKET.get()) < 1 && !p.getAbilities().instabuild) return c.text("needTicket");
+        if (!c.enabled) return com.rtshop.story.StoryText.pick(p, "레이드가 꺼져 있습니다.", "The raid is turned off.");
+        if (state != IDLE) return c.textFor(p, "locked");
+        if (!c.requireKill.isBlank() && c.requireKills > 0 && kills(p) < c.requireKills) return c.textFor(p, "needKill", c.requireKills, kills(p));
+        if (countItem(p, ModItems.RAID_TICKET.get()) < 1 && !p.getAbilities().instabuild) return c.textFor(p, "needTicket");
         return null;
     }
 
@@ -309,7 +309,7 @@ public final class Raid {
         RaidConfig c = RaidConfig.get();
         JsonObject o = new JsonObject();
         JsonObject t = new JsonObject();
-        for (String k : RaidConfig.defaultTexts().keySet()) t.addProperty(k, c.text(k));
+        for (String k : RaidConfig.defaultTexts().keySet()) t.addProperty(k, c.textFor(p, k));
         o.add("texts", t);
         String why = cannotEnter(p);
         o.addProperty("boss", c.boss);
@@ -439,7 +439,7 @@ public final class Raid {
         if (npc != null && npc >= 0 && !(p instanceof FakePlayer)) {
             Entity e = p.level().getEntity(npc);
             if (e == null || e.distanceToSqr(p) > 12 * 12) {
-                say(p, "안내인에게서 너무 멀리 있습니다.", ChatFormatting.RED);
+                say(p, com.rtshop.story.StoryText.pick(p, "안내인에게서 너무 멀리 있습니다.", "You are too far from the guide."), ChatFormatting.RED);
                 return false;
             }
         }
@@ -466,7 +466,7 @@ public final class Raid {
         } else {
             p.teleportTo(level, c.arenaX + 0.5, c.arenaY + 1, c.arenaZ + c.arenaRadius - 5 + 0.5, 180F, 0F);
         }
-        say(p, c.text("entered"), ChatFormatting.GOLD);
+        say(p, c.textFor(p, "entered"), ChatFormatting.GOLD);
         return true;
     }
 
@@ -538,18 +538,18 @@ public final class Raid {
     /** 탈출권 사용 (곧바로 돌려보낸다: 명령·점검용). */
     public static boolean escape(ServerPlayer p) {
         if (!inArena(p) && !flagged(p)) {
-            say(p, "레이드 구역 안에서만 쓸 수 있습니다.", ChatFormatting.RED);
+            say(p, com.rtshop.story.StoryText.pick(p, "레이드 구역 안에서만 쓸 수 있습니다.", "You can only use this inside the raid arena."), ChatFormatting.RED);
             return false;
         }
         sendHome(p);
-        say(p, RaidConfig.get().text("escaped"), ChatFormatting.YELLOW);
+        say(p, RaidConfig.get().textFor(p, "escaped"), ChatFormatting.YELLOW);
         return true;
     }
 
     /** 탈출권 아이템: 이번 틱이 끝난 뒤 돌려보내도록 예약한다. */
     public static boolean requestEscape(ServerPlayer p) {
         if (!inArena(p) && !flagged(p)) {
-            say(p, "레이드 구역 안에서만 쓸 수 있습니다.", ChatFormatting.RED);
+            say(p, com.rtshop.story.StoryText.pick(p, "레이드 구역 안에서만 쓸 수 있습니다.", "You can only use this inside the raid arena."), ChatFormatting.RED);
             return false;
         }
         PENDING_ESCAPE.add(p.getUUID());
@@ -581,7 +581,7 @@ public final class Raid {
     public static boolean summon(ServerPlayer p) {
         RaidConfig c = RaidConfig.get();
         if (state != IDLE) {
-            say(p, c.text("alreadySummoned"), ChatFormatting.RED);
+            say(p, c.textFor(p, "alreadySummoned"), ChatFormatting.RED);
             return false;
         }
         ServerLevel level = arenaLevel(p.server);
@@ -611,7 +611,7 @@ public final class Raid {
         VOTED.clear();
         level.addFreshEntity(living);
         for (ServerPlayer o : playersIn(p.server)) {
-            say(o, c.text("summoned", p.getGameProfile().getName()), ChatFormatting.RED);
+            say(o, c.textFor(o, "summoned", p.getGameProfile().getName()), ChatFormatting.RED);
         }
         return true;
     }
@@ -643,7 +643,7 @@ public final class Raid {
         o.addProperty("voted", VOTED.contains(p.getUUID()));
         JsonObject t = new JsonObject();
         for (String k : new String[]{"voteTitle", "voteAgree", "voteStay", "voteCount", "failTitle", "failSub", "failConfirm", "failBody", "successTitle", "returnNotice"}) {
-            t.addProperty(k, c.text(k));
+            t.addProperty(k, c.textFor(p, k));
         }
         o.add("texts", t);
         send(p, RaidPacket.PROMPT, o);
@@ -657,7 +657,7 @@ public final class Raid {
         state = FAILED;
         until = Weekly.now() + c.failReturnSeconds * 1000L;
         for (ServerPlayer p : playersIn(server)) {
-            title(p, c.text("failTitle"), c.text("failSub"), ChatFormatting.DARK_RED);
+            title(p, c.textFor(p, "failTitle"), c.textFor(p, "failSub"), ChatFormatting.DARK_RED);
             prompt(p, "fail", c.failReturnSeconds);
         }
     }
@@ -672,11 +672,11 @@ public final class Raid {
         List<ServerPlayer> in = playersIn(server);
         for (ServerPlayer p : in) restoreMode(p);
         if (!byPlayer) {
-            for (ServerPlayer p : in) say(p, c.text("notByPlayer"), ChatFormatting.YELLOW);
+            for (ServerPlayer p : in) say(p, c.textFor(p, "notByPlayer"), ChatFormatting.YELLOW);
         } else {
             rewarded = true;
             for (ServerPlayer p : in) {
-                title(p, c.text("successTitle"), c.text("successSub"), ChatFormatting.GOLD);
+                title(p, c.textFor(p, "successTitle"), c.textFor(p, "successSub"), ChatFormatting.GOLD);
                 com.rtshop.rank.Ranks.add(p, com.rtshop.rank.Ranks.RAIDS, 1);
                 try {
                     reward(p);
@@ -686,7 +686,7 @@ public final class Raid {
             }
         }
         for (ServerPlayer p : in) {
-            say(p, c.text("returnNotice", c.returnSeconds), ChatFormatting.AQUA);
+            say(p, c.textFor(p, "returnNotice", c.returnSeconds), ChatFormatting.AQUA);
             prompt(p, "vote", c.returnSeconds);
         }
     }
@@ -712,9 +712,9 @@ public final class Raid {
                 com.rtshop.rank.Ranks.earned(p, c.weeklyGold);
             }
             e.weeklyWeek = week;
-            say(p, c.text("weeklyGot"), ChatFormatting.GREEN);
+            say(p, c.textFor(p, "weeklyGot"), ChatFormatting.GREEN);
         } else {
-            say(p, c.text("weeklyAlready"), ChatFormatting.GRAY);
+            say(p, c.textFor(p, "weeklyAlready"), ChatFormatting.GRAY);
         }
         e.clears++;
         data.touch();
@@ -744,15 +744,15 @@ public final class Raid {
             Reward.give(p, s.copy());
             got++;
             String name = s.getHoverName().getString() + (s.getCount() > 1 ? " ×" + s.getCount() : "");
-            say(p, c.text("dropGot", name), ChatFormatting.LIGHT_PURPLE);
+            say(p, c.textFor(p, "dropGot", name), ChatFormatting.LIGHT_PURPLE);
             if (grade == Reward.GRADES.length - 1) {
                 lastBroadcast = c.text("mysteryGot", p.getGameProfile().getName(), c.text("mysteryName"), name);
                 for (ServerPlayer o : p.server.getPlayerList().getPlayers()) {
-                    say(o, lastBroadcast, ChatFormatting.DARK_PURPLE);
+                    say(o, c.textFor(o, "mysteryGot", p.getGameProfile().getName(), c.textFor(o, "mysteryName"), name), ChatFormatting.DARK_PURPLE);
                 }
             }
         }
-        if (got == 0 && rolls > 0) say(p, c.text("dropNone"), ChatFormatting.GRAY);
+        if (got == 0 && rolls > 0) say(p, c.textFor(p, "dropNone"), ChatFormatting.GRAY);
         return got;
     }
 
@@ -840,7 +840,7 @@ public final class Raid {
                 p.clearFire();
                 keep(p).putInt(NBT_MODE, p.gameMode.getGameModeForPlayer().getId());
                 p.setGameMode(GameType.SPECTATOR);
-                say(p, c.text("downed"), ChatFormatting.RED);
+                say(p, c.textFor(p, "downed"), ChatFormatting.RED);
             }
             return;
         }
@@ -859,7 +859,7 @@ public final class Raid {
                 boolean first = !firstBossDown(p);
                 data.of(p.getUUID()).kills.merge(id.toString(), 1, Integer::sum);
                 if (first && c.npcsAfterFirstBoss && !(p instanceof FakePlayer)) {
-                    say(p, c.text("npcOpened"), ChatFormatting.GOLD);
+                    say(p, c.textFor(p, "npcOpened"), ChatFormatting.GOLD);
                 }
             }
             data.touch();
@@ -994,7 +994,7 @@ public final class Raid {
         if (event.getHand() != InteractionHand.MAIN_HAND) return;
         ItemStack held = sp.getMainHandItem();
         if (!held.is(ModItems.RAID_EYE.get())) {
-            say(sp, "제단에는 레이드 소환의 눈을 사용하세요.", ChatFormatting.GRAY);
+            say(sp, com.rtshop.story.StoryText.pick(sp, "제단에는 레이드 소환의 눈을 사용하세요.", "Use a Raid Summoning Eye on the altar."), ChatFormatting.GRAY);
             return;
         }
         if (summon(sp) && !sp.getAbilities().instabuild) {

@@ -88,6 +88,23 @@ for f in sorted(glob.glob(os.path.join(here, 'en3', 'p*.py'))):
         out.setdefault(src3[m.START + i], tr)
         n3 += 1
 print("story lines (source3): %d / %d translated" % (n3, len(src3)))
+# 설정 기본 문구 (extract4.py 가 자바 코드에서 모은 source4.json 과 en4/p<시작번호>.py): 레이드·주간 보상·보스 소개·결계·스킬라 단서·직업·무기 종류·세계 규칙
+p4 = os.path.join(here, 'source4.json')
+src4 = json.load(open(p4, encoding='utf-8')) if os.path.exists(p4) else []
+n4 = 0
+for f in sorted(glob.glob(os.path.join(here, 'en4', 'p*.py'))):
+    spec = importlib.util.spec_from_file_location('en4_' + os.path.basename(f)[:-3], f)
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    if m.START != n4:
+        print("en4 의 번역이 이어지지 않습니다:", os.path.basename(f), "START", m.START, "앞의 끝", n4); sys.exit(1)
+    for i, tr in enumerate(m.EN):
+        ko = src4[m.START + i]
+        if ko.count('%s') != tr.count('%s'):
+            print("en4: %s 의 수가 원문과 다릅니다:", ko, '=>', tr); sys.exit(1)
+        out.setdefault(ko, tr)
+        n4 += 1
+if n4 != len(src4):
+    print("source4 의 번역 수가 원문과 다릅니다:", n4, len(src4)); sys.exit(1)
 for k, v in EXTRA.items():
     out.setdefault(k, v)
 for qd in story["quests"]:

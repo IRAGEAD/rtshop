@@ -210,6 +210,37 @@ public final class JobConfig {
         return paramLine(key, v, handMargin, null);
     }
 
+    /** 영어 설명 (이야기 언어가 한국어가 아닌 사람에게). 수치로 조립하는 글이라 번역 표 대신 여기서 만든다. */
+    public static String[] paramLine(String key, double v, double handMargin, JobDef d, boolean en) {
+        if (!en) return paramLine(key, v, handMargin, d);
+        double hearts = Math.abs(v) / 2;
+        String heartText = (hearts == Math.rint(hearts) ? Long.toString(Math.round(hearts)) : String.format(Locale.ROOT, "%.1f", hearts)) + (hearts == 1 ? " heart" : " hearts");
+        String text = switch (key) {
+            case "critDamage" -> "Sword critical damage " + signed(v);
+            case "maxHealth" -> "Max health " + flat(v) + " (" + heartText + ")";
+            case "moveSpeed" -> "Movement speed " + signed(v);
+            case "damageTaken" -> "Damage taken " + signed(-v);
+            case "knockbackResist" -> "Knockback resistance " + signed(v);
+            case "arrowSave" -> pct(v) + " chance to get a fired arrow back";
+            case "shieldKnockback" -> "Blocking with a shield pushes melee attackers back (strength " + pct(v) + ")";
+            case "shieldReflect" -> "Returns " + pct(v) + " of the melee damage blocked with a shield";
+            case "distanceBonus" -> "Projectile damage up to " + signed(v) + " the farther the hit (full at "
+                    + Math.round(d == null ? 32 : d.param("distanceFull", 32)) + "+ blocks)";
+            case "maxMana" -> "Max mana " + signed(v) + " (Iron's Spells)";
+            case "spellPower" -> "Spell power " + signed(v) + " (Iron's Spells · Wizards)";
+            case "starUp" -> pct(v) + " chance that a harvested crop's star grade goes up one step";
+            case "extraHarvest" -> pct(v) + " chance of 1 extra crop per harvest";
+            case "fishSell" -> "Fish sale price " + signed(v);
+            case "extraFish" -> pct(v) + " chance of 1 extra fish per catch";
+            case "mineSpeed" -> "Mining speed " + signed(v);
+            case "extraOre" -> pct(v) + " chance of an extra drop when mining ore";
+            case "foodBonus" -> "Hunger restored by food " + signed(v);
+            case "dishSell" -> "Hand-cooked dish sale price " + signed(v) + " (about " + Math.round((1 + handMargin) * (1 + v) * 100) + "% of the ingredient cost)";
+            default -> key + " " + signed(v);
+        };
+        return new String[]{v > 0 ? "+" : "-", text};
+    }
+
     public static String[] paramLine(String key, double v, double handMargin, JobDef d) {
         boolean good = v > 0;
         String text = switch (key) {
@@ -240,13 +271,19 @@ public final class JobConfig {
 
     /** 화면에 보일 설명 줄: 앞 글자가 '+'(장점) / '-'(단점) / ' '(참고). */
     public List<String> describe(JobDef d, double handMargin) {
+        return describe(d, handMargin, null);
+    }
+
+    /** 그 플레이어의 이야기 언어로 쓴 설명 줄 (p 가 null 이면 한국어). */
+    public List<String> describe(JobDef d, double handMargin, net.minecraft.server.level.ServerPlayer p) {
+        boolean en = com.rtshop.story.StoryText.en(p);
         List<String> pros = new ArrayList<>();
         List<String> cons = new ArrayList<>();
         for (Map.Entry<String, Double> e : d.params.entrySet()) {
             if (e.getValue() == 0 || e.getKey().equals("distanceFull")) {
                 continue; // 최대 보너스 거리는 거리 보너스 설명 안에 함께 적는다
             }
-            String[] l = paramLine(e.getKey(), e.getValue(), handMargin, d);
+            String[] l = paramLine(e.getKey(), e.getValue(), handMargin, d, en);
             (l[0].equals("+") ? pros : cons).add(l[1]);
         }
         // 같은 수치의 무기 종류는 한 줄로 묶는다
@@ -265,26 +302,26 @@ public final class JobConfig {
             }
             StringBuilder sb = new StringBuilder();
             if (dmg != 0) {
-                sb.append("피해 ").append(signed(dmg));
+                sb.append(en ? "damage " : "피해 ").append(signed(dmg));
             }
             if (spd != 0) {
                 if (sb.length() > 0) {
                     sb.append(", ");
                 }
-                sb.append("공격 속도 ").append(signed(spd));
+                sb.append(en ? "attack speed " : "공격 속도 ").append(signed(spd));
             }
             String key = sb.toString();
-            groups.computeIfAbsent(key, k -> new ArrayList<>()).add(typeName(type));
+            groups.computeIfAbsent(key, k -> new ArrayList<>()).add(com.rtshop.story.StoryText.t(p, typeName(type)));
             goodOf.put(key, dmg > 0 || (dmg == 0 && spd > 0));
         }
         for (Map.Entry<String, List<String>> g : groups.entrySet()) {
-            String line = String.join("·", g.getValue()) + " " + g.getKey();
+            String line = en ? String.join(" / ", g.getValue()) + ": " + g.getKey() : String.join("·", g.getValue()) + " " + g.getKey();
             (goodOf.get(g.getKey()) ? pros : cons).add(line);
         }
         List<String> out = new ArrayList<>();
         pros.forEach(s -> out.add("+" + s));
         cons.forEach(s -> out.add("-" + s));
-        d.notes.forEach(s -> out.add(" " + s));
+        d.notes.forEach(s -> out.add(" " + com.rtshop.story.StoryText.t(p, s)));
         return out;
     }
 
