@@ -244,3 +244,9 @@
 - CI 의 셰이더 사진: client/ClientShaderTest (+ .github/scripts/shaderpacks.py). 결과 rtshop-shadertest-<팩>.txt.
 - 보호권: 3.49 부터 모루 칸 방식. 3.64.2 에서 남은 옛 안내 문구를 고치고, 옛 방식의 보호(GUARD_KEY)는 접속할 때 보호권으로 돌려준다(Enhance.refundLegacyGuard / onLoginGuard).
 - 밸런스 검토 자료: test/PackDiag.gear (diag.txt 의 == weapons · == armor · == extreme gear sources), 문서 docs/balance_review.md.
+
+3.65.0 (밸런스: 원거리 · 마법 강화 · 터무니없는 장비 · 값)
+- 강화 종류: enhance/Enhance.kind (RANGED · MAGIC 추가, rangedItem / magicItem / spellAttribute), 피해: enhance/EnhanceRanged (쏜 것의 rtshop_enh_lv, 주문은 든 지팡이).
+- 터무니없는 장비: rules/ItemPolicy.extreme · rules/ExtremeGuard (줍기 · 가방) · rules/MobRules.onDrops · rules/RecipeRules.hiddenOutput.
+- 값: shop/PricingConfig.ingredientValues (귀한 재료), shop/ShopLoader.oreVariantValue · addOreVariants (돌 변형 광석), Price.staffFallback (완드) · Price.explicitPrice (직접 적은 값은 그대로),
+  "만들면 훨씬 싼데 비싸게 팔던 품목" 내리기(applyRecipePricing 끝). 점검: test/PackDiag.loops (돈이 불어나는 길 · 뽑기와 상점에 함께 있는 물건).

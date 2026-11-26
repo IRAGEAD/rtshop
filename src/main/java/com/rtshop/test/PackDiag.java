@@ -185,7 +185,10 @@ final class PackDiag {
         return sb.toString();
     }
 
-    private static final String[] PRICE_IDS = {"minecraft:iron_ingot", "minecraft:gold_ingot", "minecraft:netherite_ingot",
+    private static final String[] PRICE_IDS = {"minecraft:golden_carrot", "minecraft:glistering_melon_slice", "minecraft:cake",
+            "farmersdelight:gleaming_salad_block", "kaleidoscope_cookery:golden_salad", "kaleidoscope_cookery:sweet_and_sour_pork_rice_bowl",
+            "kaleidoscope_cookery:shengjian_mantou", "kaleidoscope_tavern:bloody_mary", "minecraft:wooden_shovel", "minecraft:bow",
+            "minecraft:iron_ingot", "minecraft:gold_ingot", "minecraft:netherite_ingot",
             "minecraft:copper_ingot", "minecraft:diamond", "minecraft:iron_sword", "minecraft:iron_chestplate",
             "minecraft:golden_sword", "minecraft:diamond_sword", "minecraft:netherite_sword", "minecraft:iron_pickaxe",
             "minecraft:raw_iron", "minecraft:iron_nugget", "minecraft:iron_block", "minecraft:gold_nugget", "spelunkery:raw_iron_nugget", "spelunkery:raw_gold_nugget", "minecraft:raw_gold"};
@@ -441,8 +444,8 @@ final class PackDiag {
             ShopLoader.Price p = l.prices.get(id);
             StringBuilder sb = new StringBuilder(id);
             if (p != null) {
-                sb.append(String.format(Locale.ROOT, " price %d sell %.3f fixedSell %s gear %s finished %s basis %s",
-                        p.price, p.sellUnit, p.fixedSell, p.gear, p.finished, p.basis));
+                sb.append(String.format(Locale.ROOT, " price %d sell %.3f fixedSell %s gear %s finished %s basis %s purchase %s need %.2f",
+                        p.price, p.sellUnit, p.fixedSell, p.gear, p.finished, p.basis, p.purchaseBasis, p.purchaseNeed));
             } else {
                 sb.append(" (no price)");
             }

@@ -6470,6 +6470,14 @@ public final class SelfTest {
         check("no food sells for less than its ingredients cost", deficits == 0, deficits == 0 ? null : deficits + ":" + sample);
         check("nothing sells for more than the shop charges for it", loops == 0, loops == 0 ? null : loops + ":" + sample);
         check("no crafted item sells for more than its materials", craftLoops == 0, craftLoops == 0 ? null : craftLoops + ":" + sample);
+        ShopLoader.Price goldenCarrot = plain(l, Items.GOLDEN_CARROT);
+        ShopLoader.Price ingotForCarrot = plain(l, Items.GOLD_INGOT);
+        if (goldenCarrot != null && goldenCarrot.sellableSomewhere && ingotForCarrot != null) {
+            // 금 조각 8개 = 금 주괴 8/9 개. 전에는 조각을 '금 장비를 녹여서'만 마련한다고 셈해 황금 당근을 5,585 G 에 사 주었다 (3.65.0)
+            double viaIngots = ingotForCarrot.price * 8.0 / 9.0;
+            check("3.65.0 a golden carrot is bought back near what its gold costs (no buy-gold, craft, sell loop)",
+                    goldenCarrot.sellUnit <= (viaIngots + 60) * 1.3, goldenCarrot.sellUnit + " vs gold " + viaIngots);
+        }
         List<String> buyLoss = ShopLoader.purchaseDeficits(l);
         check("buying ingredients from the shops and cooking never loses money, and a hopper-fed furnace cannot farm money",
                 buyLoss.isEmpty(), buyLoss.isEmpty() ? null : buyLoss.size() + ": " + String.join(" / ", buyLoss.subList(0, Math.min(8, buyLoss.size()))));

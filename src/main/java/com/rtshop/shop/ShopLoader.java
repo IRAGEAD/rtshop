@@ -1271,6 +1271,9 @@ public final class ShopLoader {
      * 한 음식의 매입가 하한: 재료를 모두 살 수 있는 조리법들의 순수 재료비 중 가장 큰 값.
      * 단 자동화할 수 있는 조리법으로 더 싸게 만들 수 있으면, 그보다 비싼 조리법은 보호하지 않는다 (skipped).
      */
+    /** 매입가 하한으로 지켜 주는 조리법: 가장 싼 조리법 재료비의 이 배수까지 (3.65.0). */
+    static final double ALT_RECIPE_LIMIT = 1.15;
+
     private static Need need(String id, Map<String, List<RecipeSolver.Recipe>> makers, Map<String, Double> pcost, RecipeSolver.Env env,
                              RecipeSolver.Config pure, PricingConfig pc, Map<String, Double> supply) {
         List<RecipeSolver.Recipe> rs = makers.getOrDefault(id, List.of());
@@ -1310,6 +1313,12 @@ public final class ShopLoader {
                 continue;
             }
             if (costs[i] > autoMin + 1.0e-6) {
+                skipped.add(rs.get(i));
+                continue;
+            }
+            // 3.65.0: 가장 싼 조리법보다 15% 넘게 비싼 조리법은 하한으로 지켜 주지 않는다. 지켜 주면 같은 음식을 싼 조리법으로 만들어
+            // 그 비싼 값에 팔아 돈이 불어난다 (손요리 마진까지 합쳐 최대 약 26% 남는 것이 한도).
+            if (min < Double.MAX_VALUE && costs[i] > min * ALT_RECIPE_LIMIT + 1.0e-6) {
                 skipped.add(rs.get(i));
                 continue;
             }
@@ -1409,12 +1418,10 @@ public final class ShopLoader {
         RecipeSolver.Config cfg = new RecipeSolver.Config();
         cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(scan);
-        List<RecipeSolver.Recipe> usable = new ArrayList<>();
-        for (RecipeSolver.Recipe r : scan.recipes) {
-            if (!storage.contains(r)) {
-                usable.add(r);
-            }
-        }
+        // 3.65.0: 재료를 사서 마련하는 길에는 보관용 조리법(주괴 → 조각 9개 등)도 넣는다. 빼면 금 조각을 '금 장비를 녹여서'처럼 터무니없이
+        // 비싼 길로만 마련할 수 있다고 계산해, 황금 당근의 매입가가 5,585 G 가 되었다 (주괴로 만들면 300 G 안팎 → 사서 만들어 팔면 큰돈).
+        // 매입가 하한을 걸 음식의 조리법(makers)에서는 그대로 뺀다.
+        List<RecipeSolver.Recipe> usable = new ArrayList<>(scan.recipes);
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(scan, storage);
         double ratio = pc.sellRatio > 0 ? pc.sellRatio : 0.5;
         int raised = 0;
@@ -1535,12 +1542,7 @@ public final class ShopLoader {
         RecipeSolver.Config cfg = new RecipeSolver.Config();
         cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
-        List<RecipeSolver.Recipe> usable = new ArrayList<>();
-        for (RecipeSolver.Recipe r : loaded.scan.recipes) {
-            if (!storage.contains(r)) {
-                usable.add(r);
-            }
-        }
+        List<RecipeSolver.Recipe> usable = new ArrayList<>(loaded.scan.recipes);   // 3.65.0: applyPurchaseFloor 와 같게 (보관용 조리법도 재료 마련에)
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
         RecipeSolver.setRefunds(refunds(loaded.prices, pc));
         Map<String, Double> sup = supply(loaded.prices);
@@ -1585,12 +1587,7 @@ public final class ShopLoader {
         RecipeSolver.Config cfg = new RecipeSolver.Config();
         cfg.flatExtra.putAll(pc.flatExtra);
         Set<RecipeSolver.Recipe> storage = storageRecipes(loaded.scan);
-        List<RecipeSolver.Recipe> usable = new ArrayList<>();
-        for (RecipeSolver.Recipe r : loaded.scan.recipes) {
-            if (!storage.contains(r)) {
-                usable.add(r);
-            }
-        }
+        List<RecipeSolver.Recipe> usable = new ArrayList<>(loaded.scan.recipes);   // 3.65.0: applyPurchaseFloor 와 같게 (보관용 조리법도 재료 마련에)
         Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, storage);
         RecipeSolver.setRefunds(refunds(loaded.prices, pc));
         Map<String, Double> sup = supply(loaded.prices);

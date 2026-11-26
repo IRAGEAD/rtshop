@@ -1,4 +1,4 @@
-# 이어받기 안내 (2026-11-27 새벽, 3.64.2 올린 뒤)
+# 이어받기 안내 (2026-11-27 아침, 3.65.0 올린 뒤)
 
 새 세션은 이 파일 하나만 읽으면 이어서 일할 수 있게 적었습니다. 더 자세한 것은 `docs/worklist.md`(요청 목록·진행), `docs/story_bible_pointer.md`(코드 지도), `docs/review_checklist.md`(사용자가 직접 볼 것) 에 있습니다.
 
@@ -59,7 +59,9 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
-- **3.64.2 를 올렸고(릴리스 latest = RT Shop 3.64.2) jar · 요약 · 밸런스 검토(`docs/balance_review.md`)를 사용자에게 보냈습니다.** 3.64.2 (worklist 의 "3.64.2", M-1 ~ M-6):
+- **3.65.0 을 올렸고(릴리스 latest = RT Shop 3.65.0) jar 와 요약을 사용자에게 보냈습니다.** 3.65.0 = 밸런스 검토의 제안 중 사용자가 고른 **C · M · D · I · K** + 추가 점검 (worklist 의 "3.65.0", N-1 ~ N-7):
+  원거리 · 마법 무기 강화 / 터무니없는 장비(Arcane Vortex) 막기 / 완드 값 / 희귀 재료 값 / 만들면 싼 물건의 상점가 / 돌 변형 광석 팔기. 남은 제안 A · B · E · F · G · H · J · L 은 사용자가 고르면.
+- 3.64.2 (worklist 의 "3.64.2", M-1 ~ M-6):
   Photon 에서 룬 제단 구슬의 빛이 다른 무늬를 덮지 않게(넓은 빛무리 없앰 · 둘레 빛만 · 셰이더에서는 밝은 발광 원판) / 강화 모루의 빛을 셰이더에서도 보이는 단계로 / CI 에서 Photon 을 켠 사진 /
   보호권 안내 문구(이미 모루 칸 방식이었음) + 옛 방식 보호 돌려주기 / 경제 · 무기 밸런스 검토(숫자는 안 바꿈, 사용자가 A~M 중 고르기를 기다림) / 떠돌이 마법사 갑옷이 지팡이로 잡히던 것.
 - 3.64.1 = 룬 제단 구슬의 기본 색을 ② 달빛 은백(ice)으로 (사용자가 고름, worklist 의 "3.64.1").
@@ -72,7 +74,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 - 3.59.0 (worklist 의 "3.59.0" · "추가 요청 15:03" · "추가 요청 15:19"):
   흔들리던 시험 두 개 손질 / 강화 정보 창의 "+13%" 글자(더하기표가 세로 줄로 보이던 것) / 영어판에 남은 한국어 / Create 를 상점 · 뽑기에서도 제외(item_policy.json 4판, gachaBan) / 상점 설정을 기본값으로 · 내 설정으로 되돌리는 명령(`/rtshop shop defaults|mine|status`).
 - 3.58.0: 기억의 문을 걸어 들어가는 문으로 + 보스 구역의 대기·불씨·깨어남 연출 / 요리 권장안 / Create 조합법·전리품·블록 드랍 금지 / NPC 자리 배치 파일 / 미니맵 NPC 아이콘 / 주식·히든 직업 제안서 / 마을 이식 설명.
-- 가지 이름: v5-next ~ v5-next16 은 이미 쓰였습니다. 다음 새 가지는 **v5-next17** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
+- 가지 이름: v5-next ~ v5-next17 은 이미 쓰였습니다. 다음 새 가지는 **v5-next18** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
 
 ## 5. 사용자에게 보낸 3.64.2 요약 (참고)
 
@@ -142,7 +144,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 2-3. **NPC 외형의 다음 걸음** (3.61.0 에서 C 방식 27명): 사용자가 인물별로 고칠 곳을 말하면 `tools/mock/npc_mock.py` 의 그 인물 함수를 고치고 → `python3 tools/gen_npc_looks.py` → (그림으로 먼저 보여 주려면 `m.render(m.<인물>())`). 직업 안내인 알버트 · 식당 주인 로렌초의 전용 모습, 팔다리 움직임(지금은 머리만 돎), 동행 NPC(`CompanionRenderer`)에게도 같은 모습을 입히는 일은 아직.
 2-4. **보스 음악 겹침** (3.63.0 에서 첫 판: 보스 음악은 한 번에 하나, 배경 음악은 쉼): 사용자에게 "어느 보스에서 무엇과 무엇이 겹쳤는지"를 물어 두었다. 답이 오면 그 경우를 본다 — 그 모드가 음악을 트는 법은 inspect job 으로(`ci-inspect` 의 cataclysm-files.txt 에 `client/sound/BossMusicPlayer`). 이름에 music · theme · bgm 이 없는 음악이면 `BossMusicClient.kindOf` 가 못 알아본다.
 2-5. **3.64.0 에서 물어 둔 것** (답을 기다림): ~~① 룬 제단 구슬의 색~~ → 3.64.1 에서 ② 달빛 은백으로 끝냄 ~~② 강화 모루의 빛이 셰이더를 켰을 때만 안 보이는지~~ → 사용자가 "Photon 기준"이라고 답했고 3.64.2 에서 고침(Photon 사진으로 확인) ③ 대사의 언어가 이상했던 NPC 의 이름과 그때의 언어 ④ 전설 이상 장비가 실제로 파괴된 적이 있는지(어떤 장비) ⑤ 상점 창의 제목 · 분류 이름도 영어로 바꿀지.
-2-7. **밸런스 검토의 제안 A~M** (3.64.2, `docs/balance_review.md` 1절 표): 사용자가 고른 것만 고친다. 숫자를 바꿀 때는 그 문서 9절의 계산(강화 마르코프 연쇄 · 뽑기 기대값)으로 다시 재서 함께 보여 준다.
+2-7. **밸런스 검토의 제안 A~M** (3.64.2, `docs/balance_review.md` 1절 표): 사용자가 고른 것만 고친다. **3.65.0 에서 C · M · D · I · K 를 고침.** 남은 것 A · B · E · F · G · H · J · L. 숫자를 바꿀 때는 그 문서 9절의 계산(강화 마르코프 연쇄 · 뽑기 기대값)으로 다시 재서 함께 보여 준다.
    계산 도구는 세션 임시 폴더에 있었으니 다시 짤 것 (강화: 단계별 성공/유지/손상/파괴 + 보호권 4가지 중 기대 비용이 가장 싼 것 고르기 = 값 반복).
 2-6. **다음 작업으로 받아 둔 것**: K-1 Diorama 지도(M)에서 이름표 대신 NPC 마다 다른 아이콘 (worklist 맨 끝 "다음 작업"). 사용자가 "작업이 끝나면 목록에 추가"라고 했으니, 다음 세션에서 시작해도 되는지 한 번 확인하고 진행.
 3. **주식 시스템 · 히든 직업(위조자 · 조사관)**: (3.60.0 에서 제안서를 다시 보여 줌. 아직 고르지 않음.) `docs/ideas_hidden_jobs_stock.md` 의 가·나·다 가운데 고르고 "정해 주실 것" 네 가지에 답하면 단계별로 만든다 (① 증서·시세·배당 → ② 위조·감정 → ③ 숨은 퀘스트). 예전 약속: 직업·퀘스트·주식은 단계별로 하나씩 만들어 전달.
@@ -211,6 +213,13 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 - 강화 정보 창의 "+13% → +17%" 는 모드팩 전체의 스크린샷(81_enhance_ready.png)에서 더하기표가 제대로 보이는 것을 확인.
 
 ## 7. 알아 둘 함정
+
+- **강화의 종류(3.65.0)**: `Enhance.kind` = ARMOR → RANGED(발사 무기 · TaCZ 총 · 갈래 …Gun) → MAGIC(지팡이 · 완드 이름/갈래 **이면서 주문력 속성**) → WEAPON(공격력) 순서.
+  RANGED · MAGIC 은 속성이 아니라 `EnhanceRanged` 가 피해를 키운다(쏜 것에 단계 기록 `rtshop_enh_lv`, 주문은 든 지팡이). 표는 weaponBonus 를 같이 쓴다.
+- **터무니없는 장비(3.65.0)**: `ItemPolicy.extreme` (공격력 25 · 방어력 20, item_policy.json 의 extremeAttack / extremeArmor). keep · lootAllow 로도 못 푼다.
+  서바이벌 가방에서 5초마다 치우므로(`ExtremeGuard`), 일부러 주려면 창작 모드로. 결과를 감춘 모드 조합법은 `RecipeRules.hiddenOutput` 이 필드에서 결과를 찾는다(터무니없는 것만 막는 데 씀).
+- **상점가 규칙(3.65.0)**: 공식으로 매긴 값만 "만드는 값의 6배 넘으면 2배로" 내린다. 상점 파일에 직접 적은 값(`Price.explicitPrice`)은 건드리지 않는다 — 기본값을 바꿀 때는 `ShopLoader.REPRICED` 로 옛 기본값 그대로인 것만 고친다.
+  `pricing.json` 의 `ingredientValues` 는 레시피 원가의 기준 값(hint)으로 들어가며, 그 재료로 만든 물건도 "정확한 원가"로 본다(되팔 때 그 원가).
 
 - **CI 에서 셰이더(3.64.2)**: 모드팩 전체 job 의 마지막 단계가 Oculus 로 셰이더 팩을 켜고 다시 띄운다 (`ClientShaderTest`, `-Drtshop.clienttest.only=shader`). CI 의 소프트웨어 그리기(llvmpipe)는 계산 셰이더 공유 메모리가 32KB 라
   Photon 의 `deferred4_a`(36KB)가 컴파일되지 않고 Oculus 가 셰이더를 통째로 끈다("shader on: off") → `.github/scripts/shaderpacks.py` 가 shaders.properties 에 `program.world0/deferred4_a.enabled=false` 를 넣은 사본을 만든다.
