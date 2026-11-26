@@ -41,8 +41,12 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
 
     /** 구슬 둘레 빛의 크기 (구슬 반지름의 배수, 3.64.2). 받침 위에서는 0.20 × 1.7 = 0.34 로 가장 안쪽 고리(0.35) 안에 머문다. */
     public static final float RIM = 1.7F;
-    /** 셰이더를 켰을 때: 몸통에 더하는 빛의 세기, 둘레 빛의 배수 (셰이더는 빛을 받지 않게 그린 그림도 그늘에서 어둡게 칠한다). */
-    public static final float SHADER_CORE = 0.85F, SHADER_RIM = 1.5F;
+    /**
+     * 셰이더를 켰을 때 몸통 위 발광 층의 세기. 셰이더는 빛을 받지 않게 그린 그림도 그늘에서 어둡게 칠하고, 발광 층도 밝은 빛깔만 환하게 낸다
+     * (CI 의 Photon 사진: 몸통은 갈색, 둘레 빛 · 별빛은 어두운 점). 그래서 셰이더에서는 흰빛 쪽으로 당긴 밝은 원판(`_core`)을 몸통 위에 겹치고,
+     * 둘레 빛은 그리지 않으며(셰이더의 번짐 효과가 대신한다), 별빛도 그 밝은 원판으로 그린다.
+     */
+    public static final float SHADER_CORE = 1.0F;
 
     /** 숨 쉬듯 밝아졌다 어두워지는 정도 (0~1). */
     public static float breath(float time) {
@@ -93,15 +97,16 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
         // 3.64.2: 빛(별빛 · 구슬 둘레)은 더하기 섞기(RenderType.eyes: 깊이를 쓰지 않음)로 — 알파 섞기 빛은 Photon 같은 셰이더에서
         // 탁한 유리처럼 보여 뒤의 고리 · 무늬를 덮었고, 깊이를 써서 뒤에 그려지는 것을 가렸다. 넓게 퍼지던 빛무리는 없애고 빛은 구슬 바로 둘레에만 둔다.
         org.joml.Quaternionf face = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
+        boolean shader = ShaderState.on();
         if (k < 0.5F) {
-            VertexConsumer glow = buf.getBuffer(RenderType.eyes(tex("_rim")));
+            VertexConsumer glow = buf.getBuffer(RenderType.eyes(tex(shader ? "_core" : "_rim")));
             for (int i = 0; i < 4; i++) {
                 float a = time * 0.012F + i * 1.5708F;
                 float tw = 0.5F + 0.5F * Mth.sin(time * 0.11F + i * 2.3F);
                 ps.pushPose();
                 ps.translate(Mth.cos(a) * 0.52F, 0.16F * Mth.sin(time * 0.03F + i * 1.9F) + (i % 2 == 0 ? 0.22F : -0.05F), Mth.sin(a) * 0.52F);
                 ps.mulPose(face);
-                glowQuad(ps, glow, 0.035F + 0.02F * tw, (0.35F + 0.65F * tw) * (1F - k * 2F));
+                glowQuad(ps, glow, (0.035F + 0.02F * tw) * (shader ? 0.55F : 1F), (0.35F + 0.65F * tw) * (1F - k * 2F));
                 ps.popPose();
             }
         }
@@ -113,8 +118,7 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
             float s = Mth.lerp(k, 0.20F, 0.12F) + flare * 0.03F * (1F - 0.5F * k);
             float br = breath(time);
             // 둘레의 빛(가장 안쪽 은빛 고리 0.35 안쪽까지만) → 그 위에 구슬. 구슬은 빛·그림자를 받지 않는 그림 (어두운 곳이나 셰이더에서 가장자리가 검게 보이지 않게)
-            boolean shader = ShaderState.on();
-            glowQuad(ps, buf.getBuffer(RenderType.eyes(tex("_rim"))), s * RIM, (0.55F + 0.15F * br + flare * 0.30F) * show * (shader ? SHADER_RIM : 1F));
+            if (!shader) glowQuad(ps, buf.getBuffer(RenderType.eyes(tex("_rim"))), s * RIM, (0.55F + 0.15F * br + flare * 0.30F) * show);
             quad(ps, buf.getBuffer(RenderType.text(tex(""))), s * (1F + 0.03F * br), show);
             if (shader) {   // 셰이더에서는 몸통이 그늘에서 어둡게 칠해진다 → 같은 자리에 발광 층을 한 번 더
                 glowQuad(ps, buf.getBuffer(RenderType.eyes(tex("_core"))), s * (1F + 0.03F * br), SHADER_CORE * show);

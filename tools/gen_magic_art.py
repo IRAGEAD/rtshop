@@ -410,19 +410,28 @@ def orb_rim_add(N, color, power=1.3):
             px[x, y] = (int(color[0] * k), int(color[1] * k), int(color[2] * k), int(255 * k))
     return im
 
-def orb_core_add(lit):
-    """구슬 몸통의 더하기 섞기 판 (3.64.2): 셰이더를 켰을 때만 몸통 위에 한 번 더 그린다 (RenderType.eyes = 셰이더의 발광 단계).
-    셰이더는 빛을 받지 않게 그린 몸통도 그늘에서 어둡게 칠하므로, 구슬이 스스로 빛나 보이게 한다. 빛깔에 투명도를 미리 곱해 둔다."""
-    im = Image.new('RGBA', lit.size); src = lit.load(); px = im.load()
-    for y in range(lit.size[1]):
-        for x in range(lit.size[0]):
-            r, g, b, a = src[x, y]
-            k = a / 255.0
-            px[x, y] = (int(r * k), int(g * k), int(b * k), a)
+def orb_core_shader(N, body, rim_light):
+    """셰이더를 켰을 때 구슬 몸통 위에 한 번 더 그리는 발광 층 (3.64.2, RenderType.eyes = 셰이더의 발광 단계).
+    셰이더는 빛을 받지 않게 그린 몸통도 그늘에서 어둡게 칠하고, 발광 층도 밝은 빛깔만 환하게 낸다(CI 의 Photon 사진: 가장자리가 갈색으로 어두웠다).
+    그래서 몸통 빛깔을 흰빛 쪽으로 많이 당긴 밝은 원판으로 그린다. 가운데가 가장 희고, 가장자리는 그 색의 테두리 빛. 빛깔에 투명도를 미리 곱해 둔다."""
+    im = Image.new('RGBA', (N, N)); px = im.load(); h = (N - 1) / 2
+    for y in range(N):
+        for x in range(N):
+            dx, dy = (x - h) / h, (y - h) / h
+            r = math.hypot(dx, dy)
+            if r > 1:
+                continue
+            base = [body[i] + (rim_light[i] - body[i]) * min(1.0, r * r) for i in range(3)]
+            w = 0.70 - 0.30 * r                                   # 가운데일수록 흰빛
+            c = [base[i] + (255 - base[i]) * w for i in range(3)]
+            hl = max(0, 1 - math.hypot(dx + 0.36, dy + 0.38) * 2.6) ** 1.2
+            c = [min(255, c[i] + (255 - c[i]) * hl) for i in range(3)]
+            a = 1.0 if r < 0.94 else (1 - (r - 0.94) / 0.06)
+            px[x, y] = (int(c[0] * a), int(c[1] * a), int(c[2] * a), int(255 * a))
     return im
 
 for _name, (_deep, _body, _rim, _glow) in ORB_COLORS.items():
     _lit = orb_lit(64, _deep, _body, _rim)
     save(_lit, 'entity/orb/%s.png' % _name)
     save(orb_rim_add(64, _glow), 'entity/orb/%s_rim.png' % _name)            # 구슬 바로 둘레의 빛 (더하기 섞기)
-    save(orb_core_add(_lit), 'entity/orb/%s_core.png' % _name)               # 셰이더를 켰을 때 몸통에 더하는 빛
+    save(orb_core_shader(64, _body, _rim), 'entity/orb/%s_core.png' % _name)   # 셰이더를 켰을 때 몸통 위의 발광 층 · 별빛
