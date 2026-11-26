@@ -213,3 +213,9 @@
   - 기본값으로 돌릴 때 지금 파일을 `config/rtshop/backup/shop_mine/<상점>.json` 에 보관. 보관본을 덮어쓰게 되면 옛 것은 `backup/shop_mine_old/` 로 옮긴다. 내 설정으로 돌릴 때 지금 파일이 기본값도 보관본도 아니면 그것도 `shop_mine_old` 에 남긴다 → 몇 번을 오가도 지워지는 설정이 없다.
   - 범위는 상점 파일(`config/rtshop/shops/*.json`: 품목 · 가격 · 분류)뿐. 직접 만든 상점(기본 설정이 없는 파일)은 건드리지 않는다. 가격 규칙(pricing.json) · 뽑기 · 강화 등 다른 설정은 포함하지 않는다.
   - 문구는 언어 파일 `rtshop.shopdef.*` (한·영).
+
+## 3.59.0 을 올린 뒤 (같은 세션, 시험 코드만 — main 에는 아직 올리지 않음)
+
+- 모드팩 전체를 여러 번 돌리다 나온 흔들리는 시험 두 개를 더 고침:
+  - 서버 "npc layout" 둘 ("[1 1 0]"): 시험 자리가 시작 지점에서 먼 청크면 세운 NPC 가 `getEntities` 에 잡히지 않는다 → 시작 지점 곁(+24, 150, +8)으로 옮기고, "바닥 없는 자리"는 지형이 무엇이든 먼저 비운다.
+  - 화면 "right-clicking a ripe crop from a real client harvests and replants it": 작물 자리 위를 하늘까지 비운다 (어두운 곳에서는 다시 심은 밀이 뽑힘).
