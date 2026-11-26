@@ -1,4 +1,4 @@
-# 이어받기 안내 (2026-11-26 밤, 3.61.0 올린 직후)
+# 이어받기 안내 (2026-11-26 밤, 3.62.0 올린 직후)
 
 새 세션은 이 파일 하나만 읽으면 이어서 일할 수 있게 적었습니다. 더 자세한 것은 `docs/worklist.md`(요청 목록·진행), `docs/story_bible_pointer.md`(코드 지도), `docs/review_checklist.md`(사용자가 직접 볼 것) 에 있습니다.
 
@@ -39,7 +39,7 @@
 ```
 python3 tools/gen_lang.py src/main/resources/assets/rtshop/lang   # 화면 문구 (ko/en 을 함께 적음)
 python3 tools/gen_story.py                                        # 스토리 (tools/story_ch0X.py 가 원본)
-python3 tools/gen_dialogue.py                                     # NPC 대화 (고치면 맨 위 VERSION 을 올림. 지금 16)
+python3 tools/gen_dialogue.py                                     # NPC 대화 (고치면 맨 위 VERSION 을 올림. 지금 17)
 python3 tools/gen_readables.py ; python3 tools/gen_guide.py       # 읽을거리 · 안내서
 python3 tools/story_lang/extract2.py ; python3 tools/story_lang/extract3.py   # 번역 안 된 글 모으기
 python3 tools/story_lang/extract4.py                                          # 자바 코드의 설정 기본 문구 (레이드·보스 소개·단서·직업 이름 등)
@@ -56,15 +56,23 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
-- **3.61.0 을 올렸고(릴리스 latest = RT Shop 3.61.0) jar 와 요약을 사용자에게 보냈습니다.** 같은 날 3.55.0 ~ 3.60.0 도 올렸습니다.
+- **3.62.0 을 올렸고(릴리스 latest = RT Shop 3.62.0) jar 와 요약을 사용자에게 보냈습니다.** 같은 날 3.55.0 ~ 3.61.0 도 올렸습니다.
+- 3.62.0 (worklist 의 "3.62.0", H-1 ~ H-4): 보스마다 다른 등장 연출(Cinematic Cataclysm 컷신 넷 + 카메라 방식 여덟) / NPC 재디자인(알버트·로렌초·엘리 전용, 시대·말투에 맞춤, 모습 30개) / 스토리 평가 반영(겉도는 처치 퀘스트 셋을 장면으로, 벨로크와의 대화 시도, 플레이어의 추리 대답, 조연의 과거) / 대사 영어판 내보내기.
 - 3.61.0 (worklist 의 "3.61.0", G-1 ~ G-5): 민원을 시청 서기 하루의 창으로 + 분류(`client/PetitionScreen`, `net/PetitionPacket`) / 보스 등장 3D 카메라(`client/BossCam`) / NPC 외형 C 방식 27명(`npc/NpcLooks`, `client/NpcLookClient`, `tools/gen_npc_looks.py`) / 이사벨을 더 예쁘게 / 이전 요청 전체 대조.
 - 3.60.0 (worklist 의 "3.60.0", F-1 ~ F-4): 모드 목록의 버전 표기(`${file.jarVersion}`) / 스토리·진행 전체 검토에서 다섯 곳 고침(우유 말, '오늘의 룬' 언급, 이글루 걸음, 프로스트모의 옛 선택, 받지 않던 선택 둘의 뒷이야기) / 민원 첫 판(`/rtshop report`, `petition/Petitions`) / 주식·히든 직업 제안서와 NPC 외형 시안을 다시 보여 줌(고른 것 없음).
 - 3.59.0 (worklist 의 "3.59.0" · "추가 요청 15:03" · "추가 요청 15:19"):
   흔들리던 시험 두 개 손질 / 강화 정보 창의 "+13%" 글자(더하기표가 세로 줄로 보이던 것) / 영어판에 남은 한국어 / Create 를 상점 · 뽑기에서도 제외(item_policy.json 4판, gachaBan) / 상점 설정을 기본값으로 · 내 설정으로 되돌리는 명령(`/rtshop shop defaults|mine|status`).
 - 3.58.0: 기억의 문을 걸어 들어가는 문으로 + 보스 구역의 대기·불씨·깨어남 연출 / 요리 권장안 / Create 조합법·전리품·블록 드랍 금지 / NPC 자리 배치 파일 / 미니맵 NPC 아이콘 / 주식·히든 직업 제안서 / 마을 이식 설명.
-- 가지 이름: v5-next ~ v5-next11 은 이미 쓰였습니다. 다음 작업 가지는 **v5-next12** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
+- 가지 이름: v5-next ~ v5-next12 는 이미 쓰였습니다. 다음 작업 가지는 **v5-next13** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
 
-## 5. 사용자에게 보낸 3.61.0 요약 (참고)
+## 5. 사용자에게 보낸 3.62.0 요약 (참고)
+
+1. 보스 연출: Cinematic Cataclysm 컷신(이그니스·리바이어던·고대의 잔해·말레딕투스)을 기억의 문 안에서 틀고, 나머지 보스는 여덟 가지 카메라 방식 가운데 하나씩.
+2. NPC: 알버트·로렌초·엘리 전용 모습, 시대에 안 맞던 일곱 명 재구성, 말투와 맞춤.
+3. 스토리: 평가의 지적 가운데 고친 것과 손대지 못한 것(본편 중반의 호흡, 이사벨 동행 횟수, 2~4장 처치 목표 전반)을 나눠 알림.
+4. 대사 txt 한국어판 · 영어판.
+
+### 그 앞 판: 3.61.0 요약
 
 1. 민원: 시청 서기 하루에게 말을 걸어 「민원 접수 · 내 민원 보기」 → 창에서 분류 다섯 가운데 하나를 고르고 글을 써 접수. 운영자 명령은 그대로(분류로 거르기 추가).
 2. 보스 등장: 카메라가 보스 곁에서 움직이는 3D 연출 (끄기 client.json 의 bossCamera). Cinematic Cataclysm 의 컷신 연동은 아니라고 알림.
@@ -165,3 +173,6 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 - **화면 쪽 새 코드(3.61)의 함정**: ① `ClientSelfTest2` 의 걸음(add(...))에서 쓰는 static 필드는 그 static 블록보다 **위에** 선언해야 한다 ("illegal forward reference" — 여기서는 문법 점검으로 안 잡히고 CI 에서만 잡힌다). ② `RenderLivingEvent.Pre` 를 취소하면 이름표도 안 그려지므로 `NpcLookClient.nameTag` 가 직접 그린다. ③ 카메라를 다른 엔티티에 태우면 내 몸은 그려지지 않는다 (바닐라 규칙). ④ 화면 쪽은 NPC 의 열쇠(엔티티 태그)를 모른다 — 서버가 `StoryPacket.NPC_LOOKS` 로 알려 준 엔티티 번호만 안다.
 - NPC 모습 파일(.bin)은 **만들어진 파일**이다: 손으로 고치지 말고 `npc_mock.py` 를 고친 뒤 `python3 tools/gen_npc_looks.py`. 머리/몸 나눔은 gen_npc_looks.py 의 HEAD_FN · BODY_FN 과 "목 위(y ≥ 23.9) · 머리 둘레 안" 규칙, 낱 상자는 `g.head = 1 … g.head = None` 으로 직접 정한다.
 - 안내서는 5판, source2 는 764줄(`en2/p763.py` 까지). StoryPacket 종류: PETITIONS 17 · NPC_LOOKS 18 · BOSS_CAM 19(아직 안 씀).
+- **Cinematic Cataclysm 연동(3.62)**: 컷신 엔티티는 보스 클래스를 물려받은 다른 엔티티 종류(`cinematiccataclysm:*_cutscene`)다. 컷신이 끝나면 그 모드가 진짜 보스(`cataclysm:*`)를 세우므로, 보스전은 그동안 `bossId == null` + `awaitBossUntil` 상태로 기다린다 (`StoryArena.tick` 의 FIGHT 맨 앞). 그 모드의 판이 바뀌어 `summon` 의 모양이 달라지면 조용히 예전 방식으로 돌아가고 로그에 한 줄 남는다. 모드팩 전체의 서버 점검 "3.62 boss cutscenes" 가 네 컷신이 실제로 시작되는지 본다.
+- **스토리를 고칠 때의 영어**: 퀘스트의 제목·소개·진행·완료는 `ch0X_en.py` · `scylla_en.py` 의 그 퀘스트 줄을 **같이** 고친다 (안 고치면 옛 영어가 새 한국어에 붙는다 — 멈추지 않으니 스스로 챙길 것). 그 밖의 줄은 extract3 가 끝에 붙여 주고 `en3/p<번호>.py` 로 번역한다. 지금 source3 는 1592줄(`en3/p1590.py` 까지).
+- 목표의 수를 늘린 퀘스트(3.62 의 「나는 모른다」 · 「다정한 거짓말」)를 **하던 중인 사람**은 새 목표의 진행이 적히지 않는다(진행 배열이 짧다) → 수첩에서 포기하고 다시 받으면 된다. 다음에는 접속할 때 배열을 늘려 주는 손질을 넣으면 좋다 (`QuestManager` 의 `pr.active`).
