@@ -52,6 +52,11 @@ final class PackDiag {
         } catch (Throwable t) {
             out.add("prices failed: " + t);
         }
+        try {
+            gear(server, out);
+        } catch (Throwable t) {
+            out.add("gear failed: " + t);
+        }
         out.add("== lrtactical melee variants");
         try {
             for (ItemStack v : com.rtshop.gacha.GachaConfig.variantsForDiag("lrtactical:melee")) {
@@ -179,6 +184,95 @@ final class PackDiag {
             "minecraft:copper_ingot", "minecraft:diamond", "minecraft:iron_sword", "minecraft:iron_chestplate",
             "minecraft:golden_sword", "minecraft:diamond_sword", "minecraft:netherite_sword", "minecraft:iron_pickaxe",
             "minecraft:raw_iron", "minecraft:iron_nugget", "minecraft:iron_block", "minecraft:gold_nugget", "spelunkery:raw_iron_nugget", "spelunkery:raw_gold_nugget", "minecraft:raw_gold"};
+
+    /**
+     * 밸런스 검토용 장비 비교표: 무기는 공격력(맨손 1 포함)·초당 공격 횟수·DPS, 방어구는 방어력·방어 강도,
+     * 그리고 얻는 길(NPC 상점 구매가, 뽑기 등급, 조합 가능 여부, 보스 전리품).
+     */
+    private static void gear(MinecraftServer server, List<String> out) {
+        ShopLoader.Loaded l = ShopServer.loaded();
+        java.util.Map<String, Integer> shop = new java.util.HashMap<>();
+        if (l != null) {
+            for (com.rtshop.shop.ShopData sd : l.shops.values()) {
+                for (com.rtshop.shop.ShopData.Entry e : sd.entries) {
+                    if (!e.buyable || e.stack.isEmpty()) continue;
+                    ResourceLocation id = ForgeRegistries.ITEMS.getKey(e.stack.getItem());
+                    if (id != null) shop.merge(id.toString(), e.price, Math::min);
+                }
+            }
+        }
+        java.util.Map<String, String> gacha = new java.util.HashMap<>();
+        for (var en : com.rtshop.gacha.GachaConfig.get().pools.entrySet()) {
+            for (var e : en.getValue()) {
+                if (e.item == null || e.item.isEmpty()) continue;
+                gacha.merge(e.item, e.grade, (a, b) -> java.util.Arrays.asList(a.split("/")).contains(b) ? a : a + "/" + b);
+            }
+        }
+        java.util.Set<String> craft = new java.util.HashSet<>();
+        var access = server.registryAccess();
+        for (var r : server.getRecipeManager().getRecipes()) {
+            try {
+                ItemStack res = r.getResultItem(access);
+                if (res == null || res.isEmpty()) continue;
+                ResourceLocation oid = ForgeRegistries.ITEMS.getKey(res.getItem());
+                if (oid != null && !com.rtshop.rules.ItemPolicy.recipeBanned(r.getId(), oid)) craft.add(oid.toString());
+            } catch (Throwable ignored) {
+            }
+        }
+        out.add("== weapons (id | name | dmg | hits/s | dps | rarity | kind | shop | gacha | craft | boss)");
+        int n = 0;
+        for (Item item : ForgeRegistries.ITEMS) {
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            if (rl == null || item == Items.AIR) continue;
+            try {
+                ItemStack s = new ItemStack(item);
+                if (s.getMaxStackSize() > 1) continue;
+                double dmg = 0;
+                double spd = 0;
+                for (var m : s.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) dmg += m.getAmount();
+                for (var m : s.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_SPEED)) spd += m.getAmount();
+                String id = rl.toString();
+                String kind = com.rtshop.rules.ItemPolicy.gun(item) ? "gun" : com.rtshop.rules.ItemPolicy.staff(item) ? "staff"
+                        : item instanceof net.minecraft.world.item.ProjectileWeaponItem ? "ranged" : "melee";
+                boolean known = shop.containsKey(id) || craft.contains(id) || gacha.containsKey(id);
+                if (!(dmg >= 6 || gacha.containsKey(id) || !kind.equals("melee") && known)) continue;
+                double total = 1 + dmg;
+                double per = Math.max(0.1, 4 + spd);
+                out.add(String.format(Locale.ROOT, "%s | %s | %.1f | %.2f | %.1f | %s | %s | %s | %s | %s | %s", id,
+                        s.getHoverName().getString(), total, per, total * per, s.getRarity(), kind,
+                        shop.containsKey(id) ? String.valueOf(shop.get(id)) : "-", gacha.getOrDefault(id, "-"),
+                        craft.contains(id) ? "Y" : "-", com.rtshop.rules.ItemPolicy.bossItem(item) ? "Y" : "-"));
+                n++;
+            } catch (Throwable t) {
+                out.add(rl + " | error " + t);
+            }
+        }
+        out.add("weapons listed: " + n);
+        out.add("== armor (id | name | slot | armor | toughness | shop | craft | boss)");
+        n = 0;
+        for (Item item : ForgeRegistries.ITEMS) {
+            if (!(item instanceof net.minecraft.world.item.ArmorItem a)) continue;
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            if (rl == null) continue;
+            try {
+                ItemStack s = new ItemStack(item);
+                EquipmentSlot es = a.getEquipmentSlot();
+                double ar = 0;
+                double to = 0;
+                for (var m : s.getAttributeModifiers(es).get(Attributes.ARMOR)) ar += m.getAmount();
+                for (var m : s.getAttributeModifiers(es).get(Attributes.ARMOR_TOUGHNESS)) to += m.getAmount();
+                if (ar < 3 && to < 2) continue;
+                String id = rl.toString();
+                out.add(String.format(Locale.ROOT, "%s | %s | %s | %.1f | %.1f | %s | %s | %s", id, s.getHoverName().getString(),
+                        es.getName(), ar, to, shop.containsKey(id) ? String.valueOf(shop.get(id)) : "-",
+                        craft.contains(id) ? "Y" : "-", com.rtshop.rules.ItemPolicy.bossItem(item) ? "Y" : "-"));
+                n++;
+            } catch (Throwable t) {
+                out.add(rl + " | error " + t);
+            }
+        }
+        out.add("armor listed: " + n);
+    }
 
     private static void prices(List<String> out) {
         ShopLoader.Loaded l = ShopServer.loaded();
