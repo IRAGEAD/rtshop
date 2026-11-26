@@ -204,9 +204,11 @@ jobs:
             done) > /tmp/inspect/diorama-api.txt 2>&1
             cp /tmp/diorama-classes.txt /tmp/inspect/diorama-classes.txt
             # 웨이포인트 저장소의 쓰임새 (MIT 라이선스: 연동 코드를 맞추는 데 씀)
-            (cd /tmp/dj && for c in dev/diorama/waypoint/WaypointStore 'dev/diorama/waypoint/WaypointStore$Folders' dev/diorama/waypoint/Waypoint 'dev/diorama/waypoint/Waypoint$Kind' dev/diorama/waypoint/Waypoints dev/diorama/waypoint/WaypointShare; do
+            (cd /tmp/dj && for c in dev/diorama/waypoint/WaypointStore 'dev/diorama/waypoint/WaypointStore$Folders' dev/diorama/waypoint/Waypoint 'dev/diorama/waypoint/Waypoint$Kind' dev/diorama/waypoint/Waypoints dev/diorama/waypoint/WaypointShare dev/diorama/waypoint/WaypointHud 'dev/diorama/Settings$WaypointLabels' 'dev/diorama/Settings$Beams'; do
               echo "######## $c"; javap -c -p "$c.class" 2>&1 | head -n 1500
             done) > /tmp/inspect/diorama-code.txt 2>&1
+            # 설정 항목의 이름만 (세계 안의 웨이포인트 표시를 끄는 항목이 있는지 보려고)
+            (cd /tmp/dj && javap -p 'dev/diorama/Settings.class' 2>&1 | head -n 400; javap -p -c 'dev/diorama/waypoint/WaypointBeams.class' 2>&1 | grep -n -A40 'static boolean has(' | head -n 80) > /tmp/inspect/diorama-settings.txt 2>&1
           fi
       - name: Inspect
         env:
