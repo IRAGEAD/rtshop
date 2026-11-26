@@ -974,6 +974,11 @@ public final class SelfTest {
                 plank = net.minecraft.world.level.block.Blocks.OAK_PLANKS.defaultBlockState(), fence = net.minecraft.world.level.block.Blocks.OAK_FENCE.defaultBlockState();
         it.unimi.dsi.fastutil.longs.LongOpenHashSet gone = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
         try {
+            // 모드팩 전체에서는 세계의 씨앗이 매번 달라, 이 자리에 산이 솟아 있으면 잎을 놓을 빈칸이 없어 시험이 틀어진다 → 먼저 위쪽을 비운다
+            for (int x = X - 6; x <= X + 27; x++) for (int z = Z - 6; z <= Z + 27; z++) for (int y = Y + 1; y <= Y + 12; y++) {
+                BlockPos cp = new BlockPos(x, y, z);
+                if (!level.getBlockState(cp).isAir()) level.setBlock(cp, air, 2);
+            }
             for (int x = X - 4; x <= X + 25; x++) for (int z = Z - 4; z <= Z + 25; z++) level.setBlock(new BlockPos(x, Y, z), dirt, 2);
             // 나무 둘 (줄기 5칸 + 잎 5x5x3): 하나는 건드려도 되는 자리, 하나는 남의 토지(touch = false)
             for (int tz : new int[]{Z + 8, Z - 1}) {
