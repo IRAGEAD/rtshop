@@ -171,8 +171,35 @@ public final class NpcLookClient {
     private static final org.joml.Vector3f TMP = new org.joml.Vector3f();
     private static final float[][] VIEW_NORMALS = new float[6][3];
 
-    /** 네모들을 넘긴다. 카메라 반대쪽을 보는 네모(카메라에서 그 면의 앞이 보이지 않는 것)는 건너뛴다. 넘긴 수를 돌려준다. */
-    private static int emit(float[] q, PoseStack ps, VertexConsumer vc, int light) {
+    private static java.lang.reflect.Method shadowPass;
+    private static boolean shadowPassLooked;
+
+    /**
+     * 뒷면 건너뛰기를 해도 되는가: "카메라가 원점인 원근 화면"일 때만 맞는 셈이라,
+     * 직교 투영(화면 속에 그리는 엔티티 등)이거나 셰이더(Oculus · Iris)가 그림자를 그리는 중이면 건너뛰지 않는다.
+     */
+    private static boolean mayCull() {
+        try {
+            if (com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix().m23() == 0F) return false;
+            if (!shadowPassLooked) {
+                shadowPassLooked = true;
+                for (String cn : new String[]{"net.irisshaders.iris.shadows.ShadowRenderingState", "net.coderbot.iris.shadows.ShadowRenderingState"}) {
+                    try {
+                        shadowPass = Class.forName(cn).getMethod("areShadowsCurrentlyBeingRendered");
+                        break;
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
+            if (shadowPass != null && Boolean.TRUE.equals(shadowPass.invoke(null))) return false;
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 네모들을 넘긴다. cull 이면 카메라 반대쪽을 보는 네모(카메라에서 그 면의 앞이 보이지 않는 것)는 건너뛴다. 넘긴 수를 돌려준다. */
+    private static int emit(float[] q, PoseStack ps, VertexConsumer vc, int light, boolean cull) {
         PoseStack.Pose last = ps.last();
         Matrix4f pose = last.pose();
         Matrix3f normal = last.normal();
@@ -187,8 +214,8 @@ public final class NpcLookClient {
             int d = (int) q[i + 12];
             float[] vn = VIEW_NORMALS[d];
             // 이 자리의 좌표는 카메라가 원점이다: 면 위의 한 점과 법선의 곱이 0 이상이면 뒷면이 보이는 것
-            pose.transformPosition(q[i], q[i + 1], q[i + 2], TMP);
-            if (TMP.x * vn[0] + TMP.y * vn[1] + TMP.z * vn[2] >= 0F) continue;
+            if (cull) pose.transformPosition(q[i], q[i + 1], q[i + 2], TMP);
+            if (cull && TMP.x * vn[0] + TMP.y * vn[1] + TMP.z * vn[2] >= 0F) continue;
             float nx = NORMALS[d][0], ny = NORMALS[d][1], nz = NORMALS[d][2];
             for (int v = 0; v < 4; v++) {
                 int k = i + v * 3, t = i + 13 + v * 2;
@@ -240,17 +267,20 @@ public final class NpcLookClient {
             ps.mulPose(Axis.YP.rotationDegrees(-bodyYaw));
             ps.scale(UNIT, UNIT, UNIT);
             VertexConsumer vc = buf.getBuffer(RenderType.entityCutoutNoCull(m.texture));
-            int sent = emit(m.body, ps, vc, light);
+            boolean cull = mayCull();
+            int sent = emit(m.body, ps, vc, light, cull);
             float[] h = headAngles(e, bodyYaw);
             ps.translate(0F, NECK, 0F);
             ps.mulPose(Axis.YP.rotationDegrees(-h[0]));
             ps.mulPose(Axis.XP.rotationDegrees(h[1]));
             ps.translate(0F, -NECK, 0F);
-            sent += emit(m.head, ps, vc, light);
+            sent += emit(m.head, ps, vc, light, cull);
             ps.popPose();
             drawnForTest++;
-            lastQuadsForTest = sent;
-            lastCulledForTest = (m.body.length + m.head.length) / STRIDE - sent;
+            if (cull) {   // 그림자 그리기처럼 건너뛰지 않는 때의 수는 점검 기록에 섞지 않는다
+                lastQuadsForTest = sent;
+                lastCulledForTest = (m.body.length + m.head.length) / STRIDE - sent;
+            }
             nameTag(e, ps, buf, light, Math.max(e.getBbHeight() + 0.5F, m.top * UNIT + 0.35F));
         } catch (Throwable t) {
             RtShop.LOGGER.debug("[rtshop] npc look", t);
