@@ -33,6 +33,8 @@ final class ClientSelfTest2 {
     }
 
     private static final List<Step> STEPS = new ArrayList<>();
+    private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static volatile long LOOK_DRAWN;
     private static volatile int npc = -1;
     static volatile int qnpc = -1;
     static volatile net.minecraft.core.BlockPos orbPos;
@@ -1940,9 +1942,6 @@ final class ClientSelfTest2 {
             waitTicks(10);
         });
     }
-
-    private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
-    private static volatile long LOOK_DRAWN;
 
     /** Epic Fight 가 이 아이템에 쓰는 렌더러 (Avalon mesh_item 이면 메쉬가 실제로 읽혔는지도). */
     static String efRendererInfo(net.minecraft.world.item.ItemStack st) {
