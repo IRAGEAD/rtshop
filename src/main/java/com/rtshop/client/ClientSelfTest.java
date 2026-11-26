@@ -513,8 +513,8 @@ public final class ClientSelfTest {
                 onServer(mc, sp -> {
                     if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
                         m.getSlot(0).set(leveled(net.minecraft.world.item.Items.DIAMOND_SWORD, 4));
+                        m.getSlot(1).set(new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 1));   // 3.64.2: 보호권은 장비 옆 칸에 올려서 쓴다
                     }
-                    com.rtshop.enhance.Enhance.setActiveGuard(sp, com.rtshop.enhance.Enhance.G_DESTROY);
                     com.rtshop.enhance.Enhance.testRoll = 0.0;
                 });
                 wait = 15;
@@ -555,8 +555,10 @@ public final class ClientSelfTest {
                     check("the info panel shows the real numbers now -> next (bonus % and attack damage)", st.size() >= 2
                             && st.get(1).next().contains("\u2192") && !st.get(1).now().equals(st.get(1).next().replace(" \u2192 ", "")),
                             st.size() < 2 ? st.size() : st.get(0).now() + st.get(0).next() + " / " + st.get(1).now() + st.get(1).next());
-                    check("the guard used beforehand shows on the client", com.rtshop.enhance.Enhance.clientGuard == com.rtshop.enhance.Enhance.G_DESTROY,
-                            com.rtshop.enhance.Enhance.clientGuard);
+                    com.rtshop.enhance.Enhance.Guard shownGuard = m instanceof com.rtshop.enhance.EnhanceMenu em
+                            ? com.rtshop.enhance.Enhance.guardFor(mc.player, em.guardStack()) : com.rtshop.enhance.Enhance.Guard.NONE;
+                    check("the guard ticket laid next to the item on the anvil shows on the client (3.64.2: the anvil slot is the only way)",
+                            shownGuard == com.rtshop.enhance.Enhance.Guard.DESTROY, shownGuard);
                 }
                 shot(mc, "81_enhance_ready");
                 mc.gameMode.handleInventoryMouseClick(m.containerId, 2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
@@ -570,8 +572,8 @@ public final class ClientSelfTest {
                         ItemStack got = m.getCarried();
                         m.setCarried(ItemStack.EMPTY);
                         m.getSlot(0).set(got.isEmpty() ? leveled(net.minecraft.world.item.Items.DIAMOND_SWORD, 5) : got);
+                        m.getSlot(1).set(new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 1));   // 앞의 강화에 한 장이 쓰였다: 새로 올린다
                     }
-                    com.rtshop.enhance.Enhance.setActiveGuard(sp, com.rtshop.enhance.Enhance.G_DESTROY);
                     com.rtshop.enhance.Enhance.testRoll = 0.99;
                 });
                 EnhancePanel.setDetailForTest(true);

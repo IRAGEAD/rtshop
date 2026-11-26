@@ -132,7 +132,7 @@ public final class ModItems {
                     tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.enhance_anvil.tip2").withStyle(net.minecraft.ChatFormatting.GRAY));
                 }
             });
-    /** 강화 보호권: 손에 들고 우클릭해 미리 사용 → 다음 강화 1번에 적용 (결과와 상관없이 소모). */
+    /** 강화 보호권: 강화 모루 위, 장비 옆 칸에 함께 올려 두면 그 강화 1번에 한 장이 쓰인다 (결과와 상관없이 소모). 손에 들고 우클릭하면 쓰는 법만 알려 준다. */
     public static final RegistryObject<Item> GUARD_DAMAGE = ITEMS.register("enhance_guard_damage",
             () -> new com.rtshop.enhance.GuardItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.UNCOMMON), false,
                     com.rtshop.enhance.Enhance.Guard.DAMAGE, "item.rtshop.enhance_guard_damage.tip", "item.rtshop.enhance_guard.tip"));

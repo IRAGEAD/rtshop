@@ -2207,6 +2207,23 @@ public final class SelfTest {
                 onlyTickets && com.rtshop.enhance.Enhance.level(gm.getCarried()) == 6 && gm.getSlot(1).getItem().getCount() == 1
                         && com.rtshop.enhance.Enhance.activeGuard(a) == 0, onlyTickets + " " + com.rtshop.enhance.Enhance.level(gm.getCarried()) + " " + gm.getSlot(1).getItem().getCount());
         gm.getSlot(1).set(ItemStack.EMPTY);
+        // 3.64.2: 보호는 모루 위 장비 옆 칸의 보호권으로만 건다 — 옛 방식(우클릭)으로 걸어 둔 보호는 접속할 때 보호권 한 장으로 돌려준다
+        int full642 = a.getInventory().countItem(com.rtshop.item.ModItems.GUARD_FULL.get());
+        a.getPersistentData().putInt(com.rtshop.enhance.Enhance.GUARD_KEY, 3);
+        int back642 = com.rtshop.enhance.Enhance.refundLegacyGuard(a);
+        int again642 = com.rtshop.enhance.Enhance.refundLegacyGuard(a);
+        int fullNow642 = a.getInventory().countItem(com.rtshop.item.ModItems.GUARD_FULL.get());
+        check("3.64.2 protection set the old way (right-click) comes back once as a guard ticket and no longer applies by itself",
+                back642 == 1 && again642 == 0 && fullNow642 == full642 + 1 && com.rtshop.enhance.Enhance.activeGuard(a) == 0
+                        && com.rtshop.enhance.Enhance.guardFor(a, ItemStack.EMPTY) == com.rtshop.enhance.Enhance.Guard.NONE,
+                back642 + " " + again642 + " " + full642 + "->" + fullNow642);
+        for (int i642 = 0; i642 < a.getInventory().getContainerSize() && fullNow642 > full642; i642++) {
+            ItemStack s642 = a.getInventory().getItem(i642);
+            if (s642.is(com.rtshop.item.ModItems.GUARD_FULL.get())) {
+                s642.shrink(1);
+                fullNow642--;
+            }
+        }
         // 몹 규칙: 모드 몹의 자연 스폰은 줄이고(기사 hollow 는 그대로, lycanth 는 더 많이), 보스가 아닌 몹은 무기·스킬북·인챈트·모드 아이템을 떨어뜨리지 않는다
         com.rtshop.rules.MobRules.Config mr = com.rtshop.rules.MobRules.fresh();
         com.rtshop.rules.MobRules.setForTest(mr);

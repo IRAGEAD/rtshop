@@ -754,7 +754,7 @@
   "rtshop.enhance.max": "최대 단계 (+11)",
   "rtshop.enhance.panel": "강화 정보",
   "rtshop.enhance.help1": "왼쪽 칸에 무기나 방어구를 올리세요.",
-  "rtshop.enhance.help2": "보호권은 손에 들고 우클릭해 미리 사용합니다 (다음 강화 1번).",
+  "rtshop.enhance.help2": "보호권은 모루 위, 장비 옆 칸에 함께 올려 두면 그 강화에 한 장이 쓰입니다.",
   "rtshop.enhance.help3": "결과 칸을 클릭하면 재료와 Gold 를 쓰고 강화를 시도합니다.",
   "rtshop.enhance.help4": "결과는 성공(+1) · 유지 · 손상(-1) · 파괴. 단계가 높을수록 비싸고 위험합니다.",
   "rtshop.enhance.click_hint": "결과 칸을 클릭해 강화하세요",
@@ -831,7 +831,7 @@
   "rtshop.enhodds.effect": "공격력",
   "rtshop.enhodds.gold": "Gold",
   "rtshop.enhodds.materials": "재료",
-  "rtshop.enhodds.footer": "손상: 단계 1 하락 · 파괴: 장비가 사라짐. 보호권은 미리 사용(우클릭)하면 다음 강화 1번에 적용: 손상 방지 = 손상→유지, 파괴 방지 = 파괴→손상, 둘 다 = 유지. 공격력은 누적 증가율(방어구는 방어력).",
+  "rtshop.enhodds.footer": "손상: 단계 1 하락 · 파괴: 장비가 사라짐. 보호권은 모루 위 장비 옆 칸에 올려 두면 그 강화 1번에 한 장이 쓰임: 손상 방지 = 손상→유지, 파괴 방지 = 파괴→손상, 둘 다 = 유지. 공격력은 누적 증가율(방어구는 방어력).",
   "rtshop.enhodds.edit": "확률·재료 편집 (OP)",
   "rtshop.enhodds.close": "닫기",
   "rtshop.enhodds.open": "확률표",
@@ -1943,5 +1943,6 @@
   "rtshop.petition.none": "접수한 민원이 없습니다.",
   "rtshop.petition.answer": "답변",
   "rtshop.petition.withdraw": "거두기",
-  "rtshop.petition.placeholder": "여기를 눌러 내용을 적어 주세요"
+  "rtshop.petition.placeholder": "여기를 눌러 내용을 적어 주세요",
+  "rtshop.enhance.guard_refund": "예전 방식(우클릭)으로 걸어 두었던 보호를 「%s」 한 장으로 돌려드렸습니다. 이제 보호권은 강화 모루 위, 장비 옆 칸에 올려 두고 씁니다."
 }

@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 5
+VERSION = 6
 CATS = []
 
 
@@ -217,7 +217,7 @@ page(c, "enhance", "장비 강화", """
 강화 모루는 마을에 하나뿐입니다. 모루를 우클릭하고 장비를 올리면 옆의 정보 창에 확률·재료·Gold 가 나옵니다.
 
 · 결과는 성공(+1), 유지, 손상(-1), 파괴 가운데 하나입니다. 단계가 오를수록 어려워집니다.
-· 보호권을 손에 들고 미리 우클릭해 두면 다음 강화 한 번에 보호가 걸립니다.
+· 보호권은 모루 위, 장비 옆 칸에 함께 올려 두면 그 강화 한 번에 한 장이 쓰입니다 (결과와 상관없이 사라지고, 한 번에 한 가지만).
 · 강화한 장비는 이름 앞에 +N 이 붙고 공격력이나 방어력이 오릅니다.
 """, image="enhance", icons=["rtshop:enhance_guard_damage", "rtshop:enhance_guard_destroy", "rtshop:enhance_guard_full"], keys="모루 보호권 방지권 강화")
 page(c, "gacha", "뽑기", """

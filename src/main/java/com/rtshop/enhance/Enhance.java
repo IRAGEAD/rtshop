@@ -139,7 +139,7 @@ public final class Enhance {
         return c;
     }
 
-    /** 보호권을 손에 들고 우클릭: 미리 사용한다 (이미 걸린 보호면 쓰지 않음). 3.49 부터는 부르지 않는다 (옛 저장 값과 점검용). */
+    /** 보호권을 손에 들고 우클릭: 미리 사용한다 (이미 걸린 보호면 쓰지 않음). 3.49 부터는 부르지 않는다 (점검용). 남아 있던 옛 보호는 3.64.2 부터 접속할 때 보호권으로 돌려준다(refundLegacyGuard). */
     public static boolean useGuardItem(ServerPlayer p, Guard g) {
         int cur = activeGuard(p);
         int add = maskOf(g);
@@ -159,6 +159,28 @@ public final class Enhance {
             case 3 -> Component.translatable("rtshop.enhance.guard_name_full");
             default -> Component.translatable("rtshop.enhance.guard_name_none");
         };
+    }
+
+    /**
+     * 3.64.2: 옛 방식(3.49 전, 보호권을 손에 들고 우클릭)으로 미리 걸어 둔 보호를 보호권 한 장으로 돌려준다 — 보호는 이제 모루 위 장비 옆 칸의 보호권으로만 건다.
+     * 접속할 때 한 번 (가방이 꽉 차 있으면 발밑에 떨군다). 돌려준 장 수 (없으면 0).
+     * guardFor 의 "미리 걸어 둔 보호" 갈래는 점검(가짜 플레이어)에서만 쓰이게 된다.
+     */
+    public static int refundLegacyGuard(ServerPlayer p) {
+        int m = p.getPersistentData().getInt(GUARD_KEY) & 3;
+        if (m == 0) return 0;
+        Item it = m == 3 ? ModItems.GUARD_FULL.get() : m == 2 ? ModItems.GUARD_DESTROY.get() : ModItems.GUARD_DAMAGE.get();
+        ItemStack back = new ItemStack(it);
+        Component name = back.getHoverName();
+        if (!p.getInventory().add(back)) p.drop(back, false);
+        setActiveGuard(p, 0);
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.enhance.guard_refund", name).withStyle(ChatFormatting.AQUA));
+        return 1;
+    }
+
+    @SubscribeEvent
+    public static void onLoginGuard(PlayerEvent.PlayerLoggedInEvent e) {
+        if (e.getEntity() instanceof ServerPlayer sp && !(sp instanceof net.minecraftforge.common.util.FakePlayer)) refundLegacyGuard(sp);
     }
 
     @SubscribeEvent
