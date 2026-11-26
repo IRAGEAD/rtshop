@@ -379,8 +379,9 @@
   장면 안에서도 빛의 반지름이 룬 고리의 0.65배 안 (`CinematicOrbStation.sceneRimForTest < ringForTest()*0.65`). 알파 섞기 빛은 Photon 에서 탁한 유리처럼 보였다 → 더하기 혼합.
   옛 `*_glow.png` · `*_halo.png` 는 지움 (`tools/gen_magic_art.py` 의 `orb_rim_add`).
   - CI 의 Photon 사진에서 구슬 몸통이 그늘에서 어두운 갈색으로 칠해졌다 (셰이더는 FULL_BRIGHT 로 그린 그림도 스스로 빛을 계산한다) →
-    **셰이더가 켜졌을 때만** 몸통 위에 발광 층(`<색>_core.png`, 미리 곱한 더하기 섞기, `RenderType.eyes`)을 한 번 더 그리고 둘레 빛을 1.5배로 (`ShaderState.on()`, `ArcaneOrbRenderer.SHADER_CORE/SHADER_RIM`).
-    셰이더가 없으면 3.64.1 과 같은 모습 (화면 점검: 셰이더 없이 발광 층 0 번).
+    **셰이더가 켜졌을 때만** 몸통 위에 발광 층(`<색>_core.png`: 흰빛 쪽으로 당긴 밝은 원판, `RenderType.eyes`)을 한 번 더 그린다 (`ShaderState.on()`, `ArcaneOrbRenderer.SHADER_CORE`).
+    Photon 은 발광 층도 밝은 빛깔만 환하게 내서(첫 시도의 구슬 몸통 그대로는 가운데만 빛나고 가장자리 갈색, 둘레 빛 · 별빛은 어두운 점) 원판을 밝게 만들었고,
+    셰이더에서는 둘레 빛을 그리지 않으며(셰이더의 번짐이 대신) 별빛도 그 원판으로 작게 그린다. 셰이더가 없으면 3.64.1 과 같은 모습 (화면 점검: 셰이더 없이 발광 층 0 번).
 - M-2. 강화 모루의 빛 (Photon) ✔: 그리는 단계를 AFTER_TRANSLUCENT_BLOCKS → **AFTER_ENTITIES** (`EnhanceAnvilGlow`). Embeddium + Oculus 로 셰이더를 켜면 반투명 블록 뒤 단계에 그린 것이 화면에 남지 않는다
   (같은 셰이더에서 보이는 Cinematic Interactions 장면이 AFTER_ENTITIES 에 그린다). 흔적 표시(`SpotClient`) · 땅 경계(`BorderRenderer`)도 같은 단계로 옮김.
 - M-3. CI 에서 셰이더를 켠 사진 ✔ (`ClientShaderTest`, 모드팩 전체 job 의 "Shader pictures" 단계): 화면 점검을 마친 세계에서 셰이더 팩을 Oculus 로 켜고 다시 띄워 150~155 사진(모루 · 흔적 · 제단 · 장면)을 찍는다.
@@ -390,7 +391,7 @@
 - M-4. 보호권 ✔: 보호권은 3.49 부터 이미 "모루 위 장비 옆 칸에 올려 두면 그 강화에 한 장이 쓰이는" 방식이었는데, 강화 창 도움말(`rtshop.enhance.help2`)과 확률표 아래 설명(`enhodds.footer`)에 옛 "우클릭으로 미리 사용" 안내가 남아 있었다 → 고침 (안내서 강화 쪽도, `gen_guide` VERSION 6).
   예전 방식으로 걸어 둔 보호가 남아 있던 사람은 접속할 때 그 보호권 한 장으로 돌려받는다(`Enhance.refundLegacyGuard`, 알림 `rtshop.enhance.guard_refund`). 화면 점검의 보호권 시험도 칸에 올리는 방식으로.
 - M-5. 경제 · 무기 밸런스 검토 ✔ (숫자는 안 바꿈): `docs/balance_review.md`. 근거를 위해 모드팩 전체 점검의 `diag.txt` 에 무기 · 방어구 비교표(`== weapons` · `== armor`: 공격력 · 초당 공격 · DPS · 상점가 · 뽑기 등급 · 조합 · 보스 전리품)를 더함 (`PackDiag.gear`).
-  사용자가 고른 제안만 다음 판에서 고친다 — 검토의 제안 A~L.
+  사용자가 고른 제안만 다음 판에서 고친다 — 검토의 제안 A~M.
   - 비교표를 만들다 찾은 것 (`diag.txt` 의 `== extreme gear sources`): 공격력 · 방어력 30 이상의 장비(거의 Arcane Vortex)를 만드는 조합법 · 그것이 든 전리품표를 적는다 — 정말 얻을 수 없는지 확인용.
 - M-6. Iron's Spells 의 떠돌이 마법사 갑옷 4종이 지팡이로 잡히던 것 ✔: `ItemPolicy.staff` 가 아이템 갈래 이름(`WanderingMagicianArmorItem`)의 "wand" 에 걸렸다 → 갑옷은 지팡이가 아니고, 갈래 이름의 "wander" 는 빼고 본다.
   그동안 조합법이 막히고 지팡이 값으로 대장간에 올라 있었다. 서버 점검 "3.64.2 the Wandering Magician armour is armour, not a staff …".

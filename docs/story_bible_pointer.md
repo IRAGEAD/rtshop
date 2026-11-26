@@ -236,3 +236,11 @@
 - 선택지는 반드시 어딘가에서 받는다 (대화 주제라도). 받지 않는 선택은 두지 않는다: 프로스트모의 옛 선택 삭제, 마녀의 잉크(ch1_witch_*) → 이사벨, 「마중」의 대답(scylla_told / scylla_lantern) → 오스카.
 - 없앤 기능을 이야기에서 부르지 않는다: '오늘의 룬'(3.47 삭제) 언급을 「안개가 걷힌 저택」에서 뺌. 거울이 하루에 한 장씩 빛난다는 설정은 그대로.
 - 1장에서 로란은 '해독제'를 입에 올리지 않는다 (「시듦과 해독제」의 병영 낙서에서 처음 알게 되므로).
+
+3.64.2 (셰이더에서의 빛 · 보호권 문구 · 밸런스 검토)
+- 셰이더가 켜졌는가: client/ShaderState.on() (Oculus/Iris 공개 API 리플렉션, 1초에 한 번). 룬 제단 구슬은 셰이더에서만 밝은 발광 원판(entity/orb/<색>_core.png, RenderType.eyes)을 겹치고 둘레 빛은 그리지 않는다
+  (ArcaneOrbRenderer · CinematicOrbStation, 그림은 tools/gen_magic_art.py 의 orb_core_shader / orb_rim_add).
+- 세계에 덧그리는 빛(EnhanceAnvilGlow · SpotClient · BorderRenderer)은 AFTER_ENTITIES 단계에 그린다 (셰이더에서 보이는 단계).
+- CI 의 셰이더 사진: client/ClientShaderTest (+ .github/scripts/shaderpacks.py). 결과 rtshop-shadertest-<팩>.txt.
+- 보호권: 3.49 부터 모루 칸 방식. 3.64.2 에서 남은 옛 안내 문구를 고치고, 옛 방식의 보호(GUARD_KEY)는 접속할 때 보호권으로 돌려준다(Enhance.refundLegacyGuard / onLoginGuard).
+- 밸런스 검토 자료: test/PackDiag.gear (diag.txt 의 == weapons · == armor · == extreme gear sources), 문서 docs/balance_review.md.
