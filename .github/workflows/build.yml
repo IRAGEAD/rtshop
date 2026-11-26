@@ -551,26 +551,11 @@ jobs:
           tail -n 400 client/logs/latest.log > /tmp/fpshots/client-tail.log 2>/dev/null || true
           grep -n -A45 "server-side action failed" client/logs/latest.log | head -n 400 > /tmp/fpshots/server-action-errors.txt 2>/dev/null || true
           grep -n -B12 "rtshop-clienttest\] FAIL" client/logs/latest.log | cut -c1-400 | head -n 600 > /tmp/fpshots/fail-context.txt 2>/dev/null || true
-          grep -n -B3 -A8 "Critical injection\|InjectionError\|VillagerTrades" client/logs/latest.log | head -n 200 > /tmp/fpshots/mixin-errors.txt 2>/dev/null || true
+          grep -n -B3 -A8 "Critical injection\|InjectionError\|Injection error\|VillagerTrades" client/logs/latest.log | cut -c1-600 | head -n 200 > /tmp/fpshots/mixin-errors.txt 2>/dev/null || true
           python3 "$GITHUB_WORKSPACE/.github/scripts/log_summary.py" client/logs/latest.log /tmp/fpshots/log-summary.txt || true
           grep -n -iE "avalon|item.?skin|mesh_item|efn:weapon|ruinsgreatsword|duskfire|EF renderer" client/logs/latest.log | cut -c1-500 | head -n 300 > /tmp/fpshots/avalon-log.txt 2>/dev/null || true
           # 어떤 모드가 주민 거래(VillagerTrades)를 Mixin 으로 고치는지
-          python3 - packcache > /tmp/fpshots/villager-trade-mixins.txt <<'PY' || true
-          import os, sys, zipfile
-          d = sys.argv[1]
-          for n in sorted(os.listdir(d)):
-              if not n.endswith('.jar'):
-                  continue
-              try:
-                  z = zipfile.ZipFile(os.path.join(d, n))
-                  for e in z.namelist():
-                      if e.endswith('.class') and 'mixin' in e.lower():
-                          b = z.read(e)
-                          if b'VillagerTrades$EmeraldsForVillagerTypeItem' in b or b'VillagerTrades$ItemsForEmeralds' in b and b'EmeraldsForVillagerType' in b:
-                              print(n, e)
-              except Exception as ex:
-                  print('skip', n, ex)
-          PY
+          python3 "$GITHUB_WORKSPACE/.github/scripts/mixin_scan.py" packcache > /tmp/fpshots/villager-trade-mixins.txt 2>&1 || true
           cd /tmp/fpshots
           git init -q -b ci-fullpack-screenshots
           git config user.name "github-actions"
