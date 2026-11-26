@@ -229,3 +229,10 @@
 
 - **귀환권 (3.53 끝에 조정)**: 일반 3,000칸 · 60분 · 5,000 G / 고급 30분 · 30,000 G. 쿨타임은 실제 시간(`TownSpawn.cooldownLeft/used`, PlayerPersisted 의 `rtshop_return_cd`). 물건 칸의 쿨타임 표시는 쓰지 않는다 (걸린 물건은 우클릭이 서버에 닿지 않아 남은 시간 안내를 띄울 수 없다). 값 고치기: `ShopLoader.REPRICED` ("상점:품목=옛값>새값@판", 옛 기본값 그대로일 때만).
 - **지도 표시**: `story/MapMarks` (`map_marks.json`) → `StoryPacket.MAP_MARKS`(16) → `client/MapMarkClient` 가 Diorama 의 `dev.diorama.waypoint.WaypointStore.get()` / `add(Waypoint)` / `addFolder(이름)` / `remove` / `changed()` 를 리플렉션으로 부른다. `Waypoint(이름, x, y, z, 차원, 색 ARGB)`, `folder` 필드에는 폴더의 이름을 넣는다. 넣은 것의 기록은 `config/rtshop/map_marks_client.json` (세계별).
+
+## 3.60 (전체 검토에서 고친 것)
+
+- 1장 이글루: 발전과제(좀비 주민 치료) 대신 흔적 「지하실에 갇힌 사람」(c1_felix, 황금 사과 1개, c1_igloo 뒤). 약은 엘레나가 값을 미리 치러 치료소에 남아 있고 금만 가져간다. 여럿이 해도 저마다 할 수 있어야 하는 걸음은 **사람마다 따로 주어지는 것(흔적 · 건네기 · 처치)** 으로 만들 것 — 한 번뿐인 세계의 물건이나 혼자만 받는 발전과제에 걸지 않는다.
+- 선택지는 반드시 어딘가에서 받는다 (대화 주제라도). 받지 않는 선택은 두지 않는다: 프로스트모의 옛 선택 삭제, 마녀의 잉크(ch1_witch_*) → 이사벨, 「마중」의 대답(scylla_told / scylla_lantern) → 오스카.
+- 없앤 기능을 이야기에서 부르지 않는다: '오늘의 룬'(3.47 삭제) 언급을 「안개가 걷힌 저택」에서 뺌. 거울이 하루에 한 장씩 빛난다는 설정은 그대로.
+- 1장에서 로란은 '해독제'를 입에 올리지 않는다 (「시듦과 해독제」의 병영 낙서에서 처음 알게 되므로).
