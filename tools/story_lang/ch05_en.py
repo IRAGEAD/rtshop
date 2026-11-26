@@ -14,7 +14,7 @@ EN = {
  "Oscar, Bram, Felix, Haru, Morris. All here. I'll count heads when we're back. And get it right. …But the archivist is missing. The girl who said she'd write one more line and come. The lantern's lit in the archive and the pen is gone. The ink jar too. He took her. Or she followed on her own feet. She is that kind of girl."),
 "story_5_04": ("Ink Dots",
  "Hell. Felix told me. Fifteen years ago Elena left an ink dot everywhere she went. For whoever came after. You followed them once already. Look. There on the basalt. A dot. Still wet. The girl made it. While being led away. This time the daughter marks and we follow. Stay behind me. Never mind the leg.",
- "Follow the ink dots Isabel left through hell with Roran, and put to rest 6 ignited revenants blocking the way.",
+ "Follow the ink dots Isabel left through hell with Roran, and put to rest 3 ignited revenants blocking the way.",
  "The dots end at the arena door. There's writing beside the last one. Hurried. 'I'm all right. I won't write it. Except one name.' …Except one name. She knows what has to be written. Did you pick up the ash the revenants dropped? They say it makes a sound in your fist. That's memory the fire spilled while eating. Listen and you'll know whose."),
 "story_5_05": ("The Apprentice of a Thousand Years Ago",
  "Give me that ash. The archivist's gone, so I'll do the listening. A fisherman has good ears. I listened under the ice for fifteen years. Makes a sound when you hold it, you said. I'll hold all three at once.",

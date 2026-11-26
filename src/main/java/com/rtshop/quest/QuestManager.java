@@ -873,8 +873,26 @@ public final class QuestManager {
                         })))));
     }
 
+    /**
+     * 3.63: 판이 바뀌며 목표가 늘어난 퀘스트를 하던 중인 사람의 진행 배열을 새 길이에 맞춘다 (늘어난 목표는 0 에서 시작).
+     * 전에는 배열이 짧아 새 목표의 진행이 적히지 않았고, 포기 후 다시 받아야 했다. 맞춘 퀘스트 수를 돌려준다.
+     */
+    public static int fitProgress(ServerPlayer p) {
+        QuestData.Progress pr = prog(p);
+        int n = 0;
+        for (Map.Entry<String, int[]> e : new ArrayList<>(pr.active.entrySet())) {
+            QuestDef q = loaded.quests.get(e.getKey());
+            if (q == null || e.getValue() == null || e.getValue().length >= q.objectives.size()) continue;
+            pr.active.put(e.getKey(), java.util.Arrays.copyOf(e.getValue(), q.objectives.size()));
+            n++;
+        }
+        if (n > 0) QuestData.get(p.server).dirty();
+        return n;
+    }
+
     @SubscribeEvent
     public static void onLoginMigrate(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer lp) fitProgress(lp);
         if (event.getEntity() instanceof ServerPlayer p && loaded.quests.containsKey("story_1_01")) {
             migrateStory(p);
             migrateStory4(p);
@@ -1609,6 +1627,10 @@ public final class QuestManager {
     public static boolean atStructure(ServerPlayer p, String target) {
         if (target == null || target.isBlank()) return true;
         if (target.startsWith("dim:")) return p.level().dimension().location().toString().equals(target.substring(4).trim()); // 그 차원에 들어서면
+        if (target.startsWith("biome:")) {   // 3.63: 그 생물 군계 안에 있으면 (구조물이 없는 곳의 흔적: 어두운 숲 등)
+            ResourceLocation biome = ResourceLocation.tryParse(target.substring(6).trim());
+            return biome != null && p.level().getBiome(p.blockPosition()).is(biome);
+        }
         QuestDef.Objective ob = new QuestDef.Objective();
         ob.type = QuestDef.Type.STRUCTURE;
         ob.target = target.trim();
