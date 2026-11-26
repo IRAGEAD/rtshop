@@ -63,8 +63,22 @@ public final class ClientConfig {
     public boolean oneBossMusic = true;
     /** RT Shop NPC 의 이름표를 이 거리(칸) 안에서만 그린다 (3.64, 프레임). 0 이면 예전처럼 멀리서도(64칸) 그린다. */
     public int npcNameDistance = 16;
-    /** 룬 제단 가운데의 빛나는 구슬의 색 (3.64): blue(별빛 푸른색) · ice(달빛 은백) · gold(황금빛) · violet(자수정 보라) · jade(비취 청록) · rose(장미빛). */
-    public String altarOrbColor = "blue";
+    /** 룬 제단 가운데의 빛나는 구슬의 색 (3.64): ice(달빛 은백, 기본 — 3.64.1 에서 사용자가 고름) · blue(별빛 푸른색) · gold(황금빛) · violet(자수정 보라) · jade(비취 청록) · rose(장미빛). */
+    public String altarOrbColor = DEFAULT_ORB;
+    public static final String DEFAULT_ORB = "ice";
+    /** client.json 에 구슬 색과 함께 적는 판 번호. 이것이 없는 파일의 "blue" 는 3.64.0 이 기본값으로 적은 것이다. */
+    private static final int ORB_COLOR_VERSION = 2;
+
+    /**
+     * client.json 의 구슬 색을 읽는다 (3.64.1). 3.64.0 은 기본값 blue 를 파일에 적어 두었으므로, 판 번호(altarOrbColorVersion)가 없는 파일의 blue 는
+     * 사람이 고른 것이 아니라 옛 기본값이다 → 새 기본값(ice)으로 옮긴다. 판 번호가 있으면(이 판부터 저장한 파일) 적힌 그대로 쓴다.
+     */
+    public static String orbColorFrom(JsonObject o) {
+        if (o == null || !o.has("altarOrbColor")) return DEFAULT_ORB;
+        String c = o.get("altarOrbColor").getAsString().trim().toLowerCase(java.util.Locale.ROOT);
+        if ("blue".equals(c) && !o.has("altarOrbColorVersion")) return DEFAULT_ORB;
+        return c;
+    }
 
     // PvP 상태 표시 (켜짐/꺼짐 + 지금 있는 곳). 위치·크기는 화면 비율.
     public static final double PDEF_W = 247.0 / 1920.0;
@@ -189,7 +203,7 @@ public final class ClientConfig {
     public synchronized void save() {
         try {
             JsonObject o = new JsonObject();
-            o.addProperty("_설명", "Gold 표시 박스·퀘스트 HUD·PvP 표시(pvpHud*)의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다. questHudScale 은 글자 배율, questHudMax 는 한 번에 보일 퀘스트 수, hudFont/questHudFont 는 글꼴(빈 값 = 기본), hudTextScale 은 Gold 글자 크기입니다.");
+            o.addProperty("_설명", "Gold 표시 박스·퀘스트 HUD·PvP 표시(pvpHud*)의 위치와 크기(화면 크기에 대한 비율 0~1). 게임 안에서 /rtshop hud 로 끌어서 옮길 수 있습니다. questHudScale 은 글자 배율, questHudMax 는 한 번에 보일 퀘스트 수, hudFont/questHudFont 는 글꼴(빈 값 = 기본), hudTextScale 은 Gold 글자 크기입니다. altarOrbColor 는 룬 제단 가운데 구슬의 색(ice 달빛 은백 · blue 별빛 푸른색 · gold 황금빛 · violet 자수정 보라 · jade 비취 청록 · rose 장미빛), 고친 뒤 게임을 다시 켜면 적용됩니다.");
             o.addProperty("configVersion", CONFIG_VERSION);
             o.addProperty("hudEnabled", hudEnabled);
             o.addProperty("hudX", hudX);
@@ -232,6 +246,7 @@ public final class ClientConfig {
             o.addProperty("oneBossMusic", oneBossMusic);
             o.addProperty("npcNameDistance", npcNameDistance);
             o.addProperty("altarOrbColor", altarOrbColor);
+            o.addProperty("altarOrbColorVersion", ORB_COLOR_VERSION);
             o.addProperty("magicFont", magicFont);
             o.addProperty("enhanceLuxFont", enhanceLuxFont);
             o.addProperty("magicScale", magicScale);
@@ -300,7 +315,8 @@ public final class ClientConfig {
                 if (o.has("bossCamera")) c.bossCamera = o.get("bossCamera").getAsBoolean();
                 if (o.has("npcLooks")) c.npcLooks = o.get("npcLooks").getAsBoolean();
                 if (o.has("oneBossMusic")) c.oneBossMusic = o.get("oneBossMusic").getAsBoolean();
-                if (o.has("altarOrbColor")) c.altarOrbColor = o.get("altarOrbColor").getAsString().trim().toLowerCase(java.util.Locale.ROOT);
+                c.altarOrbColor = orbColorFrom(o);
+                boolean orbMoved = o.has("altarOrbColor") && !o.has("altarOrbColorVersion");   // 옛 파일: 판 번호를 적어 두어 다음부터는 적힌 그대로 읽게 한다
                 if (o.has("npcNameDistance")) c.npcNameDistance = Math.max(0, Math.min(64, o.get("npcNameDistance").getAsInt()));
                 if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
                 if (o.has("magicFont")) c.magicFont = o.get("magicFont").getAsString();
@@ -311,7 +327,7 @@ public final class ClientConfig {
                 if (o.has("magicPanelLeft")) c.magicPanelLeft = o.get("magicPanelLeft").getAsBoolean();
                 c.clamp();
                 c.clampQuest();
-                if (!o.has("questHudEnabled")) {
+                if (!o.has("questHudEnabled") || orbMoved) {
                     c.save();
                 }
             } else {

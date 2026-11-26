@@ -31,7 +31,7 @@ public class ArcaneOrbRenderer implements BlockEntityRenderer<ArcaneOrbBlockEnti
 
     public static String color() {
         String c = ClientConfig.get().altarOrbColor;
-        return c != null && COLORS.contains(c) ? c : "blue";
+        return c != null && COLORS.contains(c) ? c : ClientConfig.DEFAULT_ORB;   // 모르는 이름이면 기본 색 (3.64.1: 달빛 은백)
     }
 
     /** part: "" 구슬 · "_glow" 구슬 둘레의 짙은 빛 · "_halo" 넓게 퍼지는 옅은 빛무리. */

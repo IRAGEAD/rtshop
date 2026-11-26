@@ -864,8 +864,8 @@ final class ClientSelfTest2 {
                     if (mc.getResourceManager().getResource(new net.minecraft.resources.ResourceLocation("rtshop", "textures/entity/orb/" + oc + part + ".png")).isEmpty()) orbMissing.append(oc).append(part).append(' ');
                 }
             }
-            check("3.64 the rune altar has a glowing orb at its centre: every colour has its three pictures, the default is blue, and the scene really draws it",
-                    orbMissing.length() == 0 && ArcaneOrbRenderer.COLORS.size() == 6 && ArcaneOrbRenderer.color().equals("blue") && ArcaneOrbRenderer.sceneOrbDrawnForTest > 0,
+            check("3.64 the rune altar has a glowing orb at its centre: every colour has its three pictures, the default is moonlight silver (3.64.1), and the scene really draws it",
+                    orbMissing.length() == 0 && ArcaneOrbRenderer.COLORS.size() == 6 && ArcaneOrbRenderer.color().equals("ice") && ArcaneOrbRenderer.sceneOrbDrawnForTest > 0,
                     orbMissing + "scene=" + ArcaneOrbRenderer.sceneOrbDrawnForTest + " block=" + ArcaneOrbRenderer.orbDrawnForTest + " " + ArcaneOrbRenderer.color());
             shot(mc, "123b_orb_scene");
             if (st != null) st.chooseForTest(0);
@@ -1899,6 +1899,16 @@ final class ClientSelfTest2 {
                 com.rtshop.quest.QuestManager.loaded().npcs.remove("t_comp");
             });
             waitTicks(30);
+        });
+        // 3.64.1: 룬 제단 구슬의 기본 색은 달빛 은백. 3.64.0 이 기본값으로 적어 둔 blue 는 옮기고, 이 판부터 저장한(고른) 색은 그대로 둔다
+        add(mc -> {
+            com.google.gson.JsonObject old641 = com.google.gson.JsonParser.parseString("{\"altarOrbColor\":\"blue\"}").getAsJsonObject();
+            com.google.gson.JsonObject chosen641 = com.google.gson.JsonParser.parseString("{\"altarOrbColor\":\"blue\",\"altarOrbColorVersion\":2}").getAsJsonObject();
+            com.google.gson.JsonObject gold641 = com.google.gson.JsonParser.parseString("{\"altarOrbColor\":\"Gold \"}").getAsJsonObject();
+            String r641 = ClientConfig.orbColorFrom(old641) + " " + ClientConfig.orbColorFrom(chosen641) + " " + ClientConfig.orbColorFrom(gold641) + " "
+                    + ClientConfig.orbColorFrom(new com.google.gson.JsonObject()) + " " + ClientConfig.get().altarOrbColor + " " + ArcaneOrbRenderer.color();
+            check("3.64.1 the rune altar orb is moonlight silver by default: a 3.64.0 file that only holds the old default (blue) moves to silver, a colour saved from now on stays as it is",
+                    r641.equals("ice blue gold ice ice ice"), r641);
         });
         // 3.64: 강화 모루의 빛 — 다가가 서 있으면 받침의 룬 띠와 옆면의 보석이 켜진다 (그림으로 확인: 130_anvil_glow)
         add(mc -> {
