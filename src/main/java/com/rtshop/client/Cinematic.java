@@ -41,7 +41,7 @@ public final class Cinematic {
         BossCam.stop();
         if ("boss".equals(str("kind", "")) && cur.has("entity")) {
             try {
-                BossCam.start(cur.get("entity").getAsInt(), duration());
+                BossCam.start(cur.get("entity").getAsInt(), duration(), str("cam", "orbit"));
             } catch (Throwable ignored) {
             }
         }

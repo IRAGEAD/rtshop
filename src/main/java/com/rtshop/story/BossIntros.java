@@ -71,13 +71,43 @@ public final class BossIntros {
 
     /** 이 보스의 등장 연출을 보여 준다 (근처 사람 모두). 보여 줬으면 true. */
     public static boolean show(LivingEntity boss) {
+        return show(boss, true);
+    }
+
+    /** 보스마다 다른 카메라 움직임 (화면 쪽 client/BossCam 의 방식 이름). 여기에 없는 보스는 orbit(둘레를 돎). */
+    private static final java.util.Map<String, String> CAMS = java.util.Map.ofEntries(
+            java.util.Map.entry("mowziesmobs:ferrous_wroughtnaut", "pushin"), java.util.Map.entry("mowziesmobs:frostmaw", "rise"),
+            java.util.Map.entry("mowziesmobs:umvuthi", "descend"), java.util.Map.entry("mowziesmobs:sculptor", "spiral"),
+            java.util.Map.entry("mowziesmobs:naga", "sweep"),
+            java.util.Map.entry("block_factorys_bosses:underworld_knight", "behind"), java.util.Map.entry("block_factorys_bosses:sandworm", "low"),
+            java.util.Map.entry("block_factorys_bosses:infernal_dragon", "descend"), java.util.Map.entry("block_factorys_bosses:yeti", "rise"),
+            java.util.Map.entry("block_factorys_bosses:kraken", "sweep"),
+            java.util.Map.entry("aquamirae:captain_cornelia", "pushin"), java.util.Map.entry("aquamirae:maze_mother", "sweep"),
+            java.util.Map.entry("fdbosses:chesed", "spiral"), java.util.Map.entry("fdbosses:malkuth", "pushin"), java.util.Map.entry("fdbosses:geburah", "descend"),
+            java.util.Map.entry("cataclysm:netherite_monstrosity", "rise"), java.util.Map.entry("cataclysm:the_harbinger", "spiral"),
+            java.util.Map.entry("cataclysm:ender_guardian", "pushin"), java.util.Map.entry("cataclysm:ender_golem", "rise"),
+            java.util.Map.entry("cataclysm:ignis", "descend"), java.util.Map.entry("cataclysm:the_leviathan", "sweep"),
+            java.util.Map.entry("cataclysm:ancient_remnant", "low"), java.util.Map.entry("cataclysm:maledictus", "behind"),
+            java.util.Map.entry("cataclysm:scylla", "sweep"),
+            java.util.Map.entry("minecraft:wither", "spiral"), java.util.Map.entry("minecraft:warden", "low"), java.util.Map.entry("minecraft:evoker", "pushin"),
+            java.util.Map.entry("minecraft:illusioner", "behind"), java.util.Map.entry("minecraft:ender_dragon", "sweep"), java.util.Map.entry("minecraft:ravager", "low"));
+
+    public static String camOf(String bossId) {
+        return CAMS.getOrDefault(bossId, "orbit");
+    }
+
+    /** camera = false 면 이름과 효과만 보인다 (다른 모드의 컷신이 이미 등장 장면을 보여 준 보스). */
+    public static boolean show(LivingEntity boss, boolean camera) {
         StoryConfig c = StoryConfig.get();
         StoryConfig.Intro in = c.intros.get(id(boss));
         if (in == null || !(boss.level() instanceof ServerLevel level)) return false;
         boss.getPersistentData().putBoolean(SEEN_TAG, true);
         SHOWN.add(boss.getUUID());
         JsonObject o = cinema(in);
-        o.addProperty("entity", boss.getId());   // 화면 쪽의 3D 카메라 연출(client/BossCam)이 이 보스를 따라간다
+        if (camera) {
+            o.addProperty("entity", boss.getId());   // 화면 쪽의 3D 카메라 연출(client/BossCam)이 이 보스를 따라간다
+            o.addProperty("cam", camOf(id(boss)));   // 보스마다 다른 움직임
+        }
         double r = c.introRadius + 12;
         for (ServerPlayer p : level.getEntitiesOfClass(ServerPlayer.class, boss.getBoundingBox().inflate(r))) {
             send(p, o);
@@ -99,7 +129,7 @@ public final class BossIntros {
                 if (p.isSpectator()) continue;
                 AABB box = p.getBoundingBox().inflate(c.introRadius);
                 List<LivingEntity> near = p.level().getEntitiesOfClass(LivingEntity.class, box,
-                        e -> e.isAlive() && !SHOWN.contains(e.getUUID()) && c.intros.containsKey(id(e)) && !e.getPersistentData().getBoolean(SEEN_TAG));
+                        e -> e.isAlive() && !SHOWN.contains(e.getUUID()) && c.intros.containsKey(id(e)) && !e.getPersistentData().getBoolean(SEEN_TAG) && !StoryArena.awaiting(e));
                 for (LivingEntity boss : near) {
                     StorySeals.Seal seal = StorySeals.ofBoss(boss);
                     if (seal == null || StorySeals.passes(p, seal)) show(boss); // 결계에 막힌 사람에게는 아직 등장하지 않는다

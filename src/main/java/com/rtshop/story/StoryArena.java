@@ -82,6 +82,19 @@ public final class StoryArena {
     public static int gateSeconds = 60;
     /** 보스 구역에 들어선 뒤 불씨를 건드리지 않아도 보스가 깨어나기까지의 시간 (초). 0 = 불씨를 건드려야만 깨어난다. */
     public static int waitSeconds = 45;
+    /** Cinematic Cataclysm 모드가 있으면 그 모드의 등장 컷신으로 보스를 깨운다 (이그니스·리바이어던·고대의 잔해·말레딕투스). story_arenas.json 의 modCutscenes. */
+    public static boolean modCutscenes = true;
+    /** 보스 ID → 그 보스의 컷신 엔티티 클래스 (Cinematic Cataclysm 1.0.1). 컷신이 끝나면 그 모드가 진짜 보스를 세운다. */
+    private static final java.util.Map<String, String> CUTSCENE_CLASS = java.util.Map.of(
+            "cataclysm:ignis", "com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity",
+            "cataclysm:the_leviathan", "com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntity",
+            "cataclysm:ancient_remnant", "com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntity",
+            "cataclysm:maledictus", "com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntity");
+    /** 컷신이 끝나고 진짜 보스가 서기를 기다리는 가장 긴 시간 (틱). 넘기면 예전처럼 직접 세운다. */
+    public static final int CUTSCENE_MAX_TICKS = 900;
+    /** 점검용: 컷신으로 깨운 횟수 / 컷신 뒤에 진짜 보스를 넘겨받은 횟수 / 마지막 실패 까닭. */
+    public static int cutscenesForTest, adoptedForTest;
+    public static String cutsceneErrorForTest = "";
     /** false 면 예전처럼 단추를 누르는 즉시 보스 구역으로 간다. */
     public static boolean walkIn = true;
     /** 깨어나는 연출의 길이 (틱). */
@@ -142,6 +155,7 @@ public final class StoryArena {
                 if (o.has("partyRange")) partyRange = Math.max(1, Math.min(64, o.get("partyRange").getAsInt()));
                 if (o.has("gateSeconds")) gateSeconds = Math.max(10, Math.min(600, o.get("gateSeconds").getAsInt()));
                 if (o.has("waitSeconds")) waitSeconds = Math.max(0, Math.min(600, o.get("waitSeconds").getAsInt()));
+                if (o.has("modCutscenes")) modCutscenes = o.get("modCutscenes").getAsBoolean();
                 if (o.has("walkIn")) walkIn = o.get("walkIn").getAsBoolean();
                 if (!o.has("partyRange") || !o.has("waitSeconds")) {
                     // 3.58: 새 항목을 예전 파일에 덧붙인다 (보스별 설정은 그대로)
@@ -212,6 +226,8 @@ public final class StoryArena {
         public Spec spec;
         /** 불씨를 건드렸거나 기다리는 시간이 다 되어, 깨어나는 연출이 돌고 있다. */
         public boolean waking;
+        /** 다른 모드의 컷신이 돌고 있다: 이 틱까지 진짜 보스가 서기를 기다린다 (0 = 기다리지 않음). */
+        public long awaitBossUntil;
     }
 
     /** 세계에 열린 문: 문을 연 사람이 걸어 들어가면 보스 구역이 열리고, 보스가 깨어나기 전까지 파티원이 뒤따라 들어올 수 있다. */
@@ -749,6 +765,17 @@ public final class StoryArena {
                     }
                 }
                 case FIGHT -> {
+                    if (s.bossId == null && s.awaitBossUntil > 0) {
+                        // 컷신 모드가 보스를 세우기를 기다린다. 서면 넘겨받고, 너무 오래 걸리면 직접 세운다.
+                        if (inside.isEmpty()) {
+                            s.state = LOST;
+                            s.endAt = now + 20;
+                        } else if (!adoptBoss(level, s) && now >= s.awaitBossUntil) {
+                            s.awaitBossUntil = 0;
+                            spawnBossPlain(level, c, s);
+                        }
+                        continue;
+                    }
                     Entity boss = s.bossId == null ? null : level.getEntity(s.bossId);
                     if (boss == null || !boss.isAlive()) {
                         s.state = WON;
@@ -779,6 +806,67 @@ public final class StoryArena {
     }
 
     private static void spawnBoss(ServerLevel level, BlockPos c, Session s) {
+        if (startModCutscene(level, c, s)) return;
+        spawnBossPlain(level, c, s);
+    }
+
+    /** Cinematic Cataclysm 의 등장 컷신을 경기장 가운데에서 튼다 (그 모드가 있고, 이 보스의 컷신이 있을 때). 틀었으면 true. */
+    private static boolean startModCutscene(ServerLevel level, BlockPos c, Session s) {
+        String cls = CUTSCENE_CLASS.get(s.boss);
+        if (cls == null || !modCutscenes || !net.minecraftforge.fml.ModList.get().isLoaded("cinematiccataclysm")) return false;
+        try {
+            Class<?> k = Class.forName(cls);
+            net.minecraft.world.phys.Vec3 at = new net.minecraft.world.phys.Vec3(c.getX() + 0.5, c.getY() + 1.0, c.getZ() + 0.5);
+            net.minecraft.core.GlobalPos home = net.minecraft.core.GlobalPos.of(level.dimension(), c.above());
+            if (s.boss.equals("cataclysm:maledictus")) {
+                k.getMethod("summon", net.minecraft.world.level.Level.class, net.minecraft.world.phys.Vec3.class, net.minecraft.world.phys.Vec3.class,
+                        net.minecraft.core.GlobalPos.class, net.minecraft.core.Direction.class)
+                        .invoke(null, level, at, new net.minecraft.world.phys.Vec3(0, 0, 1), home, net.minecraft.core.Direction.SOUTH);
+            } else {
+                k.getMethod("summon", net.minecraft.world.level.Level.class, net.minecraft.world.phys.Vec3.class, net.minecraft.core.GlobalPos.class).invoke(null, level, at, home);
+            }
+            s.bossId = null;
+            s.awaitBossUntil = now + CUTSCENE_MAX_TICKS;
+            s.state = FIGHT;
+            cutscenesForTest++;
+            return true;
+        } catch (Throwable t) {
+            Throwable cause = t.getCause() == null ? t : t.getCause();
+            cutsceneErrorForTest = cause.toString();
+            com.rtshop.RtShop.LOGGER.warn("[rtshop] 보스 컷신을 틀지 못해 직접 세웁니다 ({}): {}", s.boss, cause.toString());
+            return false;
+        }
+    }
+
+    /** 컷신이 끝나 그 모드가 세운 진짜 보스를 찾아 이 보스전의 보스로 삼는다. */
+    private static boolean adoptBoss(ServerLevel level, Session s) {
+        EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(s.boss));
+        if (type == null) return false;
+        BlockPos c = center(level.getServer(), s.slot);
+        AABB box = new AABB(c).inflate(s.spec.radius + 12, s.spec.height + 20, s.spec.radius + 12);
+        for (Entity e : level.getEntitiesOfClass(Entity.class, box, x -> x.getType() == type && x.isAlive())) {
+            e.addTag(BOSS_TAG);
+            if (e instanceof Mob m) m.setPersistenceRequired();
+            s.bossId = e.getUUID();
+            s.awaitBossUntil = 0;
+            adoptedForTest++;
+            // 컷신이 등장 장면이었으니 우리 쪽은 이름만 띄운다 (카메라는 다시 움직이지 않는다)
+            if (e instanceof net.minecraft.world.entity.LivingEntity le) BossIntros.show(le, false);
+            return true;
+        }
+        return false;
+    }
+
+    /** 이 엔티티가 "컷신 뒤에 넘겨받기를 기다리는" 보스전 안에 있는가 (그동안에는 우리 쪽 등장 연출을 따로 틀지 않는다). */
+    public static boolean awaiting(Entity e) {
+        try {
+            for (Session s : SESSIONS.values()) if (s.awaitBossUntil > 0 && inSlot(e, s)) return true;
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
+    private static void spawnBossPlain(ServerLevel level, BlockPos c, Session s) {
         EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(s.boss));
         Entity e = type == null ? null : type.create(level);
         if (e == null) {
