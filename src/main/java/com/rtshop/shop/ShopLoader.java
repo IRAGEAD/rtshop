@@ -1279,6 +1279,7 @@ public final class ShopLoader {
         List<RecipeSolver.Recipe> rs = makers.getOrDefault(id, List.of());
         double autoMin = Double.MAX_VALUE;
         double min = Double.MAX_VALUE;
+        double minFull = Double.MAX_VALUE;
         double[] costs = new double[rs.size()];
         double fullMax = -1;
         List<AutoRoute> routes = new ArrayList<>();
@@ -1293,6 +1294,10 @@ public final class ShopLoader {
                 }
                 all.add(new RecipeCost(rs.get(i), costs[i], items));
                 min = Math.min(min, costs[i]);
+                // 자유 조리법으로 만든 요리는 따로(flexUnit) 사므로 정식 값으로 팔 수 없다 → '가장 싼 조리법'에서 뺀다
+                if (!(pc.flexDishPricing && isFlexRecipe(rs.get(i)))) {
+                    minFull = Math.min(minFull, costs[i]);
+                }
                 // 재료를 상점에서 산 그대로 화로에 넣어 만들 수 있는 경우만 '자동화 가능'으로 본다
                 boolean direct = !used.isEmpty();
                 for (RecipeSolver.Pick u : used) {
@@ -1318,7 +1323,8 @@ public final class ShopLoader {
             }
             // 3.65.0: 가장 싼 조리법보다 15% 넘게 비싼 조리법은 하한으로 지켜 주지 않는다. 지켜 주면 같은 음식을 싼 조리법으로 만들어
             // 그 비싼 값에 팔아 돈이 불어난다 (손요리 마진까지 합쳐 최대 약 26% 남는 것이 한도).
-            if (min < Double.MAX_VALUE && costs[i] > min * ALT_RECIPE_LIMIT + 1.0e-6) {
+            double cheapest = minFull < Double.MAX_VALUE ? minFull : min;
+            if (cheapest < Double.MAX_VALUE && costs[i] > cheapest * ALT_RECIPE_LIMIT + 1.0e-6) {
                 skipped.add(rs.get(i));
                 continue;
             }
@@ -1571,7 +1577,7 @@ public final class ShopLoader {
                 }
             }
             for (RecipeSolver.Recipe r : n.skipped()) {
-                out.add(String.format(Locale.ROOT, "%s | 보호 안 함: %s [%s] (상점 재료를 화로에 바로 넣어 더 싸게 만들 수 있음)", id, r.id, r.type));
+                out.add(String.format(Locale.ROOT, "%s | 보호 안 함: %s [%s] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)", id, r.id, r.type));
             }
         }
         return out;

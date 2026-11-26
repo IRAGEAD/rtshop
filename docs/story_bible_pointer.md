@@ -250,3 +250,4 @@
 - 터무니없는 장비: rules/ItemPolicy.extreme · rules/ExtremeGuard (줍기 · 가방) · rules/MobRules.onDrops · rules/RecipeRules.hiddenOutput.
 - 값: shop/PricingConfig.ingredientValues (귀한 재료), shop/ShopLoader.oreVariantValue · addOreVariants (돌 변형 광석), Price.staffFallback (완드) · Price.explicitPrice (직접 적은 값은 그대로),
   "만들면 훨씬 싼데 비싸게 팔던 품목" 내리기(applyRecipePricing 끝). 점검: test/PackDiag.loops (돈이 불어나는 길 · 뽑기와 상점에 함께 있는 물건).
+  음식 매입가 하한: ShopLoader.need (ALT_RECIPE_LIMIT 1.15, 자유 조리법은 '가장 싼 조리법'에서 뺌) · applyPurchaseFloor (재료 마련에 보관용 조합법도).
