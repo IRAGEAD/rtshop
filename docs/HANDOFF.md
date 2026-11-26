@@ -50,7 +50,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
-- **3.54.0 을 main 에 올렸습니다** (커밋 ba60ce41). main 의 build 가 끝나면 릴리스가 바뀝니다. ← 새 세션은 먼저 릴리스 이름이 3.54.0 인지 확인하고, 아직 사용자에게 jar 를 보내지 않았다면 보냅니다 (아래 5의 요약 사용).
+- **3.54.0 을 올렸고(릴리스 latest = RT Shop 3.54.0, 커밋 ba60ce41) jar 와 요약을 사용자에게 보냈습니다.** main 의 fullpack 은 올린 뒤에도 돌고 있었으니, 새 세션은 `ci-fullpack-screenshots` 의 결과가 통과인지 한 번 확인합니다.
 - 3.54.0 에 든 것 (3.53.0 은 따로 올리지 않고 함께 들어감):
   - 3.53 묶음: 기록·주간 순위·칭호와 NPC 셋(`/rtshop npc quest_bounty|quest_ranks|quest_titles`), 조사대 도감, 조사대 안내서, 아이템 짧은 설명(Shift), 도구 재판매, 강화 정보 창(연한 금빛 판 + 송명·Playfair 글꼴), 아이템 규칙 2판(betternether·arcane vortex 는 상점에서 안 팖 / spmovesets 는 자연 스폰·드랍에서 뺌), 대화·읽을거리·안내서 영어.
   - 귀환권 조정(C-3): 일반 3,000칸·1시간·5,000 G / 고급 30분·30,000 G(하루 5장). 쿨타임은 실제 시간·종류별·죽어도 유지. `/rtshop spawn resetcd [사람]`. 깔린 서버의 설정·상점 값은 옛 기본값일 때만 자동으로 고침.
@@ -59,7 +59,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   - 스토리 검토(B-2): 어긋난 곳 셋을 고침 (worklist 맨 아래에 적어 둠).
 - 마지막 fullpack(run 45721437420, 번역 넣기 직전 커밋): 서버 798 · 클라이언트 313 점검 모두 통과. 번역·스토리 글 수정 뒤의 커밋은 main 의 build 만 거칩니다 → **main build 가 실패하면** `gh run view <id> --log-failed` 로 보고 고쳐 다시 올립니다 (새로 넣은 점검: "every text in the bundled quest files has an English version").
 
-## 5. 사용자에게 보낼 3.54.0 요약 (아직 안 보냈다면)
+## 5. 사용자에게 보낸 3.54.0 요약 (참고)
 
 1. 귀환권: 일반 3,000칸·쿨타임 1시간·5,000 G, 고급 쿨타임 30분·30,000 G. 쿨타임 중에 우클릭하면 남은 시간이 뜸.
 2. 순위·칭호·현상금 NPC, 도감, 안내서, 아이템 설명, 강화 창 새 글꼴, 아이템 규칙 (위 4의 3.53 묶음).
