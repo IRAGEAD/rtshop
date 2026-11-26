@@ -253,7 +253,7 @@ public final class Attendance {
     /** 출석 버튼. */
     public static boolean doCheckIn(ServerPlayer p, boolean needNpc) {
         if (needNpc && !nearNpc(p)) {
-            result(p, Component.translatable("rtshop.att.need_npc", AttendanceConfig.get().npcName), false);
+            result(p, Component.translatable("rtshop.att.need_npc", com.rtshop.story.StoryText.t(p, AttendanceConfig.get().npcName)), false);
             return false;
         }
         refresh(p);
@@ -354,7 +354,7 @@ public final class Attendance {
             case com.rtshop.net.AttendanceActionPacket.RESTORE -> useTicketFromInventory(p);
             case com.rtshop.net.AttendanceActionPacket.SHOP -> {
                 if (!nearNpc(p)) {
-                    result(p, Component.translatable("rtshop.att.need_npc", AttendanceConfig.get().npcName), false);
+                    result(p, Component.translatable("rtshop.att.need_npc", com.rtshop.story.StoryText.t(p, AttendanceConfig.get().npcName)), false);
                     return;
                 }
                 String shop = AttendanceConfig.get().shop;
@@ -444,7 +444,7 @@ public final class Attendance {
         long now = clock.getAsLong();
         long today = dayOf(now, c);
         JsonObject o = new JsonObject();
-        o.addProperty("npc", c.npcName);
+        o.addProperty("npc", com.rtshop.story.StoryText.t(p, c.npcName));
         o.addProperty("atNpc", npcId >= 0);
         o.addProperty("canEdit", canEdit(p));
         o.addProperty("zone", c.zone().getId());

@@ -380,7 +380,7 @@ public final class Gacha {
     public static List<GachaConfig.Entry> doPull(ServerPlayer p, String cat, String tier, int n, boolean needNpc) {
         GachaConfig c = GachaConfig.get();
         if (needNpc && !nearNpc(p)) {
-            result(p, Component.translatable("rtshop.gacha.need_npc", c.npcName), false);
+            result(p, Component.translatable("rtshop.gacha.need_npc", com.rtshop.story.StoryText.t(p, c.npcName)), false);
             return null;
         }
         if ((n != 1 && n != 10) || !c.tiers.containsKey(tier) || !c.pools.containsKey(cat)) {
@@ -460,7 +460,7 @@ public final class Gacha {
     /** 뽑기 표시가 붙은 인벤토리 칸 하나를 분해한다. 받은 조각 수 (실패 0). */
     public static int dismantle(ServerPlayer p, int slot, boolean needNpc) {
         if (needNpc && !nearNpc(p)) {
-            result(p, Component.translatable("rtshop.gacha.need_npc", GachaConfig.get().npcName), false);
+            result(p, Component.translatable("rtshop.gacha.need_npc", com.rtshop.story.StoryText.t(p, GachaConfig.get().npcName)), false);
             return 0;
         }
         Inventory inv = p.getInventory();
@@ -482,7 +482,7 @@ public final class Gacha {
     /** 이 등급 이하의 뽑기 아이템을 모두 분해. */
     public static int dismantleAll(ServerPlayer p, int maxGrade, boolean needNpc) {
         if (needNpc && !nearNpc(p)) {
-            result(p, Component.translatable("rtshop.gacha.need_npc", GachaConfig.get().npcName), false);
+            result(p, Component.translatable("rtshop.gacha.need_npc", com.rtshop.story.StoryText.t(p, GachaConfig.get().npcName)), false);
             return 0;
         }
         int total = 0;
@@ -500,7 +500,7 @@ public final class Gacha {
     public static boolean exchange(ServerPlayer p, String cat, String tier, int n, boolean needNpc) {
         GachaConfig c = GachaConfig.get();
         if (needNpc && !nearNpc(p)) {
-            result(p, Component.translatable("rtshop.gacha.need_npc", c.npcName), false);
+            result(p, Component.translatable("rtshop.gacha.need_npc", com.rtshop.story.StoryText.t(p, c.npcName)), false);
             return false;
         }
         int ti = java.util.Arrays.asList(GachaConfig.TIERS).indexOf(tier);
@@ -616,7 +616,7 @@ public final class Gacha {
     public static JsonObject view(ServerPlayer p) {
         GachaConfig c = GachaConfig.get();
         JsonObject o = new JsonObject();
-        o.addProperty("npc", c.npcName);
+        o.addProperty("npc", com.rtshop.story.StoryText.t(p, c.npcName));
         o.addProperty("atNpc", nearNpc(p));
         o.addProperty("canEdit", canEdit(p));
         o.addProperty("shop", ShopServer.shops().get(c.shop) != null);

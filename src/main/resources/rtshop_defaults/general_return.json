@@ -3,7 +3,7 @@
  "items": [
   {
    "item": "rtshop:return_ticket",
-   "price": 5000,
+   "price": 10000,
    "category": "misc",
    "sell": false
   },

@@ -277,7 +277,7 @@ public final class Jobs {
     public static void handleChoose(ServerPlayer p, String jobId) {
         Result r;
         if (!nearNpc(p)) {
-            r = new Result(false, Component.translatable("rtshop.job.need_npc", JobConfig.get().npcName));
+            r = new Result(false, Component.translatable("rtshop.job.need_npc", com.rtshop.story.StoryText.t(p, JobConfig.get().npcName)));
         } else {
             r = choose(p, jobId);
         }

@@ -2373,8 +2373,8 @@ public final class SelfTest {
             ShopData gen = ShopServer.shops().get("general");
             int ti = gen == null ? -1 : findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET.get()) && e.buyable);
             int tj = gen == null ? -1 : findEntry(gen, e -> e.stack.is(com.rtshop.item.ModItems.RETURN_TICKET_PLUS.get()) && e.buyable);
-            check("the general store sells both return tickets: 5000 G and 30000 G (3.53; an installed shop still at the old default price is updated)",
-                    ti >= 0 && tj >= 0 && gen.entries.get(ti).price == 5000 && gen.entries.get(tj).price == 30000,
+            check("the general store sells both return tickets: 10000 G and 30000 G (3.55; an installed shop still at an old default price is updated)",
+                    ti >= 0 && tj >= 0 && gen.entries.get(ti).price == 10000 && gen.entries.get(tj).price == 30000,
                     ti < 0 || tj < 0 ? "missing" : gen.entries.get(ti).price + " " + gen.entries.get(tj).price);
             // 옛 값으로 깔린 상점 파일의 값 고치기: 기본값 그대로인 것만 고치고, 운영자가 바꾼 값은 그대로 둔다
             try {
@@ -2385,6 +2385,16 @@ public final class SelfTest {
                 String after = java.nio.file.Files.readString(priceFile);
                 java.nio.file.Files.deleteIfExists(priceFile);
                 check("repricing touches only entries still at the old default price", n1 == 1 && n2 == 0 && after.contains("5000") && after.contains("9999"), n1 + " " + n2 + " " + after);
+                // 3.55: 1,500 → 5,000 → 10,000 으로 차례로 오르고, 운영자가 정한 값(7,777)은 그대로
+                java.nio.file.Path rpFile55 = java.nio.file.Files.createTempFile("rtshop_reprice2", ".json");
+                java.nio.file.Files.writeString(rpFile55, "{\"items\":[{\"item\":\"rtshop:return_ticket\",\"price\":1500},{\"item\":\"rtshop:return_ticket\",\"price\":7777}]}");
+                int rpN55a = com.rtshop.shop.ShopLoader.reprice(rpFile55, "rtshop:return_ticket", 1500, 5000);
+                int rpN55b = com.rtshop.shop.ShopLoader.reprice(rpFile55, "rtshop:return_ticket", 5000, 10000);
+                String rpAfter55 = java.nio.file.Files.readString(rpFile55);
+                java.nio.file.Files.deleteIfExists(rpFile55);
+                boolean rpListed55 = java.util.Arrays.asList(com.rtshop.shop.ShopLoader.REPRICED).contains("general:rtshop:return_ticket=5000>10000@2");
+                check("the plain return ticket's default price rises to 10000 G on installed shops too (old defaults only)",
+                        rpN55a == 1 && rpN55b == 1 && rpAfter55.contains("10000") && rpAfter55.contains("7777") && !rpAfter55.contains("1500") && rpListed55, rpN55a + " " + rpN55b + " " + rpAfter55);
             } catch (Exception ex) {
                 check("repricing touches only entries still at the old default price", false, ex.toString());
             }

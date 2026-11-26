@@ -194,7 +194,8 @@ public final class ShopLoader {
             "gacha_shop+gacha_shop_magic@1", "general+general_return@1", "general+general_books@1"};
 
     /** 기본값이 바뀐 품목: "상점:품목=옛값>새값@판". 설치된 파일의 값이 옛 기본값 그대로일 때만 새 값으로 고친다 (한 번만). */
-    public static final String[] REPRICED = {"general:rtshop:return_ticket=1500>5000@1", "general:rtshop:return_ticket_plus=12000>30000@1"};
+    public static final String[] REPRICED = {"general:rtshop:return_ticket=1500>5000@1", "general:rtshop:return_ticket_plus=12000>30000@1",
+            "general:rtshop:return_ticket=5000>10000@2"};   // 3.55: 일반 귀환권 5,000 → 10,000 G (위의 @1 다음에 차례로 적용된다)
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");
