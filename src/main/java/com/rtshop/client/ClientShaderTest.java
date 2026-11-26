@@ -16,7 +16,9 @@ import static com.rtshop.client.ClientSelfTest.shot;
  * 셰이더를 켠 화면에서 찍는 짧은 점검 (3.64.2). JVM 옵션 -Drtshop.clienttest=true -Drtshop.clienttest.only=shader 일 때만 돈다
  * (CI 의 모드팩 전체 job 이 화면 점검 뒤에, 모드팩에 든 Photon 을 Oculus 로 켜고 한 번 더 클라이언트를 띄운다).
  * 사용자가 Photon 에서 본 문제를 사람 대신 그림으로 확인하려는 것: 강화 모루의 빛 · 흔적 표시 · 룬 제단의 구슬과 그 빛.
- * 결과는 rtshop-shadertest.txt, 사진은 screenshots/150_photon_*.png.
+ * 결과는 rtshop-shadertest.txt, 사진은 screenshots/150_<팩>_*.png (팩 이름은 -Drtshop.shadertest.label, 기본 photon).
+ * CI 의 소프트웨어 그리기(llvmpipe)는 계산 셰이더의 공유 메모리가 32KB 뿐이라 Photon 의 계산 패스 하나가 안 만들어진다:
+ * CI 는 그 패스만 끈 Photon 을 먼저 써 보고, 그래도 켜지지 않으면 다른 셰이더 팩(같은 Oculus 경로)으로 찍는다.
  */
 final class ClientShaderTest {
     private ClientShaderTest() {
@@ -32,6 +34,8 @@ final class ClientShaderTest {
     private static volatile BlockPos orb;
     private static long anvilDrawn;
     private static long spotsBefore;
+    /** 사진 이름과 결과에 쓰는 셰이더 팩 이름 (photon, complementary, bsl ...). */
+    static final String LABEL = System.getProperty("rtshop.shadertest.label", "photon").replaceAll("[^a-z0-9]", "");
 
     static int count() {
         return STEPS.size();
@@ -111,7 +115,7 @@ final class ClientShaderTest {
         add(mc -> {
             String st = shaderState();
             RtShop.LOGGER.info("[rtshop-clienttest] shader state: {}", st);
-            check("the shader pack is on for these pictures (Oculus with the pack's Photon)", st.startsWith("on ") && st.toLowerCase(java.util.Locale.ROOT).contains("photon"), st);
+            check("the shader pack is on for these pictures (Oculus with the pack's " + LABEL + ")", st.startsWith("on "), st);
             // 강화 모루: 남쪽(앞) 세 칸, 내려다본다
             onServer(mc, sp -> {
                 if (base == null) return;
@@ -126,7 +130,7 @@ final class ClientShaderTest {
             float lv = anvil == null ? -1F : EnhanceAnvilGlow.levelForTest(anvil);
             check("with the shader on, the enhance anvil's runes and gem light up when someone stands near it, and the glow is really drawn",
                     lv > 0.95F && EnhanceAnvilGlow.drawnForTest > anvilDrawn, lv + " drawn=" + (EnhanceAnvilGlow.drawnForTest - anvilDrawn));
-            shot(mc, "150_photon_anvil");
+            shot(mc, "150_" + LABEL + "_anvil");
             waitTicks(30);
         });
         // 흔적 표시 (이야기의 "살펴보기"): 앞 세 칸 바닥
@@ -148,7 +152,7 @@ final class ClientShaderTest {
         });
         add(mc -> {
             check("with the shader on, the trace to look at is listed on the screen side", SpotClient.countForTest() >= 1, SpotClient.countForTest());
-            shot(mc, "151_photon_spot");
+            shot(mc, "151_" + LABEL + "_spot");
             onServer(mc, sp -> {
                 com.rtshop.quest.QuestManager.abandon(sp, "t_shader_spot");
                 com.rtshop.quest.QuestManager.loaded().quests.remove("t_shader_spot");
@@ -162,13 +166,18 @@ final class ClientShaderTest {
                 orb = base.offset(0, 0, 2);
                 sp.serverLevel().setBlockAndUpdate(orb, com.rtshop.magic.MagicRegistry.ORB.get().defaultBlockState());
                 sp.getInventory().add(new net.minecraft.world.item.ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 5));
+                // 마을의 제단은 하나뿐이다: 앞의 화면 점검에서 놓은 제단 대신 이 제단을 마을의 제단으로 (안 그러면 열기를 거절한다)
+                com.rtshop.rules.WorldRules.setAltar(sp.serverLevel(), orb);
+                sp.getInventory().selected = 8;
+                sp.getInventory().setItem(8, net.minecraft.world.item.ItemStack.EMPTY);
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(8));
                 sp.connection.teleport(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 6F);
             });
             waitTicks(80);
         });
         add(mc -> {
             check("with the shader on, the orb on its pedestal is drawn (orb, rim glow and rings)", ArcaneOrbRenderer.orbDrawnForTest > 0, ArcaneOrbRenderer.orbDrawnForTest);
-            shot(mc, "152_photon_orb");
+            shot(mc, "152_" + LABEL + "_orb");
             if (orb != null) {
                 mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
                         net.minecraft.world.phys.Vec3.atCenterOf(orb).add(0, 0.5, 0), net.minecraft.core.Direction.UP, orb, false));
@@ -177,7 +186,7 @@ final class ClientShaderTest {
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
-            shot(mc, "153_photon_orb_scene_intro");
+            shot(mc, "153_" + LABEL + "_orb_scene_intro");
             waitTicks(160);
         });
         add(mc -> {
@@ -186,13 +195,13 @@ final class ClientShaderTest {
             check("with the shader on, the rune altar scene draws the orb with its glow kept close around it",
                     st != null && ArcaneOrbRenderer.sceneOrbDrawnForTest > 0 && CinematicOrbStation.sceneRimForTest < CinematicOrbStation.ringForTest() * 0.65,
                     CinematicOrb.phaseForTest() + " rim=" + CinematicOrbStation.sceneRimForTest);
-            shot(mc, "154_photon_orb_scene");
+            shot(mc, "154_" + LABEL + "_orb_scene");
             if (st != null) st.chooseForTest(0);
             waitTicks(20);
         });
         add(mc -> {
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
-            shot(mc, "155_photon_orb_chosen");
+            shot(mc, "155_" + LABEL + "_orb_chosen");
             waitTicks(60);   // 사진이 다 써질 때까지
         });
     }
