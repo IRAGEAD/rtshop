@@ -890,6 +890,12 @@ public final class QuestManager {
         return n;
     }
 
+    /** 점검용: 진행 중인 퀘스트의 진행 배열을 옛 판처럼 짧게 만든다. */
+    public static void shortenForTest(ServerPlayer p, String questId, int len) {
+        int[] pg = prog(p).active.get(questId);
+        if (pg != null && len < pg.length) prog(p).active.put(questId, java.util.Arrays.copyOf(pg, len));
+    }
+
     @SubscribeEvent
     public static void onLoginMigrate(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer lp) fitProgress(lp);

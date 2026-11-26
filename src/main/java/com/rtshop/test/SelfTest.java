@@ -3791,6 +3791,48 @@ public final class SelfTest {
         boolean fin5 = QuestManager.isCompleted(a, "story_5_12") && QuestManager.hasFlag(a, "seal_ignis") && QuestManager.hasFlag(a, "fin_erased") && !QuestManager.hasFlag(a, "fin_forgave");
         check("finale progress moves over the same way (the line of ash is kept)", mid5 && fin5, mid5 + "/" + fin5);
         QuestManager.reset(a);
+        // 3.63: 이사벨은 사막 · 늪에 따라가지 않는다 / 1장 가운데의 쉬는 장면 둘 / 채우기용 처치 목표 줄임 / 목표가 늘어난 퀘스트의 진행 배열 맞추기 / 생물 군계에 놓는 흔적
+        QuestManager.Loaded l363 = QuestManager.loaded();
+        QuestDef q107 = l363.quests.get("story_1_07"), q113 = l363.quests.get("story_1_13"), q207 = l363.quests.get("story_2_07"), q407 = l363.quests.get("story_4_07");
+        int big363 = 0;
+        StringBuilder bigNames363 = new StringBuilder();
+        for (QuestDef q363 : l363.quests.values()) {
+            if (!q363.id.startsWith("story_2_") && !q363.id.startsWith("story_3_") && !q363.id.startsWith("story_4_") && !q363.id.startsWith("story_5_")) continue;
+            for (QuestDef.Objective ob363 : q363.objectives) {
+                // 보스·중간 보스가 아닌 채우기용 처치는 많아야 4 (모드가 없을 때의 대신 목표는 세지 않는다: 그것은 읽을 때 걸러진다)
+                if (ob363.type == QuestDef.Type.KILL && ob363.count > 4 && ob363.target.indexOf(':') > 0 && !ob363.target.startsWith("minecraft:")) {
+                    big363++;
+                    bigNames363.append(q363.id).append(' ').append(ob363.target).append('x').append(ob363.count).append(' ');
+                }
+            }
+        }
+        boolean scenes363 = q107 != null && q113 != null && q107.companion == null && q113.companion == null
+                && q107.objectives.stream().anyMatch(o -> o.type == QuestDef.Type.INSPECT && o.target.equals("c1_shade") && o.after.equals("c1_pyramid"))
+                && q113.objectives.stream().anyMatch(o -> o.type == QuestDef.Type.INSPECT && o.target.equals("c1_sill") && o.after.equals("c1_ink"))
+                && l363.quests.get("story_1_02").companion != null && l363.quests.get("story_1_37").companion != null;
+        boolean mod363 = (q207 == null || q207.objectives.stream().noneMatch(o -> o.target.startsWith("mowziesmobs:"))
+                || q207.objectives.stream().anyMatch(o -> o.target.equals("c2_trunks") && o.at.equals("biome:minecraft:dark_forest")))
+                && (q407 == null || q407.objectives.stream().noneMatch(o -> o.target.startsWith("cataclysm:"))
+                || q407.objectives.stream().anyMatch(o -> o.target.equals("c4_yoke") && o.after.equals("c4_basin")));
+        check("3.63 story: Isabel stays behind for the pyramid and the swamp hut (she still walks to the portal and the tower), both quests end on a quiet scene, the dark wood and the cursed pyramid have theirs when their mods are in, and no filler kill in chapters 2 to 5 asks for more than 4",
+                scenes363 && mod363 && big363 == 0, scenes363 + " " + mod363 + " " + big363 + " " + bigNames363);
+        for (String f : List.of("story_v4", "story_v5", "story_v6", "story_v7", "story_v8")) QuestManager.setFlag(a, f, true);
+        QuestManager.forceComplete(a, "story_1_06");
+        boolean took363 = QuestManager.accept(a, "story_1_07", "quest_order_archivist");
+        int full363 = QuestManager.progressOf(a, "story_1_07") == null ? -1 : QuestManager.progressOf(a, "story_1_07").length;
+        if (took363) QuestManager.progressOf(a, "story_1_07")[0] = 1;
+        QuestManager.shortenForTest(a, "story_1_07", 2);
+        int short363 = QuestManager.progressOf(a, "story_1_07") == null ? -1 : QuestManager.progressOf(a, "story_1_07").length;
+        int fit363 = QuestManager.fitProgress(a);
+        int[] pg363 = QuestManager.progressOf(a, "story_1_07");
+        check("3.63 a quest that gained a goal: someone already on it gets a progress slot for the new goal (what was done is kept, the new goal starts at 0, nothing to fix the second time)",
+                took363 && full363 == 3 && short363 == 2 && fit363 == 1 && pg363 != null && pg363.length == 3 && pg363[0] == 1 && pg363[2] == 0 && QuestManager.fitProgress(a) == 0,
+                took363 + " " + full363 + " " + short363 + " " + fit363 + " " + (pg363 == null ? -1 : pg363.length));
+        String biome363 = a.level().getBiome(a.blockPosition()).unwrapKey().map(k -> k.location().toString()).orElse("");
+        check("3.63 a trace can be tied to a biome: it appears only while the player stands in that biome",
+                !biome363.isEmpty() && QuestManager.atStructure(a, "biome:" + biome363) && !QuestManager.atStructure(a, "biome:rtshop:no_such_biome") && !QuestManager.atStructure(a, "biome:"),
+                biome363);
+        QuestManager.reset(a);
     }
 
     private static String altarKeep = null;
