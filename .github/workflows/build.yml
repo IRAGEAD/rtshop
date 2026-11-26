@@ -226,7 +226,9 @@ jobs:
             } > /tmp/inspect/kc-recipes.txt 2>&1
             mkdir -p /tmp/kj && (cd /tmp/kj && unzip -q -o "$PWD/../../$KJ" 2>/dev/null || unzip -q -o "$GITHUB_WORKSPACE/$KJ")
             # flex 조리법을 쓰는 곳 (냄비·육수 냄비의 블록 엔티티): 넣은 재료 수에 따라 결과 개수가 어떻게 정해지는지
-            (cd /tmp/kj && for c in $(grep -rl -E "FlexPotRecipe|FlexStockpotRecipe" --include='*.class' . | grep -v -i -E "compat|datagen|serializer|/recipe/Flex" | head -n 8); do echo "######## $c"; javap -p -c "$c" 2>&1 | head -n 1800; done) > /tmp/inspect/kc-flex-code.txt 2>&1 || true
+            # 음식 품질: flex 조리법으로 만든 음식에 붙는 품질이 어떻게 정해지고 어디에 적히는지
+            (cd /tmp/kj && for c in $(find . -path '*item/quality*' -name '*.class' | head -n 12); do echo "######## $c"; javap -p -c "$c" 2>&1 | head -n 700; done) > /tmp/inspect/kc-flex-code.txt 2>&1 || true
+            (cd /tmp/kj && ls data/kaleidoscope_cookery 2>/dev/null; find data -ipath '*quality*' | head -n 40; for f in $(find data -ipath '*quality*' -name '*.json' | head -n 6); do echo "######## $f"; head -c 1500 "$f"; echo; done; grep -h -i "quality" assets/kaleidoscope_cookery/lang/en_us.json | head -n 40) > /tmp/inspect/kc-quality.txt 2>&1 || true
           fi
       - name: Inspect
         env:
