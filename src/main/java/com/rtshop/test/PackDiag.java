@@ -248,6 +248,7 @@ final class PackDiag {
             }
         }
         out.add("weapons listed: " + n);
+        extreme(server, out, craft);
         out.add("== armor (id | name | slot | armor | toughness | shop | craft | boss)");
         n = 0;
         for (Item item : ForgeRegistries.ITEMS) {
@@ -272,6 +273,62 @@ final class PackDiag {
             }
         }
         out.add("armor listed: " + n);
+    }
+
+    /**
+     * 터무니없이 센 장비(공격력 30 이상 · 방어력 30 이상, 대부분 Arcane Vortex)를 정말 얻을 수 없는지: 그것을 만드는 조합법(막혔는지),
+     * 그것이 든 전리품표(전리품 규칙이 빼는지)를 적는다. 전리품표는 JSON 으로 바꿔 아이템 ID 를 찾는다.
+     */
+    private static void extreme(MinecraftServer server, List<String> out, java.util.Set<String> craftable) {
+        java.util.Set<String> ids = new java.util.TreeSet<>();
+        for (Item item : ForgeRegistries.ITEMS) {
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            if (rl == null || item == Items.AIR) continue;
+            try {
+                ItemStack s = new ItemStack(item);
+                double dmg = 0;
+                for (var m : s.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE)) dmg += m.getAmount();
+                double ar = 0;
+                if (item instanceof net.minecraft.world.item.ArmorItem a) {
+                    for (var m : s.getAttributeModifiers(a.getEquipmentSlot()).get(Attributes.ARMOR)) ar += m.getAmount();
+                }
+                if (dmg >= 30 || ar >= 30) ids.add(rl.toString());
+            } catch (Throwable ignored) {
+            }
+        }
+        out.add("== extreme gear sources (" + ids.size() + " items with attack or armor 30+)");
+        int recipes = 0;
+        for (var r : server.getRecipeManager().getRecipes()) {
+            try {
+                ResourceLocation oid = com.rtshop.rules.RecipeRules.outputId(r, server);
+                if (oid == null || !ids.contains(oid.toString())) continue;
+                recipes++;
+                out.add("recipe " + r.getId() + " (" + net.minecraftforge.registries.ForgeRegistries.RECIPE_SERIALIZERS.getKey(r.getSerializer()) + ") -> " + oid
+                        + (com.rtshop.rules.ItemPolicy.recipeBanned(r.getId(), oid) ? " BANNED" : " OPEN"));
+            } catch (Throwable ignored) {
+            }
+        }
+        int tables = 0;
+        int failed = 0;
+        com.google.gson.Gson gson = net.minecraft.world.level.storage.loot.Deserializers.createLootTableSerializer().create();
+        for (ResourceLocation key : server.getLootData().getKeys(net.minecraft.world.level.storage.loot.LootDataType.TABLE)) {
+            String json;
+            try {
+                json = gson.toJsonTree(server.getLootData().getLootTable(key)).toString();
+            } catch (Throwable t) {
+                failed++;
+                continue;
+            }
+            for (String id : ids) {
+                if (!json.contains("\"" + id + "\"")) continue;
+                tables++;
+                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
+                ItemStack st = item == null ? ItemStack.EMPTY : new ItemStack(item);
+                out.add("loot " + key + " has " + id + (com.rtshop.rules.ItemPolicy.lootBanned(st, false) ? " (removed by the loot rules)" : " KEPT")
+                        + (com.rtshop.rules.ItemPolicy.lootBanned(st, true) ? "" : " (kept in boss tables)"));
+            }
+        }
+        out.add("extreme: " + recipes + " recipes, " + tables + " loot table hits, " + failed + " tables not readable");
     }
 
     private static void prices(List<String> out) {
