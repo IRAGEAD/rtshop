@@ -43,6 +43,11 @@ public final class EnhancePanel {
     private static final net.minecraft.resources.ResourceLocation FONT_ID = new net.minecraft.resources.ResourceLocation(com.rtshop.RtShop.MODID, "enhance");
     /** 금빛 판 위 글자의 새김 빛 (글자 바로 아래의 밝은 선). */
     private static final int C_CARVE = 0xD0FFFCEC;
+    /**
+     * 3.64: 사용자 요청 "강화 정보 창의 글자에서 그림자를 모두 제거" — 이 창의 글자는 그림자 없이 그린다 (drawString 의 마지막 값은 모두 false),
+     * 금빛 판 위 글자 밑에 깔던 밝은 새김 선(글자가 겹쳐 보이는 원인)도 끈다. 새김 선만 되살리려면 true.
+     */
+    private static final boolean CARVE = false;
 
     static boolean lux() {
         return ClientConfig.get().enhanceLuxFont;
@@ -50,7 +55,7 @@ public final class EnhancePanel {
 
     /** 금빛 판 위의 글자: 아래에 밝은 선을 한 번 깔아 새긴 것처럼 보이게 한다. */
     private static void carved(GuiGraphics g, Font font, String t, int x, int y, int col) {
-        if (lux()) {
+        if (CARVE && lux()) {
             g.pose().pushPose();
             g.pose().translate(0, 0.5F, 0);
             g.drawString(font, t, x, y, C_CARVE, false);
@@ -72,13 +77,13 @@ public final class EnhancePanel {
         g.pose().pushPose();
         g.pose().translate(ox, y + (scale - sc) * 4F, 0);   // 줄어든 만큼 아래로 내려 줄을 맞춘다
         g.pose().scale(sc, sc, 1);
-        if (carve && lux()) {
+        if (CARVE && carve && lux()) {
             g.pose().pushPose();
             g.pose().translate(0, 0.5F / sc, 0);
             g.drawString(font, t, 0, 0, C_CARVE, false);
             g.pose().popPose();
         }
-        g.drawString(font, t, 0, 0, col, shadow);
+        g.drawString(font, t, 0, 0, col, false);   // 3.64: 그림자 없음 (shadow 값은 쓰지 않는다)
         g.pose().popPose();
     }
 
@@ -93,7 +98,7 @@ public final class EnhancePanel {
         g.pose().pushPose();
         g.pose().translate(x0, y - 1, 0);
         g.pose().scale(sc, sc, 1);
-        g.drawString(font, t, 0, 0, 0xFFFFE9A8, true);
+        g.drawString(font, t, 0, 0, 0xFFFFE9A8, false);
         g.pose().popPose();
         // 아래 절반은 짙은 금으로 덧그린다 (가위질)
         int mid = y + 4;
@@ -264,13 +269,13 @@ public final class EnhancePanel {
         }
     }
 
-    /** 점판암 위의 글자: 밝은 색 + 그림자. */
+    /** 점판암 위의 글자: 밝은 색 (3.64: 그림자 없음). */
     private static void slate(GuiGraphics g, Font font, String t, int x, int y, int col) {
-        g.drawString(font, t, x, y, col, true);
+        g.drawString(font, t, x, y, col, false);
     }
 
     private static void slateCentered(GuiGraphics g, Font font, String t, int cx, int y, int col) {
-        g.drawString(font, t, cx - font.width(t) / 2, y, col, true);
+        g.drawString(font, t, cx - font.width(t) / 2, y, col, false);
     }
 
     /** 닦은 강철 판 (가운데가 늘어나는 9칸 그림; 그림은 화면 48칸 = 96픽셀, 모서리 6칸). */
@@ -289,7 +294,7 @@ public final class EnhancePanel {
         for (String k : keys) {
             for (FormattedCharSequence line : font.split(Component.translatable(k), tw)) {
                 if (ty > bottom) return;
-                g.drawString(font, line, tx, ty, C_ON_SLATE_SOFT, true);
+                g.drawString(font, line, tx, ty, C_ON_SLATE_SOFT, false);
                 ty += 10;
             }
             ty += 3;
@@ -301,7 +306,7 @@ public final class EnhancePanel {
         g.pose().pushPose();
         g.pose().translate(cx - font.width(t) * sc / 2F, y, 0);
         g.pose().scale(sc, sc, 1);
-        g.drawString(font, t, 0, 0, col, shadow);
+        g.drawString(font, t, 0, 0, col, false);   // 3.64: 그림자 없음 (shadow 값은 쓰지 않는다)
         g.pose().popPose();
     }
 
@@ -339,15 +344,15 @@ public final class EnhancePanel {
         }
         // +지금 ▶ +다음
         if (l == null) {
-            big(g, font, "+" + cur + " MAX", cx, y + 128, 1.25F, C_BRASS, true);
+            big(g, font, "+" + cur + " MAX", cx, y + 128, 1.25F, C_BRASS, false);
         } else {
             String a = "+" + cur, b = "+" + (cur + 1);
-            g.drawString(font, a, cx - 12 - font.width(a), y + 130, C_ON_SLATE_SOFT, true);
-            g.drawString(font, "▶", cx - 4, y + 130, C_BRASS, true);
+            g.drawString(font, a, cx - 12 - font.width(a), y + 130, C_ON_SLATE_SOFT, false);
+            g.drawString(font, "▶", cx - 4, y + 130, C_BRASS, false);
             g.pose().pushPose();
             g.pose().translate(cx + 10, y + 127, 0);
             g.pose().scale(1.4F, 1.4F, 1);
-            g.drawString(font, b, 0, 0, C_BRASS, true);
+            g.drawString(font, b, 0, 0, C_BRASS, false);
             g.pose().popPose();
         }
         // 능력치: 지금 → 다음 (강철 판)
@@ -439,7 +444,7 @@ public final class EnhancePanel {
         List<FormattedCharSequence> hl = font.split(Component.translatable(ok ? "rtshop.enhance.click_hint" : "rtshop.enhance.missing"), w - 30);
         int hy = y + h - 12 - Math.min(2, hl.size()) * 10;
         for (int i = 0; i < hl.size() && i < 2; i++) {
-            g.drawString(font, hl.get(i), cx - font.width(hl.get(i)) / 2, hy + i * 10, ok ? C_OK_SLATE : C_BAD_SLATE, true);
+            g.drawString(font, hl.get(i), cx - font.width(hl.get(i)) / 2, hy + i * 10, ok ? C_OK_SLATE : C_BAD_SLATE, false);
         }
         if (tip != null) {
             // 재료·보호권 칸에 마우스를 올리면 그 이름을 창 안에 띠로 보여 준다 (설명 창은 쓰지 않는다)
@@ -468,7 +473,7 @@ public final class EnhancePanel {
             fit(g, lf, eq.getHoverName().getString(), x + w / 2F, y + 91, w - 30, 1F, C_ON_SLATE, 1, true, false);
         }
         title(g, lf, Component.translatable("rtshop.enhance.panel").getString(), x + w / 2, y + 15);
-        g.drawString(lf, Component.translatable("rtshop.enhui.detail_title"), tx, ty, C_ON_SLATE, true);
+        g.drawString(lf, Component.translatable("rtshop.enhui.detail_title"), tx, ty, C_ON_SLATE, false);
         int bx0 = x + 14, by0 = y + 136, bx1 = x + w - 14, by1 = y + h - 14;
         // 설명 창과 같은 어두운 바탕 (글자 색이 어두운 바탕용이라서)
         g.fill(bx0, by0, bx1, by1, 0xF0100010);
@@ -502,7 +507,7 @@ public final class EnhancePanel {
         detailScroll = Math.max(0, Math.min(max, detailScroll));
         int yy = by0 + 5;
         for (int i = detailScroll; i < cachedLines.size() && i < detailScroll + rows; i++) {
-            g.drawString(font, cachedLines.get(i), bx0 + 5, yy, 0xFFFFFFFF, true);
+            g.drawString(font, cachedLines.get(i), bx0 + 5, yy, 0xFFFFFFFF, false);
             yy += 10;
         }
         if (max > 0) {
@@ -511,7 +516,7 @@ public final class EnhancePanel {
             int barY = by0 + 2 + (trackH - barH) * detailScroll / max;
             g.fill(bx1 - 3, barY, bx1 - 1, barY + barH, 0xFFB0A0FF);
             String more = Component.translatable("rtshop.enhui.detail_scroll").getString();
-            g.drawString(font, more, x + w - 16 - font.width(more), ty, C_ON_SLATE_SOFT, true);
+            g.drawString(font, more, x + w - 16 - font.width(more), ty, C_ON_SLATE_SOFT, false);
         }
     }
 
