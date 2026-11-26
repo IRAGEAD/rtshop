@@ -3,7 +3,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
-VERSION = 16
+VERSION = 17
 
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
@@ -847,6 +847,38 @@ more("shop_fisher", topics=[
         b("돌려받을 생각은 없소. 그건 원래 마중 나가는 사람 물건이오. 이제야 임자를 찾아간 거요.",
           "I don't want it back. A lantern like that belongs to whoever goes out to meet someone. It has only now found its owner."),
     ], flags=["scylla_lantern"]),
+])
+
+# 3.62: 조연의 말투와 지나온 일 (이사벨·에르윈 말고도 사람이 보이게)
+more("attendance", topics=[
+    tb("haru_first_day", "서기의 첫날", "The clerk's first day", [
+        b("저는 열아홉에 서기가 됐습니다. 첫날 받아 적은 것이 제 아버지의 사망 신고였습니다. 신고하러 오신 분이 어머니였습니다.",
+          "I became a clerk at nineteen. The first thing I took down, on my first day, was the notice of my own father's death. The one who came to file it was my mother."),
+        b("어머니는 날짜를 하루 틀리게 말씀하셨습니다. 저는 들은 대로 적었습니다. 그 장부는 지금도 하루가 틀린 채로 있습니다. 고치려면 신고한 사람이 다시 와야 하는데, 어머니도 이제 안 계십니다.",
+          "My mother gave the date wrong by one day. I wrote what I heard. That ledger is still wrong by one day. To correct it the person who filed has to come back, and my mother is gone now too."),
+        b("그날부터 저는 들은 말을 한 번 되받아 말합니다. '그러니까 이러이러하다는 말씀입니까' 하고요. 귀찮아하시는 분이 많습니다. 그래도 합니다.",
+          "Since that day I say back whatever I am told, once. 'So what you mean is this and this?' Many people find it tiresome. I do it anyway."),
+    ], flags=["order_apprentice"]),
+])
+more("quest_bounty", topics=[
+    tb("garret_eye", "안대", "The eyepatch", [
+        b("이 눈 말이오. 짐승한테 잃은 게 아니오. 현상금 벽보를 믿다가 잃었소.",
+          "This eye. I didn't lose it to a beast. I lost it trusting a bounty notice."),
+        b("스물둘에 벽보 한 장을 뜯었소. '가축 도둑, 왼뺨에 흉터.' 사흘을 쫓아 잡았는데 흉터가 오른뺨에 있더이다. 벽보 쓴 서기가 마주 보고 적은 거요. 엉뚱한 사람이었소. 그 사람이 휘두른 낫이 이 눈이오.",
+          "At twenty-two I tore down a notice. 'Cattle thief, scar on the left cheek.' I tracked him three days and caught him, and the scar was on the right. The clerk who wrote it had been facing the man. It was the wrong fellow. The sickle he swung is this eye."),
+        b("그래서 내 게시판의 벽보는 내가 직접 보고 온 것만 붙소. 느리다고들 하오. 느려도 되오. 틀린 벽보는 사람을 둘 잡소. 쫓기는 쪽 하나, 쫓는 쪽 하나.",
+          "So the only notices on my board are ones I went and saw for myself. They say I'm slow. Slow will do. A wrong notice takes two people. The one hunted, and the one hunting."),
+    ]),
+])
+more("shop_restaurant", topics=[
+    tb("lorenzo_word", "벨리시모", "Bellissimo", [
+        b("'벨리시모'요? 우리 할머니 말이에요. 바다 건너에서 시집오셨는데, 이쪽 말을 끝까지 다 못 배우셨어요. 맛있을 때 하는 말은 그것 하나였죠.",
+          "'Bellissimo'? That's my grandmother's word. She married in from across the sea and never did learn all of our language. She had exactly one thing she said when food was good."),
+        b("그런데 그게 맛있다는 뜻이 아니래요. 나중에 뱃사람한테 들었어요. '참 곱다'는 뜻이라고. 할머니는 평생 음식을 보고 곱다고 하신 거예요.",
+          "Only it doesn't mean tasty. A sailor told me, years later. It means 'how lovely.' All her life my grandmother looked at food and called it lovely."),
+        b("그래서 저는 접시를 내기 전에 한 번 봐요. 맛은 손님이 정하지만, 고운 건 내가 정할 수 있으니까요. 자, 오늘 것도… 벨리시모!",
+          "So I look at every plate once before it goes out. The guest decides whether it's tasty, but lovely is something I can decide. There, today's too… bellissimo!"),
+    ]),
 ])
 
 data = {"version": VERSION,

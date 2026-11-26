@@ -1,5 +1,5 @@
 {
- "version": 16,
+ "version": 17,
  "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), chatter: 일상 이야기 (무작위 한 마디), topics: 이야기 주제 (need: flags·notFlags·quests 조건). 문장은 \"이름: 대사\" 로 말하는 사람을 바꿀 수 있고, {\"ko\": \"...\", \"en\": \"...\"} 로 두 언어를 적을 수 있습니다. 직접 고쳤다면 \"edited\": true 로 두세요 (모드 업데이트 때 덮어쓰지 않습니다).",
  "edited": false,
  "npcs": {
@@ -1647,6 +1647,27 @@
       "언젠가 베스탈리아 모든 사람에게 제 요리를 먹이는 게 꿈이에요.",
       "원정대에도 도시락을 싸 드리고 싶어요. 배고픈 영웅은 슬프잖아요!"
      ]
+    },
+    {
+     "id": "lorenzo_word",
+     "title": {
+      "ko": "벨리시모",
+      "en": "Bellissimo"
+     },
+     "lines": [
+      {
+       "ko": "'벨리시모'요? 우리 할머니 말이에요. 바다 건너에서 시집오셨는데, 이쪽 말을 끝까지 다 못 배우셨어요. 맛있을 때 하는 말은 그것 하나였죠.",
+       "en": "'Bellissimo'? That's my grandmother's word. She married in from across the sea and never did learn all of our language. She had exactly one thing she said when food was good."
+      },
+      {
+       "ko": "그런데 그게 맛있다는 뜻이 아니래요. 나중에 뱃사람한테 들었어요. '참 곱다'는 뜻이라고. 할머니는 평생 음식을 보고 곱다고 하신 거예요.",
+       "en": "Only it doesn't mean tasty. A sailor told me, years later. It means 'how lovely.' All her life my grandmother looked at food and called it lovely."
+      },
+      {
+       "ko": "그래서 저는 접시를 내기 전에 한 번 봐요. 맛은 손님이 정하지만, 고운 건 내가 정할 수 있으니까요. 자, 오늘 것도… 벨리시모!",
+       "en": "So I look at every plate once before it goes out. The guest decides whether it's tasty, but lovely is something I can decide. There, today's too… bellissimo!"
+      }
+     ]
     }
    ]
   },
@@ -1690,6 +1711,27 @@
       "마을 밖에서 늘어난 것들을 줄여 달라는 종이요. 하루에 몇 장, 한 주에 몇 장까지 맡을 수 있소.",
       "맡은 놈을 정해진 수만큼 잡으면 값은 그 자리에서 나가오. 여기까지 돌아올 것 없소.",
       "싸우는 길을 걷는 이에게는 값을 조금 더 쳐 주오. 목숨 값이니 당연한 일이오."
+     ]
+    },
+    {
+     "id": "garret_eye",
+     "title": {
+      "ko": "안대",
+      "en": "The eyepatch"
+     },
+     "lines": [
+      {
+       "ko": "이 눈 말이오. 짐승한테 잃은 게 아니오. 현상금 벽보를 믿다가 잃었소.",
+       "en": "This eye. I didn't lose it to a beast. I lost it trusting a bounty notice."
+      },
+      {
+       "ko": "스물둘에 벽보 한 장을 뜯었소. '가축 도둑, 왼뺨에 흉터.' 사흘을 쫓아 잡았는데 흉터가 오른뺨에 있더이다. 벽보 쓴 서기가 마주 보고 적은 거요. 엉뚱한 사람이었소. 그 사람이 휘두른 낫이 이 눈이오.",
+       "en": "At twenty-two I tore down a notice. 'Cattle thief, scar on the left cheek.' I tracked him three days and caught him, and the scar was on the right. The clerk who wrote it had been facing the man. It was the wrong fellow. The sickle he swung is this eye."
+      },
+      {
+       "ko": "그래서 내 게시판의 벽보는 내가 직접 보고 온 것만 붙소. 느리다고들 하오. 느려도 되오. 틀린 벽보는 사람을 둘 잡소. 쫓기는 쪽 하나, 쫓는 쪽 하나.",
+       "en": "So the only notices on my board are ones I went and saw for myself. They say I'm slow. Slow will do. A wrong notice takes two people. The one hunted, and the one hunting."
+      }
      ]
     }
    ]
@@ -1792,6 +1834,32 @@
      "need": {
       "flags": [
        "clue_grey_coin"
+      ]
+     }
+    },
+    {
+     "id": "haru_first_day",
+     "title": {
+      "ko": "서기의 첫날",
+      "en": "The clerk's first day"
+     },
+     "lines": [
+      {
+       "ko": "저는 열아홉에 서기가 됐습니다. 첫날 받아 적은 것이 제 아버지의 사망 신고였습니다. 신고하러 오신 분이 어머니였습니다.",
+       "en": "I became a clerk at nineteen. The first thing I took down, on my first day, was the notice of my own father's death. The one who came to file it was my mother."
+      },
+      {
+       "ko": "어머니는 날짜를 하루 틀리게 말씀하셨습니다. 저는 들은 대로 적었습니다. 그 장부는 지금도 하루가 틀린 채로 있습니다. 고치려면 신고한 사람이 다시 와야 하는데, 어머니도 이제 안 계십니다.",
+       "en": "My mother gave the date wrong by one day. I wrote what I heard. That ledger is still wrong by one day. To correct it the person who filed has to come back, and my mother is gone now too."
+      },
+      {
+       "ko": "그날부터 저는 들은 말을 한 번 되받아 말합니다. '그러니까 이러이러하다는 말씀입니까' 하고요. 귀찮아하시는 분이 많습니다. 그래도 합니다.",
+       "en": "Since that day I say back whatever I am told, once. 'So what you mean is this and this?' Many people find it tiresome. I do it anyway."
+      }
+     ],
+     "need": {
+      "flags": [
+       "order_apprentice"
       ]
      }
     }

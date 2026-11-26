@@ -857,6 +857,22 @@ public final class StoryArena {
         return false;
     }
 
+    /** 점검용: 이 자리에서 그 보스의 컷신을 틀어 보고 곧바로 치운다. 틀렸으면 "ok", 아니면 까닭 (모드가 없으면 ""). */
+    public static String cutsceneForTest(ServerLevel level, BlockPos c, String boss) {
+        Session s = new Session();
+        s.boss = boss;
+        cutsceneErrorForTest = "";
+        boolean ok = startModCutscene(level, c, s);
+        try {
+            for (Entity e : level.getEntitiesOfClass(Entity.class, new AABB(c).inflate(300), x -> {
+                ResourceLocation rl = ForgeRegistries.ENTITY_TYPES.getKey(x.getType());
+                return rl != null && rl.getNamespace().equals("cinematiccataclysm");
+            })) e.discard();
+        } catch (Throwable ignored) {
+        }
+        return ok ? "ok" : cutsceneErrorForTest;
+    }
+
     /** 이 엔티티가 "컷신 뒤에 넘겨받기를 기다리는" 보스전 안에 있는가 (그동안에는 우리 쪽 등장 연출을 따로 틀지 않는다). */
     public static boolean awaiting(Entity e) {
         try {

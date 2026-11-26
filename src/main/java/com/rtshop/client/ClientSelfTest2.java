@@ -1904,12 +1904,13 @@ final class ClientSelfTest2 {
             check("3.61 npc looks: those NPCs are drawn as people instead of villagers", NpcLookClient.drawnForTest > LOOK_DRAWN, NpcLookClient.drawnForTest - LOOK_DRAWN);
             shot(mc, "131_npc_looks");
             int cam361 = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(LOOK_IDS.size() - 1);
-            Cinematic.play("{\"kind\":\"boss\",\"name\":\"카메라 점검\",\"epithet\":\"3D 등장 연출\",\"color\":\"FF7A20\",\"shake\":0,\"seconds\":4,\"entity\":" + cam361 + "}");
+            Cinematic.play("{\"kind\":\"boss\",\"name\":\"카메라 점검\",\"epithet\":\"3D 등장 연출\",\"color\":\"FF7A20\",\"shake\":0,\"seconds\":4,\"cam\":\"spiral\",\"entity\":" + cam361 + "}");
             waitTicks(30);
         });
         add(mc -> {
             check("3.61 boss camera: during a boss entrance the camera leaves the player's eyes and stands near the boss",
-                    BossCam.active() && mc.getCameraEntity() != mc.player && BossCam.startsForTest > 0, BossCam.active() + " " + BossCam.lastForTest);
+                    BossCam.active() && mc.getCameraEntity() != mc.player && BossCam.startsForTest > 0 && BossCam.styleForTest().equals("spiral")
+                            && BossCam.STYLES.contains(com.rtshop.story.BossIntros.camOf("cataclysm:the_harbinger")), BossCam.active() + " " + BossCam.styleForTest() + " " + BossCam.lastForTest);
             shot(mc, "132_boss_cam");
             waitTicks(75);
         });

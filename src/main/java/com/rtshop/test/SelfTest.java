@@ -3747,12 +3747,27 @@ public final class SelfTest {
                         && mwView.getAsJsonArray("mine").size() == 2 && mwView.getAsJsonArray("mine").get(0).getAsJsonObject().get("id").getAsInt() == mwBadCat
                         && mwView.get("open").getAsInt() == 2 && !com.rtshop.petition.Petitions.nearClerk(a),
                 mwCatId + " " + mwBadCat + " " + mwView);
+        // 3.62: 보스마다 다른 카메라 방식 / Cinematic Cataclysm 컷신으로 깨우기 (그 모드가 있을 때만)
+        boolean cc362 = net.minecraftforge.fml.ModList.get().isLoaded("cinematiccataclysm");
+        String ccTrace = "";
+        boolean ccAll = true, ccNone = true;
+        for (String cb362 : List.of("cataclysm:ancient_remnant", "cataclysm:the_leviathan", "cataclysm:maledictus", "cataclysm:ignis")) {
+            String r362 = com.rtshop.story.StoryArena.cutsceneForTest(a.serverLevel(), a.serverLevel().getSharedSpawnPos().above(60), cb362);
+            ccTrace += cb362.substring(10) + "=" + r362 + " ";
+            if (!r362.equals("ok")) ccAll = false;
+            else ccNone = false;
+        }
+        check("3.62 boss cutscenes: with Cinematic Cataclysm installed its four boss cutscenes start in the arena; without it bosses are raised directly; every boss has a camera style",
+                (cc362 ? ccAll : ccNone) && com.rtshop.story.BossIntros.camOf("mowziesmobs:frostmaw").equals("rise")
+                        && com.rtshop.story.BossIntros.camOf("cataclysm:netherite_monstrosity").equals("rise") && com.rtshop.story.BossIntros.camOf("no:such_boss").equals("orbit"),
+                cc362 + " " + ccTrace);
         String lkMissing = "";
         for (String lk361 : com.rtshop.npc.NpcLooks.ALL) if (com.rtshop.npc.NpcLooks.quadsOf(lk361) < 500) lkMissing += lk361 + " ";
         check("3.61 npc looks: every look has its model file, and NPC keys find their look (exact first, then the longest prefix; unknown keys stay villagers)",
                 lkMissing.isEmpty() && com.rtshop.npc.NpcLooks.lookOf("quest_order_archivist").equals("isabel") && com.rtshop.npc.NpcLooks.lookOf("shop_general_books").equals("m_general")
                         && com.rtshop.npc.NpcLooks.lookOf("shop_blacksmith").equals("bram") && com.rtshop.npc.NpcLooks.lookOf("attendance").equals("haru")
-                        && com.rtshop.npc.NpcLooks.lookOf("shop_no_such_shop").isEmpty() && com.rtshop.npc.NpcLooks.lookOf(null).isEmpty(),
+                        && com.rtshop.npc.NpcLooks.lookOf("job").equals("albert") && com.rtshop.npc.NpcLooks.lookOf("shop_restaurant").equals("lorenzo")
+                        && com.rtshop.npc.NpcLooks.lookOf("shop_attendance_shop").equals("eli") && com.rtshop.npc.NpcLooks.lookOf("shop_no_such_shop").isEmpty() && com.rtshop.npc.NpcLooks.lookOf(null).isEmpty(),
                 lkMissing + "/" + com.rtshop.npc.NpcLooks.lookOf("quest_order_archivist") + "/" + com.rtshop.npc.NpcLooks.lookOf("shop_general_books"));
         com.rtshop.petition.Petitions.forTestReset(a.server);
         check("3.60 reports: filing trims the text and records the place, the cooldown, empty and long texts and the open limit refuse, an answer and a close change the state, an answered one cannot be withdrawn, the data survives saving, the commands exist",
