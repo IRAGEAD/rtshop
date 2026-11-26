@@ -210,12 +210,9 @@ jobs:
             # 설정 항목의 이름만 (세계 안의 웨이포인트 표시를 끄는 항목이 있는지 보려고)
             (cd /tmp/dj && javap -p 'dev/diorama/Settings.class' 2>&1 | head -n 400; javap -p -c 'dev/diorama/waypoint/WaypointBeams.class' 2>&1 | grep -n -A40 'static boolean has(' | head -n 80) > /tmp/inspect/diorama-settings.txt 2>&1
           fi
-      - name: Inspect
-        env:
-          SPIRAL_CALLS: '/(FloorController|FloorProgress|AbyssPlayers|AbyssEncounters|ArenaSession|AbyssCycle|AbyssParties|BossProgress|FloorSelectionScreen|AbyssPlayerLifecycle|ChallengeRewards|ChestPayout|AbyssNetwork|AbyssDimension|ForgeGameplayEvents|AbyssPlatformImpl|PersistentEntityData|AbyssBlockProtection|CommandInit)(\$[^/]*)?\.class$'
-          CATACLYSM_CALLS: '/(Ignis_Entity|LLibrary_Boss_Monster|LLibrary_Monster|Animation_Monsters|AltarOfFire_Block_Entity|Altar_Of_Fire_Block|Boss_monster)\.class$'
+      - name: Inspect cooking recipes
         run: |
-          python3 .github/scripts/inspect_pack.py packcache /tmp/inspect
+          mkdir -p /tmp/inspect
           # Kaleidoscope Cookery 의 조리법 두 종류(pot / flex_pot)가 어떻게 다른지 (C-6: 요리 이익 구멍)
           KJ="$(ls packcache/*.jar | grep -i "kaleidoscope" | grep -i "cook" | head -1)"
           if [ -n "$KJ" ]; then
@@ -230,6 +227,12 @@ jobs:
             mkdir -p /tmp/kj && (cd /tmp/kj && unzip -q -o "$PWD/../../$KJ" 2>/dev/null || unzip -q -o "$GITHUB_WORKSPACE/$KJ")
             (cd /tmp/kj && for c in $(find . -name '*.class' | grep -i "flex" | grep -v '\$' | head -n 12); do echo "######## $c"; javap -p -c "$c" 2>&1 | head -n 400; done) > /tmp/inspect/kc-flex-code.txt 2>&1 || true
           fi
+      - name: Inspect
+        env:
+          SPIRAL_CALLS: '/(FloorController|FloorProgress|AbyssPlayers|AbyssEncounters|ArenaSession|AbyssCycle|AbyssParties|BossProgress|FloorSelectionScreen|AbyssPlayerLifecycle|ChallengeRewards|ChestPayout|AbyssNetwork|AbyssDimension|ForgeGameplayEvents|AbyssPlatformImpl|PersistentEntityData|AbyssBlockProtection|CommandInit)(\$[^/]*)?\.class$'
+          CATACLYSM_CALLS: '/(Ignis_Entity|LLibrary_Boss_Monster|LLibrary_Monster|Animation_Monsters|AltarOfFire_Block_Entity|Altar_Of_Fire_Block|Boss_monster)\.class$'
+        run: |
+          python3 .github/scripts/inspect_pack.py packcache /tmp/inspect
           # Cinematic Interactions 의 공개 API 와 그 API 를 쓰는 곳
           CJ="$PWD/$(ls packcache/*.jar | grep -i "cinematic interaction" | head -1)"
           mkdir -p /tmp/cj && (cd /tmp/cj && unzip -q -o "$CJ")
