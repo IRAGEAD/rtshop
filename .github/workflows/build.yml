@@ -216,6 +216,20 @@ jobs:
           CATACLYSM_CALLS: '/(Ignis_Entity|LLibrary_Boss_Monster|LLibrary_Monster|Animation_Monsters|AltarOfFire_Block_Entity|Altar_Of_Fire_Block|Boss_monster)\.class$'
         run: |
           python3 .github/scripts/inspect_pack.py packcache /tmp/inspect
+          # Kaleidoscope Cookery 의 조리법 두 종류(pot / flex_pot)가 어떻게 다른지 (C-6: 요리 이익 구멍)
+          KJ="$(ls packcache/*.jar | grep -i "kaleidoscope" | grep -i "cook" | head -1)"
+          if [ -n "$KJ" ]; then
+            {
+              echo "jar: $KJ"
+              unzip -l "$KJ" | awk '{print $4}' | grep -E "^data/kaleidoscope_cookery/recipes/" | sed 's#/[^/]*$##' | sort | uniq -c
+              for f in pot/braised_beef flex_pot/braised_beef stockpot/beef_noodle flex_stockpot/beef_noodle pot/fondant_pie flex_pot/fondant_pie pot/candied_potato flex_pot/candied_potato; do
+                echo "######## $f"; unzip -p "$KJ" "data/kaleidoscope_cookery/recipes/$f.json" 2>&1 | head -c 2500; echo
+              done
+              echo "######## classes with Flex in the name"; unzip -l "$KJ" | awk '{print $4}' | grep -i "flex" | head -n 40
+            } > /tmp/inspect/kc-recipes.txt 2>&1
+            mkdir -p /tmp/kj && (cd /tmp/kj && unzip -q -o "$PWD/../../$KJ" 2>/dev/null || unzip -q -o "$GITHUB_WORKSPACE/$KJ")
+            (cd /tmp/kj && for c in $(find . -name '*.class' | grep -i "flex" | grep -v '\$' | head -n 12); do echo "######## $c"; javap -p -c "$c" 2>&1 | head -n 400; done) > /tmp/inspect/kc-flex-code.txt 2>&1 || true
+          fi
           # Cinematic Interactions 의 공개 API 와 그 API 를 쓰는 곳
           CJ="$PWD/$(ls packcache/*.jar | grep -i "cinematic interaction" | head -1)"
           mkdir -p /tmp/cj && (cd /tmp/cj && unzip -q -o "$CJ")
