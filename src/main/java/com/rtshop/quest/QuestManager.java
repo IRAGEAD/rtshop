@@ -825,11 +825,16 @@ public final class QuestManager {
         List<String> stale = new ArrayList<>(STALE_DEFAULTS);
         if (com.rtshop.story.Dialogue.stale) stale.add("dialogue.json");
         if (!UPDATED_DEFAULTS.isEmpty()) {
-            p.sendSystemMessage(Component.literal("[RT Shop] 기본 퀘스트 파일을 새 판으로 바꿨습니다: " + String.join(", ", UPDATED_DEFAULTS)
+            p.sendSystemMessage(Component.literal(com.rtshop.story.StoryText.en(p)
+                    ? "[RT Shop] Default quest files were replaced with this version's: " + String.join(", ", UPDATED_DEFAULTS) + " (the old files are in config/rtshop/backup)"
+                    : "[RT Shop] 기본 퀘스트 파일을 새 판으로 바꿨습니다: " + String.join(", ", UPDATED_DEFAULTS)
                     + " (이전 파일은 config/rtshop/backup 에 있습니다)").withStyle(net.minecraft.ChatFormatting.GRAY));
         }
         if (stale.isEmpty()) return;
-        p.sendSystemMessage(Component.literal("[RT Shop] 직접 고친 파일이라 새 판이 적용되지 않은 기본 파일: " + String.join(", ", stale)
+        p.sendSystemMessage(Component.literal(com.rtshop.story.StoryText.en(p)
+                ? "[RT Shop] Default files that were edited by hand and so did not get this version's: " + String.join(", ", stale)
+                + "  →  /rtshop defaults update all (your edits are kept in config/rtshop/backup)"
+                : "[RT Shop] 직접 고친 파일이라 새 판이 적용되지 않은 기본 파일: " + String.join(", ", stale)
                 + "  →  /rtshop defaults update all (고친 내용은 config/rtshop/backup 에 보관)").withStyle(net.minecraft.ChatFormatting.YELLOW));
     }
 
@@ -839,8 +844,10 @@ public final class QuestManager {
                 .executes(ctx -> {
                     List<String> stale = new ArrayList<>(STALE_DEFAULTS);
                     if (com.rtshop.story.Dialogue.stale) stale.add("dialogue.json");
-                    ctx.getSource().sendSuccess(() -> Component.literal(stale.isEmpty() ? "기본 퀘스트·대화 파일이 모두 이 판의 것입니다."
-                            : "직접 고쳐서 새 판을 받지 못한 파일: " + String.join(", ", stale) + "  (/rtshop defaults update all)"), false);
+                    ctx.getSource().sendSuccess(() -> Component.literal(stale.isEmpty()
+                            ? com.rtshop.story.StoryText.pick(ctx.getSource(), "기본 퀘스트·대화 파일이 모두 이 판의 것입니다.", "Every default quest and dialogue file is this version's.")
+                            : com.rtshop.story.StoryText.pick(ctx.getSource(), "직접 고쳐서 새 판을 받지 못한 파일: ", "Files edited by hand that did not get this version's: ")
+                            + String.join(", ", stale) + "  (/rtshop defaults update all)"), false);
                     return 1;
                 })
                 .then(net.minecraft.commands.Commands.literal("update").then(net.minecraft.commands.Commands.argument("file", com.mojang.brigadier.arguments.StringArgumentType.word())
@@ -852,12 +859,14 @@ public final class QuestManager {
                                 if (!name.equals("dialogue.json")) n += refreshDefaults(dir(), name);
                                 if (name.equals("dialogue.json") || name.equals("all")) n += com.rtshop.story.Dialogue.forceDefault() ? 1 : 0;
                             } catch (Exception e) {
-                                ctx.getSource().sendFailure(Component.literal("바꾸지 못했습니다: " + e));
+                                ctx.getSource().sendFailure(Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "바꾸지 못했습니다: ", "Could not replace them: ") + e));
                                 return 0;
                             }
                             reload();
                             int fn = n;
-                            ctx.getSource().sendSuccess(() -> Component.literal("기본 파일 " + fn + "개를 새 판으로 바꿨습니다. 이전 파일은 config/rtshop/backup 에 있습니다."), true);
+                            ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(),
+                                    "기본 파일 " + fn + "개를 새 판으로 바꿨습니다. 이전 파일은 config/rtshop/backup 에 있습니다.",
+                                    "Replaced " + fn + " default file(s) with this version's. The old files are in config/rtshop/backup.")), true);
                             return n;
                         })))));
     }

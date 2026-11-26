@@ -166,6 +166,66 @@ public final class RaidConfig {
         };
     }
 
+    /** 편집기에 보일 문구 이름 (영어). */
+    public static String labelEn(String key) {
+        return switch (key) {
+            case "npcName" -> "Guide's name";
+            case "bossName" -> "Boss name";
+            case "dialogue1" -> "Dialogue 1";
+            case "dialogue2" -> "Dialogue 2";
+            case "dialogue3" -> "Dialogue 3";
+            case "uiTitle" -> "Entry screen title";
+            case "uiSub" -> "Entry screen subtitle";
+            case "enterButton" -> "Enter button";
+            case "confirmTitle" -> "Confirm window title";
+            case "confirmBody" -> "Confirm window text";
+            case "confirmYes" -> "Confirm window: yes";
+            case "confirmNo" -> "Confirm window: no";
+            case "needKill" -> "Requirement not met (kills)";
+            case "npcLocked" -> "Before the first boss kill (NPC locked)";
+            case "npcOpened" -> "First boss kill notice";
+            case "needTicket" -> "No ticket";
+            case "locked" -> "Cannot enter (in progress)";
+            case "entered" -> "Entry notice";
+            case "summoned" -> "Boss summoned notice";
+            case "alreadySummoned" -> "Already summoned";
+            case "successTitle" -> "Success text";
+            case "successSub" -> "Success text (small)";
+            case "failTitle" -> "Failure text";
+            case "failSub" -> "Failure text (small)";
+            case "returnNotice" -> "Return notice (%s = seconds)";
+            case "voteTitle" -> "Leave vote title";
+            case "voteAgree" -> "Vote: leave now";
+            case "voteStay" -> "Vote: stay";
+            case "voteCount" -> "Vote count";
+            case "failConfirm" -> "Failure window: leave button";
+            case "failBody" -> "Failure window text";
+            case "despawn" -> "Boss vanished notice";
+            case "notByPlayer" -> "No reward notice";
+            case "downed" -> "Downed notice";
+            case "escaped" -> "Escaped notice";
+            case "weeklyGot" -> "Weekly reward received";
+            case "weeklyAlready" -> "Weekly reward already received";
+            case "dropGot" -> "Drop received (%s = item)";
+            case "dropNone" -> "No drop";
+            case "mysteryName" -> "Name of the [???] grade";
+            case "mysteryGot" -> "[???] obtained notice";
+            case "rewardWeekly" -> "Reward list: weekly reward heading";
+            case "rewardDrops" -> "Reward list: drops heading";
+            case "title" -> "Window title";
+            case "reset" -> "Reset notice";
+            case "floor" -> "Floor name";
+            case "got" -> "Reward received notice";
+            case "gotNothing" -> "No chance reward notice";
+            case "done" -> "Received mark";
+            default -> key;
+        };
+    }
+
+    public static String label(String key, boolean en) {
+        return en ? labelEn(key) : label(key);
+    }
+
     public String text(String key) {
         String v = texts.get(key);
         if (v == null || v.isEmpty()) {

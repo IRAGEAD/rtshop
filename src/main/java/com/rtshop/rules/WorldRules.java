@@ -387,7 +387,7 @@ public final class WorldRules {
                     if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(com.rtshop.story.StoryText.t(pa, wa.textAltarBuild)).withStyle(ChatFormatting.YELLOW), true);
                 } else if (opA && !wa.altarSet && event.getLevel() instanceof Level la) {
                     setAltar(la, event.getPos());
-                    ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal("이 제단을 마을의 단 하나뿐인 룬 제단으로 정했습니다. (바꾸려면 새 제단 곁에서 /rtshop altar here)").withStyle(ChatFormatting.GREEN));
+                    ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal(com.rtshop.story.StoryText.pick((ServerPlayer) event.getEntity(), "이 제단을 마을의 단 하나뿐인 룬 제단으로 정했습니다. (바꾸려면 새 제단 곁에서 /rtshop altar here)", "This altar is now the town's one and only Rune Altar. (To change it, stand by the new altar and use /rtshop altar here)")).withStyle(ChatFormatting.GREEN));
                 }
                 return;
             }
@@ -399,7 +399,7 @@ public final class WorldRules {
                     if (event.getEntity() instanceof ServerPlayer pa) com.rtshop.notice.Notice.send(pa, Component.literal(com.rtshop.story.StoryText.t(pa, wa.textAnvilBuild)).withStyle(ChatFormatting.YELLOW), true);
                 } else if (opA && !wa.anvilSet && event.getLevel() instanceof Level la) {
                     setAnvil(la, event.getPos());
-                    ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal("이 모루를 마을의 단 하나뿐인 강화 모루로 정했습니다. (바꾸려면 새 모루 곁에서 /rtshop anvil here)").withStyle(ChatFormatting.GREEN));
+                    ((ServerPlayer) event.getEntity()).sendSystemMessage(Component.literal(com.rtshop.story.StoryText.pick((ServerPlayer) event.getEntity(), "이 모루를 마을의 단 하나뿐인 강화 모루로 정했습니다. (바꾸려면 새 모루 곁에서 /rtshop anvil here)", "This anvil is now the town's one and only Enhancement Anvil. (To change it, stand by the new anvil and use /rtshop anvil here)")).withStyle(ChatFormatting.GREEN));
                 }
                 return;
             }
@@ -417,7 +417,7 @@ public final class WorldRules {
             }
             if (op && !w.abyssPortalSet && event.getLevel() instanceof Level l) {
                 setPortal(l, event.getPos());
-                p.sendSystemMessage(Component.literal("이 문을 나선 비경으로 가는 단 하나의 문으로 정했습니다. (바꾸려면 새 문 앞에서 /rtshop abyss portal here)").withStyle(ChatFormatting.GREEN));
+                p.sendSystemMessage(Component.literal(com.rtshop.story.StoryText.pick(p, "이 문을 나선 비경으로 가는 단 하나의 문으로 정했습니다. (바꾸려면 새 문 앞에서 /rtshop abyss portal here)", "This portal is now the only way into the Spiral Abyss. (To change it, stand at the new portal and use /rtshop abyss portal here)")).withStyle(ChatFormatting.GREEN));
             }
         } catch (Throwable ignored) {
         }
@@ -482,18 +482,18 @@ public final class WorldRules {
                         if (rl != null && rl.toString().equals(ANVIL_KEY) && (found == null || b.distSqr(p.blockPosition()) < found.distSqr(p.blockPosition()))) found = b.immutable();
                     }
                     if (found == null) {
-                        ctx.getSource().sendFailure(Component.literal("5칸 안에 강화 모루가 없습니다. 모루 곁에서 다시 입력하세요."));
+                        ctx.getSource().sendFailure(Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "5칸 안에 강화 모루가 없습니다. 모루 곁에서 다시 입력하세요.", "No Enhancement Anvil within 5 blocks. Stand next to the anvil and try again.")));
                         return 0;
                     }
                     setAnvil(p.level(), found);
-                    ctx.getSource().sendSuccess(() -> Component.literal("이 모루를 단 하나뿐인 강화 모루로 정했습니다. 다른 모루는 쓸 수 없습니다.").withStyle(ChatFormatting.GREEN), true);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "이 모루를 단 하나뿐인 강화 모루로 정했습니다. 다른 모루는 쓸 수 없습니다.", "This anvil is now the one and only Enhancement Anvil. No other anvil can be used.")).withStyle(ChatFormatting.GREEN), true);
                     return 1;
                 }))
                 .then(Commands.literal("clear").executes(ctx -> {
                     WorldRules w = get();
                     w.anvilSet = false;
                     save(w);
-                    ctx.getSource().sendSuccess(() -> Component.literal("모루 지정을 풀었습니다. 지금은 어느 강화 모루든 쓸 수 있습니다."), true);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "모루 지정을 풀었습니다. 지금은 어느 강화 모루든 쓸 수 있습니다.", "The anvil is no longer fixed. Any Enhancement Anvil can be used now.")), true);
                     return 1;
                 }))));
     }
@@ -516,18 +516,18 @@ public final class WorldRules {
                         if (rl != null && rl.toString().equals(ALTAR_KEY) && (found == null || b.distSqr(p.blockPosition()) < found.distSqr(p.blockPosition()))) found = b.immutable();
                     }
                     if (found == null) {
-                        ctx.getSource().sendFailure(Component.literal("5칸 안에 별빛 수정 구체가 없습니다. 제단 곁에서 다시 입력하세요."));
+                        ctx.getSource().sendFailure(Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "5칸 안에 별빛 수정 구체가 없습니다. 제단 곁에서 다시 입력하세요.", "No Starlight Crystal Orb within 5 blocks. Stand next to the altar and try again.")));
                         return 0;
                     }
                     setAltar(p.level(), found);
-                    ctx.getSource().sendSuccess(() -> Component.literal("이 제단을 단 하나뿐인 룬 제단으로 정했습니다. 다른 제단은 쓸 수 없습니다.").withStyle(ChatFormatting.GREEN), true);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "이 제단을 단 하나뿐인 룬 제단으로 정했습니다. 다른 제단은 쓸 수 없습니다.", "This altar is now the one and only Rune Altar. No other altar can be used.")).withStyle(ChatFormatting.GREEN), true);
                     return 1;
                 }))
                 .then(Commands.literal("clear").executes(ctx -> {
                     WorldRules w = get();
                     w.altarSet = false;
                     save(w);
-                    ctx.getSource().sendSuccess(() -> Component.literal("제단 지정을 풀었습니다. 지금은 어느 제단이든 쓸 수 있습니다."), true);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "제단 지정을 풀었습니다. 지금은 어느 제단이든 쓸 수 있습니다.", "The altar is no longer fixed. Any altar can be used now.")), true);
                     return 1;
                 }))));
     }
@@ -546,14 +546,14 @@ public final class WorldRules {
                         .then(Commands.literal("here").executes(ctx -> {
                             ServerPlayer p = ctx.getSource().getPlayerOrException();
                             setPortal(p.level(), p.blockPosition());
-                            ctx.getSource().sendSuccess(() -> Component.literal("여기를 나선 비경으로 가는 단 하나의 문으로 정했습니다. 다른 곳의 문으로는 들어갈 수 없습니다.").withStyle(ChatFormatting.GREEN), true);
+                            ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "여기를 나선 비경으로 가는 단 하나의 문으로 정했습니다. 다른 곳의 문으로는 들어갈 수 없습니다.", "This spot is now the only portal into the Spiral Abyss. Portals anywhere else will not let anyone in.")).withStyle(ChatFormatting.GREEN), true);
                             return 1;
                         }))
                         .then(Commands.literal("clear").executes(ctx -> {
                             WorldRules w = get();
                             w.abyssPortalSet = false;
                             save(w);
-                            ctx.getSource().sendSuccess(() -> Component.literal("문 지정을 풀었습니다. 지금은 어느 문으로든 들어갈 수 있습니다."), true);
+                            ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "문 지정을 풀었습니다. 지금은 어느 문으로든 들어갈 수 있습니다.", "The portal is no longer fixed. Any portal leads in now.")), true);
                             return 1;
                         })))));
     }

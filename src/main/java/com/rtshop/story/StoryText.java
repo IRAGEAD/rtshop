@@ -105,6 +105,17 @@ public final class StoryText {
         return en(p) ? en : ko;
     }
 
+    /** 명령의 답: 명령을 친 것이 플레이어면 그 사람의 언어로 (콘솔·명령 블록은 한국어). */
+    public static String pick(net.minecraft.commands.CommandSourceStack src, String ko, String en) {
+        return src != null && src.getEntity() instanceof ServerPlayer p ? pick(p, ko, en) : ko;
+    }
+
+    /** 편집 화면의 저장 실패 문구("저장하지 못했습니다: 까닭")를 그 사람의 언어로. */
+    public static String saveError(ServerPlayer p, String err) {
+        if (err == null || !en(p)) return err;
+        return err.replace("저장하지 못했습니다: ", "Could not save: ").replace("파일에 쓰지 못했습니다: ", "Could not write the file: ");
+    }
+
     /** 서식(%s)이 든 설정 문구: 먼저 번역하고 그다음에 값을 끼운다. */
     public static String f(ServerPlayer p, String template, Object... args) {
         String v = t(p, template);

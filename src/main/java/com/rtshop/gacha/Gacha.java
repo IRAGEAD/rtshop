@@ -770,7 +770,7 @@ public final class Gacha {
             }
         }
         openEditor(p);
-        result(p, err == null ? Component.translatable("rtshop.gacha.saved") : Component.literal(err), err == null);
+        result(p, err == null ? Component.translatable("rtshop.gacha.saved") : Component.literal(com.rtshop.story.StoryText.saveError(p, err)), err == null);
     }
 
     // ------------------------------------------------------------------ NPC

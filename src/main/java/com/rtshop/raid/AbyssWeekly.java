@@ -455,17 +455,20 @@ public final class AbyssWeekly {
                 Config c = config();
                 JsonObject o = new JsonObject();
                 o.addProperty("id", "abyss");
-                o.addProperty("title", "Spiral Abyss 주간 보상 설정");
+                boolean en = com.rtshop.story.StoryText.en(p);
+                o.addProperty("title", en ? "Spiral Abyss Weekly Reward Settings" : "Spiral Abyss 주간 보상 설정");
                 JsonArray f = new JsonArray();
                 for (int i = 0; i < FLOORS; i++) {
-                    f.add(RewardEditor.field("gold" + i, (c.endless ? "무한 " + ((i + 1) * c.endlessStep) + "웨이브" : ROMAN[i] + "층 클리어") + " Gold", true, Long.toString(c.gold[i])));
+                    f.add(RewardEditor.field("gold" + i, (en ? (c.endless ? "Endless wave " + ((i + 1) * c.endlessStep) : "Floor " + ROMAN[i] + " clear")
+                            : (c.endless ? "무한 " + ((i + 1) * c.endlessStep) + "웨이브" : ROMAN[i] + "층 클리어")) + " Gold", true, Long.toString(c.gold[i])));
                 }
-                f.add(RewardEditor.field("resetDay", "주간 초기화 요일 (1 = 월요일 … 7 = 일요일)", true, Integer.toString(c.resetDay)));
-                f.add(RewardEditor.field("resetHour", "주간 초기화 시각 (0~23시)", true, Integer.toString(c.resetHour)));
-                for (String k : defaultTexts().keySet()) f.add(RewardEditor.field("text." + k, RaidConfig.label(k), false, c.text(k)));
+                f.add(RewardEditor.field("resetDay", en ? "Weekly reset day (1 = Monday … 7 = Sunday)" : "주간 초기화 요일 (1 = 월요일 … 7 = 일요일)", true, Integer.toString(c.resetDay)));
+                f.add(RewardEditor.field("resetHour", en ? "Weekly reset hour (0-23)" : "주간 초기화 시각 (0~23시)", true, Integer.toString(c.resetHour)));
+                for (String k : defaultTexts().keySet()) f.add(RewardEditor.field("text." + k, RaidConfig.label(k, en), false, c.text(k)));
                 o.add("fields", f);
                 JsonArray g = new JsonArray();
-                for (int i = 1; i <= FLOORS; i++) g.add(RewardEditor.group("floor" + i, c.endless ? "무한 " + (i * c.endlessStep) + "웨이브" : ROMAN[i - 1] + "층", false, true));
+                for (int i = 1; i <= FLOORS; i++) g.add(RewardEditor.group("floor" + i, en ? (c.endless ? "Endless wave " + (i * c.endlessStep) : "Floor " + ROMAN[i - 1])
+                        : (c.endless ? "무한 " + (i * c.endlessStep) + "웨이브" : ROMAN[i - 1] + "층"), false, true));
                 o.add("groups", g);
                 o.add("rewards", RewardEditor.rewardsJson(c.rewards));
                 return o;
@@ -504,8 +507,10 @@ public final class AbyssWeekly {
     public static LiteralArgumentBuilder<CommandSourceStack> adminCommand() {
         return Commands.literal("abyss").requires(src -> src.hasPermission(2))
                 .executes(ctx -> {
-                    ctx.getSource().sendSuccess(() -> Component.literal("Spiral Abyss 주간 보상: " + (config().enabled ? "켜짐" : "꺼짐") + " · 모드 연결 "
-                            + (detected() ? "됨" : "안 됨") + "  (/rtshop abyss edit)"), false);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(),
+                            "Spiral Abyss 주간 보상: " + (config().enabled ? "켜짐" : "꺼짐") + " · 모드 연결 " + (detected() ? "됨" : "안 됨"),
+                            "Spiral Abyss weekly rewards: " + (config().enabled ? "on" : "off") + " · mod " + (detected() ? "found" : "not found"))
+                            + "  (/rtshop abyss edit)"), false);
                     return 1;
                 })
                 .then(Commands.literal("edit").executes(ctx -> {
@@ -516,14 +521,17 @@ public final class AbyssWeekly {
                     ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
                     resetPlayer(t);
                     sendView(t);
-                    ctx.getSource().sendSuccess(() -> Component.literal(t.getGameProfile().getName() + " 의 이번 주 주간 보상 기록을 지웠습니다."), true);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(),
+                            t.getGameProfile().getName() + " 의 이번 주 주간 보상 기록을 지웠습니다.", "Cleared this week's weekly reward record for " + t.getGameProfile().getName() + ".")), true);
                     return 1;
                 })))
                 .then(Commands.literal("clear").then(Commands.argument("player", EntityArgument.player())
                         .then(Commands.argument("floor", IntegerArgumentType.integer(1, FLOORS)).executes(ctx -> {
                             ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
                             boolean ok = cleared(t, IntegerArgumentType.getInteger(ctx, "floor"));
-                            ctx.getSource().sendSuccess(() -> Component.literal(ok ? "그 층의 주간 보상을 지급했습니다." : "이번 주에 이미 받은 층입니다."), true);
+                            ctx.getSource().sendSuccess(() -> Component.literal(ok
+                                    ? com.rtshop.story.StoryText.pick(ctx.getSource(), "그 층의 주간 보상을 지급했습니다.", "Gave that floor's weekly reward.")
+                                    : com.rtshop.story.StoryText.pick(ctx.getSource(), "이번 주에 이미 받은 층입니다.", "That floor was already claimed this week.")), true);
                             return ok ? 1 : 0;
                         }))));
     }

@@ -900,7 +900,10 @@ public final class SelfTest {
                 net.minecraft.world.level.block.Blocks.WATER, net.minecraft.world.level.block.Blocks.OAK_PLANKS, net.minecraft.world.level.block.Blocks.AIR};
         for (int x = X - 2; x <= X + 9; x++) {
             for (int z = Z - 2; z <= Z + 9; z++) {
-                for (int y = Y - 3; y <= Y + 8; y++) level.setBlock(new BlockPos(x, y, z), (y < Y ? B[0] : B[7]).defaultBlockState(), 2);
+                // 모드팩 전체의 세계는 씨앗이 매번 다르다: 이 자리가 산속이면 Y+8 위에 지형이 남아 clearPlot 이 그 꼭대기를 "땅"으로 본다.
+                // 그러니 그 칸의 지표면까지 전부 비운다.
+                int topY = Math.max(Y + 8, level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, x, z));
+                for (int y = topY; y >= Y - 3; y--) level.setBlock(new BlockPos(x, y, z), (y < Y ? B[0] : B[7]).defaultBlockState(), 2);
                 level.setBlock(new BlockPos(x, Y, z), B[1].defaultBlockState(), 2);
                 level.setBlock(new BlockPos(x, Y + 1, z), B[2].defaultBlockState(), 2);
             }
@@ -937,7 +940,8 @@ public final class SelfTest {
                     bought && level.getBlockState(new BlockPos(X + 1, Y + 1, Z + 1)).isAir() && level.getBlockState(new BlockPos(X + 4, Y + 1, Z + 4)).isAir()
                             && level.getBlockState(new BlockPos(X + 4, Y + 3, Z + 4)).isAir(),
                     bought + " " + level.getBlockState(new BlockPos(X + 1, Y + 1, Z + 1)) + " " + level.getBlockState(new BlockPos(X + 4, Y + 1, Z + 4))
-                            + " " + level.getBlockState(new BlockPos(X + 4, Y + 3, Z + 4)) + " ground=" + level.getBlockState(new BlockPos(X + 1, Y, Z + 1)));
+                            + " " + level.getBlockState(new BlockPos(X + 4, Y + 3, Z + 4)) + " ground=" + level.getBlockState(new BlockPos(X + 1, Y, Z + 1))
+                            + " surface=" + level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, X + 4, Z + 4) + " (Y=" + Y + ")");
             check("...but keeps the farmland, the ground and the water channel",
                     level.getBlockState(new BlockPos(X + 1, Y, Z + 1)).is(B[1]) && level.getBlockState(new BlockPos(X + 4, Y, Z + 4)).is(B[3])
                             && level.getBlockState(new BlockPos(X + 2, Y, Z + 2)).is(B[5]) && level.getBlockState(new BlockPos(X + 1, Y - 1, Z + 1)).is(B[0]));
@@ -4421,6 +4425,30 @@ public final class SelfTest {
                                 && enRaid4.contains("3") && !enRaid4.equals(koRaid4) && koRaid4.contains("이그니스") && "English".equals(enPick4)
                                 && "한국어".equals(com.rtshop.story.StoryText.pick(a, "한국어", "English")),
                         enDesc4 + " // " + enRaid4 + " // " + koRaid4);
+                // 3.58.1: 편집 화면의 제목·항목 이름 — 영어로 보는 운영자에게는 한글이 남지 않아야 한다
+                com.rtshop.story.StoryText.setLang(a, "en_us");
+                StringBuilder enEd5 = new StringBuilder();
+                for (String tk5 : new String[]{"raid", "abyss", "abyssfloor1"}) {
+                    com.rtshop.raid.RewardEditor.Target tg5 = com.rtshop.raid.RewardEditor.TARGETS.get(tk5);
+                    if (tg5 == null) continue;
+                    com.google.gson.JsonObject md5 = tg5.model(a);
+                    enEd5.append(md5.get("title").getAsString()).append('|');
+                    for (com.google.gson.JsonElement fe5 : md5.getAsJsonArray("fields")) enEd5.append(fe5.getAsJsonObject().get("label").getAsString()).append('|');
+                    for (com.google.gson.JsonElement ge5 : md5.getAsJsonArray("groups")) enEd5.append(ge5.getAsJsonObject().get("label").getAsString()).append('|');
+                }
+                String enCmd5 = com.rtshop.story.StoryText.saveError(a, "저장하지 못했습니다: x");
+                com.rtshop.story.StoryText.setLang(a, "ko_kr");
+                String koEd5 = com.rtshop.raid.RewardEditor.TARGETS.get("raid").model(a).get("title").getAsString();
+                String hangulAt5 = "";
+                for (String part5 : enEd5.toString().split("\\|")) {
+                    for (int ci5 = 0; ci5 < part5.length(); ci5++) {
+                        if (part5.charAt(ci5) >= 0xAC00 && part5.charAt(ci5) <= 0xD7A3) hangulAt5 = part5;
+                    }
+                }
+                check("the reward editors' titles and field names are English for an English operator and Korean for a Korean one",
+                        enEd5.length() > 300 && hangulAt5.isEmpty() && koEd5.equals("주간 레이드 설정") && "Could not save: x".equals(enCmd5)
+                                && "저장하지 못했습니다: x".equals(com.rtshop.story.StoryText.saveError(a, "저장하지 못했습니다: x")),
+                        hangulAt5 + " // " + koEd5 + " // " + enCmd5 + " // " + enEd5.length());
             }
             com.rtshop.story.StoryText.setLang(a, "");
         }

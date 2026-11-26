@@ -589,7 +589,7 @@ public final class Raid {
         EntityType<?> type = rl == null || !ForgeRegistries.ENTITY_TYPES.containsKey(rl) ? null : ForgeRegistries.ENTITY_TYPES.getValue(rl);
         Entity e = type == null ? null : type.create(level);
         if (!(e instanceof LivingEntity living)) {
-            say(p, "레이드 보스를 찾을 수 없습니다: " + c.boss + " (raid.json 의 boss)", ChatFormatting.RED);
+            say(p, com.rtshop.story.StoryText.pick(p, "레이드 보스를 찾을 수 없습니다: " + c.boss + " (raid.json 의 boss)", "The raid boss could not be found: " + c.boss + " (boss in raid.json)"), ChatFormatting.RED);
             return false;
         }
         living.moveTo(c.arenaX + 0.5, c.arenaY + 1, c.arenaZ - 9 + 0.5, 0F, 0F);
@@ -1048,17 +1048,17 @@ public final class Raid {
                     if (action == ACT_EDIT_ADD) {
                         ItemStack held = p.getMainHandItem();
                         if (held.isEmpty()) {
-                            say(p, "손에 든 아이템이 없습니다. 보상으로 넣을 아이템을 손에 들고 누르세요.", ChatFormatting.RED);
+                            say(p, com.rtshop.story.StoryText.pick(p, "손에 든 아이템이 없습니다. 보상으로 넣을 아이템을 손에 들고 누르세요.", "Your hand is empty. Hold the item to add as a reward, then press the button."), ChatFormatting.RED);
                         } else {
                             t.add(p, Reward.of(o.get("addGroup").getAsString(), o.get("addGrade").getAsInt(), held));
                         }
                     } else {
-                        say(p, "저장했습니다.", ChatFormatting.GREEN);
+                        say(p, com.rtshop.story.StoryText.pick(p, "저장했습니다.", "Saved."), ChatFormatting.GREEN);
                     }
                     send(p, RaidPacket.EDITOR, t.model(p));
                 } catch (Exception e) {
                     RtShop.LOGGER.warn("[rtshop] 보상 편집 저장 실패", e);
-                    say(p, "저장하지 못했습니다: " + e.getMessage(), ChatFormatting.RED);
+                    say(p, com.rtshop.story.StoryText.pick(p, "저장하지 못했습니다: ", "Could not save: ") + e.getMessage(), ChatFormatting.RED);
                 }
             }
             case AbyssWeekly.ACT_VIEW -> AbyssWeekly.sendView(p);
@@ -1078,6 +1078,11 @@ public final class Raid {
         ctx.getSource().sendSuccess(() -> Component.literal(text), true);
     }
 
+    /** 명령의 답을 명령을 친 사람의 언어로. */
+    private static void ok(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx, String ko, String en) {
+        ok(ctx, com.rtshop.story.StoryText.pick(ctx.getSource(), ko, en));
+    }
+
     /** /rtshop raid ... */
     public static LiteralArgumentBuilder<CommandSourceStack> adminCommand() {
         return Commands.literal("raid").requires(src -> src.hasPermission(2))
@@ -1085,7 +1090,10 @@ public final class Raid {
                     RaidConfig c = RaidConfig.get();
                     ok(ctx, "레이드: 보스 " + c.boss + " · 체력 ×" + c.healthMultiplier + " · 공격 ×" + c.damageMultiplier + " · 상태 "
                             + new String[]{"대기", "진행 중", "성공(귀환 대기)", "실패(귀환 대기)"}[state] + " · 구역 " + c.arenaDim + " " + c.arenaX + " " + c.arenaY + " " + c.arenaZ
-                            + " · 안에 " + playersIn(ctx.getSource().getServer()).size() + "명  (/rtshop raid edit)");
+                            + " · 안에 " + playersIn(ctx.getSource().getServer()).size() + "명  (/rtshop raid edit)",
+                            "Raid: boss " + c.boss + " · health ×" + c.healthMultiplier + " · damage ×" + c.damageMultiplier + " · state "
+                            + new String[]{"idle", "in progress", "cleared (waiting to return)", "failed (waiting to return)"}[state] + " · arena " + c.arenaDim + " " + c.arenaX + " " + c.arenaY + " " + c.arenaZ
+                            + " · " + playersIn(ctx.getSource().getServer()).size() + " inside  (/rtshop raid edit)");
                     return 1;
                 })
                 .then(Commands.literal("edit").executes(ctx -> {
@@ -1102,12 +1110,12 @@ public final class Raid {
                             c.arenaY = Math.max(p.level().getMinBuildHeight() + 3, Math.min(p.level().getMaxBuildHeight() - c.arenaHeight - 3, p.getBlockY() - 1));
                             c.arenaZ = p.getBlockZ();
                             int n = build(p.serverLevel());
-                            ok(ctx, "레이드 구역을 여기에 지었습니다 (블록 " + n + "개). 제단은 가운데에 있습니다.");
+                            ok(ctx, "레이드 구역을 여기에 지었습니다 (블록 " + n + "개). 제단은 가운데에 있습니다.", "Built the raid arena here (" + n + " blocks). The altar is in the middle.");
                             return 1;
                         }))
                         .then(Commands.literal("build").executes(ctx -> {
                             int n = build(arenaLevel(ctx.getSource().getServer()));
-                            ok(ctx, "레이드 구역을 다시 지었습니다 (블록 " + n + "개).");
+                            ok(ctx, "레이드 구역을 다시 지었습니다 (블록 " + n + "개).", "Rebuilt the raid arena (" + n + " blocks).");
                             return 1;
                         }))
                         .then(Commands.literal("tp").executes(ctx -> {
@@ -1126,19 +1134,19 @@ public final class Raid {
                     c.returnY = p.getY();
                     c.returnZ = p.getZ();
                     c.save();
-                    ok(ctx, "레이드가 끝나면 돌아올 곳을 여기로 정했습니다.");
+                    ok(ctx, "레이드가 끝나면 돌아올 곳을 여기로 정했습니다.", "Players will return here when the raid ends.");
                     return 1;
                 })))
                 .then(Commands.literal("end").executes(ctx -> {
                     forceEnd(ctx.getSource().getServer());
-                    ok(ctx, "레이드를 끝내고 안에 있던 사람을 모두 돌려보냈습니다.");
+                    ok(ctx, "레이드를 끝내고 안에 있던 사람을 모두 돌려보냈습니다.", "Ended the raid and sent everyone inside back.");
                     return 1;
                 }))
                 .then(Commands.literal("kills").then(Commands.argument("player", EntityArgument.player())
                         .then(Commands.argument("count", IntegerArgumentType.integer(0, 9999)).executes(ctx -> {
                             ServerPlayer t = EntityArgument.getPlayer(ctx, "player");
                             setKills(t, IntegerArgumentType.getInteger(ctx, "count"));
-                            ok(ctx, t.getGameProfile().getName() + " 의 입장 조건 처치 수: " + kills(t));
+                            ok(ctx, t.getGameProfile().getName() + " 의 입장 조건 처치 수: " + kills(t), t.getGameProfile().getName() + " — kills toward the entry requirement: " + kills(t));
                             return 1;
                         }))))
                 .then(Commands.literal("weekly").then(Commands.literal("reset").then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
@@ -1146,7 +1154,7 @@ public final class Raid {
                     RaidData d = RaidData.get(t.server);
                     d.of(t.getUUID()).weeklyWeek = -1;
                     d.touch();
-                    ok(ctx, t.getGameProfile().getName() + " 의 이번 주 주간 보상 기록을 지웠습니다.");
+                    ok(ctx, t.getGameProfile().getName() + " 의 이번 주 주간 보상 기록을 지웠습니다.", "Cleared this week's weekly reward record for " + t.getGameProfile().getName() + ".");
                     return 1;
                 }))));
     }

@@ -333,16 +333,17 @@ public final class AbyssFloors {
                     Floor f = get()[floor - 1];
                     JsonObject o = new JsonObject();
                     o.addProperty("id", "abyssfloor" + floor);
-                    o.addProperty("title", "Spiral Abyss " + floor + "층 상자 보상");
+                    boolean en = com.rtshop.story.StoryText.en(p);
+                    o.addProperty("title", en ? "Spiral Abyss Floor " + floor + " Chest Rewards" : "Spiral Abyss " + floor + "층 상자 보상");
                     JsonArray fl = new JsonArray();
-                    fl.add(RewardEditor.field("use", "직접 정한 보상 사용 (1 = 사용, 0 = 모드 원래 보상)", true, f.use ? "1" : "0"));
-                    fl.add(RewardEditor.field("experience", "경험치 (-1 = 모드 원래 값)", true, Integer.toString(f.experience)));
+                    fl.add(RewardEditor.field("use", en ? "Use custom rewards (1 = yes, 0 = the mod's own rewards)" : "직접 정한 보상 사용 (1 = 사용, 0 = 모드 원래 보상)", true, f.use ? "1" : "0"));
+                    fl.add(RewardEditor.field("experience", en ? "Experience (-1 = the mod's own value)" : "경험치 (-1 = 모드 원래 값)", true, Integer.toString(f.experience)));
                     for (int k = 1; k <= CHESTS; k++) {
-                        fl.add(RewardEditor.field("weight" + k, "상자 " + k + " 이 뽑히는 비중 (0 = 안 나옴)", true, Integer.toString(f.weight[k - 1])));
+                        fl.add(RewardEditor.field("weight" + k, en ? "Weight of chest " + k + " (0 = never)" : "상자 " + k + " 이 뽑히는 비중 (0 = 안 나옴)", true, Integer.toString(f.weight[k - 1])));
                     }
                     o.add("fields", fl);
                     JsonArray g = new JsonArray();
-                    for (int k = 1; k <= CHESTS; k++) g.add(RewardEditor.group("c" + k, "상자 " + k, false, true));
+                    for (int k = 1; k <= CHESTS; k++) g.add(RewardEditor.group("c" + k, (en ? "Chest " : "상자 ") + k, false, true));
                     o.add("groups", g);
                     o.add("rewards", RewardEditor.rewardsJson(f.rewards));
                     return o;
@@ -362,7 +363,7 @@ public final class AbyssFloors {
                     }
                     save(fs);
                     AbyssFloors.apply(p.server);
-                    if (f.use && !f.custom()) p.sendSystemMessage(Component.literal("상자가 모두 비어 있어 이 층은 모드 원래 보상을 씁니다. [보상] 갈래에서 아이템을 손에 들고 추가하세요."));
+                    if (f.use && !f.custom()) p.sendSystemMessage(Component.literal(com.rtshop.story.StoryText.pick(p, "상자가 모두 비어 있어 이 층은 모드 원래 보상을 씁니다. [보상] 갈래에서 아이템을 손에 들고 추가하세요.", "Every chest is empty, so this floor uses the mod's own rewards. Hold an item and add it under the [Rewards] tab.")));
                 }
 
                 @Override

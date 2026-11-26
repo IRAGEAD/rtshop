@@ -225,7 +225,9 @@ public final class BossMusic {
                     String t = StringArgumentType.getString(ctx, "track");
                     PREVIEW.put(p.getUUID(), t);
                     send(p, t, -1);
-                    ctx.getSource().sendSuccess(() -> Component.literal("미리 듣기: rtshop:music." + t + " (그 소리 파일이 없으면 아무 소리도 나지 않습니다). 멈추기: /rtshop music stop"), false);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(p,
+                            "미리 듣기: rtshop:music." + t + " (그 소리 파일이 없으면 아무 소리도 나지 않습니다). 멈추기: /rtshop music stop",
+                            "Preview: rtshop:music." + t + " (nothing plays if that sound file is missing). Stop: /rtshop music stop")), false);
                     return 1;
                 })))
                 .then(Commands.literal("stop").executes(ctx -> {
@@ -237,7 +239,7 @@ public final class BossMusic {
                 }))
                 .then(Commands.literal("reload").executes(ctx -> {
                     reload();
-                    ctx.getSource().sendSuccess(() -> Component.literal("boss_music.json 을 다시 읽었습니다: " + get().tracks), false);
+                    ctx.getSource().sendSuccess(() -> Component.literal(com.rtshop.story.StoryText.pick(ctx.getSource(), "boss_music.json 을 다시 읽었습니다: ", "Reloaded boss_music.json: ") + get().tracks), false);
                     return 1;
                 }))));
     }

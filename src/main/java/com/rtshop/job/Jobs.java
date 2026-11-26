@@ -152,6 +152,15 @@ public final class Jobs {
         return Math.max(0, at + JobConfig.get().cooldownMillis(slot) - now());
     }
 
+    /** 남은 시간을 보는 사람의 언어로 (언어 파일의 rtshop.job.dur_*). */
+    public static Component durationText(long ms) {
+        long min = (ms + 59_999) / 60_000;
+        long h = min / 60;
+        long m = min % 60;
+        if (h >= 24) return Component.translatable("rtshop.job.dur_days", h / 24, h % 24);
+        return h > 0 ? Component.translatable("rtshop.job.dur_hours", h, m) : Component.translatable("rtshop.job.dur_minutes", m);
+    }
+
     public static String duration(long ms) {
         long min = (ms + 59_999) / 60_000;
         long h = min / 60;
@@ -194,7 +203,7 @@ public final class Jobs {
         }
         long left = cooldownLeft(p, d.slot);
         if (left > 0) {
-            return new Result(false, Component.translatable("rtshop.job.cooldown", duration(left)));
+            return new Result(false, Component.translatable("rtshop.job.cooldown", durationText(left)));
         }
         long cost = cfg.cost(d.slot);
         if (Economy.wallet(p) < cost) {
@@ -210,7 +219,7 @@ public final class Jobs {
         RtShop.LOGGER.info("[rtshop] {} 이(가) 직업을 '{}' -> '{}' 로 바꿨습니다 ({} G)", p.getGameProfile().getName(),
                 old == null ? current : old.name, d.name, cost);
         return new Result(true, Component.translatable("rtshop.job.changed", old == null ? current : com.rtshop.story.StoryText.t(p, old.name), com.rtshop.story.StoryText.t(p, d.name),
-                String.format("%,d", cost), duration(cfg.cooldownMillis(d.slot))));
+                String.format("%,d", cost), durationText(cfg.cooldownMillis(d.slot))));
     }
 
     /** 관리자용: 비용·쿨타임·해금과 상관없이 바로 정한다. 빈 문자열이면 그 칸을 비운다. */

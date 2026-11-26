@@ -33,6 +33,13 @@ public final class StoryGates {
         return null;
     }
 
+    /** 장 이름("1장" · "1장 중반")을 보는 사람의 언어로 (언어 파일의 rtshop.gate.*). 모르는 이름은 그대로. */
+    public static net.minecraft.network.chat.Component chapterName(String lock) {
+        if ("1장".equals(lock)) return net.minecraft.network.chat.Component.translatable("rtshop.gate.ch1");
+        if ("1장 중반".equals(lock)) return net.minecraft.network.chat.Component.translatable("rtshop.gate.ch1_mid");
+        return net.minecraft.network.chat.Component.literal(lock == null ? "" : lock);
+    }
+
     /** 클라이언트에 잠금 상태를 알려 준다 (상점 진열대에 "1장 후" 표시). 접속·퀘스트 완료·다시 읽기 때. */
     public static void sync(ServerPlayer p) {
         if (p instanceof net.minecraftforge.common.util.FakePlayer || p.connection == null) return;

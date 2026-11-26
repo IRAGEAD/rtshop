@@ -815,7 +815,7 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         if (blocked) {
             dim(g, x + 1, y + 1, CELL - 2, CELL - 2, 0x99403020);
             if (!sellMode) {
-                Component full = r.storyLock != null ? Component.translatable("rtshop.ui.story_lock_short", r.storyLock) : Component.translatable("rtshop.ui.full");
+                Component full = r.storyLock != null ? Component.translatable("rtshop.ui.story_lock_short", com.rtshop.story.StoryGates.chapterName(r.storyLock)) : Component.translatable("rtshop.ui.full");
                 overText(g, full.getString(), x + (CELL - this.font.width(full)) / 2, y + 12, 0xFFFFC0B0);
             }
         }
@@ -841,7 +841,7 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         if (blocked) {
             dim(g, x + 1, y + 1, w - 2, LIST_H - 2, 0x99403020);
             if (!sellMode) {
-                Component full = r.storyLock != null ? Component.translatable("rtshop.ui.story_lock_short", r.storyLock) : Component.translatable("rtshop.ui.full");
+                Component full = r.storyLock != null ? Component.translatable("rtshop.ui.story_lock_short", com.rtshop.story.StoryGates.chapterName(r.storyLock)) : Component.translatable("rtshop.ui.full");
                 overText(g, full.getString(), x + w - 8 - this.font.width(full) - pw, y + 7, 0xFFFFC0B0);
             }
         }
@@ -911,7 +911,7 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
                 tip.add(Component.translatable("rtshop.msg.inv_full_buy").withStyle(ChatFormatting.RED));
             }
             if (r.storyLock != null) {
-                tip.add(Component.translatable("rtshop.msg.story_locked", r.storyLock).withStyle(ChatFormatting.LIGHT_PURPLE));
+                tip.add(Component.translatable("rtshop.msg.story_locked", com.rtshop.story.StoryGates.chapterName(r.storyLock)).withStyle(ChatFormatting.LIGHT_PURPLE));
             }
             appendRecipe(tip, r.entry);
             tip.add(Component.translatable("rtshop.ui.hint_buy").withStyle(ChatFormatting.DARK_GRAY));

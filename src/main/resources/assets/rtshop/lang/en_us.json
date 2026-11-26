@@ -1137,7 +1137,7 @@
   "rtshop.quest.obj.advancement": "Achieve: %s",
   "rtshop.quest.obj.dimension": "Enter: %s",
   "rtshop.economy.death_story_boss": "You fell fighting a story boss. You kept your Gold.",
-  "rtshop.msg.story_locked": "This gear unlocks after finishing %s of the main story.",
+  "rtshop.msg.story_locked": "This gear unlocks once you are past %s of the main story.",
   "rtshop.qedit.type_structure": "Structure",
   "rtshop.qedit.type_advancement": "Advancement",
   "rtshop.qedit.type_dimension": "Dimension",
@@ -1906,5 +1906,7 @@
   "rtshop.npclayout.applied": "NPC layout applied again: %s places to set down (%s set down now).",
   "rtshop.npclayout.no_file": "There is no config/rtshop/npc_layout.json.",
   "rtshop.hud.minimap_npc.on": "Minimap NPC icons: ON",
-  "rtshop.hud.minimap_npc.off": "Minimap NPC icons: OFF"
+  "rtshop.hud.minimap_npc.off": "Minimap NPC icons: OFF",
+  "rtshop.gate.ch1": "Chapter 1",
+  "rtshop.gate.ch1_mid": "mid-Chapter 1"
 }

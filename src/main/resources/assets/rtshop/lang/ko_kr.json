@@ -1906,5 +1906,7 @@
   "rtshop.npclayout.applied": "NPC 배치를 다시 적용했습니다: 새로 세울 자리 %s곳 (지금 세운 NPC %s명).",
   "rtshop.npclayout.no_file": "config/rtshop/npc_layout.json 이 없습니다.",
   "rtshop.hud.minimap_npc.on": "미니맵 NPC 아이콘: 켜짐",
-  "rtshop.hud.minimap_npc.off": "미니맵 NPC 아이콘: 꺼짐"
+  "rtshop.hud.minimap_npc.off": "미니맵 NPC 아이콘: 꺼짐",
+  "rtshop.gate.ch1": "1장",
+  "rtshop.gate.ch1_mid": "1장 중반"
 }

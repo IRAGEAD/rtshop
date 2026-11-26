@@ -55,6 +55,6 @@ public final class JobEditor {
         }
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new JobEditorPacket(JobConfig.get().toJson().toString()));
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new ResultPacket(
-                err == null ? Component.translatable("rtshop.jedit.saved") : Component.literal(err), err == null));
+                err == null ? Component.translatable("rtshop.jedit.saved") : Component.literal(com.rtshop.story.StoryText.saveError(p, err)), err == null));
     }
 }

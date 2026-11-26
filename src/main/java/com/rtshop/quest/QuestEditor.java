@@ -43,6 +43,13 @@ public final class QuestEditor {
     private static final String CUSTOM_HELP = "게임 안 퀘스트 편집기(/rtshop quest edit)에서 새로 만든 퀘스트와 NPC 가 저장되는 파일입니다. 메모장으로 고쳐도 됩니다. 모드 업데이트로 바뀌지 않습니다.";
 
     /** 결과: ok = 저장/삭제가 되었는가, message = 사용자에게 보일 설명. */
+    /** 지금 편집 화면을 쓰는 사람이 영어로 보는가 (open · handle 이 정한다. 서버 스레드에서만 쓴다). */
+    private static boolean en;
+
+    private static String m(String ko, String english) {
+        return en ? english : ko;
+    }
+
     public record Result(boolean ok, String message) {
     }
 
@@ -57,7 +64,12 @@ public final class QuestEditor {
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), snapshot(p.server));
+        en = com.rtshop.story.StoryText.en(p);
+        try {
+            ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), snapshot(p.server));
+        } finally {
+            en = false;
+        }
     }
 
     /** 편집 화면에 보낼 현재 상태: 파일에 적힌 그대로의 퀘스트·NPC (지금 쓰이지 않는 것도 포함). */
@@ -72,23 +84,23 @@ public final class QuestEditor {
                 try {
                     root = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
                 } catch (Exception e) {
-                    quests.add(new QuestEditorPacket.Entry("", name, "", "파일을 읽을 수 없습니다: " + e.getMessage()));
+                    quests.add(new QuestEditorPacket.Entry("", name, "", m("파일을 읽을 수 없습니다: ", "Cannot read the file: ") + e.getMessage()));
                     continue;
                 }
                 for (JsonElement e : array(root, "quests")) {
                     String id = idOf(e);
                     String status = "";
                     if (!e.isJsonObject()) {
-                        status = "퀘스트 형식이 아닙니다";
+                        status = m("퀘스트 형식이 아닙니다", "Not a quest entry");
                     } else {
                         try {
                             QuestDef.parse(e.getAsJsonObject());
                             if (l.dropped.containsKey(id)) {
                                 status = l.dropped.get(id);
                             } else if (!l.quests.containsKey(id)) {
-                                status = "다른 파일에 같은 ID 가 있어서 쓰이지 않습니다";
+                                status = m("다른 파일에 같은 ID 가 있어서 쓰이지 않습니다", "Not used: another file has the same ID");
                             } else if (!name.equals(l.questFile.get(id))) {
-                                status = "다른 파일(" + l.questFile.get(id) + ")에 같은 ID 가 있어서 쓰이지 않습니다";
+                                status = m("다른 파일(" + l.questFile.get(id) + ")에 같은 ID 가 있어서 쓰이지 않습니다", "Not used: another file (" + l.questFile.get(id) + ") has the same ID");
                             }
                         } catch (Exception ex) {
                             status = ex.getMessage();
@@ -138,7 +150,8 @@ public final class QuestEditor {
             try {
                 return JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
             } catch (Exception e) {
-                throw new IOException(f.getFileName() + " 파일이 깨져 있어서 고쳐 쓸 수 없습니다. 메모장으로 열어 고치거나 지워 주세요. (" + e.getMessage() + ")");
+                throw new IOException(f.getFileName() + m(" 파일이 깨져 있어서 고쳐 쓸 수 없습니다. 메모장으로 열어 고치거나 지워 주세요. (",
+                        " is broken and cannot be rewritten. Open it in a text editor and fix or delete it. (") + e.getMessage() + ")");
             }
         }
         JsonObject o = new JsonObject();
@@ -206,7 +219,7 @@ public final class QuestEditor {
         try {
             q = QuestDef.parse(JsonParser.parseString(json).getAsJsonObject());
         } catch (Exception e) {
-            return new Result(false, "저장하지 못했습니다: " + e.getMessage());
+            return new Result(false, m("저장하지 못했습니다: ", "Could not save: ") + e.getMessage());
         }
         boolean isNew = origId == null || origId.isEmpty();
         // 편집 화면에 없는 값(연출)은 원래 퀘스트에서 그대로 가져간다
@@ -229,10 +242,10 @@ public final class QuestEditor {
         try {
             String file = findFile("quests", q.id);
             if (isNew && file != null) {
-                return new Result(false, "ID '" + q.id + "' 는 이미 있습니다 (" + file + "). 다른 ID 를 써 주세요.");
+                return new Result(false, m("ID '" + q.id + "' 는 이미 있습니다 (" + file + "). 다른 ID 를 써 주세요.", "The ID '" + q.id + "' already exists (" + file + "). Please use another ID."));
             }
             if (!isNew && !origId.equals(q.id)) {
-                return new Result(false, "이미 있는 퀘스트의 ID 는 바꿀 수 없습니다 (플레이어 진행 기록이 ID 에 묶여 있습니다).");
+                return new Result(false, m("이미 있는 퀘스트의 ID 는 바꿀 수 없습니다 (플레이어 진행 기록이 ID 에 묶여 있습니다).", "The ID of an existing quest cannot be changed (player progress is tied to the ID)."));
             }
             if (file == null) {
                 file = QuestManager.CUSTOM_FILE;
@@ -243,12 +256,12 @@ public final class QuestEditor {
             writeRoot(f, root);
             QuestManager.Loaded l = QuestManager.reload();
             if (!l.quests.containsKey(q.id)) {
-                String why = l.dropped.getOrDefault(q.id, "다른 파일에 같은 ID 가 있습니다");
-                return new Result(true, "저장했지만 지금은 쓰이지 않습니다: " + why);
+                String why = l.dropped.getOrDefault(q.id, m("다른 파일에 같은 ID 가 있습니다", "another file has the same ID"));
+                return new Result(true, m("저장했지만 지금은 쓰이지 않습니다: ", "Saved, but not in use right now: ") + why);
             }
-            return new Result(true, "'" + q.title + "' 을(를) 저장했습니다 (" + file + "). 바로 적용됩니다.");
+            return new Result(true, m("'" + q.title + "' 을(를) 저장했습니다 (" + file + "). 바로 적용됩니다.", "Saved '" + q.title + "' (" + file + "). It applies at once."));
         } catch (IOException e) {
-            return new Result(false, "저장하지 못했습니다: " + e.getMessage());
+            return new Result(false, m("저장하지 못했습니다: ", "Could not save: ") + e.getMessage());
         }
     }
 
@@ -261,21 +274,21 @@ public final class QuestEditor {
             }
         }
         if (!users.isEmpty()) {
-            return new Result(false, "다음 퀘스트가 이 퀘스트를 선행 조건으로 쓰고 있어서 지울 수 없습니다: " + String.join(", ", users));
+            return new Result(false, m("다음 퀘스트가 이 퀘스트를 선행 조건으로 쓰고 있어서 지울 수 없습니다: ", "Cannot delete: these quests require this one first: ") + String.join(", ", users));
         }
         try {
             String file = findFile("quests", id);
             if (file == null) {
-                return new Result(false, "퀘스트 '" + id + "' 를 찾지 못했습니다.");
+                return new Result(false, m("퀘스트 '" + id + "' 를 찾지 못했습니다.", "Quest '" + id + "' was not found."));
             }
             Path f = QuestManager.dir().resolve(file);
             JsonObject root = readRoot(f, CUSTOM_HELP);
             replace(root, "quests", id, null);
             writeRoot(f, root);
             QuestManager.reload();
-            return new Result(true, "퀘스트 '" + id + "' 를 지웠습니다. 이미 받은 플레이어의 진행 기록은 무시됩니다.");
+            return new Result(true, m("퀘스트 '" + id + "' 를 지웠습니다. 이미 받은 플레이어의 진행 기록은 무시됩니다.", "Deleted quest '" + id + "'. Progress of players who already took it is ignored."));
         } catch (IOException e) {
-            return new Result(false, "지우지 못했습니다: " + e.getMessage());
+            return new Result(false, m("지우지 못했습니다: ", "Could not delete: ") + e.getMessage());
         }
     }
 
@@ -290,13 +303,13 @@ public final class QuestEditor {
             id = o.get("id").getAsString().trim();
             name = o.has("name") ? o.get("name").getAsString().trim() : "";
         } catch (Exception e) {
-            return new Result(false, "저장하지 못했습니다: NPC 정보가 올바르지 않습니다.");
+            return new Result(false, m("저장하지 못했습니다: NPC 정보가 올바르지 않습니다.", "Could not save: the NPC data is not valid."));
         }
         if (!id.matches("[a-z0-9_.-]+")) {
-            return new Result(false, "NPC ID 는 영문 소문자·숫자·_ . - 만 쓸 수 있습니다: '" + id + "'");
+            return new Result(false, m("NPC ID 는 영문 소문자·숫자·_ . - 만 쓸 수 있습니다: '", "An NPC ID may only use lowercase letters, digits and _ . - : '") + id + "'");
         }
         if (name.isEmpty()) {
-            return new Result(false, "NPC 이름을 적어 주세요.");
+            return new Result(false, m("NPC 이름을 적어 주세요.", "Please enter the NPC's name."));
         }
         JsonObject clean = new JsonObject();
         clean.addProperty("id", id);
@@ -307,10 +320,10 @@ public final class QuestEditor {
         try {
             String file = findFile("npcs", id);
             if (isNew && file != null) {
-                return new Result(false, "NPC ID '" + id + "' 는 이미 있습니다. 다른 ID 를 써 주세요.");
+                return new Result(false, m("NPC ID '" + id + "' 는 이미 있습니다. 다른 ID 를 써 주세요.", "The NPC ID '" + id + "' already exists. Please use another ID."));
             }
             if (!isNew && !origId.equals(id)) {
-                return new Result(false, "이미 있는 NPC 의 ID 는 바꿀 수 없습니다 (소환된 NPC 와 퀘스트가 ID 로 연결되어 있습니다).");
+                return new Result(false, m("이미 있는 NPC 의 ID 는 바꿀 수 없습니다 (소환된 NPC 와 퀘스트가 ID 로 연결되어 있습니다).", "The ID of an existing NPC cannot be changed (spawned NPCs and quests are linked by the ID)."));
             }
             if (file == null) {
                 file = QuestManager.CUSTOM_FILE;
@@ -321,10 +334,10 @@ public final class QuestEditor {
             writeRoot(f, root);
             QuestManager.reload();
             int renamed = server == null ? 0 : renameSpawned(server, id, name);
-            String extra = renamed > 0 ? " 소환되어 있는 NPC " + renamed + "명의 이름도 바꿨습니다." : "";
-            return new Result(true, "NPC '" + name + "' 을(를) 저장했습니다." + extra);
+            String extra = renamed > 0 ? m(" 소환되어 있는 NPC " + renamed + "명의 이름도 바꿨습니다.", " Also renamed " + renamed + " spawned NPC(s).") : "";
+            return new Result(true, m("NPC '" + name + "' 을(를) 저장했습니다.", "Saved NPC '" + name + "'.") + extra);
         } catch (IOException e) {
-            return new Result(false, "저장하지 못했습니다: " + e.getMessage());
+            return new Result(false, m("저장하지 못했습니다: ", "Could not save: ") + e.getMessage());
         }
     }
 
@@ -358,21 +371,21 @@ public final class QuestEditor {
             }
         }
         if (!users.isEmpty()) {
-            return new Result(false, "다음 퀘스트가 이 NPC 를 쓰고 있어서 지울 수 없습니다: " + String.join(", ", users));
+            return new Result(false, m("다음 퀘스트가 이 NPC 를 쓰고 있어서 지울 수 없습니다: ", "Cannot delete: these quests use this NPC: ") + String.join(", ", users));
         }
         try {
             String file = findFile("npcs", id);
             if (file == null) {
-                return new Result(false, "NPC '" + id + "' 를 찾지 못했습니다.");
+                return new Result(false, m("NPC '" + id + "' 를 찾지 못했습니다.", "NPC '" + id + "' was not found."));
             }
             Path f = QuestManager.dir().resolve(file);
             JsonObject root = readRoot(f, CUSTOM_HELP);
             replace(root, "npcs", id, null);
             writeRoot(f, root);
             QuestManager.reload();
-            return new Result(true, "NPC '" + id + "' 를 지웠습니다. 이미 소환된 NPC 는 크리에이티브에서 직접 없애 주세요.");
+            return new Result(true, m("NPC '" + id + "' 를 지웠습니다. 이미 소환된 NPC 는 크리에이티브에서 직접 없애 주세요.", "Deleted NPC '" + id + "'. Remove any NPC already spawned by hand in creative mode."));
         } catch (IOException e) {
-            return new Result(false, "지우지 못했습니다: " + e.getMessage());
+            return new Result(false, m("지우지 못했습니다: ", "Could not delete: ") + e.getMessage());
         }
     }
 
@@ -388,15 +401,20 @@ public final class QuestEditor {
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.qedit.no_permission"));
             return;
         }
-        Result r = switch (action) {
-            case SAVE_QUEST -> saveQuest(origId, json);
-            case DELETE_QUEST -> deleteQuest(origId);
-            case SAVE_NPC -> saveNpc(p.server, origId, json);
-            case DELETE_NPC -> deleteNpc(origId);
-            default -> new Result(false, "?");
-        };
-        RtShop.LOGGER.info("[rtshop] 퀘스트 편집 ({}): {}", p.getGameProfile().getName(), r.message());
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), snapshot(p.server));
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new ResultPacket(Component.literal(r.message()), r.ok()));
+        en = com.rtshop.story.StoryText.en(p);
+        try {
+            Result r = switch (action) {
+                case SAVE_QUEST -> saveQuest(origId, json);
+                case DELETE_QUEST -> deleteQuest(origId);
+                case SAVE_NPC -> saveNpc(p.server, origId, json);
+                case DELETE_NPC -> deleteNpc(origId);
+                default -> new Result(false, "?");
+            };
+            RtShop.LOGGER.info("[rtshop] 퀘스트 편집 ({}): {}", p.getGameProfile().getName(), r.message());
+            ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), snapshot(p.server));
+            ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new ResultPacket(Component.literal(r.message()), r.ok()));
+        } finally {
+            en = false;
+        }
     }
 }

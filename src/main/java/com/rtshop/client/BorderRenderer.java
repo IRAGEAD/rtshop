@@ -118,6 +118,27 @@ public final class BorderRenderer {
         return max;
     }
 
+    /**
+     * 시험용: 테두리 기둥 꼭대기가 "그 자리의 실제 땅"(맞닿은 네 칸 가운데 가장 높은 윗면)보다 얼마나 위에 있는가.
+     * 지형이 오르내려도 기둥 높이(POST)를 넘지 않아야 한다 (발밑 기준의 maxRiseForTest 는 언덕에서는 지형만큼 커진다).
+     */
+    public static double maxRiseAboveGroundForTest() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null) return 0;
+        int ref = (int) Math.floor(mc.player.getY());
+        double max = 0;
+        for (Corner c : corners) {
+            int top = Math.max(Math.max(mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x, c.z), mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x - 1, c.z)),
+                    Math.max(mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x, c.z - 1), mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x - 1, c.z - 1)));
+            max = Math.max(max, vertexY(mc.level, c.x, c.z, ref) + POST - top);
+        }
+        return max;
+    }
+
+    public static int cornersForTest() {
+        return corners.size();
+    }
+
     private static final double RAIL_LOW = 0.08, RAIL_HIGH = 1.1, POST = 1.7;
 
     // ------------------------------------------------------------------ 바닥 높이

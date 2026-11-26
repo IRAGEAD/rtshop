@@ -839,7 +839,7 @@ public final class ShopServer {
         }
         String lock = com.rtshop.story.StoryGates.lockedChapter(player, entry.stack);
         if (lock != null) {
-            sendResult(player, Component.translatable("rtshop.msg.story_locked", lock), false);
+            sendResult(player, Component.translatable("rtshop.msg.story_locked", com.rtshop.story.StoryGates.chapterName(lock)), false);
             return;
         }
         boolean firstDeed = entry.stack.is(ModItems.FIRST_LAND_DEED.get());

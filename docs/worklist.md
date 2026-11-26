@@ -183,3 +183,15 @@
 - D-7 ✔ NPC 자리 배치: `quest/NpcLayout` (월드 데이터 rtshop_npc_layout, 파일 `config/rtshop/npc_layout.json`). 쓰는 법 `docs/npc_layout.md`. 명령 `/rtshop npc layout [save|apply]`.
 - D-9 ✔ 미니맵 NPC 아이콘: Diorama 의 레이더(`dev.diorama.render.Radar.collect` 가 `Radar.kind` 를 묻는 자리)에 `mixin/DioramaRadarMixin`. 서버가 지도 표시와 함께 "말을 걸어 본 NPC"의 UUID 목록을 보내고(`MAP_MARKS` 의 radar · marks 의 "npc:UUID"), 화면 쪽이 NoAI + 이름 붙은 주민 가운데 목록에 없는 것을 뺀다. `/rtshop hud` 의 「미니맵 NPC 아이콘」 단추로 모두 끔 (client.json 의 minimapNpcIcons). 서버 설정 map_marks.json 의 radarKnownOnly.
 - D-6 ✔ 제안: `docs/ideas_hidden_jobs_stock.md` (사용자가 안을 고르면 만든다). D-8 ✔ 설명 (계획 문서 `docs/town_transplant.md` 그대로).
+
+## 3.58.1 (11-26 오후, 새 세션 · 작업 가지 v5-next9) — HANDOFF 6절의 "바로 할 수 있는 것"
+
+- 흔들리던 시험 두 개 (시험 코드만):
+  - 서버 "buying a farmland lot removes the crops and structures standing on it": 시험 자리(3200, 100, 3200)가 산속이면 Y+8 위에 지형이 남아 `clearPlot` 이 그 꼭대기를 땅으로 보고 아무것도 치우지 않았다 (밀은 어두워서 저절로 뽑혀 "치워진 것처럼" 보였음). → 시험이 그 칸의 지표면까지 전부 비운다. 실패 줄에 surface 높이도 적는다.
+  - 화면 "the border is a low outline along the ground": 발밑에서 잰 높이는 언덕만큼 커진다 (언덕 속 칸은 위로 10칸까지 찾으므로 최대 13.7). → 기둥이 "그 자리의 실제 땅" 위로 얼마나 솟는지(`BorderRenderer.maxRiseAboveGroundForTest`, 기준 2.0)로 본다.
+- 강화 정보 창의 "+13%" 가 "|13%" 로 보이던 것: Playfair 의 더하기표는 가로 획이 30/1000 em 이라 12px 에서 사라졌다. → `enhance_num.ttf` 의 + − = 를 하이픈 굵기(84)로 (`tools/gen_enhance_font.py` 의 `thicken_signs`, 이미 만든 파일은 `--fix-signs`).
+- 영어판에 남은 한국어:
+  - 운영자 명령의 답: 모루·제단·나선 비경 문 지정(`WorldRules`), `/rtshop raid …`, `/rtshop abyss …`, `/rtshop defaults …`, `/rtshop music …` → `StoryText.pick(ctx.getSource(), ko, en)` (콘솔은 한국어).
+  - 편집 화면: 레이드·주간 보상·층 상자 편집기의 제목과 항목 이름(`RewardEditor` · `RaidConfig.label(k, en)`), 퀘스트 편집기의 저장·삭제 결과(`QuestEditor.m`), 직업·뽑기·출석 편집기의 저장 실패 문구(`StoryText.saveError`).
+  - 플레이어가 보는 것 (찾다가 나온 것): 상점의 "1장 이후" 잠금 표시(언어 파일 `rtshop.gate.*` · `StoryGates.chapterName`), 직업 변경 쿨타임의 "3시간 20분"(`Jobs.durationText`), 출석 복구 안내의 날짜(`Attendance.time`), 주간 보상 창의 "제 Ⅲ 층 · 받음 · 닫기".
+  - 그대로 둔 것: 설정 파일 안의 `_help` 설명, 퀘스트 파일을 읽다 생긴 문제 목록(로그), NPC 머리 위 이름, 운영자가 직접 고친 설정 문구.

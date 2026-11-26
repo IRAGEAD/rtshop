@@ -87,7 +87,7 @@ public class AbyssRewardScreen extends Screen {
             Fx2D.end();
             g.fill(x + 10, ry + ROWH - 4, x + W - 10, ry + ROWH - 3, 0x307C64E0);
             AbyssPanel.star(g, x + 24, ry + 12, 7F, done, time, f);
-            RaidText.draw(g, this.font, o.has("endless") && o.get("endless").getAsBoolean() ? AbyssPanel.label(o, f) + " 웨이브" : "제 " + AbyssPanel.ROMAN[f - 1] + " 층", RaidText.SERIF, x + 38, ry + 8, done ? RaidFx.GOLD_HI : 0xFFE0D4FF);
+            RaidText.draw(g, this.font, floorName(o, f), RaidText.SERIF, x + 38, ry + 8, done ? RaidFx.GOLD_HI : 0xFFE0D4FF);
             int ix = x + 92;
             for (Reward r : all) {
                 if (!r.group.equals("floor" + f) || ix > x + W - 96) continue;
@@ -111,7 +111,7 @@ public class AbyssRewardScreen extends Screen {
                 ix += 24;
             }
             long gv = AbyssPanel.gold(o, f);
-            String right = done ? "받음" : gv > 0 ? Ui.num(gv) + " G" : "";
+            String right = done ? (o.has("texts") && o.getAsJsonObject("texts").has("done") ? AbyssPanel.t(o, "done") : HudLang.storyEn() ? "Claimed" : "받음") : gv > 0 ? Ui.num(gv) + " G" : "";
             g.pose().pushPose();
             g.pose().translate(0, 0, 300);
             if (done) {
@@ -129,7 +129,7 @@ public class AbyssRewardScreen extends Screen {
         boolean hov = Ui.inside(mx, my, c[0], c[1], c[2], c[3]);
         g.fill(c[0], c[1], c[0] + c[2], c[1] + c[3], hov ? 0xC0402C88 : 0x90201846);
         RaidFx.box(g, c[0], c[1], c[0] + c[2], c[1] + c[3], hov ? RaidFx.GOLD_HI : 0xA0D4A85A);
-        RaidText.center(g, this.font, "닫기", RaidText.SERIF, c[0] + c[2] / 2, c[1] + 4, hov ? 0xFFFFF4DC : 0xFFE0D4FF);
+        RaidText.center(g, this.font, HudLang.storyEn() ? "Close" : "닫기", RaidText.SERIF, c[0] + c[2] / 2, c[1] + 4, hov ? 0xFFFFF4DC : 0xFFE0D4FF);
         if (!hover.isEmpty()) {
             List<Component> tip = new ArrayList<>(hover.getTooltipLines(Minecraft.getInstance().player, TooltipFlag.Default.NORMAL));
             if (hoverChance < 99.99) {
@@ -155,5 +155,12 @@ public class AbyssRewardScreen extends Screen {
     @Override
     public void onClose() {
         Minecraft.getInstance().setScreen(parent);
+    }
+
+    /** 줄 머리의 단계 이름: "제 Ⅲ 층" / "30 웨이브" (영어: "Floor Ⅲ" / "Wave 30"). */
+    static String floorName(JsonObject o, int f) {
+        boolean endless = o.has("endless") && o.get("endless").getAsBoolean();
+        if (HudLang.storyEn()) return endless ? "Wave " + AbyssPanel.label(o, f) : "Floor " + AbyssPanel.ROMAN[f - 1];
+        return endless ? AbyssPanel.label(o, f) + " 웨이브" : "제 " + AbyssPanel.ROMAN[f - 1] + " 층";
     }
 }

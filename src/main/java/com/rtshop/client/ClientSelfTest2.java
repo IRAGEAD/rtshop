@@ -247,7 +247,11 @@ final class ClientSelfTest2 {
         add(mc -> {
             check("/rtshop border on shows the border of the lot you stand in", BorderRenderer.activeForTest() && BorderRenderer.segmentsForTest() > 20,
                     BorderRenderer.segmentsForTest());
-            check("the border is a low outline along the ground (no wall into the sky)", BorderRenderer.maxRiseForTest() < 12, BorderRenderer.maxRiseForTest());
+            // 시험용 토지는 무작위 지형에 놓인다: 발밑에서 잰 높이는 언덕만큼 커지므로(6.7 ~ 13.7), 기둥이 "그 자리의 땅" 위로 얼마나 솟는지로 본다
+            check("the border is a low outline along the ground (no wall into the sky)",
+                    BorderRenderer.cornersForTest() > 0 && BorderRenderer.maxRiseAboveGroundForTest() <= 2.0,
+                    "above the ground " + BorderRenderer.maxRiseAboveGroundForTest() + " / above the feet " + BorderRenderer.maxRiseForTest()
+                            + " / corners " + BorderRenderer.cornersForTest());
             mc.player.setXRot(28);
             waitTicks(6);
         });

@@ -211,7 +211,7 @@ public final class Attendance {
             if (ch == Change.GRACE) {
                 com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.grace_warn", before).withStyle(ChatFormatting.GOLD));
             } else {
-                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.reset_warn", before, time(e.resetAt + (long) (c.restoreWindowHours * HOUR), c))
+                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.reset_warn", before, time(p, e.resetAt + (long) (c.restoreWindowHours * HOUR), c))
                         .withStyle(ChatFormatting.RED));
             }
         }
@@ -300,7 +300,7 @@ public final class Attendance {
             }
             case EXPIRED -> com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.restore_expired").withStyle(ChatFormatting.RED));
             case COOLDOWN -> com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.restore_cooldown",
-                    time(e.restoreAt + (long) (c.restoreCooldownHours * HOUR), c)).withStyle(ChatFormatting.RED));
+                    time(p, e.restoreAt + (long) (c.restoreCooldownHours * HOUR), c)).withStyle(ChatFormatting.RED));
             default -> com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.att.restore_nothing").withStyle(ChatFormatting.YELLOW));
         }
         result(p, Component.translatable("rtshop.att.restore_fail"), false);
@@ -417,7 +417,7 @@ public final class Attendance {
             renameNpcs(p.server);
         }
         openEditor(p);
-        result(p, err == null ? Component.translatable("rtshop.att.saved") : Component.literal(err), err == null);
+        result(p, err == null ? Component.translatable("rtshop.att.saved") : Component.literal(com.rtshop.story.StoryText.saveError(p, err)), err == null);
     }
 
     /** 설정의 NPC 이름이 바뀌었으면 이미 세워 둔 출석 NPC 이름도 바꾼다. */
@@ -510,8 +510,11 @@ public final class Attendance {
         return entry(p).lastDay != dayOf(clock.getAsLong(), c);
     }
 
-    private static String time(long ms, AttendanceConfig c) {
-        return java.time.format.DateTimeFormatter.ofPattern("M월 d일 HH:mm").format(Instant.ofEpochMilli(ms).atZone(c.zone()));
+    private static String time(ServerPlayer p, long ms, AttendanceConfig c) {
+        java.time.format.DateTimeFormatter f = com.rtshop.story.StoryText.en(p)
+                ? java.time.format.DateTimeFormatter.ofPattern("MMM d, HH:mm", java.util.Locale.ENGLISH)
+                : java.time.format.DateTimeFormatter.ofPattern("M월 d일 HH:mm");
+        return f.format(Instant.ofEpochMilli(ms).atZone(c.zone()));
     }
 
     // ------------------------------------------------------------------ NPC
@@ -582,7 +585,7 @@ public final class Attendance {
         }
         if (restorable(e, clock.getAsLong(), c)) {
             msg.append(Component.translatable("rtshop.att.remind_restore", e.savedStreak,
-                    time(e.resetAt + (long) (c.restoreWindowHours * HOUR), c)).withStyle(ChatFormatting.LIGHT_PURPLE));
+                    time(p, e.resetAt + (long) (c.restoreWindowHours * HOUR), c)).withStyle(ChatFormatting.LIGHT_PURPLE));
         }
         msg.append(Component.literal(" "));
         msg.append(Component.translatable("rtshop.att.remind_link").withStyle(st -> st.withColor(ChatFormatting.GOLD).withUnderlined(true)

@@ -87,39 +87,41 @@ public final class RewardEditor {
     static {
         TARGETS.put("raid", new Target() {
             private final String[] gradeNames = {"일반", "고급", "희귀", "영웅", "전설", "[???]"};
+            private final String[] gradeNamesEn = {"Common", "Uncommon", "Rare", "Epic", "Legendary", "[???]"};
 
             @Override
             public JsonObject model(ServerPlayer p) {
                 RaidConfig c = RaidConfig.get();
                 JsonObject o = new JsonObject();
                 o.addProperty("id", "raid");
-                o.addProperty("title", "주간 레이드 설정");
+                boolean en = com.rtshop.story.StoryText.en(p);
+                o.addProperty("title", en ? "Weekly Raid Settings" : "주간 레이드 설정");
                 JsonArray f = new JsonArray();
-                f.add(field("healthMultiplier", "보스 체력 배율 (2 = 받는 피해 절반 = 체력 2배)", true, num(c.healthMultiplier)));
-                f.add(field("damageMultiplier", "보스 공격력 배율", true, num(c.damageMultiplier)));
-                f.add(field("requireKills", "입장 조건: 일반 보스 처치 수", true, num(c.requireKills)));
-                f.add(field("returnSeconds", "성공 뒤 마을로 돌아가기까지 (초)", true, num(c.returnSeconds)));
-                f.add(field("failReturnSeconds", "실패 뒤 자동으로 돌려보내기까지 (초)", true, num(c.failReturnSeconds)));
-                f.add(field("weeklyGold", "주간 보상 Gold", true, num(c.weeklyGold)));
-                f.add(field("rollsFresh", "드랍 굴림 횟수 (이번 주 주간 보상을 아직 안 받은 사람)", true, num(c.rollsFresh)));
-                f.add(field("rollsRepeat", "드랍 굴림 횟수 (이미 받은 사람)", true, num(c.rollsRepeat)));
+                f.add(field("healthMultiplier", en ? "Boss health multiplier (2 = half damage taken = double health)" : "보스 체력 배율 (2 = 받는 피해 절반 = 체력 2배)", true, num(c.healthMultiplier)));
+                f.add(field("damageMultiplier", en ? "Boss damage multiplier" : "보스 공격력 배율", true, num(c.damageMultiplier)));
+                f.add(field("requireKills", en ? "Entry requirement: normal boss kills" : "입장 조건: 일반 보스 처치 수", true, num(c.requireKills)));
+                f.add(field("returnSeconds", en ? "Seconds before returning to town after a clear" : "성공 뒤 마을로 돌아가기까지 (초)", true, num(c.returnSeconds)));
+                f.add(field("failReturnSeconds", en ? "Seconds before being sent back after a failure" : "실패 뒤 자동으로 돌려보내기까지 (초)", true, num(c.failReturnSeconds)));
+                f.add(field("weeklyGold", en ? "Weekly reward Gold" : "주간 보상 Gold", true, num(c.weeklyGold)));
+                f.add(field("rollsFresh", en ? "Drop rolls (weekly reward not yet claimed this week)" : "드랍 굴림 횟수 (이번 주 주간 보상을 아직 안 받은 사람)", true, num(c.rollsFresh)));
+                f.add(field("rollsRepeat", en ? "Drop rolls (already claimed)" : "드랍 굴림 횟수 (이미 받은 사람)", true, num(c.rollsRepeat)));
                 for (int i = 0; i < 6; i++) {
-                    f.add(field("chanceFresh" + i, gradeNames[i] + " 등급 확률 % (주간 보상 전)", true, num(c.chanceFresh[i])));
+                    f.add(field("chanceFresh" + i, (en ? gradeNamesEn[i] + " chance % (before the weekly reward)" : gradeNames[i] + " 등급 확률 % (주간 보상 전)"), true, num(c.chanceFresh[i])));
                 }
                 for (int i = 0; i < 6; i++) {
-                    f.add(field("chanceRepeat" + i, gradeNames[i] + " 등급 확률 % (주간 보상을 받은 뒤)", true, num(c.chanceRepeat[i])));
+                    f.add(field("chanceRepeat" + i, (en ? gradeNamesEn[i] + " chance % (after the weekly reward)" : gradeNames[i] + " 등급 확률 % (주간 보상을 받은 뒤)"), true, num(c.chanceRepeat[i])));
                 }
-                f.add(field("resetDay", "주간 초기화 요일 (1 = 월요일 … 7 = 일요일)", true, num(c.resetDay)));
-                f.add(field("resetHour", "주간 초기화 시각 (0~23시)", true, num(c.resetHour)));
-                f.add(field("boss", "레이드 보스 (엔티티 ID)", false, c.boss));
-                f.add(field("requireKill", "입장 조건 몬스터 (엔티티 ID, 비우면 조건 없음)", false, c.requireKill));
+                f.add(field("resetDay", en ? "Weekly reset day (1 = Monday … 7 = Sunday)" : "주간 초기화 요일 (1 = 월요일 … 7 = 일요일)", true, num(c.resetDay)));
+                f.add(field("resetHour", en ? "Weekly reset hour (0-23)" : "주간 초기화 시각 (0~23시)", true, num(c.resetHour)));
+                f.add(field("boss", en ? "Raid boss (entity ID)" : "레이드 보스 (엔티티 ID)", false, c.boss));
+                f.add(field("requireKill", en ? "Entry requirement monster (entity ID, empty = none)" : "입장 조건 몬스터 (엔티티 ID, 비우면 조건 없음)", false, c.requireKill));
                 for (String k : RaidConfig.defaultTexts().keySet()) {
-                    f.add(field("text." + k, RaidConfig.label(k), false, c.text(k)));
+                    f.add(field("text." + k, RaidConfig.label(k, en), false, c.text(k)));
                 }
                 o.add("fields", f);
                 JsonArray g = new JsonArray();
-                g.add(group(RaidConfig.G_WEEKLY, "주간 보상 (매주 첫 성공 때 모두 지급)", false, false));
-                g.add(group(RaidConfig.G_DROP, "보스 드랍 (등급 굴림)", true, false));
+                g.add(group(RaidConfig.G_WEEKLY, en ? "Weekly reward (all given on the first clear each week)" : "주간 보상 (매주 첫 성공 때 모두 지급)", false, false));
+                g.add(group(RaidConfig.G_DROP, en ? "Boss drops (rolled by grade)" : "보스 드랍 (등급 굴림)", true, false));
                 o.add("groups", g);
                 o.add("rewards", rewardsJson(c.rewards));
                 return o;
