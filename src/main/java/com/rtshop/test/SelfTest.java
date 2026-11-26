@@ -3196,7 +3196,12 @@ public final class SelfTest {
         section("npc layout");
         java.nio.file.Path lf = com.rtshop.quest.NpcLayout.file();
         byte[] lfKeep = java.nio.file.Files.exists(lf) ? java.nio.file.Files.readAllBytes(lf) : null;
-        BlockPos lp = new BlockPos(40, 150, 60);
+        // 엔티티를 찾는 시험은 세계의 시작 지점 곁(늘 엔티티가 도는 청크)에서 한다: 씨앗이 매번 다른 모드팩 전체의 세계에서는
+        // 시작 지점이 원점에서 멀 수 있고, 그러면 (40, 60) 의 청크는 블록만 읽히고 엔티티는 getEntities 에 잡히지 않는다 (세웠는데 0명으로 보임).
+        BlockPos lsp = level.getSharedSpawnPos();
+        int lpx = lsp.getX() + 24, lpz = lsp.getZ() + 8;
+        BlockPos lp = new BlockPos(lpx, 150, lpz);
+        String lxKey = "\"x\": " + (lpx + 0.5), lxMoved = "\"x\": " + (lpx + 2.5), lxAir = "\"x\": " + (lpx + 12.5);
         net.minecraft.world.phys.AABB lbox = new net.minecraft.world.phys.AABB(lp).inflate(6.0);
         com.rtshop.quest.NpcLayout.forceForTest = true;
         try {
@@ -3209,14 +3214,18 @@ public final class SelfTest {
                     level.setBlockAndUpdate(lp.offset(dx, 1, dz), Blocks.AIR.defaultBlockState());
                 }
             }
+            // "바닥이 없는 자리" 시험의 자리(12칸 옆)는 지형이 무엇이든 비워 둔다
+            for (int dz = -1; dz <= 1; dz++) {
+                for (int dy = -2; dy <= 2; dy++) level.setBlockAndUpdate(lp.offset(12, dy, dz), Blocks.AIR.defaultBlockState());
+            }
             for (net.minecraft.world.entity.Entity e : level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> com.rtshop.quest.NpcLayout.keyOf(x) != null)) e.discard();
             com.rtshop.quest.NpcLayout.resetForTest(server);
-            net.minecraft.world.entity.npc.Villager lv = ShopServer.spawnNpc(level, new net.minecraft.world.phys.Vec3(40.5, 150, 60.5), 90F, "bank");
+            net.minecraft.world.entity.npc.Villager lv = ShopServer.spawnNpc(level, new net.minecraft.world.phys.Vec3(lpx + 0.5, 150, lpz + 0.5), 90F, "bank");
             int wrote = com.rtshop.quest.NpcLayout.export(server);
             String text = java.nio.file.Files.readString(lf);
             check("an NPC set down in the game is written to npc_layout.json with its key and place",
-                    lv != null && wrote == 1 && com.rtshop.quest.NpcLayout.knownForTest(server, "bank") == 1 && text.contains("\"bank\"") && text.contains("40.5") && text.contains("60.5"),
-                    wrote + " " + text.length());
+                    lv != null && wrote == 1 && com.rtshop.quest.NpcLayout.knownForTest(server, "bank") == 1 && text.contains("\"bank\"") && text.contains(lxKey) && text.contains("\"z\": " + (lpz + 0.5)),
+                    wrote + " " + text.length() + " " + lxKey);
             // 다른 서버: 같은 파일, NPC 가 하나도 없는 세계
             if (lv != null) lv.discard();
             com.rtshop.quest.NpcLayout.resetForTest(server);
@@ -3224,18 +3233,18 @@ public final class SelfTest {
             int made = com.rtshop.quest.NpcLayout.settle(server);
             List<net.minecraft.world.entity.Entity> stand = level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> "bank".equals(com.rtshop.quest.NpcLayout.keyOf(x)));
             check("a server that gets the file sets the NPC down at the same place by itself, once (the same file is not applied twice)",
-                    want == 1 && made == 1 && stand.size() == 1 && Math.abs(stand.get(0).getX() - 40.5) < 0.01 && Math.abs(stand.get(0).getZ() - 60.5) < 0.01
+                    want == 1 && made == 1 && stand.size() == 1 && Math.abs(stand.get(0).getX() - (lpx + 0.5)) < 0.01 && Math.abs(stand.get(0).getZ() - (lpz + 0.5)) < 0.01
                             && com.rtshop.quest.NpcLayout.apply(server, false) < 0 && com.rtshop.quest.NpcLayout.pendingForTest(server) == 0,
-                    want + " " + made + " " + stand.size());
+                    want + " " + made + " " + stand.size() + " at " + lp + " entities tick there: " + level.isPositionEntityTicking(lp));
             // 배치를 고친 파일: 두 칸 옆으로
-            java.nio.file.Files.writeString(lf, java.nio.file.Files.readString(lf).replace("40.5", "42.5").replace("\"id\": \"", "\"id\": \"moved-"));
+            java.nio.file.Files.writeString(lf, java.nio.file.Files.readString(lf).replace(lxKey, lxMoved).replace("\"id\": \"", "\"id\": \"moved-"));
             int moved = com.rtshop.quest.NpcLayout.apply(server, false);
             int made2 = com.rtshop.quest.NpcLayout.settle(server);
             stand = level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> "bank".equals(com.rtshop.quest.NpcLayout.keyOf(x)));
             check("a changed file moves the NPC: the old one is taken away and a new one stands at the new place",
-                    moved == 1 && made2 == 1 && stand.size() == 1 && Math.abs(stand.get(0).getX() - 42.5) < 0.01, moved + " " + made2 + " " + stand.size());
+                    moved == 1 && made2 == 1 && stand.size() == 1 && Math.abs(stand.get(0).getX() - (lpx + 2.5)) < 0.01, moved + " " + made2 + " " + stand.size());
             // 바닥이 없는 자리(지형이 다른 세계)에는 세우지 않는다
-            java.nio.file.Files.writeString(lf, java.nio.file.Files.readString(lf).replace("42.5", "52.5").replace("\"id\": \"", "\"id\": \"air-"));
+            java.nio.file.Files.writeString(lf, java.nio.file.Files.readString(lf).replace(lxMoved, lxAir).replace("\"id\": \"", "\"id\": \"air-"));
             int moved2 = com.rtshop.quest.NpcLayout.apply(server, false);
             int made3 = com.rtshop.quest.NpcLayout.settle(server);
             check("where there is no floor (a world with other terrain) the NPC is not set down; the place keeps waiting",
