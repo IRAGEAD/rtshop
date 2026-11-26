@@ -49,10 +49,10 @@ public final class NpcLooks {
     /** 만들어 둔 모습 전부 (모습 파일의 이름). */
     public static final List<String> ALL = List.of("erwin", "isabel", "roran", "felix", "bram", "oscar", "haru", "morris", "lucky",
             "m_farmer", "m_food", "m_fish", "m_gear", "m_general", "m_land", "m_bank", "m_ticket", "m_raid",
-            "leon", "bron", "garen", "lia", "elis", "garret", "theo", "adel", "raid_guide");
+            "leon", "bron", "garen", "lia", "elis", "garret", "theo", "adel", "raid_guide", "albert", "lorenzo", "eli");
     public static final String RAID_GUIDE_KEY = "raid_guide";
     private static final double RANGE = 72.0;
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     public boolean enabled = true;
     public final Map<String, String> looks = new LinkedHashMap<>();
@@ -68,10 +68,10 @@ public final class NpcLooks {
                 {"quest_bram", "bram"}, {"quest_oscar", "oscar"}, {"quest_guide", "morris"}, {"quest_bounty", "garret"}, {"quest_ranks", "theo"},
                 {"quest_titles", "adel"}, {"quest_sword_master", "leon"}, {"quest_war_chief", "bron"}, {"quest_shield_keeper", "garen"},
                 {"quest_hunter", "lia"}, {"quest_archmage", "elis"},
-                {"attendance", "haru"}, {"gacha", "lucky"}, {"bank", "m_bank"}, {"job", "m_gear"}, {RAID_GUIDE_KEY, "raid_guide"},
-                {"shop_farmer", "m_farmer"}, {"shop_food", "m_food"}, {"shop_restaurant", "m_food"}, {"shop_fisher", "oscar"},
+                {"attendance", "haru"}, {"gacha", "lucky"}, {"bank", "m_bank"}, {"job", "albert"}, {RAID_GUIDE_KEY, "raid_guide"},
+                {"shop_farmer", "m_farmer"}, {"shop_food", "m_food"}, {"shop_restaurant", "lorenzo"}, {"shop_fisher", "oscar"},
                 {"shop_blacksmith*", "bram"}, {"shop_general*", "m_general"}, {"shop_land", "m_land"}, {"shop_castle_plots", "m_land"},
-                {"shop_raid", "m_raid"}, {"shop_gacha_shop*", "m_ticket"}, {"shop_attendance_shop", "haru"}};
+                {"shop_raid", "m_raid"}, {"shop_gacha_shop*", "m_ticket"}, {"shop_attendance_shop", "eli"}};
         for (String[] e : d) n.looks.put(e[0], e[1]);
         return n;
     }
@@ -99,6 +99,17 @@ public final class NpcLooks {
                 if (o.has("enabled")) n.enabled = o.get("enabled").getAsBoolean();
                 if (o.has("looks")) {
                     for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("looks").entrySet()) n.looks.put(e.getKey(), e.getValue().getAsString());
+                }
+                // 2판(3.62): 전용 모습이 생긴 세 사람. 1판의 기본값 그대로일 때만 바꾼다 (운영자가 고친 줄은 그대로).
+                if (!o.has("version") || o.get("version").getAsInt() < 2) {
+                    n.looks.replace("job", "m_gear", "albert");
+                    n.looks.replace("shop_restaurant", "m_food", "lorenzo");
+                    n.looks.replace("shop_attendance_shop", "haru", "eli");
+                    o.addProperty("version", VERSION);
+                    JsonObject l2 = new JsonObject();
+                    n.looks.forEach(l2::addProperty);
+                    o.add("looks", l2);
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
                 }
                 return n;
             }

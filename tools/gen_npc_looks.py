@@ -18,7 +18,8 @@ OUT = os.path.join(here, '..', 'src', 'main', 'resources', 'assets', 'rtshop', '
 
 LOOKS = ['erwin', 'isabel', 'roran', 'felix', 'bram', 'oscar', 'haru', 'morris', 'lucky',
          'm_farmer', 'm_food', 'm_fish', 'm_gear', 'm_general', 'm_land', 'm_bank', 'm_ticket', 'm_raid',
-         'leon', 'bron', 'garen', 'lia', 'elis', 'garret', 'theo', 'adel', 'raid_guide']
+         'leon', 'bron', 'garen', 'lia', 'elis', 'garret', 'theo', 'adel', 'raid_guide',
+         'albert', 'lorenzo', 'eli']
 HEAD_FN = ['face', 'hair', 'beard', 'glasses', 'hat_brim', 'hood', 'furhat', 'toque', 'wizhat', 'beret', 'bandana', 'circlet', 'cap', 'quill']
 BODY_FN = ['pack', 'pauldron', 'scarf', 'hood_down', 'mantle', 'cloak', 'staff', 'held']
 
