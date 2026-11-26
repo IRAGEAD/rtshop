@@ -61,6 +61,8 @@ public final class ClientConfig {
     public boolean npcLooks = true;
     /** 보스 음악이 겹치지 않게 한다 (3.63): 다른 모드의 보스 음악은 한 번에 하나만 흐르고, 그동안 배경 음악은 쉰다. 끄면 다른 모드의 음악에 손대지 않는다. */
     public boolean oneBossMusic = true;
+    /** RT Shop NPC 의 이름표를 이 거리(칸) 안에서만 그린다 (3.64, 프레임). 0 이면 예전처럼 멀리서도(64칸) 그린다. */
+    public int npcNameDistance = 16;
 
     // PvP 상태 표시 (켜짐/꺼짐 + 지금 있는 곳). 위치·크기는 화면 비율.
     public static final double PDEF_W = 247.0 / 1920.0;
@@ -226,6 +228,7 @@ public final class ClientConfig {
             o.addProperty("bossCamera", bossCamera);
             o.addProperty("npcLooks", npcLooks);
             o.addProperty("oneBossMusic", oneBossMusic);
+            o.addProperty("npcNameDistance", npcNameDistance);
             o.addProperty("magicFont", magicFont);
             o.addProperty("enhanceLuxFont", enhanceLuxFont);
             o.addProperty("magicScale", magicScale);
@@ -294,6 +297,7 @@ public final class ClientConfig {
                 if (o.has("bossCamera")) c.bossCamera = o.get("bossCamera").getAsBoolean();
                 if (o.has("npcLooks")) c.npcLooks = o.get("npcLooks").getAsBoolean();
                 if (o.has("oneBossMusic")) c.oneBossMusic = o.get("oneBossMusic").getAsBoolean();
+                if (o.has("npcNameDistance")) c.npcNameDistance = Math.max(0, Math.min(64, o.get("npcNameDistance").getAsInt()));
                 if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
                 if (o.has("magicFont")) c.magicFont = o.get("magicFont").getAsString();
                 if (o.has("enhanceLuxFont")) c.enhanceLuxFont = o.get("enhanceLuxFont").getAsBoolean();

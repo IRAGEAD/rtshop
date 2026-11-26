@@ -36,7 +36,8 @@ import java.util.Optional;
  * 모습은 그림을 입힌 네모들의 묶음이다 (네모 = assets/rtshop/npc_looks/&lt;이름&gt;.bin, 빛깔 = textures/npc_looks/&lt;이름&gt;.png, 형식은 tools/gen_npc_looks.py 머리말).
  * 3.63: 빛깔을 그림에 구워 넣어 네모를 인물당 2천여 개 → 2~3백 개로 줄였고, 카메라 반대쪽을 보는 네모는 넘기지 않는다
  * (3.61 · 3.62 에서는 NPC 가 모인 곳에서 프레임이 크게 떨어졌다).
- * 몸은 엔티티가 보는 쪽으로 서고, 머리(얼굴·머리카락·수염·모자)는 8칸 안의 플레이어를 천천히 바라본다. 이름표는 예전처럼 머리 위에.
+ * 몸은 엔티티가 보는 쪽으로 서고, 머리(얼굴·머리카락·수염·모자)는 8칸 안의 플레이어를 천천히 바라본다. 이름표는 예전처럼 머리 위에
+ * (3.64: 가까울 때만 — client.json 의 npcNameDistance, 기본 16칸).
  * client.json 의 npcLooks 를 false 로 하면 예전의 주민 모습.
  */
 @Mod.EventBusSubscriber(modid = RtShop.MODID, value = Dist.CLIENT)
@@ -287,12 +288,42 @@ public final class NpcLookClient {
         }
     }
 
+    /** 점검용: 이름표를 그린 횟수 / 멀어서 그리지 않은 횟수. */
+    public static long namesDrawnForTest, namesSkippedForTest;
+
+    /**
+     * 이 거리(제곱)에서 NPC 의 이름표를 그리는가 (3.64). max = client.json 의 npcNameDistance (칸).
+     * 0 이하면 예전처럼 64칸까지 그린다. 이름표는 글자마다 네모를 두 번(벽 너머용 · 보통) 그려서, NPC 가 모인 곳에서는 먼 이름표까지 다 그리면 프레임이 깎인다.
+     */
+    public static boolean nameShownAt(double distSq, int max) {
+        if (distSq > 4096.0) return false;
+        return max <= 0 || distSq <= (double) max * max;
+    }
+
+    /** 주민 모습으로 그려지는 RT Shop NPC(npcLooks 를 끈 때)의 이름표에도 같은 거리 규칙을 쓴다. */
+    @SubscribeEvent
+    public static void onVanillaNameTag(net.minecraftforge.client.event.RenderNameTagEvent event) {
+        if (LOOKS.isEmpty() || !LOOKS.containsKey(event.getEntity().getId())) return;
+        try {
+            Minecraft mc = Minecraft.getInstance();
+            if (!nameShownAt(mc.getEntityRenderDispatcher().distanceToSqr(event.getEntity()), ClientConfig.get().npcNameDistance)) {
+                event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+                namesSkippedForTest++;
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
     /** 머리 위의 이름표 (주민을 그리지 않으니 직접 그린다. 바닐라의 이름표와 같은 모습). */
     private static void nameTag(LivingEntity e, PoseStack ps, MultiBufferSource buf, int light, float height) {
         Minecraft mc = Minecraft.getInstance();
         if (!Minecraft.renderNames()) return;
         boolean show = e.isCustomNameVisible() || (e.hasCustomName() && e == mc.getEntityRenderDispatcher().crosshairPickEntity);
-        if (!show || mc.getEntityRenderDispatcher().distanceToSqr(e) > 4096.0) return;
+        if (!show || !nameShownAt(mc.getEntityRenderDispatcher().distanceToSqr(e), ClientConfig.get().npcNameDistance)) {
+            if (show) namesSkippedForTest++;
+            return;
+        }
+        namesDrawnForTest++;
         Component name = e.getDisplayName();
         boolean through = !e.isDiscrete();
         ps.pushPose();

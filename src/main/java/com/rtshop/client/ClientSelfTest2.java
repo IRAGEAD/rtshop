@@ -1917,6 +1917,11 @@ final class ClientSelfTest2 {
             check("3.63 npc looks are cheap to draw: a figure sends at most a few hundred quads, and the faces turned away from the camera are skipped",
                     NpcLookClient.lastQuadsForTest > 20 && NpcLookClient.lastQuadsForTest < 400 && NpcLookClient.lastCulledForTest > 20,
                     NpcLookClient.lastQuadsForTest + " sent / " + NpcLookClient.lastCulledForTest + " skipped");
+            check("3.64 npc name tags are drawn only up close: within the set distance yes, beyond it no (0 = as far as before, never past 64 blocks), and the NPCs standing right here have theirs",
+                    NpcLookClient.nameShownAt(4.0 * 4.0, 16) && NpcLookClient.nameShownAt(16.0 * 16.0, 16) && !NpcLookClient.nameShownAt(17.0 * 17.0, 16)
+                            && NpcLookClient.nameShownAt(40.0 * 40.0, 0) && !NpcLookClient.nameShownAt(70.0 * 70.0, 0) && !NpcLookClient.nameShownAt(70.0 * 70.0, 64)
+                            && ClientConfig.get().npcNameDistance == 16 && NpcLookClient.namesDrawnForTest > 0,
+                    ClientConfig.get().npcNameDistance + " drawn=" + NpcLookClient.namesDrawnForTest + " skipped=" + NpcLookClient.namesSkippedForTest);
             shot(mc, "131_npc_looks");
             int cam361 = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(LOOK_IDS.size() - 1);
             Cinematic.play("{\"kind\":\"boss\",\"name\":\"카메라 점검\",\"epithet\":\"3D 등장 연출\",\"color\":\"FF7A20\",\"shake\":0,\"seconds\":4,\"cam\":\"spiral\",\"entity\":" + cam361 + "}");
