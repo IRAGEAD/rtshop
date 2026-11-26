@@ -1,0 +1,199 @@
+package com.rtshop.client;
+
+import com.rtshop.RtShop;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.rtshop.client.ClientSelfTest.check;
+import static com.rtshop.client.ClientSelfTest.onServer;
+import static com.rtshop.client.ClientSelfTest.shot;
+
+/**
+ * 셰이더를 켠 화면에서 찍는 짧은 점검 (3.64.2). JVM 옵션 -Drtshop.clienttest=true -Drtshop.clienttest.only=shader 일 때만 돈다
+ * (CI 의 모드팩 전체 job 이 화면 점검 뒤에, 모드팩에 든 Photon 을 Oculus 로 켜고 한 번 더 클라이언트를 띄운다).
+ * 사용자가 Photon 에서 본 문제를 사람 대신 그림으로 확인하려는 것: 강화 모루의 빛 · 흔적 표시 · 룬 제단의 구슬과 그 빛.
+ * 결과는 rtshop-shadertest.txt, 사진은 screenshots/150_photon_*.png.
+ */
+final class ClientShaderTest {
+    private ClientShaderTest() {
+    }
+
+    interface Step {
+        void run(Minecraft mc);
+    }
+
+    private static final List<Step> STEPS = new ArrayList<>();
+    private static volatile BlockPos base;
+    private static volatile BlockPos anvil;
+    private static volatile BlockPos orb;
+    private static long anvilDrawn;
+    private static long spotsBefore;
+
+    static int count() {
+        return STEPS.size();
+    }
+
+    /** k 번째 걸음. 목록이 끝나면 결과를 적고 (조금 기다렸다가) 끈다. */
+    static void run(Minecraft mc, int k) {
+        if (k < STEPS.size()) {
+            STEPS.get(k).run(mc);
+        } else if (k == STEPS.size()) {
+            ClientSelfTest.finish(mc);
+        }
+    }
+
+    private static void waitTicks(int n) {
+        ClientSelfTest.wait = n;
+    }
+
+    /** 지금 셰이더가 켜져 있는가와 셰이더 묶음의 이름 (Oculus 의 공개 API 를 리플렉션으로). */
+    static String shaderState() {
+        try {
+            Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            Object inst = api.getMethod("getInstance").invoke(null);
+            boolean inUse = (Boolean) api.getMethod("isShaderPackInUse").invoke(inst);
+            String pack = "?";
+            for (String cn : new String[]{"net.irisshaders.iris.Iris", "net.coderbot.iris.Iris"}) {
+                try {
+                    Object name = Class.forName(cn).getMethod("getCurrentPackName").invoke(null);
+                    pack = String.valueOf(name);
+                    break;
+                } catch (Throwable ignored) {
+                }
+            }
+            return (inUse ? "on " : "off ") + pack;
+        } catch (Throwable t) {
+            return "no shader mod (" + t.getClass().getSimpleName() + ")";
+        }
+    }
+
+    private static void add(Step s) {
+        STEPS.add(s);
+    }
+
+    static {
+        // 세계가 뜨고 셰이더가 다 만들어질 때까지 (소프트웨어 그리기라 오래 걸린다)
+        add(mc -> waitTicks(300));
+        // 둘레를 평평하게 고른다: 9×9 돌 바닥, 그 위 5칸은 비움. 한낮 · 맑음 · 몬스터 없음 · 무적
+        add(mc -> {
+            onServer(mc, sp -> {
+                sp.serverLevel().setDayTime(6000);
+                sp.serverLevel().setWeatherParameters(6000, 0, false, false);
+                sp.server.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DAYLIGHT).set(false, sp.server);
+                sp.server.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING).set(false, sp.server);
+                sp.getAbilities().invulnerable = true;
+                sp.onUpdateAbilities();
+                for (net.minecraft.world.entity.Entity e : sp.serverLevel().getEntities(sp, sp.getBoundingBox().inflate(48),
+                        e -> e instanceof net.minecraft.world.entity.monster.Enemy)) {
+                    e.discard();
+                }
+                BlockPos p = sp.blockPosition();
+                for (BlockPos q : BlockPos.betweenClosed(p.offset(-5, -1, -5), p.offset(5, -1, 5))) {
+                    sp.serverLevel().setBlockAndUpdate(q, Blocks.STONE.defaultBlockState());
+                }
+                for (BlockPos q : BlockPos.betweenClosed(p.offset(-5, 0, -5), p.offset(5, 5, 5))) {
+                    if (!sp.serverLevel().getBlockState(q).isAir()) sp.serverLevel().setBlockAndUpdate(q, Blocks.AIR.defaultBlockState());
+                }
+                base = p.immutable();
+                sp.getInventory().selected = 8;
+                sp.getInventory().setItem(8, net.minecraft.world.item.ItemStack.EMPTY);
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(8));
+                sp.connection.teleport(p.getX() + 0.5, p.getY(), p.getZ() + 0.5, 0F, 0F);
+            });
+            mc.setScreen(null);
+            waitTicks(80);
+        });
+        // 셰이더가 정말 켜졌는가 (꺼져 있으면 아래 사진들은 셰이더 없는 모습이다)
+        add(mc -> {
+            String st = shaderState();
+            RtShop.LOGGER.info("[rtshop-clienttest] shader state: {}", st);
+            check("the shader pack is on for these pictures (Oculus with the pack's Photon)", st.startsWith("on ") && st.toLowerCase(java.util.Locale.ROOT).contains("photon"), st);
+            // 강화 모루: 남쪽(앞) 세 칸, 내려다본다
+            onServer(mc, sp -> {
+                if (base == null) return;
+                anvil = base.offset(0, 0, 3);
+                sp.serverLevel().setBlockAndUpdate(anvil, com.rtshop.enhance.ModEnhance.ANVIL.get().defaultBlockState());
+                sp.connection.teleport(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 33F);
+            });
+            anvilDrawn = EnhanceAnvilGlow.drawnForTest;
+            waitTicks(120);
+        });
+        add(mc -> {
+            float lv = anvil == null ? -1F : EnhanceAnvilGlow.levelForTest(anvil);
+            check("with the shader on, the enhance anvil's runes and gem light up when someone stands near it, and the glow is really drawn",
+                    lv > 0.95F && EnhanceAnvilGlow.drawnForTest > anvilDrawn, lv + " drawn=" + (EnhanceAnvilGlow.drawnForTest - anvilDrawn));
+            shot(mc, "150_photon_anvil");
+            waitTicks(30);
+        });
+        // 흔적 표시 (이야기의 "살펴보기"): 앞 세 칸 바닥
+        add(mc -> {
+            onServer(mc, sp -> {
+                if (anvil != null) sp.serverLevel().setBlockAndUpdate(anvil, Blocks.AIR.defaultBlockState());
+                if (base == null) return;
+                com.rtshop.quest.QuestDef q = com.rtshop.quest.QuestDef.parse(com.google.gson.JsonParser.parseString(
+                        "{\"id\":\"t_shader_spot\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"INSPECT\",\"target\":\"t_shader_circle\",\"shape\":\"circle\","
+                                + "\"text\":\"그을린 마법진\",\"lines\":[\"바닥에 원이 그을려 있다.\"]}]}").getAsJsonObject());
+                com.rtshop.quest.QuestManager.loaded().quests.put(q.id, q);
+                com.rtshop.quest.QuestManager.accept(sp, "t_shader_spot", null);
+                com.rtshop.story.Spots.placeForTest(sp, "t_shader_circle", base.offset(0, 0, 3));
+                com.rtshop.story.Spots.update(sp);
+                sp.connection.teleport(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 18F);
+            });
+            spotsBefore = SpotClient.countForTest();
+            waitTicks(80);
+        });
+        add(mc -> {
+            check("with the shader on, the trace to look at is listed on the screen side", SpotClient.countForTest() >= 1, SpotClient.countForTest());
+            shot(mc, "151_photon_spot");
+            onServer(mc, sp -> {
+                com.rtshop.quest.QuestManager.abandon(sp, "t_shader_spot");
+                com.rtshop.quest.QuestManager.loaded().quests.remove("t_shader_spot");
+            });
+            waitTicks(30);
+        });
+        // 룬 제단(별빛 수정 구체): 받침 위에 가만히 있는 모습 → 장면 → 분야를 고른 모습
+        add(mc -> {
+            onServer(mc, sp -> {
+                if (base == null) return;
+                orb = base.offset(0, 0, 2);
+                sp.serverLevel().setBlockAndUpdate(orb, com.rtshop.magic.MagicRegistry.ORB.get().defaultBlockState());
+                sp.getInventory().add(new net.minecraft.world.item.ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 5));
+                sp.connection.teleport(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 6F);
+            });
+            waitTicks(80);
+        });
+        add(mc -> {
+            check("with the shader on, the orb on its pedestal is drawn (orb, rim glow and rings)", ArcaneOrbRenderer.orbDrawnForTest > 0, ArcaneOrbRenderer.orbDrawnForTest);
+            shot(mc, "152_photon_orb");
+            if (orb != null) {
+                mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
+                        net.minecraft.world.phys.Vec3.atCenterOf(orb).add(0, 0.5, 0), net.minecraft.core.Direction.UP, orb, false));
+            }
+            waitTicks(40);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            shot(mc, "153_photon_orb_scene_intro");
+            waitTicks(160);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            CinematicOrbStation st = CinematicOrb.station();
+            check("with the shader on, the rune altar scene draws the orb with its glow kept close around it",
+                    st != null && ArcaneOrbRenderer.sceneOrbDrawnForTest > 0 && CinematicOrbStation.sceneRimForTest < CinematicOrbStation.ringForTest() * 0.65,
+                    CinematicOrb.phaseForTest() + " rim=" + CinematicOrbStation.sceneRimForTest);
+            shot(mc, "154_photon_orb_scene");
+            if (st != null) st.chooseForTest(0);
+            waitTicks(20);
+        });
+        add(mc -> {
+            if (!com.rtshop.magic.MagicRegistry.cinematic) return;
+            shot(mc, "155_photon_orb_chosen");
+            waitTicks(60);   // 사진이 다 써질 때까지
+        });
+    }
+}

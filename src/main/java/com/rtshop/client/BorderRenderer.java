@@ -182,7 +182,9 @@ public final class BorderRenderer {
 
     @SubscribeEvent
     public static void onRender(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || System.currentTimeMillis() > until || edges.isEmpty()) {
+        // 3.64.2: AFTER_TRANSLUCENT_BLOCKS 대신 AFTER_ENTITIES — Embeddium + Oculus 에서 셰이더(Photon 등)를 켜면 반투명 지형 단계에서 그린 것이
+        // 보이지 않았다 (사용자: Photon 에서 강화 모루의 빛이 안 들어옴). Cinematic Interactions 의 장면(마법진 · 룬석)이 그리는 단계라 셰이더에서도 보이는 것이 확인된 곳이다.
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES || System.currentTimeMillis() > until || edges.isEmpty()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();

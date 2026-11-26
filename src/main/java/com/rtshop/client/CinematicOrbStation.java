@@ -53,6 +53,13 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
     private static final ResourceLocation STONES_SEL = new ResourceLocation("rtshop", "textures/gui/magic/stones_sel.png");
     private static final String[] CATS = MagicGachaScreen.CATS;
     private static final double RING = 0.37, STONE = 0.10, SIGIL = 0.085;
+    /** 점검용: 장면 속 구슬 둘레 빛의 반지름 (룬석 고리 RING 의 절반 남짓이어야 룬석 · 글자를 덮지 않는다). */
+    public static double sceneRimForTest;
+    public static double ringForTest() {
+        return RING;
+    }
+    /** 장면 속 가운데 구슬의 반지름 (고리의 가장 안쪽 띠 0.14 보다 작게). */
+    private static final double ORB_R = 0.105;
     public static final double RITUAL = 1.6, PEAK = 0.55;
 
     public enum Target {
@@ -554,17 +561,19 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         float appear = (float) Anim.outBack(Anim.clamp01(p), 1.6);
         // 3.64: 가운데의 빛나는 구슬. 고리(혼천의) 한가운데에 떠서 숨 쉬듯 밝아지고, 분야를 고르거나 소환 문양에 손을 대면 더 밝아지며, 의식 동안에는 크게 부푼다.
         // 받침 위의 구슬(ArcaneOrbRenderer)은 장면이 펼쳐지는 만큼 옅어지고 이 구슬이 그 자리를 잇는다.
+        // 3.64.2: 빛 번짐이 룬석 · 마법진 · 글자를 덮지 않게 — 넓은 빛무리를 없애고, 빛은 구슬 바로 둘레(구슬의 1.7배, 룬석 고리 0.37 의 절반쯤)에만,
+        // 더하기 섞기 · 깊이를 쓰지 않는 그리기(RenderType.eyes)로 둔다. 알파 섞기 빛은 Photon 에서 탁한 유리처럼 뒤를 덮고 깊이를 써서 뒤에 그려지는 것을 가렸다.
         {
             float gl = (float) Math.min(2.0, glow);                       // 0.5 평소 · 0.65 분야를 고름 · 0.8~ 문양에 손을 댐 · ~1.9 의식
             float br = ArcaneOrbRenderer.breath((float) (clock * 20.0));
-            double os = 0.105 * appear * (1.0 + 0.10 * (gl - 0.5) + 0.03 * br);
+            double os = ORB_R * appear * (1.0 + 0.10 * (gl - 0.5) + 0.03 * br);
             Vec3 toCam = cam.subtract(orb);
             toCam = toCam.lengthSqr() < 1.0e-6 ? Vec3.ZERO : toCam.normalize();
-            double halo = os * (3.4 + 0.5 * br + 1.2 * (gl - 0.5));
-            quad(pose, buffers, camera, ArcaneOrbRenderer.tex("_halo"), orb, halo, halo, 0f, 1f, 1f, (float) (p * Math.min(1.0, 0.50 + 0.25 * br + 0.35 * (gl - 0.5))));
-            quad(pose, buffers, camera, ArcaneOrbRenderer.tex("_glow"), orb.add(toCam.scale(0.004)), os * 2.4, os * 2.4, 0f, 1f, 1f, (float) (p * Math.min(1.0, 0.65 + 0.15 * br + 0.30 * (gl - 0.5))));
+            float rimStrength = (float) (p * Math.min(1.0, 0.50 + 0.15 * br + 0.30 * Math.min(1.5, gl - 0.5)));
+            glowQuad(pose, buffers, camera, ArcaneOrbRenderer.tex("_rim"), orb, os * ArcaneOrbRenderer.RIM, rimStrength);
             quad(pose, buffers, camera, ArcaneOrbRenderer.tex(""), orb.add(toCam.scale(0.008)), os, os, 0f, 1f, 1f, (float) p);
             ArcaneOrbRenderer.sceneOrbDrawnForTest++;
+            sceneRimForTest = os * ArcaneOrbRenderer.RIM;
         }
         // 룬석 다섯: 고르지 않은 룬석도 어두워지지 않는다. 고른 것은 조금 커지고 금빛 테가 푸른빛으로 바뀐다
         // (뒤에 덧그리던 빛무리는 셰이더·어두운 곳에서 검은 테로 보여서 없앴다)
@@ -650,6 +659,28 @@ public final class CinematicOrbStation extends AddonMenuStation<MagicMenu> {
         vc.vertex(m, x + lx - ux, y + ly - uy, z + lz - uz).color(c, c, c, a).uv(u0, 1f).uv2(0xF000F0).endVertex();
         vc.vertex(m, x - lx - ux, y - ly - uy, z - lz - uz).color(c, c, c, a).uv(u1, 1f).uv2(0xF000F0).endVertex();
         vc.vertex(m, x - lx + ux, y - ly + uy, z - lz + uz).color(c, c, c, a).uv(u1, 0f).uv2(0xF000F0).endVertex();
+    }
+
+    /** 더하기 섞기로 그리는 카메라를 보는 빛 한 장 (RenderType.eyes, 깊이를 쓰지 않음, 앞뒤 두 면). 세기는 꼭짓점 빛깔로 (3.64.2). */
+    private static void glowQuad(PoseStack pose, MultiBufferSource buffers, Camera camera, ResourceLocation tex, Vec3 at, double half, float strength) {
+        int c = Math.max(0, Math.min(255, Math.round(strength * 255)));
+        if (c <= 0) return;
+        Vector3f l = camera.getLeftVector(), u = camera.getUpVector();
+        Vec3 cam = camera.getPosition();
+        float x = (float) (at.x - cam.x), y = (float) (at.y - cam.y), z = (float) (at.z - cam.z);
+        float lx = l.x() * (float) half, ly = l.y() * (float) half, lz = l.z() * (float) half;
+        float ux = u.x() * (float) half, uy = u.y() * (float) half, uz = u.z() * (float) half;
+        float[][] v = {{x + lx + ux, y + ly + uy, z + lz + uz, 0f, 0f}, {x + lx - ux, y + ly - uy, z + lz - uz, 0f, 1f},
+                {x - lx - ux, y - ly - uy, z - lz - uz, 1f, 1f}, {x - lx + ux, y - ly + uy, z - lz + uz, 1f, 0f}};
+        VertexConsumer vc = buffers.getBuffer(RenderType.eyes(tex));
+        Matrix4f m = pose.last().pose();
+        org.joml.Matrix3f nm = pose.last().normal();
+        for (int[] order : ArcaneOrbRenderer.BOTH_WAYS) {
+            for (int i : order) {
+                vc.vertex(m, v[i][0], v[i][1], v[i][2]).color(c, c, c, 255).uv(v[i][3], v[i][4])
+                        .overlayCoords(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(nm, 0f, 0f, 1f).endVertex();
+            }
+        }
     }
 
     /** 카메라를 보는 글자 (가운데 정렬). */

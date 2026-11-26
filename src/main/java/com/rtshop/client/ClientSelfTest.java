@@ -58,6 +58,8 @@ public final class ClientSelfTest {
     }
 
     private static final boolean ENABLED = Boolean.getBoolean("rtshop.clienttest");
+    /** 3.64.2: -Drtshop.clienttest.only=shader 이면 셰이더를 켠 화면의 짧은 점검(ClientShaderTest)만 돌리고 결과를 rtshop-shadertest.txt 에 적는다. */
+    static final boolean SHADER_ONLY = "shader".equals(System.getProperty("rtshop.clienttest.only", ""));
     private static final List<String> LINES = new ArrayList<>();
     private static int step = 0;
     private static boolean gradeTabStage = false;
@@ -1179,6 +1181,10 @@ public final class ClientSelfTest {
     }
 
     private static void next(Minecraft mc) {
+        if (SHADER_ONLY) {
+            ClientShaderTest.run(mc, step);
+            return;
+        }
         // Fantasy 의 안내 대화창이 화면을 가로채면 닫는다 (강화 모루 장면 중에는 그대로 둠)
         if (step < NPC_END + 3 || step > ENH_END) {
             closeForeign(mc);
@@ -2139,14 +2145,14 @@ public final class ClientSelfTest {
         return -1;
     }
 
-    private static void finish(Minecraft mc) {
+    static void finish(Minecraft mc) {
         List<String> out = new ArrayList<>();
-        out.add("RT Shop client self-test");
+        out.add(SHADER_ONLY ? "RT Shop client self-test (shader on: " + ClientShaderTest.shaderState() + ")" : "RT Shop client self-test");
         out.addAll(LINES);
         out.add("");
         out.add(failed == 0 ? "RESULT: ALL PASS (" + passed + " checks)" : "RESULT: FAILED (" + failed + " of " + (passed + failed) + " checks)");
         try {
-            Files.write(mc.gameDirectory.toPath().resolve("rtshop-clienttest.txt"), out, StandardCharsets.UTF_8);
+            Files.write(mc.gameDirectory.toPath().resolve(SHADER_ONLY ? "rtshop-shadertest.txt" : "rtshop-clienttest.txt"), out, StandardCharsets.UTF_8);
         } catch (Throwable t) {
             RtShop.LOGGER.error("[rtshop-clienttest] could not write the result file", t);
         }

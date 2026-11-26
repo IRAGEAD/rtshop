@@ -398,7 +398,18 @@ def orb_halo(N, color, peak, power):
             px[x, y] = (*color, int(peak * (1 - r) ** power) if r < 1 else 0)
     return im
 
+def orb_rim_add(N, color, power=1.3):
+    """구슬 둘레의 빛 (3.64.2): 더하기 섞기(RenderType.eyes)용 그림 — 빛깔에 세기를 미리 곱해 둔다(더하기 섞기는 투명도를 보지 않는다).
+    가운데는 구슬이 덮고, 바깥 가장자리로 갈수록 0 이 된다. 예전의 넓은 빛무리(_halo)와 알파 섞기 빛(_glow)은 Photon 같은 셰이더에서
+    다른 무늬를 덮거나 탁하게 보여서 없앴다."""
+    im = Image.new('RGBA', (N, N)); px = im.load(); h = (N - 1) / 2
+    for y in range(N):
+        for x in range(N):
+            r = math.hypot((x - h) / h, (y - h) / h)
+            k = max(0.0, 1 - r) ** power if r < 1 else 0.0
+            px[x, y] = (int(color[0] * k), int(color[1] * k), int(color[2] * k), int(255 * k))
+    return im
+
 for _name, (_deep, _body, _rim, _glow) in ORB_COLORS.items():
     save(orb_lit(64, _deep, _body, _rim), 'entity/orb/%s.png' % _name)
-    save(orb_halo(64, _glow, 205, 2.0), 'entity/orb/%s_glow.png' % _name)     # 구슬 바로 둘레의 짙은 빛
-    save(orb_halo(64, _glow, 120, 1.35), 'entity/orb/%s_halo.png' % _name)    # 넓게 퍼지는 옅은 빛 (숨 쉬듯 커졌다 작아진다)
+    save(orb_rim_add(64, _glow), 'entity/orb/%s_rim.png' % _name)            # 구슬 바로 둘레의 빛 (더하기 섞기)
