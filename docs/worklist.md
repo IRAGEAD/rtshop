@@ -360,6 +360,16 @@
 - J-5. 요청 전체 대조 ✔ (이번 세션의 요청 + 3.61.0 의 G-5 대조 뒤에 받은 것) — 결과는 사용자에게 보낸 요약과 `docs/HANDOFF.md` 6절.
 - 자체 점검: 화면 "3.64 npc name tags are drawn only up close …" · "3.64 the rune altar has a glowing orb at its centre …" · "3.64 the enhance anvil lights up …"(+ 스크린샷 130), 서버 "3.64 NPC talk follows the story language everywhere …".
 
+## 3.64.1 (2026-11-27 새벽, 가지 v5-next15)
+
+요청: "룬 제단의 구슬 색상을 2번의 달빛 은백으로 변경" (3.64.0 에서 보낸 시안 ①~⑥ 가운데 ②).
+
+- L-1. 구슬의 기본 색 = ice(달빛 은백) ✔: `ClientConfig.DEFAULT_ORB`. 모르는 이름이 적혀 있어도 이 색.
+  - 이미 3.64.0 을 한 번 켠 사람의 `client.json` 에는 옛 기본값 `"altarOrbColor": "blue"` 가 적혀 있다 → 판 번호(`altarOrbColorVersion`)가 없는 파일의 blue 는 은백으로 옮기고 판 번호를 적어 둔다(`ClientConfig.orbColorFrom`). 이 판부터 저장한 색은 적힌 그대로(사람이 blue 를 고르면 blue).
+  - 다른 색으로 바꾸는 법(사용자에게 알림): `config/rtshop/client.json` 의 `altarOrbColor` 를 blue · gold · violet · jade · rose 가운데 하나로 고친 뒤 게임을 다시 켠다. 파일의 `_설명` 에도 적어 둠.
+  - 손대지 않은 것: Cinematic Interactions 가 없을 때 뜨는 2D 마법 뽑기 창의 구슬 그림(`MagicGachaScreen`, 모드팩에서는 쓰이지 않음)은 예전 푸른 그림 그대로.
+- 자체 점검: 화면 "3.64.1 the rune altar orb is moonlight silver by default …"(옛 파일 옮기기 포함), 모드팩 전체의 "3.64 the rune altar has a glowing orb …" 의 기본 색 조건을 ice 로.
+
 ## 다음 작업 (사용자가 3.64.0 작업 중에 목록에 넣어 달라고 한 것 — **아직 하지 않음**)
 
 - K-1. **Diorama 지도(M 키)의 NPC 표시**: 이름표(웨이포인트 이름) 대신 NPC 마다 서로 다른 아이콘으로 위치를 보이기.
