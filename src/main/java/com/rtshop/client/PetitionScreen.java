@@ -82,7 +82,13 @@ public class PetitionScreen extends Screen {
         fy = (this.height - H) / 2;
         box = null;
         if (tab == 0) {
-            box = new MultiLineEditBox(this.font, fx + PAD, fy + 86, W - PAD * 2, 92, Component.empty(), Component.empty());
+            // 바닐라의 검은 상자 대신 창에 어울리는 짙은 갈색 바탕 (글자는 밝은 빛 그대로)
+            box = new MultiLineEditBox(this.font, fx + PAD, fy + 86, W - PAD * 2, 92, Component.translatable("rtshop.petition.placeholder"), Component.empty()) {
+                public void renderBackground(GuiGraphics g) {
+                    g.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), isFocused() ? Ui.C_GOLD_DARK : Ui.C_PARCH_SHADE);
+                    g.fill(getX() + 1, getY() + 1, getX() + getWidth() - 1, getY() + getHeight() - 1, 0xFF3B2A1A);
+                }
+            };
             box.setCharacterLimit(max);
             box.setValue(draft);
             box.setValueListener(v -> draft = v);

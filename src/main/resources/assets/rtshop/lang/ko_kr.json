@@ -1942,5 +1942,6 @@
   "rtshop.petition.hint": "지금 서 있는 자리가 함께 적힙니다. 답이 달리면 알려 드립니다.",
   "rtshop.petition.none": "접수한 민원이 없습니다.",
   "rtshop.petition.answer": "답변",
-  "rtshop.petition.withdraw": "거두기"
+  "rtshop.petition.withdraw": "거두기",
+  "rtshop.petition.placeholder": "여기를 눌러 내용을 적어 주세요"
 }

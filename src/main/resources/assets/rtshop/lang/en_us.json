@@ -1942,5 +1942,6 @@
   "rtshop.petition.hint": "Where you stand is recorded with it. You will be told when it is answered.",
   "rtshop.petition.none": "You have no reports.",
   "rtshop.petition.answer": "Answer",
-  "rtshop.petition.withdraw": "Withdraw"
+  "rtshop.petition.withdraw": "Withdraw",
+  "rtshop.petition.placeholder": "Click here and write your report"
 }

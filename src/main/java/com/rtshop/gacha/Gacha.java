@@ -781,6 +781,8 @@ public final class Gacha {
             return null;
         }
         v.moveTo(pos.x, pos.y, pos.z, yaw, 0.0F);
+        v.setYHeadRot(yaw);   // 3.61: 몸과 머리도 그쪽을 보게 (moveTo 는 yRot 만 바꿔, 화면에서는 늘 남쪽을 보고 섰다)
+        v.setYBodyRot(yaw);
         v.setNoAi(true);
         v.setInvulnerable(true);
         v.setSilent(true);
