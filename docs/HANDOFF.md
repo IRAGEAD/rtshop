@@ -72,7 +72,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 ## 6. 남은 일 (11-26 오후, 3.58.0 뒤)
 
 바로 할 수 있는 것 (사용자 답 없이):
-1. 모드팩 전체 화면 점검의 흔들리는 항목 손보기 ("the border is a low outline along the ground": 아래 함정 참고). 시험 코드만 고치는 일.
+1. 모드팩 전체 점검에서 무작위 지형에 따라 흔들리는 두 항목 손보기: 화면 쪽 "the border is a low outline along the ground"(아래 함정 참고)와 서버 쪽 "buying a farmland lot removes the crops and structures standing on it"(토지 뒷정리: 3.55 에서 자리를 먼저 비우게 고쳤는데도 3.58.0 의 main 실행에서 울타리·판자가 남았다고 실패). 시험 코드만 고치는 일.
 2. 영어판에 남은 한국어(운영자 명령의 답·편집 화면 항목 이름), 강화 창 "+13%" 글자 확인 — "하면 좋은 것".
 
 사용자의 답·자료를 기다리는 것:
@@ -83,6 +83,12 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 7. **A-12 마을 이식 명령** (`/rtshop town export|import`): 설명만 했다. 요청하면 만든다 (2~3일분).
 8. **A-14 히든 아이템 3개**: 보류.
 9. **Create 금지의 해석 확인** (위 5절 3번).
+10. **Create 물건이 남아 있는 다른 길** (모드팩 전체 점검에서 봄, 사용자에게 알리고 뺄지 물어 둠): 장비 상점에 지팡이로 올라간 `create:wand_of_symmetry`(9,000 G), 뽑기 장신구 묶음의 Create 1종, 마법 뽑기 스킬북의 Create 인챈트 2종(capacity · potato_recovery). 빼라고 하면: `ItemPolicy.Config.defaults()` 와 판 올리기(4판)에 shopBan `create:*` 를 더하고, 뽑기 묶음을 만드는 곳(Gacha 의 장신구·스킬북 모으기)에서 lootBan 에 걸리는 것을 거른다.
+
+3.58.0 의 시험 결과 (기록):
+- build (가지 v5-next8, 실행 45756341891): 서버 773개 전부 통과 · 화면 295/300 (늘 실패하는 5개뿐).
+- 모드팩 전체 (main, 실행 45757436070 — main 은 결과를 가지에 올리지 않아 job 로그로 봄): 화면 320개 전부 통과 (미니맵 믹스인 확인 줄 `[4]`), 서버 817/818 — 실패 1개는 "buying a farmland lot removes the crops and structures standing on it" (토지 뒷정리 시험). 같은 코드의 가지 실행에서는 서버 시험이 전부 통과했으므로 무작위 지형에 따라 흔들리는 항목으로 봄.
+- 가지 실행의 모드팩 전체 화면 점검은 러너가 중간에 끊겨(뒤 단계가 모두 skipped, 로그 없음) 결과가 없다.
 
 ## 7. 알아 둘 함정
 
