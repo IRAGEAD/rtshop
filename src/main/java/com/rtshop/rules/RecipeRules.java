@@ -175,6 +175,35 @@ public final class RecipeRules {
         }
     }
 
+    /**
+     * 결과를 getResultItem 으로 알려 주지 않는 조합법의 결과 아이템을 필드에서 찾는다 (ItemStack 필드 중 비어 있지 않은 것, 이름에 result · output 이 든 것 먼저).
+     * 터무니없는 장비를 막는 데만 쓴다 (3.65.0).
+     */
+    public static ResourceLocation hiddenOutput(Recipe<?> r) {
+        net.minecraft.world.item.Item best = null;
+        try {
+            for (Class<?> k = r.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
+                for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                    net.minecraft.world.item.Item it = null;
+                    if (f.getType() == ItemStack.class) {
+                        f.setAccessible(true);
+                        if (f.get(r) instanceof ItemStack st && !st.isEmpty()) it = st.getItem();
+                    } else if (net.minecraft.world.item.Item.class.isAssignableFrom(f.getType())) {
+                        f.setAccessible(true);
+                        if (f.get(r) instanceof net.minecraft.world.item.Item i && i != net.minecraft.world.item.Items.AIR) it = i;
+                    }
+                    if (it == null) continue;
+                    String n = f.getName().toLowerCase(java.util.Locale.ROOT);
+                    if (n.contains("result") || n.contains("output")) return ForgeRegistries.ITEMS.getKey(it);
+                    if (best == null) best = it;
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return best == null ? null : ForgeRegistries.ITEMS.getKey(best);
+    }
+
     public static boolean disabled(Rules rules, ResourceLocation id, ResourceLocation output) {
         if (rules.disabled.contains(id.toString())) return true;
         if (rules.disabled.contains("mod:" + id.getNamespace())) return true;
@@ -218,6 +247,15 @@ public final class RecipeRules {
                 ItemPolicy.noteRecipe(why, r.getId(), made);
                 off++;
                 continue;
+            }
+            // 3.65.0: 결과를 알려 주지 않는 모드 전용 조합법(Arcane Vortex 의 작업대 등)도, 안에 든 결과 아이템이 터무니없이 센 장비면 막는다
+            if (made == null) {
+                ResourceLocation hidden = hiddenOutput(r);
+                if (hidden != null && ItemPolicy.extreme(new ItemStack(ForgeRegistries.ITEMS.getValue(hidden)))) {
+                    ItemPolicy.noteRecipe("extreme", r.getId(), hidden);
+                    off++;
+                    continue;
+                }
             }
             out.add(r);
         }

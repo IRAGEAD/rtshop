@@ -319,6 +319,15 @@ final class PackDiag {
         for (var r : server.getRecipeManager().getRecipes()) {
             try {
                 ResourceLocation oid = com.rtshop.rules.RecipeRules.outputId(r, server);
+                boolean hidden = false;
+                if (oid == null) {
+                    oid = com.rtshop.rules.RecipeRules.hiddenOutput(r);
+                    hidden = true;
+                }
+                if (r.getId().getNamespace().equals("arcanevortex") && hidden) {
+                    out.add("arcanevortex recipe " + r.getId() + " (" + net.minecraftforge.registries.ForgeRegistries.RECIPE_SERIALIZERS.getKey(r.getSerializer())
+                            + ") hidden result " + oid);
+                }
                 if (oid == null || !ids.contains(oid.toString())) continue;
                 recipes++;
                 out.add("recipe " + r.getId() + " (" + net.minecraftforge.registries.ForgeRegistries.RECIPE_SERIALIZERS.getKey(r.getSerializer()) + ") -> " + oid
