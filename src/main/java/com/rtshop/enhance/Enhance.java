@@ -47,7 +47,8 @@ public final class Enhance {
     /** 강화 모루 결과 칸의 미리보기 표시 (꺼내면 바로 결과로 바뀐다). */
     public static final String TRY_TAG = "rtshop_enh_try";
 
-    public enum Kind { NONE, WEAPON, ARMOR }
+    /** WEAPON 근접(공격력 속성) · ARMOR 갑옷 · RANGED 활 · 쇠뇌 · 총(쏜 것의 피해) · MAGIC 지팡이 · 완드(주문 피해). RANGED · MAGIC 은 3.65.0 부터. */
+    public enum Kind { NONE, WEAPON, ARMOR, RANGED, MAGIC }
 
     /** 시험용: 정해 두면 다음 강화의 굴림값(0~1)으로 쓰인다. */
     public static volatile Double testRoll = null;
@@ -233,6 +234,75 @@ public final class Enhance {
 
     // ------------------------------------------------------------------ 종류
 
+    private static final java.util.Map<Item, Boolean> RANGED = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<Item, Boolean> MAGIC = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.List<String> STAFF_WORDS = java.util.List.of("staff", "wand", "scepter", "sceptre");
+
+    /** 활 · 쇠뇌(발사 무기), 그리고 총 (TaCZ 의 총, 갈래 이름이 …Gun / …GunItem 인 것). 서버 · 클라이언트가 설정 없이 같게 본다. */
+    public static boolean rangedItem(Item it) {
+        return RANGED.computeIfAbsent(it, item -> {
+            if (item instanceof net.minecraft.world.item.ProjectileWeaponItem) return true;
+            if (item instanceof net.minecraft.world.item.BlockItem || item.isEdible()) return false;
+            net.minecraft.resources.ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item);
+            if (id != null && id.getNamespace().equals("tacz")) return id.getPath().contains("gun") && !id.getPath().contains("smith");
+            for (Class<?> k = item.getClass(); k != null && k != Item.class; k = k.getSuperclass()) {
+                String n = k.getSimpleName().toLowerCase(java.util.Locale.ROOT);
+                if (n.endsWith("gunitem") || n.endsWith("gun")) return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * 마법 무기(지팡이 · 완드): 이름의 낱말(staff · wand · scepter)이나 갈래 이름(…Staff… · …Wand…)이 지팡이이고, **주문력 속성**이 붙은 것.
+     * 주문력이 없는 지팡이(Weapons of Miracles 의 전투용 봉 같은 근접 무기, Create 의 대칭 지팡이 같은 도구)는 마법 무기가 아니다.
+     * 갑옷 · 블록 · 음식은 아니다 (3.64.2: Wandering Magician 갑옷). 서버 · 클라이언트가 설정 없이 같게 본다.
+     */
+    public static boolean magicItem(Item it) {
+        return MAGIC.computeIfAbsent(it, item -> {
+            if (item instanceof ArmorItem || item instanceof net.minecraft.world.item.BlockItem || item.isEdible()) return false;
+            boolean staffLike = false;
+            net.minecraft.resources.ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item);
+            if (id != null) {
+                for (String piece : id.getPath().toLowerCase(java.util.Locale.ROOT).split("[_/.\\-]")) {
+                    for (String w : STAFF_WORDS) if (piece.equals(w) || piece.equals(w + "s") || piece.endsWith(w)) staffLike = true;
+                }
+            }
+            for (Class<?> k = item.getClass(); !staffLike && k != null && k != Item.class; k = k.getSuperclass()) {
+                String n = k.getSimpleName().toLowerCase(java.util.Locale.ROOT);
+                if (n.contains("staff") || n.contains("wand") && !n.contains("wander")) staffLike = true;
+            }
+            return staffLike && spellAttribute(item);
+        });
+    }
+
+    /** 손에 들면 주문력 · 마나 같은 마법 속성이 붙는가 (Iron's Spells · Spell Engine 계열 · Ars 등). */
+    public static boolean spellAttribute(Item item) {
+        try {
+            ItemStack s = new ItemStack(item);
+            for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND}) {
+                for (net.minecraft.world.entity.ai.attributes.Attribute a : s.getAttributeModifiers(slot).keySet()) {
+                    net.minecraft.resources.ResourceLocation k = net.minecraftforge.registries.ForgeRegistries.ATTRIBUTES.getKey(a);
+                    if (k == null) continue;
+                    String ns = k.getNamespace();
+                    String path = k.getPath();
+                    if (ns.equals("irons_spellbooks") || ns.equals("spell_power") || ns.equals("spell_engine") || ns.startsWith("ars_")
+                            || path.contains("spell") || path.contains("mana")) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
+    /** 이 단계의 보너스 % (갑옷은 방어력 표, 나머지는 무기 표). */
+    public static double bonusPct(EnhanceConfig cfg, Kind k, int lv) {
+        double[] arr = k == Kind.ARMOR ? cfg.armorBonus : cfg.weaponBonus;
+        return arr.length == 0 ? 0 : arr[Math.max(0, Math.min(lv, arr.length - 1))];
+    }
+
     private static boolean has(Collection<AttributeModifier> mods) {
         for (AttributeModifier m : mods) {
             if (m.getOperation() == AttributeModifier.Operation.ADDITION && m.getAmount() > 0) return true;
@@ -240,7 +310,10 @@ public final class Enhance {
         return false;
     }
 
-    /** 무기(공격력이 있는 한 손 장비) 또는 방어구(방어력이 있는 갑옷). 여러 개 쌓이는 아이템은 제외. */
+    /**
+     * 무기(공격력이 있는 한 손 장비) · 방어구(방어력이 있는 갑옷) · 원거리 무기(활 · 쇠뇌 · 총) · 마법 무기(지팡이 · 완드). 여러 개 쌓이는 아이템은 제외.
+     * 원거리 · 마법 무기는 공격력 속성 대신 쏜 것 / 주문의 피해가 오른다 (EnhanceRanged). 지팡이는 근접 공격력이 조금 있어도 마법 무기로 본다.
+     */
     public static Kind kind(ItemStack s) {
         if (s.isEmpty() || s.getMaxStackSize() > 1) return Kind.NONE;
         Item it = s.getItem();
@@ -250,6 +323,8 @@ public final class Enhance {
                     && (it instanceof ArmorItem || has(it.getAttributeModifiers(es, s).get(Attributes.ARMOR)))) {
                 return Kind.ARMOR;
             }
+            if (rangedItem(it)) return Kind.RANGED;
+            if (magicItem(it)) return Kind.MAGIC;
             if (it instanceof SwordItem || it instanceof AxeItem || it instanceof TridentItem
                     || has(it.getAttributeModifiers(EquipmentSlot.MAINHAND, s).get(Attributes.ATTACK_DAMAGE))) {
                 return Kind.WEAPON;

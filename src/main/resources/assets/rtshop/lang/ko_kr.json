@@ -719,7 +719,7 @@
   "rtshop.plot.list_starter_owned": "#%1$s %2$s · %3$s칸 · 초보 농지 · 주인 %5$s (눌러서 이동)",
   "rtshop.gachaedit.weapon_mods": "일반~희귀 무기 모드",
   "block.rtshop.enhance_anvil": "강화 모루",
-  "block.rtshop.enhance_anvil.tip1": "무기와 방어구를 +11 까지 강화합니다.",
+  "block.rtshop.enhance_anvil.tip1": "무기(활 · 총 · 지팡이 포함)와 방어구를 +11 까지 강화합니다.",
   "block.rtshop.enhance_anvil.tip2": "Mining Master 보석, Spelunkery 광물, Gold 가 듭니다.",
   "container.rtshop.enhance": "강화 모루",
   "item.rtshop.enhance_guard_damage": "손상 방지권",
@@ -753,7 +753,7 @@
   "rtshop.enhance.not_enhanceable": "강화할 수 없는 아이템",
   "rtshop.enhance.max": "최대 단계 (+11)",
   "rtshop.enhance.panel": "강화 정보",
-  "rtshop.enhance.help1": "왼쪽 칸에 무기나 방어구를 올리세요.",
+  "rtshop.enhance.help1": "왼쪽 칸에 무기(활 · 총 · 지팡이 포함)나 방어구를 올리세요.",
   "rtshop.enhance.help2": "보호권은 모루 위, 장비 옆 칸에 함께 올려 두면 그 강화에 한 장이 쓰입니다.",
   "rtshop.enhance.help3": "결과 칸을 클릭하면 재료와 Gold 를 쓰고 강화를 시도합니다.",
   "rtshop.enhance.help4": "결과는 성공(+1) · 유지 · 손상(-1) · 파괴. 단계가 높을수록 비싸고 위험합니다.",
@@ -1944,5 +1944,10 @@
   "rtshop.petition.answer": "답변",
   "rtshop.petition.withdraw": "거두기",
   "rtshop.petition.placeholder": "여기를 눌러 내용을 적어 주세요",
-  "rtshop.enhance.guard_refund": "예전 방식(우클릭)으로 걸어 두었던 보호를 「%s」 한 장으로 돌려드렸습니다. 이제 보호권은 강화 모루 위, 장비 옆 칸에 올려 두고 씁니다."
+  "rtshop.enhance.guard_refund": "예전 방식(우클릭)으로 걸어 두었던 보호를 「%s」 한 장으로 돌려드렸습니다. 이제 보호권은 강화 모루 위, 장비 옆 칸에 올려 두고 씁니다.",
+  "rtshop.enhui.stat_ranged_pct": "원거리 피해 보너스",
+  "rtshop.enhui.stat_magic_pct": "주문 피해 보너스",
+  "rtshop.enhance.bonus_ranged": "강화 +%s/%s · 화살 · 총알 피해 +%s",
+  "rtshop.enhance.bonus_magic": "강화 +%s/%s · 주문 피해 +%s",
+  "rtshop.rules.extreme_removed": "%s 은(는) 이 모드팩에서 쓸 수 없는 장비라 치웠습니다."
 }

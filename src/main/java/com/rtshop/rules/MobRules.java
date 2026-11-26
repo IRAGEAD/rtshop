@@ -308,6 +308,8 @@ public final class MobRules {
                 ItemPolicy.mobDrops(e, isBoss, event.getSource().getEntity(), event.getDrops());
             } catch (Throwable ignored) {
             }
+            // 3.65.0: 터무니없이 센 장비(Arcane Vortex 등)는 보스가 코드로 직접 떨어뜨려도 뺀다 (전리품표가 아닌 길)
+            event.getDrops().removeIf(d -> ItemPolicy.extreme(d.getItem()));
             if (!get().dropsEnabled || isBoss) return;
             List<ItemStack> held;
             synchronized (PICKED) {

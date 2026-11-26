@@ -551,11 +551,20 @@ public final class EnhancePanel {
         Enhance.clearPreview(b);
         Enhance.setLevel(a, cur);
         Enhance.setLevel(b, cur + 1);
-        boolean armor = Enhance.kind(eq) == Enhance.Kind.ARMOR;
-        double[] arr = armor ? cfg.armorBonus : cfg.weaponBonus;
-        String pNow = "+" + EnhanceClient.pct(arr[Math.min(cur, arr.length - 1)]);
-        String pNext = hasNext ? arrow("+" + EnhanceClient.pct(arr[Math.min(cur + 1, arr.length - 1)])) : "";
-        out.add(new Stat(Component.translatable(armor ? "rtshop.enhui.stat_armor_pct" : "rtshop.enhui.stat_attack_pct").getString(), pNow, pNext));
+        Enhance.Kind kind = Enhance.kind(eq);
+        boolean armor = kind == Enhance.Kind.ARMOR;
+        String pNow = "+" + EnhanceClient.pct(Enhance.bonusPct(cfg, kind, cur));
+        String pNext = hasNext ? arrow("+" + EnhanceClient.pct(Enhance.bonusPct(cfg, kind, cur + 1))) : "";
+        String label = switch (kind) {
+            case ARMOR -> "rtshop.enhui.stat_armor_pct";
+            case RANGED -> "rtshop.enhui.stat_ranged_pct";
+            case MAGIC -> "rtshop.enhui.stat_magic_pct";
+            default -> "rtshop.enhui.stat_attack_pct";
+        };
+        out.add(new Stat(Component.translatable(label).getString(), pNow, pNext));
+        if (kind == Enhance.Kind.RANGED || kind == Enhance.Kind.MAGIC) {
+            return out;   // 원거리 · 마법 무기는 속성이 아니라 쏜 것 / 주문의 피해가 오른다: 보너스 % 만
+        }
         try {
             if (armor) {
                 EquipmentSlot slot = LivingEntity.getEquipmentSlotForItem(eq);

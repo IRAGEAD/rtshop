@@ -364,6 +364,32 @@ public final class SelfTest {
         }
     }
 
+    /** 어느 상점에서든 팔 수 있는 가장 높은 기본 매입가 (없으면 -1). */
+    private static double sellable(String id) {
+        double best = -1;
+        for (com.rtshop.shop.ShopData sd : ShopServer.shops().values()) {
+            for (com.rtshop.shop.ShopData.Entry en : sd.entries) {
+                if (!en.sellable || en.stack.isEmpty()) continue;
+                ResourceLocation rl = ForgeRegistries.ITEMS.getKey(en.stack.getItem());
+                if (rl != null && rl.toString().equals(id) && en.sellUnit > best) best = en.sellUnit;
+            }
+        }
+        return best;
+    }
+
+    /** 어느 상점에서든 살 수 있는 가장 싼 값 (없으면 -1). */
+    private static int buyable(MinecraftServer server, String id) {
+        int best = -1;
+        for (com.rtshop.shop.ShopData sd : ShopServer.shops().values()) {
+            for (com.rtshop.shop.ShopData.Entry en : sd.entries) {
+                if (!en.buyable || en.stack.isEmpty()) continue;
+                ResourceLocation rl = ForgeRegistries.ITEMS.getKey(en.stack.getItem());
+                if (rl != null && rl.toString().equals(id) && (best < 0 || en.price < best)) best = en.price;
+            }
+        }
+        return best;
+    }
+
     private static FakePlayer fake(ServerLevel level, String name) {
         UUID id = UUID.nameUUIDFromBytes(("rtshop:" + name).getBytes(StandardCharsets.UTF_8));
         return FakePlayerFactory.get(level, new GameProfile(id, name));
@@ -1996,6 +2022,8 @@ public final class SelfTest {
             }
         }
         check("11 enhancement levels: success falls, damage/destroy rise, cost rises, odds add up to 100", shape, bad);
+        enhanceRanged(level, a);
+        extremeGear(level, a);
         check("from +4 success drops sharply and keep has a big share", cfg.level(4).success <= 50 && cfg.level(3).success - cfg.level(4).success >= 20
                 && cfg.level(4).maintain >= 30 && cfg.level(11).success <= 5 && cfg.level(8).maintain >= 30);
         // 1판 기본 확률 파일은 2판 확률로 올라간다 (OP 가 바꾼 단계는 그대로)
@@ -2489,6 +2517,20 @@ public final class SelfTest {
                         wander != null && wander != net.minecraft.world.item.Items.AIR && !com.rtshop.rules.ItemPolicy.staff(wander)
                                 && (graybeard == null || graybeard == net.minecraft.world.item.Items.AIR || com.rtshop.rules.ItemPolicy.staff(graybeard)),
                         wander + " " + graybeard);
+                if (net.minecraftforge.fml.ModList.get().isLoaded("spelunkery")) {
+                    double variant = sellable("spelunkery:andesite_iron_ore");
+                    double vanilla = sellable("minecraft:iron_ore");
+                    check("3.65.0 stone-variant ores (Spelunkery's andesite iron ore) can be sold like the plain ore, for the same price",
+                            variant > 0 && Math.abs(variant - vanilla) < 1.0e-6, variant + " vs " + vanilla);
+                }
+                if (net.minecraftforge.fml.ModList.get().isLoaded("wizards")) {
+                    int novice = buyable(server, "wizards:wand_novice");
+                    int neth = buyable(server, "wizards:wand_netherite_arcane");
+                    int nethStaff = buyable(server, "wizards:staff_netherite_arcane");
+                    check("3.65.0 wands are priced by what they are made of (novice wand cheap, netherite wand near the netherite staff), not all 6,000 G",
+                            novice > 0 && neth > 0 && novice < neth && neth >= 20000 && (nethStaff <= 0 || neth >= nethStaff / 3),
+                            "novice " + novice + " netherite " + neth + " netherite staff " + nethStaff);
+                }
             }
             info("item policy: " + com.rtshop.rules.ItemPolicy.bossCountForTest() + " boss items, " + com.rtshop.rules.ItemPolicy.listedCountForTest() + " listed gear, wom listed " + womListed
                     + ", recipes blocked: mod " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("mod") + " ban " + com.rtshop.rules.ItemPolicy.recipesBlockedForTest("ban")
@@ -2737,6 +2779,139 @@ public final class SelfTest {
     }
 
     // ------------------------------------------------------------------ 퀘스트
+
+    /** 3.65.0: 터무니없이 센 장비(공격력 25 · 방어력 20 이상, 모드팩에서는 Arcane Vortex)는 전리품 · 드롭 · 조합 · 가방에서 빠진다. */
+    private static void extremeGear(ServerLevel level, FakePlayer a) {
+        Item ex = null;
+        int count = 0;
+        StringBuilder mods = new StringBuilder();
+        for (Item it : ForgeRegistries.ITEMS) {
+            if (com.rtshop.rules.ItemPolicy.extreme(new ItemStack(it))) {
+                count++;
+                if (ex == null) ex = it;
+                String ns = ForgeRegistries.ITEMS.getKey(it).getNamespace();
+                if (mods.indexOf(ns) < 0) mods.append(' ').append(ns);
+            }
+        }
+        boolean normalOk = !com.rtshop.rules.ItemPolicy.extreme(new ItemStack(Items.NETHERITE_SWORD))
+                && !com.rtshop.rules.ItemPolicy.extreme(new ItemStack(Items.NETHERITE_CHESTPLATE))
+                && !com.rtshop.rules.ItemPolicy.extreme(new ItemStack(Items.TRIDENT));
+        Item best = ForgeRegistries.ITEMS.getValue(new ResourceLocation("paladins", "ruby_great_hammer"));
+        boolean bestOk = best == null || best == Items.AIR || !com.rtshop.rules.ItemPolicy.extreme(new ItemStack(best));
+        if (ex == null) {
+            check("3.65.0 normal gear is not taken for extreme gear (none in this pack)", normalOk && bestOk);
+            return;
+        }
+        ResourceLocation exId = ForgeRegistries.ITEMS.getKey(ex);
+        boolean loot = com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(ex), true) && com.rtshop.rules.ItemPolicy.lootBanned(new ItemStack(ex), false);
+        boolean recipe = com.rtshop.rules.ItemPolicy.recipeBanned(new ResourceLocation("rtshop", "test_extreme"), exId);
+        int slot = a.getInventory().getFreeSlot();
+        int removed = -1;
+        if (slot >= 0) {
+            a.getInventory().setItem(slot, new ItemStack(ex));
+            removed = com.rtshop.rules.ExtremeGuard.sweep(a);
+        }
+        check("3.65.0 extreme gear (" + count + " items:" + mods + ") is kept out of chests, mob and boss loot and recipes, and taken out of a survival player's bag; "
+                        + "normal top gear (netherite, the strongest pack weapon) is not",
+                loot && recipe && removed == 1 && a.getInventory().countItem(ex) == 0 && normalOk && bestOk,
+                exId + " loot=" + loot + " recipe=" + recipe + " removed=" + removed);
+    }
+
+    /** 3.65.0: 활 · 쇠뇌 · 총은 쏜 것의 피해가, 지팡이 · 완드는 주문 피해가 강화 단계만큼 오른다 (EnhanceRanged). */
+    private static void enhanceRanged(ServerLevel level, FakePlayer a) {
+        com.rtshop.enhance.Enhance.Kind bowKind = com.rtshop.enhance.Enhance.kind(new ItemStack(Items.BOW));
+        com.rtshop.enhance.Enhance.Kind xbowKind = com.rtshop.enhance.Enhance.kind(new ItemStack(Items.CROSSBOW));
+        check("3.65.0 bows and crossbows can be enhanced as ranged weapons; swords, tridents and armour keep their kinds",
+                bowKind == com.rtshop.enhance.Enhance.Kind.RANGED && xbowKind == com.rtshop.enhance.Enhance.Kind.RANGED
+                        && com.rtshop.enhance.Enhance.kind(new ItemStack(Items.IRON_SWORD)) == com.rtshop.enhance.Enhance.Kind.WEAPON
+                        && com.rtshop.enhance.Enhance.kind(new ItemStack(Items.TRIDENT)) == com.rtshop.enhance.Enhance.Kind.WEAPON
+                        && com.rtshop.enhance.Enhance.kind(new ItemStack(Items.DIAMOND_CHESTPLATE)) == com.rtshop.enhance.Enhance.Kind.ARMOR
+                        && com.rtshop.enhance.Enhance.kind(new ItemStack(Items.STICK)) == com.rtshop.enhance.Enhance.Kind.NONE
+                        && com.rtshop.enhance.Enhance.enhanceable(new ItemStack(Items.BOW)),
+                bowKind + " " + xbowKind);
+        ItemStack bow = new ItemStack(Items.BOW);
+        com.rtshop.enhance.Enhance.setLevel(bow, 7);
+        ItemStack mainBefore = a.getMainHandItem().copy();
+        net.minecraft.world.entity.projectile.Arrow arrow = null;
+        try {
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, bow);
+            arrow = new net.minecraft.world.entity.projectile.Arrow(level, a);
+            arrow.setPos(a.getX(), a.getY() + 300, a.getZ());
+            arrow.setNoGravity(true);
+            level.addFreshEntity(arrow);
+            int tagged = arrow.getPersistentData().getInt(com.rtshop.enhance.EnhanceRanged.TAG);
+            net.minecraft.world.entity.monster.Zombie target = new net.minecraft.world.entity.monster.Zombie(level);
+            net.minecraftforge.event.entity.living.LivingHurtEvent hit =
+                    new net.minecraftforge.event.entity.living.LivingHurtEvent(target, level.damageSources().arrow(arrow, a), 10F);
+            com.rtshop.enhance.EnhanceRanged.onHurt(hit);
+            double want = 10.0 * (1 + com.rtshop.enhance.Enhance.bonusPct(com.rtshop.enhance.EnhanceConfig.get(), com.rtshop.enhance.Enhance.Kind.RANGED, 7) / 100.0);
+            // 주문 피해에는 활의 단계를 쓰지 않는다
+            net.minecraftforge.event.entity.living.LivingHurtEvent spell =
+                    new net.minecraftforge.event.entity.living.LivingHurtEvent(target, level.damageSources().indirectMagic(a, a), 10F);
+            com.rtshop.enhance.EnhanceRanged.onHurt(spell);
+            // 화살이 나온 뒤에 활을 내려놓아도 그 화살은 쏜 때의 단계
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            net.minecraftforge.event.entity.living.LivingHurtEvent later =
+                    new net.minecraftforge.event.entity.living.LivingHurtEvent(target, level.damageSources().arrow(arrow, a), 10F);
+            com.rtshop.enhance.EnhanceRanged.onHurt(later);
+            check("3.65.0 an arrow from a +7 bow carries the level and hits 28% harder (even after the bow is put away); a spell does not use the bow's level",
+                    tagged == 7 && Math.abs(hit.getAmount() - want) < 0.01 && Math.abs(later.getAmount() - want) < 0.01 && Math.abs(spell.getAmount() - 10F) < 0.01,
+                    tagged + " " + hit.getAmount() + " " + later.getAmount() + " " + spell.getAmount() + " want " + want);
+            // 지팡이 · 완드 (마법 모드가 있을 때): 주문 피해가 오른다
+            Item staff = null;
+            for (Item it : ForgeRegistries.ITEMS) {
+                if (com.rtshop.enhance.Enhance.kind(new ItemStack(it)) == com.rtshop.enhance.Enhance.Kind.MAGIC) {
+                    staff = it;
+                    break;
+                }
+            }
+            if (staff != null) {
+                ItemStack st = new ItemStack(staff);
+                com.rtshop.enhance.Enhance.setLevel(st, 11);
+                a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, st);
+                net.minecraftforge.event.entity.living.LivingHurtEvent cast =
+                        new net.minecraftforge.event.entity.living.LivingHurtEvent(target, level.damageSources().indirectMagic(a, a), 10F);
+                com.rtshop.enhance.EnhanceRanged.onHurt(cast);
+                double want11 = 10.0 * (1 + com.rtshop.enhance.Enhance.bonusPct(com.rtshop.enhance.EnhanceConfig.get(), com.rtshop.enhance.Enhance.Kind.MAGIC, 11) / 100.0);
+                net.minecraftforge.event.entity.living.LivingHurtEvent swing =
+                        new net.minecraftforge.event.entity.living.LivingHurtEvent(target, level.damageSources().playerAttack(a), 10F);
+                com.rtshop.enhance.EnhanceRanged.onHurt(swing);
+                check("3.65.0 a +11 staff or wand makes spells 62% stronger (its melee swing is not raised this way)",
+                        Math.abs(cast.getAmount() - want11) < 0.01 && Math.abs(swing.getAmount() - 10F) < 0.01,
+                        ForgeRegistries.ITEMS.getKey(staff) + " " + cast.getAmount() + " " + swing.getAmount());
+            } else {
+                info("3.65.0 no staff or wand in this pack: the spell side was not tried");
+            }
+            if (net.minecraftforge.fml.ModList.get().isLoaded("tacz") || net.minecraftforge.fml.ModList.get().isLoaded("irons_spellbooks")) {
+                Item gun = ForgeRegistries.ITEMS.getValue(new ResourceLocation("tacz", "modern_kinetic_gun"));
+                Item wander = ForgeRegistries.ITEMS.getValue(new ResourceLocation("irons_spellbooks", "wandering_magician_chestplate"));
+                Item graybeard = ForgeRegistries.ITEMS.getValue(new ResourceLocation("irons_spellbooks", "graybeard_staff"));
+                Item womStaff = ForgeRegistries.ITEMS.getValue(new ResourceLocation("wom", "iron_staff"));
+                Item symmetry = ForgeRegistries.ITEMS.getValue(new ResourceLocation("create", "wand_of_symmetry"));
+                check("3.65.0 in the pack: a TaCZ gun is a ranged weapon, Iron's staffs are magic weapons, the Wandering Magician chestplate is armour, "
+                                + "a Weapons of Miracles fighting staff stays a melee weapon and Create's wand of symmetry is not a weapon",
+                        (gun == null || gun == Items.AIR || com.rtshop.enhance.Enhance.kind(new ItemStack(gun)) == com.rtshop.enhance.Enhance.Kind.RANGED)
+                                && (graybeard == null || graybeard == Items.AIR || com.rtshop.enhance.Enhance.kind(new ItemStack(graybeard)) == com.rtshop.enhance.Enhance.Kind.MAGIC)
+                                && (wander == null || wander == Items.AIR || com.rtshop.enhance.Enhance.kind(new ItemStack(wander)) == com.rtshop.enhance.Enhance.Kind.ARMOR)
+                                && (womStaff == null || womStaff == Items.AIR || com.rtshop.enhance.Enhance.kind(new ItemStack(womStaff)) == com.rtshop.enhance.Enhance.Kind.WEAPON)
+                                && (symmetry == null || symmetry == Items.AIR || com.rtshop.enhance.Enhance.kind(new ItemStack(symmetry)) == com.rtshop.enhance.Enhance.Kind.NONE),
+                        gun + " " + graybeard + " " + wander + " " + womStaff + " " + symmetry);
+                int magic = 0;
+                int ranged = 0;
+                for (Item it : ForgeRegistries.ITEMS) {
+                    com.rtshop.enhance.Enhance.Kind k = com.rtshop.enhance.Enhance.kind(new ItemStack(it));
+                    if (k == com.rtshop.enhance.Enhance.Kind.MAGIC) magic++;
+                    if (k == com.rtshop.enhance.Enhance.Kind.RANGED) ranged++;
+                }
+                info("3.65.0 enhanceable as magic weapons: " + magic + ", as ranged weapons: " + ranged);
+            }
+        } catch (Throwable t) {
+            check("3.65.0 ranged and magic enhancement could be tried", false, t.toString());
+        } finally {
+            if (arrow != null) arrow.discard();
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, mainBefore);
+        }
+    }
 
     private static QuestDef tempQuest(String json) {
         return QuestDef.parse(JsonParser.parseString(json).getAsJsonObject());
@@ -6355,6 +6530,23 @@ public final class SelfTest {
         ShopLoader.Price stonePick = plain(l, Items.STONE_PICKAXE);
         check("tools made from free materials are not worth crafting for sale", stonePick != null && stonePick.sellUnit <= 20,
                 stonePick == null ? null : stonePick.sellUnit + " (shop " + stonePick.price + ")");
+        ShopLoader.Price shovel = plain(l, Items.WOODEN_SHOVEL);
+        ShopLoader.Price bricks = plain(l, Items.BRICKS);
+        check("3.65.0 things anyone can craft from priced materials are not sold for many times what they cost to make (wooden shovel, bricks, stone pickaxe)",
+                (shovel == null || shovel.price <= 20) && (bricks == null || bricks.price <= 5) && (stonePick == null || stonePick.price <= 40),
+                (shovel == null ? "-" : shovel.price + "") + " / " + (bricks == null ? "-" : bricks.price + "") + " / " + (stonePick == null ? "-" : stonePick.price + ""));
+        if (l.solved != null) {
+            boolean guessed = false;
+            StringBuilder g = new StringBuilder();
+            for (String id : new String[]{"minecraft:nether_star", "minecraft:elytra", "minecraft:totem_of_undying", "minecraft:echo_shard", "minecraft:dragon_breath"}) {
+                if (l.solved.estimated.containsKey(id)) {
+                    guessed = true;
+                    g.append(' ').append(id).append('=').append(l.solved.estimated.get(id));
+                }
+            }
+            check("3.65.0 rare materials (nether star, elytra, totem, echo shard, dragon breath) use real values in recipe costs, not the 2 G guess",
+                    !guessed, l.solved.estimated.size() + " guessed" + g);
+        }
         if (bucket != null && milk != null && ingot != null) {
             check("an empty bucket is bought back for three iron ingots", Math.abs(bucket.sellUnit - 3.0 * ingot.price) < 1.0e-6,
                     bucket.sellUnit);

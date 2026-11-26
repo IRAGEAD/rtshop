@@ -87,6 +87,8 @@ public final class ShopLoader {
         public boolean anchor;
         /** 장비 공식으로 가격이 정해진 품목(무기·방어구·도구). 만들 수 있으면 항상 재료 원가 기준으로 매입한다. */
         public boolean gear;
+        /** 3.65.0: 어느 상점도 팔지 않던 지팡이로 올린 품목 (값은 임시 고정가: 레시피 원가를 알면 그것으로 바꾼다). */
+        public boolean staffFallback;
         public String basis = "";
         public double cost = -1;
         /** 매입가를 계산한 조리법의 재료(가장 싼 것 기준)와 1회 생산량. */
@@ -426,6 +428,11 @@ public final class ShopLoader {
         } catch (Throwable t) {
             RtShop.LOGGER.error("[rtshop] 빠진 지팡이를 상점에 올리는 중 오류", t);
         }
+        try {
+            addOreVariants(raws, prices, allItems, out.notes);
+        } catch (Throwable t) {
+            RtShop.LOGGER.error("[rtshop] 광석의 돌 변형을 상점에 올리는 중 오류", t);
+        }
         if (scan != null && pc.autoListFoodIngredients) {
             try {
                 addMissingFoodIngredients(raws, prices, scan, pc, out.notes);
@@ -582,6 +589,73 @@ public final class ShopLoader {
      * 지팡이는 만들 수 없고 상점에서 사야 하므로(아이템 규칙), 어느 상점도 팔지 않는 지팡이를 대장장이에게 올린다.
      * 값은 장비 공식(공격력·내구도)의 5배와 희귀도에 따른 기본값 중 큰 쪽.
      */
+    /**
+     * 3.65.0: 바닐라 광석은 매입용(사지 않고 팔기만)으로 올라 있는데, 같은 광석의 돌 변형(Spelunkery 의 안산암 · 섬록암 · 화강암 · 응회암 철광석 등)은
+     * 팔 곳이 없었다 → 그 바닐라 광석을 사들이는 상점에 같은 값 · 같은 분류로 올린다 (매입만).
+     */
+    private static void addOreVariants(List<Raw> raws, Map<String, Price> prices, List<Item> allItems, List<String> notes) {
+        Map<String, Raw> shopOf = new HashMap<>();
+        Map<String, Price> priceOf = new HashMap<>();
+        Map<String, String> catOf = new HashMap<>();
+        Set<String> listed = new HashSet<>();
+        for (Raw r : raws) {
+            listed.addAll(r.keys);
+            for (Ref ref : r.refs) {
+                Price p = prices.get(ref.key);
+                if (p == null || !ref.sell || ref.buy || !isPlain(p.stack)) continue;
+                String id = itemId(p.stack);
+                if (id.startsWith("minecraft:") && id.endsWith("_ore") && !shopOf.containsKey(id)) {
+                    shopOf.put(id, r);
+                    priceOf.put(id, p);
+                    catOf.put(id, ref.category);
+                }
+            }
+        }
+        if (shopOf.isEmpty()) return;
+        List<String> added = new ArrayList<>();
+        for (Item item : allItems) {
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            if (rl == null || rl.getNamespace().equals("minecraft") || rl.getNamespace().equals(RtShop.MODID) || !rl.getPath().endsWith("_ore")) continue;
+            ItemStack plain = new ItemStack(item);
+            String key = key(plain);
+            if (listed.contains(key) || com.rtshop.rules.ItemPolicy.shopBanned(plain)) continue;
+            String path = rl.getPath();
+            String vid = null;
+            for (String w : ORE_WORDS) {
+                if (!path.contains(w)) continue;
+                for (String v : new String[]{"minecraft:" + w + "_ore", "minecraft:nether_" + w + "_ore", "minecraft:deepslate_" + w + "_ore"}) {
+                    if (priceOf.containsKey(v)) {
+                        vid = v;
+                        break;
+                    }
+                }
+                if (vid != null) break;
+            }
+            if (vid == null) continue;
+            Raw target = shopOf.get(vid);
+            if (!target.keys.add(key)) continue;
+            Price p = prices.get(key);
+            if (p == null) {
+                p = new Price();
+                p.stack = plain;
+                p.price = priceOf.get(vid).price;
+                prices.put(key, p);
+            }
+            Ref ref = new Ref();
+            ref.key = key;
+            ref.category = catOf.get(vid);
+            ref.buy = false;
+            ref.sell = true;
+            target.refs.add(ref);
+            listed.add(key);
+            added.add(rl + "=" + p.price);
+        }
+        if (!added.isEmpty()) {
+            RtShop.LOGGER.info("[rtshop] 팔 곳이 없던 광석의 돌 변형 {}종을 바닐라 광석과 같은 값의 매입 품목으로 올렸습니다: {}", added.size(), added);
+            notes.add("팔 곳이 없던 광석의 돌 변형 " + added.size() + "종을 바닐라 광석과 같은 값의 매입 품목으로 올렸습니다: " + String.join(", ", added));
+        }
+    }
+
     private static void addMissingStaffs(List<Raw> raws, Map<String, Price> prices, List<Item> allItems, List<String> notes) {
         com.rtshop.rules.ItemPolicy.Config ic = com.rtshop.rules.ItemPolicy.get();
         if (!ic.enabled || !ic.recipeBanStaffs || !ic.listStaffs) {
@@ -633,7 +707,10 @@ public final class ShopLoader {
                 };
                 int g = Pricing.gear(plain);
                 p.price = Math.max(1, Pricing.nice(Math.max(g * 5.0, ic.staffPrice * rare)));
-                p.gear = g > 0;
+                // 3.65.0: 지팡이는 장비다. 레시피 원가를 알면 그것으로 값을 다시 매긴다(applyRecipePricing) —
+                // 전에는 공격력이 낮은 완드가 장비로 잡히지 않아 초보 완드도 네더라이트 완드도 6,000 G 그대로였다.
+                p.gear = true;
+                p.staffFallback = true;
                 prices.put(key, p);
             }
             Ref ref = new Ref();
@@ -653,6 +730,25 @@ public final class ShopLoader {
     }
 
     // ------------------------------------------------------------------ 레시피 원가
+
+    private static final String[] ORE_WORDS = {"diamond", "emerald", "gold", "iron", "copper", "redstone", "lapis", "coal", "quartz"};
+
+    /** 광석의 돌 변형(…_iron_ore 등)의 값: 같은 광물의 바닐라 광석 값 (상점의 매입용 광석 가격). 광석이 아니면 null. */
+    static Double oreVariantValue(ResourceLocation rl, Map<String, Double> base, Map<String, Double> hints) {
+        if (rl == null || rl.getNamespace().equals("minecraft") || !rl.getPath().endsWith("_ore")) {
+            return null;
+        }
+        String path = rl.getPath();
+        for (String w : ORE_WORDS) {
+            if (!path.contains(w)) continue;
+            for (String v : new String[]{"minecraft:" + w + "_ore", "minecraft:nether_" + w + "_ore", "minecraft:deepslate_" + w + "_ore"}) {
+                Double x = hints.get(v);
+                if (x == null) x = base.get(v);
+                if (x != null && x > 0) return x;
+            }
+        }
+        return null;
+    }
 
     private static void applyRecipePricing(RecipeScan.Scan scan, PricingConfig pc, Loaded out) {
         Map<String, Price> prices = out.prices;
@@ -683,10 +779,20 @@ public final class ShopLoader {
                 anchors.add(itemId(p.stack));
             }
         }
+        // 3.65.0: 가격표에 없는 귀한 재료의 값(pricing.json 의 ingredientValues). 상점에 오르지 않는 재료라 기준 값으로만 쓴다.
+        for (Map.Entry<String, Double> e : pc.ingredientValues.entrySet()) {
+            if (e.getValue() != null && e.getValue() > 0 && !base.containsKey(e.getKey()) && !hints.containsKey(e.getKey())) {
+                hints.put(e.getKey(), e.getValue());
+            }
+        }
         RecipeScan.solve(scan, base, hints, anchors, pc, id -> {
             // 가격표에 없는 말단 재료의 추정가. 공짜로 얻을 수 있는 재료일 수도 있으므로 낮게 잡는다
             // (높게 잡으면 그 재료가 들어간 음식값이 부풀어 돈벌이 수단이 된다).
             ResourceLocation rl = ResourceLocation.tryParse(id);
+            Double ore = oreVariantValue(rl, base, hints);
+            if (ore != null) {
+                return ore;   // 3.65.0: 광석의 돌 변형(Spelunkery 의 안산암 철광석 등)은 같은 바닐라 광석의 값
+            }
             Item item = rl == null ? null : ForgeRegistries.ITEMS.getValue(rl);
             if (item != null && item != Items.AIR) {
                 int f = Pricing.food(new ItemStack(item));
@@ -746,10 +852,14 @@ public final class ShopLoader {
                 } else if (res.exact.contains(id)) {
                     // 가격표에 있는 재료만으로 만드는 물건: 재료값 그대로 매입 (재료를 사서 만들어 팔면 본전)
                     p.sellUnit = c;
-                    p.price = Math.max(p.price, buyPrice(c, 1.0 / ratio));
+                    // 임시 고정가로 올린 지팡이는 원가 기준 값으로 바꾼다 (재료 단계만큼 값이 달라진다, 3.65.0)
+                    p.price = p.staffFallback ? buyPrice(c, 1.0 / ratio) : Math.max(p.price, buyPrice(c, 1.0 / ratio));
                     p.basis = String.valueOf(res.costRecipe.get(id));
                 } else {
                     // 가격을 추정한 재료가 섞인 물건: 추정이 틀려도 손해가 없도록 보수적으로 (상점가의 50% 와 원가 중 낮은 쪽)
+                    if (p.staffFallback) {
+                        p.price = Math.max(p.price, buyPrice(c, 1.0 / ratio));   // 지팡이: 임시가보다 원가가 높으면 원가 기준
+                    }
                     p.sellUnit = Math.min(p.price * ratio, c);
                     p.basis = String.valueOf(res.costRecipe.get(id));
                 }
@@ -759,6 +869,39 @@ public final class ShopLoader {
         if (!zeroCost.isEmpty()) {
             out.notes.add("원가가 0 으로 계산되어 레시피 원가를 쓰지 않은 품목 " + zeroCost.size() + "종: "
                     + String.join(", ", zeroCost.subList(0, Math.min(20, zeroCost.size()))));
+        }
+        // 3.65.0: 플레이어가 직접 만들 수 있는 물건(가격표에 있는 재료만으로)인데 상점가가 만드는 값의 6배를 넘으면, 만드는 값의 2배로 내린다
+        // (나무 삽 205 G · 벽돌 10 G 처럼 만들면 몇 G 인 것을 비싸게 파는 일). 앵커 · 음식 · 지팡이 임시가 · 막힌 조합법은 그대로.
+        List<String> lowered = new ArrayList<>();
+        for (Price p : prices.values()) {
+            if (!isPlain(p.stack) || !p.buyableSomewhere || p.dynamicFood || p.staffFallback || p.stack.isEdible()) {
+                continue;
+            }
+            String id = itemId(p.stack);
+            Double c = res.cost.get(id);
+            if (anchors.contains(id) || c == null || c < 0.005 || !res.exact.contains(id) || res.processed.contains(id)) {
+                continue;
+            }
+            int fair = buyPrice(c, 1.0 / ratio);
+            if (p.price <= fair * 3 || p.price - fair < 10) {
+                continue;
+            }
+            String recipe = String.valueOf(res.costRecipe.get(id));
+            ResourceLocation rid = ResourceLocation.tryParse(recipe);
+            ResourceLocation oid = ResourceLocation.tryParse(id);
+            if (rid == null || oid == null || com.rtshop.rules.ItemPolicy.recipeBanned(rid, oid)) {
+                continue;
+            }
+            lowered.add(id + " " + p.price + "→" + fair);
+            p.price = fair;
+            if (p.sellUnit > p.price * ratio) {
+                p.sellUnit = p.price * ratio;
+            }
+        }
+        if (!lowered.isEmpty()) {
+            out.notes.add("만들면 훨씬 싼데 비싸게 팔던 품목 " + lowered.size() + "종의 상점가를 만드는 값의 2배로 내렸습니다: "
+                    + String.join(", ", lowered.subList(0, Math.min(40, lowered.size()))));
+            RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
         }
         if (pc.purchaseFloor) {
             applyPurchaseFloor(scan, pc, out);

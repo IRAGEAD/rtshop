@@ -57,6 +57,11 @@ final class PackDiag {
         } catch (Throwable t) {
             out.add("gear failed: " + t);
         }
+        try {
+            loops(out);
+        } catch (Throwable t) {
+            out.add("loops failed: " + t);
+        }
         out.add("== lrtactical melee variants");
         try {
             for (ItemStack v : com.rtshop.gacha.GachaConfig.variantsForDiag("lrtactical:melee")) {
@@ -248,6 +253,19 @@ final class PackDiag {
             }
         }
         out.add("weapons listed: " + n);
+        // 3.65.0: 강화에서 원거리 · 마법 무기로 보는 것 (쏜 것 / 주문의 피해가 오른다)
+        StringBuilder rk = new StringBuilder();
+        StringBuilder mk = new StringBuilder();
+        for (Item item : ForgeRegistries.ITEMS) {
+            try {
+                com.rtshop.enhance.Enhance.Kind k = com.rtshop.enhance.Enhance.kind(new ItemStack(item));
+                if (k == com.rtshop.enhance.Enhance.Kind.RANGED) rk.append(' ').append(ForgeRegistries.ITEMS.getKey(item));
+                if (k == com.rtshop.enhance.Enhance.Kind.MAGIC) mk.append(' ').append(ForgeRegistries.ITEMS.getKey(item));
+            } catch (Throwable ignored) {
+            }
+        }
+        out.add("== enhance ranged:" + rk);
+        out.add("== enhance magic:" + mk);
         extreme(server, out, craft);
         out.add("== armor (id | name | slot | armor | toughness | shop | craft | boss)");
         n = 0;
@@ -329,6 +347,81 @@ final class PackDiag {
             }
         }
         out.add("extreme: " + recipes + " recipes, " + tables + " loot table hits, " + failed + " tables not readable");
+    }
+
+    /**
+     * 3.65.0 돈이 불어나는 길 찾기: (1) 같은 물건을 어느 상점에서 사서 다른 상점에 더 비싸게 팔 수 있는가,
+     * (2) 가격표에 있는 재료만으로 만드는 물건(레시피 원가가 정확한 것)을 그 원가보다 비싸게 팔 수 있는가 (음식은 수고비 몫이 있으니 따로 표시).
+     * 품질(별 · 무게) 배율 전 기본 매입가 기준.
+     */
+    private static void loops(List<String> out) {
+        ShopLoader.Loaded l = ShopServer.loaded();
+        if (l == null) return;
+        java.util.Map<String, Integer> minBuy = new java.util.HashMap<>();
+        java.util.Map<String, String> minBuyShop = new java.util.HashMap<>();
+        java.util.Map<String, Double> maxSell = new java.util.HashMap<>();
+        java.util.Map<String, String> maxSellShop = new java.util.HashMap<>();
+        for (java.util.Map.Entry<String, com.rtshop.shop.ShopData> se : l.shops.entrySet()) {
+            for (com.rtshop.shop.ShopData.Entry e : se.getValue().entries) {
+                if (e.stack.isEmpty() || e.stack.hasTag()) continue;
+                ResourceLocation rl = ForgeRegistries.ITEMS.getKey(e.stack.getItem());
+                if (rl == null) continue;
+                String id = rl.toString();
+                if (e.buyable && (!minBuy.containsKey(id) || e.price < minBuy.get(id))) {
+                    minBuy.put(id, e.price);
+                    minBuyShop.put(id, se.getKey());
+                }
+                if (e.sellable && e.sellUnit > 0 && (!maxSell.containsKey(id) || e.sellUnit > maxSell.get(id))) {
+                    maxSell.put(id, e.sellUnit);
+                    maxSellShop.put(id, se.getKey());
+                }
+            }
+        }
+        out.add("== money loops: buy in one shop, sell in another for more");
+        int n1 = 0;
+        for (java.util.Map.Entry<String, Double> e : maxSell.entrySet()) {
+            Integer b = minBuy.get(e.getKey());
+            if (b != null && e.getValue() > b + 1.0e-6) {
+                out.add(String.format(Locale.ROOT, "%s | buy %d (%s) | sell %.2f (%s)", e.getKey(), b, minBuyShop.get(e.getKey()), e.getValue(), maxSellShop.get(e.getKey())));
+                n1++;
+            }
+        }
+        out.add("same-item loops: " + n1);
+        out.add("== money loops: make from shop materials, sell for more than they cost (item | sell | material cost | recipe | food?)");
+        int n2 = 0;
+        int food = 0;
+        if (l.solved != null) {
+            List<String> rows = new ArrayList<>();
+            for (java.util.Map.Entry<String, Double> e : maxSell.entrySet()) {
+                String id = e.getKey();
+                Double c = l.solved.cost.get(id);
+                if (c == null || c < 0.005 || !l.solved.exact.contains(id)) continue;
+                double gain = e.getValue() - c;
+                if (gain <= Math.max(0.5, c * 0.02)) continue;
+                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
+                boolean isFood = item != null && (item.isEdible() || l.solved.processed.contains(id));
+                if (isFood) food++;
+                else n2++;
+                rows.add(String.format(Locale.ROOT, "%08.1f|%s | sell %.2f | cost %.2f | %s | %s", gain, id, e.getValue(), c, l.solved.costRecipe.get(id), isFood ? "food" : "NOT FOOD"));
+            }
+            rows.sort(java.util.Comparator.reverseOrder());
+            for (int i = 0; i < Math.min(80, rows.size()); i++) out.add(rows.get(i).substring(rows.get(i).indexOf('|') + 1));
+        }
+        out.add("craft loops: " + n2 + " non-food, " + food + " food (food has the cook's margin by design)");
+        // 뽑기에 든 물건을 상점에서도 살 수 있으면 뽑기가 헛일이 된다
+        out.add("== gacha items you can also buy in a shop (item | grade | shop price)");
+        int n3 = 0;
+        for (var en : com.rtshop.gacha.GachaConfig.get().pools.entrySet()) {
+            for (var e : en.getValue()) {
+                if (e.item == null || e.item.isEmpty()) continue;
+                Integer b = minBuy.get(e.item);
+                if (b != null) {
+                    out.add(e.item + " | " + en.getKey() + ":" + e.grade + " | " + b + " (" + minBuyShop.get(e.item) + ")");
+                    n3++;
+                }
+            }
+        }
+        out.add("gacha items in shops: " + n3);
     }
 
     private static void prices(List<String> out) {

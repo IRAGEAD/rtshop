@@ -61,6 +61,12 @@ public final class PricingConfig {
     public final Map<String, Double> margins = new LinkedHashMap<>();
     public final Map<String, Double> labor = new LinkedHashMap<>();
     public final Map<String, Double> flatExtra = new LinkedHashMap<>();
+    /**
+     * 3.65.0: 가격표에 없는 재료의 값 (G). 레시피 원가를 셀 때만 쓰이고 상점에는 오르지 않는다.
+     * 적지 않은 재료는 defaultIngredientValue(2 G)로 추정되어, 네더의 별 · 겉날개 같은 귀한 재료로 만드는 물건의 원가가 너무 낮게 잡혔다.
+     * 광석의 돌 변형(Spelunkery 의 안산암 철광석 등)은 같은 바닐라 광석의 값을 쓴다 (ShopLoader).
+     */
+    public final Map<String, Double> ingredientValues = new LinkedHashMap<>();
     public final Map<String, String> fluidCosts = new LinkedHashMap<>();
     public final Map<String, List<String>> typeExtras = new LinkedHashMap<>();
 
@@ -128,6 +134,41 @@ public final class PricingConfig {
         List<String> rice = new ArrayList<>();
         rice.add("#forge:cooked_rice");
         typeExtras.put("kaleidoscope_cookery:rice_bowl", rice);
+        // 귀한 재료의 값 (3.65.0). 바닐라: 보스 · 희귀 전리품
+        Object[][] values = {
+                {"minecraft:nether_star", 20000}, {"minecraft:dragon_egg", 50000}, {"minecraft:elytra", 15000}, {"minecraft:enchanted_golden_apple", 10000},
+                {"minecraft:dragon_head", 5000}, {"minecraft:totem_of_undying", 3000}, {"minecraft:wither_skeleton_skull", 2000},
+                {"minecraft:diamond_horse_armor", 4000}, {"minecraft:golden_horse_armor", 1500}, {"minecraft:iron_horse_armor", 600},
+                {"minecraft:sculk_catalyst", 800}, {"minecraft:echo_shard", 600}, {"minecraft:creeper_head", 500}, {"minecraft:goat_horn", 500},
+                {"minecraft:bell", 500}, {"minecraft:disc_fragment_5", 500}, {"minecraft:dragon_breath", 300}, {"minecraft:ghast_tear", 300},
+                {"minecraft:skeleton_skull", 200}, {"minecraft:sculk_sensor", 200}, {"minecraft:wither_rose", 200}, {"minecraft:phantom_membrane", 150},
+                {"minecraft:spore_blossom", 100}, {"minecraft:gilded_blackstone", 100}, {"minecraft:crying_obsidian", 60}, {"minecraft:torchflower", 50},
+                {"minecraft:pitcher_plant", 50}, {"minecraft:shroomlight", 30},
+                // 모드의 보스 재료 · 귀한 재료 (없는 모드의 것은 쓰이지 않는다)
+                {"cataclysm:lacrima", 3000}, {"cataclysm:essence_of_the_storm", 3000}, {"cataclysm:void_core", 5000}, {"cataclysm:void_jaw", 3000},
+                {"cataclysm:monstrous_horn", 3000}, {"cataclysm:sandstorm_in_a_bottle", 3000}, {"cataclysm:athame", 5000}, {"cataclysm:khopesh", 5000},
+                {"cataclysm:infernal_forge", 5000}, {"cataclysm:gauntlet_of_guard", 5000}, {"cataclysm:kobolediator_skull", 1000}, {"cataclysm:dying_ember", 500},
+                {"cataclysm:amethyst_crab_shell", 500}, {"cataclysm:crystallized_coral_fragments", 200}, {"cataclysm:koboleton_bone", 100},
+                {"cataclysm:coral_chunk", 100}, {"cataclysm:void_stone", 100},
+                {"irons_spellbooks:pyrium_ingot", 3000}, {"irons_spellbooks:dragonskin", 3000}, {"irons_spellbooks:divine_soulshard", 3000},
+                {"irons_spellbooks:arcane_debris", 1500}, {"irons_spellbooks:raw_mithril", 1500}, {"irons_spellbooks:dead_king_phylactery_shard", 1000},
+                {"irons_spellbooks:ancient_knowledge_fragment", 500}, {"irons_spellbooks:ice_spider_egg", 500}, {"irons_spellbooks:cinder_essence", 300},
+                {"irons_spellbooks:permafrost_shard", 300}, {"irons_spellbooks:lightning_bottle", 300}, {"irons_spellbooks:bloody_vellum", 200},
+                {"irons_spellbooks:frozen_bone", 100}, {"irons_spellbooks:ruined_book", 100}, {"irons_spellbooks:arcane_essence", 50}, {"irons_spellbooks:hogskin", 50},
+                {"efn:deepdark_heart", 5000}, {"wom:demon_seal", 3000}, {"wom:eternal_fire_arcane", 3000}, {"wom:overly_large_cylinder", 500},
+                {"wom:claw", 200}, {"wom:fur", 50}, {"aquamirae:ship_graveyard_echo", 1000}, {"aquamirae:pirate_pouch", 500}, {"aquamirae:anglers_fang", 300},
+                {"mowziesmobs:captured_grottol", 1000}, {"mowziesmobs:naga_fang", 500}, {"block_factorys_bosses:kraken_tooth", 2000},
+                {"block_factorys_bosses:dragon_bone", 2000}, {"fdbosses:polished_justicestone", 500},
+                {"armory_rpgs:champion_upgrade_crystal", 2000}, {"armory_rpgs:conqueror_upgrade_crystal", 2000}, {"armory_rpgs:redeemer_upgrade_crystal", 2000},
+                {"armory_rpgs:vanquisher_upgrade_crystal", 2000}, {"armory_rpgs:champion_forgotten_upgrade_crystal", 3000},
+                {"armory_rpgs:conqueror_forgotten_upgrade_crystal", 3000}, {"armory_rpgs:redeemer_forgotten_upgrade_crystal", 3000},
+                {"armory_rpgs:vanquisher_forgotten_upgrade_crystal", 3000},
+                {"jewelry:citrine", 300}, {"jewelry:jade", 300}, {"jewelry:ruby", 300}, {"jewelry:sapphire", 300}, {"jewelry:tanzanite", 300}, {"jewelry:topaz", 300},
+                {"create:zinc_ore", 180}, {"create:deepslate_zinc_ore", 180},
+        };
+        for (Object[] v : values) {
+            ingredientValues.put((String) v[0], ((Number) v[1]).doubleValue());
+        }
     }
 
     public RecipeSolver.Config solverConfig() {
@@ -183,6 +224,7 @@ public final class PricingConfig {
                 readDoubles(o, "margins", c.margins);
                 readDoubles(o, "labor", c.labor);
                 readDoubles(o, "flatExtra", c.flatExtra);
+                readDoubles(o, "ingredientValues", c.ingredientValues);
                 if (o.has("fluidCosts") && o.get("fluidCosts").isJsonObject()) {
                     c.fluidCosts.clear();
                     for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("fluidCosts").entrySet()) {
@@ -205,6 +247,7 @@ public final class PricingConfig {
                 help.add("margins: 레시피 종류별 마진(0.05 = 5%) · labor: 조리 1회당 수고비(G) · flatExtra: 1회당 추가 원가(기본 없음)");
                 help.add("주의: 화로·조합대처럼 자동화할 수 있는 레시피 종류에 margin/labor/flatExtra 를 주면 재료를 사서 만들어 파는 것만으로 돈이 불어납니다");
                 help.add("음식 매입가 = (재료 원가 + flatExtra) × (1 + margin) + labor, 음식 판매가 = 매입가 × foodBuyMultiplier");
+                help.add("ingredientValues (3.65.0): 가격표에 없는 귀한 재료의 값(G). 레시피 원가를 셀 때만 쓰고 상점에는 오르지 않는다 (적지 않은 재료는 defaultIngredientValue).");
                 help.add("notForSaleMods: 이 모드들의 아이템은 상점이 팔지 않습니다 (보스를 잡아서 얻는 스토리 보상). 플레이어가 파는 것은 됩니다");
                 help.add("purchaseFloor 가 켜져 있으면 어떤 조리법으로 만들든 재료를 상점에서 산 값 이상으로 매입합니다");
                 help.add("flexDishPricing: 자유 조리법(Kaleidoscope Cookery 의 flex 냄비, 품질 꼬리표가 붙는 요리)으로 만든 요리는 재료 한 벌 값 + 손 조리 이익으로 삽니다. 최상급(Superb)만 정식 조리법과 같은 값");
@@ -235,6 +278,7 @@ public final class PricingConfig {
                 o.add("margins", doubles(c.margins));
                 o.add("labor", doubles(c.labor));
                 o.add("flatExtra", doubles(c.flatExtra));
+            o.add("ingredientValues", doubles(c.ingredientValues));
                 JsonObject fl = new JsonObject();
                 c.fluidCosts.forEach(fl::addProperty);
                 o.add("fluidCosts", fl);

@@ -719,7 +719,7 @@
   "rtshop.plot.list_starter_owned": "#%1$s %2$s · %3$s blocks · starter field · owner %5$s (click to go)",
   "rtshop.gachaedit.weapon_mods": "Common-rare weapon mods",
   "block.rtshop.enhance_anvil": "Enhancement Anvil",
-  "block.rtshop.enhance_anvil.tip1": "Enhances weapons and armor up to +11.",
+  "block.rtshop.enhance_anvil.tip1": "Enhances weapons (bows, guns and staffs too) and armor up to +11.",
   "block.rtshop.enhance_anvil.tip2": "Costs Mining Master gems, Spelunkery minerals and Gold.",
   "container.rtshop.enhance": "Enhancement Anvil",
   "item.rtshop.enhance_guard_damage": "Damage Guard",
@@ -753,7 +753,7 @@
   "rtshop.enhance.not_enhanceable": "Can't be enhanced",
   "rtshop.enhance.max": "Max level (+11)",
   "rtshop.enhance.panel": "Enhancement",
-  "rtshop.enhance.help1": "Put a weapon or armor piece in the left slot.",
+  "rtshop.enhance.help1": "Put a weapon (bows, guns and staffs too) or armor piece in the left slot.",
   "rtshop.enhance.help2": "Put a guard ticket in the slot next to the item on the anvil: one is used on that attempt.",
   "rtshop.enhance.help3": "Click the result slot to spend the materials and Gold and try.",
   "rtshop.enhance.help4": "Results: success (+1), keep, damage (-1), destroy. Higher levels cost more and are riskier.",
@@ -1944,5 +1944,10 @@
   "rtshop.petition.answer": "Answer",
   "rtshop.petition.withdraw": "Withdraw",
   "rtshop.petition.placeholder": "Click here and write your report",
-  "rtshop.enhance.guard_refund": "The protection you had set the old way (right-click) was returned as one %s. Guard tickets now go in the slot next to the item on the enhancement anvil."
+  "rtshop.enhance.guard_refund": "The protection you had set the old way (right-click) was returned as one %s. Guard tickets now go in the slot next to the item on the enhancement anvil.",
+  "rtshop.enhui.stat_ranged_pct": "Ranged damage bonus",
+  "rtshop.enhui.stat_magic_pct": "Spell damage bonus",
+  "rtshop.enhance.bonus_ranged": "Enhanced +%s/%s · Arrow and bullet damage +%s",
+  "rtshop.enhance.bonus_magic": "Enhanced +%s/%s · Spell damage +%s",
+  "rtshop.rules.extreme_removed": "%s can't be used in this pack, so it was taken away."
 }

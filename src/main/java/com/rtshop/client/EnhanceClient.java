@@ -90,9 +90,13 @@ public final class EnhanceClient {
             tip.set(0, Component.literal("+" + lv + " ").withStyle(color(lv), ChatFormatting.BOLD).append(tip.get(0)));
             EnhanceConfig cfg = EnhanceConfig.client();
             Enhance.Kind k = Enhance.kind(s);
-            String key = k == Enhance.Kind.ARMOR ? "rtshop.enhance.bonus_armor" : "rtshop.enhance.bonus_weapon";
-            double[] arr = k == Enhance.Kind.ARMOR ? cfg.armorBonus : cfg.weaponBonus;
-            tip.add(Math.min(1, tip.size()), Component.translatable(key, lv, EnhanceConfig.MAX_LEVEL, pct(arr[Math.min(lv, arr.length - 1)]))
+            String key = switch (k) {
+                case ARMOR -> "rtshop.enhance.bonus_armor";
+                case RANGED -> "rtshop.enhance.bonus_ranged";
+                case MAGIC -> "rtshop.enhance.bonus_magic";
+                default -> "rtshop.enhance.bonus_weapon";
+            };
+            tip.add(Math.min(1, tip.size()), Component.translatable(key, lv, EnhanceConfig.MAX_LEVEL, pct(Enhance.bonusPct(cfg, k, lv)))
                     .withStyle(color(lv)));
         }
     }

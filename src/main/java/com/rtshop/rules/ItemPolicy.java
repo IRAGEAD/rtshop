@@ -95,6 +95,13 @@ public final class ItemPolicy {
         /** 상점 금지(shopBan) 모드의 장비는 "상점에서만" 규칙에서 빼서, 그 모드의 조합법과 전리품을 그대로 둔다. */
         public boolean shopBannedKeepOwnWays = true;
         public boolean vanillaGearToo = false;
+        /**
+         * 터무니없이 센 장비 (3.65.0): 공격력이 extremeAttack 이상이거나 갑옷 한 조각의 방어력이 extremeArmor 이상인 장비는
+         * 전리품(상자 · 몹 · 보스) · 몹 드롭 · 조합법에서 뺀다 (keep · lootAllow 에 적어도). 0 = 끔.
+         * 모드팩에서 Arcane Vortex 의 공격력 수백 ~ 무한 무기 · 방어력 21억 갑옷이 여기에 걸린다. 다른 장비는 공격력 17 · 방어력 13 이 가장 높다.
+         */
+        public double extremeAttack = 25;
+        public double extremeArmor = 20;
         public final Set<String> keep = new LinkedHashSet<>();
         /** 몬스터를 잡으면 따로 굴리는 드랍 (Iron's Spells 의 잉크): 아이템 → 확률(0~1). */
         public final Map<String, Double> mobDrops = new LinkedHashMap<>();
@@ -135,6 +142,7 @@ public final class ItemPolicy {
             help.add("blockDropBan: 블록을 캤을 때도 나오지 않는 아이템 (Create: 던전의 건축물에 놓인 블록을 캐서 얻지 못하게). 비우면 캐서 얻을 수 있다.");
             help.add("gachaBan: 뽑기에 오르지 않는 것 — 무기·장신구·펫 묶음의 아이템 ID 와 마법 뽑기의 인챈트 ID (Create: 상점·뽑기 어디에서도 얻지 못하게). gacha.json 의 목록은 지우지 않고 건너뛰기만 한다.");
             help.add("recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).");
+            help.add("extremeAttack / extremeArmor (3.65.0): 공격력이 이 값 이상이거나 갑옷 한 조각의 방어력이 이 값 이상인 터무니없는 장비는 전리품 · 몹과 보스의 드롭 · 조합법에서 뺀다 (keep · lootAllow 보다 먼저). 0 = 끔. 기본 25 / 20 (모드팩의 다른 장비는 17 / 13 이 가장 높다).");
             help.add("shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.");
             help.add("recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.");
             o.add("_help", help);
@@ -171,6 +179,8 @@ public final class ItemPolicy {
             o.addProperty("modGearShopOnly", modGearShopOnly);
             o.addProperty("shopBannedKeepOwnWays", shopBannedKeepOwnWays);
             o.addProperty("vanillaGearToo", vanillaGearToo);
+            o.addProperty("extremeAttack", extremeAttack);
+            o.addProperty("extremeArmor", extremeArmor);
             o.add("keep", arr(keep));
             return o;
         }
@@ -205,6 +215,8 @@ public final class ItemPolicy {
             c.modGearShopOnly = bool(o, "modGearShopOnly", true);
             c.shopBannedKeepOwnWays = bool(o, "shopBannedKeepOwnWays", true);
             c.vanillaGearToo = bool(o, "vanillaGearToo", false);
+            c.extremeAttack = o.has("extremeAttack") && o.get("extremeAttack").isJsonPrimitive() ? o.get("extremeAttack").getAsDouble() : d.extremeAttack;
+            c.extremeArmor = o.has("extremeArmor") && o.get("extremeArmor").isJsonPrimitive() ? o.get("extremeArmor").getAsDouble() : d.extremeArmor;
             strings(o, "keep", c.keep, d.keep);
             strings(o, "gachaBan", c.gachaBan, d.gachaBan);
             int v = v0(o);
@@ -311,7 +323,8 @@ public final class ItemPolicy {
         final List<Map.Entry<Pat, Double>> factors = new ArrayList<>();
         volatile Set<Item> boss = Set.of();
         volatile Set<Item> listed = Set.of();
-        final Map<Item, Boolean> gear = new ConcurrentHashMap<>(), staff = new ConcurrentHashMap<>(), gun = new ConcurrentHashMap<>();
+        final Map<Item, Boolean> gear = new ConcurrentHashMap<>(), staff = new ConcurrentHashMap<>(), gun = new ConcurrentHashMap<>(),
+                extreme = new ConcurrentHashMap<>();
 
         State(Config c) {
             this.c = c;
@@ -515,10 +528,48 @@ public final class ItemPolicy {
         return s.c.enabled && !stack.isEmpty() && s.lootAllow.hit(id(stack.getItem()));
     }
 
+    /**
+     * 터무니없이 센 장비인가 (3.65.0): 공격력(더하기 수정치 합)이 extremeAttack 이상, 또는 어느 칸에서든 방어력이 extremeArmor 이상.
+     * 무한 · 숫자가 아닌 값도 센 것으로 본다. 아이템별로 기억한다.
+     */
+    public static boolean extreme(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        State s = st();
+        if (!s.c.enabled) return false;
+        Item item = stack.getItem();
+        Boolean hit = s.extreme.get(item);
+        if (hit != null) return hit;
+        boolean g = false;
+        try {
+            ItemStack one = new ItemStack(item);
+            if (one.getMaxStackSize() == 1 && !(item instanceof BlockItem)) {
+                double dmg = 0;
+                for (net.minecraft.world.entity.ai.attributes.AttributeModifier m : one.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND)
+                        .get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)) {
+                    if (m.getOperation() == net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION) dmg += m.getAmount();
+                }
+                double armor = 0;
+                for (net.minecraft.world.entity.EquipmentSlot es : net.minecraft.world.entity.EquipmentSlot.values()) {
+                    double sum = 0;
+                    for (net.minecraft.world.entity.ai.attributes.AttributeModifier m : one.getAttributeModifiers(es).get(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)) {
+                        if (m.getOperation() == net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION) sum += m.getAmount();
+                    }
+                    armor = Math.max(armor, Double.isNaN(sum) ? Double.POSITIVE_INFINITY : sum);
+                }
+                if (Double.isNaN(dmg)) dmg = Double.POSITIVE_INFINITY;
+                g = s.c.extremeAttack > 0 && dmg >= s.c.extremeAttack || s.c.extremeArmor > 0 && armor >= s.c.extremeArmor;
+            }
+        } catch (Throwable ignored) {
+        }
+        s.extreme.put(item, g);
+        return g;
+    }
+
     /** 전리품(상자·몹·낚시)에서 빠져야 하는가. bossTable = 보스의 전리품표. */
     public static boolean lootBanned(ItemStack stack, boolean bossTable) {
         State s = st();
         if (!s.c.enabled || stack.isEmpty()) return false;
+        if (extreme(stack)) return true;   // 3.65.0: 터무니없이 센 장비는 보스 전리품 · lootAllow 에서도 뺀다
         Item item = stack.getItem();
         ResourceLocation id = id(item);
         if (id == null || s.lootAllow.hit(id)) return false;
@@ -548,9 +599,12 @@ public final class ItemPolicy {
         State s = st();
         if (!s.c.enabled) return null;
         if (recipe != null && s.c.recipeBanMods.contains(recipe.getNamespace())) return "mod";
-        if (output == null || s.keep.hit(output)) return null;
+        if (output == null) return null;
+        Item item0 = ForgeRegistries.ITEMS.getValue(output);
+        if (item0 != null && item0 != Items.AIR && extreme(new ItemStack(item0))) return "extreme";   // 3.65.0: keep 에 적어도 못 만든다
+        if (s.keep.hit(output)) return null;
         if (s.recipeBan.hit(output)) return "ban";
-        Item item = ForgeRegistries.ITEMS.getValue(output);
+        Item item = item0;
         if (item == null || item == Items.AIR || s.boss.contains(item)) return null;
         if (s.c.recipeBanStaffs && staff(item)) return "staff";
         if (ours(output) || (vanilla(output) && !s.c.vanillaGearToo)) return null;
