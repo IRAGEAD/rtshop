@@ -224,9 +224,12 @@ jobs:
         run: |
           mkdir -p /tmp/inspect
           # 보스 컷신 모드: 컷신 엔티티가 무엇을 하고(카메라·보스 소환), 어디서 불리는지, 글(언어 파일)은 무엇인지 — 기억의 문 안에서 그 컷신을 틀려고
-          CC="$(ls packcache/*.jar | grep -i "cinematiccataclysm" | head -1)"
+          CC="$(ls packcache/*.jar /tmp/mods/*.jar 2>/dev/null | grep -i "cinematic.\?cataclysm" | head -1)"
+          ls packcache | grep -i "cinem\|catac" > /tmp/inspect/cincat-where.txt 2>&1 || true
+          ls /tmp/mods | grep -i "cinem\|catac" >> /tmp/inspect/cincat-where.txt 2>&1 || true
+          case "$CC" in /*) ;; ?*) CC="$GITHUB_WORKSPACE/$CC" ;; esac
           if [ -n "$CC" ]; then
-            mkdir -p /tmp/ccj && (cd /tmp/ccj && unzip -q -o "$GITHUB_WORKSPACE/$CC")
+            mkdir -p /tmp/ccj && (cd /tmp/ccj && unzip -q -o "$CC")
             {
               echo "######## files"; (cd /tmp/ccj && find . -type f | grep -v "\.png$\|\.ogg$" | sort | head -n 400)
               echo "######## sizes"; (cd /tmp/ccj && find . -name '*.ogg' -o -name '*.png' | wc -l)
