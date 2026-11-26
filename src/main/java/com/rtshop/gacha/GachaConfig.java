@@ -244,7 +244,7 @@ public final class GachaConfig {
             return true;
         }
         String path = rl.getPath();
-        return excludeMods.contains(rl.getNamespace()) || excludeItems.contains(rl.toString())
+        return excludeMods.contains(rl.getNamespace()) || excludeItems.contains(rl.toString()) || com.rtshop.rules.ItemPolicy.gachaBanned(rl)
                 || path.contains("debug") || path.contains("creative") || path.startsWith("dev_") || path.contains("_test")
                 || rl.getNamespace().equals(RtShop.MODID);
     }
@@ -962,12 +962,14 @@ public final class GachaConfig {
 
     /** 이 이름의 아이템/엔티티가 실제로 있는지 (없는 칸은 뽑기에서 뺀다). */
     public static boolean valid(Entry e) {
+        // 아이템 규칙(item_policy.json 의 gachaBan)이 막은 것은 목록에 있어도 나오지 않는다
         if (!e.entity.isEmpty()) {
             ResourceLocation rl = ResourceLocation.tryParse(e.entity);
-            return rl != null && ForgeRegistries.ENTITY_TYPES.containsKey(rl);
+            return rl != null && ForgeRegistries.ENTITY_TYPES.containsKey(rl) && !com.rtshop.rules.ItemPolicy.gachaBanned(rl);
         }
         ResourceLocation rl = ResourceLocation.tryParse(e.item);
-        return rl != null && ForgeRegistries.ITEMS.containsKey(rl) && ForgeRegistries.ITEMS.getValue(rl) != Items.AIR;
+        return rl != null && ForgeRegistries.ITEMS.containsKey(rl) && ForgeRegistries.ITEMS.getValue(rl) != Items.AIR
+                && !com.rtshop.rules.ItemPolicy.gachaBanned(rl);
     }
 
     static String lower(String s) {

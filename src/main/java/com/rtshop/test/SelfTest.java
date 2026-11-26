@@ -2285,6 +2285,36 @@ public final class SelfTest {
                             && com.rtshop.rules.ItemPolicy.recipeReason(new ResourceLocation("create:crafting/kinetics/shaft"), null) != null
                             && !com.rtshop.rules.ItemPolicy.blockDropBanned(new ItemStack(Items.COBBLESTONE)),
                     crOld.recipeBanMods + " " + crOld.lootBan + " " + crOld.blockDropBan);
+            // 3.58.1 (4판): Create 전용 아이템은 상점과 뽑기에도 오르지 않는다
+            com.rtshop.rules.ItemPolicy.Config crOld3 = com.rtshop.rules.ItemPolicy.Config.fromJson(JsonParser.parseString(
+                    "{\"version\":3,\"shopBan\":[\"efn:*\"],\"gachaBan\":[\"mymod:thing\"]}").getAsJsonObject());
+            com.rtshop.rules.ItemPolicy.Config crKeep4 = com.rtshop.rules.ItemPolicy.Config.fromJson(JsonParser.parseString(
+                    "{\"version\":4,\"shopBan\":[\"efn:*\"],\"gachaBan\":[]}").getAsJsonObject());
+            List<String> crLeft = new ArrayList<>();
+            for (Map.Entry<String, com.rtshop.shop.ShopData> crSh : com.rtshop.shop.ShopServer.shops().entrySet()) {
+                for (com.rtshop.shop.ShopData.Entry crSe : crSh.getValue().entries) {
+                    ResourceLocation crId = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(crSe.stack.getItem());
+                    if (crId != null && crId.getNamespace().equals("create")) crLeft.add(crSh.getKey() + ":" + crId);
+                }
+            }
+            for (String crCat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
+                for (com.rtshop.gacha.GachaConfig.Entry crGe : com.rtshop.gacha.GachaConfig.get().pool(crCat)) {
+                    if ((crGe.item.startsWith("create:") || crGe.entity.startsWith("create:")) && com.rtshop.gacha.GachaConfig.valid(crGe)) crLeft.add("gacha " + crCat + ":" + crGe.item + crGe.entity);
+                }
+            }
+            for (com.rtshop.magic.MagicConfig.Ench crEn : com.rtshop.magic.MagicConfig.get().enchants) {
+                if (crEn.id.startsWith("create:") && crEn.enchantment() != null) crLeft.add("magic enchant:" + crEn.id);
+            }
+            com.rtshop.gacha.GachaConfig.Entry crProbe = new com.rtshop.gacha.GachaConfig.Entry();
+            crProbe.item = "minecraft:diamond";
+            check("Create: nothing of it is sold in an NPC shop or comes out of a gacha (shopBan + the new gachaBan), an installed version-3 file gains both, and a version-4 file is left as the operator wrote it",
+                    crDef.shopBan.contains("create:*") && crDef.gachaBan.contains("create:*")
+                            && crOld3.shopBan.contains("create:*") && crOld3.shopBan.contains("efn:*") && crOld3.gachaBan.contains("create:*") && crOld3.gachaBan.contains("mymod:thing")
+                            && !crKeep4.shopBan.contains("create:*") && crKeep4.gachaBan.isEmpty()
+                            && com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("create:goggles")) && com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("create:capacity"))
+                            && !com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("minecraft:diamond")) && com.rtshop.gacha.GachaConfig.valid(crProbe)
+                            && crLeft.isEmpty(),
+                    crLeft + " " + crOld3.shopBan + " " + crOld3.gachaBan + " " + crKeep4.shopBan);
         }
         check("by default the NPC shops never list the enhance anvil or a boss item (nether star); ordinary goods are untouched, and nothing vanilla loses its recipe",
                 com.rtshop.rules.ItemPolicy.shopBanned(new ItemStack(com.rtshop.item.ModItems.ENHANCE_ANVIL.get())) && com.rtshop.rules.ItemPolicy.bossItem(Items.NETHER_STAR)

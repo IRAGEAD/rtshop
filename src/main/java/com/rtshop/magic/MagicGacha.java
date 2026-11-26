@@ -493,7 +493,7 @@ public final class MagicGacha {
         o.add("knownSkills", skills);
         JsonArray ench = new JsonArray();
         for (var en : ForgeRegistries.ENCHANTMENTS.getEntries()) {
-            if (en.getValue().isCurse()) continue;
+            if (en.getValue().isCurse() || com.rtshop.rules.ItemPolicy.gachaBanned(en.getKey().location())) continue;
             JsonObject x = new JsonObject();
             x.addProperty("id", en.getKey().location().toString());
             x.addProperty("max", en.getValue().getMaxLevel());

@@ -83,7 +83,8 @@ public final class MagicConfig {
 
         public Enchantment enchantment() {
             ResourceLocation rl = ResourceLocation.tryParse(id);
-            return rl == null ? null : ForgeRegistries.ENCHANTMENTS.getValue(rl);
+            // 아이템 규칙(gachaBan)이 막은 인챈트는 없는 것으로 친다: 목록에 남아 있어도 나오지 않는다
+            return rl == null || com.rtshop.rules.ItemPolicy.gachaBanned(rl) ? null : ForgeRegistries.ENCHANTMENTS.getValue(rl);
         }
     }
 
@@ -201,7 +202,7 @@ public final class MagicConfig {
         for (var en : ForgeRegistries.ENCHANTMENTS.getEntries()) {
             Enchantment e = en.getValue();
             String id = en.getKey().location().toString();
-            if (e.isCurse() || have.contains(id) || !fitsReroll(e)) continue;
+            if (e.isCurse() || have.contains(id) || !fitsReroll(e) || com.rtshop.rules.ItemPolicy.gachaBanned(en.getKey().location())) continue;
             int max = Math.max(1, e.getMaxLevel());
             for (int lv = 1; lv <= max; lv++) {
                 Ench x = new Ench();

@@ -195,3 +195,12 @@
   - 편집 화면: 레이드·주간 보상·층 상자 편집기의 제목과 항목 이름(`RewardEditor` · `RaidConfig.label(k, en)`), 퀘스트 편집기의 저장·삭제 결과(`QuestEditor.m`), 직업·뽑기·출석 편집기의 저장 실패 문구(`StoryText.saveError`).
   - 플레이어가 보는 것 (찾다가 나온 것): 상점의 "1장 이후" 잠금 표시(언어 파일 `rtshop.gate.*` · `StoryGates.chapterName`), 직업 변경 쿨타임의 "3시간 20분"(`Jobs.durationText`), 출석 복구 안내의 날짜(`Attendance.time`), 주간 보상 창의 "제 Ⅲ 층 · 받음 · 닫기".
   - 그대로 둔 것: 설정 파일 안의 `_help` 설명, 퀘스트 파일을 읽다 생긴 문제 목록(로그), NPC 머리 위 이름, 운영자가 직접 고친 설정 문구.
+
+## 추가 요청 (11-26 15:03) → 3.58.1
+
+- E-1. Create 모드 전용 아이템을 상점과 뽑기에서 삭제. (주식 · 히든 직업 · NPC 외형은 예시였을 뿐 고른 것이 아님 — 그대로 대기.)
+  - ✔ item_policy.json 4판: shopBan 에 `create:*`, 새 항목 **gachaBan**(`create:*`). 깔린 3판 파일은 저절로 4판으로 (운영자가 넣은 줄은 그대로).
+  - 상점: 지팡이로 올라가던 `create:wand_of_symmetry` 가 빠진다 (`ShopLoader` 가 shopBan 을 읽을 때마다 거름. 상점 파일은 건드리지 않음).
+  - 뽑기: `GachaConfig.valid` 가 gachaBan 에 걸린 칸을 "없는 것"으로 친다 → 굴림·확률표·화면에서 빠지고, 편집 화면에는 꺼진 칸으로 보인다. 새로 만드는 목록(`excluded`)에도 들어가지 않는다. gacha.json 은 지우지 않는다 (gachaBan 에서 빼면 되돌아옴).
+  - 마법 뽑기의 인챈트: `MagicConfig.Ench.enchantment()` 가 gachaBan 에 걸린 인챈트(create:capacity · create:potato_recovery)를 없는 것으로 친다. 자동 채우기와 편집 화면의 고를 수 있는 목록에서도 빠진다.
+  - 자체 점검 "Create: nothing of it is sold in an NPC shop or comes out of a gacha …" (모드팩 전체에서는 실제 상점·뽑기 목록을 훑는다).
