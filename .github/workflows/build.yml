@@ -513,6 +513,113 @@ jobs:
           git commit -q -m "Inspect from run ${{ github.run_id }}" || exit 0
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-inspect
 
+  perf:
+    # 3.70.0 성능 측정 (테스트 가지에서만, 참고용): 모드팩 전체로 실제 지형의 새 세계를 띄워 서버 틱 시간 · 지형 생성 속도 · 메모리,
+    # 클라이언트 FPS(마을 NPC · 날아서 새 땅 · 몹 곁), Distant Horizons 의 가까운 청크 빈틈(전용 서버 접속)을 재고, JFR 로 모드별 CPU 몫을 낸다.
+    needs: build
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 110
+    env:
+      SKIP_MODS: "cwb-,forgematica,mafglib,oculus"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: actions/download-artifact@v4
+        with:
+          name: rtshop-jar
+          path: jar
+      - uses: actions/cache@v4
+        with:
+          path: packcache
+          key: pack-${{ hashFiles('.github/scripts/pack_files.json', '.github/scripts/pack_overrides.json') }}-v2
+      - name: Download the pack's mods
+        run: python3 .github/scripts/fullpack.py .github/scripts/pack_files.json packcache server/mods "$SKIP_MODS" .github/scripts/pack_overrides.json
+      - name: Install Forge server
+        run: |
+          cd server
+          FV=1.20.1-47.4.29
+          echo "FORGE_VER=$FV" >> "$GITHUB_ENV"
+          curl -fsSL -o installer.jar "https://maven.minecraftforge.net/net/minecraftforge/forge/$FV/forge-$FV-installer.jar"
+          java -jar installer.jar --installServer > installer.log 2>&1 || (tail -n 30 installer.log; exit 1)
+          cp ../jar/*.jar mods/
+          echo "eula=true" > eula.txt
+          nproc; free -g | head -n 2
+      - name: Server performance (real terrain)
+        run: |
+          cd server
+          printf 'online-mode=false\nspawn-protection=0\nlevel-name=perfworld\nlevel-seed=20261127\nmax-tick-time=-1\nview-distance=8\nsimulation-distance=6\ndifficulty=easy\n' > server.properties
+          echo "-Xmx10G -Drtshop.perftest=true -XX:StartFlightRecording=filename=perf-server.jfr,settings=profile,dumponexit=true" > user_jvm_args.txt
+          START=$(date +%s)
+          bash run.sh nogui > perf-server.log 2>&1 &
+          for i in $(seq 1 180); do
+            sleep 10
+            if grep -q "^RESULT" rtshop-perf-server.txt 2>/dev/null; then echo "perf finished after $((i*10))s"; break; fi
+            if ! pgrep -x java > /dev/null; then echo "server exited after $((i*10))s"; break; fi
+          done
+          sleep 20; pkill -x java || true; sleep 5
+          echo "startup: $(grep -o 'Done ([0-9.]*s)' perf-server.log | head -n 1)"
+          cat rtshop-perf-server.txt || tail -n 40 perf-server.log
+          python3 ../.github/scripts/perf_report.py perf-server.jfr mods rtshop-perf-server.txt > perf-server-report.txt 2>&1 || true
+          head -n 160 perf-server-report.txt | cut -c1-400
+      - name: Client performance (singleplayer, real terrain)
+        if: always()
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
+          python3 -m pip install -q "portablemc<5"
+          mkdir -p client/mods client/saves
+          while IFS= read -r f; do case "$f" in ""|Chunky*) ;; *) cp "packcache/$f" client/mods/ ;; esac; done < packcache/client_mods.txt
+          cp jar/*.jar client/mods/
+          cp -r server/perfworld client/saves/rtshoptest
+          rm -f client/saves/rtshoptest/session.lock
+          printf 'onboardAccessibility:false\ntutorialStep:none\nskipMultiplayerWarning:true\njoinedFirstServer:true\npauseOnLostFocus:false\nguiScale:2\nrenderDistance:8\nsimulationDistance:6\nmaxFps:260\nenableVsync:false\ngraphicsMode:1\nao:true\nentityShadows:true\nnarrator:0\nsoundCategory_master:0.0\nlang:ko_kr\n' > client/options.txt
+          echo "mods: $(ls client/mods | wc -l)"
+          (sleep 1500; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
+          (timeout -k 20 1400 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true -Drtshop.clienttest.only=perf -XX:StartFlightRecording=filename=$PWD/client/perf-client.jfr,settings=profile,dumponexit=true" --resolution 1280x720 > client-perf.log 2>&1) || echo "client exit code $?"
+          pkill -9 -f "rtshop.clienttest" || true
+          pkill -f "sleep 1500" || true
+          cat client/rtshop-perf-client.txt 2>/dev/null || (echo "no client perf result"; tail -n 30 client/logs/latest.log | cut -c1-300)
+          python3 .github/scripts/perf_report.py client/perf-client.jfr client/mods client/rtshop-perf-client.txt > perf-client-report.txt 2>&1 || true
+          head -n 160 perf-client-report.txt | cut -c1-400
+          cp client/logs/latest.log client/logs/perf.log 2>/dev/null || true
+      - name: Distant Horizons near-chunk gap (dedicated server + client)
+        if: always()
+        run: |
+          cd server
+          printf 'online-mode=false\nspawn-protection=0\nlevel-name=perfworld\nlevel-seed=20261127\nmax-tick-time=-1\nview-distance=6\nsimulation-distance=6\ngamemode=creative\nforce-gamemode=true\nenforce-secure-profile=false\n' > server.properties
+          echo "-Xmx8G -Drtshop.perftest=true -Drtshop.perftest.serve=true" > user_jvm_args.txt
+          bash run.sh nogui > dh-server.log 2>&1 &
+          for i in $(seq 1 60); do sleep 10; if grep -q "Done (" dh-server.log; then echo "server up after $((i*10))s"; break; fi; done
+          cd ..
+          (sleep 900; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
+          (timeout -k 20 800 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev -s 127.0.0.1 --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx7G -Drtshop.clienttest=true -Drtshop.clienttest.only=dh" --resolution 1280x720 > client-dh.log 2>&1) || echo "client exit code $?"
+          pkill -9 -f "rtshop.clienttest" || true
+          pkill -f "sleep 900" || true
+          pkill -x java || true
+          cat client/rtshop-dh-client.txt client/rtshop-dh-notes.txt 2>/dev/null || (echo "no DH result"; tail -n 30 client/logs/latest.log | cut -c1-300)
+          grep -iE "distant ?horizons|\[DH|rtshop-dh|render distance" client/logs/latest.log | cut -c1-260 | head -n 40 || true
+      - name: Share performance results (test branches only)
+        if: always()
+        run: |
+          mkdir -p /tmp/perf
+          cp server/rtshop-perf-server.txt perf-server-report.txt client/rtshop-perf-client.txt perf-client-report.txt client/rtshop-dh-client.txt client/rtshop-dh-notes.txt /tmp/perf/ 2>/dev/null || true
+          cp server/perf-server.log /tmp/perf/ 2>/dev/null || true
+          cp client/screenshots/16*.png client/screenshots/17*.png /tmp/perf/ 2>/dev/null || true
+          grep -iE "rtshop-perf|rtshop-dh|exception|error" client/logs/perf.log 2>/dev/null | cut -c1-300 | head -n 200 > /tmp/perf/client-perf-log.txt || true
+          tail -n 300 client/logs/latest.log > /tmp/perf/client-dh-tail.log 2>/dev/null || true
+          cd /tmp/perf
+          git init -q -b ci-perf
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Performance from run ${{ github.run_id }}" || exit 0
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-perf
+
   fullpack:
     # 모드팩 "RT1 - 2" 의 모드 전체(매니페스트에 적힌 버전 그대로)와 함께 포지 서버에서 자체 점검을 돌린다 (참고용: 실패해도 빌드는 유지)
     needs: build

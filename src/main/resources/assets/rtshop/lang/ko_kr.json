@@ -1953,5 +1953,6 @@
   "rtshop.enhui.fail_stacks": "누적 %s/%s",
   "rtshop.enhance.fail_stacks_tip": "실패 누적 %s/%s · 다음 강화 성공률 +%s (그 단계 성공률의)",
   "rtshop.enhui.stat_reduce": "받는 피해 감소",
-  "rtshop.enhance.bonus_reduce": "받는 피해 -%s (입은 강화 방어구마다 더해짐, 최대 %s)"
+  "rtshop.enhance.bonus_reduce": "받는 피해 -%s (입은 강화 방어구마다 더해짐, 최대 %s)",
+  "rtshop.dh.matched": "서버가 %s 청크까지 보내 주어 렌더 거리를 %s → %s 로 맞췄습니다 (그 바깥은 Distant Horizons 가 그립니다. 서버를 나가면 원래대로)."
 }

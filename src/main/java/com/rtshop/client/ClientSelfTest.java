@@ -126,10 +126,10 @@ public final class ClientSelfTest {
             DialogueScreen.autoMainForTest = true;
             ClientEvents.holdScreens = false; // 점검은 연출이 끝나기를 기다리지 않는다 (따로 시험한다)
         }
-        if (mc.player == null || mc.level == null || mc.getSingleplayerServer() == null) {
+        if (mc.player == null || mc.level == null || (mc.getSingleplayerServer() == null && !ClientDhTest.ENABLED)) {
             idle++;
             try {
-                autoEnter(mc);
+                if (!ClientDhTest.ENABLED) autoEnter(mc);   // DH 시험은 런처가 전용 서버로 바로 들어간다
             } catch (Throwable t) {
                 RtShop.LOGGER.error("[rtshop-clienttest] could not open the test world", t);
             }
@@ -149,6 +149,15 @@ public final class ClientSelfTest {
             return;
         }
         // 다음 단계 전에 내장 서버가 밀린 일을 마쳤는지 확인한다 (모드팩 전체에서는 지형 생성으로 서버가 수십 초 멈출 때가 있다)
+        if (ClientDhTest.ENABLED) {   // 전용 서버에 들어가 있다: 기다릴 내장 서버가 없다
+            try {
+                next(mc);
+            } catch (Throwable t) {
+                RtShop.LOGGER.error("[rtshop-clienttest] dh step {} failed", step, t);
+            }
+            step++;
+            return;
+        }
         if (!barrierPosted) {
             barrierPosted = true;
             barrierDone = false;
@@ -269,6 +278,11 @@ public final class ClientSelfTest {
                 }
             }
         }
+    }
+
+    /** 이번 걸음을 다음 틱에 한 번 더 돈다 (걸음 기계가 끝에 하나 더하므로 미리 하나 뺀다). */
+    static void repeatStep() {
+        step--;
     }
 
     static void check(String name, boolean ok) {
@@ -1185,6 +1199,14 @@ public final class ClientSelfTest {
     private static void next(Minecraft mc) {
         if (SHADER_ONLY) {
             ClientShaderTest.run(mc, step);
+            return;
+        }
+        if (ClientPerfTest.ENABLED) {
+            ClientPerfTest.run(mc, step);
+            return;
+        }
+        if (ClientDhTest.ENABLED) {
+            ClientDhTest.run(mc, step);
             return;
         }
         // Fantasy 의 안내 대화창이 화면을 가로채면 닫는다 (강화 모루 장면 중에는 그대로 둠)
@@ -2154,7 +2176,8 @@ public final class ClientSelfTest {
         out.add("");
         out.add(failed == 0 ? "RESULT: ALL PASS (" + passed + " checks)" : "RESULT: FAILED (" + failed + " of " + (passed + failed) + " checks)");
         try {
-            Files.write(mc.gameDirectory.toPath().resolve(SHADER_ONLY ? "rtshop-shadertest.txt" : "rtshop-clienttest.txt"), out, StandardCharsets.UTF_8);
+            Files.write(mc.gameDirectory.toPath().resolve(SHADER_ONLY ? "rtshop-shadertest.txt" : ClientPerfTest.ENABLED ? "rtshop-perf-client-checks.txt"
+                    : ClientDhTest.ENABLED ? "rtshop-dh-client.txt" : "rtshop-clienttest.txt"), out, StandardCharsets.UTF_8);
         } catch (Throwable t) {
             RtShop.LOGGER.error("[rtshop-clienttest] could not write the result file", t);
         }

@@ -96,6 +96,11 @@ public final class ClientConfig {
     public boolean dialogueSound = true;
     /** 미니맵(Diorama)의 몹 아이콘에 RT Shop NPC 를 보일 것인가. /rtshop hud 에서 켜고 끈다. */
     public boolean minimapNpcIcons = true;
+    /**
+     * 3.70.0: Distant Horizons 가 있으면, 서버에 들어갔을 때 렌더 거리를 서버 시야 거리에 맞춘다 (나가면 되돌림).
+     * DH 는 렌더 거리 바깥부터 먼 풍경(LOD)을 그리므로, 렌더 거리가 서버 시야 거리보다 크면 그 사이의 가까운 청크가 비어 보인다.
+     */
+    public boolean dhMatchServer = true;
     /** RT Shop 창 글꼴: sans(고딕) / serif(명조) / pixel(게임 기본) */
     public String uiFont = "sans";
     /** RT Shop 창 글자 크기: 0 작게, 1 보통, 2 크게 */
@@ -225,6 +230,7 @@ public final class ClientConfig {
             o.addProperty("fantasyQuestPopups", fantasyQuestPopups);
             o.addProperty("dialogueSound", dialogueSound);
             o.addProperty("minimapNpcIcons", minimapNpcIcons);
+            o.addProperty("dhMatchServer", dhMatchServer);
             o.addProperty("uiFont", uiFont);
             o.addProperty("uiFontSize", uiFontSize);
             o.addProperty("pvpHudX", pvpHudX);
@@ -296,6 +302,7 @@ public final class ClientConfig {
                 if (o.has("fantasyQuestPopups")) c.fantasyQuestPopups = o.get("fantasyQuestPopups").getAsBoolean();
                 if (o.has("dialogueSound")) c.dialogueSound = o.get("dialogueSound").getAsBoolean();
                 if (o.has("minimapNpcIcons")) c.minimapNpcIcons = o.get("minimapNpcIcons").getAsBoolean();
+                if (o.has("dhMatchServer")) c.dhMatchServer = o.get("dhMatchServer").getAsBoolean();
                 if (o.has("uiFont")) c.uiFont = o.get("uiFont").getAsString();
                 if (o.has("uiFontSize")) c.uiFontSize = Math.max(0, Math.min(2, o.get("uiFontSize").getAsInt()));
                 if (o.has("pvpHudX")) c.pvpHudX = o.get("pvpHudX").getAsDouble();

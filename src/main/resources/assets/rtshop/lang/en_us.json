@@ -1953,5 +1953,6 @@
   "rtshop.enhui.fail_stacks": "Fails %s/%s",
   "rtshop.enhance.fail_stacks_tip": "Failures %s/%s · next success chance +%s (of that level's rate)",
   "rtshop.enhui.stat_reduce": "Damage taken",
-  "rtshop.enhance.bonus_reduce": "Damage taken -%s (adds up over worn enhanced armour, up to %s)"
+  "rtshop.enhance.bonus_reduce": "Damage taken -%s (adds up over worn enhanced armour, up to %s)",
+  "rtshop.dh.matched": "The server sends %s chunks, so the render distance was set from %s to %s (Distant Horizons draws beyond it; restored when you leave)."
 }

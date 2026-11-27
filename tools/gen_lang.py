@@ -7,6 +7,8 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ # ---- 3.70: Distant Horizons 의 가까운 청크 빈틈
+ "rtshop.dh.matched": ("서버가 %s 청크까지 보내 주어 렌더 거리를 %s → %s 로 맞췄습니다 (그 바깥은 Distant Horizons 가 그립니다. 서버를 나가면 원래대로).", "The server sends %s chunks, so the render distance was set from %s to %s (Distant Horizons draws beyond it; restored when you leave)."),
  # ---- 3.61: 민원 창 (시청 서기 하루)
  "rtshop.talk.petition": ("민원 접수 · 내 민원 보기", "File a report · see my reports"),
  "rtshop.petition.title": ("민원 창구 — 시청 서기 하루", "Reports — Haru the Town Clerk"),
