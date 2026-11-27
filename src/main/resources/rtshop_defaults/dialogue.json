@@ -329,6 +329,9 @@
       ],
       "notQuests": [
        "story_5_09"
+      ],
+      "notFlags": [
+       "story_done"
       ]
      }
     }
@@ -1061,6 +1064,9 @@
       ],
       "notQuests": [
        "story_1_33"
+      ],
+      "notFlags": [
+       "story_done"
       ]
      }
     },
@@ -1075,6 +1081,9 @@
       ],
       "notQuests": [
        "story_1_35"
+      ],
+      "notFlags": [
+       "story_done"
       ]
      }
     },
@@ -1089,6 +1098,9 @@
       ],
       "notQuests": [
        "story_5_08"
+      ],
+      "notFlags": [
+       "story_done"
       ]
      }
     }
