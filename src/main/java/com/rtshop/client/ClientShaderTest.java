@@ -32,7 +32,7 @@ final class ClientShaderTest {
     private static volatile BlockPos base;
     private static volatile BlockPos anvil;
     private static volatile BlockPos orb;
-    private static long anvilDrawn;
+    private static long anvilDrawn, anvilAdd, anvilSh;
     private static long spotsBefore;
     /** 사진 이름과 결과에 쓰는 셰이더 팩 이름 (photon, complementary, bsl ...). */
     static final String LABEL = System.getProperty("rtshop.shadertest.label", "photon").replaceAll("[^a-z0-9]", "");
@@ -124,6 +124,8 @@ final class ClientShaderTest {
                 sp.connection.teleport(base.getX() + 0.5, base.getY(), base.getZ() + 0.5, 0F, 33F);
             });
             anvilDrawn = EnhanceAnvilGlow.drawnForTest;
+            anvilAdd = EnhanceAnvilGlow.addDrawnForTest;
+            anvilSh = EnhanceAnvilGlow.shaderDrawnForTest;
             waitTicks(120);
         });
         add(mc -> {
@@ -131,7 +133,37 @@ final class ClientShaderTest {
             check("with the shader on, the enhance anvil's runes and gem light up when someone stands near it, and the glow is really drawn",
                     lv > 0.95F && EnhanceAnvilGlow.drawnForTest > anvilDrawn, lv + " drawn=" + (EnhanceAnvilGlow.drawnForTest - anvilDrawn));
             shot(mc, "150_" + LABEL + "_anvil");
-            waitTicks(30);
+            // 3.75 (W-16): 셰이더에서는 한 겹(룬 · 보석의 획)만 — 스스로 빛나는 불투명 겹은 까맣게 켜지고 툭 꺼지며 크게 번졌다
+            check("3.75 with the shader on, the anvil glow is one see-through layer only (the opaque self-glowing layer that popped and bled is not drawn)",
+                    EnhanceAnvilGlow.shaderDrawnForTest > anvilSh && EnhanceAnvilGlow.addDrawnForTest == anvilAdd,
+                    "sh=" + (EnhanceAnvilGlow.shaderDrawnForTest - anvilSh) + " add=" + (EnhanceAnvilGlow.addDrawnForTest - anvilAdd));
+            EnhanceAnvilGlow.holdForTest = 0.2F;
+            waitTicks(40);
+        });
+        // 켜지는 도중의 모습 (밝기를 묶어 두고 찍는다): 20% · 45% · 70% — 매끈하게 밝아지는지 그림으로 본다
+        add(mc -> {
+            shot(mc, "150_" + LABEL + "_anvil_l20");
+            EnhanceAnvilGlow.holdForTest = 0.45F;
+            waitTicks(40);
+        });
+        add(mc -> {
+            shot(mc, "150_" + LABEL + "_anvil_l45");
+            EnhanceAnvilGlow.holdForTest = 0.7F;
+            waitTicks(40);
+        });
+        add(mc -> {
+            shot(mc, "150_" + LABEL + "_anvil_l70");
+            EnhanceAnvilGlow.holdForTest = null;
+            // 비스듬히 (룬 띠와 모루 옆면의 보석이 함께 보이게)
+            onServer(mc, sp -> {
+                if (base == null) return;
+                sp.connection.teleport(base.getX() + 2.5, base.getY(), base.getZ() + 1.5, 45F, 24F);
+            });
+            waitTicks(60);
+        });
+        add(mc -> {
+            shot(mc, "150_" + LABEL + "_anvil_side");
+            waitTicks(20);
         });
         // 흔적 표시 (이야기의 "살펴보기"): 앞 세 칸 바닥
         add(mc -> {

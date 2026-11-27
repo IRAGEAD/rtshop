@@ -27,6 +27,7 @@ SLATE, SLATE_L, SLATE_D = (62, 66, 76), (86, 90, 102), (44, 48, 58)
 FORGED, FORGED_L, FORGED_D = (56, 58, 66), (118, 122, 134), (34, 36, 42)
 BRASS, BRASS_L, BRASS_D = (190, 150, 72), (232, 198, 112), (136, 100, 44)
 EMBER, EMBER_H = (255, 130, 44), (255, 214, 130)
+EMBER_SH = (255, 168, 72)   # 셰이더에서 쓰는 룬 빛깔: 셰이더의 따뜻한 빛을 받으면 붉어지므로 조금 더 노랗게
 
 # 룬 여섯 자 (5x5 텍셀). 받침 아랫단의 옆면 가운데 판(모델 x 2..14)에 2픽셀 간격으로 놓인다.
 RUNES = ["#...#|#..#.|###..|#..#.|#...#", "#####|..#..|..#..|.#.#.|#...#", "#..#.|#.#..|##...|#.#..|#..##", ".###.|#...#|#.#.#|#...#|.###.", "#...#|##..#|#.#.#|#..##|#...#", "..#..|.###.|#.#.#|..#..|..#.."]
@@ -112,6 +113,16 @@ def make_textures():
         return o
     out['enh_glow_side_add'] = additive(out['enh_glow_side'])
     out['enh_glow_anvil_add'] = additive(out['enh_glow_anvil'])
+    # 3.75 (W-16): 셰이더용 — 룬 · 보석의 획만 (둘레의 옅은 빛 없음). 셰이더는 그림을 빛으로 비춰 칠하므로
+    # 옅은 둘레가 "번진 물감"처럼 보였다. 빛 번짐(bloom)은 셰이더가 스스로 만든다.
+    def core(src, hot=None):
+        w, h = src.size; sp = src.load(); o = Image.new('RGBA', (w, h), (0, 0, 0, 0)); op = o.load()
+        for y in range(h):
+            for x in range(w):
+                if sp[x, y][3] == 255: op[x, y] = (hot or sp[x, y][:3]) + (255,)
+        return o
+    out['enh_glow_side_sh'] = core(out['enh_glow_side'], EMBER_SH)
+    out['enh_glow_anvil_sh'] = core(out['enh_glow_anvil'])
     for n, im in out.items(): im.save(os.path.join(ASSETS, 'textures', 'block', n + '.png'))
     return out
 

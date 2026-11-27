@@ -39,6 +39,7 @@ final class ClientSelfTest2 {
     private static volatile net.minecraft.core.BlockPos ANVIL_364;
     private static volatile float[] ANVIL_ROT_364;
     private static long ANVIL_DRAWN_364;
+    private static long ANVIL_ADD_375, ANVIL_SH_375;
     private static volatile long LOOK_DRAWN;
     private static volatile int npc = -1;
     static volatile int qnpc = -1;
@@ -2047,6 +2048,8 @@ final class ClientSelfTest2 {
                 sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), sp.getYRot(), 32F);
             });
             ANVIL_DRAWN_364 = EnhanceAnvilGlow.drawnForTest;
+            ANVIL_ADD_375 = EnhanceAnvilGlow.addDrawnForTest;
+            ANVIL_SH_375 = EnhanceAnvilGlow.shaderDrawnForTest;
             waitTicks(70);
         });
         add(mc -> {
@@ -2054,6 +2057,25 @@ final class ClientSelfTest2 {
             check("3.64 the enhance anvil lights up when someone stands near it: its glow is fully on and is really being drawn (rune band and gem, two layers)",
                     lv364 > 0.95F && EnhanceAnvilGlow.drawnForTest > ANVIL_DRAWN_364, lv364 + " drawn=" + (EnhanceAnvilGlow.drawnForTest - ANVIL_DRAWN_364));
             shot(mc, "130_anvil_glow");
+            // 3.75 (W-16): 셰이더가 없으면 지금까지와 같은 두 겹, 셰이더용 그림은 쓰지 않는다
+            boolean sh375 = ShaderState.on();
+            check("3.75 without a shader the enhance anvil keeps its two layers (soft glow layer drawn, the shader-only picture not used)",
+                    sh375 || (EnhanceAnvilGlow.addDrawnForTest > ANVIL_ADD_375 && EnhanceAnvilGlow.shaderDrawnForTest == ANVIL_SH_375),
+                    "shader=" + sh375 + " add=" + (EnhanceAnvilGlow.addDrawnForTest - ANVIL_ADD_375) + " sh=" + (EnhanceAnvilGlow.shaderDrawnForTest - ANVIL_SH_375));
+            // 셰이더에서 켜지고 꺼지는 모습: 드러나는 빛 = 켜진 정도 (작은 걸음마다 매끈하게), 투명도는 셰이더가 버리는 0.1 아래로 내려가지 않는다
+            StringBuilder bad375 = new StringBuilder();
+            float prev375 = -1F;
+            int minA375 = 255;
+            for (int i375 = 1; i375 <= 1000; i375++) {
+                float g375 = i375 / 1000F;
+                float shown375 = EnhanceAnvilGlow.shaderShownForTest(g375);
+                minA375 = Math.min(minA375, EnhanceAnvilGlow.shaderColor(g375)[0]);
+                if (Math.abs(shown375 - g375) > 0.02F || shown375 + 0.004F < prev375) bad375.append(g375).append('=').append(shown375).append(' ');
+                prev375 = shown375;
+            }
+            check("3.75 with a shader the anvil glow fades in and out smoothly: the light shown follows the glow level step by step, and its opacity never drops under the 0.1 the shader throws away",
+                    bad375.length() == 0 && minA375 >= 26 && EnhanceAnvilGlow.shaderShownForTest(0.004F) < 0.01F,
+                    "minAlpha=" + minA375 + " off=" + EnhanceAnvilGlow.shaderShownForTest(0.004F) + " " + (bad375.length() > 200 ? bad375.substring(0, 200) : bad375));
             onServer(mc, sp -> {
                 if (ANVIL_364 != null) sp.serverLevel().setBlockAndUpdate(ANVIL_364, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                 if (ANVIL_ROT_364 != null) sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), ANVIL_ROT_364[0], ANVIL_ROT_364[1]);

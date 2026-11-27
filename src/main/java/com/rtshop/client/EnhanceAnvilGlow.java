@@ -6,10 +6,12 @@ import com.rtshop.RtShop;
 import com.rtshop.enhance.EnhanceAnvilBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -38,8 +40,26 @@ public final class EnhanceAnvilGlow {
     /** 3.64: 빛을 한 겹 더 — 거미 눈처럼 스스로 빛나는 그리기(더하기 섞기)로 덧그린다. 셰이더는 이 그리기를 "빛나는 것"으로 다뤄 번지는 빛을 준다. */
     private static final ResourceLocation SIDE_ADD = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_side_add.png");
     private static final ResourceLocation GEM_ADD = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_anvil_add.png");
+    /**
+     * 3.75 (W-16, 사용자: Photon 에서 룬과 보석의 불빛이 부자연스럽게 번지고 뚝뚝 끊기며 켜지고 꺼진다): 셰이더용 그림 — 룬 · 보석의 획만.
+     * 셰이더가 켜져 있으면 이 한 겹만 그린다. 까닭 (Oculus 1.8 + Photon, 마인크래프트 1.20.1 에서 확인):
+     * 둘째 겹(RenderType.eyes)은 셰이더의 "스스로 빛나는 불투명 단계"로 가서 투명도로 흐려지지 못한다 — 켜지는 첫 순간 룬이 까맣게 칠해졌다가
+     * 밝기의 세제곱으로 갑자기 환해지고, 꺼질 때도 까만 룬에서 원래 돌로 툭 돌아왔다. 옅은 둘레(알파 55~120)도 불투명한 갈색 테두리가 되어 크게 번졌다.
+     * 첫째 겹(RenderType.text)은 셰이더의 반투명 단계(gbuffers_entities_translucent)라 투명도로 부드럽게 섞인다 — 다만 투명도 0.1 아래는 버려지므로
+     * 투명도는 0.12 아래로 내리지 않고 그 아래의 어두움은 빛깔(꼭짓점 색)로 낮춘다 ({@link #shaderColor}).
+     */
+    private static final ResourceLocation SIDE_SH = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_side_sh.png");
+    private static final ResourceLocation GEM_SH = new ResourceLocation(RtShop.MODID, "textures/block/enh_glow_anvil_sh.png");
+    /** 셰이더에서 쓰는 가장 낮은 투명도 (셰이더는 0.1 아래를 버린다). */
+    static final float SH_MIN_ALPHA = 0.12F;
     /** 점검용: 빛을 그린 횟수 (모루 하나에 한 번). */
     public static long drawnForTest;
+    /** 점검용: 둘째 겹(스스로 빛나는 그리기)을 그린 횟수 — 셰이더가 켜져 있으면 늘지 않아야 한다. */
+    public static long addDrawnForTest;
+    /** 점검용: 셰이더용 그림으로 그린 횟수. */
+    public static long shaderDrawnForTest;
+    /** 점검용: 밝기를 이 값(0~1)에 묶어 두고 그린다 (null 이면 평소대로). */
+    public static volatile Float holdForTest;
     /** 이 거리 안으로 오면 켜진다. */
     public static final double NEAR = 5.0;
     private static final float UP = 1F / 40F, DOWN = 1F / 70F;
@@ -114,19 +134,30 @@ public final class EnhanceAnvilGlow {
         PoseStack ps = event.getPoseStack();
         MultiBufferSource.BufferSource buf = mc.renderBuffers().bufferSource();
         float time = (mc.level.getGameTime() % 24000L) + event.getPartialTick();
+        boolean shader = ShaderState.on();
+        Float hold = holdForTest;
         boolean any = false;
         for (Map.Entry<BlockPos, float[]> e : GLOW.entrySet()) {
-            float lv = Mth.lerp(event.getPartialTick(), e.getValue()[1], e.getValue()[0]);
+            float lv = hold != null ? hold : Mth.lerp(event.getPartialTick(), e.getValue()[1], e.getValue()[0]);
             if (lv <= 0.01F) continue;
             BlockPos p = e.getKey();
             BlockState st = mc.level.getBlockState(p);
             if (!(st.getBlock() instanceof EnhanceAnvilBlock)) continue;
             // 부드럽게 켜지고(느리게 시작해 느리게 끝남), 다 켜진 뒤에는 숨 쉬듯 조금 일렁인다
             float ease = lv * lv * (3F - 2F * lv);
-            int a = Mth.clamp(Math.round(255 * ease * (0.86F + 0.14F * Mth.sin(time * 0.07F))), 0, 255);
             ps.pushPose();
             ps.translate(p.getX() - cp.x, p.getY() - cp.y, p.getZ() - cp.z);
             Matrix4f m = ps.last().pose();
+            if (shader) {
+                // 셰이더: 일렁임 없이 한 겹만. 빛은 셰이더가 비춘다 — 블록 빛 15, 하늘빛은 그 자리의 것 (동굴 속에서 하늘빛을 받지 않게).
+                drawShader(buf, m, st, ease, LightTexture.pack(15, skyAround(mc, p)));
+                ps.popPose();
+                drawnForTest++;
+                shaderDrawnForTest++;
+                any = true;
+                continue;
+            }
+            int a = Mth.clamp(Math.round(255 * ease * (0.86F + 0.14F * Mth.sin(time * 0.07F))), 0, 255);
             VertexConsumer side = buf.getBuffer(RenderType.text(SIDE));
             float e0 = 0.5F / 16F - 0.004F, e1 = 15.5F / 16F + 0.004F, lo = 2F / 16F, hi = 14F / 16F, top = 3F / 16F;
             // 받침 아랫단의 네 옆면 (가운데 판). u 는 밖에서 볼 때 오른쪽으로 늘어난다 — 모델의 면 UV 와 같은 규칙.
@@ -163,22 +194,76 @@ public final class EnhanceAnvilGlow {
             }
             ps.popPose();
             drawnForTest++;
+            addDrawnForTest++;
             any = true;
         }
         if (any) buf.endBatch();
     }
 
+    /**
+     * 셰이더용 빛깔: 켜진 정도 g(0~1) → {투명도, 꼭짓점 밝기} (0~255).
+     * 셰이더의 반투명 단계는 (그림 빛깔 × 꼭짓점 색)을 선형 빛으로 바꿔(약 2.2 제곱) 비춘 뒤 투명도를 곱해 섞는다.
+     * 그래서 드러나는 빛의 양은 투명도 × 밝기^2.2 이다 — 이것이 g 와 같아지게 하고, 투명도는 0.12 아래로 내리지 않는다
+     * (0.1 아래는 셰이더가 버려서, 켜지는 첫 순간 빛이 10% 로 툭 나타났다).
+     */
+    static int[] shaderColor(float g) {
+        g = Mth.clamp(g, 0F, 1F);
+        float alpha = Math.max(g, SH_MIN_ALPHA);
+        float tint = (float) Math.pow(g / alpha, 1.0 / 2.2);
+        return new int[]{Mth.clamp(Math.round(255 * alpha), 0, 255), Mth.clamp(Math.round(255 * tint), 0, 255)};
+    }
+
+    /** 셰이더 위에서 드러나는 빛의 양 (투명도 × 밝기^2.2, 0~1) — 점검용. */
+    static float shaderShownForTest(float g) {
+        int[] c = shaderColor(g);
+        return (c[0] / 255F) * (float) Math.pow(c[1] / 255F, 2.2);
+    }
+
+    private static void drawShader(MultiBufferSource.BufferSource buf, Matrix4f m, BlockState st, float g, int light) {
+        int[] c = shaderColor(g);
+        int a = c[0], t = c[1];
+        VertexConsumer side = buf.getBuffer(RenderType.text(SIDE_SH));
+        float e0 = 0.5F / 16F - 0.004F, e1 = 15.5F / 16F + 0.004F, lo = 2F / 16F, hi = 14F / 16F, top = 3F / 16F;
+        quad(side, m, lo, 0, e0, hi, top, e0, 1 - lo, 1 - hi, t, a, light);        // 북
+        quad(side, m, hi, 0, e1, lo, top, e1, hi, lo, t, a, light);                // 남
+        quad(side, m, e0, 0, hi, e0, top, lo, hi, lo, t, a, light);                // 서
+        quad(side, m, e1, 0, lo, e1, top, hi, 1 - lo, 1 - hi, t, a, light);        // 동
+        VertexConsumer gem = buf.getBuffer(RenderType.text(GEM_SH));
+        float g0 = 6.5F / 16F, g1 = 9.5F / 16F, y0 = 12F / 16F, y1 = 14.75F / 16F, n = 3F / 16F - 0.004F, f = 13F / 16F + 0.004F;
+        if (EnhanceAnvilBlock.alongZ(st)) {
+            quad(gem, m, n, y0, g1, n, y1, g0, g1, g0, t, a, light);
+            quad(gem, m, f, y0, g0, f, y1, g1, g0, g1, t, a, light);
+        } else {
+            quad(gem, m, g0, y0, n, g1, y1, n, g0, g1, t, a, light);
+            quad(gem, m, g1, y0, f, g0, y1, f, g1, g0, t, a, light);
+        }
+    }
+
+    /** 모루 둘레(네 옆과 위)에서 가장 밝은 하늘빛 (0~15). */
+    private static int skyAround(Minecraft mc, BlockPos p) {
+        int best = 0;
+        for (BlockPos q : new BlockPos[]{p.north(), p.south(), p.west(), p.east(), p.above()}) {
+            best = Math.max(best, mc.level.getBrightness(LightLayer.SKY, q));
+        }
+        return best;
+    }
+
     /** 세로로 선 네모 하나 (아래 왼쪽 → 위 오른쪽; 앞뒤 어느 쪽에서도 보이게 두 번). 세로 v: 아래 = 1, 위 = 1 - 높이. */
     private static void quad(VertexConsumer vc, Matrix4f m, float x0, float y0, float z0, float x1, float y1, float z1, float u0, float u1, int a) {
+        quad(vc, m, x0, y0, z0, x1, y1, z1, u0, u1, 255, a, 0xF000F0);
+    }
+
+    /** t = 꼭짓점 밝기(0~255), light = 빛 칸 (LightTexture.pack). */
+    private static void quad(VertexConsumer vc, Matrix4f m, float x0, float y0, float z0, float x1, float y1, float z1, float u0, float u1, int t, int a, int light) {
         float v0 = 1F - y0, v1 = 1F - y1;
-        put(vc, m, x0, y0, z0, u0, v0, a);
-        put(vc, m, x1, y0, z1, u1, v0, a);
-        put(vc, m, x1, y1, z1, u1, v1, a);
-        put(vc, m, x0, y1, z0, u0, v1, a);
-        put(vc, m, x0, y1, z0, u0, v1, a);
-        put(vc, m, x1, y1, z1, u1, v1, a);
-        put(vc, m, x1, y0, z1, u1, v0, a);
-        put(vc, m, x0, y0, z0, u0, v0, a);
+        put(vc, m, x0, y0, z0, u0, v0, t, a, light);
+        put(vc, m, x1, y0, z1, u1, v0, t, a, light);
+        put(vc, m, x1, y1, z1, u1, v1, t, a, light);
+        put(vc, m, x0, y1, z0, u0, v1, t, a, light);
+        put(vc, m, x0, y1, z0, u0, v1, t, a, light);
+        put(vc, m, x1, y1, z1, u1, v1, t, a, light);
+        put(vc, m, x1, y0, z1, u1, v0, t, a, light);
+        put(vc, m, x0, y0, z0, u0, v0, t, a, light);
     }
 
     /** 스스로 빛나는 네모 (앞뒤 두 번). 밝기는 빛깔로 조절한다 — 더하기 섞기는 투명도를 보지 않는다. */
@@ -202,7 +287,7 @@ public final class EnhanceAnvilGlow {
         quad(vc, m, x0, y0, z0, x1, y1, z1, u0, u1, a);
     }
 
-    private static void put(VertexConsumer vc, Matrix4f m, float x, float y, float z, float u, float v, int a) {
-        vc.vertex(m, x, y, z).color(255, 255, 255, a).uv(u, v).uv2(0xF000F0).endVertex();
+    private static void put(VertexConsumer vc, Matrix4f m, float x, float y, float z, float u, float v, int t, int a, int light) {
+        vc.vertex(m, x, y, z).color(t, t, t, a).uv(u, v).uv2(light).endVertex();
     }
 }
