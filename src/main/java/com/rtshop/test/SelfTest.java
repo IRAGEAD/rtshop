@@ -5733,10 +5733,20 @@ public final class SelfTest {
         boolean firstSeen = com.rtshop.story.Hunts.seen(a, "minecraft:zombie");
         long w1 = Economy.wallet(a);
         com.rtshop.story.Hunts.onKill(a, z);
+        long wDone = Economy.wallet(a);
+        long[] owed = com.rtshop.story.Hunts.unclaimed(a);
+        // 3.75.0 (사용자 W-7): 다 잡아도 그 자리에서 주지 않고, 게시판지기에게 돌아가면(게시판을 열면) 받는다
+        boolean hud375 = QuestManager.hudEntries(a).stream().anyMatch(x -> x.id().equals(QuestManager.BOUNTY_ID) && x.ready());
+        com.rtshop.story.Hunts.openBoard(a, -1);
         long w2 = Economy.wallet(a);
         check("a bounty pays out once its count is reached (100 G, more with a combat job), and the first kill fills the bestiary",
                 firstSeen && w1 == w0 && w2 - w1 == com.rtshop.story.Hunts.reward(a, 100) && w2 > w1, w0 + " " + w1 + " " + w2);
+        check("3.75 a finished bounty is paid at the bounty board, not on the spot; the quest HUD points back to the board until then",
+                wDone == w1 && owed[0] == 1 && owed[1] == com.rtshop.story.Hunts.reward(a, 100) && hud375 && com.rtshop.story.Hunts.unclaimed(a)[0] == 0
+                        && QuestManager.hudEntries(a).stream().noneMatch(x -> x.id().equals(QuestManager.BOUNTY_ID)),
+                wDone + " " + w1 + " owed " + owed[0] + "/" + owed[1] + " hud " + hud375);
         com.rtshop.story.Hunts.onKill(a, z);
+        com.rtshop.story.Hunts.openBoard(a, -1);
         check("a finished bounty does not pay twice", Economy.wallet(a) == w2);
         QuestManager.setFlag(a, "story_ch1_done", true);
         boolean mowzie = com.rtshop.story.Hunts.available(a).stream().anyMatch(t -> t.entity.startsWith("mowziesmobs:"));

@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 13
+VERSION = 14
 CATS = []
 
 
@@ -273,7 +273,8 @@ page(c, "attendance", "출석", """
 page(c, "bounty", "현상금", """
 현상금 게시판에서 토벌 의뢰를 맡습니다. 하루에 몇 장, 한 주에 몇 장까지 맡을 수 있습니다.
 
-· 맡은 몹을 정해진 수만큼 잡으면 그 자리에서 Gold 를 받습니다.
+· 맡은 몹을 정해진 수만큼 잡은 뒤, 현상금 게시판지기에게 돌아가 게시판을 열면 Gold 를 받습니다. 그때까지 화면의 퀘스트 표시가 돌아갈 곳을 알려 줍니다.
+· 받지 않은 보상은 의뢰가 바뀌어도 사라지지 않습니다.
 · 싸우는 직업을 가진 사람은 조금 더 받습니다.
 · /bounty 로 맡은 의뢰를 봅니다.
 """, image="bounty", keys="현상금 토벌 의뢰 게시판")

@@ -64,6 +64,11 @@ NEW = {
  "rtshop.npclayout.removed": ("%s 을(를) 치웠습니다 (%s, %s, %s). 배치 파일에서도 빠집니다.", "Removed %s (%s, %s, %s). It is taken out of the layout file too."),
  # ---- 3.74: 크리에이티브 탭
  "itemGroup.rtshop": ("RT Shop", "RT Shop"),
+ # ---- 3.75: 현상금 보상은 게시판지기에게 돌아가서 받는다 (사용자 W-7)
+ "rtshop.hunt.daily_ready": ("[토벌 의뢰 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.", "[Bounty done] %s x%s — return to the bounty board keeper for %s G."),
+ "rtshop.hunt.weekly_ready": ("[주간 토벌 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.", "[Weekly bounty done] %s x%s — return to the bounty board keeper for %s G."),
+ "rtshop.hunt.claimed": ("현상금 %s건의 보상 %s G 를 받았습니다.", "Collected %s bounties: %s G."),
+ "rtshop.hunt.board_claimed": ("받은 보상: %s건 · %s G", "Collected: %s · %s G"),
  # ---- 3.74: Cataclysm 보스 건축물은 나침반 대신 그 모드의 눈으로 (사용자 W-11)
  "item.rtshop.survey_compass.eye": ("%1$s: 보스가 사는 곳이라 나침반 바늘이 돌지 않습니다. %2$s 을(를) 던지면 그쪽으로 날아갑니다 (만드는 법은 JEI · 레시피 책).", "%1$s: a boss lives there, so the needle won't settle. Throw %2$s and it flies that way (see JEI or the recipe book for how to make one)."),
  "item.rtshop.survey_compass.desc4": ("Cataclysm 보스의 건축물은 가리키지 않는다: 그 모드의 「눈」을 던져 찾는다.", "Does not point to Cataclysm boss buildings: throw that mod's eye to find them."),

@@ -1968,6 +1968,17 @@ public final class QuestManager {
             }
         } catch (Throwable ignored) {
         }
+        // 3.75.0 (사용자 W-7): 받지 않은 현상금이 있으면 게시판지기에게 돌아가라고 알린다
+        try {
+            long[] owed = com.rtshop.story.Hunts.unclaimed(p);
+            if (owed[0] > 0) {
+                String g = String.format("%,d", owed[1]);
+                out.add(new com.rtshop.net.QuestHudPacket.Entry(BOUNTY_ID,
+                        com.rtshop.story.StoryText.pick(p, "현상금 보상 받기 (" + owed[0] + "건 · " + g + " G)", "Collect your bounty (" + owed[0] + " · " + g + " G)"), true,
+                        com.rtshop.story.StoryText.t(p, npcName(com.rtshop.story.Hunts.NPC_BOARD)), List.of(), NpcPlaces.where(p.server, com.rtshop.story.Hunts.NPC_BOARD)));
+            }
+        } catch (Throwable ignored) {
+        }
         // 받을 수 있는 퀘스트가 있으면 다음에 찾아갈 NPC 를 알려 준다 (메인 스토리 먼저, 숨은 이야기는 알리지 않는다)
         QuestDef next = null;
         int more = 0;
@@ -1999,6 +2010,8 @@ public final class QuestManager {
     public static final String NEXT_ID = "_next:";
     /** HUD 의 "오늘 출석" 줄 ID. */
     public static final String ATTEND_ID = "_attend";
+    /** HUD 의 "현상금 보상 받기" 줄 ID (3.75.0). */
+    public static final String BOUNTY_ID = "_bounty";
 
     /** 직업 선행 퀘스트의 직업 칸(전투·생활). 직업 선행 퀘스트가 아니면 null. */
     public static String jobSlotOf(QuestDef q) {

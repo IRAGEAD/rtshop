@@ -393,6 +393,11 @@ public final class Hunts {
             for (int i = 0; i < list.size(); i++) {
                 CompoundTag b = list.getCompound(i);
                 if (b.getBoolean("weekly") ? !newWeek : !newDay) keep.add(b);
+                else if (b.getBoolean("unclaimed")) {
+                    // 받지 않은 보상은 의뢰가 바뀌어도 잃지 않는다: 다음에 게시판에 오면 함께 받는다
+                    d.putLong("owed", d.getLong("owed") + b.getLong("payout"));
+                    d.putInt("owedCount", d.getInt("owedCount") + 1);
+                }
             }
             List<Target> avail = available(p);
             if (newDay) roll(keep, avail, Math.max(h.dailyCount, h.dailyOffers), false, 1.0);
@@ -470,13 +475,14 @@ public final class Hunts {
             if (have >= need) {
                 b.putBoolean("done", true);
                 long gold = reward(p, b.getLong("gold"));
-                Economy.addWallet(p, gold);
-                com.rtshop.rank.Ranks.earned(p, gold);
-                com.rtshop.stats.IncomeStats.add(p, "bounty", gold);
+                // 3.75.0 (사용자 W-7 "현상금 보상은 목표 달성 후 현상금 npc를 다시 찾아가서 수령하는 방식으로"): 보상은 게시판지기에게 돌아가서 받는다
+                b.putBoolean("unclaimed", true);
+                b.putLong("payout", gold);
                 com.rtshop.rank.Ranks.add(p, com.rtshop.rank.Ranks.BOUNTIES, 1);
-                com.rtshop.notice.Notice.send(p, Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.weekly_done" : "rtshop.hunt.daily_done",
+                com.rtshop.notice.Notice.send(p, Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.weekly_ready" : "rtshop.hunt.daily_ready",
                         victim.getType().getDescription(), need, String.format("%,d", gold)).withStyle(ChatFormatting.GOLD));
                 p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.7F, 1.2F);
+                QuestManager.syncHud(p);
             } else {
                 com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.progress", victim.getType().getDescription(), have, need).withStyle(ChatFormatting.YELLOW), true);
             }
@@ -549,6 +555,7 @@ public final class Hunts {
             x.addProperty("stars", b.contains("stars") ? b.getInt("stars") : stars(b.getString("entity")));
             x.addProperty("accepted", accepted(b));
             x.addProperty("done", b.getBoolean("done"));
+            if (b.getBoolean("unclaimed")) x.addProperty("unclaimed", true);
             a.add(x);
         }
         o.add("list", a);
@@ -560,8 +567,57 @@ public final class Hunts {
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.board_far").withStyle(ChatFormatting.RED), true);
             return;
         }
+        long[] got = claim(p);
+        com.google.gson.JsonObject o = boardJson(p, entity);
+        if (got[0] > 0) {
+            o.addProperty("claimed", got[0]);
+            o.addProperty("claimedGold", got[1]);
+        }
         com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
-                new com.rtshop.net.StoryPacket(com.rtshop.net.StoryPacket.BOUNTY, boardJson(p, entity).toString()));
+                new com.rtshop.net.StoryPacket(com.rtshop.net.StoryPacket.BOUNTY, o.toString()));
+    }
+
+    /** 받지 않은 현상금 {건수, Gold} (끝낸 의뢰 + 의뢰가 바뀌며 넘어온 몫). */
+    public static long[] unclaimed(ServerPlayer p) {
+        CompoundTag d = data(p);
+        long n = d.getInt("owedCount"), gold = d.getLong("owed");
+        ListTag list = d.getList("list", Tag.TAG_COMPOUND);
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag b = list.getCompound(i);
+            if (b.getBoolean("unclaimed")) {
+                n++;
+                gold += b.getLong("payout");
+            }
+        }
+        return new long[]{n, gold};
+    }
+
+    /** 게시판지기 곁에서: 받지 않은 현상금을 모두 받는다. {건수, Gold}. */
+    public static long[] claim(ServerPlayer p) {
+        long[] u = unclaimed(p);
+        if (u[0] <= 0) return u;
+        CompoundTag d = data(p);
+        ListTag list = d.getList("list", Tag.TAG_COMPOUND);
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag b = list.getCompound(i);
+            if (b.getBoolean("unclaimed")) {
+                b.remove("unclaimed");
+                b.putBoolean("claimed", true);
+            }
+        }
+        d.put("list", list);
+        d.remove("owed");
+        d.remove("owedCount");
+        long gold = u[1];
+        if (gold > 0) {
+            Economy.addWallet(p, gold);
+            com.rtshop.rank.Ranks.earned(p, gold);
+            com.rtshop.stats.IncomeStats.add(p, "bounty", gold);
+        }
+        com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.claimed", u[0], String.format("%,d", gold)).withStyle(ChatFormatting.GOLD));
+        p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.0F);
+        QuestManager.syncHud(p);
+        return u;
     }
 
     public static long reward(ServerPlayer p, long base) {

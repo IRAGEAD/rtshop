@@ -2033,5 +2033,9 @@
   "rtshop.npclayout.remove_none": "No RT Shop NPC in sight (or within 4 blocks).",
   "rtshop.npclayout.removed": "Removed %s (%s, %s, %s). It is taken out of the layout file too.",
   "item.rtshop.survey_compass.eye": "%1$s: a boss lives there, so the needle won't settle. Throw %2$s and it flies that way (see JEI or the recipe book for how to make one).",
-  "item.rtshop.survey_compass.desc4": "Does not point to Cataclysm boss buildings: throw that mod's eye to find them."
+  "item.rtshop.survey_compass.desc4": "Does not point to Cataclysm boss buildings: throw that mod's eye to find them.",
+  "rtshop.hunt.daily_ready": "[Bounty done] %s x%s — return to the bounty board keeper for %s G.",
+  "rtshop.hunt.weekly_ready": "[Weekly bounty done] %s x%s — return to the bounty board keeper for %s G.",
+  "rtshop.hunt.claimed": "Collected %s bounties: %s G.",
+  "rtshop.hunt.board_claimed": "Collected: %s · %s G"
 }

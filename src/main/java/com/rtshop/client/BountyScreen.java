@@ -54,6 +54,11 @@ public class BountyScreen extends Screen {
         return rows.size();
     }
 
+    /** 점검용: 이번에 받은 현상금 {건수, Gold} (없으면 0, 0). */
+    public long[] claimedForTest() {
+        return data.has("claimed") ? new long[]{data.get("claimed").getAsLong(), data.get("claimedGold").getAsLong()} : new long[]{0, 0};
+    }
+
     public int takenForTest() {
         return data.get("dailyTaken").getAsInt() + data.get("weeklyTaken").getAsInt();
     }
@@ -147,6 +152,11 @@ public class BountyScreen extends Screen {
         String quota = Component.translatable("rtshop.hunt.board_quota", data.get("dailyTaken").getAsInt(), data.get("dailyMax").getAsInt(),
                 data.get("weeklyTaken").getAsInt(), data.get("weeklyMax").getAsInt()).getString();
         g.drawString(font, quota, fx + 10, fy + 28, Ui.C_CREAM, false);
+        if (data.has("claimed")) {
+            // 3.75.0 (사용자 W-7): 돌아와서 받은 현상금
+            String got = Component.translatable("rtshop.hunt.board_claimed", data.get("claimed").getAsLong(), Ui.num(data.get("claimedGold").getAsLong())).getString();
+            g.drawString(font, got, fx + W - 10 - font.width(got), fy + 28, 0xFFFFD866, false);
+        }
         int lx = fx + 8, ly = fy + 40, lw = W - 16, lh = H - 50;
         Ui.bevel(g, lx, ly, lw, lh, Ui.C_PARCH_DARK, Ui.C_PARCH_SHADE, Ui.C_SHADOW);
         if (rows.isEmpty()) {

@@ -2033,5 +2033,9 @@
   "rtshop.npclayout.remove_none": "바라보는(또는 4칸 안의) RT Shop NPC 가 없습니다.",
   "rtshop.npclayout.removed": "%s 을(를) 치웠습니다 (%s, %s, %s). 배치 파일에서도 빠집니다.",
   "item.rtshop.survey_compass.eye": "%1$s: 보스가 사는 곳이라 나침반 바늘이 돌지 않습니다. %2$s 을(를) 던지면 그쪽으로 날아갑니다 (만드는 법은 JEI · 레시피 책).",
-  "item.rtshop.survey_compass.desc4": "Cataclysm 보스의 건축물은 가리키지 않는다: 그 모드의 「눈」을 던져 찾는다."
+  "item.rtshop.survey_compass.desc4": "Cataclysm 보스의 건축물은 가리키지 않는다: 그 모드의 「눈」을 던져 찾는다.",
+  "rtshop.hunt.daily_ready": "[토벌 의뢰 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.",
+  "rtshop.hunt.weekly_ready": "[주간 토벌 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.",
+  "rtshop.hunt.claimed": "현상금 %s건의 보상 %s G 를 받았습니다.",
+  "rtshop.hunt.board_claimed": "받은 보상: %s건 · %s G"
 }
