@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 14
+VERSION = 15
 CATS = []
 
 
@@ -34,12 +34,13 @@ page(c, "tools", "조사대의 도구", """
 
 · 조사대 도감: 마주친 몹, 잡은 몹, 손에 넣은 장비가 적힙니다.
 · 조사대 안내서: 지금 보고 있는 이 책입니다.
+· 조사 수첩: 살펴본 흔적과 그때 본 글이 적힙니다.
 · 조사대 나침반: 진행 중인 퀘스트가 찾는 장소의 방향과 거리를 알려 줍니다.
 · 귀환권: 마을로 돌아갑니다. (「귀환권」 쪽 참고)
 · 무기 설명서: 특수기가 있는 무기를 처음 얻으면 한 권 받습니다.
 
-도감과 안내서는 처음에 한 권씩 받습니다. 잃어버리면 잡화점에서 다시 살 수 있습니다.
-""", icons=["rtshop:codex", "rtshop:guidebook", "rtshop:survey_compass", "rtshop:return_ticket", "rtshop:weapon_manual"], keys="도감 가이드북 나침반 설명서")
+도감 · 안내서 · 조사 수첩은 처음에 한 권씩 받습니다. 잃어버리면 잡화점에서 다시 살 수 있습니다.
+""", icons=["rtshop:codex", "rtshop:guidebook", "rtshop:survey_notebook", "rtshop:survey_compass", "rtshop:return_ticket", "rtshop:weapon_manual"], keys="도감 가이드북 나침반 설명서 수첩")
 page(c, "talk", "NPC 와 대화", """
 마을 사람을 우클릭하면 대화 상자가 열립니다.
 
@@ -85,7 +86,7 @@ page(c, "traces", "흔적 살펴보기", """
 · 갈 수 없는 자리에 놓였으면 그 퀘스트를 포기했다가 다시 받습니다. 흔적이 곁에 새로 나타납니다.
 · 다른 사람에게는 보이지 않고, 부수거나 옮길 수 없습니다.
 
-살펴본 것은 조사 수첩에 남습니다: /rtshop notebook
+살펴본 것은 조사 수첩(들고 우클릭, 또는 /rtshop notebook)에 남습니다.
 """, keys="흔적 살펴보기 조사 연습용 기억의 문 빛기둥 수첩")
 page(c, "gate", "기억의 문", """
 이야기의 보스는 세계 어딘가에 서 있지 않습니다. 「기억의 문」 너머의 따로 떨어진 방에서 싸웁니다.

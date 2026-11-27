@@ -12,6 +12,12 @@
    "price": 2000,
    "category": "misc",
    "sell": false
+  },
+  {
+   "item": "rtshop:survey_notebook",
+   "price": 1500,
+   "category": "misc",
+   "sell": false
   }
  ]
 }

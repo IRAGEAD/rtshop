@@ -64,6 +64,10 @@ NEW = {
  "rtshop.npclayout.removed": ("%s 을(를) 치웠습니다 (%s, %s, %s). 배치 파일에서도 빠집니다.", "Removed %s (%s, %s, %s). It is taken out of the layout file too."),
  # ---- 3.74: 크리에이티브 탭
  "itemGroup.rtshop": ("RT Shop", "RT Shop"),
+ # ---- 3.75: 조사 수첩 아이템 (사용자 W-3)
+ "item.rtshop.survey_notebook": ("조사 수첩", "Field Notebook"),
+ "item.rtshop.survey_notebook.tip1": ("들고 우클릭하면 펼쳐진다. 살펴본 흔적과 그때 본 글이 적혀 있다.", "Right-click while holding it to open. Holds the traces you looked at and what you read there."),
+ "item.rtshop.survey_notebook.tip2": ("잃어버리면 잡화점에서 다시 살 수 있다.", "If lost, the general store sells another."),
  # ---- 3.75: 현상금 보상은 게시판지기에게 돌아가서 받는다 (사용자 W-7)
  "rtshop.hunt.daily_ready": ("[토벌 의뢰 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.", "[Bounty done] %s x%s — return to the bounty board keeper for %s G."),
  "rtshop.hunt.weekly_ready": ("[주간 토벌 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.", "[Weekly bounty done] %s x%s — return to the bounty board keeper for %s G."),

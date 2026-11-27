@@ -2037,5 +2037,8 @@
   "rtshop.hunt.daily_ready": "[토벌 의뢰 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.",
   "rtshop.hunt.weekly_ready": "[주간 토벌 완료] %s %s마리 — 현상금 게시판지기에게 돌아가면 %s G 를 받습니다.",
   "rtshop.hunt.claimed": "현상금 %s건의 보상 %s G 를 받았습니다.",
-  "rtshop.hunt.board_claimed": "받은 보상: %s건 · %s G"
+  "rtshop.hunt.board_claimed": "받은 보상: %s건 · %s G",
+  "item.rtshop.survey_notebook": "조사 수첩",
+  "item.rtshop.survey_notebook.tip1": "들고 우클릭하면 펼쳐진다. 살펴본 흔적과 그때 본 글이 적혀 있다.",
+  "item.rtshop.survey_notebook.tip2": "잃어버리면 잡화점에서 다시 살 수 있다."
 }

@@ -179,6 +179,19 @@ public final class SelfTest {
                 roranHidden + " " + roranShown + " " + sevenHidden + " " + sevenHeard + " " + sevenShown + " " + oldSave + " " + haruHidden + " " + haruShown);
         a.getPersistentData().remove("rtshop_chats");
         QuestManager.reset(a);
+
+        // W-3: 조사 수첩도 도감 · 안내서처럼 아이템 (한 번 받고, 잡화점에서 다시 산다)
+        for (int i = 0; i < a.getInventory().getContainerSize(); i++)
+            if (a.getInventory().getItem(i).is(ModItems.SURVEY_NOTEBOOK.get())) a.getInventory().setItem(i, ItemStack.EMPTY);
+        a.getPersistentData().remove(com.rtshop.story.Guide.NOTEBOOK_TAG);
+        boolean nbGiven = com.rtshop.story.Guide.giveNotebook(a) && a.getInventory().contains(new ItemStack(ModItems.SURVEY_NOTEBOOK.get()));
+        boolean nbOnce = !com.rtshop.story.Guide.giveNotebook(a);
+        ShopData general375 = ShopServer.shops().get("general");
+        boolean nbSold = general375 != null && findEntry(general375, e -> e.stack.is(ModItems.SURVEY_NOTEBOOK.get())) >= 0;
+        check("3.75 the field notebook is an item like the codex and guidebook: given once, sold again at the general store",
+                nbGiven && nbOnce && nbSold, nbGiven + " " + nbOnce + " " + nbSold);
+        for (int i = 0; i < a.getInventory().getContainerSize(); i++)
+            if (a.getInventory().getItem(i).is(ModItems.SURVEY_NOTEBOOK.get())) a.getInventory().setItem(i, ItemStack.EMPTY);
     }
 
     /** 3.74.0: 화면 · 문구 · 퀘스트 표시 (사용자 메모 W-*) 중 서버 쪽 */

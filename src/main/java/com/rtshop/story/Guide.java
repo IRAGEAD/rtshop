@@ -101,4 +101,23 @@ public final class Guide {
         ItemStack book = new ItemStack(com.rtshop.item.ModItems.GUIDEBOOK.get());
         if (!p.getInventory().contains(book) && !p.getInventory().add(book)) p.drop(book, false);
     }
+
+    /** 3.75.0 (사용자 W-3): 조사 수첩도 한 권 준다. 예전부터 하던 사람도 다음에 들어올 때 한 번 받는다. */
+    @SubscribeEvent
+    public static void onLoginNotebook(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer p) || p instanceof FakePlayer || !Codex.get().giveOnFirstJoin) return;
+        giveNotebook(p);
+    }
+
+    public static final String NOTEBOOK_TAG = "rtshop_notebook_given";
+
+    /** 조사 수첩을 아직 받지 않았으면 한 권. 줬으면 true. */
+    public static boolean giveNotebook(ServerPlayer p) {
+        if (p.getPersistentData().getBoolean(NOTEBOOK_TAG)) return false;
+        p.getPersistentData().putBoolean(NOTEBOOK_TAG, true);
+        ItemStack book = new ItemStack(com.rtshop.item.ModItems.SURVEY_NOTEBOOK.get());
+        if (p.getInventory().contains(book)) return false;
+        if (!p.getInventory().add(book)) p.drop(book, false);
+        return true;
+    }
 }

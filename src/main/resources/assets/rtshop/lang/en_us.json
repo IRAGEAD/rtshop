@@ -2037,5 +2037,8 @@
   "rtshop.hunt.daily_ready": "[Bounty done] %s x%s — return to the bounty board keeper for %s G.",
   "rtshop.hunt.weekly_ready": "[Weekly bounty done] %s x%s — return to the bounty board keeper for %s G.",
   "rtshop.hunt.claimed": "Collected %s bounties: %s G.",
-  "rtshop.hunt.board_claimed": "Collected: %s · %s G"
+  "rtshop.hunt.board_claimed": "Collected: %s · %s G",
+  "item.rtshop.survey_notebook": "Field Notebook",
+  "item.rtshop.survey_notebook.tip1": "Right-click while holding it to open. Holds the traces you looked at and what you read there.",
+  "item.rtshop.survey_notebook.tip2": "If lost, the general store sells another."
 }
