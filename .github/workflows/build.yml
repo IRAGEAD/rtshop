@@ -319,6 +319,20 @@ jobs:
         run: |
           mkdir -p /tmp/inspect
           python3 .github/scripts/inspect_recipes.py packcache "kaleidoscope_tavern:shaker,kaleidoscope_cookery:teapot,kaleidoscope_cookery:oil_pot,kaleidoscope_cookery:enamel_basin,better_farming_plus:sprinkler,minecraft:bucket,minecraft:water_bucket,minecraft:milk_bucket,minecraft:cake,farmersdelight:cake_slice,kaleidoscope_tavern:rum,kaleidoscope_cookery:sticky_candy" > /tmp/inspect/price-recipes.txt 2>&1 || true
+      - name: Inspect Fantasy Mounts world settings
+        run: |
+          # 3.74.0 (사용자 W-19 "월드 세팅 중 quests 기본값을 off"): 세계 설정이 어느 파일의 어떤 키인지, 기본값을 어디서 읽는지
+          mkdir -p /tmp/inspect /tmp/fj
+          J="$PWD/$(ls packcache/*.jar | grep -i "fantasy" | head -1)"
+          (cd /tmp/fj && unzip -q -o "$J" 'com/bonfyre/fantasy/*' || true)
+          {
+            for c in com/bonfyre/fantasy/config/WorldFiles com/bonfyre/fantasy/config/WorldSettings com/bonfyre/fantasy/core/config/FantasySettings 'com/bonfyre/fantasy/core/config/FantasySettings$Server' \
+                     com/bonfyre/fantasy/core/config/panel/PanelFile com/bonfyre/fantasy/core/config/SettingsSource; do
+              echo "######## $c"; (cd /tmp/fj && javap -p -c -constants "$c.class" 2>&1 | grep -E "ldc|String |Field |Method |public|private|static|invoke" | head -n 260)
+            done
+            echo "######## classes mentioning quests"
+            (cd /tmp/fj && grep -rl -a "quests" com/bonfyre/fantasy | head -n 40)
+          } > /tmp/inspect/fantasy-world.txt 2>&1 || true
       - name: Inspect
         env:
           SPIRAL_CALLS: '/(FloorController|FloorProgress|AbyssPlayers|AbyssEncounters|ArenaSession|AbyssCycle|AbyssParties|BossProgress|FloorSelectionScreen|AbyssPlayerLifecycle|ChallengeRewards|ChestPayout|AbyssNetwork|AbyssDimension|ForgeGameplayEvents|AbyssPlatformImpl|PersistentEntityData|AbyssBlockProtection|CommandInit)(\$[^/]*)?\.class$'
@@ -547,16 +561,6 @@ jobs:
               done
               for f in $(unzip -l "$J" | awk '{print $4}' | grep -i -E "(\.toml|quest.*\.json|settings.*\.json)$" | head -n 10); do echo "---- $f"; unzip -p "$J" "$f" | head -c 4000; echo; done
             } > /tmp/inspect/mod-fantasy.txt 2>&1
-            # 3.74.0 (사용자 W-19 "월드 세팅 중 quests 기본값을 off"): 세계 설정이 어느 파일의 어떤 키인지, 기본값을 어디서 읽는지
-            mkdir -p /tmp/fj && (cd /tmp/fj && unzip -q -o "$OLDPWD/$J" 'com/bonfyre/fantasy/*' 2>/dev/null || unzip -q -o "$J" 'com/bonfyre/fantasy/*')
-            {
-              for c in com/bonfyre/fantasy/config/WorldFiles com/bonfyre/fantasy/config/WorldSettings com/bonfyre/fantasy/core/config/FantasySettings 'com/bonfyre/fantasy/core/config/FantasySettings$Server' \
-                       com/bonfyre/fantasy/core/config/panel/PanelFile com/bonfyre/fantasy/core/config/SettingsSource; do
-                echo "######## $c"; (cd /tmp/fj && javap -p -c -constants "$c.class" 2>&1 | grep -E "ldc|String |Field |Method |public|private|static|invoke" | head -n 260)
-              done
-              echo "######## classes mentioning quests"
-              (cd /tmp/fj && grep -rl -a "quests" com/bonfyre/fantasy | head -n 40)
-            } > /tmp/inspect/fantasy-world.txt 2>&1
           fi
           cd /tmp/inspect
           git init -q -b ci-inspect
