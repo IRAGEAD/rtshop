@@ -1,0 +1,3 @@
+RT Shop client self-test
+
+RESULT: ALL PASS (0 checks)

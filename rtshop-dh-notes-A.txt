@@ -1,0 +1,8 @@
+joined 127.0.0.1:25565 · render distance 12 · effective 12 · server view 6 · DH true · Farsight true
+t0s: DH probe: java.lang.NullPointerException: Cannot invoke "java.lang.Short.shortValue()"
+t30s: C: 160/3480 D: 12 · DH probe: java.lang.NullPointerException: Cannot invoke "java.lang.Short.shortValue()"
+t60s: C: 194/3480 D: 12 · DH probe: java.lang.NullPointerException: Cannot invoke "java.lang.Short.shortValue()"
+t90s: C: 194/3480 D: 12 · DH probe: java.lang.NullPointerException: Cannot invoke "java.lang.Short.shortValue()"
+t120s: C: 194/3480 D: 12 · DH probe: java.lang.NullPointerException: Cannot invoke "java.lang.Short.shortValue()"
+before: render distance 12 · effective 12 · C: 194/3480 D: 12 · DH probe: java.lang.NullPointerException: Cannot invoke "java.lang.Short.shortValue()"
+after: render distance 6 · effective 6 · C: 165/3480 D: 6 · DH probe: java.lang.NullPointerException: Cannot invoke "java.lang.Short.shortValue()"

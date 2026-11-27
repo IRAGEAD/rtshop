@@ -1,0 +1,500 @@
+JFR client/perf-client-base.jfr · mods dir client/mods · packages mapped 6250
+PHASE town 16:15:37.506 16:16:08.537 fps avg 2.6 min 2 p10 2 · frames 82 = 2.64 fps · server mspt avg 44.4 max 79.5 · entities 330 · C: 89/6192 D: 8
+PHASE explore 16:16:08.862 16:17:12.545 fps avg 2.7 min 1 p10 2 · frames 168 = 2.64 fps · server mspt avg 43.9 max 86.2 · entities 84 · C: 3/1704 D: 8
+PHASE mobs 16:17:18.448 16:17:49.381 fps avg 2.4 min 2 p10 2 · frames 75 = 2.42 fps · server mspt avg 56.4 max 97.2 · entities 196 · C: 65/5856 D: 8
+
+=== phase town · server thread(s) · 1395 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): mixin:spiral_abyss 78.7, ArcaneVortex_[Alpha] 14.4, epic-fight 6.5, curios-forge 4.6, mowziesmobs 4.4, witherreincarnated 3.7, tacz 2.7, artifacts-forge 2.5, L_Enders_Cataclysm 2.4, Quark 2.4, miningmaster 2.2, crittersandcompanions 2.1, mixin:modelloader 1.6, accessories-neoforge 1.4, adorablehamsterpets 1.2, mixin:adorablehamsterpets 1.1, spmovesets 1.1, mixin:horsingaround 1.1, fantasy 1.0, mixin:curios 1.0, rtshop 1.0, ?net.fabricmc.fabric.api.attachment.v1 0.7
+  base: minecraft 99.9, jdk 99.0, forge 27.9, fastutil 12.3, google-libs 8.0, netty 0.4
+  top of the stack (self %): minecraft 67.2, ArcaneVortex_[Alpha] 12.2, curios-forge 4.2, forge 3.9, tacz 2.1, mixin:horsingaround 1.1, spmovesets 0.9, epic-fight 0.7, adorablehamsterpets 0.6, fantasy 0.6, rtshop 0.6, accessories-neoforge 0.6, mowziesmobs 0.6, crittersandcompanions 0.4
+  busiest methods:
+      5.7%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      3.4%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$dynamicCacheGen
+      3.3%  net.minecraft.world.level.entity.EntitySectionStorage.m_188362_
+      2.6%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke
+      2.5%  top.theillusivec4.curios.api.CuriosApi.getEntitySlots
+      2.4%  com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind
+      2.0%  net.minecraft.world.level.chunk.storage.SectionStorage.m_63818_
+      1.9%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+      1.6%  net.minecraft.world.entity.ai.goal.GoalSelector.m_25373_
+      1.6%  net.minecraft.world.entity.ai.attributes.AttributeMap.m_22146_
+      1.6%  net.minecraft.world.level.entity.EntitySection.m_260830_
+      1.6%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$genCacheBeforeGettingTicking
+  [mixin:spiral_abyss 78.7%] called from: 78.7 ServerLevel.m_8647_ -> ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [mixin:spiral_abyss] working in: 78.7 net.minecraft.server.level.ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [ArcaneVortex_[Alpha] 14.4%] called from: 3.7 LivingEntity.m_21051_ -> MixinHooks.invokeReturn | 1.5 Entity.m_213877_ -> MixinHooks.invoke | 0.9 Level.m_46463_ -> TimeStopHooks.tickBlockEntity | 0.8 ServerLevel.m_184063_ -> TimeStopHooks.checkDespawn
+  [ArcaneVortex_[Alpha]] working in: 2.6 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke | 2.4 com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind | 1.9 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter | 1.1 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.exit
+  [epic-fight 6.5%] called from: 3.3 WrappedGoal.m_8037_ -> TargetChasingGoal.m_8037_ | 1.7 ASMEventHandler.invoke -> __EntityEvents_updateEvent_LivingTickEvent.invoke | 0.6 Entity.handler$coe000$epicfight_setOldPosAndRot -> EpicFightCapabilities.getEntityPatch | 0.3 ASMEventHandler.invoke -> __EntityEvents_equipChangeEvent_LivingEquipmentChangeEvent.invoke
+  [epic-fight] working in: 3.3 yesman.epicfight.world.entity.ai.goal.TargetChasingGoal.m_8037_ | 0.9 yesman.epicfight.world.capabilities.EpicFightCapabilities.getEntityPatch | 0.6 yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch.tick | 0.2 yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch.getSkillCapability
+  [curios-forge 4.6%] called from: 3.2 CapabilityDispatcher.getCapability -> CurioInventoryCapability$Provider.getCapability | 1.1 ASMEventHandler.invoke -> __CuriosEventHandler_tick_LivingTickEvent.invoke | 0.1 ForgePlatformHelper.lambda$isEquippedBy$0 -> CurioInventoryCapability$CurioInventoryWrapper.findFirstCurio | 0.1 ForgePlatformHelper.isEquippedBy -> CuriosApi.getCuriosInventory
+  [curios-forge] working in: 2.5 top.theillusivec4.curios.api.CuriosApi.getEntitySlots | 0.8 top.theillusivec4.curios.common.data.CuriosEntityManager.getEntitySlots | 0.4 theillusivec4.curios.common.capability.CurioInventoryCapability$CurioInventoryWrapper.clearCachedSlotModifiers | 0.4 top.theillusivec4.curios.common.event.CuriosEventHandler.lambda$tick$34
+  [mowziesmobs 4.4%] called from: 3.9 ASMEventHandler.invoke -> __ServerEventHandler_onLivingTick_LivingTickEvent.invoke | 0.5 WrappedGoal.m_8036_ -> AvoidEntityIfNotTamedGoal.m_8036_ | 0.1 ASMEventHandler.invoke -> __ServerEventHandler_onLivingHurt_LivingHurtEvent.invoke
+  [mowziesmobs] working in: 2.2 com.bobmowzie.mowziesmobs.server.ServerEventHandler.onLivingTick | 1.3 com.bobmowzie.mowziesmobs.server.capability.CapabilityHandler.getCapability | 0.5 com.bobmowzie.mowziesmobs.server.ai.AvoidEntityIfNotTamedGoal.m_8036_ | 0.4 com.bobmowzie.mowziesmobs.server.capability.AbilityCapability$AbilityCapabilityImp.tick
+  [witherreincarnated 3.7%] called from: 2.4 WrappedGoal.m_8036_ -> ModifyAIEvent$5.m_8036_ | 1.1 ASMEventHandler.invoke -> __HandlePossessedMobsEvent_possessedTick_LivingTickEvent.invoke | 0.1 ingEntity.handler$dbj000$witherreincarnated_setPossessionCanAttack -> HandlePossessedMobsEvent.lambda$static$0 | 0.1 dler$dbp000$witherreincarnated_stopRandomStrollingForPossessedMobs -> HandlePossessedMobsEvent.lambda$static$0
+  [witherreincarnated] working in: 2.4 com.alexander.witherreincarnated.events.ModifyAIEvent$5.m_8036_ | 1.0 com.alexander.witherreincarnated.events.HandlePossessedMobsEvent.possessedTick | 0.3 com.alexander.witherreincarnated.events.HandlePossessedMobsEvent.lambda$static$0 | 0.1 com.alexander.witherreincarnated.events.HandlePossessedMobsEvent.lambda$possessedTick$1
+
+=== phase town · render thread(s) · 372 samples
+  threads: main 100%
+  mods anywhere in the stack (inclusive %): ArcaneVortex_[Alpha] 12.4, spmovesets 9.7, punchy 6.5, epic-fight 5.9, mixin:tacz 5.1, curios-forge 4.8, diorama 4.0, entityculling-forge 3.5, ?dev.tr7zw.transition.loader 3.5, witherreincarnated 3.0, fantasy 2.4, rtshop 2.4, mixin:horsingaround 1.6, Yazz's Dungeons The Sequel  1.6, DistantHorizons 1.6, embeddium 1.6, Quark 1.3, Zeta 1.3, fdbosses 1.3, mixin:fantasy 1.1, irons_spellbooks 0.8, accessories-neoforge 0.8
+  base: minecraft 100.0, forge 100.0, jdk 100.0, google-libs 8.9, fastutil 5.1, mixin 1.3, joml 0.8
+  top of the stack (self %): minecraft 41.4, ArcaneVortex_[Alpha] 10.8, spmovesets 9.7, curios-forge 4.8, punchy 3.8, forge 2.7, epic-fight 2.7, diorama 2.4, Yazz's Dungeons The Sequel  1.3, mixin 1.3, DistantHorizons 1.3, embeddium 1.3, entityculling-forge 1.1, fantasy 1.1
+  busiest methods:
+      7.8%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      3.5%  top.theillusivec4.curios.api.CuriosApi.getEntitySlots
+      3.0%  net.minecraft.world.level.entity.EntitySectionStorage.m_188362_
+      2.4%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+      2.2%  net.minecraft.world.entity.ai.attributes.AttributeMap.m_22146_
+      2.2%  net.minecraft.world.level.biome.BiomeManager.m_204214_
+      1.3%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke
+      1.1%  com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind
+      1.1%  net.minecraftforge.common.util.LazyOptional.getValue
+      1.1%  net.minecraft.client.multiplayer.ClientLevel.m_233612_
+      1.1%  net.minecraft.world.entity.Entity.handler$coe000$epicfight_setOldPosAndRot
+      1.1%  net.minecraft.world.entity.LivingEntity.modify$zpj000$horsingaround$gaitStride
+  [ArcaneVortex_[Alpha] 12.4%] called from: 1.6 LivingEntity.m_21051_ -> MixinHooks.invokeReturn | 1.1 LivingEntity.m_8107_ -> MixinHooks.invoke | 0.8 LevelRenderer.m_172993_ -> TimeStopAtlas.dispatchRenderStage | 0.8 Entity.m_20184_ -> MixinHooks.invokeReturn
+  [ArcaneVortex_[Alpha]] working in: 2.4 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter | 1.3 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke | 1.1 com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind | 0.5 com.luoee.arcanevortex.TimeStop.Client.TimeStopAtlas.dispatchRenderStage
+  [spmovesets 9.7%] called from: 1.1 ASMEventHandler.invoke -> __SonnaFx_tick_ClientTickEvent.invoke | 1.1 ASMEventHandler.invoke -> __GoddyFx_tick_ClientTickEvent.invoke | 1.1 ASMEventHandler.invoke -> __ReactionFx_tick_ClientTickEvent.invoke | 0.8 ASMEventHandler.invoke -> __PyroFx_tick_ClientTickEvent.invoke
+  [spmovesets] working in: 0.5 spmovesets.spmovesets.movesets.Elementos.Atsu.fx.client.BulletFx.tick | 0.3 spmovesets.spmovesets.movesets.Elementos.Zyra.fx.client.__ZyraFx_postLiving_Post.invoke | 0.3 .spmovesets.movesets.Elementos.Goddy.fx.client.__DemonTransformCamera_onDemonCameraTick_ClientTickEvent.invoke | 0.3 spmovesets.spmovesets.movesets.Elementos.Sonna.fx.client.ScaleFx.tick
+  [punchy 6.5%] called from: 5.9 EventBus.doCastFilter -> ForgeClientPlatform.onClientTick | 0.3 LevelRenderer.original$punchy$captureFishingProjection -> ParticleSpaceTransform.world | 0.3 ItemInHandRenderer.original$punchy$renderFirstPersonModel -> PunchyArmRenderer.renderFirstPerson
+  [punchy] working in: 1.3 punchy.compat.BetterCombatCompat.applyVanillaItemDisplay | 0.8 punchy.client.state.MovementStateMachine.updateSimulation | 0.3 punchy.config.PunchyConfig.findBlacklistMatch | 0.3 punchy.client.state.WalkOnWaterStateMachine.logTriggerState
+  [epic-fight 5.9%] called from: 2.2 Entity.handler$coe000$epicfight_setOldPosAndRot -> EpicFightCapabilities.getEntityPatch | 2.2 ASMEventHandler.invoke -> __Events_renderLivingEvent_Pre.invoke | 0.5 ASMEventHandler.invoke -> __EntityEvents_updateEvent_LivingTickEvent.invoke | 0.3 ParticleEngine.m_107393_ -> AbstractTrailParticle.m_5989_
+  [epic-fight] working in: 2.2 yesman.epicfight.world.capabilities.EpicFightCapabilities.getEntityPatch | 0.3 yesman.epicfight.api.utils.math.OpenMatrix4f.setIdentity | 0.3 yesman.epicfight.client.renderer.patched.entity.PCreeperRenderer.getOverlayCoord | 0.3 yesman.epicfight.api.client.model.SkinnedMesh.getVertexNormal
+  [mixin:tacz 5.1%] called from: 5.1 EntityRenderDispatcher.m_114384_ -> EntityRenderDispatcher.wrapOperation$fml000$tacz$captureThermalVertices
+  [mixin:tacz] working in: 5.1 net.minecraft.client.renderer.entity.EntityRenderDispatcher.wrapOperation$fml000$tacz$captureThermalVertices
+  [curios-forge 4.8%] called from: 3.5 CapabilityDispatcher.getCapability -> CurioInventoryCapability$Provider.getCapability | 0.5 ASMEventHandler.invoke -> __CuriosEventHandler_tick_LivingTickEvent.invoke | 0.3 CuriosCompat.getQuiver -> CuriosHelper.findCurios | 0.3 CurioBaseItem.lambda$isEquippedBy$0 -> CurioInventoryCapability$CurioInventoryWrapper.findFirstCurio
+  [curios-forge] working in: 3.5 top.theillusivec4.curios.api.CuriosApi.getEntitySlots | 0.5 top.theillusivec4.curios.common.inventory.CurioStacksHandler.getStacks | 0.3 top.theillusivec4.curios.common.capability.CurioInventoryCapability$CurioInventoryWrapper.findFirstCurio | 0.3 top.theillusivec4.curios.common.inventory.CurioStacksHandler.applySyncTag
+
+=== phase town · dh thread(s) · 175 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 88%, DH-Render Loader Thread[1] 4%, DH-Render Loader Thread[0] 3%, DH-Phantom Array Recycler Thread[0] 2%, DH-ClientTickTimer 1%, DH-LOD Builder Thread[1] 1%, DH-Regen Queue [minecraft:overworld] Thr 1%, DH-Update Propagate Queue [illusioner:co 1%
+  mods anywhere in the stack (inclusive %): DistantHorizons 100.0
+  base: jdk 100.0, fastutil 0.6, minecraft 0.6
+  top of the stack (self %): DistantHorizons 99.4, minecraft 0.6
+  busiest methods:
+     42.9%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     41.7%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      4.6%  com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout.getLongArray
+      1.7%  com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPoolStatTracker.debugAddPoolByteSize
+      1.1%  com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance
+      1.1%  com.seibel.distanthorizons.core.render.QuadTree.QuadTreeTickNodeHolder.removeEnableAndDisableNode
+      0.6%  com.seibel.distanthorizons.core.dataObjects.transformers.LodDataBuilder.createFromChunk
+      0.6%  com.seibel.distanthorizons.core.file.fullDatafile.V2.FullDataUpdatePropagatorV2.queueRegeneration
+      0.6%  dh_sqlite.core.SafeStmtPtr.safeRun
+      0.6%  com.seibel.distanthorizons.core.util.RenderDataPointReducingList.populate
+      0.6%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint
+      0.6%  com.seibel.distanthorizons.core.util.RenderDataPointReducingList.sortByPosition
+  [DistantHorizons 100.0%] called from: 88.0 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 8.0 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 1.7 ThreadPoolExecutor.runWorker -> PhantomArrayListPool.lambda$static$0 | 1.1 TimerThread.mainLoop -> DhClientServerWorld$1.run
+  [DistantHorizons] working in: 42.9 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 41.7 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 4.6 com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout.getLongArray | 1.7 istanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPoolStatTracker.debugAddPoolByteSize
+
+=== phase town · other thread(s) · 1797 samples
+  threads: diorama-baker 70%, diorama-saved-chunks-worker 16%, CullThread 10%, Chunk Render Task Executor  3%, diorama-fog-mask 1%, diorama-tile-writer 0%, Netty Server IO  0%, Flywheel Task Executor  0%
+  mods anywhere in the stack (inclusive %): diorama 87.0, entityculling-forge 10.1, embeddium 2.7, punchy 0.2, mixin:sodiumdynamiclights 0.2, sodiumdynamiclights-forge 0.2, mixin:modernfix 0.1, Quark 0.1, ?dev.engine_room.flywheel.impl.task 0.1, mixin:supp 0.1
+  base: jdk 99.9, fastutil 3.5, minecraft 2.7, forge 0.2, netty 0.1
+  top of the stack (self %): diorama 86.3, entityculling-forge 9.1, minecraft 2.4, embeddium 1.4, forge 0.2, punchy 0.2, sodiumdynamiclights-forge 0.2, netty 0.1, ?dev.engine_room.flywheel.impl.task 0.1, mixin:sodiumdynamiclights 0.1
+  busiest methods:
+     17.5%  dev.diorama.bake.TileBaker.blocked
+     16.8%  dev.diorama.bake.VoxelReader$Decoded.ids
+     15.6%  dev.diorama.bake.TileBaker.trace
+     14.1%  dev.diorama.bake.VoxelReader.snapshot
+      9.0%  dev.diorama.bake.VoxelReader.enterSolidSection
+      3.8%  dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isVisible
+      3.6%  dev.diorama.bake.TileBaker.skyAt
+      1.8%  dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube
+      1.6%  dev.diorama.bake.TileBaker.occludes
+      1.4%  dev.diorama.bake.VoxelReader.chunk
+      1.3%  dev.diorama.bake.TileBaker.bakePixels
+      0.9%  dev.tr7zw.entityculling.CullTask.cullEntities
+  [diorama 87.0%] called from: 69.5 ThreadPoolExecutor.runWorker -> MapLevel.lambda$bake$10 | 16.3 FutureTask.run -> SavedChunkImport.lambda$submit$5 | 0.8 CompletableFuture$AsyncRun.run -> MapViewport.lambda$finish$6 | 0.3 Executors$RunnableAdapter.call -> TileStore.rebuildOverviews
+  [diorama] working in: 17.5 dev.diorama.bake.TileBaker.blocked | 16.8 dev.diorama.bake.VoxelReader$Decoded.ids | 15.6 dev.diorama.bake.TileBaker.trace | 14.1 dev.diorama.bake.VoxelReader.snapshot
+  [entityculling-forge 10.1%] called from: 10.1 Thread.run -> CullTask.run
+  [entityculling-forge] working in: 3.8 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isVisible | 2.7 dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube | 0.9 dev.tr7zw.entityculling.CullTask.cullEntities | 0.9 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isAABBVisible
+
+=== phase explore · server thread(s) · 2017 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): mixin:spiral_abyss 68.2, ArcaneVortex_[Alpha] 11.5, mowziesmobs 4.0, curios-forge 3.9, artifacts-forge 3.5, crittersandcompanions 2.7, witherreincarnated 2.7, Quark 2.7, tacz 2.6, L_Enders_Cataclysm 2.3, epic-fight 2.3, miningmaster 1.3, adorablehamsterpets 1.3, mixin:modelloader 1.1, accessories-neoforge 1.1, spmovesets 1.0, WeaponsOfMiracles 0.9, mixin:adorablehamsterpets 0.8, rtshop 0.7, mixin:curios 0.7, SpiralAbyss 0.6, caelus-forge 0.6
+  base: minecraft 100.0, jdk 99.4, forge 23.9, fastutil 13.2, google-libs 8.0, lwjgl 0.1, netty 0.1
+  top of the stack (self %): minecraft 74.2, ArcaneVortex_[Alpha] 8.8, curios-forge 3.4, forge 3.1, tacz 1.8, spmovesets 0.7, mowziesmobs 0.7, rtshop 0.6, WeaponsOfMiracles 0.5, crittersandcompanions 0.4, adorablehamsterpets 0.4, accessories-neoforge 0.4, L_Enders_Cataclysm 0.3, fantasy 0.3
+  busiest methods:
+      4.6%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      3.6%  net.minecraft.world.level.chunk.storage.SectionStorage.m_63818_
+      2.6%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$dynamicCacheGen
+      2.4%  top.theillusivec4.curios.api.CuriosApi.getEntitySlots
+      2.3%  com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind
+      2.3%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$genCacheBeforeGettingFluid
+      2.1%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke
+      2.1%  net.minecraft.world.level.entity.EntitySectionStorage.m_188362_
+      2.0%  net.minecraft.util.ClassInstanceMultiMap.m_13533_
+      1.7%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+      1.5%  net.minecraft.world.entity.ai.goal.GoalSelector.m_186081_
+      1.4%  net.minecraft.world.level.chunk.PalettedContainer.m_63085_
+  [mixin:spiral_abyss 68.2%] called from: 68.2 ServerLevel.m_8647_ -> ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [mixin:spiral_abyss] working in: 68.2 net.minecraft.server.level.ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [ArcaneVortex_[Alpha] 11.5%] called from: 2.9 LivingEntity.m_21051_ -> MixinHooks.invokeReturn | 1.2 ServerLevel.m_184063_ -> TimeStopHooks.checkDespawn | 1.1 Level.m_46463_ -> TimeStopHooks.tickBlockEntity | 1.0 Entity.m_213877_ -> MixinHooks.invoke
+  [ArcaneVortex_[Alpha]] working in: 2.3 com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind | 2.1 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke | 1.7 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter | 1.1 com.luoee.arcanevortex.TimeStop.Hook.TimeStopHooks.checkDespawn
+  [mowziesmobs 4.0%] called from: 3.2 ASMEventHandler.invoke -> __ServerEventHandler_onLivingTick_LivingTickEvent.invoke | 0.7 WrappedGoal.m_8036_ -> AvoidEntityIfNotTamedGoal.m_8036_ | 0.0 EntityType.m_20615_ -> EntityGrottol.<init>
+  [mowziesmobs] working in: 2.1 com.bobmowzie.mowziesmobs.server.ServerEventHandler.onLivingTick | 0.7 com.bobmowzie.mowziesmobs.server.ai.AvoidEntityIfNotTamedGoal.m_8036_ | 0.7 com.bobmowzie.mowziesmobs.server.capability.CapabilityHandler.getCapability | 0.3 com.bobmowzie.mowziesmobs.server.capability.AbilityCapability$AbilityCapabilityImp.tick
+  [curios-forge 3.9%] called from: 2.5 CapabilityDispatcher.getCapability -> CurioInventoryCapability$Provider.getCapability | 1.0 ASMEventHandler.invoke -> __CuriosEventHandler_tick_LivingTickEvent.invoke | 0.2 ForgePlatformHelper.isEquippedBy -> CuriosApi.getCuriosInventory | 0.0 ForgePlatformHelper.lambda$isEquippedBy$0 -> CurioInventoryCapability$CurioInventoryWrapper.findFirstCurio
+  [curios-forge] working in: 2.4 top.theillusivec4.curios.api.CuriosApi.getEntitySlots | 0.4 theillusivec4.curios.common.capability.CurioInventoryCapability$CurioInventoryWrapper.clearCachedSlotModifiers | 0.3 top.theillusivec4.curios.common.data.CuriosEntityManager.getEntitySlots | 0.2 top.theillusivec4.curios.mixin.CuriosImplMixinHooks.getCuriosInventory
+  [artifacts-forge 3.5%] called from: 1.5 ServerLevel.mixinextras$bridge$m_8119_$210 -> MimicEntity.m_8119_ | 1.1 EventBus.doCastFilter -> ArtifactEventsForge.onLivingUpdate | 0.5 Entity.modifyReturnValue$foo000$blockRain -> UmbrellaItem.isHoldingUmbrellaUpright | 0.2 LivingEntity.wrapOperation$fpl000$travel -> SnowshoesItem.getModifiedFriction
+  [artifacts-forge] working in: 1.4 artifacts.entity.MimicEntity.m_8119_ | 0.7 artifacts.forge.event.ArtifactEventsForge.onUmbrellaLivingUpdate | 0.7 artifacts.item.UmbrellaItem.isHoldingUmbrellaUpright | 0.2 artifacts.forge.platform.ForgePlatformHelper.isEquippedBy
+
+=== phase explore · render thread(s) · 443 samples
+  threads: main 100%
+  mods anywhere in the stack (inclusive %): spmovesets 14.2, diorama 14.0, ArcaneVortex_[Alpha] 8.1, punchy 7.7, epic-fight 4.3, create 3.8, fantasy 2.7, mixin:iris 2.3, DistantHorizons 2.0, embeddium 1.6, rtshop 1.4, mixin:epicfight 1.4, ?com.tterrag.registrate.util.entry 0.9, architectury 0.9, irons_spellbooks 0.9, oculus 0.9, mixin:horsingaround 0.9, starcatcher 0.9, tacz 0.9, Quark 0.9, Zeta 0.9, ?net.createmod.ponder 0.7
+  base: minecraft 100.0, jdk 100.0, forge 99.8, google-libs 9.5, fastutil 4.3, joml 1.4, mixin 0.7
+  top of the stack (self %): minecraft 33.2, spmovesets 12.9, diorama 12.2, ArcaneVortex_[Alpha] 6.8, punchy 5.2, forge 4.3, fantasy 2.5, epic-fight 2.3, create 2.3, DistantHorizons 2.0, embeddium 1.4, tacz 0.9, mixin 0.7, rtshop 0.7
+  busiest methods:
+      7.7%  net.minecraft.world.level.biome.BiomeManager.m_204214_
+      3.8%  dev.diorama.CaveSight.inSight
+      2.5%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      1.8%  dev.diorama.CaveSight.read
+      1.6%  com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind
+      1.4%  net.minecraft.world.entity.ai.attributes.AttributeMap.m_22146_
+      1.4%  dev.diorama.render.MapViewport.buildMask
+      1.4%  dev.diorama.CaveSight.spread
+      1.1%  dev.diorama.data.SeenBlocks.markSeen
+      0.9%  net.minecraftforge.registries.RegistryObject.get
+      0.9%  net.minecraft.world.level.entity.EntitySectionStorage.m_188362_
+      0.9%  net.minecraft.world.level.Level.m_6522_
+  [spmovesets 14.2%] called from: 1.8 ASMEventHandler.invoke -> __SonnaFx_tick_ClientTickEvent.invoke | 1.6 ASMEventHandler.invoke -> __ReactionFx_tick_ClientTickEvent.invoke | 1.4 ASMEventHandler.invoke -> __DarkyFx_tick_ClientTickEvent.invoke | 1.1 ASMEventHandler.invoke -> __GoddyFx_tick_ClientTickEvent.invoke
+  [spmovesets] working in: 0.5 spmovesets.spmovesets.movesets.Elementos.Nebu.client.NebuAmbience.tick | 0.5 spmovesets.spmovesets.movesets.Pasivas.NitaPasiva.NitaInfinity.isActive | 0.5 spmovesets.spmovesets.movesets.Elementos.Sonna.fx.client.DrumFx.tick | 0.5 spmovesets.spmovesets.movesets.Elementos.Goddy.fx.client.DemonFx.tick
+  [diorama 14.0%] called from: 10.6 EventBus.doCastFilter -> DioramaForgeClient.lambda$init$16 | 3.2 ForgeGui.lambda$render$0 -> DioramaForgeClient.lambda$init$5 | 0.2 ClientChunkCache.handler$din000$diorama$onLightUpdate -> MapSession.lightSectionChanged
+  [diorama] working in: 3.8 dev.diorama.CaveSight.inSight | 2.3 dev.diorama.CaveSight.read | 1.4 dev.diorama.render.MapViewport.buildMask | 1.4 dev.diorama.CaveSight.spread
+  [ArcaneVortex_[Alpha] 8.1%] called from: 1.8 LivingEntity.m_21051_ -> MixinHooks.invokeReturn | 0.7 Entity.m_20184_ -> MixinHooks.invokeReturn | 0.7 LevelRenderer.m_172993_ -> TimeStopAtlas.dispatchRenderStage | 0.7 GameRenderer.m_109089_ -> MixinHooks.invoke
+  [ArcaneVortex_[Alpha]] working in: 1.6 com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind | 0.5 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke | 0.5 com.luoee.arcanevortex.Mixin.Protection.PlayerProtection.on | 0.5 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+  [punchy 7.7%] called from: 7.2 EventBus.doCastFilter -> ForgeClientPlatform.onClientTick | 0.5 ItemInHandRenderer.original$punchy$renderFirstPersonModel -> PunchyArmRenderer.renderFirstPerson
+  [punchy] working in: 0.7 punchy.client.state.CustomAnimationResolver.findEntries | 0.7 punchy.compat.BetterCombatCompat.applyVanillaItemDisplay | 0.5 punchy.client.api.McGameFacts.sample | 0.2 punchy.client.PunchyClient.shouldSuppressOffhandRender
+  [epic-fight 4.3%] called from: 1.4 ASMEventHandler.invoke -> __Events_renderHand_RenderHandEvent.invoke | 0.9 Entity.handler$coe000$epicfight_setOldPosAndRot -> EpicFightCapabilities.getEntityPatch | 0.2 TimeStopClientHooks.renderParticle -> AbstractTrailParticle.m_5744_ | 0.2 ASMEventHandler.invoke -> __Events_renderLivingEvent_Pre.invoke
+  [epic-fight] working in: 0.9 yesman.epicfight.world.capabilities.EpicFightCapabilities.getEntityPatch | 0.5 yesman.epicfight.client.renderer.patched.item.RenderItemBase.renderItemInHand | 0.5 yesman.epicfight.client.renderer.FirstPersonRenderer.render | 0.5 yesman.epicfight.client.events.engine.RenderEngine$Events.renderHand
+  [create 3.8%] called from: 1.8 ASMEventHandler.invoke -> __ClientEvents_onTick_ClientTickEvent.invoke | 0.7 GameRenderer.handler$hmc000$create$bigShapePick -> BigOutlines.pick | 0.5 ASMEventHandler.invoke -> __SymmetryHandler_onRenderWorld_RenderLevelStageEvent.invoke | 0.2 ASMEventHandler.invoke -> __HauntedBellPulser_hauntedBellCreatesPulse_PlayerTickEvent.invoke
+  [create] working in: 0.5 com.simibubi.create.foundation.block.BigOutlines.pick | 0.2 com.simibubi.create.content.redstone.link.LinkRenderer.tick | 0.2 com.simibubi.create.foundation.events.ClientEvents.onTick | 0.2 com.simibubi.create.content.equipment.symmetryWand.SymmetryHandler.onRenderWorld
+
+=== phase explore · worldgen thread(s) · 2250 samples
+  threads: Worker-Main 100%
+  mods anywhere in the stack (inclusive %): spelunkery 18.9, Zeta 4.7, Quark 3.9, modernfix-forge 2.2, integrated_api 1.5, entityculling-forge 0.4, create 0.3, BCLib 0.3, ?org.apache.commons.lang3.tuple 0.2, mixin:mfix 0.2, ferritecore 0.1, ?org.objectweb.asm 0.0, ArcaneVortex_[Alpha] 0.0, miningmaster 0.0, L_Enders_Cataclysm 0.0, fantasy 0.0, architectury 0.0
+  base: minecraft 100.0, jdk 99.8, fastutil 5.8, google-libs 1.2, forge 0.4, mixin 0.2, netty 0.0
+  top of the stack (self %): minecraft 82.5, spelunkery 12.2, Quark 1.5, integrated_api 1.0, modernfix-forge 0.7, Zeta 0.7, forge 0.3, mixin 0.2, entityculling-forge 0.2, create 0.2, ?org.apache.commons.lang3.tuple 0.1, ferritecore 0.1, BCLib 0.0, ?org.objectweb.asm 0.0
+  busiest methods:
+     13.8%  net.minecraft.world.level.levelgen.Aquifer$NoiseBasedAquifer.m_207104_
+      7.4%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular
+      6.4%  net.minecraft.server.level.WorldGenRegion.m_6522_
+      4.6%  net.minecraft.world.level.biome.Climate$RTree$SubTree.m_183370_
+      4.5%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75333_
+      3.4%  net.minecraft.world.level.chunk.BulkSectionAccess.m_156104_
+      3.2%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75327_
+      2.8%  net.minecraft.core.HolderSet$Direct.m_203333_
+      2.3%  net.minecraft.world.level.levelgen.synth.PerlinNoise.m_75417_
+      1.9%  net.minecraft.world.level.levelgen.feature.OreFeature.m_225186_
+      1.7%  net.minecraft.world.level.levelgen.NoiseChunk.m_209241_
+      1.6%  net.minecraft.world.level.chunk.ChunkAccess.m_141937_
+  [spelunkery 18.9%] called from: 18.8 Feature.m_225028_ -> BlockStripeFeature.m_142674_ | 0.0 Feature.m_225028_ -> WallMushroomFeature.m_142674_ | 0.0 StructureStart.m_226850_ -> MineshaftDustCorridor.m_213694_
+  [spelunkery] working in: 7.4 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular | 7.2 com.ordana.spelunkery.worldgen.features.BlockStripeFeature.m_142674_ | 1.6 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleDomainWarpOpenSimplex2Gradient | 1.3 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GenNoiseSingle
+  [Zeta 4.7%] called from: 4.7 Feature.m_225028_ -> DeferredFeature.m_142674_
+  [Zeta] working in: 3.2 org.violetmoon.zeta.world.generator.multichunk.ClusterBasedGenerator.lambda$generateChunkPart$0 | 0.7 org.violetmoon.zeta.world.generator.multichunk.ClusterShape.isInside | 0.5 org.violetmoon.zeta.world.generator.Generator.getBiome | 0.1 org.violetmoon.zeta.config.type.BiomeTagConfig.canSpawn
+  [Quark 3.9%] called from: 3.1 ClusterBasedGenerator.lambda$generateChunkPart$0 -> BigStoneClusterGenerator$1.canPlaceAt | 0.5 MultiChunkFeatureGenerator.generateChunk -> UndergroundStyleGenerator.getSourcesInChunk | 0.1 ClusterBasedGenerator.lambda$generateChunkPart$0 -> UndergroundStyleGenerator$Context.canPlaceAt | 0.0 Generator.generate -> FallenLogGenerator.generateChunk
+  [Quark] working in: 3.0 org.violetmoon.quark.content.world.gen.BigStoneClusterGenerator.canPlaceBlock | 0.5 org.violetmoon.quark.content.world.undergroundstyle.base.UndergroundStyleGenerator.getSourcesInChunk | 0.1 org.violetmoon.quark.content.world.undergroundstyle.base.UndergroundStyleGenerator$Context.canPlaceAt | 0.1 org.violetmoon.quark.content.world.module.BigStoneClustersModule.lambda$configChanged$7
+
+=== phase explore · dh thread(s) · 1858 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 90%, DH-Render Loader Thread[0] 5%, DH-Render Loader Thread[1] 4%, DH-ClientTickTimer 0%, DH-Phantom Array Recycler Thread[0] 0%, DH-LOD Builder Thread[1] 0%, DH-LOD Builder Thread[0] 0%, DH-FullDataPayloadSender 0%
+  mods anywhere in the stack (inclusive %): DistantHorizons 100.0
+  base: jdk 100.0, fastutil 1.6
+  top of the stack (self %): DistantHorizons 100.0
+  busiest methods:
+     47.8%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     37.9%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      1.9%  com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance
+      1.1%  com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding.ColumnBox.makeAdjVerticalQuad
+      0.7%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.getDataPointAtBlockPos
+      0.7%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkUpdateQueueManager.setCenter
+      0.6%  com.seibel.distanthorizons.core.util.RenderDataPointReducingList.sortBySize
+      0.5%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkUpdateQueueManager.runQueueingLoop
+      0.5%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataToRenderDataTransformer.setRenderColumnView
+      0.5%  com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout.getLongArray
+      0.4%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkUpdateQueueManager.processQueuedChunkPreUpdate
+      0.4%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+  [DistantHorizons 100.0%] called from: 90.1 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 9.1 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 0.4 TimerThread.mainLoop -> DhClientServerWorld$1.run | 0.3 ThreadPoolExecutor.runWorker -> PhantomArrayListPool.lambda$static$0
+  [DistantHorizons] working in: 47.8 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 37.9 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 1.9 com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance | 1.1 com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding.ColumnBox.makeAdjVerticalQuad
+
+=== phase explore · other thread(s) · 3580 samples
+  threads: diorama-baker 80%, diorama-saved-chunks-worker 10%, CullThread 7%, Chunk Render Task Executor  1%, IO-Worker 0%, diorama-tile-writer 0%, diorama-fog-mask 0%, Flywheel Task Executor  0%
+  mods anywhere in the stack (inclusive %): diorama 91.1, entityculling-forge 7.2, embeddium 1.2, sodiumdynamiclights-forge 0.2, mixin:sodiumdynamiclights 0.2, ?dev.engine_room.flywheel.impl.task 0.1, punchy 0.1, ?dev.engine_room.flywheel.lib.task 0.1, ferritecore 0.1, ?dev.engine_room.flywheel.lib.task.functional 0.1, Zeta 0.1, Quark 0.0, ?dev.engine_room.flywheel.impl.visualization 0.0, ?dev.engine_room.flywheel.backend.engine 0.0
+  base: jdk 99.9, fastutil 3.5, minecraft 2.8, forge 0.1
+  top of the stack (self %): diorama 90.2, entityculling-forge 6.1, minecraft 2.5, embeddium 0.6, sodiumdynamiclights-forge 0.2, forge 0.1, punchy 0.1, ferritecore 0.1, Zeta 0.1, ?dev.engine_room.flywheel.impl.visualization 0.0, ?dev.engine_room.flywheel.lib.task 0.0, ?dev.engine_room.flywheel.impl.task 0.0, ?dev.engine_room.flywheel.backend.engine 0.0
+  busiest methods:
+     27.5%  dev.diorama.bake.TileBaker.trace
+     13.3%  dev.diorama.bake.TileBaker.blocked
+     10.8%  dev.diorama.bake.VoxelReader.enterSolidSection
+      7.0%  dev.diorama.bake.VoxelReader$Decoded.ids
+      6.1%  dev.diorama.bake.TileSpots.passedWhenSaved
+      5.2%  dev.diorama.bake.VoxelReader.snapshot
+      5.0%  dev.diorama.bake.VoxelReader.state
+      4.1%  dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube
+      4.0%  dev.diorama.bake.TileBaker.skyAt
+      1.9%  dev.diorama.bake.TileBaker.bakePixels
+      1.8%  dev.diorama.bake.VoxelReader.solid
+      1.2%  dev.diorama.bake.VoxelReader.chunk
+  [diorama 91.1%] called from: 80.4 ThreadPoolExecutor.runWorker -> MapLevel.lambda$bake$10 | 9.9 FutureTask.run -> SavedChunkImport.lambda$submit$5 | 0.4 Executors$RunnableAdapter.call -> TileStore.rebuildOverviews | 0.3 CompletableFuture$AsyncRun.run -> MapViewport.lambda$finish$6
+  [diorama] working in: 27.5 dev.diorama.bake.TileBaker.trace | 13.3 dev.diorama.bake.TileBaker.blocked | 10.8 dev.diorama.bake.VoxelReader.enterSolidSection | 7.0 dev.diorama.bake.VoxelReader$Decoded.ids
+  [entityculling-forge 7.2%] called from: 7.2 Thread.run -> CullTask.run
+  [entityculling-forge] working in: 5.1 dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube | 0.7 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isVisible | 0.6 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.stepRay | 0.4 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isAABBVisible
+
+=== phase mobs · server thread(s) · 1291 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): mixin:spiral_abyss 68.6, ArcaneVortex_[Alpha] 11.2, mowziesmobs 4.8, witherreincarnated 3.0, curios-forge 3.0, Quark 2.6, artifacts-forge 2.3, tacz 2.2, epic-fight 2.2, fantasy 2.0, miningmaster 1.8, L_Enders_Cataclysm 1.5, crittersandcompanions 1.4, mixin:adorablehamsterpets 1.2, adorablehamsterpets 1.1, mixin:modelloader 1.1, WeaponsOfMiracles 1.0, spmovesets 1.0, mixin:curios 1.0, accessories-neoforge 0.8, mixin:horsingaround 0.6, mixin:create 0.5
+  base: minecraft 100.0, jdk 99.5, forge 23.2, fastutil 14.5, google-libs 8.3
+  top of the stack (self %): minecraft 74.4, ArcaneVortex_[Alpha] 8.7, forge 3.5, curios-forge 2.7, tacz 1.6, fantasy 1.2, mowziesmobs 0.9, spmovesets 0.9, WeaponsOfMiracles 0.7, mixin:horsingaround 0.6, L_Enders_Cataclysm 0.5, adorablehamsterpets 0.4, crittersandcompanions 0.4, accessories-neoforge 0.4
+  busiest methods:
+      5.5%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$genCacheBeforeGettingFluid
+      5.0%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      3.3%  net.minecraft.world.level.chunk.storage.SectionStorage.m_63818_
+      2.7%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$dynamicCacheGen
+      2.3%  net.minecraft.world.level.entity.EntitySectionStorage.m_188362_
+      2.2%  com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind
+      2.1%  net.minecraft.world.level.Level.m_6522_
+      1.8%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke
+      1.7%  net.minecraft.util.ClassInstanceMultiMap.m_13533_
+      1.7%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+      1.7%  top.theillusivec4.curios.api.CuriosApi.getEntitySlots
+      1.5%  net.minecraft.world.level.material.FlowingFluid.m_76061_
+  [mixin:spiral_abyss 68.6%] called from: 68.6 ServerLevel.m_8647_ -> ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [mixin:spiral_abyss] working in: 68.6 net.minecraft.server.level.ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [ArcaneVortex_[Alpha] 11.2%] called from: 2.7 LivingEntity.m_21051_ -> MixinHooks.invokeReturn | 1.0 Level.m_46463_ -> TimeStopHooks.tickBlockEntity | 0.9 Entity.m_213877_ -> MixinHooks.invoke | 0.7 ServerLevel.m_8793_ -> TimeStopHooks.tickScheduled
+  [ArcaneVortex_[Alpha]] working in: 2.2 com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind | 1.8 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke | 1.7 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter | 1.0 com.luoee.arcanevortex.TimeStop.Hook.TimeStopHooks.tickBlockEntity
+  [mowziesmobs 4.8%] called from: 3.6 ASMEventHandler.invoke -> __ServerEventHandler_onLivingTick_LivingTickEvent.invoke | 0.9 WrappedGoal.m_8036_ -> AvoidEntityIfNotTamedGoal.m_8036_ | 0.2 ServerLevel.mixinextras$bridge$m_8119_$210 -> EntityGrottol.m_8119_
+  [mowziesmobs] working in: 2.0 com.bobmowzie.mowziesmobs.server.ServerEventHandler.onLivingTick | 0.9 com.bobmowzie.mowziesmobs.server.ai.AvoidEntityIfNotTamedGoal.m_8036_ | 0.9 com.bobmowzie.mowziesmobs.server.capability.CapabilityHandler.getCapability | 0.7 com.bobmowzie.mowziesmobs.server.capability.AbilityCapability$AbilityCapabilityImp.tick
+  [witherreincarnated 3.0%] called from: 2.0 WrappedGoal.m_8036_ -> ModifyAIEvent$5.m_8036_ | 0.9 ASMEventHandler.invoke -> __HandlePossessedMobsEvent_possessedTick_LivingTickEvent.invoke | 0.1 WrappedGoal.m_8036_ -> ModifyAIEvent$1.m_8036_ | 0.1 ingEntity.handler$dbj000$witherreincarnated_setPossessionCanAttack -> HandlePossessedMobsEvent.lambda$static$0
+  [witherreincarnated] working in: 2.0 com.alexander.witherreincarnated.events.ModifyAIEvent$5.m_8036_ | 0.6 com.alexander.witherreincarnated.events.HandlePossessedMobsEvent.possessedTick | 0.2 com.alexander.witherreincarnated.events.HandlePossessedMobsEvent.lambda$possessedTick$1 | 0.2 com.alexander.witherreincarnated.events.HandlePossessedMobsEvent.lambda$static$0
+  [curios-forge 3.0%] called from: 1.9 CapabilityDispatcher.getCapability -> CurioInventoryCapability$Provider.getCapability | 1.0 ASMEventHandler.invoke -> __CuriosEventHandler_tick_LivingTickEvent.invoke | 0.1 ForgePlatformHelper.lambda$isEquippedBy$0 -> CurioInventoryCapability$CurioInventoryWrapper.findFirstCurio
+  [curios-forge] working in: 1.7 top.theillusivec4.curios.api.CuriosApi.getEntitySlots | 0.5 top.theillusivec4.curios.common.data.CuriosEntityManager.getEntitySlots | 0.3 theillusivec4.curios.common.capability.CurioInventoryCapability$CurioInventoryWrapper.clearCachedSlotModifiers | 0.2 top.theillusivec4.curios.common.event.CuriosEventHandler.lambda$tick$34
+
+=== phase mobs · render thread(s) · 269 samples
+  threads: main 100%
+  mods anywhere in the stack (inclusive %): spmovesets 10.8, ArcaneVortex_[Alpha] 8.9, punchy 6.7, epic-fight 6.7, diorama 5.9, mixin:tacz 5.2, mixin:iris 4.1, embeddium 3.7, create 2.2, mixin:horsingaround 2.2, fantasy 1.9, DistantHorizons 1.5, mixin:punchy 1.5, mixin:epicfight 1.5, entityculling-forge 1.5, ?dev.tr7zw.transition.loader 1.5, mixin:fantasy 1.1, Yazz's Dungeons The Sequel  1.1, rtshop 1.1, L_Enders_Cataclysm 1.1, mixin:adorablehamsterpets 0.7, artifacts-forge 0.7
+  base: forge 100.0, minecraft 100.0, jdk 100.0, google-libs 11.5, fastutil 5.6, joml 0.7, mixin 0.4
+  top of the stack (self %): minecraft 47.2, spmovesets 10.8, ArcaneVortex_[Alpha] 6.7, punchy 5.6, diorama 3.7, embeddium 3.3, epic-fight 3.0, forge 3.0, create 1.5, DistantHorizons 0.7, architectury 0.7, oculus 0.7, L_Enders_Cataclysm 0.7, ImmediatelyFast-Forge 0.7
+  busiest methods:
+      7.1%  net.minecraft.world.level.biome.BiomeManager.m_204214_
+      3.7%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      3.3%  net.minecraft.world.level.entity.EntitySectionStorage.m_188362_
+      2.6%  dev.diorama.render.MapViewport.buildMask
+      2.2%  net.minecraft.world.level.chunk.ChunkAccess.m_141937_
+      1.9%  com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind
+      1.5%  net.minecraft.world.level.Level.m_6522_
+      1.5%  net.minecraft.world.level.chunk.PalettedContainer.m_63085_
+      1.1%  net.minecraft.world.level.lighting.LayerLightSectionStorage.m_75787_
+      1.1%  net.minecraft.world.entity.ai.attributes.AttributeMap.m_22146_
+      1.1%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+      1.1%  net.minecraftforge.eventbus.EventBus.post
+  [spmovesets 10.8%] called from: 1.9 ASMEventHandler.invoke -> __NowyFx_tick_ClientTickEvent.invoke | 1.5 ASMEventHandler.invoke -> __GoddyFx_tick_ClientTickEvent.invoke | 1.1 ASMEventHandler.invoke -> __DarkyFx_tick_ClientTickEvent.invoke | 1.1 ASMEventHandler.invoke -> __PyroFx_tick_ClientTickEvent.invoke
+  [spmovesets] working in: 0.7 spmovesets.spmovesets.movesets.Elementos.Darky.fx.client.ShadowStandFx.hasWork | 0.4 spmovesets.spmovesets.movesets.Elementos.Darky.fx.client.RevelacionFx.tick | 0.4 spmovesets.spmovesets.movesets.Elementos.Vita.fx.client.RootFx.tick | 0.4 spmovesets.spmovesets.movesets.Elementos.Pyro.fx.client.SerpienteFx.tick
+  [ArcaneVortex_[Alpha] 8.9%] called from: 1.9 LivingEntity.m_21051_ -> MixinHooks.invokeReturn | 1.5 ParticleEngine.render -> TimeStopClientHooks.renderParticle | 0.7 Entity.m_20184_ -> MixinHooks.invokeReturn | 0.7 Minecraft.m_91398_ -> MixinHooks.invoke
+  [ArcaneVortex_[Alpha]] working in: 1.9 com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind | 1.5 com.luoee.arcanevortex.TimeStop.Client.TimeStopClientHooks.renderParticle | 1.1 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter | 0.4 com.luoee.arcanevortex.Help.ScreenShakeHelper$ClientHandler.onClientTick
+  [punchy 6.7%] called from: 5.6 EventBus.doCastFilter -> ForgeClientPlatform.onClientTick | 0.7 ItemInHandRenderer.original$punchy$renderFirstPersonModel -> PunchyArmRenderer.renderFirstPerson | 0.4 ItemInHandRenderer.handler$dff000$punchy$renderFirstPersonModel -> Hooks.frame
+  [punchy] working in: 0.7 punchy.client.state.CustomAnimationResolver.normalizeType | 0.7 punchy.compat.BetterCombatCompat.applyVanillaItemDisplay | 0.4 punchy.client.state.MovementStateMachine.applyCameraLookToRoot | 0.4 punchy.client.state.MovementStateMachine$MotionFrame.applyTo
+  [epic-fight 6.7%] called from: 3.7 ASMEventHandler.invoke -> __Events_renderLivingEvent_Pre.invoke | 1.1 ASMEventHandler.invoke -> __EntityEvents_updateEvent_LivingTickEvent.invoke | 1.1 ASMEventHandler.invoke -> __Events_clientTickEvent_ClientTickEvent.invoke | 0.4 Entity.handler$coe000$epicfight_setOldPosAndRot -> EpicFightCapabilities.getEntityPatch
+  [epic-fight] working in: 1.1 yesman.epicfight.api.client.model.SkinnedMesh.getVertexPosition | 1.1 yesman.epicfight.api.client.camera.EpicFightCameraAPI.postClientTick | 0.7 yesman.epicfight.client.renderer.patched.item.RenderTwoHandedRangedWeapon.renderItemInHand | 0.4 yesman.epicfight.client.world.capabilites.entitypatch.player.LocalPlayerPatch.clientTick
+  [diorama 5.9%] called from: 5.2 ForgeGui.lambda$render$0 -> DioramaForgeClient.lambda$init$5 | 0.7 EventBus.doCastFilter -> DioramaForgeClient.lambda$init$16
+  [diorama] working in: 2.6 dev.diorama.render.MapViewport.buildMask | 0.7 dev.diorama.MinimapHud.compass | 0.4 dev.diorama.render.Pins.scale | 0.4 dev.diorama.render.MapLevel.peek
+  [mixin:tacz 5.2%] called from: 5.2 EntityRenderDispatcher.m_114384_ -> EntityRenderDispatcher.wrapOperation$fml000$tacz$captureThermalVertices
+  [mixin:tacz] working in: 5.2 net.minecraft.client.renderer.entity.EntityRenderDispatcher.wrapOperation$fml000$tacz$captureThermalVertices
+
+=== phase mobs · worldgen thread(s) · 805 samples
+  threads: Worker-Main 100%
+  mods anywhere in the stack (inclusive %): spelunkery 21.1, Zeta 4.8, Quark 4.3, integrated_api 4.0, modernfix-forge 2.2, ?org.apache.commons.lang3.tuple 0.9, mixin:mfix 0.5, ferritecore 0.1, block_factorys_bosses 0.1, entityculling-forge 0.1
+  base: minecraft 99.9, jdk 99.8, fastutil 5.5, mixin 1.5, google-libs 0.9, forge 0.2
+  top of the stack (self %): minecraft 81.1, spelunkery 12.7, Quark 2.2, mixin 1.5, integrated_api 0.7, Zeta 0.4, ?org.apache.commons.lang3.tuple 0.4, modernfix-forge 0.2, forge 0.2, ferritecore 0.1, entityculling-forge 0.1, mixin:mfix 0.1
+  busiest methods:
+     14.0%  net.minecraft.world.level.levelgen.Aquifer$NoiseBasedAquifer.m_207104_
+      7.7%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular
+      5.5%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75333_
+      4.3%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75327_
+      3.5%  net.minecraft.server.level.WorldGenRegion.m_6522_
+      2.7%  net.minecraft.world.level.levelgen.synth.PerlinNoise.m_75417_
+      2.7%  net.minecraft.world.level.biome.Climate$RTree$SubTree.m_183370_
+      2.4%  net.minecraft.world.level.chunk.ChunkAccess.m_141937_
+      2.2%  net.minecraft.world.level.chunk.BulkSectionAccess.m_156104_
+      2.2%  net.minecraft.world.level.levelgen.NoiseChunk.m_209241_
+      2.0%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GenNoiseSingle
+      1.9%  org.violetmoon.quark.content.world.gen.BigStoneClusterGenerator.canPlaceBlock
+  [spelunkery 21.1%] called from: 21.1 Feature.m_225028_ -> BlockStripeFeature.m_142674_
+  [spelunkery] working in: 8.6 com.ordana.spelunkery.worldgen.features.BlockStripeFeature.m_142674_ | 7.7 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular | 2.0 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GenNoiseSingle | 1.7 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleDomainWarpOpenSimplex2Gradient
+  [Zeta 4.8%] called from: 4.8 Feature.m_225028_ -> DeferredFeature.m_142674_
+  [Zeta] working in: 3.7 org.violetmoon.zeta.world.generator.multichunk.ClusterBasedGenerator.lambda$generateChunkPart$0 | 0.5 org.violetmoon.zeta.world.generator.Generator.getBiome | 0.2 org.violetmoon.zeta.world.generator.multichunk.ClusterShape.isInside | 0.1 org.violetmoon.zeta.config.type.BiomeTagConfig.canSpawn
+  [Quark 4.3%] called from: 3.5 ClusterBasedGenerator.lambda$generateChunkPart$0 -> BigStoneClusterGenerator$1.canPlaceAt | 0.5 MultiChunkFeatureGenerator.generateChunk -> UndergroundStyleGenerator.getSourcesInChunk | 0.2 ClusterBasedGenerator.lambda$generateChunkPart$0 -> UndergroundStyleGenerator$Context.canPlaceAt | 0.1 MultiChunkFeatureGenerator.generateChunk -> BigStoneClusterGenerator.getSourcesInChunk
+  [Quark] working in: 3.4 org.violetmoon.quark.content.world.gen.BigStoneClusterGenerator.canPlaceBlock | 0.5 org.violetmoon.quark.content.world.undergroundstyle.base.UndergroundStyleGenerator.getSourcesInChunk | 0.2 org.violetmoon.quark.content.world.undergroundstyle.base.UndergroundStyleGenerator$Context.canPlaceAt | 0.1 org.violetmoon.quark.content.world.gen.BigStoneClusterGenerator.getSourcesInChunk
+  [integrated_api 4.0%] called from: 2.1 Structure.m_262864_ -> ModAdaptiveStructure.m_214086_ | 0.9 Structure.m_262864_ -> JigsawStructure.m_214086_ | 0.7 Beardifier.handler$daj000$intapi_calculateDensity -> EnhancedBeardifierHelper.computeDensity | 0.2 IASinglePoolElement.m_214015_
+  [integrated_api] working in: 2.2 com.craisinlord.integrated_api.world.structures.JigsawStructure.extraSpawningChecks | 1.0 com.craisinlord.integrated_api.world.structures.pieces.IASinglePoolElement.getTemplate | 0.7 com.craisinlord.integrated_api.world.terrainadaptation.beardifier.EnhancedBeardifierHelper.computeDensity
+
+=== phase mobs · dh thread(s) · 1247 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 80%, DH-LOD Builder Thread[1] 9%, DH-LOD Builder Thread[0] 7%, DH-Render Loader Thread[0] 3%, DH-Render Loader Thread[1] 2%, DH-FullDataPayloadSender 0%, DH-Phantom Array Recycler Thread[0] 0%, DH-ClientTickTimer 0%
+  mods anywhere in the stack (inclusive %): DistantHorizons 100.0
+  base: jdk 100.0, minecraft 2.2, fastutil 1.0, forge 0.4, google-libs 0.1
+  top of the stack (self %): DistantHorizons 97.8, minecraft 1.8, forge 0.4
+  busiest methods:
+     42.4%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     33.7%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      2.4%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+      2.2%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+      1.8%  com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper_forge.getBlockState
+      1.4%  net.minecraft.world.level.chunk.PalettedContainer.m_63085_
+      1.2%  com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance
+      1.1%  com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding.ColumnBox.makeAdjVerticalQuad
+      1.1%  com.seibel.distanthorizons.core.wrapperInterfaces.chunk.ChunkLightStorage$LightSection.get
+      1.0%  com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap.addIfNotPresentAndGetId
+      1.0%  com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState
+      0.7%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.removeUnusedIdsAndRemap
+  [DistantHorizons 100.0%] called from: 79.8 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 20.0 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 0.1 TimerThread.mainLoop -> TimerUtil$1.run | 0.1 ThreadPoolExecutor.runWorker -> PhantomArrayListPool.lambda$static$0
+  [DistantHorizons] working in: 42.4 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 33.7 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 2.4 com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get | 2.2 com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+
+=== phase mobs · other thread(s) · 1755 samples
+  threads: diorama-baker 83%, CullThread 13%, Chunk Render Task Executor  2%, diorama-fog-mask 1%, diorama-tile-writer 1%, diorama-saved-chunks-worker 0%, Netty Server IO  0%, Flywheel Task Executor  0%
+  mods anywhere in the stack (inclusive %): diorama 84.6, entityculling-forge 13.2, embeddium 1.8, mixin:sodiumdynamiclights 0.3, sodiumdynamiclights-forge 0.2, ferritecore 0.2, mixin:modernfix 0.1, ?dev.engine_room.flywheel.impl.task 0.1, ExtraLib 0.1, mixin:iris 0.1
+  base: jdk 99.9, fastutil 6.2, minecraft 3.2, forge 0.2, netty 0.2
+  top of the stack (self %): diorama 84.3, entityculling-forge 11.5, minecraft 2.8, embeddium 0.6, sodiumdynamiclights-forge 0.2, mixin:sodiumdynamiclights 0.2, ferritecore 0.2, forge 0.1, netty 0.1, ?dev.engine_room.flywheel.impl.task 0.1
+  busiest methods:
+     32.0%  dev.diorama.bake.TileBaker.trace
+     14.4%  dev.diorama.bake.TileBaker.blocked
+      8.2%  dev.diorama.bake.TileBaker.skyAt
+      7.5%  dev.diorama.bake.VoxelReader.enterSolidSection
+      7.4%  dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube
+      3.8%  dev.diorama.bake.VoxelReader.state
+      2.4%  dev.diorama.bake.VoxelReader.blockLight
+      2.0%  dev.diorama.bake.TileBaker.shade
+      2.0%  dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isVisible
+      1.9%  dev.diorama.bake.TileBaker.bakePixels
+      1.7%  dev.diorama.bake.VoxelReader$Decoded.ids
+      1.6%  dev.diorama.bake.VoxelReader.chunk
+  [diorama 84.6%] called from: 82.7 ThreadPoolExecutor.runWorker -> MapLevel.lambda$bake$10 | 0.9 CompletableFuture$AsyncRun.run -> MapViewport.lambda$finish$6 | 0.6 Executors$RunnableAdapter.call -> TileStore.rebuildOverviews | 0.2 FutureTask.run -> SavedChunkImport.lambda$submit$5
+  [diorama] working in: 32.0 dev.diorama.bake.TileBaker.trace | 14.4 dev.diorama.bake.TileBaker.blocked | 8.2 dev.diorama.bake.TileBaker.skyAt | 7.5 dev.diorama.bake.VoxelReader.enterSolidSection
+  [entityculling-forge 13.2%] called from: 13.2 Thread.run -> CullTask.run
+  [entityculling-forge] working in: 9.1 dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube | 2.0 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isVisible | 0.8 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.stepRay | 0.4 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isAABBVisible
+
+=== phase (between phases) · server thread(s) · 3032 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): mixin:spiral_abyss 55.9, ArcaneVortex_[Alpha] 8.9, rtshop 8.1, epic-fight 2.6, mowziesmobs 2.6, curios-forge 2.5, witherreincarnated 2.4, Quark 2.1, crittersandcompanions 1.8, tacz 1.8, miningmaster 1.7, L_Enders_Cataclysm 1.6, artifacts-forge 1.4, adorablehamsterpets 1.3, accessories-neoforge 1.0, spmovesets 1.0, mixin:adorablehamsterpets 0.9, WeaponsOfMiracles 0.8, mixin:modelloader 0.7, mixin:curios 0.7, diorama 0.6, architectury 0.6
+  base: minecraft 100.0, jdk 99.5, forge 28.1, fastutil 11.9, google-libs 6.7, netty 0.4, mixin 0.4, lwjgl 0.3
+  top of the stack (self %): minecraft 70.8, ArcaneVortex_[Alpha] 6.8, rtshop 4.6, forge 4.2, curios-forge 2.3, tacz 1.3, spmovesets 0.7, WeaponsOfMiracles 0.7, L_Enders_Cataclysm 0.5, epic-fight 0.5, mowziesmobs 0.5, ?org.objectweb.asm 0.4, accessories-neoforge 0.4, netty 0.4
+  busiest methods:
+      7.6%  net.minecraft.server.level.DistanceManager.m_140805_
+      3.5%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      2.6%  net.minecraft.util.thread.StrictQueue$QueueStrictQueue.m_6944_
+      2.2%  net.minecraft.world.level.entity.EntitySectionStorage.m_188362_
+      2.1%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$dynamicCacheGen
+      1.9%  net.minecraft.world.level.chunk.storage.SectionStorage.m_63818_
+      1.7%  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.redirect$zfc000$genCacheBeforeGettingFluid
+      1.5%  net.minecraft.server.level.ChunkMap.m_140324_
+      1.5%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke
+      1.4%  net.minecraft.util.ClassInstanceMultiMap.m_13533_
+      1.4%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+      1.3%  net.minecraft.world.level.chunk.PalettedContainer.m_63085_
+  [mixin:spiral_abyss 55.9%] called from: 55.8 ServerLevel.m_8647_ -> ServerLevel.wrapOperation$fde000$spiral_abyss$tick | 0.0 ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [mixin:spiral_abyss] working in: 55.9 net.minecraft.server.level.ServerLevel.wrapOperation$fde000$spiral_abyss$tick
+  [ArcaneVortex_[Alpha] 8.9%] called from: 1.6 LivingEntity.m_21051_ -> MixinHooks.invokeReturn | 0.6 Level.m_46463_ -> TimeStopHooks.tickBlockEntity | 0.6 ClassLoader.defineClass1 -> MasterTransformer.transform | 0.6 Entity.m_213877_ -> MixinHooks.invoke
+  [ArcaneVortex_[Alpha]] working in: 1.5 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke | 1.4 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter | 1.0 com.luoee.arcanevortex.Mixin.Protection.AttributeGuard.bind | 0.6 com.luoee.arcanevortex.TimeStop.Hook.TimeStopHooks.tickBlockEntity
+  [rtshop 8.1%] called from: 7.4 ASMEventHandler.invoke -> __ShopServer_onServerStarting_ServerStartingEvent.invoke | 0.1 ASMEventHandler.invoke -> __RecipeRules_onStarting_ServerStartingEvent.invoke | 0.1 ASMEventHandler.invoke -> __StagedStructures_onTick_ServerTickEvent.invoke | 0.1 ASMEventHandler.invoke -> __MagicGacha_onStarting_ServerStartingEvent.invoke
+  [rtshop] working in: 0.9 com.rtshop.shop.ShopLoader.parseAuto | 0.7 com.rtshop.shop.RecipeScan.collect | 0.6 com.rtshop.gacha.GachaConfig.autoPets | 0.4 com.rtshop.shop.RecipeSolver.purchaseCosts
+
+=== phase (between phases) · render thread(s) · 2666 samples
+  threads: main 100%
+  mods anywhere in the stack (inclusive %): epic-fight 17.8, jei 15.8, EpicFight Nightfall 10.5, ArcaneVortex_[Alpha] 8.1, epic_fight_avalon 6.6, irons_spellbooks 5.9, rtshop 5.2, ?org.objectweb.asm 5.1, punchy 4.9, modernfix-forge 3.9, spmovesets 3.2, WeaponsOfMiracles 2.7, diorama 2.0, epicfight-extra 1.7, Patchouli 1.7, resourcefullib 1.7, ?org.objectweb.asm.tree 1.6, moonlight 1.6, tacz 1.4, create 1.4, mixin:tacz 1.3, fantasy 1.2
+  base: jdk 99.4, forge 88.8, minecraft 84.7, google-libs 30.7, mixin 9.6, fastutil 6.2, logging 0.6, lwjgl 0.3
+  top of the stack (self %): minecraft 23.7, epic-fight 16.2, forge 15.2, ArcaneVortex_[Alpha] 5.6, jei 5.1, mixin 5.1, ?org.objectweb.asm 4.5, punchy 2.9, spmovesets 2.6, diorama 1.5, resourcefullib 1.3, modernfix-forge 1.2, fantasy 0.8, tacz 0.8
+  busiest methods:
+     14.7%  yesman.epicfight.api.asset.JsonAssetLoader.<init>
+      2.5%  mezz.jei.common.ingredients.itemStacks.TypedItemStack.getIngredient
+      2.4%  net.minecraft.nbt.CompoundTag.m_6426_
+      2.4%  cpw.mods.modlauncher.ModuleLayerHandler.buildLayer
+      2.0%  org.spongepowered.asm.util.Bytecode.getOpcodeName
+      1.9%  org.objectweb.asm.ClassReader.readCode
+      1.3%  cpw.mods.niofs.union.UnionFileSystem.testFilter
+      1.3%  mezz.jei.library.recipes.collect.IngredientUidIndex.computeExactIfAbsent
+      1.2%  net.minecraft.network.syncher.SynchedEntityData.m_135379_
+      1.1%  cpw.mods.niofs.union.UnionFileSystem.lambda$newDirStream$11
+      1.0%  com.luoee.arcanevortex.Content.Item.EntityRemover.Purge.HiddenClassDefeater.indexOf
+      0.9%  net.minecraft.world.inventory.AbstractContainerMenu.m_38946_
+  [epic-fight 17.8%] called from: 14.7 SimplePreparableReloadListener.m_10789_ -> AnimationManager.m_5787_ | 0.9 ASMEventHandler.invoke -> __Events_renderLivingEvent_Pre.invoke | 0.3 Entity.handler$coe000$epicfight_setOldPosAndRot -> EpicFightCapabilities.getEntityPatch | 0.3 ASMEventHandler.invoke -> __EntityEvents_updateEvent_LivingTickEvent.invoke
+  [epic-fight] working in: 14.7 yesman.epicfight.api.asset.JsonAssetLoader.<init> | 0.3 yesman.epicfight.world.capabilities.EpicFightCapabilities.getEntityPatch | 0.2 yesman.epicfight.api.animation.AnimationManager.lambda$apply$8 | 0.2 yesman.epicfight.client.renderer.patched.entity.PatchedLivingEntityRenderer.<init>
+  [jei 15.8%] called from: 14.3 EventBus.doCastFilter -> StartEventObserver.onRecipesUpdatedEvent | 0.8 ReferencePipeline$3$1.accept -> AnvilRecipeMaker.lambda$getBookEnchantmentRecipes$4 | 0.2 PluginLoader.createRecipeManager | 0.2 JeiStarter.start
+  [jei] working in: 2.5 mezz.jei.common.ingredients.itemStacks.TypedItemStack.getIngredient | 1.8 mezz.jei.common.ingredients.itemStacks.TypedItemStack.copyTag | 1.7 mezz.jei.forge.platform.RecipeHelper.getGrindstoneResult | 1.5 mezz.jei.library.render.ItemStackRenderer.getTooltip
+  [EpicFight Nightfall 10.5%] called from: 0.2 AnimationManager$AnimationAccessorImpl.get -> EFNYamatoAnimations.lambda$build$113 | 0.2 AnimationManager$AnimationAccessorImpl.get -> EFNAnimations.lambda$build$28 | 0.1 AnimationManager$AnimationAccessorImpl.get -> EFNAnimations.lambda$build$30 | 0.1 ASMEventHandler.invoke -> __ClientModBusEvent_onParticleRegistry_RegisterParticleProvidersEvent.invoke
+  [EpicFight Nightfall] working in: 2.0 com.hm.efn.animations.types.murasama.MurasamaAttackAnimation.<init> | 1.0 com.hm.efn.animations.types.yamato.YamatoAttackAnimation.<init> | 0.3 com.hm.efn.animations.types.murasama.MurasamaLivingAnimation.<init> | 0.3 com.hm.efn.animations.types.stun.EFNStunAnimation.<init>
+  [ArcaneVortex_[Alpha] 8.1%] called from: 3.0 ClassLoader.defineClass1 -> MasterTransformer.transform | 1.2 CompletableFuture$AsyncRun.run -> ArcaneVortex.lambda$commonSetup$0 | 0.5 NativeConstructorAccessorImpl.newInstance0 -> ModStateProvider.<clinit> | 0.4 GuiGraphics.drawString -> MixinHooks.wrapInvoke
+  [ArcaneVortex_[Alpha]] working in: 1.0 com.luoee.arcanevortex.Content.Item.EntityRemover.Purge.HiddenClassDefeater.indexOf | 0.8 com.luoee.arcanevortex.TimeStop.Hook.TimeStopTransformer.containsMarker | 0.5 com.luoee.arcanevortex.Service.ModStateProvider.<clinit> | 0.5 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+  [epic_fight_avalon 6.6%] called from: 2.0 MurasamaAttackAnimation.<init> -> AvalonAttackAnimation.<init> | 1.0 YamatoAttackAnimation.<init> -> AvalonAttackAnimation.<init> | 0.2 SekiroAttackAnimation.<init> -> AvalonAttackAnimation.<init> | 0.2 BroadBladeAttackAnimation.<init> -> AvalonAttackAnimation.<init>
+  [epic_fight_avalon] working in: 6.3 com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation.<init> | 0.2 com.merlin204.avalon.epicfight.animations.AvalonMovementAnimation.<init> | 0.1 com.merlin204.avalon.epicfight.gameassets.animations.VFXAnimations.lambda$buildVFXAnimations$5 | 0.0 com.merlin204.avalon.entity.client.renderer.patch.entity.AvalonRendererPatch.<init>
+  [irons_spellbooks 5.9%] called from: 5.1 PluginLoader.lambda$createRecipeManager$18 -> JeiPlugin.registerRecipes | 0.2 ASMEventHandler.invoke -> __ClientPlayerEvents_onPlayerTick_PlayerTickEvent.invoke | 0.1 ItemStack.handler$hek000$init -> ImbuableChestplateArmorItem.initializeSpellContainer | 0.1 ScrollJeiInterpreter.apply
+  [irons_spellbooks] working in: 2.1 io.redspace.ironsspellbooks.jei.ArcaneAnvilRecipeCategory.setRecipe | 1.7 io.redspace.ironsspellbooks.jei.JeiPlugin.registerRecipes | 0.7 io.redspace.ironsspellbooks.api.backwards_compat.CodecHelper.set | 0.2 io.redspace.ironsspellbooks.api.backwards_compat.CodecHelper.get
+
+=== phase (between phases) · worldgen thread(s) · 204 samples
+  threads: Worker-Main 100%
+  mods anywhere in the stack (inclusive %): spelunkery 26.0, Quark 3.9, Zeta 3.9, modernfix-forge 2.9, obscure_api-18 1.5, entityculling-forge 1.0, ?org.objectweb.asm 0.5, ArcaneVortex_[Alpha] 0.5, irons_lib 0.5
+  base: jdk 99.5, minecraft 98.0, fastutil 9.3, google-libs 2.5, mixin 1.0, forge 0.5
+  top of the stack (self %): minecraft 74.5, spelunkery 18.6, Quark 2.0, modernfix-forge 1.5, obscure_api-18 1.0, mixin 1.0, ArcaneVortex_[Alpha] 0.5, irons_lib 0.5, entityculling-forge 0.5
+  busiest methods:
+     12.7%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular
+     10.8%  net.minecraft.world.level.levelgen.Aquifer$NoiseBasedAquifer.m_207104_
+      4.9%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75333_
+      4.4%  net.minecraft.server.level.WorldGenRegion.m_6522_
+      3.9%  net.minecraft.world.level.lighting.LayerLightSectionStorage.m_75787_
+      3.4%  net.minecraft.world.level.chunk.ChunkAccess.m_141937_
+      2.9%  net.minecraft.world.level.levelgen.NoiseChunk.m_209241_
+      2.9%  net.minecraft.world.level.chunk.BulkSectionAccess.m_156104_
+      2.5%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GenNoiseSingle
+      2.5%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GradCoord
+      2.5%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75327_
+      2.0%  net.minecraft.world.level.lighting.LayerLightSectionStorage.m_284283_
+  [spelunkery 26.0%] called from: 26.0 Feature.m_225028_ -> BlockStripeFeature.m_142674_
+  [spelunkery] working in: 12.7 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular | 7.4 com.ordana.spelunkery.worldgen.features.BlockStripeFeature.m_142674_ | 2.5 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GenNoiseSingle | 2.5 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GradCoord
+  [Quark 3.9%] called from: 3.4 ClusterBasedGenerator.lambda$generateChunkPart$0 -> BigStoneClusterGenerator$1.canPlaceAt | 0.5 MultiChunkFeatureGenerator.generateChunk -> UndergroundStyleGenerator.getSourcesInChunk
+  [Quark] working in: 3.4 org.violetmoon.quark.content.world.gen.BigStoneClusterGenerator.canPlaceBlock | 0.5 org.violetmoon.quark.content.world.undergroundstyle.base.UndergroundStyleGenerator.getSourcesInChunk
+  [Zeta 3.9%] called from: 3.9 Feature.m_225028_ -> DeferredFeature.m_142674_
+  [Zeta] working in: 3.4 org.violetmoon.zeta.world.generator.multichunk.ClusterBasedGenerator.lambda$generateChunkPart$0 | 0.5 org.violetmoon.zeta.world.generator.Generator.getBiome
+
+=== phase (between phases) · dh thread(s) · 1709 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 41%, DH-LOD Builder Thread[0] 18%, DH-LOD Builder Thread[1] 18%, DH-Update Propagator Thread[0] 9%, DH-Update Propagator Thread[1] 9%, DH-Render Loader Thread[0] 1%, DH-Render Loader Thread[1] 1%, DH-Phantom Array Recycler Thread[0] 1%
+  mods anywhere in the stack (inclusive %): DistantHorizons 99.9, ?org.objectweb.asm 0.1, ferritecore 0.1, ArcaneVortex_[Alpha] 0.1
+  base: jdk 100.0, minecraft 6.9, fastutil 4.5, forge 4.3, google-libs 0.1
+  top of the stack (self %): DistantHorizons 92.9, forge 4.2, minecraft 2.8, ?org.objectweb.asm 0.1, ferritecore 0.1
+  busiest methods:
+     21.2%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     16.0%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      8.5%  com.seibel.distanthorizons.core.sql.dto.FullDataSourceV2DTO.readBlobToDataSourceDataArrayV2
+      4.0%  net.minecraftforge.common.extensions.IForgeBlockState.getLightEmission
+      3.8%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+      3.5%  com.seibel.distanthorizons.core.wrapperInterfaces.chunk.ChunkLightStorage$LightSection.get
+      3.2%  com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper_forge.getBlockState
+      2.5%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint
+      2.2%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+      1.9%  com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance
+      1.8%  com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState
+      1.7%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.removeUnusedIdsAndRemap
+  [DistantHorizons 99.9%] called from: 57.1 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 40.7 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 0.8 ThreadPoolExecutor.runWorker -> PhantomArrayListPool.lambda$static$0 | 0.6 TimerThread.mainLoop -> DhClientServerWorld$1.run
+  [DistantHorizons] working in: 21.2 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 16.0 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 8.5 com.seibel.distanthorizons.core.sql.dto.FullDataSourceV2DTO.readBlobToDataSourceDataArrayV2 | 4.9 com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper_forge.getWorldBlockLightPosList
+
+=== phase (between phases) · other thread(s) · 7424 samples
+  threads: diorama-baker 42%, Worker-ResourceReload 23%, diorama-gpu-check 8%, modloading-worker 6%, ArcaneVortex-Font3D-Prebake 5%, CullThread 4%, diorama-saved-chunks-worker 3%, pool-4-thread 2%
+  mods anywhere in the stack (inclusive %): diorama 54.1, ArcaneVortex_[Alpha] 7.6, entityculling-forge 4.2, ferritecore 3.7, ?org.objectweb.asm 2.2, embeddium 2.1, modernfix-forge 2.0, tacz 2.0, geckolib 1.8, mixin:iris 1.5, ?org.objectweb.asm.tree 0.7, ?com.github.mcmodderanchor.simplebedrockmodel.v1. 0.7, mixin:embeddium 0.5, ?com.github.mcmodderanchor.simplebedrockmodel.v2. 0.4, fzzy_config 0.4, weatherglass 0.3, Quark 0.3, block_factorys_bosses 0.3, moonlight 0.3, rhino-forge 0.2, Zeta 0.2, kubejs-forge 0.2
+  base: jdk 99.7, minecraft 26.6, forge 16.4, google-libs 13.1, fastutil 7.6, mixin 2.4, kotlin 0.4, netty 0.2
+  top of the stack (self %): diorama 53.0, minecraft 17.9, ArcaneVortex_[Alpha] 6.5, forge 4.0, ferritecore 3.6, entityculling-forge 3.5, mixin 2.1, ?org.objectweb.asm 1.9, embeddium 1.0, ?com.github.mcmodderanchor.simplebedrockmodel.v1. 0.7, geckolib 0.6, tacz 0.5, modernfix-forge 0.5, mixin:iris 0.5
+  busiest methods:
+     16.5%  dev.diorama.bake.TileBaker.trace
+      9.1%  dev.diorama.bake.TileBaker.blocked
+      6.0%  dev.diorama.bake.VoxelReader$Decoded.ids
+      5.5%  dev.diorama.bake.VoxelReader.enterSolidSection
+      3.0%  dev.diorama.bake.VoxelReader.snapshot
+      2.8%  dev.diorama.bake.TileBaker.skyAt
+      1.9%  net.minecraft.util.GsonHelper.m_13780_
+      1.5%  com.luoee.arcanevortex.Content.Font3D.Client.Font3DGlyphForge.marchingSquares
+      1.5%  dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube
+      1.4%  malte0811.ferritecore.fastmap.FastMap.getKeyFor
+      1.2%  com.luoee.arcanevortex.Content.Font3D.Client.Font3DGlyphForge.signedField
+      1.2%  net.minecraft.client.resources.model.ModelBakery.m_119259_
+  [diorama 54.1%] called from: 41.6 ThreadPoolExecutor.runWorker -> MapLevel.lambda$bake$10 | 7.8 ThreadPoolExecutor.runWorker -> MapLevel.lambda$checkOnGpu$16 | 3.1 FutureTask.run -> SavedChunkImport.lambda$submit$5 | 1.1 CompletableFuture$AsyncSupply.run -> Markers.lambda$arrow$1
+  [diorama] working in: 16.5 dev.diorama.bake.TileBaker.trace | 9.1 dev.diorama.bake.TileBaker.blocked | 6.1 dev.diorama.bake.VoxelReader$Decoded.ids | 5.5 dev.diorama.bake.VoxelReader.enterSolidSection
+  [ArcaneVortex_[Alpha] 7.6%] called from: 4.9 CompletableFuture$UniRun.tryFire -> Font3DGlyphs.prebake | 2.3 NativeConstructorAccessorImpl.newInstance0 -> ArcaneVortex.<init> | 0.2 ClassLoader.defineClass1 -> MasterTransformer.transform | 0.0 UnbakedGeometryHelper.bake -> CosmicModelLoader$CosmicGeometry.bake
+  [ArcaneVortex_[Alpha]] working in: 1.5 com.luoee.arcanevortex.Content.Font3D.Client.Font3DGlyphForge.marchingSquares | 1.2 com.luoee.arcanevortex.Content.Font3D.Client.Font3DGlyphForge.signedField | 1.0 com.luoee.arcanevortex.Content.Font3D.Client.Font3DGlyphForge.put | 0.6 com.luoee.arcanevortex.NativeAgent.Mixin.TypeHierarchy.openStream
+  [entityculling-forge 4.2%] called from: 4.2 Thread.run -> CullTask.run
+  [entityculling-forge] working in: 2.1 dev.tr7zw.entityculling.provider.DirectProvider.isOpaqueFullCube | 1.0 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isVisible | 0.4 dev.tr7zw.entityculling.versionless.occlusionculling.OcclusionCullingInstance.isAABBVisible | 0.2 dev.tr7zw.entityculling.CullTask.cullEntities
+  [ferritecore 3.7%] called from: 1.6 SimpleBakedModel$Builder.handler$hgi000$deduplicate -> Deduplicator.deduplicate | 1.4 StateHolder.m_61143_ -> FastMapEntryImmutableMap.get | 0.5 ModelResourceLocation.handler$hge000$constructTail -> Deduplicator.deduplicateVariant | 0.1 MultiPartBakedModel$Builder.redirect$hgf000$build -> Deduplicator.makeMultipartModel
+  [ferritecore] working in: 1.4 malte0811.ferritecore.fastmap.FastMap.getKeyFor | 0.8 malte0811.ferritecore.hash.LambdaBasedHash.equals | 0.6 malte0811.ferritecore.impl.Deduplicator.deduplicate | 0.5 malte0811.ferritecore.impl.Deduplicator.deduplicateVariant
+

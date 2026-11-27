@@ -1,0 +1,80 @@
+[16:12:13] [main/INFO]: If this message is the only thing at the bottom of your log before a crash, you probably have a driver issue.
+[16:12:23] [main/WARN]: Error loading class: tschipp/carryon/common/config/ListHandler (java.lang.ClassNotFoundException: tschipp.carryon.common.config.ListHandler)
+[16:12:23] [main/WARN]: Error loading class: tschipp/carryon/common/carry/PickupHandler (java.lang.ClassNotFoundException: tschipp.carryon.common.carry.PickupHandler)
+[16:12:23] [main/WARN]: Error loading class: io/homo/superresolution/common/config/SuperResolutionConfig (java.lang.ClassNotFoundException: io.homo.superresolution.common.config.SuperResolutionConfig)
+[16:12:23] [main/WARN]: Error loading class: org/tastytrash/spatialGUI/client/SpatialGUIClient (java.lang.ClassNotFoundException: org.tastytrash.spatialGUI.client.SpatialGUIClient)
+[16:12:23] [main/WARN]: Error loading class: mekanism/client/render/entity/RenderFlame (java.lang.ClassNotFoundException: mekanism.client.render.entity.RenderFlame)
+[16:12:23] [main/WARN]: Error loading class: mekanism/client/render/armor/MekaSuitArmor (java.lang.ClassNotFoundException: mekanism.client.render.armor.MekaSuitArmor)
+[16:12:23] [main/WARN]: Error loading class: net/minecraft/server/network/ServerCommonPacketListenerImpl (java.lang.ClassNotFoundException: net.minecraft.server.network.ServerCommonPacketListenerImpl)
+[16:12:24] [main/WARN]: Error loading class: dev/tr7zw/skinlayers/versionless/render/CustomModelPart (java.lang.ClassNotFoundException: dev.tr7zw.skinlayers.versionless.render.CustomModelPart)
+[16:12:24] [main/WARN]: Error loading class: dev/tr7zw/skinlayers/versionless/render/CustomizableCube (java.lang.ClassNotFoundException: dev.tr7zw.skinlayers.versionless.render.CustomizableCube)
+[16:12:24] [main/WARN]: Error loading class: de/teamlapen/vampirism/client/renderer/entity/layers/VampirePlayerHeadLayer (java.lang.ClassNotFoundException: de.teamlapen.vampirism.client.renderer.entity.layers.VampirePlayerHeadLayer)
+[16:12:24] [main/WARN]: Error loading class: de/teamlapen/werewolves/client/render/layer/HumanWerewolfLayer (java.lang.ClassNotFoundException: de.teamlapen.werewolves.client.render.layer.HumanWerewolfLayer)
+[16:12:24] [main/WARN]: Error loading class: io/github/mortuusars/exposure/client/camera/CameraClient (java.lang.ClassNotFoundException: io.github.mortuusars.exposure.client.camera.CameraClient)
+[16:12:24] [main/WARN]: Error loading class: fuzs/swordblockingmechanics/handler/SwordBlockingHandler (java.lang.ClassNotFoundException: fuzs.swordblockingmechanics.handler.SwordBlockingHandler)
+[16:12:24] [main/WARN]: Error loading class: fuzs/swordblockingmechanics/client/handler/FirstPersonRenderingHandler (java.lang.ClassNotFoundException: fuzs.swordblockingmechanics.client.handler.FirstPersonRenderingHandler)
+[16:12:24] [main/WARN]: Error loading class: dev/ftb/mods/ftbchunks/client/map/UpdateChunkFromServerTask (java.lang.ClassNotFoundException: dev.ftb.mods.ftbchunks.client.map.UpdateChunkFromServerTask)
+[16:12:24] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
+[16:12:24] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
+[16:12:24] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
+[16:12:24] [main/WARN]: Error loading class: com/github/exopandora/shouldersurfing/client/ShoulderSurfing (java.lang.ClassNotFoundException: com.github.exopandora.shouldersurfing.client.ShoulderSurfing)
+[16:12:24] [main/WARN]: Error loading class: com/github/exopandora/shouldersurfing/client/ShoulderSurfingCamera (java.lang.ClassNotFoundException: com.github.exopandora.shouldersurfing.client.ShoulderSurfingCamera)
+[16:12:24] [main/WARN]: Error loading class: dev/tr7zw/skinlayers/render/CustomizableModelPart (java.lang.ClassNotFoundException: dev.tr7zw.skinlayers.render.CustomizableModelPart)
+[16:12:24] [main/WARN]: Error loading class: net/saksolm/monsterexpansion/entity/custom/AbstractLargeMonster (java.lang.ClassNotFoundException: net.saksolm.monsterexpansion.entity.custom.AbstractLargeMonster)
+[16:12:24] [main/WARN]: Error loading class: dev/emi/emi/EmiUtil (java.lang.ClassNotFoundException: dev.emi.emi.EmiUtil)
+[16:12:24] [main/WARN]: Error loading class: mezz/modnametooltip/TooltipEventHandler (java.lang.ClassNotFoundException: mezz.modnametooltip.TooltipEventHandler)
+[16:12:24] [main/WARN]: Error loading class: me/shedaniel/rei/impl/client/ClientHelperImpl (java.lang.ClassNotFoundException: me.shedaniel.rei.impl.client.ClientHelperImpl)
+[16:12:24] [main/WARN]: Error loading class: noobanidus/mods/lootr/config/ConfigManager (java.lang.ClassNotFoundException: noobanidus.mods.lootr.config.ConfigManager)
+[16:12:24] [main/WARN]: Error loading class: xaero/map/gui/GuiMap (java.lang.ClassNotFoundException: xaero.map.gui.GuiMap)
+[16:12:24] [main/WARN]: Error loading class: xaero/map/gui/GuiMap (java.lang.ClassNotFoundException: xaero.map.gui.GuiMap)
+org.spongepowered.asm.mixin.transformer.throwables.InvalidInterfaceMixinException: Interface mixin contains a non-public method! Found extendHasAnyMatching(Ljava/util/function/Predicate;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V in accessories-common.mixins.json:Contai
+[16:12:25] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
+[16:12:25] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
+[16:12:25] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
+[16:12:25] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
+[16:12:25] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
+[16:12:25] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
+[16:12:25] [main/WARN]: Error loading class: org/jetbrains/annotations/ApiStatus$Internal (java.lang.ClassNotFoundException: org.jetbrains.annotations.ApiStatus$Internal)
+com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401
+	at com.mojang.authlib.exceptions.MinecraftClientHttpException.toAuthenticationException(MinecraftClientHttpException.java:56) ~[authlib-4.0.43.jar%2399!/:?]
+Caused by: com.mojang.authlib.exceptions.MinecraftClientHttpException: Status: 401
+[16:13:21] [modloading-worker-0/INFO]: Epic Fight web server status: Failed at initializing Authentication provider: java.lang.ClassNotFoundException: yesman.epicfight.epicskins.user.AuthenticationHelperImpl
+[16:13:22] [Worker-ResourceReload-2/INFO]: [software.bernie.geckolib.core.molang.MolangParser:parseSymbolsMolang:285]: java.lang.IndexOutOfBoundsException: Index -1 out of bounds for length 0
+[16:13:22] [Worker-ResourceReload-2/INFO]: [software.bernie.geckolib.loading.json.typeadapter.BakedAnimationsAdapter:deserialize:43]: software.bernie.geckolib.core.molang.MolangException: Couldn't parse '0-' expression!
+com.google.gson.JsonParseException: for LLibrary bug not putting particle into textures set is not valid resource location
+com.google.gson.JsonParseException: for LLibrary bug not putting particle into textures set is not valid resource location
+[16:13:27] [Worker-ResourceReload-0/WARN]: Unable to load model: 'betternether:block/basalt_slab_bottom' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_bottom.json
+[16:13:27] [Worker-ResourceReload-0/WARN]: Unable to load model: 'betternether:block/basalt_slab_top' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_top.json
+[16:13:27] [Worker-ResourceReload-0/WARN]: Unable to load model: 'betternether:block/basalt_slab_double' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_double.json
+[16:13:27] [Worker-ResourceReload-0/WARN]: Unable to load model: 'minecraft:block/chest_right' referenced from: betternether:mushroom_fir_trimmed_chest#facing=north,type=single,waterlogged=true: java.io.FileNotFoundException: minecraft:models/block/chest_right.json
+[16:13:27] [Worker-ResourceReload-0/WARN]: Unable to load model: 'minecraft:block/chest_left' referenced from: betternether:mushroom_fir_trimmed_chest#facing=north,type=single,waterlogged=true: java.io.FileNotFoundException: minecraft:models/block/chest_left.json
+[16:13:27] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'fdbosses:blockstates/no_entity_spawn_block.json' missing model for variant: 'fdbosses:no_entity_spawn_block#'
+com.google.gson.JsonParseException: java.io.EOFException: End of input at line 1 column 1 path $
+Caused by: java.io.EOFException: End of input at line 1 column 1 path $
+[16:13:28] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'spelunkery:blockstates/bunny_ears.json' missing model for variant: 'spelunkery:bunny_ears#'
+[16:13:28] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'spelunkery:blockstates/true_crown.json' missing model for variant: 'spelunkery:true_crown#'
+[16:13:31] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'fdlib:blockstates/test.json' missing model for variant: 'fdlib:test#'
+[16:13:32] [Worker-ResourceReload-1/ERROR]: A mod is calling registerReloadListener at the wrong time. This will cause random concurrency crashes when ModernFix is not installed. Please report this to them. If you are a modder, refer to https://github.com/embeddedt/ModernFix/wiki/registerReloadListe
+java.lang.Exception: registerReloadListener called on wrong thread
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=31'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=32'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=30'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=35'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=36'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=33'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=34'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=39'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=37'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=38'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=9'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=8'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=7'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=6'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=42'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=43'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=40'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=41'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=46'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=47'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=44'
+[16:13:32] [Worker-ResourceReload-0/WARN]: Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=45'

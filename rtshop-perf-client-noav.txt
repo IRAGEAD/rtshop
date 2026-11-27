@@ -1,0 +1,7 @@
+RT Shop performance (client)
+mods 206 · render distance 8 · graphics fancy · GL llvmpipe (LLVM 21.1.8, 256 bits) 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3 · diorama FANCY gpuBaking true
+PHASE town 16:31:48.930 16:32:20.045 fps avg 2.6 min 1 p10 2 · frames 84 = 2.70 fps · server mspt avg 40.8 max 65.0 · entities 336 · C: 89/6384 D: 8
+PHASE explore 16:32:20.540 16:33:23.563 fps avg 2.8 min 1 p10 1 · frames 179 = 2.84 fps · server mspt avg 39.8 max 83.2 · entities 76 · C: 6/2064 D: 8
+PHASE mobs 16:33:29.428 16:33:59.526 fps avg 2.7 min 2 p10 2 · frames 82 = 2.72 fps · server mspt avg 44.2 max 71.9 · entities 196 · C: 72/6456 D: 8
+
+RESULT: DONE

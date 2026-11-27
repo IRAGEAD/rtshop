@@ -1,0 +1,9 @@
+== server perf (new world, Chunky + DH)
+[16:08:10] [Server thread/INFO] [co.rt.RtShop/]: [RT Shop] Distant Horizons -> Chunky link deferred until Chunky is loaded (setup)
+[16:09:27] [Server thread/INFO] [minecraft/DedicatedServer]: Done (87.194s)! For help, type "help"
+== client base (singleplayer, Chunky + DH)
+[16:14:26] [Server thread/INFO]: [RT Shop] Distant Horizons -> Chunky link deferred until Chunky is loaded (setup)
+== DH test (dedicated server + client, Chunky + DH)
+[16:35:37] [Server thread/INFO] [co.rt.RtShop/]: [RT Shop] Distant Horizons -> Chunky link deferred until Chunky is loaded (setup)
+[16:35:38] [Server thread/INFO] [minecraft/DedicatedServer]: Done (4.186s)! For help, type "help"
+[16:38:12] [Render thread/INFO]: [RT Shop] Distant Horizons -> Chunky link deferred until Chunky is loaded (setup)

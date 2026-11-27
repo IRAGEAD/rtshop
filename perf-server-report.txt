@@ -1,0 +1,336 @@
+JFR perf-server.jfr · mods dir mods · packages mapped 6018
+PHASE warmup 16:09:31.642 16:09:46.883 ticks 300 mspt avg 26.33 p95 77.64 max 688.9
+PHASE idle 16:09:46.903 16:10:16.879 ticks 600 mspt avg 1.10 p95 2.99 max 9.1 · entities 147 · loaded chunks 2209
+PHASE worldgen 16:10:16.879 16:10:29.943 ticks 0 mspt avg 0.00 p95 0.00 max 0.0 · 196 chunks in 13.1 s = 15.00 chunks/s
+PHASE after-worldgen 16:10:29.944 16:10:39.878 ticks 200 mspt avg 3.33 p95 41.24 max 58.0
+PHASE mobs 16:10:39.917 16:11:09.879 ticks 600 mspt avg 1.02 p95 1.33 max 5.2 · entities 297 · loaded chunks 2209
+
+=== phase warmup · server thread(s) · 770 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): ArcaneVortex_[Alpha] 12.9, mixin:spiral_abyss 12.2, fantasy 1.7, artifacts-forge 1.6, SpiralAbyss 0.8, adorablehamsterpets 0.8, mowziesmobs 0.6, supplementaries 0.5, Yazz's Dungeons The Sequel  0.5, tacz 0.5, moonlight 0.4, mixin:adorablehamsterpets 0.4, miningmaster 0.4, accessories-neoforge 0.4, witherreincarnated 0.4, mixin:create 0.4, Zeta 0.3, rpg_companions_tiny_dragons 0.3, mixin:cinematic 0.3, rtshop 0.3, ferritecore 0.3, epic-fight 0.3
+  base: minecraft 100.0, jdk 100.0, forge 12.6, fastutil 4.3, google-libs 2.7, mixin 0.1
+  top of the stack (self %): minecraft 85.5, forge 6.9, ArcaneVortex_[Alpha] 2.2, fantasy 0.9, adorablehamsterpets 0.5, tacz 0.5, SpiralAbyss 0.4, rtshop 0.3, ferritecore 0.3, create 0.3, accessories-neoforge 0.3, spmovesets 0.3, miningmaster 0.1, ?org.objectweb.asm 0.1
+  busiest methods:
+     26.9%  net.minecraft.server.level.DistanceManager$FixedPlayerDistanceChunkTracker.m_6410_
+     12.6%  net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.m_7245_
+     12.3%  net.minecraft.server.level.ServerChunkCache.m_8466_
+      5.6%  net.minecraftforge.eventbus.EventBus.post
+      5.2%  net.minecraft.util.thread.BlockableEventLoop.m_7245_
+      1.8%  net.minecraft.server.level.ServerChunkCache.m_7587_
+      1.4%  net.minecraft.server.level.DistanceManager$ChunkTicketTracker.m_140877_
+      1.3%  net.minecraft.world.ticks.LevelChunkTicks.m_193195_
+      1.3%  net.minecraft.world.level.chunk.HashMapPalette.m_187917_
+      1.0%  com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke
+      1.0%  net.minecraft.world.level.chunk.LevelChunk$BoundTickingBlockEntity.m_142224_
+      0.8%  net.minecraft.server.level.ChunkHolder.m_140085_
+  [ArcaneVortex_[Alpha] 12.9%] called from: 9.2 ServerLevel.m_8793_ -> TimeStopHooks.tickScheduled | 1.6 Level.m_46463_ -> TimeStopHooks.tickBlockEntity | 0.3 ClassLoader.defineClass1 -> MasterTransformer.transform | 0.3 LivingEntity.m_21051_ -> MixinHooks.invokeReturn
+  [ArcaneVortex_[Alpha]] working in: 8.7 com.luoee.arcanevortex.TimeStop.Hook.TimeStopHooks.tickScheduledRaw | 1.6 com.luoee.arcanevortex.TimeStop.Hook.TimeStopHooks.tickBlockEntity | 1.0 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.invoke | 0.3 com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks.enter
+  [mixin:spiral_abyss 12.2%] called from: 11.9 ServerLevel.m_8647_ -> ServerLevel.wrapOperation$cal000$spiral_abyss$tick | 0.1 Level.m_6933_ -> Level.handler$cbe000$spiral_abyss$suppressDeathStructure | 0.1 ServerLevel.wrapOperation$cal000$spiral_abyss$tick
+  [mixin:spiral_abyss] working in: 12.1 net.minecraft.server.level.ServerLevel.wrapOperation$cal000$spiral_abyss$tick | 0.1 net.minecraft.world.level.Level.handler$cbe000$spiral_abyss$suppressDeathStructure
+
+=== phase warmup · dh thread(s) · 450 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 29%, DH-LOD Builder Thread[1] 26%, DH-LOD Builder Thread[0] 24%, DH-Update Propagator Thread[1] 10%, DH-Update Propagator Thread[0] 10%, DH-Phantom Array Recycler Thread[0] 0%
+  mods anywhere in the stack (inclusive %): DistantHorizons 100.0
+  base: jdk 100.0, fastutil 6.7, minecraft 5.8, forge 4.7, google-libs 0.4
+  top of the stack (self %): DistantHorizons 94.2, forge 4.7, minecraft 1.1
+  busiest methods:
+     15.8%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+      9.8%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      8.0%  com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState
+      6.4%  com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper_forge.getBiomeWrapper
+      4.9%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+      4.7%  net.minecraftforge.common.extensions.IForgeBlockState.getLightEmission
+      3.8%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint
+      3.6%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.removeUnusedIdsAndRemap
+      3.3%  com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap.addIfNotPresentAndGetId
+      3.3%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+      3.3%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.mergeInputTwoByTwoDataColumn
+      3.1%  com.seibel.distanthorizons.core.generation.DhLightingEngine.recursivelyLightAdjacentDataPoints
+  [DistantHorizons 100.0%] called from: 70.2 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 29.3 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 0.2 HashMap.put -> ChunkWrapper_forge.getBlockState | 0.2 ThreadPoolExecutor.runWorker -> PhantomArrayListPool.lambda$static$0
+  [DistantHorizons] working in: 15.8 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 9.8 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 8.0 com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState | 6.4 com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper_forge.getBiomeWrapper
+
+=== phase warmup · other thread(s) · 826 samples
+  threads: pool-12-thread 98%, IO-Worker 2%, Fzzy Config File Watcher 0%
+  mods anywhere in the stack (inclusive %): fzzy_config 0.1
+  base: jdk 100.0, minecraft 99.8
+  top of the stack (self %): minecraft 99.8, fzzy_config 0.1
+  busiest methods:
+     55.0%  net.minecraft.world.level.biome.Climate$RTree$SubTree.m_183370_
+     26.0%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75333_
+     11.4%  net.minecraft.world.level.levelgen.synth.PerlinNoise.m_75417_
+      4.1%  net.minecraft.world.level.biome.Climate$RTree$Node.m_186959_
+      0.7%  net.minecraft.nbt.CompoundTag.m_6434_
+      0.7%  net.minecraft.nbt.CompoundTag.m_128368_
+      0.4%  net.minecraft.world.level.levelgen.synth.PerlinNoise.m_75408_
+      0.4%  net.minecraft.nbt.LongArrayTag.m_6434_
+      0.2%  net.minecraft.util.Mth.m_14049_
+      0.2%  net.minecraft.world.level.biome.Climate$RTree.m_186930_
+      0.1%  net.minecraft.world.level.levelgen.DensityFunctions$YClampedGradient.m_207386_
+      0.1%  me.fzzyhmstrs.fzzy_config.util.ThreadingUtils.start$lambda$4
+
+=== phase idle · server thread(s) · 2359 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): ArcaneVortex_[Alpha] 0.4, spmovesets 0.2, DistantHorizons 0.1, rtshop 0.0, irons_spellbooks 0.0, reincarnated_x_epicfight 0.0, minevegas-casino 0.0
+  base: minecraft 100.0, jdk 100.0, forge 11.1, fastutil 0.3, google-libs 0.3
+  top of the stack (self %): minecraft 88.9, forge 10.6, spmovesets 0.2, ArcaneVortex_[Alpha] 0.1, DistantHorizons 0.1, rtshop 0.0, irons_spellbooks 0.0, reincarnated_x_epicfight 0.0
+  busiest methods:
+     40.3%  net.minecraft.server.level.DistanceManager$FixedPlayerDistanceChunkTracker.m_6410_
+     17.6%  net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.m_7245_
+     17.5%  net.minecraft.server.level.ServerChunkCache.m_8466_
+     10.5%  net.minecraftforge.eventbus.EventBus.post
+      4.8%  net.minecraft.util.thread.BlockableEventLoop.m_7245_
+      2.2%  net.minecraft.server.MinecraftServer.m_129961_
+      1.8%  net.minecraft.util.thread.BlockableEventLoop.m_18701_
+      1.7%  net.minecraft.server.level.DistanceManager$ChunkTicketTracker.m_140877_
+      0.6%  net.minecraft.server.MinecraftServer.m_6362_
+      0.4%  net.minecraft.server.level.ChunkMap.m_198874_
+      0.3%  net.minecraft.server.level.ChunkHolder.m_140085_
+      0.3%  net.minecraft.server.level.ThreadedLevelLightEngine.m_9409_
+
+=== phase idle · dh thread(s) · 464 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 59%, DH-Update Propagator Thread[1] 13%, DH-Update Propagator Thread[0] 11%, DH-LOD Builder Thread[1] 9%, DH-LOD Builder Thread[0] 8%, DH-Chunk Update Queue [minecraft:the_net 0%
+  mods anywhere in the stack (inclusive %): DistantHorizons 100.0
+  base: jdk 99.8, fastutil 5.6, minecraft 1.3, forge 1.1
+  top of the stack (self %): DistantHorizons 98.7, forge 1.1, minecraft 0.2
+  busiest methods:
+     31.5%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     25.4%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      5.8%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint
+      3.4%  com.seibel.distanthorizons.core.generation.DhLightingEngine.recursivelyLightAdjacentDataPoints
+      3.0%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+      2.8%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+      2.6%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.mergeInputTwoByTwoDataColumn
+      2.6%  com.seibel.distanthorizons.core.sql.repo.FullDataSourceV2Repo.putAllBytes
+      2.4%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.removeUnusedIdsAndRemap
+      2.4%  com.seibel.distanthorizons.core.util.objects.pooling.StringPool$TrieNode.getOrCreateChild
+      1.9%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.writeVarint
+      1.7%  com.seibel.distanthorizons.core.sql.dto.FullDataSourceV2DTO.readBlobToDataSourceDataArrayV2
+  [DistantHorizons 100.0%] called from: 58.6 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 41.2 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 0.2 ChunkUpdateQueueManager.runQueueingLoop
+  [DistantHorizons] working in: 31.5 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 25.4 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 5.8 com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint | 3.4 com.seibel.distanthorizons.core.generation.DhLightingEngine.recursivelyLightAdjacentDataPoints
+
+=== phase worldgen · worldgen thread(s) · 1155 samples
+  threads: Worker-Main 100%
+  mods anywhere in the stack (inclusive %): spelunkery 18.7, Zeta 4.9, Quark 4.6, modernfix-forge 4.3, integrated_api 3.0, ?org.apache.commons.lang3.tuple 0.2, mixin:mfix 0.2, fantasy 0.1, ?org.objectweb.asm 0.1, create 0.1, L_Enders_Cataclysm 0.1, mixin:irons_spellbooks 0.1, ?org.apache.commons.lang3 0.1
+  base: minecraft 100.0, jdk 99.9, fastutil 2.2, mixin 1.0, google-libs 0.3, forge 0.3
+  top of the stack (self %): minecraft 84.1, spelunkery 11.0, Quark 1.6, modernfix-forge 1.0, mixin 0.9, integrated_api 0.4, Zeta 0.3, ?org.apache.commons.lang3.tuple 0.2, forge 0.2, ?org.objectweb.asm 0.1, create 0.1, mixin:irons_spellbooks 0.1, ?org.apache.commons.lang3 0.1
+  busiest methods:
+     17.2%  net.minecraft.world.level.levelgen.Aquifer$NoiseBasedAquifer.m_207104_
+      5.7%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75333_
+      5.6%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular
+      5.2%  net.minecraft.world.level.levelgen.synth.PerlinNoise.m_75417_
+      3.5%  net.minecraft.world.level.biome.Climate$RTree$SubTree.m_183370_
+      3.4%  net.minecraft.core.HolderSet$Named.m_203333_
+      3.1%  net.minecraft.server.level.WorldGenRegion.m_6522_
+      2.6%  net.minecraft.world.level.levelgen.Beardifier.m_207386_
+      2.3%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75327_
+      2.2%  net.minecraft.world.level.levelgen.NoiseChunk.m_209215_
+      2.2%  net.minecraft.world.level.levelgen.feature.OreFeature.m_225171_
+      2.2%  net.minecraft.world.level.levelgen.NoiseChunk.m_209241_
+  [spelunkery 18.7%] called from: 18.6 Feature.m_225028_ -> BlockStripeFeature.m_142674_ | 0.1 Feature.m_225028_ -> WallMushroomFeature.m_142674_
+  [spelunkery] working in: 7.7 com.ordana.spelunkery.worldgen.features.BlockStripeFeature.m_142674_ | 5.6 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular | 1.9 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleDomainWarpOpenSimplex2Gradient | 1.6 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GenNoiseSingle
+  [Zeta 4.9%] called from: 4.9 Feature.m_225028_ -> DeferredFeature.m_142674_
+  [Zeta] working in: 4.1 org.violetmoon.zeta.world.generator.multichunk.ClusterBasedGenerator.lambda$generateChunkPart$0 | 0.5 org.violetmoon.zeta.world.generator.Generator.getBiome | 0.3 org.violetmoon.zeta.world.generator.multichunk.ClusterShape.isInside | 0.1 org.violetmoon.zeta.config.type.DimensionConfig.canSpawnHere
+  [Quark 4.6%] called from: 4.1 ClusterBasedGenerator.lambda$generateChunkPart$0 -> BigStoneClusterGenerator$1.canPlaceAt | 0.4 MultiChunkFeatureGenerator.generateChunk -> UndergroundStyleGenerator.getSourcesInChunk | 0.1 Generator.generate -> BlossomTreeGenerator.generateChunk
+  [Quark] working in: 4.0 org.violetmoon.quark.content.world.gen.BigStoneClusterGenerator.canPlaceBlock | 0.4 org.violetmoon.quark.content.world.undergroundstyle.base.UndergroundStyleGenerator.getSourcesInChunk | 0.1 org.violetmoon.quark.content.world.module.BigStoneClustersModule.lambda$configChanged$7 | 0.1 org.violetmoon.quark.content.world.gen.BlossomTreeGenerator.generateChunk
+  [modernfix-forge 4.3%] called from: 1.9 SurfaceSystem.handler$zeg000$prefetchBlockArray -> PrefetchingBlockColumn.prefetch | 0.9 StructureTemplateManager.m_230427_ -> CachingStructureManager.readStructure | 0.8 SurfaceSystem.m_224648_ -> PrefetchingBlockColumn.m_183639_ | 0.3 SurfaceSystem.modify$zeg000$useFasterLookup -> ChunkBiomeLookup.prepare
+  [modernfix-forge] working in: 1.9 org.embeddedt.modernfix.world.gen.PrefetchingBlockColumn.prefetch | 0.8 org.embeddedt.modernfix.world.gen.PrefetchingBlockColumn.m_183639_ | 0.4 org.embeddedt.modernfix.world.gen.MemoizingDensityVisitor.m_214017_ | 0.3 org.embeddedt.modernfix.structure.CachingStructureManager.saveCachedUpgraded
+  [integrated_api 3.0%] called from: 1.3 Structure.m_262864_ -> JigsawStructure.m_214086_ | 1.0 Structure.m_262864_ -> ModAdaptiveStructure.m_214086_ | 0.3 Beardifier.handler$bdf000$intapi_calculateDensity -> EnhancedBeardifierHelper.computeDensity | 0.1 IASinglePoolElement.m_214015_
+  [integrated_api] working in: 1.6 com.craisinlord.integrated_api.world.structures.JigsawStructure.extraSpawningChecks | 0.8 com.craisinlord.integrated_api.world.structures.pieces.IASinglePoolElement.getTemplate | 0.4 com.craisinlord.integrated_api.world.terrainadaptation.beardifier.EnhancedBeardifierHelper.computeDensity | 0.1 lord.integrated_api.world.structures.pieces.manager.PieceLimitedJigsawManager.lambda$assembleJigsawStructure$0
+
+=== phase worldgen · dh thread(s) · 1036 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 90%, DH-LOD Builder Thread[0] 5%, DH-LOD Builder Thread[1] 3%, DH-Update Propagator Thread[1] 1%, DH-Update Propagator Thread[0] 0%, DH-Phantom Array Recycler Thread[0] 0%
+  mods anywhere in the stack (inclusive %): DistantHorizons 99.8
+  base: jdk 100.0, fastutil 0.8, minecraft 0.3, forge 0.1
+  top of the stack (self %): DistantHorizons 99.5, minecraft 0.2, forge 0.1
+  busiest methods:
+     48.2%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     38.0%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      2.6%  com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance
+      1.8%  com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper_forge.getBiomeWrapper
+      1.6%  com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState
+      1.3%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.removeUnusedIdsAndRemap
+      1.3%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+      0.8%  com.seibel.distanthorizons.core.wrapperInterfaces.chunk.ChunkLightStorage$LightSection.get
+      0.6%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+      0.4%  com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap.addIfNotPresentAndGetId
+      0.4%  com.seibel.distanthorizons.core.generation.DhLightingEngine.recursivelyLightAdjacentDataPoints
+      0.3%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkUpdateQueueManager.processQueuedChunkPreUpdate
+  [DistantHorizons 99.8%] called from: 90.3 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 9.5 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 0.1 ThreadPoolExecutor.runWorker -> PhantomArrayListPool.lambda$static$0
+  [DistantHorizons] working in: 48.2 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 38.0 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 2.6 com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance | 1.8 com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper_forge.getBiomeWrapper
+
+=== phase after-worldgen · server thread(s) · 753 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): create 0.4, spmovesets 0.1, ArcaneVortex_[Alpha] 0.1, EpicFight Nightfall 0.1, rtshop 0.1, DistantHorizons 0.1
+  base: minecraft 100.0, jdk 100.0, google-libs 1.3, forge 0.9, fastutil 0.1
+  top of the stack (self %): minecraft 98.8, create 0.4, forge 0.1, spmovesets 0.1, ArcaneVortex_[Alpha] 0.1, EpicFight Nightfall 0.1, rtshop 0.1, DistantHorizons 0.1
+  busiest methods:
+     39.3%  net.minecraft.server.level.DistanceManager$FixedPlayerDistanceChunkTracker.m_6410_
+     20.2%  net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.m_7245_
+     14.9%  net.minecraft.server.level.ServerChunkCache.m_8466_
+     10.2%  net.minecraft.world.level.lighting.DynamicGraphMinFixedPoint.m_75588_
+      5.3%  net.minecraft.util.thread.BlockableEventLoop.m_7245_
+      1.9%  net.minecraft.util.thread.BlockableEventLoop.m_18701_
+      1.3%  net.minecraft.server.MinecraftServer.m_129961_
+      1.2%  net.minecraft.world.level.chunk.HashMapPalette.m_187917_
+      0.8%  net.minecraft.server.level.DistanceManager$ChunkTicketTracker.m_140877_
+      0.8%  net.minecraft.server.MinecraftServer.m_6362_
+      0.4%  net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap.m_13563_
+      0.4%  net.minecraft.server.level.ChunkHolder.m_140085_
+
+=== phase after-worldgen · dh thread(s) · 140 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 39%, DH-LOD Builder Thread[1] 21%, DH-LOD Builder Thread[0] 21%, DH-Update Propagator Thread[1] 12%, DH-Update Propagator Thread[0] 7%
+  mods anywhere in the stack (inclusive %): DistantHorizons 100.0
+  base: jdk 100.0, fastutil 8.6, minecraft 5.7, forge 4.3
+  top of the stack (self %): DistantHorizons 94.3, forge 4.3, minecraft 1.4
+  busiest methods:
+     20.0%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     15.0%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      8.6%  com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState
+      6.4%  com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper_forge.getBiomeWrapper
+      5.0%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.mergeInputTwoByTwoDataColumn
+      5.0%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+      4.3%  net.minecraftforge.common.extensions.IForgeBlockState.getLightEmission
+      4.3%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+      2.9%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.writeVarint
+      2.9%  com.seibel.distanthorizons.core.generation.DhLightingEngine.recursivelyLightAdjacentDataPoints
+      2.9%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint
+      2.1%  com.seibel.distanthorizons.core.sql.repo.FullDataSourceV2Repo.putAllBytes
+  [DistantHorizons 100.0%] called from: 60.7 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 39.3 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop
+  [DistantHorizons] working in: 20.0 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 15.0 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 8.6 com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState | 6.4 com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper_forge.getBiomeWrapper
+
+=== phase mobs · server thread(s) · 2339 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): spmovesets 0.2, ArcaneVortex_[Alpha] 0.1, architectury 0.1, fantasy 0.1, EpicFight Nightfall 0.0, rtshop 0.0, jauml 0.0
+  base: minecraft 100.0, jdk 100.0, forge 0.5, fastutil 0.3, google-libs 0.3
+  top of the stack (self %): minecraft 99.4, spmovesets 0.2, ArcaneVortex_[Alpha] 0.1, architectury 0.1, EpicFight Nightfall 0.0, rtshop 0.0, jauml 0.0, fantasy 0.0
+  busiest methods:
+     42.2%  net.minecraft.server.level.DistanceManager$FixedPlayerDistanceChunkTracker.m_6410_
+     17.0%  net.minecraft.server.level.ServerChunkCache.m_8466_
+     16.6%  net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.m_7245_
+      9.6%  net.minecraft.world.level.lighting.DynamicGraphMinFixedPoint.m_75588_
+      5.1%  net.minecraft.util.thread.BlockableEventLoop.m_7245_
+      2.9%  net.minecraft.server.MinecraftServer.m_129961_
+      2.0%  net.minecraft.server.level.DistanceManager$ChunkTicketTracker.m_140877_
+      1.9%  net.minecraft.util.thread.BlockableEventLoop.m_18701_
+      0.5%  net.minecraft.server.level.ChunkHolder.m_140085_
+      0.3%  net.minecraft.server.level.TickingTracker.m_6172_
+      0.3%  net.minecraft.server.MinecraftServer.m_6362_
+      0.2%  net.minecraft.server.level.TickingTracker.m_184145_
+
+=== phase (between phases) · server thread(s) · 4944 samples
+  threads: Server thread 100%
+  mods anywhere in the stack (inclusive %): rtshop 3.2, mixin:mfix 0.4, BCLib 0.4, BetterNether 0.4, mixin:fts 0.4, DistantHorizons 0.3, ArcaneVortex_[Alpha] 0.2, ?org.objectweb.asm 0.1, moonlight 0.1, supplementaries 0.1, mixin:modernfix 0.1, Quark 0.1, puffish_skills 0.1, epic-fight 0.1, ferritecore 0.1, bettercombat-forge 0.1, modernfix-forge 0.0, artifacts-forge 0.0, Zeta 0.0, mixin:create 0.0, irons_spellbooks 0.0, ?org.objectweb.asm.tree.analysis 0.0
+  base: jdk 100.0, minecraft 100.0, forge 4.4, google-libs 0.3, fastutil 0.3, mixin 0.2, logging 0.1
+  top of the stack (self %): minecraft 96.2, rtshop 1.8, forge 1.0, ArcaneVortex_[Alpha] 0.2, mixin 0.1, DistantHorizons 0.1, ?org.objectweb.asm 0.1, Quark 0.1, puffish_skills 0.1, supplementaries 0.1, ferritecore 0.0, bettercombat-forge 0.0, BCLib 0.0, mixin:efn 0.0
+  busiest methods:
+     31.4%  net.minecraft.server.level.DistanceManager$FixedPlayerDistanceChunkTracker.m_6410_
+     23.6%  net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.m_7245_
+     16.8%  net.minecraft.server.level.ServerChunkCache.m_8466_
+      8.5%  net.minecraft.world.level.lighting.DynamicGraphMinFixedPoint.m_75588_
+      5.9%  net.minecraft.util.thread.BlockableEventLoop.m_7245_
+      2.2%  net.minecraft.util.thread.BlockableEventLoop.m_18701_
+      1.8%  net.minecraft.server.MinecraftServer.m_129961_
+      1.6%  net.minecraft.server.level.DistanceManager$ChunkTicketTracker.m_140877_
+      0.5%  net.minecraft.server.level.ThreadedLevelLightEngine.m_9409_
+      0.4%  net.minecraft.server.level.ServerChunkCache.m_7587_
+      0.3%  net.minecraft.server.MinecraftServer.m_6362_
+      0.3%  net.minecraft.util.thread.BlockableEventLoop.m_6367_
+  [rtshop 3.2%] called from: 3.0 ASMEventHandler.invoke -> __ShopServer_onServerStarting_ServerStartingEvent.invoke | 0.1 ASMEventHandler.invoke -> __RecipeRules_onStarting_ServerStartingEvent.invoke | 0.1 ShopServer.onServerStarting | 0.0 GachaConfig.reload
+  [rtshop] working in: 0.4 com.rtshop.shop.ShopLoader.parseAuto | 0.4 com.rtshop.gacha.GachaConfig.variants | 0.2 com.rtshop.shop.RecipeSolver.relax | 0.2 com.rtshop.shop.RecipeSolver.purchaseCosts
+
+=== phase (between phases) · render thread(s) · 1185 samples
+  threads: main 100%
+  mods anywhere in the stack (inclusive %): epic-fight 31.2, EpicFight Nightfall 21.1, epic_fight_avalon 13.7, ?org.objectweb.asm 9.5, ArcaneVortex_[Alpha] 5.0, WeaponsOfMiracles 5.0, epicfight-extra 3.3, modernfix-forge 3.2, ?org.objectweb.asm.tree 3.1, ?org.openjdk.nashorn.internal.runtime 2.0, kubejs-forge 2.0, ?org.openjdk.nashorn.api.scripting 1.9, FarmersDelight 1.9, moonlight 1.6, Zeta 1.4, Quark 1.3, BetterNether 1.2, ferritecore 1.0, ?org.openjdk.nashorn.internal.codegen 0.8, ?org.openjdk.nashorn.internal.runtime.linker 0.8, L_Enders_Cataclysm 0.7, BCLib 0.7
+  base: jdk 99.0, forge 91.1, minecraft 67.2, google-libs 34.9, mixin 22.5, logging 1.2, fastutil 1.0
+  top of the stack (self %): epic-fight 30.1, forge 29.8, mixin 12.1, ?org.objectweb.asm 7.7, minecraft 6.0, ArcaneVortex_[Alpha] 3.4, ?org.objectweb.asm.tree 2.0, modernfix-forge 1.3, ferritecore 0.9, ?org.openjdk.nashorn.internal.runtime 0.6, ?org.openjdk.nashorn.internal.runtime.linker 0.5, minevegas-casino 0.3, fdlib 0.3, create 0.3
+  busiest methods:
+     29.5%  yesman.epicfight.api.asset.JsonAssetLoader.<init>
+      7.4%  cpw.mods.modlauncher.ModuleLayerHandler.buildLayer
+      5.0%  org.spongepowered.asm.util.Bytecode.getOpcodeName
+      3.3%  org.objectweb.asm.ClassReader.readCode
+      2.9%  cpw.mods.niofs.union.UnionFileSystem.testFilter
+      1.6%  cpw.mods.niofs.union.UnionFileSystem.lambda$newDirStream$11
+      1.5%  org.spongepowered.asm.mixin.transformer.ClassInfo.findMember
+      1.4%  cpw.mods.niofs.union.UnionPath.toString
+      1.4%  cpw.mods.niofs.union.UnionFileSystem.openFileSystem
+      1.1%  cpw.mods.jarhandling.impl.Jar.<init>
+      1.1%  com.luoee.arcanevortex.Content.Item.EntityRemover.Purge.HiddenClassDefeater.indexOf
+      1.0%  cpw.mods.niofs.union.UnionFileSystem.toRealPath
+  [epic-fight 31.2%] called from: 29.9 SimplePreparableReloadListener.m_10789_ -> AnimationManager.m_5787_ | 0.3 EventBus.doCastFilter -> SkillManager.registerSkills | 0.3 DeferredRegister.lambda$addEntries$1 -> EpicFightBlockEntities.lambda$static$0 | 0.3 AnimationManager.apply
+  [epic-fight] working in: 29.6 yesman.epicfight.api.asset.JsonAssetLoader.<init> | 0.3 yesman.epicfight.api.data.reloader.SkillManager.registerSkills | 0.3 yesman.epicfight.world.level.block.entity.EpicFightBlockEntities.lambda$static$0 | 0.3 yesman.epicfight.api.asset.JsonAssetLoader.getTransformSheet
+  [EpicFight Nightfall 21.1%] called from: 0.3 AnimationManager$AnimationAccessorImpl.get -> EFNYamatoAnimations.lambda$build$113 | 0.3 AnimationManager$AnimationAccessorImpl.get -> EFNLanceAnimations.lambda$build$61 | 0.3 AnimationManager$AnimationAccessorImpl.get -> EFNAnimations.lambda$build$30 | 0.2 AnimationManager$AnimationAccessorImpl.get -> EFNExsiliumgladiusAnimations.lambda$build$16
+  [EpicFight Nightfall] working in: 4.4 com.hm.efn.animations.types.murasama.MurasamaAttackAnimation.<init> | 1.7 com.hm.efn.animations.types.yamato.YamatoAttackAnimation.<init> | 0.6 com.hm.efn.animations.types.stun.EFNStunAnimation.<init> | 0.5 com.hm.efn.animations.types.broadblade.BroadBladeAttackAnimation.<init>
+  [epic_fight_avalon 13.7%] called from: 4.4 MurasamaAttackAnimation.<init> -> AvalonAttackAnimation.<init> | 1.7 YamatoAttackAnimation.<init> -> AvalonAttackAnimation.<init> | 0.5 BroadBladeAttackAnimation.<init> -> AvalonAttackAnimation.<init> | 0.4 SekiroAttackAnimation.<init> -> AvalonAttackAnimation.<init>
+  [epic_fight_avalon] working in: 13.1 com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation.<init> | 0.4 com.merlin204.avalon.epicfight.animations.AvalonMovementAnimation.<init> | 0.2 com.merlin204.avalon.epicfight.gameassets.animations.VFXAnimations.lambda$buildVFXAnimations$5
+  [?org.objectweb.asm 9.5%] called from: 3.7 ClassTransformer.transform -> ClassReader.accept | 1.4 MixinLaunchPluginLegacy.getClassNode -> ClassReader.accept | 0.7 AccessTransformerList.lambda$getTransformersForTarget$6 -> Type.equals | 0.5 MethodInsnNode.accept -> MethodWriter.visitMethodInsn
+  [?org.objectweb.asm] working in: 4.3 org.objectweb.asm.ClassReader.readCode | 0.9 org.objectweb.asm.Type.equals | 0.7 org.objectweb.asm.ClassReader.readUtf | 0.3 org.objectweb.asm.Label.accept
+  [ArcaneVortex_[Alpha] 5.0%] called from: 3.4 ClassLoader.defineClass1 -> MasterTransformer.transform | 1.4 CompletableFuture$AsyncRun.run -> ArcaneVortex.lambda$commonSetup$0 | 0.1 DeferredRegister.lambda$addEntries$1 -> ModBlock.lambda$static$43 | 0.1 ClassLoader.defineClass1 -> MasterTransformer.interested
+  [ArcaneVortex_[Alpha]] working in: 1.1 com.luoee.arcanevortex.Content.Item.EntityRemover.Purge.HiddenClassDefeater.indexOf | 0.5 com.luoee.arcanevortex.TimeStop.Hook.TimeStopTransformer.containsMarker | 0.5 com.luoee.arcanevortex.Content.Item.EntityRemover.Purge.HiddenClassDefeater.readBytes | 0.3 com.luoee.arcanevortex.Content.Item.EntityRemover.Purge.EntityBytecodeGate.gate
+  [WeaponsOfMiracles 5.0%] called from: 0.2 AnimationManager$AnimationAccessorImpl.get -> AnimsEvilSkeleton.lambda$build$22 | 0.1 DeferredRegister.lambda$addEntries$1 -> WOMEntities.lambda$static$0 | 0.1 ASMEventHandler.invoke -> __WOMSkills_buildSkillEvent_SkillBuildEvent.invoke | 0.1 AnimationManager$AnimationAccessorImpl.get -> AnimsAgony.lambda$build$2
+  [WeaponsOfMiracles] working in: 2.8 reascer.wom.animation.attacks.BasicMultipleAttackAnimation.<init> | 0.2 reascer.wom.animation.dodges.CancelableDodgeAnimation.<init> | 0.1 reascer.wom.world.entity.WOMEntities.lambda$static$0 | 0.1 reascer.wom.gameasset.WOMSkills.buildSkillEvent
+
+=== phase (between phases) · worldgen thread(s) · 6387 samples
+  threads: Worker-Main 100%
+  mods anywhere in the stack (inclusive %): spelunkery 16.2, modernfix-forge 2.2, integrated_api 0.9, Quark 0.7, Zeta 0.6, BCLib 0.4, epic-fight 0.3, mowziesmobs 0.3, ?org.apache.commons.lang3.tuple 0.2, create 0.2, mixin:mfix 0.1, artifacts-forge 0.1, ?org.objectweb.asm 0.0, ArcaneVortex_[Alpha] 0.0, WeaponsOfMiracles 0.0, ferritecore 0.0, ?net.nikdo53.neobackports.datamaps 0.0, geckolib 0.0, SpiralAbyss 0.0, YungsApi 0.0, spmovesets 0.0, mixin:modernfix 0.0
+  base: minecraft 100.0, jdk 99.3, fastutil 2.3, forge 1.5, google-libs 1.4, mixin 1.1, logging 0.2
+  top of the stack (self %): minecraft 86.7, spelunkery 10.1, mixin 1.1, forge 0.6, modernfix-forge 0.4, integrated_api 0.3, ?org.apache.commons.lang3.tuple 0.2, Quark 0.1, create 0.1, ?org.objectweb.asm 0.0, ferritecore 0.0, ArcaneVortex_[Alpha] 0.0, epic-fight 0.0, Zeta 0.0
+  busiest methods:
+     20.0%  net.minecraft.core.HolderSet$Named.m_203333_
+      6.9%  net.minecraft.world.level.levelgen.Aquifer$NoiseBasedAquifer.m_207104_
+      6.3%  com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular
+      5.7%  net.minecraft.world.level.biome.Climate$RTree$SubTree.m_183370_
+      4.8%  net.minecraft.world.level.levelgen.feature.OreFeature.m_225171_
+      4.8%  net.minecraft.world.level.chunk.PalettedContainer.m_63085_
+      3.5%  net.minecraft.world.level.levelgen.blockpredicates.AllOfPredicate.test
+      2.9%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75333_
+      2.7%  net.minecraft.core.HolderSet$Direct.m_203333_
+      2.6%  net.minecraft.server.level.WorldGenRegion.m_6522_
+      2.4%  net.minecraft.world.level.levelgen.synth.PerlinNoise.m_75417_
+      2.4%  net.minecraft.world.level.levelgen.blockpredicates.AnyOfPredicate.test
+  [spelunkery 16.2%] called from: 16.2 Feature.m_225028_ -> BlockStripeFeature.m_142674_ | 0.0 StructureStart.m_226850_ -> MineshaftDustCorridor.m_213694_
+  [spelunkery] working in: 6.3 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleCellular | 6.3 com.ordana.spelunkery.worldgen.features.BlockStripeFeature.m_142674_ | 1.4 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.GenNoiseSingle | 1.2 com.ordana.spelunkery.worldgen.feature_configs.util.FastNoiseLite.SingleDomainWarpOpenSimplex2Gradient
+
+=== phase (between phases) · dh thread(s) · 4203 samples
+  threads: DH-Chunk Update Queue [minecraft:overwor 82%, DH-LOD Builder Thread[0] 5%, DH-LOD Builder Thread[1] 4%, DH-Update Propagator Thread[0] 4%, DH-Update Propagator Thread[1] 4%, DH-Phantom Array Recycler Thread[0] 0%, DH-Request Module Ticker [minecraft:over 0%, DH-Full Data Migration Thread[0] 0%
+  mods anywhere in the stack (inclusive %): DistantHorizons 99.9, ArcaneVortex_[Alpha] 0.0, ?org.objectweb.asm 0.0, ferritecore 0.0
+  base: jdk 100.0, fastutil 2.2, minecraft 0.8, forge 0.5, google-libs 0.0
+  top of the stack (self %): DistantHorizons 99.0, forge 0.5, minecraft 0.3, ?org.objectweb.asm 0.0, ferritecore 0.0
+  busiest methods:
+     42.8%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest
+     37.4%  com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem
+      1.5%  com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState
+      1.4%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint
+      1.3%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.mergeInputTwoByTwoDataColumn
+      1.0%  com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper_forge.getBiomeWrapper
+      1.0%  com.seibel.distanthorizons.core.generation.DhLightingEngine.recursivelyLightAdjacentDataPoints
+      0.9%  com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.writeVarint
+      0.9%  com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2.removeUnusedIdsAndRemap
+      0.8%  com.seibel.distanthorizons.core.dataObjects.transformers.FullDataOcclusionCuller.checkOcclusion
+      0.8%  com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair.get
+      0.7%  com.seibel.distanthorizons.core.pos.DhChunkPos.squaredDistance
+  [DistantHorizons 99.9%] called from: 82.3 ThreadPoolExecutor.runWorker -> ChunkUpdateQueueManager.runQueueingLoop | 17.4 ThreadPoolExecutor.runWorker -> PriorityTaskPicker$TrackedRunnable.run | 0.1 ThreadPoolExecutor.runWorker -> PhantomArrayListPool.lambda$static$0 | 0.0 ThreadPoolExecutor.runWorker -> LodRequestModule.tickLoop
+  [DistantHorizons] working in: 42.8 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.popClosest | 37.4 com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkPosQueue.addItem | 1.5 com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper_forge.fromBlockState | 1.4 com.seibel.distanthorizons.core.sql.dto.util.VarintUtil.readVarint
+
+=== phase (between phases) · other thread(s) · 1271 samples
+  threads: pool-9-thread 57%, modloading-worker 30%, pool-2-thread 7%, Fzzy Config Worker 3%, e4mc_minecraft-init 1%, HttpClient-1-Worker 1%, Thread 0%, Netty Epoll Server IO  0%
+  mods anywhere in the stack (inclusive %): ArcaneVortex_[Alpha] 12.8, ?org.objectweb.asm 7.7, fzzy_config 2.2, ?org.objectweb.asm.tree 2.0, kubejs-forge 1.8, Zeta 1.3, Quark 1.3, supplementaries 1.2, rhino-forge 1.1, create 1.0, e4mc-forge 0.9, modernfix-forge 0.8, moonlight 0.8, YungsApi 0.6, epic-fight 0.6, spmovesets 0.6, fantasy 0.5, puffish_skills 0.4, ExtraQuests 0.4, BCLib 0.4, ftb-quests-forge 0.3, ?com.tterrag.registrate 0.3
+  base: jdk 98.9, minecraft 57.8, forge 37.1, mixin 3.8, kotlin 2.9, google-libs 1.1, logging 0.9, netty 0.9
+  top of the stack (self %): minecraft 57.4, forge 15.8, ?org.objectweb.asm 6.1, ArcaneVortex_[Alpha] 5.0, mixin 3.3, fzzy_config 2.0, ?org.objectweb.asm.tree 1.0, rhino-forge 1.0, netty 0.6, supplementaries 0.5, fantasy 0.4, epic-fight 0.3, YungsApi 0.2, modernfix-forge 0.2
+  busiest methods:
+     30.0%  net.minecraft.world.level.biome.Climate$RTree$SubTree.m_183370_
+     15.3%  net.minecraft.world.level.levelgen.synth.ImprovedNoise.m_75333_
+      7.9%  net.minecraft.world.level.levelgen.synth.PerlinNoise.m_75417_
+      3.5%  cpw.mods.niofs.union.UnionPath.toString
+      2.9%  cpw.mods.niofs.union.UnionFileSystem.byteChannel
+      2.6%  net.minecraft.world.level.biome.Climate$RTree$Node.m_186959_
+      1.9%  me.fzzyhmstrs.fzzy_config.impl.ConfigApiImpl.serializeToToml$fzzy_config
+      1.7%  cpw.mods.niofs.union.UnionFileSystem.testFilter
+      1.3%  com.luoee.arcanevortex.NativeAgent.TSRGMapper.doLoad
+      1.1%  org.objectweb.asm.ClassReader.readCode
+      0.8%  org.spongepowered.asm.util.Bytecode.getOpcodeName
+      0.8%  org.spongepowered.asm.mixin.transformer.MixinConfig.hasMixinsFor
+  [ArcaneVortex_[Alpha] 12.8%] called from: 12.4 NativeConstructorAccessorImpl.newInstance0 -> ArcaneVortex.<init> | 0.4 ClassLoader.defineClass1 -> MasterTransformer.transform
+  [ArcaneVortex_[Alpha]] working in: 5.7 com.luoee.arcanevortex.NativeAgent.Mixin.TypeHierarchy.openStream | 1.3 com.luoee.arcanevortex.NativeAgent.TSRGMapper.doLoad | 1.0 com.luoee.arcanevortex.Content.Item.EntityRemover.Purge.HiddenClassDefeater.readBytes | 0.5 com.luoee.arcanevortex.NativeAgent.Mixin.MixinRemapper.contains
+  [?org.objectweb.asm 7.7%] called from: 2.6 ClassTransformer.transform -> ClassReader.accept | 0.9 MixinClassTransformer.probeHasMatch -> ClassReader.accept | 0.6 Scanner.fileVisitor -> ClassReader.<init> | 0.4 MethodInsnNode.accept -> MethodWriter.visitMethodInsn
+  [?org.objectweb.asm] working in: 1.7 org.objectweb.asm.ClassReader.readCode | 1.0 org.objectweb.asm.ClassReader.readMethod | 0.6 org.objectweb.asm.ClassReader.readUtf | 0.6 org.objectweb.asm.ClassReader.<init>
+
