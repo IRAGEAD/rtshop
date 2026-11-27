@@ -190,6 +190,17 @@ public final class SelfTest {
         boolean nbSold = general375 != null && findEntry(general375, e -> e.stack.is(ModItems.SURVEY_NOTEBOOK.get())) >= 0;
         check("3.75 the field notebook is an item like the codex and guidebook: given once, sold again at the general store",
                 nbGiven && nbOnce && nbSold, nbGiven + " " + nbOnce + " " + nbSold);
+
+        // W-8: 도감의 장비 탭에는 상점 · 뽑기 · 전리품으로 얻을 수 있는 장비만 (Arcane Vortex 처럼 그렇지 않은 것은 뺀다)
+        com.rtshop.story.Codex.reload();
+        List<String> gear375 = com.rtshop.story.Codex.gear();
+        java.util.Set<String> can375 = com.rtshop.story.Codex.obtainable();
+        boolean allCan = can375 != null && gear375.stream().allMatch(x -> can375.contains(x) || com.rtshop.story.Codex.get().keepGear.contains(x));
+        boolean lootScan = can375 != null && can375.contains("minecraft:name_tag") && can375.contains("minecraft:golden_sword");
+        boolean avGone = !net.minecraftforge.fml.ModList.get().isLoaded("arcanevortex") || !gear375.contains("arcanevortex:annivire_sword");
+        check("3.75 the codex gear tab lists only gear you can buy, pull from the gacha or find as loot (chests, mob drops); the rest is left out",
+                allCan && lootScan && avGone && gear375.contains("minecraft:iron_sword"),
+                gear375.size() + " shown, " + com.rtshop.story.Codex.lastHiddenGear + " hidden, loot " + lootScan + " av " + avGone);
         for (int i = 0; i < a.getInventory().getContainerSize(); i++)
             if (a.getInventory().getItem(i).is(ModItems.SURVEY_NOTEBOOK.get())) a.getInventory().setItem(i, ItemStack.EMPTY);
     }

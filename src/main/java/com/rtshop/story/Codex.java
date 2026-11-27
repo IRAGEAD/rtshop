@@ -83,6 +83,10 @@ public final class Codex {
         public List<String> extraMobs = new ArrayList<>();
         public List<String> hideMobs = new ArrayList<>();
         public Map<String, String> notes = new LinkedHashMap<>();
+        /** 3.75.0 (사용자 W-8): 장비 탭에는 상점 · 뽑기 · 전리품(상자 · 몹)으로 얻을 수 있는 장비만 (이미 얻은 것은 그대로 보인다). */
+        public boolean obtainableGearOnly = true;
+        /** 그래도 장비 탭에 늘 넣을 아이템 ID. */
+        public List<String> keepGear = new ArrayList<>();
     }
 
     private static Config config;
@@ -106,6 +110,7 @@ public final class Codex {
             if (c.extraMobs == null) c.extraMobs = new ArrayList<>();
             if (c.hideMobs == null) c.hideMobs = new ArrayList<>();
             if (c.notes == null) c.notes = new LinkedHashMap<>();
+            if (c.keepGear == null) c.keepGear = new ArrayList<>();
             c.meetRadius = Math.max(4, Math.min(48, c.meetRadius));
             if (write) {
                 try {
@@ -177,14 +182,91 @@ public final class Codex {
         List<String> g = gear;
         if (g != null) return g;
         Config c = get();
+        java.util.Set<String> can = c.obtainableGearOnly ? obtainable() : null;
         List<String> out = new ArrayList<>();
+        int hidden = 0;
         for (Item item : ForgeRegistries.ITEMS) {
             ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
             if (rl == null || item == Items.AIR || c.excludeMods.contains(rl.getNamespace())) continue;
-            if (ItemPolicy.gear(item)) out.add(rl.toString());
+            if (!ItemPolicy.gear(item)) continue;
+            if (can != null && !can.contains(rl.toString()) && !c.keepGear.contains(rl.toString())) {
+                hidden++;
+                continue;
+            }
+            out.add(rl.toString());
         }
+        if (can == null && c.obtainableGearOnly) return out;   // 서버가 아직 없으면(시작 전) 걸러 내지 못한 목록은 담아 두지 않는다
+        lastHiddenGear = hidden;
         gear = out;
         return out;
+    }
+
+    /** 점검용: 장비 탭에서 뺀 수. */
+    public static volatile int lastHiddenGear = -1;
+
+    /**
+     * 보통 방법으로 얻을 수 있는 아이템 ID: NPC 상점에서 살 수 있는 것 · 뽑기에 나오는 것 · 전리품 표(상자 · 몹 · 낚시 등, data/*/loot_tables)에 적힌 것.
+     * 서버가 없으면 null.
+     */
+    public static java.util.Set<String> obtainable() {
+        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return null;
+        java.util.Set<String> out = new java.util.HashSet<>();
+        try {
+            for (com.rtshop.shop.ShopData d : com.rtshop.shop.ShopServer.shops().values()) {
+                for (com.rtshop.shop.ShopData.Entry e : d.entries) {
+                    if (!e.buyable) continue;
+                    ResourceLocation rl = ForgeRegistries.ITEMS.getKey(e.stack.getItem());
+                    if (rl != null) out.add(rl.toString());
+                }
+            }
+        } catch (Throwable t) {
+            RtShop.LOGGER.debug("[rtshop] 도감: 상점 목록을 읽지 못함 {}", t.toString());
+        }
+        try {
+            for (List<com.rtshop.gacha.GachaConfig.Entry> pool : com.rtshop.gacha.GachaConfig.get().pools.values())
+                for (com.rtshop.gacha.GachaConfig.Entry e : pool) if (e.item != null && !e.item.isEmpty()) out.add(e.item);
+        } catch (Throwable t) {
+            RtShop.LOGGER.debug("[rtshop] 도감: 뽑기 목록을 읽지 못함 {}", t.toString());
+        }
+        try {
+            var rm = server.getResourceManager();
+            for (var en : rm.listResources("loot_tables", r -> r.getPath().endsWith(".json")).entrySet()) {
+                try (var in = en.getValue().open()) {
+                    lootItems(com.google.gson.JsonParser.parseString(new String(in.readAllBytes(), StandardCharsets.UTF_8)), out);
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Throwable t) {
+            RtShop.LOGGER.debug("[rtshop] 도감: 전리품 표를 읽지 못함 {}", t.toString());
+        }
+        return out;
+    }
+
+    /** 전리품 표 JSON 에서 아이템 이름 (item 항목의 name, tag 항목은 그 태그의 아이템). */
+    static void lootItems(com.google.gson.JsonElement e, java.util.Set<String> out) {
+        if (e == null || e.isJsonNull() || e.isJsonPrimitive()) return;
+        if (e.isJsonArray()) {
+            for (com.google.gson.JsonElement x : e.getAsJsonArray()) lootItems(x, out);
+            return;
+        }
+        com.google.gson.JsonObject o = e.getAsJsonObject();
+        String type = o.has("type") && o.get("type").isJsonPrimitive() ? o.get("type").getAsString() : "";
+        if (o.has("name") && o.get("name").isJsonPrimitive()) {
+            String name = o.get("name").getAsString();
+            if (type.equals("minecraft:item") || type.equals("item")) out.add(name.contains(":") ? name : "minecraft:" + name);
+            else if (type.equals("minecraft:tag") || type.equals("tag")) {
+                ResourceLocation tl = ResourceLocation.tryParse(name);
+                if (tl != null) {
+                    var tag = ForgeRegistries.ITEMS.tags();
+                    if (tag != null) for (Item it : tag.getTag(net.minecraft.tags.ItemTags.create(tl))) {
+                        ResourceLocation rl = ForgeRegistries.ITEMS.getKey(it);
+                        if (rl != null) out.add(rl.toString());
+                    }
+                }
+            }
+        }
+        for (var x : o.entrySet()) if (!x.getValue().isJsonPrimitive()) lootItems(x.getValue(), out);
     }
 
     // ================================================================== 기록
@@ -368,10 +450,20 @@ public final class Codex {
         }
         out.add("mobs", ms);
         JsonArray gs = new JsonArray();
-        for (String g : gear()) {
+        List<String> list = gear();
+        for (String g : list) {
             JsonArray a = new JsonArray();
             a.add(g);
             a.add(r.gear.contains(g) ? 1 : 0);
+            gs.add(a);
+        }
+        // 3.75.0: 목록에서 뺀 장비라도 이미 얻은 것은 보인다
+        java.util.Set<String> shown = new java.util.HashSet<>(list);
+        for (String g : r.gear) {
+            if (shown.contains(g)) continue;
+            JsonArray a = new JsonArray();
+            a.add(g);
+            a.add(1);
             gs.add(a);
         }
         out.add("gear", gs);
