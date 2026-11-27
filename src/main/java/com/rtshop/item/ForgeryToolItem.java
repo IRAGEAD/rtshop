@@ -37,6 +37,13 @@ public class ForgeryToolItem extends Item {
         return kind;
     }
 
+    /** 3.78 살펴보기: 히든 직업의 도구도 처음엔 무엇인지 모른다 (화면 쪽에서 이름을 감춘다). */
+    @Override
+    public Component getName(ItemStack stack) {
+        if (com.rtshop.story.Examine.hideName(stack)) return com.rtshop.story.Examine.unknownName();
+        return super.getName(stack);
+    }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack tool = player.getItemInHand(hand);

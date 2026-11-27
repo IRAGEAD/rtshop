@@ -36,6 +36,10 @@ final class ClientSelfTest2 {
     private static final List<String> PORTRAIT_IDS = new ArrayList<>(), PORTRAIT_SHOW = new ArrayList<>(), PORTRAIT_OLD_BLANK = new ArrayList<>(),
             PORTRAIT_OLD_CLIPPED = new ArrayList<>(), PORTRAIT_ICON = new ArrayList<>(), PORTRAIT_ODD = new ArrayList<>(), PORTRAIT_BAD = new ArrayList<>();
     private static int PORTRAIT_I;
+    private static int EXAMINE_SLOT_378;
+    private static ItemStack EXAMINE_KEEP_378 = ItemStack.EMPTY;
+    private static boolean EXAMINE_HID_378;
+    private static String EXAMINE_INFO_378 = "";
 
     /** 시험용: 몹 그림을 한 화면에 늘어놓는다 (before = 예전 방식). */
     static final class PortraitGrid extends net.minecraft.client.gui.screens.Screen {
@@ -1811,6 +1815,13 @@ final class ClientSelfTest2 {
                 boolean off = MapMarkClient.hideOnRadar(rv);
                 ClientConfig.get().minimapNpcIcons = true;
                 boolean others = !MapMarkClient.hideOnRadar(wild) && !MapMarkClient.hideOnRadar(mc.player);
+                // 3.78: 이야기에서 자리를 비운 NPC 는 말을 걸어 본 사이여도 미니맵 아이콘이 없다
+                String lookBefore = NpcLookClient.lookOfForTest(rv.getId());
+                NpcLookClient.receive("{\"looks\":{\"" + rv.getId() + "\":\"" + NpcLookClient.ABSENT + "\"}}");
+                boolean absentHidden = MapMarkClient.hideOnRadar(rv);
+                NpcLookClient.receive("{\"looks\":{\"" + rv.getId() + "\":\"" + lookBefore + "\"}}");
+                boolean backShown = !MapMarkClient.hideOnRadar(rv);
+                check("3.78 an NPC that is away in the story has no minimap icon (it comes back with the NPC)", absentHidden && backShown, absentHidden + " " + backShown);
                 MapMarkClient.learnForTest("{\"radar\":true,\"marks\":[],\"gone\":[\"npc:" + rv.getUUID() + "\"]}");
                 check("minimap icons: an RT Shop NPC shows only after it has been talked to, the setting hides them all, and ordinary villagers and players are never hidden",
                         !before && unmet && met && off && others && MapMarkClient.hideOnRadar(rv), before + " " + unmet + " " + met + " " + off + " " + others);
@@ -2513,6 +2524,55 @@ final class ClientSelfTest2 {
                 com.rtshop.quest.QuestData.get(sp.server).dirty();
                 net.minecraft.world.entity.Entity v = sp.serverLevel().getEntity(ABSENT_ID_377);
                 if (v != null) v.discard();
+            });
+            waitTicks(5);
+        });
+        // 3.78 (W-13 살펴보기): 처음 얻은 이야기 물건은 이름 · 설명이 감춰지고 「?」 — 들고 우클릭하면 2초 뒤에 보인다
+        add(mc -> {
+            onServer(mc, sp -> {
+                com.rtshop.story.Examine.resetForTest(sp, true);
+                EXAMINE_SLOT_378 = sp.getInventory().selected;
+                EXAMINE_KEEP_378 = sp.getInventory().getItem(8).copy();
+                sp.getInventory().setItem(8, new ItemStack(com.rtshop.item.ModItems.UNDYING_EMBER.get()));
+                sp.getInventory().selected = 8;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(8));
+                sp.inventoryMenu.broadcastChanges();
+            });
+            waitTicks(15);
+        });
+        add(mc -> {
+            ItemStack held = mc.player.getMainHandItem();
+            String unk = net.minecraft.client.resources.language.I18n.get("rtshop.examine.unknown_name");
+            java.util.List<net.minecraft.network.chat.Component> tip = held.getTooltipLines(mc.player, net.minecraft.world.item.TooltipFlag.Default.NORMAL);
+            String tips = tip.stream().map(net.minecraft.network.chat.Component::getString).reduce("", (x, y) -> x + " | " + y);
+            String hint = net.minecraft.client.resources.language.I18n.get("rtshop.examine.hint", "2");
+            String guide = net.minecraft.client.resources.language.I18n.get("item.rtshop.undying_ember.guide");
+            EXAMINE_HID_378 = held.is(com.rtshop.item.ModItems.UNDYING_EMBER.get()) && com.rtshop.story.Examine.clientUnknown(held)
+                    && held.getHoverName().getString().equals(unk) && tips.contains(unk) && tips.contains(hint) && !tips.contains(guide);
+            EXAMINE_INFO_378 = held.getHoverName().getString() + " :: " + tips;
+            mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+            waitTicks(8);
+        });
+        add(mc -> {
+            shot(mc, "135a_examine_unknown");
+            mc.setScreen(null);
+            mc.gameMode.useItem(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND);   // 진짜 우클릭
+            waitTicks(70);
+        });
+        add(mc -> {
+            ItemStack held = mc.player.getMainHandItem();
+            String real = net.minecraft.client.resources.language.I18n.get("item.rtshop.undying_ember");
+            java.util.List<net.minecraft.network.chat.Component> tip = held.getTooltipLines(mc.player, net.minecraft.world.item.TooltipFlag.Default.NORMAL);
+            String tips = tip.stream().map(net.minecraft.network.chat.Component::getString).reduce("", (x, y) -> x + " | " + y);
+            boolean known = !com.rtshop.story.Examine.clientUnknown(held) && held.getHoverName().getString().equals(real)
+                    && tips.contains(net.minecraft.client.resources.language.I18n.get("item.rtshop.undying_ember.guide"));
+            check("3.78 a story item first shows as an unidentified item (name and lore hidden, how to examine shown); holding it and right-clicking examines it, then its name and lore show",
+                    EXAMINE_HID_378 && known, EXAMINE_INFO_378 + " → " + held.getHoverName().getString() + " :: " + tips);
+            onServer(mc, sp -> {
+                sp.getInventory().setItem(8, EXAMINE_KEEP_378);
+                sp.getInventory().selected = EXAMINE_SLOT_378;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(EXAMINE_SLOT_378));
+                sp.inventoryMenu.broadcastChanges();
             });
             waitTicks(5);
         });

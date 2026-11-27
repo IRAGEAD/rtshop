@@ -2091,5 +2091,11 @@
   "rtshop.stock.err.forged": "거래소가 위조를 알아보고 판명 도장을 찍었습니다. 값은 치르지 않습니다.",
   "rtshop.stock.err.wanted": "수배 중이라 거래소가 거래를 받지 않습니다.",
   "rtshop.stock.wanted_banner": "수배 중 — 거래소와 거래할 수 없습니다",
-  "rtshop.job.hidden_full": "%s 의 자리가 지금은 차 있습니다 (서버에 %s명까지). 누군가 다른 직업으로 바꾸면 자리가 납니다."
+  "rtshop.job.hidden_full": "%s 의 자리가 지금은 차 있습니다 (서버에 %s명까지). 누군가 다른 직업으로 바꾸면 자리가 납니다.",
+  "rtshop.examine.unknown_name": "처음 보는 물건",
+  "rtshop.examine.unknown_desc": "아직 살펴보지 않았다. 무엇인지는 살펴봐야 안다.",
+  "rtshop.examine.hint": "들고 우클릭: 살펴보기 (%s초)",
+  "rtshop.examine.progress": "살펴보는 중… %s",
+  "rtshop.examine.done": "살펴봤다: %s",
+  "rtshop.examine.stopped": "살펴보기를 멈췄다."
 }

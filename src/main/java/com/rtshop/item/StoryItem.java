@@ -39,6 +39,13 @@ public class StoryItem extends Item {
         return InteractionResultHolder.pass(stack);
     }
 
+    /** 3.78 살펴보기: 아직 살펴보지 않았으면 (화면 쪽에서) 이름을 감춘다. */
+    @Override
+    public Component getName(ItemStack stack) {
+        if (com.rtshop.story.Examine.hideName(stack)) return com.rtshop.story.Examine.unknownName();
+        return super.getName(stack);
+    }
+
     @Override
     public boolean isFoil(ItemStack stack) {
         return foil || super.isFoil(stack);

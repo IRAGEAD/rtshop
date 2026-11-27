@@ -531,7 +531,8 @@ public class QuestTalkScreen extends Screen {
             if (v.rewardGold() > 0) rowsOut.add(new Object[]{"g", Ui.num(v.rewardGold()) + " G", 0xFFFFE9A8});
             for (QuestView.RewardItem r : v.rewardItems()) {
                 ItemStack s = stackOf(r.item());
-                String name = (s.isEmpty() ? r.item() : s.getHoverName().getString()) + " x" + r.count();
+                String name = (s.isEmpty() ? r.item() : com.rtshop.story.Examine.clientUnknown(s) && !s.hasCustomHoverName()
+                        ? net.minecraft.network.chat.Component.translatable(s.getDescriptionId()).getString() : s.getHoverName().getString()) + " x" + r.count();   // 3.78: 보상 이름은 진짜로
                 rowsOut.add(new Object[]{"i", s, 0xFFF0E6CC, Ui.clip(font, name, inner - 16)});
             }
         }

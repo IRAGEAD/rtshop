@@ -894,6 +894,66 @@ public final class SelfTest {
         }
     }
 
+    /** 3.78.0: W-13 살펴보기 (타르코프식) — 이야기 물건 · 스킬라 단서 · 히든 아이템. */
+    private static void examine378(FakePlayer a) {
+        a.getInventory().clearContent();
+        com.rtshop.story.Examine.resetForTest(a, true);
+        ItemStack ember = new ItemStack(com.rtshop.item.ModItems.UNDYING_EMBER.get());
+        ItemStack page = new ItemStack(com.rtshop.item.ModItems.CHRONICLE_PAGE.get());
+        ItemStack loupe = new ItemStack(com.rtshop.item.ModItems.APPRAISAL_LOUPE.get());
+        ItemStack plain = new ItemStack(Items.IRON_INGOT);
+        String kEmber = com.rtshop.story.Examine.key(ember), kLoupe = com.rtshop.story.Examine.key(loupe);
+        check("3.78 story items and hidden items (the hidden job tools) need examining; ordinary items do not",
+                "rtshop:undying_ember".equals(kEmber) && "rtshop:appraisal_loupe".equals(kLoupe) && com.rtshop.story.Examine.key(plain) == null
+                        && "rtshop:chronicle_page".equals(com.rtshop.story.Examine.key(page)),
+                kEmber + " " + kLoupe + " " + com.rtshop.story.Examine.key(plain));
+        // 스킬라 단서는 단서마다 따로
+        com.rtshop.story.ScyllaClues.Clue coin = com.rtshop.story.ScyllaClues.get().clues.get("storm_coin");
+        ItemStack clue = coin == null ? ItemStack.EMPTY : com.rtshop.story.ScyllaClues.stack(coin);
+        check("3.78 each Scylla clue is examined on its own (its key names the clue)",
+                !clue.isEmpty() && "clue:storm_coin".equals(com.rtshop.story.Examine.key(clue)), clue.isEmpty() ? "no clue item" : com.rtshop.story.Examine.key(clue));
+        // 들고 우클릭 → 살펴보기 시작 (원래 쓰임은 막힘) → 다른 물건으로 바꾸면 멈춤 → 다시 → 다 되면 앎
+        a.setItemInHand(InteractionHand.MAIN_HAND, ember.copy());
+        boolean started = com.rtshop.story.Examine.tryStart(a, InteractionHand.MAIN_HAND);
+        a.setItemInHand(InteractionHand.MAIN_HAND, plain.copy());
+        com.rtshop.story.Examine.tickForTest(a, 1);
+        boolean stopped = !com.rtshop.story.Examine.examiningForTest(a) && !com.rtshop.story.Examine.knows(a, kEmber);
+        a.setItemInHand(InteractionHand.MAIN_HAND, ember.copy());
+        boolean again = com.rtshop.story.Examine.tryStart(a, InteractionHand.MAIN_HAND);
+        String early = com.rtshop.story.Examine.tickForTest(a, 10);
+        String got = com.rtshop.story.Examine.tickForTest(a, 200);
+        boolean knowsNow = com.rtshop.story.Examine.knows(a, kEmber);
+        boolean secondUse = !com.rtshop.story.Examine.tryStart(a, InteractionHand.MAIN_HAND);   // 알면 막지 않는다 (읽기 · 쓰기가 그대로)
+        boolean otherStill = !com.rtshop.story.Examine.knows(a, kLoupe);
+        check("3.78 right-clicking an unknown item starts examining instead of using it; switching items stops it; after about 2 seconds it is known (only that kind, only this player)",
+                started && stopped && again && early == null && kEmber.equals(got) && knowsNow && secondUse && otherStill,
+                started + " " + stopped + " " + again + " " + early + " " + got + " " + knowsNow + " " + secondUse + " " + otherStill);
+        // 3.78 이전부터 지니던 물건은 처음 들어올 때 이미 아는 것으로
+        a.getInventory().clearContent();
+        com.rtshop.story.Examine.resetForTest(a, false);
+        a.getInventory().add(page.copy());
+        com.rtshop.story.Examine.grandfather(a);
+        boolean oldKnown = com.rtshop.story.Examine.knows(a, "rtshop:chronicle_page");
+        boolean newUnknown = !com.rtshop.story.Examine.knows(a, kEmber);
+        a.getInventory().add(ember.copy());
+        com.rtshop.story.Examine.grandfather(a);   // 두 번째부터는 아무것도 하지 않는다
+        boolean stillUnknown = !com.rtshop.story.Examine.knows(a, kEmber);
+        check("3.78 what a player already carried before this version is known on the first login; things found afterwards still need examining",
+                oldKnown && newUnknown && stillUnknown, oldKnown + " " + newUnknown + " " + stillUnknown);
+        // 설정 파일 · 안내서
+        com.google.gson.JsonObject ej = com.rtshop.story.Examine.configJsonForTest();
+        boolean guidePage = false;
+        for (com.google.gson.JsonElement gc : com.rtshop.story.Guide.get().getAsJsonArray("categories")) {
+            for (com.google.gson.JsonElement gp : gc.getAsJsonObject().getAsJsonArray("pages")) guidePage |= "examine".equals(gp.getAsJsonObject().get("id").getAsString());
+        }
+        check("3.78 examine.json has the switches (enabled, seconds, storyItems, hiddenItems with both hidden job tools) and the guide explains it",
+                ej.has("enabled") && ej.has("seconds") && ej.has("storyItems") && ej.getAsJsonArray("hiddenItems").toString().contains("rtshop:forger_kit")
+                        && ej.getAsJsonArray("hiddenItems").toString().contains("rtshop:appraisal_loupe") && guidePage, ej + " guide " + guidePage);
+        a.getInventory().clearContent();
+        a.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        com.rtshop.story.Examine.resetForTest(a, true);
+    }
+
     /** 3.77.0: ⑥ 스토리 점검 · W-21 — 지켜 온 이야기 규칙을 시험으로 붙잡아 둔다. */
     private static void story377(FakePlayer a) {
         java.util.regex.Pattern sleepy = java.util.regex.Pattern.compile("눕|잠|자라|자게|잔다|주무|눈 좀|눈을 붙|쉬");
@@ -5171,6 +5231,7 @@ public final class SelfTest {
         forgery(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
         hiddenPaths(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
         story377(a);
+        examine378(a);
         // 3.73: 성능 진단 (/fpscheck · /rtshop perfcheck) — 스택의 프레임을 모드로 돌리는 규칙
         StackTraceElement[] st373 = {
                 new StackTraceElement("java.lang.Object", "wait", null, -1),

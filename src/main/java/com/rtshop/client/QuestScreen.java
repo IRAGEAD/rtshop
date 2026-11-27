@@ -248,7 +248,12 @@ public class QuestScreen extends Screen {
         if (item == null) {
             return id;
         }
-        return new ItemStack(item).getHoverName().getString();
+        ItemStack st = new ItemStack(item);
+        // 3.78 살펴보기: 아직 살펴보지 않은 물건이라도 퀘스트의 목표에는 진짜 이름 (무엇을 가져가야 하는지는 알아야 한다)
+        if (com.rtshop.story.Examine.clientUnknown(st)) {
+            return net.minecraft.network.chat.Component.translatable(st.getDescriptionId()).getString();
+        }
+        return st.getHoverName().getString();
     }
 
     public static String objectiveName(QuestView.ObjView o) {

@@ -72,6 +72,11 @@ public final class StoryClient {
             }
         } else if (kind == StoryPacket.NPC_LOOKS) {
             NpcLookClient.receive(json);
+        } else if (kind == StoryPacket.EXAMINE) {
+            try {
+                com.rtshop.story.Examine.clientReceive(json);
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.STOCKS) {
             try {
                 StockScreen.open(JsonParser.parseString(json).getAsJsonObject());

@@ -22,13 +22,24 @@ public final class ItemMarks {
 
     /** Forge 의 IItemDecorator 로 등록된다. 무언가 그렸으면 true. */
     public static boolean render(GuiGraphics g, Font font, ItemStack stack, int x, int y) {
-        if (stack.isEmpty() || !stack.hasTag()) {
+        if (stack.isEmpty()) {
             return false;
+        }
+        boolean drew = false;
+        try {
+            if (com.rtshop.story.Examine.clientUnknown(stack)) {
+                question(g, x + 11, y);   // 3.78 살펴보기: 아직 살펴보지 않은 물건은 오른쪽 위에 「?」
+                drew = true;
+            }
+        } catch (Throwable ignored) {
+        }
+        if (!stack.hasTag()) {
+            return drew;
         }
         int star = Math.min(3, SeedRules.star(stack));
         boolean seed = SeedRules.isLicensed(stack);
         if (star <= 0 && !seed) {
-            return false;
+            return drew;
         }
         g.pose().pushPose();
         g.pose().translate(0.0F, 0.0F, 200.0F); // 아이템 그림보다 앞에
@@ -44,5 +55,18 @@ public final class ItemMarks {
         }
         g.pose().popPose();
         return true;
+    }
+
+    private static final int Q = 0xFFFFD24A;
+    private static final int Q_EDGE = 0xFF3A2400;
+
+    /** 작은 물음표 (5x7 칸, 테두리 있음): 살펴보지 않은 물건. */
+    static void question(GuiGraphics g, int x, int y) {
+        g.pose().pushPose();
+        g.pose().translate(0.0F, 0.0F, 200.0F);
+        g.fill(x, y, x + 5, y + 7, Q_EDGE);
+        int[][] px = {{1, 1}, {2, 1}, {3, 1}, {3, 2}, {2, 3}, {3, 3}, {2, 5}};
+        for (int[] p : px) g.fill(x + p[0], y + p[1], x + p[0] + 1, y + p[1] + 1, Q);
+        g.pose().popPose();
     }
 }

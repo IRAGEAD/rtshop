@@ -44,7 +44,9 @@ public final class MobPortrait {
     /** 재는 칸에서 몹의 발이 놓이는 높이 (위에서부터의 비율). */
     private static final float ANCHOR_Y = 0.72F;
     /** 칸을 이만큼 채운다 (가장자리에 조금 틈). */
-    private static final float FILL = 0.86F;
+    private static final float FILL = 0.9F;
+    /** 자리를 잴 때 양 끝에서 덜어 내는 칠해진 양 (가늘게 삐져나온 꼬리 끝 · 수염 · 빛줄기 때문에 몸이 작아지지 않게). */
+    private static final float TRIM = 0.015F;
     /** 칸 안에서 천천히 도는 몹을 재는 각도. */
     private static final float[] ANGLES = {0F, 60F, 120F, 180F, 240F, 300F};
     private static final Quaternionf TILT = new Quaternionf().rotateZ((float) Math.PI).rotateX(-0.25F);
@@ -252,8 +254,9 @@ public final class MobPortrait {
             u = v;
             if (why.equals("ok")) why = "big";
         }
-        float w = u[2] - u[0] + 1, h = u[3] - u[1] + 1;
-        float cx = (u[0] + u[2] + 1) / 2F - S / 2F, cy = (u[1] + u[3] + 1) / 2F - S * ANCHOR_Y;
+        // 칸에 맞추는 것은 가는 끝을 뺀 몸 (끝이 칸 밖으로 조금 나가 잘려도 몸이 작아지지 않게)
+        float w = u[7] - u[5] + 1, h = u[8] - u[6] + 1;
+        float cx = (u[5] + u[7] + 1) / 2F - S / 2F, cy = (u[6] + u[8] + 1) / 2F - S * ANCHOR_Y;
         return new Fit(probe, w, h, cx, cy, ItemStack.EMPTY, why, u[4]);
     }
 
@@ -261,16 +264,16 @@ public final class MobPortrait {
         return u[0] <= 1 || u[1] <= 1 || u[2] >= S - 2 || u[3] >= S - 2;
     }
 
-    /** 여러 각도로 그린 것을 합친 사각형 {minX, minY, maxX, maxY, 칠해진 수(가장 많은 각도)}. */
+    /** 여러 각도로 그린 것을 합친 사각형 {minX, minY, maxX, maxY, 칠해진 수(가장 많은 각도), 가는 끝을 뺀 minX, minY, maxX, maxY}. */
     private static int[] union(LivingEntity e, float probe) {
-        int[] u = {S, S, -1, -1, 0};
+        int[] u = {S, S, -1, -1, 0, S, S, -1, -1};
         for (float a : ANGLES) {
             int[] p = probe(e, probe, a);
             if (p[4] == 0) continue;
-            u[0] = Math.min(u[0], p[0]);
-            u[1] = Math.min(u[1], p[1]);
-            u[2] = Math.max(u[2], p[2]);
-            u[3] = Math.max(u[3], p[3]);
+            for (int i = 0; i < 4; i++) {
+                u[i] = i < 2 ? Math.min(u[i], p[i]) : Math.max(u[i], p[i]);
+                u[5 + i] = i < 2 ? Math.min(u[5 + i], p[5 + i]) : Math.max(u[5 + i], p[5 + i]);
+            }
             u[4] = Math.max(u[4], p[4]);
         }
         return u;
@@ -333,7 +336,9 @@ public final class MobPortrait {
             if (err instanceof Error er) throw er;
             throw new RuntimeException(err);
         }
-        int[] r = {S, S, -1, -1, 0};
+        // {minX, minY, maxX, maxY, 수, 그리고 가는 끝(꼬리 끝 · 수염 · 더듬이 같은 칠해진 양의 TRIM 쯤)을 뺀 minX, minY, maxX, maxY}
+        int[] r = {S, S, -1, -1, 0, S, S, -1, -1};
+        int[] cols = new int[S], rows = new int[S];
         try (NativeImage img = new NativeImage(S, S, false)) {
             RenderSystem.bindTexture(target.getColorTextureId());
             img.downloadTexture(0, false);
@@ -346,11 +351,31 @@ public final class MobPortrait {
                         if (x > r[2]) r[2] = x;
                         if (y > r[3]) r[3] = y;
                         r[4]++;
+                        cols[x]++;
+                        rows[y]++;
                     }
                 }
             }
         }
+        if (r[4] > 0) {
+            int cut = (int) (r[4] * TRIM);
+            int[] tx = trim(cols, cut), ty = trim(rows, cut);
+            r[5] = tx[0];
+            r[6] = ty[0];
+            r[7] = tx[1];
+            r[8] = ty[1];
+        }
         return r;
+    }
+
+    /** 양 끝에서 칠해진 양을 cut 만큼씩 덜어 낸 범위 {처음, 끝}. */
+    private static int[] trim(int[] h, int cut) {
+        int a = 0, sum = 0;
+        while (a < h.length - 1 && sum + h[a] <= cut) sum += h[a++];
+        int b = h.length - 1;
+        sum = 0;
+        while (b > a && sum + h[b] <= cut) sum += h[b--];
+        return new int[]{a, b};
     }
 
     // ---- 시험용 ----
@@ -409,7 +434,8 @@ public final class MobPortrait {
             float area = (float) (p[2] - p[0] + 1) * (p[3] - p[1] + 1);
             float in = ix1 > ix0 && iy1 > iy0 ? (ix1 - ix0) * (iy1 - iy0) / area : 0F;
             inside = Math.max(inside, (int) (p[4] * in));
-            over = Math.max(over, (int) Math.max(Math.max(bx - p[0], by - p[1]), Math.max(p[2] + 1 - (bx + box), p[3] + 1 - (by + box))));
+            // 넘친 거리는 가는 끝을 뺀 몸으로 잰다 (꼬리 끝 몇 픽셀이 잘리는 것은 괜찮다)
+            over = Math.max(over, (int) Math.max(Math.max(bx - p[5], by - p[6]), Math.max(p[7] + 1 - (bx + box), p[8] + 1 - (by + box))));
         }
         return new int[]{inside, Math.max(0, over)};
     }

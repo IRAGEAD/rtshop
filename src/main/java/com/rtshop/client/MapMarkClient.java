@@ -67,7 +67,8 @@ public final class MapMarkClient {
     /** 미니맵·지도의 몹 아이콘에서 이 개체를 감출 것인가 (DioramaRadarMixin 이 부른다). */
     public static boolean hideOnRadar(net.minecraft.world.entity.Entity e) {
         if (!looksLikeNpc(e)) return false;
-        boolean hide = !ClientConfig.get().minimapNpcIcons || (radarKnownOnly && !KNOWN_NPCS.contains(e.getUUID()));
+        // 3.78: 이야기에서 자리를 비운 NPC (내 화면에서 몸을 그리지 않는 동안) 는 미니맵 아이콘도 없다
+        boolean hide = !ClientConfig.get().minimapNpcIcons || (radarKnownOnly && !KNOWN_NPCS.contains(e.getUUID())) || NpcLookClient.absent(e.getId());
         if (hide) hiddenOnRadarForTest++;
         return hide;
     }

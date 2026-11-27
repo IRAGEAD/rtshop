@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 /** 서버 -> 클라이언트: 이야기 연출 (CINEMA: 장 제목·보스 등장·환영·자막) / LORE: 아이템 이야기 목록. */
 public final class StoryPacket {
-    public static final int CINEMA = 0, LORE = 1, GATE = 2, DIALOGUE = 3, BOUNTY = 4, SPOTS = 5, NOTEBOOK = 6, MUSIC = 7, GRADES = 8, READ = 9, RANKS = 10, TITLES = 11, CODEX = 12, CODEX_MOB = 13, GUIDE = 14, ITEM_NOTES = 15, MAP_MARKS = 16, PETITIONS = 17, NPC_LOOKS = 18, BOSS_CAM = 19, STOCKS = 20;
+    public static final int CINEMA = 0, LORE = 1, GATE = 2, DIALOGUE = 3, BOUNTY = 4, SPOTS = 5, NOTEBOOK = 6, MUSIC = 7, GRADES = 8, READ = 9, RANKS = 10, TITLES = 11, CODEX = 12, CODEX_MOB = 13, GUIDE = 14, ITEM_NOTES = 15, MAP_MARKS = 16, PETITIONS = 17, NPC_LOOKS = 18, BOSS_CAM = 19, STOCKS = 20, EXAMINE = 21;
     public final int kind;
     public final String json;
 

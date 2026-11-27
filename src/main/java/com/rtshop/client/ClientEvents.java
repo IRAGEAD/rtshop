@@ -203,6 +203,7 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        com.rtshop.story.Examine.clientClear();
         ClientLand.clear();
         ClientQuestHud.clear();
         SpotClient.clear();
@@ -342,6 +343,25 @@ public final class ClientEvents {
     }
 
     // ------------------------------------------------------------------ 아이템 설명
+
+    /**
+     * 살펴보기 (3.78, W-13): 아직 살펴보지 않은 이야기 · 히든 물건은 이름과 설명을 모두 감추고 「처음 보는 물건」과 살펴보는 법만 보인다.
+     * 다른 모드가 붙인 줄까지 감추도록 맨 나중에 (LOWEST).
+     */
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public static void onExamineTooltip(ItemTooltipEvent event) {
+        try {
+            if (!com.rtshop.story.Examine.clientUnknown(event.getItemStack())) return;
+            List<Component> tips = event.getToolTip();
+            tips.clear();
+            tips.add(com.rtshop.story.Examine.unknownName());
+            tips.add(Component.translatable("rtshop.examine.unknown_desc").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+            String sec = com.rtshop.story.Examine.clientSeconds() == Math.rint(com.rtshop.story.Examine.clientSeconds())
+                    ? String.valueOf((int) com.rtshop.story.Examine.clientSeconds()) : String.valueOf(com.rtshop.story.Examine.clientSeconds());
+            tips.add(Component.translatable("rtshop.examine.hint", sec).withStyle(ChatFormatting.YELLOW));
+        } catch (Throwable ignored) {
+        }
+    }
 
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {

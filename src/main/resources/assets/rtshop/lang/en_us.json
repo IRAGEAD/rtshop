@@ -2091,5 +2091,11 @@
   "rtshop.stock.err.forged": "The exchange spotted a forgery and stamped it. Nothing is paid.",
   "rtshop.stock.err.wanted": "You are wanted; the exchange will not deal with you.",
   "rtshop.stock.wanted_banner": "Wanted — the exchange will not deal with you",
-  "rtshop.job.hidden_full": "There is no place for a %s right now (up to %s per server). One opens when someone changes jobs."
+  "rtshop.job.hidden_full": "There is no place for a %s right now (up to %s per server). One opens when someone changes jobs.",
+  "rtshop.examine.unknown_name": "Unidentified item",
+  "rtshop.examine.unknown_desc": "You have not examined it yet. Look it over to learn what it is.",
+  "rtshop.examine.hint": "Hold it and right-click: examine (%ss)",
+  "rtshop.examine.progress": "Examining… %s",
+  "rtshop.examine.done": "Examined: %s",
+  "rtshop.examine.stopped": "You stopped examining it."
 }

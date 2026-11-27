@@ -556,7 +556,9 @@ public final class ShopServer {
         com.rtshop.stats.ItemStats.syncAll(ctx.getSource().getServer());
         com.rtshop.story.WildSpawns.reload();
         com.rtshop.story.StoryArena.reload();
+        com.rtshop.story.Examine.reload();
         for (ServerPlayer sp : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+            com.rtshop.story.Examine.sync(sp);
             com.rtshop.story.BossIntros.sendLore(sp);
             com.rtshop.story.StoryGates.sync(sp);
         }

@@ -32,6 +32,7 @@ final class ClientShaderTest {
     private static volatile BlockPos base;
     private static volatile BlockPos anvil;
     private static volatile BlockPos orb;
+    private static volatile String ALTAR_KEEP;
     private static long anvilDrawn, anvilAdd, anvilSh;
     private static long spotsBefore;
     /** 사진 이름과 결과에 쓰는 셰이더 팩 이름 (photon, complementary, bsl ...). */
@@ -200,6 +201,10 @@ final class ClientShaderTest {
                 sp.getInventory().add(new net.minecraft.world.item.ItemStack(com.rtshop.magic.MagicRegistry.TICKET_SELECT.get(), 5));
                 // 마을의 제단은 하나뿐이다: 앞의 화면 점검에서 놓은 제단 대신 이 제단을 마을의 제단으로 (안 그러면 열기를 거절한다)
                 com.rtshop.rules.WorldRules.setAltar(sp.serverLevel(), orb);
+                // 3.78: 이야기 잠금(「거울이 아무것도 비추지 않는다」)에 막혀 장면이 바로 닫히던 것 — 이 사진 동안만 잠금을 푼다 (예전의 알려진 실패 1건)
+                com.rtshop.story.StorySystems.ensure();
+                if (ALTAR_KEEP == null) ALTAR_KEEP = com.rtshop.story.StorySystems.altarLockFlag;
+                com.rtshop.story.StorySystems.altarLockFlag = "";
                 sp.getInventory().selected = 8;
                 sp.getInventory().setItem(8, net.minecraft.world.item.ItemStack.EMPTY);
                 sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(8));
@@ -244,6 +249,9 @@ final class ClientShaderTest {
             waitTicks(20);
         });
         add(mc -> {
+            onServer(mc, sp -> {
+                if (ALTAR_KEEP != null) com.rtshop.story.StorySystems.altarLockFlag = ALTAR_KEEP;
+            });
             if (!com.rtshop.magic.MagicRegistry.cinematic) return;
             shot(mc, "155_" + LABEL + "_orb_chosen");
             waitTicks(60);   // 사진이 다 써질 때까지
