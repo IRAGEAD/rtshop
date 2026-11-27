@@ -59,7 +59,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
-- **3.68.0 = 직업별 수입 기록** (worklist 의 "3.68.0"): `/rtshop income` · `income me` · `income reset`, 표 파일 `config/rtshop/export/income.txt` · `income.csv`.
+- **3.68.0 을 올렸습니다 (릴리스 latest = RT Shop 3.68.0) = 직업별 수입 기록** (worklist 의 "3.68.0"): `/rtshop income` · `income me` · `income reset`, 표 파일 `config/rtshop/export/income.txt` · `income.csv`.
   사용자가 1~2주 돌린 결과(또는 파일)를 주면 그 숫자로 생활 직업 수치를 다시 맞춘다 (지금 숫자는 추정 — `docs/balance_review.md` 11 · 12절).
 - **3.67.0 을 올렸고(릴리스 latest = RT Shop 3.67.0) 3.66.0 · 3.67.0 의 jar 와 요약을 사용자에게 보냈습니다.** 3.67.0 = 생활 직업 수입 맞추기 (worklist 의 "3.67.0", P-1 ~ P-3):
   농부 별 한 단계 위 35% · 한 개 더 20% / 물고기 매입 85% / 광부 캔 광물 판매 +20% / 요리사 손요리 +20%. 옛 기본값 그대로인 설정 파일만 한 번 고친다(jobs.json paramsVersion 2, pricing.json version 2).
@@ -186,6 +186,10 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 8. **A-14 히든 아이템 3개**: 보류.
 9. **Create 금지의 해석 확인**: 3.58.0 에서 "Create 는 던전 모드 IDAS 가 건축물에 쓰는 것이라 건축물은 그대로 두고 만들기·줍기·캐기만 막았다"고 설명하고 맞는지 물어 둠. 3.59.0 에서 사용자가 "Create 전용 아이템을 상점과 뽑기에서 삭제"를 직접 시켰으니 방향은 맞는 것으로 보이나, 던전 상자의 Create 물건에 대해서는 따로 답이 없었다.
 10. **상점 설정 되돌리기의 범위**: 지금은 상점 파일뿐. 사용자가 가격 규칙(pricing.json) · 뽑기 · 강화 같은 다른 설정도 같은 식으로 되돌리고 싶다고 하면 `ShopDefaults` 의 짜임(보관 폴더 + 기본값 견주기)을 그 설정에도 쓴다.
+
+3.68.0 의 시험 결과 (기록, 가지 v5-next20 · 실행 45942737455, 커밋 ee93a7f):
+- integration 서버 827개 전부 통과. 모드팩 전체: 서버 861개 · 화면 331개 전부 통과, 셰이더 사진 4/5 (7절). 새 점검 넷(수입 칸 · 표 · 움직인 시간 · 판매 출처).
+- 앞선 시도: 45942464488 — 움직인 시간 점검에서 가짜 플레이어를 teleportTo 로 옮겼는데 자리가 바뀌지 않음 → setPos.
 
 3.67.0 의 시험 결과 (기록, 가지 v5-next19 · 실행 45936569802, 커밋 b2ac7f3 — 3.66.0 의 코드를 모두 포함):
 - integration 서버 823개 전부 통과. 모드팩 전체: 서버 857개 · 화면 331개 전부 통과, 셰이더 사진 4/5 (장면이 바로 닫히는 것, 7절). `diag.txt` 에 "rtshop | RT Shop | 3.67.0".
