@@ -826,7 +826,7 @@ public final class ShopServer {
                         entry.stack.getHoverName(), r[0], num(r[1])), true);
             }
         } else {
-            buy(player, entry, amount);
+            buy(player, d.id, entry, amount);
         }
     }
 
@@ -859,7 +859,7 @@ public final class ShopServer {
         }
     }
 
-    private static void buy(ServerPlayer player, ShopData.Entry entry, int amount) {
+    private static void buy(ServerPlayer player, String shopId, ShopData.Entry entry, int amount) {
         if (!entry.buyable) {
             sendResult(player, Component.translatable("rtshop.msg.not_buyable"), false);
             return;
@@ -894,6 +894,7 @@ public final class ShopServer {
         InvUtil.apply(player.getInventory(), sim);
         Economy.addWallet(player, -total);
         com.rtshop.rank.Ranks.spent(player, total);
+        com.rtshop.stock.Stocks.onShopBuy(player, shopId, total);   // 조합 실적 (3.72): 대장간 · 토지
         com.rtshop.rules.TownSpawn.bought(player, entry.stack, amount);
         if (firstDeed) {
             LandManager.markFirstDeed(player);

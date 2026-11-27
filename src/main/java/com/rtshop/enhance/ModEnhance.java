@@ -29,6 +29,10 @@ public final class ModEnhance {
     public static final RegistryObject<Block> PSHOP = BLOCKS.register("player_shop",
             () -> new com.rtshop.pshop.PlayerShopBlock(BlockBehaviour.Properties.copy(Blocks.BARREL).strength(2.5F, 1200F).noOcclusion()));
 
+    /** 조합 시세판 (3.72.0): 우클릭하면 조합 증서의 시세판이 열린다. */
+    public static final RegistryObject<Block> STOCK_BOARD = BLOCKS.register("stock_board",
+            () -> new com.rtshop.stock.StockBoardBlock(BlockBehaviour.Properties.copy(Blocks.SPRUCE_PLANKS).strength(2.0F, 1200F).noOcclusion()));
+
     @SuppressWarnings("DataFlowIssue")
     public static final RegistryObject<net.minecraft.world.level.block.entity.BlockEntityType<com.rtshop.pshop.PlayerShopBlockEntity>> PSHOP_BE =
             BLOCK_ENTITIES.register("player_shop", () -> net.minecraft.world.level.block.entity.BlockEntityType.Builder

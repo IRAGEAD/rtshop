@@ -450,6 +450,7 @@ public final class Enhance {
         if (p.getAbilities().instabuild) return;
         Economy.addWallet(p, -l.gold);
         com.rtshop.rank.Ranks.spent(p, l.gold);
+        com.rtshop.stock.Stocks.activity(p, "smith", l.gold);   // 조합 실적 (3.72)
         Inventory inv = p.getInventory();
         for (Need n : needs(cfg, l, p)) {
             int left = n.need;

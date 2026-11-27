@@ -140,6 +140,124 @@ public final class SelfTest {
     }
 
     /** 기록이 쌓이면 칭호가 열리고, 효과는 둘까지·내거는 것은 하나, 한 주가 끝나면 윗자리에 보상이 맡겨진다. */
+    /**
+     * 3.72: 조합 증서 (주식) — 시세(실적 · 소식 · 하루 한도), 사기 · 되팔기(수수료는 기금으로), 장부에 없는 복사본, 배당(기금에서만, 지난주부터 가진 증서, 도장),
+     * 죽어도 떨어지지 않음, 창 내용, 은행원의 [증권 거래], 명령.
+     */
+    private static void stocks(MinecraftServer server, FakePlayer a) {
+        com.rtshop.stock.StockConfig sc = com.rtshop.stock.StockConfig.copyOfDefaults();
+        sc.noise = 0;
+        sc.pull = 0;
+        com.rtshop.stock.StockConfig.forTest(sc);
+        com.rtshop.stock.Stocks.testAnywhere = true;
+        com.rtshop.stock.Stocks.testing = true;
+        try {
+            com.rtshop.stock.Stocks.resetForTest(server);
+            com.rtshop.stock.StockData sd = com.rtshop.stock.StockData.get(server);
+            boolean start = sd.board("fish").price == 400 && sd.board("survey").price == 1000 && sd.boards.size() == 6;
+            // 시세: 첫날 실적 5,000 → 그대로 / 둘째 날 어업 40,000(한 사람 상한 30,000) · 농업 0 → +6% · -6%
+            java.util.UUID id = a.getUUID();
+            com.rtshop.stock.Stocks.activity(server, id, "fish", 5000);
+            com.rtshop.stock.Stocks.activity(server, id, "farm", 5000);
+            com.rtshop.stock.Stocks.advance(server, 1, true);
+            long f1 = sd.board("fish").price, r1 = sd.board("farm").price;
+            com.rtshop.stock.Stocks.activity(server, id, "fish", 40000);
+            com.rtshop.stock.Stocks.advance(server, 1, true);
+            long f2 = sd.board("fish").price, r2 = sd.board("farm").price;
+            // 이야기 소식(얼어붙은 바다가 풀렸다 +8%)은 서버에서 한 번만, 하루 한도 ±10% 안에서
+            com.rtshop.stock.Stocks.onQuestDone(a, "story_3_38");
+            com.rtshop.stock.Stocks.onQuestDone(a, "story_3_38");
+            boolean news = sd.board("fish").pendingNews > 0.079 && sd.board("fish").pendingNews < 0.081 && sd.newsLog.size() == 1;
+            com.rtshop.stock.Stocks.activity(server, id, "fish", 30000);
+            com.rtshop.stock.Stocks.advance(server, 1, true);
+            long f3 = sd.board("fish").price, r3 = sd.board("farm").price;
+            boolean prices = f1 == 400 && r1 == 400 && f2 == 424 && r2 == 376 && f3 == 466 && r3 == 365 && sd.board("fish").pendingNews == 0
+                    && sd.board("fish").history.size() == 3;
+            // 사기 · 되팔기: 수수료 2% 는 기금으로
+            com.rtshop.economy.Economy.setWallet(a, 10_000_000L);
+            a.getInventory().clearContent();
+            long w0 = com.rtshop.economy.Economy.wallet(a), fund0 = sd.fund;
+            int b1 = com.rtshop.stock.Stocks.buy(a, "fish", 10);
+            long paid = w0 - com.rtshop.economy.Economy.wallet(a);
+            boolean bought = b1 == com.rtshop.stock.Stocks.OK && paid == 466L * 10 + 94 && sd.fund - fund0 == 94 && sd.certs.size() == 1;
+            ItemStack cert = ItemStack.EMPTY;
+            for (ItemStack s : a.getInventory().items) if (s.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get())) cert = s;
+            boolean item = !cert.isEmpty() && "fish".equals(com.rtshop.item.StockCertificateItem.union(cert)) && com.rtshop.item.StockCertificateItem.shares(cert) == 10
+                    && cert.getHoverName().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc372
+                    && tc372.getKey().equals("item.rtshop.stock_certificate.named") && tc372.getArgs().length == 3 && Integer.valueOf(10).equals(tc372.getArgs()[2]);
+            sc.buyPerDay = 15;
+            int bLimit = com.rtshop.stock.Stocks.buy(a, "fish", 10);
+            sc.buyPerDay = 200;
+            int bAmount = com.rtshop.stock.Stocks.buy(a, "fish", sc.maxPerCertificate + 1);
+            int bUnion = com.rtshop.stock.Stocks.buy(a, "nope", 1);
+            boolean refused = bLimit == com.rtshop.stock.Stocks.ERR_LIMIT && bAmount == com.rtshop.stock.Stocks.ERR_AMOUNT && bUnion == com.rtshop.stock.Stocks.ERR_UNION;
+            // 복사본: 같은 일련번호의 두 번째 장은 장부에 없어 되팔 수 없다
+            java.util.UUID serial = com.rtshop.item.StockCertificateItem.id(cert);
+            a.getInventory().add(cert.copy());
+            long w1 = com.rtshop.economy.Economy.wallet(a), fund1 = sd.fund;
+            long sold = com.rtshop.stock.Stocks.sell(a, serial);
+            long soldCopy = com.rtshop.stock.Stocks.sell(a, serial);
+            boolean sellOk = sold == 466L * 10 - 94 && com.rtshop.economy.Economy.wallet(a) - w1 == sold && sd.fund - fund1 == 94 && sd.certs.isEmpty()
+                    && soldCopy == -com.rtshop.stock.Stocks.ERR_INVALID;
+            a.getInventory().clearContent();
+            // 배당: 지난주부터 가진 증서에, 기금에서만, 한 주에 한 번 (증서에 도장)
+            int b2 = com.rtshop.stock.Stocks.buy(a, "fish", 10);
+            com.rtshop.stock.Stocks.activity(server, id, "fish", 10000);
+            long fundBefore = sd.fund;
+            long early = com.rtshop.stock.Stocks.claim(a);   // 이번 주에 산 증서: 아직 없음
+            com.rtshop.stock.Stocks.advance(server, 7, true);
+            long divPer = sd.board("fish").dividend;
+            long w2 = com.rtshop.economy.Economy.wallet(a), fund2 = sd.fund;
+            long got = com.rtshop.stock.Stocks.claim(a);
+            long again = com.rtshop.stock.Stocks.claim(a);
+            ItemStack c2 = ItemStack.EMPTY;
+            for (ItemStack s : a.getInventory().items) if (s.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get())) c2 = s;
+            net.minecraft.nbt.CompoundTag ct = c2.getTagElement(com.rtshop.item.StockCertificateItem.TAG);
+            boolean dividend = b2 == com.rtshop.stock.Stocks.OK && early == 0 && divPer > 0 && got == divPer * 10 && com.rtshop.economy.Economy.wallet(a) - w2 == got
+                    && fund2 - sd.fund == got && again == 0 && ct != null && ct.contains("paidDay") && sd.fund >= 0 && fundBefore > 0;
+            // 죽어도 떨어지지 않는다 (떨어질 것에서 빼 두었다가 되살아날 때 돌려준다)
+            java.util.List<net.minecraft.world.entity.item.ItemEntity> drops = new java.util.ArrayList<>();
+            drops.add(new net.minecraft.world.entity.item.ItemEntity(a.level(), a.getX(), a.getY(), a.getZ(), c2.copy()));
+            a.getInventory().clearContent();
+            net.minecraftforge.event.entity.living.LivingDropsEvent de = new net.minecraftforge.event.entity.living.LivingDropsEvent(a, a.level().damageSources().generic(), drops, 0, false);
+            com.rtshop.stock.Stocks.onDrops(de);
+            boolean kept = de.getDrops().isEmpty() && a.getPersistentData().getList("rtshop_keep_certs", net.minecraft.nbt.Tag.TAG_COMPOUND).size() == 1;
+            com.rtshop.stock.Stocks.onClone(new net.minecraftforge.event.entity.player.PlayerEvent.Clone(a, a, true));
+            boolean back = false;
+            for (ItemStack s : a.getInventory().items) back |= s.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get()) && serialOf(s) != null;
+            back &= !a.getPersistentData().contains("rtshop_keep_certs");
+            // 창 · 은행원의 [증권 거래] · 명령
+            com.google.gson.JsonObject v = com.rtshop.stock.Stocks.view(a, true, "rtshop.stock.claimed", new String[]{"80"}, true);
+            boolean view = v.get("trade").getAsBoolean() && v.getAsJsonArray("unions").size() == 6 && v.getAsJsonArray("mine").size() == 1
+                    && v.getAsJsonArray("news").size() == 1 && v.get("msg").getAsString().equals("rtshop.stock.claimed")
+                    && v.getAsJsonArray("unions").get(1).getAsJsonObject().getAsJsonArray("history").size() >= 2;
+            boolean desk = com.rtshop.story.Dialogue.buildForTest(a, "bank").has("stocks") && !com.rtshop.story.Dialogue.buildForTest(a, "job").has("stocks");
+            boolean cmd = server.getCommands().getDispatcher().findNode(List.of("rtshop", "stocks", "trade")) != null
+                    && server.getCommands().getDispatcher().findNode(List.of("rtshop", "stocks", "status")) != null
+                    && server.getCommands().getDispatcher().findNode(List.of("rtshop", "stocks", "nextday")) != null;
+            check("3.72 stocks: six unions; the daily price follows the day's work against the last days (one person's share capped), story news once, within ±10%",
+                    start && prices && news, "start " + start + " prices " + f1 + "/" + r1 + " " + f2 + "/" + r2 + " " + f3 + "/" + r3 + " news " + news + " " + sd.board("fish").pendingNews);
+            check("3.72 stocks: buying and selling back pay a 2% fee into the fund; limits per day · per certificate; a copied certificate is not in the ledger",
+                    bought && item && refused && sellOk, "bought " + bought + " (" + b1 + ", paid " + paid + ") item " + item + " refused " + bLimit + "/" + bAmount + "/" + bUnion
+                            + " sell " + sold + "/" + soldCopy + " " + sellOk);
+            check("3.72 stocks: weekly dividends come only from the fund, for certificates held since last week, once (stamped); certificates are kept on death",
+                    dividend && kept && back, "dividend " + dividend + " (early " + early + " per " + divPer + " got " + got + " again " + again + " fund " + fundBefore + "→" + sd.fund
+                            + ") kept " + kept + " back " + back);
+            check("3.72 stocks: the window gets prices · history · my certificates · news; the banker offers [Exchange]; commands", view && desk && cmd,
+                    "view " + view + " desk " + desk + " cmd " + cmd + " " + v);
+        } finally {
+            com.rtshop.stock.Stocks.testAnywhere = false;
+            com.rtshop.stock.Stocks.testing = false;
+            com.rtshop.stock.StockConfig.forTest(null);
+            com.rtshop.stock.Stocks.resetForTest(server);
+            a.getInventory().clearContent();
+        }
+    }
+
+    private static java.util.UUID serialOf(ItemStack s) {
+        return com.rtshop.item.StockCertificateItem.id(s);
+    }
+
     private static void ranks(MinecraftServer server, FakePlayer a, FakePlayer b) {
         com.rtshop.rank.Ranks.testFakes = true;
         try {
@@ -4261,6 +4379,7 @@ public final class SelfTest {
                 pl371 + " " + p1371 + " " + p2371 + " " + p3371 + " limits " + pLimits + " defaults " + pDefaults + " denied " + pDenied + " (op before " + wasOp371 + ") answered " + pAnswered
                         + " closed " + pClosed + " deleted " + pDeleted + " view " + pAdminView + " cmd " + pCmd371 + " " + com.rtshop.petition.Petitions.lastAdminForTest);
         com.rtshop.petition.Petitions.forTestReset(a.server);
+        stocks(a.server, a);
         // 3.62: 보스마다 다른 카메라 방식 / Cinematic Cataclysm 컷신으로 깨우기 (그 모드가 있을 때만)
         boolean cc362 = net.minecraftforge.fml.ModList.get().isLoaded("cinematiccataclysm");
         String ccTrace = "";

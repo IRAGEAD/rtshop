@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {"tag": "minecraft:signs"},
+    {"item": "minecraft:paper"},
+    {"item": "minecraft:gold_nugget"}
+  ],
+  "result": {"item": "rtshop:stock_board"}
+}

@@ -341,6 +341,7 @@ public final class Dialogue {
         if (service) out.addProperty("service", true);   // 맡은 일이 따로 있는 NPC: 줄 퀘스트가 없으면 [퀘스트] 를 보이지 않는다
         if ((npcKey.startsWith("quest_") && !service) || QuestManager.hasQuests(npcKey)) out.addProperty("questNpc", true);
         if (com.rtshop.petition.Petitions.CLERK.equals(npcKey)) out.addProperty("petition", true);   // 시청 서기: 민원 창구 (3.61)
+        if (com.rtshop.stock.Stocks.DESK.equals(npcKey) && com.rtshop.stock.StockConfig.get().enabled) out.addProperty("stocks", true);   // 은행원: 증권 창구 (3.72)
         if (com.rtshop.story.Hunts.isBoardKey(npcKey)) out.addProperty("bounty", true);
         if (com.rtshop.rank.Ranks.get().enabled) {
             if (com.rtshop.rank.Ranks.NPC_RANKS.equals(npcKey)) out.addProperty("ranks", true);

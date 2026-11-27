@@ -65,6 +65,7 @@ public class RtShop {
             event.accept(ModItems.SHARD);
             event.accept(ModItems.ENHANCE_ANVIL);
             event.accept(ModItems.PLAYER_SHOP);
+            event.accept(ModItems.STOCK_BOARD);
             event.accept(ModItems.GUARD_DAMAGE);
             event.accept(ModItems.GUARD_DESTROY);
             event.accept(ModItems.GUARD_FULL);

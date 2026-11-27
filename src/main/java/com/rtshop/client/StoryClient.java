@@ -72,6 +72,11 @@ public final class StoryClient {
             }
         } else if (kind == StoryPacket.NPC_LOOKS) {
             NpcLookClient.receive(json);
+        } else if (kind == StoryPacket.STOCKS) {
+            try {
+                StockScreen.open(JsonParser.parseString(json).getAsJsonObject());
+            } catch (Exception ignored) {
+            }
         } else if (kind == StoryPacket.PETITIONS) {
             try {
                 PetitionScreen.open(JsonParser.parseString(json).getAsJsonObject());

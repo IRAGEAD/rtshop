@@ -1,1 +1,7 @@
-{"replace": false, "values": ["rtshop:player_shop"]}
+{
+  "replace": false,
+  "values": [
+    "rtshop:player_shop",
+    "rtshop:stock_board"
+  ]
+}

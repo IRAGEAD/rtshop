@@ -98,6 +98,7 @@ public final class IncomeStats extends SavedData {
     /** 접속하지 않은 사람의 수입 (플레이어 상점의 판매 대금 등). */
     public static void add(MinecraftServer server, UUID id, String name, String source, long amount) {
         if (server == null || id == null || amount <= 0) return;
+        com.rtshop.stock.Stocks.onIncome(server, id, source, amount);   // 조합 실적 (3.72)
         IncomeStats d = get(server);
         PlayerRec r = d.players.computeIfAbsent(id, k -> new PlayerRec());
         if (name != null && !name.isEmpty()) r.name = name;

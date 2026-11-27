@@ -1422,6 +1422,11 @@ public final class QuestManager {
         pr.active.remove(q.id);
         pr.completed.add(q.id);
         pr.flags.addAll(q.rewardFlags);
+        try {
+            com.rtshop.stock.Stocks.onQuestDone(p, q.id);   // 이야기 소식 → 조합 시세 (3.72)
+        } catch (Throwable t) {
+            RtShop.LOGGER.warn("[rtshop] 조합 소식 실패: {}", t.toString());
+        }
         if (choice >= 0 && choice < q.choices.size()) {
             pr.flags.addAll(q.choices.get(choice).flags);
         }

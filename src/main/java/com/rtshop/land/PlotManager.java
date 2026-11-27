@@ -881,6 +881,7 @@ public final class PlotManager {
         }
         Economy.addWallet(p, -land.price);
         com.rtshop.rank.Ranks.spent(p, land.price);
+        com.rtshop.stock.Stocks.activity(p, "land", land.price);   // 조합 실적 (3.72)
         land.owner = p.getUUID();
         land.ownerName = p.getGameProfile().getName();
         land.paid = land.price;

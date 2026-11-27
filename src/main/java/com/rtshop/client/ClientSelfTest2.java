@@ -2187,6 +2187,55 @@ final class ClientSelfTest2 {
             shot(mc, "133d_petition_answer");
             mc.setScreen(null);
             onServer(mc, sp -> com.rtshop.petition.Petitions.forTestReset(sp.server));
+            // 3.72: 조합 증서 — 며칠 치 시세 · 소식을 만들어 두고 증권 창구(은행원)를 연 것처럼 연다
+            onServer(mc, sp -> {
+                com.rtshop.stock.Stocks.testAnywhere = true;
+                com.rtshop.stock.Stocks.testing = true;
+                com.rtshop.stock.Stocks.resetForTest(sp.server);
+                java.util.Random r372 = new java.util.Random(7);
+                for (int d = 0; d < 12; d++) {
+                    for (String u : new String[]{"farm", "fish", "smith", "food", "land", "survey"}) {
+                        com.rtshop.stock.Stocks.activity(sp.server, sp.getUUID(), u, 2000 + r372.nextInt(16000));
+                    }
+                    if (d == 9) com.rtshop.stock.Stocks.onQuestDone(sp, "story_3_38");
+                    com.rtshop.stock.Stocks.advance(sp.server, 1, true);
+                }
+                com.rtshop.economy.Economy.addWallet(sp, 200_000);
+                com.rtshop.stock.Stocks.buy(sp, "fish", 10);
+                com.rtshop.stock.Stocks.buy(sp, "fish", 25);
+                com.rtshop.stock.Stocks.open(sp, true, null, null, true);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            boolean on372 = mc.screen instanceof StockScreen s372 && s372.tradeForTest() && s372.unionsForTest() == 6 && s372.mineForTest() == 2 && s372.fitsForTest();
+            check("3.72 stocks: the exchange window opens with six unions, 14 days of prices, my certificates and the news; names fit", on372,
+                    mc.screen instanceof StockScreen s2 ? s2.tradeForTest() + " " + s2.unionsForTest() + " " + s2.mineForTest() + " fits " + s2.fitsForTest() : String.valueOf(mc.screen));
+            if (mc.screen instanceof StockScreen s3) s3.selectForTest("fish");
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "134_stock_exchange");
+            // 시세판 블록처럼 보기만 (사고팔기 단추 없음)
+            onServer(mc, sp -> com.rtshop.stock.Stocks.open(sp, false, null, null, true));
+            waitTicks(10);
+        });
+        add(mc -> {
+            check("3.72 stocks: the price board (block, command, certificate) only shows prices", mc.screen instanceof StockScreen s4 && !s4.tradeForTest(), mc.screen);
+            if (mc.screen instanceof StockScreen s5) s5.selectForTest("survey");
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "134b_stock_board");
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                com.rtshop.stock.Stocks.testAnywhere = false;
+                com.rtshop.stock.Stocks.testing = false;
+                com.rtshop.stock.Stocks.resetForTest(sp.server);
+                for (int i = 0; i < sp.getInventory().getContainerSize(); i++) {
+                    if (sp.getInventory().getItem(i).is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get())) sp.getInventory().setItem(i, ItemStack.EMPTY);
+                }
+            });
             waitTicks(10);
         });
     }

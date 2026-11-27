@@ -143,6 +143,20 @@ public final class ModItems {
             () -> new com.rtshop.enhance.GuardItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.EPIC), true,
                     com.rtshop.enhance.Enhance.Guard.FULL, "item.rtshop.enhance_guard_full.tip", "item.rtshop.enhance_guard.tip"));
 
+    /** 조합 증서 (3.72.0): 조합 · 주 수 · 일련번호는 NBT. 은행원(증권 창구)에게서 사고 되판다. */
+    public static final RegistryObject<Item> STOCK_CERTIFICATE = ITEMS.register("stock_certificate",
+            () -> new StockCertificateItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+
+    /** 조합 시세판 (블록, 3.72.0): 우클릭하면 시세판. */
+    public static final RegistryObject<Item> STOCK_BOARD = ITEMS.register("stock_board",
+            () -> new net.minecraft.world.item.BlockItem(com.rtshop.enhance.ModEnhance.STOCK_BOARD.get(), new Item.Properties()) {
+                @Override
+                public void appendHoverText(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.Level level,
+                                            java.util.List<net.minecraft.network.chat.Component> tip, net.minecraft.world.item.TooltipFlag flag) {
+                    tip.add(net.minecraft.network.chat.Component.translatable("block.rtshop.stock_board.tip").withStyle(net.minecraft.ChatFormatting.GRAY));
+                }
+            });
+
     /** 플레이어 상점 진열대 (블록). */
     public static final RegistryObject<Item> PLAYER_SHOP = ITEMS.register("player_shop",
             () -> new net.minecraft.world.item.BlockItem(com.rtshop.enhance.ModEnhance.PSHOP.get(), new Item.Properties()) {
