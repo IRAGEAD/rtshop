@@ -211,6 +211,19 @@ jobs:
             done
           } > /tmp/inspect/dash-hud.txt 2>&1 || true
           ls /tmp/inspect/dash_png | head -n 80 >> /tmp/inspect/dash-hud.txt || true
+          # Bosses'Rise (block_factorys_bosses) 의 「Dodge Roll」: 설정 · HUD 등록 · 키 · 패킷 (끄는 법을 찾으려고 — 모양만, 코드는 올리지 않음)
+          BR="$(ls packcache/*.jar | grep -i "block_factorys_bosses" | head -n 1)"
+          if [ -n "$BR" ]; then
+            rm -rf /tmp/brj && mkdir -p /tmp/brj && (cd /tmp/brj && unzip -q -o "$GITHUB_WORKSPACE/$BR" 2>/dev/null || true)
+            {
+              echo "jar: $BR"
+              (cd /tmp/brj && find . -name "*.class" | sed 's#^\./##; s#\.class$##' | grep -i -E "roll|dash|dodge|overlay|hud|config|key|input|stamina|charge" | head -n 120)
+              echo "== mods.toml"; grep -v "^#" /tmp/brj/META-INF/mods.toml 2>/dev/null | grep -v "^$" | head -n 40
+              for c in $(cd /tmp/brj && find . -name "*.class" | sed 's#^\./##; s#\.class$##' | grep -i -E "roll|dash|dodge|overlay|hud|config|keybind|keymap" | grep -v '\$' | head -n 30); do
+                echo "######## $c"; (cd /tmp/brj && javap -p -c -constants "$c.class" 2>&1 | grep -E "^(public|private|protected|static|final|class|interface| *(public|private|protected|static))|ldc|getstatic|invokestatic|invokevirtual .*(define|comment|push|register|KeyMapping|Overlay)" | head -n 160)
+              done
+            } > /tmp/inspect/bossesrise-roll.txt 2>&1 || true
+          fi
       - name: Inspect Diorama
         run: |
           mkdir -p /tmp/inspect
