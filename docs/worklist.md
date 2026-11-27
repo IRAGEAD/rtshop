@@ -688,3 +688,13 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 - K-2. **뽑기의 전설 등급 이상 장비는 강화에서 파괴되지 않게, 파괴 확률은 유지와 손상에 분배**.
   - **이미 들어 있다 (3.49)**: `Enhance.unbreakable` / `levelFor` — 뽑기 등급이 `enhance.json` 의 `safeFromGrade`(기본 legendary) 이상이면 파괴 확률을 유지 · 손상에 반씩 나눈다. 사용자에게 그렇게 알리고, 실제로 파괴된 적이 있으면 어떤 장비였는지 물어 둠 (뽑기 표식이 없는 장비 — 상점에서 산 같은 물건 · 3.49 전에 뽑은 것 — 는 등급을 몰라 해당되지 않는다. 그 경우가 문제면 `safeItems` 에 아이템 ID 를 적거나 규칙을 넓힌다).
 
+## 3.76.0 — ④ 히든 직업 위조자 · 조사관 + ⑤ 숨은 길 (가지 v5-next29)
+
+- A-1. ④ `stock/Forgery` · `item/ForgeryToolItem` (위조 도구 꾸러미 · 감정 돋보기) · `StockData.forged/caught/wanted…` · `StockConfig.forgery` · `StockCertificateItem` 판명 도장 ·
+  `Stocks` (되팔기 판정 · 배당에서 드러남 · 봉랍 확인 action 4 · 수배 거절 · 창에서 가짜도 진짜처럼) · `StockScreen` ([확인] · 판명 줄 · 수배 띠 · 공고 소식) · 직업 forger / investigator (hidden, 생활 칸).
+  아이콘 시안 tools/gen_forgery_icons.py (꾸러미 C · 돋보기 A 를 기본, 사용자가 고르면 CHOSEN 을 바꿈). 안내서 「위조자와 조사관」(needFlag) · 조합 증서 쪽에 봉랍 확인.
+- A-2. ⑤ `story/HiddenJobs` + tools/story_hidden_jobs.py: story_4_16 의 갈림길(hj_reveal / hj_conceal, 하나뿐) · 그 전에 마친 사람의 hidden_jobs_0 ·
+  숨김 → 밤의 룬 제단(15%/밤) → 럭키의 서랍 셋째 칸(5,000 G + 종이 8 · 먹물 4 · 벌집 4) → 세 서명 시험(틀리면 7일) → 위조 도구 + unlock_job_forger /
+  밝힘 → 비 오는 날의 이사벨(30%/일, 또는 봉랍 확인으로 위조를 처음 밝혀냄) → 은행원의 장부 → 세 장의 쪽 시험(틀리면 7일) → 감정 돋보기 + unlock_job_investigator.
+  `Jobs.choose` 의 서버 인원 한도 (jobs.json hiddenJobCap 2). 영어: hidden_jobs_en.py · en3/p1616 · en2/p972 · en4/p207.
+- A-3. W-16 다듬기: 셰이더에서 드러나는 빛 = ease² (3.75 의 Photon 사진에서 20% 가 이미 다 켜진 듯 보였음).
