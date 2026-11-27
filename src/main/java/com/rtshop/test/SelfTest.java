@@ -873,7 +873,7 @@ public final class SelfTest {
         }
         try {
             storySystems(server, level, a);
-            npcLayout(server, level);
+            npcLayout(server, level, a);
         } catch (Throwable t) {
             crash("story systems", t);
         }
@@ -3911,7 +3911,7 @@ public final class SelfTest {
     /** 메인 스토리: 퀘스트가 모두 실제로 있는 몹·구조물·아이템을 가리키는지, 새 목표 종류와 연출이 도는지. */
     /** 마법 뽑기: 분야 선택/무작위 스킬북 뽑기, 야마토는 공격 분야에만, 10회 보장, 티켓, 인챈트 재설정(하나만). */
     /** NPC 자리 배치: 세운 자리가 파일에 적히고, 그 파일을 가진 다른 세계에서는 같은 자리에 저절로 선다. */
-    private static void npcLayout(MinecraftServer server, ServerLevel level) throws Exception {
+    private static void npcLayout(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         section("npc layout");
         java.nio.file.Path lf = com.rtshop.quest.NpcLayout.file();
         byte[] lfKeep = java.nio.file.Files.exists(lf) ? java.nio.file.Files.readAllBytes(lf) : null;
