@@ -5501,15 +5501,15 @@ public final class SelfTest {
                             && !ShopServer.minedGood(new ItemStack(Items.CHARCOAL)) && !ShopServer.minedGood(new ItemStack(Items.GOLD_NUGGET)),
                     rawIron == null ? "no raw iron in shops" : ShopServer.jobSellMultiplier(a, rawIron) + "");
             com.rtshop.job.Jobs.force(a, "life", "cook");
-            com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
+            com.rtshop.job.JobConfig jc367 = com.rtshop.job.JobConfig.get();
             check("3.67.0 life jobs are brought closer: farmer star-up 35% · extra crop 20%, cook dish bonus 20%, miner ore sale +20%, fish bought at 85% of the list",
-                    jc.job("farmer").param("starUp", 0) == 0.35 && jc.job("farmer").param("extraHarvest", 0) == 0.20 && jc.job("cook").param("dishSell", 0) == 0.20
-                            && jc.job("miner").param("oreSell", 0) == 0.20 && com.rtshop.shop.PricingConfig.get().fishBaseMultiplier == 1.7,
-                    jc.job("farmer").params + " " + jc.job("cook").params + " " + jc.job("miner").params + " fish " + com.rtshop.shop.PricingConfig.get().fishBaseMultiplier);
+                    jc367.job("farmer").param("starUp", 0) == 0.35 && jc367.job("farmer").param("extraHarvest", 0) == 0.20 && jc367.job("cook").param("dishSell", 0) == 0.20
+                            && jc367.job("miner").param("oreSell", 0) == 0.20 && com.rtshop.shop.PricingConfig.get().fishBaseMultiplier == 1.7,
+                    jc367.job("farmer").params + " " + jc367.job("cook").params + " " + jc367.job("miner").params + " fish " + com.rtshop.shop.PricingConfig.get().fishBaseMultiplier);
             // 옛 jobs.json: 기본값 그대로인 수치만 새 값으로, 운영자가 고친 수치는 그대로
-            com.google.gson.JsonObject oldJobs = jc.toJson();
-            oldJobs.remove("paramsVersion");
-            for (com.google.gson.JsonElement je : oldJobs.getAsJsonArray("jobs")) {
+            com.google.gson.JsonObject oldJobs367 = jc367.toJson();
+            oldJobs367.remove("paramsVersion");
+            for (com.google.gson.JsonElement je : oldJobs367.getAsJsonArray("jobs")) {
                 com.google.gson.JsonObject jo = je.getAsJsonObject();
                 String jid = jo.get("id").getAsString();
                 if (jid.equals("farmer")) {
@@ -5518,11 +5518,11 @@ public final class SelfTest {
                 }
                 if (jid.equals("cook")) jo.getAsJsonObject("params").addProperty("dishSell", 0.28);
             }
-            com.rtshop.job.JobConfig up = com.rtshop.job.JobConfig.fromJson(oldJobs);
-            int changedParams = up.upgradeParams(1);
+            com.rtshop.job.JobConfig up367 = com.rtshop.job.JobConfig.fromJson(oldJobs367);
+            int changedParams367 = up367.upgradeParams(1);
             check("3.67.0 an older jobs.json gets the new life-job numbers where it still had the old defaults, and keeps numbers the server changed",
-                    changedParams == 2 && up.job("farmer").param("starUp", 0) == 0.35 && up.job("farmer").param("extraHarvest", 0) == 0.15
-                            && up.job("cook").param("dishSell", 0) == 0.20, changedParams + " " + up.job("farmer").params + " " + up.job("cook").params);
+                    changedParams367 == 2 && up367.job("farmer").param("starUp", 0) == 0.35 && up367.job("farmer").param("extraHarvest", 0) == 0.15
+                            && up367.job("cook").param("dishSell", 0) == 0.20, changedParams367 + " " + up367.job("farmer").params + " " + up367.job("cook").params);
 
             // 요리: 손으로 만드는 요리는 누구나 재료비의 110% 이상, 요리사는 140% 이상
             double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;
