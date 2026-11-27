@@ -62,6 +62,12 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 - **(11-28 01:45) 3.75.0 올림 · 보냄** (main = b407618, 모드팩 전체 시험 서버 886 · 화면 353 모두 통과, Photon 강화 모루 전후 그림 · 조사 수첩 아이콘 시안(지금 C) 함께 보냄).
   3.74.0 은 11-28 01:05 에 보냄. 사용자에게 물은 것 (답을 worklist 에 적고 다음 판에 반영): W-10 스킬라 단서 확률 0.05/0.02/0.01% · 식품 상인의 생선 4개(+말린 다시마 · 수련잎) 뺄지 ·
   W-27 나침반 1000칸 → 500칸? · W-4 상점 토지 값 1.5배/2배 · Arcane Vortex 남길지 · 조사 수첩 아이콘 A/B/C. W-22 는 사용자의 /fpscheck 파일을 기다림.
+- **(11-28 02:55) 3.76.0 올림 · 보냄** (main = b63f379, run 46036747900: 모드팩 전체 서버 900 · 화면 355 통과, Photon 모루 사진 확인, 아이콘 시안 그림 함께 보냄 — 꾸러미 A/B/C · 돋보기 A/B/C 답 기다림).
+  성능 측정(run 46029389854) 결과는 docs/performance.md 2-4 · W-12 문서 DH 항목에 적고 사용자에게 요약 보냄 (DH 가 FPS 의 가장 큰 몫, 팩 11 의 다섯 모드는 범인 아님, 전송 한도는 그대로 권함).
+- **3.77.0 = ⑥ 스토리 완성 점검 + W-21 (가지 v5-next30, worklist 「3.77.0」 B-1 ~ B-10)**: 빌드 시험(run 46043572903) 서버 855 통과 · 화면은 팩 모드가 필요한 5개만 실패(늘 그런 것).
+  자리를 비운 NPC(dialogue.json 의 absent → `Dialogue.absentText/hiddenFor`, `NpcLooks.lookFor` 의 "_absent", `NpcLookClient` 이 그리지 않음), 장갑 벗은 장로 `erwin_bare`,
+  4_09 · 5_07 · 2_14 · 3_11 · 1_33 · 숨은 이야기 7 의 주는/받는 사람, 꿈 끝말 다섯, 고른 뒤 돌아오지 않던 선택 둘(알버트 · 이사벨 주제). **gen_dialogue.py 는 막아 둠 — dialogue.json 이 원본(지금 20판).**
+  다음: 전체 시험(fullpack) → 올리기 → 사용자에게 스토리 완성 보고 + 대사 합본 txt (`python3 tools/export_story_txt.py`).
 - **3.76.0 = ④ 히든 직업 + ⑤ 숨은 길 (가지 v5-next29, worklist 「3.76.0」 A-1 ~ A-3)**: CI run 46034356966 (전체). ④ 는 run 46032625937 에서 시험 모두 통과.
   `stock/Forgery` · `item/ForgeryToolItem` · `story/HiddenJobs` · tools/story_hidden_jobs.py · tools/gen_forgery_icons.py (아이콘 시안: 꾸러미 C · 돋보기 A 기본, 사용자에게 그림을 보내 고르게).
   끝나면 올리고 → ⑥ 스토리 점검 (+W-21 전체 스토리 검토) 은 새 가지 v5-next30.
