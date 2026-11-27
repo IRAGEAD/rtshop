@@ -150,7 +150,8 @@ public final class EnhanceAnvilGlow {
             Matrix4f m = ps.last().pose();
             if (shader) {
                 // 셰이더: 일렁임 없이 한 겹만. 빛은 셰이더가 비춘다 — 블록 빛 15, 하늘빛은 그 자리의 것 (동굴 속에서 하늘빛을 받지 않게).
-                drawShader(buf, m, st, ease, LightTexture.pack(15, skyAround(mc, p)));
+                // 3.76.0: 드러나는 빛 = ease² — 셰이더의 HDR 화면에서는 빛의 양이 조금만 있어도 환해 보여서, 20% 에서 이미 다 켜진 듯했다 (3.75 의 사진).
+                drawShader(buf, m, st, ease * ease, LightTexture.pack(15, skyAround(mc, p)));
                 ps.popPose();
                 drawnForTest++;
                 shaderDrawnForTest++;
