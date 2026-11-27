@@ -79,5 +79,5 @@ EN = {
 "hidden_illusioner_6": ("Whether to Speak the Name",
  "(The Order's cellar. The door is open. An old man sits facing the wall.) It's you. I know the step. And Isabel. Carrying a sheet of paper. …I won't ask what that paper is. If I ask, I shall ask for it. He asked to be let go. I have chosen to let go. Only days ago. My hand still feels empty. You decide. I have no right to.",
  "Decide whether to let Erwin hear his teacher's name.",
- "(Isabel closes the Chronicle.) I wrote it. This too. As you decided. I wrote Velok's name as well. 'The senior who wrote a kind lie. For a thousand years he repeated his teacher's name, one letter a day.' The mirrors are all broken but the Rune Altar stands. The five stones look like letters now. I'll still call them by those silly names. Attack, defence, evasion. The teacher would have laughed, he said. So let him laugh."),
+ "(Isabel closes the Chronicle.) \"I wrote it. This too. As you decided. I wrote Velok's name as well. 'The senior who wrote a kind lie. For a thousand years he repeated his teacher's name, one letter a day.' The mirrors are all broken but the Rune Altar stands. The five stones look like letters now. I'll still call them by those silly names. Attack, defence, evasion. The teacher would have laughed, he said. So let him laugh.\""),
 }

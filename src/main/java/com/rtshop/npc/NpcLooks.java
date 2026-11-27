@@ -162,7 +162,7 @@ public final class NpcLooks {
     public static String lookFor(ServerPlayer p, Entity e) {
         if (e instanceof com.rtshop.story.CompanionEntity c) return lookOf("quest_" + c.npcId());
         String key = keyOf(e);
-        if (key != null && com.rtshop.story.Dialogue.absentText(p, key) != null) return ABSENT;
+        if (key != null && com.rtshop.story.Dialogue.hiddenFor(p, key)) return ABSENT;
         String look = lookOf(key);
         String[] v = STORY_VARIANTS.get(look);
         if (v != null && QuestManager.hasFlag(p, v[0])) return v[1];

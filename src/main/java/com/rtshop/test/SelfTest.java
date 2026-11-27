@@ -951,6 +951,13 @@ public final class SelfTest {
         check("3.77 greetings follow the story: Isabel's after the Elder's betrayal is no longer hidden behind her chapter-1 one, and she and the Elder greet differently once the story is done",
                 (gBetray.contains("믿기지") || gBetray.toLowerCase(java.util.Locale.ROOT).contains("believe")) && (gDone.contains("빈 줄") || gDone.contains("blank line"))
                         && (eDone.contains("발소리") || eDone.toLowerCase(java.util.Locale.ROOT).contains("footstep")), gBetray + " / " + gDone + " / " + eDone);
+        // 끝말을 하는 사람에게 보고한다 · 갇히거나 끌려간 사람에게 퀘스트를 받지 않는다
+        java.util.function.Function<String, QuestDef> qd = id -> QuestManager.loaded().quests.get(id);
+        check("3.77 you report to whoever speaks the closing words, and no quest is handed out by someone who is trapped or taken (4_09 · 5_07 relayed; 2_14 · 3_11 reported where it happened)",
+                "quest_order_elder".equals(qd.apply("story_4_09").giver) && "quest_order_archivist".equals(qd.apply("story_4_09").turnInNpc())
+                        && "quest_order_captain".equals(qd.apply("story_5_07").giver) && "quest_order_captain".equals(qd.apply("story_5_07").turnInNpc())
+                        && "quest_order_captain".equals(qd.apply("story_2_14").turnInNpc()) && "shop_fisher".equals(qd.apply("story_3_11").turnInNpc()),
+                qd.apply("story_4_09").giver + ">" + qd.apply("story_4_09").turnInNpc() + " " + qd.apply("story_5_07").giver + " " + qd.apply("story_2_14").turnInNpc() + " " + qd.apply("story_3_11").turnInNpc());
         check("3.77 the way chosen at Morris's first question (life / combat) is picked up by Albert the Job Guide",
                 life.contains("path_life") && !life.contains("path_combat") && combat.contains("path_combat") && !combat.contains("path_life")
                         && !none.contains("path_life") && !none.contains("path_combat"), life + " / " + combat + " / " + none);

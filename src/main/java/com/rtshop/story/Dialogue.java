@@ -355,6 +355,17 @@ public final class Dialogue {
      * 맞으면 그 글(빈자리의 모습)을 돌려준다, 아니면 null. 그동안 그 NPC 는 이 사람의 화면에서 보이지 않고(NpcLooks), 말을 걸면 그 글만 보인다.
      */
     public static String absentText(ServerPlayer p, String npcKey) {
+        JsonObject a = absentEntry(p, npcKey);
+        return a == null ? null : text(p, a.get("text"));
+    }
+
+    /** 그 사람의 화면에서 이 NPC 를 그리지 않는가 ("stay": true 는 곁에 있되 말이 없는 때 — 보이고, 그 한 마디만). */
+    public static boolean hiddenFor(ServerPlayer p, String npcKey) {
+        JsonObject a = absentEntry(p, npcKey);
+        return a != null && !(a.has("stay") && a.get("stay").getAsBoolean());
+    }
+
+    private static JsonObject absentEntry(ServerPlayer p, String npcKey) {
         if (p == null || npcKey == null) return null;
         try {
             JsonObject all = get();
@@ -362,7 +373,7 @@ public final class Dialogue {
             JsonObject n = all.getAsJsonObject("npcs").getAsJsonObject(npcKey);
             if (!n.has("absent") || !n.get("absent").isJsonArray()) return null;
             for (JsonElement e : n.getAsJsonArray("absent")) {
-                if (e.isJsonObject() && e.getAsJsonObject().has("text") && ok(p, e.getAsJsonObject())) return text(p, e.getAsJsonObject().get("text"));
+                if (e.isJsonObject() && e.getAsJsonObject().has("text") && ok(p, e.getAsJsonObject())) return e.getAsJsonObject();
             }
         } catch (Exception ex) {
             RtShop.LOGGER.debug("[rtshop] absent", ex);

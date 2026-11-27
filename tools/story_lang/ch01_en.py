@@ -139,7 +139,7 @@ EN = {
 "story_1_33": ("Mother's Voice",
  "Trouble. The archivist is gone. I counted twice. Gone. She took the echo shards down into the ancient city alone, to hear more of her mother's voice. I can't take those stairs. This leg makes noise. You go. Crouch past the sensors and bring her back. Do not run.",
  "Crouch past a sculk sensor in the ancient city and bring the archivist back. (Advancement 'Sneak 100')",
- "(Isabel grips the shards with shaking hands. Roran silently counts. Two.) …I'm sorry. From inside the door Mother's voice called my name. But Mother never called me 'Isabel'. Always 'Bel'. That wasn't Mother."),
+ "(Isabel grips the shards with shaking hands. Roran silently counts.) …Two. Good. (Isabel finally speaks.) \"…I'm sorry. From inside the door Mother's voice called my name. But Mother never called me 'Isabel'. Always 'Bel'. That wasn't Mother.\""),
 "story_1_34": ("That Which Calls Names",
  "The thing before the door is the gatekeeper the King of Silence set there. It was in the Code: it lets no one live who speaks a name. It mimics the voices it swallowed. Elena's is in there too. Open the Memory Gate. It has no eyes. It finds you by sound.",
  "Open the Memory Gate and put the gatekeeper warden to rest.",

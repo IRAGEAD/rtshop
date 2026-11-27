@@ -1,6 +1,6 @@
 {
  "version": 20,
- "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), chatter: 일상 이야기 (무작위 한 마디), topics: 이야기 주제 (need: flags·notFlags·quests·items 조건, 3.75 부터 met: 그 NPC 와 이야기한 뒤 · heard: terms 의 낱말을 들은 뒤). 문장은 \"이름: 대사\" 로 말하는 사람을 바꿀 수 있고, {\"ko\": \"...\", \"en\": \"...\"} 로 두 언어를 적을 수 있습니다. 직접 고쳤다면 \"edited\": true 로 두세요 (모드 업데이트 때 덮어쓰지 않습니다).",
+ "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), chatter: 일상 이야기 (무작위 한 마디), topics: 이야기 주제 (need: flags·notFlags·quests·items 조건, 3.75 부터 met: 그 NPC 와 이야기한 뒤 · heard: terms 의 낱말을 들은 뒤). 문장은 \"이름: 대사\" 로 말하는 사람을 바꿀 수 있고, {\"ko\": \"...\", \"en\": \"...\"} 로 두 언어를 적을 수 있습니다. 직접 고쳤다면 \"edited\": true 로 두세요 (모드 업데이트 때 덮어쓰지 않습니다). absent: 이야기 속에서 그 사람이 자리를 비운 때 [{\"text\", \"need\"}] — 조건이 맞는 동안 그 사람의 화면에서 NPC 를 그리지 않고, 말을 걸면 그 글만 보인다 (\"stay\": true 면 보이되 그 한 마디만).",
  "edited": false,
  "terms": {
   "_help": "3.75.0: 무엇에 대해 묻는 주제(need.heard)는 그 낱말(words)이 나오는 글을 본 뒤에, 또는 그 낱말이 나오는 퀘스트(quests)를 끝낸 뒤에 열린다. need.met 은 그 NPC 와 한 번 이야기한 뒤 (a|b = 같은 사람의 여러 이름).",
@@ -1050,6 +1050,34 @@
     "옛 뱃노래에 이런 절이 있어요. '우리에겐 배가 있었다. 마중 나간 누이는 돌아오지 않았다.' 연대기에는 그 누이가 한 줄도 없어요."
    ],
    "absent": [
+    {
+     "text": {
+      "ko": "(기록고 책상이 비어 있다. 메아리 조각을 두던 상자가 열려 있고, 펼친 지도에 고대 도시 쪽으로 떨리는 선이 그어져 있다.)",
+      "en": "(The archive desk is empty. The box that held the echo shards stands open, and a shaky line runs across the open map toward the ancient city.)"
+     },
+     "need": {
+      "quests": [
+       "story_1_32"
+      ],
+      "notQuests": [
+       "story_1_33"
+      ]
+     }
+    },
+    {
+     "text": {
+      "ko": "(기록고 책상이 비어 있다. 잉크병 밑에 쪽지가 눌려 있다. '부두에 있어요. 찾지 마세요. 괜찮아요. — 이사벨')",
+      "en": "(The archive desk is empty. A note is pinned under the ink bottle. 'I'm at the docks. Don't come looking. I'm all right. — Isabel')"
+     },
+     "need": {
+      "quests": [
+       "story_1_33"
+      ],
+      "notQuests": [
+       "story_1_35"
+      ]
+     }
+    },
     {
      "text": {
       "ko": "(기록고 책상이 비어 있다. 펼친 연대기 위에 펜이 놓여 있다. 마지막 줄의 잉크가 아직 마르지 않았다.)",
