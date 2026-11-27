@@ -6497,18 +6497,18 @@ public final class SelfTest {
             check("3.65.0 price costs skip removed mods' recipes for other mods' things (Create's cake), but keep the ones for their own things (Create's flour)",
                     ShopLoader.foreignBannedRouteForTest(createCake) && !ShopLoader.foreignBannedRouteForTest(createFlour) && !ShopLoader.foreignBannedRouteForTest(vanillaCake));
             // 음식이 아닌 물건은 재료를 사서 만드는 값보다 비싸게 사 주지 않는다 (사서 만들어 팔기만 해도 돈이 불어나는 길이 없다)
-            java.util.Map<String, ShopLoader.BuyRoute> routes = ShopLoader.buyRoutes(l);
-            List<String> craftLoops = new ArrayList<>();
+            java.util.Map<String, ShopLoader.BuyRoute> buyRoutes365 = ShopLoader.buyRoutes(l);
+            List<String> buyCraftLoops = new ArrayList<>();
             for (ShopLoader.Price pr : l.prices.values()) {
                 if (pr.stack.isEmpty() || pr.stack.hasTag() || !pr.sellableSomewhere || pr.dynamicFood || pr.stack.isEdible()) continue;
                 String pid = String.valueOf(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(pr.stack.getItem()));
                 if (l.solved != null && l.solved.processed.contains(pid)) continue;
-                ShopLoader.BuyRoute br = routes.get(pid);
+                ShopLoader.BuyRoute br = buyRoutes365.get(pid);
                 double sell = pr.sellUnit >= 0 ? pr.sellUnit : pr.price * 0.5;
-                if (br != null && sell > br.cost() + 1.0) craftLoops.add(pid + " " + sell + ">" + br.cost());
+                if (br != null && sell > br.cost() + 1.0) buyCraftLoops.add(pid + " " + sell + ">" + br.cost());
             }
             check("3.65.0 nothing but food is bought back for more than its materials cost in the shops (no buy, craft, sell loop)",
-                    craftLoops.isEmpty(), craftLoops.size() + " " + String.join(", ", craftLoops.subList(0, Math.min(6, craftLoops.size()))));
+                    buyCraftLoops.isEmpty(), buyCraftLoops.size() + " " + String.join(", ", buyCraftLoops.subList(0, Math.min(6, buyCraftLoops.size()))));
         }
         List<String> buyLoss = ShopLoader.purchaseDeficits(l);
         check("buying ingredients from the shops and cooking never loses money, and a hopper-fed furnace cannot farm money",
