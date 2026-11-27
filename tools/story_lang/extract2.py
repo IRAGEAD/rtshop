@@ -25,6 +25,17 @@ for name in ('dialogue.json', 'readables.json', 'guide.json', 'quests/npcs.json'
     if name in ('quests/tutorial.json', 'quests/job_quests.json'):
         # 'quests' 는 조건 목록의 열쇠라 위에서 건너뛴다: 퀘스트 파일의 본문은 여기서 따로 모은다
         for qd in data.get('quests', []): walk(qd)
+# 3.69.0: 상점 창의 제목 · 상인 이름 · 분류 이름 (상점 파일의 품목 목록은 빼고). 다른 곳의 같은 낱말과 뜻이 갈리지 않게 "상점:" 을 붙여 따로 번역한다
+#   (서버 ShopServer.shopText 가 "상점:" + 글 → 그냥 글 순으로 찾는다). 식당의 제목 · 주인 이름은 코드(Restaurant)의 기본값.
+SHOPS = ('attendance_shop', 'blacksmith', 'blacksmith_enhance', 'farmer', 'fisher', 'food', 'gacha_shop', 'gacha_shop_magic', 'general', 'land', 'raid')
+for name in SHOPS:
+    data = json.load(open(os.path.join(R, name + '.json'), encoding='utf-8'))
+    for k in ('title', 'npcName'):
+        if k in data: walk('상점:' + data[k])
+    for c in data.get('categories', []) or []:
+        if c.get('name'): walk('상점:' + c['name'])
+for s in ('식당', '식당 주인'):
+    walk('상점:' + s)
 path = os.path.join(here, 'source2.json')
 old = json.load(open(path, encoding='utf-8')) if os.path.exists(path) else []
 have = set(old)

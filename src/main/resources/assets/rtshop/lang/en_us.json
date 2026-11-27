@@ -728,7 +728,7 @@
   "item.rtshop.enhance_guard_destroy.tip": "If the attempt would destroy the item, it is only damaged (level drops) instead.",
   "item.rtshop.enhance_guard_full": "Enhancement Protection",
   "item.rtshop.enhance_guard_full.tip": "Blocks both damage and destruction: the level is kept.",
-  "item.rtshop.enhance_guard.tip": "Put it on the enhancement anvil next to the item. Up to +6 one is used only when it actually saves the item (it stays on success or keep); from +7 one is used on every attempt. One kind at a time.",
+  "item.rtshop.enhance_guard.tip": "Put it on the enhancement anvil next to the item: one is used on that attempt, whatever the result. One kind at a time.",
   "rtshop.enhance.odds_success": "Success %s",
   "rtshop.enhance.odds_maintain": "Keep %s",
   "rtshop.enhance.odds_damage": "Damage %s",
@@ -754,7 +754,7 @@
   "rtshop.enhance.max": "Max level (+11)",
   "rtshop.enhance.panel": "Enhancement",
   "rtshop.enhance.help1": "Put a weapon (bows, guns and staffs too) or armor piece in the left slot.",
-  "rtshop.enhance.help2": "Put a guard ticket in the slot next to the item on the anvil (up to +6 one is used only when it saves the item; from +7, one per attempt).",
+  "rtshop.enhance.help2": "Put a guard ticket in the slot next to the item on the anvil: one is used on that attempt.",
   "rtshop.enhance.help3": "Click the result slot to spend the materials and Gold and try.",
   "rtshop.enhance.help4": "Results: success (+1), keep, damage (-1), destroy. Higher levels cost more and are riskier.",
   "rtshop.enhance.click_hint": "Click the result slot to enhance",
@@ -831,7 +831,7 @@
   "rtshop.enhodds.effect": "Attack",
   "rtshop.enhodds.gold": "Gold",
   "rtshop.enhodds.materials": "Materials",
-  "rtshop.enhodds.footer": "Damage: -1 level · Destroy: item lost. Each failure (keep or damage) raises the next success chance by %s of that level's rate (up to %s times, reset on success). A guard ticket next to the item covers that attempt (up to +6 one is used only if it saves the item; from +7, one per attempt): damage→keep, destroy→damage, both→keep. Attack is the total bonus (armor for armor, plus less damage taken from +8).",
+  "rtshop.enhodds.footer": "Damage: -1 level · Destroy: item lost. Each failure (keep or damage) raises the next success chance by %s of that level's rate (up to %s times, reset on success). A guard ticket next to the item covers that attempt (one is used): damage→keep, destroy→damage, both→keep. Attack is the total bonus (armor for armor, plus less damage taken from +8).",
   "rtshop.enhodds.edit": "Edit odds (OP)",
   "rtshop.enhodds.close": "Close",
   "rtshop.enhodds.open": "Odds",
@@ -1648,7 +1648,7 @@
   "rtshop.enhui.guard": "Protection",
   "rtshop.enhui.guard_none": "None",
   "rtshop.enhui.guard_risk": "None · may break",
-  "rtshop.enhance.guard_howto": "Put the guard ticket on the enhancement anvil next to the item. Up to +6 one is used only when it saves the item; from +7, one per attempt.",
+  "rtshop.enhance.guard_howto": "Put the guard ticket on the enhancement anvil next to the item: one is used on that attempt.",
   "rtshop.enhance.safe_note": "This item cannot be destroyed by enhancing (legendary or above, or hidden gear). That chance is split between keep and damage.",
   "rtshop.enhui.guard_safe": "None · cannot break",
   "rtshop.perm.survival_op": "Operator features are off in survival mode. Switch with /gamemode creative and try again.",
@@ -1953,6 +1953,5 @@
   "rtshop.enhui.fail_stacks": "Fails %s/%s",
   "rtshop.enhance.fail_stacks_tip": "Failures %s/%s · next success chance +%s (of that level's rate)",
   "rtshop.enhui.stat_reduce": "Damage taken",
-  "rtshop.enhance.bonus_reduce": "Damage taken -%s (adds up over worn enhanced armour, up to %s)",
-  "rtshop.enhance.guard_active_keep": "Protected: %s (up to +%s one is used only if it saves the item; it stays on success or keep)"
+  "rtshop.enhance.bonus_reduce": "Damage taken -%s (adds up over worn enhanced armour, up to %s)"
 }

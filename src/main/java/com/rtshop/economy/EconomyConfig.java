@@ -16,12 +16,13 @@ import java.util.List;
 
 /** config/rtshop/economy.json */
 public final class EconomyConfig {
-    /** 설정 파일의 세대. 2 = RT Shop 3.0 (전체 물가를 10배로 세분화). */
-    private static final int CONFIG_VERSION = 3;
+    /** 설정 파일의 세대. 2 = RT Shop 3.0 (전체 물가를 10배로 세분화). 4 = 3.69.0 (사망 시 소지금 손실 5~50% → 5~30%). */
+    private static final int CONFIG_VERSION = 4;
 
     public long startingGold = 1000;
     public double deathLossMinPercent = 5.0;
-    public double deathLossMaxPercent = 50.0;
+    /** 3.69.0: 50 → 30 (사용자 요청 "J는 손실 폭을 5-30%로"). 옛 기본값 50 그대로인 파일만 한 번 고친다. */
+    public double deathLossMaxPercent = 30.0;
     public String bankNpcName = "은행원";
     /** 플레이어 상점 직원의 하루 고용비 (출석 초기화 시각에 예금 → 지갑 순으로 나간다). */
     public long employeeWage = 1000;
@@ -77,6 +78,7 @@ public final class EconomyConfig {
                 }
                 if (o.has("deathLossMinPercent")) c.deathLossMinPercent = o.get("deathLossMinPercent").getAsDouble();
                 if (o.has("deathLossMaxPercent")) c.deathLossMaxPercent = o.get("deathLossMaxPercent").getAsDouble();
+                if (version < 4 && c.deathLossMaxPercent == 50.0) c.deathLossMaxPercent = 30.0;   // 3.69.0: 옛 기본값만
                 if (o.has("bankNpcName")) c.bankNpcName = o.get("bankNpcName").getAsString();
                 if (o.has("npcRange")) c.npcRange = o.get("npcRange").getAsDouble();
                 if (o.has("checkDeathLoss")) c.checkDeathLoss = o.get("checkDeathLoss").getAsBoolean();

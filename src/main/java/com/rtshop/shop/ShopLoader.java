@@ -204,7 +204,9 @@ public final class ShopLoader {
             "general:rtshop:return_ticket=5000>10000@2",   // 3.55: 일반 귀환권 5,000 → 10,000 G (위의 @1 다음에 차례로 적용된다)
             "general:minecraft:bricks=10>2@1",             // 3.65.0: 벽돌은 만들면 1~4 G
             // 3.66.0: 당근 · 감자 · 양파 씨앗 50 → 30 G (거두는 값이 씨앗값과 비슷했다)
-            "farmer:minecraft:carrot=50>30@1", "farmer:minecraft:potato=50>30@1", "farmer:farmersdelight:onion=50>30@1"};
+            "farmer:minecraft:carrot=50>30@1", "farmer:minecraft:potato=50>30@1", "farmer:farmersdelight:onion=50>30@1",
+            // 3.69.0: 파괴 방지권 20,000 → 4,000 G (+5 ~ +6 에서 쓸모가 있게. 손상 방지권 · 강화 보호권은 그대로)
+            "blacksmith:rtshop:enhance_guard_destroy=20000>4000@1"};
 
     private static void installAdded(Path dir, Path root, boolean force) throws IOException {
         Path list = root.resolve("added_shops.txt");

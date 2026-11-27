@@ -728,7 +728,7 @@
   "item.rtshop.enhance_guard_destroy.tip": "강화가 '파괴'로 끝나도 장비가 사라지지 않고 손상(단계 하락)으로 바뀝니다.",
   "item.rtshop.enhance_guard_full": "강화 보호권",
   "item.rtshop.enhance_guard_full.tip": "손상과 파괴를 모두 막아 단계가 그대로 유지됩니다.",
-  "item.rtshop.enhance_guard.tip": "강화 모루 위에 장비와 함께 올려 두면 그 강화에 쓰입니다. +6 까지는 장비를 실제로 지켰을 때만 한 장이 사라지고(성공 · 유지면 그대로 남음), +7 부터는 시도마다 한 장. 한 번에 한 가지만.",
+  "item.rtshop.enhance_guard.tip": "강화 모루 위에 장비와 함께 올려 두면 그 강화에 한 장이 쓰이고, 결과와 상관없이 사라집니다. 한 번에 한 가지만.",
   "rtshop.enhance.odds_success": "성공 %s",
   "rtshop.enhance.odds_maintain": "유지 %s",
   "rtshop.enhance.odds_damage": "손상 %s",
@@ -754,7 +754,7 @@
   "rtshop.enhance.max": "최대 단계 (+11)",
   "rtshop.enhance.panel": "강화 정보",
   "rtshop.enhance.help1": "왼쪽 칸에 무기(활 · 총 · 지팡이 포함)나 방어구를 올리세요.",
-  "rtshop.enhance.help2": "보호권은 모루 위, 장비 옆 칸에 함께 올려 두면 그 강화에 쓰입니다 (+6 까지는 지켰을 때만 한 장, +7 부터는 시도마다 한 장).",
+  "rtshop.enhance.help2": "보호권은 모루 위, 장비 옆 칸에 함께 올려 두면 그 강화에 한 장이 쓰입니다.",
   "rtshop.enhance.help3": "결과 칸을 클릭하면 재료와 Gold 를 쓰고 강화를 시도합니다.",
   "rtshop.enhance.help4": "결과는 성공(+1) · 유지 · 손상(-1) · 파괴. 단계가 높을수록 비싸고 위험합니다.",
   "rtshop.enhance.click_hint": "결과 칸을 클릭해 강화하세요",
@@ -831,7 +831,7 @@
   "rtshop.enhodds.effect": "공격력",
   "rtshop.enhodds.gold": "Gold",
   "rtshop.enhodds.materials": "재료",
-  "rtshop.enhodds.footer": "손상: 단계 1 하락 · 파괴: 장비가 사라짐. 실패(유지 · 손상)할 때마다 다음 성공률이 그 단계 성공률의 %s 씩 오름 (최대 %s번, 성공하면 처음으로). 보호권은 모루 위 장비 옆 칸에 (+6 까지는 지켰을 때만 한 장, +7 부터는 시도마다 한 장): 손상 방지 = 손상→유지, 파괴 방지 = 파괴→손상, 둘 다 = 유지. 공격력은 누적 증가율(방어구는 방어력, +8 부터 받는 피해 감소도).",
+  "rtshop.enhodds.footer": "손상: 단계 1 하락 · 파괴: 장비가 사라짐. 실패(유지 · 손상)할 때마다 다음 성공률이 그 단계 성공률의 %s 씩 오름 (최대 %s번, 성공하면 처음으로). 보호권은 모루 위 장비 옆 칸에 올려 두면 그 강화 1번에 한 장이 쓰임: 손상 방지 = 손상→유지, 파괴 방지 = 파괴→손상, 둘 다 = 유지. 공격력은 누적 증가율(방어구는 방어력, +8 부터 받는 피해 감소도).",
   "rtshop.enhodds.edit": "확률·재료 편집 (OP)",
   "rtshop.enhodds.close": "닫기",
   "rtshop.enhodds.open": "확률표",
@@ -1648,7 +1648,7 @@
   "rtshop.enhui.guard": "보호권",
   "rtshop.enhui.guard_none": "없음",
   "rtshop.enhui.guard_risk": "없음 · 파괴 주의",
-  "rtshop.enhance.guard_howto": "보호권은 강화 모루 위에 장비와 함께 올려 두면 그 강화에 쓰입니다. +6 까지는 장비를 지켰을 때만, +7 부터는 시도마다 한 장이 사라집니다.",
+  "rtshop.enhance.guard_howto": "보호권은 강화 모루 위에 장비와 함께 올려 두면 그 강화에 한 장이 쓰입니다.",
   "rtshop.enhance.safe_note": "이 장비는 강화로 파괴되지 않습니다 (전설 이상·히든 장비). 그 확률은 유지와 손상으로 나뉩니다.",
   "rtshop.enhui.guard_safe": "없음 · 파괴 없음",
   "rtshop.perm.survival_op": "서바이벌 모드에서는 운영자 기능을 쓸 수 없습니다. /gamemode creative 로 바꾼 뒤 다시 해 주세요.",
@@ -1953,6 +1953,5 @@
   "rtshop.enhui.fail_stacks": "누적 %s/%s",
   "rtshop.enhance.fail_stacks_tip": "실패 누적 %s/%s · 다음 강화 성공률 +%s (그 단계 성공률의)",
   "rtshop.enhui.stat_reduce": "받는 피해 감소",
-  "rtshop.enhance.bonus_reduce": "받는 피해 -%s (입은 강화 방어구마다 더해짐, 최대 %s)",
-  "rtshop.enhance.guard_active_keep": "보호 적용: %s (+%s 까지는 장비를 지켰을 때만 한 장이 쓰이고, 성공 · 유지면 그대로 남습니다)"
+  "rtshop.enhance.bonus_reduce": "받는 피해 -%s (입은 강화 방어구마다 더해짐, 최대 %s)"
 }

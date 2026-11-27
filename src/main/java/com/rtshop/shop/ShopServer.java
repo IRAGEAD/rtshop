@@ -702,7 +702,31 @@ public final class ShopServer {
         }
         Economy.sync(player);
         SESSIONS.put(player.getUUID(), new Session(false, d.id, npcId));
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new OpenShopPacket(Restaurant.is(d) ? Restaurant.viewFor(player, d) : d));
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new OpenShopPacket(localized(player, Restaurant.is(d) ? Restaurant.viewFor(player, d) : d)));
+    }
+
+    /**
+     * 3.69.0: 상점 창의 제목 · 상인 이름 · 분류 이름을 받는 사람의 언어로 (사용자 요청 "상점 창 제목과 분류 이름도 게임 언어에 따라").
+     * 번역 표에 있는 기본 문구만 바뀌고, 운영자가 고친 이름은 적힌 그대로 나간다.
+     */
+    public static ShopData localized(ServerPlayer p, ShopData d) {
+        if (d == null || !com.rtshop.story.StoryText.en(p)) return d;
+        List<ShopData.Category> cats = new ArrayList<>();
+        for (ShopData.Category c : d.categories) cats.add(new ShopData.Category(c.id, shopText(p, c.name), c.icon));
+        ShopData v = new ShopData(d.id, d.version, shopText(p, d.title), shopText(p, d.npcName), d.profession, cats, d.entries,
+                d.starMult, d.fishBase, d.fishBonus, d.fishGolden, d.fishNoInfo);
+        v.emptyNote = d.emptyNote;
+        v.sellNote = d.sellNote;
+        v.sellLockNote = d.sellLockNote;
+        return v;
+    }
+
+    /** 상점 글 하나: "상점:" 을 붙인 번역(상점에서만 쓰는 뜻) → 그냥 번역 → 원문. */
+    public static String shopText(ServerPlayer p, String s) {
+        if (s == null || s.isEmpty()) return s;
+        String k = "상점:" + s;
+        String v = com.rtshop.story.StoryText.t(p, k);
+        return v.equals(k) ? com.rtshop.story.StoryText.t(p, s) : v;
     }
 
     /** 식당 메뉴가 바뀌었다: 상점 데이터를 다시 만들고, 식당 창을 열어 둔 사람들에게 새 메뉴를 알려 준다. */

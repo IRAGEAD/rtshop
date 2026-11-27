@@ -479,19 +479,6 @@ public final class Enhance {
     }
 
     /** 방지권 적용: 손상 방지권 = 손상→유지, 파괴 방지권 = 파괴→손상, 강화 보호권 = 손상·파괴→유지. */
-    /**
-     * 3.69.0: 이번 강화에서 보호권 한 장이 쓰이는가. targetLevel 이 guardKeepUpTo(기본 6) 이하면 보호권이 결과를 실제로 바꿨을 때만
-     * (손상 → 유지, 파괴 → 손상·유지) 쓰이고, 성공하거나 막을 일이 없었으면 그대로 남는다. 그 위 단계는 시도할 때마다 한 장.
-     */
-    public static boolean guardSpent(EnhanceConfig cfg, int targetLevel, boolean protectedIt) {
-        return protectedIt || !guardKept(cfg, targetLevel);
-    }
-
-    /** 이 단계로 올리는 강화에서는 보호권이 지켰을 때만 쓰이는가. */
-    public static boolean guardKept(EnhanceConfig cfg, int targetLevel) {
-        return targetLevel <= cfg.guardKeepUpTo;
-    }
-
     public static Outcome protect(Outcome o, Guard g) {
         if (o == Outcome.DAMAGE && (g == Guard.DAMAGE || g == Guard.FULL)) return Outcome.MAINTAIN;
         if (o == Outcome.DESTROY && g == Guard.FULL) return Outcome.MAINTAIN;

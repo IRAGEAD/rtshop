@@ -447,8 +447,7 @@ public final class EnhancePanel {
         fit(g, font, g1, gx + 5, my0 + 4, gw - 10, 1F, C_PLATE_INK, 0, false, true);
         fit(g, font, g2, gx + 5, my0 + 14, gw - 10, 1F, guarded ? 0xFF1F6F8B : l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, 0, false, false);
         if (over(gx, my0, gw, size)) {
-            tip = guarded ? (Enhance.guardKept(cfg, cur + 1) ? Component.translatable("rtshop.enhance.guard_active_keep", Enhance.guardName(mask), cfg.guardKeepUpTo)
-                    : Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask)))
+            tip = guarded ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
                     : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : safe ? "rtshop.enhance.safe_note" : "rtshop.enhance.no_guard");
         }
         // 맨 아래 한마디: 누르면 강화 / 무엇이 모자란지
