@@ -205,7 +205,7 @@ public final class Codex {
     public static volatile int lastHiddenGear = -1;
 
     /**
-     * 보통 방법으로 얻을 수 있는 아이템 ID: NPC 상점에서 살 수 있는 것 · 뽑기에 나오는 것 · 전리품 표(상자 · 몹 · 낚시 등, data/*/loot_tables)에 적힌 것.
+     * 보통 방법으로 얻을 수 있는 아이템 ID: NPC 상점에서 살 수 있는 것 · 뽑기에 나오는 것 · 전리품 표(상자 · 몹 · 낚시 등, data/모드/loot_tables)에 적힌 것.
      * 서버가 없으면 null.
      */
     public static java.util.Set<String> obtainable() {
