@@ -29,8 +29,10 @@ import java.util.Map;
  */
 public final class EnhanceConfig {
     public static final int MAX_LEVEL = 11;
-    /** 3 (3.66.0): 성공률 조금 ↑ · +8~+11 Gold ↓ · 높은 단계 보너스 ↑ · 실패 누적. 기본값 그대로인 곳만 새 값으로. */
-    public static final int CONFIG_VERSION = 3;
+    /** 3 (3.66.0): 성공률 조금 ↑ · +8~+11 Gold ↓ · 높은 단계 보너스 ↑ · 실패 누적. 4 (3.69.0): +7 · +8 Gold 조금 ↑ (보호권 규칙). 기본값 그대로인 곳만 새 값으로. */
+    public static final int CONFIG_VERSION = 4;
+    /** 3판 기본값 중 4판에서 바뀐 단계 (단계, 성공, 유지, 손상, 파괴, Gold). */
+    private static final double[][] V3_CHANGED = {{7, 19, 36, 27, 18, 10000}, {8, 13, 35, 30, 22, 15000}};
     /** 1판 기본 확률 (그대로면 2판 확률로 바꾼다). */
     private static final double[][] OLD_ODDS = {{}, {90, 9, 1, 0}, {83, 9, 8, 0}, {75, 8.5, 16.5, 0}, {66, 8, 23, 3}, {56, 7.5, 28.5, 8},
             {46, 7, 34, 13}, {37, 6.5, 39, 17.5}, {29, 6, 43, 22}, {22, 5, 46, 27}, {15, 4, 49, 32}, {9, 3, 51, 37}};
@@ -83,6 +85,11 @@ public final class EnhanceConfig {
     public final List<String> safeItems = new ArrayList<>();
     /** 손상 결과일 때 내려가는 단계 수. */
     public int damageDrop = 1;
+    /**
+     * 3.69.0: 이 단계까지 올리는 강화(+1 ~ +6)에서는 보호권이 장비를 실제로 지켰을 때만 한 장 쓰인다 (성공·유지면 그대로 남음).
+     * 그 위 단계는 시도할 때마다 한 장. 0 = 언제나 한 장, 11 = 언제나 지켰을 때만.
+     */
+    public int guardKeepUpTo = 6;
     /** 이 단계 이상 성공하면 서버 전체에 알리고 특별 연출을 보인다. */
     public int broadcastFrom = 7;
 
@@ -125,8 +132,9 @@ public final class EnhanceConfig {
         levels[4] = lv(4, 49, 35, 12, 4, 2000, "#gem_fine", 1, "#gem_common", 2, "spelunkery:raw_magnetite", 3);
         levels[5] = lv(5, 37, 37, 17, 9, 3500, "#gem_fine", 2, "spelunkery:cinnabar", 2);
         levels[6] = lv(6, 27, 37, 22, 14, 6000, "#gem_fine", 3, "spelunkery:cinnabar", 3);
-        levels[7] = lv(7, 19, 36, 27, 18, 10000, "#gem_nether", 1, "#gem_fine", 2, "spelunkery:sulfur", 4);
-        levels[8] = lv(8, 13, 35, 30, 22, 15000, "#gem_nether", 2, "spelunkery:rough_diamond", 1);
+        // 4판(3.69.0): +6 까지는 보호권이 지켰을 때만 쓰이게 되어 +7 · +8 의 전체 비용이 내려간 만큼 Gold 를 조금 올림 (10,000 → 12,500, 15,000 → 16,000)
+        levels[7] = lv(7, 19, 36, 27, 18, 12500, "#gem_nether", 1, "#gem_fine", 2, "spelunkery:sulfur", 4);
+        levels[8] = lv(8, 13, 35, 30, 22, 16000, "#gem_nether", 2, "spelunkery:rough_diamond", 1);
         levels[9] = lv(9, 10, 33, 31, 26, 21000, "#gem_nether", 3, "spelunkery:rough_diamond", 2);
         levels[10] = lv(10, 7, 31, 32, 30, 29000, "#gem_rare", 1, "#gem_nether", 2, "spelunkery:rough_emerald", 2);
         levels[11] = lv(11, 5, 29, 32, 34, 40000, "#gem_rare", 2, "#gem_nether", 3, "spelunkery:rough_diamond", 2,
@@ -175,13 +183,15 @@ public final class EnhanceConfig {
         help.add("장비 강화 설정. 강화 모루(대장장이에게서 삼)에 장비를 올리고 망치로 두드려 강화합니다.");
         help.add("levels: 목표 단계(1~11)마다 success(성공)·maintain(유지)·damage(손상: 단계 하락)·destroy(파괴) 확률(%), gold(드는 Gold), materials(재료).");
         help.add("materials: {item: 아이템 ID 또는 #묶음, count}. 묶음은 groups 의 아이템 중 아무거나 섞어서 씁니다. 설치되지 않은 모드의 재료는 빼고 계산합니다.");
-        help.add("손상 방지권은 손상을 유지로, 파괴 방지권은 파괴를 손상으로 바꿉니다 (강화 보호권은 둘 다). 방지권은 시도할 때마다 1장 씁니다.");
+        help.add("손상 방지권은 손상을 유지로, 파괴 방지권은 파괴를 손상으로 바꿉니다 (강화 보호권은 둘 다).");
+        help.add("guardKeepUpTo: 이 단계까지 올리는 강화에서는 방지권이 장비를 실제로 지켰을 때만 1장 쓰입니다 (성공·유지면 남음). 그 위 단계는 시도할 때마다 1장. 0 = 늘 1장.");
         help.add("weaponBonus/armorBonus: 단계별 누적 증가율(%). 무기 = 공격력, 방어구 = 방어력. toughnessFrom 단계부터 방어 강도 +toughnessPerLevel.");
         help.add("armorReduce: 방어구 한 조각이 줄여 주는 받는 피해(%, 단계별). 입은 조각마다 더하고 합쳐서 최대 40%. 방어력은 30 에서 더 오르지 않으므로 높은 단계의 몫.");
         help.add("failBonusPct / failStackMax: 실패(유지·손상)할 때마다 다음 성공률이 그 단계 성공률의 failBonusPct % 만큼 오른다. 최대 failStackMax 번 쌓이고, 성공하면 처음으로 (장비마다 따로).");
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
         o.addProperty("damageDrop", damageDrop);
+        o.addProperty("guardKeepUpTo", guardKeepUpTo);
         o.addProperty("safeFromGrade", safeFromGrade);
         com.google.gson.JsonArray safe = new com.google.gson.JsonArray();
         safeItems.forEach(safe::add);
@@ -295,6 +305,7 @@ public final class EnhanceConfig {
         if (o.has("toughnessPerLevel")) c.toughnessPerLevel = o.get("toughnessPerLevel").getAsDouble();
         if (o.has("armorReduce")) c.armorReduce = doubles(o.getAsJsonArray("armorReduce"), c.armorReduce);
         if (o.has("failBonusPct")) c.failBonusPct = Math.max(0, o.get("failBonusPct").getAsDouble());
+        if (o.has("guardKeepUpTo")) c.guardKeepUpTo = Math.max(0, Math.min(MAX_LEVEL, o.get("guardKeepUpTo").getAsInt()));
         if (o.has("failStackMax")) c.failStackMax = Math.max(0, Math.min(50, o.get("failStackMax").getAsInt()));
         return c;
     }
@@ -397,6 +408,18 @@ public final class EnhanceConfig {
                         }
                         if (java.util.Arrays.equals(c.weaponBonus, V2_WEAPON)) c.weaponBonus = d.weaponBonus.clone();
                         if (java.util.Arrays.equals(c.armorBonus, V2_ARMOR)) c.armorBonus = d.armorBonus.clone();
+                    }
+                    if (ver < 4) {   // 3판 기본값 그대로인 +7 · +8 → 4판 Gold
+                        EnhanceConfig d = new EnhanceConfig();
+                        d.defaults();
+                        for (double[] v3 : V3_CHANGED) {
+                            int i = (int) v3[0];
+                            Level l = c.levels[i];
+                            if (l != null && l.success == v3[1] && l.maintain == v3[2] && l.damage == v3[3] && l.destroy == v3[4] && l.gold == (long) v3[5]) {
+                                l.gold = d.levels[i].gold;
+                                changed++;
+                            }
+                        }
                     }
                     save(c);
                     RtShop.LOGGER.info("[rtshop] enhance.json 을 {}판으로 올렸습니다 (기본값이던 단계 {}곳을 새 값으로)", CONFIG_VERSION, changed);

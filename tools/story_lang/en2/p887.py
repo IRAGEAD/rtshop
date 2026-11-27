@@ -1,0 +1,5 @@
+START = 887
+EN = [
+# 3.69.0: 안내서 「장비 강화」 — 보호권은 +6 까지는 지켰을 때만 쓰임
+"There is only one enhance anvil in town. Right-click it and place your gear; the panel beside it shows the odds, materials and Gold.\n\n· The result is one of success (+1), no change, damage (-1) or destruction. It gets harder as the level rises.\n· Every failure (no change or damage) raises that item's next success chance a little (by 10% of that level's chance, up to 5 times). A success resets it.\n· Put a guard ticket in the slot next to the item on the anvil and it covers that attempt (only one kind at a time). Up to +6 one is used only when it actually saves the item, and it stays on a success or no change. From +7 one is used on every attempt.\n· Enhanced gear shows +N before its name and gains attack or defense. Bows, crossbows and guns raise the damage of their arrows and bullets, and staffs and wands raise spell damage, by the same share.\n· From +8, armour also cuts the damage you take (adding up over the pieces you wear, up to 40%), because armour points stop rising at 30.",
+]

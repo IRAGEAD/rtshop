@@ -127,27 +127,33 @@ public class EnhanceMenu extends AnvilMenu {
             return;
         }
         Enhance.consume(sp, cfg, l);
-        // 모루에 올린 보호권 한 장: 이번 강화에 쓰이고, 결과와 상관없이 사라진다 (올린 것이 없으면 옛 방식으로 미리 써 둔 보호)
+        // 모루에 올린 보호권 (올린 것이 없으면 옛 방식으로 미리 써 둔 보호)
         ItemStack ticket = guardStack();
         Enhance.Guard guard = Enhance.guardFor(sp, ticket);
         boolean useGuard = guard != Enhance.Guard.NONE;
-        if (Enhance.guardOf(ticket) != Enhance.Guard.NONE) {
-            if (!sp.getAbilities().instabuild) {
-                ticket.shrink(1);
-                inputSlots.setItem(1, ticket.isEmpty() ? ItemStack.EMPTY : ticket);
-            }
-        } else if (useGuard) {
-            Enhance.setActiveGuard(sp, 0);
-        }
         // 전설 이상·히든 장비는 파괴되지 않는다: 그 확률은 유지와 손상에 반씩. 실패 누적이 있으면 성공률이 오른다 (3.66.0)
         int failsBefore = Enhance.failStacks(in);
         l = Enhance.levelFor(cfg, l, in);
         Enhance.Outcome rolled = Enhance.roll(l, Enhance.testRoll != null ? Enhance.testRoll : sp.getRandom().nextDouble());
+        Enhance.Outcome plain = rolled == Enhance.Outcome.DAMAGE && cur == 0 ? Enhance.Outcome.MAINTAIN : rolled;
         Enhance.Outcome o = useGuard ? Enhance.protect(rolled, guard) : rolled;
         if (o == Enhance.Outcome.DAMAGE && cur == 0) {
             o = Enhance.Outcome.MAINTAIN;
         }
-        boolean guarded = o != rolled;
+        boolean guarded = o != plain;
+        // 3.69.0: guardKeepUpTo(기본 +6) 까지 올리는 강화에서는 보호권이 장비를 지켰을 때만 한 장 쓰이고, 그 위는 시도할 때마다 한 장
+        lastGuardSpentForTest = false;
+        if (useGuard && Enhance.guardSpent(cfg, cur + 1, guarded)) {
+            lastGuardSpentForTest = true;
+            if (Enhance.guardOf(ticket) != Enhance.Guard.NONE) {
+                if (!sp.getAbilities().instabuild) {
+                    ticket.shrink(1);
+                    inputSlots.setItem(1, ticket.isEmpty() ? ItemStack.EMPTY : ticket);
+                }
+            } else {
+                Enhance.setActiveGuard(sp, 0);
+            }
+        }
         int after = Enhance.levelAfter(o, cur, cfg);
         ItemStack shown = target.copy();
         Enhance.clearPreview(shown);
@@ -169,6 +175,9 @@ public class EnhanceMenu extends AnvilMenu {
         broadcastChanges();
         Enhance.announce(sp, shown, o, guarded, cur, after < 0 ? cur : after);
     }
+
+    /** 점검용: 마지막 강화에서 보호권이 쓰였는가. */
+    public static volatile boolean lastGuardSpentForTest;
 
     /** 꺼낸 미리보기 장비를 찾는다: 손에 든 것(일반 클릭) → 꺼낸 그 스택 → 가방(Shift 클릭). */
     private static ItemStack find(ServerPlayer sp, ItemStack taken, String id) {

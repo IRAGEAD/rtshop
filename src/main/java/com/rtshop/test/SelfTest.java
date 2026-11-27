@@ -2076,6 +2076,52 @@ public final class SelfTest {
     }
 
     /** 3.66.0: 실패 누적(B) · 보호권 값 그대로 · 높은 단계 수치 · 방어구 피해 감소 · 마법 뽑기 천장 없음(A) · 씨앗값(N). */
+    /** 3.69.0: +6 까지는 보호권이 장비를 지켰을 때만 쓰이고, +7 부터는 시도마다 한 장. (결과 단계, 남은 보호권 수, 쓰였는가) */
+    private static int[] guardTry(com.rtshop.enhance.EnhanceMenu gm, FakePlayer a, ItemStack sword, int cur, double roll) {
+        ItemStack g = sword.copy();
+        com.rtshop.enhance.Enhance.setLevel(g, cur);
+        gm.getSlot(0).set(g);
+        com.rtshop.enhance.Enhance.testRoll = roll;
+        try {
+            gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        } finally {
+            com.rtshop.enhance.Enhance.testRoll = null;
+        }
+        ItemStack out = gm.getCarried().copy();
+        gm.setCarried(ItemStack.EMPTY);
+        return new int[]{out.isEmpty() ? -1 : com.rtshop.enhance.Enhance.level(out), gm.getSlot(1).getItem().getCount(),
+                com.rtshop.enhance.EnhanceMenu.lastGuardSpentForTest ? 1 : 0};
+    }
+
+    private static void enhance369(ServerLevel level, BlockPos pos, FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, ItemStack sword) {
+        com.rtshop.enhance.Enhance.setActiveGuard(a, 0);
+        giveMaterials(a, cfg, 5, 4);
+        com.rtshop.enhance.EnhanceMenu gm = enhanceMenu(level, pos, a);
+        ItemStack des = new ItemStack(com.rtshop.item.ModItems.GUARD_DESTROY.get(), 3);
+        gm.getSlot(1).set(des);
+        // +4 → +5 (성공 37 · 유지 37 · 손상 17 · 파괴 9): 성공 · 유지 · 손상(파괴 방지권이 막지 않음)에는 남고, 파괴를 손상으로 바꿨을 때만 한 장
+        int[] s = guardTry(gm, a, sword, 4, 0.0);
+        int[] m = guardTry(gm, a, sword, 4, 0.50);
+        int[] d = guardTry(gm, a, sword, 4, 0.80);
+        int[] x = guardTry(gm, a, sword, 4, 0.95);
+        check("3.69.0 up to +6 a guard ticket stays when the attempt succeeds, keeps, or ends in something it does not cover, and is used only when it saved the item",
+                s[0] == 5 && s[1] == 3 && s[2] == 0 && m[0] == 4 && m[1] == 3 && d[0] == 3 && d[1] == 3 && x[0] == 3 && x[1] == 2 && x[2] == 1
+                        && cfg.guardKeepUpTo == 6 && com.rtshop.enhance.Enhance.guardKept(cfg, 6) && !com.rtshop.enhance.Enhance.guardKept(cfg, 7),
+                java.util.Arrays.toString(s) + java.util.Arrays.toString(m) + java.util.Arrays.toString(d) + java.util.Arrays.toString(x));
+        gm.getSlot(1).set(ItemStack.EMPTY);
+        // +6 → +7 부터는 시도마다 한 장 (성공해도)
+        giveMaterials(a, cfg, 7, 1);
+        gm.getSlot(1).set(new ItemStack(com.rtshop.item.ModItems.GUARD_FULL.get(), 2));
+        int[] h = guardTry(gm, a, sword, 6, 0.0);
+        gm.getSlot(1).set(ItemStack.EMPTY);
+        check("3.69.0 from +7 a guard ticket is used on every attempt, as before; +7 and +8 cost a little more Gold (12,500 · 16,000)",
+                h[0] == 7 && h[1] == 1 && h[2] == 1 && cfg.level(7).gold == 12500 && cfg.level(8).gold == 16000 && cfg.level(9).gold == 21000,
+                java.util.Arrays.toString(h) + " " + cfg.level(7).gold + " " + cfg.level(8).gold);
+        gm.setCarried(ItemStack.EMPTY);
+        gm.getSlot(0).set(ItemStack.EMPTY);
+        a.containerMenu = a.inventoryMenu;
+    }
+
     private static void enhance366(ServerLevel level, BlockPos pos, FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, ItemStack sword) {
         com.rtshop.enhance.EnhanceConfig.Level raw11 = cfg.level(11);
         ItemStack st3 = new ItemStack(Items.IRON_SWORD);
@@ -2251,6 +2297,22 @@ public final class SelfTest {
                     up3.level(11).success == dft.level(11).success && up3.level(11).gold == dft.level(11).gold && up3.level(10).success == 6
                             && up3.level(10).gold == 40000 && up3.weaponBonus[11] == dft.weaponBonus[11] && up3.failBonusPct == dft.failBonusPct,
                     up3.level(11).success + "/" + up3.level(11).gold + " " + up3.level(10).success + "/" + up3.level(10).gold + " " + up3.weaponBonus[11]);
+            // 3.69.0: 3판 기본값 그대로인 +7 은 4판 Gold 로, 서버에서 확률을 바꾼 +8 은 그대로, 새 칸 guardKeepUpTo 는 기본 6
+            com.google.gson.JsonObject v3 = cfg.toJson();
+            v3.addProperty("configVersion", 3);
+            v3.remove("guardKeepUpTo");
+            v3.getAsJsonArray("levels").get(6).getAsJsonObject().addProperty("gold", 10000);
+            com.google.gson.JsonObject l8 = v3.getAsJsonArray("levels").get(7).getAsJsonObject();
+            l8.addProperty("gold", 15000);
+            l8.addProperty("success", 14);
+            l8.addProperty("maintain", 34);
+            Files.writeString(ep, v3.toString(), StandardCharsets.UTF_8);
+            com.rtshop.enhance.EnhanceConfig.reload();
+            com.rtshop.enhance.EnhanceConfig up4 = com.rtshop.enhance.EnhanceConfig.get();
+            check("3.69.0 an enhance.json from 3.66 ~ 3.68 moves a default +7 to the new Gold, keeps a +8 the server changed, and protects up to +6 only when needed",
+                    up4.level(7).gold == 12500 && up4.level(8).gold == 15000 && up4.level(8).success == 14 && up4.guardKeepUpTo == 6
+                            && Files.readString(ep, StandardCharsets.UTF_8).contains("\"guardKeepUpTo\""),
+                    up4.level(7).gold + " " + up4.level(8).gold + "/" + up4.level(8).success + " " + up4.guardKeepUpTo);
             // OP 편집기 저장
             com.google.gson.JsonObject ed = cfg.toJson();
             ed.getAsJsonArray("levels").get(0).getAsJsonObject().addProperty("success", 77);
@@ -2403,6 +2465,7 @@ public final class SelfTest {
         com.rtshop.util.Later.flushForTest();
         check("...and is then sent to everyone", com.rtshop.enhance.Enhance.lastBroadcast.startsWith("7:"), com.rtshop.enhance.Enhance.lastBroadcast);
         enhance366(level, pos, a, cfg, sword);
+        enhance369(level, pos, a, cfg, sword);
         check("the scene bands are +7~8, +9~10 and +11, each with a longer build-up", com.rtshop.enhance.Enhance.fxTier(6, 7) == 0
                 && com.rtshop.enhance.Enhance.fxTier(7, 7) == 1 && com.rtshop.enhance.Enhance.fxTier(8, 7) == 1
                 && com.rtshop.enhance.Enhance.fxTier(9, 7) == 2 && com.rtshop.enhance.Enhance.fxTier(10, 7) == 2
@@ -2959,7 +3022,7 @@ public final class SelfTest {
         com.rtshop.enhance.Enhance.testRoll = 0.99;
         gm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
         com.rtshop.enhance.Enhance.testRoll = null;
-        check("damage guard does not stop destruction (and is used up anyway)", gm.getCarried().isEmpty() && com.rtshop.enhance.Enhance.activeGuard(a) == 0);
+        check("damage guard does not stop destruction (3.69.0: +7 and up, so it is used up anyway)", gm.getCarried().isEmpty() && com.rtshop.enhance.Enhance.activeGuard(a) == 0);
         r = enhanceOnce(level, pos, a, sword, 6, 2, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
         check("destruction guard: destroy becomes damage", com.rtshop.enhance.Enhance.level(r) == 5 && r.is(Items.IRON_SWORD));
         r = enhanceOnce(level, pos, a, sword, 6, 3, 0.99, net.minecraft.world.inventory.ClickType.PICKUP);
@@ -2972,7 +3035,8 @@ public final class SelfTest {
         gm2.getSlot(0).set(sword.copy());
         com.rtshop.enhance.Enhance.setActiveGuard(a, com.rtshop.enhance.Enhance.G_DESTROY);
         gm2.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
-        check("a used guard is spent on the next attempt whatever happens, even at +1", com.rtshop.enhance.Enhance.activeGuard(a) == 0);
+        check("3.69.0 an old armed guard is kept when there was nothing to protect (+0 -> +1)", com.rtshop.enhance.Enhance.activeGuard(a) == com.rtshop.enhance.Enhance.G_DESTROY);
+        com.rtshop.enhance.Enhance.setActiveGuard(a, 0);
         gm2.setCarried(ItemStack.EMPTY);
         ItemStack max = sword.copy();
         com.rtshop.enhance.Enhance.setLevel(max, 11);
