@@ -59,6 +59,24 @@ public final class Cinematic {
         return cur != null && time() < duration();
     }
 
+    /** 3.71: 보스 등장은 건너뛸 수 있다 (조작 설정의 "연출 건너뛰기", 기본 Enter). 이야기의 장 제목 · 환영 · 자막은 건너뛰지 않는다. */
+    public static boolean skippable() {
+        return active() && "boss".equals(str("kind", "")) && time() < duration() - 0.5F;
+    }
+
+    /** 점검용: 지금까지 건너뛴 횟수. */
+    public static int skipsForTest;
+
+    /** 남은 시간을 짧게 접어 0.35초 동안 사라지게 하고, 카메라를 플레이어의 눈으로 돌린다. */
+    public static void skip() {
+        if (!skippable()) return;
+        float left = 0.35F;
+        if (timeForTest >= 0) timeForTest = Math.max(timeForTest, duration() - left);
+        else startAt = System.currentTimeMillis() - (long) ((duration() - left) * 1000L);
+        BossCam.stop();
+        skipsForTest++;
+    }
+
     /** 창을 닫고 시작한 연출(퀘스트를 받을 때의 장 제목·환영 등)인가: 도는 동안에는 다른 창이 그 위로 열리지 않게 미룬다. */
     public static boolean holdsScreens() {
         return active() && cur.has("closeScreen") && cur.get("closeScreen").getAsBoolean();
@@ -124,7 +142,10 @@ public final class Cinematic {
         try {
             switch (str("kind", "")) {
                 case "title" -> title(g, mc.font, sw, sh, t, dur);
-                case "boss" -> boss(g, mc.font, sw, sh, t, dur);
+                case "boss" -> {
+                    boss(g, mc.font, sw, sh, t, dur);
+                    skipHint(g, mc.font, sw, sh, t, dur);
+                }
                 case "vision" -> vision(g, mc.font, sw, sh, t, dur);
                 case "names" -> names(g, mc.font, sw, sh, t, dur);
                 default -> line(g, mc.font, sw, sh, t, dur);
@@ -249,6 +270,18 @@ public final class Cinematic {
             float q = Math.max(0, Math.min(1, (t - 1.8F) / 0.6F)) * c;
             RaidText.center(g, font, "“" + quote + "”", RaidText.SERIF, sw / 2, Math.round(cy + 20), (Math.round(255 * q) << 24) | 0xCFC2AA);
         }
+    }
+
+    /** 3.71: 아래 검은 띠 오른쪽에 "Enter 건너뛰기" (보스 등장, 반 초 뒤부터). */
+    private static void skipHint(GuiGraphics g, Font font, int sw, int sh, float t, float dur) {
+        if (t < 0.5F || t > dur - 0.5F) return;
+        float k = Math.min(1F, (t - 0.5F) / 0.4F) * fadeInOut(t, dur, 0.01F, 0.6F);
+        int a = Math.round(170 * k);
+        if (a < 8) return;
+        String key = ClientModEvents.SKIP_KEY.getTranslatedKeyMessage().getString();
+        String hint = net.minecraft.network.chat.Component.translatable("rtshop.cinematic.skip", key).getString();
+        int b = Math.round(sh * 0.12F);
+        g.drawString(font, hint, sw - 10 - font.width(hint), sh - b / 2 - 4, (a << 24) | 0xE8DCC8, false);
     }
 
     private static void vision(GuiGraphics g, Font font, int sw, int sh, float t, float dur) {

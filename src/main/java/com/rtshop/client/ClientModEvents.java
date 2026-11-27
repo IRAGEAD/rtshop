@@ -25,6 +25,8 @@ public final class ClientModEvents {
     public static final KeyMapping JOB_KEY = new KeyMapping("key.rtshop.job", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
     public static final KeyMapping QUEST_KEY = new KeyMapping("key.rtshop.quest", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
     public static final KeyMapping PVP_KEY = new KeyMapping("key.rtshop.pvp", InputConstants.UNKNOWN.getValue(), "key.categories.rtshop");
+    /** 3.71: 보스 등장 연출 건너뛰기 (기본 Enter — 바닐라가 게임 화면에서 쓰지 않는 키). */
+    public static final KeyMapping SKIP_KEY = new KeyMapping("key.rtshop.skip_scene", InputConstants.KEY_RETURN, "key.categories.rtshop");
 
     @SubscribeEvent
     public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
@@ -74,5 +76,6 @@ public final class ClientModEvents {
         event.register(QUEST_KEY);
         event.register(JOB_KEY);
         event.register(PVP_KEY);
+        event.register(SKIP_KEY);
     }
 }

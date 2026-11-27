@@ -7,6 +7,24 @@ for d in (ko_old, en_old):
         d.pop(k, None)
 
 NEW = {
+ # ---- 3.71: 보스 등장 건너뛰기
+ "key.rtshop.skip_scene": ("연출 건너뛰기 (보스 등장)", "Skip scene (boss entrance)"),
+ "rtshop.cinematic.skip": ("%s  건너뛰기", "%s  skip"),
+ # ---- 3.71: 민원 운영 탭
+ "rtshop.petition.tab_admin": ("운영 (%s)", "Admin (%s)"),
+ "rtshop.petition.f_all": ("전체", "All"),
+ "rtshop.petition.f_cat": ("분류: %s", "Category: %s"),
+ "rtshop.petition.act_answer": ("답변", "Answer"),
+ "rtshop.petition.act_close": ("종결", "Close"),
+ "rtshop.petition.act_tp": ("이동", "Go there"),
+ "rtshop.petition.act_delete": ("삭제", "Delete"),
+ "rtshop.petition.answer_to": ("#%s 에 답변", "Answer to #%s"),
+ "rtshop.petition.answer_placeholder": ("답변을 적어 주세요", "Write the answer"),
+ "rtshop.petition.send": ("보내기", "Send"),
+ "rtshop.petition.cancel": ("취소", "Cancel"),
+ "rtshop.petition.admin_none": ("해당하는 민원이 없습니다.", "No reports match."),
+ "rtshop.petition.delete_confirm": ("#%s 을(를) 지우려면 [삭제] 를 한 번 더 누르세요 (Shift+클릭은 바로).", "Click [Delete] again to delete #%s (Shift+click deletes at once)."),
+ "rtshop.petition.admin_only": ("운영자만 쓸 수 있습니다.", "Operators only."),
  # ---- 3.70: Distant Horizons 의 가까운 청크 빈틈
  "rtshop.dh.matched": ("서버가 %s 청크까지 보내 주어 렌더 거리를 %s → %s 로 맞췄습니다 (그 바깥은 Distant Horizons 가 그립니다. 서버를 나가면 원래대로).", "The server sends %s chunks, so the render distance was set from %s to %s (Distant Horizons draws beyond it; restored when you leave)."),
  # ---- 3.61: 민원 창 (시청 서기 하루)

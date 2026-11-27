@@ -4220,6 +4220,47 @@ public final class SelfTest {
                         && mwView.getAsJsonArray("mine").size() == 2 && mwView.getAsJsonArray("mine").get(0).getAsJsonObject().get("id").getAsInt() == mwBadCat
                         && mwView.get("open").getAsInt() == 2 && !com.rtshop.petition.Petitions.nearClerk(a),
                 mwCatId + " " + mwBadCat + " " + mwView);
+        // 3.71: 민원 설정 파일 (한도를 바꾸면 그대로 따름) · 운영 탭 (운영자에게만 모든 민원, 창에서 답변 · 종결 · 지우기)
+        com.rtshop.petition.Petitions.forTestReset(a.server);
+        com.rtshop.petition.Petitions.Config pc371 = new com.rtshop.petition.Petitions.Config();
+        pc371.maxLength = 40;
+        pc371.maxOpen = 2;
+        pc371.cooldownSeconds = 0;
+        com.rtshop.petition.Petitions.forTestConfig(pc371);
+        int pl371 = com.rtshop.petition.Petitions.file(a, "bug", "가".repeat(41));
+        int p1371 = com.rtshop.petition.Petitions.file(a, "bug", "상점 창의 글자가 겹쳐요");
+        int p2371 = com.rtshop.petition.Petitions.file(a, "idea", "낚시 대회를 열어 주세요");
+        int p3371 = com.rtshop.petition.Petitions.file(a, "etc", "세 번째");
+        com.google.gson.JsonObject pv371 = com.rtshop.petition.Petitions.view(a, "", false);
+        boolean pLimits = pl371 == com.rtshop.petition.Petitions.ERR_LONG && p1371 > 0 && p2371 > 0 && p3371 == com.rtshop.petition.Petitions.ERR_MANY
+                && pv371.get("max").getAsInt() == 40 && pv371.get("maxOpen").getAsInt() == 2;
+        com.rtshop.petition.Petitions.forTestConfig(null);
+        boolean pDefaults = com.rtshop.petition.Petitions.cfg().maxLength == com.rtshop.petition.Petitions.MAX_LEN && com.rtshop.petition.Petitions.cfg().maxOpen == com.rtshop.petition.Petitions.MAX_OPEN;
+        // 운영자가 아니면 운영 탭의 일이 막힌다
+        boolean wasOp371 = a.hasPermissions(2);
+        com.rtshop.petition.Petitions.fromScreen(a, 4, p1371, "");
+        boolean pDenied = wasOp371 || ("denied".equals(com.rtshop.petition.Petitions.lastAdminForTest) && com.rtshop.petition.Petitions.find(a.server, p1371).state == com.rtshop.petition.Petitions.OPEN)
+                && !pv371.get("op").getAsBoolean() && !pv371.has("all");
+        if (!wasOp371) a.server.getPlayerList().op(a.getGameProfile());
+        com.rtshop.petition.Petitions.fromScreen(a, 3, p1371, "다음 판에서 고칩니다");
+        com.rtshop.petition.Petitions.Entry pe371 = com.rtshop.petition.Petitions.find(a.server, p1371);
+        boolean pAnswered = pe371 != null && pe371.state == com.rtshop.petition.Petitions.ANSWERED && pe371.answer.equals("다음 판에서 고칩니다");
+        com.rtshop.petition.Petitions.fromScreen(a, 4, p1371, "");
+        boolean pClosed = pe371 != null && pe371.state == com.rtshop.petition.Petitions.CLOSED;
+        com.rtshop.petition.Petitions.fromScreen(a, 5, p2371, "");
+        boolean pDeleted = com.rtshop.petition.Petitions.find(a.server, p2371) == null;
+        com.google.gson.JsonObject pa371 = com.rtshop.petition.Petitions.view(a, "", false, 2);
+        boolean pAdminView = pa371.get("op").getAsBoolean() && pa371.get("tab").getAsInt() == 2 && pa371.getAsJsonArray("all").size() == 1
+                && pa371.getAsJsonArray("all").get(0).getAsJsonObject().get("where").getAsString().contains(",")
+                && pa371.getAsJsonArray("all").get(0).getAsJsonObject().get("name").getAsString().equals(a.getGameProfile().getName());
+        if (!wasOp371) a.server.getPlayerList().deop(a.getGameProfile());
+        boolean pCmd371 = a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "report", "admin")) != null
+                && a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "report", "reload")) != null;
+        check("3.71 reports: the limits come from petitions.json (length · open count), operators get every report in the window and can answer, close and delete there; others cannot",
+                pLimits && pDefaults && pDenied && pAnswered && pClosed && pDeleted && pAdminView && pCmd371,
+                pl371 + " " + p1371 + " " + p2371 + " " + p3371 + " limits " + pLimits + " defaults " + pDefaults + " denied " + pDenied + " (op before " + wasOp371 + ") answered " + pAnswered
+                        + " closed " + pClosed + " deleted " + pDeleted + " view " + pAdminView + " cmd " + pCmd371 + " " + com.rtshop.petition.Petitions.lastAdminForTest);
+        com.rtshop.petition.Petitions.forTestReset(a.server);
         // 3.62: 보스마다 다른 카메라 방식 / Cinematic Cataclysm 컷신으로 깨우기 (그 모드가 있을 때만)
         boolean cc362 = net.minecraftforge.fml.ModList.get().isLoaded("cinematiccataclysm");
         String ccTrace = "";

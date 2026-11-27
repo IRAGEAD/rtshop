@@ -156,6 +156,18 @@ public final class BossCam {
         return true;
     }
 
+    /** 3.71: 연출 건너뛰기 키 (보스 등장 중에만, 창이 열려 있지 않을 때). */
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        try {
+            while (ClientModEvents.SKIP_KEY.consumeClick()) {
+                if (Minecraft.getInstance().screen == null && Cinematic.skippable()) Cinematic.skip();
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
     @SubscribeEvent
     public static void onRenderTick(TickEvent.RenderTickEvent event) {
         if (event.phase != TickEvent.Phase.START || cam == null) return;

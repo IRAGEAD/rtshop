@@ -1954,5 +1954,21 @@
   "rtshop.enhance.fail_stacks_tip": "Failures %s/%s · next success chance +%s (of that level's rate)",
   "rtshop.enhui.stat_reduce": "Damage taken",
   "rtshop.enhance.bonus_reduce": "Damage taken -%s (adds up over worn enhanced armour, up to %s)",
-  "rtshop.dh.matched": "The server sends %s chunks, so the render distance was set from %s to %s (Distant Horizons draws beyond it; restored when you leave)."
+  "rtshop.dh.matched": "The server sends %s chunks, so the render distance was set from %s to %s (Distant Horizons draws beyond it; restored when you leave).",
+  "rtshop.petition.tab_admin": "Admin (%s)",
+  "rtshop.petition.f_all": "All",
+  "rtshop.petition.f_cat": "Category: %s",
+  "rtshop.petition.act_answer": "Answer",
+  "rtshop.petition.act_close": "Close",
+  "rtshop.petition.act_tp": "Go there",
+  "rtshop.petition.act_delete": "Delete",
+  "rtshop.petition.answer_to": "Answer to #%s",
+  "rtshop.petition.answer_placeholder": "Write the answer",
+  "rtshop.petition.send": "Send",
+  "rtshop.petition.cancel": "Cancel",
+  "rtshop.petition.admin_none": "No reports match.",
+  "rtshop.petition.delete_confirm": "Click [Delete] again to delete #%s (Shift+click deletes at once).",
+  "rtshop.petition.admin_only": "Operators only.",
+  "key.rtshop.skip_scene": "Skip scene (boss entrance)",
+  "rtshop.cinematic.skip": "%s  skip"
 }

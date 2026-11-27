@@ -2091,6 +2091,23 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             check("3.61 boss camera: when the entrance ends the camera is back in the player's eyes", !BossCam.active() && mc.getCameraEntity() == mc.player, mc.getCameraEntity());
+            // 3.71: 보스 등장 건너뛰기 — 안내 글이 보이고, 건너뛰면 곧바로 끝나 카메라가 돌아온다
+            int cam371 = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(LOOK_IDS.size() - 1);
+            Cinematic.play("{\"kind\":\"boss\",\"name\":\"건너뛰기 점검\",\"epithet\":\"Enter\",\"color\":\"5AA0FF\",\"shake\":0,\"seconds\":6,\"cam\":\"orbit\",\"entity\":" + cam371 + "}");
+            waitTicks(30);
+        });
+        add(mc -> {
+            boolean before371 = Cinematic.skippable() && BossCam.active();
+            shot(mc, "132b_boss_skip_hint");
+            int n371 = Cinematic.skipsForTest;
+            Cinematic.skip();
+            check("3.71 boss entrance can be skipped (key 'skip scene', Enter by default): it was skippable, the skip took", before371 && Cinematic.skipsForTest == n371 + 1 && !BossCam.active(),
+                    before371 + " skips " + Cinematic.skipsForTest + " cam " + BossCam.active() + " key " + ClientModEvents.SKIP_KEY.getTranslatedKeyMessage().getString());
+            waitTicks(12);
+        });
+        add(mc -> {
+            check("3.71 a skipped boss entrance is over within a moment and the camera is back in the player's eyes", !Cinematic.active() && mc.getCameraEntity() == mc.player,
+                    Cinematic.active() + " " + mc.getCameraEntity());
             onServer(mc, sp -> {
                 for (int id361 : LOOK_IDS) {
                     net.minecraft.world.entity.Entity e361 = sp.serverLevel().getEntity(id361);
@@ -2113,6 +2130,36 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             shot(mc, "133b_petition_mine");
+            mc.setScreen(null);
+            // 3.71: 운영 탭 — 다른 사람이 낸 것처럼 몇 건을 더 두고 /rtshop report admin 으로 연다
+            onServer(mc, sp -> {
+                com.rtshop.petition.Petitions.forTestNoCooldown();
+                com.rtshop.petition.Petitions.file(sp, "player", "광장에서 누가 계속 길을 막아요.");
+                com.rtshop.petition.Petitions.forTestNoCooldown();
+                com.rtshop.petition.Petitions.file(sp, "idea", "다음 축제 때 낚시 대회를 열어 주세요.");
+                sp.server.getCommands().performPrefixedCommand(sp.createCommandSourceStack(), "rtshop report admin");
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            boolean on371 = mc.screen instanceof PetitionScreen pa371 && pa371.opForTest() && pa371.tabNowForTest() == 2 && pa371.allForTest() >= 4;
+            check("3.71 reports: an operator gets the admin tab with every report (filter by state and category, answer · close · go · delete)", on371,
+                    mc.screen instanceof PetitionScreen pb371 ? pb371.opForTest() + " tab " + pb371.tabNowForTest() + " all " + pb371.allForTest() : String.valueOf(mc.screen));
+            if (mc.screen instanceof PetitionScreen pc371) pc371.filterForTest(3, -1);
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "133c_petition_admin");
+            if (mc.screen instanceof PetitionScreen pd371) {
+                pd371.filterForTest(0, -1);
+                int idAns = 0;
+                for (com.rtshop.petition.Petitions.Entry e371 : com.rtshop.petition.Petitions.data(mc.getSingleplayerServer()).list) if (e371.state == 0) idAns = e371.id;
+                pd371.answerForTest(idAns, "광장에 안내판을 세웠습니다. 다시 그러면 알려 주세요.");
+            }
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "133d_petition_answer");
             mc.setScreen(null);
             onServer(mc, sp -> com.rtshop.petition.Petitions.forTestReset(sp.server));
             waitTicks(10);

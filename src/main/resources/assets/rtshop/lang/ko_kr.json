@@ -1954,5 +1954,21 @@
   "rtshop.enhance.fail_stacks_tip": "실패 누적 %s/%s · 다음 강화 성공률 +%s (그 단계 성공률의)",
   "rtshop.enhui.stat_reduce": "받는 피해 감소",
   "rtshop.enhance.bonus_reduce": "받는 피해 -%s (입은 강화 방어구마다 더해짐, 최대 %s)",
-  "rtshop.dh.matched": "서버가 %s 청크까지 보내 주어 렌더 거리를 %s → %s 로 맞췄습니다 (그 바깥은 Distant Horizons 가 그립니다. 서버를 나가면 원래대로)."
+  "rtshop.dh.matched": "서버가 %s 청크까지 보내 주어 렌더 거리를 %s → %s 로 맞췄습니다 (그 바깥은 Distant Horizons 가 그립니다. 서버를 나가면 원래대로).",
+  "rtshop.petition.tab_admin": "운영 (%s)",
+  "rtshop.petition.f_all": "전체",
+  "rtshop.petition.f_cat": "분류: %s",
+  "rtshop.petition.act_answer": "답변",
+  "rtshop.petition.act_close": "종결",
+  "rtshop.petition.act_tp": "이동",
+  "rtshop.petition.act_delete": "삭제",
+  "rtshop.petition.answer_to": "#%s 에 답변",
+  "rtshop.petition.answer_placeholder": "답변을 적어 주세요",
+  "rtshop.petition.send": "보내기",
+  "rtshop.petition.cancel": "취소",
+  "rtshop.petition.admin_none": "해당하는 민원이 없습니다.",
+  "rtshop.petition.delete_confirm": "#%s 을(를) 지우려면 [삭제] 를 한 번 더 누르세요 (Shift+클릭은 바로).",
+  "rtshop.petition.admin_only": "운영자만 쓸 수 있습니다.",
+  "key.rtshop.skip_scene": "연출 건너뛰기 (보스 등장)",
+  "rtshop.cinematic.skip": "%s  건너뛰기"
 }
