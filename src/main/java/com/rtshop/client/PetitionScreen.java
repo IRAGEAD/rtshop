@@ -118,8 +118,8 @@ public class PetitionScreen extends Screen {
 
     @Override
     protected void init() {
-        W = tab == 2 ? W2 : W1;
-        H = tab == 2 ? H2 : H1;
+        W = tab == 2 ? Math.min(W2, Math.max(W1, this.width - 8)) : W1;
+        H = tab == 2 ? Math.min(H2, Math.max(H1, this.height - 8)) : H1;   // 작은 화면(GUI 크게)에서도 창이 화면 안에
         fx = (this.width - W) / 2;
         fy = (this.height - H) / 2;
         box = null;
