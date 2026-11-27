@@ -6,6 +6,11 @@ on:
       - 'tools/**'
       - '**.md'
   workflow_dispatch:
+    inputs:
+      perf:
+        description: "성능 측정 job 도 돌릴지 (테스트 가지, 약 70분)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -555,7 +560,7 @@ jobs:
     # 3.70.0 성능 측정 (테스트 가지에서만, 참고용): 모드팩 전체로 실제 지형의 새 세계를 띄워 서버 틱 시간 · 지형 생성 속도 · 메모리,
     # 클라이언트 FPS(마을 NPC · 날아서 새 땅 · 몹 곁), Distant Horizons 의 가까운 청크 빈틈(전용 서버 접속)을 재고, JFR 로 모드별 CPU 몫을 낸다.
     needs: build
-    if: github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.perf)
     runs-on: ubuntu-latest
     continue-on-error: true
     timeout-minutes: 110
