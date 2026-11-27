@@ -857,14 +857,29 @@ public final class SelfTest {
                 noHint.isEmpty(), noHint);
         // 고른 것은 반드시 뒤에서 돌아온다: 대화(인사 · 주제) 또는 그 표식을 묻는 퀘스트. 시험의 맞고 틀림(_passed/_failed)은 따로 다룬다.
         String talk = com.rtshop.story.Dialogue.get().toString();
+        // 퀘스트는 모드에 따라 빠지는 것(환술사 이야기 등)이 있어서, 묻는 쪽은 jar 에 든 퀘스트 파일 전부에서 찾는다
+        StringBuilder asks = new StringBuilder();
+        for (String f : new String[]{"story.json", "tutorial.json", "job_quests.json"}) {
+            try (java.io.InputStream in = SelfTest.class.getResourceAsStream("/rtshop_defaults/quests/" + f)) {
+                if (in == null) continue;
+                for (com.google.gson.JsonElement qe : com.google.gson.JsonParser.parseString(new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8))
+                        .getAsJsonObject().getAsJsonArray("quests")) {
+                    com.google.gson.JsonObject qo = qe.getAsJsonObject();
+                    for (String k : new String[]{"requiresFlags", "blockedByFlags"})
+                        if (qo.has(k)) asks.append(qo.get("id").getAsString()).append('=').append(qo.get(k)).append('\n');
+                }
+            } catch (Exception ex) {
+                asks.append("error ").append(ex);
+            }
+        }
         List<String> silent = new ArrayList<>();
         for (QuestDef q : QuestManager.loaded().quests.values()) {
             for (QuestDef.Choice c : q.choices) {
                 for (String f : c.flags) {
                     if (f.endsWith("_passed") || f.endsWith("_failed") || silent.contains(f)) continue;
                     boolean used = talk.contains("\"" + f + "\"");
-                    for (QuestDef o : QuestManager.loaded().quests.values()) {
-                        if (o != q && (o.requiresFlags.contains(f) || o.blockedByFlags.contains(f))) used = true;
+                    for (String line : asks.toString().split("\n")) {
+                        if (!line.startsWith(q.id + "=") && line.contains("\"" + f + "\"")) used = true;
                     }
                     if (!used) silent.add(q.id + ":" + f);
                 }
@@ -893,6 +908,45 @@ public final class SelfTest {
         List<String> combat = topicIds375(a, "job");
         QuestManager.reset(a);
         List<String> none = topicIds375(a, "job");
+        // 자리를 비운 때: 끌려간 이사벨(로란의 「남은 불씨」 뒤 ~ 이그니스가 잠들 때까지) · 떠난 장로(배신 뒤 ~ 기사단장의 말을 전해 들을 때까지)
+        net.minecraft.world.entity.npc.Villager isa = new net.minecraft.world.entity.npc.Villager(net.minecraft.world.entity.EntityType.VILLAGER, a.serverLevel());
+        isa.addTag(QuestManager.QUEST_TAG_PREFIX + "order_archivist");
+        net.minecraft.world.entity.npc.Villager erw = new net.minecraft.world.entity.npc.Villager(net.minecraft.world.entity.EntityType.VILLAGER, a.serverLevel());
+        erw.addTag(QuestManager.QUEST_TAG_PREFIX + "order_elder");
+        QuestManager.reset(a);
+        String isaBefore = com.rtshop.npc.NpcLooks.lookFor(a, isa);
+        QuestManager.forceComplete(a, "story_5_03");
+        com.google.gson.JsonObject gone = com.rtshop.story.Dialogue.buildForTest(a, "quest_order_archivist");
+        a.setShiftKeyDown(true);
+        boolean claimsShift = com.rtshop.story.Dialogue.claims(a, "quest_order_archivist");
+        a.setShiftKeyDown(false);
+        String isaGone = com.rtshop.npc.NpcLooks.lookFor(a, isa);
+        QuestManager.forceComplete(a, "story_5_08");
+        String isaBack = com.rtshop.npc.NpcLooks.lookFor(a, isa);
+        boolean backTalk = !com.rtshop.story.Dialogue.buildForTest(a, "quest_order_archivist").has("absent");
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "erwin_betrayal", true);
+        boolean erwGone = com.rtshop.npc.NpcLooks.ABSENT.equals(com.rtshop.npc.NpcLooks.lookFor(a, erw)) && com.rtshop.story.Dialogue.buildForTest(a, "quest_order_elder").has("absent");
+        QuestManager.forceComplete(a, "story_5_09");
+        com.google.gson.JsonObject seated = com.rtshop.story.Dialogue.buildForTest(a, "quest_order_elder");
+        QuestManager.reset(a);
+        check("3.77 while Isabel is taken (after Roran's 'The Last Ember' until Ignis sleeps) and while the Elder is gone, they are not drawn for that player and their place shows only an empty desk — no topics, no quests, even when crouching; they come back after",
+                "isabel".equals(isaBefore) && com.rtshop.npc.NpcLooks.ABSENT.equals(isaGone) && gone.has("absent") && gone.getAsJsonArray("topics").size() == 0
+                        && !gone.has("questNpc") && claimsShift && "isabel".equals(isaBack) && backTalk && erwGone && !seated.has("absent")
+                        && !"quest_order_archivist".equals(QuestManager.loaded().quests.get("story_5_07").giver),
+                isaBefore + " " + isaGone + " " + gone + " shift " + claimsShift + " back " + isaBack + " " + backTalk + " erwin " + erwGone + " seated " + seated.get("greet")
+                        + " 5_07 " + QuestManager.loaded().quests.get("story_5_07").giver);
+        // 인사는 「조건이 맞는 것 중 마지막」: 배신 뒤의 이사벨 인사가 1장 끝의 인사에 가려져 있었다
+        QuestManager.setFlag(a, "story_ch1_done", true);
+        QuestManager.setFlag(a, "erwin_betrayal", true);
+        String gBetray = com.rtshop.story.Dialogue.buildForTest(a, "quest_order_archivist").get("greet").getAsString();
+        QuestManager.setFlag(a, "story_done", true);
+        String gDone = com.rtshop.story.Dialogue.buildForTest(a, "quest_order_archivist").get("greet").getAsString();
+        String eDone = com.rtshop.story.Dialogue.buildForTest(a, "quest_order_elder").get("greet").getAsString();
+        QuestManager.reset(a);
+        check("3.77 greetings follow the story: Isabel's after the Elder's betrayal is no longer hidden behind her chapter-1 one, and she and the Elder greet differently once the story is done",
+                (gBetray.contains("믿기지") || gBetray.toLowerCase(java.util.Locale.ROOT).contains("believe")) && (gDone.contains("빈 줄") || gDone.contains("blank line"))
+                        && (eDone.contains("발소리") || eDone.toLowerCase(java.util.Locale.ROOT).contains("footstep")), gBetray + " / " + gDone + " / " + eDone);
         check("3.77 the way chosen at Morris's first question (life / combat) is picked up by Albert the Job Guide",
                 life.contains("path_life") && !life.contains("path_combat") && combat.contains("path_combat") && !combat.contains("path_life")
                         && !none.contains("path_life") && !none.contains("path_combat"), life + " / " + combat + " / " + none);

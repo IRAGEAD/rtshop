@@ -34,6 +34,9 @@ final class ClientSelfTest2 {
 
     private static final List<Step> STEPS = new ArrayList<>();
     private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static long ABSENT_377;
+    private static boolean GONE_377;
+    private static String GONE_INFO_377 = "";
     /** 3.71: 점검용 동행 NPC 의 엔티티 번호. */
     static volatile int COMPANION_ID = -1;
     private static volatile net.minecraft.core.BlockPos ANVIL_364;
@@ -2355,6 +2358,47 @@ final class ClientSelfTest2 {
                     if (st.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get()) || st.is(net.minecraft.world.item.Items.PAPER) || st.is(net.minecraft.world.item.Items.GLOW_INK_SAC)
                             || st.is(net.minecraft.world.item.Items.HONEYCOMB)) sp.getInventory().setItem(i, ItemStack.EMPTY);
                 }
+            });
+            waitTicks(5);
+        });
+        // 3.77.0: 이야기 속에서 끌려간 이사벨은 그 사람의 화면에 그려지지 않는다 (로란의 「남은 불씨」 뒤 ~ 이그니스가 잠들 때까지)
+        add(mc -> {
+            ABSENT_377 = NpcLookClient.absentSkippedForTest;
+            onServer(mc, sp -> {
+                net.minecraft.world.entity.Entity isa = LOOK_IDS.isEmpty() ? null : sp.serverLevel().getEntity(LOOK_IDS.get(0));
+                if (isa != null) {
+                    net.minecraft.world.phys.Vec3 lk = sp.getLookAngle();
+                    double len = Math.max(0.01, Math.sqrt(lk.x * lk.x + lk.z * lk.z));
+                    isa.teleportTo(sp.getX() + lk.x / len * 3.0, sp.getY(), sp.getZ() + lk.z / len * 3.0);
+                }
+                com.rtshop.quest.QuestData.Progress pr = com.rtshop.quest.QuestManager.progressOf(sp);
+                pr.completed.remove("story_5_08");
+                pr.completed.add("story_5_03");
+                com.rtshop.quest.QuestData.get(sp.server).dirty();
+            });
+            waitTicks(50);
+        });
+        add(mc -> {
+            int isa = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(0);
+            GONE_377 = isa > 0 && NpcLookClient.absent(isa) && NpcLookClient.absentSkippedForTest > ABSENT_377;
+            GONE_INFO_377 = isa + " look '" + NpcLookClient.lookOfForTest(isa) + "' skipped " + (NpcLookClient.absentSkippedForTest - ABSENT_377);
+            shot(mc, "131c_isabel_taken");
+            onServer(mc, sp -> {
+                com.rtshop.quest.QuestManager.progressOf(sp).completed.add("story_5_08");
+                com.rtshop.quest.QuestData.get(sp.server).dirty();
+            });
+            waitTicks(50);
+        });
+        add(mc -> {
+            int isa = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(0);
+            boolean back = isa > 0 && "isabel".equals(NpcLookClient.lookOfForTest(isa)) && !NpcLookClient.absent(isa);
+            check("3.77 while Isabel is taken in the story she is not drawn on that player's screen (no figure, no name), and she is back once Ignis sleeps",
+                    GONE_377 && back, GONE_INFO_377 + " → back '" + NpcLookClient.lookOfForTest(isa) + "'");
+            onServer(mc, sp -> {
+                com.rtshop.quest.QuestData.Progress pr = com.rtshop.quest.QuestManager.progressOf(sp);
+                pr.completed.remove("story_5_03");
+                pr.completed.remove("story_5_08");
+                com.rtshop.quest.QuestData.get(sp.server).dirty();
             });
             waitTicks(5);
         });

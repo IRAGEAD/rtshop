@@ -318,6 +318,11 @@ public final class NpcLookClient {
         String look = LOOKS.get(e.getId());
         // 3.75 (W-2): 동행은 엔티티에 실린 모습을 먼저 (서버의 모습 목록이 닿기 전에도)
         if (comp && !((com.rtshop.story.CompanionEntity) e).look().isEmpty()) look = ((com.rtshop.story.CompanionEntity) e).look();
+        if (ABSENT.equals(look)) {   // 3.77: 이야기 속에서 자리를 비운 사람 — 그리지 않는다 (이름표도)
+            event.setCanceled(true);
+            absentSkippedForTest++;
+            return;
+        }
         if (look == null || e.isInvisible() || !ClientConfig.get().npcLooks) return;
         Model m = model(look);
         if (m == null) return;
@@ -371,6 +376,16 @@ public final class NpcLookClient {
     /** 점검용: 동행 NPC 를 인물 모습으로 그린 횟수. */
     public static long companionsDrawnForTest;
 
+    /** 3.77: 서버가 「자리를 비웠다」고 알린 NPC 의 모습 이름 (NpcLooks.ABSENT 와 같다). */
+    public static final String ABSENT = "_absent";
+    /** 점검용: 자리를 비워 그리지 않은 횟수. */
+    public static long absentSkippedForTest;
+
+    /** 이 엔티티를 자리를 비운 것으로 받았는가. */
+    public static boolean absent(int entityId) {
+        return ABSENT.equals(LOOKS.get(entityId));
+    }
+
     /** 점검용: 이 엔티티에 모습이 정해졌는가. */
     public static String lookOfForTest(int entityId) {
         return LOOKS.getOrDefault(entityId, "");
@@ -392,6 +407,10 @@ public final class NpcLookClient {
     @SubscribeEvent
     public static void onVanillaNameTag(net.minecraftforge.client.event.RenderNameTagEvent event) {
         if (LOOKS.isEmpty() || !LOOKS.containsKey(event.getEntity().getId())) return;
+        if (absent(event.getEntity().getId())) {   // 자리를 비운 사람의 이름표도 없다
+            event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+            return;
+        }
         try {
             Minecraft mc = Minecraft.getInstance();
             if (!nameShownAt(mc.getEntityRenderDispatcher().distanceToSqr(event.getEntity()), ClientConfig.get().npcNameDistance)) {

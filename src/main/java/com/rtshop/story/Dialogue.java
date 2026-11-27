@@ -350,6 +350,26 @@ public final class Dialogue {
         return build(p, npcKey, -1);
     }
 
+    /**
+     * 3.77.0: 이야기 속에서 그 사람이 자리를 비운 때 (이 사람에게만) — dialogue.json 의 NPC 마다 "absent": [{"text", "need"}].
+     * 맞으면 그 글(빈자리의 모습)을 돌려준다, 아니면 null. 그동안 그 NPC 는 이 사람의 화면에서 보이지 않고(NpcLooks), 말을 걸면 그 글만 보인다.
+     */
+    public static String absentText(ServerPlayer p, String npcKey) {
+        if (p == null || npcKey == null) return null;
+        try {
+            JsonObject all = get();
+            if (!all.has("npcs") || !all.getAsJsonObject("npcs").has(npcKey)) return null;
+            JsonObject n = all.getAsJsonObject("npcs").getAsJsonObject(npcKey);
+            if (!n.has("absent") || !n.get("absent").isJsonArray()) return null;
+            for (JsonElement e : n.getAsJsonArray("absent")) {
+                if (e.isJsonObject() && e.getAsJsonObject().has("text") && ok(p, e.getAsJsonObject())) return text(p, e.getAsJsonObject().get("text"));
+            }
+        } catch (Exception ex) {
+            RtShop.LOGGER.debug("[rtshop] absent", ex);
+        }
+        return null;
+    }
+
     static JsonObject build(ServerPlayer p, String npcKey, int entityId) {
         JsonObject all = get();
         JsonObject npcs = all.has("npcs") ? all.getAsJsonObject("npcs") : new JsonObject();
@@ -358,6 +378,14 @@ public final class Dialogue {
         out.addProperty("npc", npcKey);
         out.addProperty("entity", entityId);
         out.addProperty("name", QuestManager.npcName(npcKey));
+        String away = absentText(p, npcKey);
+        if (away != null) {   // 자리를 비웠다: 빈자리의 모습만 (장면 · 이야기 · 퀘스트 없음, 만난 것으로도 치지 않는다)
+            out.addProperty("mode", "talk");
+            out.addProperty("greet", away);
+            out.add("topics", new JsonArray());
+            out.addProperty("absent", true);
+            return out;
+        }
         JsonArray scene = pendingScene(p, npcKey);
         if (scene != null) {
             out.addProperty("mode", "scene");
@@ -540,6 +568,7 @@ public final class Dialogue {
     /** 이 NPC 를 누르면 대화 상자가 먼저 열리는가 (그러면 다른 창은 열지 않는다). */
     public static boolean claims(ServerPlayer p, String key) {
         if (p == null || key == null || BYPASS.contains(p.getUUID())) return false;
+        if (absentText(p, key) != null) return true;   // 3.77: 자리를 비운 사람은 웅크려 눌러도 퀘스트 창을 열지 않는다
         return pendingScene(p, key) != null || (dialogueFirst && !p.isShiftKeyDown());
     }
 

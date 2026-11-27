@@ -153,6 +153,17 @@ public final class NpcLooks {
         return ALL.contains(best) ? best : "";
     }
 
+    /** 3.77.0: 이야기 속에서 자리를 비운 NPC 에게 보내는 모습 — 화면은 그 NPC 를 그리지 않는다 (그 사람에게만). */
+    public static final String ABSENT = "_absent";
+
+    /** 이 사람에게 이 엔티티를 어떤 모습으로 보일지: 자리를 비웠으면 ABSENT (동행은 그 자리에 있는 그 사람이므로 제외). */
+    public static String lookFor(ServerPlayer p, Entity e) {
+        if (e instanceof com.rtshop.story.CompanionEntity c) return lookOf("quest_" + c.npcId());
+        String key = keyOf(e);
+        if (key != null && com.rtshop.story.Dialogue.absentText(p, key) != null) return ABSENT;
+        return lookOf(key);
+    }
+
     /** 엔티티의 NPC 열쇠 (레이드 안내인 포함). NPC 가 아니면 null. */
     public static String keyOf(Entity e) {
         if (e.getTags().isEmpty()) return null;
@@ -186,8 +197,9 @@ public final class NpcLooks {
                 JsonObject add = null;
                 for (Entity e : p.level().getEntities(p, p.getBoundingBox().inflate(RANGE), x -> !x.getTags().isEmpty() || x instanceof com.rtshop.story.CompanionEntity)) {
                     // 3.71: 동행 NPC 도 그 이야기 인물의 모습으로 (열쇠 quest_<NPC ID>)
-                    String look = lookOf(e instanceof com.rtshop.story.CompanionEntity c ? "quest_" + c.npcId() : keyOf(e));
-                    if (look.isEmpty() || look.equals(sent.get(e.getId()))) continue;
+                    String look = lookFor(p, e);
+                    String before = sent.get(e.getId());
+                    if (look.equals(before) || (look.isEmpty() && !ABSENT.equals(before))) continue;
                     sent.put(e.getId(), look);
                     if (add == null) add = new JsonObject();
                     add.addProperty(Integer.toString(e.getId()), look);

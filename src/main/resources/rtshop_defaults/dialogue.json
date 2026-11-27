@@ -47,10 +47,16 @@
      }
     },
     {
-     "text": "(장로의 자리는 비어 있다. 책상 위에 장갑 한 켤레가 놓여 있다. 안쪽이 그을렸다.)",
+     "text": {
+      "ko": "(장갑 없는 노인이 앉아 있다. 손등의 획은 식어서 흉터가 됐다.) …자네군. 앉게. 이제 서 있을 힘이 없네.",
+      "en": "(An old man sits without his gloves. The stroke on the back of his hand has cooled into a scar.) …It's you. Sit. I've no strength left to stand."
+     },
      "need": {
-      "flags": [
-       "erwin_betrayal"
+      "quests": [
+       "story_5_09"
+      ],
+      "notFlags": [
+       "story_done"
       ]
      }
     },
@@ -68,6 +74,9 @@
      "need": {
       "items": [
        "efn:meen_spear"
+      ],
+      "notFlags": [
+       "erwin_betrayal"
       ]
      }
     },
@@ -77,15 +86,39 @@
      "need": {
       "items": [
        "efn:meen_spear"
+      ],
+      "notFlags": [
+       "erwin_betrayal"
       ]
      }
     }
    ],
    "chatter": [
-    "이 장갑 말인가? 오래된 화상 자국이 있어서 말일세. 신경 쓰지 말게.",
-    "요즘 밤마다 남쪽 하늘이 붉어지는군. 좋은 징조는 아닐세.",
+    {
+     "text": "이 장갑 말인가? 오래된 화상 자국이 있어서 말일세. 신경 쓰지 말게.",
+     "need": {
+      "notFlags": [
+       "erwin_betrayal"
+      ]
+     }
+    },
+    {
+     "text": "요즘 밤마다 남쪽 하늘이 붉어지는군. 좋은 징조는 아닐세.",
+     "need": {
+      "notFlags": [
+       "erwin_betrayal"
+      ]
+     }
+    },
     "수도회도 예전 같지 않네. 한때는 견습이 백 명이 넘었지.",
-    "늙으면 잠이 줄지. …나는 잠을 잊은 지 오래일세.",
+    {
+     "text": "늙으면 잠이 줄지. …나는 잠을 잊은 지 오래일세.",
+     "need": {
+      "notFlags": [
+       "erwin_betrayal"
+      ]
+     }
+    },
     {
      "text": "일곱 봉인이라… 그 이름을 다시 듣게 될 줄은 몰랐네.",
      "need": {
@@ -102,6 +135,28 @@
       ],
       "notFlags": [
        "erwin_betrayal"
+      ]
+     }
+    },
+    {
+     "text": {
+      "ko": "요즘은 잠이 오네. 천 년 만에. 눈을 뜨면 오늘 첫 줄을 뭐라고 쓸지부터 생각하지.",
+      "en": "These days sleep comes. After a thousand years. When I wake, the first thing I think of is what today's first line will be."
+     },
+     "need": {
+      "flags": [
+       "story_done"
+      ]
+     }
+    },
+    {
+     "text": {
+      "ko": "로란이 문을 잠그지 말라더군. 그래서 열어 두었네. 드나드는 사람은 없어도, 열어 두는 게 좋더군.",
+      "en": "Roran told me not to lock the door. So I've left it open. No one comes or goes, but I find I like it open."
+     },
+     "need": {
+      "flags": [
+       "story_done"
       ]
      }
     }
@@ -130,6 +185,9 @@
       ],
       "heard": [
        "ashen_chronicle"
+      ],
+      "notFlags": [
+       "erwin_betrayal"
       ]
      }
     },
@@ -147,6 +205,9 @@
       ],
       "heard": [
        "undying_ember"
+      ],
+      "notFlags": [
+       "erwin_betrayal"
       ]
      }
     },
@@ -160,6 +221,9 @@
      "need": {
       "flags": [
        "story_ch1_done"
+      ],
+      "notFlags": [
+       "erwin_betrayal"
       ]
      }
     },
@@ -193,6 +257,9 @@
      "need": {
       "items": [
        "efn:meen_spear"
+      ],
+      "notFlags": [
+       "erwin_betrayal"
       ]
      }
     },
@@ -244,7 +311,27 @@
     }
    ],
    "hints": [
-    "…여덟. 아니, 일곱이라고 했나? 나이를 먹으니 숫자가 헷갈리는군."
+    {
+     "text": "…여덟. 아니, 일곱이라고 했나? 나이를 먹으니 숫자가 헷갈리는군.",
+     "need": {
+      "notFlags": [
+       "erwin_betrayal"
+      ]
+     }
+    }
+   ],
+   "absent": [
+    {
+     "text": "(장로의 자리는 비어 있다. 책상 위에 장갑 한 켤레가 놓여 있다. 안쪽이 그을렸다.)",
+     "need": {
+      "flags": [
+       "erwin_betrayal"
+      ],
+      "notQuests": [
+       "story_5_09"
+      ]
+     }
+    }
    ]
   },
   "quest_order_archivist": {
@@ -259,6 +346,14 @@
      }
     },
     {
+     "text": "조사대원님. …어머니의 일지는 제 책상 맨 위 서랍에 있어요. 매일 한 줄씩 읽어요.",
+     "need": {
+      "flags": [
+       "story_ch1_done"
+      ]
+     }
+    },
+    {
      "text": "…아직도 믿기지 않아요. 그분이 우리 곁에 그렇게 오래 있었다니.",
      "need": {
       "flags": [
@@ -267,10 +362,13 @@
      }
     },
     {
-     "text": "조사대원님. …어머니의 일지는 제 책상 맨 위 서랍에 있어요. 매일 한 줄씩 읽어요.",
+     "text": {
+      "ko": "조사대원님! 오늘은 뭘 적을까요? (왼손바닥의 흉터를 펜 끝으로 톡 친다.) 빈 줄은 아직 그대로예요.",
+      "en": "Investigator! What shall we write today? (She taps the scar on her left palm with the tip of her pen.) The blank line is still there."
+     },
      "need": {
       "flags": [
-       "story_ch1_done"
+       "story_done"
       ]
      }
     },
@@ -950,6 +1048,22 @@
     "…이건 그냥 혼잣말이에요. 잘린 연대기 자리마다 아주 옅은 보랏빛이 묻어 있어요. 우리 잉크는 검은색인데요.",
     "어머니 일지에 이런 낙서가 있었어요. '거울은 거짓말을 한다. 거울 속 필경사는 더하다.' 무슨 뜻일까요.",
     "옛 뱃노래에 이런 절이 있어요. '우리에겐 배가 있었다. 마중 나간 누이는 돌아오지 않았다.' 연대기에는 그 누이가 한 줄도 없어요."
+   ],
+   "absent": [
+    {
+     "text": {
+      "ko": "(기록고 책상이 비어 있다. 펼친 연대기 위에 펜이 놓여 있다. 마지막 줄의 잉크가 아직 마르지 않았다.)",
+      "en": "(The archive desk is empty. A pen lies on the open chronicle. The ink of the last line is not yet dry.)"
+     },
+     "need": {
+      "quests": [
+       "story_5_03"
+      ],
+      "notQuests": [
+       "story_5_08"
+      ]
+     }
+    }
    ]
   },
   "quest_order_captain": {
