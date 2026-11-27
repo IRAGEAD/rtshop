@@ -103,6 +103,11 @@ incl = collections.defaultdict(collections.Counter)   # (phase, group) -> mod ->
 selfc = collections.defaultdict(collections.Counter)
 meth = collections.defaultdict(collections.Counter)
 total = collections.Counter()
+# 모드마다: 그 모드의 칸 중 쌓인 호출의 가장 바깥(무엇이 그 모드의 일을 부르나) · 가장 안쪽(그 모드가 어디서 시간을 쓰나)
+outer = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
+inner = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
+# 바닐라 클래스에 섞여 들어간 mixin 처리기(handler$zza000$modid$name 등)는 그 모드의 칸으로 센다
+MIXIN_RE = re.compile(r'^(?:handler|redirect|modify\w*|wrap\w*|localvar|constant)\$[0-9a-z]+\$([a-z0-9_]+)\$')
 proc = subprocess.Popen(['jfr', 'print', '--events', 'jdk.ExecutionSample', '--stack-depth', '48', jfr], stdout=subprocess.PIPE,
                         stderr=subprocess.DEVNULL, text=True, errors='replace')
 thread, t, frames, inst = '', 0.0, [], False
@@ -112,9 +117,24 @@ def flush():
         return
     key = (phase_of(t), group(thread))
     total[key] += 1
-    owners = [owner(c) for c, _ in frames]
+    owners = []
+    for c, mname in frames:
+        mm = MIXIN_RE.match(mname)
+        owners.append('mixin:' + mm.group(1) if mm else owner(c))
     for o in set(owners):
         incl[key][o] += 1
+    seen = set()
+    for (c, mname), o in zip(frames, owners):
+        if o in BASE or o in seen:
+            continue
+        seen.add(o)
+        inner[key][o][c + '.' + mname] += 1
+    seen = set()
+    for (c, mname), o in reversed(list(zip(frames, owners))):
+        if o in BASE or o in seen:
+            continue
+        seen.add(o)
+        outer[key][o][c + '.' + mname] += 1
     for (c, mname), o in zip(frames, owners):
         if o not in BORING:
             selfc[key][o] += 1
@@ -164,4 +184,8 @@ for ph in order:
         print('  busiest methods:')
         for mname, c in meth[key].most_common(12):
             print('    %5.1f%%  %s' % (100.0 * c / n, mname[-150:]))
+        heavy = [(o, c) for o, c in mods if 100.0 * c / n >= 3.0][:6]
+        for o, c in heavy:
+            print('  [%s %.1f%%] called from:' % (o, 100.0 * c / n), ' | '.join('%.1f %s' % (100.0 * k / n, m[-110:]) for m, k in outer[key][o].most_common(4)))
+            print('  [%s] working in:' % o, ' | '.join('%.1f %s' % (100.0 * k / n, m[-110:]) for m, k in inner[key][o].most_common(4)))
         print()

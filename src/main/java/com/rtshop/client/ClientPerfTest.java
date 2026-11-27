@@ -43,6 +43,8 @@ final class ClientPerfTest {
     private static long phaseStart;
     private static boolean fly;
     private static double flyY;
+    private static int frames;
+    private static final String VARIANT = System.getProperty("rtshop.perf.variant", "base");
 
     /** k 번째 걸음 (ClientSelfTest 의 걸음 기계가 부른다: 걸음 사이에 내장 서버가 밀린 일을 마칠 때까지 기다린다). */
     static void run(Minecraft mc, int k) {
@@ -111,6 +113,22 @@ final class ClientPerfTest {
             case 5 -> begin("mobs", 600, false);
             case 6 -> {
                 shot(mc, "161_perf_mobs");
+                // 지도 품질(FANCY · FAST)을 눈으로 견주게 큰 지도를 열어 찍는다 (마을 위로 돌아가서)
+                onServer(mc, sp -> {
+                    var level = sp.serverLevel();
+                    BlockPos s = level.getSharedSpawnPos();
+                    int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, s.getX(), s.getZ());
+                    sp.teleportTo(level, s.getX() + 0.5, y + 1.6, s.getZ() + 0.5, 0F, 10F);
+                });
+                ClientSelfTest.wait = 200;
+            }
+            case 7 -> {
+                openMap(mc);
+                ClientSelfTest.wait = 100;
+            }
+            case 8 -> {
+                if (mc.screen != null && mc.screen.getClass().getName().startsWith("dev.diorama")) shot(mc, "162_perf_map_" + VARIANT);
+                mc.setScreen(null);
                 OUT.add("");
                 OUT.add("RESULT: DONE");
                 try {
@@ -132,9 +150,46 @@ final class ClientPerfTest {
         left = ticks;
         fly = flying;
         phaseStart = System.currentTimeMillis();
+        frames = 0;
         FPS.clear();
         MSPT.clear();
         ClientSelfTest.wait = ticks + 10;
+    }
+
+    /** Diorama 의 큰 지도 (없거나 열 수 없으면 그냥 지나간다). */
+    private static void openMap(Minecraft mc) {
+        if (!net.minecraftforge.fml.ModList.get().isLoaded("diorama")) return;
+        try {
+            Class<?> ms = Class.forName("dev.diorama.MapScreen");
+            for (java.lang.reflect.Constructor<?> k : ms.getDeclaredConstructors()) {
+                Class<?>[] ps = k.getParameterTypes();
+                Object[] args = new Object[ps.length];
+                boolean ok = true;
+                for (int i = 0; i < ps.length; i++) {
+                    if (ps[i] == boolean.class) args[i] = false;
+                    else if (ps[i] == int.class) args[i] = 0;
+                    else if (ps[i] == double.class) args[i] = 0D;
+                    else if (ps[i] == float.class) args[i] = 0F;
+                    else if (ps[i].isPrimitive()) ok = false;
+                }
+                if (!ok) continue;
+                try {
+                    k.setAccessible(true);
+                    mc.setScreen((net.minecraft.client.gui.screens.Screen) k.newInstance(args));
+                    return;
+                } catch (Throwable t) {
+                    RtShop.LOGGER.info("[rtshop-perf] map screen {}: {}", java.util.Arrays.toString(ps), t.toString());
+                }
+            }
+        } catch (Throwable t) {
+            RtShop.LOGGER.info("[rtshop-perf] map screen: {}", t.toString());
+        }
+    }
+
+    /** 그린 화면 수 (FPS 를 소수점까지: 소프트웨어 그리기에서는 초당 2~3 장이라 정수 FPS 로는 차이가 안 보인다). */
+    @SubscribeEvent
+    public static void onFrame(TickEvent.RenderTickEvent event) {
+        if (ENABLED && event.phase == TickEvent.Phase.END && left > 0) frames++;
     }
 
     @SubscribeEvent
@@ -164,9 +219,11 @@ final class ClientPerfTest {
                 ms += v;
                 msMax = Math.max(msMax, v);
             }
-            OUT.add(String.format("PHASE %s %s %s fps avg %.1f min %d p10 %d · server mspt avg %.1f max %.1f · entities %d · %s", phase,
-                    com.rtshop.test.PerfTest.clockOf(phaseStart), com.rtshop.test.PerfTest.clockOf(System.currentTimeMillis()),
+            long now = System.currentTimeMillis();
+            OUT.add(String.format("PHASE %s %s %s fps avg %.1f min %d p10 %d · frames %d = %.2f fps · server mspt avg %.1f max %.1f · entities %d · %s", phase,
+                    com.rtshop.test.PerfTest.clockOf(phaseStart), com.rtshop.test.PerfTest.clockOf(now),
                     f.isEmpty() ? 0 : sum / f.size(), f.isEmpty() ? 0 : f.get(0), f.isEmpty() ? 0 : f.get(Math.min(f.size() - 1, f.size() / 10)),
+                    frames, frames * 1000.0 / Math.max(1, now - phaseStart),
                     MSPT.isEmpty() ? 0 : ms / MSPT.size(), msMax, mc.level == null ? 0 : mc.level.getEntityCount(), mc.levelRenderer.getChunkStatistics()));
             RtShop.LOGGER.info("[rtshop-perf] {}", OUT.get(OUT.size() - 1));
             fly = false;

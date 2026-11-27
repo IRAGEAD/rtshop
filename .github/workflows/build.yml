@@ -228,10 +228,29 @@ jobs:
           {
             echo "DH: $DH"; echo "Chunky: $CK"
             if [ -n "$DH" ]; then rm -rf /tmp/dhj && mkdir -p /tmp/dhj && (cd /tmp/dhj && unzip -q -o "$GITHUB_WORKSPACE/$DH" 'com/seibel/distanthorizons/forge/wrappers/modAccessor/*' 'com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/*' 2>/dev/null; \
-              for c in com/seibel/distanthorizons/forge/wrappers/modAccessor/ChunkyAccessor com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/AbstractChunkyAccessor; do echo "######## $c"; javap -p -c "$c.class" 2>&1 | head -n 400; done); fi
+              for c in com/seibel/distanthorizons/forge/wrappers/modAccessor/ChunkyAccessor com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/AbstractChunkyAccessor; do echo "######## $c"; javap -p -c "$c.class" 2>&1 | head -n 400; done); \
+              rm -rf /tmp/dha && mkdir -p /tmp/dha && (cd /tmp/dha && unzip -q -o "$GITHUB_WORKSPACE/$DH" 'com/seibel/*' 2>/dev/null; echo "== who calls tryRunFirstTimeSetup"; \
+                for f in $(grep -rl --include=*.class "tryRunFirstTimeSetup" . | head -n 8); do echo "-- $f"; javap -p -c "$f" 2>&1 | grep -n -B12 -A2 "tryRunFirstTimeSetup" | grep -E "^[0-9]+[-:]  (public|private|protected|static|void)|tryRunFirstTimeSetup|invoke" | head -n 30; done); fi
             if [ -n "$CK" ]; then rm -rf /tmp/ckj && mkdir -p /tmp/ckj && (cd /tmp/ckj && unzip -q -o "$GITHUB_WORKSPACE/$CK" && echo "== classes" && find . -name "*.class" | grep -iE "provider|forge|chunky\.class" | head -n 40; \
               for c in org/popcraft/chunky/ChunkyProvider $(find . -name "ChunkyForge*.class" | sed 's#^\./##; s#\.class$##' | head -n 3); do echo "######## $c"; javap -p -c "$c.class" 2>&1 | head -n 300; done); fi
           } > /tmp/inspect/dh-chunky.txt 2>&1 || true
+      - name: Inspect Arcane Vortex (3.70.0)
+        run: |
+          mkdir -p /tmp/inspect
+          # 성능 측정에서 내장 서버 틱의 약 10% (NativeAgent.MixinHooks · AttributeGuard): 무엇을 하고 언제 불리는지, 모드가 더하는 것(날개 등)
+          AV="$(ls packcache/*.jar | grep -i "arcanevortex" | head -n 1)"
+          if [ -n "$AV" ]; then
+            rm -rf /tmp/avj && mkdir -p /tmp/avj && (cd /tmp/avj && unzip -q -o "$GITHUB_WORKSPACE/$AV" 2>/dev/null || true)
+            {
+              echo "AV: $AV"; cat /tmp/avj/META-INF/MANIFEST.MF 2>/dev/null | head -n 30; grep -vE "^\s*#" /tmp/avj/META-INF/mods.toml 2>/dev/null | grep -v "^$" | head -n 40
+              echo "== packages"; (cd /tmp/avj && find . -name "*.class" | sed 's#^\./##; s#/[^/]*$##' | sort | uniq -c | sort -rn | head -n 80)
+              echo "== mixin configs"; (cd /tmp/avj && for f in $(ls *.json 2>/dev/null); do echo "-- $f"; head -c 4000 "$f"; echo; done)
+              echo "== items (en_us)"; (cd /tmp/avj && find . -path "*lang/en_us.json" | head -n 2 | xargs -r -I{} sh -c 'grep -oE "\"(item|block|entity|effect)\.arcanevortex\.[^\"]+\": *\"[^\"]*\"" {} | head -n 300')
+              for c in $(cd /tmp/avj && find . \( -name "*AttributeGuard*.class" -o -name "*MixinHooks*.class" -o -name "*NativeAgent*.class" \) | sed 's#^\./##; s#\.class$##' | head -n 12); do
+                echo "######## $c"; (cd /tmp/avj && javap -p -c "$c.class" 2>&1 | head -n 900)
+              done
+            } > /tmp/inspect/arcanevortex.txt 2>&1 || true
+          fi
       - name: Inspect Diorama waypoint icons
         run: |
           mkdir -p /tmp/inspect
@@ -564,8 +583,9 @@ jobs:
       - name: Server performance (real terrain)
         run: |
           cd server
-          # 모드팩의 dhcompat(overrides, CI 에서는 받을 수 없음) 없이 Distant Horizons 3.3.3 + Chunky 를 함께 켜면 첫 청크에서 튕긴다 ("Chunky is not loaded") → 측정에서는 Chunky 를 뺀다
-          mkdir -p ../offmods && mv mods/Chunky*.jar ../offmods/ 2>/dev/null || true
+          # Distant Horizons 3.3.3 + Chunky 는 모드팩의 dhcompat 없이 켜면 새 세계의 첫 청크에서 튕겼다 ("Chunky is not loaded").
+          # 3.70.0 의 RT Shop 막이(DhChunkyMixin)를 시험하려고 Chunky 를 그대로 둔다 (새 세계를 만드는 이 단계가 튕기던 바로 그 경우).
+          ls mods | grep -iE "^chunky|distanthorizons" || true
           printf 'online-mode=false\nspawn-protection=0\nlevel-name=perfworld\nlevel-seed=20261127\nmax-tick-time=-1\nview-distance=8\nsimulation-distance=6\ndifficulty=easy\n' > server.properties
           echo "-Xmx10G -Drtshop.perftest=true -Drtshop.perf.jfr=$PWD/perf-server.jfr -XX:StartFlightRecording=settings=profile" > user_jvm_args.txt
           START=$(date +%s)
@@ -579,6 +599,8 @@ jobs:
           echo "startup: $(grep -o 'Done ([0-9.]*s)' perf-server.log | head -n 1)"
           cat rtshop-perf-server.txt || tail -n 40 perf-server.log
           for f in crash-reports/*.txt; do [ -f "$f" ] && grep -E "^Description:|Caused by|Exception|^\tat (com|net|org|dev)\.[a-z]" "$f" | grep -v "at net.minecraft" | head -n 20; done
+          { echo "== server perf (new world, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Chunky .*(loaded|enabled)|Done \(" perf-server.log | cut -c1-260 | head -n 8; ls crash-reports 2>/dev/null; } >> ../chunky-check.txt
+          cat ../chunky-check.txt
           python3 ../.github/scripts/perf_report.py perf-server.jfr mods rtshop-perf-server.txt > perf-server-report.txt 2>&1 || true
           head -n 160 perf-server-report.txt | cut -c1-400
       - name: Client performance (singleplayer, real terrain) — as the pack, lean, lean + server-side optimizers
@@ -588,7 +610,8 @@ jobs:
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
           python3 -m pip install -q "portablemc<5"
           mkdir -p client/mods client/saves
-          while IFS= read -r f; do case "$f" in ""|Chunky*) ;; *) cp "packcache/$f" client/mods/ ;; esac; done < packcache/client_mods.txt
+          # base 는 모드팩 그대로 (Chunky 포함: 싱글플레이에서도 RT Shop 의 DH · Chunky 막이를 시험), lean · opt 는 Chunky 를 뺀다
+          while IFS= read -r f; do [ -n "$f" ] && cp "packcache/$f" client/mods/; done < packcache/client_mods.txt
           cp jar/*.jar client/mods/
           printf 'onboardAccessibility:false\ntutorialStep:none\nskipMultiplayerWarning:true\njoinedFirstServer:true\npauseOnLostFocus:false\nguiScale:2\nrenderDistance:8\nsimulationDistance:6\nmaxFps:260\nenableVsync:false\ngraphicsMode:1\nao:true\nentityShadows:true\nnarrator:0\nsoundCategory_master:0.0\nlang:ko_kr\n' > client/options.txt
           echo "mods: $(ls client/mods | wc -l)"
@@ -599,7 +622,7 @@ jobs:
             rm -f client/rtshop-perf-client.txt
             (sleep 1300; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
             local wd=$!
-            (timeout -k 20 1200 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true -Drtshop.clienttest.only=perf -Drtshop.perf.jfr=$PWD/client/perf-client-$name.jfr -XX:StartFlightRecording=settings=profile" --resolution 1280x720 > client-perf-$name.log 2>&1) || echo "client exit code $?"
+            (timeout -k 20 1200 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true -Drtshop.clienttest.only=perf -Drtshop.perf.variant=$name -Drtshop.perf.jfr=$PWD/client/perf-client-$name.jfr -XX:StartFlightRecording=settings=profile" --resolution 1280x720 > client-perf-$name.log 2>&1) || echo "client exit code $?"
             pkill -9 -f "rtshop.clienttest" || true
             kill $wd 2>/dev/null || true
             cp client/rtshop-perf-client.txt client/rtshop-perf-client-$name.txt 2>/dev/null || echo "no $name result"
@@ -608,8 +631,9 @@ jobs:
             python3 .github/scripts/perf_report.py client/perf-client-$name.jfr client/mods client/rtshop-perf-client-$name.txt > perf-client-$name-report.txt 2>&1 || true
           }
           run_client base
+          { echo "== client base (singleplayer, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/perf-base.log | cut -c1-260 | head -n 4; ls client/crash-reports 2>/dev/null; } >> chunky-check.txt
           # lean: ArcaneVortex(물건이 모두 RT Shop 규칙으로 막혀 있음) · Farsight(DH 와 겹침) 빼고, Diorama 의 지도 품질을 FAST 로
-          mkdir -p offclient && mv client/mods/ArcaneVortex*.jar client/mods/*arsight*.jar offclient/ 2>/dev/null || true
+          mkdir -p offclient && mv client/mods/ArcaneVortex*.jar client/mods/*arsight*.jar client/mods/Chunky*.jar offclient/ 2>/dev/null || true
           DCFG=$(find client -path '*diorama*' -name 'config.json' | head -n 1); echo "diorama config: $DCFG"; grep -o '"quality"[^,}]*' "$DCFG" 2>/dev/null || true
           [ -n "$DCFG" ] && sed -i 's/"quality": *"FANCY"/"quality": "FAST"/' "$DCFG" && grep -o '"quality"[^,}]*' "$DCFG"
           run_client lean
@@ -634,12 +658,14 @@ jobs:
           pkill -f "sleep 900" || true
           pkill -x java || true
           cat client/rtshop-dh-client.txt client/rtshop-dh-notes.txt 2>/dev/null || (echo "no DH result"; tail -n 30 client/logs/latest.log | cut -c1-300)
+          { echo "== DH test (dedicated server + client, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Done \(" server/dh-server.log | cut -c1-260 | head -n 6; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/latest.log | cut -c1-260 | head -n 4; ls server/crash-reports client/crash-reports 2>/dev/null; } >> chunky-check.txt
+          cat chunky-check.txt
           grep -iE "distant ?horizons|\[DH|rtshop-dh|render distance" client/logs/latest.log | cut -c1-260 | head -n 40 || true
       - name: Share performance results (test branches only)
         if: always()
         run: |
           mkdir -p /tmp/perf
-          cp server/rtshop-perf-server.txt perf-server-report.txt client/rtshop-perf-client-*.txt perf-client-*-report.txt client/rtshop-dh-client.txt client/rtshop-dh-notes.txt /tmp/perf/ 2>/dev/null || true
+          cp server/rtshop-perf-server.txt server/perf-server-report.txt client/rtshop-perf-client-*.txt perf-client-*-report.txt client/rtshop-dh-client.txt client/rtshop-dh-notes.txt chunky-check.txt /tmp/perf/ 2>/dev/null || true
           ls extramods > /tmp/perf/extramods.txt 2>/dev/null || true
           mkdir -p /tmp/perf/crash && cp server/crash-reports/*.txt client/crash-reports/*.txt /tmp/perf/crash/ 2>/dev/null || true
           cp server/dh-server.log /tmp/perf/ 2>/dev/null || true

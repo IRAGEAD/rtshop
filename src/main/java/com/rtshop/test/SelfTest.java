@@ -2751,6 +2751,26 @@ public final class SelfTest {
                         bnRecipes == 0 && bnLoot, bnRecipes + " recipes " + bnSample + " loot " + bnLoot);
                 betterNetherDrops(level, a);
             }
+            if (net.minecraftforge.fml.ModList.get().isLoaded("distanthorizons") && net.minecraftforge.fml.ModList.get().isLoaded("chunky")) {
+                // 3.70.0: DH 3.3.3 은 Chunky 가 등록되기 전(세계를 여는 동안)에 연결하려다 튕겼다 → RT Shop 이 Chunky 가 켜질 때까지 미룬다
+                boolean hooked = false;
+                String names = "";
+                try {
+                    Class<?> acc = Class.forName("com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.AbstractChunkyAccessor", false, SelfTest.class.getClassLoader());
+                    for (java.lang.reflect.Method m : acc.getDeclaredMethods()) {
+                        if (m.getName().contains("waitForChunky")) {
+                            hooked = true;
+                            names = m.getName();
+                        }
+                    }
+                } catch (Throwable t) {
+                    names = t.toString();
+                }
+                check("3.70.0 Distant Horizons waits until Chunky is loaded before linking to it (no crash on the first chunk without dhcompat)",
+                        hooked && com.rtshop.compat.ChunkyReady.now() && !"none".equals(com.rtshop.compat.ChunkyReady.probeForTest()),
+                        names + " ready " + com.rtshop.compat.ChunkyReady.now() + " probe " + com.rtshop.compat.ChunkyReady.probeForTest()
+                                + " deferred " + com.rtshop.compat.ChunkyReady.wasDeferred());
+            }
             check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
                     banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,
                     "banned " + banned + " guns " + gunsListed + " boss " + bossListed + " tacz recipes " + tacz + " craftable " + craftableListed + " " + sample);
