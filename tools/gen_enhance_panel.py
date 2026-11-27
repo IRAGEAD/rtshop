@@ -35,20 +35,20 @@ def background():
     return down(s.done())
 
 def runes():
-    """룬 열한 자 x 두 모습(켜짐 · 다음 단계): 칸 하나 16x15 (화면 픽셀). 바탕은 투명."""
+    """룬 열한 자 x 두 모습(켜짐 · 다음 단계): 칸 하나 16x15 (화면 픽셀). 바탕은 투명.
+    3.78 (사용자 "강화 정보 창의 룬이 채워질 때 글자 테두리를 벗어나는 문제"): 예전에는 바탕 띠에 새긴 홈(선 굵기 S(.8) = 3)보다 굵은 선(4 · 5)에
+    바깥 빛무리까지 둘러, 켜진 룬이 홈 밖으로 번진 굵은 덩어리로 보였다 (줄일 때 LANCZOS 가 테두리에 붉은 · 노란 띠도 만들었다).
+    이제 홈과 같은 자리 · 같은 굵기(3)의 선으로만 채우고(다음 단계는 더 밝은 색), 빛무리 없이, BOX 로 줄인다 → 빛이 홈 안에만 든다.
+    (게임에서 더 굵어 보인 까닭은 그릴 때 섞기(blend)가 꺼져 반투명 빛무리가 불투명하게 찍힌 것: EnhancePanel 이 룬을 그리기 전에 섞기를 켠다.)"""
     cw, ch = 16, 15; K = M.K
     im = Image.new('RGBA', (cw * MAXLV * K, ch * 2 * K), (0, 0, 0, 0))
-    for row, (core, halo, w) in enumerate((((255, 176, 90), (255, 130, 44), .9), ((255, 232, 170), (255, 170, 70), 1.15))):
+    for row, (core, width) in enumerate((((255, 172, 78), 3), ((255, 238, 184), 3))):
         layer = Image.new('L', im.size, 0); d = ImageDraw.Draw(layer)
         for i in range(MAXLV):
             u = 1.9; ox, oy = i * cw + cw / 2 - u, row * ch + ch / 2 - 2 * u
-            for (a, b, c, e) in RUNES[i]: d.line([(S(ox + a * u), S(oy + b * u)), (S(ox + c * u), S(oy + e * u))], fill=255, width=S(w))
-        # 빛무리는 옅게 (작은 화면에서 룬이 뭉개진 덩어리로 보이지 않게): 글자 선이 또렷이 남아야 한다
-        glow = layer.filter(ImageFilter.GaussianBlur(S(0.8 if row == 0 else 1.1)))
-        g = Image.new('RGBA', im.size, halo + (255,)); g.putalpha(glow.point(lambda q: int(q * (.30 if row == 0 else .45))))
-        im = Image.alpha_composite(im, g)
+            for (a, b, c, e) in RUNES[i]: d.line([(S(ox + a * u), S(oy + b * u)), (S(ox + c * u), S(oy + e * u))], fill=255, width=width)
         c = Image.new('RGBA', im.size, core + (255,)); c.putalpha(layer); im = Image.alpha_composite(im, c)
-    return down(im)
+    return im.resize((im.width * 2 // K, im.height * 2 // K), Image.BOX)
 
 def plate():
     """연한 금빛 판 (가운데가 늘어나는 9칸 그림): 48x48 화면 픽셀, 모서리 6."""

@@ -33,6 +33,41 @@ final class ClientSelfTest2 {
     }
 
     private static final List<Step> STEPS = new ArrayList<>();
+    private static final List<String> PORTRAIT_IDS = new ArrayList<>(), PORTRAIT_SHOW = new ArrayList<>(), PORTRAIT_OLD_BLANK = new ArrayList<>(),
+            PORTRAIT_OLD_CLIPPED = new ArrayList<>(), PORTRAIT_ICON = new ArrayList<>(), PORTRAIT_ODD = new ArrayList<>(), PORTRAIT_BAD = new ArrayList<>();
+    private static int PORTRAIT_I;
+
+    /** 시험용: 몹 그림을 한 화면에 늘어놓는다 (before = 예전 방식). */
+    static final class PortraitGrid extends net.minecraft.client.gui.screens.Screen {
+        private final List<String> ids;
+        private final boolean before;
+
+        PortraitGrid(List<String> ids, boolean before) {
+            super(net.minecraft.network.chat.Component.literal("portraits"));
+            this.ids = new ArrayList<>(ids);
+            this.before = before;
+        }
+
+        @Override
+        public void render(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float pt) {
+            g.fill(0, 0, width, height, 0xFF2A1A10);
+            int box = 40, cols = Math.max(1, (width - 6) / (box + 4));
+            for (int i = 0; i < ids.size(); i++) {
+                int x = 4 + (i % cols) * (box + 4), y = 4 + (i / cols) * (box + 10);
+                if (y + box > height) break;
+                g.fill(x, y, x + box, y + box, 0xFF24160C);
+                if (before) MobPortrait.drawLegacyForTest(g, ids.get(i), x, y, box, 30F);
+                else MobPortrait.draw(g, ids.get(i), x, y, box, 30F);
+                String nm = ids.get(i).substring(ids.get(i).indexOf(':') + 1);
+                g.pose().pushPose();
+                g.pose().translate(x, y + box + 1, 0);
+                g.pose().scale(0.5F, 0.5F, 1F);
+                g.drawString(font, nm.length() > 18 ? nm.substring(0, 18) : nm, 0, 0, 0xFFFFFFFF, false);
+                g.pose().popPose();
+            }
+            g.drawString(font, before ? "BEFORE (hitbox scale)" : "NOW (measured fit)", width - 130, height - 10, 0xFFFFD866, false);
+        }
+    }
     private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
     private static long ABSENT_377;
     private static int ABSENT_ID_377 = -1;
@@ -1318,6 +1353,17 @@ final class ClientSelfTest2 {
                 check("the function buttons other mods put at the top-left of the inventory (FTB sidebar) are gone (at least one was removed)",
                         !left && ClientEvents.sidebarRemovedForTest >= 1, ClientEvents.sidebarRemovedForTest + " | " + kinds);
             }
+            if (net.minecraftforge.fml.ModList.get().isLoaded("spiral_abyss")) {
+                // 3.78 (사용자 11-28): Spiral Abyss 의 일지 단추(왼쪽 위)도 숨긴다
+                boolean abyssLeft = false;
+                StringBuilder kinds378 = new StringBuilder();
+                for (net.minecraft.client.gui.components.events.GuiEventListener l : mc.screen.children()) {
+                    abyssLeft |= ClientEvents.abyssButton(l);
+                    kinds378.append(l.getClass().getName()).append(' ');
+                }
+                check("3.78 the Spiral Abyss journal button at the top-left of the inventory is gone (one was removed, none left to draw)",
+                        !abyssLeft && ClientEvents.abyssRemovedForTest >= 1, ClientEvents.abyssRemovedForTest + " | " + kinds378);
+            }
             check("the job badge lists the combat and life job with their passives (no job = 'none', never empty)",
                     mc.screen instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen && jl.size() >= 4 && named
                             && !jl.get(0).getString().isBlank(), jl.size() + " / " + jl.get(0).getString());
@@ -1492,6 +1538,71 @@ final class ClientSelfTest2 {
             shot(mc, "128c_codex_boss");
             mc.setScreen(null);
             onServer(mc, sp -> com.rtshop.story.Codex.resetForTest(sp));
+            waitTicks(5);
+        });
+        // 3.78 (사용자 "도감에서 몹들의 3D 모습이 일부 보이지 않는 문제"): 도감의 모든 몹을 화면 밖에서 그려 보고, 칸 안에 보이는지 잰다
+        add(mc -> {
+            if (PORTRAIT_IDS.isEmpty()) {
+                PORTRAIT_IDS.addAll(com.rtshop.story.Codex.mobs().keySet());
+                PORTRAIT_I = 0;
+            }
+            long t0 = System.nanoTime();
+            while (PORTRAIT_I < PORTRAIT_IDS.size() && System.nanoTime() - t0 < 400_000_000L) {
+                String id = PORTRAIT_IDS.get(PORTRAIT_I++);
+                try {
+                    int[] old;
+                    try {
+                        old = MobPortrait.boxCheckForTest(id, 64, true);
+                    } catch (Throwable t) {
+                        old = new int[]{0, 0}; // 예전 방식으로는 그리다 오류: 빈칸이었던 것과 같다
+                    }
+                    MobPortrait.Fit f = MobPortrait.fitNowForTest(id);
+                    if (f == null) {
+                        PORTRAIT_BAD.add(id + " (no fit: " + MobPortrait.pipelineInfo + ")");
+                        continue;
+                    }
+                    boolean oldBlank = old[0] == 0, oldClipped = old[1] > 8;
+                    if (oldBlank) PORTRAIT_OLD_BLANK.add(id);
+                    else if (oldClipped) PORTRAIT_OLD_CLIPPED.add(id + "(" + old[1] + ")");
+                    if (f.isIcon()) {
+                        PORTRAIT_ICON.add(id + " [" + f.why + "]");
+                        if (PORTRAIT_SHOW.size() < 72) PORTRAIT_SHOW.add(id);
+                        continue;
+                    }
+                    int[] neu = MobPortrait.boxCheckForTest(id, 64, false);
+                    if (neu[0] <= 0 || neu[1] > 3) PORTRAIT_BAD.add(id + " in " + neu[0] + " over " + neu[1] + " " + f.why);
+                    if (!f.why.equals("ok")) PORTRAIT_ODD.add(id + " " + f.why);
+                    if ((oldBlank || oldClipped || !f.why.equals("ok")) && PORTRAIT_SHOW.size() < 72) PORTRAIT_SHOW.add(id);
+                } catch (Throwable t) {
+                    PORTRAIT_BAD.add(id + " threw " + t);
+                }
+            }
+            if (PORTRAIT_I < PORTRAIT_IDS.size()) {
+                ClientSelfTest.repeatStep();
+                return;
+            }
+            int n = PORTRAIT_IDS.size();
+            ClientSelfTest.LINES.add("  codex portraits: mobs " + n + ", before: blank " + PORTRAIT_OLD_BLANK.size() + " clipped " + PORTRAIT_OLD_CLIPPED.size()
+                    + ", now: egg " + PORTRAIT_ICON.size() + " odd " + PORTRAIT_ODD.size() + " bad " + PORTRAIT_BAD.size() + " (" + MobPortrait.pipelineInfo + ")");
+            ClientSelfTest.LINES.add("  codex portraits blank before: " + PORTRAIT_OLD_BLANK);
+            ClientSelfTest.LINES.add("  codex portraits clipped before: " + PORTRAIT_OLD_CLIPPED);
+            ClientSelfTest.LINES.add("  codex portraits as eggs now: " + PORTRAIT_ICON);
+            ClientSelfTest.LINES.add("  codex portraits re-measured (far/shown/big): " + PORTRAIT_ODD);
+            check("3.78 every codex mob shows inside its box: the 3D model is measured off-screen and fitted, or its spawn egg when the model draws nothing",
+                    MobPortrait.pipelineOkForTest() && PORTRAIT_BAD.isEmpty() && n >= 30 && PORTRAIT_ICON.size() <= Math.max(3, n / 7),
+                    "mobs " + n + " egg " + PORTRAIT_ICON.size() + " bad " + PORTRAIT_BAD);
+            if (PORTRAIT_SHOW.isEmpty()) PORTRAIT_SHOW.addAll(PORTRAIT_IDS.subList(0, Math.min(36, n)));
+            mc.setScreen(new PortraitGrid(PORTRAIT_SHOW, false));
+            waitTicks(15);
+        });
+        add(mc -> {
+            shot(mc, "128d_codex_portraits_now");
+            mc.setScreen(new PortraitGrid(PORTRAIT_SHOW, true));
+            waitTicks(15);
+        });
+        add(mc -> {
+            shot(mc, "128e_codex_portraits_before");
+            mc.setScreen(null);
             waitTicks(5);
         });
         // 안내서(가이드북): 갈래별 쪽, 그림과 글, 낱말로 찾기

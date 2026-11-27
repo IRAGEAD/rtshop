@@ -84,8 +84,11 @@ public final class Hunts {
     public int dailyCount = 3, weeklyCount = 1;
     /** 게시판에 붙는 의뢰 수 (이 중에서 dailyCount·weeklyCount 개까지 골라 맡는다) */
     public int dailyOffers = 6, weeklyOffers = 3;
-    /** 게시판을 맡는 NPC (말을 걸면 [현상금 게시판] 이 보인다) */
-    public List<String> boardNpcs = new ArrayList<>(List.of("attendance"));
+    /**
+     * 게시판을 맡는 NPC (말을 걸면 [현상금 게시판] 이 보인다). 현상금 게시판지기(quest_bounty)는 늘 맡고, 여기에는 그 밖의 NPC 를 더한다.
+     * 3.78 (사용자 11-28): 시청 서기 하루(attendance)는 더 이상 맡지 않는다 — 기본값은 비어 있다.
+     */
+    public List<String> boardNpcs = new ArrayList<>();
     public double weeklyMultiplier = 3.0;
     /** 하루가 바뀌는 시각 (한국 시간 기준 시) */
     public int resetHour = 6;
@@ -94,7 +97,8 @@ public final class Hunts {
     public final List<Pool> pools = new ArrayList<>();
     public final List<Book> books = new ArrayList<>();
 
-    static final int VERSION = 2;
+    /** 2: 난이도 자동 보상의 목록. 3 (3.78): 하루(attendance)를 게시판 NPC 에서 뺀다. */
+    static final int VERSION = 3;
     private static Hunts current;
     private static final Random RNG = new Random();
 
@@ -302,6 +306,11 @@ public final class Hunts {
         return o;
     }
 
+    /** 시험용: 설치된 파일을 읽는 것과 같은 길. */
+    public static Hunts fromJsonForTest(JsonObject o) {
+        return fromJson(o);
+    }
+
     static Hunts fromJson(JsonObject o) {
         Hunts h = new Hunts();
         if (o.has("enabled")) h.enabled = o.get("enabled").getAsBoolean();
@@ -316,8 +325,11 @@ public final class Hunts {
         if (o.has("weeklyMultiplier")) h.weeklyMultiplier = Math.max(1, o.get("weeklyMultiplier").getAsDouble());
         if (o.has("resetHour")) h.resetHour = Math.max(0, Math.min(23, o.get("resetHour").getAsInt()));
         if (o.has("jobBonus")) h.jobBonus = Math.max(0, o.get("jobBonus").getAsDouble());
+        int ver = o.has("version") ? o.get("version").getAsInt() : 0;
+        // 3.78: 하루(attendance)에게서도 현상금 게시판이 열렸다 → 옛 기본값 ["attendance"] 그대로면 비운다 (서버 주인이 고친 목록은 그대로)
+        if (ver < 3 && h.boardNpcs.size() == 1 && "attendance".equals(h.boardNpcs.get(0))) h.boardNpcs.clear();
         // 예전 파일(version 없음)의 목록은 손으로 매긴 보상이라 새 기본 목록(난이도 자동)으로 바꾼다
-        if (!o.has("version") || o.get("version").getAsInt() < VERSION) {
+        if (ver < 2) {
             h.pools.addAll(defaults().pools);
         } else if (o.has("pools")) {
             for (JsonElement e : o.getAsJsonArray("pools")) {

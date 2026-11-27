@@ -101,43 +101,13 @@ public class BountyScreen extends Screen {
     }
 
     /** 몹 모습 (3D 모델을 작게). 만들 수 없는 몹은 null. */
-    private static final java.util.Map<String, net.minecraft.world.entity.LivingEntity> MODELS = new java.util.HashMap<>();
-
     static net.minecraft.world.entity.LivingEntity model(String entity) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return null;
-        net.minecraft.world.entity.LivingEntity e = MODELS.get(entity);
-        if (e != null && e.level() == mc.level) return e;
-        try {
-            EntityType<?> t = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(entity));
-            net.minecraft.world.entity.Entity made = t == null ? null : t.create(mc.level);
-            e = made instanceof net.minecraft.world.entity.LivingEntity l ? l : null;
-        } catch (Throwable ex) {
-            e = null;
-        }
-        MODELS.put(entity, e);
-        return e;
+        return MobPortrait.model(entity);
     }
 
-    /** 몹 그림: 칸(box×box) 안에 맞춰 천천히 도는 3D 모습. 없으면 알 아이콘. */
+    /** 몹 그림: 칸(box×box) 안에 맞춰 천천히 도는 3D 모습 (3.78: 몹마다 한 번 재어 칸에 꼭 맞춤 — MobPortrait). 그릴 수 없으면 알 아이콘. */
     static void drawMob(GuiGraphics g, String entity, int x, int y, int box, float spin) {
-        net.minecraft.world.entity.LivingEntity e = model(entity);
-        if (e == null) {
-            g.renderItem(new ItemStack(net.minecraft.world.item.Items.PAPER), x + (box - 16) / 2, y + (box - 16) / 2);
-            return;
-        }
-        float size = Math.max(e.getBbHeight(), e.getBbWidth());
-        int scale = Math.max(2, (int) (box * 0.8F / Math.max(0.5F, size)));
-        g.enableScissor(x, y, x + box, y + box);
-        e.yBodyRot = 180F + spin;
-        e.yBodyRotO = e.yBodyRot;
-        e.setYRot(e.yBodyRot);
-        e.yHeadRot = e.yBodyRot;
-        e.yHeadRotO = e.yBodyRot;
-        e.setXRot(0);
-        net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventory(g, x + box / 2, y + box - 2, scale,
-                new org.joml.Quaternionf().rotateZ((float) Math.PI).rotateX(-0.25F), null, e);
-        g.disableScissor();
+        MobPortrait.draw(g, entity, x, y, box, spin);
     }
 
     @Override

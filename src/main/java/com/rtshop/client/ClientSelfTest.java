@@ -60,7 +60,7 @@ public final class ClientSelfTest {
     private static final boolean ENABLED = Boolean.getBoolean("rtshop.clienttest");
     /** 3.64.2: -Drtshop.clienttest.only=shader 이면 셰이더를 켠 화면의 짧은 점검(ClientShaderTest)만 돌리고 결과를 rtshop-shadertest.txt 에 적는다. */
     static final boolean SHADER_ONLY = "shader".equals(System.getProperty("rtshop.clienttest.only", ""));
-    private static final List<String> LINES = new ArrayList<>();
+    static final List<String> LINES = new ArrayList<>();
     private static int step = 0;
     private static boolean gradeTabStage = false;
     private static int panelTries = 0, grandTries = 0;
@@ -549,6 +549,10 @@ public final class ClientSelfTest {
                         !net.minecraftforge.fml.ModList.get().isLoaded("cinematic") && !(mc.screen instanceof EnhanceScreen)
                                 || (EnhancePanel.lastRunesForTest == 4 && EnhancePanel.lastSlotsForTest >= 2),
                         EnhancePanel.lastRunesForTest + " / " + EnhancePanel.lastSlotsForTest);
+                if (EnhancePanel.lastRunesForTest > 0) {
+                    // 3.78: 켜진 룬은 섞기를 켜고 그린다 (꺼져 있으면 옅은 빛무리가 불투명하게 찍혀 홈 밖으로 번졌다)
+                    check("3.78 the lit runes are drawn with blending on, so their light stays inside the engraved letters", EnhancePanel.lastRuneBlendForTest);
+                }
                 check("standing at the enhance anvil its rune band has begun to light up (found by the client, brightness above 0)",
                         EnhanceAnvilGlow.countForTest() >= 1 && EnhanceAnvilGlow.brightestForTest() > 0F,
                         EnhanceAnvilGlow.countForTest() + " / " + EnhanceAnvilGlow.brightestForTest());

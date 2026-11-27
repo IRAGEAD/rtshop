@@ -120,6 +120,8 @@ public final class EnhancePanel {
     private static double hoverX = -1, hoverY = -1;
     /** 점검용: 마지막으로 그린 재료 칸의 수(Gold 칸 포함), 켜진 룬의 수. */
     public static int lastSlotsForTest, lastRunesForTest;
+    /** 점검용: 룬을 그릴 때 섞기가 켜져 있었는가 (3.78). */
+    public static boolean lastRuneBlendForTest;
 
     /** 화면에 다 들어오게 줄인 배율. */
     public static double scale(Screen s) {
@@ -258,7 +260,7 @@ public final class EnhancePanel {
     // ------------------------------------------------------------------ 그리기
 
     public static void draw(GuiGraphics g, Font font, EnhanceMenu menu, Player player, int x, int y, int w, int h) {
-        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        blend();
         g.blit(T_PANEL, x, y, W, H, 0, 0, W * 2, H * 2, W * 2, H * 2);
         ItemStack eq = menu.equipment();
         Font lf = lux() ? UiFont.of(FONT_ID) : font;
@@ -278,8 +280,18 @@ public final class EnhancePanel {
         g.drawString(font, t, cx - font.width(t) / 2, y, col, false);
     }
 
+    /**
+     * 반투명 그림을 그리기 전에 섞기(blend)를 켠다. 3.78 (사용자 "강화 정보 창의 룬이 채워질 때 글자 테두리를 벗어나는 문제"):
+     * 그 앞에 그린 장비 아이콘 · 글자가 섞기를 꺼 두어, 켜진 룬의 옅은 빛무리가 불투명하게 찍혀 홈 밖으로 번진 굵은 덩어리(붉은 · 노란 테)로 보였다.
+     */
+    static void blend() {
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
+    }
+
     /** 닦은 강철 판 (가운데가 늘어나는 9칸 그림; 그림은 화면 48칸 = 96픽셀, 모서리 6칸). */
     static void plate(GuiGraphics g, int x, int y, int w, int h) {
+        blend();
         int c = 6, t = 96, cc = 12, mid = 96 - 24;
         int[][] cols = {{x, c, 0, cc}, {x + c, w - 2 * c, cc, mid}, {x + w - c, c, t - cc, cc}};
         int[][] rows = {{y, c, 0, cc}, {y + c, h - 2 * c, cc, mid}, {y + h - c, c, t - cc, cc}};
@@ -337,7 +349,9 @@ public final class EnhancePanel {
         g.renderItem(eq, 0, 0);
         g.pose().popPose();
         fit(g, font, eq.getHoverName().getString(), cx, y + 91, w - 30, 1F, C_ON_SLATE, 1, true, false);
-        // 룬 띠: 강화 단계만큼 불이 들어온다 (다음 단계의 룬이 가장 밝다)
+        // 룬 띠: 강화 단계만큼 불이 들어온다 (다음 단계의 룬이 가장 밝다). 빛은 띠에 새긴 홈 안에만 (3.78: 섞기를 켜고, 홈과 같은 굵기의 그림)
+        blend();
+        lastRuneBlendForTest = org.lwjgl.opengl.GL11.glIsEnabled(org.lwjgl.opengl.GL11.GL_BLEND);
         float step = (W - 28 - 16) / (float) (EnhanceConfig.MAX_LEVEL - 1);
         for (int i = 0; i < EnhanceConfig.MAX_LEVEL && i < 11; i++) {
             boolean lit = i < cur, next = i == cur && l != null;

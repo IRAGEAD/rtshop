@@ -255,6 +255,20 @@ public final class SelfTest {
                 food != null && farmer != null && dup.isEmpty() && emptyCats.isEmpty() && wheatAtFarmer && breadAtFood
                         && mig && !migAgain && migText.contains("skipItemsOf") && migText.contains("식재료") && !migText.contains("농산물"),
                 "dup " + dup + " empty " + emptyCats + " wheat@farmer " + wheatAtFarmer + " bread@food " + breadAtFood + " mig " + mig + "/" + migAgain + " " + migText);
+        // 3.78 (사용자 11-28 07:31): 시청 서기 하루(attendance)에게서는 현상금 게시판이 열리지 않는다 (게시판지기만). 설치된 hunts.json 은 옛 기본값 그대로일 때만 고친다
+        {
+            com.google.gson.JsonObject hv2 = com.google.gson.JsonParser.parseString(
+                    "{\"version\":2,\"boardNpcs\":[\"attendance\"],\"pools\":[{\"flag\":\"\",\"targets\":[[\"minecraft:zombie\",2,3,77]]}]}").getAsJsonObject();
+            com.rtshop.story.Hunts h2 = com.rtshop.story.Hunts.fromJsonForTest(hv2);
+            com.google.gson.JsonObject hv2b = com.google.gson.JsonParser.parseString("{\"version\":2,\"boardNpcs\":[\"attendance\",\"general\"]}").getAsJsonObject();
+            com.rtshop.story.Hunts h2b = com.rtshop.story.Hunts.fromJsonForTest(hv2b);
+            boolean poolKept = h2.pools.size() == 1 && h2.pools.get(0).targets.size() == 1 && h2.pools.get(0).targets.get(0).gold == 77;
+            check("3.78 Haru the town clerk no longer opens the bounty board (only the board keeper does); an untouched old hunts.json drops him, a custom list and the pools stay",
+                    !com.rtshop.story.Hunts.isBoardKey("attendance") && com.rtshop.story.Hunts.isBoardKey("quest_bounty")
+                            && !com.rtshop.story.Hunts.get().boardNpcs.contains("attendance")
+                            && h2.boardNpcs.isEmpty() && h2b.boardNpcs.equals(List.of("attendance", "general")) && poolKept,
+                    com.rtshop.story.Hunts.get().boardNpcs + " " + h2.boardNpcs + " " + h2b.boardNpcs + " pool " + poolKept);
+        }
         // 3.78 (W-15): 식품 상인은 수산물 상인(fisher)이 다루는 품목도 올리지 않는다 (물고기 · 말린 켈프 · 수련잎). 설치된 파일은 ["farmer"] 그대로일 때만 fisher 를 더한다
         {
             ShopData fisher378 = ShopServer.shops().get("fisher");

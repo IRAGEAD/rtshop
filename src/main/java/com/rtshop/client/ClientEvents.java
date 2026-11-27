@@ -158,24 +158,37 @@ public final class ClientEvents {
     /**
      * 가방 창(크리에이티브 포함)의 왼쪽 위에 다른 모드가 붙이는 기능 단추 묶음(FTB Library 의 옆줄 단추: 팀·지도·날씨·시간 등)을 없앤다 (3.50).
      * 그 기능들은 저마다의 키로 여전히 쓸 수 있다. client.json 의 hideSidebarButtons 로 끌 수 있다.
+     * 3.78 (사용자 11-28): Spiral Abyss 의 일지 단추(왼쪽 위의 나무 문장)도 숨긴다 — hideAbyssInventoryButton. 일지는 그 모드의 키로 열린다.
      */
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
     public static void onScreenInitLast(ScreenEvent.Init.Post event) {
         try {
-            if (!ClientConfig.get().hideSidebarButtons || !(event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen<?>)) return;
-            int removed = 0;
+            if (!(event.getScreen() instanceof net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen<?>)) return;
+            ClientConfig cc = ClientConfig.get();
+            int removed = 0, abyss = 0;
             for (net.minecraft.client.gui.components.events.GuiEventListener l : new java.util.ArrayList<>(event.getListenersList())) {
-                if (sidebarButton(l)) {
+                if (cc.hideSidebarButtons && sidebarButton(l)) {
                     event.removeListener(l);
                     removed++;
+                } else if (cc.hideAbyssInventoryButton && abyssButton(l)) {
+                    event.removeListener(l);
+                    abyss++;
                 }
             }
             sidebarRemovedForTest = removed;
+            abyssRemovedForTest = abyss;
         } catch (Throwable ignored) {
         }
     }
 
     public static int sidebarRemovedForTest = -1;
+    public static int abyssRemovedForTest = -1;
+
+    /** Spiral Abyss 가 가방 창에 붙이는 단추 (JournalNavigation.icon 이 만드는 이름 없는 Button). */
+    static boolean abyssButton(Object widget) {
+        String n = widget.getClass().getName();
+        return n.startsWith("com.pla.spiral_abyss.");
+    }
 
     static boolean sidebarButton(Object widget) {
         String n = widget.getClass().getName();
