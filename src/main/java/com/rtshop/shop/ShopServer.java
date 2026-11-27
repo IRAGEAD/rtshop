@@ -878,17 +878,42 @@ public final class ShopServer {
                 entry.stack.getHoverName(), amount, num(total)), true);
     }
 
-    /** 직업 판매 보너스: 어부는 수산물, 요리사는 손으로 조리한 요리. */
+    /** 직업 판매 보너스: 어부는 수산물, 요리사는 손으로 조리한 요리, 광부는 캐낸 광석 · 원석 · 보석 (3.67.0). */
     public static double jobSellMultiplier(ServerPlayer player, ShopData.Entry entry) {
         double m = 1.0;
         if (entry.fish) {
             m += com.rtshop.job.Jobs.stat(player, "fishSell");
+        }
+        if (minedGood(entry.stack)) {
+            m += com.rtshop.job.Jobs.stat(player, "oreSell");
         }
         if (ShopLoader.handCooked(loaded, entry.stack)) {
             m += com.rtshop.job.Jobs.stat(player, "dishSell");
         }
         m *= 1.0 + com.rtshop.rank.Ranks.effect(player, "sell_bonus") / 100.0;   // 칭호 효과: 장사 수완
         return m;
+    }
+
+    private static final net.minecraft.tags.TagKey<net.minecraft.world.item.Item>[] MINED = mined("forge:ores", "forge:raw_materials", "forge:gems", "forge:dusts/redstone");
+
+    @SuppressWarnings("unchecked")
+    private static net.minecraft.tags.TagKey<net.minecraft.world.item.Item>[] mined(String... tags) {
+        net.minecraft.tags.TagKey<net.minecraft.world.item.Item>[] out = new net.minecraft.tags.TagKey[tags.length];
+        for (int i = 0; i < tags.length; i++) out[i] = net.minecraft.tags.ItemTags.create(new net.minecraft.resources.ResourceLocation(tags[i]));
+        return out;
+    }
+
+    /**
+     * 광부가 판매 보너스를 받는 '캐낸 것': 광석 블록 · 원석 · 보석 · 레드스톤 가루 · 석탄 (3.67.0).
+     * 주괴 · 조각처럼 만들어 내는 것, 숯처럼 상점 재료로 구워 만드는 것은 뺀다 (사서 만들어 팔아 남는 길이 생기지 않게).
+     */
+    public static boolean minedGood(ItemStack s) {
+        if (s.isEmpty() || s.is(net.minecraft.world.item.Items.CHARCOAL)) return false;
+        if (s.is(net.minecraft.world.item.Items.COAL)) return true;
+        for (net.minecraft.tags.TagKey<net.minecraft.world.item.Item> t : MINED) {
+            if (s.is(t)) return true;
+        }
+        return false;
     }
 
     /**

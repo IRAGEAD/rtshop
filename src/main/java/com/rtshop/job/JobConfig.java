@@ -30,6 +30,12 @@ public final class JobConfig {
     public static final String LIFE = "life";
     /** 설정 파일 세대. 3.5 에서 무기 상성이 생기며 2 가 됐다 (이전 파일은 backup 으로 옮기고 새 기본값을 쓴다). */
     public static final int CONFIG_VERSION = 2;
+    /**
+     * 직업 수치의 판 (3.67.0 = 2: 생활 직업 수입 맞추기). 옛 기본값 그대로인 수치만 새 값으로 바꾼다 (운영자가 고친 수치는 그대로).
+     * {직업, 수치, 옛 기본값, 새 기본값}
+     */
+    public static final int PARAMS_VERSION = 2;
+    private static final Object[][] PARAMS_V2 = {{"farmer", "starUp", 0.20, 0.35}, {"farmer", "extraHarvest", 0.10, 0.20}, {"cook", "dishSell", 0.28, 0.20}};
     /** 수치가 %가 아니라 그대로의 값인 패시브 (체력 칸 수 등). */
     public static final Set<String> FLAT_PARAMS = Set.of("maxHealth", "distanceFull");
 
@@ -179,10 +185,11 @@ public final class JobConfig {
                 p("maxMana", 0.10, "spellPower", 0.10, "maxHealth", -2),
                 p("sword", -0.25, -0.10, "axe", -0.25, -0.10, "blunt", -0.25, -0.10, "spear", -0.25, -0.10, "dagger", -0.25, -0.10,
                         "fist", -0.25, -0.10, "bow", -0.25, 0, "crossbow", -0.25, 0, "gun", -0.25, 0)));
-        add(def("farmer", LIFE, "농부", "minecraft:iron_hoe", p("starUp", 0.20, "extraHarvest", 0.10), p()));
+        // 3.67.0 생활 직업 수입 맞추기 (사용자 요청 "완벽히 같게 하지는 말고 납득이 될 만큼"): 농부 ↑ · 광부에 캔 광물 판매 보너스 · 요리사 조금 ↓ (어부는 물고기 값 쪽에서)
+        add(def("farmer", LIFE, "농부", "minecraft:iron_hoe", p("starUp", 0.35, "extraHarvest", 0.20), p()));
         add(def("fisher", LIFE, "어부", "minecraft:fishing_rod", p("fishSell", 0.20, "extraFish", 0.10), p()));
-        add(def("miner", LIFE, "광부", "minecraft:iron_pickaxe", p("mineSpeed", 0.15, "extraOre", 0.10), p()));
-        add(def("cook", LIFE, "요리사", "minecraft:cooked_beef", p("foodBonus", 0.20, "dishSell", 0.28), p()));
+        add(def("miner", LIFE, "광부", "minecraft:iron_pickaxe", p("mineSpeed", 0.15, "extraOre", 0.10, "oreSell", 0.20), p()));
+        add(def("cook", LIFE, "요리사", "minecraft:cooked_beef", p("foodBonus", 0.20, "dishSell", 0.20), p()));
     }
 
     private void add(JobDef d) {
@@ -234,6 +241,7 @@ public final class JobConfig {
             case "extraFish" -> pct(v) + " chance of 1 extra fish per catch";
             case "mineSpeed" -> "Mining speed " + signed(v);
             case "extraOre" -> pct(v) + " chance of an extra drop when mining ore";
+            case "oreSell" -> "Mined ore, raw metal and gem sale price " + signed(v);
             case "foodBonus" -> "Hunger restored by food " + signed(v);
             case "dishSell" -> "Hand-cooked dish sale price " + signed(v) + " (about " + Math.round((1 + handMargin) * (1 + v) * 100) + "% of the ingredient cost)";
             default -> key + " " + signed(v);
@@ -262,6 +270,7 @@ public final class JobConfig {
             case "extraFish" -> "낚시로 잡은 물고기 " + pct(v) + " 확률로 1마리 더";
             case "mineSpeed" -> "채굴 속도 " + signed(v);
             case "extraOre" -> "광석을 캘 때 " + pct(v) + " 확률로 추가 드롭";
+            case "oreSell" -> "캐낸 광석 · 원석 · 보석 판매가 " + signed(v);
             case "foodBonus" -> "음식을 먹을 때 포만감 " + signed(v);
             case "dishSell" -> "손으로 만든 요리 판매가 " + signed(v) + " (재료비의 약 " + Math.round((1 + handMargin) * (1 + v) * 100) + "%)";
             default -> key + " " + signed(v);
@@ -352,7 +361,14 @@ public final class JobConfig {
                 JsonObject o = JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject();
                 int ver = o.has("configVersion") ? o.get("configVersion").getAsInt() : 1;
                 if (ver >= CONFIG_VERSION) {
-                    return fromJson(o);
+                    JobConfig c = fromJson(o);
+                    int pv = o.has("paramsVersion") ? o.get("paramsVersion").getAsInt() : 1;
+                    if (pv < PARAMS_VERSION) {
+                        int n = c.upgradeParams(pv);
+                        c.save();
+                        RtShop.LOGGER.info("[rtshop] jobs.json 의 생활 직업 수치를 {}판으로 올렸습니다 (기본값이던 수치 {}개)", PARAMS_VERSION, n);
+                    }
+                    return c;
                 }
                 // 이전 버전 파일: 보관하고 새 기본값으로 바꾼다 (비용·쿨타임·NPC 이름은 이어받는다)
                 Path backup = FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("backup").resolve("jobs_v" + ver + "_" + System.currentTimeMillis() + ".json");
@@ -385,6 +401,22 @@ public final class JobConfig {
         Path p = path();
         Files.createDirectories(p.getParent());
         Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(toJson()), StandardCharsets.UTF_8);
+    }
+
+    /** 옛 판의 기본값 그대로인 수치를 새 기본값으로 바꾼다. 바꾼 수를 돌려준다. (새로 생긴 수치 — 광부 oreSell — 는 읽을 때 기본값으로 붙는다.) */
+    public int upgradeParams(int from) {
+        int n = 0;
+        if (from < 2) {
+            for (Object[] u : PARAMS_V2) {
+                JobDef d = jobs.get((String) u[0]);
+                Double cur = d == null ? null : d.params.get((String) u[1]);
+                if (cur != null && Math.abs(cur - (Double) u[2]) < 1e-9) {
+                    d.params.put((String) u[1], (Double) u[3]);
+                    n++;
+                }
+            }
+        }
+        return n;
     }
 
     /** JSON 에서 읽는다. 형식이 틀리면 IllegalArgumentException (편집기 저장 검사에도 쓴다). */
@@ -481,6 +513,7 @@ public final class JobConfig {
         help.add("jobs[].unlockFlag: 이 표식을 보상으로 주는 퀘스트가 있으면 그 퀘스트를 깨야 고를 수 있습니다.");
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
+        o.addProperty("paramsVersion", PARAMS_VERSION);
         o.addProperty("changeCostCombat", changeCostCombat);
         o.addProperty("changeCostLife", changeCostLife);
         o.addProperty("cooldownHoursCombat", cooldownHoursCombat);

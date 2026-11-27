@@ -5484,6 +5484,45 @@ public final class SelfTest {
             check("a cook gets no bonus on furnace food (no hopper money farm)", steakIdx < 0
                     || Math.abs(ShopServer.jobSellMultiplier(a, food.entries.get(steakIdx)) - 1.0) < 1e-6);
             check("a fisher bonus does not apply to a cook", codIdx < 0 || Math.abs(ShopServer.jobSellMultiplier(a, fisher.entries.get(codIdx)) - 1.0) < 1e-6);
+            // 3.67.0 생활 직업 수입 맞추기: 광부는 캐낸 광석 · 원석 · 보석을 20% 더 받고, 주괴나 물고기는 아니다
+            com.rtshop.job.Jobs.force(a, "life", "miner");
+            ShopData.Entry rawIron = null, ingot = null;
+            for (ShopData sd : ShopServer.shops().values()) {
+                for (ShopData.Entry en : sd.entries) {
+                    if (rawIron == null && en.sellable && en.stack.is(Items.RAW_IRON)) rawIron = en;
+                    if (ingot == null && en.sellable && en.stack.is(Items.IRON_INGOT)) ingot = en;
+                }
+            }
+            check("3.67.0 a miner sells mined goods (raw iron) for 20% more, but not ingots or fish",
+                    rawIron != null && Math.abs(ShopServer.jobSellMultiplier(a, rawIron) - 1.20) < 1e-6
+                            && (ingot == null || Math.abs(ShopServer.jobSellMultiplier(a, ingot) - 1.0) < 1e-6)
+                            && (codIdx < 0 || Math.abs(ShopServer.jobSellMultiplier(a, fisher.entries.get(codIdx)) - 1.0) < 1e-6)
+                            && ShopServer.minedGood(new ItemStack(Items.DIAMOND)) && ShopServer.minedGood(new ItemStack(Items.IRON_ORE))
+                            && !ShopServer.minedGood(new ItemStack(Items.CHARCOAL)) && !ShopServer.minedGood(new ItemStack(Items.GOLD_NUGGET)),
+                    rawIron == null ? "no raw iron in shops" : ShopServer.jobSellMultiplier(a, rawIron) + "");
+            com.rtshop.job.Jobs.force(a, "life", "cook");
+            com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
+            check("3.67.0 life jobs are brought closer: farmer star-up 35% · extra crop 20%, cook dish bonus 20%, miner ore sale +20%, fish bought at 85% of the list",
+                    jc.job("farmer").param("starUp", 0) == 0.35 && jc.job("farmer").param("extraHarvest", 0) == 0.20 && jc.job("cook").param("dishSell", 0) == 0.20
+                            && jc.job("miner").param("oreSell", 0) == 0.20 && com.rtshop.shop.PricingConfig.get().fishBaseMultiplier == 1.7,
+                    jc.job("farmer").params + " " + jc.job("cook").params + " " + jc.job("miner").params + " fish " + com.rtshop.shop.PricingConfig.get().fishBaseMultiplier);
+            // 옛 jobs.json: 기본값 그대로인 수치만 새 값으로, 운영자가 고친 수치는 그대로
+            com.google.gson.JsonObject oldJobs = jc.toJson();
+            oldJobs.remove("paramsVersion");
+            for (com.google.gson.JsonElement je : oldJobs.getAsJsonArray("jobs")) {
+                com.google.gson.JsonObject jo = je.getAsJsonObject();
+                String jid = jo.get("id").getAsString();
+                if (jid.equals("farmer")) {
+                    jo.getAsJsonObject("params").addProperty("starUp", 0.20);
+                    jo.getAsJsonObject("params").addProperty("extraHarvest", 0.15);
+                }
+                if (jid.equals("cook")) jo.getAsJsonObject("params").addProperty("dishSell", 0.28);
+            }
+            com.rtshop.job.JobConfig up = com.rtshop.job.JobConfig.fromJson(oldJobs);
+            int changedParams = up.upgradeParams(1);
+            check("3.67.0 an older jobs.json gets the new life-job numbers where it still had the old defaults, and keeps numbers the server changed",
+                    changedParams == 2 && up.job("farmer").param("starUp", 0) == 0.35 && up.job("farmer").param("extraHarvest", 0) == 0.15
+                            && up.job("cook").param("dishSell", 0) == 0.20, changedParams + " " + up.job("farmer").params + " " + up.job("cook").params);
 
             // 요리: 손으로 만드는 요리는 누구나 재료비의 110% 이상, 요리사는 140% 이상
             double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;
@@ -5497,13 +5536,15 @@ public final class SelfTest {
                 if (p.sellUnit + 1e-6 < p.purchaseNeed * (1 + margin)) {
                     low.add(ShopLoader.itemId(p.stack) + " " + p.sellUnit + "<" + p.purchaseNeed * (1 + margin));
                 }
-                double cook = p.sellUnit * (1 + cfg.job("cook").param("dishSell", 0));
-                if (p.cookable && cook + 1e-6 < p.purchaseNeed * 1.40) {
-                    low.add(ShopLoader.itemId(p.stack) + " cook " + cook + "<" + p.purchaseNeed * 1.4);
+                double cookBonus = cfg.job("cook").param("dishSell", 0);
+                double cook = p.sellUnit * (1 + cookBonus);
+                double cookWant = p.purchaseNeed * (1 + margin) * (1 + cookBonus);   // 3.67.0: 요리사 보너스 28% → 20% (재료비의 약 132%)
+                if (p.cookable && cook + 1e-6 < cookWant) {
+                    low.add(ShopLoader.itemId(p.stack) + " cook " + cook + "<" + cookWant);
                 }
             }
             info(hand + " hand-made foods");
-            check("hand-made food pays everyone 10% over the ingredients and a cook 40% or more", low.isEmpty(),
+            check("hand-made food pays everyone 10% over the ingredients and a cook the cook's bonus on top (about 132%)", low.isEmpty(),
                     low.isEmpty() ? null : low.subList(0, Math.min(6, low.size())));
             ShopLoader.Price bread = ShopServer.loaded().prices.get("minecraft:bread");
             ShopLoader.Price wheatP = ShopServer.loaded().prices.get("minecraft:wheat");

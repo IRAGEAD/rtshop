@@ -72,9 +72,11 @@ public final class PricingConfig {
 
     /**
      * 직접 낚은 물고기(무게 정보가 있는 것)의 매입가 배율. 기준 = 가격표 가격의 50%.
-     * 기본값 2.0 은 평균 무게의 물고기를 가격표 가격 그대로 사 준다는 뜻이다.
+     * 3.67.0: 2.0(가격표 그대로) → 1.7(85%). 어부가 다른 생활 직업보다 크게 벌던 것을 맞춤 (pricing.json 의 version 2, 옛 기본값 2.0 그대로인 파일만 고침).
      */
-    public double fishBaseMultiplier = 2.0;
+    public double fishBaseMultiplier = 1.7;
+    /** pricing.json 의 판: 2 = 3.67.0 (물고기 매입가 85%). */
+    public static final int FILE_VERSION = 2;
     /** 물고기 무게 보정 폭: 가장 무거우면 +25%, 가장 가벼우면 -25% (기본값이면 가격표 가격의 75%~125%). */
     public double fishWeightBonus = 0.25;
     /** 황금 물고기의 배율 (기준 = 가격표 가격의 50%). 기본값 6.0 = 가격표 가격의 3배. */
@@ -221,6 +223,17 @@ public final class PricingConfig {
                 if (o.has("fishWeightBonus")) c.fishWeightBonus = Math.max(0, Math.min(0.9, o.get("fishWeightBonus").getAsDouble()));
                 if (o.has("fishGoldenMultiplier")) c.fishGoldenMultiplier = Math.max(1, o.get("fishGoldenMultiplier").getAsDouble());
                 if (o.has("fishNoInfoMultiplier")) c.fishNoInfoMultiplier = Math.max(0, o.get("fishNoInfoMultiplier").getAsDouble());
+                int fileVer = o.has("version") && o.get("version").isJsonPrimitive() ? o.get("version").getAsInt() : 1;
+                if (fileVer < FILE_VERSION) {
+                    // 3.67.0: 물고기 매입가 100% → 85% — 옛 기본값(2.0) 그대로일 때만 바꾸고, 판 번호를 적어 한 번만
+                    if (o.has("fishBaseMultiplier") && Math.abs(c.fishBaseMultiplier - 2.0) < 1e-9) {
+                        c.fishBaseMultiplier = 1.7;
+                        o.addProperty("fishBaseMultiplier", 1.7);
+                    }
+                    o.addProperty("version", FILE_VERSION);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                    RtShop.LOGGER.info("[rtshop] pricing.json 을 {}판으로 올렸습니다 (물고기 매입가 배율 {})", FILE_VERSION, c.fishBaseMultiplier);
+                }
                 readDoubles(o, "margins", c.margins);
                 readDoubles(o, "labor", c.labor);
                 readDoubles(o, "flatExtra", c.flatExtra);
@@ -271,6 +284,7 @@ public final class PricingConfig {
                 o.addProperty("handCookedMargin", c.handCookedMargin);
                 o.addProperty("autoListFoodIngredients", c.autoListFoodIngredients);
                 o.addProperty("autoIngredientPrice", c.autoIngredientPrice);
+                o.addProperty("version", FILE_VERSION);
                 o.addProperty("fishBaseMultiplier", c.fishBaseMultiplier);
                 o.addProperty("fishWeightBonus", c.fishWeightBonus);
                 o.addProperty("fishGoldenMultiplier", c.fishGoldenMultiplier);
