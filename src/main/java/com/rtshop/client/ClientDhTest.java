@@ -13,8 +13,10 @@ import static com.rtshop.client.ClientSelfTest.shot;
 
 /**
  * Distant Horizons 의 가까운 청크 빈틈 재현과 고침 확인 (3.70.0). JVM 옵션 -Drtshop.clienttest=true -Drtshop.clienttest.only=dh,
- * 런처가 전용 서버(시야 거리 6)로 바로 들어간 상태에서: 렌더 거리 12 로 두고 높이 올라 지평선을 찍고(고치기 전),
+ * 런처가 전용 서버(시야 거리 6)로 바로 들어간 상태에서: 렌더 거리 12 로 두고 높이 올라 35도 아래를 내려다보며 찍고(고치기 전),
  * DhViewGuard 를 켜서 렌더 거리가 서버 시야 거리로 맞춰진 뒤 다시 찍는다. 결과 rtshop-dh-client.txt, 사진 170 · 171.
+ * 3.71.0: 먼 풍경 자료가 서버에서 올 시간을 2분 반 주고, 찍을 때마다 DH 가 고리(150 칸) · 먼 곳(320 칸)에 LOD 자료를 갖고 있는지 적는다
+ * (3.70.0 의 사진은 1 분 만에 찍어 먼 풍경이 아직 없었다).
  */
 @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = RtShop.MODID, value = net.minecraftforge.api.distmarker.Dist.CLIENT)
 final class ClientDhTest {
@@ -25,6 +27,8 @@ final class ClientDhTest {
     private static final List<String> NOTES = new ArrayList<>();
     private static int climb;
     private static double hoverY = -1;
+    /** 내려다보는 각도: 90 칸 위에서 35 도면 화면 가운데가 128 칸(8 청크) 앞, 곧 진짜 청크(6)와 먼 풍경 사이 고리에 닿는다. */
+    private static final float PITCH = 35F;
 
     /** 올라간 높이에 떠 있게 한다 (서버나 다른 모드가 날기를 꺼도 떨어지지 않게). */
     @net.minecraftforge.eventbus.api.SubscribeEvent
@@ -35,7 +39,7 @@ final class ClientDhTest {
         mc.player.getAbilities().flying = true;
         mc.player.setDeltaMovement(0, 0, 0);
         if (Math.abs(mc.player.getY() - hoverY) > 0.5) mc.player.setPos(mc.player.getX(), hoverY, mc.player.getZ());
-        mc.player.setXRot(12F);
+        mc.player.setXRot(PITCH);
     }
 
     static void run(Minecraft mc, int k) {
@@ -69,25 +73,25 @@ final class ClientDhTest {
                     mc.player.getAbilities().flying = true;
                     mc.player.setDeltaMovement(0, 0, 0);
                     mc.player.setPos(mc.player.getX(), mc.player.getY() + 1, mc.player.getZ());
-                    mc.player.setXRot(12F);
+                    mc.player.setXRot(PITCH);
                     ClientSelfTest.wait = 0;
                     stay();
                     return;
                 }
                 hoverY = mc.player.getY();   // 사진을 찍을 때까지 이 높이에 떠 있는다 (onTick)
-                ClientSelfTest.wait = 1200;   // 청크와 먼 풍경이 들어올 때까지 1 분
+                ClientSelfTest.wait = 3000;   // 청크와 먼 풍경(서버가 보내는 LOD)이 들어올 때까지 2 분 반
             }
             case 3 -> {
                 shot(mc, "170_dh_gap_before");
                 NOTES.add("before: render distance " + mc.options.renderDistance().get() + " · effective " + mc.options.getEffectiveRenderDistance()
-                        + " · " + mc.levelRenderer.getChunkStatistics());
+                        + " · " + mc.levelRenderer.getChunkStatistics() + " · " + lodProbe(mc));
                 ClientConfig.get().dhMatchServer = true;
-                ClientSelfTest.wait = 600;
+                ClientSelfTest.wait = 900;
             }
             case 4 -> {
                 shot(mc, "171_dh_gap_after");
                 int raw = mc.options.renderDistance().get(), eff = mc.options.getEffectiveRenderDistance();
-                NOTES.add("after: render distance " + raw + " · effective " + eff + " · " + mc.levelRenderer.getChunkStatistics());
+                NOTES.add("after: render distance " + raw + " · effective " + eff + " · " + mc.levelRenderer.getChunkStatistics() + " · " + lodProbe(mc));
                 check("3.70.0 with Distant Horizons on a server, the render distance is set to what the server sends (no empty ring between real chunks and far views), even with Farsight",
                         DhViewGuard.serverView >= 2 && raw == DhViewGuard.serverView && DhViewGuard.clampedForTest == raw,
                         raw + " / effective " + eff + " / server " + DhViewGuard.serverView + " / clamped " + DhViewGuard.clampedForTest);
@@ -110,6 +114,51 @@ final class ClientDhTest {
             default -> {
             }
         }
+    }
+
+    /**
+     * DH 가 LOD 자료를 갖고 있는지 (DH API 를 리플렉션으로): 내 둘레 8 방향의 150 칸(고리) · 320 칸(먼 곳).
+     * 자료가 있는데 사진에 안 보이면 그리기 문제, 자료가 없으면 서버에서 아직 안 온 것이다.
+     */
+    static String lodProbe(Minecraft mc) {
+        try {
+            Class<?> d = Class.forName("com.seibel.distanthorizons.api.DhApi$Delayed");
+            Object world = d.getField("worldProxy").get(null), terrain = d.getField("terrainRepo").get(null);
+            if (world == null || terrain == null) return "DH API not ready";
+            Object level = null;
+            java.lang.reflect.Method all = world.getClass().getMethod("getAllLoadedLevelWrappers");
+            all.setAccessible(true);
+            for (Object l : (Iterable<?>) all.invoke(world)) {
+                if (String.valueOf(l).contains("overworld")) level = l;
+            }
+            if (level == null) return "DH: no overworld level";
+            java.lang.reflect.Method col = null;
+            StringBuilder names = new StringBuilder();
+            for (java.lang.reflect.Method m : terrain.getClass().getMethods()) {
+                Class<?>[] p = m.getParameterTypes();
+                if (m.getDeclaringClass() != Object.class) names.append(m.getName()).append('/').append(p.length).append(' ');
+                if (p.length == 3 && p[1] == int.class && p[2] == int.class && m.getName().toLowerCase(java.util.Locale.ROOT).contains("column")) col = m;
+            }
+            if (col == null) return "DH: no column lookup (" + names.toString().trim() + ")";
+            col.setAccessible(true);
+            int px = mc.player.getBlockX(), pz = mc.player.getBlockZ(), ring = 0, far = 0;
+            for (int i = 0; i < 8; i++) {
+                double a = i * Math.PI / 4;
+                if (hasLod(col, terrain, level, px + (int) Math.round(Math.cos(a) * 150), pz + (int) Math.round(Math.sin(a) * 150))) ring++;
+                if (hasLod(col, terrain, level, px + (int) Math.round(Math.cos(a) * 320), pz + (int) Math.round(Math.sin(a) * 320))) far++;
+            }
+            return "DH LOD data: ring (150) " + ring + "/8 · far (320) " + far + "/8";
+        } catch (Throwable t) {
+            return "DH probe: " + t;
+        }
+    }
+
+    private static boolean hasLod(java.lang.reflect.Method col, Object terrain, Object level, int x, int z) throws Exception {
+        Object r = col.invoke(terrain, level, x, z);
+        if (r == null) return false;
+        if (!r.getClass().getField("success").getBoolean(r)) return false;
+        Object payload = r.getClass().getField("payload").get(r);
+        return payload != null && (!payload.getClass().isArray() || java.lang.reflect.Array.getLength(payload) > 0);
     }
 
     /** 같은 걸음을 다시 돌게 한다 (올라가는 동안). */

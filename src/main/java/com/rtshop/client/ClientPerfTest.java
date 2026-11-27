@@ -53,7 +53,8 @@ final class ClientPerfTest {
             case 1 -> {
                 OUT.add("RT Shop performance (client)");
                 OUT.add("mods " + net.minecraftforge.fml.ModList.get().size() + " · render distance " + mc.options.renderDistance().get()
-                        + " · graphics " + mc.options.graphicsMode().get() + " · GL " + com.mojang.blaze3d.platform.GlUtil.getRenderer() + " " + com.mojang.blaze3d.platform.GlUtil.getOpenGLVersion());
+                        + " · graphics " + mc.options.graphicsMode().get() + " · GL " + com.mojang.blaze3d.platform.GlUtil.getRenderer() + " " + com.mojang.blaze3d.platform.GlUtil.getOpenGLVersion()
+                        + " · " + dioramaInfo());
                 onServer(mc, sp -> {
                     var level = sp.serverLevel();
                     var server = sp.server;
@@ -154,6 +155,46 @@ final class ClientPerfTest {
         FPS.clear();
         MSPT.clear();
         ClientSelfTest.wait = ticks + 10;
+    }
+
+    /**
+     * 세계를 열기 전 (타이틀 화면, ClientSelfTest.autoEnter): dfast 변형이면 Diorama 지도 품질을 FAST 로 바꾼다.
+     * Diorama 는 설정을 바꾸기 전에는 파일을 만들지 않아 CI 가 미리 찾아 고칠 수 없었다 → 게임 안에서 바꾸고 저장한 뒤,
+     * 파일 위치와 원래 있었는지를 rtshop-diorama-file.txt 에 적어 CI 가 다음 변형 전에 되돌린다.
+     */
+    static void beforeWorld(Minecraft mc) {
+        if (!ENABLED || !"dfast".equals(VARIANT)) return;
+        try {
+            Class<?> st = Class.forName("dev.diorama.Settings");
+            Object s = st.getMethod("get").invoke(null);
+            java.lang.reflect.Field q = st.getField("quality");
+            Object old = q.get(s);
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            Object fast = Enum.valueOf((Class) q.getType(), "FAST");
+            java.lang.reflect.Method fm = st.getDeclaredMethod("file");
+            fm.setAccessible(true);
+            java.nio.file.Path file = ((java.nio.file.Path) fm.invoke(null)).toAbsolutePath();
+            boolean existed = Files.exists(file);
+            if (existed) Files.copy(file, file.resolveSibling(file.getFileName() + ".rtshop-bak"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            Files.write(mc.gameDirectory.toPath().resolve("rtshop-diorama-file.txt"), List.of(file.toString(), existed ? "existed" : "created"), StandardCharsets.UTF_8);
+            q.set(s, fast);
+            st.getMethod("save").invoke(s);
+            OUT.add("diorama quality " + old + " -> " + q.get(s) + " (" + file + (existed ? "" : ", new file") + ")");
+        } catch (Throwable t) {
+            OUT.add("diorama quality: could not set FAST: " + t);
+        }
+        RtShop.LOGGER.info("[rtshop-perf] {}", OUT.get(OUT.size() - 1));
+    }
+
+    /** 지금 Diorama 설정 (지도 품질 · GPU 굽기): 변형마다 결과 머리에 적는다. */
+    private static String dioramaInfo() {
+        try {
+            Class<?> st = Class.forName("dev.diorama.Settings");
+            Object s = st.getMethod("get").invoke(null);
+            return "diorama " + st.getField("quality").get(s) + " gpuBaking " + st.getField("gpuBaking").get(s);
+        } catch (Throwable t) {
+            return "diorama ?";
+        }
     }
 
     /** Diorama 의 큰 지도 (없거나 열 수 없으면 그냥 지나간다). */

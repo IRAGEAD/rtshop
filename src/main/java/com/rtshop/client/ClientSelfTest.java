@@ -205,6 +205,7 @@ public final class ClientSelfTest {
             if (!opening) {
                 opening = true;
                 RtShop.LOGGER.info("[rtshop-clienttest] opening the test world from the title screen");
+                if (ClientPerfTest.ENABLED) ClientPerfTest.beforeWorld(mc);
                 mc.createWorldOpenFlows().loadLevel(s, "rtshoptest");
             }
             return;

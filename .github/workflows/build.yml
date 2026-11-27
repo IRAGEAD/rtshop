@@ -641,8 +641,6 @@ jobs:
           { echo "== client base (singleplayer, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/perf-base.log | cut -c1-260 | head -n 4; ls client/crash-reports 2>/dev/null || true; } >> chunky-check.txt
           # 이제부터 한 가지씩만 바꿔 그 몫을 잰다 (Chunky 는 가만히 있을 때 일이 없어 빼 둔다: base 가 튕기면 나머지라도 재게)
           mkdir -p offclient && mv client/mods/Chunky*.jar offclient/ 2>/dev/null || true
-          # Diorama 설정 파일 (base 가 처음 켤 때 만든다)
-          DCFG=$(grep -rl --include=*.json '"gpuBaking"' client/config client 2>/dev/null | head -n 1); echo "diorama config: $DCFG"; head -c 6000 "$DCFG" 2>/dev/null | tr '\n' ' ' | cut -c1-6000; echo
           # noav: Arcane Vortex 만 뺌
           mkdir -p offav && mv client/mods/ArcaneVortex*.jar offav/ 2>/dev/null || true
           run_client noav
@@ -651,17 +649,15 @@ jobs:
           mkdir -p offfs && mv client/mods/*arsight*.jar offfs/ 2>/dev/null || true
           run_client nofs
           mv offfs/* client/mods/ 2>/dev/null || true
-          # dfast: Diorama 지도 품질만 FAST
-          if [ -n "$DCFG" ]; then
-            cp "$DCFG" dcfg.bak
-            python3 - "$DCFG" <<'PY'
-          import json, sys
-          p = sys.argv[1]; d = json.load(open(p)); d['quality'] = 'FAST'; json.dump(d, open(p, 'w'), indent=2); print('diorama quality', d.get('quality'), 'gpuBaking', d.get('gpuBaking'))
-          PY
-            run_client dfast
-            cp dcfg.bak "$DCFG"
+          # dfast: Diorama 지도 품질만 FAST — Diorama 는 설정을 바꾸기 전에는 파일을 만들지 않는다 (7차에서 못 찾은 까닭).
+          # RT Shop 이 세계를 열기 전에 게임 안에서 FAST 로 바꿔 저장하고 파일 위치를 적는다 → 끝나면 여기서 되돌린다
+          run_client dfast
+          if [ -f client/rtshop-diorama-file.txt ]; then
+            DF=$(sed -n 1p client/rtshop-diorama-file.txt); DS=$(sed -n 2p client/rtshop-diorama-file.txt)
+            if [ "$DS" = existed ]; then mv -f "$DF.rtshop-bak" "$DF"; else rm -f "$DF"; fi
+            echo "diorama settings put back ($DS): $DF"; rm -f client/rtshop-diorama-file.txt
           else
-            echo "no diorama config: dfast skipped"
+            echo "dfast: RT Shop left no note of the Diorama settings file"
           fi
           # addons: AI Improvements · Clumps 만 더함 (Canary 는 3차 실행에서 이 모드팩과 함께 켜지지 않았다: accessories 의 mixin 오류)
           cp extramods/AI-Improvements*.jar extramods/Clumps*.jar client/mods/ 2>/dev/null || true
@@ -679,9 +675,9 @@ jobs:
           cd ..
           for attempt in 1 2; do
             rm -f client/rtshop-dh-client.txt client/rtshop-dh-notes.txt
-            (sleep 900; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
+            (sleep 1050; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
             wd=$!
-            (timeout -k 20 800 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev -s 127.0.0.1 --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx7G -Drtshop.clienttest=true -Drtshop.clienttest.only=dh" --resolution 1280x720 > client-dh.log 2>&1) || echo "client exit code $?"
+            (timeout -k 20 950 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev -s 127.0.0.1 --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx7G -Drtshop.clienttest=true -Drtshop.clienttest.only=dh" --resolution 1280x720 > client-dh.log 2>&1) || echo "client exit code $?"
             pkill -9 -f "rtshop.clienttest" || true
             kill $wd 2>/dev/null || true
             # CI 가 붐비면 접속 직후에 연결이 끊기는 일이 있다 (서버: "Timed out") → 한 번 더
