@@ -1,4 +1,4 @@
-"""Enhancement art: three guard tickets (silver ticket base + shield emblem). The anvil block: tools/gen_enhance_anvil.py."""
+"""Enhancement art: four guard tickets (silver ticket base + shield emblem). The anvil block: tools/gen_enhance_anvil.py."""
 import os, random
 from PIL import Image
 
@@ -23,6 +23,8 @@ STYLES = {
     'enhance_guard_damage': ((60, 130, 230, 255), (230, 240, 255, 255)),
     'enhance_guard_destroy': ((215, 50, 50, 255), (255, 220, 120, 255)),
     'enhance_guard_full': ((235, 185, 40, 255), (170, 70, 230, 255)),
+    # 3.66.0: 하급 보호권 (+6 강화까지, 손상 · 파괴 모두 막음) — 청동 방패
+    'enhance_guard_lesser': ((176, 118, 66, 255), (245, 226, 196, 255)),
 }
 for name, (col, mark) in STYLES.items():
     im = base.copy()

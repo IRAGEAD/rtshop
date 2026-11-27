@@ -99,6 +99,16 @@ public final class EnhanceClient {
             tip.add(Math.min(1, tip.size()), Component.translatable(key, lv, EnhanceConfig.MAX_LEVEL, pct(Enhance.bonusPct(cfg, k, lv)))
                     .withStyle(color(lv)));
         }
+        // 3.66.0 실패 누적: 다음 강화의 성공률이 얼마나 올라 있는지
+        int fails = Enhance.failStacks(s);
+        if (fails > 0 && !tip.isEmpty()) {
+            EnhanceConfig cfg = EnhanceConfig.client();
+            int shown = Math.min(fails, cfg.failStackMax);
+            if (shown > 0 && cfg.failBonusPct > 0) {
+                tip.add(Math.min(lv > 0 ? 2 : 1, tip.size()), Component.translatable("rtshop.enhance.fail_stacks_tip", shown, cfg.failStackMax,
+                        pct(shown * cfg.failBonusPct)).withStyle(ChatFormatting.GREEN));
+            }
+        }
     }
 
     /**

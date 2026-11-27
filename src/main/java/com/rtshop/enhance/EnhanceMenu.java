@@ -128,10 +128,11 @@ public class EnhanceMenu extends AnvilMenu {
         }
         Enhance.consume(sp, cfg, l);
         // 모루에 올린 보호권 한 장: 이번 강화에 쓰이고, 결과와 상관없이 사라진다 (올린 것이 없으면 옛 방식으로 미리 써 둔 보호)
+        // 하급 보호권은 목표 +lesserGuardMax 까지만 쓰인다: 그보다 높으면 쓰이지도 사라지지도 않는다 (3.66.0)
         ItemStack ticket = guardStack();
-        Enhance.Guard guard = Enhance.guardFor(sp, ticket);
+        Enhance.Guard guard = Enhance.guardFor(sp, ticket, cur + 1, cfg);
         boolean useGuard = guard != Enhance.Guard.NONE;
-        if (Enhance.guardOf(ticket) != Enhance.Guard.NONE) {
+        if (Enhance.guardOf(ticket, cur + 1, cfg) != Enhance.Guard.NONE) {
             if (!sp.getAbilities().instabuild) {
                 ticket.shrink(1);
                 inputSlots.setItem(1, ticket.isEmpty() ? ItemStack.EMPTY : ticket);
@@ -139,7 +140,8 @@ public class EnhanceMenu extends AnvilMenu {
         } else if (useGuard) {
             Enhance.setActiveGuard(sp, 0);
         }
-        // 전설 이상·히든 장비는 파괴되지 않는다: 그 확률은 유지와 손상에 반씩
+        // 전설 이상·히든 장비는 파괴되지 않는다: 그 확률은 유지와 손상에 반씩. 실패 누적이 있으면 성공률이 오른다 (3.66.0)
+        int failsBefore = Enhance.failStacks(in);
         l = Enhance.levelFor(cfg, l, in);
         Enhance.Outcome rolled = Enhance.roll(l, Enhance.testRoll != null ? Enhance.testRoll : sp.getRandom().nextDouble());
         Enhance.Outcome o = useGuard ? Enhance.protect(rolled, guard) : rolled;
@@ -151,12 +153,15 @@ public class EnhanceMenu extends AnvilMenu {
         ItemStack shown = target.copy();
         Enhance.clearPreview(shown);
         Enhance.clearPreview(target);
+        int failsAfter = Enhance.failStacksAfter(cfg, failsBefore, o);
         if (after < 0) {
             target.setCount(0);
             Enhance.setLevel(shown, cur);
         } else {
             Enhance.setLevel(target, after);
             Enhance.setLevel(shown, after);
+            Enhance.setFailStacks(target, failsAfter);
+            Enhance.setFailStacks(shown, failsAfter);
         }
         inputSlots.setItem(0, ItemStack.EMPTY);
         int event = o == Enhance.Outcome.DESTROY ? 1029 : 1030;

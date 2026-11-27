@@ -30,7 +30,7 @@ public class EnhanceOddsScreen extends Screen {
     }
 
     public static int tableHeight() {
-        return 28 + ROW * EnhanceConfig.MAX_LEVEL + 34;
+        return 28 + ROW * EnhanceConfig.MAX_LEVEL + 44;   // 3.66.0: 아래 설명이 네 줄 (실패 누적 · 하급 보호권)
     }
 
     /** 표를 (x, y) 에 그린다. 시네마틱 장면 위 오버레이에서도 쓴다. */
@@ -71,7 +71,8 @@ public class EnhanceOddsScreen extends Screen {
             }
         }
         int fy = y + 26 + EnhanceConfig.MAX_LEVEL * ROW + 2;
-        List<net.minecraft.util.FormattedCharSequence> lines = font.split(Component.translatable("rtshop.enhodds.footer"), w - 24);
+        List<net.minecraft.util.FormattedCharSequence> lines = font.split(Component.translatable("rtshop.enhodds.footer",
+                EnhanceClient.pct(cfg.failBonusPct), cfg.failStackMax, cfg.lesserGuardMax), w - 24);
         for (net.minecraft.util.FormattedCharSequence line : lines) {
             g.drawString(font, line, x + 12, fy, Ui.C_INK_SOFT, false);
             fy += 10;

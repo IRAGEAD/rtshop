@@ -1972,6 +1972,83 @@ public final class SelfTest {
         return v;
     }
 
+    /** 3.66.0: 실패 누적(B) · 하급 보호권(E) · 높은 단계 수치 · 마법 뽑기 천장 없음(A) · 씨앗값(N). */
+    private static void enhance366(ServerLevel level, BlockPos pos, FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, ItemStack sword) {
+        com.rtshop.enhance.EnhanceConfig.Level raw11 = cfg.level(11);
+        ItemStack st3 = new ItemStack(Items.IRON_SWORD);
+        com.rtshop.enhance.Enhance.setFailStacks(st3, 3);
+        com.rtshop.enhance.EnhanceConfig.Level up11 = com.rtshop.enhance.Enhance.levelFor(cfg, raw11, st3);
+        ItemStack st9 = new ItemStack(Items.IRON_SWORD);
+        com.rtshop.enhance.Enhance.setFailStacks(st9, 9);
+        com.rtshop.enhance.EnhanceConfig.Level cap11 = com.rtshop.enhance.Enhance.levelFor(cfg, raw11, st9);
+        double sum = up11.success + up11.maintain + up11.damage + up11.destroy;
+        check("3.66.0 each failure raises the next success chance by 10% of that level's chance, up to 5 times; the other outcomes shrink so the total stays 100",
+                cfg.failBonusPct == 10 && cfg.failStackMax == 5 && Math.abs(up11.success - raw11.success * 1.3) < 1e-9 && Math.abs(sum - 100) < 1e-6
+                        && Math.abs(cap11.success - raw11.success * 1.5) < 1e-9 && up11.destroy < raw11.destroy
+                        && com.rtshop.enhance.Enhance.failStacksAfter(cfg, 0, com.rtshop.enhance.Enhance.Outcome.MAINTAIN) == 1
+                        && com.rtshop.enhance.Enhance.failStacksAfter(cfg, 5, com.rtshop.enhance.Enhance.Outcome.DAMAGE) == 5
+                        && com.rtshop.enhance.Enhance.failStacksAfter(cfg, 4, com.rtshop.enhance.Enhance.Outcome.SUCCESS) == 0,
+                raw11.success + " -> " + up11.success + " / cap " + cap11.success + " sum " + sum);
+        // 모루에서: 유지 두 번 → 누적 2, 그다음 성공 → 0
+        com.rtshop.enhance.Enhance.setActiveGuard(a, 0);
+        giveMaterials(a, cfg, 7, 4);
+        ItemStack f1 = enhanceOnce(level, pos, a, sword, 6, 0, 0.30, net.minecraft.world.inventory.ClickType.PICKUP);
+        ItemStack f2 = enhanceOnce(level, pos, a, f1, 6, 0, 0.30, net.minecraft.world.inventory.ClickType.PICKUP);
+        ItemStack f3 = enhanceOnce(level, pos, a, f2, 6, 0, 0.0, net.minecraft.world.inventory.ClickType.PICKUP);
+        check("3.66.0 on the anvil a failed attempt adds one to the item's failure count, and a success clears it",
+                com.rtshop.enhance.Enhance.level(f1) == 6 && com.rtshop.enhance.Enhance.failStacks(f1) == 1 && com.rtshop.enhance.Enhance.failStacks(f2) == 2
+                        && com.rtshop.enhance.Enhance.level(f3) == 7 && com.rtshop.enhance.Enhance.failStacks(f3) == 0,
+                com.rtshop.enhance.Enhance.level(f1) + "/" + com.rtshop.enhance.Enhance.failStacks(f1) + " " + com.rtshop.enhance.Enhance.failStacks(f2)
+                        + " " + com.rtshop.enhance.Enhance.level(f3) + "/" + com.rtshop.enhance.Enhance.failStacks(f3));
+        // 하급 보호권: +6 까지는 손상 · 파괴를 막고 한 장 쓰임, +7 부터는 쓰이지 않고 남음
+        giveMaterials(a, cfg, 5, 1);
+        giveMaterials(a, cfg, 7, 1);
+        com.rtshop.enhance.EnhanceMenu lm = enhanceMenu(level, pos, a);
+        ItemStack g4 = sword.copy();
+        com.rtshop.enhance.Enhance.setLevel(g4, 4);
+        lm.getSlot(0).set(g4);
+        lm.getSlot(1).set(new ItemStack(com.rtshop.item.ModItems.GUARD_LESSER.get(), 2));
+        com.rtshop.enhance.Enhance.testRoll = 0.999;
+        lm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        com.rtshop.enhance.Enhance.testRoll = null;
+        int lvA = com.rtshop.enhance.Enhance.level(lm.getCarried());
+        boolean keptA = !lm.getCarried().isEmpty();
+        int leftA = lm.getSlot(1).getItem().getCount();
+        lm.setCarried(ItemStack.EMPTY);
+        ItemStack g6b = sword.copy();
+        com.rtshop.enhance.Enhance.setLevel(g6b, 6);
+        lm.getSlot(0).set(g6b);
+        com.rtshop.enhance.Enhance.testRoll = 0.60;
+        lm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
+        com.rtshop.enhance.Enhance.testRoll = null;
+        int lvB = com.rtshop.enhance.Enhance.level(lm.getCarried());
+        int leftB = lm.getSlot(1).getItem().getCount();
+        lm.setCarried(ItemStack.EMPTY);
+        lm.getSlot(1).set(ItemStack.EMPTY);
+        check("3.66.0 the lesser protection guards attempts up to +6 (a destroy roll keeps the level, one ticket used) and is left alone from +7 (damage goes through, no ticket used)",
+                keptA && lvA == 4 && leftA == 1 && lvB == 5 && leftB == 1, keptA + " +" + lvA + " left " + leftA + " / +" + lvB + " left " + leftB);
+        ShopLoader.Price lp = ShopServer.loaded().prices.get("rtshop:enhance_guard_lesser");
+        ShopLoader.Price fp = ShopServer.loaded().prices.get("rtshop:enhance_guard_full");
+        check("3.66.0 the blacksmith sells the lesser protection cheaply (2,000 G), and the full protection now costs 25,000 G",
+                lp != null && lp.price == 2000 && lp.buyableSomewhere && fp != null && fp.price == 25000,
+                (lp == null ? "missing" : lp.price + "") + " / " + (fp == null ? "missing" : fp.price + ""));
+        check("3.66.0 high levels give more: +8 ~ +11 attack bonus 38 / 48 / 60 / 75%, armour 41 / 50 / 61 / 75%; costs fall (+11 Gold 30,000, success 5%)",
+                cfg.weaponBonus[8] == 38 && cfg.weaponBonus[11] == 75 && cfg.armorBonus[9] == 50 && cfg.armorBonus[11] == 75
+                        && cfg.level(11).gold == 30000 && cfg.level(11).success == 5 && cfg.level(9).success == 10,
+                java.util.Arrays.toString(cfg.weaponBonus) + " " + cfg.level(11).gold);
+        check("3.66.0 the magic gacha has no pity (the old 80-pull setting is not used)", !com.rtshop.magic.MagicConfig.get().pityOn);
+        int seed30 = 0, seed50 = 0;
+        ShopData farmer = ShopServer.shops().get("farmer");
+        if (farmer != null) {
+            for (ShopData.Entry en : farmer.entries) {
+                if (!en.buyable || !(en.stack.is(Items.CARROT) || en.stack.is(Items.POTATO))) continue;
+                if (en.price == 30) seed30++;
+                if (en.price == 50) seed50++;
+            }
+            check("3.66.0 carrot and potato seeds cost 30 G (were 50 G, more than the crop is worth)", seed30 >= 2 && seed50 == 0, seed30 + " at 30, " + seed50 + " at 50");
+        }
+    }
+
     private static void giveMaterials(FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, int target, int times) {
         for (com.rtshop.enhance.Enhance.Need n : com.rtshop.enhance.Enhance.needs(cfg, cfg.level(target), a)) {
             a.getInventory().add(new ItemStack(n.items.get(0), n.need * times));
@@ -2044,9 +2121,38 @@ public final class SelfTest {
             Files.writeString(ep, old.toString(), StandardCharsets.UTF_8);
             com.rtshop.enhance.EnhanceConfig.reload();
             com.rtshop.enhance.EnhanceConfig up = com.rtshop.enhance.EnhanceConfig.get();
+            com.rtshop.enhance.EnhanceConfig dft = new com.rtshop.enhance.EnhanceConfig();
+            dft.defaults();
             check("an old enhance.json with default odds is upgraded; edited levels are kept",
-                    up.level(1).success == 90 && up.level(1).maintain == 10 && up.level(2).success == 82 && up.level(3).success == 70.5,
+                    up.level(1).success == dft.level(1).success && up.level(1).maintain == dft.level(1).maintain && up.level(2).success == dft.level(2).success
+                            && up.level(3).success == 70.5,
                     up.level(1).success + " " + up.level(2).success + " " + up.level(3).success);
+            // 3.66.0: 2판 기본값 그대로인 단계는 3판(성공률 ↑ · Gold ↓)으로, 서버에서 바꾼 단계와 보너스 표는 그대로
+            com.google.gson.JsonObject v2 = cfg.toJson();
+            v2.addProperty("configVersion", 2);
+            com.google.gson.JsonObject l11 = v2.getAsJsonArray("levels").get(10).getAsJsonObject();
+            l11.addProperty("success", 3);
+            l11.addProperty("maintain", 31);
+            l11.addProperty("damage", 32);
+            l11.addProperty("destroy", 34);
+            l11.addProperty("gold", 65000);
+            com.google.gson.JsonObject l10 = v2.getAsJsonArray("levels").get(9).getAsJsonObject();
+            l10.addProperty("success", 6);
+            l10.addProperty("maintain", 32);
+            l10.addProperty("damage", 32);
+            l10.addProperty("destroy", 30);
+            l10.addProperty("gold", 40000);
+            com.google.gson.JsonArray oldWeapon = new com.google.gson.JsonArray();
+            for (double v : new double[]{0, 3, 6, 9, 13, 17, 22, 28, 35, 43, 52, 62}) oldWeapon.add(v);
+            v2.add("weaponBonus", oldWeapon);
+            v2.remove("failBonusPct");
+            Files.writeString(ep, v2.toString(), StandardCharsets.UTF_8);
+            com.rtshop.enhance.EnhanceConfig.reload();
+            com.rtshop.enhance.EnhanceConfig up3 = com.rtshop.enhance.EnhanceConfig.get();
+            check("3.66.0 an enhance.json from 3.65 moves its default levels to the new odds and Gold, keeps a level the server changed, and gets the new bonus table",
+                    up3.level(11).success == dft.level(11).success && up3.level(11).gold == dft.level(11).gold && up3.level(10).success == 6
+                            && up3.level(10).gold == 40000 && up3.weaponBonus[11] == dft.weaponBonus[11] && up3.failBonusPct == dft.failBonusPct,
+                    up3.level(11).success + "/" + up3.level(11).gold + " " + up3.level(10).success + "/" + up3.level(10).gold + " " + up3.weaponBonus[11]);
             // OP 편집기 저장
             com.google.gson.JsonObject ed = cfg.toJson();
             ed.getAsJsonArray("levels").get(0).getAsJsonObject().addProperty("success", 77);
@@ -2198,6 +2304,7 @@ public final class SelfTest {
                 com.rtshop.enhance.Enhance.lastBroadcast + " / " + com.rtshop.util.Later.pendingForTest());
         com.rtshop.util.Later.flushForTest();
         check("...and is then sent to everyone", com.rtshop.enhance.Enhance.lastBroadcast.startsWith("7:"), com.rtshop.enhance.Enhance.lastBroadcast);
+        enhance366(level, pos, a, cfg, sword);
         check("the scene bands are +7~8, +9~10 and +11, each with a longer build-up", com.rtshop.enhance.Enhance.fxTier(6, 7) == 0
                 && com.rtshop.enhance.Enhance.fxTier(7, 7) == 1 && com.rtshop.enhance.Enhance.fxTier(8, 7) == 1
                 && com.rtshop.enhance.Enhance.fxTier(9, 7) == 2 && com.rtshop.enhance.Enhance.fxTier(10, 7) == 2
@@ -2466,6 +2573,21 @@ public final class SelfTest {
         }
         check("after the trial the real rules are back: the iron sword and TNT can be crafted again",
                 server.getRecipeManager().byKey(new ResourceLocation("minecraft:iron_sword")).isPresent() && server.getRecipeManager().byKey(tntRecipe).isPresent());
+        {
+            // 3.66.0: 옛 판(4판) item_policy.json 을 읽으면 Better Nether 금지가 더해진다 (운영자가 적은 다른 줄은 그대로)
+            com.google.gson.JsonObject old4 = new com.google.gson.JsonObject();
+            old4.addProperty("version", 4);
+            com.google.gson.JsonArray lb = new com.google.gson.JsonArray();
+            lb.add("minecraft:saddle");
+            old4.add("lootBan", lb);
+            com.rtshop.rules.ItemPolicy.Config migrated = com.rtshop.rules.ItemPolicy.Config.fromJson(old4);
+            com.rtshop.rules.ItemPolicy.Config fresh = com.rtshop.rules.ItemPolicy.Config.defaults();
+            check("3.66.0 item rules: Better Nether's recipes, loot and block drops are banned by default and added to an older rules file (keeping its own lines)",
+                    migrated.lootBan.contains("betternether:*") && migrated.lootBan.contains("minecraft:saddle") && migrated.recipeBan.contains("betternether:*")
+                            && migrated.recipeBanMods.contains("betternether") && migrated.blockDropBan.contains("betternether:*")
+                            && fresh.recipeBanMods.contains("betternether") && fresh.lootBan.contains("betternether:*") && fresh.blockDropBan.contains("betternether:*"),
+                    migrated.lootBan + " " + migrated.recipeBanMods + " " + migrated.blockDropBan);
+        }
         if (net.minecraftforge.fml.ModList.get().isLoaded("wom") || net.minecraftforge.fml.ModList.get().isLoaded("efn") || net.minecraftforge.fml.ModList.get().isLoaded("tacz")) {
             int banned = 0, womListed = 0, gunsListed = 0, bossListed = 0, tacz = 0, craftableListed = 0;
             String sample = "";
@@ -2486,15 +2608,27 @@ public final class SelfTest {
                         && com.rtshop.rules.ItemPolicy.recipeReason(rec.getId(), out) != null) { craftableListed++; sample = out.toString(); }
             }
             if (net.minecraftforge.fml.ModList.get().isLoaded("betternether")) {
-                // 상점에 올리지 않는 모드의 장비는 그 모드의 조합법으로 만든다 (상점에도 없고 만들 수도 없는 물건이 되지 않게)
-                int netherGear = 0;
+                // 3.66.0: Better Nether 의 아이템은 만들지도, 상자 · 몹 · 보스 · 블록에서 얻지도 못한다 (상점은 전부터 금지)
+                int bnRecipes = 0;
+                String bnSample = "";
                 for (net.minecraft.world.item.crafting.Recipe<?> rec : server.getRecipeManager().getRecipes()) {
                     ResourceLocation out = com.rtshop.rules.RecipeRules.outputId(rec, server);
-                    if (out == null || !out.getNamespace().equals("betternether")) continue;
-                    net.minecraft.world.item.Item it = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(out);
-                    if (it != null && com.rtshop.rules.ItemPolicy.gear(it)) netherGear++;
+                    if (rec.getId().getNamespace().equals("betternether") || out != null && out.getNamespace().equals("betternether")) {
+                        bnRecipes++;
+                        bnSample = rec.getId().toString();
+                    }
                 }
-                check("mod pack: Better Nether is not sold by NPC shops, and its gear keeps its own recipes", netherGear > 0, netherGear + " gear recipes");
+                net.minecraft.world.item.Item ruby = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new ResourceLocation("betternether", "nether_ruby"));
+                net.minecraft.world.item.Item rubySword = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(new ResourceLocation("betternether", "flaming_ruby_sword"));
+                boolean bnLoot = true;
+                for (net.minecraft.world.item.Item it : new net.minecraft.world.item.Item[]{ruby, rubySword}) {
+                    if (it == null || it == Items.AIR) continue;
+                    ItemStack st = new ItemStack(it);
+                    bnLoot &= com.rtshop.rules.ItemPolicy.lootBanned(st, false) && com.rtshop.rules.ItemPolicy.lootBanned(st, true)
+                            && com.rtshop.rules.ItemPolicy.blockDropBanned(st);
+                }
+                check("3.66.0 mod pack: no Better Nether item can be crafted, and none comes from chests, mobs, bosses or broken blocks",
+                        bnRecipes == 0 && bnLoot, bnRecipes + " recipes " + bnSample + " loot " + bnLoot);
             }
             check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
                     banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,
@@ -2876,7 +3010,7 @@ public final class SelfTest {
                 net.minecraftforge.event.entity.living.LivingHurtEvent swing =
                         new net.minecraftforge.event.entity.living.LivingHurtEvent(target, level.damageSources().playerAttack(a), 10F);
                 com.rtshop.enhance.EnhanceRanged.onHurt(swing);
-                check("3.65.0 a +11 staff or wand makes spells 62% stronger (its melee swing is not raised this way)",
+                check("3.65.0 a +11 staff or wand makes spells stronger by the +11 bonus (its melee swing is not raised this way)",
                         Math.abs(cast.getAmount() - want11) < 0.01 && Math.abs(swing.getAmount() - 10F) < 0.01,
                         ForgeRegistries.ITEMS.getKey(staff) + " " + cast.getAmount() + " " + swing.getAmount());
             } else {

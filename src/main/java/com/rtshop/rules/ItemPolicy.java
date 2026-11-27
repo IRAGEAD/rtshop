@@ -62,8 +62,9 @@ public final class ItemPolicy {
 
     public static final class Config {
         /** 설정 파일의 판. 2 (3.53): Better Nether 도 상점 금지, 전리품 금지의 "*fruit*:*" 자리에 "spmovesets:*". 3 (3.58): Create 의 조합법·전리품·블록 드랍 금지.
-         *  4 (3.58.1): Create 는 상점(shopBan)과 뽑기(gachaBan)에도 오르지 않는다. */
-        public static final int VERSION = 4;
+         *  4 (3.58.1): Create 는 상점(shopBan)과 뽑기(gachaBan)에도 오르지 않는다.
+         *  5 (3.66.0): Better Nether 의 모든 아이템 — 조합법 · 전리품 · 몹/블록 드롭 금지 (상점은 2판부터 금지). */
+        public static final int VERSION = 5;
         /** 읽어 온 파일이 예전 판이라 고쳐 썼는가 (다시 저장한다). */
         transient boolean migrated;
         public boolean enabled = true;
@@ -117,11 +118,11 @@ public final class ItemPolicy {
             c.bossItems.addAll(List.of("minecraft:nether_star", "minecraft:dragon_egg", "minecraft:dragon_head"));
             c.lootBan.addAll(List.of("spmovesets:*", "artifacts:*", "relics_rpgs:*", "jewelry:*", "simplehats:*",
                     "adorablehamsterpets:*", "crittersandcompanions:*", "rpg_companions_tiny_dragons:*", "fantasymounts:*",
-                    "efn:*", "tacz:*", "lrtactical:*", "create:*"));
-            c.blockDropBan.add("create:*");
+                    "efn:*", "tacz:*", "lrtactical:*", "create:*", "betternether:*"));
+            c.blockDropBan.addAll(List.of("create:*", "betternether:*"));
             c.lootAllow.addAll(List.of("irons_spellbooks:*_ink", "irons_spellbooks:ink_*"));
-            c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil", "create:*"));
-            c.recipeBanMods.addAll(List.of("tacz", "create"));
+            c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil", "create:*", "betternether:*"));
+            c.recipeBanMods.addAll(List.of("tacz", "create", "betternether"));
             c.staffWords.addAll(List.of("staff", "wand", "scepter", "sceptre"));
             c.mobDrops.put("irons_spellbooks:common_ink", 0.03);
             c.mobDrops.put("irons_spellbooks:uncommon_ink", 0.012);
@@ -220,6 +221,13 @@ public final class ItemPolicy {
             strings(o, "keep", c.keep, d.keep);
             strings(o, "gachaBan", c.gachaBan, d.gachaBan);
             int v = v0(o);
+            if (v < 5) {   // 3.66.0: Better Nether 의 아이템은 만들거나 줍거나 캐서 얻지 못한다 (조합으로 만드는 무기가 뽑기 전설 무기보다 셌다)
+                c.recipeBanMods.add("betternether");
+                c.recipeBan.add("betternether:*");
+                c.lootBan.add("betternether:*");
+                c.blockDropBan.add("betternether:*");
+                c.migrated = true;
+            }
             if (v < 4) {   // 3.58.1: Create 전용 아이템은 상점과 뽑기에도 오르지 않는다 (지팡이로 올라간 대칭의 지팡이, 장신구 묶음의 고글, 마법 뽑기의 인챈트 2종)
                 c.shopBan.add("create:*");
                 c.gachaBan.add("create:*");
@@ -368,7 +376,7 @@ public final class ItemPolicy {
                 Config c = Config.fromJson(JsonParser.parseString(Files.readString(path(), StandardCharsets.UTF_8)).getAsJsonObject());
                 if (c.migrated) {
                     Files.writeString(path(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
-                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음).", Config.VERSION);
+                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음, 5: Better Nether 의 조합법·전리품·드롭 금지).", Config.VERSION);
                 }
                 return c;
             }

@@ -325,13 +325,13 @@
   },
   {
    "item": "minecraft:carrot",
-   "price": 50,
+   "price": 30,
    "category": "seeds",
    "seed": true
   },
   {
    "item": "minecraft:potato",
-   "price": 50,
+   "price": 30,
    "category": "seeds",
    "seed": true
   },
@@ -397,7 +397,7 @@
   },
   {
    "item": "farmersdelight:onion",
-   "price": 50,
+   "price": 30,
    "category": "seeds",
    "seed": true
   },

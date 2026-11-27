@@ -126,18 +126,67 @@ public final class Enhance {
         return id != null && cfg.safeItems.contains(id.toString());
     }
 
-    /** 이 장비에 맞춘 단계 확률: 파괴되지 않는 장비는 파괴 확률을 유지와 손상에 반씩 나눠 준다. */
+    /**
+     * 이 장비에 맞춘 단계 확률: 파괴되지 않는 장비는 파괴 확률을 유지와 손상에 반씩 나눠 준다.
+     * 3.66.0: 실패 누적이 있으면 성공률이 (그 단계 성공률 × failBonusPct% × 누적 수)만큼 오르고, 나머지 셋은 그 비율대로 줄어든다.
+     */
     public static EnhanceConfig.Level levelFor(EnhanceConfig cfg, EnhanceConfig.Level l, ItemStack s) {
-        if (l == null || l.destroy <= 0 || !unbreakable(cfg, s)) return l;
+        if (l == null) return null;
+        boolean safe = l.destroy > 0 && unbreakable(cfg, s);
+        double add = l.success * failBonus(cfg, s);
+        if (!safe && add <= 0) return l;
         EnhanceConfig.Level c = new EnhanceConfig.Level();
         c.level = l.level;
         c.success = l.success;
-        c.maintain = l.maintain + l.destroy / 2.0;
-        c.damage = l.damage + l.destroy / 2.0;
-        c.destroy = 0;
+        c.maintain = l.maintain + (safe ? l.destroy / 2.0 : 0);
+        c.damage = l.damage + (safe ? l.destroy / 2.0 : 0);
+        c.destroy = safe ? 0 : l.destroy;
         c.gold = l.gold;
         c.materials.addAll(l.materials);
+        double rest = c.maintain + c.damage + c.destroy;
+        if (add > 0 && rest > 0) {
+            add = Math.min(add, rest);
+            double f = (rest - add) / rest;
+            c.maintain *= f;
+            c.damage *= f;
+            c.destroy *= f;
+            c.success += add;
+        }
         return c;
+    }
+
+    // ------------------------------------------------------------------ 실패 누적 (3.66.0)
+
+    /** 장비에 쌓인 실패 수 (성공하면 0). */
+    public static final String FAIL_TAG = "rtshop_enh_fail";
+
+    public static int failStacks(ItemStack s) {
+        CompoundTag t = s.getTag();
+        return t == null ? 0 : Math.max(0, t.getInt(FAIL_TAG));
+    }
+
+    public static void setFailStacks(ItemStack s, int n) {
+        if (n <= 0) {
+            CompoundTag t = s.getTag();
+            if (t != null) {
+                t.remove(FAIL_TAG);
+                if (t.isEmpty()) s.setTag(null);
+            }
+        } else {
+            s.getOrCreateTag().putInt(FAIL_TAG, n);
+        }
+    }
+
+    /** 실패 누적으로 오르는 성공률의 배수 (0.3 = 그 단계 성공률의 30% 만큼 더). */
+    public static double failBonus(EnhanceConfig cfg, ItemStack s) {
+        if (cfg.failBonusPct <= 0 || cfg.failStackMax <= 0) return 0;
+        return Math.min(failStacks(s), cfg.failStackMax) * cfg.failBonusPct / 100.0;
+    }
+
+    /** 이번 결과 뒤의 실패 수: 성공이면 0, 아니면 하나 더 (최대 failStackMax). */
+    public static int failStacksAfter(EnhanceConfig cfg, int before, Outcome o) {
+        if (o == Outcome.SUCCESS || cfg.failStackMax <= 0) return 0;
+        return Math.min(cfg.failStackMax, Math.min(before, cfg.failStackMax) + 1);
     }
 
     /** 보호권을 손에 들고 우클릭: 미리 사용한다 (이미 걸린 보호면 쓰지 않음). 3.49 부터는 부르지 않는다 (점검용). 남아 있던 옛 보호는 3.64.2 부터 접속할 때 보호권으로 돌려준다(refundLegacyGuard). */
@@ -195,8 +244,24 @@ public final class Enhance {
         Item it = s.getItem();
         if (it == ModItems.GUARD_DAMAGE.get()) return Guard.DAMAGE;
         if (it == ModItems.GUARD_DESTROY.get()) return Guard.DESTROY;
-        if (it == ModItems.GUARD_FULL.get()) return Guard.FULL;
+        if (it == ModItems.GUARD_FULL.get() || it == ModItems.GUARD_LESSER.get()) return Guard.FULL;
         return Guard.NONE;
+    }
+
+    /** 하급 보호권인가 (3.66.0: 손상 · 파괴를 모두 막지만 목표 +lesserGuardMax 까지만). */
+    public static boolean lesser(ItemStack s) {
+        return !s.isEmpty() && s.getItem() == ModItems.GUARD_LESSER.get();
+    }
+
+    /** 목표 단계에 쓰이는 보호권의 보호: 하급 보호권은 lesserGuardMax 보다 높은 강화에는 쓰이지 않는다(NONE, 소모도 안 됨). */
+    public static Guard guardOf(ItemStack s, int target, EnhanceConfig cfg) {
+        if (lesser(s) && target > cfg.lesserGuardMax) return Guard.NONE;
+        return guardOf(s);
+    }
+
+    public static Guard guardFor(Player p, ItemStack ticket, int target, EnhanceConfig cfg) {
+        Guard g = guardOf(ticket, target, cfg);
+        return g != Guard.NONE || lesser(ticket) ? g : fromMask(activeGuard(p));
     }
 
     // ------------------------------------------------------------------ 단계

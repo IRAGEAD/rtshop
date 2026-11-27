@@ -314,12 +314,16 @@ public final class EnhancePanel {
         return hoverX >= x && hoverX < x + w && hoverY >= y && hoverY < y + h;
     }
 
+    /** 점검용: 마지막으로 그린 실패 누적 글자 ("" = 없음). */
+    public static String lastFailBadgeForTest = "";
+
     private static void drawMain(GuiGraphics g, Font font, EnhanceMenu menu, Player player, ItemStack eq, int x, int y, int w, int h) {
         int cx = x + w / 2;
         EnhanceConfig cfg = EnhanceConfig.client();
         title(g, font, Component.translatable("rtshop.enhance.panel").getString(), cx, y + 15);
         lastSlotsForTest = 0;
         lastRunesForTest = 0;
+        lastFailBadgeForTest = "";
         if (eq.isEmpty() || !Enhance.enhanceable(eq)) {
             help(g, font, x + 16, y + 132, w - 32, y + h - 24, "rtshop.enhance.help1", "rtshop.enhance.help2", "rtshop.enhance.help3", "rtshop.enhance.help4");
             return;
@@ -354,6 +358,13 @@ public final class EnhancePanel {
             g.pose().scale(1.4F, 1.4F, 1);
             g.drawString(font, b, 0, 0, C_BRASS, false);
             g.pose().popPose();
+            // 3.66.0 실패 누적: 오른쪽 끝에 "누적 3/5" (성공률은 아래 확률에 이미 반영)
+            int fails = Math.min(Enhance.failStacks(eq), cfg.failStackMax);
+            if (fails > 0 && cfg.failBonusPct > 0) {
+                String fs = Component.translatable("rtshop.enhui.fail_stacks", fails, cfg.failStackMax).getString();
+                fit(g, font, fs, x + w - 16, y + 131, w / 3, 0.85F, C_UP, 2, false, false);   // 오른쪽 끝에 맞춤
+                lastFailBadgeForTest = fs;
+            }
         }
         // 능력치: 지금 → 다음 (강철 판)
         List<Stat> stats = stats(eq, cur, l != null, cfg);
@@ -376,8 +387,10 @@ public final class EnhancePanel {
             help(g, font, x + 16, oy + 4, w - 32, y + h - 14, "rtshop.enhance.max_note");
             return;
         }
-        // 확률: 성공은 크게, 나머지 셋은 작게
-        Enhance.Guard guard = Enhance.guardFor(player, menu.guardStack());
+        // 확률: 성공은 크게, 나머지 셋은 작게 (하급 보호권은 목표 +lesserGuardMax 까지만 쓰인다, 실패 누적이 있으면 성공이 오른다)
+        ItemStack ticketOnAnvil = menu.guardStack();
+        boolean lesserIdle = Enhance.lesser(ticketOnAnvil) && cur + 1 > cfg.lesserGuardMax;
+        Enhance.Guard guard = Enhance.guardFor(player, ticketOnAnvil, cur + 1, cfg);
         int mask = Enhance.maskOf(guard);
         boolean safe = Enhance.unbreakable(cfg, eq);
         l = Enhance.levelFor(cfg, l, eq);
@@ -432,11 +445,14 @@ public final class EnhancePanel {
         plate(g, gx, my0, gw, size);
         boolean guarded = guard != Enhance.Guard.NONE;
         String g1 = Component.translatable("rtshop.enhui.guard").getString();
-        String g2 = guarded ? Enhance.guardName(mask).getString() : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : safe ? "rtshop.enhui.guard_safe" : "rtshop.enhui.guard_none").getString();
+        String g2 = guarded ? Enhance.guardName(mask).getString()
+                : lesserIdle ? Component.translatable("rtshop.enhui.guard_lesser_idle", cfg.lesserGuardMax).getString()
+                : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : safe ? "rtshop.enhui.guard_safe" : "rtshop.enhui.guard_none").getString();
         fit(g, font, g1, gx + 5, my0 + 4, gw - 10, 1F, C_PLATE_INK, 0, false, true);
-        fit(g, font, g2, gx + 5, my0 + 14, gw - 10, 1F, guarded ? 0xFF1F6F8B : l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, 0, false, false);
+        fit(g, font, g2, gx + 5, my0 + 14, gw - 10, 1F, guarded ? 0xFF1F6F8B : lesserIdle || l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, 0, false, false);
         if (over(gx, my0, gw, size)) {
             tip = guarded ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
+                    : lesserIdle ? Component.translatable("rtshop.enhance.lesser_idle", cfg.lesserGuardMax)
                     : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : safe ? "rtshop.enhance.safe_note" : "rtshop.enhance.no_guard");
         }
         // 맨 아래 한마디: 누르면 강화 / 무엇이 모자란지
