@@ -59,6 +59,13 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
+- **(11-28 새벽) 3.73.0 올림 · 보냄** (시장 사건 · /fpscheck · /rtshop perfcheck, 모드팩 전체 시험 서버 873 · 화면 341 모두 통과). **3.74.0 은 가지 v5-next27 에서 CI 중** (worklist 「3.74.0」 Y-1 ~ Y-12):
+  민원 글자 수 · 상점 툴팁 · 잠금 글 · HUD 높이 · 크리에이티브 탭 · 지도 표시 다시 · 직업 퀘스트 HUD · NPC reset/remove · 모리스 말투 + 대화 선택지 이야기 언어 · 식품 상인 skipItemsOf(값은 그대로) ·
+  나침반 대신 Cataclysm 눈 · Fantasy Mounts 퀘스트 끄기(그 모드의 fantasy-server.toml 을 직접). W-27(나침반 1000칸)은 이미 있음. W-10(스킬라 단서 확률)은 사용자 답을 기다림.
+  W-12 안내 문서(Docs) https://claude.ai/artifact/QGFS5i3wCxM8CL92uK9fS9 — DH 서버 전송 한도 권장값은 run 46014583936 의 perf 결과(DH A/B)로 채울 것.
+  3.74.0 다음: 3.75.0 (W-7 현상금 수령 · W-3 조사 수첩 아이템 · W-6 순위 보상 편집 · W-8 도감 장비 정리 · W-26 반짝이는 별 · W-25 대화 주제 잠금 · W-16 Photon 룬 불빛 · W-5 안내서) → ④ → ⑤ → ⑥(+W-21).
+  답으로만: W-13(타르코프식 설명: 살펴보기는 이야기 · 히든 아이템과 ④의 위조 증서에만 권함) · W-4(상점 토지 계획).
+
 - **3.72.0 = ③ 주식 1단계: 조합 증서 · 시세 · 배당 · 시세판 (worklist 의 "3.72.0", V-1 ~ V-7, 사용자가 고른 (가)안 · 조합 여섯 · ±10% · 수수료 2%)**:
   `stock/StockConfig`(config/rtshop/stocks.json) · `StockData`(world/data/rtshop_stocks.dat — 장부가 원본) · `Stocks`(시세 · 거래 · 배당 · 소식 · 죽음 보관 · 명령) · `StockBoardBlock` · `item/StockCertificateItem` · `client/StockScreen` · `net/StockPacket`.
   은행원 대화의 [증권 거래] = `/rtshop stocks trade`. 실적 고리: `IncomeStats.add` → `Stocks.onIncome`, `ShopServer.buy` → `onShopBuy`, `PlotManager.buy` · `Enhance.consume` → `activity`, `QuestManager.turnIn` → `onQuestDone`.
