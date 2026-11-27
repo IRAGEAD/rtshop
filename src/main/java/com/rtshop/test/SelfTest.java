@@ -203,6 +203,21 @@ public final class SelfTest {
                 gear375.size() + " shown, " + com.rtshop.story.Codex.lastHiddenGear + " hidden, loot " + lootScan + " av " + avGone);
         for (int i = 0; i < a.getInventory().getContainerSize(); i++)
             if (a.getInventory().getItem(i).is(ModItems.SURVEY_NOTEBOOK.get())) a.getInventory().setItem(i, ItemStack.EMPTY);
+        // W-5: 안내서의 강화 쪽이 보호권 쓰는 법과 세 가지가 하는 일, 전설 이상은 파괴되지 않음을 적고, 영어 글도 있다
+        String enh375 = "";
+        for (com.google.gson.JsonElement ce : com.rtshop.story.Guide.get().getAsJsonArray("categories"))
+            for (com.google.gson.JsonElement pe : ce.getAsJsonObject().getAsJsonArray("pages"))
+                if ("enhance".equals(pe.getAsJsonObject().get("id").getAsString())) enh375 = pe.getAsJsonObject().get("text").getAsString();
+        com.rtshop.story.StoryText.setLang(a, "en_us");
+        String enh375en = com.rtshop.story.StoryText.t(a, enh375);
+        com.rtshop.story.StoryText.setLang(a, "");
+        boolean protect375 = com.rtshop.enhance.Enhance.protect(com.rtshop.enhance.Enhance.Outcome.DAMAGE, com.rtshop.enhance.Enhance.Guard.DAMAGE) == com.rtshop.enhance.Enhance.Outcome.MAINTAIN
+                && com.rtshop.enhance.Enhance.protect(com.rtshop.enhance.Enhance.Outcome.DESTROY, com.rtshop.enhance.Enhance.Guard.DESTROY) == com.rtshop.enhance.Enhance.Outcome.DAMAGE
+                && com.rtshop.enhance.Enhance.protect(com.rtshop.enhance.Enhance.Outcome.DESTROY, com.rtshop.enhance.Enhance.Guard.FULL) == com.rtshop.enhance.Enhance.Outcome.MAINTAIN;
+        check("3.75 the guidebook's enhance page explains how to use guard tickets (middle slot, one per attempt) and what each of the three does, as the anvil really does it, in Korean and English",
+                enh375.contains("가운데") && enh375.contains("손상 방지권") && enh375.contains("파괴 방지권") && enh375.contains("강화 보호권") && enh375.contains("전설 이상")
+                        && enh375en.contains("Destruction Guard") && !enh375en.equals(enh375) && protect375,
+                enh375.length() + " / en " + (enh375en.equals(enh375) ? "missing" : enh375en.length()) + " protect " + protect375);
     }
 
     /** 3.74.0: 화면 · 문구 · 퀘스트 표시 (사용자 메모 W-*) 중 서버 쪽 */
