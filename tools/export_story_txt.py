@@ -15,7 +15,7 @@ if EN:
         return x
     for _n in data["npcs"]: _n["name"] = _tr.get(_n["name"], _n["name"])
     data["quests"] = [_walk(q) for q in data["quests"]]
-LBL = {"주는 사람": "Given by", "받을 때": "On accept", "진행 중": "In progress", "끝낼 때": "On completion", "끝낸 뒤": "After completion", "목표": "Goal", "동행": "Companion",
+LBL = {"주는 사람": "Given by", "보고 받는 사람": "Report to", "받을 때": "On accept", "진행 중": "In progress", "끝낼 때": "On completion", "끝낸 뒤": "After completion", "목표": "Goal", "동행": "Companion",
        "선택": "Choice", "장 제목": "chapter title", "이름 적기": "names written", "환영": "vision", "한마디": "line", ", 잠들 때": ", in sleep",
        "대화": "talk", "처치": "defeat", "가져오기": "bring", "찾아가기": "go to", "차원": "dimension", "조건": "condition", "발전과제": "advancement", "살펴보기": "examine", "지불": "pay", "방문": "visit",
        "도착": "arrive", "전투": "fight", "위급": "in danger", "쉴 때": "idle", "흔적 발견": "trace found", "일을 마쳤을 때": "done",
@@ -52,6 +52,8 @@ for q in data["quests"]:
     _m = re.search(r"\(([^()]*)\)$", q.get("chain", ""))
     w(); w("■ %s  %s" % (_m.group(1) if _m else "", q["title"]))
     w("  " + T("주는 사람") + ": " + npc.get(q["giver"], q["giver"]))
+    if q.get("turnIn") and q["turnIn"] != q["giver"]:   # 3.77: 보고 받는 사람이 다르면
+        w("  " + T("보고 받는 사람") + ": " + npc.get(q["turnIn"], q["turnIn"]))
     scene("받을 때", q.get("sceneAccept"))
     w("  [" + T("받을 때") + "] " + q["intro"])
     w("  [" + T("진행 중") + "] " + q["progress"])
