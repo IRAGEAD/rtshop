@@ -98,6 +98,12 @@ public final class EnhanceClient {
             };
             tip.add(Math.min(1, tip.size()), Component.translatable(key, lv, EnhanceConfig.MAX_LEVEL, pct(Enhance.bonusPct(cfg, k, lv)))
                     .withStyle(color(lv)));
+            // 3.66.0: +8 이상 방어구는 받는 피해도 줄인다 (입은 조각마다 더해짐)
+            double red = k == Enhance.Kind.ARMOR && cfg.armorReduce.length > 0 ? cfg.armorReduce[Math.min(lv, cfg.armorReduce.length - 1)] : 0;
+            if (red > 0) {
+                tip.add(Math.min(2, tip.size()), Component.translatable("rtshop.enhance.bonus_reduce", pct(red),
+                        pct(com.rtshop.enhance.EnhanceRanged.MAX_REDUCE)).withStyle(color(lv)));
+            }
         }
         // 3.66.0 실패 누적: 다음 강화의 성공률이 얼마나 올라 있는지
         int fails = Enhance.failStacks(s);

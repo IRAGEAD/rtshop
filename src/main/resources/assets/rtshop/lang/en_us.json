@@ -831,7 +831,7 @@
   "rtshop.enhodds.effect": "Attack",
   "rtshop.enhodds.gold": "Gold",
   "rtshop.enhodds.materials": "Materials",
-  "rtshop.enhodds.footer": "Damage: -1 level · Destroy: item lost. Each failure (keep or damage) raises the next success chance by %s of that level's rate (up to %s times, reset on success). A guard ticket next to the item covers that attempt (one is used): damage→keep, destroy→damage, both→keep. Attack is the total bonus (armor for armor).",
+  "rtshop.enhodds.footer": "Damage: -1 level · Destroy: item lost. Each failure (keep or damage) raises the next success chance by %s of that level's rate (up to %s times, reset on success). A guard ticket next to the item covers that attempt (one is used): damage→keep, destroy→damage, both→keep. Attack is the total bonus (armor for armor, plus less damage taken from +8).",
   "rtshop.enhodds.edit": "Edit odds (OP)",
   "rtshop.enhodds.close": "Close",
   "rtshop.enhodds.open": "Odds",
@@ -1951,5 +1951,7 @@
   "rtshop.enhance.bonus_magic": "Enhanced +%s/%s · Spell damage +%s",
   "rtshop.rules.extreme_removed": "%s can't be used in this pack, so it was taken away.",
   "rtshop.enhui.fail_stacks": "Fails %s/%s",
-  "rtshop.enhance.fail_stacks_tip": "Failures %s/%s · next success chance +%s (of that level's rate)"
+  "rtshop.enhance.fail_stacks_tip": "Failures %s/%s · next success chance +%s (of that level's rate)",
+  "rtshop.enhui.stat_reduce": "Damage taken",
+  "rtshop.enhance.bonus_reduce": "Damage taken -%s (adds up over worn enhanced armour, up to %s)"
 }

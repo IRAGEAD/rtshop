@@ -84,4 +84,29 @@ public final class EnhanceRanged {
             e.setAmount((float) (e.getAmount() * multiplier(lv)));
         }
     }
+
+    // ------------------------------------------------------------------ 3.66.0 방어구의 받는 피해 감소
+
+    /** 입은 강화 방어구가 줄여 주는 받는 피해의 합(%, 최대 MAX_REDUCE). */
+    public static final double MAX_REDUCE = 40;
+
+    public static double armorReducePct(EnhanceConfig cfg, net.minecraft.world.entity.LivingEntity e) {
+        double sum = 0;
+        for (net.minecraft.world.entity.EquipmentSlot slot : new net.minecraft.world.entity.EquipmentSlot[]{net.minecraft.world.entity.EquipmentSlot.HEAD,
+                net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET}) {
+            net.minecraft.world.item.ItemStack s = e.getItemBySlot(slot);
+            int lv = s.isEmpty() ? 0 : Enhance.level(s);
+            if (lv <= 0 || cfg.armorReduce.length == 0 || Enhance.kind(s) != Enhance.Kind.ARMOR) continue;
+            sum += cfg.armorReduce[Math.min(lv, cfg.armorReduce.length - 1)];
+        }
+        return Math.max(0, Math.min(MAX_REDUCE, sum));
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onHurtArmor(LivingHurtEvent e) {
+        if (e.getEntity().level().isClientSide || e.getAmount() <= 0) return;
+        if (e.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) return;   // 공허 · /kill
+        double pct = armorReducePct(EnhanceConfig.get(), e.getEntity());
+        if (pct > 0) e.setAmount((float) (e.getAmount() * (1.0 - pct / 100.0)));
+    }
 }

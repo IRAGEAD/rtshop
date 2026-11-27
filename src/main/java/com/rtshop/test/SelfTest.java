@@ -1972,7 +1972,7 @@ public final class SelfTest {
         return v;
     }
 
-    /** 3.66.0: 실패 누적(B) · 보호권 값(E) · 높은 단계 수치 · 마법 뽑기 천장 없음(A) · 씨앗값(N). */
+    /** 3.66.0: 실패 누적(B) · 보호권 값 그대로 · 높은 단계 수치 · 방어구 피해 감소 · 마법 뽑기 천장 없음(A) · 씨앗값(N). */
     private static void enhance366(ServerLevel level, BlockPos pos, FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, ItemStack sword) {
         com.rtshop.enhance.EnhanceConfig.Level raw11 = cfg.level(11);
         ItemStack st3 = new ItemStack(Items.IRON_SWORD);
@@ -2003,13 +2003,34 @@ public final class SelfTest {
         ShopLoader.Price dp = ShopServer.loaded().prices.get("rtshop:enhance_guard_damage");
         ShopLoader.Price xp = ShopServer.loaded().prices.get("rtshop:enhance_guard_destroy");
         ShopLoader.Price fp = ShopServer.loaded().prices.get("rtshop:enhance_guard_full");
-        check("3.66.0 guard tickets cost less: damage 10,000 · destruction 15,000 · full 25,000 G",
-                dp != null && dp.price == 10000 && xp != null && xp.price == 15000 && fp != null && fp.price == 25000,
+        check("3.66.0 guard ticket prices stay as they were: damage 15,000 · destruction 20,000 · full 35,000 G",
+                dp != null && dp.price == 15000 && xp != null && xp.price == 20000 && fp != null && fp.price == 35000,
                 (dp == null ? "?" : dp.price) + " / " + (xp == null ? "?" : xp.price) + " / " + (fp == null ? "?" : fp.price));
-        check("3.66.0 high levels give more: +8 ~ +11 attack bonus 38 / 48 / 60 / 75%, armour 41 / 50 / 61 / 75%; costs fall (+11 Gold 36,000, success 5%)",
-                cfg.weaponBonus[8] == 38 && cfg.weaponBonus[11] == 75 && cfg.armorBonus[9] == 50 && cfg.armorBonus[11] == 75
-                        && cfg.level(11).gold == 36000 && cfg.level(11).success == 5 && cfg.level(9).success == 10,
+        check("3.66.0 high levels give much more: +8 ~ +11 attack bonus 40 / 55 / 75 / 100%, armour 40 / 50 / 60 / 75%; +11 costs 40,000 G at 5%",
+                cfg.weaponBonus[8] == 40 && cfg.weaponBonus[11] == 100 && cfg.armorBonus[9] == 50 && cfg.armorBonus[11] == 75
+                        && cfg.level(11).gold == 40000 && cfg.level(11).success == 5 && cfg.level(9).success == 10,
                 java.util.Arrays.toString(cfg.weaponBonus) + " " + cfg.level(11).gold);
+        // +8 이상 방어구: 받는 피해가 조각마다 줄어든다 (방어력은 30 에서 막히므로)
+        net.minecraft.world.item.Item[] set = {Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS};
+        net.minecraft.world.entity.EquipmentSlot[] slots = {net.minecraft.world.entity.EquipmentSlot.HEAD, net.minecraft.world.entity.EquipmentSlot.CHEST,
+                net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET};
+        ItemStack[] keepArmor = new ItemStack[4];
+        for (int i = 0; i < 4; i++) {
+            keepArmor[i] = a.getItemBySlot(slots[i]).copy();
+            ItemStack piece = new ItemStack(set[i]);
+            com.rtshop.enhance.Enhance.setLevel(piece, 11);
+            a.setItemSlot(slots[i], piece);
+        }
+        double full = com.rtshop.enhance.EnhanceRanged.armorReducePct(cfg, a);
+        net.minecraftforge.event.entity.living.LivingHurtEvent hit =
+                new net.minecraftforge.event.entity.living.LivingHurtEvent(a, level.damageSources().generic(), 10F);
+        com.rtshop.enhance.EnhanceRanged.onHurtArmor(hit);
+        com.rtshop.enhance.Enhance.setLevel(a.getItemBySlot(slots[0]), 8);
+        for (int i = 1; i < 4; i++) a.setItemSlot(slots[i], ItemStack.EMPTY);
+        double one8 = com.rtshop.enhance.EnhanceRanged.armorReducePct(cfg, a);
+        for (int i = 0; i < 4; i++) a.setItemSlot(slots[i], keepArmor[i]);
+        check("3.66.0 armour from +8 also cuts damage taken: four +11 pieces take 30% less (10 -> 7), one +8 piece 1.5%",
+                Math.abs(full - 30) < 1e-9 && Math.abs(hit.getAmount() - 7F) < 0.01 && Math.abs(one8 - 1.5) < 1e-9, full + " " + hit.getAmount() + " " + one8);
         check("3.66.0 the magic gacha has no pity (the old 80-pull setting is not used)", !com.rtshop.magic.MagicConfig.get().pityOn);
         int seed30 = 0, seed50 = 0;
         ShopData farmer = ShopServer.shops().get("farmer");

@@ -555,6 +555,10 @@ public final class EnhancePanel {
     }
 
     /** 강화로 달라지는 수치: 보너스 %, 그리고 그 장비의 실제 공격 피해 / 방어력 / 방어 강도. */
+    private static double reduce(EnhanceConfig cfg, int lv) {
+        return lv <= 0 || cfg.armorReduce.length == 0 ? 0 : cfg.armorReduce[Math.min(lv, cfg.armorReduce.length - 1)];
+    }
+
     public static List<Stat> stats(ItemStack eq, int cur, boolean hasNext, EnhanceConfig cfg) {
         List<Stat> out = new ArrayList<>();
         ItemStack a = eq.copy(), b = eq.copy();
@@ -572,7 +576,14 @@ public final class EnhancePanel {
             case MAGIC -> "rtshop.enhui.stat_magic_pct";
             default -> "rtshop.enhui.stat_attack_pct";
         };
-        out.add(new Stat(Component.translatable(label).getString(), pNow, pNext));
+        double rNow = armor ? reduce(cfg, cur) : 0, rNext = armor && hasNext ? reduce(cfg, cur + 1) : 0;
+        if (rNow > 0 || rNext > 0) {
+            // 3.66.0: +8 부터 방어구는 받는 피해가 줄어든다 — 방어력 % 줄 대신 보여 준다 (방어력은 아래 줄에 그대로, 줄 수는 같게)
+            out.add(new Stat(Component.translatable("rtshop.enhui.stat_reduce").getString(), "-" + EnhanceClient.pct(rNow),
+                    hasNext ? arrow("-" + EnhanceClient.pct(rNext)) : ""));
+        } else {
+            out.add(new Stat(Component.translatable(label).getString(), pNow, pNext));
+        }
         if (kind == Enhance.Kind.RANGED || kind == Enhance.Kind.MAGIC) {
             return out;   // 원거리 · 마법 무기는 속성이 아니라 쏜 것 / 주문의 피해가 오른다: 보너스 % 만
         }

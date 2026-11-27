@@ -63,8 +63,14 @@ public final class EnhanceConfig {
     public final Map<String, List<String>> groups = new LinkedHashMap<>();
     public final Map<String, String> groupNames = new LinkedHashMap<>();
     /** 단계별 누적 % (0 단계 = 0). */
-    public double[] weaponBonus = {0, 3, 6, 9, 13, 17, 22, 28, 38, 48, 60, 75};
-    public double[] armorBonus = {0, 4, 8, 12, 16, 21, 26, 32, 41, 50, 61, 75};
+    /** 3.66.0: 높은 단계의 몫을 키움 (+8~+11 = 40/55/75/100%, 사용자 요청 "고단계 강화를 하는 메리트가 확실하도록"). */
+    public double[] weaponBonus = {0, 3, 6, 9, 13, 17, 22, 28, 40, 55, 75, 100};
+    public double[] armorBonus = {0, 4, 8, 12, 16, 21, 26, 32, 40, 50, 60, 75};
+    /**
+     * 3.66.0: 방어구 한 조각이 줄여 주는 받는 피해 % (단계별). 방어력은 30 에서 더 오르지 않아(네더라이트 한 벌 20 × 1.5) 높은 단계의 방어력 % 가
+     * 센 방어구에는 소용없으므로, +8 부터는 받는 피해를 따로 줄인다. 입은 조각마다 더하고 합쳐서 최대 40%.
+     */
+    public double[] armorReduce = {0, 0, 0, 0, 0, 0, 0, 0, 1.5, 3, 5, 7.5};
     /** 실패 누적(3.66.0): 실패할 때마다 다음 성공률이 그 단계 성공률의 이 % 만큼 오른다 (최대 failStackMax 번, 성공하면 처음으로). 0 = 끔. */
     public double failBonusPct = 10;
     public int failStackMax = 5;
@@ -112,7 +118,7 @@ public final class EnhanceConfig {
         // 확률: 성공·유지는 단계가 오를수록 내려가고, 손상·파괴는 올라간다. +4 부터 파괴 가능
         // 2판: +4 부터 성공률을 크게 낮추고 유지 비중을 높였다. +4 부터 파괴 가능
         // 3판(3.66.0, 사용자 요청 "강화 비용이 너무 비싸다"): 성공률을 유지에서 옮겨 조금 올리고(+2~+8 은 1, +9~+11 은 8/5/3 → 10/7/5),
-        // +8~+11 의 Gold 를 내리고(16,000/25,000/40,000/65,000 → 14,000/19,000/26,000/36,000: 11:50 "살짝 인상" 반영), 실패 누적(failBonusPct)을 더함
+        // +8~+11 의 Gold 를 내리고(16,000/25,000/40,000/65,000 → 15,000/21,000/29,000/40,000: 11:50 · 12:07 "조금 인상" 반영), 실패 누적(failBonusPct)을 더함
         levels[1] = lv(1, 90, 10, 0, 0, 300, "#gem_common", 1, "spelunkery:salt", 2);
         levels[2] = lv(2, 83, 14, 3, 0, 600, "#gem_common", 2, "spelunkery:salt", 3);
         levels[3] = lv(3, 73, 19, 8, 0, 1200, "#gem_common", 3, "spelunkery:raw_magnetite", 2);
@@ -120,10 +126,10 @@ public final class EnhanceConfig {
         levels[5] = lv(5, 37, 37, 17, 9, 3500, "#gem_fine", 2, "spelunkery:cinnabar", 2);
         levels[6] = lv(6, 27, 37, 22, 14, 6000, "#gem_fine", 3, "spelunkery:cinnabar", 3);
         levels[7] = lv(7, 19, 36, 27, 18, 10000, "#gem_nether", 1, "#gem_fine", 2, "spelunkery:sulfur", 4);
-        levels[8] = lv(8, 13, 35, 30, 22, 14000, "#gem_nether", 2, "spelunkery:rough_diamond", 1);
-        levels[9] = lv(9, 10, 33, 31, 26, 19000, "#gem_nether", 3, "spelunkery:rough_diamond", 2);
-        levels[10] = lv(10, 7, 31, 32, 30, 26000, "#gem_rare", 1, "#gem_nether", 2, "spelunkery:rough_emerald", 2);
-        levels[11] = lv(11, 5, 29, 32, 34, 36000, "#gem_rare", 2, "#gem_nether", 3, "spelunkery:rough_diamond", 2,
+        levels[8] = lv(8, 13, 35, 30, 22, 15000, "#gem_nether", 2, "spelunkery:rough_diamond", 1);
+        levels[9] = lv(9, 10, 33, 31, 26, 21000, "#gem_nether", 3, "spelunkery:rough_diamond", 2);
+        levels[10] = lv(10, 7, 31, 32, 30, 29000, "#gem_rare", 1, "#gem_nether", 2, "spelunkery:rough_emerald", 2);
+        levels[11] = lv(11, 5, 29, 32, 34, 40000, "#gem_rare", 2, "#gem_nether", 3, "spelunkery:rough_diamond", 2,
                 "spelunkery:rough_emerald", 2);
     }
 
@@ -171,6 +177,7 @@ public final class EnhanceConfig {
         help.add("materials: {item: 아이템 ID 또는 #묶음, count}. 묶음은 groups 의 아이템 중 아무거나 섞어서 씁니다. 설치되지 않은 모드의 재료는 빼고 계산합니다.");
         help.add("손상 방지권은 손상을 유지로, 파괴 방지권은 파괴를 손상으로 바꿉니다 (강화 보호권은 둘 다). 방지권은 시도할 때마다 1장 씁니다.");
         help.add("weaponBonus/armorBonus: 단계별 누적 증가율(%). 무기 = 공격력, 방어구 = 방어력. toughnessFrom 단계부터 방어 강도 +toughnessPerLevel.");
+        help.add("armorReduce: 방어구 한 조각이 줄여 주는 받는 피해(%, 단계별). 입은 조각마다 더하고 합쳐서 최대 40%. 방어력은 30 에서 더 오르지 않으므로 높은 단계의 몫.");
         help.add("failBonusPct / failStackMax: 실패(유지·손상)할 때마다 다음 성공률이 그 단계 성공률의 failBonusPct % 만큼 오른다. 최대 failStackMax 번 쌓이고, 성공하면 처음으로 (장비마다 따로).");
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
@@ -223,6 +230,11 @@ public final class EnhanceConfig {
         o.add("armorBonus", ab);
         o.addProperty("toughnessFrom", toughnessFrom);
         o.addProperty("toughnessPerLevel", toughnessPerLevel);
+        JsonArray ar = new JsonArray();
+        for (double v : armorReduce) {
+            ar.add(v);
+        }
+        o.add("armorReduce", ar);
         o.addProperty("failBonusPct", failBonusPct);
         o.addProperty("failStackMax", failStackMax);
         return o;
@@ -281,6 +293,7 @@ public final class EnhanceConfig {
         if (o.has("armorBonus")) c.armorBonus = doubles(o.getAsJsonArray("armorBonus"), c.armorBonus);
         if (o.has("toughnessFrom")) c.toughnessFrom = o.get("toughnessFrom").getAsInt();
         if (o.has("toughnessPerLevel")) c.toughnessPerLevel = o.get("toughnessPerLevel").getAsDouble();
+        if (o.has("armorReduce")) c.armorReduce = doubles(o.getAsJsonArray("armorReduce"), c.armorReduce);
         if (o.has("failBonusPct")) c.failBonusPct = Math.max(0, o.get("failBonusPct").getAsDouble());
         if (o.has("failStackMax")) c.failStackMax = Math.max(0, Math.min(50, o.get("failStackMax").getAsInt()));
         return c;

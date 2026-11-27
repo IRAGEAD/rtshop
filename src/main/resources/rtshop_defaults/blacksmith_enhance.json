@@ -16,19 +16,19 @@
   },
   {
    "item": "rtshop:enhance_guard_damage",
-   "price": 10000,
-   "category": "enhance",
-   "sell": false
-  },
-  {
-   "item": "rtshop:enhance_guard_destroy",
    "price": 15000,
    "category": "enhance",
    "sell": false
   },
   {
+   "item": "rtshop:enhance_guard_destroy",
+   "price": 20000,
+   "category": "enhance",
+   "sell": false
+  },
+  {
    "item": "rtshop:enhance_guard_full",
-   "price": 25000,
+   "price": 35000,
    "category": "enhance",
    "sell": false
   },
