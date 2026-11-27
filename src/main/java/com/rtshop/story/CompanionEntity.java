@@ -57,6 +57,8 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
     String style = "melee";
     private int downed;
     private int boltCooldown;
+    /** 점검용 동행(forTest): 퀘스트가 없어도 돌아가지 않는다. */
+    boolean testStay;
     public long lastSaid, lastFight, lastLow;
     final java.util.Map<String, Integer> lastIndex = new java.util.HashMap<>();
     boolean saidFight;
@@ -133,6 +135,24 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
 
     public boolean isGuest(UUID id) {
         return guests.containsKey(id);
+    }
+
+    /** 이 동행이 어느 이야기 인물인가 (퀘스트의 NPC ID). NPC 외형(NpcLooks)이 그 인물의 모습을 입힌다 (3.71). */
+    public String npcId() {
+        return npcId;
+    }
+
+    /** 점검용: 퀘스트 없이 그 인물의 동행을 세운다 (주인을 따라감). */
+    public static CompanionEntity forTest(net.minecraft.server.level.ServerLevel level, String npc, net.minecraft.server.level.ServerPlayer owner) {
+        CompanionEntity c = Companions.TYPE.get().create(level);
+        if (c == null) return null;
+        c.npcId = npc;
+        c.ownerId = owner.getUUID();
+        c.questId = "test";
+        c.testStay = true;
+        c.moveTo(owner.getX() + 2.5, owner.getY(), owner.getZ() + 1.5, owner.getYRot(), 0);
+        level.addFreshEntity(c);
+        return c;
     }
 
     public boolean isDowned() {
@@ -230,7 +250,7 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
             ServerPlayer o = owner();
             // 떠난 일행은 빼고, 앞장선 사람이 떠났으면 남은 일행이 이어받는다 (아무도 없으면 돌아간다)
             Companions.pruneGuests(this);
-            if (o == null || !o.isAlive() || o.level() != level() || !QuestManager.isActive(o, questId)) {
+            if (o == null || !o.isAlive() || o.level() != level() || (!testStay && !QuestManager.isActive(o, questId))) {
                 if (!Companions.handOver(this, o)) {
                     Companions.leave(this, o);
                     return;

@@ -2103,7 +2103,30 @@ final class ClientSelfTest2 {
             Cinematic.skip();
             check("3.71 boss entrance can be skipped (key 'skip scene', Enter by default): it was skippable, the skip took", before371 && Cinematic.skipsForTest == n371 + 1 && !BossCam.active(),
                     before371 + " skips " + Cinematic.skipsForTest + " cam " + BossCam.active() + " key " + ClientModEvents.SKIP_KEY.getTranslatedKeyMessage().getString());
-            waitTicks(12);
+            // 3.71 NPC 외형: 동행(이사벨)도 그 인물의 모습으로, 걸을 때 팔다리가 움직인다
+            onServer(mc, sp -> {
+                com.rtshop.story.CompanionEntity c371 = com.rtshop.story.CompanionEntity.forTest(sp.serverLevel(), "order_archivist", sp);
+                COMPANION_ID = c371 == null ? -1 : c371.getId();
+            });
+            waitTicks(50);
+        });
+        add(mc -> {
+            int[] isa = NpcLookClient.partsForTest("isabel"), leon = NpcLookClient.partsForTest("leon");
+            float[] walkLegs = NpcLookClient.pose(1.2F, 1F, 10F, true), walkSkirt = NpcLookClient.pose(1.2F, 1F, 10F, false), idle = NpcLookClient.pose(0F, 0F, 10F, true);
+            boolean poses = Math.abs(walkLegs[3]) > 0.1F && walkLegs[3] == -walkLegs[4] && Math.abs(walkLegs[0] - walkLegs[1]) > 0.1F
+                    && walkSkirt[3] == 0F && walkSkirt[5] > 0F && idle[3] == 0F && idle[2] > 0F && Math.abs(idle[0]) < 0.06F;
+            check("3.71 npc looks move: arms and legs are their own parts (a skirt or long coat keeps the legs still), walking swings arms against legs, standing sways the arms a little",
+                    isa.length == 6 && isa[2] > 0 && isa[3] > 0 && isa[4] == 0 && leon.length == 6 && leon[4] > 0 && leon[5] > 0 && poses,
+                    java.util.Arrays.toString(isa) + " " + java.util.Arrays.toString(leon) + " legs " + java.util.Arrays.toString(walkLegs) + " skirt " + java.util.Arrays.toString(walkSkirt));
+            check("3.71 a companion (Isabel) wears her own look instead of a villager's",
+                    COMPANION_ID > 0 && NpcLookClient.lookOfForTest(COMPANION_ID).equals("isabel") && NpcLookClient.companionsDrawnForTest > 0,
+                    COMPANION_ID + " look '" + NpcLookClient.lookOfForTest(COMPANION_ID) + "' drawn " + NpcLookClient.companionsDrawnForTest);
+            shot(mc, "131b_companion_look");
+            onServer(mc, sp -> {
+                net.minecraft.world.entity.Entity c = sp.serverLevel().getEntity(COMPANION_ID);
+                if (c != null) c.discard();
+            });
+            waitTicks(5);
         });
         add(mc -> {
             check("3.71 a skipped boss entrance is over within a moment and the camera is back in the player's eyes", !Cinematic.active() && mc.getCameraEntity() == mc.player,
@@ -2165,6 +2188,9 @@ final class ClientSelfTest2 {
             waitTicks(10);
         });
     }
+
+    /** 3.71: 점검용 동행 NPC 의 엔티티 번호. */
+    static int COMPANION_ID = -1;
 
     /** Epic Fight 가 이 아이템에 쓰는 렌더러 (Avalon mesh_item 이면 메쉬가 실제로 읽혔는지도). */
     static String efRendererInfo(net.minecraft.world.item.ItemStack st) {

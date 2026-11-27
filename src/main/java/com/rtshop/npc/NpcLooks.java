@@ -184,8 +184,9 @@ public final class NpcLooks {
                 Map<Integer, String> sent = SENT.computeIfAbsent(p.getUUID(), u -> new HashMap<>());
                 if (sent.size() > 4000) sent.clear();
                 JsonObject add = null;
-                for (Entity e : p.level().getEntities(p, p.getBoundingBox().inflate(RANGE), x -> !x.getTags().isEmpty())) {
-                    String look = lookOf(keyOf(e));
+                for (Entity e : p.level().getEntities(p, p.getBoundingBox().inflate(RANGE), x -> !x.getTags().isEmpty() || x instanceof com.rtshop.story.CompanionEntity)) {
+                    // 3.71: 동행 NPC 도 그 이야기 인물의 모습으로 (열쇠 quest_<NPC ID>)
+                    String look = lookOf(e instanceof com.rtshop.story.CompanionEntity c ? "quest_" + c.npcId() : keyOf(e));
                     if (look.isEmpty() || look.equals(sent.get(e.getId()))) continue;
                     sent.put(e.getId(), look);
                     if (add == null) add = new JsonObject();

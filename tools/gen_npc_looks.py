@@ -7,7 +7,8 @@ python3 tools/gen_npc_looks.py   →  src/main/resources/assets/rtshop/npc_looks
 (3.61 은 빛깔마다 네모를 따로 적어 인물당 2천 개가 넘었고, NPC 가 모인 곳에서 프레임이 크게 떨어졌다. 3.63 부터 인물당 2~3백 개.)
 
 파일 형식 2판 (바이트): 'RTNL' · 판(1) = 2 · 네모 수(4, 큰 끝) · 그림 너비(2) · 그림 높이(2) · 네모마다 11바이트
-  [부위 0=몸 1=머리][방향 0:+x 1:-x 2:+y 3:-y 4:+z 5:-z][면의 자리][a0][b0][a1][b1][u(2)][v(2)]   (자리는 반 픽셀, 부호 있는 1바이트. u·v 는 (a0, b0) 칸의 그림 속 자리)
+  [부위 0=몸 1=머리 2=팔(+x) 3=팔(-x) 4=다리(+x) 5=다리(-x)][방향 0:+x 1:-x 2:+y 3:-y 4:+z 5:-z][면의 자리][a0][b0][a1][b1][u(2)][v(2)]   (자리는 반 픽셀, 부호 있는 1바이트. u·v 는 (a0, b0) 칸의 그림 속 자리)
+  (3.71: 팔다리 부위 2~5 를 더했다. 3.70 까지의 화면 쪽은 1 이 아닌 부위를 모두 몸으로 그리므로 그대로 읽힌다.)
   ±x 면: a = y, b = z / ±y 면: a = x, b = z / ±z 면: a = x, b = y.  앞은 +z, 발바닥은 y = 0, 머리의 축은 y = 48(목).
   그림에서 칸 (a, b) 의 빛깔은 (u + a - a0, v + b - b0) 에 있다. 네모마다 둘레에 한 칸씩 같은 빛깔을 덧대어 이웃 네모의 빛깔이 번지지 않게 한다.
 머리(얼굴·머리카락·수염·모자·안경)는 따로 묶여 플레이어를 바라보며 돈다. 그 밖은 몸.
@@ -41,6 +42,60 @@ def _box(s, x0, y0, z0, x1, y1, z1, col, n=5):
             for z in range(round(z0 * U), round(z1 * U)):
                 if (x, y, z) in s.v: s.p[(x, y, z)] = part
 m.Fig.box = _box
+
+# 3.71 팔다리: 상자를 놓은 함수(옷 · 소품)를 칸마다 적어 두고, 다 쌓은 뒤 팔 · 다리 칸을 가른다 (limbs)
+_box_part = m.Fig.box
+def _box_src(s, x0, y0, z0, x1, y1, z1, col, n=5):
+    _box_part(s, x0, y0, z0, x1, y1, z1, col, n)
+    src = getattr(s, '_src', [])
+    if not hasattr(s, 'src'): s.src = {}
+    tag = src[-1] if src else 'direct'
+    for x in range(round(x0 * U), round(x1 * U)):
+        for y in range(round(y0 * U), round(y1 * U)):
+            for z in range(round(z0 * U), round(z1 * U)):
+                if (x, y, z) in s.v: s.src[(x, y, z)] = tag
+m.Fig.box = _box_src
+SRC_FN = ['human', 'coat', 'held', 'skirt', 'apron', 'cloak', 'mantle', 'pack', 'pauldron', 'staff', 'scarf', 'strap', 'plate', 'belt', 'pouch', 'satchel', 'hood_down', 'buttons']
+# 몸에 붙어 움직이지 않는 것 (팔다리 자리에 있어도 몸)
+STATIC = {'skirt', 'apron', 'cloak', 'mantle', 'pack', 'pauldron', 'staff', 'scarf', 'strap', 'plate', 'belt', 'pouch', 'satchel', 'hood_down', 'buttons'}
+def _tag(name):
+    fn = getattr(m, name)
+    def w(g, *a, **k):
+        if not hasattr(g, '_src'): g._src = []
+        g._src.append(name)
+        try: return fn(g, *a, **k)
+        finally: g._src.pop()
+    setattr(m, name, w)
+for _n in SRC_FN: _tag(_n)
+
+def limbs(g):
+    """몸(0) 칸 가운데 팔 · 다리를 가른다: 팔 = 어깨 아래 몸통 바깥(|x| >= 4, 12 <= y < 25) 또는 손에 든 것, 다리 = 허리 아래(y < 12).
+    치마 · 긴 겉옷 · 앞치마 · 망토가 허리 아래를 덮거나 다리 기둥 밖으로 나온 칸이 있으면 다리는 가르지 않는다 (걸을 때 치마가 찢어지지 않게).
+    돌려준다: 다리를 갈랐는가."""
+    p, src = g.p, getattr(g, 'src', {})
+    skirted = False
+    for (x, y, z), part in p.items():
+        if part != 0 or y >= 12 * U: continue
+        t = src.get((x, y, z), 'direct')
+        cx, cz = (x + .5) / U, (z + .5) / U
+        # 허리 아래를 덮는 옷이거나, 따로 그린 칸이 다리 기둥 밖으로 나왔으면 (허리띠 · 주머니 · 가방 같은 몸의 소품은 빼고)
+        if t in ('coat', 'skirt', 'apron', 'cloak') or (t == 'direct' and (abs(cx) > 4.6 or abs(cz) > 2.8)):
+            skirted = True
+            break
+    for key, part in list(p.items()):
+        if part != 0: continue
+        t = src.get(key, 'direct')
+        if t in STATIC: continue
+        x, y, z = key
+        cx, cy = (x + .5) / U, (y + .5) / U
+        if t == 'held':
+            p[key] = 2 if cx >= 0 else 3
+        elif 12 <= cy < 25 and abs(cx) >= 4:
+            p[key] = 2 if cx > 0 else 3
+        elif cy < 12 and not skirted and t in ('human', 'direct'):
+            p[key] = 4 if cx >= 0 else 5
+    return not skirted
+
 def _wrap(name, part):
     fn = getattr(m, name)
     def w(g, *a, **k):
@@ -100,6 +155,7 @@ def main():
     total = 0
     for name in LOOKS:
         g = getattr(m, name)()
+        legs = limbs(g)
         rs = rects(g)
         W, H, pos = pack(rs)
         im = Image.new('RGBA', (W, H), (0, 0, 0, 0)); px = im.load()
@@ -114,7 +170,8 @@ def main():
             for (part, d, plane, a0, b0, a1, b1, col), (u, v) in zip(rs, pos):
                 f.write(struct.pack('>BBbbbbbHH', part, d, plane, a0, b0, a1, b1, u, v))
         total += len(rs)
-        print('%-11s %4d quads  (head %d)  texture %dx%d' % (name, len(rs), sum(1 for r in rs if r[0] == 1), W, H))
+        print('%-11s %4d quads  (head %d, arms %d, legs %d%s)  texture %dx%d' % (name, len(rs), sum(1 for r in rs if r[0] == 1), sum(1 for r in rs if r[0] in (2, 3)),
+              sum(1 for r in rs if r[0] in (4, 5)), '' if legs else ' — skirt: legs stay', W, H))
     print(len(LOOKS), 'looks,', total, 'quads ->', os.path.normpath(OUT))
 
 if __name__ == '__main__': main()

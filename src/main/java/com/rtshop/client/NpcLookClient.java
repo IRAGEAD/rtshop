@@ -52,11 +52,19 @@ public final class NpcLookClient {
     private static final float UNIT = 0.9375F / 32F;
     /** 머리가 도는 축의 높이 (반 픽셀): 목. */
     private static final float NECK = 48F;
+    /** 3.71 팔다리가 도는 축 (반 픽셀): 어깨(옆으로 12, 높이 44) · 엉덩이(옆으로 4, 높이 24). */
+    private static final float ARM_X = 12F, ARM_Y = 44F, LEG_X = 4F, LEG_Y = 24F;
 
     private static final class Model {
         float[] body = new float[0], head = new float[0];
+        /** 3.71: 부위 2 · 3 (팔 +x · -x), 4 · 5 (다리 +x · -x). 치마 · 긴 겉옷을 입은 인물은 다리가 없다(몸에 붙음). */
+        float[][] limbs = {new float[0], new float[0], new float[0], new float[0]};
         float top;
         ResourceLocation texture;
+
+        boolean legs() {
+            return limbs[2].length > 0 || limbs[3].length > 0;
+        }
     }
 
     private static final Model MISSING = new Model();
@@ -92,7 +100,17 @@ public final class NpcLookClient {
     /** 모습 파일을 읽어 그릴 수 있는 꼴로 바꾼다. 없거나 깨졌으면 null (그 NPC 는 주민 모습으로 남는다). */
     public static int quadsForTest(String look) {
         Model m = model(look);
-        return m == null ? -1 : (m.body.length + m.head.length) / STRIDE;
+        if (m == null) return -1;
+        int n = m.body.length + m.head.length;
+        for (float[] l : m.limbs) n += l.length;
+        return n / STRIDE;
+    }
+
+    /** 점검용: 부위별 네모 수 [몸, 머리, 팔+, 팔-, 다리+, 다리-]. */
+    public static int[] partsForTest(String look) {
+        Model m = model(look);
+        if (m == null) return new int[0];
+        return new int[]{m.body.length / STRIDE, m.head.length / STRIDE, m.limbs[0].length / STRIDE, m.limbs[1].length / STRIDE, m.limbs[2].length / STRIDE, m.limbs[3].length / STRIDE};
     }
 
     private static Model model(String look) {
@@ -120,43 +138,48 @@ public final class NpcLookClient {
             if (n < 0 || n > 20000 || tw <= 0 || th <= 0 || b.length < 13 + n * 11) return null;
             ResourceLocation tex = ResourceLocation.tryParse("rtshop:textures/npc_looks/" + look + ".png");
             if (tex == null || Minecraft.getInstance().getResourceManager().getResource(tex).isEmpty()) return null;
-            int heads = 0;
-            for (int i = 0; i < n; i++) if (b[13 + i * 11] == 1) heads++;
+            // 부위: 0 몸 · 1 머리 · 2~5 팔다리 (3.71, 그 밖의 값은 몸)
+            int[] count = new int[6];
+            for (int i = 0; i < n; i++) {
+                int part = b[13 + i * 11];
+                count[part >= 0 && part < 6 ? part : 0]++;
+            }
             Model m = new Model();
             m.texture = tex;
-            m.body = new float[(n - heads) * STRIDE];
-            m.head = new float[heads * STRIDE];
-            int ib = 0, ih = 0;
+            m.body = new float[count[0] * STRIDE];
+            m.head = new float[count[1] * STRIDE];
+            for (int k = 0; k < 4; k++) m.limbs[k] = new float[count[k + 2] * STRIDE];
+            int[] at = new int[6];
             for (int i = 0; i < n; i++) {
                 int o = 13 + i * 11;
-                boolean head = b[o] == 1;
+                int part = b[o] >= 0 && b[o] < 6 ? b[o] : 0;
+                boolean head = part == 1;
                 int dir = Math.max(0, Math.min(5, b[o + 1]));
                 float p = b[o + 2], a0 = b[o + 3], b0 = b[o + 4], a1 = b[o + 5], b1 = b[o + 6];
                 float u = ((b[o + 7] & 0xFF) << 8) | (b[o + 8] & 0xFF), v = ((b[o + 9] & 0xFF) << 8) | (b[o + 10] & 0xFF);
-                float[] q = head ? m.head : m.body;
-                int at = head ? ih : ib;
+                float[] q = part == 0 ? m.body : head ? m.head : m.limbs[part - 2];
+                int w = at[part];
                 if (dir < 2) {            // ±x: a = y, b = z
-                    put(q, at, p, a0, b0, p, a1, b0, p, a1, b1, p, a0, b1);
+                    put(q, w, p, a0, b0, p, a1, b0, p, a1, b1, p, a0, b1);
                     m.top = Math.max(m.top, a1);
                 } else if (dir < 4) {     // ±y: a = x, b = z
-                    put(q, at, a0, p, b0, a1, p, b0, a1, p, b1, a0, p, b1);
+                    put(q, w, a0, p, b0, a1, p, b0, a1, p, b1, a0, p, b1);
                     m.top = Math.max(m.top, p);
                 } else {                  // ±z: a = x, b = y
-                    put(q, at, a0, b0, p, a1, b0, p, a1, b1, p, a0, b1, p);
+                    put(q, w, a0, b0, p, a1, b0, p, a1, b1, p, a0, b1, p);
                     m.top = Math.max(m.top, b1);
                 }
-                q[at + 12] = dir;
+                q[w + 12] = dir;
                 float u0 = u / tw, v0 = v / th, u1 = (u + (a1 - a0)) / tw, v1 = (v + (b1 - b0)) / th;
-                q[at + 13] = u0;
-                q[at + 14] = v0;
-                q[at + 15] = u1;
-                q[at + 16] = v0;
-                q[at + 17] = u1;
-                q[at + 18] = v1;
-                q[at + 19] = u0;
-                q[at + 20] = v1;
-                if (head) ih += STRIDE;
-                else ib += STRIDE;
+                q[w + 13] = u0;
+                q[w + 14] = v0;
+                q[w + 15] = u1;
+                q[w + 16] = v0;
+                q[w + 17] = u1;
+                q[w + 18] = v1;
+                q[w + 19] = u0;
+                q[w + 20] = v1;
+                at[part] += STRIDE;
             }
             return m;
         } catch (Throwable t) {
@@ -249,6 +272,44 @@ public final class NpcLookClient {
         return cur;
     }
 
+    /**
+     * 3.71 팔다리 각 (라디안): [팔+ 앞뒤, 팔- 앞뒤, 팔 옆으로, 다리+ 앞뒤, 다리- 앞뒤, 몸 오르내림(반 픽셀), 몸 좌우 기울기(도)].
+     * 걸을 때는 팔과 반대쪽 다리가 함께 앞으로 (다리가 없는 인물 — 치마 · 긴 겉옷 — 은 몸이 살짝 오르내리며 흔들림),
+     * 서 있을 때는 팔이 숨 쉬듯 조금 흔들린다.
+     */
+    public static float[] pose(float walkPos, float walkSpeed, float age, boolean legs) {
+        float spd = Mth.clamp(walkSpeed, 0F, 1F);
+        float swing = Mth.cos(walkPos * 0.6662F) * spd;
+        float idleX = Mth.sin(age * 0.067F) * 0.05F, idleZ = Mth.cos(age * 0.09F) * 0.04F + 0.05F;
+        float arm = swing * 0.75F;
+        float leg = legs ? swing * 0.9F : 0F;
+        float bob = legs ? 0F : Math.abs(Mth.sin(walkPos * 0.6662F)) * 1.2F * spd;
+        float tilt = legs ? 0F : Mth.sin(walkPos * 0.6662F) * 2.5F * spd;
+        return new float[]{-arm + idleX, arm - idleX, idleZ, leg, -leg, bob, tilt};
+    }
+
+    /** 점검용: 마지막으로 그린 인물의 자세. */
+    public static float[] lastPoseForTest = new float[7];
+
+    private static int limb(float[] q, PoseStack ps, VertexConsumer vc, int light, boolean cull, float px, float py, float xRot, float zRot) {
+        if (q.length == 0) return 0;
+        ps.pushPose();
+        ps.translate(px, py, 0F);
+        if (zRot != 0F) ps.mulPose(Axis.ZP.rotation(zRot));
+        if (xRot != 0F) ps.mulPose(Axis.XP.rotation(xRot));
+        ps.translate(-px, -py, 0F);
+        int n = emit(q, ps, vc, light, cull);
+        ps.popPose();
+        return n;
+    }
+
+    /** 동행처럼 스스로 움직이는 인물은 그 엔티티가 보는 쪽으로 머리를 돌린다 (마을 NPC 는 가까운 플레이어를 바라봄). */
+    private static float[] ownHead(LivingEntity e, float bodyYaw, float pt) {
+        float yaw = Mth.clamp(Mth.wrapDegrees(Mth.rotLerp(pt, e.yHeadRotO, e.yHeadRot) - bodyYaw), -50F, 50F);
+        float pitch = Mth.clamp(Mth.lerp(pt, e.xRotO, e.getXRot()), -30F, 30F);
+        return new float[]{yaw, pitch};
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onRender(RenderLivingEvent.Pre<?, ?> event) {
         if (LOOKS.isEmpty()) return;
@@ -264,13 +325,26 @@ public final class NpcLookClient {
             int light = event.getPackedLight();
             MultiBufferSource buf = event.getMultiBufferSource();
             float bodyYaw = Mth.rotLerp(pt, e.yBodyRotO, e.yBodyRot);
+            boolean companion = e instanceof com.rtshop.story.CompanionEntity;
             ps.pushPose();
             ps.mulPose(Axis.YP.rotationDegrees(-bodyYaw));
+            if (companion && ((com.rtshop.story.CompanionEntity) e).isDowned()) {   // 쓰러졌을 때는 몸을 숙인다 (CompanionRenderer 와 같게)
+                ps.translate(0, -0.25, 0);
+                ps.mulPose(Axis.XP.rotationDegrees(28F));
+            }
             ps.scale(UNIT, UNIT, UNIT);
             VertexConsumer vc = buf.getBuffer(RenderType.entityCutoutNoCull(m.texture));
             boolean cull = mayCull();
+            float[] pose = pose(e.walkAnimation.position(pt), e.walkAnimation.speed(pt), e.tickCount + pt, m.legs());
+            lastPoseForTest = pose;
+            if (pose[5] != 0F) ps.translate(0F, pose[5], 0F);
+            if (pose[6] != 0F) ps.mulPose(Axis.ZP.rotationDegrees(pose[6]));
             int sent = emit(m.body, ps, vc, light, cull);
-            float[] h = headAngles(e, bodyYaw);
+            sent += limb(m.limbs[0], ps, vc, light, cull, ARM_X, ARM_Y, pose[0], pose[2]);
+            sent += limb(m.limbs[1], ps, vc, light, cull, -ARM_X, ARM_Y, pose[1], -pose[2]);
+            sent += limb(m.limbs[2], ps, vc, light, cull, LEG_X, LEG_Y, pose[3], 0F);
+            sent += limb(m.limbs[3], ps, vc, light, cull, -LEG_X, LEG_Y, pose[4], 0F);
+            float[] h = companion ? ownHead(e, bodyYaw, pt) : headAngles(e, bodyYaw);
             ps.translate(0F, NECK, 0F);
             ps.mulPose(Axis.YP.rotationDegrees(-h[0]));
             ps.mulPose(Axis.XP.rotationDegrees(h[1]));
@@ -279,13 +353,24 @@ public final class NpcLookClient {
             ps.popPose();
             drawnForTest++;
             if (cull) {   // 그림자 그리기처럼 건너뛰지 않는 때의 수는 점검 기록에 섞지 않는다
+                int all = m.body.length + m.head.length;
+                for (float[] l : m.limbs) all += l.length;
                 lastQuadsForTest = sent;
-                lastCulledForTest = (m.body.length + m.head.length) / STRIDE - sent;
+                lastCulledForTest = all / STRIDE - sent;
             }
+            if (companion) companionsDrawnForTest++;
             nameTag(e, ps, buf, light, Math.max(e.getBbHeight() + 0.5F, m.top * UNIT + 0.35F));
         } catch (Throwable t) {
             RtShop.LOGGER.debug("[rtshop] npc look", t);
         }
+    }
+
+    /** 점검용: 동행 NPC 를 인물 모습으로 그린 횟수. */
+    public static long companionsDrawnForTest;
+
+    /** 점검용: 이 엔티티에 모습이 정해졌는가. */
+    public static String lookOfForTest(int entityId) {
+        return LOOKS.getOrDefault(entityId, "");
     }
 
     /** 점검용: 이름표를 그린 횟수 / 멀어서 그리지 않은 횟수. */
