@@ -57,6 +57,13 @@ NEW = {
  "rtshop.stock.err.invalid": ("장부에 없는 증서입니다 (복사본이거나 이미 되판 증서).", "That certificate is not in the ledger (a copy, or already sold)."),
  "rtshop.stock.err.none": ("그 증서를 가방에서 찾지 못했습니다.", "That certificate is not in your inventory."),
  "rtshop.stock.news_broadcast": ("[시세판] %s — %s 다음 시세 %s", "[Price board] %s — %s next price %s"),
+ # ---- 3.74: NPC 치우기 · 배치 초기화
+ "rtshop.npclayout.reset_ask": ("모든 RT Shop NPC(상인 · 이야기 NPC 등, 플레이어 상점 직원은 빼고)를 치우고 배치 파일을 비웁니다. 되돌릴 수 없습니다. 정말이면: /rtshop npc layout reset confirm", "This removes every RT Shop NPC (traders, story NPCs …, not player shop staff) and empties the layout file. It cannot be undone. To go ahead: /rtshop npc layout reset confirm"),
+ "rtshop.npclayout.reset_done": ("NPC 배치를 초기화했습니다: 지금 %s명을 치웠고, 아직 불러오지 않은 곳의 %s명은 그 근처에 누가 가면 치웁니다.", "NPC layout reset: removed %s now; %s more will be removed when their area loads."),
+ "rtshop.npclayout.remove_none": ("바라보는(또는 4칸 안의) RT Shop NPC 가 없습니다.", "No RT Shop NPC in sight (or within 4 blocks)."),
+ "rtshop.npclayout.removed": ("%s 을(를) 치웠습니다 (%s, %s, %s). 배치 파일에서도 빠집니다.", "Removed %s (%s, %s, %s). It is taken out of the layout file too."),
+ # ---- 3.74: 크리에이티브 탭
+ "itemGroup.rtshop": ("RT Shop", "RT Shop"),
  # ---- 3.73: FPS 진단 (/fpscheck)
  "rtshop.fpscheck.busy": ("이미 진단 중입니다.", "A check is already running."),
  "rtshop.fpscheck.start": ("FPS 진단을 %s초 동안 합니다. 평소처럼 움직이세요 (FPS 가 떨어지는 곳이면 더 좋습니다).", "Checking FPS for %s seconds. Play as usual (best where the FPS drops)."),
@@ -994,7 +1001,9 @@ NEW = {
  "rtshop.qhud.next_npc": ("→ %s", "→ %s"),
  "rtshop.qhud.next_more": ("받을 수 있는 퀘스트 %s개 더", "%s more quests available"),
  "rtshop.qhud.attend": ("오늘 출석 보상 받기", "Today's attendance reward"),
- "rtshop.qhud.where": ("%1$s쪽 약 %2$s칸 (%3$s, %4$s)", "about %2$s blocks %1$s (%3$s, %4$s)"),
+ "rtshop.qhud.where": ("%1$s쪽 약 %2$s칸 (%3$s, %4$s, %5$s)", "about %2$s blocks %1$s (%3$s, %4$s, %5$s)"),
+ "rtshop.qhud.where_below": ("바로 아래 약 %s칸 (높이 %s)", "about %s blocks right below (y %s)"),
+ "rtshop.qhud.where_above": ("바로 위 약 %s칸 (높이 %s)", "about %s blocks right above (y %s)"),
  "rtshop.qhud.where_here": ("바로 근처에 있음", "right here"),
  "rtshop.qhud.where_dim": ("다른 차원에 있음", "in another dimension"),
  "rtshop.dir.0": ("남", "south"), "rtshop.dir.1": ("남서", "south-west"), "rtshop.dir.2": ("서", "west"), "rtshop.dir.3": ("북서", "north-west"),

@@ -156,31 +156,36 @@ public class DialogueScreen extends Screen {
     private String lastChat = "";
     private static final java.util.Random CHAT_RNG = new java.util.Random();
 
+    /** 3.74: 대화 상자의 글(선택지·안내)은 대사와 같은 이야기 언어로 (게임 언어가 영어여도 이야기가 한국어면 한국어). */
+    static String tl(String key, Object... args) {
+        return HudLang.tr(HudLang.storyCode(), key, args);
+    }
+
     private List<String[]> choices() {
         List<String[]> out = new ArrayList<>();
         if (replyAt >= 0 && replyAt < lines.size()) {
             for (String r : lines.get(replyAt)[1].split(" ‖ ")) out.add(new String[]{"reply", "", r.trim()});
             return out;
         }
-        if (data.has("main")) out.add(new String[]{"main", "", Component.translatable(data.get("main").getAsString()).getString()});
+        if (data.has("main")) out.add(new String[]{"main", "", tl(data.get("main").getAsString())});
         // 전용 NPC 의 일: 순위 기록원·칭호 관리인·현상금 게시판지기
         boolean service = data.has("service") && data.get("service").getAsBoolean();
-        if (data.has("petition")) out.add(new String[]{"petition", "", Component.translatable("rtshop.talk.petition").getString()});
-        if (data.has("stocks")) out.add(new String[]{"stocks", "", Component.translatable("rtshop.talk.stocks").getString()});
-        if (data.has("ranks")) out.add(new String[]{"ranks", "", Component.translatable("rtshop.talk.ranks").getString()});
-        if (data.has("titles")) out.add(new String[]{"titles", "", Component.translatable("rtshop.talk.titles").getString()});
-        if (service && data.has("bounty")) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
+        if (data.has("petition")) out.add(new String[]{"petition", "", tl("rtshop.talk.petition")});
+        if (data.has("stocks")) out.add(new String[]{"stocks", "", tl("rtshop.talk.stocks")});
+        if (data.has("ranks")) out.add(new String[]{"ranks", "", tl("rtshop.talk.ranks")});
+        if (data.has("titles")) out.add(new String[]{"titles", "", tl("rtshop.talk.titles")});
+        if (service && data.has("bounty")) out.add(new String[]{"bounty", "", tl("rtshop.talk.bounty")});
         for (JsonObject t : topics) {
             String title = t.get("title").getAsString();
             boolean isNew = t.has("new") && t.get("new").getAsBoolean();
             out.add(new String[]{"topic", t.get("id").getAsString(), (isNew ? "✦ " : "") + title});
         }
         int q = data.has("quests") ? data.get("quests").getAsInt() : 0;
-        if (q > 0) out.add(new String[]{"quest", "", Component.translatable("rtshop.talk.quests", q).getString()});
-        else if (data.has("questNpc")) out.add(new String[]{"quest", "", Component.translatable("rtshop.talk.quests_none").getString()});
-        out.add(new String[]{"history", "", Component.translatable("rtshop.talk.history").getString()});
-        if (!service && data.has("bounty") && data.get("bounty").getAsBoolean()) out.add(new String[]{"bounty", "", Component.translatable("rtshop.talk.bounty").getString()});
-        out.add(new String[]{"bye", "", Component.translatable("rtshop.talk.bye").getString()});
+        if (q > 0) out.add(new String[]{"quest", "", tl("rtshop.talk.quests", q)});
+        else if (data.has("questNpc")) out.add(new String[]{"quest", "", tl("rtshop.talk.quests_none")});
+        out.add(new String[]{"history", "", tl("rtshop.talk.history")});
+        if (!service && data.has("bounty") && data.get("bounty").getAsBoolean()) out.add(new String[]{"bounty", "", tl("rtshop.talk.bounty")});
+        out.add(new String[]{"bye", "", tl("rtshop.talk.bye")});
         return out;
     }
 
@@ -332,7 +337,7 @@ public class DialogueScreen extends Screen {
 
     /** 대화 중에 보이는 「대화 내역」 딱지의 자리 {x, y, w, h}. */
     private int[] historyTag() {
-        String t = Component.translatable("rtshop.talk.history_key").getString();
+        String t = tl("rtshop.talk.history_key");
         int w = (int) (font.width(t) * 0.7F) + 6;
         return new int[]{boxX() + boxW() - w - 6, boxY() - 9, w, 9};
     }
@@ -384,17 +389,17 @@ public class DialogueScreen extends Screen {
         g.fill(x, bottom - 1, x + w, bottom, 0xFFC7A25A);
         g.fill(x, top, x + 1, bottom, 0xFFC7A25A);
         g.fill(x + w - 1, top, x + w, bottom, 0xFFC7A25A);
-        g.drawString(font, Component.translatable("rtshop.talk.history_title", npcName), x + 12, top + 7, 0xFFE8C878, false);
+        g.drawString(font, tl("rtshop.talk.history_title", npcName), x + 12, top + 7, 0xFFE8C878, false);
         List<Object[]> ls = historyLines();
         if (ls.isEmpty()) {
-            g.drawString(font, Component.translatable("rtshop.talk.history_empty"), x + 12, top + 22, 0x99E6DCC8, false);
+            g.drawString(font, tl("rtshop.talk.history_empty"), x + 12, top + 22, 0x99E6DCC8, false);
         }
         historyScroll = Math.max(0, Math.min(historyScroll, Math.max(0, ls.size() - rows)));
         for (int i = 0; i < rows && historyScroll + i < ls.size(); i++) {
             Object[] l = ls.get(historyScroll + i);
             g.drawString(font, (FormattedCharSequence) l[1], x + 12, top + 22 + i * 11, (Integer) l[0], false);
         }
-        String hint = Component.translatable("rtshop.talk.history_hint").getString();
+        String hint = tl("rtshop.talk.history_hint");
         Ui.scaledText(g, font, hint, x + w - 10 - (int) (font.width(hint) * 0.7F), bottom - 10, 0.7F, 0x88F6ECD2, false);
     }
 
@@ -458,7 +463,7 @@ public class DialogueScreen extends Screen {
             if (lineDone() && (System.currentTimeMillis() / 400) % 2 == 0) {
                 g.drawString(font, "▼", x + w - 16, y + h - 12, 0xFFC7A25A, false);
             }
-            String hint = Component.translatable(scene ? "rtshop.talk.hint_scene" : "rtshop.talk.hint").getString();
+            String hint = tl(scene ? "rtshop.talk.hint_scene" : "rtshop.talk.hint");
             Ui.scaledText(g, font, hint, x + w - 10 - (int) (font.width(hint) * 0.7F) - 14, y + h - 10, 0.7F, 0x88F6ECD2, false);
             String page = (index + 1) + " / " + lines.size();
             Ui.scaledText(g, font, page, x + 10, y + h - 10, 0.7F, 0x66F6ECD2, false);
@@ -468,7 +473,7 @@ public class DialogueScreen extends Screen {
         boolean hh = mx >= ht[0] && mx < ht[0] + ht[2] && my >= ht[1] && my < ht[1] + ht[3];
         g.fill(ht[0], ht[1], ht[0] + ht[2], ht[1] + ht[3], hh ? 0xFF3A2A14 : 0xE01B140C);
         g.fill(ht[0], ht[1], ht[0] + ht[2], ht[1] + 1, 0xFFC7A25A);
-        Ui.scaledText(g, font, Component.translatable("rtshop.talk.history_key").getString(), ht[0] + 3, ht[1] + 2, 0.7F, hh ? 0xFFFFE3A3 : 0xCCF6ECD2, false);
+        Ui.scaledText(g, font, tl("rtshop.talk.history_key"), ht[0] + 3, ht[1] + 2, 0.7F, hh ? 0xFFFFE3A3 : 0xCCF6ECD2, false);
         super.render(g, mx, my, partial);
     }
 

@@ -1972,7 +1972,7 @@ public final class QuestManager {
         QuestDef next = null;
         int more = 0;
         for (QuestDef q : loaded.quests.values()) {
-            if (q.giver.isEmpty() || q.id.startsWith("hidden") || !QuestDef.modOk(q.mod) || !isAvailable(p, q) || jobQuestSettled(p, q)) continue;
+            if (q.giver.isEmpty() || q.id.startsWith("hidden") || !QuestDef.modOk(q.mod) || !isAvailable(p, q) || jobQuestHiddenInHud(p, q)) continue;
             if (next == null || nextRank(q) < nextRank(next)) {
                 if (next != null) more++;
                 next = q;
@@ -2022,6 +2022,27 @@ public final class QuestManager {
         for (String id : prog(p).active.keySet()) {
             QuestDef a = loaded.quests.get(id);
             if (a != null && !a.id.equals(q.id) && slot.equals(jobSlotOf(a))) return true;
+        }
+        return false;
+    }
+
+    /** 직업 선행 퀘스트를 HUD 에 알리기 시작하는 이야기 퀘스트 (탐험대장 로란의 「조사대원의 밑천」). */
+    public static final String JOB_HINT_AFTER = "story_0_02";
+
+    /**
+     * HUD 의 "다음 퀘스트" · "받을 수 있는 퀘스트 N개 더" 에서 뺄 직업 선행 퀘스트 (3.74.0, 사용자 W-1 · W-24):
+     * 「조사대원의 밑천」을 마치기 전, 직업이 하나라도 있거나(전투든 생활이든), 어느 직업이든 선행 퀘스트를 하고 있으면 다른 직업의 선행 퀘스트는 알리지 않는다.
+     * (받는 것 자체는 막지 않는다 — 직업 안내인에게서 그대로 받을 수 있다.)
+     */
+    public static boolean jobQuestHiddenInHud(ServerPlayer p, QuestDef q) {
+        if (jobSlotOf(q) == null) return false;
+        QuestData.Progress pr = prog(p);
+        if (loaded.quests.containsKey(JOB_HINT_AFTER) && !pr.completed.contains(JOB_HINT_AFTER)) return true;
+        com.rtshop.job.JobData.Entry e = com.rtshop.job.Jobs.entry(p);
+        if ((e.combat != null && !e.combat.isEmpty()) || (e.life != null && !e.life.isEmpty())) return true;
+        for (String id : pr.active.keySet()) {
+            QuestDef a = loaded.quests.get(id);
+            if (a != null && !a.id.equals(q.id) && jobSlotOf(a) != null) return true;
         }
         return false;
     }

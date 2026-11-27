@@ -136,9 +136,16 @@ public class PetitionScreen extends Screen {
                     g.fill(getX() + 1, getY() + 1, getX() + getWidth() - 1, getY() + getHeight() - 1, 0xFF3B2A1A);
                 }
             };
-            box.setCharacterLimit(max);
-            box.setValue(draft);
-            box.setValueListener(v -> draft = v);
+            // 3.74.0 (사용자 W-14 "민원 탭 글자 그림자"): 바닐라 입력 칸은 한도를 두면 칸 아래에 그림자 있는 회색 글자 수를 그려 창의 글자 수와 겹쳤다
+            // → 바닐라 한도는 쓰지 않고 넘치면 잘라 낸다 (글자 수는 창이 한 번만 그린다)
+            box.setValue(draft.length() > max ? draft.substring(0, max) : draft);
+            box.setValueListener(v -> {
+                if (v.length() > max) {
+                    box.setValue(v.substring(0, max));
+                    return;
+                }
+                draft = v;
+            });
             this.addRenderableWidget(box);
         }
         rows.clear();
@@ -193,9 +200,14 @@ public class PetitionScreen extends Screen {
                     g.fill(getX() + 1, getY() + 1, getX() + getWidth() - 1, getY() + getHeight() - 1, 0xFF3B2A1A);
                 }
             };
-            answerBox.setCharacterLimit(max);
-            answerBox.setValue(answerDraft);
-            answerBox.setValueListener(v -> answerDraft = v);
+            answerBox.setValue(answerDraft.length() > max ? answerDraft.substring(0, max) : answerDraft);
+            answerBox.setValueListener(v -> {
+                if (v.length() > max) {
+                    answerBox.setValue(v.substring(0, max));
+                    return;
+                }
+                answerDraft = v;
+            });
             this.addRenderableWidget(answerBox);
             this.setFocused(answerBox);
         }

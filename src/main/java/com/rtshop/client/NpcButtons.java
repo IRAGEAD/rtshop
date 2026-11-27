@@ -76,6 +76,13 @@ public final class NpcButtons {
         default boolean npcButtonsHidden() {
             return false;
         }
+
+        /**
+         * 단추를 그린 뒤에 그릴 것 (3.74.0, 사용자 W-23 "상점 탭에서 아이템의 툴팁을 버튼이 가리는 문제"): 단추는 화면 위(z 450)에 그려져
+         * 화면이 먼저 그린 툴팁(z 400)을 덮었다 → 툴팁은 여기서 그 위에 그린다.
+         */
+        default void lateTooltips(GuiGraphics g, int mx, int my) {
+        }
     }
 
     public static final int H = 14;
@@ -165,6 +172,12 @@ public final class NpcButtons {
             }
         }
         g.pose().popPose();
+        if (s instanceof Host h) {
+            g.pose().pushPose();
+            g.pose().translate(0, 0, 100);   // 툴팁 자신의 z 400 + 100 → 단추(450) 위
+            h.lateTooltips(g, e.getMouseX(), e.getMouseY());
+            g.pose().popPose();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

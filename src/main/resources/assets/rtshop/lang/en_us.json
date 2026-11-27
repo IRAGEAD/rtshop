@@ -1537,7 +1537,7 @@
   "rtshop.spot.need": "You need %s ×%s to do this.",
   "rtshop.spot.tag.small_flowers": "flowers",
   "rtshop.qhud.attend": "Today's attendance reward",
-  "rtshop.qhud.where": "about %2$s blocks %1$s (%3$s, %4$s)",
+  "rtshop.qhud.where": "about %2$s blocks %1$s (%3$s, %4$s, %5$s)",
   "rtshop.qhud.where_here": "right here",
   "rtshop.qhud.where_dim": "in another dimension",
   "rtshop.dir.0": "south",
@@ -2024,5 +2024,12 @@
   "rtshop.fpscheck.busy": "A check is already running.",
   "rtshop.fpscheck.start": "Checking FPS for %s seconds. Play as usual (best where the FPS drops).",
   "rtshop.fpscheck.done": "FPS check: average %s · lowest %s · waiting on the GPU %s%% · busiest mods: %s",
-  "rtshop.fpscheck.file": "Saved as %s in the game folder (please send this file)"
+  "rtshop.fpscheck.file": "Saved as %s in the game folder (please send this file)",
+  "rtshop.qhud.where_below": "about %s blocks right below (y %s)",
+  "rtshop.qhud.where_above": "about %s blocks right above (y %s)",
+  "itemGroup.rtshop": "RT Shop",
+  "rtshop.npclayout.reset_ask": "This removes every RT Shop NPC (traders, story NPCs …, not player shop staff) and empties the layout file. It cannot be undone. To go ahead: /rtshop npc layout reset confirm",
+  "rtshop.npclayout.reset_done": "NPC layout reset: removed %s now; %s more will be removed when their area loads.",
+  "rtshop.npclayout.remove_none": "No RT Shop NPC in sight (or within 4 blocks).",
+  "rtshop.npclayout.removed": "Removed %s (%s, %s, %s). It is taken out of the layout file too."
 }

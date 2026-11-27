@@ -31,7 +31,9 @@ def spoken(default, where, e):
 st = load('quests/story.json'); dj = load('dialogue.json')
 for f in ('quests/story.json', 'quests/npcs.json', 'quests/tutorial.json', 'quests/job_quests.json'):
     try:
-        for n in load(f).get('npcs', []): NAME2KEY[n['name']] = canon('quest_' + n['id'])
+        for n in load(f).get('npcs', []):
+            NAME2KEY[n['name']] = canon('quest_' + n['id'])
+            if n.get('greeting'): add(canon('quest_' + n['id']), f + ' greeting', n['greeting'])   # 3.74.0: 우클릭 인사도 (사용자 W-20)
     except Exception: pass
 NAME2KEY.update({'안내인 모리스': 'guide', '어부 오스카': 's_fisher', '시청 서기 하루': 'attendance', '직업 안내인 알버트': 'job', '대장장이 브람': 'bram', '지도 제작자 펠릭스': 'felix'})
 for k, n in dj['npcs'].items():

@@ -179,10 +179,16 @@ public final class QuestHud {
         try {
             if (!mc.player.level().dimension().location().toString().equals(p[0])) return HudLang.tr(lang, "rtshop.qhud.where_dim");
             double dx = Integer.parseInt(p[1]) + 0.5 - mc.player.getX(), dz = Integer.parseInt(p[3]) + 0.5 - mc.player.getZ();
+            int dy = Integer.parseInt(p[2]) - mc.player.getBlockY();
             int dist = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
-            if (dist < 6) return HudLang.tr(lang, "rtshop.qhud.where_here");
+            if (dist < 6) {
+                // 3.74.0 (사용자 W-9): 바로 위 · 아래(동굴 속 흔적 등)면 높이까지 알려 준다
+                if (dy <= -4) return HudLang.tr(lang, "rtshop.qhud.where_below", -dy, p[2]);
+                if (dy >= 4) return HudLang.tr(lang, "rtshop.qhud.where_above", dy, p[2]);
+                return HudLang.tr(lang, "rtshop.qhud.where_here");
+            }
             int idx = Math.floorMod((int) Math.round(Math.toDegrees(Math.atan2(-dx, dz)) / 45.0), 8);
-            return HudLang.tr(lang, "rtshop.qhud.where", HudLang.tr(lang, "rtshop.dir." + idx), dist, p[1], p[3]);
+            return HudLang.tr(lang, "rtshop.qhud.where", HudLang.tr(lang, "rtshop.dir." + idx), dist, p[1], p[2], p[3]);
         } catch (NumberFormatException e) {
             return "";
         }

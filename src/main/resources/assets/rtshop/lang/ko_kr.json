@@ -1537,7 +1537,7 @@
   "rtshop.spot.need": "이 일을 하려면 %s ×%s 이(가) 필요하다.",
   "rtshop.spot.tag.small_flowers": "꽃",
   "rtshop.qhud.attend": "오늘 출석 보상 받기",
-  "rtshop.qhud.where": "%1$s쪽 약 %2$s칸 (%3$s, %4$s)",
+  "rtshop.qhud.where": "%1$s쪽 약 %2$s칸 (%3$s, %4$s, %5$s)",
   "rtshop.qhud.where_here": "바로 근처에 있음",
   "rtshop.qhud.where_dim": "다른 차원에 있음",
   "rtshop.dir.0": "남",
@@ -2024,5 +2024,12 @@
   "rtshop.fpscheck.busy": "이미 진단 중입니다.",
   "rtshop.fpscheck.start": "FPS 진단을 %s초 동안 합니다. 평소처럼 움직이세요 (FPS 가 떨어지는 곳이면 더 좋습니다).",
   "rtshop.fpscheck.done": "FPS 진단: 평균 %s · 가장 낮음 %s · 그래픽 카드 기다림 %s%% · 시간을 많이 쓴 모드: %s",
-  "rtshop.fpscheck.file": "결과 파일: 게임 폴더의 %s (이 파일을 보내 주세요)"
+  "rtshop.fpscheck.file": "결과 파일: 게임 폴더의 %s (이 파일을 보내 주세요)",
+  "rtshop.qhud.where_below": "바로 아래 약 %s칸 (높이 %s)",
+  "rtshop.qhud.where_above": "바로 위 약 %s칸 (높이 %s)",
+  "itemGroup.rtshop": "RT Shop",
+  "rtshop.npclayout.reset_ask": "모든 RT Shop NPC(상인 · 이야기 NPC 등, 플레이어 상점 직원은 빼고)를 치우고 배치 파일을 비웁니다. 되돌릴 수 없습니다. 정말이면: /rtshop npc layout reset confirm",
+  "rtshop.npclayout.reset_done": "NPC 배치를 초기화했습니다: 지금 %s명을 치웠고, 아직 불러오지 않은 곳의 %s명은 그 근처에 누가 가면 치웁니다.",
+  "rtshop.npclayout.remove_none": "바라보는(또는 4칸 안의) RT Shop NPC 가 없습니다.",
+  "rtshop.npclayout.removed": "%s 을(를) 치웠습니다 (%s, %s, %s). 배치 파일에서도 빠집니다."
 }

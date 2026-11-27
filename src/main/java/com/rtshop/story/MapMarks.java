@@ -310,11 +310,28 @@ public final class MapMarks {
 
     /** icon: Diorama 웨이포인트 그림 ("rtshop:anvil" 등, "" = 없음 · 이름표). */
     public static boolean mark(ServerPlayer p, String id, String name, String dim, int x, int y, int z, int color, String icon) {
+        return mark(p, id, name, dim, x, y, z, color, icon, false);
+    }
+
+    /** 점검용: 마지막으로 "다시 보내기"(again)를 한 표시 id. */
+    public static volatile String lastAgainForTest = "";
+
+    /**
+     * again (3.74.0, 사용자 W-28 "NPC 와 대화 후 맵에 생기는 표시는 실수로 삭제해도 다시 대화를 걸면 생기게"): 이미 아는 같은 표시라도 그 하나를 다시 보내
+     * 플레이어가 지도에서 지웠으면 다시 넣게 한다 (NPC 에게 말을 걸 때).
+     */
+    public static boolean mark(ServerPlayer p, String id, String name, String dim, int x, int y, int z, int color, String icon, boolean again) {
         if (!get().enabled || name == null || name.isBlank()) return false;
         CompoundTag marks = kept(p).getCompound(KEY);
         CompoundTag old = marks.contains(id) ? marks.getCompound(id) : null;
         if (old != null && old.getString("name").equals(name) && old.getString("dim").equals(dim) && old.getString("i").equals(icon)
                 && Math.abs(old.getInt("x") - x) <= 3 && Math.abs(old.getInt("y") - y) <= 3 && Math.abs(old.getInt("z") - z) <= 3) {
+            if (again) {
+                JsonArray a = new JsonArray();
+                a.add(json(id, old));
+                send(p, a, new JsonArray(), false, true);
+                lastAgainForTest = id;
+            }
             return false;   // 서너 칸 움직인 것은 같은 자리로 본다 (NPC 가 조금씩 밀리는 것 때문에 자꾸 고치지 않게)
         }
         CompoundTag t = new CompoundTag();
@@ -391,7 +408,7 @@ public final class MapMarks {
         if (npc.getTags().contains(com.rtshop.pshop.Employees.TAG)) return false;   // 플레이어 상점의 직원은 적지 않는다
         if (npc.level().dimension() == StoryArena.DIM) return false;
         return mark(p, "npc:" + npc.getUUID(), npc.getCustomName().getString(), npc.level().dimension().location().toString(),
-                npc.blockPosition().getX(), npc.blockPosition().getY(), npc.blockPosition().getZ(), colorFor(npc), iconFor(npc));
+                npc.blockPosition().getX(), npc.blockPosition().getY(), npc.blockPosition().getZ(), colorFor(npc), iconFor(npc), true);
     }
 
     private static Entity findNpc(net.minecraft.server.MinecraftServer server, String uuid) {

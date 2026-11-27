@@ -473,7 +473,83 @@ public final class NpcLayout extends SavedData {
                             int made = n < 0 ? 0 : settle(server);
                             ctx.getSource().sendSuccess(() -> Component.translatable(n < 0 ? "rtshop.npclayout.no_file" : "rtshop.npclayout.applied", n, made).withStyle(n < 0 ? ChatFormatting.RED : ChatFormatting.GREEN), true);
                             return n < 0 ? 0 : 1;
-                        })))));
+                        }))
+                        // 3.74.0 (사용자 W-18 "NPC 배치 초기화"): 모든 RT Shop NPC 를 치우고 배치 파일을 비운다 (지금 불러온 곳은 바로, 나머지는 그 청크가 돌 때). 되돌릴 수 없어 confirm 을 붙여야 한다
+                        .then(Commands.literal("reset").executes(ctx -> {
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.npclayout.reset_ask").withStyle(ChatFormatting.GOLD), false);
+                            return 1;
+                        }).then(Commands.literal("confirm").executes(ctx -> {
+                            int[] n = reset(ctx.getSource().getServer());
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.npclayout.reset_done", n[0], n[1]).withStyle(ChatFormatting.GREEN), true);
+                            return 1;
+                        }))))
+                // 3.74.0 (사용자 W-18 "선택 npc 삭제 명령어"): 바라보는(없으면 가장 가까운 4칸 안) RT Shop NPC 하나를 치운다. 배치 파일에서도 빠진다
+                .then(Commands.literal("remove").executes(ctx -> {
+                    net.minecraft.server.level.ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    Entity e = picked(p);
+                    if (e == null) {
+                        ctx.getSource().sendFailure(Component.translatable("rtshop.npclayout.remove_none"));
+                        return 0;
+                    }
+                    String name = e.getCustomName() == null ? keyOf(e) : e.getCustomName().getString();
+                    e.discard();
+                    ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.npclayout.removed", name, (int) Math.floor(e.getX()), (int) Math.floor(e.getY()), (int) Math.floor(e.getZ()))
+                            .withStyle(ChatFormatting.GREEN), true);
+                    return 1;
+                }))));
+    }
+
+    /** 바라보는 RT Shop NPC (8칸 안, 시선에서 가장 가까운 것). 없으면 4칸 안에서 가장 가까운 것. 플레이어 상점의 직원은 뺀다. */
+    public static Entity picked(net.minecraft.server.level.ServerPlayer p) {
+        net.minecraft.world.phys.Vec3 eye = p.getEyePosition(), look = p.getViewVector(1F);
+        Entity best = null, near = null;
+        double bestDot = 0.96, nearD = 16;
+        for (Entity e : p.level().getEntities(p, p.getBoundingBox().inflate(8), x -> keyOf(x) != null && !x.getTags().contains(com.rtshop.pshop.Employees.TAG))) {
+            net.minecraft.world.phys.Vec3 to = e.position().add(0, e.getBbHeight() * 0.6, 0).subtract(eye);
+            double len = to.length();
+            if (len < 0.01) continue;
+            double dot = to.scale(1 / len).dot(look);
+            if (len <= 8 && dot > bestDot) {
+                bestDot = dot;
+                best = e;
+            }
+            double d2 = e.distanceToSqr(p);
+            if (d2 < nearD) {
+                nearD = d2;
+                near = e;
+            }
+        }
+        return best != null ? best : near;
+    }
+
+    /** 모든 RT Shop NPC 를 치운다: {지금 치운 수, 나중에(그 청크가 돌 때) 치울 수}. 배치 파일은 비운다. */
+    public static int[] reset(MinecraftServer server) {
+        NpcLayout d = get(server);
+        int now = 0;
+        java.util.Set<java.util.UUID> gone = new java.util.HashSet<>();
+        for (ServerLevel level : server.getAllLevels()) {
+            List<Entity> list = new ArrayList<>();
+            for (Entity e : level.getAllEntities()) {
+                if (keyOf(e) != null && !e.getTags().contains(com.rtshop.pshop.Employees.TAG)) list.add(e);
+            }
+            for (Entity e : list) {
+                gone.add(e.getUUID());
+                e.discard();
+                now++;
+            }
+        }
+        int later = 0;
+        for (java.util.UUID id : new ArrayList<>(d.known.keySet())) {
+            if (gone.contains(id)) continue;
+            d.retired.add(id);   // 아직 불러오지 않은 곳의 NPC: 다음에 보이면 치운다 (note)
+            later++;
+        }
+        d.known.clear();
+        d.pending.clear();
+        d.changed = true;
+        d.setDirty();
+        export(server);
+        return new int[]{now, later};
     }
 
     // ------------------------------------------------------------------ 점검용

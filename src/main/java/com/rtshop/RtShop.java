@@ -30,6 +30,7 @@ public class RtShop {
         com.rtshop.enhance.ModEnhance.register(bus);
         ModItems.ITEMS.register(bus);
         com.rtshop.magic.MagicRegistry.register(bus);
+        com.rtshop.item.ModTabs.register(bus);
         com.rtshop.story.Companions.register(bus);
         com.rtshop.rules.LootRules.init();
         FarmLootModifier.SERIALIZERS.register(bus);

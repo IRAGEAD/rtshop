@@ -581,8 +581,26 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         } else if (confirmAll) {
             drawConfirmAll(g, realMx, realMy);
         } else if (hover >= 0 && hover < rows.size()) {
-            drawRowTooltip(g, rows.get(hover), mx, my);
+            // 툴팁은 상인 단추([대화] · [퀘스트] · [상점 편집])를 그린 뒤에 그 위에 (NpcButtons.onRender → lateTooltips)
+            lateTip = rows.get(hover);
+            lateX = mx;
+            lateY = my;
         }
+    }
+
+    private Row lateTip;
+    private int lateX, lateY;
+
+    @Override
+    public void lateTooltips(GuiGraphics g, int mx, int my) {
+        Row r = lateTip;
+        lateTip = null;
+        if (r != null) drawRowTooltip(g, r, lateX, lateY);
+    }
+
+    /** 점검용: 이번 그림에서 툴팁을 나중으로 미뤘는가. */
+    public boolean lateTipForTest() {
+        return lateTip != null;
     }
 
     private void bevel(GuiGraphics g, int x, int y, int w, int h, int fill, int hi, int lo) {
@@ -741,6 +759,25 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         ps.popPose();
     }
 
+    /** 가운데(cx)에 맞춰, 넓으면 maxW 에 들어가게 줄여 그린다. */
+    private void overTextFit(GuiGraphics g, String text, float cx, int y, int maxW, int color) {
+        int w = this.font.width(text);
+        float sc = w > maxW ? maxW / (float) w : 1F;
+        PoseStack ps = g.pose();
+        ps.pushPose();
+        ps.translate(cx - w * sc / 2F, y + (1F - sc) * 4F, 300.0F);
+        ps.scale(sc, sc, 1F);
+        g.drawString(this.font, text, 0, 0, color, true);
+        ps.popPose();
+    }
+
+    /** 점검용: 칸 안의 글이 칸에 들어가는가 (줄인 뒤의 폭). */
+    public boolean lockLabelFitsForTest(String text) {
+        int w = this.font.width(text);
+        float sc = w > CELL - 4 ? (CELL - 4) / (float) w : 1F;
+        return w * sc <= CELL - 4 + 0.01F;
+    }
+
     private void overText(GuiGraphics g, String text, int x, int y, int color) {
         PoseStack ps = g.pose();
         ps.pushPose();
@@ -816,7 +853,8 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
             dim(g, x + 1, y + 1, CELL - 2, CELL - 2, 0x99403020);
             if (!sellMode) {
                 Component full = r.storyLock != null ? Component.translatable("rtshop.ui.story_lock_short", com.rtshop.story.StoryGates.chapterName(r.storyLock)) : Component.translatable("rtshop.ui.full");
-                overText(g, full.getString(), x + (CELL - this.font.width(full)) / 2, y + 12, 0xFFFFC0B0);
+                // 3.74.0 (사용자 W-30): "1장 이후" 같은 글이 칸(36)보다 넓으면 줄여서 칸 안에
+                overTextFit(g, full.getString(), x + CELL / 2.0F, y + 12, CELL - 4, 0xFFFFC0B0);
             }
         }
     }
