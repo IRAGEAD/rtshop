@@ -245,6 +245,30 @@ public final class SelfTest {
         QuestManager.reset(a);
         QuestManager.loaded().quests.remove(qEye.id);
         QuestManager.loaded().quests.remove(qFar.id);
+
+        // W-19: Fantasy Mounts 의 퀘스트를 기본으로 끈다 ([quests] enabled 만, 한 번만, 새 세계는 defaultconfigs 로)
+        boolean fq = false;
+        String fqInfo = "";
+        try {
+            Path dir = Files.createTempDirectory("rtshop-fantasy374");
+            Path world = dir.resolve("serverconfig").resolve("fantasy-server.toml");
+            Files.createDirectories(world.getParent());
+            Files.writeString(world, "configVersion = 2\n[quests]\n\t#Turn quests on.\n\tenabled = true\n\tintroduction = true\n\n\t[quests.earnMounts]\n\t\tenabled = true\n",
+                    StandardCharsets.UTF_8);
+            Path def = dir.resolve("defaultconfigs").resolve("fantasy-server.toml"), done = dir.resolve("done.txt");
+            int n1 = com.rtshop.compat.FantasyQuestsOff.run(List.of(world, dir.resolve("missing.toml")), def, done);
+            String after = Files.readString(world, StandardCharsets.UTF_8);
+            Files.writeString(world, after.replaceFirst("enabled = false", "enabled = true"), StandardCharsets.UTF_8);   // 주인이 다시 켰다
+            int n2 = com.rtshop.compat.FantasyQuestsOff.run(List.of(world), def, done);
+            String again = Files.readString(world, StandardCharsets.UTF_8), defText = Files.exists(def) ? Files.readString(def, StandardCharsets.UTF_8) : "";
+            fq = n1 == 2 && after.contains("[quests]\n\t#Turn quests on.\n\tenabled = false") && after.contains("[quests.earnMounts]\n\t\tenabled = true")
+                    && n2 == 0 && again.contains("\tenabled = true\n\tintroduction") && defText.contains("[quests]") && defText.contains("enabled = false");
+            fqInfo = n1 + " " + n2 + " | " + after.replace("\n", "/") + " | " + defText.length();
+        } catch (Exception e) {
+            fqInfo = e.toString();
+        }
+        check("3.74 Fantasy Mounts quests start switched off: [quests] enabled becomes false once per world file (sub-sections untouched, a later switch-on stays), new worlds get it from defaultconfigs",
+                fq, fqInfo);
     }
 
     private static void stocks(MinecraftServer server, FakePlayer a) {
@@ -5085,6 +5109,22 @@ public final class SelfTest {
             RtShop.LOGGER.info("[rtshop-selftest] Fantasy Mounts quest settings: {}", com.rtshop.compat.FantasyQuestsOff.LAST);
             check("Fantasy Mounts quests are off by default (its quest settings were found)", java.nio.file.Files.exists(com.rtshop.compat.FantasyQuestsOff.marker(server)),
                     com.rtshop.compat.FantasyQuestsOff.modId() + " " + com.rtshop.compat.FantasyQuestsOff.LAST);
+            // 3.74.0 (W-19): 그 모드의 설정 파일(공용 · 이 세계)에 [quests] enabled = false 가 적혔다 (2.3.3 은 Forge 설정이 아니라 예전 방법으로는 꺼지지 않았다)
+            com.rtshop.compat.FantasyQuestsOff.applyWorld(server);   // 서버가 켜진 뒤의 몫 (이 점검이 그보다 먼저 돌 수도 있어서)
+            List<Path> fq374 = new ArrayList<>();
+            fq374.add(FMLPaths.CONFIGDIR.get().resolve(com.rtshop.compat.FantasyQuestsOff.FILE));
+            fq374.addAll(com.rtshop.compat.FantasyQuestsOff.worldFiles(server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT)));
+            boolean anyOff374 = false, anyOn374 = false;
+            StringBuilder fqInfo374 = new StringBuilder();
+            for (Path f : fq374) {
+                if (!Files.isRegularFile(f)) continue;
+                Boolean on = com.rtshop.compat.FantasyQuestsOff.questsEnabled(f);
+                fqInfo374.append(FMLPaths.GAMEDIR.get().relativize(f.toAbsolutePath())).append('=').append(on).append(' ');
+                if (Boolean.FALSE.equals(on)) anyOff374 = true;
+                if (Boolean.TRUE.equals(on)) anyOn374 = true;
+            }
+            check("3.74 Fantasy Mounts' own settings file says [quests] enabled = false (common and this world's file)", anyOff374 && !anyOn374,
+                    fqInfo374 + " | " + com.rtshop.compat.FantasyQuestsOff.LAST_FILES);
         }
         if (net.minecraftforge.fml.ModList.get().isLoaded("idas")) {
             int n = com.rtshop.compat.IdasVanilla.apply(true);

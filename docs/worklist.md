@@ -417,9 +417,12 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 - Y-8. W-18 `/rtshop npc layout reset [confirm]` (배치 초기화: 불러온 NPC 는 지우고, 안 불러온 것은 다음에 불러올 때 지움) · `/rtshop npc remove` (바라보는 NPC 하나).
 - Y-9. W-20 모리스의 퀘스트 창 인사를 다른 대사처럼 해요체로 (npcs.json, 고치지 않은 서버는 저절로 바뀜) · 대화 상자의 선택지 · 안내 글을 대사와 같은 **이야기 언어**로 (게임 언어가 영어여도 이야기가 한국어면 한국어).
 - Y-10. W-15 식품 상인: 농작물 상인이 다루는 품목 56개(날 농작물 · 고기 · 달걀 · 우유 · 양동이 …)를 뺌 — 상점 파일 옵션 `skipItemsOf: ["farmer"]` (직접 적은 것 · 자동 규칙 모두, 빈 구분 탭은 숨김).
-  설치된 food.json 에는 한 번 `skipItemsOf` 를 넣고 옛 이름 「농산물」 구분을 「식재료」로 (`ShopLoader.MIGRATED food-skip-farmer@1`), 가공 식재료 · 손질한 고기 12개를 덧붙임 (`APPENDED food+food_processed@1`). 어부와 겹치는 생선 4개는 그대로 (물어볼 것).
+  설치된 food.json 에는 한 번 `skipItemsOf` 를 넣고 옛 이름 「농산물」 구분을 「식재료」로 (`ShopLoader.MIGRATED food-skip-farmer@1`). 가공 식재료(반죽 등)를 새로 팔면 화로로 굽는 빵 값이 3밀 기준(132 G 이상)에서 반죽 기준(84 G)으로 내려가서(통합 시험이 잡음) 새 품목은 넣지 않음 — 값은 그대로. 어부와 겹치는 생선 4개는 그대로 (물어볼 것).
 - Y-11. W-11 조사대 나침반: Cataclysm 보스 건축물 8곳(영혼 대장간 · 불꽃 경기장 · 폐허 성채 · 가라앉은 도시 · 고대 공장 · 저주받은 피라미드 · 얼어붙은 감옥 · 바다 위의 궁)은 가리키지 않고 그 모드의 눈(몬스트러스 · 불꽃 · 공허 · 심연 · 기계 · 사막 · 저주 · 폭풍)을 던지라고 알림.
   같은 때 진행 중인 다른 장소가 있으면 그쪽을 가리킴. 자수정 둥지는 그대로 나침반. 안내서 「이야기 장소로 가는 법」 · 나침반 설명에 한 줄. (눈을 얻는 길은 CI inspect `cataclysm-eyes.txt` 로 확인할 것)
+- Y-12. W-19 Fantasy Mounts 퀘스트 기본 끔: 예전(3.6x) `compat/FantasyQuestsOff` 는 Forge 설정의 quest 값을 끄는 방법이라 2.3.3 에서는 아무것도 못 껐다 (팩 시험 기록 `fantasymounts []`).
+  → 그 모드의 `fantasy-server.toml` 을 직접: 공용 config · 세계마다의 파일은 처음 한 번 `[quests] enabled = true → false` (본 파일은 config/rtshop/compat_done.txt), 새 세계는 `defaultconfigs/fantasy-server.toml`.
+  RT Shop 을 만들 때(그 모드가 읽기 전)와 서버가 켜진 뒤. 파일 자리는 CI fullpack 의 `fantasy-settings.txt` 로 확인할 것.
 - W-12 안내 문서 (Docs): 「RT1 - 2 모드팩 24시간 서버 열기 (포트포워딩)」 https://claude.ai/artifact/QGFS5i3wCxM8CL92uK9fS9 — 준비물 · Forge 47.4.29 서버 · 빼는 클라이언트 전용 모드 4개(cwb · Forgematica · MaFgLib · Oculus) ·
   server.properties(allow-flight=true 등) · ipTIME 포트포워딩 · DDNS · 자동 재시작 실행 파일 · 백업 · playit.gg/오라클(지금 2 OCPU · 12GB) · Chunky · NPC 배치 옮기기. DH 서버 전송 한도 권장값은 성능 측정 결과로 채울 것.
 - W-27 은 이미 있음: 나침반은 3.61 전부터 마을(성 영역) 경계에서 **1000칸** 넘게 떨어진 곳만 가리킨다 (설명 · 안내서에도). 500칸으로 낮출지는 사용자가 고르면.
