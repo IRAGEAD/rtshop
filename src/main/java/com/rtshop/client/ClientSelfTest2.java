@@ -35,6 +35,7 @@ final class ClientSelfTest2 {
     private static final List<Step> STEPS = new ArrayList<>();
     private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
     private static long ABSENT_377;
+    private static int ABSENT_ID_377 = -1;
     private static boolean GONE_377;
     private static String GONE_INFO_377 = "";
     /** 3.71: 점검용 동행 NPC 의 엔티티 번호. */
@@ -2365,12 +2366,12 @@ final class ClientSelfTest2 {
         add(mc -> {
             ABSENT_377 = NpcLookClient.absentSkippedForTest;
             onServer(mc, sp -> {
-                net.minecraft.world.entity.Entity isa = LOOK_IDS.isEmpty() ? null : sp.serverLevel().getEntity(LOOK_IDS.get(0));
-                if (isa != null) {
-                    net.minecraft.world.phys.Vec3 lk = sp.getLookAngle();
-                    double len = Math.max(0.01, Math.sqrt(lk.x * lk.x + lk.z * lk.z));
-                    isa.teleportTo(sp.getX() + lk.x / len * 3.0, sp.getY(), sp.getZ() + lk.z / len * 3.0);
-                }
+                // 앞선 점검들이 사람을 옮겨 다니므로, 바로 앞에 이사벨을 새로 세운다 (끝나면 치움) — 고개는 수평으로
+                sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), sp.getYRot(), 0F);
+                net.minecraft.world.phys.Vec3 lk = net.minecraft.world.phys.Vec3.directionFromRotation(0F, sp.getYRot());
+                double len = Math.max(0.01, Math.sqrt(lk.x * lk.x + lk.z * lk.z));
+                var v377 = com.rtshop.quest.QuestManager.spawnNpc(sp.serverLevel(), sp.position().add(lk.x / len * 3.0, 0, lk.z / len * 3.0), sp.getYRot() + 180, "order_archivist");
+                ABSENT_ID_377 = v377 == null ? -1 : v377.getId();
                 com.rtshop.quest.QuestData.Progress pr = com.rtshop.quest.QuestManager.progressOf(sp);
                 pr.completed.remove("story_5_08");
                 pr.completed.add("story_5_03");
@@ -2379,7 +2380,7 @@ final class ClientSelfTest2 {
             waitTicks(50);
         });
         add(mc -> {
-            int isa = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(0);
+            int isa = ABSENT_ID_377;
             GONE_377 = isa > 0 && NpcLookClient.absent(isa) && NpcLookClient.absentSkippedForTest > ABSENT_377;
             GONE_INFO_377 = isa + " look '" + NpcLookClient.lookOfForTest(isa) + "' skipped " + (NpcLookClient.absentSkippedForTest - ABSENT_377);
             shot(mc, "131c_isabel_taken");
@@ -2390,7 +2391,7 @@ final class ClientSelfTest2 {
             waitTicks(50);
         });
         add(mc -> {
-            int isa = LOOK_IDS.isEmpty() ? -1 : LOOK_IDS.get(0);
+            int isa = ABSENT_ID_377;
             boolean back = isa > 0 && "isabel".equals(NpcLookClient.lookOfForTest(isa)) && !NpcLookClient.absent(isa);
             check("3.77 while Isabel is taken in the story she is not drawn on that player's screen (no figure, no name), and she is back once Ignis sleeps",
                     GONE_377 && back, GONE_INFO_377 + " → back '" + NpcLookClient.lookOfForTest(isa) + "'");
@@ -2399,6 +2400,8 @@ final class ClientSelfTest2 {
                 pr.completed.remove("story_5_03");
                 pr.completed.remove("story_5_08");
                 com.rtshop.quest.QuestData.get(sp.server).dirty();
+                net.minecraft.world.entity.Entity v = sp.serverLevel().getEntity(ABSENT_ID_377);
+                if (v != null) v.discard();
             });
             waitTicks(5);
         });
