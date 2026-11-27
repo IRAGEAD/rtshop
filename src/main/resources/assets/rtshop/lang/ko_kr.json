@@ -2090,5 +2090,6 @@
   "rtshop.stock.cert_exposed": "No.%s · 위조 판명",
   "rtshop.stock.err.forged": "거래소가 위조를 알아보고 판명 도장을 찍었습니다. 값은 치르지 않습니다.",
   "rtshop.stock.err.wanted": "수배 중이라 거래소가 거래를 받지 않습니다.",
-  "rtshop.stock.wanted_banner": "수배 중 — 거래소와 거래할 수 없습니다"
+  "rtshop.stock.wanted_banner": "수배 중 — 거래소와 거래할 수 없습니다",
+  "rtshop.job.hidden_full": "%s 의 자리가 지금은 차 있습니다 (서버에 %s명까지). 누군가 다른 직업으로 바꾸면 자리가 납니다."
 }

@@ -59,6 +59,15 @@ public final class JobData extends SavedData {
         setDirty();
     }
 
+    /** 이 칸에 이 직업을 가진 사람 수 (나를 빼고, 히든 직업의 서버 인원 한도 · 3.76.0). */
+    public int count(String slot, String jobId, UUID except) {
+        int n = 0;
+        for (Map.Entry<UUID, Entry> e : players.entrySet()) {
+            if (!e.getKey().equals(except) && jobId.equals(e.getValue().get(slot))) n++;
+        }
+        return n;
+    }
+
     public static JobData load(CompoundTag tag) {
         JobData d = new JobData();
         ListTag list = tag.getList("players", Tag.TAG_COMPOUND);

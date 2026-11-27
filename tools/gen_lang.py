@@ -1956,6 +1956,7 @@ NEW = {
  "rtshop.stock.err.forged": ("거래소가 위조를 알아보고 판명 도장을 찍었습니다. 값은 치르지 않습니다.", "The exchange spotted a forgery and stamped it. Nothing is paid."),
  "rtshop.stock.err.wanted": ("수배 중이라 거래소가 거래를 받지 않습니다.", "You are wanted; the exchange will not deal with you."),
  "rtshop.stock.wanted_banner": ("수배 중 — 거래소와 거래할 수 없습니다", "Wanted — the exchange will not deal with you"),
+ "rtshop.job.hidden_full": ("%s 의 자리가 지금은 차 있습니다 (서버에 %s명까지). 누군가 다른 직업으로 바꾸면 자리가 납니다.", "There is no place for a %s right now (up to %s per server). One opens when someone changes jobs."),
 }
 ko = dict(ko_old); en = dict(en_old)
 for k, (a, b) in NEW.items():

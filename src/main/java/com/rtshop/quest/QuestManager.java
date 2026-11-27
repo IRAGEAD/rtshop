@@ -501,6 +501,11 @@ public final class QuestManager {
 
     // ------------------------------------------------------------------ 상태 조회
 
+    /** 이 사람의 진행 (3.76.0: 숨은 시험을 되돌리려고 밖에서도). */
+    public static QuestData.Progress progressOf(ServerPlayer p) {
+        return prog(p);
+    }
+
     private static QuestData.Progress prog(ServerPlayer p) {
         return QuestData.get(p.server).of(p.getUUID());
     }
@@ -1437,6 +1442,11 @@ public final class QuestManager {
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.completed", com.rtshop.story.StoryText.t(p, q.title)));
         scene(p, q.sceneDone);
         if (q.sceneDream != null) queueDream(p, q.sceneDream);
+        try {
+            com.rtshop.story.HiddenJobs.afterTurnIn(p, q, choice);   // 3.76.0: 히든 직업의 숨은 길 (선택의 낌새 · 시험)
+        } catch (Throwable t) {
+            RtShop.LOGGER.warn("[rtshop] 숨은 길 처리 실패: {}", t.toString());
+        }
         nextHint(p, q, npcKey);
         if (!q.rewardFlags.isEmpty()) {
             com.rtshop.story.StoryGates.sync(p);

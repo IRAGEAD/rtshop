@@ -21,7 +21,8 @@ EN = [
     "· Sold back to the exchange, it either passes or gets caught depending on its workmanship. What a forgery is paid comes only from the exchange's fund, and it cannot pass when the fund is short. It is always found out when the dividend stamp is put on it.\n"
     "· When a forgery is found out, whoever held it, the forger who made it is fined (30% of that day's face value, from the wallet, then from savings). Found out three times within two weeks, the forger is wanted for 7 days: their name goes on the price board and the exchange will not deal with them.\n"
     "· Inspector: hold the Appraiser's Loupe with a certificate in your other hand and right-click to look for flaws. Once a day per certificate. When you find one, you stamp it 'exposed as forged' and receive half of the forger's fine.\n"
-    "· A genuine certificate always gives 'You find no flaw'. A forgery whose flaw you miss says the same.",
+    "· A genuine certificate always gives 'You find no flaw'. A forgery whose flaw you miss says the same.\n"
+    "· Each server has room for two forgers and two inspectors. A place opens when someone changes to another job.",
     # 976
     "forger inspector forgery appraise loupe wanted hidden job",
 ]

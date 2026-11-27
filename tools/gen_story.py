@@ -105,6 +105,9 @@ assert _used == set(REPLIES), set(REPLIES) - _used
 # 숨은 이야기 「마중 나간 사람」(스킬라)은 tools/story_scylla.py
 exec(open(os.path.join(os.path.dirname(__file__), 'story_scylla.py'), encoding='utf-8').read())
 
+# 숨은 이야기 「고쳐 쓰는 손」 · 「지키는 눈」 (히든 직업 위조자 · 조사관으로 가는 길, 3.76.0)은 tools/story_hidden_jobs.py
+exec(open(os.path.join(os.path.dirname(__file__), 'story_hidden_jobs.py'), encoding='utf-8').read())
+
 # 4판으로 다시 쓴 장: 「장 이름 (i/n)」 번호를 실제 순서대로 다시 매긴다 (퀘스트를 끼워 넣거나 빼도 ID 는 그대로 두려고)
 for _prefix in ("story_0_", "story_1_", "story_2_", "story_3_", "story_4_", "story_5_"):
     _qs = [x for x in Q if x["id"].startswith(_prefix)]

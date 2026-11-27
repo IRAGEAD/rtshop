@@ -193,6 +193,10 @@ public final class Jobs {
         if (jobId.equals(current)) {
             return new Result(false, Component.translatable("rtshop.job.already", com.rtshop.story.StoryText.t(p, d.name)));
         }
+        // 3.76.0: 히든 직업은 서버에 정해진 수만 (기본 2명). 누군가 그만두면 자리가 난다.
+        if (d.hidden && cfg.hiddenJobCap > 0 && data.count(d.slot, jobId, p.getUUID()) >= cfg.hiddenJobCap) {
+            return new Result(false, Component.translatable("rtshop.job.hidden_full", com.rtshop.story.StoryText.t(p, d.name), cfg.hiddenJobCap));
+        }
         if (current.isEmpty()) {
             e.set(d.slot, jobId, 0);
             data.dirty();

@@ -716,6 +716,135 @@ public final class SelfTest {
         }
     }
 
+    /** 3.76.0 ⑤ 히든 직업으로 가는 숨은 길: 갈림길(하나뿐) · 정해진 때의 낮은 확률 · 값과 틀릴 수 있는 시험(이레) · 서버 인원 한도. */
+    private static void hiddenPaths(MinecraftServer server, FakePlayer a, FakePlayer b) {
+        com.rtshop.job.JobData jd = com.rtshop.job.JobData.get(server);
+        com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
+        net.minecraft.server.level.ServerLevel ow = server.overworld();
+        long keepTime = ow.getDayTime();
+        boolean keepRain = ow.isRaining();
+        int keepCap = jc.hiddenJobCap;
+        try {
+            for (FakePlayer p : new FakePlayer[]{a, b}) {
+                QuestManager.reset(p);
+                jd.clear(p.getUUID());
+                p.getInventory().clearContent();
+                p.getPersistentData().remove("rtshop_hj_night");
+                p.getPersistentData().remove("rtshop_hj_rain");
+                p.getPersistentData().remove("rtshop_hj_fail_forger");
+                p.getPersistentData().remove("rtshop_hj_fail_inspector");
+            }
+            com.rtshop.story.HiddenJobs.testShiftMs = 0;
+            // ① 갈림길: 4장의 받침대에 두 갈래, 그 전에 마친 사람은 기록관의 짧은 퀘스트로 같은 선택 (한 번뿐)
+            QuestDef altar = QuestManager.loaded().quests.get("story_4_16");
+            boolean fork = altar != null && altar.choices.size() == 2 && altar.choices.get(0).flags.contains("hj_reveal") && altar.choices.get(1).flags.contains("hj_conceal");
+            QuestManager.forceComplete(a, "story_4_16");
+            QuestManager.forceComplete(b, "story_4_16");
+            boolean makeup = QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_jobs_0"));
+            QuestManager.accept(a, "hidden_jobs_0", null);
+            QuestManager.onTalk(a, "quest_order_archivist");
+            boolean conceal = QuestManager.turnIn(a, "hidden_jobs_0", null, 1) && QuestManager.hasFlag(a, "hj_conceal") && !QuestManager.hasFlag(a, "hj_reveal");
+            QuestManager.accept(b, "hidden_jobs_0", null);
+            QuestManager.onTalk(b, "quest_order_archivist");
+            boolean reveal = QuestManager.turnIn(b, "hidden_jobs_0", null, 0) && QuestManager.hasFlag(b, "hj_reveal");
+            boolean once = !QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_jobs_0"))
+                    && !QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_inspector_1"))
+                    && !QuestManager.isAvailable(b, QuestManager.loaded().quests.get("hidden_forger_1"));
+            check("3.76 hidden paths: the pedestal scene in chapter 4 forks once (read the added line to Isabel / keep it); those past it choose through Isabel's short quest; one path per person",
+                    fork && makeup && conceal && reveal && once, "fork " + fork + " makeup " + makeup + " conceal " + conceal + " reveal " + reveal + " once " + once);
+            // ② 정해진 때의 낮은 확률: 숨김 = 밤에 제단 곁, 한 밤에 한 번 / 밝힘 = 비 오는 날 기록관, 하루에 한 번
+            com.rtshop.story.HiddenJobs.testNearAltar = true;
+            ow.setDayTime(Math.floorDiv(ow.getDayTime(), 24000L) * 24000L + 6000);
+            com.rtshop.story.HiddenJobs.testRoll = 0.0;
+            boolean dayNo = !com.rtshop.story.HiddenJobs.nightAtAltar(a);
+            ow.setDayTime(ow.getDayTime() + 12000);   // 한밤
+            com.rtshop.story.HiddenJobs.testRoll = 0.5;
+            boolean missed = !com.rtshop.story.HiddenJobs.nightAtAltar(a);
+            com.rtshop.story.HiddenJobs.testRoll = 0.0;
+            boolean sameNight = !com.rtshop.story.HiddenJobs.nightAtAltar(a);
+            ow.setDayTime(ow.getDayTime() + 24000);   // 다음 밤
+            boolean seenF = com.rtshop.story.HiddenJobs.nightAtAltar(a) && QuestManager.hasFlag(a, "hj_forger_seen")
+                    && QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_forger_1")) && !com.rtshop.story.HiddenJobs.nightAtAltar(b);
+            ow.setWeatherParameters(6000, 0, false, false);
+            com.rtshop.story.HiddenJobs.testRoll = 0.0;
+            boolean dry = !com.rtshop.story.HiddenJobs.talkedTo(b, "quest_order_archivist");
+            ow.setWeatherParameters(0, 6000, true, false);
+            com.rtshop.story.HiddenJobs.testRoll = 0.9;
+            boolean rainMiss = !com.rtshop.story.HiddenJobs.talkedTo(b, "quest_order_archivist");
+            com.rtshop.story.HiddenJobs.testRoll = 0.0;
+            boolean sameDay = !com.rtshop.story.HiddenJobs.talkedTo(b, "quest_order_archivist");
+            com.rtshop.story.HiddenJobs.testShiftMs = 86_400_000L;
+            boolean seenI = com.rtshop.story.HiddenJobs.talkedTo(b, "quest_order_archivist") && QuestManager.hasFlag(b, "hj_inspector_seen")
+                    && QuestManager.isAvailable(b, QuestManager.loaded().quests.get("hidden_inspector_1")) && !com.rtshop.story.HiddenJobs.talkedTo(a, "quest_order_archivist");
+            com.rtshop.story.HiddenJobs.testShiftMs = 0;
+            check("3.76 hidden paths: the hidden teacher shows only at set times and rarely — at night by the rune altar once a night (forger), on rainy days with Isabel once a day (inspector)",
+                    dayNo && missed && sameNight && seenF && dry && rainMiss && sameDay && seenI,
+                    "day " + dayNo + " missed " + missed + " sameNight " + sameNight + " seenF " + seenF + " dry " + dry + " rainMiss " + rainMiss + " sameDay " + sameDay + " seenI " + seenI);
+            // ③ 값 · 시험: 틀리면 이레 동안 다시 못 본다, 맞히면 도구와 직업의 표식
+            com.rtshop.economy.Economy.setWallet(a, 20_000);
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.PAPER, 8));
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.INK_SAC, 4));
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.HONEYCOMB, 4));
+            boolean f1 = QuestManager.accept(a, "hidden_forger_1", null) && QuestManager.turnIn(a, "hidden_forger_1", null, -1)
+                    && com.rtshop.economy.Economy.wallet(a) == 15_000 && count(a, s2 -> s2.is(net.minecraft.world.item.Items.PAPER)) == 0;
+            QuestManager.accept(a, "hidden_forger_2", null);
+            QuestManager.onTalk(a, "gacha");
+            boolean wrong = QuestManager.turnIn(a, "hidden_forger_2", null, 0) && QuestManager.hasFlag(a, "hj_forger_failed")
+                    && !QuestManager.isCompleted(a, "hidden_forger_2") && !QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_forger_2"));
+            com.rtshop.story.HiddenJobs.testShiftMs = 6L * 86_400_000L;
+            com.rtshop.story.HiddenJobs.clearExpired(a);
+            boolean stillLocked = QuestManager.hasFlag(a, "hj_forger_failed");
+            com.rtshop.story.HiddenJobs.testShiftMs = 7L * 86_400_000L + 60_000L;
+            com.rtshop.story.HiddenJobs.clearExpired(a);
+            boolean reopened = !QuestManager.hasFlag(a, "hj_forger_failed") && QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_forger_2"));
+            QuestManager.accept(a, "hidden_forger_2", null);
+            QuestManager.onTalk(a, "gacha");
+            boolean right = QuestManager.turnIn(a, "hidden_forger_2", null, 1) && QuestManager.hasFlag(a, "hj_forger_passed") && QuestManager.isCompleted(a, "hidden_forger_2");
+            QuestManager.accept(a, "hidden_forger_3", null);
+            QuestManager.onTalk(a, "gacha");
+            boolean kit = QuestManager.turnIn(a, "hidden_forger_3", null, -1) && QuestManager.hasFlag(a, "unlock_job_forger")
+                    && count(a, s2 -> s2.is(com.rtshop.item.ModItems.FORGER_KIT.get())) == 1;
+            com.rtshop.story.HiddenJobs.testShiftMs = 0;
+            QuestManager.accept(b, "hidden_inspector_1", null);
+            QuestManager.onTalk(b, "bank");
+            QuestManager.onTalk(b, "quest_order_archivist");
+            boolean i1 = QuestManager.turnIn(b, "hidden_inspector_1", null, -1);
+            QuestManager.accept(b, "hidden_inspector_2", null);
+            QuestManager.onTalk(b, "quest_order_archivist");
+            boolean i2 = QuestManager.turnIn(b, "hidden_inspector_2", null, 1) && QuestManager.hasFlag(b, "hj_inspector_passed");
+            QuestManager.accept(b, "hidden_inspector_3", null);
+            QuestManager.onTalk(b, "quest_order_archivist");
+            boolean loupe = QuestManager.turnIn(b, "hidden_inspector_3", null, -1) && QuestManager.hasFlag(b, "unlock_job_investigator")
+                    && count(b, s2 -> s2.is(com.rtshop.item.ModItems.APPRAISAL_LOUPE.get())) == 1;
+            check("3.76 hidden paths: the teacher asks a price and a test that can be failed (a wrong answer locks it for seven days); passing gives the tool and opens the job",
+                    f1 && wrong && stillLocked && reopened && right && kit && i1 && i2 && loupe,
+                    "f1 " + f1 + " wrong " + wrong + " locked " + stillLocked + " reopened " + reopened + " right " + right + " kit " + kit + " i1 " + i1 + " i2 " + i2 + " loupe " + loupe);
+            // ④ 서버 인원 한도
+            jd.of(b.getUUID()).life = "forger";
+            jd.dirty();
+            jc.hiddenJobCap = 1;
+            com.rtshop.job.Jobs.Result full = com.rtshop.job.Jobs.choose(a, "forger");
+            jc.hiddenJobCap = 2;
+            com.rtshop.job.Jobs.Result room = com.rtshop.job.Jobs.choose(a, "forger");
+            check("3.76 hidden paths: each hidden job has a server limit (2 by default); when it is full the Job Guide says so",
+                    !full.ok() && full.message().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tf && tf.getKey().equals("rtshop.job.hidden_full")
+                            && room.ok() && com.rtshop.stock.Forgery.hasJob(a, "forger"), full.message().getString() + " / " + room.message().getString());
+        } finally {
+            com.rtshop.story.HiddenJobs.testNearAltar = null;
+            com.rtshop.story.HiddenJobs.testRoll = null;
+            com.rtshop.story.HiddenJobs.testShiftMs = 0;
+            jc.hiddenJobCap = keepCap;
+            ow.setDayTime(keepTime);
+            if (keepRain) ow.setWeatherParameters(0, 6000, true, false);
+            else ow.setWeatherParameters(6000, 0, false, false);
+            for (FakePlayer p : new FakePlayer[]{a, b}) {
+                QuestManager.reset(p);
+                jd.clear(p.getUUID());
+                p.getInventory().clearContent();
+            }
+        }
+    }
+
     private static boolean guidePage376(FakePlayer p, String id) {
         for (com.google.gson.JsonElement ce : com.rtshop.story.Guide.forPlayer(p, com.rtshop.story.Guide.get()).getAsJsonArray("categories"))
             for (com.google.gson.JsonElement pe : ce.getAsJsonObject().getAsJsonArray("pages"))
@@ -4873,6 +5002,7 @@ public final class SelfTest {
         com.rtshop.petition.Petitions.forTestReset(a.server);
         stocks(a.server, a);
         forgery(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
+        hiddenPaths(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
         // 3.73: 성능 진단 (/fpscheck · /rtshop perfcheck) — 스택의 프레임을 모드로 돌리는 규칙
         StackTraceElement[] st373 = {
                 new StackTraceElement("java.lang.Object", "wait", null, -1),

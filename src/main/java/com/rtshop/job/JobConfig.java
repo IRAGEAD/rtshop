@@ -73,6 +73,13 @@ public final class JobConfig {
     public double cooldownHoursCombat = 48;
     public double cooldownHoursLife = 24;
     public String npcName = "직업 안내인";
+    /**
+     * 히든 직업 (3.76.0, 위조자 · 조사관): 서버 인원 한도, 숨은 길이 열릴 확률 (위조자 = 밤에 룬 제단 곁에서 한 밤에 한 번,
+     * 조사관 = 비 오는 날 기록관과 이야기할 때 하루에 한 번), 시험에서 틀리면 다시 볼 수 있을 때까지의 날 수.
+     */
+    public int hiddenJobCap = 2;
+    public double hiddenNightChance = 0.15, hiddenRainChance = 0.30;
+    public int hiddenRetryDays = 7;
     public final Map<String, JobDef> jobs = new LinkedHashMap<>();
     public final List<WeaponTypes.Type> weaponTypes = new ArrayList<>();
     /** 아이템 ID -> 무기 종류 (자동 분류가 틀린 모드 무기를 바로잡을 때). "none" = 무기 아님. */
@@ -443,6 +450,10 @@ public final class JobConfig {
         if (o.has("cooldownHoursCombat")) c.cooldownHoursCombat = Math.max(0, o.get("cooldownHoursCombat").getAsDouble());
         if (o.has("cooldownHoursLife")) c.cooldownHoursLife = Math.max(0, o.get("cooldownHoursLife").getAsDouble());
         if (o.has("npcName")) c.npcName = o.get("npcName").getAsString();
+        if (o.has("hiddenJobCap")) c.hiddenJobCap = Math.max(0, o.get("hiddenJobCap").getAsInt());
+        if (o.has("hiddenNightChance")) c.hiddenNightChance = Math.max(0, Math.min(1, o.get("hiddenNightChance").getAsDouble()));
+        if (o.has("hiddenRainChance")) c.hiddenRainChance = Math.max(0, Math.min(1, o.get("hiddenRainChance").getAsDouble()));
+        if (o.has("hiddenRetryDays")) c.hiddenRetryDays = Math.max(0, Math.min(365, o.get("hiddenRetryDays").getAsInt()));
         if (o.has("weaponTypes") && o.get("weaponTypes").isJsonArray()) {
             for (JsonElement e : o.getAsJsonArray("weaponTypes")) {
                 c.weaponTypes.add(WeaponTypes.read(e.getAsJsonObject()));
@@ -525,6 +536,9 @@ public final class JobConfig {
         help.add("jobs[].weapons: 무기 종류별 {damage: 피해 증감, speed: 공격 속도 증감} (0.10 = +10%, -0.15 = -15%). magic 은 주문 피해. 공격 속도는 근접 무기에만 적용.");
         help.add("weaponTypes: 무기 종류와 분류 규칙 (위에서부터 처음 맞는 종류). weaponOverrides: 아이템 ID -> 종류 (자동 분류가 틀렸을 때, none = 무기 아님)");
         help.add("jobs[].unlockFlag: 이 표식을 보상으로 주는 퀘스트가 있으면 그 퀘스트를 깨야 고를 수 있습니다.");
+        help.add("jobs[].hidden: 표식을 얻기 전에는 직업 창에 보이지도 않는 히든 직업. hiddenJobCap = 히든 직업마다 서버에 둘 수 있는 사람 수 (0 = 한도 없음), "
+                + "hiddenNightChance = 위조자의 길이 열릴 확률 (밤에 룬 제단 곁, 한 밤에 한 번), hiddenRainChance = 조사관의 길이 열릴 확률 (비 오는 날 기록관과 이야기할 때, 하루에 한 번), "
+                + "hiddenRetryDays = 숨은 시험에서 틀리면 다시 볼 수 있을 때까지의 날 수.");
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
         o.addProperty("paramsVersion", PARAMS_VERSION);
@@ -533,6 +547,10 @@ public final class JobConfig {
         o.addProperty("cooldownHoursCombat", cooldownHoursCombat);
         o.addProperty("cooldownHoursLife", cooldownHoursLife);
         o.addProperty("npcName", npcName);
+        o.addProperty("hiddenJobCap", hiddenJobCap);
+        o.addProperty("hiddenNightChance", hiddenNightChance);
+        o.addProperty("hiddenRainChance", hiddenRainChance);
+        o.addProperty("hiddenRetryDays", hiddenRetryDays);
         JsonArray arr = new JsonArray();
         for (JobDef d : jobs.values()) {
             JsonObject j = new JsonObject();

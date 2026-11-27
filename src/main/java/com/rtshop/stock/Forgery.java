@@ -305,6 +305,7 @@ public final class Forgery {
         if (matches(fake, s) && roll() >= passChance(fake.quality)) {
             expose(p.server, d, serial, fake, s, null);
             p.getInventory().setChanged();
+            com.rtshop.story.HiddenJobs.sealCheckFound(p);   // 조사관의 숨은 길: 위조 증서를 처음 밝혀낸 사람 (밝힘을 고른 사람만)
             return FOUND;
         }
         return CLEAN;

@@ -367,6 +367,7 @@ public final class Dialogue {
         }
         String greet = greet(p, npcKey, n, scene == null);
         if (entityId != -1 || testMet) QuestManager.setFlag(p, metFlag(npcKey), true);   // 3.75.0: 이 NPC 와 이야기했다
+        if (entityId != -1) HiddenJobs.talkedTo(p, npcKey);   // 3.76.0: 비 오는 날의 기록관 (조사관의 숨은 길)
         hear(p, greet);
         // 3.64: 서버가 제 언어로 풀어 보내던 글(서버의 언어는 플레이어의 언어와 다를 수 있다)을 그 사람의 이야기 언어로 고른다
         if (greet.isEmpty()) greet = StoryText.pick(p, "무슨 일이세요?", "What can I do for you?");
