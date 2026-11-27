@@ -1400,7 +1400,7 @@
   "item.rtshop.memory_shard.guide": "Hand 3 to Oscar the Fisher in the quest \"The Apprentice of a Thousand Years Ago\". Do not drop or sell them.",
   "item.rtshop.frost_heart.guide": "Hand 1 to Expedition Captain Roran in the quest \"The Door That Won't Go Out\". Do not drop or sell it.",
   "item.rtshop.scylla_clue.guide": "They say something opens once enough are recorded. Do not throw it away.",
-  "item.rtshop.survey_compass.desc3": "Only points to places that really exist, at least 1000 blocks from town.",
+  "item.rtshop.survey_compass.desc3": "Only points to places that really exist, at least 500 blocks from town.",
   "rtshop.itemstats.title": "Equipment Stats",
   "rtshop.itemstats.no_item": "Pick an item ('Other item' below, or hold one and run /rtshop itemstats).",
   "rtshop.itemstats.col_attr": "Stat",

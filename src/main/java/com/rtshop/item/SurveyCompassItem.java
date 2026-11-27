@@ -131,11 +131,11 @@ public class SurveyCompassItem extends Item {
         return false;
     }
 
-    /** 마을(성 영역)에서 최소 이만큼 떨어진 건축물만 안내한다. */
-    public static final double MIN_TOWN = 1000;
+    /** 마을(성 영역)에서 최소 이만큼 떨어진 건축물만 안내한다 (3.78: 1000 → 500, 사용자가 정함 11-28). */
+    public static final double MIN_TOWN = 500;
 
     /**
-     * 구조물 ID, #태그 또는 "모드:*" 가운데 실제로 생긴 가장 가까운 자리 (반경 200 청크, 마을에서 1000블럭 이상).
+     * 구조물 ID, #태그 또는 "모드:*" 가운데 실제로 생긴 가장 가까운 자리 (반경 200 청크, 마을에서 MIN_TOWN(500)블럭 이상).
      * 없으면 null. 생기지 않은 자리(다른 모드·단계 잠금·지형 조건)는 알려 주지 않는다.
      */
     public static BlockPos locate(ServerLevel level, String target, BlockPos from) {

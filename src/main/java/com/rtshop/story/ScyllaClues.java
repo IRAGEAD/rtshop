@@ -82,7 +82,9 @@ public final class ScyllaClues {
 
     public boolean enabled = true;
     public int needed = 5;
-    public int version = 2;
+    public int version = VERSION;
+    /** 3: 3.78 의 새 확률 (뽑기 단서 0.05%, 낚시 단서 0.1% · 천장 없음). */
+    public static final int VERSION = 3;
     public String rewardItem = "cataclysm:storm_eye";
     public String grantFlag = "seal_scylla";
     /** 단서를 다 모아도 이 표식(메인 스토리의 끝)이 있어야 폭풍이 열린다. 그 표식을 주는 퀘스트가 없으면 따지지 않는다. */
@@ -118,9 +120,10 @@ public final class ScyllaClues {
 
     static Map<String, Clue> defaults() {
         Map<String, Clue> m = new LinkedHashMap<>();
-        // 다섯 단서 = 폭풍의 여제가 쓴 「마중의 항해일지」의 흩어진 다섯 조각. 얻는 때는 운과 선택에 따라 다르지만, 천장이 있어 결국 모두 얻는다.
-        Clue a = clue("storm_coin", "여덟 갈래 번개가 찍힌 품삯", "행운 상인의 상품 더미에 섞여 있던 낡은 은화. 앞면에 여덟 갈래 번개, 뒷면에 한 줄: \"마중 나간 날의 품삯. 돌아와서 치름.\"", "gacha", "", 0.002);
-        a.pity = 300;
+        // 다섯 단서 = 폭풍의 여제가 쓴 「마중의 항해일지」의 흩어진 다섯 조각. 얻는 때는 운과 선택에 따라 다르다.
+        // 뽑기·보스·상자 단서는 천장이 있어 결국 얻고, 낚시 단서(3.78)는 천장 없이 0.1% 운에만 맡긴다 (사용자가 정함 11-28).
+        Clue a = clue("storm_coin", "여덟 갈래 번개가 찍힌 품삯", "행운 상인의 상품 더미에 섞여 있던 낡은 은화. 앞면에 여덟 갈래 번개, 뒷면에 한 줄: \"마중 나간 날의 품삯. 돌아와서 치름.\"", "gacha", "", 0.0005);
+        a.pity = 300; // 3.78: 0.2% → 0.05% (천장 300 은 그대로)
         hint(a, "*", "그런 돈은 처음 보는데. 품삯을 '돌아와서 치른다'니, 못 돌아온 배의 돈이겠구먼.");
         hint(a, "cleric", "여덟 갈래라. 일곱이 아니고? …세어 보니 정말 여덟이군.");
         m.put(a.id, a);
@@ -134,8 +137,7 @@ public final class ScyllaClues {
         hint(c, "*", "이 가락, 들어 본 것 같은데… 폭풍 치는 밤이면 바다 쪽에서 들리는 그거 아닌가?");
         hint(c, "librarian", "이름 자리만 비어 있네요. 지운 게 아니에요. 잉크가 닿은 적이 없어요. 부르려던 이름을 잊은 사람이 적은 악보예요.");
         m.put(c.id, c);
-        Clue d = clue("wet_logbook", "젖은 항해일지 조각", "바다에서 낚아 올린, 소금에 절은 종이. \"여덟 번째 함대, 폭풍의 눈 안에 닻을 내림. 제독께서 이르시길, 누가 오는지는 잊었으나 맞을 채비는 풀지 말라 하심.\"", "fish", "ocean", 0.01);
-        d.pity = 180;
+        Clue d = clue("wet_logbook", "젖은 항해일지 조각", "바다에서 낚아 올린, 소금에 절은 종이. \"여덟 번째 함대, 폭풍의 눈 안에 닻을 내림. 제독께서 이르시길, 누가 오는지는 잊었으나 맞을 채비는 풀지 말라 하심.\"", "fish", "ocean", 0.001); // 3.78: 1% → 0.1%, 천장 없음 (예전 180)
         hint(d, "fisherman", "폭풍의 눈 안에 닻을 내린다고? 미친 소리… 라고 하고 싶은데, 눈 안은 잔잔하긴 하지. 거기 천 년 있을 수 있다면 말이야.");
         hint(d, "*", "여덟 번째 함대? 왕국은 일곱이었다던데. 여덟째 나라의 배라는 건가.");
         m.put(d.id, d);
@@ -143,6 +145,24 @@ public final class ScyllaClues {
         hint(f, "*", "'…중하는 이'? 앞 글자가 깨졌네. 존중? 마중? 인장에 그런 말을 새기는 사람도 있나.");
         m.put(f.id, f);
         return m;
+    }
+
+    /** 시험용: 기본 단서를 담은 새 설정 (설치된 파일과 상관없이, 버전은 2 로 — 옮기기 시험용). */
+    public static ScyllaClues freshForTest() {
+        ScyllaClues s = new ScyllaClues();
+        s.clues.putAll(defaults());
+        s.version = 2;
+        return s;
+    }
+
+    /** 시험용: 새로 깔 때의 기본 단서 (설치된 파일과 상관없이). */
+    public static Map<String, Clue> defaultsForTest() {
+        return defaults();
+    }
+
+    /** 시험용: 파일에 쓸 모양. */
+    public JsonObject toJsonForTest() {
+        return toJson();
     }
 
     private static Path file() {
@@ -191,6 +211,11 @@ public final class ScyllaClues {
                         s.clues.put(c.id, c);
                     }
                 }
+                int ver = o.has("version") ? o.get("version").getAsInt() : 0;
+                if (migrate3(s, ver)) {
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(s.toJson()), StandardCharsets.UTF_8);
+                    RtShop.LOGGER.info("[rtshop] scylla.json 을 3.78 의 확률로 바꿨습니다 (뽑기 단서 0.05%, 낚시 단서 0.1% · 천장 없음).");
+                }
             } else {
                 s.clues.putAll(defaults());
                 Files.createDirectories(f.getParent());
@@ -201,6 +226,23 @@ public final class ScyllaClues {
             if (s.clues.isEmpty()) s.clues.putAll(defaults());
         }
         return s;
+    }
+
+    /**
+     * 3.78 (version 3): 설치된 scylla.json 이 예전 기본값 그대로일 때만 새 확률로 바꾼다. 서버 주인이 손댄 값은 두고, 버전만 올린다.
+     * 뽑기 단서 storm_coin 0.002 → 0.0005 (천장 300 그대로), 낚시 단서 wet_logbook 0.01·천장 180 → 0.001·천장 없음. 바꾼 게 있으면(버전 포함) true.
+     */
+    public static boolean migrate3(ScyllaClues s, int ver) {
+        if (ver >= 3) return false;
+        Clue coin = s.clues.get("storm_coin");
+        if (coin != null && "gacha".equals(coin.source) && Math.abs(coin.chance - 0.002) < 1e-9) coin.chance = 0.0005;
+        Clue log = s.clues.get("wet_logbook");
+        if (log != null && "fish".equals(log.source) && Math.abs(log.chance - 0.01) < 1e-9 && log.pity == 180) {
+            log.chance = 0.001;
+            log.pity = 0;
+        }
+        s.version = VERSION;
+        return true;
     }
 
     private static String str(JsonObject o, String k, String d) {
@@ -214,7 +256,7 @@ public final class ScyllaClues {
                 + "hints: 주민 직업(fisherman, librarian…, *=그 밖) -> 단서를 들고 말을 걸면 들려줄 소문. needed 개를 모으면 rewardItem 과 grantFlag(결계)를 준다.");
         o.addProperty("enabled", enabled);
         o.addProperty("needed", needed);
-        o.addProperty("version", 2);
+        o.addProperty("version", VERSION);
         o.addProperty("rewardItem", rewardItem);
         o.addProperty("grantFlag", grantFlag);
         o.addProperty("requireFlag", requireFlag);
@@ -393,8 +435,8 @@ public final class ScyllaClues {
     }
 
     /**
-     * 운에 달린 단서를 굴린다 (뽑기 한 번, 보스 한 마리, 상자 하나, 낚시 한 번이 시도 한 번). 시도할수록 확률이 오르고,
-     * 천장에 닿으면 반드시 나온다. 그래서 얻는 때는 사람마다 달라도 결국 모두 얻는다. 얻었으면 true.
+     * 운에 달린 단서를 굴린다 (뽑기 한 번, 보스 한 마리, 상자 하나, 낚시 한 번이 시도 한 번). 천장(pity)이 있는 단서는 시도할수록 확률이 오르고
+     * 천장에 닿으면 반드시 나온다. 천장이 0 인 단서(3.78 의 낚시 단서)는 늘 같은 확률이다. 얻었으면 true.
      */
     public static boolean roll(ServerPlayer p, String source, String where, int attempts, net.minecraft.world.phys.Vec3 at) {
         ScyllaClues s = get();

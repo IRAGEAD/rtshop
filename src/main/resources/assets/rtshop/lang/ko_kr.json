@@ -1400,7 +1400,7 @@
   "item.rtshop.memory_shard.guide": "퀘스트 「천 년 전의 제자」에서 어부 오스카에게 3개를 건네야 합니다. 버리거나 팔지 마세요.",
   "item.rtshop.frost_heart.guide": "퀘스트 「꺼지지 않는 문」에서 탐험대장 로란에게 1개를 건네야 합니다. 버리거나 팔지 마세요.",
   "item.rtshop.scylla_clue.guide": "필요한 만큼 수첩에 기록하면 무언가가 열린다고 한다. 버리지 마세요.",
-  "item.rtshop.survey_compass.desc3": "마을에서 1000블럭 이상 떨어진, 실제로 있는 장소만 가리킨다.",
+  "item.rtshop.survey_compass.desc3": "마을에서 500블럭 이상 떨어진, 실제로 있는 장소만 가리킨다.",
   "rtshop.itemstats.title": "장비 능력치 설정",
   "rtshop.itemstats.no_item": "장비를 고르세요 (아래 '다른 장비' 또는 손에 들고 /rtshop itemstats).",
   "rtshop.itemstats.col_attr": "능력치",

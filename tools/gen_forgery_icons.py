@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'rtshop', 'textures', 'item')
-CHOSEN = {'forger_kit': 'C', 'appraisal_loupe': 'A'}
+CHOSEN = {'forger_kit': 'C', 'appraisal_loupe': 'C'}   # 사용자가 고름 (11-28 07:20): 꾸러미 C · 돋보기 C
 
 PAL = {
     '.': None,

@@ -255,6 +255,41 @@ public final class SelfTest {
                 food != null && farmer != null && dup.isEmpty() && emptyCats.isEmpty() && wheatAtFarmer && breadAtFood
                         && mig && !migAgain && migText.contains("skipItemsOf") && migText.contains("식재료") && !migText.contains("농산물"),
                 "dup " + dup + " empty " + emptyCats + " wheat@farmer " + wheatAtFarmer + " bread@food " + breadAtFood + " mig " + mig + "/" + migAgain + " " + migText);
+        // 3.78 (W-15): 식품 상인은 수산물 상인(fisher)이 다루는 품목도 올리지 않는다 (물고기 · 말린 켈프 · 수련잎). 설치된 파일은 ["farmer"] 그대로일 때만 fisher 를 더한다
+        {
+            ShopData fisher378 = ShopServer.shops().get("fisher");
+            java.util.Set<String> fishKeys378 = new java.util.HashSet<>();
+            if (fisher378 != null) for (ShopData.Entry e : fisher378.entries) fishKeys378.add(ShopLoader.key(e.stack));
+            List<String> dup378 = new ArrayList<>();
+            if (food != null) for (ShopData.Entry e : food.entries) if (fishKeys378.contains(ShopLoader.key(e.stack))) dup378.add(ShopLoader.itemId(e.stack));
+            boolean codAtFisher = fisher378 != null && findEntry(fisher378, e -> e.stack.is(Items.COD)) >= 0;
+            boolean codAtFood = food != null && findEntry(food, e -> e.stack.is(Items.COD)) >= 0;
+            boolean kelpAtFood = food != null && findEntry(food, e -> e.stack.is(Items.DRIED_KELP)) >= 0;
+            java.util.Set<String> usedCats378 = new java.util.HashSet<>();
+            if (food != null) for (ShopData.Entry e : food.entries) usedCats378.add(e.category);
+            List<String> emptyCats378 = new ArrayList<>();
+            if (food != null) for (ShopData.Category c : food.categories) if (!usedCats378.contains(c.id)) emptyCats378.add(c.id);
+            boolean m1 = false, m2 = true, m3 = true;
+            String t1 = "", t3 = "";
+            try {
+                Path tmp = Files.createTempFile("rtshop-food378", ".json");
+                Files.writeString(tmp, "{\"items\":[],\"skipItemsOf\":[\"farmer\"]}", StandardCharsets.UTF_8);
+                m1 = ShopLoader.migrateFoodSkipFisher(tmp);
+                t1 = Files.readString(tmp, StandardCharsets.UTF_8);
+                m2 = ShopLoader.migrateFoodSkipFisher(tmp);
+                Files.writeString(tmp, "{\"items\":[],\"skipItemsOf\":[]}", StandardCharsets.UTF_8);
+                m3 = ShopLoader.migrateFoodSkipFisher(tmp);
+                t3 = Files.readString(tmp, StandardCharsets.UTF_8);
+                Files.deleteIfExists(tmp);
+            } catch (Exception e) {
+                t1 = e.toString();
+            }
+            check("3.78 the food merchant lists nothing the fish merchant sells (fish, dried kelp, lily pads); installed food.json files get fisher once, owner lists untouched",
+                    food != null && fisher378 != null && dup378.isEmpty() && codAtFisher && !codAtFood && !kelpAtFood && emptyCats378.isEmpty()
+                            && m1 && t1.contains("\"farmer\"") && t1.contains("\"fisher\"") && !m2 && !m3 && !t3.contains("fisher"),
+                    "dup " + dup378 + " cod@fisher " + codAtFisher + " cod@food " + codAtFood + " kelp@food " + kelpAtFood + " empty " + emptyCats378
+                            + " mig " + m1 + "/" + m2 + "/" + m3 + " " + t1);
+        }
 
         // W-1 · W-24: 퀘스트 HUD 의 "다음 퀘스트" 에 직업 선행 퀘스트는 「조사대원의 밑천」 뒤부터, 직업이 없고 다른 선행 퀘스트를 하지 않을 때만
         QuestManager.reset(a);
@@ -5444,15 +5479,15 @@ public final class SelfTest {
         }
     }
 
-    /** 조사대 나침반·/locate 는 실제로 생긴 건축물만, 마을에서 1000블럭 이상 / 장비 능력치 설정 / 이야기 물건 안내 / 대화 먼저. */
+    /** 조사대 나침반·/locate 는 실제로 생긴 건축물만, 마을에서 500블럭 이상 (3.78) / 장비 능력치 설정 / 이야기 물건 안내 / 대화 먼저. */
     private static void findersAndStats(MinecraftServer server, ServerLevel level, FakePlayer a) throws Exception {
         section("Survey compass / locate / equipment stats");
         ServerLevel ow = server.overworld();
         BlockPos spawn = ow.getSharedSpawnPos();
-        // 나침반: 이 시험 세계(평지)에 있는 마을로 확인 — 실제로 생긴 곳만, 마을(성 영역/스폰)에서 1000블럭 이상
+        // 나침반: 이 시험 세계(평지)에 있는 마을로 확인 — 실제로 생긴 곳만, 마을(성 영역/스폰)에서 MIN_TOWN(500)블럭 이상
         long t0 = System.currentTimeMillis();
         var villages = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:village");
-        var f = com.rtshop.story.StructureFinder.find(ow, villages, spawn, 200, 1000);
+        var f = com.rtshop.story.StructureFinder.find(ow, villages, spawn, 200, com.rtshop.item.SurveyCompassItem.MIN_TOWN);
         long ms = System.currentTimeMillis() - t0;
         LINES.add("  compass search: checked=" + com.rtshop.story.StructureFinder.lastChecked + " rejected=" + com.rtshop.story.StructureFinder.lastRejected
                 + " townSkipped=" + com.rtshop.story.StructureFinder.lastTownSkipped + " ms=" + ms + " at=" + (f == null ? "none" : f.pos.toShortString())
@@ -5461,21 +5496,22 @@ public final class SelfTest {
         if (f == null) {
             // 모드팩 평지 세계에는 마을이 생기지 않을 수 있다 (마을 모드가 바닐라 마을을 바꿔 놓음): 무너진 차원문으로 확인
             compassTarget = "#minecraft:ruined_portal";
-            f = com.rtshop.story.StructureFinder.find(ow, com.rtshop.story.StructureFinder.resolve(ow, compassTarget), spawn, 200, 1000);
+            f = com.rtshop.story.StructureFinder.find(ow, com.rtshop.story.StructureFinder.resolve(ow, compassTarget), spawn, 200, com.rtshop.item.SurveyCompassItem.MIN_TOWN);
             LINES.add("  compass search (ruined portal): at=" + (f == null ? "none" : f.pos.toShortString()) + " " + com.rtshop.story.StructureFinder.lastInfo);
         }
         check("the survey compass finds a structure that really generated (its start exists in the chunk)",
                 f != null && com.rtshop.story.StructureFinder.verify(ow, f.structure, f.cx, f.cz) != null,
                 f == null ? "none" : f.pos.toShortString());
-        check("the place it points to is at least 1000 blocks from town",
-                f != null && com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ()) >= 1000,
+        check("the place it points to is at least 500 blocks from town (3.78, was 1000)",
+                com.rtshop.item.SurveyCompassItem.MIN_TOWN == 500
+                        && f != null && com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ()) >= com.rtshop.item.SurveyCompassItem.MIN_TOWN,
                 f == null ? "none" : String.valueOf((int) com.rtshop.story.StructureFinder.townDistance(ow, f.pos.getX(), f.pos.getZ())));
         check("the compass search stays quick (under 6 s)", ms < 6000, ms + " ms");
         BlockPos viaItem = com.rtshop.item.SurveyCompassItem.locate(ow, compassTarget, spawn);
         check("the compass item uses the same verified search", viaItem != null && f != null && viaItem.equals(f.pos));
         // 이 세계에 생길 수 없는 건축물(평지의 무너진 차원문)은 절대 가리키지 않는다
         var portals = com.rtshop.story.StructureFinder.resolve(ow, "#minecraft:ruined_portal");
-        var none = com.rtshop.story.StructureFinder.find(ow, portals, spawn, 200, 1000);
+        var none = com.rtshop.story.StructureFinder.find(ow, portals, spawn, 200, com.rtshop.item.SurveyCompassItem.MIN_TOWN);
         LINES.add("  ruined portal search: at=" + (none == null ? "none" : none.pos.toShortString()) + " " + com.rtshop.story.StructureFinder.lastInfo);
         check("a structure that cannot generate in this world is never pointed to (or, if found, it is really there)",
                 none == null || com.rtshop.story.StructureFinder.verify(ow, none.structure, none.cx, none.cz) != null);
@@ -6173,7 +6209,32 @@ public final class SelfTest {
         check("a villager gives a profession-specific rumour, others a general one",
                 com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("wet_logbook"), "fisherman").contains("폭풍의 눈")
                         && com.rtshop.story.ScyllaClues.hintFor(sc.clues.get("wet_logbook"), "farmer") != null);
-        // 다섯 단서: 뽑기·보스·야생·낚시는 운에 달렸지만 천장이 있어 결국 얻고, 인장은 선택지(카스)에 따라 다른 때에 얻는다
+        // 다섯 단서: 뽑기·보스·야생은 운에 달렸지만 천장이 있어 결국 얻고, 낚시(3.78)는 천장 없는 0.1%, 인장은 선택지(카스)에 따라 다른 때에 얻는다
+        {
+            java.util.Map<String, com.rtshop.story.ScyllaClues.Clue> sc378Dc = com.rtshop.story.ScyllaClues.defaultsForTest();
+            com.rtshop.story.ScyllaClues.Clue sc378Coin = sc378Dc.get("storm_coin"), sc378Log = sc378Dc.get("wet_logbook");
+            check("3.78 the gacha Scylla clue is 0.05% (pity 300 kept) and the sea-fishing clue 0.1% with no pity",
+                    Math.abs(sc378Coin.chance - 0.0005) < 1e-12 && sc378Coin.pity == 300 && Math.abs(sc378Log.chance - 0.001) < 1e-12 && sc378Log.pity == 0
+                            && "ocean".equals(sc378Log.target), sc378Coin.chance + "/" + sc378Coin.pity + " " + sc378Log.chance + "/" + sc378Log.pity);
+            // 설치된 scylla.json (2판): 옛 기본값 그대로면 새 값으로, 서버 주인이 바꾼 값은 그대로
+            com.rtshop.story.ScyllaClues sc378Old = com.rtshop.story.ScyllaClues.freshForTest();
+            sc378Old.clues.get("storm_coin").chance = 0.002;
+            sc378Old.clues.get("wet_logbook").chance = 0.01;
+            sc378Old.clues.get("wet_logbook").pity = 180;
+            boolean sc378Mig = com.rtshop.story.ScyllaClues.migrate3(sc378Old, 2);
+            com.rtshop.story.ScyllaClues sc378Own = com.rtshop.story.ScyllaClues.freshForTest();
+            sc378Own.clues.get("storm_coin").chance = 0.003;
+            sc378Own.clues.get("wet_logbook").chance = 0.02;
+            sc378Own.clues.get("wet_logbook").pity = 90;
+            boolean sc378Mig2 = com.rtshop.story.ScyllaClues.migrate3(sc378Own, 2);
+            boolean sc378Again = com.rtshop.story.ScyllaClues.migrate3(sc378Old, 3);
+            check("an installed scylla.json moves to the 3.78 chances only where the old defaults are untouched",
+                    sc378Mig && Math.abs(sc378Old.clues.get("storm_coin").chance - 0.0005) < 1e-12 && sc378Old.clues.get("storm_coin").pity == 300
+                            && Math.abs(sc378Old.clues.get("wet_logbook").chance - 0.001) < 1e-12 && sc378Old.clues.get("wet_logbook").pity == 0
+                            && sc378Mig2 && sc378Own.clues.get("storm_coin").chance == 0.003 && sc378Own.clues.get("wet_logbook").chance == 0.02 && sc378Own.clues.get("wet_logbook").pity == 90
+                            && !sc378Again && sc378Old.version == 3 && sc378Old.toJsonForTest().get("version").getAsInt() == 3,
+                    sc378Old.clues.get("storm_coin").chance + " " + sc378Old.clues.get("wet_logbook").chance + "/" + sc378Old.clues.get("wet_logbook").pity + " own " + sc378Own.clues.get("storm_coin").chance);
+        }
         {
             java.util.Set<String> src = new java.util.TreeSet<>();
             for (com.rtshop.story.ScyllaClues.Clue c : sc.clues.values()) src.add(c.source);

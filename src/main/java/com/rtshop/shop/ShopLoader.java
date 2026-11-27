@@ -203,7 +203,7 @@ public final class ShopLoader {
             "general+general_books@2"};   // 3.75.0: 조사 수첩 (이미 있는 것은 건너뛰고 새 것만)
 
     /** 한 번만 하는 상점 파일 고치기 (3.74.0 부터): 이름 → 할 일. 기록(added_shops.txt)에 이름이 없을 때 한 번. */
-    public static final String[] MIGRATED = {"food-skip-farmer@1"};
+    public static final String[] MIGRATED = {"food-skip-farmer@1", "food-skip-fisher@1"};
 
     /** 기본값이 바뀐 품목: "상점:품목=옛값>새값@판". 설치된 파일의 값이 옛 기본값 그대로일 때만 새 값으로 고친다 (한 번만). */
     public static final String[] REPRICED = {"general:rtshop:return_ticket=1500>5000@1", "general:rtshop:return_ticket_plus=12000>30000@1",
@@ -296,6 +296,8 @@ public final class ShopLoader {
             try {
                 if (mark.equals("food-skip-farmer@1")) {
                     migrateFoodSkipFarmer(dir.resolve("food.json"));
+                } else if (mark.equals("food-skip-fisher@1")) {
+                    migrateFoodSkipFisher(dir.resolve("food.json"));
                 }
             } catch (Exception ex) {
                 RtShop.LOGGER.error("[rtshop] 상점 파일 고치기 {} 실패: {}", mark, ex.toString());
@@ -345,6 +347,33 @@ public final class ShopLoader {
             RtShop.LOGGER.info("[rtshop] 식품 상인 파일에 농작물 상인과 겹치는 품목 빼기(skipItemsOf)를 넣었습니다.");
         }
         return changed;
+    }
+
+    /**
+     * 3.78.0 (사용자 W-15 "어부 가게와 겹치는 항목 빼기"): 설치된 식품 상인 파일의 skipItemsOf 가 3.74 의 기본값 ["farmer"] 그대로(또는 없음)이면
+     * 수산물 상인 "fisher" 를 더한다 (물고기 · 말린 켈프 · 수련잎은 수산물 상인에게서만). 주인이 고친 목록은 그대로 둔다. 고쳤으면 true.
+     */
+    public static boolean migrateFoodSkipFisher(Path file) throws IOException {
+        if (!Files.exists(file)) {
+            return false;
+        }
+        com.google.gson.JsonObject shop = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+        com.google.gson.JsonArray a;
+        if (!shop.has("skipItemsOf")) {
+            a = new com.google.gson.JsonArray();
+            a.add("farmer");
+        } else if (shop.get("skipItemsOf").isJsonArray() && shop.getAsJsonArray("skipItemsOf").size() == 1
+                && "farmer".equals(shop.getAsJsonArray("skipItemsOf").get(0).getAsString())) {
+            a = shop.getAsJsonArray("skipItemsOf");
+        } else {
+            return false;
+        }
+        a.add("fisher");
+        shop.add("skipItemsOf", a);
+        Files.writeString(file, new com.google.gson.GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(shop),
+                StandardCharsets.UTF_8);
+        RtShop.LOGGER.info("[rtshop] 식품 상인 파일에 수산물 상인과 겹치는 품목 빼기(skipItemsOf fisher)를 더했습니다.");
+        return true;
     }
 
     /** 상점 파일에서 이 품목의 값이 옛 기본값(from) 그대로면 새 값(to)으로 고친다. 고친 수를 돌려준다. */

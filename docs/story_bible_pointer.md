@@ -51,7 +51,7 @@
 - 스킬라 = 오렐의 쌍둥이 누이, 새벽의 섬 제독, 칭호 '마중하는 이'. 폭풍의 눈 안에 함대와 숨어 잊히지 않았으나 누구를 마중 나왔는지는 잊음. 천 년째 지나는 배를 들여다봄 → 폭풍 조사대 배 17척 전부 폭풍 속 입항(서장 모리스의 말, 하루의 장부).
 - 에르윈은 그녀를 안다. 코넬리아에게 판 항로 = 폭풍 한가운데(그녀가 스승의 이름을 말하는지 들으려고). 닻이 봉인을 건드려 바다가 얼었다. 카엘의 유언 회수. → 3장 재작성 때 이 설정에 맞출 것(항해일지의 '여덟 번째 눈' = 폭풍의 눈, 선장실의 받아 적으라는 지시).
 - 잿빛 무리 노래 둘째 절 "우리에겐 배가 있었다. 마중 나간 누이는 돌아오지 않았다" (표식 scylla_song2).
-- 단서 5: storm_coin(뽑기 0.2%, 천장 300) / thunder_scale(이야기 보스 4%, 천장 14) / torn_hymn(안 열린 상자 0.6%, 천장 150) / wet_logbook(바다 낚시 1%, 천장 180) / seal_shard(선택지: 카스를 놓아줬으면 1장 뒤 hidden_scylla_kas_a, 넘겼으면 3장 뒤 hidden_scylla_kas_b). 시도할수록 확률이 오르고 천장에서 확정. config/rtshop/scylla.json (version 2, 예전 파일은 scylla_v1_backup.json).
+- 단서 5: storm_coin(뽑기 0.05%, 천장 300 · 3.78) / thunder_scale(이야기 보스 4%, 천장 14) / torn_hymn(안 열린 상자 0.6%, 천장 150) / wet_logbook(바다 낚시 0.1%, 천장 없음 · 3.78) / seal_shard(선택지: 카스를 놓아줬으면 1장 뒤 hidden_scylla_kas_a, 넘겼으면 3장 뒤 hidden_scylla_kas_b). 시도할수록 확률이 오르고 천장에서 확정. config/rtshop/scylla.json (version 2, 예전 파일은 scylla_v1_backup.json).
 - 퀘스트: hidden_scylla_0(하루, 1장 뒤) → _1(오스카, 2장 뒤) → [다섯 단서 + story_done → seal_scylla] → _2 일지 맞추기 → _3 난파선(로란 동행) → _4 에르윈의 자백·빈 연회장 → _5 대면(acropolis 에서, 기억의 문 아님: 약속에 묶인 사람) → _6 대답 선택(scylla_told / scylla_lantern).
 - 4장·종장을 다시 쓸 때: 에르윈이 바다를 보지 못하는 이유에 이 설정을 넣고, scylla_song2 를 가진 사람에게 에르윈의 반응 대사 추가.
 

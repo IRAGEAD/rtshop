@@ -1075,7 +1075,7 @@ NEW = {
  "item.rtshop.memory_shard.guide": ("퀘스트 「천 년 전의 제자」에서 어부 오스카에게 3개를 건네야 합니다. 버리거나 팔지 마세요.", "Hand 3 to Oscar the Fisher in the quest \"The Apprentice of a Thousand Years Ago\". Do not drop or sell them."),
  "item.rtshop.frost_heart.guide": ("퀘스트 「꺼지지 않는 문」에서 탐험대장 로란에게 1개를 건네야 합니다. 버리거나 팔지 마세요.", "Hand 1 to Expedition Captain Roran in the quest \"The Door That Won't Go Out\". Do not drop or sell it."),
  "item.rtshop.scylla_clue.guide": ("필요한 만큼 수첩에 기록하면 무언가가 열린다고 한다. 버리지 마세요.", "They say something opens once enough are recorded. Do not throw it away."),
- "item.rtshop.survey_compass.desc3": ("마을에서 1000블럭 이상 떨어진, 실제로 있는 장소만 가리킨다.", "Only points to places that really exist, at least 1000 blocks from town."),
+ "item.rtshop.survey_compass.desc3": ("마을에서 500블럭 이상 떨어진, 실제로 있는 장소만 가리킨다.", "Only points to places that really exist, at least 500 blocks from town."),
  "item.rtshop.undying_ember": ("꺼지지 않는 불씨", "Undying Ember"),
  "item.rtshop.undying_ember.desc1": ("견습 서약을 한 날 장로가 건넨 불씨.", "The ember the Elder handed you on the day of your oath."),
  "item.rtshop.undying_ember.desc2": ("손에 쥐면 누군가의 체온처럼 따뜻하다.", "It is warm in the hand, like someone's body heat."),
