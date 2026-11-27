@@ -400,6 +400,15 @@ public final class ShopLoader {
         if (pc.recipePricing && server != null) {
             try {
                 scan = RecipeScan.collect(server, pc);
+                // 3.65.0: 조합법을 통째로 지우는 모드(Create · TaCZ)가 '다른 모드의 물건'을 만드는 조합법은 게임에 없는 싼 길이다
+                // (Create 의 케이크 조합법으로 케이크 원가 12.6 G → 케이크 조각 4 G → 조각 7개로 케이크를 만들어 157 G 에 팔기, 분쇄로 금 조각 5.3 G 등).
+                // 원가 계산에서 뺀다. 그 모드 자신의 물건을 만드는 조합법은 그 물건의 값을 매기려고 남긴다.
+                int foreign = scan.recipes.size();
+                scan.recipes.removeIf(ShopLoader::foreignBannedRoute);
+                foreign -= scan.recipes.size();
+                if (foreign > 0) {
+                    RtShop.LOGGER.info("[rtshop] 값 계산에서 뺀 조합법(게임에서 지운 모드가 다른 모드의 물건을 만드는 것): {}개", foreign);
+                }
                 for (RecipeSolver.Recipe rc : scan.recipes) {
                     for (RecipeSolver.Out o : rc.outputs) {
                         outputTypes.computeIfAbsent(o.item, k -> new HashSet<>()).add(rc.type);
@@ -906,6 +915,7 @@ public final class ShopLoader {
                     + String.join(", ", lowered.subList(0, Math.min(40, lowered.size()))));
             RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
         }
+        applySellCap(scan, pc, out, res);
         if (pc.purchaseFloor) {
             applyPurchaseFloor(scan, pc, out);
         }
@@ -1412,6 +1422,34 @@ public final class ShopLoader {
         return inGame(r);
     }
 
+    /** 조합법을 통째로 지우는 모드(item_policy 의 recipeBanMods)의 조합법인데 결과가 다른 모드의 물건인가 (3.65.0). */
+    static boolean foreignBannedRoute(RecipeSolver.Recipe r) {
+        try {
+            com.rtshop.rules.ItemPolicy.Config c = com.rtshop.rules.ItemPolicy.get();
+            if (c == null || !c.enabled || r == null || r.id == null) {
+                return false;
+            }
+            int i = r.id.indexOf(':');
+            if (i <= 0 || !c.recipeBanMods.contains(r.id.substring(0, i))) {
+                return false;
+            }
+            for (RecipeSolver.Out o : r.outputs) {
+                int j = o.item.indexOf(':');
+                String ns = j > 0 ? o.item.substring(0, j) : "minecraft";
+                if (!c.recipeBanMods.contains(ns)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public static boolean foreignBannedRouteForTest(RecipeSolver.Recipe r) {
+        return foreignBannedRoute(r);
+    }
+
     private static List<RecipeSolver.Recipe> inGameRecipes(RecipeScan.Scan scan) {
         List<RecipeSolver.Recipe> l = new ArrayList<>();
         for (RecipeSolver.Recipe r : scan.recipes) {
@@ -1614,39 +1652,91 @@ public final class ShopLoader {
         return out;
     }
 
+    /** 재료를 모두 상점에서 사서 만드는 가장 싼 길: 재료비 · 조합법 · 재료. */
+    public record BuyRoute(double cost, String recipe, String type, List<RecipeSolver.Pick> picks) {
+    }
+
     /**
-     * 점검용(diag): 재료를 모두 상점에서 사서 게임에 있는 조합법(보관용 포함, 자유 조리법 제외)으로 만들 때 가장 싼 재료비.
-     * 사서 만들어 팔면 남는 길(돈 불리기)을 찾는 데 쓴다. 만들 길이 없거나 재료를 살 수 없으면 맵에 없다.
+     * 재료를 모두 상점에서 사서 게임에 있는 조합법(보관용 포함, 자유 조리법 제외)으로 만들 때 가장 싼 길 (아이템 → 길).
+     * 사서 만들어 팔면 남는 길(돈 불리기)을 찾고 막는 데 쓴다. 만들 길이 없거나 재료를 살 수 없으면 맵에 없다.
      */
-    public static Map<String, Double> cheapestPurchaseCosts(Loaded loaded) {
-        Map<String, Double> res = new HashMap<>();
-        if (loaded.scan == null || loaded.scan.env == null) {
+    private static Map<String, BuyRoute> buyRoutes(RecipeScan.Scan scan, Map<String, Price> prices, PricingConfig pc) {
+        Map<String, BuyRoute> res = new HashMap<>();
+        if (scan == null || scan.env == null) {
             return res;
         }
-        PricingConfig pc = PricingConfig.get();
         RecipeSolver.Config cfg = new RecipeSolver.Config();
         cfg.flatExtra.putAll(pc.flatExtra);
-        List<RecipeSolver.Recipe> usable = inGameRecipes(loaded.scan);
-        Map<String, List<RecipeSolver.Recipe>> makers = byOutput(loaded.scan, Set.of());
-        RecipeSolver.setRefunds(refunds(loaded.prices, pc));
-        Map<String, Double> sup = supply(loaded.prices);
-        Map<String, Double> pcost = RecipeSolver.purchaseCosts(sup, usable, loaded.scan.env, cfg);
+        List<RecipeSolver.Recipe> usable = inGameRecipes(scan);
+        Map<String, List<RecipeSolver.Recipe>> makers = byOutput(scan, Set.of());
+        RecipeSolver.setRefunds(refunds(prices, pc));
+        Map<String, Double> sup = supply(prices);
+        Map<String, Double> pcost = RecipeSolver.purchaseCosts(sup, usable, scan.env, cfg);
         for (Map.Entry<String, List<RecipeSolver.Recipe>> e : makers.entrySet()) {
             double best = -1;
+            RecipeSolver.Recipe by = null;
             for (RecipeSolver.Recipe r : e.getValue()) {
                 if (pc.flexDishPricing && isFlexRecipe(r)) {
                     continue;
                 }
-                double c = RecipeSolver.purchaseRequirement(r, e.getKey(), pcost, loaded.scan.env, cfg, null);
+                double c = RecipeSolver.purchaseRequirement(r, e.getKey(), pcost, scan.env, cfg, null);
                 if (c > 0 && (best < 0 || c < best)) {
                     best = c;
+                    by = r;
                 }
             }
-            if (best > 0) {
-                res.put(e.getKey(), best);
+            if (by != null) {
+                List<RecipeSolver.Pick> picks = new ArrayList<>();
+                RecipeSolver.purchaseRequirement(by, e.getKey(), pcost, scan.env, cfg, picks);
+                res.put(e.getKey(), new BuyRoute(best, by.id, by.type, picks));
             }
         }
         return res;
+    }
+
+    /** 점검용(diag · 자체 점검): 지금 가격표로 본 buyRoutes. */
+    public static Map<String, BuyRoute> buyRoutes(Loaded loaded) {
+        return buyRoutes(loaded.scan, loaded.prices, PricingConfig.get());
+    }
+
+    /** 음식이 아닌 물건인가 (음식은 손요리 마진 · 수고비 · 매입가 하한이 따로 있다). */
+    static boolean nonFood(Price p, RecipeSolver.Result res) {
+        String id = itemId(p.stack);
+        return !p.dynamicFood && !p.stack.isEdible() && (res == null || !res.processed.contains(id));
+    }
+
+    /**
+     * 3.65.0: 재료를 모두 상점에서 사서 게임에 있는 조합법으로 만들 수 있는 물건(음식 제외)은 그 재료비보다 비싸게 사 주지 않는다.
+     * 비싸게 사 주면 사서 만들어 팔기만 해도 돈이 불어난다. 음식은 매입가 하한(applyPurchaseFloor)이 따로 맡는다.
+     */
+    private static void applySellCap(RecipeScan.Scan scan, PricingConfig pc, Loaded out, RecipeSolver.Result res) {
+        if (scan == null || scan.env == null) {
+            return;
+        }
+        double ratio = pc.sellRatio > 0 ? pc.sellRatio : 0.5;
+        Map<String, BuyRoute> routes = buyRoutes(scan, out.prices, pc);
+        List<String> capped = new ArrayList<>();
+        for (Price p : out.prices.values()) {
+            if (!isPlain(p.stack) || !p.sellableSomewhere || !nonFood(p, res)) {
+                continue;
+            }
+            String id = itemId(p.stack);
+            BuyRoute b = routes.get(id);
+            if (b == null) {
+                continue;
+            }
+            double now = p.sellUnit >= 0 ? p.sellUnit : p.price * ratio;
+            if (now <= b.cost() + 1.0) {
+                continue;
+            }
+            p.sellUnit = b.cost();
+            capped.add(String.format(Locale.ROOT, "%s %.1f→%.1f (%s)", id, now, b.cost(), b.recipe()));
+        }
+        if (!capped.isEmpty()) {
+            out.notes.add("사서 만들면 더 싸서 매입가를 재료비로 내린 품목 " + capped.size() + "종: "
+                    + String.join(", ", capped.subList(0, Math.min(40, capped.size()))));
+            RtShop.LOGGER.info("[rtshop] {}", out.notes.get(out.notes.size() - 1));
+        }
     }
 
     /** 결과 점검: 재료를 상점에서 사서 어떤 조리법으로 만들어도 매입가가 재료비 이상인가. 손해인 경우의 설명 목록. */

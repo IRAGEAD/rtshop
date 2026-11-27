@@ -261,6 +261,10 @@ jobs:
             (cd /tmp/kj && for c in $(find . -path '*item/quality*' -name '*.class' | head -n 12); do echo "######## $c"; javap -p -c "$c" 2>&1 | head -n 700; done) > /tmp/inspect/kc-flex-code.txt 2>&1 || true
             (cd /tmp/kj && ls data/kaleidoscope_cookery 2>/dev/null; find data -ipath '*quality*' | head -n 40; for f in $(find data -ipath '*quality*' -name '*.json' | head -n 6); do echo "######## $f"; head -c 1500 "$f"; echo; done; grep -h -i "quality" assets/kaleidoscope_cookery/lang/en_us.json | head -n 40) > /tmp/inspect/kc-quality.txt 2>&1 || true
           fi
+      - name: Inspect recipes for the price check
+        run: |
+          mkdir -p /tmp/inspect
+          python3 .github/scripts/inspect_recipes.py packcache "kaleidoscope_tavern:shaker,kaleidoscope_cookery:teapot,kaleidoscope_cookery:oil_pot,kaleidoscope_cookery:enamel_basin,better_farming_plus:sprinkler,minecraft:bucket,minecraft:water_bucket,minecraft:milk_bucket,minecraft:cake,farmersdelight:cake_slice,kaleidoscope_tavern:rum,kaleidoscope_cookery:sticky_candy" > /tmp/inspect/price-recipes.txt 2>&1 || true
       - name: Inspect
         env:
           SPIRAL_CALLS: '/(FloorController|FloorProgress|AbyssPlayers|AbyssEncounters|ArenaSession|AbyssCycle|AbyssParties|BossProgress|FloorSelectionScreen|AbyssPlayerLifecycle|ChallengeRewards|ChestPayout|AbyssNetwork|AbyssDimension|ForgeGameplayEvents|AbyssPlatformImpl|PersistentEntityData|AbyssBlockProtection|CommandInit)(\$[^/]*)?\.class$'

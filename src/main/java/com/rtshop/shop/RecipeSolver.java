@@ -772,7 +772,9 @@ public final class RecipeSolver {
                     }
                     Double v = pc.get(item);
                     if (v != null) {
-                        double net = netPurchase(item, v, env);
+                        // 3.65.0: 돌려받는 그릇이 바로 이 조합법의 결과물이면(물 양동이 → 양동이) 그릇 값을 두 번 셈하지 않는다
+                        String rem = env.remainder(item);
+                        double net = rem != null && !rem.equals(item) && count(p, rem) > 0 ? v : netPurchase(item, v, env);
                         if (net < best) {
                             best = net;
                             bestItem = item;

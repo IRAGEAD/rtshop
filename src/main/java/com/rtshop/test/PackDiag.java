@@ -185,7 +185,7 @@ final class PackDiag {
         return sb.toString();
     }
 
-    private static final String[] PRICE_IDS = {"minecraft:golden_carrot", "minecraft:glistering_melon_slice", "minecraft:cake",
+    private static final String[] PRICE_IDS = {"farmersdelight:cake_slice", "minecraft:bucket", "minecraft:water_bucket", "minecraft:milk_bucket", "kaleidoscope_tavern:shaker", "better_farming_plus:sprinkler", "minecraft:golden_carrot", "minecraft:glistering_melon_slice", "minecraft:cake",
             "farmersdelight:gleaming_salad_block", "kaleidoscope_cookery:golden_salad", "kaleidoscope_cookery:sweet_and_sour_pork_rice_bowl",
             "kaleidoscope_cookery:shengjian_mantou", "kaleidoscope_tavern:bloody_mary", "minecraft:wooden_shovel", "minecraft:bow",
             "minecraft:iron_ingot", "minecraft:gold_ingot", "minecraft:netherite_ingot",
@@ -404,23 +404,28 @@ final class PackDiag {
         out.add("   (food is meant to leave the 10% hand-cooked margin + up to 15% between recipes + the cooking labour fee: pot 80, stockpot 60, barrel 50, shaker 40, teapot 20, steamer 10 G a batch)");
         int n2 = 0;
         int food = 0;
-        java.util.Map<String, Double> buyCost = ShopLoader.cheapestPurchaseCosts(l);
+        java.util.Map<String, ShopLoader.BuyRoute> routes = ShopLoader.buyRoutes(l);
         List<String> rows = new ArrayList<>();
         for (java.util.Map.Entry<String, Double> e : maxSell.entrySet()) {
             String id = e.getKey();
-            Double c = buyCost.get(id);
-            if (c == null || c < 0.005) continue;
+            ShopLoader.BuyRoute br = routes.get(id);
+            if (br == null || br.cost() < 0.005) continue;
+            double c = br.cost();
             double gain = e.getValue() - c;
-            if (gain <= Math.max(1.0, c * 0.3)) continue;
+            ShopLoader.Price pr = l.prices.get(id);
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
-            boolean isFood = item != null && (item.isEdible() || (l.solved != null && l.solved.processed.contains(id)));
+            boolean isFood = (pr != null && pr.dynamicFood) || (item != null && (item.isEdible() || (l.solved != null && l.solved.processed.contains(id))));
+            if (gain <= (isFood ? Math.max(1.0, c * 0.3) : 1.0)) continue;
             if (isFood) food++;
             else n2++;
-            rows.add(String.format(Locale.ROOT, "%010.1f|%s | sell %.2f | cost %.2f | x%.2f | %s", gain, id, e.getValue(), c, e.getValue() / c, isFood ? "food" : "NOT FOOD"));
+            StringBuilder in = new StringBuilder();
+            for (RecipeSolver.Pick pk : br.picks()) in.append(in.length() == 0 ? "" : ", ").append(fmtCount(pk.count)).append(' ').append(pk.item);
+            rows.add(String.format(Locale.ROOT, "%010.1f|%s | sell %.2f | cost %.2f | x%.2f | %s | %s [%s] : %s", gain, id, e.getValue(), c, e.getValue() / c,
+                    isFood ? "food" : "NOT FOOD", br.recipe(), br.type(), in));
         }
         rows.sort(java.util.Comparator.reverseOrder());
         for (int i = 0; i < Math.min(60, rows.size()); i++) out.add(rows.get(i).substring(rows.get(i).indexOf('|') + 1));
-        out.add("craft loops (sell > 1.3 x materials bought in the shops): " + n2 + " non-food, " + food + " food; items with a buy route: " + buyCost.size());
+        out.add("craft loops: " + n2 + " non-food (sell > materials + 1 G), " + food + " food (sell > 1.3 x materials); items with a buy route: " + routes.size());
         // 뽑기에 든 물건을 상점에서도 살 수 있으면 뽑기가 헛일이 된다
         out.add("== gacha items you can also buy in a shop (item | grade | shop price)");
         int n3 = 0;
@@ -435,6 +440,10 @@ final class PackDiag {
             }
         }
         out.add("gacha items in shops: " + n3);
+    }
+
+    private static String fmtCount(double c) {
+        return c == Math.rint(c) ? String.valueOf((long) c) : String.format(Locale.ROOT, "%.2f", c);
     }
 
     private static void prices(List<String> out) {
