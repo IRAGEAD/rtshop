@@ -49,7 +49,9 @@ public final class NpcLooks {
     /** 만들어 둔 모습 전부 (모습 파일의 이름). */
     public static final List<String> ALL = List.of("erwin", "isabel", "roran", "felix", "bram", "oscar", "haru", "morris", "lucky",
             "m_farmer", "m_food", "m_fish", "m_gear", "m_general", "m_land", "m_bank", "m_ticket", "m_raid",
-            "leon", "bron", "garen", "lia", "elis", "garret", "theo", "adel", "raid_guide", "albert", "lorenzo", "eli");
+            "leon", "bron", "garen", "lia", "elis", "garret", "theo", "adel", "raid_guide", "albert", "lorenzo", "eli", "erwin_bare");
+    /** 3.77: 이야기에 따라 바뀌는 모습 (본래 모습 → {표식, 바뀐 모습}) — 배신 뒤 장갑을 벗은 장로 (맨손, 손등에 식은 획). */
+    private static final Map<String, String[]> STORY_VARIANTS = Map.of("erwin", new String[]{"erwin_betrayal", "erwin_bare"});
     public static final String RAID_GUIDE_KEY = "raid_guide";
     private static final double RANGE = 72.0;
     private static final int VERSION = 2;
@@ -161,7 +163,10 @@ public final class NpcLooks {
         if (e instanceof com.rtshop.story.CompanionEntity c) return lookOf("quest_" + c.npcId());
         String key = keyOf(e);
         if (key != null && com.rtshop.story.Dialogue.absentText(p, key) != null) return ABSENT;
-        return lookOf(key);
+        String look = lookOf(key);
+        String[] v = STORY_VARIANTS.get(look);
+        if (v != null && QuestManager.hasFlag(p, v[0])) return v[1];
+        return look;
     }
 
     /** 엔티티의 NPC 열쇠 (레이드 안내인 포함). NPC 가 아니면 null. */

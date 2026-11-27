@@ -929,7 +929,11 @@ public final class SelfTest {
         boolean erwGone = com.rtshop.npc.NpcLooks.ABSENT.equals(com.rtshop.npc.NpcLooks.lookFor(a, erw)) && com.rtshop.story.Dialogue.buildForTest(a, "quest_order_elder").has("absent");
         QuestManager.forceComplete(a, "story_5_09");
         com.google.gson.JsonObject seated = com.rtshop.story.Dialogue.buildForTest(a, "quest_order_elder");
+        String bare = com.rtshop.npc.NpcLooks.lookFor(a, erw);
         QuestManager.reset(a);
+        String gloved = com.rtshop.npc.NpcLooks.lookFor(a, erw);
+        check("3.77 once the Elder's glove has come off in the story he is seen without it (bare hands, a cooled stroke on the back of one), only by those who saw it",
+                "erwin_bare".equals(bare) && "erwin".equals(gloved) && com.rtshop.npc.NpcLooks.quadsOf("erwin_bare") > 50, bare + " / " + gloved + " / " + com.rtshop.npc.NpcLooks.quadsOf("erwin_bare"));
         check("3.77 while Isabel is taken (after Roran's 'The Last Ember' until Ignis sleeps) and while the Elder is gone, they are not drawn for that player and their place shows only an empty desk — no topics, no quests, even when crouching; they come back after",
                 "isabel".equals(isaBefore) && com.rtshop.npc.NpcLooks.ABSENT.equals(isaGone) && gone.has("absent") && gone.getAsJsonArray("topics").size() == 0
                         && !gone.has("questNpc") && claimsShift && "isabel".equals(isaBack) && backTalk && erwGone && !seated.has("absent")
