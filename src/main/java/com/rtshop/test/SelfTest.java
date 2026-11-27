@@ -3974,21 +3974,24 @@ public final class SelfTest {
             net.minecraft.world.entity.npc.Villager rb = ShopServer.spawnNpc(level, new net.minecraft.world.phys.Vec3(lpx + 0.5, 150, lpz + 0.5), 90F, "bank");
             net.minecraft.world.entity.npc.Villager rf = ShopServer.spawnNpc(level, new net.minecraft.world.phys.Vec3(lpx + 4.5, 150, lpz + 0.5), 90F, "fisher");
             com.rtshop.quest.NpcLayout.export(server);
-            int knownBank = com.rtshop.quest.NpcLayout.knownForTest(server, "bank"), knownFisher = com.rtshop.quest.NpcLayout.knownForTest(server, "fisher");
+            int knownBank = com.rtshop.quest.NpcLayout.knownForTest(server, "bank"), knownFisher = com.rtshop.quest.NpcLayout.knownForTest(server, "shop_fisher");
             net.minecraft.world.phys.Vec3 keep374 = a.position();
-            float keepYaw374 = a.getYRot(), keepPitch374 = a.getXRot();
+            float keepYaw374 = a.getYRot(), keepPitch374 = a.getXRot(), keepHead374 = a.getYHeadRot();
             a.moveTo(lpx + 3.5, 150, lpz + 0.5, 90F, 0F);    // 서쪽(-x)을 본다: 앞의 은행원을 고른다 (등 뒤 1칸의 어부는 아니다)
+            a.setYHeadRot(90F);                               // 시선은 머리 방향을 따른다 (moveTo 는 몸만 돌린다)
             net.minecraft.world.entity.Entity pickW = com.rtshop.quest.NpcLayout.picked(a);
             a.moveTo(lpx + 3.5, 150, lpz + 0.5, 180F, 60F);  // 아무도 보지 않으면 4칸 안에서 가장 가까운 NPC (어부)
+            a.setYHeadRot(180F);
             net.minecraft.world.entity.Entity pickN = com.rtshop.quest.NpcLayout.picked(a);
             a.moveTo(keep374.x, keep374.y, keep374.z, keepYaw374, keepPitch374);
+            a.setYHeadRot(keepHead374);
             int[] rs374 = com.rtshop.quest.NpcLayout.reset(server, e -> lbox.contains(e.position()));
             int left374 = level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> com.rtshop.quest.NpcLayout.keyOf(x) != null).size();
             boolean cmd374 = server.getCommands().getDispatcher().findNode(List.of("rtshop", "npc", "remove")) != null
                     && server.getCommands().getDispatcher().findNode(List.of("rtshop", "npc", "layout", "reset")) != null;
             check("3.74 /rtshop npc remove picks the NPC you look at (else the nearest); /rtshop npc layout reset takes the NPCs away and forgets their places",
                     rb != null && rf != null && pickW == rb && pickN == rf && rs374[0] == 2 && left374 == 0 && knownBank == 1 && knownFisher == 1
-                            && com.rtshop.quest.NpcLayout.knownForTest(server, "bank") == 0 && com.rtshop.quest.NpcLayout.knownForTest(server, "fisher") == 0 && cmd374,
+                            && com.rtshop.quest.NpcLayout.knownForTest(server, "bank") == 0 && com.rtshop.quest.NpcLayout.knownForTest(server, "shop_fisher") == 0 && cmd374,
                     (pickW == null ? "null" : com.rtshop.quest.NpcLayout.keyOf(pickW)) + " / " + (pickN == null ? "null" : com.rtshop.quest.NpcLayout.keyOf(pickN))
                             + " reset " + java.util.Arrays.toString(rs374) + " left " + left374 + " known " + knownBank + "," + knownFisher + " cmd " + cmd374);
         } finally {
