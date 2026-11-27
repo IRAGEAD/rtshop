@@ -46,6 +46,11 @@ import java.util.UUID;
 public class CompanionEntity extends PathfinderMob implements VillagerDataHolder {
     private static final EntityDataAccessor<VillagerData> DATA = SynchedEntityData.defineId(CompanionEntity.class, EntityDataSerializers.VILLAGER_DATA);
     private static final EntityDataAccessor<Boolean> DOWNED = SynchedEntityData.defineId(CompanionEntity.class, EntityDataSerializers.BOOLEAN);
+    /**
+     * 3.75 (W-2): 이 동행이 입는 인물의 모습 (npc_looks 의 이름, "" = 주민 모습). 엔티티와 함께 화면에 가므로 나타나는 순간부터 그 모습이다 —
+     * 예전에는 서버가 1초마다 보내는 모습 목록을 기다리는 동안(그리고 그 목록이 늦으면 더 오래) 주민 모습으로 보였다.
+     */
+    private static final EntityDataAccessor<String> LOOK = SynchedEntityData.defineId(CompanionEntity.class, EntityDataSerializers.STRING);
     public static final int DOWN_TICKS = 120;
 
     UUID ownerId;
@@ -79,6 +84,16 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
         super.defineSynchedData();
         entityData.define(DATA, new VillagerData(VillagerType.PLAINS, VillagerProfession.NONE, 5));
         entityData.define(DOWNED, false);
+        entityData.define(LOOK, "");
+    }
+
+    /** 입은 모습의 이름 ("" = 주민 모습). */
+    public String look() {
+        return entityData.get(LOOK);
+    }
+
+    public void setLook(String look) {
+        entityData.set(LOOK, look == null ? "" : look);
     }
 
     @Override
@@ -147,6 +162,7 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
         CompanionEntity c = Companions.TYPE.get().create(level);
         if (c == null) return null;
         c.npcId = npc;
+        c.setLook(com.rtshop.npc.NpcLooks.lookOf("quest_" + npc));
         c.ownerId = owner.getUUID();
         c.questId = "test";
         c.testStay = true;

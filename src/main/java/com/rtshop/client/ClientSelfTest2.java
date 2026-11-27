@@ -2161,6 +2161,11 @@ final class ClientSelfTest2 {
             check("3.71 a companion (Isabel) wears her own look instead of a villager's",
                     COMPANION_ID > 0 && NpcLookClient.lookOfForTest(COMPANION_ID).equals("isabel") && NpcLookClient.companionsDrawnForTest > 0,
                     COMPANION_ID + " look '" + NpcLookClient.lookOfForTest(COMPANION_ID) + "' drawn " + NpcLookClient.companionsDrawnForTest);
+            // 3.75 (W-2): 동행은 모습을 엔티티에 싣고 온다 — 서버의 모습 목록(1초마다)을 기다리지 않는다
+            net.minecraft.world.entity.Entity ce375 = mc.level == null ? null : mc.level.getEntity(COMPANION_ID);
+            String synced375 = ce375 instanceof com.rtshop.story.CompanionEntity cc375 ? cc375.look() : "?";
+            check("3.75 a companion carries its look with it, so it wears that look from the moment it appears (no villager look while the server's look list is on its way)",
+                    "isabel".equals(synced375), synced375);
             shot(mc, "131b_companion_look");
             onServer(mc, sp -> {
                 net.minecraft.world.entity.Entity c = sp.serverLevel().getEntity(COMPANION_ID);

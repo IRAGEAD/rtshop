@@ -93,6 +93,7 @@ public final class Companions {
         if (p instanceof net.minecraftforge.common.util.FakePlayer) c.testOwner = p;
         c.questId = q.id;
         c.npcId = npcId;
+        c.setLook(com.rtshop.npc.NpcLooks.lookOf("quest_" + npcId));   // 3.75 (W-2): 나타나는 순간부터 그 인물의 모습
         c.style = str(def, "style", "melee");
         c.setVillagerData(new VillagerData(VillagerType.PLAINS, ShopServer.profession(n.profession), 5));
         c.setCustomName(Component.literal(StoryText.t(p, n.name)));

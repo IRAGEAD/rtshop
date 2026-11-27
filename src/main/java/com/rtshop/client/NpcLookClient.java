@@ -312,9 +312,12 @@ public final class NpcLookClient {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onRender(RenderLivingEvent.Pre<?, ?> event) {
-        if (LOOKS.isEmpty()) return;
         LivingEntity e = event.getEntity();
+        boolean comp = e instanceof com.rtshop.story.CompanionEntity;
+        if (LOOKS.isEmpty() && !comp) return;
         String look = LOOKS.get(e.getId());
+        // 3.75 (W-2): 동행은 엔티티에 실린 모습을 먼저 (서버의 모습 목록이 닿기 전에도)
+        if (comp && !((com.rtshop.story.CompanionEntity) e).look().isEmpty()) look = ((com.rtshop.story.CompanionEntity) e).look();
         if (look == null || e.isInvisible() || !ClientConfig.get().npcLooks) return;
         Model m = model(look);
         if (m == null) return;
