@@ -355,7 +355,17 @@ public final class Stocks {
 
     // ------------------------------------------------------------------ 거래
 
-    public static final int OK = 0, ERR_OFF = 1, ERR_FAR = 2, ERR_UNION = 3, ERR_AMOUNT = 4, ERR_LIMIT = 5, ERR_MONEY = 6, ERR_FULL = 7, ERR_INVALID = 8, ERR_NONE = 9;
+    public static final int OK = 0, ERR_OFF = 1, ERR_FAR = 2, ERR_UNION = 3, ERR_AMOUNT = 4, ERR_LIMIT = 5, ERR_MONEY = 6, ERR_FULL = 7, ERR_INVALID = 8, ERR_NONE = 9,
+            ERR_FORGED = 10, ERR_WANTED = 11;
+
+    /** 인벤토리에서 이 일련번호의 증서 칸 (-1 = 없음). */
+    static int slotOf(ServerPlayer p, UUID serial) {
+        for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+            ItemStack s = p.getInventory().getItem(i);
+            if (s.is(ModItems.STOCK_CERTIFICATE.get()) && serial.equals(StockCertificateItem.id(s))) return i;
+        }
+        return -1;
+    }
 
     /** 은행원(증권 창구)이 곁에 있는가. */
     public static boolean nearDesk(ServerPlayer p) {
@@ -378,6 +388,7 @@ public final class Stocks {
         if (shares < 1 || shares > c.maxPerCertificate) return ERR_AMOUNT;
         StockData d = StockData.get(p.server);
         roll(p.server);
+        if (Forgery.isWanted(d, p.getUUID())) return ERR_WANTED;
         int bought = d.boughtToday.getOrDefault(p.getUUID(), 0);
         if (bought + shares > c.buyPerDay) return ERR_LIMIT;
         StockData.Board b = d.board(union);
@@ -412,17 +423,16 @@ public final class Stocks {
         if (!nearDesk(p)) return -ERR_FAR;
         StockData d = StockData.get(p.server);
         roll(p.server);
-        int slot = -1;
-        for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
-            ItemStack s = p.getInventory().getItem(i);
-            if (s.is(ModItems.STOCK_CERTIFICATE.get()) && serial.equals(StockCertificateItem.id(s))) {
-                slot = i;
-                break;
-            }
-        }
+        if (Forgery.isWanted(d, p.getUUID())) return -ERR_WANTED;
+        int slot = slotOf(p, serial);
         if (slot < 0) return -ERR_NONE;
         ItemStack s = p.getInventory().getItem(slot);
         StockData.Cert cert = d.certs.get(serial);
+        if (cert == null && Forgery.on()) {
+            // 3.76.0: 위조 증서 — 거래소의 눈을 속이면 기금에서 값을 치르고, 아니면 판명 도장
+            StockData.Forged f = d.forged.get(serial);
+            if (Forgery.matches(f, s)) return Forgery.sellFake(p, d, serial, f, slot);
+        }
         if (!valid(cert, s)) return -ERR_INVALID;
         StockData.Board b = d.board(cert.union);
         long value = b.price * cert.shares, fee = (long) Math.ceil(value * c.fee), pay = Math.max(0, value - fee);
@@ -438,7 +448,7 @@ public final class Stocks {
     }
 
     /** 장부의 증서와 아이템이 맞는가 (조합 · 주 수). */
-    static boolean valid(StockData.Cert cert, ItemStack s) {
+    public static boolean valid(StockData.Cert cert, ItemStack s) {
         return cert != null && cert.union.equals(StockCertificateItem.union(s)) && cert.shares == StockCertificateItem.shares(s);
     }
 
@@ -447,17 +457,35 @@ public final class Stocks {
         return cert != null && cert.issuedDay < weekStartDay(d.week) && cert.paidWeek != d.week && d.board(cert.union).dividend > 0;
     }
 
-    /** 가진 증서의 배당을 모두 받는다. 받은 Gold (없으면 0). */
+    /** 가짜가 배당을 받을 수 있어 보이는가 (진짜의 eligible 과 같은 규칙 — 가짜에는 도장이 없다). */
+    static boolean eligibleLook(StockData d, StockData.Forged f) {
+        return f != null && f.issuedDay < weekStartDay(d.week) && d.board(f.union).dividend > 0;
+    }
+
+    /** 점검용 · 창: 마지막 배당 받기에서 드러난 가짜의 수. */
+    public static int lastClaimExposed;
+
+    /** 가진 증서의 배당을 모두 받는다. 받은 Gold (없으면 0). 배당 도장을 찍다가 가짜가 드러나면 판명 도장 (lastClaimExposed). */
     public static long claim(ServerPlayer p) {
         StockConfig c = StockConfig.get();
+        lastClaimExposed = 0;
         if (!c.enabled || !nearDesk(p)) return 0;
         StockData d = StockData.get(p.server);
         roll(p.server);
+        if (Forgery.isWanted(d, p.getUUID())) return 0;
         long total = 0;
         for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
             ItemStack s = p.getInventory().getItem(i);
             if (!s.is(ModItems.STOCK_CERTIFICATE.get())) continue;
             UUID id = StockCertificateItem.id(s);
+            if (id != null && Forgery.on() && !d.certs.containsKey(id)) {
+                StockData.Forged f = d.forged.get(id);
+                if (Forgery.matches(f, s) && eligibleLook(d, f)) {
+                    Forgery.expose(p.server, d, id, f, s, null);
+                    lastClaimExposed++;
+                    continue;
+                }
+            }
             StockData.Cert cert = id == null ? null : d.certs.get(id);
             if (!valid(cert, s) || !eligible(d, cert)) continue;
             long due = Math.min(d.fund, d.board(cert.union).dividend * cert.shares);
@@ -473,6 +501,7 @@ public final class Stocks {
             p.getInventory().setChanged();
             Economy.addWallet(p, total);
         }
+        if (lastClaimExposed > 0) p.getInventory().setChanged();
         return total;
     }
 
@@ -498,6 +527,8 @@ public final class Stocks {
         o.addProperty("buyPerDay", c.buyPerDay);
         o.addProperty("buyLeft", Math.max(0, c.buyPerDay - d.boughtToday.getOrDefault(p.getUUID(), 0)));
         o.addProperty("today", date(d.day));
+        o.addProperty("wanted", Forgery.isWanted(d, p.getUUID()));
+        o.addProperty("checking", Forgery.on());
         long nextDay = Attendance.dayStart(d.day + 1, AttendanceConfig.get());
         o.addProperty("resetIn", Math.max(0, (nextDay - now()) / 1000L));
         o.addProperty("weekIn", Math.max(0, (Attendance.dayStart(weekStartDay(d.week + 1), AttendanceConfig.get()) - now()) / 1000L));
@@ -522,16 +553,33 @@ public final class Stocks {
             x.addProperty("shares", StockCertificateItem.shares(s));
             x.addProperty("no", StockCertificateItem.no(s));
             boolean v = valid(cert, s);
-            x.addProperty("valid", v);
+            // 3.76.0: 위조 증서는 판명되기 전까지 이 목록에서도 진짜와 똑같이 보인다 (배당 받을 몫까지)
+            StockData.Forged fake = !v && id != null && Forgery.on() ? d.forged.get(id) : null;
+            boolean fv = !v && Forgery.matches(fake, s);
+            x.addProperty("valid", v || fv);
+            if (StockCertificateItem.exposed(s) != null) x.addProperty("exposed", true);
             if (v) {
                 int ui = c.index(cert.union);
                 if (ui >= 0) held[ui] += cert.shares;
                 x.addProperty("issued", date(cert.issuedDay));
                 x.addProperty("bought", cert.price);
-                x.addProperty("value", d.board(cert.union).price * cert.shares);
+                long value = d.board(cert.union).price * cert.shares;
+                x.addProperty("value", value);
                 x.addProperty("eligible", eligible(d, cert));
                 x.addProperty("paid", cert.paidWeek == d.week);
                 x.addProperty("due", eligible(d, cert) ? d.board(cert.union).dividend * cert.shares : 0);
+                x.addProperty("checkFee", Forgery.checkFee(value));
+            } else if (fv) {
+                int ui = c.index(fake.union);
+                if (ui >= 0) held[ui] += fake.shares;
+                x.addProperty("issued", date(fake.issuedDay));
+                x.addProperty("bought", fake.price);
+                long value = d.board(fake.union).price * fake.shares;
+                x.addProperty("value", value);
+                x.addProperty("eligible", eligibleLook(d, fake));
+                x.addProperty("paid", false);
+                x.addProperty("due", eligibleLook(d, fake) ? d.board(fake.union).dividend * fake.shares : 0);
+                x.addProperty("checkFee", Forgery.checkFee(value));
             }
             mine.add(x);
         }
@@ -605,8 +653,22 @@ public final class Stocks {
             }
             case 3 -> {
                 long g = claim(p);
-                if (g > 0) open(p, true, "rtshop.stock.claimed", new String[]{num(g)}, true);
+                if (lastClaimExposed > 0) open(p, true, "rtshop.stock.claim_exposed", new String[]{num(g), String.valueOf(lastClaimExposed)}, false);
+                else if (g > 0) open(p, true, "rtshop.stock.claimed", new String[]{num(g)}, true);
+                else if (Forgery.isWanted(p)) open(p, true, err(ERR_WANTED), null, false);
                 else open(p, true, "rtshop.stock.no_dividend", null, false);
+            }
+            case 4 -> {
+                int r;
+                try {
+                    r = Forgery.check(p, UUID.fromString(serial));
+                } catch (IllegalArgumentException ex) {
+                    r = -ERR_NONE;
+                }
+                String fee = num(Forgery.lastCheckFeeForTest);
+                if (r == Forgery.CLEAN) open(p, true, "rtshop.stock.check_clean", new String[]{fee}, true);
+                else if (r == Forgery.FOUND) open(p, true, "rtshop.stock.check_fake", new String[]{fee, num(Forgery.lastFineForTest[1])}, false);
+                else open(p, true, err(-r), null, false);
             }
             default -> open(p, true, null, null, true);
         }
@@ -623,11 +685,13 @@ public final class Stocks {
             case ERR_MONEY -> "money";
             case ERR_FULL -> "full";
             case ERR_INVALID -> "invalid";
+            case ERR_FORGED -> "forged";
+            case ERR_WANTED -> "wanted";
             default -> "none";
         };
     }
 
-    static String num(long v) {
+    public static String num(long v) {
         return String.format("%,d", v);
     }
 
@@ -761,6 +825,19 @@ public final class Stocks {
         d.week = Long.MIN_VALUE;
         d.played = false;
         d.thunderTicks = 0;
+        d.forged.clear();
+        d.caught.clear();
+        d.wanted.clear();
+        d.wantedNames.clear();
+        d.forgedToday.clear();
+        d.forgeDay = Long.MIN_VALUE;
+        d.appraised.clear();
+        d.finesTotal = 0;
+        d.findersTotal = 0;
+        d.forgedPaidTotal = 0;
+        synchronized (Forgery.testRolls) {
+            Forgery.testRolls.clear();
+        }
         testShiftMs = 0;
         roll(server);
     }

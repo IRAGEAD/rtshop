@@ -68,6 +68,24 @@ public class StockCertificateItem extends Item {
         return t == null ? 0 : t.getLong("no");
     }
 
+    /**
+     * 위조 판명 도장 (3.76.0): 거래소나 조사관이 가짜임을 밝혀낸 증서. 값은 드러낸 쪽 (조사관 이름, "" = 거래소).
+     * 이 도장이 없으면 가짜도 진짜와 똑같이 보인다 — 위조인지는 서버의 기록(StockData.forged)만 안다.
+     */
+    @Nullable
+    public static String exposed(ItemStack stack) {
+        CompoundTag t = stack.getTagElement(TAG);
+        return t != null && t.contains("exposed") ? t.getString("exposed") : null;
+    }
+
+    public static void markExposed(ItemStack stack, String by) {
+        CompoundTag t = stack.getTagElement(TAG);
+        if (t != null) {
+            t.putString("exposed", by == null ? "" : by);
+            t.remove("paidDay");
+        }
+    }
+
     /** 배당 도장 (받은 날). */
     public static void stamp(ItemStack stack, long day) {
         CompoundTag t = stack.getTagElement(TAG);
@@ -77,6 +95,10 @@ public class StockCertificateItem extends Item {
     @Override
     public Component getName(ItemStack stack) {
         CompoundTag t = stack.getTagElement(TAG);
+        if (t != null && t.contains("exposed")) {
+            String ko = t.getString("name"), en = t.getString("nameEn").isEmpty() ? ko : t.getString("nameEn");
+            return Component.translatable("item.rtshop.stock_certificate.fake_named", ko, en, t.getInt("shares"));
+        }
         if (t != null && t.getInt("shares") > 0) {
             // 언어 파일이 이름 둘 중 하나를 고른다 (ko "%1$s 증서 · %3$s주", en "%2$s certificate · %3$s shares"): 화면 쪽 코드가 필요 없다
             String ko = t.getString("name"), en = t.getString("nameEn").isEmpty() ? ko : t.getString("nameEn");
@@ -88,7 +110,7 @@ public class StockCertificateItem extends Item {
     @Override
     public boolean isFoil(ItemStack stack) {
         CompoundTag t = stack.getTagElement(TAG);
-        return t != null && t.contains("paidDay");
+        return t != null && t.contains("paidDay") && !t.contains("exposed");
     }
 
     @Override
@@ -101,6 +123,12 @@ public class StockCertificateItem extends Item {
         tips.add(Component.translatable("item.rtshop.stock_certificate.no", String.format("%06d", t.getLong("no"))).withStyle(ChatFormatting.GRAY));
         tips.add(Component.translatable("item.rtshop.stock_certificate.issued", Stocks.date(t.getLong("issued")), String.format("%,d", t.getLong("price")))
                 .withStyle(ChatFormatting.GRAY));
+        if (t.contains("exposed")) {
+            String by = t.getString("exposed");
+            tips.add((by.isEmpty() ? Component.translatable("item.rtshop.stock_certificate.exposed_exchange")
+                    : Component.translatable("item.rtshop.stock_certificate.exposed", by)).withStyle(ChatFormatting.RED));
+            return;
+        }
         if (t.contains("paidDay")) {
             tips.add(Component.translatable("item.rtshop.stock_certificate.paid", Stocks.date(t.getLong("paidDay"))).withStyle(ChatFormatting.GOLD));
         }

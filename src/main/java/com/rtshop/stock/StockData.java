@@ -60,6 +60,19 @@ public final class StockData extends SavedData {
         public String buyerName = "";
     }
 
+    /**
+     * 위조 증서 한 장 (3.76.0): 장부(certs)에는 없고 여기에만 있다. 아이템은 진짜와 똑같이 생겼고 (일련번호는 본으로 삼은 증서의 것),
+     * 위조인지는 서버의 이 표만 안다. 드러나거나 거래소가 사들이면 이 표에서 지운다.
+     */
+    public static final class Forged {
+        public String union = "";
+        public int shares;
+        public long issuedDay, no, price, madeDay;
+        public double quality;
+        public UUID forger;
+        public String forgerName = "";
+    }
+
     /** 시세판의 소식 한 줄. */
     public static final class NewsLine {
         public long day;
@@ -74,6 +87,16 @@ public final class StockData extends SavedData {
     public final Set<String> newsDone = new HashSet<>();
     public final List<NewsLine> newsLog = new ArrayList<>();
     public final Map<UUID, Integer> boughtToday = new HashMap<>();
+    /** 위조 증서 (아이템 id → 기록), 위조자마다 드러난 날들, 수배가 끝나는 날(그날까지), 오늘 떠낸 수(forgeDay 의 것), 조사관이 살핀 증서("조사관|증서" → 날). */
+    public final Map<UUID, Forged> forged = new HashMap<>();
+    public final Map<UUID, List<Long>> caught = new HashMap<>();
+    public final Map<UUID, Long> wanted = new HashMap<>();
+    public final Map<UUID, String> wantedNames = new HashMap<>();
+    public final Map<UUID, Integer> forgedToday = new HashMap<>();
+    public long forgeDay = Long.MIN_VALUE;
+    public final Map<String, Long> appraised = new HashMap<>();
+    /** 지금까지 걷은 위조 벌금 · 조사관에게 준 몫 · 통과한 가짜에 기금이 치른 값 (기록). */
+    public long finesTotal, findersTotal, forgedPaidTotal;
     public long fund;
     /** 마지막으로 시세를 정한 날 (출석의 날짜 번호) · 주. Long.MIN_VALUE = 아직 없음. */
     public long day = Long.MIN_VALUE, week = Long.MIN_VALUE;
@@ -162,6 +185,48 @@ public final class StockData extends SavedData {
             CompoundTag c = bt.getCompound(i);
             if (c.hasUUID("id")) d.boughtToday.put(c.getUUID("id"), c.getInt("n"));
         }
+        ListTag fl = tag.getList("forged", Tag.TAG_COMPOUND);
+        for (int i = 0; i < fl.size(); i++) {
+            CompoundTag c = fl.getCompound(i);
+            if (!c.hasUUID("id")) continue;
+            Forged x = new Forged();
+            x.union = c.getString("union");
+            x.shares = c.getInt("shares");
+            x.issuedDay = c.getLong("issued");
+            x.no = c.getLong("no");
+            x.price = c.getLong("price");
+            x.madeDay = c.getLong("made");
+            x.quality = c.getDouble("q");
+            if (c.hasUUID("forger")) x.forger = c.getUUID("forger");
+            x.forgerName = c.getString("forgerName");
+            if (x.shares > 0 && !x.union.isEmpty()) d.forged.put(c.getUUID("id"), x);
+        }
+        ListTag ct = tag.getList("caught", Tag.TAG_COMPOUND);
+        for (int i = 0; i < ct.size(); i++) {
+            CompoundTag c = ct.getCompound(i);
+            if (!c.hasUUID("id")) continue;
+            List<Long> days = new ArrayList<>();
+            for (Tag t : c.getList("days", Tag.TAG_LONG)) days.add(((LongTag) t).getAsLong());
+            d.caught.put(c.getUUID("id"), days);
+        }
+        ListTag wt = tag.getList("wanted", Tag.TAG_COMPOUND);
+        for (int i = 0; i < wt.size(); i++) {
+            CompoundTag c = wt.getCompound(i);
+            if (!c.hasUUID("id")) continue;
+            d.wanted.put(c.getUUID("id"), c.getLong("until"));
+            d.wantedNames.put(c.getUUID("id"), c.getString("name"));
+        }
+        ListTag ft = tag.getList("forgedToday", Tag.TAG_COMPOUND);
+        for (int i = 0; i < ft.size(); i++) {
+            CompoundTag c = ft.getCompound(i);
+            if (c.hasUUID("id")) d.forgedToday.put(c.getUUID("id"), c.getInt("n"));
+        }
+        d.forgeDay = tag.contains("forgeDay") ? tag.getLong("forgeDay") : Long.MIN_VALUE;
+        CompoundTag ap = tag.getCompound("appraised");
+        for (String k : ap.getAllKeys()) d.appraised.put(k, ap.getLong(k));
+        d.finesTotal = tag.getLong("finesTotal");
+        d.findersTotal = tag.getLong("findersTotal");
+        d.forgedPaidTotal = tag.getLong("forgedPaidTotal");
         return d;
     }
 
@@ -242,6 +307,57 @@ public final class StockData extends SavedData {
             bt.add(c);
         }
         tag.put("bought", bt);
+        ListTag fl = new ListTag();
+        for (Map.Entry<UUID, Forged> e : forged.entrySet()) {
+            Forged x = e.getValue();
+            CompoundTag c = new CompoundTag();
+            c.putUUID("id", e.getKey());
+            c.putString("union", x.union);
+            c.putInt("shares", x.shares);
+            c.putLong("issued", x.issuedDay);
+            c.putLong("no", x.no);
+            c.putLong("price", x.price);
+            c.putLong("made", x.madeDay);
+            c.putDouble("q", x.quality);
+            if (x.forger != null) c.putUUID("forger", x.forger);
+            c.putString("forgerName", x.forgerName);
+            fl.add(c);
+        }
+        tag.put("forged", fl);
+        ListTag ct = new ListTag();
+        for (Map.Entry<UUID, List<Long>> e : caught.entrySet()) {
+            CompoundTag c = new CompoundTag();
+            c.putUUID("id", e.getKey());
+            ListTag days = new ListTag();
+            for (long v : e.getValue()) days.add(LongTag.valueOf(v));
+            c.put("days", days);
+            ct.add(c);
+        }
+        tag.put("caught", ct);
+        ListTag wt = new ListTag();
+        for (Map.Entry<UUID, Long> e : wanted.entrySet()) {
+            CompoundTag c = new CompoundTag();
+            c.putUUID("id", e.getKey());
+            c.putLong("until", e.getValue());
+            c.putString("name", wantedNames.getOrDefault(e.getKey(), ""));
+            wt.add(c);
+        }
+        tag.put("wanted", wt);
+        ListTag ft = new ListTag();
+        for (Map.Entry<UUID, Integer> e : forgedToday.entrySet()) {
+            CompoundTag c = new CompoundTag();
+            c.putUUID("id", e.getKey());
+            c.putInt("n", e.getValue());
+            ft.add(c);
+        }
+        tag.put("forgedToday", ft);
+        if (forgeDay != Long.MIN_VALUE) tag.putLong("forgeDay", forgeDay);
+        CompoundTag ap = new CompoundTag();
+        for (Map.Entry<String, Long> e : appraised.entrySet()) ap.putLong(e.getKey(), e.getValue());
+        tag.put("appraised", ap);
+        tag.putLong("finesTotal", finesTotal);
+        tag.putLong("findersTotal", findersTotal);
+        tag.putLong("forgedPaidTotal", forgedPaidTotal);
         return tag;
     }
 }

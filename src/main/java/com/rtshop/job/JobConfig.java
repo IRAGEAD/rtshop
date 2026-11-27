@@ -37,7 +37,7 @@ public final class JobConfig {
     public static final int PARAMS_VERSION = 2;
     private static final Object[][] PARAMS_V2 = {{"farmer", "starUp", 0.20, 0.35}, {"farmer", "extraHarvest", 0.10, 0.20}, {"cook", "dishSell", 0.28, 0.20}};
     /** 수치가 %가 아니라 그대로의 값인 패시브 (체력 칸 수 등). */
-    public static final Set<String> FLAT_PARAMS = Set.of("maxHealth", "distanceFull");
+    public static final Set<String> FLAT_PARAMS = Set.of("maxHealth", "distanceFull", "forgeDaily");
 
     public static final class JobDef {
         public String id;
@@ -190,9 +190,17 @@ public final class JobConfig {
         add(def("fisher", LIFE, "어부", "minecraft:fishing_rod", p("fishSell", 0.20, "extraFish", 0.10), p()));
         add(def("miner", LIFE, "광부", "minecraft:iron_pickaxe", p("mineSpeed", 0.15, "extraOre", 0.10, "oreSell", 0.20), p()));
         add(def("cook", LIFE, "요리사", "minecraft:cooked_beef", p("foodBonus", 0.20, "dishSell", 0.20), p()));
+        // 3.76.0 ④ 히든 직업 (생활 칸): 숨은 퀘스트로 표식(unlock_job_<id>)을 얻은 사람에게만 직업 안내인의 목록에 보인다
+        add(def("forger", LIFE, "위조자", "rtshop:forger_kit", p("forgeSkill", 0.15, "forgeDaily", 3), p()), true);
+        add(def("investigator", LIFE, "조사관", "rtshop:appraisal_loupe", p("inspectSkill", 0.25), p()), true);
     }
 
     private void add(JobDef d) {
+        jobs.put(d.id, d);
+    }
+
+    private void add(JobDef d, boolean hidden) {
+        d.hidden = hidden;
         jobs.put(d.id, d);
     }
 
@@ -244,6 +252,9 @@ public final class JobConfig {
             case "oreSell" -> "Mined ore, raw metal and gem sale price " + signed(v);
             case "foodBonus" -> "Hunger restored by food " + signed(v);
             case "dishSell" -> "Hand-cooked dish sale price " + signed(v) + " (about " + Math.round((1 + handMargin) * (1 + v) * 100) + "% of the ingredient cost)";
+            case "forgeSkill" -> "Forged certificates look more genuine " + signed(v) + " (hold the forger's kit, the certificate to copy in the other hand)";
+            case "forgeDaily" -> "Up to " + Math.round(v) + " forged certificates a day (paper, ink sac, honeycomb)";
+            case "inspectSkill" -> "Chance to find a forged certificate's flaw " + signed(v) + " (hold the appraiser's loupe, the certificate in the other hand)";
             default -> key + " " + signed(v);
         };
         return new String[]{v > 0 ? "+" : "-", text};
@@ -273,6 +284,9 @@ public final class JobConfig {
             case "oreSell" -> "캐낸 광석 · 원석 · 보석 판매가 " + signed(v);
             case "foodBonus" -> "음식을 먹을 때 포만감 " + signed(v);
             case "dishSell" -> "손으로 만든 요리 판매가 " + signed(v) + " (재료비의 약 " + Math.round((1 + handMargin) * (1 + v) * 100) + "%)";
+            case "forgeSkill" -> "위조 증서의 완성도 " + signed(v) + " (위조 도구를 들고, 다른 손에 본으로 삼을 증서)";
+            case "forgeDaily" -> "하루에 위조 증서 " + Math.round(v) + "장까지 (종이 · 먹물 주머니 · 벌집 조각)";
+            case "inspectSkill" -> "위조 증서의 흠을 찾을 확률 " + signed(v) + " (감정 돋보기를 들고, 다른 손에 증서)";
             default -> key + " " + signed(v);
         };
         return new String[]{good ? "+" : "-", text};

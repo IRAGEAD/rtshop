@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 16
+VERSION = 17
 CATS = []
 
 
@@ -16,8 +16,9 @@ def cat(id_, name):
     return c
 
 
-def page(c, id_, title, text, image="", icons=None, mod="", keys=""):
+def page(c, id_, title, text, image="", icons=None, mod="", keys="", need=""):
     p = {"id": id_, "title": title, "text": text.strip("\n")}
+    if need: p["needFlag"] = need
     if image:
         p["image"] = "rtshop:textures/guide/%s.png" % image
         p["iw"], p["ih"] = 480, 270
@@ -183,7 +184,8 @@ page(c, "stocks", "조합 증서", """
 · 배당은 주마다 정해집니다. 지난주부터 가진 증서를 은행원에게 보여 주면 받고, 증서에 도장이 찍힙니다. 배당은 수수료가 모인 기금에서만 나갑니다.
 · 증서는 건네거나 플레이어 상점에 올릴 수 있고, 쓰러져도 떨어지지 않습니다. 장부에 없는 증서(복사본)는 통하지 않습니다.
 · 조합 시세판(블록)이나 /rtshop stocks 로 지난 14일의 시세와 소식을 봅니다. 증서를 들고 우클릭해도 됩니다.
-""", icons=["rtshop:stock_certificate", "rtshop:stock_board"], keys="주식 증서 시세 배당 조합 증권 거래 시세판")
+· 창구에서 증서 옆의 [확인] 을 누르면 작은 수수료(액면가의 1%, 최소 100 G)를 내고 거래소의 봉랍 확인을 받습니다. 사람에게서 산 증서는 확인해 두면 안심입니다.
+""", icons=["rtshop:stock_certificate", "rtshop:stock_board"], keys="주식 증서 시세 배당 조합 증권 거래 시세판 확인 봉랍")
 page(c, "restaurant", "식당", """
 식당 주인에게는 요리사만 요리를 팔 수 있습니다. 식품 상인보다 조금 더 쳐 줍니다.
 
@@ -232,6 +234,17 @@ page(c, "weapons", "직업과 무기", """
 · 마법은 마법사의 길을 걷는 사람만 쓸 수 있습니다.
 · 전투 직업이 없으면 상성도 없습니다.
 """, keys="상성 무기 분류 마법사")
+
+page(c, "hidden_jobs", "위조자와 조사관", """
+이야기의 깊은 곳에서만 길이 열리는 두 직업입니다. 생활 직업 칸에 들어가고, 길을 연 뒤 직업 안내인에게서 고릅니다.
+
+· 위조자: 위조 도구 꾸러미를 들고, 다른 손에 본으로 삼을 증서를 든 채 우클릭하면 가짜를 한 장 떠냅니다. 종이 · 먹물 주머니 · 벌집 조각이 들고, 발광 먹물 주머니를 쓰면 더 그럴듯합니다. 하루 3장까지.
+· 가짜는 겉모습도, 거래소 창구의 목록도 진짜와 똑같습니다. 사람에게 건네거나 플레이어 상점에 올릴 수 있습니다.
+· 거래소에 되팔면 완성도에 따라 통과하거나 걸립니다. 통과한 값은 거래소의 기금에서만 나가고, 기금이 모자라면 통과하지 못합니다. 배당 도장을 찍을 때는 반드시 드러납니다.
+· 가짜가 드러나면 누가 들고 있었든 그것을 떠낸 위조자에게 벌금이 매겨집니다 (그날 액면가의 30%, 지갑에서, 모자라면 예금에서). 2주 안에 세 번 드러나면 7일 동안 수배되어 시세판에 이름이 오르고 거래소와 거래할 수 없습니다.
+· 조사관: 감정 돋보기를 들고, 다른 손에 증서를 든 채 우클릭하면 흠을 찾습니다. 같은 증서는 하루에 한 번만. 흠을 찾으면 「위조 판명」 도장을 찍고, 위조자의 벌금에서 절반을 받습니다.
+· 진짜 증서를 살피면 언제나 「흠을 찾지 못했다」 입니다. 가짜도 흠을 놓치면 같은 말이 나옵니다.
+""", icons=["rtshop:forger_kit", "rtshop:appraisal_loupe"], keys="위조자 조사관 위조 감정 돋보기 수배 히든 직업", need="unlock_job_forger|unlock_job_investigator")
 
 # ================================================================ 성장
 c = cat("growth", "성장")

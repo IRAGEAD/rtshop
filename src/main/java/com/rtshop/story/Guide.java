@@ -24,7 +24,7 @@ import java.nio.file.Path;
  * 가이드북 (config/rtshop/guide.json, 3.53): 아이템 「조사대 안내서」를 들고 우클릭하면 펼쳐진다.
  * 이야기를 따라가며 저절로 알게 되는 것 말고, 모드팩의 시스템과 쓰는 법을 갈래·모드별로 그림과 글로 적어 둔 책. 이름으로 찾을 수 있다.
  * <pre>
- * "categories": [ { "id", "name", "pages": [ { "id", "title", "mod": "이 모드가 있을 때만 (쉼표로 여럿 = 하나라도)", "icons": [아이템 ID…],
+ * "categories": [ { "id", "name", "pages": [ { "id", "title", "mod": "이 모드가 있을 때만 (쉼표로 여럿 = 하나라도)", "needFlag": "이 표식이 있는 사람에게만 (| 로 여럿 = 하나라도)", "icons": [아이템 ID…],
  *                                               "image": "rtshop:textures/guide/bank.png", "iw": 480, "ih": 270, "text": "글 (\n 줄바꿈)", "keys": "찾기에 걸릴 낱말" } ] } ]
  * </pre>
  * 직접 고쳤으면 "edited": true 를 넣어 새 판으로 바뀌지 않게 한다. 처음 들어온 사람에게 한 권 주고, 잃어버리면 잡화점에서 다시 산다.
@@ -86,7 +86,31 @@ public final class Guide {
 
     public static void open(ServerPlayer p) {
         if (p.connection == null || p instanceof FakePlayer) return;
-        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.GUIDE, StoryText.json(p, get()).toString()));
+        ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.GUIDE, StoryText.json(p, forPlayer(p, get())).toString()));
+    }
+
+    /** 3.76.0: 이 사람에게 보일 쪽만 (needFlag 가 있으면 그 표식 가운데 하나가 있어야 — 히든 직업의 쪽은 그 직업을 연 사람에게만). */
+    public static JsonObject forPlayer(ServerPlayer p, JsonObject book) {
+        JsonObject out = book.deepCopy();
+        if (!out.has("categories")) return out;
+        com.google.gson.JsonArray cats = new com.google.gson.JsonArray();
+        for (com.google.gson.JsonElement ce : out.getAsJsonArray("categories")) {
+            JsonObject c = ce.getAsJsonObject();
+            if (!c.has("pages")) continue;
+            com.google.gson.JsonArray pages = new com.google.gson.JsonArray();
+            for (com.google.gson.JsonElement pe : c.getAsJsonArray("pages")) {
+                JsonObject pg = pe.getAsJsonObject();
+                String need = pg.has("needFlag") ? pg.get("needFlag").getAsString().trim() : "";
+                boolean ok = need.isEmpty();
+                for (String f : need.split("\\|")) ok |= !f.isBlank() && com.rtshop.quest.QuestManager.hasFlag(p, f.trim());
+                if (ok) pages.add(pg);
+            }
+            if (pages.size() == 0) continue;
+            c.add("pages", pages);
+            cats.add(c);
+        }
+        out.add("categories", cats);
+        return out;
     }
 
     /** 처음 들어온 사람에게 안내서를 한 권 준다 (도감과 같은 장부에 적는다). */

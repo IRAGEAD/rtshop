@@ -486,6 +486,243 @@ public final class SelfTest {
         return com.rtshop.item.StockCertificateItem.id(s);
     }
 
+    /** 가방에서 이 일련번호의 증서 (없으면 EMPTY). */
+    private static ItemStack certIn(FakePlayer p, java.util.UUID id) {
+        for (ItemStack s : p.getInventory().items) if (s.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get()) && id.equals(serialOf(s))) return s;
+        return ItemStack.EMPTY;
+    }
+
+    /** 가방의 증서 가운데 이것들이 아닌 새것 (없으면 EMPTY). */
+    private static ItemStack newCert(FakePlayer p, java.util.Set<java.util.UUID> known) {
+        for (ItemStack s : p.getInventory().items)
+            if (s.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get()) && serialOf(s) != null && !known.contains(serialOf(s))) return s;
+        return ItemStack.EMPTY;
+    }
+
+    private static void rolls(double... v) {
+        synchronized (com.rtshop.stock.Forgery.testRolls) {
+            com.rtshop.stock.Forgery.testRolls.clear();
+            for (double x : v) com.rtshop.stock.Forgery.testRolls.add(x);
+        }
+    }
+
+    /** 3.76.0 ④ 히든 직업: 위조자 · 조사관, 위조 증서 · 거래소 판정 · 봉랍 확인 · 배당 · 벌금 · 수배. */
+    private static void forgery(MinecraftServer server, FakePlayer a, FakePlayer b) {
+        com.rtshop.stock.StockConfig sc = com.rtshop.stock.StockConfig.copyOfDefaults();
+        sc.noise = 0;
+        sc.pull = 0;
+        sc.events = false;
+        com.rtshop.stock.StockConfig.forTest(sc);
+        com.rtshop.stock.Stocks.testAnywhere = true;
+        com.rtshop.stock.Stocks.testing = true;
+        com.rtshop.job.JobData jd = com.rtshop.job.JobData.get(server);
+        try {
+            com.rtshop.stock.Stocks.resetForTest(server);
+            com.rtshop.stock.Stocks.advance(server, 1, true);
+            com.rtshop.stock.StockData sd = com.rtshop.stock.StockData.get(server);
+            QuestManager.reset(a);
+            QuestManager.reset(b);
+            jd.clear(a.getUUID());
+            jd.clear(b.getUUID());
+            a.getInventory().clearContent();
+            b.getInventory().clearContent();
+            com.rtshop.economy.Economy.setWallet(a, 1_000_000L);
+            com.rtshop.economy.Economy.setWallet(b, 0);
+            // 히든 직업은 표식이 없으면 직업 창에 보이지도 않는다
+            java.util.function.Function<FakePlayer, java.util.Set<String>> shown = p -> {
+                java.util.Set<String> ids = new java.util.HashSet<>();
+                for (com.rtshop.net.JobOpenPacket.JobView v : com.rtshop.job.Jobs.view(p, true).jobs) ids.add(v.id());
+                return ids;
+            };
+            boolean hiddenBefore = !shown.apply(a).contains("forger") && !shown.apply(a).contains("investigator") && shown.apply(a).contains("farmer");
+            QuestManager.setFlag(a, "unlock_job_forger", true);
+            boolean openForger = shown.apply(a).contains("forger") && !shown.apply(a).contains("investigator");
+            com.rtshop.economy.Economy.setWallet(a, 1_000_000L);
+            boolean chosen = com.rtshop.job.Jobs.choose(a, "forger").ok() && com.rtshop.stock.Forgery.hasJob(a, "forger");
+            QuestManager.setFlag(b, "unlock_job_investigator", true);
+            jd.of(b.getUUID()).life = "investigator";
+            jd.setDirty();
+            java.util.List<String> desc = com.rtshop.job.JobConfig.get().describe(com.rtshop.job.JobConfig.get().jobs.get("forger"), 0.1);
+            boolean descOk = String.join("|", desc).contains("위조 증서의 완성도 +15%") && String.join("|", desc).contains("하루에 위조 증서 3장까지");
+            boolean guideShown = guidePage376(a, "hidden_jobs") && guidePage376(b, "hidden_jobs");
+            QuestManager.setFlag(b, "unlock_job_investigator", false);
+            boolean guideHidden = !guidePage376(b, "hidden_jobs") && guidePage376(b, "stocks");
+            QuestManager.setFlag(b, "unlock_job_investigator", true);
+            check("3.76 hidden jobs: the forger and the inspector are unseen at the Job Guide until their mark is earned, then can be chosen (life slot); their guidebook page shows only to them",
+                    hiddenBefore && openForger && chosen && descOk && guideShown && guideHidden,
+                    "hidden " + hiddenBefore + " open " + openForger + " chosen " + chosen + " desc " + descOk + " " + desc + " guide " + guideShown + "/" + guideHidden);
+
+            // 진짜 증서 한 장 (본)
+            com.rtshop.economy.Economy.setWallet(a, 1_000_000L);
+            int bought = com.rtshop.stock.Stocks.buy(a, "fish", 10);
+            ItemStack real = ItemStack.EMPTY;
+            for (ItemStack s2 : a.getInventory().items) if (s2.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get())) real = s2;
+            java.util.UUID realId = serialOf(real);
+            java.util.Set<java.util.UUID> known = new java.util.HashSet<>(java.util.List.of(realId));
+            // 재료가 없으면 못 뜬다 · 직업이 없는 사람은 도구를 못 쓴다
+            int noPaper = com.rtshop.stock.Forgery.forge(a, real);
+            int notJob = com.rtshop.stock.Forgery.forge(b, real);
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.PAPER, 8));
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.INK_SAC, 8));
+            a.getInventory().add(new ItemStack(net.minecraft.world.item.Items.HONEYCOMB, 8));
+            // 첫 장: 완성도 0.50 + 솜씨 0.15 = 0.65 (그럴듯하다)
+            rolls(0.5);
+            int f1r = com.rtshop.stock.Forgery.forge(a, real);
+            double q1 = com.rtshop.stock.Forgery.lastQualityForTest;
+            ItemStack f1 = newCert(a, known);
+            java.util.UUID f1Id = serialOf(f1);
+            known.add(f1Id);
+            net.minecraft.nbt.CompoundTag rt = real.getTagElement(com.rtshop.item.StockCertificateItem.TAG), ft = f1.getTagElement(com.rtshop.item.StockCertificateItem.TAG);
+            boolean same = ft != null && rt != null && ft.getAllKeys().equals(rt.getAllKeys()) && ft.getLong("no") == rt.getLong("no") && ft.getInt("shares") == 10
+                    && ft.getString("union").equals("fish") && ft.getLong("issued") == rt.getLong("issued") && ft.getLong("price") == rt.getLong("price")
+                    && f1.getHoverName().getString().equals(real.getHoverName().getString()) && !f1.isEnchanted() && com.rtshop.item.StockCertificateItem.exposed(f1) == null
+                    && sd.forged.containsKey(f1Id) && !sd.certs.containsKey(f1Id);
+            // 거래소 창구의 목록에서도 진짜와 똑같이 보인다
+            com.google.gson.JsonObject v376 = com.rtshop.stock.Stocks.view(a, true, null, null, true);
+            com.google.gson.JsonObject rowReal = null, rowFake = null;
+            for (com.google.gson.JsonElement e : v376.getAsJsonArray("mine")) {
+                com.google.gson.JsonObject x = e.getAsJsonObject();
+                if (x.get("id").getAsString().equals(realId.toString())) rowReal = x;
+                if (x.get("id").getAsString().equals(f1Id.toString())) rowFake = x;
+            }
+            boolean listed = rowReal != null && rowFake != null && rowFake.get("valid").getAsBoolean() && !rowFake.has("exposed")
+                    && rowFake.get("value").getAsLong() == rowReal.get("value").getAsLong() && rowFake.get("issued").getAsString().equals(rowReal.get("issued").getAsString())
+                    && rowFake.get("checkFee").getAsLong() == rowReal.get("checkFee").getAsLong();
+            check("3.76 forger: with paper, ink and honeycomb a real certificate is copied; the copy looks exactly the same (item, name, serial, exchange list) — only the server knows",
+                    bought == com.rtshop.stock.Stocks.OK && noPaper == com.rtshop.stock.Forgery.NO_PAPER && notJob == com.rtshop.stock.Forgery.NOT_JOB && f1r == com.rtshop.stock.Forgery.OK
+                            && Math.abs(q1 - 0.65) < 1e-6 && "convincing".equals(com.rtshop.stock.Forgery.tier(q1)) && same && listed,
+                    "buy " + bought + " noPaper " + noPaper + " notJob " + notJob + " forge " + f1r + " q " + q1 + " same " + same + " listed " + listed + " " + rowFake);
+            // 가짜를 본으로 뜨면 완성도가 떨어진다 · 하루 3장
+            rolls(0.5);
+            int f2r = com.rtshop.stock.Forgery.forge(a, f1);
+            double q2 = com.rtshop.stock.Forgery.lastQualityForTest;
+            ItemStack f2 = newCert(a, known);
+            java.util.UUID f2Id = serialOf(f2);
+            known.add(f2Id);
+            rolls(0.5);
+            int f3r = com.rtshop.stock.Forgery.forge(a, real);
+            ItemStack f3 = newCert(a, known);
+            java.util.UUID f3Id = serialOf(f3);
+            known.add(f3Id);
+            int f4r = com.rtshop.stock.Forgery.forge(a, real);
+            check("3.76 forger: a copy of a copy comes out worse (−10%); three a day",
+                    f2r == com.rtshop.stock.Forgery.OK && Math.abs(q2 - 0.55) < 1e-6 && f3r == com.rtshop.stock.Forgery.OK && f4r == com.rtshop.stock.Forgery.LIMIT
+                            && com.rtshop.stock.Forgery.forgeLeft(a) == 0 && !f2.isEmpty() && !f3.isEmpty(),
+                    f2r + " q2 " + q2 + " f3 " + f3r + " f4 " + f4r + " left " + com.rtshop.stock.Forgery.forgeLeft(a));
+            // 거래소에 되팔기: 통과하면 값은 기금에서만 (기금이 모자라면 통과 못 함), 걸리면 판명 도장 + 위조자 벌금
+            sd.fund = 100_000;
+            long price = sd.board("fish").price, value = price * 10, fee = (long) Math.ceil(value * sc.fee), pay = value - fee;
+            long w0 = com.rtshop.economy.Economy.wallet(a), fund0 = sd.fund;
+            rolls(0.0);
+            long sold = com.rtshop.stock.Stocks.sell(a, f1Id);
+            boolean passed = sold == pay && com.rtshop.economy.Economy.wallet(a) - w0 == pay && fund0 - sd.fund == pay && !sd.forged.containsKey(f1Id)
+                    && certIn(a, f1Id).isEmpty() && sd.forgedPaidTotal == pay && "pass".equals(com.rtshop.stock.Forgery.lastJudgeForTest);
+            long w1 = com.rtshop.economy.Economy.wallet(a), fund1 = sd.fund;
+            rolls(0.99);
+            long caught = com.rtshop.stock.Stocks.sell(a, f2Id);
+            long fine = Math.round(value * sc.forgery.fineRate);
+            ItemStack f2now = certIn(a, f2Id);
+            boolean caughtOk = caught == -com.rtshop.stock.Stocks.ERR_FORGED && !f2now.isEmpty() && "".equals(com.rtshop.item.StockCertificateItem.exposed(f2now))
+                    && w1 - com.rtshop.economy.Economy.wallet(a) == fine && sd.fund - fund1 == fine && !sd.forged.containsKey(f2Id)
+                    && sd.caught.get(a.getUUID()).size() == 1 && f2now.getHoverName().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc376
+                    && tc376.getKey().equals("item.rtshop.stock_certificate.fake_named");
+            int exposedTemplate = com.rtshop.stock.Forgery.forge(a, f2now);
+            // 기금이 모자라면 통과하지 못한다 (Gold 가 새로 생기지 않게)
+            sd.fund = 0;
+            check("3.76 exchange: a forgery that fools the exchange is paid from the fees fund only; one that is caught is stamped 'forged' and its forger is fined (into the fund)",
+                    passed && caughtOk && exposedTemplate == com.rtshop.stock.Forgery.EXPOSED_TEMPLATE,
+                    "sold " + sold + "/" + pay + " passed " + passed + " caught " + caught + " ok " + caughtOk + " fine " + fine + " tpl " + exposedTemplate);
+            // 조사관: 넘겨받은 가짜의 흠을 찾으면 판명 도장, 위조자의 벌금에서 절반 · 진짜는 언제나 "흠을 찾지 못했다" · 같은 증서는 하루 한 번
+            sd.fund = 0;
+            ItemStack give = f3.copy();
+            f3.setCount(0);
+            b.getInventory().add(give);
+            ItemStack f3b = certIn(b, f3Id);
+            long wa = com.rtshop.economy.Economy.wallet(a), wb = com.rtshop.economy.Economy.wallet(b);
+            rolls(0.0, 0.4);
+            int found = com.rtshop.stock.Forgery.appraise(b, f3b);
+            long fine3 = Math.round(value * sc.forgery.fineRate), share = Math.round(fine3 * sc.forgery.finderShare);
+            boolean foundOk = found == com.rtshop.stock.Forgery.FOUND && b.getGameProfile().getName().equals(com.rtshop.item.StockCertificateItem.exposed(f3b))
+                    && wa - com.rtshop.economy.Economy.wallet(a) == fine3 && com.rtshop.economy.Economy.wallet(b) - wb == share && sd.fund == fine3 - share
+                    && sd.caught.get(a.getUUID()).size() == 2 && com.rtshop.stock.Forgery.lastFlawForTest == 1;
+            ItemStack realCopy = real.copy();
+            b.getInventory().add(realCopy);
+            rolls(0.0);
+            int clean = com.rtshop.stock.Forgery.appraise(b, certIn(b, realId));
+            int again = com.rtshop.stock.Forgery.appraise(b, certIn(b, realId));
+            int notInspector = com.rtshop.stock.Forgery.appraise(a, real);
+            b.getInventory().clearContent();
+            check("3.76 inspector: finding a forgery's flaw stamps it and pays half of the forger's fine; a real one always shows no flaw; one look per certificate a day",
+                    foundOk && clean == com.rtshop.stock.Forgery.CLEAN && again == com.rtshop.stock.Forgery.AGAIN && notInspector == com.rtshop.stock.Forgery.NOT_JOB,
+                    "found " + found + " ok " + foundOk + " fine " + fine3 + " share " + share + " fund " + sd.fund + " clean " + clean + " again " + again + " notInspector " + notInspector);
+            // 다음 날: 봉랍 확인 (수수료를 내고 누구나) — 세 번째로 드러나면 수배 (시세판 공고 · 거래 금지)
+            com.rtshop.stock.Stocks.advance(server, 1, true);
+            rolls(0.5);
+            int f4b = com.rtshop.stock.Forgery.forge(a, real);
+            ItemStack f4 = newCert(a, known);
+            java.util.UUID f4Id = serialOf(f4);
+            known.add(f4Id);
+            long wc = com.rtshop.economy.Economy.wallet(a);
+            long cfee = com.rtshop.stock.Forgery.checkFee(sd.board("fish").price * 10);
+            rolls(0.0);
+            int checkReal = com.rtshop.stock.Forgery.check(a, realId);
+            rolls(0.99);
+            int checkFake = com.rtshop.stock.Forgery.check(a, f4Id);
+            boolean wanted = com.rtshop.stock.Forgery.isWanted(a) && sd.newsLog.stream().anyMatch(l -> "notice".equals(l.kind) && l.text.contains(a.getGameProfile().getName()));
+            int buyWanted = com.rtshop.stock.Stocks.buy(a, "fish", 1);
+            long sellWanted = com.rtshop.stock.Stocks.sell(a, realId);
+            boolean viewWanted = com.rtshop.stock.Stocks.view(a, true, null, null, true).get("wanted").getAsBoolean();
+            check("3.76 seal check: anyone pays a small fee to have a certificate checked (a real one is always fine); the third forgery found out in two weeks puts its forger on the wanted notice, barred from the exchange",
+                    f4b == com.rtshop.stock.Forgery.OK && checkReal == com.rtshop.stock.Forgery.CLEAN && checkFake == com.rtshop.stock.Forgery.FOUND && cfee == 100
+                            && wc - com.rtshop.economy.Economy.wallet(a) >= 2 * cfee && wanted && buyWanted == com.rtshop.stock.Stocks.ERR_WANTED
+                            && sellWanted == -com.rtshop.stock.Stocks.ERR_WANTED && viewWanted,
+                    "forge " + f4b + " real " + checkReal + " fake " + checkFake + " fee " + cfee + " wanted " + wanted + " buy " + buyWanted + " sell " + sellWanted + " view " + viewWanted);
+            // 배당 도장을 찍을 때는 반드시 드러난다 (수배가 풀린 뒤, 넘겨받은 사람이 받으러 가도)
+            rolls(0.5);
+            int f5r = com.rtshop.stock.Forgery.forge(a, real);
+            ItemStack f5 = newCert(a, known);
+            java.util.UUID f5Id = serialOf(f5);
+            ItemStack f5give = f5.copy();
+            f5.setCount(0);
+            b.getInventory().add(f5give);
+            com.rtshop.stock.Stocks.activity(server, a.getUUID(), "fish", 20000);
+            sd.fund = 50_000;
+            com.rtshop.stock.Stocks.advance(server, 7, true);
+            long divPer = sd.board("fish").dividend;
+            long gotDiv = com.rtshop.stock.Stocks.claim(b);
+            ItemStack f5b = certIn(b, f5Id);
+            boolean divExposed = f5r == com.rtshop.stock.Forgery.OK && divPer > 0 && gotDiv == 0 && com.rtshop.stock.Stocks.lastClaimExposed == 1
+                    && "".equals(com.rtshop.item.StockCertificateItem.exposed(f5b)) && !sd.forged.containsKey(f5Id) && !com.rtshop.stock.Forgery.isWanted(a);
+            check("3.76 dividends: stamping a forged certificate always gives it away, whoever holds it (the holder gets nothing for it)",
+                    divExposed, "forge " + f5r + " div " + divPer + " got " + gotDiv + " exposed " + com.rtshop.stock.Stocks.lastClaimExposed + " wanted " + com.rtshop.stock.Forgery.isWanted(a));
+            // 저장 · 불러오기: 위조 기록과 수배가 남는다
+            net.minecraft.nbt.CompoundTag saved = sd.save(new net.minecraft.nbt.CompoundTag());
+            com.rtshop.stock.StockData back = com.rtshop.stock.StockData.load(saved);
+            check("3.76 the forgery records (forged copies, times found out, wanted, totals) are saved with the world",
+                    back.forged.keySet().equals(sd.forged.keySet()) && back.caught.keySet().equals(sd.caught.keySet()) && back.wanted.equals(sd.wanted)
+                            && back.finesTotal == sd.finesTotal && back.findersTotal == sd.findersTotal && back.forgedPaidTotal == sd.forgedPaidTotal,
+                    back.forged.size() + "/" + sd.forged.size() + " " + back.wanted + " " + back.finesTotal);
+        } finally {
+            com.rtshop.stock.Stocks.testAnywhere = false;
+            com.rtshop.stock.Stocks.testing = false;
+            com.rtshop.stock.StockConfig.forTest(null);
+            com.rtshop.stock.Stocks.resetForTest(server);
+            jd.clear(a.getUUID());
+            jd.clear(b.getUUID());
+            QuestManager.reset(a);
+            QuestManager.reset(b);
+            a.getInventory().clearContent();
+            b.getInventory().clearContent();
+        }
+    }
+
+    private static boolean guidePage376(FakePlayer p, String id) {
+        for (com.google.gson.JsonElement ce : com.rtshop.story.Guide.forPlayer(p, com.rtshop.story.Guide.get()).getAsJsonArray("categories"))
+            for (com.google.gson.JsonElement pe : ce.getAsJsonObject().getAsJsonArray("pages"))
+                if (id.equals(pe.getAsJsonObject().get("id").getAsString())) return true;
+        return false;
+    }
+
     private static void ranks(MinecraftServer server, FakePlayer a, FakePlayer b) {
         com.rtshop.rank.Ranks.testFakes = true;
         try {
@@ -3934,6 +4171,7 @@ public final class SelfTest {
             QuestManager.reset(a);
             clear(a);
             check("job '" + d.id + "' is locked until its quest line is done", !com.rtshop.job.Jobs.unlocked(a, d));
+            if (d.hidden) continue;   // 3.76.0: 히든 직업은 선행 퀘스트 대신 숨은 퀘스트로 열린다 (v376 에서 따로 점검)
             boolean ok = true;
             String fail = "";
             for (int n = 1; n <= 20 && ok; n++) {
@@ -4634,6 +4872,7 @@ public final class SelfTest {
                         + " closed " + pClosed + " deleted " + pDeleted + " view " + pAdminView + " cmd " + pCmd371 + " " + com.rtshop.petition.Petitions.lastAdminForTest);
         com.rtshop.petition.Petitions.forTestReset(a.server);
         stocks(a.server, a);
+        forgery(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
         // 3.73: 성능 진단 (/fpscheck · /rtshop perfcheck) — 스택의 프레임을 모드로 돌리는 규칙
         StackTraceElement[] st373 = {
                 new StackTraceElement("java.lang.Object", "wait", null, -1),
@@ -5955,9 +6194,10 @@ public final class SelfTest {
             QuestManager.setFlag(a, "unlock_job_" + id, true); // 선행 퀘스트는 아래 'job quests' 에서 따로 점검
         }
         try {
-            check("9 jobs are defined (5 combat, 4 life)", cfg.jobs.size() >= 9
-                    && cfg.jobs.values().stream().filter(d -> d.slot.equals("combat")).count() == 5
-                    && cfg.jobs.values().stream().filter(d -> d.slot.equals("life")).count() == 4);
+            check("9 jobs are defined (5 combat, 4 life) plus 2 hidden life jobs (forger, investigator)", cfg.jobs.size() >= 11
+                    && cfg.jobs.values().stream().filter(d -> d.slot.equals("combat") && !d.hidden).count() == 5
+                    && cfg.jobs.values().stream().filter(d -> d.slot.equals("life") && !d.hidden).count() == 4
+                    && cfg.jobs.values().stream().filter(d -> d.slot.equals("life") && d.hidden).count() == 2);
             Economy.setWallet(a, 20_000);
             check("the first combat job is free", com.rtshop.job.Jobs.choose(a, "swordsman").ok()
                     && com.rtshop.job.Jobs.has(a, "swordsman") && Economy.wallet(a) == 20_000);

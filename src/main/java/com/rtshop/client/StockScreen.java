@@ -149,9 +149,11 @@ public class StockScreen extends Screen {
         for (int i = 0; i < unions.size() && i < lh / ROW; i++) drawRow(g, unions.get(i), lx, ly + 2 + i * ROW, i == sel, Ui.inside(mx, my, lx + 2, ly + 2 + i * ROW, LIST_W - 4, ROW - 1));
         int dx = lx + LIST_W + 6, dw = W - LIST_W - 22;
         Ui.bevel(g, dx, ly, dw, lh, Ui.C_PARCH, Ui.C_PARCH_HI, Ui.C_PARCH_SHADE);
+        checkTip = null;
         if (!unions.isEmpty()) drawDetail(g, unions.get(sel), dx, ly, dw, lh, mx, my);
         drawNews(g, lx, fy + H - NEWS_H - 8, W - 16, NEWS_H, mx, my);
         super.render(g, mx, my, partial);
+        if (checkTip != null) g.renderTooltip(font, checkTip, mx, my);
     }
 
     private void drawRow(GuiGraphics g, JsonObject u, int x, int y, boolean on, boolean hov) {
@@ -255,8 +257,9 @@ public class StockScreen extends Screen {
             Ui.button(g, font, buyX, y, 42, 13, Component.translatable("rtshop.stock.buy").getString(), Ui.inside(mx, my, buyX, y, 42, 13), can);
             y += 16;
             long cost = price * amount, fee = (long) Math.ceil(cost * data.get("fee").getAsDouble());
-            String pv = Component.translatable("rtshop.stock.cost", Ui.num(cost), Ui.num(fee), Ui.num(cost + fee), data.get("buyLeft").getAsInt()).getString();
-            Ui.scaledText(g, font, Ui.clip(font, pv, (int) ((dw - 16) / 0.8F)), dx + 8, y, 0.8F, cost + fee > data.get("wallet").getAsLong() ? Ui.C_RED : Ui.C_INK_SOFT, false);
+            String pv = wanted() ? Component.translatable("rtshop.stock.wanted_banner").getString()
+                    : Component.translatable("rtshop.stock.cost", Ui.num(cost), Ui.num(fee), Ui.num(cost + fee), data.get("buyLeft").getAsInt()).getString();
+            Ui.scaledText(g, font, Ui.clip(font, pv, (int) ((dw - 16) / 0.8F)), dx + 8, y, 0.8F, wanted() || cost + fee > data.get("wallet").getAsLong() ? Ui.C_RED : Ui.C_INK_SOFT, false);
             y += 10;
         } else {
             Ui.scaledText(g, font, Component.translatable("rtshop.stock.view_hint").getString(), dx + 8, y, 0.8F, Ui.C_INK_SOFT, false);
@@ -273,16 +276,25 @@ public class StockScreen extends Screen {
             JsonObject c = mineHere.get(i + scroll);
             int ry = listTop + i * 12;
             boolean valid = c.get("valid").getAsBoolean();
+            boolean exposed = c.has("exposed") && c.get("exposed").getAsBoolean();
             String line = valid
                     ? Component.translatable("rtshop.stock.cert_line", String.format("%06d", c.get("no").getAsLong()), c.get("shares").getAsInt(), c.get("issued").getAsString(),
                     Ui.num(c.get("value").getAsLong())).getString()
-                    : Component.translatable("rtshop.stock.cert_invalid", String.format("%06d", c.get("no").getAsLong())).getString();
+                    : Component.translatable(exposed ? "rtshop.stock.cert_exposed" : "rtshop.stock.cert_invalid", String.format("%06d", c.get("no").getAsLong())).getString();
             if (valid && c.get("paid").getAsBoolean()) line += " ✔";
-            Ui.scaledText(g, font, Ui.clip(font, line, (int) ((dw - (trade() ? 66 : 16)) / 0.8F)), dx + 8, ry + 2, 0.8F, valid ? Ui.C_INK : Ui.C_RED, false);
+            boolean checkBtn = trade() && valid && checking();
+            Ui.scaledText(g, font, Ui.clip(font, line, (int) ((dw - (trade() ? (checkBtn ? 98 : 66) : 16)) / 0.8F)), dx + 8, ry + 2, 0.8F, valid ? Ui.C_INK : Ui.C_RED, false);
             if (trade() && valid) {
                 int sx = dx + dw - 50;
                 boolean arm = armed.equals(c.get("id").getAsString());
                 Ui.button(g, font, sx, ry, 42, 11, Component.translatable(arm ? "rtshop.stock.sell_confirm" : "rtshop.stock.sell").getString(), Ui.inside(mx, my, sx, ry, 42, 11), true);
+            }
+            if (checkBtn) {
+                // 3.76.0: 봉랍 확인 (수수료를 내고 거래소가 위조인지 살핀다)
+                int cx = dx + dw - 82;
+                boolean over = Ui.inside(mx, my, cx, ry, 30, 11);
+                Ui.button(g, font, cx, ry, 30, 11, Component.translatable("rtshop.stock.check").getString(), over, true);
+                if (over && c.has("checkFee")) checkTip = Component.translatable("rtshop.stock.check_tip", Ui.num(c.get("checkFee").getAsLong()));
             }
         }
         if (mineHere.size() > rows) {
@@ -293,6 +305,17 @@ public class StockScreen extends Screen {
         if (!msg.isEmpty() && System.currentTimeMillis() - msgAt < 6000) {
             Ui.scaledText(g, font, Ui.clip(font, msg, (int) ((dw - 16) / 0.8F)), dx + 8, ly + lh - 9, 0.8F, msgOk ? Ui.C_GREEN : Ui.C_RED, false);
         }
+    }
+
+    /** 봉랍 확인 단추 위의 설명 (render 끝에 그린다). */
+    private Component checkTip;
+
+    private boolean checking() {
+        return data != null && data.has("checking") && data.get("checking").getAsBoolean();
+    }
+
+    private boolean wanted() {
+        return data != null && data.has("wanted") && data.get("wanted").getAsBoolean();
     }
 
     private List<JsonObject> mineOf(String union) {
@@ -322,9 +345,11 @@ public class StockScreen extends Screen {
             JsonObject n = ns.get(i).getAsJsonObject();
             String text = en() && n.has("textEn") ? n.get("textEn").getAsString() : n.get("text").getAsString();
             boolean story = !n.has("kind") || n.get("kind").getAsString().equals("story");
-            String head = (story ? "✦ " : "") + n.get("date").getAsString() + " " + unionName(n.get("union").getAsString()) + " " + pct(n.get("change").getAsDouble()) + " · ";
+            boolean notice = n.has("kind") && n.get("kind").getAsString().equals("notice");
+            String head = notice ? "⚠ " + n.get("date").getAsString() + " · "
+                    : (story ? "✦ " : "") + n.get("date").getAsString() + " " + unionName(n.get("union").getAsString()) + " " + pct(n.get("change").getAsDouble()) + " · ";
             int ly = y + 4 + i * 11;
-            Ui.scaledText(g, font, head, x + 6, ly, 0.8F, unionColor(n.get("union").getAsString()), false);
+            Ui.scaledText(g, font, head, x + 6, ly, 0.8F, notice ? Ui.C_RED : unionColor(n.get("union").getAsString()), false);
             Ui.scaledText(g, font, Ui.clip(font, text, (int) ((tw - font.width(head) * 0.8F) / 0.8F)), x + 6 + font.width(head) * 0.8F, ly, 0.8F, Ui.C_INK, false);
         }
         String fund = Component.translatable("rtshop.stock.fund", Ui.num(data.get("fund").getAsLong())).getString();
@@ -392,6 +417,11 @@ public class StockScreen extends Screen {
                 JsonObject c = mineHere.get(i + scroll);
                 if (!c.get("valid").getAsBoolean()) continue;
                 int ry = listTop + i * 12;
+                if (checking() && Ui.inside(mx, my, dx + dw - 82, ry, 30, 11)) {
+                    click();
+                    ShopNet.CHANNEL.sendToServer(new StockPacket(4, "", 0, c.get("id").getAsString()));
+                    return true;
+                }
                 if (Ui.inside(mx, my, dx + dw - 50, ry, 42, 11)) {
                     String id = c.get("id").getAsString();
                     click();
@@ -442,6 +472,20 @@ public class StockScreen extends Screen {
 
     public boolean tradeForTest() {
         return trade();
+    }
+
+    /** 점검용: 내 증서 줄의 {판명되지 않은 것(진짜로 보이는 것), 위조 판명}. */
+    public int[] rowsForTest() {
+        int ok = 0, ex = 0;
+        for (JsonObject c : mine) {
+            if (c.has("exposed") && c.get("exposed").getAsBoolean()) ex++;
+            else if (c.get("valid").getAsBoolean()) ok++;
+        }
+        return new int[]{ok, ex};
+    }
+
+    public boolean checkingForTest() {
+        return checking();
     }
 
     public int mineForTest() {

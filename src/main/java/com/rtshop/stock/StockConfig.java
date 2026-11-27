@@ -82,6 +82,25 @@ public final class StockConfig {
         }
     }
 
+    /**
+     * 위조 증서와 감정 (3.76.0, ④ 히든 직업 위조자 · 조사관). 수치는 모두 0~1 의 몫.
+     * 거래소가 가짜를 통과시킬 확률 = 완성도 - exchangeEye (0.02 ~ 0.9). 드러나면 위조자에게 벌금(그날 액면가 × fineRate, 지갑 → 예금 순),
+     * 조사관이 드러냈으면 걷힌 벌금의 finderShare 를 조사관에게, 나머지는 기금으로. 같은 위조자의 가짜가 wantedWindowDays 안에 wantedAfter 번 드러나면
+     * wantedDays 동안 수배(시세판 공고 · 거래소 거래 금지).
+     */
+    public static final class Forgery {
+        public boolean enabled = true;
+        public double exchangeEye = 0.25;
+        public double checkFeeRate = 0.01;
+        public long checkFeeMin = 100;
+        public double fineRate = 0.30, finderShare = 0.5;
+        public int wantedAfter = 3, wantedWindowDays = 14, wantedDays = 7;
+        public double baseQuality = 0.50, glowInkBonus = 0.10, qualitySpread = 0.08, copyPenalty = 0.10;
+        public double inspectBase = 0.35, inspectFlawWeight = 0.6;
+    }
+
+    public final Forgery forgery = new Forgery();
+
     public boolean enabled = true;
     /** 무작위 시장 사건을 켜는가 · 하루에 일어날 확률 · 조건 사건(뇌우 · 주말)이 조건을 채웠을 때 일어날 확률. */
     public boolean events = true;
@@ -203,7 +222,7 @@ public final class StockConfig {
             if (Files.exists(f)) {
                 JsonObject o = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
                 read(c, o);
-                if (!o.has("eventList") && !Boolean.getBoolean("rtshop.selftest") && !Boolean.getBoolean("rtshop.clienttest")) {
+                if ((!o.has("eventList") || !o.has("forgery")) && !Boolean.getBoolean("rtshop.selftest") && !Boolean.getBoolean("rtshop.clienttest")) {
                     // 3.72.0 에서 만든 파일: 고친 값은 그대로 두고 새로 생긴 사건 목록을 적어 넣는다 (볼 수 있고 고칠 수 있게)
                     Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(write(c)), StandardCharsets.UTF_8);
                 }
@@ -281,6 +300,25 @@ public final class StockConfig {
                 x.textEn = n.has("textEn") ? n.get("textEn").getAsString() : x.text;
                 if (!x.text.isEmpty() && c.union(x.union) != null) c.eventList.add(x);
             }
+        }
+        if (o.has("forgery") && o.get("forgery").isJsonObject()) {
+            JsonObject g = o.getAsJsonObject("forgery");
+            Forgery f = c.forgery;
+            if (g.has("enabled")) f.enabled = g.get("enabled").getAsBoolean();
+            if (g.has("exchangeEye")) f.exchangeEye = clamp(g.get("exchangeEye").getAsDouble(), 0, 1);
+            if (g.has("checkFeeRate")) f.checkFeeRate = clamp(g.get("checkFeeRate").getAsDouble(), 0, 0.5);
+            if (g.has("checkFeeMin")) f.checkFeeMin = Math.max(0, g.get("checkFeeMin").getAsLong());
+            if (g.has("fineRate")) f.fineRate = clamp(g.get("fineRate").getAsDouble(), 0, 5);
+            if (g.has("finderShare")) f.finderShare = clamp(g.get("finderShare").getAsDouble(), 0, 1);
+            if (g.has("wantedAfter")) f.wantedAfter = Math.max(1, Math.min(100, g.get("wantedAfter").getAsInt()));
+            if (g.has("wantedWindowDays")) f.wantedWindowDays = Math.max(1, Math.min(365, g.get("wantedWindowDays").getAsInt()));
+            if (g.has("wantedDays")) f.wantedDays = Math.max(0, Math.min(365, g.get("wantedDays").getAsInt()));
+            if (g.has("baseQuality")) f.baseQuality = clamp(g.get("baseQuality").getAsDouble(), 0, 1);
+            if (g.has("glowInkBonus")) f.glowInkBonus = clamp(g.get("glowInkBonus").getAsDouble(), 0, 1);
+            if (g.has("qualitySpread")) f.qualitySpread = clamp(g.get("qualitySpread").getAsDouble(), 0, 0.5);
+            if (g.has("copyPenalty")) f.copyPenalty = clamp(g.get("copyPenalty").getAsDouble(), 0, 1);
+            if (g.has("inspectBase")) f.inspectBase = clamp(g.get("inspectBase").getAsDouble(), 0, 1);
+            if (g.has("inspectFlawWeight")) f.inspectFlawWeight = clamp(g.get("inspectFlawWeight").getAsDouble(), 0, 2);
         }
         if (o.has("news") && o.get("news").isJsonArray()) {
             c.news.clear();
@@ -362,6 +400,29 @@ public final class StockConfig {
             es.add(x);
         }
         o.add("eventList", es);
+        JsonObject g = new JsonObject();
+        Forgery f = c.forgery;
+        g.addProperty("_help", "위조 증서와 감정 (히든 직업 위조자 · 조사관): exchangeEye = 거래소의 눈 (가짜가 통과할 확률 = 완성도 - 이 값), "
+                + "checkFeeRate · checkFeeMin = 거래소의 봉랍 확인 수수료 (액면가의 몫, 최소 Gold), fineRate = 가짜가 드러나면 위조자가 내는 벌금 (액면가의 몫), "
+                + "finderShare = 조사관이 드러냈을 때 그 벌금에서 조사관이 받는 몫, wantedAfter · wantedWindowDays · wantedDays = 며칠 안에 몇 번 드러나면 며칠 동안 수배, "
+                + "baseQuality · glowInkBonus · qualitySpread · copyPenalty = 가짜의 완성도 (기본 · 발광 먹물 · 흔들림 · 가짜를 본으로 떴을 때 깎이는 몫), "
+                + "inspectBase · inspectFlawWeight = 조사관이 흠을 찾을 확률 (기본 + 직업 솜씨 + (1 - 완성도) × 이 값).");
+        g.addProperty("enabled", f.enabled);
+        g.addProperty("exchangeEye", f.exchangeEye);
+        g.addProperty("checkFeeRate", f.checkFeeRate);
+        g.addProperty("checkFeeMin", f.checkFeeMin);
+        g.addProperty("fineRate", f.fineRate);
+        g.addProperty("finderShare", f.finderShare);
+        g.addProperty("wantedAfter", f.wantedAfter);
+        g.addProperty("wantedWindowDays", f.wantedWindowDays);
+        g.addProperty("wantedDays", f.wantedDays);
+        g.addProperty("baseQuality", f.baseQuality);
+        g.addProperty("glowInkBonus", f.glowInkBonus);
+        g.addProperty("qualitySpread", f.qualitySpread);
+        g.addProperty("copyPenalty", f.copyPenalty);
+        g.addProperty("inspectBase", f.inspectBase);
+        g.addProperty("inspectFlawWeight", f.inspectFlawWeight);
+        o.add("forgery", g);
         return o;
     }
 

@@ -40,6 +40,7 @@ final class ClientSelfTest2 {
     private static volatile float[] ANVIL_ROT_364;
     private static long ANVIL_DRAWN_364;
     private static long ANVIL_ADD_375, ANVIL_SH_375;
+    private static volatile String LIFE_376;
     private static volatile long LOOK_DRAWN;
     private static volatile int npc = -1;
     static volatile int qnpc = -1;
@@ -2296,6 +2297,65 @@ final class ClientSelfTest2 {
                     && java.nio.file.Files.exists(FpsCheckClient.lastFileForTest);
             check("3.73 /fpscheck samples the render thread for a few seconds and writes a report (FPS, GPU wait, time by mod) into the game folder", ok373,
                     FpsCheckClient.lastReportForTest.size() + " lines · " + FpsCheckClient.lastFileForTest + " · " + (rep373.length() > 300 ? rep373.substring(0, 300) : rep373));
+            // 3.76 ④: 위조 증서 한 장(판명 안 됨)과 판명된 한 장을 들고 증권 창구를 연다 — 가짜는 진짜와 똑같은 줄, 판명된 것은 붉은 줄, 줄마다 [확인]
+            onServer(mc, sp -> {
+                com.rtshop.stock.Stocks.testAnywhere = true;
+                com.rtshop.stock.Stocks.testing = true;
+                com.rtshop.stock.Stocks.resetForTest(sp.server);
+                com.rtshop.stock.Stocks.advance(sp.server, 1, true);
+                com.rtshop.economy.Economy.addWallet(sp, 200_000);
+                com.rtshop.stock.Stocks.buy(sp, "fish", 10);
+                LIFE_376 = com.rtshop.job.JobData.get(sp.server).of(sp.getUUID()).life;
+                com.rtshop.job.JobData.get(sp.server).of(sp.getUUID()).life = "forger";
+                sp.getInventory().add(new ItemStack(net.minecraft.world.item.Items.PAPER, 2));
+                sp.getInventory().add(new ItemStack(net.minecraft.world.item.Items.GLOW_INK_SAC, 2));
+                sp.getInventory().add(new ItemStack(net.minecraft.world.item.Items.HONEYCOMB, 2));
+                ItemStack real376 = ItemStack.EMPTY;
+                for (ItemStack st : sp.getInventory().items) if (st.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get())) real376 = st;
+                com.rtshop.stock.Forgery.forge(sp, real376);
+                com.rtshop.stock.Forgery.forge(sp, real376);
+                com.rtshop.stock.StockData sd376 = com.rtshop.stock.StockData.get(sp.server);
+                for (ItemStack st : sp.getInventory().items) {
+                    java.util.UUID id376 = com.rtshop.item.StockCertificateItem.id(st);
+                    if (id376 != null && sd376.forged.containsKey(id376)) {
+                        com.rtshop.stock.Forgery.expose(sp.server, sd376, id376, sd376.forged.get(id376), st, null);
+                        break;
+                    }
+                }
+                com.rtshop.stock.Stocks.open(sp, true, null, null, true);
+            });
+            waitTicks(15);
+        });
+        add(mc -> {
+            int[] rows376 = mc.screen instanceof StockScreen s376 ? s376.rowsForTest() : new int[]{-1, -1};
+            boolean chk376 = mc.screen instanceof StockScreen s376b && s376b.checkingForTest() && s376b.tradeForTest();
+            if (mc.screen instanceof StockScreen s376c) s376c.selectForTest("fish");
+            check("3.76 the exchange window shows a forged certificate exactly like a real one (two clean rows), the exposed one in red, and a [Check] button for the seal check",
+                    rows376[0] == 2 && rows376[1] == 1 && chk376, java.util.Arrays.toString(rows376) + " check " + chk376);
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "134c_stock_forgery");
+            mc.setScreen(null);
+            ItemStack exp376 = ItemStack.EMPTY;
+            for (ItemStack st : mc.player.getInventory().items) if (com.rtshop.item.StockCertificateItem.exposed(st) != null) exp376 = st;
+            java.util.List<net.minecraft.network.chat.Component> tip376 = exp376.isEmpty() ? java.util.List.of()
+                    : exp376.getTooltipLines(mc.player, net.minecraft.world.item.TooltipFlag.Default.NORMAL);
+            String tips376 = tip376.stream().map(net.minecraft.network.chat.Component::getString).reduce("", (x, y) -> x + " | " + y);
+            check("3.76 an exposed forgery says so in its name and tooltip (others show nothing)", !exp376.isEmpty() && tips376.contains(net.minecraft.client.resources.language.I18n.get("item.rtshop.stock_certificate.exposed_exchange")),
+                    tips376);
+            onServer(mc, sp -> {
+                com.rtshop.job.JobData.get(sp.server).of(sp.getUUID()).life = LIFE_376 == null ? "" : LIFE_376;
+                com.rtshop.job.JobData.get(sp.server).setDirty();
+                com.rtshop.stock.Stocks.testAnywhere = false;
+                com.rtshop.stock.Stocks.testing = false;
+                com.rtshop.stock.Stocks.resetForTest(sp.server);
+                for (int i = 0; i < sp.getInventory().getContainerSize(); i++) {
+                    ItemStack st = sp.getInventory().getItem(i);
+                    if (st.is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get()) || st.is(net.minecraft.world.item.Items.PAPER) || st.is(net.minecraft.world.item.Items.GLOW_INK_SAC)
+                            || st.is(net.minecraft.world.item.Items.HONEYCOMB)) sp.getInventory().setItem(i, ItemStack.EMPTY);
+                }
+            });
             waitTicks(5);
         });
         add(mc -> {

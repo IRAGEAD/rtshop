@@ -151,6 +151,12 @@ public final class ModItems {
     public static final RegistryObject<Item> STOCK_CERTIFICATE = ITEMS.register("stock_certificate",
             () -> new StockCertificateItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
 
+    /** 히든 직업의 도구 (3.76.0): 위조 도구 꾸러미(위조자) · 감정 돋보기(조사관). 숨은 퀘스트의 보상으로만 얻는다 (상점에 없음). */
+    public static final RegistryObject<Item> FORGER_KIT = ITEMS.register("forger_kit",
+            () -> new ForgeryToolItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE), ForgeryToolItem.KIT));
+    public static final RegistryObject<Item> APPRAISAL_LOUPE = ITEMS.register("appraisal_loupe",
+            () -> new ForgeryToolItem(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE), ForgeryToolItem.LOUPE));
+
     /** 조합 시세판 (블록, 3.72.0): 우클릭하면 시세판. */
     public static final RegistryObject<Item> STOCK_BOARD = ITEMS.register("stock_board",
             () -> new net.minecraft.world.item.BlockItem(com.rtshop.enhance.ModEnhance.STOCK_BOARD.get(), new Item.Properties()) {
