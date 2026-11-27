@@ -192,6 +192,25 @@ jobs:
         run: python3 .github/scripts/fullpack.py .github/scripts/pack_files.json packcache /tmp/mods "" .github/scripts/pack_overrides.json > /dev/null
       - name: Inspect antidote items and Spell Engine
         run: bash .github/scripts/inspect_spell.sh || true
+      - name: Inspect dash / dodge HUD (3.78)
+        run: |
+          mkdir -p /tmp/inspect/dash_png
+          # 3.78 (사용자 11-28 08:31): 핫바 오른쪽의 초록 화살표 두 개 + 숫자 (Z 키, 대시 비슷한 것) 가 어느 모드인지
+          {
+            for J in packcache/*.jar; do
+              L="$(unzip -l "$J" 2>/dev/null | awk '{print $4}')"
+              for f in $(echo "$L" | grep -E "assets/[^/]+/lang/(en_us|ko_kr)\.json$"); do
+                hits="$(unzip -p "$J" "$f" 2>/dev/null | grep -o -i -E '"key[^"]*": *"[^"]*"' | grep -i -E "dash|dodge|roll|step|mover|evade|boost|leap|jump" | head -n 20)"
+                [ -n "$hits" ] && { echo "== $J $f"; echo "$hits"; }
+              done
+              t="$(echo "$L" | grep -i -E "\.png$" | grep -i -E "(gui|hud|overlay|skill)" | grep -i -E "dash|dodge|roll|stamina|step|mover|charge|arrow|sprint" | head -n 20)"
+              if [ -n "$t" ]; then
+                echo "== textures $J"; echo "$t"
+                for p in $(echo "$t" | head -n 8); do unzip -p "$J" "$p" > "/tmp/inspect/dash_png/$(basename "$J" .jar)__$(echo "$p" | tr '/' '_')" 2>/dev/null || true; done
+              fi
+            done
+          } > /tmp/inspect/dash-hud.txt 2>&1 || true
+          ls /tmp/inspect/dash_png | head -n 80 >> /tmp/inspect/dash-hud.txt || true
       - name: Inspect Diorama
         run: |
           mkdir -p /tmp/inspect
