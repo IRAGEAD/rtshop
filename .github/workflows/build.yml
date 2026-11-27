@@ -741,7 +741,7 @@ jobs:
       - name: Install Forge server
         run: |
           cd server
-          # 모드팩(RT1 - 2_7)의 Forge 버전
+          # 모드팩(RT1 - 2_11)의 Forge 버전
           FV=1.20.1-47.4.29
           echo "FORGE_VER=$FV" >> "$GITHUB_ENV"
           curl -fsSL -o installer.jar "https://maven.minecraftforge.net/net/minecraftforge/forge/$FV/forge-$FV-installer.jar"

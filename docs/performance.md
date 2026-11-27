@@ -38,7 +38,16 @@
 - 지형 생성: 바닐라 기후 표(`Climate$RTree`)와 Spelunkery(18~23%)가 대부분 → **Chunky 로 미리 만들어 두면 플레이 중에는 들지 않는다.**
 - 전용 서버(플레이어 없음): 마을 · 몹 장면 MSPT 1~2 ms (여유 많음), 시작 80초, 메모리 GC 뒤 1.3 GB.
 
-### 2-2. 4차 실행 (변형 하나씩) — 아래에 숫자
+### 2-2. 6차 실행 45982255494 (base, 화면 스레드까지)
+
+- 클라이언트 base: 마을 내장 서버 MSPT 74.9 · 날기 83.6 · 몹 88.6 (변형 비교는 7차: 6차는 crash 폴더가 없을 때 `ls` 가 2 를 돌려 base 뒤에 멈췄다).
+- **Arcane Vortex 가 바닐라 · 다른 모드 메서드 1,360 곳에 고리를 건다** (perf 결과의 "arcanevortex hooks"):
+  `Entity.isRemoved` · `LivingEntity.getAttribute` · `Entity.setDeltaMovement` · 블록 엔티티 틱(시간 정지) · 청크 불러오기/내리기 · 다른 모드의 엔티티(Iron's Spells · Cataclysm …) · DH 의 설정 모음까지.
+  → 마을 장면에서 **내장 서버 스레드의 자기 시간 14.4%**, **화면 스레드의 자기 시간 14.1%** (가장 큰 단일 모드). 부르는 곳: `getAttribute → MixinHooks.invokeReturn`, `isRemoved → MixinHooks.invoke`, `tickBlockEntities → TimeStopHooks`, `LevelRenderer → TimeStopAtlas`.
+- 화면 스레드의 다른 무게: SP Movesets 8.9% (기술 효과 클래스마다 매 틱 클라이언트 처리), Epic Fight 5.2%, Diorama 4.6% (레이더), TACZ 4.6% (모든 엔티티 그리기를 감쌈), Punchy 4.3%, RT Shop 1.3%.
+- 배경 스레드: diorama-baker 86% · Entity Culling 11%.
+
+### 2-3. 7차 실행 (변형 하나씩) — 아래에 숫자
 
 (결과를 받으면 채움)
 
