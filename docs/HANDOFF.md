@@ -192,6 +192,11 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 9. **Create 금지의 해석 확인**: 3.58.0 에서 "Create 는 던전 모드 IDAS 가 건축물에 쓰는 것이라 건축물은 그대로 두고 만들기·줍기·캐기만 막았다"고 설명하고 맞는지 물어 둠. 3.59.0 에서 사용자가 "Create 전용 아이템을 상점과 뽑기에서 삭제"를 직접 시켰으니 방향은 맞는 것으로 보이나, 던전 상자의 Create 물건에 대해서는 따로 답이 없었다.
 10. **상점 설정 되돌리기의 범위**: 지금은 상점 파일뿐. 사용자가 가격 규칙(pricing.json) · 뽑기 · 강화 같은 다른 설정도 같은 식으로 되돌리고 싶다고 하면 `ShopDefaults` 의 짜임(보관 폴더 + 기본값 견주기)을 그 설정에도 쓴다.
 
+3.69.0 의 시험 결과 (기록, 가지 v5-next22 · 실행 45959153849, 커밋 5326450 의 코드):
+- build · integration 통과. 모드팩 전체 job 은 화면 점검 단계에서 러너가 멈춰(7절의 흔들리는 단계) 취소 → 같은 코드에 성능 측정 장치 · DhViewGuard 만 더한 v5-next23 의 실행 45959911742 에서
+  모드팩 전체 서버 865개 · 화면 332개 전부 통과 (3.69.0 점검: 보호권 값 · 사망 손실 30% · 상점 창 영어 56/56 · K-1 그림 [rtshop:anvil rtshop:clover x1 loads true listed true icons 19]).
+  큰 지도 사진 134_map_npc_icons.png 에서 핀 안의 그림(검 · 물고기 · 모루 · 동전 · 책 · 밀 · 클로버)과 이름표 없음을 확인.
+
 3.68.1 의 시험 결과 (기록, 가지 v5-next21 · 실행 45948417701, 커밋 54656d3):
 - integration 서버 827개 전부 통과. 모드팩 전체: 서버 862개 · 화면 331개 전부 통과, 셰이더 사진 4/5 (7절). `diag.txt` 에 "rtshop | RT Shop | 3.68.1".
 - 새 점검 "3.68.1 breaking Better Nether blocks drops none of their items …" = [coal true tried 6 leaked [] stopped by the guard 4] — 여섯 블록 중 넷이 실제로 코드 드롭이었고 BlockDropGuard 가 막음. 같은 방법으로 캔 석탄 광석은 석탄이 나옴.
