@@ -34,6 +34,8 @@ final class ClientSelfTest2 {
 
     private static final List<Step> STEPS = new ArrayList<>();
     private static final java.util.List<Integer> LOOK_IDS = new java.util.concurrent.CopyOnWriteArrayList<>();
+    /** 3.71: 점검용 동행 NPC 의 엔티티 번호. */
+    static volatile int COMPANION_ID = -1;
     private static volatile net.minecraft.core.BlockPos ANVIL_364;
     private static volatile float[] ANVIL_ROT_364;
     private static long ANVIL_DRAWN_364;
@@ -2188,9 +2190,6 @@ final class ClientSelfTest2 {
             waitTicks(10);
         });
     }
-
-    /** 3.71: 점검용 동행 NPC 의 엔티티 번호. */
-    static int COMPANION_ID = -1;
 
     /** Epic Fight 가 이 아이템에 쓰는 렌더러 (Avalon mesh_item 이면 메쉬가 실제로 읽혔는지도). */
     static String efRendererInfo(net.minecraft.world.item.ItemStack st) {
