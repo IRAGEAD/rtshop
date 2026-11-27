@@ -552,6 +552,8 @@ jobs:
       - name: Server performance (real terrain)
         run: |
           cd server
+          # 모드팩의 dhcompat(overrides, CI 에서는 받을 수 없음) 없이 Distant Horizons 3.3.3 + Chunky 를 함께 켜면 첫 청크에서 튕긴다 ("Chunky is not loaded") → 측정에서는 Chunky 를 뺀다
+          mkdir -p ../offmods && mv mods/Chunky*.jar ../offmods/ 2>/dev/null || true
           printf 'online-mode=false\nspawn-protection=0\nlevel-name=perfworld\nlevel-seed=20261127\nmax-tick-time=-1\nview-distance=8\nsimulation-distance=6\ndifficulty=easy\n' > server.properties
           echo "-Xmx10G -Drtshop.perftest=true -XX:StartFlightRecording=filename=perf-server.jfr,settings=profile,dumponexit=true" > user_jvm_args.txt
           START=$(date +%s)
@@ -564,6 +566,7 @@ jobs:
           sleep 20; pkill -x java || true; sleep 5
           echo "startup: $(grep -o 'Done ([0-9.]*s)' perf-server.log | head -n 1)"
           cat rtshop-perf-server.txt || tail -n 40 perf-server.log
+          for f in crash-reports/*.txt; do [ -f "$f" ] && grep -E "^Description:|Caused by|Exception|^\tat (com|net|org|dev)\.[a-z]" "$f" | grep -v "at net.minecraft" | head -n 20; done
           python3 ../.github/scripts/perf_report.py perf-server.jfr mods rtshop-perf-server.txt > perf-server-report.txt 2>&1 || true
           head -n 160 perf-server-report.txt | cut -c1-400
       - name: Client performance (singleplayer, real terrain)
@@ -587,6 +590,25 @@ jobs:
           python3 .github/scripts/perf_report.py client/perf-client.jfr client/mods client/rtshop-perf-client.txt > perf-client-report.txt 2>&1 || true
           head -n 160 perf-client-report.txt | cut -c1-400
           cp client/logs/latest.log client/logs/perf.log 2>/dev/null || true
+      - name: Client performance, lean variant (no ArcaneVortex, no Farsight)
+        if: always()
+        run: |
+          # 같은 장면을 ArcaneVortex(모든 물건이 RT Shop 규칙으로 막혀 있음) · Farsight(DH 와 겹침) 없이 한 번 더 (같은 세계 사본)
+          (cd /tmp && rm -rf djq && mkdir djq && cd djq && unzip -q -o "$GITHUB_WORKSPACE/$(ls $GITHUB_WORKSPACE/packcache/*.jar | grep -i diorama | head -n 1 | sed "s#$GITHUB_WORKSPACE/##")" 'dev/diorama/Settings*' && javap -p -c -constants 'dev/diorama/Settings$Quality.class' | grep -E "public static final|ldc" | head -n 30; javap -p -c -constants dev/diorama/Settings.class | grep -E "ldc.*(json|toml|cfg|properties|quality)" | head -n 20) || true
+          mkdir -p offclient && mv client/mods/ArcaneVortex*.jar client/mods/*arsight*.jar offclient/ 2>/dev/null || true
+          ls offclient
+          rm -rf client/saves/rtshoptest && cp -r server/perfworld client/saves/rtshoptest && rm -f client/saves/rtshoptest/session.lock
+          cp client/rtshop-perf-client.txt client/rtshop-perf-client-base.txt 2>/dev/null || true
+          (sleep 1500; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
+          (timeout -k 20 1400 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx9G -Drtshop.clienttest=true -Drtshop.clienttest.only=perf -XX:StartFlightRecording=filename=$PWD/client/perf-client-lean.jfr,settings=profile,dumponexit=true" --resolution 1280x720 > client-perf-lean.log 2>&1) || echo "client exit code $?"
+          pkill -9 -f "rtshop.clienttest" || true
+          pkill -f "sleep 1500" || true
+          cp client/rtshop-perf-client.txt client/rtshop-perf-client-lean.txt 2>/dev/null || true
+          cp client/rtshop-perf-client-base.txt client/rtshop-perf-client.txt 2>/dev/null || true
+          cat client/rtshop-perf-client-lean.txt 2>/dev/null || echo "no lean result"
+          python3 .github/scripts/perf_report.py client/perf-client-lean.jfr client/mods client/rtshop-perf-client-lean.txt > perf-client-lean-report.txt 2>&1 || true
+          head -n 60 perf-client-lean-report.txt | cut -c1-400
+          mv offclient/* client/mods/ 2>/dev/null || true
       - name: Distant Horizons near-chunk gap (dedicated server + client)
         if: always()
         run: |
@@ -607,7 +629,9 @@ jobs:
         if: always()
         run: |
           mkdir -p /tmp/perf
-          cp server/rtshop-perf-server.txt perf-server-report.txt client/rtshop-perf-client.txt perf-client-report.txt client/rtshop-dh-client.txt client/rtshop-dh-notes.txt /tmp/perf/ 2>/dev/null || true
+          cp server/rtshop-perf-server.txt perf-server-report.txt client/rtshop-perf-client.txt perf-client-report.txt client/rtshop-perf-client-lean.txt perf-client-lean-report.txt client/rtshop-dh-client.txt client/rtshop-dh-notes.txt /tmp/perf/ 2>/dev/null || true
+          mkdir -p /tmp/perf/crash && cp server/crash-reports/*.txt client/crash-reports/*.txt /tmp/perf/crash/ 2>/dev/null || true
+          cp server/dh-server.log /tmp/perf/ 2>/dev/null || true
           cp server/perf-server.log /tmp/perf/ 2>/dev/null || true
           cp client/screenshots/16*.png client/screenshots/17*.png /tmp/perf/ 2>/dev/null || true
           grep -iE "rtshop-perf|rtshop-dh|exception|error" client/logs/perf.log 2>/dev/null | cut -c1-300 | head -n 200 > /tmp/perf/client-perf-log.txt || true

@@ -153,7 +153,7 @@ for ph in order:
     for g in ('server', 'render', 'worldgen', 'dh', 'other'):
         key = (ph, g)
         n = total[key]
-        if n < 50:
+        if n < (15 if g == 'render' else 50):
             continue
         print('=== phase %s · %s thread(s) · %d samples' % (ph, g, n))
         mods = [(o, c) for o, c in incl[key].most_common() if o not in BASE]
