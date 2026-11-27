@@ -365,6 +365,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 - **결계** (`seals.json`): 앞선 퀘스트를 끝내지 않은 사람은 이야기 보스에게 다가가면 밀려나고, 서로 피해를 줄 수 없고, 제단·묘비·봉인의 문이 작동하지 않습니다. 자격이 있는 파티원이 가까이 있으면 함께 지나갑니다. 주간 레이드 경기장은 예외입니다.
 - **보스 구조물 희소화** (`structures.json`): 보스 모드의 구조물 간격을 늘린 데이터팩을 자동으로 만들어 얹습니다 (Cataclysm 1.8배, Mowzie's 1.6배, Aquamirae 1.4배). 새로 만들어지는 땅에만 적용됩니다.
 - **연출** (`story.json`): 장 제목·꿈(환영)·대사 장면, 보스마다 다른 등장 연출(약 4초 무적), 보스가 떨어뜨린 물건의 이야기(툴팁).
+  보스 등장 장면은 조작 설정의 **"연출 건너뛰기"(기본 Enter)** 로 건너뜁니다 (3.71, 화면 아래 띠에 안내).
 - 장비 상인의 희귀 장비는 1장, 서사 장비는 2장을 마치면 살 수 있습니다. 이야기 보스 근처에서 죽으면 Gold 를 잃지 않습니다.
 - **토벌 의뢰판** (`/bounty`, `hunts.json`): 매일 3개·매주 1개 의뢰가 저절로 걸리고, 다 잡으면 바로 Gold. 깨어 둔 장에 따라 몹이 늘어납니다. 전투 직업이 있으면 +20%.
 - **몹 도감** (`/bestiary`): 처음 잡은 몹을 기록하고, 장별 목록을 다 채우면 보상 (3,000~20,000 G).
@@ -407,6 +408,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 | `restaurant.json` | 식당 주인: 판매 보너스, 팔 수 있는 직업, 식품 상인의 요리 판매 여부 |
 | `abyss.json` | Spiral Abyss 주간 보상: 층별 보상·확률·Gold (게임 안 `/rtshop abyss edit`) |
 | `raid.json` | 주간 레이드: 보스·배율·조건·문구·보상·구역 위치 (게임 안 `/rtshop raid edit`) |
+| `petitions.json` | 민원 (3.71): 글자 수 `maxLength`(20~1000) · 처리 전 건수 `maxOpen` · 다음 접수까지 초 `cooldownSeconds` · 남겨 두는 종결 건수 `keepClosed` · 시청 서기 곁으로 치는 거리 `clerkRange` · 운영자 알림 `notifyOps` (`/rtshop report reload`) |
 
 수정 후 `/rtshop reload` 로 적용합니다. `farming.json` 은 클라이언트에도 같은 내용을 넣어야 아이템 설명이 맞게 나옵니다.
 
@@ -425,6 +427,8 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 | `/rtshop abyss edit` · `abyss reset\|clear ...` | OP | Spiral Abyss 주간 보상 편집기 · 기록 관리 |
 | `/rtshop land` | 모두 | 토지 설정 화면 |
 | `/rtshop quest` | 모두 | 퀘스트 수첩 |
+| `/rtshop report` · `report write\|list\|cancel <번호>` | 모두 | 민원 창 (시청 서기 하루 곁에서 쓰기, 어디서나 내 민원 보기) · 쓰기 · 내 민원 · 취소 |
+| `/rtshop report admin` · `report all\|answer\|close\|delete\|tp ...` · `report reload` | OP | 민원 운영 창 (모든 민원을 상태 · 분류로 걸러 답변 · 종결 · 이동 · 삭제, 3.71) · 같은 일을 명령으로 · 민원 설정 다시 읽기 |
 | `/rtshop attendance` | 모두 | 출석부 보기 (출석은 출석 NPC 앞에서) |
 | `/rtshop gacha` · `/rtshop gacha edit` | 모두 · OP | 뽑기 창 보기 (뽑기는 뽑기 상인 앞에서) · 뽑기 편집기 |
 | `/rtshop attendance edit` | OP | 출석 보상 편집기 |
