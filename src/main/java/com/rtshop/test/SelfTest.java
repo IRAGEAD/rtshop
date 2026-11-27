@@ -144,6 +144,43 @@ public final class SelfTest {
      * 3.72: 조합 증서 (주식) — 시세(실적 · 소식 · 하루 한도), 사기 · 되팔기(수수료는 기금으로), 장부에 없는 복사본, 배당(기금에서만, 지난주부터 가진 증서, 도장),
      * 죽어도 떨어지지 않음, 창 내용, 은행원의 [증권 거래], 명령.
      */
+    /** 대화 상자에 보이는 주제 id 들. */
+    private static List<String> topicIds375(ServerPlayer p, String npc) {
+        List<String> out = new ArrayList<>();
+        for (com.google.gson.JsonElement e : com.rtshop.story.Dialogue.buildForTest(p, npc).getAsJsonArray("topics")) out.add(e.getAsJsonObject().get("id").getAsString());
+        return out;
+    }
+
+    /** 3.75.0: 기능 바꾸기 (사용자 메모 W-*) 중 서버 쪽 */
+    private static void v375(MinecraftServer server, FakePlayer a) {
+        // W-25: 다른 NPC 에 대해 묻는 주제는 그 NPC 와 이야기한 뒤, 무엇에 대해 묻는 주제는 그 이야기를 들은 뒤
+        QuestManager.reset(a);
+        a.getPersistentData().remove("rtshop_chats");
+        com.rtshop.story.Dialogue.testMet = false;
+        QuestManager.setFlag(a, "order_apprentice", true);
+        boolean roranHidden = !topicIds375(a, "quest_order_archivist").contains("habit_roran");
+        QuestManager.setFlag(a, com.rtshop.story.Dialogue.metFlag("quest_order_captain"), true);
+        boolean roranShown = topicIds375(a, "quest_order_archivist").contains("habit_roran");
+        boolean sevenHidden = !topicIds375(a, "quest_order_archivist").contains("seven");
+        com.rtshop.story.Dialogue.read(a, "quest_order_elder", "order");   // 장로의 「잿불 수도회에 대해」 에 일곱 왕 이야기가 나온다
+        boolean sevenHeard = QuestManager.hasFlag(a, com.rtshop.story.Dialogue.heardFlag("seven_kings"));
+        boolean sevenShown = topicIds375(a, "quest_order_archivist").contains("seven");
+        // 예전부터 하던 사람: 그 낱말이 나오는 퀘스트를 끝냈으면 들은 것으로
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "order_apprentice", true);
+        QuestManager.forceComplete(a, "story_0_02b");
+        boolean oldSave = topicIds375(a, "quest_order_archivist").contains("seven") && topicIds375(a, "quest_order_elder").contains("ember");
+        // 하루(시청 서기)와 이야기한 적이 있으면(일상 이야기) 모리스의 「서기 하루 씨」
+        boolean haruHidden = !topicIds375(a, "quest_guide").contains("habit_haru");
+        com.rtshop.story.Dialogue.chatted(a, "attendance");
+        boolean haruShown = topicIds375(a, "quest_guide").contains("habit_haru");
+        check("3.75 dialogue topics about another NPC open after talking to that NPC once, topics about something after hearing of it (the Seven Kings); older saves count finished quests",
+                roranHidden && roranShown && sevenHidden && sevenHeard && sevenShown && oldSave && haruHidden && haruShown,
+                roranHidden + " " + roranShown + " " + sevenHidden + " " + sevenHeard + " " + sevenShown + " " + oldSave + " " + haruHidden + " " + haruShown);
+        a.getPersistentData().remove("rtshop_chats");
+        QuestManager.reset(a);
+    }
+
     /** 3.74.0: 화면 · 문구 · 퀘스트 표시 (사용자 메모 W-*) 중 서버 쪽 */
     private static void v374(MinecraftServer server, FakePlayer a) {
         // W-15: 식품 상인은 농작물 상인이 다루는 품목을 올리지 않는다 (직접 적은 것 · 자동 규칙 모두). 빈 구분 탭은 없다
@@ -4576,6 +4613,7 @@ public final class SelfTest {
                         && a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "perfcheck")) != null,
                 rt373 + " " + pr373.self + " " + pr373.incl);
         v374(a.server, a);
+        v375(a.server, a);
         // 3.62: 보스마다 다른 카메라 방식 / Cinematic Cataclysm 컷신으로 깨우기 (그 모드가 있을 때만)
         boolean cc362 = net.minecraftforge.fml.ModList.get().isLoaded("cinematiccataclysm");
         String ccTrace = "";

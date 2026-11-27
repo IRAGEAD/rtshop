@@ -127,7 +127,91 @@ public final class Dialogue {
         if (n.has("quests")) for (JsonElement e : n.getAsJsonArray("quests")) if (!QuestManager.isCompleted(p, e.getAsString())) return false;
         if (n.has("notQuests")) for (JsonElement e : n.getAsJsonArray("notQuests")) if (QuestManager.isCompleted(p, e.getAsString())) return false;
         if (n.has("items")) for (JsonElement e : n.getAsJsonArray("items")) if (!carries(p, e.getAsString())) return false;
+        // 3.75.0 (사용자 W-25): 다른 NPC 에 대해 묻는 것은 그 NPC 와 한 번 이야기한 뒤에, 무엇에 대해 묻는 것은 그 이야기를 들은 뒤에
+        if (n.has("met")) for (JsonElement e : n.getAsJsonArray("met")) if (!met(p, e.getAsString())) return false;
+        if (n.has("heard")) for (JsonElement e : n.getAsJsonArray("heard")) if (!heard(p, e.getAsString())) return false;
         return true;
+    }
+
+    public static String metFlag(String npc) {
+        return "met_" + npc;
+    }
+
+    public static String heardFlag(String term) {
+        return "heard_" + term;
+    }
+
+    /**
+     * 이 NPC 와 한 번이라도 이야기했는가: 대화 상자를 연 적이 있거나(3.75.0 부터 적어 둔다), 일상 이야기를 나눴거나,
+     * 그 NPC 의 퀘스트를 끝냈다 (그 전부터 하던 사람도 다시 말을 걸지 않아도 되게).
+     */
+    public static boolean met(ServerPlayer p, String npc) {
+        if (npc == null || npc.isEmpty()) return true;
+        if (npc.contains("|")) {
+            for (String one : npc.split("\\|")) if (!one.isBlank() && met(p, one.trim())) return true;   // 같은 사람의 여러 이름 (상인 · 이야기 NPC)
+            return false;
+        }
+        if (QuestManager.hasFlag(p, metFlag(npc)) || chats(p, npc) > 0) return true;
+        for (QuestDef q : QuestManager.loaded().quests.values()) {
+            if ((npc.equals(q.giver) || npc.equals(q.turnInNpc())) && QuestManager.isCompleted(p, q.id)) return true;
+        }
+        return false;
+    }
+
+    /** 그 이야기(terms 의 낱말)를 들었는가: 들은 표시가 있거나, 그 낱말이 나오는 퀘스트(terms.quests)를 끝냈다. */
+    public static boolean heard(ServerPlayer p, String term) {
+        if (QuestManager.hasFlag(p, heardFlag(term))) return true;
+        JsonObject t = terms().has(term) && terms().get(term).isJsonObject() ? terms().getAsJsonObject(term) : null;
+        if (t == null) return true;   // 정의가 없는 낱말로 막지는 않는다
+        if (t.has("quests")) for (JsonElement e : t.getAsJsonArray("quests")) if (QuestManager.isCompleted(p, e.getAsString())) return true;
+        return false;
+    }
+
+    /** dialogue.json 의 "terms": 낱말 id → {words: [글에 나오는 말], quests: [그 말이 나오는 퀘스트]} */
+    static JsonObject terms() {
+        JsonObject all = get();
+        return all.has("terms") && all.get("terms").isJsonObject() ? all.getAsJsonObject("terms") : new JsonObject();
+    }
+
+    /** 플레이어가 본 글에서 낱말을 찾아 「들었다」 표시를 남긴다 (원문 · 영어 둘 다 본다). 새로 들은 수. */
+    public static int hear(ServerPlayer p, JsonElement shown) {
+        if (shown == null || shown.isJsonNull()) return 0;
+        StringBuilder all = new StringBuilder();
+        gather(shown, all);
+        String text = all.toString();
+        if (text.isEmpty()) return 0;
+        int n = 0;
+        for (java.util.Map.Entry<String, JsonElement> e : terms().entrySet()) {
+            if (!e.getValue().isJsonObject() || QuestManager.hasFlag(p, heardFlag(e.getKey()))) continue;
+            JsonObject t = e.getValue().getAsJsonObject();
+            if (!t.has("words")) continue;
+            for (JsonElement w : t.getAsJsonArray("words")) {
+                if (!w.getAsString().isEmpty() && text.contains(w.getAsString())) {
+                    QuestManager.setFlag(p, heardFlag(e.getKey()), true);
+                    n++;
+                    break;
+                }
+            }
+        }
+        return n;
+    }
+
+    public static int hear(ServerPlayer p, String shown) {
+        return shown == null ? 0 : hear(p, new com.google.gson.JsonPrimitive(shown));
+    }
+
+    private static void gather(JsonElement e, StringBuilder out) {
+        if (e == null || e.isJsonNull()) return;
+        if (e.isJsonPrimitive()) {
+            out.append(e.getAsString()).append('\n');
+        } else if (e.isJsonArray()) {
+            for (JsonElement x : e.getAsJsonArray()) gather(x, out);
+        } else if (e.isJsonObject()) {
+            for (java.util.Map.Entry<String, JsonElement> x : e.getAsJsonObject().entrySet()) {
+                if (x.getKey().equals("need") || x.getKey().equals("id") || x.getKey().equals("once") || x.getKey().equals("chance")) continue;
+                gather(x.getValue(), out);
+            }
+        }
     }
 
     /** 이 물건을 지니고 있는가 (가방·양손·갑옷). */
@@ -259,6 +343,9 @@ public final class Dialogue {
         ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new StoryPacket(StoryPacket.DIALOGUE, StoryText.json(p, out).toString()));
     }
 
+    /** 점검용: buildForTest 로 연 대화도 「이야기했다」 로 친다. */
+    public static boolean testMet;
+
     public static JsonObject buildForTest(ServerPlayer p, String npcKey) {
         return build(p, npcKey, -1);
     }
@@ -279,6 +366,8 @@ public final class Dialogue {
             out.addProperty("mode", "talk");
         }
         String greet = greet(p, npcKey, n, scene == null);
+        if (entityId != -1 || testMet) QuestManager.setFlag(p, metFlag(npcKey), true);   // 3.75.0: 이 NPC 와 이야기했다
+        hear(p, greet);
         // 3.64: 서버가 제 언어로 풀어 보내던 글(서버의 언어는 플레이어의 언어와 다를 수 있다)을 그 사람의 이야기 언어로 고른다
         if (greet.isEmpty()) greet = StoryText.pick(p, "무슨 일이세요?", "What can I do for you?");
         out.addProperty("greet", greet);
@@ -405,6 +494,8 @@ public final class Dialogue {
         Entity e = p.level().getEntity(entityId);
         String key = e == null ? null : QuestManager.npcKey(e);
         if (key == null || !near(p, e)) return;
+        hear(p, pendingScene(p, key));   // 3.75.0: 장면에서 들은 이야기
+        QuestManager.setFlag(p, metFlag(key), true);
         QuestManager.onTalk(p, key, true);
         QuestManager.openDialog(p, key, entityId);
     }
@@ -412,6 +503,17 @@ public final class Dialogue {
     public static void read(ServerPlayer p, String npc, String topic) {
         if (topic.startsWith("_")) return;
         QuestManager.setFlag(p, readFlag(npc, topic), true);
+        try {
+            JsonObject all = get();
+            JsonObject n = all.has("npcs") && all.getAsJsonObject("npcs").has(npc) ? all.getAsJsonObject("npcs").getAsJsonObject(npc) : null;
+            if (n != null && n.has("topics")) {
+                for (JsonElement e : n.getAsJsonArray("topics")) {
+                    JsonObject x = e.getAsJsonObject();
+                    if (topic.equals(x.get("id").getAsString())) hear(p, x.get("lines"));
+                }
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     public static boolean openFor(ServerPlayer p, int entityId) {

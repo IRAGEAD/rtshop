@@ -1,7 +1,39 @@
 {
- "version": 18,
- "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), chatter: 일상 이야기 (무작위 한 마디), topics: 이야기 주제 (need: flags·notFlags·quests 조건). 문장은 \"이름: 대사\" 로 말하는 사람을 바꿀 수 있고, {\"ko\": \"...\", \"en\": \"...\"} 로 두 언어를 적을 수 있습니다. 직접 고쳤다면 \"edited\": true 로 두세요 (모드 업데이트 때 덮어쓰지 않습니다).",
+ "version": 19,
+ "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), chatter: 일상 이야기 (무작위 한 마디), topics: 이야기 주제 (need: flags·notFlags·quests·items 조건, 3.75 부터 met: 그 NPC 와 이야기한 뒤 · heard: terms 의 낱말을 들은 뒤). 문장은 \"이름: 대사\" 로 말하는 사람을 바꿀 수 있고, {\"ko\": \"...\", \"en\": \"...\"} 로 두 언어를 적을 수 있습니다. 직접 고쳤다면 \"edited\": true 로 두세요 (모드 업데이트 때 덮어쓰지 않습니다).",
  "edited": false,
+ "terms": {
+  "_help": "3.75.0: 무엇에 대해 묻는 주제(need.heard)는 그 낱말(words)이 나오는 글을 본 뒤에, 또는 그 낱말이 나오는 퀘스트(quests)를 끝낸 뒤에 열린다. need.met 은 그 NPC 와 한 번 이야기한 뒤 (a|b = 같은 사람의 여러 이름).",
+  "seven_kings": {
+   "words": [
+    "일곱 왕",
+    "Seven Kings",
+    "seven kings"
+   ],
+   "quests": [
+    "story_0_02b"
+   ]
+  },
+  "ashen_chronicle": {
+   "words": [
+    "잿빛 연대기",
+    "Ashen Chronicle"
+   ],
+   "quests": [
+    "story_1_01"
+   ]
+  },
+  "undying_ember": {
+   "words": [
+    "꺼지지 않는 불씨",
+    "Undying Ember",
+    "undying ember"
+   ],
+   "quests": [
+    "story_0_02b"
+   ]
+  }
+ },
  "npcs": {
   "quest_order_elder": {
    "greet": [
@@ -95,6 +127,9 @@
      "need": {
       "flags": [
        "order_apprentice"
+      ],
+      "heard": [
+       "ashen_chronicle"
       ]
      }
     },
@@ -109,6 +144,9 @@
      "need": {
       "flags": [
        "order_apprentice"
+      ],
+      "heard": [
+       "undying_ember"
       ]
      }
     },
@@ -281,6 +319,9 @@
      "need": {
       "flags": [
        "order_apprentice"
+      ],
+      "heard": [
+       "seven_kings"
       ]
      }
     },
@@ -781,6 +822,9 @@
      "need": {
       "flags": [
        "order_apprentice"
+      ],
+      "met": [
+       "quest_order_captain"
       ]
      }
     },
@@ -797,6 +841,9 @@
       ],
       "notFlags": [
        "erwin_betrayal"
+      ],
+      "met": [
+       "quest_order_elder"
       ]
      }
     },
@@ -1056,6 +1103,9 @@
      "need": {
       "flags": [
        "order_apprentice"
+      ],
+      "met": [
+       "quest_order_archivist"
       ]
      }
     },
@@ -1072,6 +1122,9 @@
       ],
       "notFlags": [
        "story_ch3_done"
+      ],
+      "met": [
+       "shop_fisher|quest_oscar"
       ]
      }
     }
@@ -1120,6 +1173,9 @@
      "need": {
       "flags": [
        "order_apprentice"
+      ],
+      "met": [
+       "attendance"
       ]
      }
     }
@@ -1338,6 +1394,9 @@
      "need": {
       "flags": [
        "order_apprentice"
+      ],
+      "met": [
+       "shop_blacksmith|quest_bram"
       ]
      }
     },
@@ -1520,6 +1579,9 @@
       ],
       "notFlags": [
        "erwin_betrayal"
+      ],
+      "met": [
+       "quest_order_elder"
       ]
      }
     },
@@ -1533,6 +1595,9 @@
      "need": {
       "flags": [
        "ch1_three_ends"
+      ],
+      "met": [
+       "quest_felix"
       ]
      }
     }
@@ -2057,6 +2122,9 @@
      "need": {
       "flags": [
        "erwin_betrayal"
+      ],
+      "met": [
+       "quest_order_elder"
       ]
      }
     }

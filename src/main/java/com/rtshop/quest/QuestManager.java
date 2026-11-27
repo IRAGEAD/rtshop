@@ -1317,6 +1317,7 @@ public final class QuestManager {
         }
         pr.active.put(q.id, new int[q.objectives.size()]);
         QuestData.get(p.server).dirty();
+        com.rtshop.story.Dialogue.hear(p, q.intro);   // 3.75.0 (W-25): 퀘스트 글에서 들은 이야기
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.accepted", com.rtshop.story.StoryText.t(p, q.title)));
         com.rtshop.story.StagedStructures.scan(p); // 이 퀘스트가 가리키는 이야기 건축물이 새 지형에 생기기 시작한다
         scene(p, q.sceneAccept);
@@ -1422,6 +1423,7 @@ public final class QuestManager {
         pr.active.remove(q.id);
         pr.completed.add(q.id);
         pr.flags.addAll(q.rewardFlags);
+        com.rtshop.story.Dialogue.hear(p, q.done);   // 3.75.0 (W-25): 마치며 들은 이야기
         try {
             com.rtshop.stock.Stocks.onQuestDone(p, q.id);   // 이야기 소식 → 조합 시세 (3.72)
         } catch (Throwable t) {
