@@ -220,6 +220,18 @@ jobs:
             done) > /tmp/inspect/diorama-radar.txt 2>&1
             (cd /tmp/dj && javap -p dev/diorama/MinimapHud.class 2>&1 | head -n 200) >> /tmp/inspect/diorama-radar.txt 2>&1
           fi
+      - name: Inspect Distant Horizons and Chunky (3.70.0)
+        run: |
+          mkdir -p /tmp/inspect
+          # DH 3.3.3 + Chunky 를 dhcompat 없이 켜면 첫 청크에서 "Chunky is not loaded" 로 튕긴다: DH 가 Chunky 를 묶는 곳과 Chunky 가 자신을 알리는 때
+          DH="$(ls packcache/*.jar | grep -i "distanthorizons" | head -n 1)"; CK="$(ls packcache/*.jar | grep -i "^packcache/chunky" | head -n 1)"
+          {
+            echo "DH: $DH"; echo "Chunky: $CK"
+            if [ -n "$DH" ]; then rm -rf /tmp/dhj && mkdir -p /tmp/dhj && (cd /tmp/dhj && unzip -q -o "$GITHUB_WORKSPACE/$DH" 'com/seibel/distanthorizons/forge/wrappers/modAccessor/*' 'com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/*' 2>/dev/null; \
+              for c in com/seibel/distanthorizons/forge/wrappers/modAccessor/ChunkyAccessor com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/AbstractChunkyAccessor; do echo "######## $c"; javap -p -c "$c.class" 2>&1 | head -n 400; done); fi
+            if [ -n "$CK" ]; then rm -rf /tmp/ckj && mkdir -p /tmp/ckj && (cd /tmp/ckj && unzip -q -o "$GITHUB_WORKSPACE/$CK" && echo "== classes" && find . -name "*.class" | grep -iE "provider|forge|chunky\.class" | head -n 40; \
+              for c in org/popcraft/chunky/ChunkyProvider $(find . -name "ChunkyForge*.class" | sed 's#^\./##; s#\.class$##' | head -n 3); do echo "######## $c"; javap -p -c "$c.class" 2>&1 | head -n 300; done); fi
+          } > /tmp/inspect/dh-chunky.txt 2>&1 || true
       - name: Inspect Diorama waypoint icons
         run: |
           mkdir -p /tmp/inspect
