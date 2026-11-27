@@ -387,10 +387,8 @@ public final class EnhancePanel {
             help(g, font, x + 16, oy + 4, w - 32, y + h - 14, "rtshop.enhance.max_note");
             return;
         }
-        // 확률: 성공은 크게, 나머지 셋은 작게 (하급 보호권은 목표 +lesserGuardMax 까지만 쓰인다, 실패 누적이 있으면 성공이 오른다)
-        ItemStack ticketOnAnvil = menu.guardStack();
-        boolean lesserIdle = Enhance.lesser(ticketOnAnvil) && cur + 1 > cfg.lesserGuardMax;
-        Enhance.Guard guard = Enhance.guardFor(player, ticketOnAnvil, cur + 1, cfg);
+        // 확률: 성공은 크게, 나머지 셋은 작게 (실패 누적이 있으면 성공이 올라 있다: Enhance.levelFor)
+        Enhance.Guard guard = Enhance.guardFor(player, menu.guardStack());
         int mask = Enhance.maskOf(guard);
         boolean safe = Enhance.unbreakable(cfg, eq);
         l = Enhance.levelFor(cfg, l, eq);
@@ -445,14 +443,11 @@ public final class EnhancePanel {
         plate(g, gx, my0, gw, size);
         boolean guarded = guard != Enhance.Guard.NONE;
         String g1 = Component.translatable("rtshop.enhui.guard").getString();
-        String g2 = guarded ? Enhance.guardName(mask).getString()
-                : lesserIdle ? Component.translatable("rtshop.enhui.guard_lesser_idle", cfg.lesserGuardMax).getString()
-                : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : safe ? "rtshop.enhui.guard_safe" : "rtshop.enhui.guard_none").getString();
+        String g2 = guarded ? Enhance.guardName(mask).getString() : Component.translatable(l.destroy > 0 ? "rtshop.enhui.guard_risk" : safe ? "rtshop.enhui.guard_safe" : "rtshop.enhui.guard_none").getString();
         fit(g, font, g1, gx + 5, my0 + 4, gw - 10, 1F, C_PLATE_INK, 0, false, true);
-        fit(g, font, g2, gx + 5, my0 + 14, gw - 10, 1F, guarded ? 0xFF1F6F8B : lesserIdle || l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, 0, false, false);
+        fit(g, font, g2, gx + 5, my0 + 14, gw - 10, 1F, guarded ? 0xFF1F6F8B : l.destroy > 0 ? C_BAD_PLATE : C_PLATE_SOFT, 0, false, false);
         if (over(gx, my0, gw, size)) {
             tip = guarded ? Component.translatable("rtshop.enhance.guard_active", Enhance.guardName(mask))
-                    : lesserIdle ? Component.translatable("rtshop.enhance.lesser_idle", cfg.lesserGuardMax)
                     : Component.translatable(l.destroy > 0 ? "rtshop.enhance.destroy_warn" : safe ? "rtshop.enhance.safe_note" : "rtshop.enhance.no_guard");
         }
         // 맨 아래 한마디: 누르면 강화 / 무엇이 모자란지

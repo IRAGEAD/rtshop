@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public final class EnhanceConfig {
     public static final int MAX_LEVEL = 11;
-    /** 3 (3.66.0): 성공률 조금 ↑ · +8~+11 Gold ↓ · 높은 단계 보너스 ↑ · 실패 누적 · 하급 보호권. 기본값 그대로인 곳만 새 값으로. */
+    /** 3 (3.66.0): 성공률 조금 ↑ · +8~+11 Gold ↓ · 높은 단계 보너스 ↑ · 실패 누적. 기본값 그대로인 곳만 새 값으로. */
     public static final int CONFIG_VERSION = 3;
     /** 1판 기본 확률 (그대로면 2판 확률로 바꾼다). */
     private static final double[][] OLD_ODDS = {{}, {90, 9, 1, 0}, {83, 9, 8, 0}, {75, 8.5, 16.5, 0}, {66, 8, 23, 3}, {56, 7.5, 28.5, 8},
@@ -68,8 +68,6 @@ public final class EnhanceConfig {
     /** 실패 누적(3.66.0): 실패할 때마다 다음 성공률이 그 단계 성공률의 이 % 만큼 오른다 (최대 failStackMax 번, 성공하면 처음으로). 0 = 끔. */
     public double failBonusPct = 10;
     public int failStackMax = 5;
-    /** 하급 보호권(3.66.0)이 쓰이는 가장 높은 목표 단계. */
-    public int lesserGuardMax = 6;
     /** 이 단계부터 방어구에 방어 강도(toughness)가 단계마다 이만큼 붙는다. */
     public int toughnessFrom = 6;
     public double toughnessPerLevel = 0.5;
@@ -114,7 +112,7 @@ public final class EnhanceConfig {
         // 확률: 성공·유지는 단계가 오를수록 내려가고, 손상·파괴는 올라간다. +4 부터 파괴 가능
         // 2판: +4 부터 성공률을 크게 낮추고 유지 비중을 높였다. +4 부터 파괴 가능
         // 3판(3.66.0, 사용자 요청 "강화 비용이 너무 비싸다"): 성공률을 유지에서 옮겨 조금 올리고(+2~+8 은 1, +9~+11 은 8/5/3 → 10/7/5),
-        // +8~+11 의 Gold 를 내리고(16,000/25,000/40,000/65,000 → 12,000/16,000/22,000/30,000), 실패 누적(failBonusPct)을 더함
+        // +8~+11 의 Gold 를 내리고(16,000/25,000/40,000/65,000 → 14,000/19,000/26,000/36,000: 11:50 "살짝 인상" 반영), 실패 누적(failBonusPct)을 더함
         levels[1] = lv(1, 90, 10, 0, 0, 300, "#gem_common", 1, "spelunkery:salt", 2);
         levels[2] = lv(2, 83, 14, 3, 0, 600, "#gem_common", 2, "spelunkery:salt", 3);
         levels[3] = lv(3, 73, 19, 8, 0, 1200, "#gem_common", 3, "spelunkery:raw_magnetite", 2);
@@ -122,10 +120,10 @@ public final class EnhanceConfig {
         levels[5] = lv(5, 37, 37, 17, 9, 3500, "#gem_fine", 2, "spelunkery:cinnabar", 2);
         levels[6] = lv(6, 27, 37, 22, 14, 6000, "#gem_fine", 3, "spelunkery:cinnabar", 3);
         levels[7] = lv(7, 19, 36, 27, 18, 10000, "#gem_nether", 1, "#gem_fine", 2, "spelunkery:sulfur", 4);
-        levels[8] = lv(8, 13, 35, 30, 22, 12000, "#gem_nether", 2, "spelunkery:rough_diamond", 1);
-        levels[9] = lv(9, 10, 33, 31, 26, 16000, "#gem_nether", 3, "spelunkery:rough_diamond", 2);
-        levels[10] = lv(10, 7, 31, 32, 30, 22000, "#gem_rare", 1, "#gem_nether", 2, "spelunkery:rough_emerald", 2);
-        levels[11] = lv(11, 5, 29, 32, 34, 30000, "#gem_rare", 2, "#gem_nether", 3, "spelunkery:rough_diamond", 2,
+        levels[8] = lv(8, 13, 35, 30, 22, 14000, "#gem_nether", 2, "spelunkery:rough_diamond", 1);
+        levels[9] = lv(9, 10, 33, 31, 26, 19000, "#gem_nether", 3, "spelunkery:rough_diamond", 2);
+        levels[10] = lv(10, 7, 31, 32, 30, 26000, "#gem_rare", 1, "#gem_nether", 2, "spelunkery:rough_emerald", 2);
+        levels[11] = lv(11, 5, 29, 32, 34, 36000, "#gem_rare", 2, "#gem_nether", 3, "spelunkery:rough_diamond", 2,
                 "spelunkery:rough_emerald", 2);
     }
 
@@ -174,7 +172,6 @@ public final class EnhanceConfig {
         help.add("손상 방지권은 손상을 유지로, 파괴 방지권은 파괴를 손상으로 바꿉니다 (강화 보호권은 둘 다). 방지권은 시도할 때마다 1장 씁니다.");
         help.add("weaponBonus/armorBonus: 단계별 누적 증가율(%). 무기 = 공격력, 방어구 = 방어력. toughnessFrom 단계부터 방어 강도 +toughnessPerLevel.");
         help.add("failBonusPct / failStackMax: 실패(유지·손상)할 때마다 다음 성공률이 그 단계 성공률의 failBonusPct % 만큼 오른다. 최대 failStackMax 번 쌓이고, 성공하면 처음으로 (장비마다 따로).");
-        help.add("lesserGuardMax: 하급 보호권(손상·파괴를 모두 막는 싼 보호권)이 쓰이는 가장 높은 목표 단계. 그보다 높은 강화에는 쓰이지 않고 남는다.");
         o.add("_help", help);
         o.addProperty("configVersion", CONFIG_VERSION);
         o.addProperty("damageDrop", damageDrop);
@@ -228,7 +225,6 @@ public final class EnhanceConfig {
         o.addProperty("toughnessPerLevel", toughnessPerLevel);
         o.addProperty("failBonusPct", failBonusPct);
         o.addProperty("failStackMax", failStackMax);
-        o.addProperty("lesserGuardMax", lesserGuardMax);
         return o;
     }
 
@@ -287,7 +283,6 @@ public final class EnhanceConfig {
         if (o.has("toughnessPerLevel")) c.toughnessPerLevel = o.get("toughnessPerLevel").getAsDouble();
         if (o.has("failBonusPct")) c.failBonusPct = Math.max(0, o.get("failBonusPct").getAsDouble());
         if (o.has("failStackMax")) c.failStackMax = Math.max(0, Math.min(50, o.get("failStackMax").getAsInt()));
-        if (o.has("lesserGuardMax")) c.lesserGuardMax = Math.max(0, Math.min(MAX_LEVEL, o.get("lesserGuardMax").getAsInt()));
         return c;
     }
 

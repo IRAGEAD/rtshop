@@ -219,9 +219,8 @@ page(c, "enhance", "장비 강화", """
 · 결과는 성공(+1), 유지, 손상(-1), 파괴 가운데 하나입니다. 단계가 오를수록 어려워집니다.
 · 실패(유지 · 손상)할 때마다 그 장비의 다음 성공률이 조금씩 오릅니다 (그 단계 성공률의 10% 씩, 최대 5번). 성공하면 처음으로 돌아갑니다.
 · 보호권은 모루 위, 장비 옆 칸에 함께 올려 두면 그 강화 한 번에 한 장이 쓰입니다 (결과와 상관없이 사라지고, 한 번에 한 가지만).
-· 하급 보호권은 싸지만 +6 강화까지만 쓰입니다 (손상 · 파괴를 모두 막음). 그보다 높은 강화에는 쓰이지 않고 남습니다.
 · 강화한 장비는 이름 앞에 +N 이 붙고 공격력이나 방어력이 오릅니다. 활 · 쇠뇌 · 총은 화살과 총알의 피해가, 지팡이 · 완드는 주문 피해가 같은 비율로 오릅니다.
-""", image="enhance", icons=["rtshop:enhance_guard_lesser", "rtshop:enhance_guard_damage", "rtshop:enhance_guard_destroy", "rtshop:enhance_guard_full"], keys="모루 보호권 방지권 강화 하급 실패")
+""", image="enhance", icons=["rtshop:enhance_guard_damage", "rtshop:enhance_guard_destroy", "rtshop:enhance_guard_full"], keys="모루 보호권 방지권 강화 실패")
 page(c, "gacha", "뽑기", """
 행운 상인에게서 무기·펫·장신구를 뽑습니다. 티켓은 뽑기 창의 티켓 상점에서 Gold 로 삽니다.
 

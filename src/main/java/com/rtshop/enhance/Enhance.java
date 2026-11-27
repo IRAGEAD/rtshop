@@ -244,24 +244,8 @@ public final class Enhance {
         Item it = s.getItem();
         if (it == ModItems.GUARD_DAMAGE.get()) return Guard.DAMAGE;
         if (it == ModItems.GUARD_DESTROY.get()) return Guard.DESTROY;
-        if (it == ModItems.GUARD_FULL.get() || it == ModItems.GUARD_LESSER.get()) return Guard.FULL;
+        if (it == ModItems.GUARD_FULL.get()) return Guard.FULL;
         return Guard.NONE;
-    }
-
-    /** 하급 보호권인가 (3.66.0: 손상 · 파괴를 모두 막지만 목표 +lesserGuardMax 까지만). */
-    public static boolean lesser(ItemStack s) {
-        return !s.isEmpty() && s.getItem() == ModItems.GUARD_LESSER.get();
-    }
-
-    /** 목표 단계에 쓰이는 보호권의 보호: 하급 보호권은 lesserGuardMax 보다 높은 강화에는 쓰이지 않는다(NONE, 소모도 안 됨). */
-    public static Guard guardOf(ItemStack s, int target, EnhanceConfig cfg) {
-        if (lesser(s) && target > cfg.lesserGuardMax) return Guard.NONE;
-        return guardOf(s);
-    }
-
-    public static Guard guardFor(Player p, ItemStack ticket, int target, EnhanceConfig cfg) {
-        Guard g = guardOf(ticket, target, cfg);
-        return g != Guard.NONE || lesser(ticket) ? g : fromMask(activeGuard(p));
     }
 
     // ------------------------------------------------------------------ 단계

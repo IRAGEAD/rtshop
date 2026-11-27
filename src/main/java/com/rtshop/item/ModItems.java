@@ -142,10 +142,6 @@ public final class ModItems {
     public static final RegistryObject<Item> GUARD_FULL = ITEMS.register("enhance_guard_full",
             () -> new com.rtshop.enhance.GuardItem(new Item.Properties().stacksTo(64).rarity(net.minecraft.world.item.Rarity.EPIC), true,
                     com.rtshop.enhance.Enhance.Guard.FULL, "item.rtshop.enhance_guard_full.tip", "item.rtshop.enhance_guard.tip"));
-    /** 하급 보호권 (3.66.0): 손상 · 파괴를 모두 막지만 목표 +6(enhance.json 의 lesserGuardMax) 강화까지만 쓰인다. 그보다 높은 강화에는 쓰이지 않고 남는다. */
-    public static final RegistryObject<Item> GUARD_LESSER = ITEMS.register("enhance_guard_lesser",
-            () -> new com.rtshop.enhance.GuardItem(new Item.Properties().stacksTo(64), false,
-                    com.rtshop.enhance.Enhance.Guard.FULL, "item.rtshop.enhance_guard_lesser.tip", "item.rtshop.enhance_guard.tip"));
 
     /** 플레이어 상점 진열대 (블록). */
     public static final RegistryObject<Item> PLAYER_SHOP = ITEMS.register("player_shop",

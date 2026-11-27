@@ -128,11 +128,10 @@ public class EnhanceMenu extends AnvilMenu {
         }
         Enhance.consume(sp, cfg, l);
         // 모루에 올린 보호권 한 장: 이번 강화에 쓰이고, 결과와 상관없이 사라진다 (올린 것이 없으면 옛 방식으로 미리 써 둔 보호)
-        // 하급 보호권은 목표 +lesserGuardMax 까지만 쓰인다: 그보다 높으면 쓰이지도 사라지지도 않는다 (3.66.0)
         ItemStack ticket = guardStack();
-        Enhance.Guard guard = Enhance.guardFor(sp, ticket, cur + 1, cfg);
+        Enhance.Guard guard = Enhance.guardFor(sp, ticket);
         boolean useGuard = guard != Enhance.Guard.NONE;
-        if (Enhance.guardOf(ticket, cur + 1, cfg) != Enhance.Guard.NONE) {
+        if (Enhance.guardOf(ticket) != Enhance.Guard.NONE) {
             if (!sp.getAbilities().instabuild) {
                 ticket.shrink(1);
                 inputSlots.setItem(1, ticket.isEmpty() ? ItemStack.EMPTY : ticket);

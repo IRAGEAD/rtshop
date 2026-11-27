@@ -831,7 +831,7 @@
   "rtshop.enhodds.effect": "Attack",
   "rtshop.enhodds.gold": "Gold",
   "rtshop.enhodds.materials": "Materials",
-  "rtshop.enhodds.footer": "Damage: -1 level · Destroy: item lost. Each failure (keep or damage) raises the next success chance by %s of that level's rate (up to %s times, reset on success). A guard ticket next to the item covers that attempt (one is used): damage→keep, destroy→damage, full = both, lesser = both up to +%s. Attack is the total bonus (armor for armor).",
+  "rtshop.enhodds.footer": "Damage: -1 level · Destroy: item lost. Each failure (keep or damage) raises the next success chance by %s of that level's rate (up to %s times, reset on success). A guard ticket next to the item covers that attempt (one is used): damage→keep, destroy→damage, both→keep. Attack is the total bonus (armor for armor).",
   "rtshop.enhodds.edit": "Edit odds (OP)",
   "rtshop.enhodds.close": "Close",
   "rtshop.enhodds.open": "Odds",
@@ -1950,10 +1950,6 @@
   "rtshop.enhance.bonus_ranged": "Enhanced +%s/%s · Arrow and bullet damage +%s",
   "rtshop.enhance.bonus_magic": "Enhanced +%s/%s · Spell damage +%s",
   "rtshop.rules.extreme_removed": "%s can't be used in this pack, so it was taken away.",
-  "item.rtshop.enhance_guard_lesser": "Lesser Enhancement Protection",
-  "item.rtshop.enhance_guard_lesser.tip": "Blocks both damage and destruction up to +6. On higher attempts it is not used and stays.",
-  "rtshop.enhui.guard_lesser_idle": "Lesser · up to +%s",
-  "rtshop.enhance.lesser_idle": "The lesser protection only works up to +%s. It is not used on this attempt and stays.",
   "rtshop.enhui.fail_stacks": "Fails %s/%s",
   "rtshop.enhance.fail_stacks_tip": "Failures %s/%s · next success chance +%s (of that level's rate)"
 }

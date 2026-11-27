@@ -68,7 +68,6 @@ public class RtShop {
             event.accept(ModItems.GUARD_DAMAGE);
             event.accept(ModItems.GUARD_DESTROY);
             event.accept(ModItems.GUARD_FULL);
-            event.accept(ModItems.GUARD_LESSER);
             event.accept(ModItems.RAID_TICKET);
             event.accept(ModItems.SURVEY_COMPASS);
             event.accept(ModItems.WEAPON_MANUAL);

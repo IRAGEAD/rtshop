@@ -15,12 +15,6 @@
    "sell": false
   },
   {
-   "item": "rtshop:enhance_guard_lesser",
-   "price": 2000,
-   "category": "enhance",
-   "sell": false
-  },
-  {
    "item": "rtshop:enhance_guard_damage",
    "price": 10000,
    "category": "enhance",

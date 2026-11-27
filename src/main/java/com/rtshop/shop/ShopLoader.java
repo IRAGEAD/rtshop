@@ -197,14 +197,13 @@ public final class ShopLoader {
     public static final String[] UPGRADED = {"gacha_shop@2"};
     /** 기존 상점 파일에 품목을 덧붙임: "상점+조각파일@판" (조각의 categories/items 중 없는 것만 추가, 한 번만). */
     public static final String[] APPENDED = {"blacksmith+blacksmith_enhance@1", "blacksmith+blacksmith_enhance@2", "general+general_pshop@1",
-            "gacha_shop+gacha_shop_magic@1", "general+general_return@1", "general+general_books@1",
-            "blacksmith+blacksmith_enhance@3"};   // 3.66.0: 하급 보호권
+            "gacha_shop+gacha_shop_magic@1", "general+general_return@1", "general+general_books@1"};
 
     /** 기본값이 바뀐 품목: "상점:품목=옛값>새값@판". 설치된 파일의 값이 옛 기본값 그대로일 때만 새 값으로 고친다 (한 번만). */
     public static final String[] REPRICED = {"general:rtshop:return_ticket=1500>5000@1", "general:rtshop:return_ticket_plus=12000>30000@1",
             "general:rtshop:return_ticket=5000>10000@2",   // 3.55: 일반 귀환권 5,000 → 10,000 G (위의 @1 다음에 차례로 적용된다)
             "general:minecraft:bricks=10>2@1",             // 3.65.0: 벽돌은 만들면 1~4 G
-            // 3.66.0: 보호권 값 내림 (하급 보호권 2,000 G 를 새로 둠), 당근 · 감자 · 양파 씨앗 50 → 30 G (거두는 값이 씨앗값과 비슷했다)
+            // 3.66.0: 보호권 값 내림, 당근 · 감자 · 양파 씨앗 50 → 30 G (거두는 값이 씨앗값과 비슷했다)
             "blacksmith:rtshop:enhance_guard_damage=15000>10000@1", "blacksmith:rtshop:enhance_guard_destroy=20000>15000@1",
             "blacksmith:rtshop:enhance_guard_full=35000>25000@1",
             "farmer:minecraft:carrot=50>30@1", "farmer:minecraft:potato=50>30@1", "farmer:farmersdelight:onion=50>30@1"};

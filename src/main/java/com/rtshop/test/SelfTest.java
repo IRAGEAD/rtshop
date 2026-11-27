@@ -1972,7 +1972,7 @@ public final class SelfTest {
         return v;
     }
 
-    /** 3.66.0: 실패 누적(B) · 하급 보호권(E) · 높은 단계 수치 · 마법 뽑기 천장 없음(A) · 씨앗값(N). */
+    /** 3.66.0: 실패 누적(B) · 보호권 값(E) · 높은 단계 수치 · 마법 뽑기 천장 없음(A) · 씨앗값(N). */
     private static void enhance366(ServerLevel level, BlockPos pos, FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, ItemStack sword) {
         com.rtshop.enhance.EnhanceConfig.Level raw11 = cfg.level(11);
         ItemStack st3 = new ItemStack(Items.IRON_SWORD);
@@ -2000,41 +2000,15 @@ public final class SelfTest {
                         && com.rtshop.enhance.Enhance.level(f3) == 7 && com.rtshop.enhance.Enhance.failStacks(f3) == 0,
                 com.rtshop.enhance.Enhance.level(f1) + "/" + com.rtshop.enhance.Enhance.failStacks(f1) + " " + com.rtshop.enhance.Enhance.failStacks(f2)
                         + " " + com.rtshop.enhance.Enhance.level(f3) + "/" + com.rtshop.enhance.Enhance.failStacks(f3));
-        // 하급 보호권: +6 까지는 손상 · 파괴를 막고 한 장 쓰임, +7 부터는 쓰이지 않고 남음
-        giveMaterials(a, cfg, 5, 1);
-        giveMaterials(a, cfg, 7, 1);
-        com.rtshop.enhance.EnhanceMenu lm = enhanceMenu(level, pos, a);
-        ItemStack g4 = sword.copy();
-        com.rtshop.enhance.Enhance.setLevel(g4, 4);
-        lm.getSlot(0).set(g4);
-        lm.getSlot(1).set(new ItemStack(com.rtshop.item.ModItems.GUARD_LESSER.get(), 2));
-        com.rtshop.enhance.Enhance.testRoll = 0.999;
-        lm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
-        com.rtshop.enhance.Enhance.testRoll = null;
-        int lvA = com.rtshop.enhance.Enhance.level(lm.getCarried());
-        boolean keptA = !lm.getCarried().isEmpty();
-        int leftA = lm.getSlot(1).getItem().getCount();
-        lm.setCarried(ItemStack.EMPTY);
-        ItemStack g6b = sword.copy();
-        com.rtshop.enhance.Enhance.setLevel(g6b, 6);
-        lm.getSlot(0).set(g6b);
-        com.rtshop.enhance.Enhance.testRoll = 0.60;
-        lm.clicked(2, 0, net.minecraft.world.inventory.ClickType.PICKUP, a);
-        com.rtshop.enhance.Enhance.testRoll = null;
-        int lvB = com.rtshop.enhance.Enhance.level(lm.getCarried());
-        int leftB = lm.getSlot(1).getItem().getCount();
-        lm.setCarried(ItemStack.EMPTY);
-        lm.getSlot(1).set(ItemStack.EMPTY);
-        check("3.66.0 the lesser protection guards attempts up to +6 (a destroy roll keeps the level, one ticket used) and is left alone from +7 (damage goes through, no ticket used)",
-                keptA && lvA == 4 && leftA == 1 && lvB == 5 && leftB == 1, keptA + " +" + lvA + " left " + leftA + " / +" + lvB + " left " + leftB);
-        ShopLoader.Price lp = ShopServer.loaded().prices.get("rtshop:enhance_guard_lesser");
+        ShopLoader.Price dp = ShopServer.loaded().prices.get("rtshop:enhance_guard_damage");
+        ShopLoader.Price xp = ShopServer.loaded().prices.get("rtshop:enhance_guard_destroy");
         ShopLoader.Price fp = ShopServer.loaded().prices.get("rtshop:enhance_guard_full");
-        check("3.66.0 the blacksmith sells the lesser protection cheaply (2,000 G), and the full protection now costs 25,000 G",
-                lp != null && lp.price == 2000 && lp.buyableSomewhere && fp != null && fp.price == 25000,
-                (lp == null ? "missing" : lp.price + "") + " / " + (fp == null ? "missing" : fp.price + ""));
-        check("3.66.0 high levels give more: +8 ~ +11 attack bonus 38 / 48 / 60 / 75%, armour 41 / 50 / 61 / 75%; costs fall (+11 Gold 30,000, success 5%)",
+        check("3.66.0 guard tickets cost less: damage 10,000 · destruction 15,000 · full 25,000 G",
+                dp != null && dp.price == 10000 && xp != null && xp.price == 15000 && fp != null && fp.price == 25000,
+                (dp == null ? "?" : dp.price) + " / " + (xp == null ? "?" : xp.price) + " / " + (fp == null ? "?" : fp.price));
+        check("3.66.0 high levels give more: +8 ~ +11 attack bonus 38 / 48 / 60 / 75%, armour 41 / 50 / 61 / 75%; costs fall (+11 Gold 36,000, success 5%)",
                 cfg.weaponBonus[8] == 38 && cfg.weaponBonus[11] == 75 && cfg.armorBonus[9] == 50 && cfg.armorBonus[11] == 75
-                        && cfg.level(11).gold == 30000 && cfg.level(11).success == 5 && cfg.level(9).success == 10,
+                        && cfg.level(11).gold == 36000 && cfg.level(11).success == 5 && cfg.level(9).success == 10,
                 java.util.Arrays.toString(cfg.weaponBonus) + " " + cfg.level(11).gold);
         check("3.66.0 the magic gacha has no pity (the old 80-pull setting is not used)", !com.rtshop.magic.MagicConfig.get().pityOn);
         int seed30 = 0, seed50 = 0;

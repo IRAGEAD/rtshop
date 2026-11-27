@@ -831,7 +831,7 @@
   "rtshop.enhodds.effect": "공격력",
   "rtshop.enhodds.gold": "Gold",
   "rtshop.enhodds.materials": "재료",
-  "rtshop.enhodds.footer": "손상: 단계 1 하락 · 파괴: 장비가 사라짐. 실패(유지 · 손상)할 때마다 다음 성공률이 그 단계 성공률의 %s 씩 오름 (최대 %s번, 성공하면 처음으로). 보호권은 모루 위 장비 옆 칸에 올려 두면 그 강화 1번에 한 장이 쓰임: 손상 방지 = 손상→유지, 파괴 방지 = 파괴→손상, 강화 보호권 = 둘 다, 하급 보호권 = +%s 까지 둘 다. 공격력은 누적 증가율(방어구는 방어력).",
+  "rtshop.enhodds.footer": "손상: 단계 1 하락 · 파괴: 장비가 사라짐. 실패(유지 · 손상)할 때마다 다음 성공률이 그 단계 성공률의 %s 씩 오름 (최대 %s번, 성공하면 처음으로). 보호권은 모루 위 장비 옆 칸에 올려 두면 그 강화 1번에 한 장이 쓰임: 손상 방지 = 손상→유지, 파괴 방지 = 파괴→손상, 둘 다 = 유지. 공격력은 누적 증가율(방어구는 방어력).",
   "rtshop.enhodds.edit": "확률·재료 편집 (OP)",
   "rtshop.enhodds.close": "닫기",
   "rtshop.enhodds.open": "확률표",
@@ -1950,10 +1950,6 @@
   "rtshop.enhance.bonus_ranged": "강화 +%s/%s · 화살 · 총알 피해 +%s",
   "rtshop.enhance.bonus_magic": "강화 +%s/%s · 주문 피해 +%s",
   "rtshop.rules.extreme_removed": "%s 은(는) 이 모드팩에서 쓸 수 없는 장비라 치웠습니다.",
-  "item.rtshop.enhance_guard_lesser": "하급 강화 보호권",
-  "item.rtshop.enhance_guard_lesser.tip": "+6 강화까지 손상과 파괴를 모두 막습니다. 그보다 높은 강화에는 쓰이지 않고 남습니다.",
-  "rtshop.enhui.guard_lesser_idle": "하급 · +%s 까지만",
-  "rtshop.enhance.lesser_idle": "하급 보호권은 +%s 강화까지만 쓰입니다. 이번 강화에는 쓰이지 않고 남습니다.",
   "rtshop.enhui.fail_stacks": "누적 %s/%s",
   "rtshop.enhance.fail_stacks_tip": "실패 누적 %s/%s · 다음 강화 성공률 +%s (그 단계 성공률의)"
 }
