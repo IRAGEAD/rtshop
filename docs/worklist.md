@@ -718,6 +718,9 @@ Arcane Vortex는 일단 유지, W-13은 스토리 및 히든 아이템에도 사
 - C-16. 다 끝나면 인게임에서 직접 확인할 목록 (docs/review_checklist.md 에도 더함).
 추가 (08:19): "일부 아이템의 툴팁 내용이 너무 많아서 잘려 보이는 문제도 해결해줘."
 - C-17. 화면보다 긴 툴팁: 줄여서 화면에 맞추고(최소 배율), 그래도 넘치면 마우스 휠로 넘겨 보기.
+추가 (08:31): "인벤토리 핫바 우측의 화살표 모양이 어떤 기능이고 어느 모드에서 나온 것인지 알려줘. 기본 키 설정은 z이고 대쉬 비슷한 역할인 것 같은데, 없애는 것이 낫겠어."
+- C-18. Bosses'Rise(block_factorys_bosses) 의 「Dodge Roll」(구르기, 키 이름 key.block_factorys_bosses.dodge_roll, HUD textures/gui/roll/dash_green.png · 숫자 = 남은 구르기) →
+  서버 설정 CAN_USE_ROLL 끔 (`compat/BossesRiseRollOff`, world_rules bossesRiseRoll=false), 화면 표시 ROLL_GUI 끔 · Z 키 한 번 풀기 (`client/BossesRiseRollClient`).
 - 한 일 (3.78.0, 가지 v5-next31):
   C-1 tools/gen_forgery_icons.py CHOSEN 돋보기 C. C-2/C-3 `ScyllaClues` 기본값 · `migrate3` (scylla.json 3판: 옛 기본값 그대로일 때만). C-4 `SurveyCompassItem.MIN_TOWN` 500, 설명 · 안내서(18판) · 영어.
   C-5 food.json skipItemsOf ["farmer","fisher"] + `ShopLoader.migrateFoodSkipFisher` (MIGRATED food-skip-fisher@1). C-7 `story/Examine` + examine.json · StoryPacket.EXAMINE · ItemMarks 「?」 ·
