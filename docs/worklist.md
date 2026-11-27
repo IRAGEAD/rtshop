@@ -406,6 +406,11 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   → 모드팩의 dhcompat 을 뺄 수 있게 됨 (dhcompat 은 ImmediatelyFast 빠른 버퍼 업로드를 끄고, 2초마다 모든 스레드를 훑는 등 성능을 깎음). ✔ 6차 실행 45982255494:
   새 세계를 만드는 전용 서버 · 싱글플레이 · 전용 서버 다시 켜기 세 경우 모두 "link deferred" 로그 뒤 정상 (튕김 없음), 모드팩 전체 서버 점검 866 개 통과 (새 점검: 막이가 붙었고 Chunky 가 켜진 뒤 연결).
 - T-3b. **ImmediatelyFast 빠른 버퍼 업로드 되돌리기** ✔ (`client/FastBufferFix`): dhcompat 이 없으면 config/immediatelyfast.json 의 fast_buffer_upload false → true 한 번 (client.json restoreFastBuffer · fastBufferRestored).
+- 요청 (20:17): "모드팩 현재 상태 업데이트" (모드팩 RT1 - 2_11 을 보냄).
+  → CI 의 팩을 11 로 (바뀐 모드 5개, `pack_files.json`). 11 에서 본 것: overrides/mods 에 **RT Shop 3.64.1**(옛 판) · **dhcompat 1.0.0** · Arcane Vortex, 매니페스트에서 **Distant Horizons 는 선택 모드(required false = 꺼짐)**,
+  config: immediatelyfast.json 의 fast_buffer_upload **false**(dhcompat 이 쓴 값), farsight.json 의 청크 미리보기 켜짐 · 최대 64, DistantHorizons.toml 은 LOD 256 · 스레드 4 × 100% · SSAO · 구름 여러 겹 · 투명 COMPLETE(11-22 에 권한 값이 아직 안 들어감).
+  dhcompat 1.0.0 이 하는 일(열어 봄): 켤 때마다 ModernFix `mixin.bugfix.paper_chunk_patches` · `chunk_deadlock` 을 false 로, ImmediatelyFast `fast_buffer_upload` · 실험 두 개를 false 로, Entity Culling `tracingDistance` 를 256 으로 파일에 쓰고, ChunkyGuard · FarsightGuard · DhApiBridge.
+  → 사용자에게: 팩의 RT Shop 을 3.70.0 으로, dhcompat 빼기, DH 를 쓸 거면 켜고 Farsight 빼기, Chunky 미리 생성, Arcane Vortex 는 고르기.
 - T-4. 모드 구성 · 설정 추천 (측정 숫자와 함께, 품질이 바뀌는 것은 사용자가 고르게): Arcane Vortex 가 서버 틱 · 화면 스레드의 약 14% (고리 1,360 곳), Diorama 지도 굽기가 배경 CPU 의 85%,
   Canary 는 이 팩과 충돌. 한 가지씩만 바꾼 측정(7차)으로 Farsight · Diorama FAST · AI Improvements + Clumps 의 몫을 따로 잰다.
 
