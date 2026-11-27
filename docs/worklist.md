@@ -716,6 +716,14 @@ Arcane Vortex는 일단 유지, W-13은 스토리 및 히든 아이템에도 사
 - C-15. 인벤토리 화면 왼쪽 위의 Spiral Abyss(spiral_abyss) 표시 숨기기.
 추가 (07:48): "모든 작업이 끝나면 내가 인게임에서 직접 테스트해봐야 할 목록을 알려줘."
 - C-16. 다 끝나면 인게임에서 직접 확인할 목록 (docs/review_checklist.md 에도 더함).
+- 한 일 (3.78.0, 가지 v5-next31):
+  C-1 tools/gen_forgery_icons.py CHOSEN 돋보기 C. C-2/C-3 `ScyllaClues` 기본값 · `migrate3` (scylla.json 3판: 옛 기본값 그대로일 때만). C-4 `SurveyCompassItem.MIN_TOWN` 500, 설명 · 안내서(18판) · 영어.
+  C-5 food.json skipItemsOf ["farmer","fisher"] + `ShopLoader.migrateFoodSkipFisher` (MIGRATED food-skip-fisher@1). C-7 `story/Examine` + examine.json · StoryPacket.EXAMINE · ItemMarks 「?」 ·
+  StoryItem/ClueItem/ForgeryToolItem.getName · 퀘스트 목표 · 보상 이름은 진짜로 · 안내서 「물건 살펴보기」(en2/p977). C-8 tools/mock/w4_shop_land.py → docs/design/w4/*.png.
+  C-9 `MapMarkClient.hideOnRadar` 에 자리 비움 · `ClientShaderTest` 제단 잠금 풀기. C-11 `client/MobPortrait` (화면 밖 128칸에 여섯 각도로 그려 칠해진 자리를 재고, 가는 끝 1.5% 를 빼고 칸에 맞춤 ·
+  안 보이면 멀리 · 보이게 해서 다시 · 그래도 없으면 알) — 바닐라 79마리 중 예전에 잘리던 32마리가 칸 안으로. C-12 `EnhancePanel.blend()` (섞기가 꺼져 빛무리가 불투명하게 찍히던 것) + 룬 그림을 홈 굵기로.
+  C-14 `Hunts` boardNpcs 기본 빈 목록 · hunts.json 3판 · 안내 글 가렛으로. C-15 `ClientEvents.abyssButton` (client.json hideAbyssInventoryButton).
+  C-10 · C-13 가이드는 문서로 (맵 이식 · NPC 배치), C-16 은 review_checklist 0장.
 
 ## 3.77.0 — ⑥ 스토리 완성 점검 + W-21 전개 · 연출 · 대사 검토 (가지 v5-next30)
 

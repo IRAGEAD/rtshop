@@ -59,6 +59,13 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
+- **(11-28 08:10) 3.78.0 작업 중 (가지 v5-next31, worklist 「사용자 답 (11-28 07:20) → 3.78.0」 C-1 ~ C-16)**: 사용자 답 반영 + 추가 요청 다섯.
+  C-1 돋보기 아이콘 C · C-2/C-3 스킬라 단서 확률 (scylla.json 3판 `ScyllaClues.migrate3`) · C-4 나침반 500칸 (`SurveyCompassItem.MIN_TOWN`, 안내서 18판) ·
+  C-5 식품 상인 skipItemsOf ["farmer","fisher"] (`ShopLoader.migrateFoodSkipFisher`) · C-7 살펴보기 `story/Examine` (examine.json, StoryPacket.EXAMINE, ItemMarks 의 「?」, 안내서 「물건 살펴보기」) ·
+  C-8 상점 토지 시안 그림 `tools/mock/w4_shop_land.py` → docs/design/w4/ · C-9 자리 비운 NPC 의 미니맵 아이콘 · 셰이더 시험의 제단 잠금 ·
+  C-11 도감 몹 그림 `client/MobPortrait` (화면 밖에서 재어 칸에 맞춤, 그릴 수 없으면 알) · C-12 강화 정보 창 룬 (섞기 켬 + 홈 굵기 그림) ·
+  C-14 하루의 현상금 게시판 뺌 (hunts.json 3판) · C-15 가방 창의 Spiral Abyss 단추 숨김 (client.json hideAbyssInventoryButton).
+  다음: 전체 시험 → 올리기 → 보고 · 맵 이식 가이드 · NPC 배치 가이드 (문서) · 인게임 확인 목록.
 - **(11-28 01:45) 3.75.0 올림 · 보냄** (main = b407618, 모드팩 전체 시험 서버 886 · 화면 353 모두 통과, Photon 강화 모루 전후 그림 · 조사 수첩 아이콘 시안(지금 C) 함께 보냄).
   3.74.0 은 11-28 01:05 에 보냄. 사용자에게 물은 것 (답을 worklist 에 적고 다음 판에 반영): W-10 스킬라 단서 확률 0.05/0.02/0.01% · 식품 상인의 생선 4개(+말린 다시마 · 수련잎) 뺄지 ·
   W-27 나침반 1000칸 → 500칸? · W-4 상점 토지 값 1.5배/2배 · Arcane Vortex 남길지 · 조사 수첩 아이콘 A/B/C. W-22 는 사용자의 /fpscheck 파일을 기다림.
