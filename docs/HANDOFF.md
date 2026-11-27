@@ -286,6 +286,12 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 7. 알아 둘 함정
 
+- **CI 의 이미 아는 실패 (3.65 부터 그대로, 고칠 것이 아님)**: build job 의 화면 점검은 늘 `FAILED (5 of …)` — 강화 정보 패널의 재료 칸("[4 / 1]") · Starlight 구슬 · 마법 뽑기 셋은
+  모드팩의 마법 모드가 있어야 하는 점검이라 build(RT Shop 만)에서는 실패하고 fullpack 의 화면 점검에서는 통과한다. fullpack 의 셰이더 점검 "rune altar … glow kept close [NONE rim=0.0]" 1개도 소프트웨어 그리기에서 늘 실패.
+  build job 의 성공 여부는 서버 자체 점검(ALL PASS)이 가른다. 새 실패가 생겼는지는 이 6개를 빼고 본다.
+- **조합 증서(3.72.0)**: 장부(`StockData.certs`)가 원본이다 — 아이템의 NBT 만으로는 통하지 않는다. 시세는 출석의 기준 시각으로 날을 센다(`Stocks.today`). `/rtshop stocks nextday` 는 장부의 날을 앞당기므로
+  그 뒤에는 진짜 날짜가 따라올 때까지 저절로 닫히지 않는다(시험용). 서버 쪽 글은 열쇠와 값만 보내고 화면이 번역한다(전용 서버에는 모드 언어 파일이 없다).
+
 - **강화의 종류(3.65.0)**: `Enhance.kind` = ARMOR → RANGED(발사 무기 · TaCZ 총 · 갈래 …Gun) → MAGIC(지팡이 · 완드 이름/갈래 **이면서 주문력 속성**) → WEAPON(공격력) 순서.
   RANGED · MAGIC 은 속성이 아니라 `EnhanceRanged` 가 피해를 키운다(쏜 것에 단계 기록 `rtshop_enh_lv`, 주문은 든 지팡이). 표는 weaponBonus 를 같이 쓴다.
 - **터무니없는 장비(3.65.0)**: `ItemPolicy.extreme` (공격력 25 · 방어력 20, item_policy.json 의 extremeAttack / extremeArmor). keep · lootAllow 로도 못 푼다.
