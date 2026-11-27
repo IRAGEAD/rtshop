@@ -594,6 +594,14 @@ public final class ItemPolicy {
         return s.c.enabled && id != null && s.gachaBan.hit(id);
     }
 
+    /** 전리품 금지 목록(lootBan)에 직접 적힌 물건인가 (모드 장비 규칙 · 보스 예외 없이, lootAllow 는 뺌). 몹이 코드로 떨어뜨리는 드롭에 쓴다 (3.68.1). */
+    public static boolean lootListed(ItemStack stack) {
+        State s = st();
+        if (!s.c.enabled || stack.isEmpty()) return false;
+        ResourceLocation id = id(stack.getItem());
+        return id != null && s.lootBan.hit(id) && !s.lootAllow.hit(id);
+    }
+
     /** 블록을 캤을 때 나오면 안 되는 아이템인가 (blockDropBan). */
     public static boolean blockDropBanned(ItemStack stack) {
         State s = st();

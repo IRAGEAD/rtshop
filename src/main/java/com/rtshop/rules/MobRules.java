@@ -310,6 +310,13 @@ public final class MobRules {
             }
             // 3.65.0: 터무니없이 센 장비(Arcane Vortex 등)는 보스가 코드로 직접 떨어뜨려도 뺀다 (전리품표가 아닌 길)
             event.getDrops().removeIf(d -> ItemPolicy.extreme(d.getItem()));
+            // 3.68.1: 전리품 금지 목록의 물건(Better Nether 등)은 몹이 전리품표가 아닌 코드로 떨어뜨려도 뺀다. 몹이 주운 물건(플레이어의 것)은 그대로.
+            List<ItemStack> picked0;
+            synchronized (PICKED) {
+                picked0 = PICKED.get(e);
+            }
+            final List<ItemStack> pickedNow = picked0 == null ? List.of() : picked0;
+            event.getDrops().removeIf(d -> ItemPolicy.lootListed(d.getItem()) && pickedNow.stream().noneMatch(h -> ItemStack.isSameItemSameTags(h, d.getItem())));
             if (!get().dropsEnabled || isBoss) return;
             List<ItemStack> held;
             synchronized (PICKED) {

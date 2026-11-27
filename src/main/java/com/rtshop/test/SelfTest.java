@@ -1972,6 +1972,45 @@ public final class SelfTest {
         return v;
     }
 
+    /** 3.68.1: Better Nether 블록을 실제로 캐 본다 — 그 모드의 물건은 나오지 않고, 같은 방법으로 캔 석탄 광석에서는 석탄이 나온다. */
+    private static void betterNetherDrops(ServerLevel level, FakePlayer a) {
+        net.minecraft.world.level.GameType mode = a.gameMode.getGameModeForPlayer();
+        ItemStack hand = a.getMainHandItem().copy();
+        BlockPos spawn = level.getSharedSpawnPos();
+        int gx = Math.floorDiv(spawn.getX(), 32) * 32, gz = Math.floorDiv(spawn.getZ(), 32) * 32;
+        int y = Math.min(level.getMaxBuildHeight() - 60, 250);
+        try {
+            a.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            a.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.NETHERITE_PICKAXE));
+            BlockPos pc = new BlockPos(gx + 2, y, gz + 6);
+            level.setBlock(pc, Blocks.COAL_ORE.defaultBlockState(), 3);
+            a.gameMode.destroyBlock(pc);
+            boolean coal = takeDrops(level, pc).stream().anyMatch(s -> s.is(Items.COAL));
+            int tried = 0;
+            int guardBefore = com.rtshop.rules.BlockDropGuard.blockedForTest;
+            List<String> leaked = new ArrayList<>();
+            for (String id : new String[]{"cincinnasite_ore", "nether_ruby_ore", "cincinnasite_block", "nether_brick_tile_large", "willow_planks", "stalagnate_planks"}) {
+                net.minecraft.world.level.block.Block blk = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("betternether", id));
+                if (blk == null || blk == Blocks.AIR) continue;
+                BlockPos p = new BlockPos(gx + 6 + tried * 4, y, gz + 6);
+                level.setBlock(p, blk.defaultBlockState(), 3);
+                a.gameMode.destroyBlock(p);
+                for (ItemStack s : takeDrops(level, p)) {
+                    ResourceLocation rl = ForgeRegistries.ITEMS.getKey(s.getItem());
+                    if (rl != null && rl.getNamespace().equals("betternether")) leaked.add(rl.toString());
+                }
+                level.setBlock(p, Blocks.AIR.defaultBlockState(), 3);
+                tried++;
+            }
+            check("3.68.1 breaking Better Nether blocks drops none of their items (a coal ore broken the same way still drops coal)",
+                    coal && tried > 0 && leaked.isEmpty(),
+                    "coal " + coal + " tried " + tried + " leaked " + leaked + " stopped by the guard " + (com.rtshop.rules.BlockDropGuard.blockedForTest - guardBefore));
+        } finally {
+            a.setGameMode(mode);
+            a.setItemInHand(InteractionHand.MAIN_HAND, hand);
+        }
+    }
+
     /** 3.68.0: 직업별 수입 기록 — 출처 나누기, 직업 칸, 움직인 시간, 시간당, 표 파일. */
     private static void incomeStats368(MinecraftServer server, FakePlayer a, ShopData fisher, ShopData food) {
         com.rtshop.stats.IncomeStats is = com.rtshop.stats.IncomeStats.get(server);
@@ -2688,6 +2727,7 @@ public final class SelfTest {
                 }
                 check("3.66.0 mod pack: no Better Nether item can be crafted, and none comes from chests, mobs, bosses or broken blocks",
                         bnRecipes == 0 && bnLoot, bnRecipes + " recipes " + bnSample + " loot " + bnLoot);
+                betterNetherDrops(level, a);
             }
             check("mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left",
                     banned == 0 && gunsListed == 0 && bossListed == 0 && tacz == 0 && craftableListed == 0,

@@ -82,7 +82,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   흔들리던 시험 두 개 손질 / 강화 정보 창의 "+13%" 글자(더하기표가 세로 줄로 보이던 것) / 영어판에 남은 한국어 / Create 를 상점 · 뽑기에서도 제외(item_policy.json 4판, gachaBan) / 상점 설정을 기본값으로 · 내 설정으로 되돌리는 명령(`/rtshop shop defaults|mine|status`).
 - 3.58.0: 기억의 문을 걸어 들어가는 문으로 + 보스 구역의 대기·불씨·깨어남 연출 / 요리 권장안 / Create 조합법·전리품·블록 드랍 금지 / NPC 자리 배치 파일 / 미니맵 NPC 아이콘 / 주식·히든 직업 제안서 / 마을 이식 설명.
 
-- 가지 이름: v5-next ~ v5-next20 은 이미 쓰였습니다. 다음 새 가지는 **v5-next21** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
+- 가지 이름: v5-next ~ v5-next21 은 이미 쓰였습니다. 다음 새 가지는 **v5-next22** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
 
 ## 5. 사용자에게 보낸 3.67.0 · 3.66.0 요약 (참고)
 
@@ -275,6 +275,8 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   ② 음식 매입가 하한 · 사서 만드는 값(`buyRoutes`)은 게임에 남는 조합법만 쓴다(`inGame`).
 - **그릇 되돌려받기(3.65.0)**: 재료가 물 양동이처럼 그릇을 돌려주면 사는 값에서 그릇 값을 뺀다(`netPurchase`). 그 그릇이 바로 조합법의 결과물이면(Iron's Spells 가마솥: 물 양동이 → 빈 양동이) 빼지 않는다 —
   빼면 양동이를 1 G 에 만든다고 계산해 양동이가 들어가는 도구(셰이커 · 찻주전자 · 스프링클러)가 돈 불리기처럼 보였다.
+- **블록 드롭 금지의 두 길(3.68.1)**: 전리품표(LootRules 의 blocks/ 표)와, 표를 거치지 않고 코드로 떨어뜨리는 블록을 막는 `BlockDropGuard`(부서진 자리 + 같은 틱).
+  `Level.destroyBlock` 처럼 BreakEvent · 폭발 이벤트가 없는 길(피스톤 · 물 등)은 막지 않는다.
 - **수입 기록(3.68.0)**: 새 Gold 지급 길을 만들면 `IncomeStats.add(p, 출처, 금액)` 도 함께 부른다 (출처 이름은 `IncomeStats.SOURCES`). 안 부르면 그 수입은 표에 빠진다.
 - **방어력 상한(3.66.0)**: 바닐라 속성의 최대값 — 방어력 30 · 방어 강도 20. 네더라이트 · 다이아 한 벌(20)은 방어력 +50% 에서 막힌다. 그래서 +8 이상 방어구의 몫은 받는 피해 감소(`EnhanceRanged.onHurtArmor`)로 준다.
 - **실패 누적(3.66.0)**: 장비 NBT `rtshop_enh_fail`. 확률은 `Enhance.levelFor` 한 곳에서만 바꾼다(서버 굴림 · 강화 창 표시 모두 이것을 씀).
