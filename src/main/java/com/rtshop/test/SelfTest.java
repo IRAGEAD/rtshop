@@ -280,6 +280,27 @@ public final class SelfTest {
                             && sentNpc.contains(banker.getCustomName().getString())
                             && sentNpc.contains("\"radar\":true") && sentNpc.contains("npc:" + banker.getUUID()),   // 화면 쪽은 이 목록으로 미니맵의 NPC 아이콘을 고른다
                     t1 + " " + t2 + " " + moved + " " + movedSilently + " " + notNpc + " " + com.rtshop.story.MapMarks.known(a));
+            // K-1 (3.69.0): NPC 표시에는 하는 일의 그림(직업 상징)과 무리 색이 붙는다. 그림이 없던 옛 표시는 다시 보낼 때 붙는다
+            java.util.List<String> noPng = new java.util.ArrayList<>();
+            for (String n : com.rtshop.story.MapMarks.ICONS) {
+                if (SelfTest.class.getResourceAsStream("/assets/rtshop/textures/waypoint_icons/" + n + ".png") == null) noPng.add(n);
+            }
+            boolean mapping = "anvil".equals(com.rtshop.story.MapMarks.iconOf("shop_blacksmith")[0]) && "fish".equals(com.rtshop.story.MapMarks.iconOf("shop_fisher")[0])
+                    && "book".equals(com.rtshop.story.MapMarks.iconOf("quest_order_archivist")[0]) && "sword".equals(com.rtshop.story.MapMarks.iconOf("quest_sword_master")[0])
+                    && "quest".equals(com.rtshop.story.MapMarks.iconOf("quest_new_story_npc")[0]) && "person".equals(com.rtshop.story.MapMarks.iconOf(null)[0])
+                    && (Integer) com.rtshop.story.MapMarks.iconOf("shop_food")[1] == com.rtshop.story.MapMarks.C_SHOP
+                    && (Integer) com.rtshop.story.MapMarks.iconOf("quest_hunter")[1] == com.rtshop.story.MapMarks.C_MASTER;
+            String oldResent = "";
+            if (banker != null) {
+                com.rtshop.story.MapMarks.mark(a, "npc:" + banker.getUUID(), banker.getCustomName().getString(), banker.level().dimension().location().toString(),
+                        banker.blockPosition().getX(), banker.blockPosition().getY(), banker.blockPosition().getZ(), 0xFFE8C56A);   // 3.68 까지처럼 그림 없이
+                com.rtshop.story.MapMarks.sendAll(a, false);
+                oldResent = com.rtshop.story.MapMarks.lastSentForTest;
+            }
+            check("K-1 an NPC mark carries the picture of what the NPC does (the bank: a coin) and its group colour; an older mark without one gets it when sent again",
+                    sentNpc.contains("\"icon\":\"rtshop:coin\"") && mapping && noPng.isEmpty() && oldResent.contains("\"icon\":\"rtshop:coin\"")
+                            && oldResent.contains("\"color\":" + com.rtshop.story.MapMarks.C_TOWN) && mc.npcIcons,
+                    mapping + " " + noPng + " " + sentNpc + " // " + oldResent);
             mc.places.clear();
             com.rtshop.story.MapMarks.sendAll(a, false);
             String afterRemove = com.rtshop.story.MapMarks.lastSentForTest;
@@ -5772,8 +5793,9 @@ public final class SelfTest {
         clear(a);
         // 3.69.0: 사망 손실 5~50% → 5~30% (옛 기본값 50 그대로인 파일만 고치고, 서버가 정한 값은 그대로)
         java.nio.file.Path ecoP = net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("economy.json");
-        String ecoKeep = Files.exists(ecoP) ? Files.readString(ecoP, StandardCharsets.UTF_8) : null;
         double fresh369 = cfg.deathLossMaxPercent, old369 = -1, mine369 = -1;
+        try {
+        String ecoKeep = Files.exists(ecoP) ? Files.readString(ecoP, StandardCharsets.UTF_8) : null;
         try {
             Files.createDirectories(ecoP.getParent());
             Files.writeString(ecoP, "{\"configVersion\":3,\"deathLossMinPercent\":5.0,\"deathLossMaxPercent\":50.0}", StandardCharsets.UTF_8);
@@ -5784,6 +5806,9 @@ public final class SelfTest {
             if (ecoKeep != null) Files.writeString(ecoP, ecoKeep, StandardCharsets.UTF_8);
             else Files.deleteIfExists(ecoP);
             EconomyConfig.reload();
+        }
+        } catch (java.io.IOException ex369) {
+            info("economy file test: " + ex369);
         }
         check("3.69.0 death takes 5~30% of carried gold by default; an old file with the old default 50 moves to 30, a value the server set stays",
                 fresh369 == 30.0 && cfg.deathLossMinPercent == 5.0 && old369 == 30.0 && mine369 == 40.0, fresh369 + " " + old369 + " " + mine369);

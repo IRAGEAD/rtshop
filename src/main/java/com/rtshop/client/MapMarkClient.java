@@ -38,7 +38,7 @@ public final class MapMarkClient {
     private static int wait, tries;
     private static boolean broken;
     /** 점검용: 지금까지 지도에 넣은 수 · 고친 수 · 뺀 수, 마지막 오류. */
-    public static int addedForTest, movedForTest, removedForTest;
+    public static int addedForTest, movedForTest, removedForTest, iconsForTest;
     public static String errorForTest = "";
 
     public static boolean available() {
@@ -197,6 +197,32 @@ public final class MapMarkClient {
         return f.get(wp);
     }
 
+    /** 없는 칸(옛 Diorama)이면 조용히 넘어간다. */
+    private static void setQuiet(Object wp, String name, Object value) {
+        try {
+            set(wp, name, value);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** 점검용: 이 폴더 · 이름의 웨이포인트에 붙은 그림 ("" = 없음, null = 그런 웨이포인트 없음). */
+    public static String iconForTest(String folder, String name) {
+        try {
+            if (!ModList.get().isLoaded("diorama")) return null;
+            Object store = store();
+            if (store == null) return null;
+            for (Object wp : (List<?>) storeClass.getMethod("all").invoke(store)) {
+                Object f = field(wp, "folder");
+                if (f != null && folder.equalsIgnoreCase(f.toString().trim()) && name.equals(field(wp, "name"))) {
+                    Object i = field(wp, "icon");
+                    return i == null ? "" : i.toString();
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
     private static void set(Object wp, String name, Object value) throws Exception {
         pointClass.getField(name).set(wp, value);
     }
@@ -244,8 +270,8 @@ public final class MapMarkClient {
                 String[] s = seen.get(id).getAsString().split("\\|");
                 seen.remove(id);
                 dirty = true;
-                if (s.length != 5) continue;
-                Object wp = find(store, folder, s[0], s[1], Integer.parseInt(s[2]), Integer.parseInt(s[3]), Integer.parseInt(s[4]));
+                if (s.length < 5) continue;
+                Object wp = s.length >= 5 ? find(store, folder, s[0], s[1], Integer.parseInt(s[2]), Integer.parseInt(s[3]), Integer.parseInt(s[4])) : null;
                 if (wp != null) {
                     storeClass.getMethod("remove", pointClass).invoke(store, wp);
                     removedForTest++;
@@ -257,20 +283,37 @@ public final class MapMarkClient {
                 JsonObject m = e.getAsJsonObject();
                 String id = m.get("id").getAsString(), name = m.get("name").getAsString().replace('|', ' '), dim = m.get("dim").getAsString();
                 int x = m.get("x").getAsInt(), y = m.get("y").getAsInt(), z = m.get("z").getAsInt(), color = m.get("color").getAsInt();
-                String sig = name + "|" + dim + "|" + x + "|" + y + "|" + z;
+                // K-1 (3.69.0): NPC 는 직업 상징 그림 (Diorama 는 그림이 있는 웨이포인트를 큰 지도에서 이름 대신 그림으로 보이고, 마우스를 올리면 이름)
+                String icon = m.has("icon") ? m.get("icon").getAsString() : "";
+                String base = name + "|" + dim + "|" + x + "|" + y + "|" + z;
+                String sig = icon.isEmpty() ? base : base + "|" + icon;
                 String prev = seen.has(id) ? seen.get(id).getAsString() : null;
                 if (sig.equals(prev) && !force) continue;                    // 이미 넣었다 (플레이어가 지웠더라도 다시 넣지 않는다)
                 Object old = null;
+                boolean sameSpot = false;
                 if (prev != null) {
                     String[] s = prev.split("\\|");
-                    if (s.length == 5) old = find(store, folder, s[0], s[1], Integer.parseInt(s[2]), Integer.parseInt(s[3]), Integer.parseInt(s[4]));
+                    if (s.length >= 5) {
+                        old = find(store, folder, s[0], s[1], Integer.parseInt(s[2]), Integer.parseInt(s[3]), Integer.parseInt(s[4]));
+                        sameSpot = base.equals(s[0] + "|" + s[1] + "|" + s[2] + "|" + s[3] + "|" + s[4]);
+                    }
                 }
-                if (old != null && !sig.equals(prev)) {                      // 자리나 이름이 바뀌었다: 있던 것을 고친다
+                if (old == null && sameSpot && !force) {                     // 그림만 새로 생겼는데 플레이어가 지운 표시: 다시 넣지 않는다
+                    seen.addProperty(id, sig);
+                    dirty = true;
+                    continue;
+                }
+                if (old != null && !sig.equals(prev)) {                      // 자리 · 이름 · 그림이 바뀌었다: 있던 것을 고친다
                     set(old, "name", name);
                     set(old, "dimension", dim);
                     set(old, "x", x);
                     set(old, "y", y);
                     set(old, "z", z);
+                    if (!icon.isEmpty()) {
+                        setQuiet(old, "icon", icon);
+                        setQuiet(old, "color", color);
+                        iconsForTest++;
+                    }
                     try {
                         set(old, "initials", pointClass.getMethod("initialsFor", String.class).invoke(null, name));
                     } catch (NoSuchMethodException ignored) {
@@ -282,6 +325,10 @@ public final class MapMarkClient {
                     Object wp = pointClass.getConstructor(String.class, int.class, int.class, int.class, String.class, int.class)
                             .newInstance(name, x, y, z, dim, color);
                     set(wp, "folder", folder);
+                    if (!icon.isEmpty()) {
+                        setQuiet(wp, "icon", icon);
+                        iconsForTest++;
+                    }
                     storeClass.getMethod("add", pointClass).invoke(store, wp);
                     addedForTest++;
                     if (notify) NoticeHud.push(Component.translatable("rtshop.mapmark.added", name));

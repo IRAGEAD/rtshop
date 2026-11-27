@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 8
+VERSION = 9
 CATS = []
 
 
@@ -50,7 +50,7 @@ page(c, "talk", "NPC 와 대화", """
 
 같은 사람과 일상 이야기를 오래 나누다 보면, 가끔 다른 데서는 들을 수 없는 말을 흘리기도 합니다.
 
-한 번 말을 걸어 본 사람과 찾아가 본 장소는 지도(Diorama)에 이름이 남습니다. 지도에서 지운 표시를 되살리려면 /rtshop mapmark resend 를 씁니다.
+한 번 말을 걸어 본 사람과 찾아가 본 장소는 지도(Diorama)에 남습니다. 사람은 하는 일의 그림(모루 · 물고기 · 책 …)으로 보이고, 마우스를 올리면 이름이 뜹니다. 핀 색은 상점(주황) · 마을 일(초록) · 이야기(파랑) · 전투 스승(빨강)입니다. 지도에서 지운 표시를 되살리려면 /rtshop mapmark resend 를 씁니다.
 """, image="talk", keys="대화 선택지 이야기 지도 표시")
 page(c, "quests", "퀘스트와 수첩", """
 퀘스트는 NPC 와의 대화에서 받습니다. 목표를 채운 뒤 다시 찾아가면 보상을 받습니다.

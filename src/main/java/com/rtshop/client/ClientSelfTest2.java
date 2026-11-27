@@ -1574,6 +1574,88 @@ final class ClientSelfTest2 {
             }
             waitTicks(5);
         });
+        // K-1 (3.69.0): NPC 표시는 큰 지도에서 이름 대신 직업 상징 그림 (Diorama 는 그림이 있는 웨이포인트의 이름을 마우스를 올릴 때만 보인다)
+        add(mc -> {
+            onServer(mc, sp -> {
+                com.rtshop.story.MapMarks.forgetAll(sp);
+                String dim = sp.level().dimension().location().toString();
+                int px = sp.blockPosition().getX(), py = sp.blockPosition().getY(), pz = sp.blockPosition().getZ();
+                String[][] d = {{"anvil", "RT 아이콘 대장장이", "24", "0"}, {"fish", "RT 아이콘 어부", "-24", "0"}, {"book", "RT 아이콘 기록관", "0", "24"},
+                        {"sword", "RT 아이콘 검술", "0", "-24"}, {"coin", "RT 아이콘 은행", "17", "17"}, {"wheat", "RT 아이콘 농부", "-17", "17"}};
+                for (String[] e : d) {
+                    com.rtshop.story.MapMarks.mark(sp, "test:icon_" + e[0], e[1], dim, px + Integer.parseInt(e[2]), py, pz + Integer.parseInt(e[3]),
+                            com.rtshop.story.MapMarks.C_SHOP, "rtshop:" + e[0]);
+                }
+                com.rtshop.story.MapMarks.mark(sp, "test:icon_old", "RT 아이콘 옛 표시", dim, px - 17, py, pz - 17, 0xFFE8C56A);   // 3.68 까지의 표시 (그림 없음)
+            });
+            waitTicks(60);
+        });
+        add(mc -> {
+            onServer(mc, sp -> com.rtshop.story.MapMarks.mark(sp, "test:icon_old", "RT 아이콘 옛 표시", sp.level().dimension().location().toString(),
+                    sp.blockPosition().getX() - 17, sp.blockPosition().getY(), sp.blockPosition().getZ() - 17, com.rtshop.story.MapMarks.C_TOWN, "rtshop:clover"));
+            waitTicks(40);
+        });
+        add(mc -> {
+            if (net.minecraftforge.fml.ModList.get().isLoaded("diorama")) {
+                String folder = com.rtshop.story.MapMarks.get().folder;
+                String anvil = MapMarkClient.iconForTest(folder, "RT 아이콘 대장장이"), old = MapMarkClient.iconForTest(folder, "RT 아이콘 옛 표시");
+                int oldCount = MapMarkClient.countForTest(folder, "RT 아이콘 옛 표시");
+                boolean loads = false, listed = false;
+                try {
+                    Class<?> wi = Class.forName("dev.diorama.render.WaypointIcons");
+                    loads = wi.getMethod("image", String.class).invoke(null, "rtshop:anvil") != null
+                            && wi.getMethod("image", String.class).invoke(null, "rtshop:clover") != null;
+                    listed = ((java.util.List<?>) wi.getMethod("all").invoke(null)).contains("rtshop:anvil");
+                } catch (Throwable t) {
+                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] waypoint icons: {}", t.toString());
+                }
+                check("K-1 NPC marks carry a picture of what the NPC does (Diorama shows it instead of the name on the big map, the name on hover); an older mark gets its picture in place",
+                        "rtshop:anvil".equals(anvil) && "rtshop:clover".equals(old) && oldCount == 1 && loads && listed && MapMarkClient.iconsForTest >= 7,
+                        anvil + " " + old + " x" + oldCount + " loads " + loads + " listed " + listed + " icons " + MapMarkClient.iconsForTest + " " + MapMarkClient.errorForTest);
+                // 큰 지도를 열어 그림을 찍는다 (열 수 없으면 사진만 건너뛴다)
+                try {
+                    Class<?> ms = Class.forName("dev.diorama.MapScreen");
+                    for (java.lang.reflect.Constructor<?> k : ms.getDeclaredConstructors()) {
+                        Class<?>[] ps = k.getParameterTypes();
+                        Object[] args = new Object[ps.length];
+                        boolean ok = true;
+                        for (int i = 0; i < ps.length; i++) {
+                            if (ps[i] == boolean.class) args[i] = false;
+                            else if (ps[i] == int.class) args[i] = 0;
+                            else if (ps[i] == double.class) args[i] = 0D;
+                            else if (ps[i] == float.class) args[i] = 0F;
+                            else if (ps[i].isPrimitive()) ok = false;
+                        }
+                        if (!ok) continue;
+                        try {
+                            k.setAccessible(true);
+                            mc.setScreen((net.minecraft.client.gui.screens.Screen) k.newInstance(args));
+                            break;
+                        } catch (Throwable t) {
+                            com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] map screen {}: {}", java.util.Arrays.toString(ps), t.toString());
+                        }
+                    }
+                } catch (Throwable t) {
+                    com.rtshop.RtShop.LOGGER.info("[rtshop-clienttest] map screen: {}", t.toString());
+                }
+            }
+            waitTicks(60);
+        });
+        add(mc -> {
+            if (mc.screen != null && mc.screen.getClass().getName().startsWith("dev.diorama")) shot(mc, "134_map_npc_icons");
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                com.rtshop.story.MapMarks.Config c = com.rtshop.story.MapMarks.get();
+                com.rtshop.story.MapMarks.forgetAll(sp);
+                try {
+                    com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> sp), new com.rtshop.net.StoryPacket(
+                            com.rtshop.net.StoryPacket.MAP_MARKS, "{\"folder\":\"" + c.folder + "\",\"marks\":[],\"gone\":[\"test:icon_anvil\",\"test:icon_fish\",\"test:icon_book\","
+                            + "\"test:icon_sword\",\"test:icon_coin\",\"test:icon_wheat\",\"test:icon_old\"],\"notify\":false,\"force\":false}"));
+                } catch (Throwable ignored) {
+                }
+            });
+            waitTicks(20);
+        });
         // 미니맵의 NPC 아이콘 (3.58): 말을 걸어 본 NPC 만 뜨고, 설정으로 모두 끈다
         add(mc -> {
             net.minecraft.world.entity.npc.Villager rv = net.minecraft.world.entity.EntityType.VILLAGER.create(mc.level);

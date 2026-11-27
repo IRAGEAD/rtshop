@@ -63,6 +63,11 @@ public final class MapMarks {
         /** true 면 미니맵의 몹 아이콘(레이더)에 RT Shop NPC 는 말을 걸어 본 것만 뜬다. false 면 모두 뜬다. */
         public boolean radarKnownOnly = true;
         public String npcColor = "#E8C56A", placeColor = "#8FC7F0";
+        /**
+         * K-1 (3.69.0): true 면 NPC 표시를 큰 지도에서 이름 대신 하는 일의 그림(직업 상징)으로 보인다 (마우스를 올리면 이름).
+         * 핀 색은 상점 · 마을 일 · 이야기 · 전투 스승으로 나눈다. false 면 예전처럼 이름표.
+         */
+        public boolean npcIcons = true;
         public final List<Place> places = new ArrayList<>();
 
         JsonObject toJson() {
@@ -76,6 +81,7 @@ public final class MapMarks {
             o.addProperty("radarKnownOnly", radarKnownOnly);
             o.addProperty("npcColor", npcColor);
             o.addProperty("placeColor", placeColor);
+            o.addProperty("npcIcons", npcIcons);
             JsonArray a = new JsonArray();
             for (Place p : places) {
                 JsonObject e = new JsonObject();
@@ -100,6 +106,7 @@ public final class MapMarks {
             if (o.has("radarKnownOnly")) c.radarKnownOnly = o.get("radarKnownOnly").getAsBoolean();
             if (o.has("npcColor")) c.npcColor = o.get("npcColor").getAsString();
             if (o.has("placeColor")) c.placeColor = o.get("placeColor").getAsString();
+            if (o.has("npcIcons")) c.npcIcons = o.get("npcIcons").getAsBoolean();
             if (o.has("places") && o.get("places").isJsonArray()) {
                 for (var e : o.getAsJsonArray("places")) {
                     if (!e.isJsonObject()) continue;
@@ -208,7 +215,64 @@ public final class MapMarks {
         o.addProperty("y", t.getInt("y"));
         o.addProperty("z", t.getInt("z"));
         o.addProperty("color", t.getInt("c"));
+        if (!t.getString("i").isEmpty()) o.addProperty("icon", t.getString("i"));
         return o;
+    }
+
+    // ------------------------------------------------------------------ K-1: NPC 의 직업 상징 (3.69.0)
+
+    /** 핀 색: 상점 · 마을 일 · 이야기 · 전투 스승. */
+    public static final int C_SHOP = 0xFFE39A3B, C_TOWN = 0xFF55A85A, C_STORY = 0xFF4F86D9, C_MASTER = 0xFFD0574A;
+
+    /** NPC 열쇠(NpcLooks.keyOf: quest_<ID> · shop_<상점> · bank · job · attendance · gacha · raid_guide) → {그림 이름, 핀 색}. 모르는 NPC 는 사람 그림. */
+    public static Object[] iconOf(String key) {
+        if (key == null) return new Object[]{"person", C_TOWN};
+        if (key.startsWith("shop_")) {
+            String s = key.substring(5);
+            String i = s.startsWith("blacksmith") ? "anvil" : s.equals("farmer") ? "wheat" : s.equals("fisher") ? "fish" : s.equals("food") ? "bread"
+                    : s.equals(com.rtshop.shop.Restaurant.ID) ? "cloche" : s.startsWith("general") ? "bag" : s.equals("land") || s.equals("castle_plots") ? "house"
+                    : s.equals("raid") ? "swords" : s.startsWith("gacha_shop") ? "ticket" : s.equals("attendance_shop") ? "calendar" : "bag";
+            return new Object[]{i, C_SHOP};
+        }
+        switch (key) {
+            case "bank": return new Object[]{"coin", C_TOWN};
+            case "job": return new Object[]{"briefcase", C_TOWN};
+            case "attendance": return new Object[]{"calendar", C_TOWN};
+            case "gacha": return new Object[]{"clover", C_TOWN};
+            case "raid_guide": return new Object[]{"swords", C_TOWN};
+            case "quest_guide": return new Object[]{"sign", C_TOWN};
+            case "quest_bounty": return new Object[]{"target", C_TOWN};
+            case "quest_ranks": return new Object[]{"trophy", C_TOWN};
+            case "quest_titles": return new Object[]{"medal", C_TOWN};
+            case "quest_order_elder": return new Object[]{"flame", C_STORY};
+            case "quest_order_archivist": return new Object[]{"book", C_STORY};
+            case "quest_order_captain": return new Object[]{"flag", C_STORY};
+            case "quest_felix": return new Object[]{"map", C_STORY};
+            case "quest_bram": return new Object[]{"anvil", C_STORY};
+            case "quest_oscar": return new Object[]{"fish", C_STORY};
+            case "quest_sword_master": return new Object[]{"sword", C_MASTER};
+            case "quest_war_chief": return new Object[]{"axe", C_MASTER};
+            case "quest_shield_keeper": return new Object[]{"shield", C_MASTER};
+            case "quest_hunter": return new Object[]{"bow", C_MASTER};
+            case "quest_archmage": return new Object[]{"staff", C_MASTER};
+            default: return new Object[]{key.startsWith("quest_") ? "quest" : "person", key.startsWith("quest_") ? C_STORY : C_TOWN};
+        }
+    }
+
+    /** 그림 이름 전부 (assets/rtshop/textures/waypoint_icons/<이름>.png, tools/gen_map_icons.py). */
+    public static final java.util.List<String> ICONS = java.util.List.of("anvil", "wheat", "fish", "bread", "cloche", "bag", "house", "swords", "ticket",
+            "calendar", "coin", "briefcase", "clover", "book", "flame", "flag", "map", "sign", "target", "trophy", "medal", "sword", "axe", "shield", "bow",
+            "staff", "quest", "person");
+
+    /** 이 NPC 의 지도 그림 ("rtshop:<이름>", 끔이면 ""). */
+    static String iconFor(Entity npc) {
+        if (!get().npcIcons) return "";
+        return RtShop.MODID + ":" + iconOf(com.rtshop.npc.NpcLooks.keyOf(npc))[0];
+    }
+
+    static int colorFor(Entity npc) {
+        if (!get().npcIcons) return color(get().npcColor, 0xFFE8C56A);
+        return (Integer) iconOf(com.rtshop.npc.NpcLooks.keyOf(npc))[1];
     }
 
     /** 점검용: 마지막으로 보낸 내용. */
@@ -236,10 +300,15 @@ public final class MapMarks {
      * 같은 표시(id)는 다시 보내지 않는다: NPC 가 옮겨졌을 때만 새 자리로 고쳐 보낸다.
      */
     public static boolean mark(ServerPlayer p, String id, String name, String dim, int x, int y, int z, int color) {
+        return mark(p, id, name, dim, x, y, z, color, "");
+    }
+
+    /** icon: Diorama 웨이포인트 그림 ("rtshop:anvil" 등, "" = 없음 · 이름표). */
+    public static boolean mark(ServerPlayer p, String id, String name, String dim, int x, int y, int z, int color, String icon) {
         if (!get().enabled || name == null || name.isBlank()) return false;
         CompoundTag marks = kept(p).getCompound(KEY);
         CompoundTag old = marks.contains(id) ? marks.getCompound(id) : null;
-        if (old != null && old.getString("name").equals(name) && old.getString("dim").equals(dim)
+        if (old != null && old.getString("name").equals(name) && old.getString("dim").equals(dim) && old.getString("i").equals(icon)
                 && Math.abs(old.getInt("x") - x) <= 3 && Math.abs(old.getInt("y") - y) <= 3 && Math.abs(old.getInt("z") - z) <= 3) {
             return false;   // 서너 칸 움직인 것은 같은 자리로 본다 (NPC 가 조금씩 밀리는 것 때문에 자꾸 고치지 않게)
         }
@@ -250,6 +319,7 @@ public final class MapMarks {
         t.putInt("y", y);
         t.putInt("z", z);
         t.putInt("c", color);
+        if (!icon.isEmpty()) t.putString("i", icon);
         marks.put(id, t);
         keep(p, marks);
         JsonArray a = new JsonArray();
@@ -269,6 +339,16 @@ public final class MapMarks {
         JsonArray a = new JsonArray(), gone = new JsonArray();
         boolean changed = false;
         for (String id : new ArrayList<>(marks.getAllKeys())) {
+            // K-1 (3.69.0): 그림이 없던 NPC 표시(3.68 까지 적힌 것)는 그 NPC 가 불러와져 있으면 그림을 붙인다 (못 찾으면 다음에 말을 걸 때)
+            if (id.startsWith("npc:") && c.npcIcons && marks.getCompound(id).getString("i").isEmpty()) {
+                Entity npc = findNpc(p.server, id.substring(4));
+                if (npc != null) {
+                    CompoundTag t = marks.getCompound(id);
+                    t.putString("i", iconFor(npc));
+                    t.putInt("c", colorFor(npc));
+                    changed = true;
+                }
+            }
             if (id.startsWith("place:")) {
                 Place pl = place(c, id.substring(6));
                 if (pl == null) {
@@ -306,7 +386,20 @@ public final class MapMarks {
         if (npc.getTags().contains(com.rtshop.pshop.Employees.TAG)) return false;   // 플레이어 상점의 직원은 적지 않는다
         if (npc.level().dimension() == StoryArena.DIM) return false;
         return mark(p, "npc:" + npc.getUUID(), npc.getCustomName().getString(), npc.level().dimension().location().toString(),
-                npc.blockPosition().getX(), npc.blockPosition().getY(), npc.blockPosition().getZ(), color(c.npcColor, 0xFFE8C56A));
+                npc.blockPosition().getX(), npc.blockPosition().getY(), npc.blockPosition().getZ(), colorFor(npc), iconFor(npc));
+    }
+
+    private static Entity findNpc(net.minecraft.server.MinecraftServer server, String uuid) {
+        if (server == null) return null;
+        try {
+            java.util.UUID u = java.util.UUID.fromString(uuid);
+            for (net.minecraft.server.level.ServerLevel l : server.getAllLevels()) {
+                Entity e = l.getEntity(u);
+                if (e != null) return e;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
