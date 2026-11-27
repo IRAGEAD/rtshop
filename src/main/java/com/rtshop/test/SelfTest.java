@@ -2009,8 +2009,10 @@ public final class SelfTest {
             long t0 = 1_000_000L;
             boolean first = com.rtshop.stats.IncomeStats.activeForTest(a, t0);
             boolean idle = com.rtshop.stats.IncomeStats.activeForTest(a, t0 + 6 * 60 * 1000L);
-            a.teleportTo(a.getX() + 3, a.getY(), a.getZ());
+            double ox = a.getX();
+            a.setPos(ox + 3, a.getY(), a.getZ());   // 가짜 플레이어는 teleportTo 로 자리가 바뀌지 않는다
             boolean back = com.rtshop.stats.IncomeStats.activeForTest(a, t0 + 7 * 60 * 1000L);
+            a.setPos(ox, a.getY(), a.getZ());
             com.rtshop.stats.IncomeStats.forgetForTest(a.getUUID());
             check("3.68.0 only active time counts: standing still for over 5 minutes stops the clock, moving starts it again", first && !idle && back,
                     first + " " + idle + " " + back);
