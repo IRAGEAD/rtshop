@@ -2575,6 +2575,12 @@ final class ClientSelfTest2 {
             shot(mc, "136b_tooltip_scroll_top");
             check("3.78 a tooltip taller than the screen is shrunk to fit with its name on screen; a very long one stops at a readable size and scrolls with the wheel",
                     TIP_FIT_378 && scrolls, TIP_INFO_378);
+            if (com.rtshop.compat.BossesRiseRollOff.loaded()) {
+                // 3.78: Bosses'Rise 의 구르기 표시(핫바 오른쪽 초록 화살표)는 꺼지고 Z 키는 풀렸다
+                String st378 = BossesRiseRollClient.stateForTest();
+                check("3.78 Bosses'Rise's dodge-roll marker next to the hotbar is off and its Z key is free", "gui=false bound=false".equals(st378),
+                        st378 + " | " + BossesRiseRollClient.lastForTest);
+            }
             waitTicks(6);
         });
         add(mc -> {

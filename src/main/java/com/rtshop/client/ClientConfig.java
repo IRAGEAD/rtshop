@@ -59,6 +59,10 @@ public final class ClientConfig {
     public boolean hideAbyssInventoryButton = true;
     /** 화면보다 긴 설명 창(툴팁)을 줄여 맞추고, 그래도 넘치면 휠로 넘겨 본다 (3.78). */
     public boolean fitLongTooltips = true;
+    /** Bosses'Rise 의 구르기 표시(핫바 오른쪽 초록 화살표)를 끄고 그 키를 한 번 풀어 준다 (3.78). */
+    public boolean hideBossesRiseRoll = true;
+    /** 그 키를 이미 한 번 풀었다 (다시 묶으면 그대로 둔다). */
+    public boolean bossesRiseKeyCleared = false;
     /** 보스 등장 때 카메라가 보스 곁에서 움직이는 3D 연출 (3.61). 끄면 화면 위의 2D 연출만 나온다. */
     public boolean bossCamera = true;
     /** RT Shop NPC 를 주민 대신 인물별 사람 모습으로 그린다 (3.61). 끄면 예전의 주민 모습. */
@@ -261,6 +265,8 @@ public final class ClientConfig {
             o.addProperty("hideSidebarButtons", hideSidebarButtons);
             o.addProperty("hideAbyssInventoryButton", hideAbyssInventoryButton);
             o.addProperty("fitLongTooltips", fitLongTooltips);
+            o.addProperty("hideBossesRiseRoll", hideBossesRiseRoll);
+            o.addProperty("bossesRiseKeyCleared", bossesRiseKeyCleared);
             o.addProperty("bossCamera", bossCamera);
             o.addProperty("npcLooks", npcLooks);
             o.addProperty("oneBossMusic", oneBossMusic);
@@ -337,6 +343,8 @@ public final class ClientConfig {
                 if (o.has("hideSidebarButtons")) c.hideSidebarButtons = o.get("hideSidebarButtons").getAsBoolean();
                 if (o.has("hideAbyssInventoryButton")) c.hideAbyssInventoryButton = o.get("hideAbyssInventoryButton").getAsBoolean();
                 if (o.has("fitLongTooltips")) c.fitLongTooltips = o.get("fitLongTooltips").getAsBoolean();
+                if (o.has("hideBossesRiseRoll")) c.hideBossesRiseRoll = o.get("hideBossesRiseRoll").getAsBoolean();
+                if (o.has("bossesRiseKeyCleared")) c.bossesRiseKeyCleared = o.get("bossesRiseKeyCleared").getAsBoolean();
                 if (o.has("bossCamera")) c.bossCamera = o.get("bossCamera").getAsBoolean();
                 if (o.has("npcLooks")) c.npcLooks = o.get("npcLooks").getAsBoolean();
                 if (o.has("oneBossMusic")) c.oneBossMusic = o.get("oneBossMusic").getAsBoolean();

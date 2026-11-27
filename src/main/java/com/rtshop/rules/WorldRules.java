@@ -60,6 +60,8 @@ public final class WorldRules {
     public boolean keepSkillsOnDeath = true;
     /** 특수기가 있는 무기를 처음 얻으면 그 무기의 설명서를 준다. */
     public boolean weaponManuals = true;
+    /** Bosses'Rise 의 구르기(Dodge Roll, Z 키)를 쓰게 둘지 (3.78: 기본 끔 — Epic Fight 의 회피기와 겹치지 않게). */
+    public boolean bossesRiseRoll = false;
     /** 강화 모루도 마을에 하나뿐 (3.49): 운영자(크리에이티브)만 놓고 치울 수 있고, 정해 둔 모루만 열린다. */
     public static final String ANVIL_KEY = "rtshop:enhance_anvil";
     public boolean anvilOpOnly = true;
@@ -127,6 +129,7 @@ public final class WorldRules {
         strings(o, "lootBlockedMods", w.lootBlockedMods);
         if (o.has("abyssPortalOpOnly")) w.abyssPortalOpOnly = o.get("abyssPortalOpOnly").getAsBoolean();
         if (o.has("weaponManuals")) w.weaponManuals = o.get("weaponManuals").getAsBoolean();
+        if (o.has("bossesRiseRoll")) w.bossesRiseRoll = o.get("bossesRiseRoll").getAsBoolean();
         if (o.has("keepSkillsOnDeath")) w.keepSkillsOnDeath = o.get("keepSkillsOnDeath").getAsBoolean();
         if (o.has("magicOnlyForMage")) w.magicOnlyForMage = o.get("magicOnlyForMage").getAsBoolean();
         if (o.has("keepSkillStacks")) w.keepSkillStacks = o.get("keepSkillStacks").getAsBoolean();
@@ -174,6 +177,7 @@ public final class WorldRules {
         help.add("keepSkillStacks: true 면 무기를 바꿔도 특수기의 스택(충전 횟수)과 게이지가 사라지지 않는다: 그 무기를 다시 들면 돌아오고, 처음 드는 무기에는 방금 것의 스택이 넘어간다.");
         help.add("keepSkillsOnDeath: true 면 스킬북으로 배운 기술이 죽어도 사라지지 않는다 (서버가 켜질 때 Epic Fight 의 게임 규칙 keepSkills 를 켠다).");
         help.add("weaponManuals: true 면 특수기가 있는 무기(Epic Fight)를 처음 얻었을 때 그 무기의 설명서를 한 권 준다 (같은 종류·같은 특수기는 한 권).");
+        help.add("bossesRiseRoll: false 면 Bosses'Rise 모드의 구르기(Dodge Roll, 기본 Z 키 · 핫바 오른쪽의 초록 화살표)를 서버에서 끈다 (서버가 켜질 때 그 모드의 Can use roll 을 끔). true 면 그 모드 설정 그대로.");
         help.add("abyssPortal: 나선 비경으로 들어갈 수 있는 단 하나의 문. 게임 안에서 문 앞에 서서 /rtshop abyss portal here (OP). abyssPortalOpOnly: 문은 운영자(크리에이티브)만 세울 수 있음.");
         help.add("enhanceAnvil: 쓸 수 있는 단 하나의 강화 모루. 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 모루 곁에서 /rtshop anvil here (풀기: /rtshop anvil clear). enhanceAnvilOpOnly: 운영자(크리에이티브)만 놓고 치울 수 있음.");
         help.add("runeAltar: 쓸 수 있는 단 하나의 룬 제단(별빛 수정 구체). 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 제단 곁에서 /rtshop altar here. runeAltarOpOnly: 운영자(크리에이티브)만 놓을 수 있음.");
@@ -190,6 +194,7 @@ public final class WorldRules {
         o.add("lootBlockedMods", c);
         o.addProperty("abyssPortalOpOnly", abyssPortalOpOnly);
         o.addProperty("weaponManuals", weaponManuals);
+        o.addProperty("bossesRiseRoll", bossesRiseRoll);
         o.addProperty("keepSkillsOnDeath", keepSkillsOnDeath);
         o.addProperty("magicOnlyForMage", magicOnlyForMage);
         o.addProperty("keepSkillStacks", keepSkillStacks);

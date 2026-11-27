@@ -5232,6 +5232,16 @@ public final class SelfTest {
         hiddenPaths(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
         story377(a);
         examine378(a);
+        // 3.78 (사용자 11-28 08:31): Bosses'Rise 의 구르기(Dodge Roll · Z 키 · 핫바 오른쪽 초록 화살표)는 서버에서 꺼 둔다
+        if (com.rtshop.compat.BossesRiseRollOff.loaded()) {
+            net.minecraftforge.common.ForgeConfigSpec.ConfigValue<Boolean> roll378 = com.rtshop.compat.BossesRiseRollOff.canUseRoll();
+            String again378 = com.rtshop.compat.BossesRiseRollOff.apply();
+            check("3.78 Bosses'Rise's dodge roll is switched off on the server (its Can use roll setting), and stays off",
+                    roll378 != null && !Boolean.TRUE.equals(roll378.get()) && "already".equals(again378) && !com.rtshop.rules.WorldRules.get().bossesRiseRoll,
+                    (roll378 == null ? "no field" : String.valueOf(roll378.get())) + " " + again378);
+        } else {
+            check("3.78 without Bosses'Rise the dodge roll switch does nothing", "absent".equals(com.rtshop.compat.BossesRiseRollOff.apply()));
+        }
         // 3.73: 성능 진단 (/fpscheck · /rtshop perfcheck) — 스택의 프레임을 모드로 돌리는 규칙
         StackTraceElement[] st373 = {
                 new StackTraceElement("java.lang.Object", "wait", null, -1),
