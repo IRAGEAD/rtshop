@@ -445,6 +445,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 | `/rtshop land` | 모두 | 토지 설정 화면 |
 | `/rtshop quest` | 모두 | 퀘스트 수첩 |
 | `/rtshop stocks` · `stocks trade` | 모두 | 조합 시세판 (어디서나 보기) · 증권 창구 (은행원 곁에서 사고팔기 · 배당) |
+| `/rtshop rank reward <종목\|all> <1위> <2위> <3위>` | OP | 주간 순위 보상 Gold 바꾸기 (3.75, 종목: kills · bosses · earned · spent · gold · quests · bounties · raids, all = 모든 종목). 순위 창의 ✎ 단추로도 |
 | `/rtshop stocks status\|reload\|nextday <일>` | OP | 기금 · 시세 · 발행 주식 보기 · 설정 다시 읽기 · 장부의 날을 손으로 닫기 (시험용) |
 | `/fpscheck [초]` | 모두 (화면 쪽) | FPS 진단 (3.73): 화면 스레드를 그 시간(기본 30초) 동안 찍어 모드별로 시간이 드는 곳 · 그래픽 카드를 기다리는 몫을 게임 폴더의 `rtshop-fpscheck-<시각>.txt` 에 적고 채팅에 요약 |
 | `/rtshop perfcheck [초]` | OP · 콘솔 | 서버 진단 (3.73): 서버 스레드를 찍어 틱 시간 · 모드별 몫을 `config/rtshop/export/perfcheck-<시각>.txt` 에 |

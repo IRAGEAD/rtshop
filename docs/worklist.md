@@ -415,6 +415,7 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 - Z-4. W-3 조사 수첩 아이템 `rtshop:survey_notebook` (`CodexItem` 의 세 번째 종류, 우클릭 = `Spots.openNotebook`): 처음 들어올 때 한 권(예전부터 하던 사람도 한 번, `Guide.giveNotebook`, 표시 rtshop_notebook_given),
   잡화점 1,500 G (`general+general_books@2`). 그림은 시안 셋(갈색+깃펜 · 갈색+별 · 보라+돋보기) 중 보라+돋보기로 — 사용자에게 고르게 보낼 것. `/rtshop notebook` 은 그대로 둠.
 - Z-5. W-8 도감 장비 탭: 상점에서 살 수 있는 것 · 뽑기 풀 · 전리품 표(data/*/loot_tables 의 item · tag)에 있는 장비만 (`Codex.obtainable`, codex.json `obtainableGearOnly` · `keepGear`). 이미 얻은 장비는 빠져도 보임.
+- Z-6. W-6 주간 순위 보상 고치기: OP 는 순위 창 아래 ✎ → 1 · 2 · 3위 칸 + [이 종목] [모든 종목에 저장] [취소] (`RankScreen`), 서버는 `/rtshop rank reward <종목|all> <1위> <2위> <3위>` (`Ranks.setRewards`, ranks.json 에 저장).
 - Z-2. W-26 흔적 위의 반짝이는 별 (`SpotClient.star`): 192칸 안에서 보이고 멀수록 조금 커짐, 24칸 넘으면 지형 너머로 비침, 32칸 안에서는 반짝이 가루(END_ROD). 흔적은 그 퀘스트를 하는 사람에게만 오므로 별도 그 사람에게만.
 
 ## 3.74.0 (2026-11-27 밤, 가지 v5-next27) — 화면 · 문구 · 퀘스트 표시 (메모 W-*)

@@ -2040,5 +2040,11 @@
   "rtshop.hunt.board_claimed": "Collected: %s · %s G",
   "item.rtshop.survey_notebook": "Field Notebook",
   "item.rtshop.survey_notebook.tip1": "Right-click while holding it to open. Holds the traces you looked at and what you read there.",
-  "item.rtshop.survey_notebook.tip2": "If lost, the general store sells another."
+  "item.rtshop.survey_notebook.tip2": "If lost, the general store sells another.",
+  "rtshop.rank.edit_this": "This one",
+  "rtshop.rank.edit_all": "Save for every category",
+  "rtshop.rank.edit_cancel": "Cancel",
+  "rtshop.rank.reward_set": "Weekly ranking rewards changed (%s): 1st %s · 2nd %s · 3rd %s G",
+  "rtshop.rank.reward_bad": "Could not change the rewards: no category %s, or a bad value.",
+  "rtshop.rank.edit_head": "1st · 2nd · 3rd place reward (Gold)"
 }

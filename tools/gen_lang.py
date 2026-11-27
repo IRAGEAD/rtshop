@@ -64,6 +64,13 @@ NEW = {
  "rtshop.npclayout.removed": ("%s 을(를) 치웠습니다 (%s, %s, %s). 배치 파일에서도 빠집니다.", "Removed %s (%s, %s, %s). It is taken out of the layout file too."),
  # ---- 3.74: 크리에이티브 탭
  "itemGroup.rtshop": ("RT Shop", "RT Shop"),
+ # ---- 3.75: 주간 순위 보상 고치기 (사용자 W-6)
+ "rtshop.rank.edit_head": ("1위 · 2위 · 3위 보상 (Gold)", "1st · 2nd · 3rd place reward (Gold)"),
+ "rtshop.rank.edit_this": ("이 종목", "This one"),
+ "rtshop.rank.edit_all": ("모든 종목에 저장", "Save for every category"),
+ "rtshop.rank.edit_cancel": ("취소", "Cancel"),
+ "rtshop.rank.reward_set": ("주간 순위 보상을 바꿨습니다 (%s): 1위 %s · 2위 %s · 3위 %s G", "Weekly ranking rewards changed (%s): 1st %s · 2nd %s · 3rd %s G"),
+ "rtshop.rank.reward_bad": ("보상을 바꾸지 못했습니다: 종목 %s 가 없거나 값이 잘못됐습니다.", "Could not change the rewards: no category %s, or a bad value."),
  # ---- 3.75: 조사 수첩 아이템 (사용자 W-3)
  "item.rtshop.survey_notebook": ("조사 수첩", "Field Notebook"),
  "item.rtshop.survey_notebook.tip1": ("들고 우클릭하면 펼쳐진다. 살펴본 흔적과 그때 본 글이 적혀 있다.", "Right-click while holding it to open. Holds the traces you looked at and what you read there."),

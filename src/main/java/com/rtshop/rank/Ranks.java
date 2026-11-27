@@ -211,6 +211,33 @@ public final class Ranks {
         config = null;
     }
 
+    /**
+     * 3.75.0 (사용자 W-6 "리더보드 보상 조정 기능"): 주간 순위 보상(1 · 2 · 3위 Gold)을 게임 안에서 바꾼다. cat = 종목 id (그 종목만) 또는 "all" (기본값 · 종목별 값은 지움).
+     * ranks.json 에 적고 바로 쓴다. 바꿨으면 true.
+     */
+    public static synchronized boolean setRewards(String cat, long first, long second, long third) {
+        if (first < 0 || second < 0 || third < 0 || first > 100_000_000L || second > 100_000_000L || third > 100_000_000L) return false;
+        Config c = get();
+        long[] r = {first, second, third};
+        if (cat.equals("all")) {
+            c.rewards = r;
+            c.categoryRewards.clear();
+        } else {
+            if (!java.util.Arrays.asList(CATS).contains(cat)) return false;
+            if (java.util.Arrays.equals(r, c.rewards)) c.categoryRewards.remove(cat);
+            else c.categoryRewards.put(cat, r);
+        }
+        try {
+            Path f = file();
+            Files.createDirectories(f.getParent());
+            Files.writeString(f, GSON.toJson(c), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            RtShop.LOGGER.warn("[rtshop] ranks.json 을 쓰지 못했습니다: {}", e.toString());
+            return false;
+        }
+        return true;
+    }
+
     public static boolean on(String cat) {
         Config c = get();
         return c.enabled && Boolean.TRUE.equals(c.categories.get(cat));
@@ -692,6 +719,7 @@ public final class Ranks {
         JsonObject out = new JsonObject();
         out.addProperty("resetIn", Weekly.untilReset(Weekly.now(), c.resetDay, c.resetHour) / 1000L);
         out.addProperty("pending", me.pendingGold);
+        if (com.rtshop.util.Perm.op(p)) out.addProperty("op", true);   // 3.75.0 (W-6): 보상 고치기 단추
         JsonArray cats = new JsonArray();
         for (String cat : CATS) {
             if (!on(cat)) continue;
@@ -809,7 +837,26 @@ public final class Ranks {
                             settle(ctx.getSource().getServer());
                             ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.rank.settled"), true);
                             return 1;
-                        })))
+                        }))
+                        // 3.75.0 (W-6): /rtshop rank reward <종목|all> <1위> <2위> <3위>
+                        .then(Commands.literal("reward").requires(s -> s.hasPermission(2))
+                                .then(Commands.argument("cat", StringArgumentType.word())
+                                        .then(Commands.argument("first", com.mojang.brigadier.arguments.LongArgumentType.longArg(0))
+                                                .then(Commands.argument("second", com.mojang.brigadier.arguments.LongArgumentType.longArg(0))
+                                                        .then(Commands.argument("third", com.mojang.brigadier.arguments.LongArgumentType.longArg(0)).executes(ctx -> {
+                                                            String cat = StringArgumentType.getString(ctx, "cat");
+                                                            long a = com.mojang.brigadier.arguments.LongArgumentType.getLong(ctx, "first"),
+                                                                    b = com.mojang.brigadier.arguments.LongArgumentType.getLong(ctx, "second"),
+                                                                    c3 = com.mojang.brigadier.arguments.LongArgumentType.getLong(ctx, "third");
+                                                            if (!setRewards(cat, a, b, c3)) {
+                                                                ctx.getSource().sendFailure(Component.translatable("rtshop.rank.reward_bad", cat));
+                                                                return 0;
+                                                            }
+                                                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.rank.reward_set", cat, String.format("%,d", a),
+                                                                    String.format("%,d", b), String.format("%,d", c3)), true);
+                                                            if (ctx.getSource().getEntity() instanceof ServerPlayer sp && near(sp, NPC_RANKS)) openRanks(sp);
+                                                            return 1;
+                                                        })))))))
                 .then(Commands.literal("title")
                         .executes(ctx -> {
                             ServerPlayer p = ctx.getSource().getPlayerOrException();

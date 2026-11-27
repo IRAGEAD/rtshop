@@ -26,6 +26,9 @@ public class RankScreen extends Screen {
     private int sel, fx, fy;
     private boolean lastWeek;
     private long openedAt = System.currentTimeMillis();
+    /** 3.75.0 (사용자 W-6): OP 가 보상(1 · 2 · 3위 Gold)을 고치는 중. */
+    private boolean editing;
+    private final net.minecraft.client.gui.components.EditBox[] boxes = new net.minecraft.client.gui.components.EditBox[3];
 
     public RankScreen(JsonObject o) {
         super(Component.translatable("rtshop.rank.title"));
@@ -44,12 +47,66 @@ public class RankScreen extends Screen {
         for (JsonElement e : o.getAsJsonArray("cats")) cats.add(e.getAsJsonObject());
         sel = Math.max(0, Math.min(sel, cats.size() - 1));
         openedAt = System.currentTimeMillis();
+        if (editing) {
+            editing = false;
+            if (minecraft != null) rebuildWidgets();
+        }
+    }
+
+    private boolean op() {
+        return data != null && data.has("op") && data.get("op").getAsBoolean();
+    }
+
+    private int[] bottom() {
+        int lx = fx + 8, ly = fy + 28, lh = H - 36;
+        int dx = lx + LIST_W + 6, dw = W - LIST_W - 22;
+        return new int[]{dx, dw, ly + lh - 42};
     }
 
     @Override
     protected void init() {
         fx = (width - W) / 2;
         fy = (height - H) / 2;
+        java.util.Arrays.fill(boxes, null);
+        if (editing && !cats.isEmpty()) {
+            int[] b = bottom();
+            JsonArray rw = cats.get(sel).getAsJsonArray("rewards");
+            for (int i = 0; i < 3; i++) {
+                net.minecraft.client.gui.components.EditBox e = new net.minecraft.client.gui.components.EditBox(font, b[0] + 8 + i * 48, b[2] + 15, 44, 12, Component.empty());
+                e.setMaxLength(10);
+                e.setFilter(v -> v.matches("[0-9]*"));
+                e.setValue(i < rw.size() ? String.valueOf(rw.get(i).getAsLong()) : "0");
+                boxes[i] = addRenderableWidget(e);
+            }
+        }
+    }
+
+    /** 고치기 단추 자리: {이 종목 x,y,w,h, 전 종목 x,y,w,h, 취소 x,y,w,h}. */
+    private static int[] editButtons(int dx, int dw, int by) {
+        int bw = (dw - 16 - 4) / 2;
+        return new int[]{dx + 156, by + 15, dw - 16 - 148, 13, dx + 8, by + 29, bw, 12, dx + 12 + bw, by + 29, bw, 12};
+    }
+
+    private long[] typed() {
+        long[] r = new long[3];
+        for (int i = 0; i < 3; i++) {
+            try {
+                r[i] = boxes[i] == null || boxes[i].getValue().isEmpty() ? -1 : Long.parseLong(boxes[i].getValue());
+            } catch (NumberFormatException e) {
+                r[i] = -1;
+            }
+        }
+        return r;
+    }
+
+    private void saveRewards(boolean all) {
+        long[] r = typed();
+        if (r[0] < 0 || r[1] < 0 || r[2] < 0 || cats.isEmpty()) return;
+        Minecraft mc = Minecraft.getInstance();
+        String cat = all ? "all" : cats.get(sel).get("id").getAsString();
+        if (mc.player != null) mc.player.connection.sendCommand("rtshop rank reward " + cat + " " + r[0] + " " + r[1] + " " + r[2]);
+        editing = false;
+        rebuildWidgets();
     }
 
     @Override
@@ -148,7 +205,19 @@ public class RankScreen extends Screen {
         JsonArray rewards = c.getAsJsonArray("rewards");
         for (int i = 0; i < rewards.size(); i++) rw.append(i == 0 ? " " : " · ").append(i + 1).append(Component.translatable("rtshop.rank.place").getString())
                 .append(" ").append(Ui.num(rewards.get(i).getAsLong())).append(" G");
-        Ui.scaledText(g, font, Ui.clip(font, rw.toString(), (int) ((dw - 16) / 0.8F)), dx + 8, by + 17, 0.8F, Ui.C_INK_SOFT, false);
+        if (editing) {
+            // 3.75.0 (W-6): 1 · 2 · 3위 칸과 [이 종목] / [전 종목] [취소]
+            g.fill(dx + 6, by + 2, dx + dw - 6, by + 14, Ui.C_PARCH);
+            g.drawString(font, Ui.clip(font, Component.translatable("rtshop.rank.edit_head").getString(), dw - 16), dx + 8, by + 4, Ui.C_INK, false);
+            int[] e = editButtons(dx, dw, by);
+            Ui.button(g, font, e[0], e[1], e[2], e[3], Component.translatable("rtshop.rank.edit_this").getString(), Ui.inside(mx, my, e[0], e[1], e[2], e[3]), true);
+            Ui.button(g, font, e[4], e[5], e[6], e[7], Component.translatable("rtshop.rank.edit_all").getString(), Ui.inside(mx, my, e[4], e[5], e[6], e[7]), true);
+            Ui.button(g, font, e[8], e[9], e[10], e[11], Component.translatable("rtshop.rank.edit_cancel").getString(), Ui.inside(mx, my, e[8], e[9], e[10], e[11]), true);
+            super.render(g, mx, my, partial);
+            return;
+        }
+        Ui.scaledText(g, font, Ui.clip(font, rw.toString(), (int) ((dw - 16 - (op() ? 16 : 0)) / 0.8F)), dx + 8, by + 17, 0.8F, Ui.C_INK_SOFT, false);
+        if (op()) Ui.button(g, font, dx + dw - 22, by + 14, 14, 12, "✎", Ui.inside(mx, my, dx + dw - 22, by + 14, 14, 12), true);
         long pending = data.get("pending").getAsLong();
         if (pending > 0) {
             String label = Component.translatable("rtshop.rank.claim", Ui.num(pending)).getString();
@@ -168,6 +237,7 @@ public class RankScreen extends Screen {
             if (i >= 0 && i < cats.size() && i != sel) {
                 sel = i;
                 click();
+                if (editing) rebuildWidgets();   // 고르던 종목의 보상으로 칸을 다시 채운다
             }
             return true;
         }
@@ -178,6 +248,32 @@ public class RankScreen extends Screen {
             return true;
         }
         int by = ly + lh - 42;
+        if (editing) {
+            int[] e = editButtons(dx, dw, by);
+            if (Ui.inside(mx, my, e[0], e[1], e[2], e[3])) {
+                click();
+                saveRewards(false);
+                return true;
+            }
+            if (Ui.inside(mx, my, e[4], e[5], e[6], e[7])) {
+                click();
+                saveRewards(true);
+                return true;
+            }
+            if (Ui.inside(mx, my, e[8], e[9], e[10], e[11])) {
+                click();
+                editing = false;
+                rebuildWidgets();
+                return true;
+            }
+            return super.mouseClicked(mx, my, button);
+        }
+        if (op() && Ui.inside(mx, my, dx + dw - 22, by + 14, 14, 12)) {
+            click();
+            editing = true;
+            rebuildWidgets();
+            return true;
+        }
         if (data.get("pending").getAsLong() > 0 && Ui.inside(mx, my, btnX(), by + 26, 104, 14)) {
             click();
             claim();
@@ -218,6 +314,23 @@ public class RankScreen extends Screen {
 
     public void claimForTest() {
         claim();
+    }
+
+    /** 점검용 (3.75 W-6): OP 의 보상 고치기 칸을 열어 값을 넣고 저장한다. 칸이 열렸으면 true. */
+    public boolean editRewardsForTest(long a, long b, long c, boolean all) {
+        if (!op()) return false;
+        editing = true;
+        rebuildWidgets();
+        if (boxes[0] == null) return false;
+        boxes[0].setValue(String.valueOf(a));
+        boxes[1].setValue(String.valueOf(b));
+        boxes[2].setValue(String.valueOf(c));
+        saveRewards(all);
+        return true;
+    }
+
+    public long rewardForTest(int place) {
+        return cats.isEmpty() ? -1 : cats.get(sel).getAsJsonArray("rewards").get(place).getAsLong();
     }
 
     /** 종목 이름과 맨 윗줄의 값이 칸 안에 들어가는가. */

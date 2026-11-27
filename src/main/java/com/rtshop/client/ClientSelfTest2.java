@@ -1783,8 +1783,22 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             check("the weekly reward is collected from the clerk", mc.screen instanceof RankScreen r && r.pendingForTest() == 0, mc.screen);
+            // 3.75.0 (사용자 W-6): OP 는 순위 창에서 보상(1 · 2 · 3위 Gold)을 고친다
+            boolean opened375 = mc.screen instanceof RankScreen r375 && r375.editRewardsForTest(30000, 15000, 7000, false);
+            check("3.75 an operator gets reward boxes in the ranking window", opened375, mc.screen);
+            waitTicks(15);
+        });
+        add(mc -> {
+            boolean changed375 = mc.screen instanceof RankScreen r && r.rewardForTest(0) == 30000 && r.rewardForTest(1) == 15000 && r.rewardForTest(2) == 7000
+                    && java.util.Arrays.equals(com.rtshop.rank.Ranks.get().categoryRewards.get("kills"), new long[]{30000, 15000, 7000});
+            check("3.75 the ranking rewards changed in the window are saved for that category (ranks.json) and shown at once", changed375,
+                    mc.screen instanceof RankScreen r2 ? r2.rewardForTest(0) + " " + r2.rewardForTest(2) : String.valueOf(mc.screen));
+            shot(mc, "127d_rank_rewards_edit");
             mc.setScreen(null);
-            onServer(mc, sp -> com.rtshop.rank.Ranks.resetForTest(sp));
+            onServer(mc, sp -> {
+                com.rtshop.rank.Ranks.setRewards("all", 20000, 10000, 5000);
+                com.rtshop.rank.Ranks.resetForTest(sp);
+            });
             com.rtshop.rank.Ranks.testAnywhere = false;
             waitTicks(5);
         });
