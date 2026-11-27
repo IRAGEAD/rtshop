@@ -112,6 +112,7 @@ public final class SpotClient {
         for (Spot s : SPOTS) {
             Vec3 c = center(s);
             double dist = c.distanceTo(cp);
+            if (dist <= STAR_RANGE) star(ps, buf, cam, c, dist, t, s);
             if (dist > 64) continue;
             boolean hot = s == aimed;
             float pulse = 0.75F + 0.25F * (float) Math.sin(t * 0.12F);
@@ -128,6 +129,41 @@ public final class SpotClient {
             if (dist > 6) board(buf.getBuffer(RenderType.text(GLOW)), ps, cam, c.add(0, 2.2, 0), 0.10F, 2.4F, 0.45F, 0.55F, 255, 214, 130, 90);
         }
         buf.endBatch();
+    }
+
+    /** 3.75.0 (사용자 W-26): 반짝이는 별이 보이는 거리 (흔적의 원 · 그림은 64칸 안). */
+    public static final double STAR_RANGE = 192;
+    /** 점검용: 이번 그림에서 별을 그린 흔적 수. */
+    public static volatile int starsForTest;
+    private static long starFrame = -1;
+
+    /**
+     * 3.75.0 (사용자 W-26 "살펴보기와 같은 퀘스트에서는 목표 지점에 작은 별 모양이 반짝거리는 효과"): 흔적 위에 반짝이는 네 갈래 별.
+     * 멀어질수록 조금 커져 192칸 밖까지 보이고, 24칸 넘게 떨어지면 지형 너머로도 비친다. 흔적은 그 퀘스트를 하는 사람에게만 오므로 별도 그 사람에게만 보인다.
+     * 가까우면(32칸 안) 별 둘레에 반짝이 가루가 가끔 날린다.
+     */
+    private static void star(PoseStack ps, MultiBufferSource.BufferSource buf, Camera cam, Vec3 c, double dist, float t, Spot s) {
+        Minecraft mc = Minecraft.getInstance();
+        long frame = mc.level == null ? 0 : mc.level.getGameTime();
+        if (frame != starFrame) {
+            starFrame = frame;
+            starsForTest = 0;
+        }
+        starsForTest++;
+        float phase = (s.id().hashCode() & 255) / 40F;
+        float tw = 0.5F + 0.5F * (float) Math.sin(t * 0.33F + phase);
+        float sz = (float) Math.max(1.0, dist / 22.0) * (0.8F + 0.25F * tw);
+        Vec3 at = c.add(0, 3.6 + Math.sin(t * 0.05F + phase) * 0.12, 0);
+        RenderType rt = dist > 24 ? RenderType.textSeeThrough(GLOW) : RenderType.text(GLOW);
+        int a = Math.round(150 + 105 * tw);
+        // 둥근 빛 + 가로 · 세로로 긴 빛 = 반짝이는 별
+        board(buf.getBuffer(rt), ps, cam, at, 0.32F * sz, 0.32F * sz, 0F, 1F, 255, 236, 170, Math.round(a * 0.7F));
+        board(buf.getBuffer(rt), ps, cam, at, 0.07F * sz, 0.75F * sz, 0.3F, 0.7F, 255, 250, 225, a);
+        board(buf.getBuffer(rt), ps, cam, at, 0.75F * sz, 0.07F * sz, 0.3F, 0.7F, 255, 250, 225, a);
+        if (dist < 32 && mc.level != null && !mc.isPaused() && mc.level.random.nextInt(10) == 0) {
+            mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, at.x + (mc.level.random.nextDouble() - 0.5) * 0.8, at.y - 0.3,
+                    at.z + (mc.level.random.nextDouble() - 0.5) * 0.8, 0, -0.015, 0);
+        }
     }
 
     private static void flat(PoseStack ps, VertexConsumer vc, Vec3 cp, Vec3 at, float half, float deg, int r, int g, int b, int a) {

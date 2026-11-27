@@ -1965,6 +1965,8 @@ final class ClientSelfTest2 {
         add(mc -> {
             check("the trace to look at is shown in the world and can be aimed at", SpotClient.countForTest() == 1 && "t_circle".equals(SpotClient.aimedForTest()),
                     SpotClient.countForTest() + " / " + SpotClient.aimedForTest());
+            check("3.75 a twinkling star hangs over the trace (seen from up to 192 blocks, only by the one on the quest)", SpotClient.starsForTest >= 1 && SpotClient.STAR_RANGE >= 128,
+                    SpotClient.starsForTest);
             boolean comp = false;
             for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
                 if (e instanceof com.rtshop.story.CompanionEntity) comp = true;

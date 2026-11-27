@@ -1,0 +1,5 @@
+START = 954
+EN = [
+# 3.75.0: 안내서 「흔적 살펴보기」 — 반짝이는 별 (사용자 W-26)
+"A goal such as 'take a look' means finding a trace and looking into it. The practice Memory Gate from your first lesson is a trace too.\n\n· When you take the quest, a notice says 'Something nearby is worth a closer look' and the trace appears 5 to 12 blocks away.\n· A trace that belongs to a structure appears when you reach that structure.\n· Traces that come in order appear after you have looked at the one before.\n· A twinkling star hangs over each trace, so you can see it from far off (about 190 blocks), and from a distance it shines through the ground.\n· Walk to the pillar of light and look at it from within 4 blocks: 'Look closer' shows up. Right-click.\n· The goal is filled only when you turn the text to its end.\n· A trace stays where it first appeared. If you have wandered off, follow the '➤' on the quest display back to it.\n· If it landed somewhere you cannot reach, give the quest up and take it again: the trace appears next to you anew.\n· Nobody else can see it, and it cannot be broken or moved.\n\nWhat you have looked at stays in the field notebook: /rtshop notebook",
+]
