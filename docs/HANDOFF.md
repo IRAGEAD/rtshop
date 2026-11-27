@@ -65,6 +65,10 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   C-8 상점 토지 시안 그림 `tools/mock/w4_shop_land.py` → docs/design/w4/ · C-9 자리 비운 NPC 의 미니맵 아이콘 · 셰이더 시험의 제단 잠금 ·
   C-11 도감 몹 그림 `client/MobPortrait` (화면 밖에서 재어 칸에 맞춤, 그릴 수 없으면 알) · C-12 강화 정보 창 룬 (섞기 켬 + 홈 굵기 그림) ·
   C-14 하루의 현상금 게시판 뺌 (hunts.json 3판) · C-15 가방 창의 Spiral Abyss 단추 숨김 (client.json hideAbyssInventoryButton).
+  C-17 긴 툴팁 `client/TooltipFit` (화면에 맞게 줄임 · 최소 0.75 · 넘치면 휠, client.json fitLongTooltips) · C-18 Bosses'Rise 구르기 끄기
+  (`compat/BossesRiseRollOff` world_rules bossesRiseRoll · `client/BossesRiseRollClient` client.json hideBossesRiseRoll / bossesRiseKeyCleared).
+  모드팩 전체 화면 시험은 25분 제한: 몹 그림 시험은 150초 예산 (모드 몹부터).
+  문서: 맵 이식 가이드 https://claude.ai/artifact/CoL8oGXVMXoScFhNcZBTxb · NPC 배치 가이드 https://claude.ai/artifact/JVpRw9FGMK4V19uthd4WJz
   다음: 전체 시험 → 올리기 → 보고 · 맵 이식 가이드 · NPC 배치 가이드 (문서) · 인게임 확인 목록.
 - **(11-28 01:45) 3.75.0 올림 · 보냄** (main = b407618, 모드팩 전체 시험 서버 886 · 화면 353 모두 통과, Photon 강화 모루 전후 그림 · 조사 수첩 아이콘 시안(지금 C) 함께 보냄).
   3.74.0 은 11-28 01:05 에 보냄. 사용자에게 물은 것 (답을 worklist 에 적고 다음 판에 반영): W-10 스킬라 단서 확률 0.05/0.02/0.01% · 식품 상인의 생선 4개(+말린 다시마 · 수련잎) 뺄지 ·
