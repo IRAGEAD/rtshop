@@ -70,7 +70,7 @@ BASE = {'minecraft', 'forge', 'jdk', 'lwjgl', 'fastutil', 'google-libs', 'netty'
 def group(t):
     if t == 'Server thread':
         return 'server'
-    if t == 'Render thread':
+    if t in ('Render thread', 'main'):   # JFR 은 이름이 바뀌기 전의 'main' 으로 적기도 한다 (클라이언트의 화면 스레드)
         return 'render'
     if t.startswith('Worker-Main') or 'worldgen' in t.lower():
         return 'worldgen'
@@ -103,6 +103,7 @@ incl = collections.defaultdict(collections.Counter)   # (phase, group) -> mod ->
 selfc = collections.defaultdict(collections.Counter)
 meth = collections.defaultdict(collections.Counter)
 total = collections.Counter()
+threads = collections.defaultdict(collections.Counter)   # (phase, group) -> 스레드 이름(번호 뗀 것) -> 표본
 # 모드마다: 그 모드의 칸 중 쌓인 호출의 가장 바깥(무엇이 그 모드의 일을 부르나) · 가장 안쪽(그 모드가 어디서 시간을 쓰나)
 outer = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
 inner = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
@@ -117,6 +118,7 @@ def flush():
         return
     key = (phase_of(t), group(thread))
     total[key] += 1
+    threads[key][re.sub(r'[-#]?\d+$', '', thread)] += 1
     owners = []
     for c, mname in frames:
         mm = MIXIN_RE.match(mname)
@@ -176,6 +178,7 @@ for ph in order:
         if n < (15 if g == 'render' else 50):
             continue
         print('=== phase %s · %s thread(s) · %d samples' % (ph, g, n))
+        print('  threads:', ', '.join('%s %.0f%%' % (tn[:40], 100.0 * c / n) for tn, c in threads[key].most_common(8)))
         mods = [(o, c) for o, c in incl[key].most_common() if o not in BASE]
         print('  mods anywhere in the stack (inclusive %):', ', '.join('%s %.1f' % (o, 100.0 * c / n) for o, c in mods[:22]))
         base = [(o, c) for o, c in incl[key].most_common() if o in BASE]

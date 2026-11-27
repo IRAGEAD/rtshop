@@ -632,17 +632,35 @@ jobs:
           }
           run_client base
           { echo "== client base (singleplayer, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/perf-base.log | cut -c1-260 | head -n 4; ls client/crash-reports 2>/dev/null; } >> chunky-check.txt
-          # lean: ArcaneVortex(물건이 모두 RT Shop 규칙으로 막혀 있음) · Farsight(DH 와 겹침) 빼고, Diorama 의 지도 품질을 FAST 로
-          mkdir -p offclient && mv client/mods/ArcaneVortex*.jar client/mods/*arsight*.jar client/mods/Chunky*.jar offclient/ 2>/dev/null || true
-          DCFG=$(find client -path '*diorama*' -name 'config.json' | head -n 1); echo "diorama config: $DCFG"; grep -o '"quality"[^,}]*' "$DCFG" 2>/dev/null || true
-          [ -n "$DCFG" ] && sed -i 's/"quality": *"FANCY"/"quality": "FAST"/' "$DCFG" && grep -o '"quality"[^,}]*' "$DCFG"
-          run_client lean
-          # opt: lean + 서버 쪽 최적화 후보 (Canary · AI Improvements · Clumps)
-          cp extramods/*.jar client/mods/ 2>/dev/null || true
-          run_client opt
-          rm -f $(ls extramods/*.jar 2>/dev/null | sed 's#extramods/#client/mods/#') 2>/dev/null || true
+          # 이제부터 한 가지씩만 바꿔 그 몫을 잰다 (Chunky 는 가만히 있을 때 일이 없어 빼 둔다: base 가 튕기면 나머지라도 재게)
+          mkdir -p offclient && mv client/mods/Chunky*.jar offclient/ 2>/dev/null || true
+          # Diorama 설정 파일 (base 가 처음 켤 때 만든다)
+          DCFG=$(grep -rl --include=*.json '"gpuBaking"' client/config client 2>/dev/null | head -n 1); echo "diorama config: $DCFG"; head -c 6000 "$DCFG" 2>/dev/null | tr '\n' ' ' | cut -c1-6000; echo
+          # noav: Arcane Vortex 만 뺌
+          mkdir -p offav && mv client/mods/ArcaneVortex*.jar offav/ 2>/dev/null || true
+          run_client noav
+          mv offav/* client/mods/ 2>/dev/null || true
+          # nofs: Farsight 만 뺌
+          mkdir -p offfs && mv client/mods/*arsight*.jar offfs/ 2>/dev/null || true
+          run_client nofs
+          mv offfs/* client/mods/ 2>/dev/null || true
+          # dfast: Diorama 지도 품질만 FAST
+          if [ -n "$DCFG" ]; then
+            cp "$DCFG" dcfg.bak
+            python3 - "$DCFG" <<'PY'
+          import json, sys
+          p = sys.argv[1]; d = json.load(open(p)); d['quality'] = 'FAST'; json.dump(d, open(p, 'w'), indent=2); print('diorama quality', d.get('quality'), 'gpuBaking', d.get('gpuBaking'))
+          PY
+            run_client dfast
+            cp dcfg.bak "$DCFG"
+          else
+            echo "no diorama config: dfast skipped"
+          fi
+          # addons: AI Improvements · Clumps 만 더함 (Canary 는 3차 실행에서 이 모드팩과 함께 켜지지 않았다: accessories 의 mixin 오류)
+          cp extramods/AI-Improvements*.jar extramods/Clumps*.jar client/mods/ 2>/dev/null || true
+          run_client addons
+          rm -f client/mods/AI-Improvements*.jar client/mods/Clumps*.jar
           mv offclient/* client/mods/ 2>/dev/null || true
-          [ -n "$DCFG" ] && sed -i 's/"quality": *"FAST"/"quality": "FANCY"/' "$DCFG" || true
       - name: Distant Horizons near-chunk gap (dedicated server + client)
         if: always()
         run: |
@@ -671,7 +689,7 @@ jobs:
           cp server/dh-server.log /tmp/perf/ 2>/dev/null || true
           cp server/perf-server.log /tmp/perf/ 2>/dev/null || true
           cp client/screenshots/16*.png client/screenshots/17*.png /tmp/perf/ 2>/dev/null || true
-          for n in base lean opt; do grep -iE "rtshop-perf|exception|crash" client/logs/perf-$n.log 2>/dev/null | cut -c1-300 | head -n 80 > /tmp/perf/client-perf-$n-log.txt || true; done
+          for n in base noav nofs dfast addons; do grep -iE "rtshop-perf|exception|crash" client/logs/perf-$n.log 2>/dev/null | cut -c1-300 | head -n 80 > /tmp/perf/client-perf-$n-log.txt || true; done
           tail -n 300 client/logs/latest.log > /tmp/perf/client-dh-tail.log 2>/dev/null || true
           cd /tmp/perf
           git init -q -b ci-perf

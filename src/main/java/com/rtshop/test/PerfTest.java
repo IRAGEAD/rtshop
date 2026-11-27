@@ -86,7 +86,16 @@ public final class PerfTest {
 
     @SubscribeEvent
     public static void onStarted(ServerStartedEvent event) {
-        if (!enabled() || Boolean.getBoolean("rtshop.perftest.serve")) return;   // serve: 측정 없이 켜 두기만 (DH 접속 시험용)
+        if (!enabled()) return;
+        if (Boolean.getBoolean("rtshop.perftest.serve")) {
+            // serve: 측정 없이 켜 두기만 (DH 접속 시험용) — 사진이 지형을 담게 한낮 · 맑음으로 멈춰 둔다
+            MinecraftServer server = event.getServer();
+            server.overworld().setDayTime(6000);
+            server.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, server);
+            server.getGameRules().getRule(GameRules.RULE_WEATHER_CYCLE).set(false, server);
+            server.overworld().setWeatherParameters(6000, 0, false, false);
+            return;
+        }
         started = true;
         Runtime rt = Runtime.getRuntime();
         OUT.add("RT Shop performance (server)");
