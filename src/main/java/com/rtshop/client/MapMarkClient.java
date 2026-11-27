@@ -88,6 +88,7 @@ public final class MapMarkClient {
 
     private static void learn(JsonObject o) {
         radarKnownOnly = o.has("radar") && o.get("radar").getAsBoolean();
+        if (o.has("view")) DhViewGuard.serverView = o.get("view").getAsInt();
         if (o.has("marks")) {
             for (JsonElement e : o.getAsJsonArray("marks")) {
                 String id = e.getAsJsonObject().get("id").getAsString();

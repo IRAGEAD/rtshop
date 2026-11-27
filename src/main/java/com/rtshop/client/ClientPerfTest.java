@@ -118,6 +118,7 @@ final class ClientPerfTest {
                 } catch (Exception e) {
                     RtShop.LOGGER.error("[rtshop-perf] could not write the client result", e);
                 }
+                com.rtshop.test.PerfTest.dumpJfr();
                 ClientSelfTest.finish(mc);
                 mc.stop();
             }

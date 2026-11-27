@@ -26,6 +26,11 @@ final class ClientDhTest {
 
     static void run(Minecraft mc, int k) {
         if (mc.player == null) return;
+        // 다른 모드가 띄우는 창(설정 동기화 확인 등)은 닫는다: 사진이 지형을 담게
+        if (mc.screen != null) {
+            RtShop.LOGGER.info("[rtshop-dh] closing {}", mc.screen.getClass().getName());
+            mc.setScreen(null);
+        }
         switch (k) {
             case 0 -> {
                 ClientConfig.get().dhMatchServer = false;
@@ -34,7 +39,8 @@ final class ClientDhTest {
             }
             case 1 -> {
                 NOTES.add("joined " + (mc.getCurrentServer() == null ? "?" : mc.getCurrentServer().ip) + " · render distance " + mc.options.renderDistance().get()
-                        + " · effective " + mc.options.getEffectiveRenderDistance() + " · DH " + net.minecraftforge.fml.ModList.get().isLoaded("distanthorizons"));
+                        + " · effective " + mc.options.getEffectiveRenderDistance() + " · server view " + DhViewGuard.serverView
+                        + " · DH " + net.minecraftforge.fml.ModList.get().isLoaded("distanthorizons") + " · Farsight " + net.minecraftforge.fml.ModList.get().isLoaded("farsight_view"));
                 mc.player.getAbilities().flying = true;
                 climb = 0;
                 ClientSelfTest.wait = 0;
@@ -63,8 +69,9 @@ final class ClientDhTest {
                 shot(mc, "171_dh_gap_after");
                 int raw = mc.options.renderDistance().get(), eff = mc.options.getEffectiveRenderDistance();
                 NOTES.add("after: render distance " + raw + " · effective " + eff + " · " + mc.levelRenderer.getChunkStatistics());
-                check("3.70.0 with Distant Horizons on a server, the render distance is set to what the server sends (no empty ring between real chunks and far views)",
-                        raw == eff && DhViewGuard.clampedForTest == eff, raw + " / " + eff + " / " + DhViewGuard.clampedForTest);
+                check("3.70.0 with Distant Horizons on a server, the render distance is set to what the server sends (no empty ring between real chunks and far views), even with Farsight",
+                        DhViewGuard.serverView >= 2 && raw == DhViewGuard.serverView && DhViewGuard.clampedForTest == raw,
+                        raw + " / effective " + eff + " / server " + DhViewGuard.serverView + " / clamped " + DhViewGuard.clampedForTest);
                 for (String n : NOTES) RtShop.LOGGER.info("[rtshop-dh] {}", n);
                 try {
                     Files.write(mc.gameDirectory.toPath().resolve("rtshop-dh-notes.txt"), NOTES, StandardCharsets.UTF_8);

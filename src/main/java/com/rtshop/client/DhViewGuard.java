@@ -24,6 +24,11 @@ public final class DhViewGuard {
 
     /** 원래 렌더 거리 (낮춰 두었을 때만, 아니면 -1). */
     private static int saved = -1;
+    /**
+     * RT Shop 서버가 알려 준 서버 시야 거리 (지도 표시 패킷에 실려 옴, 모르면 -1).
+     * Farsight 처럼 서버보다 멀리 그리게 하는 모드는 바닐라의 '유효 렌더 거리'를 내 렌더 거리로 늘려 버려서, 그 값만으로는 빈 고리를 막지 못한다.
+     */
+    public static volatile int serverView = -1;
     private static boolean told;
     /** 점검용: 마지막으로 맞춘 렌더 거리. */
     public static volatile int clampedForTest = -1;
@@ -41,7 +46,7 @@ public final class DhViewGuard {
             restore(mc);
             return;
         }
-        int raw = mc.options.renderDistance().get(), eff = mc.options.getEffectiveRenderDistance();
+        int raw = mc.options.renderDistance().get(), eff = serverView >= 2 ? Math.min(serverView, mc.options.getEffectiveRenderDistance()) : mc.options.getEffectiveRenderDistance();
         if (eff >= 2 && eff < raw) {
             if (saved < 0) saved = raw;
             mc.options.renderDistance().set(eff);
@@ -58,6 +63,7 @@ public final class DhViewGuard {
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         restore(Minecraft.getInstance());
         told = false;
+        serverView = -1;
     }
 
     private static void restore(Minecraft mc) {

@@ -59,6 +59,26 @@ public final class PerfTest {
         return CLOCK.format(Instant.ofEpochMilli(millis));
     }
 
+    /**
+     * 끝나기 전에 JFR 기록을 파일로 남긴다 (-Drtshop.perf.jfr=<경로>). 프로그램이 끝날 때 남기는 것(dumponexit)은
+     * 클라이언트가 닫히다 멈춰 강제로 끝나면 사라지므로, 측정이 끝난 바로 그때 한 번 더 남긴다.
+     */
+    public static void dumpJfr() {
+        String to = System.getProperty("rtshop.perf.jfr", "");
+        if (to.isEmpty()) return;
+        try {
+            Class<?> fr = Class.forName("jdk.jfr.FlightRecorder");
+            Object rec = fr.getMethod("getFlightRecorder").invoke(null);
+            for (Object r : (java.util.List<?>) fr.getMethod("getRecordings").invoke(rec)) {
+                r.getClass().getMethod("dump", java.nio.file.Path.class).invoke(r, java.nio.file.Path.of(to));
+                RtShop.LOGGER.info("[rtshop-perf] JFR written to {}", to);
+                break;
+            }
+        } catch (Throwable t) {
+            RtShop.LOGGER.warn("[rtshop-perf] could not write JFR: {}", t.toString());
+        }
+    }
+
     /** 단계 시각 (JFR 의 표본 시각과 같은 꼴: 시:분:초.밀리초, 이 컴퓨터의 시간대). */
     public static String clockOf(long millis) {
         return clock(millis);
@@ -182,6 +202,7 @@ public final class PerfTest {
                     OUT.add("");
                     OUT.add("RESULT: DONE");
                     write(server);
+                    dumpJfr();
                     left = -1;
                     server.halt(false);
                 }

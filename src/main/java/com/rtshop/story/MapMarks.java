@@ -283,6 +283,11 @@ public final class MapMarks {
         o.addProperty("folder", get().folder);
         o.addProperty("world", get().showInWorld);
         o.addProperty("radar", get().enabled && get().npcs && get().radarKnownOnly);
+        // 3.70.0: 서버 시야 거리 (클라이언트의 DhViewGuard 가 Distant Horizons 의 빈 고리를 막는 데 씀 — 다른 모드가 바닐라 값을 바꿔도 정확하게)
+        try {
+            if (p.server != null) o.addProperty("view", p.server.getPlayerList().getViewDistance());
+        } catch (Throwable ignored) {
+        }
         o.add("marks", marks);
         o.add("gone", gone);
         o.addProperty("notify", notify);
