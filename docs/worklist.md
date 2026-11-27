@@ -716,6 +716,8 @@ Arcane Vortex는 일단 유지, W-13은 스토리 및 히든 아이템에도 사
 - C-15. 인벤토리 화면 왼쪽 위의 Spiral Abyss(spiral_abyss) 표시 숨기기.
 추가 (07:48): "모든 작업이 끝나면 내가 인게임에서 직접 테스트해봐야 할 목록을 알려줘."
 - C-16. 다 끝나면 인게임에서 직접 확인할 목록 (docs/review_checklist.md 에도 더함).
+추가 (08:19): "일부 아이템의 툴팁 내용이 너무 많아서 잘려 보이는 문제도 해결해줘."
+- C-17. 화면보다 긴 툴팁: 줄여서 화면에 맞추고(최소 배율), 그래도 넘치면 마우스 휠로 넘겨 보기.
 - 한 일 (3.78.0, 가지 v5-next31):
   C-1 tools/gen_forgery_icons.py CHOSEN 돋보기 C. C-2/C-3 `ScyllaClues` 기본값 · `migrate3` (scylla.json 3판: 옛 기본값 그대로일 때만). C-4 `SurveyCompassItem.MIN_TOWN` 500, 설명 · 안내서(18판) · 영어.
   C-5 food.json skipItemsOf ["farmer","fisher"] + `ShopLoader.migrateFoodSkipFisher` (MIGRATED food-skip-fisher@1). C-7 `story/Examine` + examine.json · StoryPacket.EXAMINE · ItemMarks 「?」 ·

@@ -36,6 +36,28 @@ final class ClientSelfTest2 {
     private static final List<String> PORTRAIT_IDS = new ArrayList<>(), PORTRAIT_SHOW = new ArrayList<>(), PORTRAIT_OLD_BLANK = new ArrayList<>(),
             PORTRAIT_OLD_CLIPPED = new ArrayList<>(), PORTRAIT_ICON = new ArrayList<>(), PORTRAIT_ODD = new ArrayList<>(), PORTRAIT_BAD = new ArrayList<>();
     private static int PORTRAIT_I;
+    private static boolean TIP_FIT_378;
+    private static String TIP_INFO_378 = "";
+
+    /** 시험용: 마우스 자리에 아주 긴 설명 창을 띄우는 화면 (lines 줄). */
+    static final class LongTipScreen extends net.minecraft.client.gui.screens.Screen {
+        private final java.util.List<net.minecraft.network.chat.Component> lines = new java.util.ArrayList<>();
+
+        LongTipScreen(int n) {
+            super(net.minecraft.network.chat.Component.literal("long tooltip"));
+            lines.add(net.minecraft.network.chat.Component.literal("아주 긴 설명의 이름 줄 (Long tooltip title)").withStyle(net.minecraft.ChatFormatting.GOLD));
+            for (int i = 1; i < n; i++) {
+                lines.add(net.minecraft.network.chat.Component.literal(i + ". 설명 줄 — line " + i).withStyle(i % 2 == 0 ? net.minecraft.ChatFormatting.GRAY : net.minecraft.ChatFormatting.AQUA));
+            }
+        }
+
+        @Override
+        public void render(net.minecraft.client.gui.GuiGraphics g, int mx, int my, float pt) {
+            renderBackground(g);
+            g.renderComponentTooltip(font, lines, width / 2 - 60, height / 2);
+        }
+    }
+
     private static int EXAMINE_SLOT_378;
     private static ItemStack EXAMINE_KEEP_378 = ItemStack.EMPTY;
     private static boolean EXAMINE_HID_378;
@@ -2526,6 +2548,39 @@ final class ClientSelfTest2 {
                 if (v != null) v.discard();
             });
             waitTicks(5);
+        });
+        // 3.78 (사용자 "툴팁 내용이 너무 많아서 잘려 보이는 문제"): 화면보다 긴 설명 창은 줄여서 위(이름)부터 보이고, 그래도 넘치면 휠로 넘긴다
+        add(mc -> {
+            TooltipFit.resetForTest();
+            mc.setScreen(new LongTipScreen(mc.getWindow().getGuiScaledHeight() / 10 + 3));   // 화면보다 조금 길다: 줄이면 들어온다
+            waitTicks(8);
+        });
+        add(mc -> {
+            int sh = mc.getWindow().getGuiScaledHeight();
+            TIP_FIT_378 = TooltipFit.fittedForTest > 0 && TooltipFit.lastScaleForTest < 1F && TooltipFit.lastScaleForTest >= TooltipFit.MIN_SCALE
+                    && TooltipFit.lastTopForTest >= 0 && TooltipFit.lastBottomForTest <= sh;
+            TIP_INFO_378 = "fit " + TooltipFit.fittedForTest + " scale " + TooltipFit.lastScaleForTest + " top " + TooltipFit.lastTopForTest + " bottom " + TooltipFit.lastBottomForTest + " / " + sh;
+            shot(mc, "136a_tooltip_fit");
+            TooltipFit.resetForTest();
+            mc.setScreen(new LongTipScreen(mc.getWindow().getGuiScaledHeight() / 10 * 2 + 12));   // 아주 길다: 줄여도 넘쳐 휠로 넘긴다
+            waitTicks(8);
+        });
+        add(mc -> {
+            int top0 = TooltipFit.lastTopForTest, max = TooltipFit.lastScrollMaxForTest;
+            TooltipFit.scrollForTest(-1);
+            TooltipFit.scrollForTest(-1);
+            int moved = TooltipFit.scrollForTest();
+            boolean scrolls = TooltipFit.fittedForTest > 0 && Math.abs(TooltipFit.lastScaleForTest - TooltipFit.MIN_SCALE) < 1e-3 && max > 0 && top0 >= 0 && moved == 24;
+            TIP_INFO_378 += " | long: scale " + TooltipFit.lastScaleForTest + " top " + top0 + " scrollMax " + max + " moved " + moved;
+            shot(mc, "136b_tooltip_scroll_top");
+            check("3.78 a tooltip taller than the screen is shrunk to fit with its name on screen; a very long one stops at a readable size and scrolls with the wheel",
+                    TIP_FIT_378 && scrolls, TIP_INFO_378);
+            waitTicks(6);
+        });
+        add(mc -> {
+            shot(mc, "136c_tooltip_scrolled");
+            mc.setScreen(null);
+            waitTicks(4);
         });
         // 3.78 (W-13 살펴보기): 처음 얻은 이야기 물건은 이름 · 설명이 감춰지고 「?」 — 들고 우클릭하면 2초 뒤에 보인다
         add(mc -> {
