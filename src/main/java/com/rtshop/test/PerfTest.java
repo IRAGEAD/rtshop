@@ -232,8 +232,43 @@ public final class PerfTest {
         return n;
     }
 
+    /**
+     * Arcane Vortex 가 자체 '네이티브 에이전트'로 바닐라 메서드에 건 고리 목록 (성능 조사용): 고리마다 대상 클래스 · 메서드 · 처리기.
+     * 측정에서 내장 서버 틱의 약 14% 가 이 고리(MixinHooks.invoke/enter · AttributeGuard.bind)에서 나왔다.
+     */
+    public static List<String> arcaneVortexHooks() {
+        List<String> out = new ArrayList<>();
+        try {
+            Class<?> hooks = Class.forName("com.luoee.arcanevortex.NativeAgent.Mixin.MixinHooks", false, PerfTest.class.getClassLoader());
+            Object[] sites = (Object[]) hooks.getMethod("sites").invoke(null);
+            out.add("arcanevortex hooks: " + sites.length);
+            for (Object site : sites) {
+                StringBuilder b = new StringBuilder("  ");
+                for (java.lang.reflect.Field f : site.getClass().getDeclaredFields()) {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                    try {
+                        f.setAccessible(true);
+                        Object v = f.get(site);
+                        if (v == null || v instanceof Number && ((Number) v).intValue() == 0 || v instanceof Boolean && !((Boolean) v)) continue;
+                        String t = v instanceof int[] ? java.util.Arrays.toString((int[]) v) : String.valueOf(v);
+                        if (t.length() > 90) t = t.substring(0, 90) + "…";
+                        b.append(f.getName()).append('=').append(t).append(' ');
+                    } catch (Throwable ignored) {
+                    }
+                }
+                out.add(b.toString());
+            }
+        } catch (ClassNotFoundException e) {
+            out.add("arcanevortex hooks: (no Arcane Vortex)");
+        } catch (Throwable t) {
+            out.add("arcanevortex hooks: " + t);
+        }
+        return out;
+    }
+
     private static void write(MinecraftServer server) {
         try {
+            if (!OUT.isEmpty() && OUT.stream().noneMatch(l -> l.startsWith("arcanevortex hooks"))) OUT.addAll(arcaneVortexHooks());
             Files.write(server.getServerDirectory().toPath().resolve("rtshop-perf-server.txt"), OUT, StandardCharsets.UTF_8);
         } catch (Exception e) {
             RtShop.LOGGER.error("[rtshop-perf] could not write the result", e);

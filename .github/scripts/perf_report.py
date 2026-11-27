@@ -132,11 +132,16 @@ def flush():
         seen.add(o)
         inner[key][o][c + '.' + mname] += 1
     seen = set()
-    for (c, mname), o in reversed(list(zip(frames, owners))):
+    pairs = list(zip(frames, owners))
+    for i in range(len(pairs) - 1, -1, -1):
+        (c, mname), o = pairs[i]
         if o in BASE or o in seen:
             continue
         seen.add(o)
-        outer[key][o][c + '.' + mname] += 1
+        # 그 모드의 가장 바깥 칸과, 그 칸을 부른 칸(바로 아래, 다른 모드나 바닐라)
+        below = pairs[i + 1][0] if i + 1 < len(pairs) else None
+        via = (below[0].rsplit('.', 1)[-1] + '.' + below[1] + ' -> ') if below else ''
+        outer[key][o][via + c.rsplit('.', 1)[-1] + '.' + mname] += 1
     for (c, mname), o in zip(frames, owners):
         if o not in BORING:
             selfc[key][o] += 1

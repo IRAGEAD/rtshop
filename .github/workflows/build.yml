@@ -249,6 +249,13 @@ jobs:
               for c in $(cd /tmp/avj && find . \( -name "*AttributeGuard*.class" -o -name "*MixinHooks*.class" -o -name "*NativeAgent*.class" \) | sed 's#^\./##; s#\.class$##' | head -n 12); do
                 echo "######## $c"; (cd /tmp/avj && javap -p -c "$c.class" 2>&1 | head -n 900)
               done
+              echo "== who calls AttributeGuard / MixinHooks (and what they hook)"
+              for f in $(cd /tmp/avj && grep -rl --include=*.class -e "AttributeGuard" -e "PlayerProtection" . | head -n 14); do
+                echo "-- $f"; (cd /tmp/avj && javap -p -c "$f" 2>&1 | grep -E "^  (public|private|protected|static).*\(|AttributeGuard|PlayerProtection|RuntimeVisible|// String (net/minecraft|L?net/minecraft)" | head -n 40)
+                (cd /tmp/avj && javap -v "$f" 2>&1 | grep -E "RuntimeVisibleAnnotations|NativeMixin|Inject|At\b|target|method|value" | head -n 30)
+              done
+              echo "######## PlayerProtection"; (cd /tmp/avj && javap -p -c com/luoee/arcanevortex/Mixin/Protection/PlayerProtection.class 2>&1 | head -n 400)
+              echo "== NativeAgent mixin classes"; (cd /tmp/avj && ls com/luoee/arcanevortex/NativeAgent/Mixin/ | head -n 80)
             } > /tmp/inspect/arcanevortex.txt 2>&1 || true
           fi
       - name: Inspect Diorama waypoint icons
