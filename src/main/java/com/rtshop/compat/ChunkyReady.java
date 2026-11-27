@@ -17,17 +17,24 @@ public final class ChunkyReady {
     private ChunkyReady() {
     }
 
+    /** 한 번 켜진 것을 보았으면 그 뒤로는 묻지 않는다 (DH 는 청크가 바뀔 때마다 설정을 다시 부르고, 한 번 연결하면 스스로 건너뛴다). */
+    private static volatile boolean seen;
+
     public static boolean now() {
+        if (seen) return true;
         try {
             if (!looked) look();
-            if (instance != null) return instance.get(null) != null;
-            if (get != null) {
+            boolean r = false;
+            if (instance != null) r = instance.get(null) != null;
+            else if (get != null) {
                 try {
-                    return get.invoke(null) != null;
+                    r = get.invoke(null) != null;
                 } catch (Throwable notYet) {
-                    return false;
+                    r = false;
                 }
             }
+            if (r) seen = true;
+            return r;
         } catch (Throwable ignored) {
             // 모양이 바뀐 Chunky: 연결을 미룬다 (튕기는 것보다 낫다)
         }
