@@ -148,6 +148,7 @@ public final class SelfTest {
         com.rtshop.stock.StockConfig sc = com.rtshop.stock.StockConfig.copyOfDefaults();
         sc.noise = 0;
         sc.pull = 0;
+        sc.events = false;   // 3.73 의 무작위 시장 사건은 아래에서 따로 본다
         com.rtshop.stock.StockConfig.forTest(sc);
         com.rtshop.stock.Stocks.testAnywhere = true;
         com.rtshop.stock.Stocks.testing = true;
