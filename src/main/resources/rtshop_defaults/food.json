@@ -13,7 +13,8 @@
   "조리한 음식의 매입가 = 재료를 이 가격표대로 샀을 때의 원가 × (1 + 마진) + 수고비. 그래서 재료를 사서 만들어 팔아도 적자가 나지 않습니다.",
   "여러 재료 중 하나를 고를 수 있는 조리법(예: '아무 채소')은 가장 싼 재료 기준으로 값을 매깁니다.",
   "우유·물 양동이는 '양동이 값 + 내용물 값'입니다. 다 쓴 빈 양동이를 되팔면 양동이 값(450G)을 그대로 돌려받습니다.",
-  "화로 연료비는 음식값에 들어가지 않습니다. 모닥불이나 스토브처럼 연료가 들지 않는 조리 도구를 쓰면 손해가 없습니다."
+  "화로 연료비는 음식값에 들어가지 않습니다. 모닥불이나 스토브처럼 연료가 들지 않는 조리 도구를 쓰면 손해가 없습니다.",
+  "skipItemsOf: 적힌 상점(농작물 상인 farmer)이 다루는 품목은 이 상점에 올리지 않습니다 (날 농작물 · 고기 · 달걀 · 우유는 농작물 상인에게서). 겹쳐도 함께 팔려면 skipItemsOf 를 지우세요."
  ],
  "title": "식품 상점",
  "npcName": "식품 상인",
@@ -21,8 +22,8 @@
  "categories": [
   {
    "id": "ingredient",
-   "name": "농산물",
-   "icon": "minecraft:carrot"
+   "name": "식재료",
+   "icon": "farmersdelight:wheat_dough"
   },
   {
    "id": "meat",
@@ -52,301 +53,76 @@
  ],
  "items": [
   {
-   "item": "minecraft:wheat",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:beetroot",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:carrot",
-   "price": 20,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:potato",
-   "price": 20,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:nether_wart",
+   "item": "farmersdelight:wheat_dough",
    "price": 30,
    "category": "ingredient",
-   "looseSell": true
+   "dynamic": true
   },
   {
-   "item": "minecraft:cocoa_beans",
-   "price": 20,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:brown_mushroom",
-   "price": 8,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:red_mushroom",
-   "price": 8,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:apple",
-   "price": 50,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:sweet_berries",
-   "price": 6,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:glow_berries",
-   "price": 8,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:chorus_fruit",
-   "price": 6,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:melon_slice",
-   "price": 1,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:melon",
-   "price": 9,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:pumpkin",
-   "price": 4,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:sugar_cane",
-   "price": 2,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "minecraft:cactus",
-   "price": 2,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:cabbage",
+   "item": "farmersdelight:raw_pasta",
    "price": 40,
    "category": "ingredient",
-   "looseSell": true
+   "dynamic": true
   },
   {
-   "item": "farmersdelight:cabbage_leaf",
-   "price": 20,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:tomato",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:onion",
-   "price": 20,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farmersdelight:rice",
-   "price": 4,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:tomato",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:red_chili",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:green_chili",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:lettuce",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:rice",
-   "price": 4,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:wild_rice",
-   "price": 20,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_cookery:fresh_tea_leaves",
-   "price": 10,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farm_and_charm:barley",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farm_and_charm:oat",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farm_and_charm:corn",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farm_and_charm:strawberry",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farm_and_charm:tomato",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farm_and_charm:lettuce",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "farm_and_charm:onion",
-   "price": 40,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_tavern:grape",
-   "price": 20,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_tavern:green_grape",
-   "price": 24,
-   "category": "ingredient",
-   "looseSell": true
-  },
-  {
-   "item": "kaleidoscope_tavern:ice_grape",
+   "item": "farmersdelight:pie_crust",
    "price": 60,
    "category": "ingredient",
-   "looseSell": true
+   "dynamic": true
   },
   {
-   "item": "kaleidoscope_tavern:gold_grape",
-   "price": 120,
+   "item": "farmersdelight:pumpkin_slice",
+   "price": 20,
    "category": "ingredient",
-   "looseSell": true
+   "dynamic": true
   },
   {
-   "item": "farmersdelight:rice_panicle",
-   "price": 8,
+   "item": "farm_and_charm:flour",
+   "price": 20,
    "category": "ingredient",
-   "looseSell": true,
-   "buy": false
+   "dynamic": true
   },
   {
-   "item": "kaleidoscope_cookery:rice_panicle",
-   "price": 12,
+   "item": "farm_and_charm:dough",
+   "price": 30,
    "category": "ingredient",
-   "looseSell": true,
-   "buy": false
+   "dynamic": true
   },
   {
-   "item": "minecraft:bamboo",
-   "price": 1,
-   "category": "ingredient",
-   "sell": false
-  },
-  {
-   "item": "minecraft:kelp",
-   "price": 1,
-   "category": "ingredient",
-   "sell": false
-  },
-  {
-   "item": "minecraft:beef",
-   "price": 80,
-   "category": "meat"
-  },
-  {
-   "item": "minecraft:porkchop",
+   "item": "farmersdelight:minced_beef",
    "price": 50,
-   "category": "meat"
-  },
-  {
-   "item": "minecraft:mutton",
-   "price": 80,
-   "category": "meat"
-  },
-  {
-   "item": "minecraft:rabbit",
-   "price": 80,
-   "category": "meat"
-  },
-  {
-   "item": "minecraft:chicken",
-   "price": 40,
-   "category": "meat"
-  },
-  {
-   "item": "farmersdelight:ham",
-   "price": 105,
    "category": "meat",
-   "buy": false
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:bacon",
+   "price": 30,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:chicken_cuts",
+   "price": 25,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:mutton_chops",
+   "price": 50,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:cod_slice",
+   "price": 70,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:salmon_slice",
+   "price": 70,
+   "category": "meat",
+   "dynamic": true
   },
   {
    "item": "minecraft:cod",
@@ -371,28 +147,6 @@
    "price": 400,
    "category": "meat",
    "fish": true
-  },
-  {
-   "item": "minecraft:egg",
-   "price": 6,
-   "category": "base"
-  },
-  {
-   "item": "minecraft:milk_bucket",
-   "price": 452,
-   "category": "base",
-   "sellPrice": 451
-  },
-  {
-   "item": "minecraft:water_bucket",
-   "price": 451,
-   "category": "base",
-   "sellPrice": 450
-  },
-  {
-   "item": "minecraft:honey_bottle",
-   "price": 16,
-   "category": "base"
   },
   {
    "item": "minecraft:sugar",
@@ -456,11 +210,6 @@
    "category": "base"
   },
   {
-   "item": "minecraft:bone_meal",
-   "price": 1,
-   "category": "base"
-  },
-  {
    "item": "minecraft:coal",
    "price": 50,
    "category": "base"
@@ -469,13 +218,6 @@
    "item": "minecraft:charcoal",
    "price": 20,
    "category": "base"
-  },
-  {
-   "item": "minecraft:bucket",
-   "price": 900,
-   "category": "base",
-   "sellPrice": 450,
-   "buy": false
   },
   {
    "item": "minecraft:cake",
@@ -800,5 +542,8 @@
   "minecraft:suspicious_stew",
   "farmersdelight:rotten_tomato",
   "farm_and_charm:rotten_tomato"
+ ],
+ "skipItemsOf": [
+  "farmer"
  ]
 }

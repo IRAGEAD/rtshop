@@ -89,6 +89,7 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 
 ### 요리
 - 식품 상인은 식재료를 팔고, 조리한 음식을 사 줍니다.
+  - 3.74: **농작물 상인이 다루는 품목(날 농작물 · 고기 · 달걀 · 우유 등)은 식품 상인에 올리지 않습니다** (`food.json` 의 `skipItemsOf: ["farmer"]`, 이미 설치된 파일에도 한 번 넣음). 식품 상인은 가공 식재료(반죽 · 생파스타 · 파이 껍질 · 밀가루 …) · 손질한 고기(다진 소고기 · 베이컨 · 생선 살 …) · 기본 재료 · 요리 · 음료 · 조리 도구를 다룹니다. 겹쳐도 함께 팔려면 `skipItemsOf` 를 지우세요.
 - **식당 주인 (3.20, `/rtshop npc restaurant`)**
   - **요리사 직업을 가진 플레이어만** 식당 주인에게 요리를 팔 수 있습니다. 식품 상인에게 팔 때보다 **5% 더** 받고, 이 5% 는 요리사 패시브(손으로 만든 요리 +28%)와 **따로 곱해집니다** (예: 100 G 짜리 요리 → 식품 상인 128 G, 식당 134 G).
   - 식당은 **처음에는 아무것도 팔지 않습니다.** 요리사가 한 번이라도 판 요리가 도감처럼 하나씩 메뉴에 올라가고(서버 전체에 알림), 메뉴에 오른 요리는 **직업과 상관없이 누구나** 살 수 있습니다. 창 제목 옆에 "메뉴 3/57" 처럼 진행도가 보이고, 창을 열어 둔 사람에게도 새 메뉴가 바로 나타납니다.
@@ -436,6 +437,9 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 | `/rtshop pvp ...` | OP | PvP 설정: `outside on\|off`, `pos1`·`pos2`·`zone add\|here\|remove\|list\|show`, `combat <초>`, `set <플레이어> on\|off` |
 | `/rtshop restaurant status\|unlock\|lock\|reset` | OP | 식당 메뉴 관리 |
 | `/rtshop npc raid` · `/rtshop npc raid_guide` | OP | 레이드 상인(티켓) · 레이드 안내인 소환 |
+| `/rtshop npc layout` · `layout save\|apply` | OP | NPC 배치 상태 · 지금 자리를 `config/rtshop/npc_layout.json` 에 적기 · 그 파일대로 세우기 |
+| `/rtshop npc layout reset` → `reset confirm` | OP | 배치 초기화 (3.74): RT Shop NPC 를 모두 치우고(플레이어 상점 직원 빼고) 배치 파일을 비움. 안 불러온 곳의 NPC 는 그곳이 불러와질 때 치움 |
+| `/rtshop npc remove` | OP | 바라보는 RT Shop NPC 하나 치우기 (3.74, 8칸 안 · 없으면 4칸 안의 가장 가까운 것). 배치 파일에서도 빠짐 |
 | `/rtshop raid edit` · `raid arena here\|build\|tp` · `raid return here` · `raid end` | OP | 레이드 설정 편집기 · 구역 위치 · 돌아올 곳 · 강제 종료 |
 | `/rtshop abyss edit` · `abyss reset\|clear ...` | OP | Spiral Abyss 주간 보상 편집기 · 기록 관리 |
 | `/rtshop land` | 모두 | 토지 설정 화면 |

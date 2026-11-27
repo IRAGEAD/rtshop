@@ -144,6 +144,109 @@ public final class SelfTest {
      * 3.72: 조합 증서 (주식) — 시세(실적 · 소식 · 하루 한도), 사기 · 되팔기(수수료는 기금으로), 장부에 없는 복사본, 배당(기금에서만, 지난주부터 가진 증서, 도장),
      * 죽어도 떨어지지 않음, 창 내용, 은행원의 [증권 거래], 명령.
      */
+    /** 3.74.0: 화면 · 문구 · 퀘스트 표시 (사용자 메모 W-*) 중 서버 쪽 */
+    private static void v374(MinecraftServer server, FakePlayer a) {
+        // W-15: 식품 상인은 농작물 상인이 다루는 품목을 올리지 않는다 (직접 적은 것 · 자동 규칙 모두). 빈 구분 탭은 없다
+        ShopData food = ShopServer.shops().get("food"), farmer = ShopServer.shops().get("farmer");
+        java.util.Set<String> farmKeys = new java.util.HashSet<>();
+        if (farmer != null) for (ShopData.Entry e : farmer.entries) farmKeys.add(ShopLoader.key(e.stack));
+        List<String> dup = new ArrayList<>();
+        java.util.Set<String> usedCats = new java.util.HashSet<>();
+        if (food != null) {
+            for (ShopData.Entry e : food.entries) {
+                if (farmKeys.contains(ShopLoader.key(e.stack))) dup.add(ShopLoader.itemId(e.stack));
+                usedCats.add(e.category);
+            }
+        }
+        List<String> emptyCats = new ArrayList<>();
+        if (food != null) for (ShopData.Category c : food.categories) if (!usedCats.contains(c.id)) emptyCats.add(c.id);
+        boolean wheatAtFarmer = farmer != null && findEntry(farmer, e -> e.stack.is(Items.WHEAT)) >= 0;
+        boolean breadAtFood = food != null && findEntry(food, e -> e.stack.is(Items.BREAD) && !e.stack.hasTag()) >= 0;
+        boolean mig = false, migAgain = true;
+        String migText = "";
+        try {
+            Path tmp = Files.createTempFile("rtshop-food374", ".json");
+            Files.writeString(tmp, "{\"categories\":[{\"id\":\"ingredient\",\"name\":\"농산물\",\"icon\":\"minecraft:carrot\"},{\"id\":\"dish\",\"name\":\"요리\"}],\"items\":[]}",
+                    StandardCharsets.UTF_8);
+            mig = ShopLoader.migrateFoodSkipFarmer(tmp);
+            migText = Files.readString(tmp, StandardCharsets.UTF_8);
+            migAgain = ShopLoader.migrateFoodSkipFarmer(tmp);
+            Files.deleteIfExists(tmp);
+        } catch (Exception e) {
+            migText = e.toString();
+        }
+        check("3.74 the food merchant lists nothing the farmer sells (crops, raw meat, eggs, milk go to the farmer); no empty tab; installed food.json files get skipItemsOf once",
+                food != null && farmer != null && dup.isEmpty() && emptyCats.isEmpty() && wheatAtFarmer && breadAtFood
+                        && mig && !migAgain && migText.contains("skipItemsOf") && migText.contains("식재료") && !migText.contains("농산물"),
+                "dup " + dup + " empty " + emptyCats + " wheat@farmer " + wheatAtFarmer + " bread@food " + breadAtFood + " mig " + mig + "/" + migAgain + " " + migText);
+
+        // W-1 · W-24: 퀘스트 HUD 의 "다음 퀘스트" 에 직업 선행 퀘스트는 「조사대원의 밑천」 뒤부터, 직업이 없고 다른 선행 퀘스트를 하지 않을 때만
+        QuestManager.reset(a);
+        com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.COMBAT, "");
+        com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.LIFE, "");
+        QuestDef jf = QuestManager.loaded().quests.get("job_farmer_1"), jw = QuestManager.loaded().quests.get("job_warrior_1");
+        boolean before = jf != null && jw != null && QuestManager.jobQuestHiddenInHud(a, jf) && QuestManager.jobQuestHiddenInHud(a, jw);
+        QuestManager.forceComplete(a, QuestManager.JOB_HINT_AFTER);
+        boolean open = jf != null && jw != null && !QuestManager.jobQuestHiddenInHud(a, jf) && !QuestManager.jobQuestHiddenInHud(a, jw);
+        com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.COMBAT, "swordsman");
+        boolean withJob = jf != null && jw != null && QuestManager.jobQuestHiddenInHud(a, jf) && QuestManager.jobQuestHiddenInHud(a, jw);
+        com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.COMBAT, "");
+        QuestManager.accept(a, "job_swordsman_1", "job");
+        boolean doing = jf != null && jw != null && QuestManager.jobQuestHiddenInHud(a, jf) && QuestManager.jobQuestHiddenInHud(a, jw);
+        QuestDef s001 = QuestManager.loaded().quests.get("story_0_01");
+        boolean storyShown = s001 != null && !QuestManager.jobQuestHiddenInHud(a, s001);
+        check("3.74 the quest HUD tells about job trial quests only after 「조사대원의 밑천」 and only while the player has no job and no trial under way (taking them still works)",
+                before && open && withJob && doing && storyShown, before + " " + open + " " + withJob + " " + doing + " " + storyShown);
+        QuestManager.reset(a);
+
+        // W-28: NPC 에게 다시 말을 걸면 그 NPC 의 지도 표시를 다시 보낸다 (지도에서 지웠어도 다시 생긴다)
+        com.rtshop.story.MapMarks.lastAgainForTest = "";
+        boolean firstMark = com.rtshop.story.MapMarks.mark(a, "t374", "Test", "minecraft:overworld", 10, 64, 10, 0xFFFFFFFF, "", true);
+        boolean noAgainFirst = com.rtshop.story.MapMarks.lastAgainForTest.isEmpty();
+        boolean secondMark = com.rtshop.story.MapMarks.mark(a, "t374", "Test", "minecraft:overworld", 11, 64, 10, 0xFFFFFFFF, "", true);
+        boolean againSent = "t374".equals(com.rtshop.story.MapMarks.lastAgainForTest);
+        com.rtshop.story.MapMarks.lastAgainForTest = "";
+        com.rtshop.story.MapMarks.mark(a, "t374", "Test", "minecraft:overworld", 10, 64, 10, 0xFFFFFFFF, "", false);
+        boolean quietWithout = com.rtshop.story.MapMarks.lastAgainForTest.isEmpty();
+        check("3.74 talking to an NPC again sends its map mark again (so a mark deleted on the map comes back); other unchanged marks stay quiet",
+                !com.rtshop.story.MapMarks.get().enabled || (firstMark && noAgainFirst && !secondMark && againSent && quietWithout),
+                com.rtshop.story.MapMarks.get().enabled + " " + firstMark + " " + noAgainFirst + " " + secondMark + " " + againSent + " " + quietWithout);
+        com.rtshop.story.MapMarks.forgetAll(a);
+
+        // W-20: 모험 안내인 모리스의 퀘스트 창 인사도 해요체, 영어 번역이 있다
+        QuestManager.NpcDef guide = QuestManager.loaded().npcs.get("guide");
+        String greet = guide == null ? "" : guide.greeting;
+        com.rtshop.story.StoryText.setLang(a, "en_us");
+        String greetEn = com.rtshop.story.StoryText.t(a, greet);
+        com.rtshop.story.StoryText.setLang(a, "");
+        check("3.74 Morris's quest-window greeting speaks like his other lines (해요체) and has an English line",
+                greet.contains("드릴게요") && !greet.contains("오게") && !greetEn.equals(greet) && greetEn.startsWith("Welcome"), greet + " / " + greetEn);
+
+        // W-11: Cataclysm 보스 건축물은 나침반 대신 그 모드의 눈으로 (다른 목표가 있으면 나침반은 그쪽을 가리킨다)
+        boolean cata = net.minecraftforge.fml.ModList.get().isLoaded("cataclysm");
+        QuestManager.reset(a);
+        QuestDef qEye = tempQuest("{\"id\":\"t_eye374\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"STRUCTURE\",\"target\":\"cataclysm:soul_black_smith\",\"text\":\"Forge\"}],\"reward\":{\"gold\":1}}");
+        QuestDef qFar = tempQuest("{\"id\":\"t_far374\",\"giver\":\"quest_guide\",\"objectives\":[{\"type\":\"STRUCTURE\",\"target\":\"minecraft:stronghold\",\"text\":\"Hold\"}],\"reward\":{\"gold\":1}}");
+        QuestManager.loaded().quests.put(qEye.id, qEye);
+        QuestManager.loaded().quests.put(qFar.id, qFar);
+        boolean tookEye = QuestManager.accept(a, qEye.id, "quest_guide"), tookFar = QuestManager.accept(a, qFar.id, "quest_guide");
+        String[] both = com.rtshop.item.SurveyCompassItem.pickTarget(a);
+        QuestManager.abandon(a, qFar.id);
+        String[] eyeOnly = com.rtshop.item.SurveyCompassItem.pickTarget(a);
+        Item eye = com.rtshop.item.SurveyCompassItem.eyeFor("cataclysm:soul_black_smith");
+        boolean eyes = cata ? eye != null && "cataclysm:monstrous_eye".equals(String.valueOf(ForgeRegistries.ITEMS.getKey(eye)))
+                && com.rtshop.item.SurveyCompassItem.eyeFor("cataclysm:burning_arena") != null && com.rtshop.item.SurveyCompassItem.eyeFor("cataclysm:amethyst_nest") == null
+                : eye == null;
+        boolean picks = tookEye && tookFar && both != null && eyeOnly != null && "cataclysm:soul_black_smith".equals(eyeOnly[0])
+                && (cata ? "minecraft:stronghold".equals(both[0]) : "cataclysm:soul_black_smith".equals(both[0]));
+        check("3.74 the survey compass leaves Cataclysm boss buildings to that mod's eyes (it points to the quest's other places first; amethyst nests stay on the compass)",
+                eyes && picks && com.rtshop.item.SurveyCompassItem.eyeFor("minecraft:stronghold") == null,
+                cata + " eye " + eye + " both " + (both == null ? "null" : both[0]) + " eyeOnly " + (eyeOnly == null ? "null" : eyeOnly[0]) + " took " + tookEye + tookFar);
+        QuestManager.reset(a);
+        QuestManager.loaded().quests.remove(qEye.id);
+        QuestManager.loaded().quests.remove(qFar.id);
+    }
+
     private static void stocks(MinecraftServer server, FakePlayer a) {
         com.rtshop.stock.StockConfig sc = com.rtshop.stock.StockConfig.copyOfDefaults();
         sc.noise = 0;
@@ -3865,6 +3968,29 @@ public final class SelfTest {
             int made3 = com.rtshop.quest.NpcLayout.settle(server);
             check("where there is no floor (a world with other terrain) the NPC is not set down; the place keeps waiting",
                     moved2 == 1 && made3 == 0 && com.rtshop.quest.NpcLayout.pendingForTest(server) == 1, moved2 + " " + made3 + " " + com.rtshop.quest.NpcLayout.pendingForTest(server));
+            // 3.74.0 (사용자 W-18): 바라보는 NPC 하나 지우기 (/rtshop npc remove) · 배치 초기화 (/rtshop npc layout reset)
+            for (net.minecraft.world.entity.Entity e : level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> com.rtshop.quest.NpcLayout.keyOf(x) != null)) e.discard();
+            com.rtshop.quest.NpcLayout.resetForTest(server);
+            net.minecraft.world.entity.npc.Villager rb = ShopServer.spawnNpc(level, new net.minecraft.world.phys.Vec3(lpx + 0.5, 150, lpz + 0.5), 90F, "bank");
+            net.minecraft.world.entity.npc.Villager rf = ShopServer.spawnNpc(level, new net.minecraft.world.phys.Vec3(lpx + 4.5, 150, lpz + 0.5), 90F, "fisher");
+            com.rtshop.quest.NpcLayout.export(server);
+            int knownBank = com.rtshop.quest.NpcLayout.knownForTest(server, "bank"), knownFisher = com.rtshop.quest.NpcLayout.knownForTest(server, "fisher");
+            net.minecraft.world.phys.Vec3 keep374 = a.position();
+            float keepYaw374 = a.getYRot(), keepPitch374 = a.getXRot();
+            a.moveTo(lpx + 3.5, 150, lpz + 0.5, 90F, 0F);    // 서쪽(-x)을 본다: 앞의 은행원을 고른다 (등 뒤 1칸의 어부는 아니다)
+            net.minecraft.world.entity.Entity pickW = com.rtshop.quest.NpcLayout.picked(a);
+            a.moveTo(lpx + 3.5, 150, lpz + 0.5, 180F, 60F);  // 아무도 보지 않으면 4칸 안에서 가장 가까운 NPC (어부)
+            net.minecraft.world.entity.Entity pickN = com.rtshop.quest.NpcLayout.picked(a);
+            a.moveTo(keep374.x, keep374.y, keep374.z, keepYaw374, keepPitch374);
+            int[] rs374 = com.rtshop.quest.NpcLayout.reset(server, e -> lbox.contains(e.position()));
+            int left374 = level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> com.rtshop.quest.NpcLayout.keyOf(x) != null).size();
+            boolean cmd374 = server.getCommands().getDispatcher().findNode(List.of("rtshop", "npc", "remove")) != null
+                    && server.getCommands().getDispatcher().findNode(List.of("rtshop", "npc", "layout", "reset")) != null;
+            check("3.74 /rtshop npc remove picks the NPC you look at (else the nearest); /rtshop npc layout reset takes the NPCs away and forgets their places",
+                    rb != null && rf != null && pickW == rb && pickN == rf && rs374[0] == 2 && left374 == 0 && knownBank == 1 && knownFisher == 1
+                            && com.rtshop.quest.NpcLayout.knownForTest(server, "bank") == 0 && com.rtshop.quest.NpcLayout.knownForTest(server, "fisher") == 0 && cmd374,
+                    (pickW == null ? "null" : com.rtshop.quest.NpcLayout.keyOf(pickW)) + " / " + (pickN == null ? "null" : com.rtshop.quest.NpcLayout.keyOf(pickN))
+                            + " reset " + java.util.Arrays.toString(rs374) + " left " + left374 + " known " + knownBank + "," + knownFisher + " cmd " + cmd374);
         } finally {
             for (net.minecraft.world.entity.Entity e : level.getEntities((net.minecraft.world.entity.Entity) null, lbox, x -> com.rtshop.quest.NpcLayout.keyOf(x) != null)) e.discard();
             com.rtshop.quest.NpcLayout.resetForTest(server);
@@ -4422,6 +4548,7 @@ public final class SelfTest {
                         && pr373.incl.getOrDefault("mixin:spiral_abyss", 0) == 1 && String.join("\n", rep373).contains(rt373)
                         && a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "perfcheck")) != null,
                 rt373 + " " + pr373.self + " " + pr373.incl);
+        v374(a.server, a);
         // 3.62: 보스마다 다른 카메라 방식 / Cinematic Cataclysm 컷신으로 깨우기 (그 모드가 있을 때만)
         boolean cc362 = net.minecraftforge.fml.ModList.get().isLoaded("cinematiccataclysm");
         String ccTrace = "";

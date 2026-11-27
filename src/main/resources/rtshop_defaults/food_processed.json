@@ -1,0 +1,79 @@
+{
+ "_설명": [
+  "3.74.0: 식품 상인의 가공 식재료 · 손질한 고기 (설치된 food.json 에 없는 것만 한 번 덧붙입니다). 날 농작물 · 고기는 농작물 상인에게서 삽니다."
+ ],
+ "items": [
+  {
+   "item": "farmersdelight:wheat_dough",
+   "price": 30,
+   "category": "ingredient",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:raw_pasta",
+   "price": 40,
+   "category": "ingredient",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:pie_crust",
+   "price": 60,
+   "category": "ingredient",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:pumpkin_slice",
+   "price": 20,
+   "category": "ingredient",
+   "dynamic": true
+  },
+  {
+   "item": "farm_and_charm:flour",
+   "price": 20,
+   "category": "ingredient",
+   "dynamic": true
+  },
+  {
+   "item": "farm_and_charm:dough",
+   "price": 30,
+   "category": "ingredient",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:minced_beef",
+   "price": 50,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:bacon",
+   "price": 30,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:chicken_cuts",
+   "price": 25,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:mutton_chops",
+   "price": 50,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:cod_slice",
+   "price": 70,
+   "category": "meat",
+   "dynamic": true
+  },
+  {
+   "item": "farmersdelight:salmon_slice",
+   "price": 70,
+   "category": "meat",
+   "dynamic": true
+  }
+ ]
+}

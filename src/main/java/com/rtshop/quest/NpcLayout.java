@@ -524,19 +524,31 @@ public final class NpcLayout extends SavedData {
 
     /** 모든 RT Shop NPC 를 치운다: {지금 치운 수, 나중에(그 청크가 돌 때) 치울 수}. 배치 파일은 비운다. */
     public static int[] reset(MinecraftServer server) {
+        return reset(server, null);
+    }
+
+    /** scope: null = 모두 (명령). 아니면 그 안의 NPC 만 치우고 그 NPC 의 기억만 지운다 (점검용: 다른 시험의 NPC 는 그대로). */
+    public static int[] reset(MinecraftServer server, java.util.function.Predicate<Entity> scope) {
         NpcLayout d = get(server);
         int now = 0;
         java.util.Set<java.util.UUID> gone = new java.util.HashSet<>();
         for (ServerLevel level : server.getAllLevels()) {
             List<Entity> list = new ArrayList<>();
             for (Entity e : level.getAllEntities()) {
-                if (keyOf(e) != null && !e.getTags().contains(com.rtshop.pshop.Employees.TAG)) list.add(e);
+                if (keyOf(e) != null && !e.getTags().contains(com.rtshop.pshop.Employees.TAG) && (scope == null || scope.test(e))) list.add(e);
             }
             for (Entity e : list) {
                 gone.add(e.getUUID());
                 e.discard();
                 now++;
             }
+        }
+        if (scope != null) {
+            for (java.util.UUID id : gone) d.known.remove(id);
+            d.changed = true;
+            d.setDirty();
+            export(server);
+            return new int[]{now, 0};
         }
         int later = 0;
         for (java.util.UUID id : new ArrayList<>(d.known.keySet())) {

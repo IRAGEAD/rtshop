@@ -319,7 +319,7 @@ jobs:
         run: |
           mkdir -p /tmp/inspect
           python3 .github/scripts/inspect_recipes.py packcache "kaleidoscope_tavern:shaker,kaleidoscope_cookery:teapot,kaleidoscope_cookery:oil_pot,kaleidoscope_cookery:enamel_basin,better_farming_plus:sprinkler,minecraft:bucket,minecraft:water_bucket,minecraft:milk_bucket,minecraft:cake,farmersdelight:cake_slice,kaleidoscope_tavern:rum,kaleidoscope_cookery:sticky_candy" > /tmp/inspect/price-recipes.txt 2>&1 || true
-      - name: Inspect Fantasy Mounts world settings
+      - name: Inspect Fantasy Mounts world settings and Cataclysm eyes
         run: |
           # 3.74.0 (사용자 W-19 "월드 세팅 중 quests 기본값을 off"): 세계 설정이 어느 파일의 어떤 키인지, 기본값을 어디서 읽는지
           mkdir -p /tmp/inspect /tmp/fj
@@ -330,9 +330,32 @@ jobs:
                      com/bonfyre/fantasy/core/config/panel/PanelFile com/bonfyre/fantasy/core/config/SettingsSource; do
               echo "######## $c"; (cd /tmp/fj && javap -p -c -constants "$c.class" 2>&1 | grep -E "ldc|String |Field |Method |public|private|static|invoke" | head -n 260)
             done
+            echo "######## FantasySettings\$Server around quests"
+            (cd /tmp/fj && javap -p -c -constants 'com/bonfyre/fantasy/core/config/FantasySettings$Server.class' 2>&1 | grep -n -A14 'String quests' | head -n 80)
+            echo "######## FantasyConfigs strings"
+            (cd /tmp/fj && javap -p -c -constants com/bonfyre/fantasy/config/FantasyConfigs.class 2>&1 | grep -E "ldc|Method .*(world|World|load|save|Panel|Source)" | head -n 120)
             echo "######## classes mentioning quests"
             (cd /tmp/fj && grep -rl -a "quests" com/bonfyre/fantasy | head -n 40)
           } > /tmp/inspect/fantasy-world.txt 2>&1 || true
+          # 3.74.0 (사용자 W-11 "Cataclysm 보스 구조물은 나침반 대신 눈으로"): 눈을 얻는 길 (조합법 · 전리품 · 거래)
+          CJ="$PWD/$(ls packcache/*.jar | grep -i "cataclysm" | grep -vi "cinematic" | head -1)"
+          {
+            echo "== $CJ"
+            for f in $(unzip -l "$CJ" | awk '{print $4}' | grep -E "^data/.*\.json$"); do
+              body="$(unzip -p "$CJ" "$f" 2>/dev/null)"
+              if echo "$body" | grep -q -E "cataclysm:(flame|void|monstrous|abyss|mech|desert|cursed|storm)_eye"; then
+                echo "---- $f"; echo "$body" | tr -d '\n' | sed 's/  */ /g' | cut -c1-1500; echo
+              fi
+            done
+            echo "== other jars that mention the eyes (recipes, loot)"
+            for J2 in packcache/*.jar; do
+              case "$J2" in *ataclysm*) continue;; esac
+              unzip -p "$J2" 'data/*' 2>/dev/null | grep -q -E "cataclysm:(flame|void|monstrous|abyss|mech|desert|cursed|storm)_eye" || continue
+              for f in $(unzip -l "$J2" 2>/dev/null | awk '{print $4}' | grep -E "^data/.*\.json$"); do
+                if unzip -p "$J2" "$f" 2>/dev/null | grep -q -E "cataclysm:(flame|void|monstrous|abyss|mech|desert|cursed|storm)_eye"; then echo "$J2 $f"; fi
+              done
+            done | head -n 60
+          } > /tmp/inspect/cataclysm-eyes.txt 2>&1 || true
       - name: Inspect
         env:
           SPIRAL_CALLS: '/(FloorController|FloorProgress|AbyssPlayers|AbyssEncounters|ArenaSession|AbyssCycle|AbyssParties|BossProgress|FloorSelectionScreen|AbyssPlayerLifecycle|ChallengeRewards|ChestPayout|AbyssNetwork|AbyssDimension|ForgeGameplayEvents|AbyssPlatformImpl|PersistentEntityData|AbyssBlockProtection|CommandInit)(\$[^/]*)?\.class$'
@@ -892,6 +915,13 @@ jobs:
           cp client/rtshop-shadertest*.txt /tmp/fpshots/ 2>/dev/null || true
           for f in client/logs/shadertest-*.log; do [ -f "$f" ] || continue; echo "===== $f"; grep -n -iE "rtshop-clienttest|using shaderpack|ShaderCompileException|error: |cinematic" "$f" | grep -viE "could not find (uniform|sampler)|Datapack animation|Error loading class" | cut -c1-400 | head -n 100; echo "----- exceptions"; grep -n -iE "Exception|Error" "$f" | grep -viE "could not find (uniform|sampler)|Datapack animation|Error loading class|ClassNotFoundException" | cut -c1-300 | head -n 40; done > /tmp/fpshots/shader-log.txt 2>/dev/null || true
           cp server/config/rtshop/export/diag.txt server/config/rtshop/export/audit.txt server/config/rtshop/export/item_policy.txt /tmp/fpshots/ 2>/dev/null || true
+          # 3.74.0 (사용자 W-19): Fantasy Mounts 설정 파일이 어디에 어떤 모양으로 생기는지 (서버 · 세계 · 클라이언트)
+          {
+            for f in server/config/fantasy-*.toml client/config/fantasy-server.toml; do [ -f "$f" ] || continue; echo "===== $f"; grep -n -B2 -A12 -i "^\[quests" "$f" | head -n 60; done
+            echo "===== files named fantasy* under the worlds"
+            find server/world client/saves -iname "*fantasy*" 2>/dev/null | head -n 40
+            for f in $(find server/world client/saves -iname "fantasy*.toml" 2>/dev/null | head -n 6); do echo "===== $f"; head -c 3000 "$f"; echo; done
+          } > /tmp/fpshots/fantasy-settings.txt 2>&1 || true
           cp server/rtshop-selftest.txt /tmp/fpshots/ 2>/dev/null || true
           mkdir -p /tmp/fpshots/crash && cp client/crash-reports/*.txt /tmp/fpshots/crash/ 2>/dev/null || true
           tail -n 400 client/logs/latest.log > /tmp/fpshots/client-tail.log 2>/dev/null || true

@@ -559,6 +559,13 @@ public class PetitionScreen extends Screen {
         this.rebuildWidgets();
     }
 
+    /** 점검용 (3.74 W-14): 글 칸에 글을 넣는다. {잘린 뒤 남은 초안 길이, 한도}. 글 칸이 없으면 null. */
+    public int[] typeForTest(String text) {
+        if (box == null) return null;
+        box.setValue(text);
+        return new int[]{draft.length(), max};
+    }
+
     public void filterForTest(int state, int category) {
         fState = state;
         fCat = category;

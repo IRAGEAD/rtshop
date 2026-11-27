@@ -131,6 +131,8 @@ public final class ShopLoader {
         final Set<String> keys = new HashSet<>();
         final Set<String> excludeIds = new HashSet<>();
         final Set<String> excludeNamespaces = new HashSet<>();
+        /** 3.74.0 (사용자 W-15): 이 상점들이 다루는 품목은 이 상점에 올리지 않는다 (식품 상인 ← 농작물 상인). */
+        final List<String> skipItemsOf = new ArrayList<>();
     }
 
     public static final class Loaded {
@@ -197,7 +199,11 @@ public final class ShopLoader {
     public static final String[] UPGRADED = {"gacha_shop@2"};
     /** 기존 상점 파일에 품목을 덧붙임: "상점+조각파일@판" (조각의 categories/items 중 없는 것만 추가, 한 번만). */
     public static final String[] APPENDED = {"blacksmith+blacksmith_enhance@1", "blacksmith+blacksmith_enhance@2", "general+general_pshop@1",
-            "gacha_shop+gacha_shop_magic@1", "general+general_return@1", "general+general_books@1"};
+            "gacha_shop+gacha_shop_magic@1", "general+general_return@1", "general+general_books@1",
+            "food+food_processed@1"};   // 3.74.0: 식품 상인의 가공 식재료 (날 농작물 · 고기는 농작물 상인에게서)
+
+    /** 한 번만 하는 상점 파일 고치기 (3.74.0 부터): 이름 → 할 일. 기록(added_shops.txt)에 이름이 없을 때 한 번. */
+    public static final String[] MIGRATED = {"food-skip-farmer@1"};
 
     /** 기본값이 바뀐 품목: "상점:품목=옛값>새값@판". 설치된 파일의 값이 옛 기본값 그대로일 때만 새 값으로 고친다 (한 번만). */
     public static final String[] REPRICED = {"general:rtshop:return_ticket=1500>5000@1", "general:rtshop:return_ticket_plus=12000>30000@1",
@@ -283,9 +289,62 @@ public final class ShopLoader {
             done.add(mark);
             changed = true;
         }
+        for (String mark : MIGRATED) {
+            if (done.contains(mark)) {
+                continue;
+            }
+            try {
+                if (mark.equals("food-skip-farmer@1")) {
+                    migrateFoodSkipFarmer(dir.resolve("food.json"));
+                }
+            } catch (Exception ex) {
+                RtShop.LOGGER.error("[rtshop] 상점 파일 고치기 {} 실패: {}", mark, ex.toString());
+            }
+            done.add(mark);
+            changed = true;
+        }
         if (changed) {
             Files.write(list, done, StandardCharsets.UTF_8);
         }
+    }
+
+    /**
+     * 3.74.0 (사용자 W-15): 설치된 식품 상인 파일에 skipItemsOf ["farmer"] 를 넣고 (농작물 상인과 겹치는 품목은 불러올 때 빠진다),
+     * 예전 기본 이름 그대로인 '농산물' 구분은 '식재료' 로 바꾼다. 이미 있거나 주인이 고친 값은 그대로 둔다. 고쳤으면 true.
+     */
+    public static boolean migrateFoodSkipFarmer(Path file) throws IOException {
+        if (!Files.exists(file)) {
+            return false;
+        }
+        com.google.gson.JsonObject shop = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+        boolean changed = false;
+        if (!shop.has("skipItemsOf")) {
+            com.google.gson.JsonArray a = new com.google.gson.JsonArray();
+            a.add("farmer");
+            shop.add("skipItemsOf", a);
+            changed = true;
+        }
+        if (shop.has("categories") && shop.get("categories").isJsonArray()) {
+            for (com.google.gson.JsonElement e : shop.getAsJsonArray("categories")) {
+                if (!e.isJsonObject()) {
+                    continue;
+                }
+                com.google.gson.JsonObject c = e.getAsJsonObject();
+                if ("ingredient".equals(str(c, "id", "")) && "농산물".equals(str(c, "name", ""))) {
+                    c.addProperty("name", "식재료");
+                    if ("minecraft:carrot".equals(str(c, "icon", ""))) {
+                        c.addProperty("icon", "farmersdelight:wheat_dough");
+                    }
+                    changed = true;
+                }
+            }
+        }
+        if (changed) {
+            Files.writeString(file, new com.google.gson.GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(shop),
+                    StandardCharsets.UTF_8);
+            RtShop.LOGGER.info("[rtshop] 식품 상인 파일에 농작물 상인과 겹치는 품목 빼기(skipItemsOf)를 넣었습니다.");
+        }
+        return changed;
     }
 
     /** 상점 파일에서 이 품목의 값이 옛 기본값(from) 그대로면 새 값(to)으로 고친다. 고친 수를 돌려준다. */
@@ -456,6 +515,11 @@ public final class ShopLoader {
                 RtShop.LOGGER.error("[rtshop] 빠진 요리 재료를 식품 상인에 올리는 중 오류", t);
             }
         }
+        try {
+            applySkipItemsOf(raws, out.notes);
+        } catch (Throwable t) {
+            RtShop.LOGGER.error("[rtshop] 다른 상점과 겹치는 품목을 빼는 중 오류", t);
+        }
         for (Raw r : raws) {
             for (Ref ref : r.refs) {
                 if (ref.buy) {
@@ -504,8 +568,22 @@ public final class ShopLoader {
                         p.parts, p.partsOut).withFlex(p.flexUnit));
             }
             JsonObject o = r.json;
+            List<ShopData.Category> cats = r.categories;
+            if (!r.skipItemsOf.isEmpty()) {
+                // 겹치는 품목을 빼서 비게 된 구분(예: 예전 기본값의 '농산물')은 탭을 보이지 않는다
+                Set<String> used = new HashSet<>();
+                for (ShopData.Entry e : entries) {
+                    used.add(e.category);
+                }
+                cats = new ArrayList<>();
+                for (ShopData.Category c : r.categories) {
+                    if (used.contains(c.id)) {
+                        cats.add(c);
+                    }
+                }
+            }
             out.shops.put(r.id, new ShopData(r.id, versionCounter, str(o, "title", r.id), str(o, "npcName", r.id),
-                    str(o, "profession", ""), r.categories, entries,
+                    str(o, "profession", ""), cats, entries,
                     fc.starMultipliers.clone(), pc.fishBaseMultiplier, pc.fishWeightBonus, pc.fishGoldenMultiplier,
                     pc.fishNoInfoMultiplier));
             RtShop.LOGGER.info("[rtshop] 상점 '{}' 로드: 품목 {}개", r.id, entries.size());
@@ -1893,6 +1971,54 @@ public final class ShopLoader {
                 }
             }
         }
+        if (root.has("skipItemsOf") && root.get("skipItemsOf").isJsonArray()) {
+            for (JsonElement el : root.getAsJsonArray("skipItemsOf")) {
+                String s = el.getAsString().trim();
+                if (!s.isEmpty() && !s.equals(r.id)) {
+                    r.skipItemsOf.add(s);
+                }
+            }
+        }
+    }
+
+    /**
+     * 3.74.0 (사용자 W-15 "농작물 상인의 판매 품목은 식품 상인과 중복되지 않도록"): skipItemsOf 에 적힌 상점이 다루는 품목(같은 아이템 · 같은 꼬리표)을
+     * 이 상점에서 뺀다. 직접 적은 품목이든 자동 규칙으로 모인 품목이든 같다. 뺀 수를 상점마다 적는다.
+     */
+    static Map<String, Integer> applySkipItemsOf(List<Raw> raws, List<String> notes) {
+        Map<String, Raw> byId = new HashMap<>();
+        for (Raw r : raws) {
+            byId.put(r.id, r);
+        }
+        Map<String, Integer> removed = new LinkedHashMap<>();
+        for (Raw r : raws) {
+            if (r.skipItemsOf.isEmpty()) {
+                continue;
+            }
+            Set<String> other = new HashSet<>();
+            for (String id : r.skipItemsOf) {
+                Raw o = byId.get(id);
+                if (o != null) {
+                    for (Ref ref : o.refs) {
+                        other.add(ref.key);
+                    }
+                }
+            }
+            int n = 0;
+            for (java.util.Iterator<Ref> it = r.refs.iterator(); it.hasNext(); ) {
+                Ref ref = it.next();
+                if (other.contains(ref.key)) {
+                    it.remove();
+                    r.keys.remove(ref.key);
+                    n++;
+                }
+            }
+            if (n > 0) {
+                removed.put(r.id, n);
+                notes.add(String.format("상점 '%s': %s 상점이 다루는 품목 %d개를 뺐습니다 (skipItemsOf)", r.id, String.join(", ", r.skipItemsOf), n));
+            }
+        }
+        return removed;
     }
 
     private static ItemStack prepare(ItemStack stack, boolean seedFlag) {

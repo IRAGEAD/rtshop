@@ -2149,6 +2149,11 @@ final class ClientSelfTest2 {
         });
         add(mc -> {
             check("3.61 reports: the clerk's window opens with the categories and a place to write", mc.screen instanceof PetitionScreen ps361 && ps361.rowsForTest() >= 5, mc.screen);
+            // 3.74.0 (사용자 W-14): 한도보다 긴 글은 한도에서 잘리고, 글자 수는 창이 한 번만 그린다 (바닐라의 그림자 있는 글자 수 없음)
+            int[] typed374 = mc.screen instanceof PetitionScreen pw374 ? pw374.typeForTest("가".repeat(1200)) : null;
+            check("3.74 reports: text longer than the limit is cut at the limit (the letter count is drawn once, by the window)",
+                    typed374 != null && typed374[0] == typed374[1] && typed374[1] > 0, typed374 == null ? "no box" : typed374[0] + "/" + typed374[1]);
+            if (mc.screen instanceof PetitionScreen pv374) pv374.typeForTest("상점 창을 닫았다 열면 검색어가 남아 있어요.");
             shot(mc, "133_petition_new");
             if (mc.screen instanceof PetitionScreen pt361) pt361.tabForTest(1);
             waitTicks(6);
@@ -2248,6 +2253,66 @@ final class ClientSelfTest2 {
                     && java.nio.file.Files.exists(FpsCheckClient.lastFileForTest);
             check("3.73 /fpscheck samples the render thread for a few seconds and writes a report (FPS, GPU wait, time by mod) into the game folder", ok373,
                     FpsCheckClient.lastReportForTest.size() + " lines · " + FpsCheckClient.lastFileForTest + " · " + (rep373.length() > 300 ? rep373.substring(0, 300) : rep373));
+            waitTicks(5);
+        });
+        add(mc -> {
+            // 3.74.0 (사용자 W-20): 대화 상자의 선택지 · 안내 글은 대사와 같은 이야기 언어로
+            ClientConfig cfg374 = ClientConfig.get();
+            String keep374 = cfg374.storyLang;
+            cfg374.storyLang = "ko_kr";
+            String ko374 = DialogueScreen.tl("rtshop.talk.bye"), koQ374 = DialogueScreen.tl("rtshop.talk.quests", 2);
+            cfg374.storyLang = "en_us";
+            String en374 = DialogueScreen.tl("rtshop.talk.bye");
+            cfg374.storyLang = keep374;
+            check("3.74 the dialogue box's choices and hints follow the story language (a Korean story shows Korean choices even in an English game)",
+                    "작별 인사".equals(ko374) && "퀘스트 이야기 (2)".equals(koQ374) && "Goodbye".equals(en374), ko374 + " / " + koQ374 + " / " + en374);
+            // W-9: 퀘스트 HUD 의 자리 — 바로 위 · 아래면 그 높이를, 멀면 (x, y, z) 를
+            String dim374 = mc.player.level().dimension().location().toString();
+            int px374 = mc.player.getBlockX(), py374 = mc.player.getBlockY(), pz374 = mc.player.getBlockZ();
+            String below374 = QuestHud.whereText(dim374 + ";" + px374 + ";" + (py374 - 12) + ";" + pz374, "ko_kr");
+            String above374 = QuestHud.whereText(dim374 + ";" + px374 + ";" + (py374 + 9) + ";" + pz374, "en_us");
+            String far374 = QuestHud.whereText(dim374 + ";" + (px374 + 40) + ";" + (py374 + 3) + ";" + pz374, "ko_kr");
+            String here374 = QuestHud.whereText(dim374 + ";" + px374 + ";" + (py374 + 1) + ";" + pz374, "ko_kr");
+            check("3.74 the quest HUD place tells the height: right below / above when close, and (x, y, z) when far",
+                    below374.contains("아래") && below374.contains(String.valueOf(py374 - 12)) && above374.contains("above") && above374.contains(String.valueOf(py374 + 9))
+                            && far374.contains(", " + (py374 + 3) + ", ") && here374.equals(HudLang.tr("ko_kr", "rtshop.qhud.where_here")),
+                    below374 + " | " + above374 + " | " + far374 + " | " + here374);
+            // W-29: 크리에이티브의 RT Shop 탭
+            net.minecraft.world.item.CreativeModeTab tab374 = net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.get(new net.minecraft.resources.ResourceLocation("rtshop", "main"));
+            int shown374 = -1;
+            String tabErr374 = "";
+            try {
+                if (tab374 != null) {
+                    tab374.buildContents(new net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters(mc.player.connection.enabledFeatures(), true, mc.level.registryAccess()));
+                    shown374 = tab374.getDisplayItems().size();
+                }
+            } catch (Throwable t) {
+                tabErr374 = t.toString();
+            }
+            check("3.74 creative mode has an RT Shop tab holding every RT Shop item", tab374 != null && shown374 == com.rtshop.item.ModTabs.countForTest() && shown374 > 20,
+                    shown374 + " / " + com.rtshop.item.ModTabs.countForTest() + " " + tabErr374);
+            onServer(mc, sp -> ShopServer.openShop(sp, "farmer", -1));
+            waitTicks(25);
+        });
+        add(mc -> {
+            // W-23: 상점의 아이템 툴팁은 상인 단추를 그린 다음 그 위에 / W-30: 「1장 이후」 같은 잠금 글은 칸에 맞게 줄인다
+            ShopScreen ss374 = mc.screen instanceof ShopScreen x ? x : null;
+            boolean[] late374 = null;
+            String lateErr374 = "";
+            if (ss374 != null) {
+                try {
+                    net.minecraft.client.gui.GuiGraphics g374 = new net.minecraft.client.gui.GuiGraphics(mc, mc.renderBuffers().bufferSource());
+                    late374 = ss374.tooltipLaterForTest(g374);
+                    g374.flush();
+                } catch (Throwable t) {
+                    lateErr374 = t.toString();
+                }
+            }
+            check("3.74 shop item tooltips wait until the merchant's buttons are drawn and then go on top", late374 != null && late374[0] && late374[1],
+                    ss374 == null ? String.valueOf(mc.screen) : late374 == null ? "no first cell " + lateErr374 : late374[0] + " " + late374[1]);
+            check("3.74 lock labels such as '1장 이후' are shrunk to fit inside the cell", ss374 != null && ss374.lockLabelFitsForTest("1장 이후") && ss374.lockLabelFitsForTest("Chapter 1 and later"),
+                    mc.screen);
+            mc.setScreen(null);
             waitTicks(5);
         });
     }

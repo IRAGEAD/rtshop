@@ -64,6 +64,9 @@ NEW = {
  "rtshop.npclayout.removed": ("%s 을(를) 치웠습니다 (%s, %s, %s). 배치 파일에서도 빠집니다.", "Removed %s (%s, %s, %s). It is taken out of the layout file too."),
  # ---- 3.74: 크리에이티브 탭
  "itemGroup.rtshop": ("RT Shop", "RT Shop"),
+ # ---- 3.74: Cataclysm 보스 건축물은 나침반 대신 그 모드의 눈으로 (사용자 W-11)
+ "item.rtshop.survey_compass.eye": ("%1$s: 보스가 사는 곳이라 나침반 바늘이 돌지 않습니다. %2$s 을(를) 던지면 그쪽으로 날아갑니다 (만드는 법은 JEI · 레시피 책).", "%1$s: a boss lives there, so the needle won't settle. Throw %2$s and it flies that way (see JEI or the recipe book for how to make one)."),
+ "item.rtshop.survey_compass.desc4": ("Cataclysm 보스의 건축물은 가리키지 않는다: 그 모드의 「눈」을 던져 찾는다.", "Does not point to Cataclysm boss buildings: throw that mod's eye to find them."),
  # ---- 3.73: FPS 진단 (/fpscheck)
  "rtshop.fpscheck.busy": ("이미 진단 중입니다.", "A check is already running."),
  "rtshop.fpscheck.start": ("FPS 진단을 %s초 동안 합니다. 평소처럼 움직이세요 (FPS 가 떨어지는 곳이면 더 좋습니다).", "Checking FPS for %s seconds. Play as usual (best where the FPS drops)."),

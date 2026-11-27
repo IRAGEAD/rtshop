@@ -603,6 +603,20 @@ public class ShopScreen extends Screen implements NpcButtons.Host {
         return lateTip != null;
     }
 
+    /**
+     * 점검용 (3.74 W-23): 첫 품목 칸 위에 마우스를 둔 채 한 번 그린다. {툴팁을 상인 단추 다음으로 미뤘나, lateTooltips 가 그리고 비웠나}.
+     * 품목이 없으면 null.
+     */
+    public boolean[] tooltipLaterForTest(GuiGraphics g) {
+        if (rows.isEmpty() || dlgRow != null) return null;
+        int mx = grid ? gridX0() + CELL / 2 : vx + vw / 2, my = vy - scroll + (grid ? CELL / 2 : rowStep() / 2);
+        if (rowAt(mx, my) != 0) return null;
+        render(g, mx, my, 0F);
+        boolean deferred = lateTip != null;
+        lateTooltips(g, mx, my);
+        return new boolean[]{deferred, lateTip == null};
+    }
+
     private void bevel(GuiGraphics g, int x, int y, int w, int h, int fill, int hi, int lo) {
         Ui.bevel(g, x, y, w, h, fill, hi, lo);
     }
