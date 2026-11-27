@@ -220,6 +220,17 @@ jobs:
             done) > /tmp/inspect/diorama-radar.txt 2>&1
             (cd /tmp/dj && javap -p dev/diorama/MinimapHud.class 2>&1 | head -n 200) >> /tmp/inspect/diorama-radar.txt 2>&1
           fi
+      - name: Inspect Diorama waypoint icons
+        run: |
+          mkdir -p /tmp/inspect
+          # K-1 (3.69.0): 큰 지도에서 NPC 웨이포인트를 이름 대신 아이콘으로 — 웨이포인트 아이콘을 어디서 읽고 어떻게 그리는지
+          if [ -d /tmp/dj ]; then
+            (cd /tmp/dj && for c in dev/diorama/render/WaypointIcons dev/diorama/render/Pins dev/diorama/waypoint/WaypointOverlay 'dev/diorama/waypoint/WaypointOverlay$Pin' 'dev/diorama/Settings$WaypointLabels'; do
+              echo "######## $c"; javap -c -p "$c.class" 2>&1 | head -n 2500
+            done) > /tmp/inspect/diorama-icons.txt 2>&1
+            (cd /tmp/dj && echo "######## MapScreen (waypoint parts)"; javap -c -p dev/diorama/MapScreen.class 2>&1 | grep -n -B3 -A3 -i "waypoint\|Pins\|label" | head -n 1500) >> /tmp/inspect/diorama-icons.txt 2>&1
+            (cd /tmp/dj && echo "######## waypoint icon files"; find . -path "*waypoint*" -name "*.png" | head -n 200; find . -ipath "*icon*" -name "*.png" | head -n 200) >> /tmp/inspect/diorama-icons.txt 2>&1
+          fi
       - name: Inspect Cinematic Cataclysm
         run: |
           mkdir -p /tmp/inspect
