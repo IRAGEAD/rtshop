@@ -2319,8 +2319,8 @@ public final class SelfTest {
         boolean sold = bs != null && findEntry(bs, e -> net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(e.stack.getItem()).toString().equals("rtshop:enhance_guard_full")) >= 0
                 && findEntry(bs, e -> net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(e.stack.getItem()).toString().equals("rtshop:enhance_anvil")) < 0;
         check("the equipment merchant sells the guard tickets but not the enhance anvil (there is one in town)", sold);
-        check("damage guard is cheaper than destruction guard; protection = both together",
-                pd != null && px != null && pf != null && pd.price < px.price && pf.price == pd.price + px.price,
+        check("3.69.0 guard tickets fit their levels: destruction guard is the cheapest (+5 ~ +6), protection the dearest (+7 and up), damage guard in between (gear that cannot break)",
+                pd != null && px != null && pf != null && px.price < pd.price && pd.price < pf.price,
                 pd == null ? "missing" : pd.price + " / " + (px == null ? "?" : px.price) + " / " + (pf == null ? "?" : pf.price));
         // 기존 상점 파일에 한 번만 덧붙임
         java.nio.file.Path tmp = Files.createTempFile("rtshop_bs", ".json");
