@@ -47,9 +47,24 @@
 - 화면 스레드의 다른 무게: SP Movesets 8.9% (기술 효과 클래스마다 매 틱 클라이언트 처리), Epic Fight 5.2%, Diorama 4.6% (레이더), TACZ 4.6% (모든 엔티티 그리기를 감쌈), Punchy 4.3%, RT Shop 1.3%.
 - 배경 스레드: diorama-baker 86% · Entity Culling 11%.
 
-### 2-3. 7차 실행 (변형 하나씩) — 아래에 숫자
+### 2-3. 7차 실행 45990016076 (모드팩 11, 변형 하나씩) — 내장 서버 MSPT (괄호는 base 대비)
 
-(결과를 받으면 채움)
+| 변형 | 마을 | 날기 | 몹 | FPS(그린 화면 수) 마을 · 날기 · 몹 |
+|---|---|---|---|---|
+| base (팩 그대로, Chunky 포함) | 68.9 | 71.8 | 74.4 | 1.41 · 2.20 · 1.76 |
+| noav (Arcane Vortex 뺌) | 50.6 (-27%) | 51.7 (-28%) | 59.9 (-19%) | 1.75 · 2.19 · 1.77 |
+| nofs (Farsight 뺌) | 67.2 (-2%) | 78.5 (+9%) | 79.8 (+7%) | 1.58 · 2.14 · 1.65 |
+| addons (AI Improvements + Clumps 더함) | 58.1 (-16%) | 63.0 (-12%) | 76.2 (+2%) | 1.51 · 1.92 · 1.69 |
+| dfast (Diorama FAST) | — | — | — | 설정 파일을 못 찾아 건너뜀 (아래) |
+
+- 흔들림: 같은 base 가 실행마다 마을 69~75 · 날기 72~94 · 몹 74~89 (3차 · 6차 · 7차) → **±5~13% 안의 차이는 우연일 수 있다.**
+- **Arcane Vortex 가 유일하게 분명한 몫**: 3차(lean)와 7차(noav) 모두 -19~-32%, 마을 FPS +24%.
+- Farsight: 속도 차이는 흔들림 안. 다만 DH 와 하는 일이 겹치고 빈틈을 부추겨 빼기를 권함 (사용자도 DH 를 남기기로 함).
+- AI Improvements + Clumps: 마을 · 날기는 좋아졌으나 몹 장면은 그대로 → 흔들림일 수 있음. 함께 켜지는 데 문제는 없음 → '선택'.
+- DH 빈틈: 고치기 전 렌더 거리 12 · 유효 12 (서버 6), 고친 뒤 6 · 6 ✔. 사진 170 · 171 은 먼 풍경이 아직 없을 때(접속 1분 뒤, 지평선 쪽 12도) 찍혀 차이가 안 보였다
+  → 3.71.0 에서 2분 반 기다린 뒤 35도로 내려다보고, DH 가 고리(150칸) · 먼 곳(320칸)에 LOD 자료를 갖고 있는지 DH API 로 적게 고침.
+- dfast: Diorama 는 설정을 바꾸기 전에는 설정 파일을 만들지 않는다 → CI 가 파일을 찾아 고칠 수 없었다.
+  → 3.71.0 에서 RT Shop 이 세계를 열기 전에 게임 안에서 FAST 로 바꿔 저장하고(`ClientPerfTest.beforeWorld`, 리플렉션: `dev.diorama.Settings.get()` · `quality` · `save()` · 비공개 `file()`), CI 가 끝난 뒤 되돌림.
 
 ## 3. RT Shop 이 고친 것 (3.70.0)
 
@@ -64,6 +79,13 @@
 3. **ImmediatelyFast 빠른 버퍼 업로드 되돌리기** (`client/FastBufferFix`): dhcompat 은 켤 때마다 `config/immediatelyfast.json` 의 `fast_buffer_upload` 를 false 로 썼다.
    dhcompat 이 없으면 RT Shop 이 한 번 true 로 되돌린다 (다음 실행부터, 다른 값은 그대로, 한 번 한 뒤에는 플레이어 선택을 존중). client.json 의 `restoreFastBuffer` 로 끈다.
 
-## 4. 추천 (사용자에게 보낸 것)
+## 4. 추천 (사용자에게 보낸 것, 11-27 21:30)
 
-(4차 결과를 받으면 채움)
+1. **Arcane Vortex**: 가장 무거운 단일 모드 (서버 -19~-28%, 마을 FPS +24%). RT Shop 이 안을 고칠 수는 없음(감시 장치) → **남길지(날개 등 장신구) 뺄지 사용자가 고름** (답 기다리는 중).
+2. **Farsight 빼기** (DH 와 겹침, 빈틈을 부추김). **dhcompat 빼기** (RT Shop 3.70.0 이 DH + Chunky 크래시를 대신 막음, dhcompat 은 성능 옵션을 끔).
+3. **Distant Horizons 를 필수로** (팩 11 매니페스트에서 required false), 팩의 RT Shop 3.64.1 을 최신으로.
+4. **Chunky 로 미리 생성**: `/chunky radius 3000` → `/chunky start` (지형 생성이 서버 · 탐험 렉의 큰 몫).
+5. 설정 파일 두 개 (화질 그대로, `overrides/config/` 에 교체):
+   - `DistantHorizons.toml`: `numberOfThreads` 4 → 3, `threadRunTimeRatio` 1.0 → 0.6 (게임에 CPU 를 양보), `[server] realTimeUpdateDistanceRadiusInChunks` 256 → 128. 보이는 거리 · 화질은 그대로.
+   - `immediatelyfast.json`: `fast_buffer_upload` true (dhcompat 이 끄던 것, RT Shop 3.70.0 도 한 번 되돌림).
+6. AI Improvements + Clumps: 효과가 흔들림 안이라 '선택'. Canary 는 이 팩과 함께 켜지지 않음.

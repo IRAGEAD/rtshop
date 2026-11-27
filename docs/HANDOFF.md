@@ -59,6 +59,11 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
+- **3.71.0 = 민원 · 보스 등장 연출 · NPC 외형의 다음 단계 (worklist 의 "3.71.0", U-1 ~ U-6)**: 민원 설정 파일(`config/rtshop/petitions.json`, `/rtshop report reload`) /
+  민원 창의 운영 탭(OP: 모든 민원을 상태 · 분류로 걸러 답변 · 종결 · 이동 · 삭제, `/rtshop report admin`, 작은 화면에서는 창이 줄어듦) / 보스 등장 장면 건너뛰기(조작 설정 "연출 건너뛰기", 기본 Enter) /
+  NPC 팔다리가 따로 움직임(모습 파일 부위 2~5, 치마 · 긴 겉옷은 다리를 몸에 붙임) / 동행 NPC 도 그 인물의 모습 / 성능 시험 보완(Diorama FAST 를 게임 안에서, DH 사진 2분 반 뒤 35도 + LOD 자료 유무).
+  성능 측정 결과 · 추천 · 설정 파일 두 개는 11-27 21:30 사용자에게 보냄 (`docs/performance.md` 2-3 · 4절). **Arcane Vortex 남길지는 사용자 답을 기다림.**
+  **다음 일 (사용자가 정한 순서)**: ③ 주식(① 증서 · 시세 · 배당 · 시세판, `docs/ideas_hidden_jobs_stock.md` (가)안) ④ 히든 직업(② 위조자 · 조사관) ⑤ 숨은 퀘스트 · 스토리 연결 ⑥ 스토리 관련 작업이 모두 끝났는지 점검.
 - **3.70.0 = 모드팩 성능 (사용자 요청 16:26 · 16:30 · 16:33, worklist 의 "3.70.0" T-1 ~ T-4, 자세한 숫자와 추천은 `docs/performance.md`)**:
   DH 의 가까운 청크 빈틈(`client/DhViewGuard` — 서버에 있는 동안 렌더 거리를 서버 시야 거리에 맞춤) / DH 3.3.3 + Chunky 크래시 막이(`mixin/DhChunkyMixin` · `DhChunkyBindMixin` · `compat/ChunkyReady`) → **dhcompat 을 뺄 수 있음** /
   dhcompat 이 꺼 둔 ImmediatelyFast 빠른 버퍼 업로드를 dhcompat 이 없으면 한 번 되돌림(`client/FastBufferFix`) / 성능 측정 장치(CI 의 perf job, 테스트 가지만: `test/PerfTest` · `client/ClientPerfTest` · `client/ClientDhTest` · `.github/scripts/perf_report.py`, 결과 가지 ci-perf).
@@ -90,7 +95,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   흔들리던 시험 두 개 손질 / 강화 정보 창의 "+13%" 글자(더하기표가 세로 줄로 보이던 것) / 영어판에 남은 한국어 / Create 를 상점 · 뽑기에서도 제외(item_policy.json 4판, gachaBan) / 상점 설정을 기본값으로 · 내 설정으로 되돌리는 명령(`/rtshop shop defaults|mine|status`).
 - 3.58.0: 기억의 문을 걸어 들어가는 문으로 + 보스 구역의 대기·불씨·깨어남 연출 / 요리 권장안 / Create 조합법·전리품·블록 드랍 금지 / NPC 자리 배치 파일 / 미니맵 NPC 아이콘 / 주식·히든 직업 제안서 / 마을 이식 설명.
 
-- 가지 이름: v5-next ~ v5-next23 은 이미 쓰였습니다. 다음 새 가지는 **v5-next24** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
+- 가지 이름: v5-next ~ v5-next24 는 이미 쓰였습니다. 다음 새 가지는 **v5-next25** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
 
 ## 5. 사용자에게 보낸 3.67.0 · 3.66.0 요약 (참고)
 
