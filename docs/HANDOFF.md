@@ -59,6 +59,8 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
+- **3.68.0 = 직업별 수입 기록** (worklist 의 "3.68.0"): `/rtshop income` · `income me` · `income reset`, 표 파일 `config/rtshop/export/income.txt` · `income.csv`.
+  사용자가 1~2주 돌린 결과(또는 파일)를 주면 그 숫자로 생활 직업 수치를 다시 맞춘다 (지금 숫자는 추정 — `docs/balance_review.md` 11 · 12절).
 - **3.67.0 을 올렸고(릴리스 latest = RT Shop 3.67.0) 3.66.0 · 3.67.0 의 jar 와 요약을 사용자에게 보냈습니다.** 3.67.0 = 생활 직업 수입 맞추기 (worklist 의 "3.67.0", P-1 ~ P-3):
   농부 별 한 단계 위 35% · 한 개 더 20% / 물고기 매입 85% / 광부 캔 광물 판매 +20% / 요리사 손요리 +20%. 옛 기본값 그대로인 설정 파일만 한 번 고친다(jobs.json paramsVersion 2, pricing.json version 2).
 - 3.66.0 (worklist 의 "3.66.0", O-1 ~ O-6): Better Nether 전부 금지 / 강화: 성공률 조금 ↑ · +8~+11 Gold ↓ · 실패 누적(10% × 5번) · 높은 단계 수치 ↑(공격 +11 = 100%) · 방어구 +8 부터 받는 피해 감소 /
@@ -80,7 +82,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   흔들리던 시험 두 개 손질 / 강화 정보 창의 "+13%" 글자(더하기표가 세로 줄로 보이던 것) / 영어판에 남은 한국어 / Create 를 상점 · 뽑기에서도 제외(item_policy.json 4판, gachaBan) / 상점 설정을 기본값으로 · 내 설정으로 되돌리는 명령(`/rtshop shop defaults|mine|status`).
 - 3.58.0: 기억의 문을 걸어 들어가는 문으로 + 보스 구역의 대기·불씨·깨어남 연출 / 요리 권장안 / Create 조합법·전리품·블록 드랍 금지 / NPC 자리 배치 파일 / 미니맵 NPC 아이콘 / 주식·히든 직업 제안서 / 마을 이식 설명.
 
-- 가지 이름: v5-next ~ v5-next19 는 이미 쓰였습니다. 다음 새 가지는 **v5-next20** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
+- 가지 이름: v5-next ~ v5-next20 은 이미 쓰였습니다. 다음 새 가지는 **v5-next21** 부터 (`git ls-remote --heads origin` 으로 먼저 확인).
 
 ## 5. 사용자에게 보낸 3.67.0 · 3.66.0 요약 (참고)
 
@@ -269,6 +271,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   ② 음식 매입가 하한 · 사서 만드는 값(`buyRoutes`)은 게임에 남는 조합법만 쓴다(`inGame`).
 - **그릇 되돌려받기(3.65.0)**: 재료가 물 양동이처럼 그릇을 돌려주면 사는 값에서 그릇 값을 뺀다(`netPurchase`). 그 그릇이 바로 조합법의 결과물이면(Iron's Spells 가마솥: 물 양동이 → 빈 양동이) 빼지 않는다 —
   빼면 양동이를 1 G 에 만든다고 계산해 양동이가 들어가는 도구(셰이커 · 찻주전자 · 스프링클러)가 돈 불리기처럼 보였다.
+- **수입 기록(3.68.0)**: 새 Gold 지급 길을 만들면 `IncomeStats.add(p, 출처, 금액)` 도 함께 부른다 (출처 이름은 `IncomeStats.SOURCES`). 안 부르면 그 수입은 표에 빠진다.
 - **방어력 상한(3.66.0)**: 바닐라 속성의 최대값 — 방어력 30 · 방어 강도 20. 네더라이트 · 다이아 한 벌(20)은 방어력 +50% 에서 막힌다. 그래서 +8 이상 방어구의 몫은 받는 피해 감소(`EnhanceRanged.onHurtArmor`)로 준다.
 - **실패 누적(3.66.0)**: 장비 NBT `rtshop_enh_fail`. 확률은 `Enhance.levelFor` 한 곳에서만 바꾼다(서버 굴림 · 강화 창 표시 모두 이것을 씀).
 - **매입가 상한(3.65.0)**: 음식이 아닌 물건은 재료를 모두 상점에서 사서 게임에 있는 조합법으로 만드는 값보다 비싸게 사 주지 않는다(`applySellCap`, 상점 파일에 적은 sellPrice 도 넘지 못함). 음식은 매입가 하한 쪽(손요리 마진 · 수고비).

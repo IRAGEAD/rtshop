@@ -326,6 +326,7 @@ public final class Attendance {
         if (r.gold > 0) {
             Economy.addWallet(p, r.gold);
             com.rtshop.rank.Ranks.earned(p, r.gold);
+            com.rtshop.stats.IncomeStats.add(p, "attendance", r.gold);
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_gold", String.format("%,d", r.gold)));
         }
         for (AttendanceConfig.Item it : r.items) {

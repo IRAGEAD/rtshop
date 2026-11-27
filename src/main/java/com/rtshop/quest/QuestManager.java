@@ -1476,6 +1476,7 @@ public final class QuestManager {
             long gold = com.rtshop.rank.Ranks.plus(p, "quest_gold", q.rewardGold);   // 칭호 효과
             Economy.addWallet(p, gold);
             com.rtshop.rank.Ranks.earned(p, gold);
+            com.rtshop.stats.IncomeStats.add(p, "quest", gold);
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.quest.reward_gold", String.format("%,d", gold)));
         }
         for (QuestDef.ItemReward ir : q.rewardItems) {

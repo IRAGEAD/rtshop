@@ -712,6 +712,7 @@ public final class Raid {
             if (c.weeklyGold > 0) {
                 Economy.addWallet(p, c.weeklyGold);
                 com.rtshop.rank.Ranks.earned(p, c.weeklyGold);
+                com.rtshop.stats.IncomeStats.add(p, "raid", c.weeklyGold);
             }
             e.weeklyWeek = week;
             say(p, c.textFor(p, "weeklyGot"), ChatFormatting.GREEN);

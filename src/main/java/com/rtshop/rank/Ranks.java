@@ -629,6 +629,7 @@ public final class Ranks {
         r.pendingNotes.clear();
         data(p.server).setDirty();
         Economy.addWallet(p, g);
+        com.rtshop.stats.IncomeStats.add(p, "title", g);
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.rank.claimed", String.format("%,d", g)).withStyle(ChatFormatting.GOLD));
         p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.7F, 1.0F);
         return g;

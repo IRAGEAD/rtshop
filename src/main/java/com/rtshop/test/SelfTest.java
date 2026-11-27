@@ -1972,6 +1972,68 @@ public final class SelfTest {
         return v;
     }
 
+    /** 3.68.0: 직업별 수입 기록 — 출처 나누기, 직업 칸, 움직인 시간, 시간당, 표 파일. */
+    private static void incomeStats368(MinecraftServer server, FakePlayer a, ShopData fisher, ShopData food) {
+        com.rtshop.stats.IncomeStats is = com.rtshop.stats.IncomeStats.get(server);
+        is.reset();
+        com.rtshop.stats.IncomeStats.testing = true;
+        try {
+            com.rtshop.job.Jobs.force(a, "life", "fisher");
+            com.rtshop.job.Jobs.force(a, "combat", "swordsman");
+            com.rtshop.stats.IncomeStats.add(a, "sell_fish", 2500);
+            com.rtshop.stats.IncomeStats.add(a, "quest", 500);
+            com.rtshop.stats.IncomeStats.add(a, "sell_fish", 0);   // 0 은 무시
+            com.rtshop.stats.IncomeStats.addTime(a, 1800);
+            com.rtshop.stats.IncomeStats.addTime(a, 1800);
+            com.rtshop.job.Jobs.force(a, "life", "farmer");
+            com.rtshop.stats.IncomeStats.add(a, "sell_farm", 700);
+            com.rtshop.stats.IncomeStats.addTime(a, 300);   // 10분이 안 되면 시간당은 '-'
+            List<com.rtshop.stats.IncomeStats.Sum> life = is.sums("life");
+            List<com.rtshop.stats.IncomeStats.Sum> combat = is.sums("combat");
+            com.rtshop.stats.IncomeStats.Sum fish = life.stream().filter(x -> x.key.equals("life:fisher")).findFirst().orElse(null);
+            com.rtshop.stats.IncomeStats.Sum farm = life.stream().filter(x -> x.key.equals("life:farmer")).findFirst().orElse(null);
+            com.rtshop.stats.IncomeStats.Sum sword = combat.stream().filter(x -> x.key.equals("combat:swordsman")).findFirst().orElse(null);
+            check("3.68.0 income is written to the earner's life and combat job with its source; time adds up; per hour = gold / hours (none under 10 minutes)",
+                    fish != null && fish.seconds == 3600 && fish.gold.get("sell_fish") == 2500 && fish.gold.get("quest") == 500 && Math.abs(fish.perHour() - 3000) < 1e-6
+                            && farm != null && farm.perHour() < 0 && farm.gold.get("sell_farm") == 700
+                            && sword != null && sword.total() == 3700 && sword.seconds == 3900,
+                    (fish == null ? "no fisher" : fish.seconds + "s " + fish.gold) + " / " + (farm == null ? "no farmer" : farm.seconds + "s") + " / " + (sword == null ? "no sword" : sword.total() + " " + sword.seconds));
+            String fishLine = fish == null ? "" : com.rtshop.stats.IncomeStats.line(fish);
+            java.nio.file.Path txt = is.export();
+            String body = Files.readString(txt, StandardCharsets.UTF_8);
+            check("3.68.0 the report line and the exported table show the job, hours and gold per hour",
+                    fishLine.startsWith("어부") && fishLine.contains("시간당 3,000 G") && body.contains("== 생활 직업") && body.contains("물고기 판매: 2,500 G")
+                            && Files.exists(txt.resolveSibling("income.csv")), fishLine);
+            // 움직인 시간만: 처음 본 때는 움직인 것으로, 5분 넘게 그대로면 잠수, 다시 움직이면 셈
+            com.rtshop.stats.IncomeStats.forgetForTest(a.getUUID());
+            long t0 = 1_000_000L;
+            boolean first = com.rtshop.stats.IncomeStats.activeForTest(a, t0);
+            boolean idle = com.rtshop.stats.IncomeStats.activeForTest(a, t0 + 6 * 60 * 1000L);
+            a.teleportTo(a.getX() + 3, a.getY(), a.getZ());
+            boolean back = com.rtshop.stats.IncomeStats.activeForTest(a, t0 + 7 * 60 * 1000L);
+            com.rtshop.stats.IncomeStats.forgetForTest(a.getUUID());
+            check("3.68.0 only active time counts: standing still for over 5 minutes stops the clock, moving starts it again", first && !idle && back,
+                    first + " " + idle + " " + back);
+            // 상점 판매의 출처 나누기
+            int codIdx = fisher == null ? -1 : findEntry(fisher, e -> e.stack.is(Items.COD) && e.fish);
+            ShopData farmerShop = ShopServer.shops().get("farmer");
+            int wheatIdx = farmerShop == null ? -1 : findEntry(farmerShop, e -> e.stack.is(Items.WHEAT) && e.sellable);
+            int beefIdx = food == null ? -1 : findEntry(food, e -> e.stack.is(Items.COOKED_BEEF) && e.sellable);
+            String srcFish = codIdx < 0 ? "?" : ShopServer.incomeSourceForTest(fisher, fisher.entries.get(codIdx));
+            String srcFarm = wheatIdx < 0 ? "?" : ShopServer.incomeSourceForTest(farmerShop, farmerShop.entries.get(wheatIdx));
+            String srcFood = beefIdx < 0 ? "?" : ShopServer.incomeSourceForTest(food, food.entries.get(beefIdx));
+            check("3.68.0 shop sales are sorted by source: fish, farm goods, food",
+                    (codIdx < 0 || srcFish.equals("sell_fish")) && (wheatIdx < 0 || srcFarm.equals("sell_farm")) && (beefIdx < 0 || srcFood.equals("sell_food")),
+                    srcFish + " " + srcFarm + " " + srcFood);
+        } catch (Exception ex) {
+            check("3.68.0 income stats work", false, ex.toString());
+        } finally {
+            com.rtshop.stats.IncomeStats.testing = false;
+            is.reset();
+            com.rtshop.job.Jobs.force(a, "life", "cook");
+        }
+    }
+
     /** 3.66.0: 실패 누적(B) · 보호권 값 그대로 · 높은 단계 수치 · 방어구 피해 감소 · 마법 뽑기 천장 없음(A) · 씨앗값(N). */
     private static void enhance366(ServerLevel level, BlockPos pos, FakePlayer a, com.rtshop.enhance.EnhanceConfig cfg, ItemStack sword) {
         com.rtshop.enhance.EnhanceConfig.Level raw11 = cfg.level(11);
@@ -5523,6 +5585,7 @@ public final class SelfTest {
             check("3.67.0 an older jobs.json gets the new life-job numbers where it still had the old defaults, and keeps numbers the server changed",
                     changedParams367 == 2 && up367.job("farmer").param("starUp", 0) == 0.35 && up367.job("farmer").param("extraHarvest", 0) == 0.15
                             && up367.job("cook").param("dishSell", 0) == 0.20, changedParams367 + " " + up367.job("farmer").params + " " + up367.job("cook").params);
+            incomeStats368(server, a, fisher, food);
 
             // 요리: 손으로 만드는 요리는 누구나 재료비의 110% 이상, 요리사는 140% 이상
             double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;

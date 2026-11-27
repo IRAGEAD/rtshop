@@ -172,6 +172,7 @@ public final class PlayerShops {
     static void payOwner(net.minecraft.server.MinecraftServer server, UUID owner, long amount) {
         EconomyData d = EconomyData.get(server);
         d.setBank(owner, d.bank(owner) + amount);
+        com.rtshop.stats.IncomeStats.add(server, owner, "", "pshop", amount);
         ServerPlayer op = server.getPlayerList().getPlayer(owner);
         if (op != null) Economy.sync(op);
     }

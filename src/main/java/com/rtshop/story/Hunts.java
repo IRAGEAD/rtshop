@@ -472,6 +472,7 @@ public final class Hunts {
                 long gold = reward(p, b.getLong("gold"));
                 Economy.addWallet(p, gold);
                 com.rtshop.rank.Ranks.earned(p, gold);
+                com.rtshop.stats.IncomeStats.add(p, "bounty", gold);
                 com.rtshop.rank.Ranks.add(p, com.rtshop.rank.Ranks.BOUNTIES, 1);
                 com.rtshop.notice.Notice.send(p, Component.translatable(b.getBoolean("weekly") ? "rtshop.hunt.weekly_done" : "rtshop.hunt.daily_done",
                         victim.getType().getDescription(), need, String.format("%,d", gold)).withStyle(ChatFormatting.GOLD));
@@ -588,6 +589,7 @@ public final class Hunts {
         d.put("books", done);
         Economy.addWallet(p, b.gold);
         com.rtshop.rank.Ranks.earned(p, b.gold);
+        com.rtshop.stats.IncomeStats.add(p, "bounty", b.gold);
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.hunt.book_done", b.name, String.format("%,d", b.gold)).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         p.level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1F, 1F);
     }

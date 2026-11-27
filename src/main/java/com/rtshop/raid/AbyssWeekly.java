@@ -326,6 +326,7 @@ public final class AbyssWeekly {
         if (c.gold[f - 1] > 0) {
             Economy.addWallet(p, c.gold[f - 1]);
             com.rtshop.rank.Ranks.earned(p, c.gold[f - 1]);
+            com.rtshop.stats.IncomeStats.add(p, "abyss", c.gold[f - 1]);
             names.add(String.format("%,d G", c.gold[f - 1]));
         }
         for (Reward r : c.floor(f)) {

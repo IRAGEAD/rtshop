@@ -878,6 +878,19 @@ public final class ShopServer {
                 entry.stack.getHoverName(), amount, num(total)), true);
     }
 
+    /** 수입 기록(3.68.0)의 판매 출처: 물고기 · 농산물(농작물 상점) · 요리와 음식 · 캐낸 광물 · 그 밖. */
+    static String incomeSource(ShopData d, ShopData.Entry entry, boolean restaurant) {
+        if (entry.fish) return "sell_fish";
+        if ("farmer".equals(d.id)) return "sell_farm";
+        if (restaurant || ShopLoader.handCooked(loaded, entry.stack) || entry.stack.isEdible()) return "sell_food";
+        if (minedGood(entry.stack)) return "sell_mined";
+        return "sell_other";
+    }
+
+    public static String incomeSourceForTest(ShopData d, ShopData.Entry entry) {
+        return incomeSource(d, entry, false);
+    }
+
     /** 직업 판매 보너스: 어부는 수산물, 요리사는 손으로 조리한 요리, 광부는 캐낸 광석 · 원석 · 보석 (3.67.0). */
     public static double jobSellMultiplier(ServerPlayer player, ShopData.Entry entry) {
         double m = 1.0;
@@ -959,6 +972,7 @@ public final class ShopServer {
         player.getInventory().setChanged();
         Economy.addWallet(player, revenue);
         com.rtshop.rank.Ranks.earned(player, revenue);
+        com.rtshop.stats.IncomeStats.add(player, incomeSource(d, entry, restaurant), revenue);
         if (restaurant) {
             try {
                 Restaurant.onSold(player, d, index);
