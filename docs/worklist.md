@@ -403,8 +403,11 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 - T-1. **측정 틀** ✔: CI 의 perf job (테스트 가지만) — 실제 지형 새 세계, 서버(`test/PerfTest`) · 클라이언트(`client/ClientPerfTest`, 변형별) · DH 빈틈(`client/ClientDhTest`), JFR 을 모드별로 (`perf_report.py`: 모드마다 부르는 곳 · 시간을 쓰는 곳까지).
 - T-2. **DH 가까운 청크 빈틈** ✔: 원인 = 서버 시야 거리 < 내 렌더 거리 (Farsight 가 바닐라 유효 거리를 늘림). `client/DhViewGuard` 가 서버의 진짜 시야 거리(지도 표시 패킷의 "view")로 렌더 거리를 낮춤 (나가면 되돌림, client.json dhMatchServer).
 - T-3. **DH + Chunky 크래시 막이**: DH 3.3.3 이 세계를 여는 동안(Chunky 등록 전) Chunky 에 연결하려다 "Chunky is not loaded" 로 튕기던 것을 `mixin/DhChunkyMixin`(설정을 미룸) · `DhChunkyBindMixin`(뒷받침) 이 막는다.
-  → 모드팩의 dhcompat 을 뺄 수 있게 됨 (dhcompat 은 ImmediatelyFast 빠른 버퍼 업로드를 끄고, 2초마다 모든 스레드를 훑는 등 성능을 깎음). CI 에서 Chunky 를 다시 넣고 새 세계(전용 서버) · 싱글 · 전용 서버 접속 세 경우로 시험.
-- T-4. 모드 구성 · 설정 추천 (측정 숫자와 함께, 품질이 바뀌는 것은 사용자가 고르게).
+  → 모드팩의 dhcompat 을 뺄 수 있게 됨 (dhcompat 은 ImmediatelyFast 빠른 버퍼 업로드를 끄고, 2초마다 모든 스레드를 훑는 등 성능을 깎음). ✔ 6차 실행 45982255494:
+  새 세계를 만드는 전용 서버 · 싱글플레이 · 전용 서버 다시 켜기 세 경우 모두 "link deferred" 로그 뒤 정상 (튕김 없음), 모드팩 전체 서버 점검 866 개 통과 (새 점검: 막이가 붙었고 Chunky 가 켜진 뒤 연결).
+- T-3b. **ImmediatelyFast 빠른 버퍼 업로드 되돌리기** ✔ (`client/FastBufferFix`): dhcompat 이 없으면 config/immediatelyfast.json 의 fast_buffer_upload false → true 한 번 (client.json restoreFastBuffer · fastBufferRestored).
+- T-4. 모드 구성 · 설정 추천 (측정 숫자와 함께, 품질이 바뀌는 것은 사용자가 고르게): Arcane Vortex 가 서버 틱 · 화면 스레드의 약 14% (고리 1,360 곳), Diorama 지도 굽기가 배경 CPU 의 85%,
+  Canary 는 이 팩과 충돌. 한 가지씩만 바꾼 측정(7차)으로 Farsight · Diorama FAST · AI Improvements + Clumps 의 몫을 따로 잰다.
 
 ## 3.69.0 (2026-11-27 오후, 가지 v5-next22)
 
