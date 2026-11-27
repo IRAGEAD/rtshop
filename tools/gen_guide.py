@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 9
+VERSION = 10
 CATS = []
 
 
@@ -135,7 +135,8 @@ page(c, "commands", "자주 쓰는 명령어", """
 · /pvp : PvP 켜기·끄기
 · /bounty : 맡은 현상금 보기
 · 민원(버그·건의·신고·토지나 거래 문제): 시청 서기 하루에게 말을 걸어 「민원 접수」를 고릅니다. 내 민원과 답변은 그 창이나 /rtshop report list
-""", keys="명령어 커맨드 민원 신고 건의")
+· 보스 등장 연출은 Enter 로 건너뛸 수 있습니다 (조작 설정의 「연출 건너뛰기」에서 키를 바꿉니다)
+""", keys="명령어 커맨드 민원 신고 건의 건너뛰기 연출")
 
 # ================================================================ 돈과 거래
 c = cat("money", "돈과 거래")
