@@ -1,5 +1,5 @@
 {
- "version": 19,
+ "version": 20,
  "_help": "NPC 대화. npcs 의 키는 NPC 키(shop_상점ID, quest_NPCID, bank, job, attendance, gacha). greet: 인사 (조건이 맞는 것 중 마지막), chatter: 일상 이야기 (무작위 한 마디), topics: 이야기 주제 (need: flags·notFlags·quests·items 조건, 3.75 부터 met: 그 NPC 와 이야기한 뒤 · heard: terms 의 낱말을 들은 뒤). 문장은 \"이름: 대사\" 로 말하는 사람을 바꿀 수 있고, {\"ko\": \"...\", \"en\": \"...\"} 로 두 언어를 적을 수 있습니다. 직접 고쳤다면 \"edited\": true 로 두세요 (모드 업데이트 때 덮어쓰지 않습니다).",
  "edited": false,
  "terms": {
@@ -892,6 +892,56 @@
      "need": {
       "flags": [
        "ch1_witch_fight"
+      ]
+     }
+    },
+    {
+     "id": "hj_reveal",
+     "title": {
+      "ko": "덧쓴 줄",
+      "en": "The line written over"
+     },
+     "lines": [
+      {
+       "ko": "받침대 밑판의 덧쓴 줄, 연대기에 옮겨 적었어요. '그런데 너는 어째서 매일 그 앞을 지나가느냐. 지나갈 때마다 나는 숨을 멈춘다.'",
+       "en": "I copied the line written over the pedestal's base plate into the chronicle. 'Then why do you pass in front of it every day? Each time you pass, I hold my breath.'"
+      },
+      {
+       "ko": "누가 누구한테 쓴 건지는 아직 몰라요. 그런데 숨을 멈춘다는 말은, 미워하는 사람한테 쓰는 말은 아닌 것 같아요.",
+       "en": "I still don't know who wrote it, or to whom. But 'I hold my breath' doesn't sound like something you write to someone you hate."
+      }
+     ],
+     "need": {
+      "flags": [
+       "hj_reveal"
+      ],
+      "notFlags": [
+       "illusioner_done"
+      ]
+     }
+    },
+    {
+     "id": "hj_conceal",
+     "title": {
+      "ko": "덧쓴 줄",
+      "en": "The line written over"
+     },
+     "lines": [
+      {
+       "ko": "받침대 밑판에 작은 글씨가 더 있었다면서요. 다 못 읽으셨다고요.",
+       "en": "There was more small writing on the base plate, I hear. You said you couldn't read all of it."
+      },
+      {
+       "ko": "괜찮아요. 저도 다 못 읽은 쪽이 많아요. 다만 미아가 그 줄을 보고 울었다는 게 마음에 걸려요. 혹시 다시 보시면, 그땐 말해 주세요.",
+       "en": "That's all right. There are plenty of pages I never finished either. Only, it weighs on me that Mia cried at that line. If you ever look again, tell me then."
+      }
+     ],
+     "need": {
+      "flags": [
+       "hj_conceal"
+      ],
+      "notFlags": [
+       "illusioner_done"
       ]
      }
     }
@@ -1862,6 +1912,50 @@
       "이미 직업이 있으면 다른 직업의 선행 퀘스트는 할 수 없어요. 한 길에 집중하세요.",
       "바꾸고 싶어지면 다시 오세요. 대가는 있지만요."
      ]
+    },
+    {
+     "id": "path_life",
+     "title": {
+      "ko": "모리스에게 들은 것",
+      "en": "What Morris told me"
+     },
+     "lines": [
+      {
+       "ko": "모리스한테 들었어요. 농사와 생활이 좋다고 하셨다면서요. 그럼 생활 직업부터 보세요. 농부, 어부, 광부, 요리사요.",
+       "en": "Morris told me. You said you like farming and a quiet life. Then look at the life jobs first. Farmer, fisher, miner, cook."
+      },
+      {
+       "ko": "원정대가 굶지 않고 돌아오는 건 그 손들 덕분이에요. 생활 칸과 전투 칸은 따로라서, 나중에 칼을 잡고 싶어지면 전투 직업도 하나 고를 수 있어요.",
+       "en": "It's those hands that keep an expedition fed and bring it home. The life slot and the combat slot are separate, so if you ever want to take up a blade, you can pick a combat job as well."
+      }
+     ],
+     "need": {
+      "flags": [
+       "path_life"
+      ]
+     }
+    },
+    {
+     "id": "path_combat",
+     "title": {
+      "ko": "모리스에게 들은 것",
+      "en": "What Morris told me"
+     },
+     "lines": [
+      {
+       "ko": "모리스한테 들었어요. 강해지고 싶다고 하셨다면서요. 그럼 전투 직업부터 보세요. 검사, 전사, 탱커, 궁수, 마법사요.",
+       "en": "Morris told me. You said you want to grow strong. Then look at the combat jobs first. Swordsman, warrior, tank, archer, mage."
+      },
+      {
+       "ko": "무기 설명에 분류가 적혀 있어요. 직업에 맞는 무기를 들면 이점이 붙어요. 생활 칸은 따로라서, 나중에 낚싯대나 괭이가 좋아지면 하나 더 고를 수 있어요.",
+       "en": "Each weapon's description says what kind it is. Hold one that suits your job and you get its edge. The life slot is separate, so if a fishing rod or a hoe ever takes your fancy, you can pick one more."
+      }
+     ],
+     "need": {
+      "flags": [
+       "path_combat"
+      ]
+     }
     }
    ]
   },

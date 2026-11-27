@@ -148,7 +148,9 @@ final class ClientDhTest {
                 Class<?>[] p = m.getParameterTypes();
                 if (m.getDeclaringClass() != Object.class) names.append(m.getName()).append('/').append(p.length).append(' ');
                 // DH 3.3 의 모양: getColumnDataAtBlockPos(level, x, z, …) — 넷째 이후의 인자는 기본값으로 채운다
-                if (p.length >= 3 && p[1] == int.class && p[2] == int.class && m.getName().toLowerCase(java.util.Locale.ROOT).contains("column")) col = m;
+                // 인자가 가장 적은 것을 고른다 (3.76: 뒤에 Short/Byte 같은 상자 인자가 붙은 것을 고르면 null 을 넘겨 DH 안에서 NullPointerException)
+                if (p.length >= 3 && p[1] == int.class && p[2] == int.class && m.getName().toLowerCase(java.util.Locale.ROOT).contains("column")
+                        && (col == null || p.length < col.getParameterCount())) col = m;
             }
             if (col == null) return "DH: no column lookup (" + names.toString().trim() + ")";
             col.setAccessible(true);
@@ -172,8 +174,10 @@ final class ClientDhTest {
         args[2] = z;
         for (int i = 3; i < pt.length; i++) {
             Class<?> t = pt[i];
-            args[i] = t == boolean.class ? Boolean.FALSE : t == int.class ? 0 : t == long.class ? 0L : t == double.class ? 0D : t == float.class ? 0F
-                    : t == byte.class ? (byte) 0 : t == short.class ? (short) 0 : null;
+            args[i] = t == boolean.class || t == Boolean.class ? Boolean.FALSE : t == int.class || t == Integer.class ? (Object) 0
+                    : t == long.class || t == Long.class ? (Object) 0L : t == double.class || t == Double.class ? (Object) 0D
+                    : t == float.class || t == Float.class ? (Object) 0F : t == byte.class || t == Byte.class ? (Object) (byte) 0
+                    : t == short.class || t == Short.class ? (Object) (short) 0 : null;
         }
         Object r = col.invoke(terrain, args);
         if (r == null) return false;

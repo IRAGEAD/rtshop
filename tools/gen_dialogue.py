@@ -5,6 +5,18 @@ import json, os
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'dialogue.json')
 VERSION = 18
 
+# ※ 3.75.0 부터는 dialogue.json 이 원본이다. W-25(주제의 need.heard · need.met, terms) · W-7(현상금 게시판의 말) ·
+#   3.77.0(숨은 갈림길 주제 hj_reveal / hj_conceal, version 20) 을 json 에 직접 넣었고 이 스크립트에는 없다.
+#   그대로 돌리면 그것들이 사라진다. 대사를 고칠 때는 json 을 직접 고치고 "version" 을 하나 올릴 것.
+import sys
+if "--force" not in sys.argv:
+    try:
+        _cur = json.load(open(OUT, encoding='utf-8'))
+    except Exception:
+        _cur = {}
+    if _cur.get("version", 0) > VERSION or "terms" in _cur:
+        sys.exit("gen_dialogue.py: dialogue.json(판 %s)이 이 스크립트(판 %d)보다 새것입니다. json 을 직접 고치세요. (덮어쓰려면 --force)" % (_cur.get("version"), VERSION))
+
 # 말투
 #  에르윈(장로)   하게체  "~하게, ~네, ~일세"
 #  이사벨(기록관) 해요체  "~해요, ~예요"

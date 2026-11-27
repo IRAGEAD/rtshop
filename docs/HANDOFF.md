@@ -41,7 +41,7 @@
 ```
 python3 tools/gen_lang.py src/main/resources/assets/rtshop/lang   # 화면 문구 (ko/en 을 함께 적음)
 python3 tools/gen_story.py                                        # 스토리 (tools/story_ch0X.py 가 원본)
-python3 tools/gen_dialogue.py                                     # NPC 대화 (고치면 맨 위 VERSION 을 올림. 지금 17)
+# NPC 대화: 3.75 부터 src/main/resources/rtshop_defaults/dialogue.json 이 원본 (직접 고치고 "version" 을 올림, 지금 20). gen_dialogue.py 는 낡아서 막아 둠
 python3 tools/gen_readables.py ; python3 tools/gen_guide.py       # 읽을거리 · 안내서
 python3 tools/story_lang/extract2.py ; python3 tools/story_lang/extract3.py   # 번역 안 된 글 모으기
 python3 tools/story_lang/extract4.py                                          # 자바 코드의 설정 기본 문구 (레이드·보스 소개·단서·직업 이름 등)

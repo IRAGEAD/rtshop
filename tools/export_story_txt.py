@@ -22,8 +22,10 @@ LBL = {"주는 사람": "Given by", "받을 때": "On accept", "진행 중": "In
        "없을 때만": "is absent", "있을 때": "is present"}
 def T(x): return LBL.get(x, x) if EN else x
 npc = {"quest_" + n["id"]: n["name"] for n in data["npcs"]}
-npc.update({"quest_guide": "안내인 모리스", "shop_fisher": "어부 오스카", "attendance": "시청 서기 하루", "job": "직업 안내인 알버트"} if not EN else
-           {"quest_guide": "Morris the Guide", "shop_fisher": "Oscar the Fisher", "attendance": "Haru the Town Clerk", "job": "Albert the Job Guide"})
+npc.update({"quest_guide": "안내인 모리스", "shop_fisher": "어부 오스카", "attendance": "시청 서기 하루", "job": "직업 안내인 알버트",
+            "gacha": "행운 상인 럭키", "bank": "은행원 그레고리", "shop_blacksmith": "대장장이 브람", "shop_restaurant": "식당 주인 로렌초"} if not EN else
+           {"quest_guide": "Morris the Guide", "shop_fisher": "Oscar the Fisher", "attendance": "Haru the Town Clerk", "job": "Albert the Job Guide",
+            "gacha": "Lucky the Fortune Merchant", "bank": "Gregory the Banker", "shop_blacksmith": "Bram the Blacksmith", "shop_restaurant": "Lorenzo the Innkeeper"})
 npc.update({n["id"]: n["name"] for n in data["npcs"]})
 TYPE = {"TALK": "대화", "KILL": "처치", "DELIVER": "가져오기", "STRUCTURE": "찾아가기", "DIMENSION": "차원", "FLAG": "조건", "ADVANCEMENT": "발전과제",
         "INSPECT": "살펴보기", "PAY": "지불", "VISIT": "방문"}
@@ -59,6 +61,8 @@ for q in data["quests"]:
         if mod: note = ("  (when the %s mod %s)" if EN else "  (%s 모드가 %s)") % (MODS.get(mod.lstrip("!"), mod.lstrip("!")), T("없을 때만" if mod.startswith("!") else "있을 때"))
         label = o.get("text") or npc.get(o.get("target", ""), o.get("target", ""))
         cnt = " x%d" % o["count"] if o.get("count", 1) > 1 else ""
+        if o["type"] == "PAY":   # 지불: 대상 없이 금액만
+            label, cnt = "{:,} G".format(o.get("count", 0)), ""
         w(("  ◇ " + T("목표") + " [%s] %s%s%s") % (T(TYPE.get(o["type"], o["type"])), label, cnt, note))
         for ln in o.get("lines", []):
             w("      " + (ln if isinstance(ln, str) else json.dumps(ln, ensure_ascii=False)))

@@ -845,6 +845,59 @@ public final class SelfTest {
         }
     }
 
+    /** 3.77.0: ⑥ 스토리 점검 · W-21 — 지켜 온 이야기 규칙을 시험으로 붙잡아 둔다. */
+    private static void story377(FakePlayer a) {
+        java.util.regex.Pattern sleepy = java.util.regex.Pattern.compile("눕|잠|자라|자게|잔다|주무|눈 좀|눈을 붙|쉬");
+        List<String> noHint = new ArrayList<>();
+        for (QuestDef q : QuestManager.loaded().quests.values()) {
+            boolean dream = q.sceneDream != null || (q.sceneDone != null && q.sceneDone.has("onSleep") && q.sceneDone.get("onSleep").getAsBoolean());
+            if (dream && !sleepy.matcher(q.done).find()) noHint.add(q.id);
+        }
+        check("3.77 every quest whose dream comes in the night says so gently in its closing words (sleep early …), never naming the dream",
+                noHint.isEmpty(), noHint);
+        // 고른 것은 반드시 뒤에서 돌아온다: 대화(인사 · 주제) 또는 그 표식을 묻는 퀘스트. 시험의 맞고 틀림(_passed/_failed)은 따로 다룬다.
+        String talk = com.rtshop.story.Dialogue.get().toString();
+        List<String> silent = new ArrayList<>();
+        for (QuestDef q : QuestManager.loaded().quests.values()) {
+            for (QuestDef.Choice c : q.choices) {
+                for (String f : c.flags) {
+                    if (f.endsWith("_passed") || f.endsWith("_failed") || silent.contains(f)) continue;
+                    boolean used = talk.contains("\"" + f + "\"");
+                    for (QuestDef o : QuestManager.loaded().quests.values()) {
+                        if (o != q && (o.requiresFlags.contains(f) || o.blockedByFlags.contains(f))) used = true;
+                    }
+                    if (!used) silent.add(q.id + ":" + f);
+                }
+            }
+        }
+        check("3.77 every choice in the story comes back later — in what people say (greeting or topic) or in a quest that asks for it; both sides of each fork",
+                silent.isEmpty(), silent);
+        // 4장 받침대의 갈림길(3.76): 이사벨이 고른 쪽에 따라 다르게 기억한다 (숨은 길은 말하지 않는다)
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "hj_reveal", true);
+        List<String> rv = topicIds375(a, "quest_order_archivist");
+        QuestManager.setFlag(a, "hj_reveal", false);
+        QuestManager.setFlag(a, "hj_conceal", true);
+        List<String> cc = topicIds375(a, "quest_order_archivist");
+        QuestManager.setFlag(a, "illusioner_done", true);
+        List<String> after = topicIds375(a, "quest_order_archivist");
+        QuestManager.reset(a);
+        check("3.77 Isabel remembers the pedestal fork: read to her → she copied the line; kept → she lets it be (no word of the hidden ways); gone once the mirror story is done",
+                rv.contains("hj_reveal") && !rv.contains("hj_conceal") && cc.contains("hj_conceal") && !cc.contains("hj_reveal") && !after.contains("hj_conceal"),
+                rv + " / " + cc + " / " + after);
+        // 모리스의 첫 물음(생활 · 전투)은 직업 안내인 알버트가 이어받는다
+        QuestManager.setFlag(a, "path_life", true);
+        List<String> life = topicIds375(a, "job");
+        QuestManager.reset(a);
+        QuestManager.setFlag(a, "path_combat", true);
+        List<String> combat = topicIds375(a, "job");
+        QuestManager.reset(a);
+        List<String> none = topicIds375(a, "job");
+        check("3.77 the way chosen at Morris's first question (life / combat) is picked up by Albert the Job Guide",
+                life.contains("path_life") && !life.contains("path_combat") && combat.contains("path_combat") && !combat.contains("path_life")
+                        && !none.contains("path_life") && !none.contains("path_combat"), life + " / " + combat + " / " + none);
+    }
+
     private static boolean guidePage376(FakePlayer p, String id) {
         for (com.google.gson.JsonElement ce : com.rtshop.story.Guide.forPlayer(p, com.rtshop.story.Guide.get()).getAsJsonArray("categories"))
             for (com.google.gson.JsonElement pe : ce.getAsJsonObject().getAsJsonArray("pages"))
@@ -5003,6 +5056,7 @@ public final class SelfTest {
         stocks(a.server, a);
         forgery(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
         hiddenPaths(a.server, a, fake(a.serverLevel(), "rtshop_test_b"));
+        story377(a);
         // 3.73: 성능 진단 (/fpscheck · /rtshop perfcheck) — 스택의 프레임을 모드로 돌리는 규칙
         StackTraceElement[] st373 = {
                 new StackTraceElement("java.lang.Object", "wait", null, -1),
