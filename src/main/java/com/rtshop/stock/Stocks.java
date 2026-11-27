@@ -252,7 +252,7 @@ public final class Stocks {
             if (!d.newsDone.add(key)) continue;
             d.board(n.union).pendingNews += n.change;
             StockData.NewsLine line = new StockData.NewsLine();
-            line.day = today();
+            line.day = d.day == Long.MIN_VALUE ? today() : d.day;   // 장부의 날 (시세판의 날짜와 같게)
             line.union = n.union;
             line.text = n.text;
             line.textEn = n.textEn;
