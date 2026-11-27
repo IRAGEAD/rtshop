@@ -471,12 +471,12 @@ NPC 를 없애려면 크리에이티브 모드에서 `/kill @e[type=villager,dis
 `/rtshop export` 를 실행하면 `config/rtshop/export/` 에 실제 적용된 가격표와 점검 보고서(`audit.txt`)가 만들어집니다.
 직접 빌드하려면 JDK 17 에서 `./gradlew build` (결과물: `build/libs/`).
 
-## 모드팩 참고: Distant Horizons 와 Chunky
+## 모드팩 참고: Distant Horizons 와 Chunky (3.70)
 
-RT Shop 과는 무관하지만, 5번 점검 환경에서 확인한 내용입니다.
-
-- 모드팩에 **Distant Horizons 3.3.3 과 Chunky 1.3.146 을 함께** 넣으면 월드에 들어가는 순간
-  `java.lang.IllegalStateException: Chunky is not loaded.` (Distant Horizons 의 `ChunkyAccessor`) 로 게임이 꺼집니다.
-- **Chunky 를 빼면** 같은 모드 구성(Farsight, Oculus 1.8.0, Arcane Vortex 0.7.10 포함)에서 정상 실행됩니다.
-- 그래서 순서는 "Chunky 로 미리 생성 (Distant Horizons 없이) → Chunky 를 빼고 Distant Horizons 추가" 입니다.
-
+- **Distant Horizons 3.3.3 + Chunky 크래시를 RT Shop 이 막습니다 (3.70.0 부터).** 둘을 함께 넣으면 월드를 여는 순간
+  `java.lang.IllegalStateException: Chunky is not loaded.` (Distant Horizons 의 `ChunkyAccessor`) 로 꺼지던 문제입니다.
+  RT Shop 이 Chunky 가 켜질 때까지 Distant Horizons 의 연결을 미루므로, 이 문제를 막으려고 넣었던 **dhcompat 은 빼도 됩니다**
+  (dhcompat 은 ImmediatelyFast 의 빠른 버퍼 업로드를 끄고 2초마다 모든 스레드를 훑는 등 성능을 깎았습니다. dhcompat 을 빼면 RT Shop 이 빠른 버퍼 업로드를 한 번 다시 켭니다 — 다음 실행부터).
+- **가까운 청크가 비어 보이는 문제**: 서버에 접속해 있는 동안 RT Shop 이 렌더 거리를 서버의 시야 거리에 맞춥니다 (나가면 원래대로, `config/rtshop/client.json` 의 `dhMatchServer` 로 끔).
+  Distant Horizons 는 렌더 거리 바깥부터 먼 풍경을 그리는데, 서버가 보내는 청크가 그보다 좁으면 그 사이가 비기 때문입니다. **Farsight 는 빼기를 권합니다** (먼 풍경은 Distant Horizons 가 맡고, Farsight 가 이 빈틈을 부추깁니다).
+- 성능 측정과 추천: `docs/performance.md`.

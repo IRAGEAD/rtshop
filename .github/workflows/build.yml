@@ -606,7 +606,7 @@ jobs:
           echo "startup: $(grep -o 'Done ([0-9.]*s)' perf-server.log | head -n 1)"
           cat rtshop-perf-server.txt || tail -n 40 perf-server.log
           for f in crash-reports/*.txt; do [ -f "$f" ] && grep -E "^Description:|Caused by|Exception|^\tat (com|net|org|dev)\.[a-z]" "$f" | grep -v "at net.minecraft" | head -n 20; done
-          { echo "== server perf (new world, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Chunky .*(loaded|enabled)|Done \(" perf-server.log | cut -c1-260 | head -n 8; ls crash-reports 2>/dev/null; } >> ../chunky-check.txt
+          { echo "== server perf (new world, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Chunky .*(loaded|enabled)|Done \(" perf-server.log | cut -c1-260 | head -n 8; ls crash-reports 2>/dev/null || true; } >> ../chunky-check.txt
           cat ../chunky-check.txt
           python3 ../.github/scripts/perf_report.py perf-server.jfr mods rtshop-perf-server.txt > perf-server-report.txt 2>&1 || true
           head -n 160 perf-server-report.txt | cut -c1-400
@@ -638,7 +638,7 @@ jobs:
             python3 .github/scripts/perf_report.py client/perf-client-$name.jfr client/mods client/rtshop-perf-client-$name.txt > perf-client-$name-report.txt 2>&1 || true
           }
           run_client base
-          { echo "== client base (singleplayer, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/perf-base.log | cut -c1-260 | head -n 4; ls client/crash-reports 2>/dev/null; } >> chunky-check.txt
+          { echo "== client base (singleplayer, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/perf-base.log | cut -c1-260 | head -n 4; ls client/crash-reports 2>/dev/null || true; } >> chunky-check.txt
           # 이제부터 한 가지씩만 바꿔 그 몫을 잰다 (Chunky 는 가만히 있을 때 일이 없어 빼 둔다: base 가 튕기면 나머지라도 재게)
           mkdir -p offclient && mv client/mods/Chunky*.jar offclient/ 2>/dev/null || true
           # Diorama 설정 파일 (base 가 처음 켤 때 만든다)
@@ -677,13 +677,20 @@ jobs:
           bash run.sh nogui > dh-server.log 2>&1 &
           for i in $(seq 1 60); do sleep 10; if grep -q "Done (" dh-server.log; then echo "server up after $((i*10))s"; break; fi; done
           cd ..
-          (sleep 900; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
-          (timeout -k 20 800 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev -s 127.0.0.1 --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx7G -Drtshop.clienttest=true -Drtshop.clienttest.only=dh" --resolution 1280x720 > client-dh.log 2>&1) || echo "client exit code $?"
-          pkill -9 -f "rtshop.clienttest" || true
-          pkill -f "sleep 900" || true
+          for attempt in 1 2; do
+            rm -f client/rtshop-dh-client.txt client/rtshop-dh-notes.txt
+            (sleep 900; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
+            wd=$!
+            (timeout -k 20 800 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev -s 127.0.0.1 --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx7G -Drtshop.clienttest=true -Drtshop.clienttest.only=dh" --resolution 1280x720 > client-dh.log 2>&1) || echo "client exit code $?"
+            pkill -9 -f "rtshop.clienttest" || true
+            kill $wd 2>/dev/null || true
+            # CI 가 붐비면 접속 직후에 연결이 끊기는 일이 있다 (서버: "Timed out") → 한 번 더
+            [ -f client/rtshop-dh-notes.txt ] && break
+            echo "DH client attempt $attempt gave no result"
+          done
           pkill -x java || true
           cat client/rtshop-dh-client.txt client/rtshop-dh-notes.txt 2>/dev/null || (echo "no DH result"; tail -n 30 client/logs/latest.log | cut -c1-300)
-          { echo "== DH test (dedicated server + client, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Done \(" server/dh-server.log | cut -c1-260 | head -n 6; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/latest.log | cut -c1-260 | head -n 4; ls server/crash-reports client/crash-reports 2>/dev/null; } >> chunky-check.txt
+          { echo "== DH test (dedicated server + client, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Done \(" server/dh-server.log | cut -c1-260 | head -n 6; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/latest.log | cut -c1-260 | head -n 4; ls server/crash-reports client/crash-reports 2>/dev/null || true; } >> chunky-check.txt
           cat chunky-check.txt
           grep -iE "distant ?horizons|\[DH|rtshop-dh|render distance" client/logs/latest.log | cut -c1-260 | head -n 40 || true
       - name: Share performance results (test branches only)
@@ -773,8 +780,8 @@ jobs:
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
           python3 -m pip install -q "portablemc<5"
           mkdir -p client/mods client/saves
-          # Chunky 는 모드팩 overrides 의 dhcompat(CI 에서는 받을 수 없음) 없이 Distant Horizons 와 함께 켜면 세계를 열 때 튕긴다 → 클라이언트 시험에서는 뺀다
-          while IFS= read -r f; do case "$f" in ""|Chunky*) ;; *) cp "packcache/$f" client/mods/ ;; esac; done < packcache/client_mods.txt
+          # Chunky 도 넣는다: Distant Horizons 와 함께 세계를 열 때 튕기던 것을 RT Shop 3.70.0 이 막는다 (전에는 모드팩의 dhcompat 이 막았다)
+          while IFS= read -r f; do [ -n "$f" ] && cp "packcache/$f" client/mods/; done < packcache/client_mods.txt
           cp jar/*.jar client/mods/
           cp -r server/world client/saves/rtshoptest
           rm -f client/saves/rtshoptest/session.lock
