@@ -25,7 +25,7 @@ final class ClientDhTest {
 
     static final boolean ENABLED = "dh".equals(System.getProperty("rtshop.clienttest.only", ""));
     private static final List<String> NOTES = new ArrayList<>();
-    private static int climb;
+    private static int climb, probes;
     private static double hoverY = -1;
     /** 내려다보는 각도: 90 칸 위에서 35 도면 화면 가운데가 128 칸(8 청크) 앞, 곧 진짜 청크(6)와 먼 풍경 사이 고리에 닿는다. */
     private static final float PITCH = 35F;
@@ -79,9 +79,19 @@ final class ClientDhTest {
                     return;
                 }
                 hoverY = mc.player.getY();   // 사진을 찍을 때까지 이 높이에 떠 있는다 (onTick)
-                ClientSelfTest.wait = 3000;   // 청크와 먼 풍경(서버가 보내는 LOD)이 들어올 때까지 2 분 반
+                probes = 0;
+                NOTES.add("t0s: " + lodProbe(mc));
+                ClientSelfTest.wait = 600;   // 청크와 먼 풍경(서버가 보내는 LOD)이 들어올 때까지 2 분 반 (30초마다 LOD 자료를 센다)
             }
             case 3 -> {
+                // 3.73.0: 먼 풍경이 들어오는 빠르기 (서버의 전송 한도를 바꿔 두 번 견준다: CI 의 DH 단계)
+                if (probes < 4) {
+                    probes++;
+                    NOTES.add("t" + probes * 30 + "s: " + mc.levelRenderer.getChunkStatistics() + " · " + lodProbe(mc));
+                    ClientSelfTest.wait = 600;
+                    stay();
+                    return;
+                }
                 shot(mc, "170_dh_gap_before");
                 NOTES.add("before: render distance " + mc.options.renderDistance().get() + " · effective " + mc.options.getEffectiveRenderDistance()
                         + " · " + mc.levelRenderer.getChunkStatistics() + " · " + lodProbe(mc));
@@ -137,7 +147,8 @@ final class ClientDhTest {
             for (java.lang.reflect.Method m : terrain.getClass().getMethods()) {
                 Class<?>[] p = m.getParameterTypes();
                 if (m.getDeclaringClass() != Object.class) names.append(m.getName()).append('/').append(p.length).append(' ');
-                if (p.length == 3 && p[1] == int.class && p[2] == int.class && m.getName().toLowerCase(java.util.Locale.ROOT).contains("column")) col = m;
+                // DH 3.3 의 모양: getColumnDataAtBlockPos(level, x, z, …) — 넷째 이후의 인자는 기본값으로 채운다
+                if (p.length >= 3 && p[1] == int.class && p[2] == int.class && m.getName().toLowerCase(java.util.Locale.ROOT).contains("column")) col = m;
             }
             if (col == null) return "DH: no column lookup (" + names.toString().trim() + ")";
             col.setAccessible(true);
@@ -154,7 +165,17 @@ final class ClientDhTest {
     }
 
     private static boolean hasLod(java.lang.reflect.Method col, Object terrain, Object level, int x, int z) throws Exception {
-        Object r = col.invoke(terrain, level, x, z);
+        Class<?>[] pt = col.getParameterTypes();
+        Object[] args = new Object[pt.length];
+        args[0] = level;
+        args[1] = x;
+        args[2] = z;
+        for (int i = 3; i < pt.length; i++) {
+            Class<?> t = pt[i];
+            args[i] = t == boolean.class ? Boolean.FALSE : t == int.class ? 0 : t == long.class ? 0L : t == double.class ? 0D : t == float.class ? 0F
+                    : t == byte.class ? (byte) 0 : t == short.class ? (short) 0 : null;
+        }
+        Object r = col.invoke(terrain, args);
         if (r == null) return false;
         if (!r.getClass().getField("success").getBoolean(r)) return false;
         Object payload = r.getClass().getField("payload").get(r);

@@ -38,7 +38,7 @@ NEW = {
  "rtshop.stock.cert_invalid": ("No.%s · 장부에 없는 증서", "No.%s · not in the ledger"),
  "rtshop.stock.sell": ("팔기", "Sell"),
  "rtshop.stock.sell_confirm": ("확인?", "Sure?"),
- "rtshop.stock.no_news": ("아직 소식이 없습니다. 이야기의 큰 고비를 넘기면 시세가 움직입니다.", "No news yet. Big moments in the story move the prices."),
+ "rtshop.stock.no_news": ("아직 소식이 없습니다. 이야기의 큰 고비(✦)나 시장 사건이 생기면 여기에 적힙니다.", "No news yet. Big story moments (✦) and market events show up here."),
  "rtshop.stock.fund": ("배당 기금 %s G", "Dividend fund %s G"),
  "rtshop.stock.next_dividend": ("다음 배당까지 %s", "Next dividend in %s"),
  "rtshop.stock.claim": ("배당 받기 (%s G)", "Collect %s G"),
@@ -57,6 +57,13 @@ NEW = {
  "rtshop.stock.err.invalid": ("장부에 없는 증서입니다 (복사본이거나 이미 되판 증서).", "That certificate is not in the ledger (a copy, or already sold)."),
  "rtshop.stock.err.none": ("그 증서를 가방에서 찾지 못했습니다.", "That certificate is not in your inventory."),
  "rtshop.stock.news_broadcast": ("[시세판] %s — %s 다음 시세 %s", "[Price board] %s — %s next price %s"),
+ # ---- 3.73: FPS 진단 (/fpscheck)
+ "rtshop.fpscheck.busy": ("이미 진단 중입니다.", "A check is already running."),
+ "rtshop.fpscheck.start": ("FPS 진단을 %s초 동안 합니다. 평소처럼 움직이세요 (FPS 가 떨어지는 곳이면 더 좋습니다).", "Checking FPS for %s seconds. Play as usual (best where the FPS drops)."),
+ "rtshop.fpscheck.done": ("FPS 진단: 평균 %s · 가장 낮음 %s · 그래픽 카드 기다림 %s%% · 시간을 많이 쓴 모드: %s", "FPS check: average %s · lowest %s · waiting on the GPU %s%% · busiest mods: %s"),
+ "rtshop.fpscheck.file": ("결과 파일: 게임 폴더의 %s (이 파일을 보내 주세요)", "Saved as %s in the game folder (please send this file)"),
+ # ---- 3.73: 무작위 시장 사건
+ "rtshop.stock.event_broadcast": ("[시세판] %s — %s %s", "[Price board] %s — %s %s"),
  # ---- 3.71: 보스 등장 건너뛰기
  "key.rtshop.skip_scene": ("연출 건너뛰기 (보스 등장)", "Skip scene (boss entrance)"),
  "rtshop.cinematic.skip": ("%s  건너뛰기", "%s  skip"),

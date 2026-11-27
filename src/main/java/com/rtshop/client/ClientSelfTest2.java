@@ -2228,6 +2228,10 @@ final class ClientSelfTest2 {
         add(mc -> {
             shot(mc, "134b_stock_board");
             mc.setScreen(null);
+            // 3.73: /fpscheck — 화면 스레드를 몇 초 찍어 결과 파일을 남긴다
+            FpsCheckClient.lastReportForTest = List.of();
+            FpsCheckClient.lastFileForTest = null;
+            FpsCheckClient.start(5);
             onServer(mc, sp -> {
                 com.rtshop.stock.Stocks.testAnywhere = false;
                 com.rtshop.stock.Stocks.testing = false;
@@ -2236,7 +2240,15 @@ final class ClientSelfTest2 {
                     if (sp.getInventory().getItem(i).is(com.rtshop.item.ModItems.STOCK_CERTIFICATE.get())) sp.getInventory().setItem(i, ItemStack.EMPTY);
                 }
             });
-            waitTicks(10);
+            waitTicks(180);
+        });
+        add(mc -> {
+            String rep373 = String.join("\n", FpsCheckClient.lastReportForTest);
+            boolean ok373 = !rep373.isEmpty() && rep373.contains("GPU:") && rep373.contains("FPS") && FpsCheckClient.lastFileForTest != null
+                    && java.nio.file.Files.exists(FpsCheckClient.lastFileForTest);
+            check("3.73 /fpscheck samples the render thread for a few seconds and writes a report (FPS, GPU wait, time by mod) into the game folder", ok373,
+                    FpsCheckClient.lastReportForTest.size() + " lines · " + FpsCheckClient.lastFileForTest + " · " + (rep373.length() > 300 ? rep373.substring(0, 300) : rep373));
+            waitTicks(5);
         });
     }
 

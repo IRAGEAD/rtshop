@@ -2001,7 +2001,7 @@
   "rtshop.stock.cert_invalid": "No.%s · not in the ledger",
   "rtshop.stock.sell": "Sell",
   "rtshop.stock.sell_confirm": "Sure?",
-  "rtshop.stock.no_news": "No news yet. Big moments in the story move the prices.",
+  "rtshop.stock.no_news": "No news yet. Big story moments (✦) and market events show up here.",
   "rtshop.stock.fund": "Dividend fund %s G",
   "rtshop.stock.next_dividend": "Next dividend in %s",
   "rtshop.stock.claim": "Collect %s G",
@@ -2019,5 +2019,10 @@
   "rtshop.stock.err.full": "No free slot in your inventory.",
   "rtshop.stock.err.invalid": "That certificate is not in the ledger (a copy, or already sold).",
   "rtshop.stock.err.none": "That certificate is not in your inventory.",
-  "rtshop.stock.news_broadcast": "[Price board] %s — %s next price %s"
+  "rtshop.stock.news_broadcast": "[Price board] %s — %s next price %s",
+  "rtshop.stock.event_broadcast": "[Price board] %s — %s %s",
+  "rtshop.fpscheck.busy": "A check is already running.",
+  "rtshop.fpscheck.start": "Checking FPS for %s seconds. Play as usual (best where the FPS drops).",
+  "rtshop.fpscheck.done": "FPS check: average %s · lowest %s · waiting on the GPU %s%% · busiest mods: %s",
+  "rtshop.fpscheck.file": "Saved as %s in the game folder (please send this file)"
 }

@@ -2001,7 +2001,7 @@
   "rtshop.stock.cert_invalid": "No.%s · 장부에 없는 증서",
   "rtshop.stock.sell": "팔기",
   "rtshop.stock.sell_confirm": "확인?",
-  "rtshop.stock.no_news": "아직 소식이 없습니다. 이야기의 큰 고비를 넘기면 시세가 움직입니다.",
+  "rtshop.stock.no_news": "아직 소식이 없습니다. 이야기의 큰 고비(✦)나 시장 사건이 생기면 여기에 적힙니다.",
   "rtshop.stock.fund": "배당 기금 %s G",
   "rtshop.stock.next_dividend": "다음 배당까지 %s",
   "rtshop.stock.claim": "배당 받기 (%s G)",
@@ -2019,5 +2019,10 @@
   "rtshop.stock.err.full": "가방에 빈칸이 없습니다.",
   "rtshop.stock.err.invalid": "장부에 없는 증서입니다 (복사본이거나 이미 되판 증서).",
   "rtshop.stock.err.none": "그 증서를 가방에서 찾지 못했습니다.",
-  "rtshop.stock.news_broadcast": "[시세판] %s — %s 다음 시세 %s"
+  "rtshop.stock.news_broadcast": "[시세판] %s — %s 다음 시세 %s",
+  "rtshop.stock.event_broadcast": "[시세판] %s — %s %s",
+  "rtshop.fpscheck.busy": "이미 진단 중입니다.",
+  "rtshop.fpscheck.start": "FPS 진단을 %s초 동안 합니다. 평소처럼 움직이세요 (FPS 가 떨어지는 곳이면 더 좋습니다).",
+  "rtshop.fpscheck.done": "FPS 진단: 평균 %s · 가장 낮음 %s · 그래픽 카드 기다림 %s%% · 시간을 많이 쓴 모드: %s",
+  "rtshop.fpscheck.file": "결과 파일: 게임 폴더의 %s (이 파일을 보내 주세요)"
 }

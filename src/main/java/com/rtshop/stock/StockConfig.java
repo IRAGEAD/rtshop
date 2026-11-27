@@ -58,7 +58,35 @@ public final class StockConfig {
         }
     }
 
+    /**
+     * 무작위 시장 사건 (3.73.0): 날이 바뀔 때 eventChance 확률로 조합 하나에 생긴다. min ~ max 사이의 몫(내리는 사건은 음수)이 그날 시세에 더해지고,
+     * followUp 이 있으면 다음 날 그 몫의 followUp 배가 한 번 더 (-0.5 = 반쯤 되돌아옴). when: "" = 아무 때나, "thunder" = 전날 뇌우가 30분 넘게, "weekend" = 토요일에.
+     */
+    public static final class Event {
+        public String id = "", union = "", when = "";
+        public double min, max, weight = 1, followUp;
+        public String text = "", textEn = "";
+
+        Event() {
+        }
+
+        Event(String id, String union, double min, double max, double followUp, String when, String text, String textEn) {
+            this.id = id;
+            this.union = union;
+            this.min = min;
+            this.max = max;
+            this.followUp = followUp;
+            this.when = when;
+            this.text = text;
+            this.textEn = textEn;
+        }
+    }
+
     public boolean enabled = true;
+    /** 무작위 시장 사건을 켜는가 · 하루에 일어날 확률 · 조건 사건(뇌우 · 주말)이 조건을 채웠을 때 일어날 확률. */
+    public boolean events = true;
+    public double eventChance = 0.30, conditionChance = 0.60;
+    public final List<Event> eventList = new ArrayList<>();
     /** 살 때 · 팔 때 수수료 (기금으로 간다). */
     public double fee = 0.02;
     /** 하루 시세 변동의 한도 (0.10 = ±10%). */
@@ -110,6 +138,27 @@ public final class StockConfig {
         c.news.add(new News("story_5_12", "fish", 0.03, "폭풍이 그친 부두", "The storm has passed over the pier"));
         c.news.add(new News("story_5_12", "farm", 0.02, "폭풍이 그친 마을의 첫 수확", "The first harvest after the storm"));
         c.news.add(new News("hidden_scylla_5", "fish", 0.04, "폭풍의 여제가 잠들었다", "The Storm Empress sleeps"));
+        // 무작위 시장 사건 (3.73.0, 사용자 22:55 "스토리 외에도 시세를 랜덤하게 바꾸는 요소(이벤트)도 있으면 좋겠어")
+        c.eventList.add(new Event("farm_bumper", "farm", 0.03, 0.07, -0.3, "", "풍년 소식: 올해 밀이 잘 여물었다", "Bumper crop: the wheat ripened well this year"));
+        c.eventList.add(new Event("farm_blight", "farm", -0.07, -0.03, -0.3, "", "병충해 소문이 돈다", "Rumours of blight in the fields"));
+        c.eventList.add(new Event("farm_seeds", "farm", 0.03, 0.05, 0, "", "먼 마을에서 씨앗 주문이 들어왔다", "A far village ordered seeds"));
+        c.eventList.add(new Event("fish_shoal", "fish", 0.04, 0.08, -0.4, "", "큰 물고기 떼가 부두 가까이 왔다", "A great shoal came close to the pier"));
+        c.eventList.add(new Event("fish_nets", "fish", -0.04, -0.02, 0, "", "그물 값이 올랐다", "Nets got pricier"));
+        c.eventList.add(new Event("fish_salt", "fish", 0.02, 0.04, 0, "", "소금 값이 내려 절임 생선이 잘 팔린다", "Salt is cheap; salted fish sells well"));
+        c.eventList.add(new Event("fish_storm", "fish", -0.06, -0.03, -0.5, "thunder", "폭풍 경보: 배들이 묶였다", "Storm warning: the boats stay tied up"));
+        c.eventList.add(new Event("smith_vein", "smith", 0.04, 0.08, -0.3, "", "새 광맥이 발견되었다", "A new ore vein was found"));
+        c.eventList.add(new Event("smith_collapse", "smith", -0.07, -0.04, -0.4, "", "광산 갱도가 무너졌다", "A mine tunnel collapsed"));
+        c.eventList.add(new Event("smith_order", "smith", 0.03, 0.05, 0, "", "수도회가 무기를 대량으로 주문했다", "The Order placed a large weapons order"));
+        c.eventList.add(new Event("smith_rival", "smith", -0.04, -0.02, 0, "", "외지 대장장이가 마을에 들어왔다", "An outside smith set up shop in town"));
+        c.eventList.add(new Event("food_festival", "food", 0.04, 0.07, -0.5, "", "마을 축제 준비로 음식 주문이 늘었다", "Festival preparations: food orders are up"));
+        c.eventList.add(new Event("food_poison", "food", -0.07, -0.04, -0.5, "", "식중독 소문이 돈다", "Rumours of food poisoning"));
+        c.eventList.add(new Event("food_market", "food", 0.02, 0.04, 0, "weekend", "주말 장터가 열렸다", "The weekend market is open"));
+        c.eventList.add(new Event("land_boom", "land", 0.04, 0.08, -0.6, "", "땅 투기 열풍이 분다", "A land rush is on"));
+        c.eventList.add(new Event("land_dispute", "land", -0.06, -0.03, -0.3, "", "경계 분쟁으로 거래가 멈췄다", "A boundary dispute froze the trades"));
+        c.eventList.add(new Event("land_road", "land", 0.03, 0.05, 0, "", "새 길이 닦인다는 소문", "Word of a new road being built"));
+        c.eventList.add(new Event("survey_haul", "survey", 0.04, 0.08, -0.3, "", "원정대가 큰 수확을 안고 돌아왔다", "An expedition came back with a great haul"));
+        c.eventList.add(new Event("survey_attack", "survey", -0.06, -0.03, -0.4, "", "괴물 습격 소식이 들려온다", "News of a monster attack"));
+        c.eventList.add(new Event("survey_patron", "survey", 0.02, 0.04, 0, "", "후원자가 조사대를 크게 후원했다", "A patron gave the Survey Corps a large gift"));
         return c;
     }
 
@@ -154,6 +203,10 @@ public final class StockConfig {
             if (Files.exists(f)) {
                 JsonObject o = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
                 read(c, o);
+                if (!o.has("eventList") && !Boolean.getBoolean("rtshop.selftest") && !Boolean.getBoolean("rtshop.clienttest")) {
+                    // 3.72.0 에서 만든 파일: 고친 값은 그대로 두고 새로 생긴 사건 목록을 적어 넣는다 (볼 수 있고 고칠 수 있게)
+                    Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(write(c)), StandardCharsets.UTF_8);
+                }
                 return c;
             }
             if (Boolean.getBoolean("rtshop.selftest") || Boolean.getBoolean("rtshop.clienttest")) return c;
@@ -208,6 +261,27 @@ public final class StockConfig {
                 c.unions.addAll(list);
             }
         }
+        if (o.has("events")) c.events = o.get("events").getAsBoolean();
+        if (o.has("eventChance")) c.eventChance = clamp(o.get("eventChance").getAsDouble(), 0, 1);
+        if (o.has("conditionChance")) c.conditionChance = clamp(o.get("conditionChance").getAsDouble(), 0, 1);
+        if (o.has("eventList") && o.get("eventList").isJsonArray()) {
+            c.eventList.clear();
+            for (JsonElement e : o.getAsJsonArray("eventList")) {
+                JsonObject n = e.getAsJsonObject();
+                Event x = new Event();
+                x.id = n.has("id") ? n.get("id").getAsString() : "";
+                x.union = n.has("union") ? n.get("union").getAsString() : "";
+                x.when = n.has("when") ? n.get("when").getAsString() : "";
+                double a = n.has("min") ? clamp(n.get("min").getAsDouble(), -0.5, 0.5) : 0, b = n.has("max") ? clamp(n.get("max").getAsDouble(), -0.5, 0.5) : a;
+                x.min = Math.min(a, b);
+                x.max = Math.max(a, b);
+                x.weight = n.has("weight") ? clamp(n.get("weight").getAsDouble(), 0, 100) : 1;
+                x.followUp = n.has("followUp") ? clamp(n.get("followUp").getAsDouble(), -1, 1) : 0;
+                x.text = n.has("text") ? n.get("text").getAsString() : "";
+                x.textEn = n.has("textEn") ? n.get("textEn").getAsString() : x.text;
+                if (!x.text.isEmpty() && c.union(x.union) != null) c.eventList.add(x);
+            }
+        }
         if (o.has("news") && o.get("news").isJsonArray()) {
             c.news.clear();
             for (JsonElement e : o.getAsJsonArray("news")) {
@@ -229,7 +303,10 @@ public final class StockConfig {
                 + "buyPerDay = 한 사람이 하루에 살 수 있는 주 수, maxPerCertificate = 증서 한 장의 주 수 한도, playerDailyCap = 한 사람이 하루 실적에 보탤 수 있는 Gold, "
                 + "metricFloor = 실적 비교의 바닥, perfWeight = 실적의 무게, noise = 작은 무작위, pull = 처음 값으로 돌아가려는 힘, "
                 + "dividendPool = 한 주에 기금의 얼마를 배당으로 나눌지, dividendCap = 한 주 배당의 시세 대비 한도, deskRange = 거래 창구(은행원)와의 거리. "
-                + "unions = 조합(id · 이름 · 처음 값 · 색), news = 이야기 소식(그 퀘스트를 서버에서 처음 마치면 다음 시세에 한 번). 날짜는 출석과 같은 기준 시각에 바뀐다. 고친 뒤 /rtshop stocks reload.");
+                + "unions = 조합(id · 이름 · 처음 값 · 색), news = 이야기 소식(그 퀘스트를 서버에서 처음 마치면 다음 시세에 한 번), "
+                + "events · eventChance = 무작위 시장 사건을 켜는가 · 하루에 일어날 확률, conditionChance = 조건 사건이 조건을 채웠을 때의 확률, "
+                + "eventList = 사건(union · min ~ max 몫(내리는 것은 음수) · weight 뽑힐 무게 · followUp 다음 날 그 몫의 몇 배(-0.5 = 반쯤 되돌아옴) · when \"\" 아무 때나 / thunder 전날 뇌우 30분 넘게 / weekend 토요일). "
+                + "날짜는 출석과 같은 기준 시각에 바뀐다. 고친 뒤 /rtshop stocks reload.");
         o.addProperty("enabled", c.enabled);
         o.addProperty("fee", c.fee);
         o.addProperty("dailyMove", c.dailyMove);
@@ -267,6 +344,24 @@ public final class StockConfig {
             ns.add(x);
         }
         o.add("news", ns);
+        o.addProperty("events", c.events);
+        o.addProperty("eventChance", c.eventChance);
+        o.addProperty("conditionChance", c.conditionChance);
+        JsonArray es = new JsonArray();
+        for (Event e : c.eventList) {
+            JsonObject x = new JsonObject();
+            x.addProperty("id", e.id);
+            x.addProperty("union", e.union);
+            x.addProperty("min", e.min);
+            x.addProperty("max", e.max);
+            x.addProperty("weight", e.weight);
+            x.addProperty("followUp", e.followUp);
+            x.addProperty("when", e.when);
+            x.addProperty("text", e.text);
+            x.addProperty("textEn", e.textEn);
+            es.add(x);
+        }
+        o.add("eventList", es);
         return o;
     }
 

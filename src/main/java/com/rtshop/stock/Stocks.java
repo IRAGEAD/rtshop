@@ -102,7 +102,13 @@ public final class Stocks {
     public static void onTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.getServer().getTickCount() % 100 != 37) return;
         try {
-            roll(event.getServer());
+            MinecraftServer server = event.getServer();
+            if (server.overworld().isThundering() && StockConfig.get().enabled) {
+                StockData d = StockData.get(server);
+                d.thunderTicks += 100;   // 3.73.0: 뇌우가 길면 다음 날 어업 조합에 폭풍 경보
+                d.setDirty();
+            }
+            roll(server);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop] 조합 시세 갱신 실패: {}", t.toString());
         }
@@ -123,8 +129,9 @@ public final class Stocks {
         boolean online = false;
         for (ServerPlayer p : server.getPlayerList().getPlayers()) online |= !(p instanceof FakePlayer);
         int guard = 0;
+        List<StockData.NewsLine> fresh = new ArrayList<>();
         while (d.day < t && guard++ < 60) {
-            closeDay(c, d);
+            fresh.addAll(closeDay(c, d));
             d.day++;
             d.boughtToday.clear();
             d.played = false;
@@ -140,14 +147,23 @@ public final class Stocks {
             d.week = weekOf(t);
             d.setDirty();
         }
+        // 오늘 생긴 시장 사건만 알린다 (서버가 며칠 꺼져 있었으면 지난 것은 시세판에만)
+        for (StockData.NewsLine l : fresh) if (l.day == d.day) broadcast(server, l);
         if (online && !d.played) {
             d.played = true;
             d.setDirty();
         }
     }
 
-    /** 하루를 닫는다: 조합마다 오늘 실적으로 내일 시세를 정한다. */
-    static void closeDay(StockConfig c, StockData d) {
+    /** 하루를 닫는다: 조합마다 오늘 실적으로 내일 시세를 정한다. 그때 생긴 시장 사건(3.73.0)을 돌려준다. */
+    static List<StockData.NewsLine> closeDay(StockConfig c, StockData d) {
+        for (StockConfig.Union u : c.unions) {   // 어제 사건의 뒷몫이 오늘 시세에
+            StockData.Board b = d.board(u.id);
+            b.pendingNews += b.pendingNext;
+            b.pendingNext = 0;
+        }
+        List<StockData.NewsLine> fresh = rollEvents(c, d);
+        d.thunderTicks = 0;
         for (StockConfig.Union u : c.unions) {
             StockData.Board b = d.board(u.id);
             long todayM = b.todayTotal(c.playerDailyCap);
@@ -172,6 +188,74 @@ public final class Stocks {
             b.weekMetric += todayM;
             b.today.clear();
             b.pendingNews = 0;
+        }
+        return fresh;
+    }
+
+    /**
+     * 무작위 시장 사건 (3.73.0): 조건 사건(전날 뇌우가 30분 넘게 → when "thunder", 새 날이 토요일 → "weekend")은 조건을 채우면 conditionChance 로,
+     * 그 밖의 사건은 하루 eventChance 확률로 하나를 무게대로 뽑는다. 몫은 그날 시세에, followUp 은 그다음 날에.
+     */
+    static List<StockData.NewsLine> rollEvents(StockConfig c, StockData d) {
+        List<StockData.NewsLine> out = new ArrayList<>();
+        if (!c.events || c.eventList.isEmpty()) return out;
+        long newDay = d.day + 1;
+        boolean thunder = d.thunderTicks >= 36_000;
+        boolean saturday = LocalDate.ofEpochDay(newDay).getDayOfWeek() == java.time.DayOfWeek.SATURDAY;
+        for (StockConfig.Event e : c.eventList) {
+            boolean cond = ("thunder".equals(e.when) && thunder) || ("weekend".equals(e.when) && saturday);
+            if (cond && c.union(e.union) != null && RNG.nextDouble() < c.conditionChance) out.add(happen(d, e, newDay));
+        }
+        if (RNG.nextDouble() < c.eventChance) {
+            double total = 0;
+            for (StockConfig.Event e : c.eventList) if (e.when.isEmpty() && c.union(e.union) != null) total += e.weight;
+            double r = RNG.nextDouble() * total;
+            for (StockConfig.Event e : c.eventList) {
+                if (!e.when.isEmpty() || c.union(e.union) == null || e.weight <= 0) continue;
+                r -= e.weight;
+                if (r <= 0) {
+                    out.add(happen(d, e, newDay));
+                    break;
+                }
+            }
+        }
+        return out;
+    }
+
+    private static StockData.NewsLine happen(StockData d, StockConfig.Event e, long day) {
+        double m = Math.round((e.min + RNG.nextDouble() * (e.max - e.min)) * 1000) / 1000.0;
+        StockData.Board b = d.board(e.union);
+        b.pendingNews += m;
+        b.pendingNext += e.followUp * m;
+        StockData.NewsLine line = new StockData.NewsLine();
+        line.day = day;
+        line.union = e.union;
+        line.text = e.text;
+        line.textEn = e.textEn;
+        line.change = m;
+        line.kind = "event";
+        d.newsLog.add(line);
+        while (d.newsLog.size() > StockData.NEWS_LOG) d.newsLog.remove(0);
+        lastEventForTest = e.id;
+        return line;
+    }
+
+    /** 점검용: 마지막으로 일어난 사건의 id. */
+    public static String lastEventForTest = "";
+
+    /** 점검용: 무작위의 씨앗을 정한다. */
+    public static void seedForTest(long seed) {
+        RNG.setSeed(seed);
+    }
+
+    /** 시장 사건을 모두에게 알린다. */
+    static void broadcast(MinecraftServer server, StockData.NewsLine l) {
+        StockConfig.Union u = StockConfig.get().union(l.union);
+        if (u == null) return;
+        for (ServerPlayer q : server.getPlayerList().getPlayers()) {
+            boolean en = com.rtshop.story.StoryText.en(q);
+            q.sendSystemMessage(Component.translatable("rtshop.stock.event_broadcast", en ? l.textEn : l.text, en ? u.nameEn : u.name, pct(l.change))
+                    .withStyle(l.change >= 0 ? ChatFormatting.GREEN : ChatFormatting.RED));
         }
     }
 
@@ -485,6 +569,7 @@ public final class Stocks {
             x.addProperty("text", n.text);
             x.addProperty("textEn", n.textEn);
             x.addProperty("change", n.change);
+            x.addProperty("kind", n.kind);
             ns.add(x);
         }
         o.add("news", ns);
@@ -647,8 +732,9 @@ public final class Stocks {
         if (d.day == Long.MIN_VALUE) roll(server);
         for (int i = 0; i < n; i++) {
             if (played) d.played = true;
-            closeDay(c, d);
+            List<StockData.NewsLine> fresh = closeDay(c, d);
             d.day++;
+            for (StockData.NewsLine l : fresh) broadcast(server, l);
             d.boughtToday.clear();
             d.played = false;
             long w = weekOf(d.day);
@@ -674,6 +760,7 @@ public final class Stocks {
         d.day = Long.MIN_VALUE;
         d.week = Long.MIN_VALUE;
         d.played = false;
+        d.thunderTicks = 0;
         testShiftMs = 0;
         roll(server);
     }

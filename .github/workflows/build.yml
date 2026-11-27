@@ -646,66 +646,95 @@ jobs:
           { echo "== client base (singleplayer, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/perf-base.log | cut -c1-260 | head -n 4; ls client/crash-reports 2>/dev/null || true; } >> chunky-check.txt
           # 이제부터 한 가지씩만 바꿔 그 몫을 잰다 (Chunky 는 가만히 있을 때 일이 없어 빼 둔다: base 가 튕기면 나머지라도 재게)
           mkdir -p offclient && mv client/mods/Chunky*.jar offclient/ 2>/dev/null || true
+          # 3.73.0 (사용자 W-22 "fps 가 이전보다 더 심하게 떨어진다"): 7 ~ 9차에서 Farsight · Diorama FAST · AI Improvements + Clumps 는 흔들림 안이라 뺐다.
+          # old5: 모드팩 10 → 11 에서 바뀐 다섯 모드(Fantasy Mounts · ModernFix · Integrated API · Kaleidoscope Cookery · Diegesis)를 10 의 판으로 — 11 에서 느려졌는지
+          mkdir -p oldmods off5
+          python3 - packcache/index.json oldmods off5 client/mods <<'PY'
+          import json, os, shutil, sys, urllib.request, urllib.parse
+          index, old, off, mods = json.load(open(sys.argv[1])), sys.argv[2], sys.argv[3], sys.argv[4]
+          pairs = [(443101, 9780715, 9746318), (790626, 9791665, 9685369), (817709, 9804290, 9552187), (1309203, 9788729, 9019240), (1790227, 9823842, 9770822)]
+          for pid, new, prev in pairs:
+              name = index.get(f'{pid}/{new}')
+              if name and os.path.exists(os.path.join(mods, name)):
+                  shutil.move(os.path.join(mods, name), os.path.join(off, name))
+              try:
+                  req = urllib.request.Request(f'https://www.curseforge.com/api/v1/mods/{pid}/files/{prev}/download', headers={'User-Agent': 'rtshop-ci (github.com/IRAGEAD/rtshop)'})
+                  with urllib.request.urlopen(req, timeout=180) as r:
+                      fn = urllib.parse.unquote(os.path.basename(urllib.parse.urlparse(r.geturl()).path))
+                      open(os.path.join(old, fn), 'wb').write(r.read())
+                  print('old5:', name, '->', fn)
+              except Exception as e:
+                  print('old5: could not get', pid, prev, e)
+          PY
+          cp oldmods/*.jar client/mods/ 2>/dev/null || true
+          run_client old5
+          for f in oldmods/*.jar; do rm -f "client/mods/$(basename "$f")"; done
+          mv off5/* client/mods/ 2>/dev/null || true
+          # nodh: Distant Horizons 만 뺌 (팩 11 에서는 선택 모드로 꺼져 있다 — 켜면 얼마나 드는지)
+          mkdir -p offdh && mv client/mods/DistantHorizons*.jar offdh/ 2>/dev/null || true
+          run_client nodh
+          mv offdh/* client/mods/ 2>/dev/null || true
           # noav: Arcane Vortex 만 뺌
           mkdir -p offav && mv client/mods/ArcaneVortex*.jar offav/ 2>/dev/null || true
           run_client noav
           mv offav/* client/mods/ 2>/dev/null || true
-          # nofs: Farsight 만 뺌
-          mkdir -p offfs && mv client/mods/*arsight*.jar offfs/ 2>/dev/null || true
-          run_client nofs
-          mv offfs/* client/mods/ 2>/dev/null || true
-          # dfast: Diorama 지도 품질만 FAST — Diorama 는 설정을 바꾸기 전에는 파일을 만들지 않는다 (7차에서 못 찾은 까닭).
-          # RT Shop 이 세계를 열기 전에 게임 안에서 FAST 로 바꿔 저장하고 파일 위치를 적는다 → 끝나면 여기서 되돌린다
-          run_client dfast
-          if [ -f client/rtshop-diorama-file.txt ]; then
-            DF=$(sed -n 1p client/rtshop-diorama-file.txt); DS=$(sed -n 2p client/rtshop-diorama-file.txt)
-            if [ "$DS" = existed ]; then mv -f "$DF.rtshop-bak" "$DF"; else rm -f "$DF"; fi
-            echo "diorama settings put back ($DS): $DF"; rm -f client/rtshop-diorama-file.txt
-          else
-            echo "dfast: RT Shop left no note of the Diorama settings file"
-          fi
-          # addons: AI Improvements · Clumps 만 더함 (Canary 는 3차 실행에서 이 모드팩과 함께 켜지지 않았다: accessories 의 mixin 오류)
-          cp extramods/AI-Improvements*.jar extramods/Clumps*.jar client/mods/ 2>/dev/null || true
-          run_client addons
-          rm -f client/mods/AI-Improvements*.jar client/mods/Clumps*.jar
           mv offclient/* client/mods/ 2>/dev/null || true
-      - name: Distant Horizons near-chunk gap (dedicated server + client)
+      - name: Distant Horizons near-chunk gap and far-view loading (dedicated server + client, twice)
         if: always()
         run: |
-          cd server
-          printf 'online-mode=false\nspawn-protection=0\nlevel-name=perfworld\nlevel-seed=20261127\nmax-tick-time=-1\nview-distance=6\nsimulation-distance=6\ngamemode=creative\nforce-gamemode=true\nenforce-secure-profile=false\n' > server.properties
-          echo "-Xmx8G -Drtshop.perftest=true -Drtshop.perftest.serve=true" > user_jvm_args.txt
-          bash run.sh nogui > dh-server.log 2>&1 &
-          for i in $(seq 1 60); do sleep 10; if grep -q "Done (" dh-server.log; then echo "server up after $((i*10))s"; break; fi; done
-          cd ..
-          for attempt in 1 2; do
-            rm -f client/rtshop-dh-client.txt client/rtshop-dh-notes.txt
-            (sleep 1050; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
-            wd=$!
-            (timeout -k 20 950 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev -s 127.0.0.1 --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx7G -Drtshop.clienttest=true -Drtshop.clienttest.only=dh" --resolution 1280x720 > client-dh.log 2>&1) || echo "client exit code $?"
-            pkill -9 -f "rtshop.clienttest" || true
-            kill $wd 2>/dev/null || true
-            # CI 가 붐비면 접속 직후에 연결이 끊기는 일이 있다 (서버: "Timed out") → 한 번 더
-            [ -f client/rtshop-dh-notes.txt ] && break
-            echo "DH client attempt $attempt gave no result"
+          # 3.73.0 (사용자 W-17 "DH 를 써도 먼 청크 로딩이 느리다"): 같은 세계 · 같은 자리에서 서버의 LOD 전송 한도만 바꿔 두 번 —
+          # A = 모드팩 그대로 (playerBandwidthLimit 500 KB/s · generationRequestRateLimit 20), B = 한도 없음 · 요청 50. 클라이언트가 30초마다 LOD 자료를 센다.
+          printf 'online-mode=false\nspawn-protection=0\nlevel-name=perfworld\nlevel-seed=20261127\nmax-tick-time=-1\nview-distance=6\nsimulation-distance=6\ngamemode=creative\nforce-gamemode=true\nenforce-secure-profile=false\n' > server/server.properties
+          echo "-Xmx8G -Drtshop.perftest=true -Drtshop.perftest.serve=true" > server/user_jvm_args.txt
+          rm -rf dhworld && cp -r server/perfworld dhworld
+          DHCFG=server/config/DistantHorizons.toml
+          cp "$DHCFG" dhcfg.bak 2>/dev/null || true
+          for run in A B; do
+            rm -rf server/perfworld && cp -r dhworld server/perfworld
+            cp dhcfg.bak "$DHCFG" 2>/dev/null || true
+            if [ "$run" = B ]; then
+              sed -i -E 's/^(\s*playerBandwidthLimit\s*=).*/\1 0/; s/^(\s*globalBandwidthLimit\s*=).*/\1 0/; s/^(\s*generationRequestRateLimit\s*=).*/\1 50/; s/^(\s*syncOnLoadRateLimit\s*=).*/\1 100/' "$DHCFG"
+            fi
+            echo "== DH run $run: $(grep -E '^\s*(playerBandwidthLimit|generationRequestRateLimit|syncOnLoadRateLimit)' "$DHCFG" | tr -s ' ' | tr '\n' ' ')"
+            # 클라이언트 쪽 LOD 저장(접속한 서버마다)을 지워 두 번 모두 처음부터
+            rm -rf client/Distant_Horizons_server_data client/Distant_Horizons 2>/dev/null || true
+            (cd server && bash run.sh nogui > dh-server-$run.log 2>&1 &)
+            for i in $(seq 1 60); do sleep 10; if grep -q "Done (" server/dh-server-$run.log; then echo "server up after $((i*10))s"; break; fi; done
+            for attempt in 1 2; do
+              rm -f client/rtshop-dh-client.txt client/rtshop-dh-notes.txt
+              (sleep 1050; pkill -9 -f "rtshop.clienttest"; pkill -9 -f Xvfb; pkill -9 -f xvfb-run) > /dev/null 2>&1 &
+              wd=$!
+              (timeout -k 20 950 xvfb-run -a -s "-screen 0 1280x720x24" portablemc --main-dir "$PWD/mc" --work-dir "$PWD/client" start forge:$FORGE_VER -u Dev -s 127.0.0.1 --jvm "$JAVA_HOME/bin/java" --jvm-args "-Xmx7G -Drtshop.clienttest=true -Drtshop.clienttest.only=dh" --resolution 1280x720 > client-dh-$run.log 2>&1) || echo "client exit code $?"
+              pkill -9 -f "rtshop.clienttest" || true
+              kill $wd 2>/dev/null || true
+              # CI 가 붐비면 접속 직후에 연결이 끊기는 일이 있다 (서버: "Timed out") → 한 번 더
+              [ -f client/rtshop-dh-notes.txt ] && break
+              echo "DH client attempt $attempt gave no result"
+            done
+            pkill -x java || true
+            sleep 5
+            cp client/rtshop-dh-notes.txt client/rtshop-dh-notes-$run.txt 2>/dev/null || true
+            cp client/rtshop-dh-client.txt client/rtshop-dh-client-$run.txt 2>/dev/null || true
+            for f in client/screenshots/170_*.png client/screenshots/171_*.png; do [ -f "$f" ] && mv "$f" "${f%.png}_$run.png"; done
+            cp client/logs/latest.log client/logs/dh-$run.log 2>/dev/null || true
+            echo "===== DH notes $run"; cat client/rtshop-dh-notes-$run.txt 2>/dev/null || (echo "no DH result"; tail -n 30 client/logs/latest.log | cut -c1-300)
           done
-          pkill -x java || true
-          cat client/rtshop-dh-client.txt client/rtshop-dh-notes.txt 2>/dev/null || (echo "no DH result"; tail -n 30 client/logs/latest.log | cut -c1-300)
-          { echo "== DH test (dedicated server + client, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Done \(" server/dh-server.log | cut -c1-260 | head -n 6; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/latest.log | cut -c1-260 | head -n 4; ls server/crash-reports client/crash-reports 2>/dev/null || true; } >> chunky-check.txt
+          cp dhcfg.bak "$DHCFG" 2>/dev/null || true
+          cp server/dh-server-A.log server/dh-server.log 2>/dev/null || true
+          { echo "== DH test (dedicated server + client, Chunky + DH)"; grep -E "Chunky link deferred|Chunky is not loaded|Done \(" server/dh-server-A.log | cut -c1-260 | head -n 6; grep -E "Chunky link deferred|Chunky is not loaded" client/logs/dh-A.log | cut -c1-260 | head -n 4; ls server/crash-reports client/crash-reports 2>/dev/null || true; } >> chunky-check.txt
           cat chunky-check.txt
-          grep -iE "distant ?horizons|\[DH|rtshop-dh|render distance" client/logs/latest.log | cut -c1-260 | head -n 40 || true
       - name: Share performance results (test branches only)
         if: always()
         run: |
           mkdir -p /tmp/perf
-          cp server/rtshop-perf-server.txt server/perf-server-report.txt client/rtshop-perf-client-*.txt perf-client-*-report.txt client/rtshop-dh-client.txt client/rtshop-dh-notes.txt chunky-check.txt /tmp/perf/ 2>/dev/null || true
+          cp server/rtshop-perf-server.txt server/perf-server-report.txt client/rtshop-perf-client-*.txt perf-client-*-report.txt client/rtshop-dh-client*.txt client/rtshop-dh-notes*.txt chunky-check.txt /tmp/perf/ 2>/dev/null || true
           ls extramods > /tmp/perf/extramods.txt 2>/dev/null || true
           mkdir -p /tmp/perf/crash && cp server/crash-reports/*.txt client/crash-reports/*.txt /tmp/perf/crash/ 2>/dev/null || true
-          cp server/dh-server.log /tmp/perf/ 2>/dev/null || true
+          cp server/dh-server-A.log server/dh-server-B.log /tmp/perf/ 2>/dev/null || true
           cp server/perf-server.log /tmp/perf/ 2>/dev/null || true
           cp client/screenshots/16*.png client/screenshots/17*.png /tmp/perf/ 2>/dev/null || true
-          for n in base noav nofs dfast addons; do grep -iE "rtshop-perf|exception|crash" client/logs/perf-$n.log 2>/dev/null | cut -c1-300 | head -n 80 > /tmp/perf/client-perf-$n-log.txt || true; done
-          tail -n 300 client/logs/latest.log > /tmp/perf/client-dh-tail.log 2>/dev/null || true
+          for n in base old5 nodh noav; do grep -iE "rtshop-perf|exception|crash" client/logs/perf-$n.log 2>/dev/null | cut -c1-300 | head -n 80 > /tmp/perf/client-perf-$n-log.txt || true; done
+          for r in A B; do grep -v "OpenGL debug message" client/logs/dh-$r.log 2>/dev/null | tail -n 200 > /tmp/perf/client-dh-$r-tail.log || true; done
           cd /tmp/perf
           git init -q -b ci-perf
           git config user.name "github-actions"

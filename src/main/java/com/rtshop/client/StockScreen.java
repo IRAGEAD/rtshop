@@ -321,7 +321,8 @@ public class StockScreen extends Screen {
         for (int i = 0; i < ns.size() && i < 3; i++) {
             JsonObject n = ns.get(i).getAsJsonObject();
             String text = en() && n.has("textEn") ? n.get("textEn").getAsString() : n.get("text").getAsString();
-            String head = n.get("date").getAsString() + " " + unionName(n.get("union").getAsString()) + " " + pct(n.get("change").getAsDouble()) + " · ";
+            boolean story = !n.has("kind") || n.get("kind").getAsString().equals("story");
+            String head = (story ? "✦ " : "") + n.get("date").getAsString() + " " + unionName(n.get("union").getAsString()) + " " + pct(n.get("change").getAsDouble()) + " · ";
             int ly = y + 4 + i * 11;
             Ui.scaledText(g, font, head, x + 6, ly, 0.8F, unionColor(n.get("union").getAsString()), false);
             Ui.scaledText(g, font, Ui.clip(font, text, (int) ((tw - font.width(head) * 0.8F) / 0.8F)), x + 6 + font.width(head) * 0.8F, ly, 0.8F, Ui.C_INK, false);

@@ -245,6 +245,30 @@ public final class SelfTest {
                             + ") kept " + kept + " back " + back);
             check("3.72 stocks: the window gets prices · history · my certificates · news; the banker offers [Exchange]; commands", view && desk && cmd,
                     "view " + view + " desk " + desk + " cmd " + cmd + " " + v);
+            // 3.73: 무작위 시장 사건 — 뇌우가 길었던 다음 날의 폭풍 경보(조건 사건), 하루 하나의 무작위 사건, 다음 날의 뒷몫, 끄기
+            com.rtshop.stock.StockConfig ec = com.rtshop.stock.StockConfig.copyOfDefaults();
+            ec.noise = 0;
+            ec.pull = 0;
+            ec.eventChance = 1;
+            ec.conditionChance = 1;
+            com.rtshop.stock.StockConfig.forTest(ec);
+            com.rtshop.stock.Stocks.resetForTest(server);
+            com.rtshop.stock.Stocks.seedForTest(373);
+            sd.thunderTicks = 40_000;
+            com.rtshop.stock.Stocks.advance(server, 1, true);
+            long evN = sd.newsLog.stream().filter(l -> "event".equals(l.kind)).count();
+            boolean storm = sd.newsLog.stream().anyMatch(l -> "event".equals(l.kind) && l.union.equals("fish") && l.change < 0 && l.text.contains("폭풍"));
+            boolean follow = Math.abs(sd.board("fish").pendingNext) > 1e-6 && sd.thunderTicks == 0;
+            boolean inRange = true;
+            for (com.rtshop.stock.StockData.NewsLine l : sd.newsLog) inRange &= Math.abs(l.change) >= 0.019 && Math.abs(l.change) <= 0.081;
+            ec.events = false;
+            com.rtshop.stock.Stocks.advance(server, 1, true);
+            boolean consumed = true;
+            for (com.rtshop.stock.StockData.Board bb : sd.boards.values()) consumed &= bb.pendingNext == 0;
+            boolean off = sd.newsLog.stream().filter(l -> "event".equals(l.kind)).count() == evN;
+            check("3.73 stocks: market events — after a long thunderstorm a storm warning for the fishers, one random event a day when it rolls (3~8%), part of it returns the next day; events can be turned off",
+                    evN >= 2 && storm && follow && inRange && consumed && off, "events " + evN + " storm " + storm + " follow " + follow + " range " + inRange + " consumed " + consumed
+                            + " off " + off + " last " + com.rtshop.stock.Stocks.lastEventForTest);
         } finally {
             com.rtshop.stock.Stocks.testAnywhere = false;
             com.rtshop.stock.Stocks.testing = false;
@@ -4380,6 +4404,23 @@ public final class SelfTest {
                         + " closed " + pClosed + " deleted " + pDeleted + " view " + pAdminView + " cmd " + pCmd371 + " " + com.rtshop.petition.Petitions.lastAdminForTest);
         com.rtshop.petition.Petitions.forTestReset(a.server);
         stocks(a.server, a);
+        // 3.73: 성능 진단 (/fpscheck · /rtshop perfcheck) — 스택의 프레임을 모드로 돌리는 규칙
+        StackTraceElement[] st373 = {
+                new StackTraceElement("java.lang.Object", "wait", null, -1),
+                new StackTraceElement("net.minecraft.world.level.Level", "m_6249_", null, -1),
+                new StackTraceElement("com.rtshop.shop.ShopServer", "buy", null, -1),
+                new StackTraceElement("net.minecraft.server.level.ServerLevel", "wrapOperation$fde000$spiral_abyss$tick", null, -1),
+                new StackTraceElement("net.minecraft.server.MinecraftServer", "m_5705_", null, -1)};
+        com.rtshop.stats.PerfCheck.Run pr373 = new com.rtshop.stats.PerfCheck.Run("test", Thread.currentThread(), 5);
+        com.rtshop.stats.PerfCheckForTest.sample(pr373, st373);
+        String rt373 = com.rtshop.stats.PerfCheck.modOf(st373[2]);
+        java.util.List<String> rep373 = com.rtshop.stats.PerfCheck.report(pr373, java.util.List.of("head"), "MSPT");
+        check("3.73 performance check: a sampled stack is charged to the innermost mod (RT Shop here, not Minecraft), a mixin handler to its mod id, and the report lists them",
+                com.rtshop.stats.PerfCheck.modOf(st373[0]) == null && com.rtshop.stats.PerfCheck.modOf(st373[1]) == null && rt373 != null
+                        && "mixin:spiral_abyss".equals(com.rtshop.stats.PerfCheck.modOf(st373[3])) && pr373.samples == 1 && pr373.self.getOrDefault(rt373, 0) == 1
+                        && pr373.incl.getOrDefault("mixin:spiral_abyss", 0) == 1 && String.join("\n", rep373).contains(rt373)
+                        && a.server.getCommands().getDispatcher().findNode(List.of("rtshop", "perfcheck")) != null,
+                rt373 + " " + pr373.self + " " + pr373.incl);
         // 3.62: 보스마다 다른 카메라 방식 / Cinematic Cataclysm 컷신으로 깨우기 (그 모드가 있을 때만)
         boolean cc362 = net.minecraftforge.fml.ModList.get().isLoaded("cinematiccataclysm");
         String ccTrace = "";

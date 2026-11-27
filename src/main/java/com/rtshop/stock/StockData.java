@@ -39,8 +39,10 @@ public final class StockData extends SavedData {
         public long dividend;
         /** 어제 시세가 바뀐 몫 (0.03 = +3%). */
         public double lastChange;
-        /** 다음 시세에 더할 이야기 소식. */
+        /** 다음 시세에 더할 이야기 소식 · 사건. */
         public double pendingNews;
+        /** 그다음 날 시세에 더할 사건의 뒷몫 (3.73.0: 오늘 오르고 내일 반쯤 되돌아오는 것). */
+        public double pendingNext;
 
         long todayTotal(long cap) {
             long t = 0;
@@ -63,6 +65,8 @@ public final class StockData extends SavedData {
         public long day;
         public String union = "", text = "", textEn = "";
         public double change;
+        /** "story" = 이야기 소식, "event" = 무작위 시장 사건 (3.73.0). */
+        public String kind = "story";
     }
 
     public final Map<String, Board> boards = new LinkedHashMap<>();
@@ -74,6 +78,8 @@ public final class StockData extends SavedData {
     /** 마지막으로 시세를 정한 날 (출석의 날짜 번호) · 주. Long.MIN_VALUE = 아직 없음. */
     public long day = Long.MIN_VALUE, week = Long.MIN_VALUE;
     public boolean played;
+    /** 오늘 오버월드에 뇌우가 친 틱 수 (3.73.0: 길면 다음 날 어업 조합에 폭풍 경보). */
+    public long thunderTicks;
     public long nextNo = 1;
     /** 지금까지 기금에 들어온 수수료 · 나간 배당 (기록). */
     public long feesTotal, dividendsTotal;
@@ -99,6 +105,7 @@ public final class StockData extends SavedData {
         d.day = tag.contains("day") ? tag.getLong("day") : Long.MIN_VALUE;
         d.week = tag.contains("week") ? tag.getLong("week") : Long.MIN_VALUE;
         d.played = tag.getBoolean("played");
+        d.thunderTicks = tag.getLong("thunderTicks");
         d.nextNo = Math.max(1, tag.getLong("nextNo"));
         d.feesTotal = tag.getLong("feesTotal");
         d.dividendsTotal = tag.getLong("dividendsTotal");
@@ -119,6 +126,7 @@ public final class StockData extends SavedData {
             x.dividend = b.getLong("dividend");
             x.lastChange = b.getDouble("lastChange");
             x.pendingNews = b.getDouble("pendingNews");
+            x.pendingNext = b.getDouble("pendingNext");
             d.boards.put(k, x);
         }
         ListTag cl = tag.getList("certs", Tag.TAG_COMPOUND);
@@ -146,6 +154,7 @@ public final class StockData extends SavedData {
             x.text = c.getString("text");
             x.textEn = c.getString("textEn");
             x.change = c.getDouble("change");
+            if (c.contains("kind")) x.kind = c.getString("kind");
             d.newsLog.add(x);
         }
         ListTag bt = tag.getList("bought", Tag.TAG_COMPOUND);
@@ -162,6 +171,7 @@ public final class StockData extends SavedData {
         if (day != Long.MIN_VALUE) tag.putLong("day", day);
         if (week != Long.MIN_VALUE) tag.putLong("week", week);
         tag.putBoolean("played", played);
+        tag.putLong("thunderTicks", thunderTicks);
         tag.putLong("nextNo", nextNo);
         tag.putLong("feesTotal", feesTotal);
         tag.putLong("dividendsTotal", dividendsTotal);
@@ -189,6 +199,7 @@ public final class StockData extends SavedData {
             b.putLong("dividend", x.dividend);
             b.putDouble("lastChange", x.lastChange);
             b.putDouble("pendingNews", x.pendingNews);
+            b.putDouble("pendingNext", x.pendingNext);
             bs.put(e.getKey(), b);
         }
         tag.put("boards", bs);
@@ -219,6 +230,7 @@ public final class StockData extends SavedData {
             c.putString("text", x.text);
             c.putString("textEn", x.textEn);
             c.putDouble("change", x.change);
+            c.putString("kind", x.kind);
             nl.add(c);
         }
         tag.put("newsLog", nl);
