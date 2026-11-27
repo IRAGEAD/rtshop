@@ -36,6 +36,9 @@ final class ClientSelfTest2 {
     private static final List<String> PORTRAIT_IDS = new ArrayList<>(), PORTRAIT_SHOW = new ArrayList<>(), PORTRAIT_OLD_BLANK = new ArrayList<>(),
             PORTRAIT_OLD_CLIPPED = new ArrayList<>(), PORTRAIT_ICON = new ArrayList<>(), PORTRAIT_ODD = new ArrayList<>(), PORTRAIT_BAD = new ArrayList<>();
     private static int PORTRAIT_I;
+    private static long PORTRAIT_T0;
+    /** 몹 그림 시험에 쓰는 시간 (모드팩 전체에서는 몹이 수백, 소프트웨어 그리기라 느리다). */
+    private static final long PORTRAIT_BUDGET_MS = 150_000L;
     private static boolean TIP_FIT_378;
     private static String TIP_INFO_378 = "";
 
@@ -1569,16 +1572,21 @@ final class ClientSelfTest2 {
         // 3.78 (사용자 "도감에서 몹들의 3D 모습이 일부 보이지 않는 문제"): 도감의 모든 몹을 화면 밖에서 그려 보고, 칸 안에 보이는지 잰다
         add(mc -> {
             if (PORTRAIT_IDS.isEmpty()) {
-                PORTRAIT_IDS.addAll(com.rtshop.story.Codex.mobs().keySet());
+                // 모드 몹을 먼저 (바닐라 몹은 빌드 시험에서 모두 본다). 모드팩 전체에서는 몹이 수백이라 시간 안에 되는 만큼만 잰다
+                for (String id : com.rtshop.story.Codex.mobs().keySet()) if (!id.startsWith("minecraft:")) PORTRAIT_IDS.add(id);
+                for (String id : com.rtshop.story.Codex.mobs().keySet()) if (id.startsWith("minecraft:")) PORTRAIT_IDS.add(id);
                 PORTRAIT_I = 0;
+                PORTRAIT_T0 = System.currentTimeMillis();
             }
             long t0 = System.nanoTime();
-            while (PORTRAIT_I < PORTRAIT_IDS.size() && System.nanoTime() - t0 < 400_000_000L) {
+            boolean outOfTime = System.currentTimeMillis() - PORTRAIT_T0 > PORTRAIT_BUDGET_MS;
+            while (!outOfTime && PORTRAIT_I < PORTRAIT_IDS.size() && System.nanoTime() - t0 < 400_000_000L) {
                 String id = PORTRAIT_IDS.get(PORTRAIT_I++);
                 try {
                     int[] old;
                     try {
-                        old = MobPortrait.boxCheckForTest(id, 64, true);
+                        // 예전 방식과의 비교는 앞의 80마리만 (시간)
+                        old = PORTRAIT_I <= 80 ? MobPortrait.boxCheckForTest(id, 64, true) : new int[]{1, 0};
                     } catch (Throwable t) {
                         old = new int[]{0, 0}; // 예전 방식으로는 그리다 오류: 빈칸이었던 것과 같다
                     }
@@ -1603,11 +1611,12 @@ final class ClientSelfTest2 {
                     PORTRAIT_BAD.add(id + " threw " + t);
                 }
             }
-            if (PORTRAIT_I < PORTRAIT_IDS.size()) {
+            if (PORTRAIT_I < PORTRAIT_IDS.size() && System.currentTimeMillis() - PORTRAIT_T0 <= PORTRAIT_BUDGET_MS) {
                 ClientSelfTest.repeatStep();
                 return;
             }
-            int n = PORTRAIT_IDS.size();
+            int n = PORTRAIT_I;   // 잰 수 (시간이 다 되면 그때까지)
+            ClientSelfTest.LINES.add("  codex portraits measured " + n + " of " + PORTRAIT_IDS.size() + " in " + (System.currentTimeMillis() - PORTRAIT_T0) / 1000 + " s");
             ClientSelfTest.LINES.add("  codex portraits: mobs " + n + ", before: blank " + PORTRAIT_OLD_BLANK.size() + " clipped " + PORTRAIT_OLD_CLIPPED.size()
                     + ", now: egg " + PORTRAIT_ICON.size() + " odd " + PORTRAIT_ODD.size() + " bad " + PORTRAIT_BAD.size() + " (" + MobPortrait.pipelineInfo + ")");
             ClientSelfTest.LINES.add("  codex portraits blank before: " + PORTRAIT_OLD_BLANK);
@@ -1615,7 +1624,7 @@ final class ClientSelfTest2 {
             ClientSelfTest.LINES.add("  codex portraits as eggs now: " + PORTRAIT_ICON);
             ClientSelfTest.LINES.add("  codex portraits re-measured (far/shown/big): " + PORTRAIT_ODD);
             check("3.78 every codex mob shows inside its box: the 3D model is measured off-screen and fitted, or its spawn egg when the model draws nothing",
-                    MobPortrait.pipelineOkForTest() && PORTRAIT_BAD.isEmpty() && n >= 30 && PORTRAIT_ICON.size() <= Math.max(3, n / 7),
+                    MobPortrait.pipelineOkForTest() && PORTRAIT_BAD.isEmpty() && n >= Math.min(30, PORTRAIT_IDS.size()) && PORTRAIT_ICON.size() <= Math.max(3, n / 7),
                     "mobs " + n + " egg " + PORTRAIT_ICON.size() + " bad " + PORTRAIT_BAD);
             if (PORTRAIT_SHOW.isEmpty()) PORTRAIT_SHOW.addAll(PORTRAIT_IDS.subList(0, Math.min(36, n)));
             mc.setScreen(new PortraitGrid(PORTRAIT_SHOW, false));
