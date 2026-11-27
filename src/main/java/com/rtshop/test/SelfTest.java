@@ -742,10 +742,10 @@ public final class SelfTest {
             QuestManager.forceComplete(b, "story_4_16");
             boolean makeup = QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_jobs_0"));
             QuestManager.accept(a, "hidden_jobs_0", null);
-            QuestManager.onTalk(a, "quest_order_archivist");
+            QuestManager.onTalk(a, "quest_order_archivist", true);
             boolean conceal = QuestManager.turnIn(a, "hidden_jobs_0", null, 1) && QuestManager.hasFlag(a, "hj_conceal") && !QuestManager.hasFlag(a, "hj_reveal");
             QuestManager.accept(b, "hidden_jobs_0", null);
-            QuestManager.onTalk(b, "quest_order_archivist");
+            QuestManager.onTalk(b, "quest_order_archivist", true);
             boolean reveal = QuestManager.turnIn(b, "hidden_jobs_0", null, 0) && QuestManager.hasFlag(b, "hj_reveal");
             boolean once = !QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_jobs_0"))
                     && !QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_inspector_1"))
@@ -788,7 +788,7 @@ public final class SelfTest {
             boolean f1 = QuestManager.accept(a, "hidden_forger_1", null) && QuestManager.turnIn(a, "hidden_forger_1", null, -1)
                     && com.rtshop.economy.Economy.wallet(a) == 15_000 && count(a, s2 -> s2.is(net.minecraft.world.item.Items.PAPER)) == 0;
             QuestManager.accept(a, "hidden_forger_2", null);
-            QuestManager.onTalk(a, "gacha");
+            QuestManager.onTalk(a, "gacha", true);
             boolean wrong = QuestManager.turnIn(a, "hidden_forger_2", null, 0) && QuestManager.hasFlag(a, "hj_forger_failed")
                     && !QuestManager.isCompleted(a, "hidden_forger_2") && !QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_forger_2"));
             com.rtshop.story.HiddenJobs.testShiftMs = 6L * 86_400_000L;
@@ -798,22 +798,22 @@ public final class SelfTest {
             com.rtshop.story.HiddenJobs.clearExpired(a);
             boolean reopened = !QuestManager.hasFlag(a, "hj_forger_failed") && QuestManager.isAvailable(a, QuestManager.loaded().quests.get("hidden_forger_2"));
             QuestManager.accept(a, "hidden_forger_2", null);
-            QuestManager.onTalk(a, "gacha");
+            QuestManager.onTalk(a, "gacha", true);
             boolean right = QuestManager.turnIn(a, "hidden_forger_2", null, 1) && QuestManager.hasFlag(a, "hj_forger_passed") && QuestManager.isCompleted(a, "hidden_forger_2");
             QuestManager.accept(a, "hidden_forger_3", null);
-            QuestManager.onTalk(a, "gacha");
+            QuestManager.onTalk(a, "gacha", true);
             boolean kit = QuestManager.turnIn(a, "hidden_forger_3", null, -1) && QuestManager.hasFlag(a, "unlock_job_forger")
                     && count(a, s2 -> s2.is(com.rtshop.item.ModItems.FORGER_KIT.get())) == 1;
             com.rtshop.story.HiddenJobs.testShiftMs = 0;
             QuestManager.accept(b, "hidden_inspector_1", null);
-            QuestManager.onTalk(b, "bank");
-            QuestManager.onTalk(b, "quest_order_archivist");
+            QuestManager.onTalk(b, "bank", true);
+            QuestManager.onTalk(b, "quest_order_archivist", true);
             boolean i1 = QuestManager.turnIn(b, "hidden_inspector_1", null, -1);
             QuestManager.accept(b, "hidden_inspector_2", null);
-            QuestManager.onTalk(b, "quest_order_archivist");
+            QuestManager.onTalk(b, "quest_order_archivist", true);
             boolean i2 = QuestManager.turnIn(b, "hidden_inspector_2", null, 1) && QuestManager.hasFlag(b, "hj_inspector_passed");
             QuestManager.accept(b, "hidden_inspector_3", null);
-            QuestManager.onTalk(b, "quest_order_archivist");
+            QuestManager.onTalk(b, "quest_order_archivist", true);
             boolean loupe = QuestManager.turnIn(b, "hidden_inspector_3", null, -1) && QuestManager.hasFlag(b, "unlock_job_investigator")
                     && count(b, s2 -> s2.is(com.rtshop.item.ModItems.APPRAISAL_LOUPE.get())) == 1;
             check("3.76 hidden paths: the teacher asks a price and a test that can be failed (a wrong answer locks it for seven days); passing gives the tool and opens the job",
