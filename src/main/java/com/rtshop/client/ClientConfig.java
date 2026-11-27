@@ -101,6 +101,12 @@ public final class ClientConfig {
      * DH 는 렌더 거리 바깥부터 먼 풍경(LOD)을 그리므로, 렌더 거리가 서버 시야 거리보다 크면 그 사이의 가까운 청크가 비어 보인다.
      */
     public boolean dhMatchServer = true;
+    /**
+     * 3.70.0: dhcompat 이 꺼 둔 ImmediatelyFast 의 빠른 버퍼 업로드를 dhcompat 이 빠진 뒤 한 번 되돌린다 (FastBufferFix).
+     * fastBufferRestored: 이미 한 번 했음 (그 뒤에 플레이어가 끈 것은 그대로 둔다).
+     */
+    public boolean restoreFastBuffer = true;
+    public boolean fastBufferRestored = false;
     /** RT Shop 창 글꼴: sans(고딕) / serif(명조) / pixel(게임 기본) */
     public String uiFont = "sans";
     /** RT Shop 창 글자 크기: 0 작게, 1 보통, 2 크게 */
@@ -231,6 +237,8 @@ public final class ClientConfig {
             o.addProperty("dialogueSound", dialogueSound);
             o.addProperty("minimapNpcIcons", minimapNpcIcons);
             o.addProperty("dhMatchServer", dhMatchServer);
+            o.addProperty("restoreFastBuffer", restoreFastBuffer);
+            o.addProperty("fastBufferRestored", fastBufferRestored);
             o.addProperty("uiFont", uiFont);
             o.addProperty("uiFontSize", uiFontSize);
             o.addProperty("pvpHudX", pvpHudX);
@@ -303,6 +311,8 @@ public final class ClientConfig {
                 if (o.has("dialogueSound")) c.dialogueSound = o.get("dialogueSound").getAsBoolean();
                 if (o.has("minimapNpcIcons")) c.minimapNpcIcons = o.get("minimapNpcIcons").getAsBoolean();
                 if (o.has("dhMatchServer")) c.dhMatchServer = o.get("dhMatchServer").getAsBoolean();
+                if (o.has("restoreFastBuffer")) c.restoreFastBuffer = o.get("restoreFastBuffer").getAsBoolean();
+                if (o.has("fastBufferRestored")) c.fastBufferRestored = o.get("fastBufferRestored").getAsBoolean();
                 if (o.has("uiFont")) c.uiFont = o.get("uiFont").getAsString();
                 if (o.has("uiFontSize")) c.uiFontSize = Math.max(0, Math.min(2, o.get("uiFontSize").getAsInt()));
                 if (o.has("pvpHudX")) c.pvpHudX = o.get("pvpHudX").getAsDouble();

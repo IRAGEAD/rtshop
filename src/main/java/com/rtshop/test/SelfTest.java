@@ -2757,10 +2757,10 @@ public final class SelfTest {
                 String names = "";
                 try {
                     Class<?> acc = Class.forName("com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.AbstractChunkyAccessor", false, SelfTest.class.getClassLoader());
-                    for (java.lang.reflect.Method m : acc.getDeclaredMethods()) {
-                        if (m.getName().contains("waitForChunky")) {
+                    for (java.lang.reflect.Method dm : acc.getDeclaredMethods()) {
+                        if (dm.getName().contains("waitForChunky")) {
                             hooked = true;
-                            names = m.getName();
+                            names = dm.getName();
                         }
                     }
                 } catch (Throwable t) {

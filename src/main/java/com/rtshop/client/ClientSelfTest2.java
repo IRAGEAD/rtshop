@@ -1574,6 +1574,25 @@ final class ClientSelfTest2 {
             }
             waitTicks(5);
         });
+        // 3.70.0: dhcompat 이 꺼 둔 ImmediatelyFast 빠른 버퍼 업로드를 dhcompat 이 없으면 한 번 되돌린다 (다른 값은 그대로)
+        add(mc -> {
+            String r1 = "", r2 = "", kept = "";
+            try {
+                java.nio.file.Path tmp = mc.gameDirectory.toPath().resolve("rtshop-if-test.json");
+                java.nio.file.Files.writeString(tmp, "{\n  \"fast_buffer_upload\": false,\n  \"regular_buffer_size\": 4096,\n  \"hud_batching\": true\n}");
+                r1 = FastBufferFix.restore(tmp);
+                r2 = FastBufferFix.restore(tmp);
+                com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString(java.nio.file.Files.readString(tmp)).getAsJsonObject();
+                kept = o.get("fast_buffer_upload").getAsBoolean() + " " + o.get("regular_buffer_size").getAsInt() + " " + o.get("hud_batching").getAsBoolean();
+                java.nio.file.Files.deleteIfExists(tmp);
+            } catch (Throwable t) {
+                kept = t.toString();
+            }
+            check("3.70.0 ImmediatelyFast's fast buffer upload that dhcompat switched off is turned back on once dhcompat is gone (other settings kept)",
+                    "restored".equals(r1) && "already on".equals(r2) && "true 4096 true".equals(kept) && !FastBufferFix.lastForTest.startsWith("error"),
+                    r1 + " / " + r2 + " / " + kept + " / at start: " + FastBufferFix.lastForTest + " · dhcompat " + FastBufferFix.dhcompatLoaded());
+            waitTicks(2);
+        });
         // K-1 (3.69.0): NPC 표시는 큰 지도에서 이름 대신 직업 상징 그림 (Diorama 는 그림이 있는 웨이포인트의 이름을 마우스를 올릴 때만 보인다)
         add(mc -> {
             onServer(mc, sp -> {

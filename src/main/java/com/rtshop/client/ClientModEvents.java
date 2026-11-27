@@ -28,6 +28,7 @@ public final class ClientModEvents {
 
     @SubscribeEvent
     public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
+        event.enqueueWork(FastBufferFix::run);
         event.enqueueWork(() -> net.minecraft.client.gui.screens.MenuScreens.register(com.rtshop.enhance.ModEnhance.MENU.get(), EnhanceScreen::new));
         event.enqueueWork(() -> {
             net.minecraft.client.gui.screens.MenuScreens.register(com.rtshop.magic.MagicRegistry.MENU.get(), MagicMenuScreen::new);
