@@ -710,6 +710,7 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   I-1 ✔ StructureRarity: structures.json 에 off (기본 ["spmovesets"], 옛 파일에는 넣어 다시 씀) — 그 모드 jar 의 structure_set 을 읽어 placement.frequency 0 으로 데이터팩에.
   시험: disable() 의 JSON, 모드팩에서는 세계의 등록부에서 spmovesets 세트가 모두 확률 0 인지 (StructurePlacement 의 float 칸 frequency 를 직접 읽음 —
   처음엔 CODEC 으로 JSON 을 만들었다가 등록부 없는 JsonOps 가 제외 구역 → 구조물 → 빈 조각 풀(자기 자신이 대체 풀)까지 펼쳐 StackOverflowError, run 46110842414).
+  → 11-28 15:55 올림 (main 4bd4b57, run 46114556277 모두 통과: 모드팩 서버 951 · 화면 366 · 셰이더 8, spmovesets 세트 21개 모두 확률 0). jar 와 보고를 보냄.
 
 ## 사용자 답 (11-28 09:47) → 3.79.0 (3.78.0 을 올린 다음)
 

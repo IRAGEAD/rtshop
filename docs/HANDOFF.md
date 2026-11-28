@@ -59,6 +59,14 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
+- **(11-28 15:55) 3.80.0 올림 · 보냄** (main = 4bd4b57, 전체 시험 run 46114556277: 모드팩 서버 951 · 화면 366 · 셰이더 8 모두 통과, 빌드 서버 896 · 화면 늘 그런 5건).
+  worklist 「사용자 답 (11-28 13:35) → 3.80.0」 G-1 · H-1 · I-1 + F-3 · F-4. 상점 무기 · 장비 값 올리기(다안, 사는 값만, 모드팩 542종: ×2 266 · ×3 132 · ×5 144) ·
+  처음 들어온 사람은 부두(TownSpawn 3판 arrival, `/rtshop spawn arrival`) · 귀환권 · 침대 없는 죽음은 분수 광장(기준 자리) ·
+  spmovesets 구조물(보스 경기장 arena_* 21개) 끔 (structures.json off → frequency 0, 새 땅만). 첫 모드팩 시험(run 46110842414)은 시험 코드의 StackOverflowError 1건
+  (StructurePlacement.CODEC + 등록부 없는 JsonOps) → frequency 칸을 직접 읽게 고침.
+  이식: 범위를 원 모양 섬 전체로 (docs/transplant_chunks_island.csv 19,807청크 · tools/transplant/map_select.py · docs/design/transplant_range_island.png), 서버를 닫는 시간 30~40분.
+  MCA Selector 한국어 화면의 틀린 번역: Import chunks = 도구 → 캐시 불러오기, Filter = 캐시 필터, Invert = 「모두 선택」(!) · 왼쪽 끌기 = 선택 · 가져올 폴더는 region 이 든 폴더.
+  가이드 문서(맵 이식) rev 11: 넓힌 범위 · 걸리는 시간 · 한국어 메뉴 표 · 복사 방법 · 막히는 곳 4줄 · 처음 오는 사람의 자리 줄. 사용자는 지금 이식 중 (4번 뒤 5~8번 안내함).
 - **(11-28 13:20) 3.79.0 올림 · 보냄** (main = da5a8ea, 전체 시험 run 46101867032: 모드팩 서버 945 · 화면 366 중 시험 실수 1건(da5a8ea 에서 고침) · 셰이더 8 통과,
   빌드 서버 891 · 화면 늘 그런 5건). worklist 「사용자 답 (11-28 09:47) → 3.79.0」 D-1 ~ D-4 · E-1 ~ E-6 · F-1 · F-2.
   상점 토지 = 남동문 광장의 기존 가판대 10곳(w4_6) · 자릿세 주 15% + 판매 5% · 강화 입자 삭제 · 도감 알의 까닭(셰이더 + Epic Fight → MobPortrait.VanillaLook) ·
