@@ -210,8 +210,21 @@ public final class TownSpawn {
         return true;
     }
 
-    /** 처음 들어온 사람이 시작하는 자리 (3.80). */
-    public record Arrival(ServerLevel level, double x, double y, double z, float yaw, float pitch, boolean dock) {
+    /** 사람을 보낼 자리 (3.80). kind: "set" 직접 정한 도착 자리 · "dock" 아모노스 부두 · "town" 마을의 기준 자리. */
+    public record Arrival(ServerLevel level, double x, double y, double z, float yaw, float pitch, String kind) {
+    }
+
+    /** 마을의 기준 자리 (귀환권 · 침대 없는 죽음). 정하지 않았으면 null. */
+    public static Arrival townPoint(MinecraftServer server) {
+        Config c = get();
+        return c.set ? new Arrival(level(server), c.x, c.y, c.z, c.yaw, c.pitch, "town") : null;
+    }
+
+    /** 처음 들어온 사람이 갈 자리 (3.80): 도착 자리, 없으면 마을의 기준 자리. 옮기지 않으면(firstJoin 끔 · 둘 다 없음) null. */
+    public static Arrival newcomerPoint(MinecraftServer server) {
+        if (!get().firstJoin) return null;
+        Arrival a = arrival(server);
+        return a != null ? a : townPoint(server);
     }
 
     /** 도착 자리: 직접 정한 자리, 아니면 아모노스 맵(성 안 토지를 넣은 세계)의 부두. 끄거나 둘 다 없으면 null. */
@@ -221,7 +234,7 @@ public final class TownSpawn {
         if (c.arrivalSet) {
             ResourceLocation rl = ResourceLocation.tryParse(c.arrivalDim);
             ServerLevel l = rl == null ? null : server.getLevel(ResourceKey.create(Registries.DIMENSION, rl));
-            return new Arrival(l == null ? server.overworld() : l, c.ax, c.ay, c.az, c.ayaw, c.apitch, false);
+            return new Arrival(l == null ? server.overworld() : l, c.ax, c.ay, c.az, c.ayaw, c.apitch, "set");
         }
         if (com.rtshop.land.LandData.get(server).castleInstalled <= 0) return null;
         com.rtshop.land.CastlePlots.Def d = com.rtshop.land.CastlePlots.def();
@@ -234,25 +247,17 @@ public final class TownSpawn {
         // 부두 바닥 위 (맵의 스폰 높이보다 지면이 높으면 지면 위로)
         int top = l.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
         double y = Math.max(d.spawn[1], top);
-        return new Arrival(l, x + 0.5, y, z + 0.5, 90F, 0F, true);   // 90 = 서쪽(마을 쪽)을 바라봄
+        return new Arrival(l, x + 0.5, y, z + 0.5, 90F, 0F, "dock");   // 90 = 서쪽(마을 쪽)을 바라봄
     }
 
-    /** 처음 들어온 사람을 도착 자리로 보낸다 (없으면 false). */
-    public static boolean sendArrival(ServerPlayer p) {
-        Arrival a = arrival(p.server);
+    /** 처음 들어온 사람 (3.80): 도착 자리(부두), 없으면 마을의 기준 자리로 보낸다. 옮겼으면 true. */
+    public static boolean placeNewcomer(ServerPlayer p) {
+        Arrival a = newcomerPoint(p.server);
         if (a == null) return false;
         p.stopRiding();
         p.teleportTo(a.level(), a.x(), a.y(), a.z(), a.yaw(), a.pitch());
         p.fallDistance = 0;
         return true;
-    }
-
-    /** 처음 들어온 사람 (3.80): 도착 자리, 없으면 마을의 기준 자리. 옮겼으면 true. */
-    public static boolean placeNewcomer(ServerPlayer p) {
-        Config c = get();
-        if (!c.firstJoin) return false;
-        if (sendArrival(p)) return true;
-        return c.set && send(p);
     }
 
     /** 이 자리에서 일반 귀환권을 쓸 수 있는가 (같은 차원, 가로 거리 안). */
@@ -441,7 +446,7 @@ public final class TownSpawn {
                         .executes(ctx -> {
                             Arrival a = arrival(ctx.getSource().getServer());
                             ctx.getSource().sendSuccess(() -> a == null ? Component.translatable("rtshop.spawn.arrival_none")
-                                    : Component.translatable(a.dock() ? "rtshop.spawn.arrival_where_dock" : "rtshop.spawn.arrival_where",
+                                    : Component.translatable("dock".equals(a.kind()) ? "rtshop.spawn.arrival_where_dock" : "rtshop.spawn.arrival_where",
                                     (int) Math.floor(a.x()), (int) Math.floor(a.y()), (int) Math.floor(a.z())), false);
                             return 1;
                         }))

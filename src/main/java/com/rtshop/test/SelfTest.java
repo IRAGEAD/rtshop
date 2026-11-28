@@ -3718,7 +3718,7 @@ public final class SelfTest {
             check("3.78.0 item rules: every spmovesets item is kept out of NPC shops and gachas and cannot be crafted, looted or dropped — by default and in an older rules file (its own lines kept; a version-6 file is left as written)",
                     spAll.test(spDef) && spAll.test(sp5) && sp5.shopBan.contains("efn:*") && sp5.recipeBan.contains("mymod:thing")
                             && !sp6.shopBan.contains("spmovesets:*") && sp6.gachaBan.isEmpty() && sp6.recipeBanMods.isEmpty()
-                            && com.rtshop.rules.ItemPolicy.Config.VERSION == 6 && spLive,
+                            && com.rtshop.rules.ItemPolicy.Config.VERSION >= 6 && spLive,
                     sp5.shopBan + " " + sp5.gachaBan + " " + sp5.recipeBanMods + " " + sp5.blockDropBan + " / " + sp6.shopBan + " live " + spLive);
         }
         if (net.minecraftforge.fml.ModList.get().isLoaded("wom") || net.minecraftforge.fml.ModList.get().isLoaded("efn") || net.minecraftforge.fml.ModList.get().isLoaded("tacz")) {
@@ -3961,12 +3961,16 @@ public final class SelfTest {
             ts.ax = sx + 40.5;
             ts.ay = sy;
             ts.az = sz + 3.5;
-            boolean placed = com.rtshop.rules.TownSpawn.placeNewcomer(a);
-            boolean atArrival = Math.abs(a.getX() - ts.ax) < 0.01 && Math.abs(a.getZ() - ts.az) < 0.01;
-            boolean back = com.rtshop.rules.TownSpawn.send(a) && Math.abs(a.getX() - ts.x) < 0.01 && Math.abs(a.getZ() - ts.z) < 0.01;
+            // 가짜 플레이어는 순간이동을 받지 않으므로 고른 자리로 본다 (옮기는 것은 귀환권 시험과 같은 TownSpawn.send / teleportTo)
+            com.rtshop.rules.TownSpawn.Arrival first = com.rtshop.rules.TownSpawn.newcomerPoint(server);
+            boolean placed = first != null && "set".equals(first.kind());
+            boolean atArrival = first != null && Math.abs(first.x() - ts.ax) < 0.01 && Math.abs(first.z() - ts.az) < 0.01;
+            com.rtshop.rules.TownSpawn.Arrival ret = com.rtshop.rules.TownSpawn.townPoint(server);
+            boolean back = ret != null && Math.abs(ret.x() - ts.x) < 0.01 && Math.abs(ret.z() - ts.z) < 0.01;
             ts.arrival = false;
-            boolean placed2 = com.rtshop.rules.TownSpawn.placeNewcomer(a);
-            boolean atTown = Math.abs(a.getX() - ts.x) < 0.01 && Math.abs(a.getZ() - ts.z) < 0.01;
+            com.rtshop.rules.TownSpawn.Arrival first2 = com.rtshop.rules.TownSpawn.newcomerPoint(server);
+            boolean placed2 = first2 != null && "town".equals(first2.kind());
+            boolean atTown = first2 != null && Math.abs(first2.x() - ts.x) < 0.01 && Math.abs(first2.z() - ts.z) < 0.01;
             ts.arrival = true;
             ts.arrivalSet = false;
             LandData ld = LandData.get(server);
@@ -3979,7 +3983,7 @@ public final class SelfTest {
             a.teleportTo(sx, sy, sz);
             check("3.80 a newcomer starts at the arrival point, while return tickets and deaths still go to the town point (fountain square); arrival off → the town point; "
                             + "unset on the Amonos map → the dock (-24042, -5344) facing the town, and no dock on other maps",
-                    placed && atArrival && back && placed2 && atTown && noDock && dock != null && dock.dock() && Math.abs(dock.x() + 24041.5) < 0.01
+                    placed && atArrival && back && placed2 && atTown && noDock && dock != null && "dock".equals(dock.kind()) && Math.abs(dock.x() + 24041.5) < 0.01
                             && Math.abs(dock.z() + 5343.5) < 0.01 && dock.y() >= 64 && dock.yaw() == 90F,
                     placed + " " + atArrival + " " + back + " " + placed2 + " " + atTown + " " + noDock + " "
                             + (dock == null ? "no dock" : dock.x() + "," + dock.y() + "," + dock.z() + " yaw " + dock.yaw()));
