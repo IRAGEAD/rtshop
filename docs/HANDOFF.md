@@ -59,7 +59,7 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
-- **(11-28 08:10) 3.78.0 작업 중 (가지 v5-next31, worklist 「사용자 답 (11-28 07:20) → 3.78.0」 C-1 ~ C-16)**: 사용자 답 반영 + 추가 요청 다섯.
+- **(11-28 09:30) 3.78.0 작업 중 (가지 v5-next31, worklist 「사용자 답 (11-28 07:20) → 3.78.0」 C-1 ~ C-19)**: 사용자 답 반영 + 추가 요청 다섯.
   C-1 돋보기 아이콘 C · C-2/C-3 스킬라 단서 확률 (scylla.json 3판 `ScyllaClues.migrate3`) · C-4 나침반 500칸 (`SurveyCompassItem.MIN_TOWN`, 안내서 18판) ·
   C-5 식품 상인 skipItemsOf ["farmer","fisher"] (`ShopLoader.migrateFoodSkipFisher`) · C-7 살펴보기 `story/Examine` (examine.json, StoryPacket.EXAMINE, ItemMarks 의 「?」, 안내서 「물건 살펴보기」) ·
   C-8 상점 토지 시안 그림 `tools/mock/w4_shop_land.py` → docs/design/w4/ · C-9 자리 비운 NPC 의 미니맵 아이콘 · 셰이더 시험의 제단 잠금 ·
@@ -68,6 +68,9 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
   C-17 긴 툴팁 `client/TooltipFit` (화면에 맞게 줄임 · 최소 0.75 · 넘치면 휠, client.json fitLongTooltips) · C-18 Bosses'Rise 구르기 끄기
   (`compat/BossesRiseRollOff` world_rules bossesRiseRoll · `client/BossesRiseRollClient` client.json hideBossesRiseRoll / bossesRiseKeyCleared).
   모드팩 전체 화면 시험은 25분 제한: 몹 그림 시험은 150초 예산 (모드 몹부터).
+  C-19 (09:23 요청) spmovesets 전부 금지 = item_policy.json 6판 (shopBan · gachaBan · recipeBan · recipeBanMods · lootBan · blockDropBan, 5판 이하 파일에 더해 씀, 가진 것은 그대로).
+  C-11 보강: 그리지 못하는 몹은 바탕 클래스(없으면 ID 낱말)의 바닐라 몹으로 대신 (`MobPortrait.standIn`), 보이게 할 때 나이 100/20/40/5/200 틱, 큰 몹은 0.35 배로 여섯 번까지.
+  run 46084250692 (835f503): 서버 · 화면 각 1건 실패(Bosses'Rise 시험 기대값 · 모래벌레 넘침) → f64cb7e 에서 고치고 run 46088117658 로 다시.
   문서: 맵 이식 가이드 https://claude.ai/artifact/CoL8oGXVMXoScFhNcZBTxb · NPC 배치 가이드 https://claude.ai/artifact/JVpRw9FGMK4V19uthd4WJz
   다음: 전체 시험 → 올리기 → 보고 · 맵 이식 가이드 · NPC 배치 가이드 (문서) · 인게임 확인 목록.
 - **(11-28 01:45) 3.75.0 올림 · 보냄** (main = b407618, 모드팩 전체 시험 서버 886 · 화면 353 모두 통과, Photon 강화 모루 전후 그림 · 조사 수첩 아이콘 시안(지금 C) 함께 보냄).
