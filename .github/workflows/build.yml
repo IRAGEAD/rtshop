@@ -422,6 +422,49 @@ jobs:
             echo "== registry strings near EntityType"
             (cd /tmp/spm && for c in $(grep -rl -a "EntityType\$Builder" --include=*.class . | head -n 10); do echo "-- $c"; strings -n 3 "$c" | grep -E "^[a-z0-9_]{3,40}$" | head -n 80; done)
           } > /tmp/inspect/spmovesets-merchant.txt 2>&1 || true
+      - name: Inspect for the 11-29 request list (3.84)
+        run: |
+          mkdir -p /tmp/inspect /tmp/i384
+          {
+            echo "== ko_kr lang lines naming 심연꾼 / 잉크 / 공기 부족 / 칩 / 히든 (per jar)"
+            for J in packcache/*.jar; do
+              for L in $(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "lang/ko_kr\.json$"); do
+                unzip -p "$J" "$L" 2>/dev/null | grep -E '심연꾼|잉크|공기 ?부족|칩"|"[^"]*chip[^"]*"|할로우|홀로우' | head -n 12 | sed "s|^|$(basename "$J") :: |"
+              done
+            done
+            echo "== en_us lang lines for hollow / abyss / not enough air / chip"
+            for J in packcache/*.jar; do
+              for L in $(unzip -l "$J" 2>/dev/null | awk '{print $4}' | grep -E "lang/en_us\.json$"); do
+                unzip -p "$J" "$L" 2>/dev/null | grep -i -E '"[^"]*(hollow|rampag|abyss[a-z]*er|not enough air|out of air|casino_chip|chip_)[^"]*"' | head -n 10 | sed "s|^|$(basename "$J") :: |"
+              done
+            done
+          } > /tmp/inspect/req384-lang.txt 2>&1 || true
+          {
+            for M in spmovesets spiral smallships roulettecasino; do
+              J="$PWD/$(ls packcache/*.jar | grep -i "$M" | head -1)"
+              echo "######## $M = $J"
+              rm -rf /tmp/i384/x && mkdir -p /tmp/i384/x && (cd /tmp/i384/x && unzip -q -o "$J" 2>/dev/null || true)
+              echo "-- mixin configs"; (cd /tmp/i384/x && for m in $(ls *.json 2>/dev/null); do echo "--- $m"; head -c 2500 "$m"; echo; done)
+              echo "-- classes naming login / key mappings / screens / boats / give"
+              (cd /tmp/i384/x && grep -rl -a -E 'PlayerLoggedInEvent|KeyMapping|RegisterKeyMappingsEvent|net/minecraft/client/gui/screens/Screen|entity/vehicle/Boat|m_36356_|addItem|getInventory' --include=*.class . | sort | head -n 60)
+              echo "-- toml/json5 config specs (strings with speed/give/starter/kit)"
+              (cd /tmp/i384/x && grep -rh -a -o -E '"?[A-Za-z_]*(speed|Speed|starter|Starter|kit|Kit|give|Give|onJoin|firstJoin)[A-Za-z_]*"?' --include=*.class . | sort | uniq -c | sort -rn | head -n 40)
+              echo "-- items (lang keys)"
+              unzip -p "$J" "assets/$( unzip -l "$J" | awk '{print $4}' | grep -E '^assets/[^/]+/lang/en_us.json$' | head -1 | cut -d/ -f2 )/lang/en_us.json" 2>/dev/null | grep -E '"(item|block)\.' | head -n 60
+            done
+            echo "######## spmovesets join handler bytecode"
+            J="$PWD/$(ls packcache/*.jar | grep -i spmovesets | head -1)"
+            rm -rf /tmp/i384/s && mkdir -p /tmp/i384/s && (cd /tmp/i384/s && unzip -q -o "$J" '*.class' 2>/dev/null || true)
+            for c in $(cd /tmp/i384/s && grep -rl -a -E 'PlayerLoggedInEvent' --include=*.class . | head -n 6); do echo "#### $c"; (cd /tmp/i384/s && javap -c -p "$c" 2>&1 | grep -E 'Method|invoke|ldc|getstatic|class|Event' | head -n 160); done
+            echo "######## spiral_abyss key + screen classes"
+            J="$PWD/$(ls packcache/*.jar | grep -i spiral | head -1)"
+            rm -rf /tmp/i384/a && mkdir -p /tmp/i384/a && (cd /tmp/i384/a && unzip -q -o "$J" '*.class' 2>/dev/null || true)
+            for c in $(cd /tmp/i384/a && grep -rl -a -E 'KeyMapping|RegisterKeyMappingsEvent' --include=*.class . | head -n 6); do echo "#### $c"; (cd /tmp/i384/a && javap -c -p "$c" 2>&1 | grep -E 'Method|invoke|ldc|getstatic|putstatic|new|class' | head -n 120); done
+            echo "######## smallships boat mixins"
+            J="$PWD/$(ls packcache/*.jar | grep -i smallships | head -1)"
+            rm -rf /tmp/i384/b && mkdir -p /tmp/i384/b && (cd /tmp/i384/b && unzip -q -o "$J" 2>/dev/null || true)
+            for c in $(cd /tmp/i384/b && grep -rl -a -E 'entity/vehicle/Boat' --include=*.class . | grep -i mixin | head -n 6); do echo "#### $c"; (cd /tmp/i384/b && javap -c -p "$c" 2>&1 | grep -E 'Method|invoke|ldc|getstatic|putfield|getfield|class|Inject|At' | head -n 120); done
+          } > /tmp/inspect/req384-mods.txt 2>&1 || true
       - name: Inspect spmovesets cartographer trades (3.82)
         run: |
           # 3.82 (사용자 11-28 17:39): 지도 제작자의 원소 지도 거래가 어디서 어떻게 붙는지 (VillagerTrades 표에는 없었음)
