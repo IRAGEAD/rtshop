@@ -702,6 +702,14 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 추가 (10:35): "조사대 나침반은 마을에서 500칸 이상 떨어진 곳부터 위치를 알려주게 해줘."
 - D-4. 3.78 에서 이미 그렇게 바꿈 (마을(성 영역) 가장자리에서 500칸 이상 떨어진 장소만 가리킴, 예전 1000칸). 알림에 나오는 거리는 "서 있는 자리에서" 라
   500 보다 작게 보일 수 있음 → 알림에 "마을에서 약 N칸" 도 함께 보여 줘서 규칙이 눈에 보이게. 보고에서 설명.
+- 한 일 (3.79.0, 가지 v5-next32):
+  D-1 `land/ShopLots` (rtshop_defaults/shop_lots.json 장터 10칸 6×4: 맵 x 324~353 · z 223~230 = 월드 -24296~-24267 · -5437~-5430, 성 안 토지와 안 겹침) ·
+  LandData.Land shopLot/rentOwed/rentWeek · land.json 상점 토지 설정 · PlotManager(제한 없음, 치우지 않음, 되팔기 절반 − 밀린 자릿세, 진열대 있으면 거절) ·
+  PlotBrowser kind "shop" + PAY_RENT · PlayerShopBlock.getStateForPlacement 에서 상점 토지 밖이면 null · PlayerShops 닫힘/PAY_RENT · 화면 [상점 토지] 탭 · 진열대 창 [자릿세 내기] ·
+  /rtshop plot shoplot status|install|remove|here <w> <h> [이름]|<번호> on|off · 안내서 19판 「상점 토지」(en2/p980) · 그림 docs/design/w4/w4_4_final_market.png.
+  D-2 검토 docs/balance_review.md 13절 — 고침 R-1 주간 순위 경쟁 없는 자리 보상 없음 (ranks.json rewardNeedsOthers). 지켜볼 것: 주식 한 사람 영향 · 고용비 · 싼 모드 무기 · 황혼불 갑옷.
+  사용자가 고를 것: 뽑기 전설 < 상점 무기 (가 등급 보정 / 나 상점 값 올림 / 다 그대로).
+  D-3 ScyllaClues 4판 (storm_coin 천장 0, migrate4). D-4 나침반 알림 found_town.
 
 ## 사용자 답 (11-28 07:20) → 3.78.0 (가지 v5-next31)
 
