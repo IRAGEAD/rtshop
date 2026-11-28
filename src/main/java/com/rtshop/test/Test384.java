@@ -77,7 +77,7 @@ final class Test384 {
         step("welcome", () -> welcome(level));
         step("harvest", () -> harvest(server, level, a, b));
         step("food", () -> food(level));
-        step("resign", () -> resign(level));
+        step("resign", () -> resign(level, gx, gz));
         step("shops", () -> shops(server));
     }
 
@@ -456,12 +456,12 @@ final class Test384 {
                     on + " cow " + com.rtshop.land.ZoneCreatures.unwanted(level, cow) + " named " + com.rtshop.land.ZoneCreatures.unwanted(level, named)
                             + " wolf " + com.rtshop.land.ZoneCreatures.unwanted(level, wolf) + " zombie " + com.rtshop.land.ZoneCreatures.unwanted(level, zombie)
                             + " npc " + com.rtshop.land.ZoneCreatures.unwanted(level, npc) + " outside " + com.rtshop.land.ZoneCreatures.unwanted(level, outside));
-            // 실제로 세계에 두고 1초마다의 정리를 돌린다 (그 청크를 불러와야 한다)
+            // 실제로 세계에 두고 1초마다의 정리를 돌린다 (막 불러온 먼 청크의 생물은 다음 틱에야 세계 목록에 오르므로 직접 건넨다)
             level.getChunkAt(BlockPos.containing(zx, 70, zz));
             boolean added = level.addFreshEntity(cow) & level.addFreshEntity(named);
             made.add(cow);
             made.add(named);
-            int n = com.rtshop.land.ZoneCreatures.sweep(level);
+            int n = com.rtshop.land.ZoneCreatures.sweep(level, List.of(cow, named, stand));
             check("3.84 the castle-zone sweep removes the animal already inside and leaves the named one", added && n >= 1 && cow.isRemoved() && !named.isRemoved(),
                     added + " swept " + n + " cow " + cow.isRemoved() + " named " + named.isRemoved());
             // 산 땅 위: 동물은 그대로, 몬스터는 지운다
@@ -596,8 +596,30 @@ final class Test384 {
             var r2 = a.gameMode.useItemOn(a, level, ItemStack.EMPTY, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(crop), Direction.UP, crop, false));
             BlockState after = level.getBlockState(crop);
             check("3.84 someone else's ripe crop cannot be harvested or bone-mealed by right-click (bone meal in hand or empty-handed); the owner may",
-                    !mayA && mayOwner && after.is(Blocks.WHEAT) && after.getValue(CropBlock.AGE) == 7 && meal == 8 && com.rtshop.land.HarvestGuard.blockedForTest >= blocked0 + 2,
-                    mayA + " " + mayOwner + " " + after + " meal " + meal + " " + r1 + " " + r2 + " blocked " + (com.rtshop.land.HarvestGuard.blockedForTest - blocked0));
+                    !mayA && mayOwner && after.is(Blocks.WHEAT) && after.getValue(CropBlock.AGE) == 7 && meal == 8,
+                    mayA + " " + mayOwner + " " + after + " meal " + meal + " " + r1 + " " + r2 + " guard " + (com.rtshop.land.HarvestGuard.blockedForTest - blocked0));
+            // 마을(성 영역)의 공용 밭 — 예전에는 산 토지만 보아서 RT Shop 의 우클릭 수확으로 거둘 수 있었다
+            LandData data = LandData.get(server);
+            int was = data.castleInstalled;
+            data.castleInstalled = com.rtshop.land.CastlePlots.VERSION;
+            BlockPos zc = new BlockPos(-24360, 120, -5420);
+            level.getChunkAt(zc);
+            try {
+                level.setBlock(zc.below(), Blocks.FARMLAND.defaultBlockState(), 2);
+                level.setBlock(zc, ripe, 2);
+                a.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BONE_MEAL, 8));
+                a.gameMode.useItemOn(a, level, a.getMainHandItem(), InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(zc), Direction.UP, zc, false));
+                a.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                a.gameMode.useItemOn(a, level, ItemStack.EMPTY, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(zc), Direction.UP, zc, false));
+                BlockState zs = level.getBlockState(zc);
+                check("3.84 the town's own fields (castle zone outside bought lots) cannot be harvested by right-click either",
+                        !com.rtshop.land.HarvestGuard.mayHarvest(a, level, zc) && zs.is(Blocks.WHEAT) && zs.getValue(CropBlock.AGE) == 7, zs);
+            } finally {
+                level.setBlock(zc, Blocks.AIR.defaultBlockState(), 2);
+                level.setBlock(zc.below(), Blocks.AIR.defaultBlockState(), 2);
+                for (Entity e : level.getEntities((Entity) null, new net.minecraft.world.phys.AABB(zc).inflate(3), e -> e instanceof net.minecraft.world.entity.item.ItemEntity)) e.discard();
+                data.castleInstalled = was;
+            }
             if (ModList.get().isLoaded("quark")) {
                 check("3.84 Quark's right-click harvest is hooked too (its harvest event is cancelled for other people's crops)", com.rtshop.land.HarvestGuard.hookedForTest());
                 owner.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
@@ -646,7 +668,7 @@ final class Test384 {
 
     // ------------------------------------------------------------------ M-66: 직업 내려놓기
 
-    private static void resign(ServerLevel level) {
+    private static void resign(ServerLevel level, int gx, int gz) {
         FakePlayer p = fresh(level, "rtshop_test_resign384");
         com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
         for (String id : jc.jobs.keySet()) com.rtshop.quest.QuestManager.setFlag(p, "unlock_job_" + id, true);
@@ -673,7 +695,7 @@ final class Test384 {
             // 화면의 [내려놓기] 는 "!resign:슬롯" — 직업 안내인 곁에서만
             com.rtshop.job.Jobs.handleChoose(p, com.rtshop.job.Jobs.RESIGN + "combat");
             boolean awayKept = "swordsman".equals(com.rtshop.job.Jobs.entry(p).combat);
-            p.moveTo(X + 30.5, Y, Z + 30.5, 0, 0);
+            p.moveTo(gx + 20.5, Y, gz + 26.5, 0, 0);   // 늘 불러와 있는 스폰 청크 (먼 청크의 생물은 다음 틱에야 찾을 수 있다)
             net.minecraft.world.entity.npc.Villager guide = com.rtshop.job.Jobs.spawnNpc(level, p.position().add(1, 0, 0), 0);
             try {
                 com.rtshop.job.Jobs.open(p, guide == null ? -1 : guide.getId());

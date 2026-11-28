@@ -134,10 +134,15 @@ public final class ZoneCreatures {
 
     /** 마을 안의 지울 생물을 지운다. 지운 수. */
     public static int sweep(ServerLevel sl) {
+        return sweep(sl, sl.getAllEntities());
+    }
+
+    /** 이 생물들 가운데 마을 안의 지울 것을 지운다 (점검은 막 불러온 청크의 생물을 직접 건넨다). 지운 수. */
+    public static int sweep(ServerLevel sl, Iterable<Entity> entities) {
         int[] box = CastlePlots.zoneBox();
         if (box == null) return 0;
         List<Entity> gone = new ArrayList<>();
-        for (Entity e : sl.getAllEntities()) {
+        for (Entity e : entities) {
             if (!(e instanceof LivingEntity) || e instanceof Player || !e.isAlive()) continue;
             double x = e.getX(), z = e.getZ();
             if (x < box[0] || x > box[2] || z < box[1] || z > box[3]) continue;

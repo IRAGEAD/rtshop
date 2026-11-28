@@ -369,7 +369,8 @@ public final class FarmEvents {
                     if (!harvestable(st)) {
                         continue;
                     }
-                    if (!LandManager.can(sp, level, p, LandData.BREAK) || !level.mayInteract(sp, p)) {
+                    // 3.84 (사용자 11-29 "뼛가루 들고 자신의 토지/농경지가 아닌 마을 내의 농작물도 캘 수 있는 문제"): 마을(성 영역)의 공용 밭도 막는다 — 예전에는 산 토지만 보았다
+                    if (!com.rtshop.land.HarvestGuard.mayHarvest(sp, level, p) || !level.mayInteract(sp, p)) {
                         denied = true;
                         continue;
                     }
@@ -481,7 +482,7 @@ public final class FarmEvents {
             if (pos == null || state == null) {
                 return;
             }
-            if (!LandManager.can(sp, level, pos, LandData.BREAK)) {
+            if (!com.rtshop.land.HarvestGuard.mayHarvest(sp, level, pos)) {   // 3.84: 마을(성 영역)의 공용 밭도
                 e.setCanceled(true);
                 return;
             }

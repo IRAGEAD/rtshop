@@ -4073,7 +4073,7 @@ public final class SelfTest {
                     && !com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("minecraft", "diamond_sword"));
             check("3.78.0 item rules: every spmovesets item is kept out of NPC shops and gachas and cannot be crafted, looted or dropped — by default and in an older rules file (its own lines kept; a version-6 file is left as written)",
                     spAll.test(spDef) && spAll.test(sp5) && sp5.shopBan.contains("efn:*") && sp5.recipeBan.contains("mymod:thing")
-                            && !sp6.shopBan.contains("spmovesets:*") && sp6.gachaBan.isEmpty() && sp6.recipeBanMods.isEmpty()
+                            && !sp6.shopBan.contains("spmovesets:*") && sp6.gachaBan.isEmpty() && !sp6.recipeBanMods.contains("spmovesets")   // 3.84: 9판 이전 파일에는 그 판의 모드(efn_enhance · smallships)가 더해진다
                             && com.rtshop.rules.ItemPolicy.Config.VERSION >= 6 && spLive,
                     sp5.shopBan + " " + sp5.gachaBan + " " + sp5.recipeBanMods + " " + sp5.blockDropBan + " / " + sp6.shopBan + " live " + spLive);
         }
