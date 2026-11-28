@@ -2365,6 +2365,15 @@ final class ClientSelfTest2 {
             waitTicks(50);
         });
         add(mc -> {
+            // 동행은 플레이어 기준 고정 자리(동 2.5 · 남 1.5)에 서므로 무작위 지형 · 방향에서는 시야 밖(뒤 · 나무 뒤)일 수 있다 — 바라본 뒤 그려졌는지 본다
+            // (팩 15 시험에서 한 번 drawn 0)
+            net.minecraft.world.entity.Entity look371 = mc.level == null ? null : mc.level.getEntity(COMPANION_ID);
+            if (look371 != null && mc.player != null) {
+                mc.player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, look371.getEyePosition());
+            }
+            waitTicks(20);
+        });
+        add(mc -> {
             int[] isa = NpcLookClient.partsForTest("isabel"), leon = NpcLookClient.partsForTest("leon");
             float[] walkLegs = NpcLookClient.pose(1.2F, 1F, 10F, true), walkSkirt = NpcLookClient.pose(1.2F, 1F, 10F, false), idle = NpcLookClient.pose(0F, 0F, 10F, true);
             boolean poses = Math.abs(walkLegs[3]) > 0.1F && walkLegs[3] == -walkLegs[4] && Math.abs(walkLegs[0] - walkLegs[1]) > 0.1F
