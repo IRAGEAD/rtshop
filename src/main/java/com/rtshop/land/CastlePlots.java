@@ -221,21 +221,60 @@ public final class CastlePlots {
         return Math.abs(s.getX() - d[0]) <= 1500 && Math.abs(s.getZ() - d[2]) <= 1500;
     }
 
-    /** 표지 블록(성 안 건물 몇 곳)이 맞는 개수. */
-    public static int signatureMatches(MinecraftServer server) {
+    /** 점검용: 표지 블록 목록을 바꿔 본다 (null = castle_plots.json 의 것). */
+    public static List<Object[]> signatureForTest;
+
+    static List<Object[]> signature() {
+        return signatureForTest != null ? signatureForTest : def().signature;
+    }
+
+    /**
+     * 3.81: 이 청크가 이미 만들어져 있는가 (불러와져 있거나, 다 만들어진 채 저장돼 있음). 저장된 기록만 읽고 새로 만들지 않는다.
+     * (예전에는 스폰이 아모노스 스폰 근처일 때만 표지 블록을 봤다 — 마을을 다른 서버로 옮기면 스폰이 0,0 근처라 알아보지 못했다)
+     */
+    public static boolean chunkExists(ServerLevel level, int cx, int cz) {
+        if (level.getChunkSource().getChunkNow(cx, cz) != null) return true;
+        try {
+            java.util.Optional<CompoundTag> tag = level.getChunkSource().chunkMap.read(new net.minecraft.world.level.ChunkPos(cx, cz)).join();
+            return tag.isPresent() && net.minecraft.world.level.chunk.storage.ChunkSerializer.getChunkTypeFromTag(tag.get())
+                    == net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 표지 블록(성 안 건물 몇 곳) 가운데 {맞는 수, 청크가 이미 있어 본 수}. 없는 청크는 만들지 않고 건너뛴다. */
+    public static int[] signatureSaved(MinecraftServer server) {
         ServerLevel level = level(server);
-        int n = 0;
-        for (Object[] s : def().signature) {
+        int n = 0, seen = 0;
+        for (Object[] s : signature()) {
             BlockPos pos = (BlockPos) s[0];
+            if (!chunkExists(level, pos.getX() >> 4, pos.getZ() >> 4)) continue;
+            seen++;
             BlockState st = level.getBlockState(pos);
             ResourceLocation id = ForgeRegistries.BLOCKS.getKey(st.getBlock());
             if (id != null && id.toString().equals(s[1])) n++;
         }
-        return n;
+        return new int[]{n, seen};
     }
 
+    /** 표지 블록이 맞는 개수 (이미 있는 청크에서만). */
+    public static int signatureMatches(MinecraftServer server) {
+        return signatureSaved(server)[0];
+    }
+
+    /** 이 세계에 아모노스 성이 있는가: 표지 블록의 60% 이상이 맞음 (스폰 자리와 상관없음 — 옮겨 온 마을도 알아봄). */
     public static boolean worldMatches(MinecraftServer server) {
-        return spawnNear(server) && !def().signature.isEmpty() && signatureMatches(server) * 10 >= def().signature.size() * 6;
+        List<Object[]> sig = signature();
+        return !sig.isEmpty() && signatureMatches(server) * 10 >= sig.size() * 6;
+    }
+
+    /** 3.81: castleInstalled 값 — 표지 블록을 봤지만 성이 없었음. 다음에 켤 때 다시 본다 (-1 은 운영자가 걷어 낸 것이라 다시 보지 않음). */
+    public static final int RECHECK = -2;
+
+    /** 서버를 켤 때 표지 블록을 볼 차례인가 (아직 정하지 않았거나, 지난번에 못 찾았음). */
+    public static boolean shouldCheck(LandData data) {
+        return data.castleInstalled == 0 || data.castleInstalled == RECHECK;
     }
 
     // ------------------------------------------------------------------ 등록
@@ -247,7 +286,7 @@ public final class CastlePlots {
         return null;
     }
 
-    /** 서버가 켜질 때: 아직 정하지 않았고 이 세계가 아모노스 맵이면 등록한다 (예전 배치면 새 배치로 바꾼다). */
+    /** 서버가 켜질 때: 아직 정하지 않았거나 지난번에 못 찾았고(RECHECK) 이 세계에 아모노스 성이 있으면 등록한다 (예전 배치면 새 배치로 바꾼다). */
     public static void autoInstall(MinecraftServer server) {
         try {
             LandData data = LandData.get(server);
@@ -256,19 +295,23 @@ public final class CastlePlots {
                 RtShop.LOGGER.info("[rtshop] 성 안 토지를 새 배치로 바꿨습니다: 새로 {}칸, 주인이 있어 그대로 둔 예전 칸 {}", up[0], up[1]);
                 return;
             }
-            if (data.castleInstalled != 0 || !LandConfig.get().castlePlotsAuto || def().tiles.isEmpty()) return;
-            if (!spawnNear(server)) {
-                return; // 다른 맵: 나중에 OP 가 /rtshop plot castle install 로 직접 넣을 수 있음
-            }
-            if (!worldMatches(server)) {
-                data.castleInstalled = -1;
-                data.setDirty();
-                RtShop.LOGGER.info("[rtshop] 스폰은 아모노스 근처지만 성 안 건물이 맞지 않아 성 안 토지를 등록하지 않습니다 ({}/{})",
-                        signatureMatches(server), def().signature.size());
-                return;
+            if (!shouldCheck(data) || !LandConfig.get().castlePlotsAuto || def().tiles.isEmpty()) return;
+            // 3.81: 스폰 자리와 상관없이, 이미 만들어진 청크의 표지 블록으로 본다 (마을을 다른 서버로 옮겨 와도 알아봄, 없는 청크는 만들지 않음)
+            int[] sig = signatureSaved(server);
+            if (sig[0] * 10 < signature().size() * 6 || signature().isEmpty()) {
+                if (data.castleInstalled != RECHECK) {
+                    data.castleInstalled = RECHECK;
+                    data.setDirty();
+                }
+                if (sig[1] > 0) {
+                    RtShop.LOGGER.info("[rtshop] 성 안 건물이 맞지 않아 성 안 토지를 등록하지 않습니다 ({}/{}, 청크가 있는 표지 {})",
+                            sig[0], signature().size(), sig[1]);
+                }
+                return; // 다른 맵: 마을을 옮겨 오면 다음에 켤 때 다시 보고, OP 가 /rtshop plot castle install 로 바로 넣을 수도 있음
             }
             int[] r = install(server);
-            RtShop.LOGGER.info("[rtshop] 아모노스 맵: 성 안 토지 {}칸을 등록했습니다 (이미 있음 {}, 다른 토지와 겹쳐 뺀 칸 {})", r[0], r[1], r[2]);
+            RtShop.LOGGER.info("[rtshop] 아모노스 맵: 성 안 토지 {}칸을 등록했습니다 (이미 있음 {}, 다른 토지와 겹쳐 뺀 칸 {}, 표지 {}/{})", r[0], r[1], r[2],
+                    sig[0], signature().size());
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop] 성 안 토지 자동 등록 실패", t);
         }

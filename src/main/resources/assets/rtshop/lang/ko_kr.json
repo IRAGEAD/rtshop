@@ -2132,5 +2132,6 @@
   "rtshop.spawn.arrival_off": "처음 들어온 사람은 마을의 기준 자리에서 시작합니다 (도착 자리 끔).",
   "rtshop.spawn.arrival_where": "처음 들어온 사람의 도착 자리: 직접 정한 자리 (%s, %s, %s)",
   "rtshop.spawn.arrival_where_dock": "처음 들어온 사람의 도착 자리: 아모노스 맵의 부두 (%s, %s, %s)",
-  "rtshop.spawn.arrival_none": "도착 자리가 없어 처음 들어온 사람은 마을의 기준 자리에서 시작합니다. /rtshop spawn arrival set 으로 정할 수 있습니다."
+  "rtshop.spawn.arrival_none": "도착 자리가 없어 처음 들어온 사람은 마을의 기준 자리에서 시작합니다. /rtshop spawn arrival set 으로 정할 수 있습니다.",
+  "rtshop.spawn.where_dock": "마을의 기준 자리를 아직 정하지 않아, 귀환권 · 침대 없는 죽음은 아모노스 부두(%s, %s, %s)로 갑니다. 분수 광장에 서서 /rtshop spawn set 으로 정하세요."
 }

@@ -67,7 +67,7 @@ public final class PlotCommands {
         var server = ctx.getSource().getServer();
         if (!force && !CastlePlots.worldMatches(server)) {
             ctx.getSource().sendFailure(Component.translatable("rtshop.castle.not_amonos",
-                    CastlePlots.spawnNear(server) ? CastlePlots.signatureMatches(server) + "/" + CastlePlots.def().signature.size() : "-"));
+                    CastlePlots.signatureMatches(server) + "/" + CastlePlots.def().signature.size()));
             return 0;
         }
         int[] r = CastlePlots.install(server);
@@ -96,8 +96,7 @@ public final class PlotCommands {
                                     if (!l.forSale()) sold++;
                                 }
                             }
-                            boolean near = CastlePlots.spawnNear(server);
-                            String sig = near ? CastlePlots.signatureMatches(server) + "/" + CastlePlots.def().signature.size() : "-";
+                            String sig = CastlePlots.signatureMatches(server) + "/" + CastlePlots.def().signature.size();
                             Component msg = Component.translatable("rtshop.castle.status", data.castleInstalled, n, sold,
                                     CastlePlots.def().tiles.size(), sig);
                             ctx.getSource().sendSuccess(() -> msg, false);

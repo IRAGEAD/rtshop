@@ -158,7 +158,7 @@ public final class LandData extends SavedData {
     /** 초보 농지를 이미 받은 플레이어. */
     private final Set<UUID> starterGiven = new HashSet<>();
     private int nextId = 1;
-    /** 성 안 토지를 설치한 판 (0 = 아직 안 함, -1 = 이 세계에는 설치하지 않음). */
+    /** 성 안 토지를 설치한 판 (0 = 아직 안 함, -1 = 운영자가 걷어 냄 · 예전에 맞지 않았음, -2 = 성을 못 찾음 — 켤 때마다 다시 봄). */
     public int castleInstalled = 0;
     /** 기본 상점 토지(장터)를 설치한 판 (0 = 아직 안 함, -1 = 운영자가 걷어 냄). */
     public int shopLotsInstalled = 0;

@@ -1755,6 +1755,68 @@ public final class SelfTest {
         } finally {
             data.castleInstalled = before;
         }
+        // 3.81 (사용자 11-28 16:18 "마을을 다른 서버에 이식했더니 … 몹 스폰 방지와 블럭 파괴 금지 … 작동하지 않는"):
+        // 스폰이 0,0 근처인 세계로 마을을 옮겨도, 이미 만들어진 청크의 표지 블록으로 아모노스 성을 알아본다 (없는 청크는 만들지 않음)
+        {
+            int was381 = data.castleInstalled;
+            int farCx = 61003, farCz = -61007;   // 아무도 가 보지 않은 먼 청크
+            boolean farBefore = com.rtshop.land.CastlePlots.chunkExists(level, farCx, farCz);
+            BlockPos sigBase = new BlockPos((int) a.getX() + 9, 120, (int) a.getZ() + 9);
+            List<Object[]> sig = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                BlockPos sp = sigBase.offset(i, 0, 0);
+                level.setBlock(sp, (i < 3 ? Blocks.GOLD_BLOCK : Blocks.STONE).defaultBlockState(), 3);
+                sig.add(new Object[]{sp, "minecraft:gold_block"});
+            }
+            sig.add(new Object[]{new BlockPos(farCx * 16 + 3, 70, farCz * 16 + 3), "minecraft:gold_block"});   // 청크가 없는 표지: 건너뜀
+            int castlesBefore = 0;
+            for (LandData.Land l : data.lands()) if (l.castle()) castlesBefore++;
+            boolean autoInstalled = false, recheckStays = false, opRemovedStays = false, cleaned = false;
+            int[] seen381 = null;
+            try {
+                com.rtshop.land.CastlePlots.signatureForTest = sig;
+                seen381 = com.rtshop.land.CastlePlots.signatureSaved(server);
+                boolean matchThree = com.rtshop.land.CastlePlots.worldMatches(server);   // 3/5 = 60%
+                level.setBlock(sigBase.offset(2, 0, 0), Blocks.STONE.defaultBlockState(), 3);
+                boolean twoIsNotEnough = !com.rtshop.land.CastlePlots.worldMatches(server);
+                level.setBlock(sigBase.offset(2, 0, 0), Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+                // 아직 정하지 않은 세계(0): 켤 때 알아보고 성 안 토지를 넣음 → 성 영역 보호가 켜짐
+                data.castleInstalled = 0;
+                com.rtshop.land.CastlePlots.autoInstall(server);
+                int castles = 0;
+                for (LandData.Land l : data.lands()) if (l.castle()) castles++;
+                autoInstalled = data.castleInstalled == com.rtshop.land.CastlePlots.VERSION && castles > castlesBefore
+                        && LandManager.guardAt(level, new BlockPos(-24360, 70, -5420)) != null;
+                com.rtshop.land.CastlePlots.uninstall(server);
+                // 지난번에 못 찾았던 세계(-2): 다시 보고, 여전히 없으면 그대로 -2
+                level.setBlock(sigBase, Blocks.STONE.defaultBlockState(), 3);
+                level.setBlock(sigBase.offset(1, 0, 0), Blocks.STONE.defaultBlockState(), 3);
+                data.castleInstalled = com.rtshop.land.CastlePlots.RECHECK;
+                com.rtshop.land.CastlePlots.autoInstall(server);
+                recheckStays = data.castleInstalled == com.rtshop.land.CastlePlots.RECHECK && com.rtshop.land.CastlePlots.shouldCheck(data);
+                // 운영자가 걷어 낸 세계(-1): 표지가 맞아도 다시 넣지 않음
+                level.setBlock(sigBase, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+                level.setBlock(sigBase.offset(1, 0, 0), Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+                data.castleInstalled = -1;
+                com.rtshop.land.CastlePlots.autoInstall(server);
+                opRemovedStays = data.castleInstalled == -1 && !com.rtshop.land.CastlePlots.shouldCheck(data);
+                check("3.81 the Amonos castle is recognised from blocks in chunks that already exist, wherever the world spawn is (a town moved to a new server); 3 of 5 marks is enough, 2 is not",
+                        seen381[0] == 3 && seen381[1] == 4 && matchThree && twoIsNotEnough, seen381[0] + "/" + seen381[1] + " " + matchThree + " " + twoIsNotEnough);
+                check("3.81 on start a world not decided yet (0) installs the castle lots and turns the castle zone on; 'not found' (-2) is checked again next time; one an operator cleared (-1) is left alone",
+                        autoInstalled && recheckStays && opRemovedStays, autoInstalled + " " + recheckStays + " " + opRemovedStays);
+            } finally {
+                com.rtshop.land.CastlePlots.signatureForTest = null;
+                com.rtshop.land.CastlePlots.uninstall(server);
+                data.castleInstalled = was381;
+                for (int i = 0; i < 4; i++) level.setBlock(sigBase.offset(i, 0, 0), Blocks.AIR.defaultBlockState(), 3);
+                int castlesAfter = 0;
+                for (LandData.Land l : data.lands()) if (l.castle()) castlesAfter++;
+                cleaned = castlesAfter == castlesBefore;
+            }
+            boolean farAfter = com.rtshop.land.CastlePlots.chunkExists(level, farCx, farCz);
+            check("3.81 looking for the castle never makes new chunks: a far chunk that did not exist still does not",
+                    !farBefore && !farAfter && level.getChunkSource().getChunkNow(farCx, farCz) == null && cleaned, farBefore + " " + farAfter + " " + cleaned);
+        }
         check("only land merchants open the lot browser", com.rtshop.land.PlotBrowser.isLandShop("land") && !com.rtshop.land.PlotBrowser.isLandShop("farmer"));
         check("lots can no longer be bought by command", server.getCommands().getDispatcher().parse("rtshop plot buy", server.createCommandSourceStack()).getReader().canRead());
 
@@ -3979,6 +4041,20 @@ public final class SelfTest {
             boolean noDock = com.rtshop.rules.TownSpawn.arrival(server) == null;
             ld.castleInstalled = 1;
             com.rtshop.rules.TownSpawn.Arrival dock = com.rtshop.rules.TownSpawn.arrival(server);
+            // 3.81: 마을의 기준 자리를 정하지 않은 서버(마을을 옮겨 온 새 서버)에서는 귀환권 · 죽음도 아모노스 부두로, 아모노스 맵이 아니면 자리 없음
+            ts.set = false;
+            ld.castleInstalled = 0;
+            boolean noSpot = com.rtshop.rules.TownSpawn.townPoint(server) == null
+                    && com.rtshop.item.ReturnTicketItem.refusal(a, true) != null
+                    && com.rtshop.item.ReturnTicketItem.refusal(a, true).getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc0
+                    && "rtshop.return.no_spot".equals(tc0.getKey());
+            ld.castleInstalled = 1;
+            com.rtshop.rules.TownSpawn.Arrival dockBack = com.rtshop.rules.TownSpawn.townPoint(server);
+            boolean dockFallback = dockBack != null && "dock".equals(dockBack.kind()) && Math.abs(dockBack.x() + 24041.5) < 0.01;
+            ld.castleInstalled = oldCastle;
+            ts.set = true;
+            check("3.81 with no town point set, return tickets and deaths go to the Amonos dock on the Amonos map; elsewhere there is still no spot",
+                    noSpot && dockFallback, noSpot + " " + (dockBack == null ? "none" : dockBack.kind() + " " + dockBack.x()));
             ld.castleInstalled = oldCastle;
             a.teleportTo(sx, sy, sz);
             check("3.80 a newcomer starts at the arrival point, while return tickets and deaths still go to the town point (fountain square); arrival off → the town point; "

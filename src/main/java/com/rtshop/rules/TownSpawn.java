@@ -199,13 +199,12 @@ public final class TownSpawn {
         return l == null ? server.overworld() : l;
     }
 
-    /** 이 사람을 마을의 기준 자리로 보낸다 (정해 두지 않았으면 false). */
+    /** 이 사람을 마을의 기준 자리로 보낸다 (정해 두지 않았으면 아모노스 맵의 부두, 그것도 없으면 false). */
     public static boolean send(ServerPlayer p) {
-        Config c = get();
-        if (!c.set) return false;
-        ServerLevel to = level(p.server);
+        Arrival to = townPoint(p.server);
+        if (to == null) return false;
         p.stopRiding();
-        p.teleportTo(to, c.x, c.y, c.z, c.yaw, c.pitch);
+        p.teleportTo(to.level(), to.x(), to.y(), to.z(), to.yaw(), to.pitch());
         p.fallDistance = 0;
         return true;
     }
@@ -217,7 +216,9 @@ public final class TownSpawn {
     /** 마을의 기준 자리 (귀환권 · 침대 없는 죽음). 정하지 않았으면 null. */
     public static Arrival townPoint(MinecraftServer server) {
         Config c = get();
-        return c.set ? new Arrival(level(server), c.x, c.y, c.z, c.yaw, c.pitch, "town") : null;
+        if (c.set) return new Arrival(level(server), c.x, c.y, c.z, c.yaw, c.pitch, "town");
+        // 3.81: 기준 자리를 아직 정하지 않은 서버(마을을 옮겨 온 새 서버 등)에서는 아모노스 맵의 부두로 — 0,0 근처의 세계 스폰으로 가지 않게
+        return dock(server);
     }
 
     /** 처음 들어온 사람이 갈 자리 (3.80): 도착 자리, 없으면 마을의 기준 자리. 옮기지 않으면(firstJoin 끔 · 둘 다 없음) null. */
@@ -236,6 +237,11 @@ public final class TownSpawn {
             ServerLevel l = rl == null ? null : server.getLevel(ResourceKey.create(Registries.DIMENSION, rl));
             return new Arrival(l == null ? server.overworld() : l, c.ax, c.ay, c.az, c.ayaw, c.apitch, "set");
         }
+        return dock(server);
+    }
+
+    /** 아모노스 맵(성 안 토지를 넣은 세계)의 부두. 아니면 null. */
+    public static Arrival dock(MinecraftServer server) {
         if (com.rtshop.land.LandData.get(server).castleInstalled <= 0) return null;
         com.rtshop.land.CastlePlots.Def d = com.rtshop.land.CastlePlots.def();
         if (d.spawn == null || d.spawn.length < 3 || d.spawn[0] == 0 && d.spawn[2] == 0) return null;
@@ -263,8 +269,9 @@ public final class TownSpawn {
     /** 이 자리에서 일반 귀환권을 쓸 수 있는가 (같은 차원, 가로 거리 안). */
     public static boolean inNormalRange(ServerPlayer p) {
         Config c = get();
-        if (!c.set || !p.level().dimension().location().toString().equals(c.dim)) return false;
-        double dx = p.getX() - c.x, dz = p.getZ() - c.z;
+        Arrival t = townPoint(p.server);
+        if (t == null || p.level().dimension() != t.level().dimension()) return false;
+        double dx = p.getX() - t.x(), dz = p.getZ() - t.z();
         return dx * dx + dz * dz <= (double) c.normalRange * c.normalRange;
     }
 
@@ -383,7 +390,7 @@ public final class TownSpawn {
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || event.isEndConquered()) return;
         Config c = get();
-        if (c.set && c.respawn && p.getRespawnPosition() == null) send(p);
+        if (c.respawn && p.getRespawnPosition() == null) send(p);   // 기준 자리, 없으면 부두 (3.81)
     }
 
     // ------------------------------------------------------------------ 명령어
@@ -472,7 +479,9 @@ public final class TownSpawn {
                         }))
                 .executes(ctx -> {
                     Config c = get();
+                    Arrival d = c.set ? null : dock(ctx.getSource().getServer());
                     ctx.getSource().sendSuccess(() -> c.set ? Component.translatable("rtshop.spawn.where", c.dim, (int) Math.floor(c.x), (int) Math.floor(c.y), (int) Math.floor(c.z))
+                            : d != null ? Component.translatable("rtshop.spawn.where_dock", (int) Math.floor(d.x()), (int) Math.floor(d.y()), (int) Math.floor(d.z()))
                             : Component.translatable("rtshop.spawn.none"), false);
                     return 1;
                 })));

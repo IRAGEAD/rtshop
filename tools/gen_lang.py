@@ -187,6 +187,7 @@ NEW = {
  "rtshop.spawn.range": ("일반 귀환권을 쓸 수 있는 거리: %s칸", "Ordinary return ticket range: %s blocks"),
  "rtshop.spawn.where": ("마을의 기준 자리: %s (%s, %s, %s)", "Town point: %s (%s, %s, %s)"),
  "rtshop.spawn.none": ("마을의 기준 자리가 아직 없습니다. 운영자가 /rtshop spawn set 으로 정합니다.", "No town point yet. An operator sets it with /rtshop spawn set."),
+ "rtshop.spawn.where_dock": ("마을의 기준 자리를 아직 정하지 않아, 귀환권 · 침대 없는 죽음은 아모노스 부두(%s, %s, %s)로 갑니다. 분수 광장에 서서 /rtshop spawn set 으로 정하세요.", "No town point is set yet, so return tickets and deaths without a bed go to the Amonos dock (%s, %s, %s). Stand on the fountain square and use /rtshop spawn set."),
  "item.rtshop.raid_escape": ("레이드 탈출권", "Raid escape ticket"),
  "item.rtshop.raid_escape.tip1": ("레이드 구역 안에서 우클릭하면 언제든 마을로 돌아갑니다.", "Right-click inside the raid arena to return to town at any time."),
  "item.rtshop.raid_escape.tip2": ("구역에 아무도 남지 않으면 보스는 사라집니다 (처치로 인정되지 않음).", "If nobody is left in the arena the boss disappears (it does not count as a kill)."),

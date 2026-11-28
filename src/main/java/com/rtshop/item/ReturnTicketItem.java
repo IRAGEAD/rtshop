@@ -39,7 +39,7 @@ public class ReturnTicketItem extends Item {
     /** 지금 쓸 수 없는 까닭 (쓸 수 있으면 null). */
     public static Component refusal(ServerPlayer sp, boolean premium) {
         TownSpawn.Config c = TownSpawn.get();
-        if (!c.set) return Component.translatable("rtshop.return.no_spot");
+        if (TownSpawn.townPoint(sp.server) == null) return Component.translatable("rtshop.return.no_spot");   // 3.81: 정하지 않았어도 아모노스 맵이면 부두
         try {
             if (com.rtshop.raid.Raid.inArena(sp) || sp.level().dimension() == com.rtshop.story.StoryArena.DIM) {
                 return Component.translatable("rtshop.return.in_arena");
