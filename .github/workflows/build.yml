@@ -416,6 +416,9 @@ jobs:
             (cd /tmp/spm && for c in $(grep -i -E "merchant|trader|mercader|comerciante|vendedor|spawn|entity" /tmp/spm-list.txt | head -n 30); do echo "######## $c"; javap -p "$c" 2>&1 | head -n 50; done)
             echo "== merchant-like strings in classes"
             (cd /tmp/spm && grep -rh -a -o -E "[a-z0-9_]*(merchant|trader|mercader|comerciante|vendedor|buhonero)[a-z0-9_]*" --include=*.class . | sort | uniq -c | sort -rn | head -n 60)
+            echo "== bytecode of the merchant arrival and its saved data"
+            (cd /tmp/spm && for c in spmovesets/spmovesets/survival/vendedor/VendedorAparicion.class spmovesets/spmovesets/survival/vendedor/VendedorDatos.class; do echo "######## $c"; javap -c -p "$c" 2>&1 | head -n 2500; done)
+            (cd /tmp/spm && ls spmovesets/spmovesets/survival/ | head -n 60; for c in $(ls spmovesets/spmovesets/survival/WorldMode*.class 2>/dev/null); do echo "######## $c"; javap -p "$c" 2>&1 | head -n 60; done)
             echo "== registry strings near EntityType"
             (cd /tmp/spm && for c in $(grep -rl -a "EntityType\$Builder" --include=*.class . | head -n 10); do echo "-- $c"; strings -n 3 "$c" | grep -E "^[a-z0-9_]{3,40}$" | head -n 80; done)
           } > /tmp/inspect/spmovesets-merchant.txt 2>&1 || true
