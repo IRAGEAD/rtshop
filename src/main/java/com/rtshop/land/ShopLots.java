@@ -39,8 +39,9 @@ import java.util.UUID;
 /**
  * 상점 토지 (3.79, 사용자 메모 W-4 "플레이어 상점: 개인 토지에는 설치 불가, 상점 토지를 산 뒤 설치" + 11-28 답):
  * <ul>
- * <li>자리 (사용자 11-28 10:56): 아모노스 맵이면 남동쪽 입구(남동문) 안, 가판대가 늘어선 넓은 광장의 가장자리에 장터 9칸(5×5)을 흩어 놓아 판매 중 구획으로 등록한다
- *     (rtshop_defaults/shop_lots.json). 칸은 모두 포장된 길 위, 기존 가판대 · 건물 · 등불과 한 칸 이상 떨어져 있고 가운데 큰길은 비운다.
+ * <li>자리 (사용자 11-28 10:56 "남동쪽 입구 근처의 넓은 공간", 11:21 "기존 맵에 있는 가판대의 위치를 덮어쓰는 방식으로"): 아모노스 맵이면 남동쪽 입구(남동문) 안 광장에
+ *     이미 있는 가판대 10곳을 그대로 판매 중 상점 토지로 등록한다 (rtshop_defaults/shop_lots.json — 칸 = 그 가판대의 차양 · 기둥 · 곁의 수레를 덮는 네모).
+ *     가판대 건물은 치우지 않고 넘긴다 (산 사람이 그 안에 진열대를 놓거나 고쳐 짓는다). 높이는 둘레 길의 높이부터 잰다 (차양 위가 아니라).
  *     운영자는 구획 지팡이로 만든 구획이나 서 있는 자리를 상점 토지로 만들 수 있다.</li>
  * <li>값 = 토지 문서(16×16) 값의 블록당 값 × 넓이 × 2 (사용자 답: 2배). 한 사람이 가질 수 있는 수에 제한이 없다 (사용자 답).</li>
  * <li>플레이어 상점 진열대는 상점 토지(내 것, 또는 놓기 권한을 받은 곳) 안에만 새로 놓는다. 개인 토지에 이미 놓인 진열대는 그대로 (사용자 답).</li>
@@ -208,17 +209,31 @@ public final class ShopLots {
         return new int[]{made, skipped, dropped};
     }
 
-    /** 네모 상점 토지 하나를 판매 중으로 만든다 (다른 토지와 겹치면 null). 높이는 그 자리의 지면에서 문서와 같은 깊이 ~ 꼭대기. */
+    /**
+     * 네모 상점 토지 하나를 판매 중으로 만든다 (다른 토지와 겹치면 null). 높이는 그 자리의 지면에서 문서와 같은 깊이 ~ 꼭대기.
+     * 지면 = 네 모서리 · 가운데와 바로 바깥 둘레 한 줄 가운데 가장 낮은 곳 (3.79: 가판대를 덮는 칸은 안쪽이 모두 차양이라, 둘레의 길 높이로 잰다).
+     */
     public static Land create(ServerLevel level, String name, int x0, int z0, int w, int h) {
         LandData data = LandData.get(level.getServer());
         String dim = LandManager.dim(level);
         int minY = level.getMinBuildHeight(), maxY = level.getMaxBuildHeight() - 1;
         if (!data.claimsNear(dim, x0, minY, z0, x0 + w - 1, maxY, z0 + h - 1, 0).isEmpty()) return null;
         int ground = Integer.MAX_VALUE;
-        for (int[] p : new int[][]{{x0, z0}, {x0 + w - 1, z0}, {x0, z0 + h - 1}, {x0 + w - 1, z0 + h - 1}, {x0 + w / 2, z0 + h / 2}}) {
+        List<int[]> pts = new ArrayList<>(List.of(new int[]{x0, z0}, new int[]{x0 + w - 1, z0}, new int[]{x0, z0 + h - 1}, new int[]{x0 + w - 1, z0 + h - 1},
+                new int[]{x0 + w / 2, z0 + h / 2}));
+        for (int x = x0 - 1; x <= x0 + w; x++) {
+            pts.add(new int[]{x, z0 - 1});
+            pts.add(new int[]{x, z0 + h});
+        }
+        for (int z = z0; z < z0 + h; z++) {
+            pts.add(new int[]{x0 - 1, z});
+            pts.add(new int[]{x0 + w, z});
+        }
+        for (int[] p : pts) {
             level.getChunk(p[0] >> 4, p[1] >> 4);
             ground = Math.min(ground, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, p[0], p[1]) - 1);
         }
+        lastGroundForTest = ground;
         Claim c = new Claim();
         c.dim = dim;
         c.type = "plot";
@@ -235,6 +250,9 @@ public final class ShopLots {
         data.touch();
         return land;
     }
+
+    /** 시험용: 마지막으로 만든 상점 토지의 지면 높이. */
+    public static int lastGroundForTest;
 
     /** 판매 중인(주인 없는) 상점 토지를 모두 지운다 (다시 자동으로 넣지 않게 -1). {지운 수, 주인이 있어 남긴 수}. */
     public static int[] uninstall(MinecraftServer server) {

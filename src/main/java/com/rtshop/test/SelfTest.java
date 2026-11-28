@@ -8707,46 +8707,44 @@ public final class SelfTest {
                 }
             }
         }
-        // 11-28 10:56: 흩어 놓기 (어느 두 칸 사이도 4칸 이상), 길 위에만 (지도에서 칸과 그 둘레 한 칸이 모두 포장된 길 빛깔)
-        int minGap = Integer.MAX_VALUE;
-        for (int i = 0; i < lots.size(); i++) {
-            for (int j = i + 1; j < lots.size(); j++) {
-                com.rtshop.land.ShopLots.Lot p1 = lots.get(i), p2 = lots.get(j);
-                int gx = Math.max(0, Math.max(p2.x0 - (p1.x0 + p1.w), p1.x0 - (p2.x0 + p2.w)));
-                int gz = Math.max(0, Math.max(p2.z0 - (p1.z0 + p1.h), p1.z0 - (p2.z0 + p2.h)));
-                minGap = Math.min(minGap, Math.max(gx, gz));
-            }
-        }
-        int offRoad = -1;
+        // 11-28 11:21 "기존 맵에 있는 가판대의 위치를 덮어쓰는 방식으로": 칸마다 성 지도에서 가판대(흰 줄무늬 · 체크무늬 차양)를 덮고, 둘레는 대체로 광장의 길
+        int offStall = -1;
         String offWhere = "";
         try (java.io.InputStream in = SelfTest.class.getResourceAsStream("/assets/rtshop/textures/gui/castle_map.png")) {
             java.awt.image.BufferedImage map = in == null ? null : javax.imageio.ImageIO.read(in);
             if (map != null) {
-                offRoad = 0;
+                offStall = 0;
                 com.rtshop.land.CastlePlots.Def cd = com.rtshop.land.CastlePlots.def();
                 for (com.rtshop.land.ShopLots.Lot t : lots) {
+                    int awning = 0, ring = 0, ringRoad = 0;
                     for (int dx = -1; dx <= t.w; dx++) {
                         for (int dz = -1; dz <= t.h; dz++) {
                             int mx = t.x0 + dx - cd.mapX0, mz = t.z0 + dz - cd.mapZ0;
                             int rgb = mx >= 0 && mz >= 0 && mx < map.getWidth() && mz < map.getHeight() ? map.getRGB(mx, mz) : 0;
                             int r = (rgb >> 16) & 255, g = (rgb >> 8) & 255, bl = rgb & 255;
                             int hi = Math.max(r, Math.max(g, bl)), lo = Math.min(r, Math.min(g, bl));
-                            if (!(hi - lo < 24 && hi > 92 && hi <= 185)) {
-                                offRoad++;
-                                offWhere = t.name + " " + (t.x0 + dx) + "," + (t.z0 + dz);
+                            boolean inside = dx >= 0 && dz >= 0 && dx < t.w && dz < t.h;
+                            if (inside && hi - lo < 24 && hi > 185) awning++;   // 차양의 흰 줄
+                            if (!inside) {
+                                ring++;
+                                if (hi - lo < 24 && hi > 92 && hi <= 185) ringRoad++;   // 포장된 길
                             }
                         }
+                    }
+                    if (awning < 4 || ringRoad * 10 < ring * 4) {
+                        offStall++;
+                        offWhere = t.name + " awning " + awning + " road " + ringRoad + "/" + ring;
                     }
                 }
             }
         } catch (Exception e) {
             offWhere = String.valueOf(e);
         }
-        check("3.79 the default market has 9 lots of 5×5 spread over the south-east gate square (inside the castle zone, clear of house lots, at least 4 blocks apart)",
-                lots.size() == 9 && lots.stream().allMatch(t -> t.w == 5 && t.h == 5) && inZone && clearOfHouses && apart && minGap >= 4,
-                lots.size() + " zone " + inZone + " houses " + clearOfHouses + " apart " + apart + " gap " + minGap + " " + why);
-        check("3.79 every market lot and the block around it is paved road on the castle map (no stall, building or lamp in the way)",
-                offRoad == 0, offRoad + " " + offWhere);
+        check("3.79 the default market is the 10 stalls of the south-east gate square (inside the castle zone, clear of house lots, not overlapping each other)",
+                lots.size() == 10 && inZone && clearOfHouses && apart && lots.stream().allMatch(t -> t.w >= 3 && t.h >= 3 && t.w * t.h <= 100),
+                lots.size() + " zone " + inZone + " houses " + clearOfHouses + " apart " + apart + " " + why);
+        check("3.79 every market lot covers an existing stall on the castle map (white awning stripes inside, the square's paving around it)",
+                offStall == 0, offStall + " " + offWhere);
         long[] deed = com.rtshop.land.ShopLots.deed();
         check("3.79 a 6×4 shop lot costs twice the land deed's price per block (40,000 G / 256 × 24 × 2 = 7,500 G)",
                 deed[0] == 40000 && deed[1] == 256 && com.rtshop.land.ShopLots.priceFor(24) == 7500, deed[0] + " / " + deed[1] + " → " + com.rtshop.land.ShopLots.priceFor(24));
@@ -8759,6 +8757,24 @@ public final class SelfTest {
                 for (int up = 0; up < 3; up++) level.setBlock(new BlockPos(x + dx, gy + up, z + dz), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
             }
         }
+        // 가판대를 덮는 칸: 안쪽이 모두 높은 차양(3칸 위)이어도 지면은 둘레 길 높이로 잰다 (진열대를 차양 밑 바닥에 놓을 수 있게)
+        BlockPos roofAt = new BlockPos(x + 8, gy + 3, z - 2);
+        for (int dx = 0; dx < 3; dx++) {
+            for (int dz = 0; dz < 3; dz++) {
+                level.setBlock(roofAt.offset(dx, 0, dz), net.minecraft.world.level.block.Blocks.RED_WOOL.defaultBlockState(), 3);
+            }
+        }
+        LandData.Land stallLot = com.rtshop.land.ShopLots.create(level, "시험 가판대", x + 8, z - 2, 3, 3);
+        int stallGround = com.rtshop.land.ShopLots.lastGroundForTest;
+        net.minecraft.world.level.block.state.BlockState air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+        for (int dx = 0; dx < 3; dx++) {
+            for (int dz = 0; dz < 3; dz++) level.setBlock(roofAt.offset(dx, 0, dz), air, 3);
+        }
+        LandData.Claim stallClaim = stallLot == null ? null : com.rtshop.land.PlotManager.plotClaim(stallLot);
+        check("3.79 a lot over a stall measures its ground from the road around it, not from the awning on top (the floor under the awning is inside the lot)",
+                stallLot != null && stallGround == gy - 1 && stallClaim != null && stallClaim.y0 <= gy,
+                stallGround + " vs " + (gy - 1) + " y0 " + (stallClaim == null ? "-" : stallClaim.y0));
+        if (stallLot != null) data.removeLand(stallLot);
         LandData.Land l1 = com.rtshop.land.ShopLots.create(level, "시험 장터 1", x, z, 6, 4);
         LandData.Land l2 = com.rtshop.land.ShopLots.create(level, "시험 장터 2", x + 6, z, 6, 4);
         LandData.Land clash = com.rtshop.land.ShopLots.create(level, "겹침", x + 3, z + 1, 6, 4);

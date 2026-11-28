@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -221,14 +220,9 @@ public final class EnhanceGrandFx {
 
     private static void reveal() {
         revealed = true;
-        Minecraft mc = Minecraft.getInstance();
         boolean success = outcome == Enhance.Outcome.SUCCESS;
         if (success) {
-            // 3.79 (사용자 11-28 10:51 시야 가림): 몸을 따라다니던 입자 대신 모루 위에 한 번만 조금
-            EnhanceFx.burst(tier == T_FORGE ? ParticleTypes.FLAME : ParticleTypes.TOTEM_OF_UNDYING, 14, 0.4, tier == T_FORGE ? 0.03 : 0.14);
-            EnhanceFx.burst(ParticleTypes.FIREWORK, tier == T_FINAL ? 14 : 8, 0.45, 0.08);
-            if (tier >= T_RUNE) EnhanceFx.burst(ParticleTypes.END_ROD, tier == T_FINAL ? 14 : 8, 0.5, 0.05);
-            if (tier == T_FINAL) EnhanceFx.burst(ParticleTypes.GLOW, 14, 0.5, 0.05);
+            // 3.79 (사용자 11-28 11:20 "강화 시에 나오는 파티클을 그냥 삭제해줘"): 큰 성공 장면도 입자를 뿌리지 않는다 (예전: 불꽃 · 토템 · 폭죽 · 엔드 막대 · 빛 입자가 몸을 따라다님)
             // 채팅 기록 등은 평소 표시를 쓰되, 글자는 이 연출이 직접 그린다
             EnhanceFx.showNow(outcome, guarded, from, to, item, true);
         } else {

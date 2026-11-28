@@ -276,7 +276,7 @@ public final class LandConfig {
 
     private static void addShopLotKeys(JsonObject o, LandConfig c) {
         JsonArray help = new JsonArray();
-        help.add("상점 토지 (3.79): 플레이어 상점 진열대를 놓는 땅. 아모노스 맵이면 남동문 안 가판대 광장에 장터 9칸(5×5, 길 위에 흩어 놓음)을 자동으로 등록합니다 (shopLotsAuto)");
+        help.add("상점 토지 (3.79): 플레이어 상점 진열대를 놓는 땅. 아모노스 맵이면 남동문 안 광장에 이미 있는 가판대 10곳을 그대로 상점 토지로 자동 등록합니다 (shopLotsAuto, 가판대 건물은 그대로 넘김)");
         help.add("토지 상인 창의 [구획 토지] → [상점 토지] 에서 지도로 보고 삽니다. 값 = 토지 문서(shopLotDeedItem, 못 찾으면 shopLotDeedPrice) 의 블록당 값 × 넓이 × shopLotPriceFactor");
         help.add("shopLotMaxPerPlayer: 한 사람이 가질 수 있는 수 (0 = 제한 없음) · 운영자는 구획 지팡이로 만든 구획을 /rtshop plot shoplot on 으로 상점 토지로 바꿀 수 있습니다");
         help.add("shopLotRentPercent: 주마다 내는 기본 자릿세 = 산 값의 % (예금 → 지갑 순, 접속하지 않아도). 못 내면 밀린 만큼(shopLotRentMaxWeeks 주까지) 쌓이고 그 토지의 진열대가 문을 닫습니다. 돈이 생기면 저절로 냅니다");
