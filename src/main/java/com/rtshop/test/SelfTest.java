@@ -3898,6 +3898,68 @@ public final class SelfTest {
                 com.rtshop.rules.ItemPolicy.afterShops(server, ShopServer.loaded());
             }
         }
+        // 3.82 (사용자 11-28 19:08 "마을 안에서만 번지지 않게 해줘"): 마을(성 영역) 안에서는 불이 번지거나 블록을 태우지 않는다
+        {
+            BlockPos fb = a.blockPosition().offset(7, 0, -7);
+            final int fzx = fb.getX(), fzz = fb.getZ();
+            com.rtshop.rules.FireGuard.zoneForTest = (x, z) -> x >= fzx - 2 && x <= fzx + 2 && z >= fzz - 2 && z <= fzz + 2;   // 5×5 시험 마을
+            net.minecraft.world.level.GameRules.BooleanValue fireRule = level.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DOFIRETICK);
+            boolean fireRuleWas = fireRule.get();
+            fireRule.set(true, server);
+            java.util.LinkedHashMap<BlockPos, net.minecraft.world.level.block.state.BlockState> fireOld = new java.util.LinkedHashMap<>();
+            java.util.function.BiConsumer<BlockPos, net.minecraft.world.level.block.state.BlockState> put = (pp, st) -> {
+                fireOld.putIfAbsent(pp, level.getBlockState(pp));
+                level.setBlock(pp, st, 3);
+            };
+            try {
+                // ① 마을 안: 판자 위의 불 → 첫 틱에 꺼지고, 밑 · 옆의 판자는 그대로
+                BlockPos plank = fb, fire = fb.above(), side = fb.above().east();
+                put.accept(plank, Blocks.OAK_PLANKS.defaultBlockState());
+                put.accept(side, Blocks.OAK_PLANKS.defaultBlockState());
+                put.accept(fire, Blocks.FIRE.defaultBlockState());
+                int st0 = com.rtshop.rules.FireGuard.stoppedForTest;
+                boolean placed = level.getBlockState(fire).is(Blocks.FIRE);
+                level.getBlockState(fire).tick(level, fire, level.getRandom());   // 불 블록의 진짜 틱 (FireBlockMixin 이 붙었는지)
+                boolean wentOut = placed && level.getBlockState(fire).isAir() && level.getBlockState(plank).is(Blocks.OAK_PLANKS)
+                        && level.getBlockState(side).is(Blocks.OAK_PLANKS) && com.rtshop.rules.FireGuard.stoppedForTest == st0 + 1;
+                // ② 마을 안: 지옥암 위의 불(벽난로)은 그대로
+                BlockPos rack = fb.offset(0, 0, 2), hearth = rack.above();
+                put.accept(rack, Blocks.NETHERRACK.defaultBlockState());
+                put.accept(hearth, Blocks.FIRE.defaultBlockState());
+                level.getBlockState(hearth).tick(level, hearth, level.getRandom());
+                boolean hearthKept = level.getBlockState(hearth).is(Blocks.FIRE) && com.rtshop.rules.FireGuard.stoppedForTest == st0 + 2;
+                // ③ 둘레 1칸 밖까지 막고 2칸 밖부터는 원래대로 (불은 바로 옆 칸까지만 태우므로)
+                boolean edge = com.rtshop.rules.FireGuard.guarded(level, new BlockPos(fzx + 3, fb.getY(), fzz))
+                        && !com.rtshop.rules.FireGuard.guarded(level, new BlockPos(fzx + 4, fb.getY(), fzz))
+                        && !com.rtshop.rules.FireGuard.onFireTick(Blocks.FIRE.defaultBlockState(), level, new BlockPos(fzx + 9, fb.getY(), fzz), level.getRandom());
+                // ④ 용암이 붙이는 불: 마을 안은 그 자리 그대로, 밖은 붙음
+                BlockPos lavaIn = fb.offset(-1, 1, 0), lavaOut = fb.offset(-9, 1, 0);
+                var evIn = new net.minecraftforge.event.level.BlockEvent.FluidPlaceBlockEvent(level, lavaIn, lavaIn.below(), Blocks.FIRE.defaultBlockState());
+                var evOut = new net.minecraftforge.event.level.BlockEvent.FluidPlaceBlockEvent(level, lavaOut, lavaOut.below(), Blocks.FIRE.defaultBlockState());
+                MinecraftForge.EVENT_BUS.post(evIn);
+                MinecraftForge.EVENT_BUS.post(evOut);
+                boolean lava = evIn.getNewState() == evIn.getOriginalState() && evOut.getNewState().is(Blocks.FIRE);
+                // ⑤ land.json 의 castleNoFireSpread 를 끄면 마을 안도 원래대로 · doFireTick 이 꺼져 있으면 손대지 않음
+                com.rtshop.land.LandConfig.get().castleNoFireSpread = false;
+                boolean offOk = !com.rtshop.rules.FireGuard.guarded(level, fb);
+                com.rtshop.land.LandConfig.get().castleNoFireSpread = true;
+                fireRule.set(false, server);
+                boolean ruleOk = !com.rtshop.rules.FireGuard.onFireTick(Blocks.FIRE.defaultBlockState(), level, fb.above(), level.getRandom());
+                fireRule.set(true, server);
+                boolean defaults = new com.rtshop.land.LandConfig().castleNoFireSpread;
+                check("3.82 inside the town (castle zone) fire does not spread or burn blocks: a fire on planks goes out on its first tick and the planks stay, a fire on netherrack (fireplace) stays, lava lights no fire; outside the town (2+ blocks away) fire follows doFireTick; land.json castleNoFireSpread (on by default) turns it off",
+                        wentOut && hearthKept && edge && lava && offOk && ruleOk && defaults,
+                        "out " + wentOut + " (placed " + placed + ", now " + level.getBlockState(fire) + ") hearth " + hearthKept + " edge " + edge + " lava " + lava
+                                + " off " + offOk + " rule " + ruleOk + " default " + defaults + " stopped " + (com.rtshop.rules.FireGuard.stoppedForTest - st0));
+            } finally {
+                com.rtshop.rules.FireGuard.zoneForTest = null;
+                com.rtshop.land.LandConfig.get().castleNoFireSpread = true;
+                java.util.List<BlockPos> back = new java.util.ArrayList<>(fireOld.keySet());
+                java.util.Collections.reverse(back);
+                for (BlockPos pp : back) level.setBlock(pp, fireOld.get(pp), 3);
+                fireRule.set(fireRuleWas, server);
+            }
+        }
         check("after the trial the real rules are back: the iron sword and TNT can be crafted again",
                 server.getRecipeManager().byKey(new ResourceLocation("minecraft:iron_sword")).isPresent() && server.getRecipeManager().byKey(tntRecipe).isPresent());
         {

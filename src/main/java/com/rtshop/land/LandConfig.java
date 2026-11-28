@@ -83,6 +83,9 @@ public final class LandConfig {
     public int plotMerchantRange = 12;
     /** 성 영역(아모노스 맵의 강·바다로 둘러싸인 성과 농경지): 블록 부수기·놓기·상호작용 금지, 몬스터 스폰 금지. */
     public boolean castleZoneProtect = true;
+    /** 3.82 (사용자 11-28 "마을 안에서만 번지지 않게 해줘"): 성 영역(+ 둘레 1칸)에서는 불이 번지거나 블록을 태우지 않는다 — 불은 첫 틱에 꺼지고
+     *  지옥암 · 마그마 위의 불(벽난로)은 그대로, 용암도 불을 붙이지 않는다. 마을 밖은 doFireTick 그대로. */
+    public boolean castleNoFireSpread = true;
 
     // ---- 상점 토지 (3.79, W-4)
     /** 아모노스 맵이면 기본 장터(동문 안 광장의 상점 토지)를 자동으로 등록한다. */
@@ -190,6 +193,7 @@ public final class LandConfig {
                 if (o.has("castlePlotPrice")) c.castlePlotPrice = Math.max(0, o.get("castlePlotPrice").getAsLong());
                 if (o.has("plotMerchantRange")) c.plotMerchantRange = Math.max(2, o.get("plotMerchantRange").getAsInt());
                 if (o.has("castleZoneProtect")) c.castleZoneProtect = o.get("castleZoneProtect").getAsBoolean();
+                if (o.has("castleNoFireSpread")) c.castleNoFireSpread = o.get("castleNoFireSpread").getAsBoolean();
                 if (o.has("shopLotsAuto")) c.shopLotsAuto = o.get("shopLotsAuto").getAsBoolean();
                 if (o.has("shopLotPriceFactor")) c.shopLotPriceFactor = Math.max(0, o.get("shopLotPriceFactor").getAsDouble());
                 if (o.has("shopLotDeedItem")) c.shopLotDeedItem = o.get("shopLotDeedItem").getAsString().trim();
@@ -209,6 +213,12 @@ public final class LandConfig {
                 }
                 if (!o.has("castleZoneProtect") && o.has("castlePlotPrice")) {
                     o.addProperty("castleZoneProtect", c.castleZoneProtect);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                }
+                if (!o.has("castleNoFireSpread") && o.has("castlePlotPrice")) {
+                    // 3.82 이전 파일: 값은 그대로 두고 불 번짐 설정만 덧붙인다
+                    o.addProperty("_불번짐_설명", FIRE_HELP);
+                    o.addProperty("castleNoFireSpread", c.castleNoFireSpread);
                     Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
                 }
                 if (!o.has("castlePlotPrice")) {
@@ -272,7 +282,12 @@ public final class LandConfig {
         o.addProperty("castlePlotPrice", c.castlePlotPrice);
         o.addProperty("plotMerchantRange", c.plotMerchantRange);
         o.addProperty("castleZoneProtect", c.castleZoneProtect);
+        o.addProperty("_불번짐_설명", FIRE_HELP);
+        o.addProperty("castleNoFireSpread", c.castleNoFireSpread);
     }
+
+    static final String FIRE_HELP = "castleNoFireSpread (3.82): true 면 마을(성 영역) 안에서는 불이 번지거나 블록을 태우지 않음 — 불은 1~2초 뒤 꺼지고, "
+            + "지옥암 · 마그마 위의 불(벽난로)은 그대로, 용암도 불을 붙이지 않음. 마을 밖은 doFireTick 그대로. false 면 마을 안도 원래대로 번짐";
 
     private static void addShopLotKeys(JsonObject o, LandConfig c) {
         JsonArray help = new JsonArray();

@@ -23,6 +23,7 @@
     "BetterCombatFallbackMixin",
     "AbyssFloorLockMixin",
     "DhChunkyMixin",
-    "DhChunkyBindMixin"
+    "DhChunkyBindMixin",
+    "FireBlockMixin"
   ]
 }
