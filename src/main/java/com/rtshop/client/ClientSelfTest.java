@@ -769,7 +769,7 @@ public final class ClientSelfTest {
             }
             case 6 -> {
                 if (!SHOP_TAB_379) {
-                    // 3.79: [상점 토지] 탭 — 성 지도 위 동문 안 광장의 장터 10칸
+                    // 3.79: [상점 토지] 탭 — 성 지도 위 남동문 안 가판대 광장에 흩어 놓은 장터 9칸 (11-28 10:56)
                     shot(mc, "89_plots_starter_tab");
                     SHOP_TAB_379 = true;
                     if (ps != null) {
@@ -781,8 +781,8 @@ public final class ClientSelfTest {
                     return;
                 }
                 var se = ps == null ? null : ps.selectedForTest();
-                check("3.79 the lot window has a [Shop lots] tab with the 10 market lots on the square between the lake and the east gate, priced at twice the deed",
-                        ps != null && ps.countForTest("shop") == 10 && se != null && "shop".equals(se.kind()) && se.price() == 7500 && se.rent() == 150,
+                check("3.79 the lot window has a [Shop lots] tab with the 9 market lots of the south-east gate square, priced at twice the deed (5×5 = 7,810 G, base rent 15% = 1,172 G)",
+                        ps != null && ps.countForTest("shop") == 9 && se != null && "shop".equals(se.kind()) && se.price() == 7810 && se.rent() == 1172,
                         ps == null ? mc.screen : ps.countForTest("shop") + " " + (se == null ? "none" : se.kind() + " " + se.price() + " " + se.rent()));
                 shot(mc, "89d_plots_shop_lots");
                 if (ps != null) ps.showForTest(1, 1, 0);

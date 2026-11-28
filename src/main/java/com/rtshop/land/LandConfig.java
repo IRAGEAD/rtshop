@@ -94,8 +94,12 @@ public final class LandConfig {
     public long shopLotDeedPrice = 40000;
     /** 한 사람이 가질 수 있는 상점 토지 수 (0 = 제한 없음). 사용자 답: 제한 없음. */
     public int shopLotMaxPerPlayer = 0;
-    /** 주마다 내는 자릿세 = 산 값의 이 % (사용자 답: 약간). 0 = 없음. */
-    public double shopLotRentPercent = 2.0;
+    /** 주마다 내는 기본 자릿세 = 산 값의 이 % (사용자 11-28 10:56 "기존 자릿세는 더 올리는 것이 좋겠어": 2 → 15). 0 = 없음. */
+    public double shopLotRentPercent = 15.0;
+    /** 판매 자릿세: 상점 토지의 진열대에서 팔린 금액의 이 % 를 팔 때 떼어 간다 (사용자 11-28 10:56 "판매 금액의 일정 %"). 0 = 없음. */
+    public double shopLotSalesFeePercent = 5.0;
+    /** 판매 자릿세를 상점 토지 밖(개인 토지에 전부터 놓여 있던)의 진열대에도 물린다. 기본은 그대로 둔다(사용자 답: 이미 놓인 것은 그대로). */
+    public boolean shopSalesFeeAllStands = false;
     /** 자릿세를 셈하는 때 (주간 초기화와 같게: 1 = 월요일, 시각). */
     public int shopLotRentDay = 1;
     public int shopLotRentHour = 6;
@@ -192,6 +196,8 @@ public final class LandConfig {
                 if (o.has("shopLotDeedPrice")) c.shopLotDeedPrice = Math.max(0, o.get("shopLotDeedPrice").getAsLong());
                 if (o.has("shopLotMaxPerPlayer")) c.shopLotMaxPerPlayer = Math.max(0, o.get("shopLotMaxPerPlayer").getAsInt());
                 if (o.has("shopLotRentPercent")) c.shopLotRentPercent = Math.max(0, Math.min(100, o.get("shopLotRentPercent").getAsDouble()));
+                if (o.has("shopLotSalesFeePercent")) c.shopLotSalesFeePercent = Math.max(0, Math.min(50, o.get("shopLotSalesFeePercent").getAsDouble()));
+                if (o.has("shopSalesFeeAllStands")) c.shopSalesFeeAllStands = o.get("shopSalesFeeAllStands").getAsBoolean();
                 if (o.has("shopLotRentDay")) c.shopLotRentDay = Math.max(1, Math.min(7, o.get("shopLotRentDay").getAsInt()));
                 if (o.has("shopLotRentHour")) c.shopLotRentHour = Math.max(0, Math.min(23, o.get("shopLotRentHour").getAsInt()));
                 if (o.has("shopLotRentMaxWeeks")) c.shopLotRentMaxWeeks = Math.max(1, o.get("shopLotRentMaxWeeks").getAsInt());
@@ -270,10 +276,11 @@ public final class LandConfig {
 
     private static void addShopLotKeys(JsonObject o, LandConfig c) {
         JsonArray help = new JsonArray();
-        help.add("상점 토지 (3.79): 플레이어 상점 진열대를 놓는 땅. 아모노스 맵이면 동문 안 광장(중앙 호수와 동문 사이)에 장터 10칸(6×4)을 자동으로 등록합니다 (shopLotsAuto)");
+        help.add("상점 토지 (3.79): 플레이어 상점 진열대를 놓는 땅. 아모노스 맵이면 남동문 안 가판대 광장에 장터 9칸(5×5, 길 위에 흩어 놓음)을 자동으로 등록합니다 (shopLotsAuto)");
         help.add("토지 상인 창의 [구획 토지] → [상점 토지] 에서 지도로 보고 삽니다. 값 = 토지 문서(shopLotDeedItem, 못 찾으면 shopLotDeedPrice) 의 블록당 값 × 넓이 × shopLotPriceFactor");
         help.add("shopLotMaxPerPlayer: 한 사람이 가질 수 있는 수 (0 = 제한 없음) · 운영자는 구획 지팡이로 만든 구획을 /rtshop plot shoplot on 으로 상점 토지로 바꿀 수 있습니다");
-        help.add("shopLotRentPercent: 주마다 내는 자릿세 = 산 값의 % (예금 → 지갑 순, 접속하지 않아도). 못 내면 밀린 만큼(shopLotRentMaxWeeks 주까지) 쌓이고 그 토지의 진열대가 문을 닫습니다. 돈이 생기면 저절로 냅니다");
+        help.add("shopLotRentPercent: 주마다 내는 기본 자릿세 = 산 값의 % (예금 → 지갑 순, 접속하지 않아도). 못 내면 밀린 만큼(shopLotRentMaxWeeks 주까지) 쌓이고 그 토지의 진열대가 문을 닫습니다. 돈이 생기면 저절로 냅니다");
+        help.add("shopLotSalesFeePercent: 판매 자릿세 — 상점 토지의 진열대에서 팔릴 때 판매 금액의 이 % 를 떼고 주인 예금에 넣습니다. shopSalesFeeAllStands: true 면 상점 토지 밖에 전부터 놓인 진열대에도");
         help.add("shopStandsOnlyOnShopLots: true 면 진열대는 상점 토지(내 것, 또는 놓기 권한을 받은 곳) 안에만 새로 놓을 수 있습니다. 이미 놓인 진열대는 그대로 씁니다");
         o.add("_상점토지_설명", help);
         o.addProperty("shopLotsAuto", c.shopLotsAuto);
@@ -282,6 +289,8 @@ public final class LandConfig {
         o.addProperty("shopLotDeedPrice", c.shopLotDeedPrice);
         o.addProperty("shopLotMaxPerPlayer", c.shopLotMaxPerPlayer);
         o.addProperty("shopLotRentPercent", c.shopLotRentPercent);
+        o.addProperty("shopLotSalesFeePercent", c.shopLotSalesFeePercent);
+        o.addProperty("shopSalesFeeAllStands", c.shopSalesFeeAllStands);
         o.addProperty("shopLotRentDay", c.shopLotRentDay);
         o.addProperty("shopLotRentHour", c.shopLotRentHour);
         o.addProperty("shopLotRentMaxWeeks", c.shopLotRentMaxWeeks);

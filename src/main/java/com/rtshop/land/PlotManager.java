@@ -905,7 +905,7 @@ public final class PlotManager {
         }
         if (land.shopLot) {
             // 상점 토지는 광장 바닥 그대로 넘긴다 (치우지 않음)
-            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.shoplot.bought_hint", money(ShopLots.rentOf(land))).withStyle(ChatFormatting.GOLD));
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.shoplot.bought_hint", money(ShopLots.rentOf(land)), ShopLots.feePctText()).withStyle(ChatFormatting.GOLD));
         } else if (!land.castle() && LandConfig.get().plotClearOnBuy) {
             try {
                 int n = clearPlot(p.server, land);

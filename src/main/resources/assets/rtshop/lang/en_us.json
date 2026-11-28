@@ -2104,7 +2104,7 @@
   "rtshop.shoplot.stand_for_sale": "%s is a shop lot still for sale (%s G). Buy it first to place a stand.",
   "rtshop.shoplot.stand_not_yours": "%s is %s's shop lot. You need the owner's place permission to put a stand there.",
   "rtshop.shoplot.limit": "One player can own up to %s shop lots.",
-  "rtshop.shoplot.bought_hint": "Stands go on shop lots only. Rent is %s G a week from next week (bank first, then wallet, even while offline).",
+  "rtshop.shoplot.bought_hint": "Stands go on shop lots only. Rent is %s G a week from next week (bank first, then wallet, even while offline) plus %s%% of each sale.",
   "rtshop.shoplot.rent_still_owed": "%s owes %s G rent, so its stands are closed. It is paid automatically once you have the money, or pay now at the land merchant or a stand.",
   "rtshop.shoplot.rent_paid": "Paid %2$s G rent for %1$s (bank %3$s · wallet %4$s).",
   "rtshop.shoplot.rent_short": "Could not pay %2$s G rent for %1$s, so its stands are closed. It is paid automatically once your bank or wallet has the money.",
@@ -2116,7 +2116,7 @@
   "rtshop.shoplot.closed_rent_owner": "Closed: %s G rent is owed. Press [Pay rent].",
   "rtshop.shoplot.pay_rent": "Pay rent (%sG)",
   "rtshop.shoplot.owed_short": "Rent owed %s G",
-  "rtshop.shoplot.rent_info": "Rent %s G/week",
+  "rtshop.shoplot.rent_info": "Rent %s G/week + %s%% of sales",
   "rtshop.shoplot.status": "Shop lots: install version %s · %s lots (sold %s · rent owed %s) · default market %s lots",
   "rtshop.shoplot.installed": "Market registered: %s new lots · %s already there · %s skipped (overlapping other land)",
   "rtshop.shoplot.removed": "Removed %s shop lots for sale (kept %s with owners). They will not be added again automatically.",
@@ -2124,5 +2124,6 @@
   "rtshop.shoplot.made": "Made shop lot #%s %s (%s×%s): price %s G · rent %s G/week",
   "rtshop.shoplot.on": "#%s %s is now a shop lot (price %s G).",
   "rtshop.shoplot.off": "#%s %s is an ordinary lot again.",
-  "item.rtshop.survey_compass.found_town": "%s: about %3$s blocks to the %2$s (about %4$s blocks from town)"
+  "item.rtshop.survey_compass.found_town": "%s: about %3$s blocks to the %2$s (about %4$s blocks from town)",
+  "rtshop.pshop.sold_msg_fee": "[Your shop] %s bought %s x%s. +%sG (bank, after a %sG lot sales fee)"
 }

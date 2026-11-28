@@ -8680,10 +8680,10 @@ public final class SelfTest {
         LINES.add("[3.79 shop lots]");
         com.rtshop.land.LandConfig cfg = com.rtshop.land.LandConfig.get();
         LandData data = LandData.get(server);
-        check("3.79 shop lot settings follow the answers: twice the deed price, no limit per player, a small weekly rent, stands only on shop lots",
-                cfg.shopLotPriceFactor == 2.0 && cfg.shopLotMaxPerPlayer == 0 && cfg.shopLotRentPercent > 0 && cfg.shopLotRentPercent <= 5
-                        && cfg.shopStandsOnlyOnShopLots && cfg.shopLotsAuto,
-                cfg.shopLotPriceFactor + " " + cfg.shopLotMaxPerPlayer + " " + cfg.shopLotRentPercent + " " + cfg.shopStandsOnlyOnShopLots);
+        check("3.79 shop lot settings follow the answers: twice the deed price, no limit per player, weekly base rent 15% + 5% of each sale, stands only on shop lots",
+                cfg.shopLotPriceFactor == 2.0 && cfg.shopLotMaxPerPlayer == 0 && cfg.shopLotRentPercent == 15.0 && cfg.shopLotSalesFeePercent == 5.0
+                        && !cfg.shopSalesFeeAllStands && cfg.shopStandsOnlyOnShopLots && cfg.shopLotsAuto,
+                cfg.shopLotPriceFactor + " " + cfg.shopLotMaxPerPlayer + " " + cfg.shopLotRentPercent + " " + cfg.shopLotSalesFeePercent + " " + cfg.shopStandsOnlyOnShopLots);
         // 기본 장터: 아모노스 성 영역 안, 집 토지(성 안 토지)와 겹치지 않고, 서로 겹치지 않음
         List<com.rtshop.land.ShopLots.Lot> lots = com.rtshop.land.ShopLots.def().lots;
         boolean inZone = true, clearOfHouses = true, apart = true;
@@ -8707,9 +8707,46 @@ public final class SelfTest {
                 }
             }
         }
-        check("3.79 the default market has 10 lots of 6×4 on the square between the central lake and the east gate (inside the castle zone, clear of house lots and of each other)",
-                lots.size() == 10 && lots.stream().allMatch(t -> t.w == 6 && t.h == 4) && inZone && clearOfHouses && apart,
-                lots.size() + " zone " + inZone + " houses " + clearOfHouses + " apart " + apart + " " + why);
+        // 11-28 10:56: 흩어 놓기 (어느 두 칸 사이도 4칸 이상), 길 위에만 (지도에서 칸과 그 둘레 한 칸이 모두 포장된 길 빛깔)
+        int minGap = Integer.MAX_VALUE;
+        for (int i = 0; i < lots.size(); i++) {
+            for (int j = i + 1; j < lots.size(); j++) {
+                com.rtshop.land.ShopLots.Lot p1 = lots.get(i), p2 = lots.get(j);
+                int gx = Math.max(0, Math.max(p2.x0 - (p1.x0 + p1.w), p1.x0 - (p2.x0 + p2.w)));
+                int gz = Math.max(0, Math.max(p2.z0 - (p1.z0 + p1.h), p1.z0 - (p2.z0 + p2.h)));
+                minGap = Math.min(minGap, Math.max(gx, gz));
+            }
+        }
+        int offRoad = -1;
+        String offWhere = "";
+        try (java.io.InputStream in = SelfTest.class.getResourceAsStream("/assets/rtshop/textures/gui/castle_map.png")) {
+            java.awt.image.BufferedImage map = in == null ? null : javax.imageio.ImageIO.read(in);
+            if (map != null) {
+                offRoad = 0;
+                com.rtshop.land.CastlePlots.Def cd = com.rtshop.land.CastlePlots.def();
+                for (com.rtshop.land.ShopLots.Lot t : lots) {
+                    for (int dx = -1; dx <= t.w; dx++) {
+                        for (int dz = -1; dz <= t.h; dz++) {
+                            int mx = t.x0 + dx - cd.mapX0, mz = t.z0 + dz - cd.mapZ0;
+                            int rgb = mx >= 0 && mz >= 0 && mx < map.getWidth() && mz < map.getHeight() ? map.getRGB(mx, mz) : 0;
+                            int r = (rgb >> 16) & 255, g = (rgb >> 8) & 255, bl = rgb & 255;
+                            int hi = Math.max(r, Math.max(g, bl)), lo = Math.min(r, Math.min(g, bl));
+                            if (!(hi - lo < 24 && hi > 92 && hi <= 185)) {
+                                offRoad++;
+                                offWhere = t.name + " " + (t.x0 + dx) + "," + (t.z0 + dz);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            offWhere = String.valueOf(e);
+        }
+        check("3.79 the default market has 9 lots of 5×5 spread over the south-east gate square (inside the castle zone, clear of house lots, at least 4 blocks apart)",
+                lots.size() == 9 && lots.stream().allMatch(t -> t.w == 5 && t.h == 5) && inZone && clearOfHouses && apart && minGap >= 4,
+                lots.size() + " zone " + inZone + " houses " + clearOfHouses + " apart " + apart + " gap " + minGap + " " + why);
+        check("3.79 every market lot and the block around it is paved road on the castle map (no stall, building or lamp in the way)",
+                offRoad == 0, offRoad + " " + offWhere);
         long[] deed = com.rtshop.land.ShopLots.deed();
         check("3.79 a 6×4 shop lot costs twice the land deed's price per block (40,000 G / 256 × 24 × 2 = 7,500 G)",
                 deed[0] == 40000 && deed[1] == 256 && com.rtshop.land.ShopLots.priceFor(24) == 7500, deed[0] + " / " + deed[1] + " → " + com.rtshop.land.ShopLots.priceFor(24));
@@ -8729,8 +8766,8 @@ public final class SelfTest {
         int oldMax = cfg.shopLotMaxPerPlayer;
         BlockPos stand = new BlockPos(x + 2, gy, z + 1), outside = new BlockPos(x - 2, gy, z + 1);
         try {
-            check("3.79 shop lots are made for sale (one overlapping another is refused): price 7,500 G, rent 2% = 150 G a week",
-                    l1 != null && l2 != null && clash == null && l1.shopLot && l1.forSale() && l1.price == 7500 && com.rtshop.land.ShopLots.rentOf(l1) == 150,
+            check("3.79 shop lots are made for sale (one overlapping another is refused): price 7,500 G, base rent 15% = 1,125 G a week",
+                    l1 != null && l2 != null && clash == null && l1.shopLot && l1.forSale() && l1.price == 7500 && com.rtshop.land.ShopLots.rentOf(l1) == 1125,
                     (l1 == null ? "none" : l1.price + " " + com.rtshop.land.ShopLots.rentOf(l1)) + " clash " + (clash != null));
             if (l1 == null || l2 == null) return;
             com.google.gson.JsonObject listed = com.rtshop.land.PlotBrowser.list(b);
@@ -8743,8 +8780,9 @@ public final class SelfTest {
                     if (o.get("id").getAsInt() == l1.id) rentShown = o.get("rent").getAsLong();
                 }
             }
-            check("3.79 the land merchant's window lists shop lots under their own tab (kind shop) with the weekly rent", shopRows >= 2 && rentShown == 150,
-                    shopRows + " rows, rent " + rentShown);
+            check("3.79 the land merchant's window lists shop lots under their own tab (kind shop) with the weekly rent and the sales %",
+                    shopRows >= 2 && rentShown == 1125 && listed.has("shopLotFeePct") && listed.get("shopLotFeePct").getAsDouble() == 5.0,
+                    shopRows + " rows, rent " + rentShown + " fee " + listed.get("shopLotFeePct"));
             // 진열대 놓기: 상점 토지 밖 · 판매 중인 칸 · 남의 칸은 안 됨
             check("3.79 a stand cannot be placed outside a shop lot", "rtshop.shoplot.stand_only".equals(trKey(com.rtshop.land.ShopLots.standDenied(a, outside))),
                     trKey(com.rtshop.land.ShopLots.standDenied(a, outside)));
@@ -8778,25 +8816,26 @@ public final class SelfTest {
                     outRes + " " + outEmpty + " / " + inRes + " " + inPlaced + " " + trKey(com.rtshop.pshop.PlayerShopBlock.lastDeniedForTest));
             // 자릿세: 다음 주 (예금 → 지갑)
             com.rtshop.land.ShopLots.tick(server);
-            ed.setBank(a.getUUID(), 100);
-            com.rtshop.economy.Economy.setWallet(a, 1000);
+            ed.setBank(a.getUUID(), 500);
+            com.rtshop.economy.Economy.setWallet(a, 3000);
             com.rtshop.raid.Weekly.testClockOffset = oldOffset + 7L * 24 * 3600 * 1000;
             int[] t1 = com.rtshop.land.ShopLots.tick(server);
-            check("3.79 next week the rent of both lots (150 G each) is taken from the bank first, then the wallet",
-                    t1[0] == 2 && l1.rentOwed == 0 && l2.rentOwed == 0 && ed.bank(a.getUUID()) == 0 && com.rtshop.economy.Economy.wallet(a) == 800
+            check("3.79 next week the base rent of both lots (1,125 G each) is taken from the bank first, then the wallet",
+                    t1[0] == 2 && l1.rentOwed == 0 && l2.rentOwed == 0 && ed.bank(a.getUUID()) == 0 && com.rtshop.economy.Economy.wallet(a) == 1250
                             && trKey(com.rtshop.land.ShopLots.lastNotice).equals("rtshop.shoplot.rent_paid"),
                     java.util.Arrays.toString(t1) + " bank " + ed.bank(a.getUUID()) + " wallet " + com.rtshop.economy.Economy.wallet(a));
             int[] again = com.rtshop.land.ShopLots.tick(server);
-            check("3.79 ...only once a week", again[0] == 0 && com.rtshop.economy.Economy.wallet(a) == 800);
+            check("3.79 ...only once a week", again[0] == 0 && com.rtshop.economy.Economy.wallet(a) == 1250);
             // 못 내면: 밀리고 진열대가 닫힘
             com.rtshop.economy.Economy.setWallet(a, 0);
             com.rtshop.raid.Weekly.testClockOffset = oldOffset + 14L * 24 * 3600 * 1000;
             com.rtshop.land.ShopLots.tick(server);
-            boolean closed = com.rtshop.land.ShopLots.closedAt(level, stand) && l1.rentOwed == 150
+            boolean closed = com.rtshop.land.ShopLots.closedAt(level, stand) && l1.rentOwed == 1125
                     && trKey(com.rtshop.land.ShopLots.lastNotice).equals("rtshop.shoplot.rent_short");
             boolean sold = false;
+            com.rtshop.pshop.PlayerShopBlockEntity.Listing li = null;
             if (level.getBlockEntity(stand) instanceof com.rtshop.pshop.PlayerShopBlockEntity be) {
-                com.rtshop.pshop.PlayerShopBlockEntity.Listing li = new com.rtshop.pshop.PlayerShopBlockEntity.Listing();
+                li = new com.rtshop.pshop.PlayerShopBlockEntity.Listing();
                 li.item = new ItemStack(net.minecraft.world.item.Items.BREAD);
                 li.price = 1;
                 li.stock = 3;
@@ -8811,17 +8850,36 @@ public final class SelfTest {
                     l1.rentOwed + " " + closed + " sold " + sold + " " + trKey(com.rtshop.pshop.PlayerShops.lastResult));
             com.rtshop.raid.Weekly.testClockOffset = oldOffset + 84L * 24 * 3600 * 1000;
             com.rtshop.land.ShopLots.tick(server);
-            check("3.79 owed rent stops growing at 4 weeks' worth", l1.rentOwed == 600, l1.rentOwed);
+            check("3.79 owed rent stops growing at 4 weeks' worth", l1.rentOwed == 4500, l1.rentOwed);
             com.rtshop.economy.Economy.setWallet(a, 100);
             net.minecraft.network.chat.Component cant = com.rtshop.land.ShopLots.payNow(a, l1);
-            com.rtshop.economy.Economy.setWallet(a, 700);
+            com.rtshop.economy.Economy.setWallet(a, 5000);
             net.minecraft.network.chat.Component paidNow = com.rtshop.land.ShopLots.payNow(a, l1);
             check("3.79 [Pay rent] needs the whole amount, then opens the stands again",
                     "rtshop.shoplot.rent_cant".equals(trKey(cant)) && "rtshop.shoplot.rent_paid_now".equals(trKey(paidNow)) && l1.rentOwed == 0
-                            && !com.rtshop.land.ShopLots.closedAt(level, stand) && com.rtshop.economy.Economy.wallet(a) == 100,
+                            && !com.rtshop.land.ShopLots.closedAt(level, stand) && com.rtshop.economy.Economy.wallet(a) == 500,
                     trKey(cant) + " " + trKey(paidNow) + " " + com.rtshop.economy.Economy.wallet(a));
-            ed.setBank(a.getUUID(), 1000);
-            boolean autoPaid = l2.rentOwed == 600 && com.rtshop.land.ShopLots.tick(server)[0] == 1 && l2.rentOwed == 0 && ed.bank(a.getUUID()) == 400;
+            // 판매 자릿세 (11-28 10:56): 상점 토지의 진열대에서 팔리면 판매 금액의 5% 를 떼고 주인 예금으로
+            ed.setBank(a.getUUID(), 0);
+            boolean feeSold = false;
+            if (li != null) {
+                li.price = 1000;
+                com.rtshop.economy.Economy.setWallet(b, 5000);
+                com.rtshop.pshop.PlayerShops.lastSalesFeeForTest = -1;
+                com.rtshop.pshop.PlayerShops.handle(b, stand, com.rtshop.pshop.PlayerShops.BUY, "{\"i\":0,\"n\":1}");
+                feeSold = li.stock == 2;
+            }
+            boolean feeOffLot = com.rtshop.land.ShopLots.salesFee(level, outside, 1000) == 0;
+            cfg.shopSalesFeeAllStands = true;
+            boolean feeEverywhere = com.rtshop.land.ShopLots.salesFee(level, outside, 1000) == 50;
+            cfg.shopSalesFeeAllStands = false;
+            check("3.79 a sale on a shop lot gives up 5% (1,000 G → owner's bank +950 G); stands off shop lots pay no sales fee unless shopSalesFeeAllStands",
+                    feeSold && com.rtshop.pshop.PlayerShops.lastSalesFeeForTest == 50 && ed.bank(a.getUUID()) == 950
+                            && com.rtshop.economy.Economy.wallet(b) == 4000 && feeOffLot && feeEverywhere,
+                    feeSold + " fee " + com.rtshop.pshop.PlayerShops.lastSalesFeeForTest + " bank " + ed.bank(a.getUUID()) + " b " + com.rtshop.economy.Economy.wallet(b)
+                            + " off " + feeOffLot + " all " + feeEverywhere + " " + trKey(com.rtshop.pshop.PlayerShops.lastResult));
+            ed.setBank(a.getUUID(), 10_000);
+            boolean autoPaid = l2.rentOwed == 4500 && com.rtshop.land.ShopLots.tick(server)[0] == 1 && l2.rentOwed == 0 && ed.bank(a.getUUID()) == 5500;
             check("3.79 owed rent is paid by itself once the money is there", autoPaid, l2.rentOwed + " bank " + ed.bank(a.getUUID()));
             // 저장
             LandData copy = LandData.load(data.save(new CompoundTag()));
@@ -8829,13 +8887,13 @@ public final class SelfTest {
             check("3.79 shop lots are saved with their rent state", c1 != null && c1.shopLot && c1.rentWeek == l1.rentWeek && c1.rentOwed == l1.rentOwed && c1.plot);
             // 되팔기: 진열대가 있으면 안 됨, 치우면 산 값의 절반 (밀린 자릿세는 뺌)
             com.rtshop.economy.Economy.setWallet(a, 0);
-            l1.rentOwed = 150;
+            l1.rentOwed = 1125;
             PlotManager.giveBack(a, l1);
             boolean refused = !l1.forSale() && com.rtshop.economy.Economy.wallet(a) == 0;
             level.removeBlock(stand, false);
             PlotManager.giveBack(a, l1);
-            check("3.79 giving a shop lot back: refused while a stand is on it, then half the price minus owed rent (3,750 − 150)",
-                    refused && l1.forSale() && com.rtshop.economy.Economy.wallet(a) == 3600 && l1.rentOwed == 0 && l1.rentWeek == 0,
+            check("3.79 giving a shop lot back: refused while a stand is on it, then half the price minus owed rent (3,750 − 1,125)",
+                    refused && l1.forSale() && com.rtshop.economy.Economy.wallet(a) == 2625 && l1.rentOwed == 0 && l1.rentWeek == 0,
                     refused + " " + l1.forSale() + " " + com.rtshop.economy.Economy.wallet(a));
             // 운영자: 구획 ↔ 상점 토지, 명령
             LandData.Land plain = data.createPlot("시험 일반 구획", 999);
@@ -8860,6 +8918,7 @@ public final class SelfTest {
         } finally {
             com.rtshop.raid.Weekly.testClockOffset = oldOffset;
             cfg.shopLotMaxPerPlayer = oldMax;
+            cfg.shopSalesFeeAllStands = false;
             if (level.getBlockState(stand).getBlock() instanceof com.rtshop.pshop.PlayerShopBlock) level.removeBlock(stand, false);
             if (l1 != null) data.removeLand(l1);
             if (l2 != null) data.removeLand(l2);

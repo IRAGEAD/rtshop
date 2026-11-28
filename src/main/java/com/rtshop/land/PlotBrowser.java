@@ -181,6 +181,7 @@ public final class PlotBrowser {
         o.addProperty("castleInstalled", data.castleInstalled);
         o.addProperty("shopLotMax", cfg.shopLotMaxPerPlayer);
         o.addProperty("shopLotRentPct", cfg.shopLotRentPercent);
+        o.addProperty("shopLotFeePct", cfg.shopLotSalesFeePercent);
         JsonObject st = new JsonObject();
         st.addProperty("job", cfg.starterPlotJob);
         st.addProperty("hasJob", !cfg.starterPlotJob.isEmpty() && com.rtshop.job.Jobs.has(p, cfg.starterPlotJob));

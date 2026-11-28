@@ -157,6 +157,8 @@ public class PlotBrowserScreen extends Screen {
     private final List<Entry> all = new ArrayList<>();
     private JsonObject starter = new JsonObject();
     private long wallet;
+    /** 3.79: 상점 토지의 판매 자릿세 % (서버 설정). */
+    private double salesFeePct;
     private int tab = 0;
     private int mode = MODE_MAP;
     private final Map<Integer, Integer> selected = new HashMap<>();
@@ -295,6 +297,7 @@ public class PlotBrowserScreen extends Screen {
         all.sort((a, b) -> a.castleNo != b.castleNo ? Integer.compare(a.castleNo, b.castleNo) : Integer.compare(a.id, b.id));
         starter = o.has("starter") ? o.getAsJsonObject("starter") : new JsonObject();
         wallet = o.get("wallet").getAsLong();
+        salesFeePct = o.has("shopLotFeePct") ? o.get("shopLotFeePct").getAsDouble() : 0;
         if (o.has("result")) {
             result = Component.Serializer.fromJson(o.get("result").getAsString());
             resultAt = System.currentTimeMillis();
@@ -801,7 +804,8 @@ public class PlotBrowserScreen extends Screen {
             }
             if (e.kind.equals("shop")) {
                 // 3.79: 상점 토지 — 주마다 자릿세, 밀린 자릿세
-                l2 += "  " + Component.translatable("rtshop.shoplot.rent_info", Ui.num(e.rent)).getString();
+                l2 += "  " + Component.translatable("rtshop.shoplot.rent_info", Ui.num(e.rent),
+                        com.rtshop.land.ShopLots.pctText(salesFeePct)).getString();
                 if (e.mine() && e.owed > 0) l2 += "  " + Component.translatable("rtshop.shoplot.owed_short", Ui.num(e.owed)).getString();
             }
             int y = by + 15;

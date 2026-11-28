@@ -88,6 +88,8 @@ public final class PlayerShops {
 
     /** 시험용: 마지막 동작 결과. */
     public static Component lastResult;
+    /** 시험용: 마지막 판매에서 뗀 판매 자릿세. */
+    public static long lastSalesFeeForTest;
 
     static void send(ServerPlayer p, BlockPos pos, PlayerShopBlockEntity be, Component result) {
         lastResult = result;
@@ -232,10 +234,15 @@ public final class PlayerShops {
         l.sold += n;
         be.totalSales += cost;
         give(p, l.item, n);
-        payOwner(p.server, be.owner, cost);
+        // 3.79: 상점 토지의 판매 자릿세 (판매 금액의 %) 를 떼고 주인 예금으로
+        long fee = com.rtshop.land.ShopLots.salesFee(p.serverLevel(), be.getBlockPos(), cost);
+        lastSalesFeeForTest = fee;
+        payOwner(p.server, be.owner, cost - fee);
         ServerPlayer op = p.server.getPlayerList().getPlayer(be.owner);
         if (op != null) {
-            com.rtshop.notice.Notice.send(op, Component.translatable("rtshop.pshop.sold_msg", p.getDisplayName(), l.item.getHoverName(), n, Long.toString(cost))
+            com.rtshop.notice.Notice.send(op, (fee > 0
+                    ? Component.translatable("rtshop.pshop.sold_msg_fee", p.getDisplayName(), l.item.getHoverName(), n, Long.toString(cost - fee), Long.toString(fee))
+                    : Component.translatable("rtshop.pshop.sold_msg", p.getDisplayName(), l.item.getHoverName(), n, Long.toString(cost)))
                     .withStyle(ChatFormatting.GOLD));
         }
         RtShop.LOGGER.info("[rtshop] 플레이어 상점 {}: {} 이(가) {} x{} 을(를) {}G 에 샀습니다", be.ownerName, p.getGameProfile().getName(),

@@ -39,12 +39,14 @@ import java.util.UUID;
 /**
  * 상점 토지 (3.79, 사용자 메모 W-4 "플레이어 상점: 개인 토지에는 설치 불가, 상점 토지를 산 뒤 설치" + 11-28 답):
  * <ul>
- * <li>자리: 아모노스 맵이면 중앙 호수와 동문(마을 입구) 사이의 광장 한가운데에 장터 10칸(6×4, 두 줄 등을 맞댐)을 판매 중 구획으로 등록한다
- *     (rtshop_defaults/shop_lots.json). 광장의 둘레 길과 동문 앞은 비워 둔다. 운영자는 구획 지팡이로 만든 구획을 상점 토지로 바꿀 수 있다.</li>
+ * <li>자리 (사용자 11-28 10:56): 아모노스 맵이면 남동쪽 입구(남동문) 안, 가판대가 늘어선 넓은 광장의 가장자리에 장터 9칸(5×5)을 흩어 놓아 판매 중 구획으로 등록한다
+ *     (rtshop_defaults/shop_lots.json). 칸은 모두 포장된 길 위, 기존 가판대 · 건물 · 등불과 한 칸 이상 떨어져 있고 가운데 큰길은 비운다.
+ *     운영자는 구획 지팡이로 만든 구획이나 서 있는 자리를 상점 토지로 만들 수 있다.</li>
  * <li>값 = 토지 문서(16×16) 값의 블록당 값 × 넓이 × 2 (사용자 답: 2배). 한 사람이 가질 수 있는 수에 제한이 없다 (사용자 답).</li>
  * <li>플레이어 상점 진열대는 상점 토지(내 것, 또는 놓기 권한을 받은 곳) 안에만 새로 놓는다. 개인 토지에 이미 놓인 진열대는 그대로 (사용자 답).</li>
- * <li>자릿세 (사용자 답: 주마다 약간): 산 값의 2% 를 주간 초기화 때 예금 → 지갑 순으로 (접속하지 않아도). 산 주는 내지 않는다.
- *     못 내면 밀린 자릿세가 쌓이고(4주 치까지) 그 토지의 진열대가 문을 닫는다. 돈이 생기면 저절로 내고 다시 연다 (토지 상인 창 · 진열대에서 바로 낼 수도 있다).</li>
+ * <li>자릿세 (사용자 11-28 10:56 "기존 자릿세 + 판매 금액의 일정 %", "기존 자릿세는 더 올리는 것이"): 기본 자릿세 = 산 값의 15% 를 주간 초기화 때 예금 → 지갑 순으로
+ *     (접속하지 않아도, 산 주는 없음) + 판매 자릿세 = 그 토지의 진열대에서 팔릴 때 판매 금액의 5% 를 떼어 간다.
+ *     기본 자릿세를 못 내면 밀린 자릿세가 쌓이고(4주 치까지) 그 토지의 진열대가 문을 닫는다. 돈이 생기면 저절로 내고 다시 연다 (토지 상인 창 · 진열대에서 바로 낼 수도 있다).</li>
  * <li>되팔기: 일반 구획처럼 산 값의 절반 (진열대를 먼저 치워야 하고, 밀린 자릿세는 빼고 돌려준다).</li>
  * </ul>
  */
@@ -128,6 +130,25 @@ public final class ShopLots {
         long[] d = deed();
         double v = d[1] <= 0 ? 0 : (double) d[0] / d[1] * area * LandConfig.get().shopLotPriceFactor;
         return Math.max(0, Math.round(v / 10.0) * 10);
+    }
+
+    /**
+     * 판매 자릿세: 이 자리의 진열대에서 amount 어치가 팔릴 때 떼어 가는 몫 (상점 토지 밖이면 0, shopSalesFeeAllStands 면 어디서나).
+     */
+    public static long salesFee(ServerLevel level, BlockPos pos, long amount) {
+        LandConfig c = LandConfig.get();
+        if (amount <= 0 || c.shopLotSalesFeePercent <= 0) return 0;
+        if (!c.shopSalesFeeAllStands && lotAt(level, pos) == null) return 0;
+        return Math.max(0, Math.min(amount, Math.round(amount * c.shopLotSalesFeePercent / 100.0)));
+    }
+
+    /** 판매 자릿세 % 를 글로 (5.0 → "5", 2.5 → "2.5"). */
+    public static String feePctText() {
+        return pctText(LandConfig.get().shopLotSalesFeePercent);
+    }
+
+    public static String pctText(double v) {
+        return v == Math.rint(v) ? Long.toString((long) v) : String.format(java.util.Locale.ROOT, "%.1f", v);
     }
 
     /** 이 상점 토지의 한 주 자릿세. */
