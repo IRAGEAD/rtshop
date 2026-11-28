@@ -149,6 +149,7 @@ public final class ShopServer {
             RtShop.LOGGER.error("[rtshop] 예전 토지 높이를 늘리지 못했습니다", t);
         }
         com.rtshop.land.CastlePlots.autoInstall(event.getServer());
+        com.rtshop.land.ShopLots.autoInstall(event.getServer());   // 3.79: 동문 안 광장의 장터 (상점 토지)
         try {
             rebuildRestaurant(event.getServer()); // 메뉴(월드 저장)를 읽어 살 수 있는 요리를 맞춘다
         } catch (Throwable t) {

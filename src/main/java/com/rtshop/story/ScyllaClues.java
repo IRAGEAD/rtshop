@@ -83,8 +83,8 @@ public final class ScyllaClues {
     public boolean enabled = true;
     public int needed = 5;
     public int version = VERSION;
-    /** 3: 3.78 의 새 확률 (뽑기 단서 0.05%, 낚시 단서 0.1% · 천장 없음). */
-    public static final int VERSION = 3;
+    /** 3: 3.78 의 새 확률 (뽑기 단서 0.05%, 낚시 단서 0.1% · 천장 없음). 4: 3.79 뽑기 단서도 천장 없음 (사용자 11-28 10:34). */
+    public static final int VERSION = 4;
     public String rewardItem = "cataclysm:storm_eye";
     public String grantFlag = "seal_scylla";
     /** 단서를 다 모아도 이 표식(메인 스토리의 끝)이 있어야 폭풍이 열린다. 그 표식을 주는 퀘스트가 없으면 따지지 않는다. */
@@ -121,9 +121,9 @@ public final class ScyllaClues {
     static Map<String, Clue> defaults() {
         Map<String, Clue> m = new LinkedHashMap<>();
         // 다섯 단서 = 폭풍의 여제가 쓴 「마중의 항해일지」의 흩어진 다섯 조각. 얻는 때는 운과 선택에 따라 다르다.
-        // 뽑기·보스·상자 단서는 천장이 있어 결국 얻고, 낚시 단서(3.78)는 천장 없이 0.1% 운에만 맡긴다 (사용자가 정함 11-28).
+        // 보스·상자 단서는 천장이 있어 결국 얻고, 낚시 단서(3.78)와 뽑기 단서(3.79)는 천장 없이 운에만 맡긴다 (사용자가 정함 11-28).
         Clue a = clue("storm_coin", "여덟 갈래 번개가 찍힌 품삯", "행운 상인의 상품 더미에 섞여 있던 낡은 은화. 앞면에 여덟 갈래 번개, 뒷면에 한 줄: \"마중 나간 날의 품삯. 돌아와서 치름.\"", "gacha", "", 0.0005);
-        a.pity = 300; // 3.78: 0.2% → 0.05% (천장 300 은 그대로)
+        a.pity = 0; // 3.78: 0.2% → 0.05%, 3.79: 천장 300 → 없음 (사용자 "스킬라 단서의 천장을 없애줘")
         hint(a, "*", "그런 돈은 처음 보는데. 품삯을 '돌아와서 치른다'니, 못 돌아온 배의 돈이겠구먼.");
         hint(a, "cleric", "여덟 갈래라. 일곱이 아니고? …세어 보니 정말 여덟이군.");
         m.put(a.id, a);
@@ -212,9 +212,11 @@ public final class ScyllaClues {
                     }
                 }
                 int ver = o.has("version") ? o.get("version").getAsInt() : 0;
-                if (migrate3(s, ver)) {
+                boolean m3 = migrate3(s, ver);
+                boolean m4 = migrate4(s, ver);
+                if (m3 || m4) {
                     Files.writeString(f, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(s.toJson()), StandardCharsets.UTF_8);
-                    RtShop.LOGGER.info("[rtshop] scylla.json 을 3.78 의 확률로 바꿨습니다 (뽑기 단서 0.05%, 낚시 단서 0.1% · 천장 없음).");
+                    RtShop.LOGGER.info("[rtshop] scylla.json 을 새 판({})으로 바꿨습니다 (3.78: 뽑기 단서 0.05%, 낚시 단서 0.1% · 천장 없음 / 3.79: 뽑기 단서 천장 없음).", VERSION);
                 }
             } else {
                 s.clues.putAll(defaults());
@@ -241,6 +243,17 @@ public final class ScyllaClues {
             log.chance = 0.001;
             log.pity = 0;
         }
+        s.version = VERSION;
+        return true;
+    }
+
+    /**
+     * 3.79 (version 4): 뽑기 단서 storm_coin 의 천장이 3.78 기본값(300) 그대로면 없앤다 (서버 주인이 바꾼 천장은 그대로). 바꾼 게 있으면(버전 포함) true.
+     */
+    public static boolean migrate4(ScyllaClues s, int ver) {
+        if (ver >= 4) return false;
+        Clue coin = s.clues.get("storm_coin");
+        if (coin != null && "gacha".equals(coin.source) && coin.pity == 300) coin.pity = 0;
         s.version = VERSION;
         return true;
     }

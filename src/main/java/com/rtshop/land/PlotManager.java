@@ -832,7 +832,7 @@ public final class PlotManager {
     public static int plotsOwned(LandData data, UUID id) {
         int n = 0;
         for (Land l : data.lands()) {
-            if (l.plot && l.owner.equals(id)) {
+            if (l.plot && !l.shopLot && l.owner.equals(id)) {   // 상점 토지는 따로 센다 (3.79: 제한 없음)
                 n++;
             }
         }
@@ -862,7 +862,11 @@ public final class PlotManager {
             return Component.translatable(land.owner.equals(p.getUUID()) ? "rtshop.plot.already_yours" : "rtshop.plot.sold", land.name, land.ownerName);
         }
         LandConfig cfg = LandConfig.get();
-        if (cfg.plotMaxPerPlayer > 0 && plotsOwned(data, p.getUUID()) >= cfg.plotMaxPerPlayer) {
+        if (land.shopLot) {
+            if (cfg.shopLotMaxPerPlayer > 0 && ShopLots.owned(data, p.getUUID()) >= cfg.shopLotMaxPerPlayer) {
+                return Component.translatable("rtshop.shoplot.limit", cfg.shopLotMaxPerPlayer);
+            }
+        } else if (cfg.plotMaxPerPlayer > 0 && plotsOwned(data, p.getUUID()) >= cfg.plotMaxPerPlayer) {
             return Component.translatable("rtshop.plot.limit", cfg.plotMaxPerPlayer);
         }
         if (Economy.wallet(p) < land.price) {
@@ -887,6 +891,7 @@ public final class PlotManager {
         land.paid = land.price;
         land.defaultPerms = 0;
         land.members.clear();
+        ShopLots.onBought(land);   // 상점 토지: 산 주의 자릿세는 없음
         data.touch();
         LAST_PLOT.remove(p.getUUID());
         com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.bought", land.name, money(land.price)).withStyle(ChatFormatting.GREEN));
@@ -898,7 +903,10 @@ public final class PlotManager {
                     .withStyle(ChatFormatting.GOLD));
             RtShop.LOGGER.info("[rtshop] {} 이(가) {} 을(를) 샀습니다: 바꾼 블록 {}", p.getGameProfile().getName(), land.name, n);
         }
-        if (!land.castle() && LandConfig.get().plotClearOnBuy) {
+        if (land.shopLot) {
+            // 상점 토지는 광장 바닥 그대로 넘긴다 (치우지 않음)
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.shoplot.bought_hint", money(ShopLots.rentOf(land))).withStyle(ChatFormatting.GOLD));
+        } else if (!land.castle() && LandConfig.get().plotClearOnBuy) {
             try {
                 int n = clearPlot(p.server, land);
                 if (n > 0) {
@@ -1030,6 +1038,21 @@ public final class PlotManager {
 
     /** 주인이 구획을 반환한다: 구매가의 일부를 돌려받고 구획은 다시 판매 중이 된다. */
     public static void giveBack(ServerPlayer p, Land land) {
+        Component denied = ShopLots.giveBackDenied(p, land);
+        if (denied != null) {
+            com.rtshop.notice.Notice.send(p, denied.copy().withStyle(ChatFormatting.RED));
+            return;
+        }
+        if (land.shopLot) {
+            // 상점 토지: 밀린 자릿세는 돌려줄 돈에서 뺀다
+            long refund = Math.max(0, land.paid * LandConfig.get().plotRefundPercent / 100 - land.rentOwed);
+            resetToSale(LandData.get(p.server), land);
+            land.rentOwed = 0;
+            land.rentWeek = 0;
+            if (refund > 0) Economy.addWallet(p, refund);
+            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.given_back", land.name, money(refund)).withStyle(ChatFormatting.YELLOW));
+            return;
+        }
         if (!land.group.isEmpty()) {
             resetToSale(LandData.get(p.server), land);
             com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.plot.starter_returned", land.name).withStyle(ChatFormatting.YELLOW));

@@ -199,11 +199,28 @@ public class PlayerShopScreen extends Screen {
             }).bounds(fx + W - 6 - renW, fy + 24, renW, 16).build());
         }
         addRenderableWidget(MButton.of(Component.translatable("gui.done"), b -> onClose()).bounds(fx + W - 56, fy + H - 22, 50, 16).build());
+        int right = fx + W - 60;
+        if (owner && rentOwed() > 0) {
+            // 3.79: 상점 토지의 자릿세가 밀려 문을 닫음 → 바로 내기
+            Component pay = Component.translatable("rtshop.shoplot.pay_rent", Ui.num(rentOwed()));
+            int w = this.font.width(pay) + 12;
+            addRenderableWidget(MButton.of(pay, b -> act(PlayerShops.PAY_RENT, "{}")).bounds(right - w, fy + H - 22, w, 16).build());
+            right -= w + 4;
+        }
         if (owner && !working() && !employee().isEmpty()) {
             Component pay = Component.translatable("rtshop.pshop.pay_wage", Ui.num(data.has("wage") ? data.get("wage").getAsLong() : 0));
             int w = this.font.width(pay) + 12;
-            addRenderableWidget(MButton.of(pay, b -> act(PlayerShops.PAY_WAGE, "{}")).bounds(fx + W - 60 - w, fy + H - 22, w, 16).build());
+            addRenderableWidget(MButton.of(pay, b -> act(PlayerShops.PAY_WAGE, "{}")).bounds(right - w, fy + H - 22, w, 16).build());
         }
+    }
+
+    /** 3.79: 이 진열대가 놓인 상점 토지의 밀린 자릿세 (0 = 없음). */
+    private long rentOwed() {
+        return data.has("rentOwed") ? data.get("rentOwed").getAsLong() : 0;
+    }
+
+    public long rentOwedForTest() {
+        return rentOwed();
     }
 
     private String employee() {
@@ -421,8 +438,11 @@ public class PlayerShopScreen extends Screen {
             if (c instanceof Button b && b.getY() >= fy + H - 24 && b.getX() < fx + W - 60) textW = Math.min(textW, b.getX() - fx - 12);
         }
         String emp = employee();
-        boolean two = !emp.isEmpty();
-        if (two) {
+        boolean two = !emp.isEmpty() || rentOwed() > 0;
+        if (rentOwed() > 0) {
+            Component st = Component.translatable(owner ? "rtshop.shoplot.closed_rent_owner" : "rtshop.shoplot.closed_rent", Ui.num(rentOwed()));
+            g.drawString(this.font, Ui.clip(this.font, st.getString(), textW), fx + 8, fy + H - 23, 0xFFFF7A6A, false);
+        } else if (two) {
             Component st = working()
                     ? Component.translatable(owner ? "rtshop.pshop.emp_working_owner" : "rtshop.pshop.emp_working", emp,
                     Ui.num(data.has("wage") ? data.get("wage").getAsLong() : 0))

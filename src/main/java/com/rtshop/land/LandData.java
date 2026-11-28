@@ -125,6 +125,12 @@ public final class LandData extends SavedData {
         public int castleGround = 0;
         /** 성 안 토지를 이미 평지로 만들었는가. */
         public boolean cleared;
+        /** 상점 토지인가 (3.79, W-4): 플레이어 상점 진열대는 이 토지 안에만 새로 놓는다. 한 사람이 가질 수 있는 수에 제한이 없고, 주마다 자릿세를 낸다. */
+        public boolean shopLot;
+        /** 상점 토지의 밀린 자릿세 (G). 0 보다 크면 그 토지의 진열대는 문을 닫는다. */
+        public long rentOwed;
+        /** 상점 토지의 자릿세를 마지막으로 셈한 주 (Weekly.id, 0 = 아직). */
+        public long rentWeek;
 
         public boolean castle() {
             return castleNo > 0;
@@ -154,6 +160,8 @@ public final class LandData extends SavedData {
     private int nextId = 1;
     /** 성 안 토지를 설치한 판 (0 = 아직 안 함, -1 = 이 세계에는 설치하지 않음). */
     public int castleInstalled = 0;
+    /** 기본 상점 토지(장터)를 설치한 판 (0 = 아직 안 함, -1 = 운영자가 걷어 냄). */
+    public int shopLotsInstalled = 0;
 
     public static LandData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(LandData::load, LandData::new, NAME);
@@ -444,6 +452,9 @@ public final class LandData extends SavedData {
             l.castleGroup = lt.contains("castleGroup") ? lt.getInt("castleGroup") : -1;
             l.castleGround = lt.getInt("castleGround");
             l.cleared = lt.getBoolean("cleared");
+            l.shopLot = lt.getBoolean("shopLot");
+            l.rentOwed = lt.getLong("rentOwed");
+            l.rentWeek = lt.getLong("rentWeek");
             ListTag ml = lt.getList("members", Tag.TAG_COMPOUND);
             for (int j = 0; j < ml.size(); j++) {
                 CompoundTag mt = ml.getCompound(j);
@@ -499,6 +510,7 @@ public final class LandData extends SavedData {
             d.starterGiven.add(sl.getCompound(i).getUUID("id"));
         }
         d.castleInstalled = tag.getInt("castleInstalled");
+        d.shopLotsInstalled = tag.getInt("shopLotsInstalled");
         return d;
     }
 
@@ -523,6 +535,11 @@ public final class LandData extends SavedData {
                     lt.putInt("castleGroup", l.castleGroup);
                     lt.putInt("castleGround", l.castleGround);
                     lt.putBoolean("cleared", l.cleared);
+                }
+                if (l.shopLot) {
+                    lt.putBoolean("shopLot", true);
+                    lt.putLong("rentOwed", l.rentOwed);
+                    lt.putLong("rentWeek", l.rentWeek);
                 }
             }
             ListTag ml = new ListTag();
@@ -573,6 +590,7 @@ public final class LandData extends SavedData {
         }
         tag.put("starterGiven", sl);
         tag.putInt("castleInstalled", castleInstalled);
+        tag.putInt("shopLotsInstalled", shopLotsInstalled);
         return tag;
     }
 }

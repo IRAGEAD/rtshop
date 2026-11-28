@@ -1524,6 +1524,11 @@ public final class SelfTest {
             crash("player shop", t);
         }
         try {
+            shopLots379(server, level, a, b, gx + 1408, gz + 1408);
+        } catch (Throwable t) {
+            crash("shop lots", t);
+        }
+        try {
             plotClear(server, level, a);
             landSweep(level);
         } catch (Throwable t) {
@@ -6360,8 +6365,8 @@ public final class SelfTest {
         {
             java.util.Map<String, com.rtshop.story.ScyllaClues.Clue> sc378Dc = com.rtshop.story.ScyllaClues.defaultsForTest();
             com.rtshop.story.ScyllaClues.Clue sc378Coin = sc378Dc.get("storm_coin"), sc378Log = sc378Dc.get("wet_logbook");
-            check("3.78 the gacha Scylla clue is 0.05% (pity 300 kept) and the sea-fishing clue 0.1% with no pity",
-                    Math.abs(sc378Coin.chance - 0.0005) < 1e-12 && sc378Coin.pity == 300 && Math.abs(sc378Log.chance - 0.001) < 1e-12 && sc378Log.pity == 0
+            check("3.78/3.79 the gacha Scylla clue is 0.05% with no pity (removed in 3.79) and the sea-fishing clue 0.1% with no pity",
+                    Math.abs(sc378Coin.chance - 0.0005) < 1e-12 && sc378Coin.pity == 0 && Math.abs(sc378Log.chance - 0.001) < 1e-12 && sc378Log.pity == 0
                             && "ocean".equals(sc378Log.target), sc378Coin.chance + "/" + sc378Coin.pity + " " + sc378Log.chance + "/" + sc378Log.pity);
             // 설치된 scylla.json (2판): 옛 기본값 그대로면 새 값으로, 서버 주인이 바꾼 값은 그대로
             com.rtshop.story.ScyllaClues sc378Old = com.rtshop.story.ScyllaClues.freshForTest();
@@ -6376,31 +6381,52 @@ public final class SelfTest {
             boolean sc378Mig2 = com.rtshop.story.ScyllaClues.migrate3(sc378Own, 2);
             boolean sc378Again = com.rtshop.story.ScyllaClues.migrate3(sc378Old, 3);
             check("an installed scylla.json moves to the 3.78 chances only where the old defaults are untouched",
-                    sc378Mig && Math.abs(sc378Old.clues.get("storm_coin").chance - 0.0005) < 1e-12 && sc378Old.clues.get("storm_coin").pity == 300
+                    sc378Mig && Math.abs(sc378Old.clues.get("storm_coin").chance - 0.0005) < 1e-12
                             && Math.abs(sc378Old.clues.get("wet_logbook").chance - 0.001) < 1e-12 && sc378Old.clues.get("wet_logbook").pity == 0
                             && sc378Mig2 && sc378Own.clues.get("storm_coin").chance == 0.003 && sc378Own.clues.get("wet_logbook").chance == 0.02 && sc378Own.clues.get("wet_logbook").pity == 90
-                            && !sc378Again && sc378Old.version == 3 && sc378Old.toJsonForTest().get("version").getAsInt() == 3,
+                            && !sc378Again && sc378Old.version == com.rtshop.story.ScyllaClues.VERSION
+                            && sc378Old.toJsonForTest().get("version").getAsInt() == com.rtshop.story.ScyllaClues.VERSION,
                     sc378Old.clues.get("storm_coin").chance + " " + sc378Old.clues.get("wet_logbook").chance + "/" + sc378Old.clues.get("wet_logbook").pity + " own " + sc378Own.clues.get("storm_coin").chance);
+            // 3.79 (사용자 11-28 10:34 "스킬라 단서의 천장을 없애줘"): 3.78 판(천장 300)이면 없애고, 서버 주인이 바꾼 천장은 그대로
+            com.rtshop.story.ScyllaClues sc379Old = com.rtshop.story.ScyllaClues.freshForTest();
+            sc379Old.clues.get("storm_coin").pity = 300;
+            boolean sc379Mig = com.rtshop.story.ScyllaClues.migrate4(sc379Old, 3);
+            com.rtshop.story.ScyllaClues sc379Own = com.rtshop.story.ScyllaClues.freshForTest();
+            sc379Own.clues.get("storm_coin").pity = 120;
+            com.rtshop.story.ScyllaClues.migrate4(sc379Own, 3);
+            boolean sc379Again = com.rtshop.story.ScyllaClues.migrate4(sc379Old, 4);
+            check("3.79 an installed scylla.json (3.78, gacha pity 300) loses the gacha clue's pity; a pity the owner changed stays",
+                    sc379Mig && sc379Old.clues.get("storm_coin").pity == 0 && sc379Own.clues.get("storm_coin").pity == 120 && !sc379Again
+                            && sc379Old.version == 4 && com.rtshop.story.ScyllaClues.VERSION == 4,
+                    sc379Old.clues.get("storm_coin").pity + " / " + sc379Own.clues.get("storm_coin").pity);
         }
         {
             java.util.Set<String> src = new java.util.TreeSet<>();
             for (com.rtshop.story.ScyllaClues.Clue c : sc.clues.values()) src.add(c.source);
             check("Scylla has five clues: gacha, story boss, wild chest, fishing and one from story choices",
                     sc.needed == 5 && sc.clues.size() == 5 && src.equals(new java.util.TreeSet<>(List.of("gacha", "boss", "wild", "fish", "quest"))), src);
-            com.rtshop.story.ScyllaClues.Clue coin = sc.clues.get("storm_coin");
-            double keep = coin.chance;
-            coin.chance = 0;
+            // 천장은 상자 단서(torn_hymn, 150)로 본다 — 뽑기 단서는 3.79 부터 천장이 없다
+            com.rtshop.story.ScyllaClues.Clue hymn = sc.clues.get("torn_hymn");
+            double keep = hymn.chance;
+            hymn.chance = 0;
             com.rtshop.story.ScyllaClues.testRolls = true;
             a.getInventory().clearContent();
-            boolean early = com.rtshop.story.ScyllaClues.roll(a, "gacha", "", coin.pity - 1, null);
-            int tries = com.rtshop.story.ScyllaClues.tries(a, "storm_coin");
-            boolean atCap = com.rtshop.story.ScyllaClues.roll(a, "gacha", "", 1, null);
-            boolean held = com.rtshop.story.ScyllaClues.of(a.getInventory().getItem(0)) == coin;
-            boolean noSecond = !com.rtshop.story.ScyllaClues.roll(a, "gacha", "", coin.pity + 5, null);
-            com.rtshop.story.ScyllaClues.testRolls = false;
-            coin.chance = keep;
+            boolean early = com.rtshop.story.ScyllaClues.roll(a, "wild", "", hymn.pity - 1, null);
+            int tries = com.rtshop.story.ScyllaClues.tries(a, "torn_hymn");
+            boolean atCap = com.rtshop.story.ScyllaClues.roll(a, "wild", "", 1, null);
+            boolean held = com.rtshop.story.ScyllaClues.of(a.getInventory().getItem(0)) == hymn;
+            boolean noSecond = !com.rtshop.story.ScyllaClues.roll(a, "wild", "", hymn.pity + 5, null);
+            hymn.chance = keep;
             check("an unlucky player still gets a luck clue at the pity cap (tries are counted, and no second copy while one is carried)",
-                    !early && tries == coin.pity - 1 && atCap && held && noSecond, early + " " + tries + " " + atCap + " " + held + " " + noSecond);
+                    hymn.pity > 0 && !early && tries == hymn.pity - 1 && atCap && held && noSecond, early + " " + tries + " " + atCap + " " + held + " " + noSecond);
+            a.getInventory().clearContent();
+            com.rtshop.story.ScyllaClues.Clue coin = sc.clues.get("storm_coin");
+            double keepCoin = coin.chance;
+            coin.chance = 0;
+            boolean noCap = !com.rtshop.story.ScyllaClues.roll(a, "gacha", "", 5000, null);
+            coin.chance = keepCoin;
+            com.rtshop.story.ScyllaClues.testRolls = false;
+            check("3.79 the gacha clue has no pity: no number of draws forces it (only its own luck)", coin.pity == 0 && noCap, coin.pity + " " + noCap);
             a.getInventory().clearContent();
             QuestDef ka = QuestManager.loaded().quests.get("hidden_scylla_kas_a"), kb = QuestManager.loaded().quests.get("hidden_scylla_kas_b");
             check("the choice clue comes either way: early for those who freed Kas, later for those who handed him over",
@@ -8624,6 +8650,204 @@ public final class SelfTest {
         level.setBlock(pos.below(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
         a.getInventory().clearContent();
         b.getInventory().clearContent();
+    }
+
+    /**
+     * 3.79 상점 토지 (W-4 + 사용자 11-28 답): 기본 장터 10칸의 자리, 값 = 토지 문서 값의 2배, 한 사람 제한 없음, 진열대는 상점 토지 안에만 새로 놓기,
+     * 주마다 자릿세(예금 → 지갑, 못 내면 밀리고 진열대가 닫힘, 4주 치까지, 돈이 생기면 저절로), 되팔기(진열대를 먼저 치움, 밀린 자릿세는 뺌), 저장.
+     */
+    private static void shopLots379(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b, int x, int z) {
+        LINES.add("");
+        LINES.add("[3.79 shop lots]");
+        com.rtshop.land.LandConfig cfg = com.rtshop.land.LandConfig.get();
+        LandData data = LandData.get(server);
+        check("3.79 shop lot settings follow the answers: twice the deed price, no limit per player, a small weekly rent, stands only on shop lots",
+                cfg.shopLotPriceFactor == 2.0 && cfg.shopLotMaxPerPlayer == 0 && cfg.shopLotRentPercent > 0 && cfg.shopLotRentPercent <= 5
+                        && cfg.shopStandsOnlyOnShopLots && cfg.shopLotsAuto,
+                cfg.shopLotPriceFactor + " " + cfg.shopLotMaxPerPlayer + " " + cfg.shopLotRentPercent + " " + cfg.shopStandsOnlyOnShopLots);
+        // 기본 장터: 아모노스 성 영역 안, 집 토지(성 안 토지)와 겹치지 않고, 서로 겹치지 않음
+        List<com.rtshop.land.ShopLots.Lot> lots = com.rtshop.land.ShopLots.def().lots;
+        boolean inZone = true, clearOfHouses = true, apart = true;
+        String why = "";
+        java.util.Set<Long> cells = new java.util.HashSet<>();
+        for (com.rtshop.land.ShopLots.Lot t : lots) {
+            inZone &= com.rtshop.land.CastlePlots.inZone(t.x0 + t.w / 2, t.z0 + t.h / 2);
+            for (int dx = 0; dx < t.w; dx++) {
+                for (int dz = 0; dz < t.h; dz++) {
+                    int cx = t.x0 + dx, cz = t.z0 + dz;
+                    if (!cells.add(((long) cx << 32) ^ (cz & 0xffffffffL))) {
+                        apart = false;
+                        why = t.name;
+                    }
+                    for (com.rtshop.land.CastlePlots.Tile tile : com.rtshop.land.CastlePlots.def().tiles) {
+                        if (tile.has(cx - tile.x0, cz - tile.z0)) {
+                            clearOfHouses = false;
+                            why = t.name + " in " + tile.no;
+                        }
+                    }
+                }
+            }
+        }
+        check("3.79 the default market has 10 lots of 6×4 on the square between the central lake and the east gate (inside the castle zone, clear of house lots and of each other)",
+                lots.size() == 10 && lots.stream().allMatch(t -> t.w == 6 && t.h == 4) && inZone && clearOfHouses && apart,
+                lots.size() + " zone " + inZone + " houses " + clearOfHouses + " apart " + apart + " " + why);
+        long[] deed = com.rtshop.land.ShopLots.deed();
+        check("3.79 a 6×4 shop lot costs twice the land deed's price per block (40,000 G / 256 × 24 × 2 = 7,500 G)",
+                deed[0] == 40000 && deed[1] == 256 && com.rtshop.land.ShopLots.priceFor(24) == 7500, deed[0] + " / " + deed[1] + " → " + com.rtshop.land.ShopLots.priceFor(24));
+        // 시험용 장터 두 칸
+        level.getChunk(x >> 4, z >> 4);
+        int gy = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x + 2, z + 1);
+        for (int dx = -3; dx < 16; dx++) {
+            for (int dz = -3; dz < 8; dz++) {
+                level.setBlock(new BlockPos(x + dx, gy - 1, z + dz), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 3);
+                for (int up = 0; up < 3; up++) level.setBlock(new BlockPos(x + dx, gy + up, z + dz), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            }
+        }
+        LandData.Land l1 = com.rtshop.land.ShopLots.create(level, "시험 장터 1", x, z, 6, 4);
+        LandData.Land l2 = com.rtshop.land.ShopLots.create(level, "시험 장터 2", x + 6, z, 6, 4);
+        LandData.Land clash = com.rtshop.land.ShopLots.create(level, "겹침", x + 3, z + 1, 6, 4);
+        long oldOffset = com.rtshop.raid.Weekly.testClockOffset;
+        int oldMax = cfg.shopLotMaxPerPlayer;
+        BlockPos stand = new BlockPos(x + 2, gy, z + 1), outside = new BlockPos(x - 2, gy, z + 1);
+        try {
+            check("3.79 shop lots are made for sale (one overlapping another is refused): price 7,500 G, rent 2% = 150 G a week",
+                    l1 != null && l2 != null && clash == null && l1.shopLot && l1.forSale() && l1.price == 7500 && com.rtshop.land.ShopLots.rentOf(l1) == 150,
+                    (l1 == null ? "none" : l1.price + " " + com.rtshop.land.ShopLots.rentOf(l1)) + " clash " + (clash != null));
+            if (l1 == null || l2 == null) return;
+            com.google.gson.JsonObject listed = com.rtshop.land.PlotBrowser.list(b);
+            int shopRows = 0;
+            long rentShown = -1;
+            for (com.google.gson.JsonElement el : listed.getAsJsonArray("plots")) {
+                com.google.gson.JsonObject o = el.getAsJsonObject();
+                if (o.get("kind").getAsString().equals("shop")) {
+                    shopRows++;
+                    if (o.get("id").getAsInt() == l1.id) rentShown = o.get("rent").getAsLong();
+                }
+            }
+            check("3.79 the land merchant's window lists shop lots under their own tab (kind shop) with the weekly rent", shopRows >= 2 && rentShown == 150,
+                    shopRows + " rows, rent " + rentShown);
+            // 진열대 놓기: 상점 토지 밖 · 판매 중인 칸 · 남의 칸은 안 됨
+            check("3.79 a stand cannot be placed outside a shop lot", "rtshop.shoplot.stand_only".equals(trKey(com.rtshop.land.ShopLots.standDenied(a, outside))),
+                    trKey(com.rtshop.land.ShopLots.standDenied(a, outside)));
+            check("3.79 ...nor on a shop lot still for sale", "rtshop.shoplot.stand_for_sale".equals(trKey(com.rtshop.land.ShopLots.standDenied(a, stand))));
+            EconomyData ed = EconomyData.get(server);
+            ed.setBank(a.getUUID(), 0);
+            com.rtshop.economy.Economy.setWallet(a, 100_000);
+            boolean bought1 = PlotManager.buyLand(a, l1);
+            boolean nolimit = com.rtshop.land.PlotManager.cannotBuy(a, l2) == null;
+            cfg.shopLotMaxPerPlayer = 1;
+            String limited = trKey(com.rtshop.land.PlotManager.cannotBuy(a, l2));
+            cfg.shopLotMaxPerPlayer = oldMax;
+            boolean bought2 = PlotManager.buyLand(a, l2);
+            check("3.79 buying shop lots: 7,500 G each, no limit per player (two in a row), and the week you buy is free",
+                    bought1 && bought2 && nolimit && "rtshop.shoplot.limit".equals(limited) && com.rtshop.economy.Economy.wallet(a) == 85_000
+                            && l1.owner.equals(a.getUUID()) && l1.rentWeek == com.rtshop.land.ShopLots.weekNow() && l1.rentOwed == 0,
+                    bought1 + " " + bought2 + " " + nolimit + " " + limited + " " + com.rtshop.economy.Economy.wallet(a));
+            check("3.79 the owner may place stands on their shop lot, others may not", com.rtshop.land.ShopLots.standDenied(a, stand) == null
+                    && "rtshop.shoplot.stand_not_yours".equals(trKey(com.rtshop.land.ShopLots.standDenied(b, stand))), trKey(com.rtshop.land.ShopLots.standDenied(b, stand)));
+            // 실제로 놓아 보기 (아이템을 손에 들고 블록 윗면을 우클릭)
+            a.setPos(stand.getX() + 0.5, stand.getY(), stand.getZ() + 2.5);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.rtshop.item.ModItems.PLAYER_SHOP.get(), 2));
+            net.minecraft.world.InteractionResult outRes = a.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(a, net.minecraft.world.InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(outside.below()).add(0, 0.5, 0), net.minecraft.core.Direction.UP, outside.below(), false)));
+            boolean outEmpty = !(level.getBlockState(outside).getBlock() instanceof com.rtshop.pshop.PlayerShopBlock) && a.getMainHandItem().getCount() == 2;
+            net.minecraft.world.InteractionResult inRes = a.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(a, net.minecraft.world.InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(stand.below()).add(0, 0.5, 0), net.minecraft.core.Direction.UP, stand.below(), false)));
+            boolean inPlaced = level.getBlockState(stand).getBlock() instanceof com.rtshop.pshop.PlayerShopBlock && a.getMainHandItem().getCount() == 1;
+            check("3.79 really placing a stand: refused outside a shop lot (item kept, no block), placed on your own shop lot",
+                    outEmpty && inPlaced && "rtshop.shoplot.stand_only".equals(trKey(com.rtshop.pshop.PlayerShopBlock.lastDeniedForTest)),
+                    outRes + " " + outEmpty + " / " + inRes + " " + inPlaced + " " + trKey(com.rtshop.pshop.PlayerShopBlock.lastDeniedForTest));
+            // 자릿세: 다음 주 (예금 → 지갑)
+            com.rtshop.land.ShopLots.tick(server);
+            ed.setBank(a.getUUID(), 100);
+            com.rtshop.economy.Economy.setWallet(a, 1000);
+            com.rtshop.raid.Weekly.testClockOffset = oldOffset + 7L * 24 * 3600 * 1000;
+            int[] t1 = com.rtshop.land.ShopLots.tick(server);
+            check("3.79 next week the rent of both lots (150 G each) is taken from the bank first, then the wallet",
+                    t1[0] == 2 && l1.rentOwed == 0 && l2.rentOwed == 0 && ed.bank(a.getUUID()) == 0 && com.rtshop.economy.Economy.wallet(a) == 800
+                            && trKey(com.rtshop.land.ShopLots.lastNotice).equals("rtshop.shoplot.rent_paid"),
+                    java.util.Arrays.toString(t1) + " bank " + ed.bank(a.getUUID()) + " wallet " + com.rtshop.economy.Economy.wallet(a));
+            int[] again = com.rtshop.land.ShopLots.tick(server);
+            check("3.79 ...only once a week", again[0] == 0 && com.rtshop.economy.Economy.wallet(a) == 800);
+            // 못 내면: 밀리고 진열대가 닫힘
+            com.rtshop.economy.Economy.setWallet(a, 0);
+            com.rtshop.raid.Weekly.testClockOffset = oldOffset + 14L * 24 * 3600 * 1000;
+            com.rtshop.land.ShopLots.tick(server);
+            boolean closed = com.rtshop.land.ShopLots.closedAt(level, stand) && l1.rentOwed == 150
+                    && trKey(com.rtshop.land.ShopLots.lastNotice).equals("rtshop.shoplot.rent_short");
+            boolean sold = false;
+            if (level.getBlockEntity(stand) instanceof com.rtshop.pshop.PlayerShopBlockEntity be) {
+                com.rtshop.pshop.PlayerShopBlockEntity.Listing li = new com.rtshop.pshop.PlayerShopBlockEntity.Listing();
+                li.item = new ItemStack(net.minecraft.world.item.Items.BREAD);
+                li.price = 1;
+                li.stock = 3;
+                be.listings.add(li);
+                com.rtshop.economy.Economy.setWallet(b, 100);
+                b.setPos(stand.getX() - 0.5, stand.getY(), stand.getZ() + 0.5);
+                com.rtshop.pshop.PlayerShops.handle(b, stand, com.rtshop.pshop.PlayerShops.BUY, "{\"i\":0,\"n\":1}");
+                sold = li.stock != 3;
+            }
+            check("3.79 rent that cannot be paid is owed and the stands on that lot close (customers cannot buy)",
+                    closed && !sold && "rtshop.shoplot.closed_rent".equals(trKey(com.rtshop.pshop.PlayerShops.lastResult)),
+                    l1.rentOwed + " " + closed + " sold " + sold + " " + trKey(com.rtshop.pshop.PlayerShops.lastResult));
+            com.rtshop.raid.Weekly.testClockOffset = oldOffset + 84L * 24 * 3600 * 1000;
+            com.rtshop.land.ShopLots.tick(server);
+            check("3.79 owed rent stops growing at 4 weeks' worth", l1.rentOwed == 600, l1.rentOwed);
+            com.rtshop.economy.Economy.setWallet(a, 100);
+            net.minecraft.network.chat.Component cant = com.rtshop.land.ShopLots.payNow(a, l1);
+            com.rtshop.economy.Economy.setWallet(a, 700);
+            net.minecraft.network.chat.Component paidNow = com.rtshop.land.ShopLots.payNow(a, l1);
+            check("3.79 [Pay rent] needs the whole amount, then opens the stands again",
+                    "rtshop.shoplot.rent_cant".equals(trKey(cant)) && "rtshop.shoplot.rent_paid_now".equals(trKey(paidNow)) && l1.rentOwed == 0
+                            && !com.rtshop.land.ShopLots.closedAt(level, stand) && com.rtshop.economy.Economy.wallet(a) == 100,
+                    trKey(cant) + " " + trKey(paidNow) + " " + com.rtshop.economy.Economy.wallet(a));
+            ed.setBank(a.getUUID(), 1000);
+            boolean autoPaid = l2.rentOwed == 600 && com.rtshop.land.ShopLots.tick(server)[0] == 1 && l2.rentOwed == 0 && ed.bank(a.getUUID()) == 400;
+            check("3.79 owed rent is paid by itself once the money is there", autoPaid, l2.rentOwed + " bank " + ed.bank(a.getUUID()));
+            // 저장
+            LandData copy = LandData.load(data.save(new CompoundTag()));
+            LandData.Land c1 = copy.land(l1.id);
+            check("3.79 shop lots are saved with their rent state", c1 != null && c1.shopLot && c1.rentWeek == l1.rentWeek && c1.rentOwed == l1.rentOwed && c1.plot);
+            // 되팔기: 진열대가 있으면 안 됨, 치우면 산 값의 절반 (밀린 자릿세는 뺌)
+            com.rtshop.economy.Economy.setWallet(a, 0);
+            l1.rentOwed = 150;
+            PlotManager.giveBack(a, l1);
+            boolean refused = !l1.forSale() && com.rtshop.economy.Economy.wallet(a) == 0;
+            level.removeBlock(stand, false);
+            PlotManager.giveBack(a, l1);
+            check("3.79 giving a shop lot back: refused while a stand is on it, then half the price minus owed rent (3,750 − 150)",
+                    refused && l1.forSale() && com.rtshop.economy.Economy.wallet(a) == 3600 && l1.rentOwed == 0 && l1.rentWeek == 0,
+                    refused + " " + l1.forSale() + " " + com.rtshop.economy.Economy.wallet(a));
+            // 운영자: 구획 ↔ 상점 토지, 명령
+            LandData.Land plain = data.createPlot("시험 일반 구획", 999);
+            LandData.Claim pc = new LandData.Claim();
+            pc.dim = com.rtshop.land.LandManager.dim(level);
+            pc.type = "plot";
+            pc.x0 = x;
+            pc.z0 = z + 6;
+            pc.x1 = x + 4;
+            pc.z1 = z + 6 + 4;
+            pc.y0 = gy - 4;
+            pc.y1 = level.getMaxBuildHeight() - 1;
+            data.addClaim(plain, pc);
+            com.rtshop.land.ShopLots.setShopLot(data, plain, true);
+            boolean became = plain.shopLot && plain.price == com.rtshop.land.ShopLots.priceFor(25) && com.rtshop.land.PlotBrowser.kind(plain).equals("shop");
+            com.rtshop.land.ShopLots.setShopLot(data, plain, false);
+            boolean back = !plain.shopLot && !com.rtshop.land.PlotBrowser.kind(plain).equals("shop");
+            data.removeLand(plain);
+            check("3.79 an operator can turn a lot into a shop lot (priced like one) and back, and has /rtshop plot shoplot",
+                    became && back && server.getCommands().getDispatcher().findNode(List.of("rtshop", "plot", "shoplot", "here")) != null
+                            && server.getCommands().getDispatcher().findNode(List.of("rtshop", "plot", "shoplot", "install")) != null);
+        } finally {
+            com.rtshop.raid.Weekly.testClockOffset = oldOffset;
+            cfg.shopLotMaxPerPlayer = oldMax;
+            if (level.getBlockState(stand).getBlock() instanceof com.rtshop.pshop.PlayerShopBlock) level.removeBlock(stand, false);
+            if (l1 != null) data.removeLand(l1);
+            if (l2 != null) data.removeLand(l2);
+            if (clash != null) data.removeLand(clash);
+            a.getInventory().clearContent();
+            b.getInventory().clearContent();
+        }
     }
 
     private static String trKey(net.minecraft.network.chat.Component c) {

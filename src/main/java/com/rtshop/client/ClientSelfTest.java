@@ -714,6 +714,7 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 onServer(mc, sp -> {
                     com.rtshop.land.CastlePlots.install(sp.server);
+                    com.rtshop.land.ShopLots.install(sp.server);   // 3.79: 동문 안 광장의 장터 10칸
                     net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
                     var v = ShopServer.spawnNpc(sp.serverLevel(), sp.position().add(look.x * 2, 0, look.z * 2), sp.getYRot() + 180, "land");
                     plotNpc = v == null ? -1 : v.getId();
@@ -767,7 +768,23 @@ public final class ClientSelfTest {
                 wait = 10;
             }
             case 6 -> {
-                shot(mc, "89_plots_starter_tab");
+                if (!SHOP_TAB_379) {
+                    // 3.79: [상점 토지] 탭 — 성 지도 위 동문 안 광장의 장터 10칸
+                    shot(mc, "89_plots_starter_tab");
+                    SHOP_TAB_379 = true;
+                    if (ps != null) {
+                        ps.showForTest(3, 0, -1);
+                        ps.zoomForTest(2.5);
+                    }
+                    step--;
+                    wait = 20;
+                    return;
+                }
+                var se = ps == null ? null : ps.selectedForTest();
+                check("3.79 the lot window has a [Shop lots] tab with the 10 market lots on the square between the lake and the east gate, priced at twice the deed",
+                        ps != null && ps.countForTest("shop") == 10 && se != null && "shop".equals(se.kind()) && se.price() == 7500 && se.rent() == 150,
+                        ps == null ? mc.screen : ps.countForTest("shop") + " " + (se == null ? "none" : se.kind() + " " + se.price() + " " + se.rent()));
+                shot(mc, "89d_plots_shop_lots");
                 if (ps != null) ps.showForTest(1, 1, 0);
                 ShopNet.CHANNEL.sendToServer(new com.rtshop.net.PlotActionPacket(com.rtshop.land.PlotBrowser.BACK, 0));
                 wait = 20;
@@ -796,11 +813,14 @@ public final class ClientSelfTest {
                 onServer(mc, sp -> {
                     var e = sp.serverLevel().getEntity(id);
                     if (e != null) e.discard();
+                    com.rtshop.land.ShopLots.uninstall(sp.server);
                 });
                 wait = 10;
             }
         }
     }
+
+    private static boolean SHOP_TAB_379;
 
     /** 플레이어 상점: 주인 화면(가방에서 올리기 + NPC 가격 비교), 진열, 손님 화면, 사기. */
     private static void pshopStep(Minecraft mc, int k) {

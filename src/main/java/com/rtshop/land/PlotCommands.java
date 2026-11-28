@@ -348,6 +348,42 @@ public final class PlotCommands {
                                 .executes(ctx -> split(ctx, 16))
                                 .then(Commands.argument("size", IntegerArgumentType.integer(4, 64))
                                         .executes(ctx -> split(ctx, IntegerArgumentType.getInteger(ctx, "size"))))))
+                // ---- 상점 토지 (3.79, OP): 장터 등록 · 걷기 · 서 있는 곳에 만들기 · 구획을 상점 토지로
+                .then(Commands.literal("shoplot").requires(s -> s.hasPermission(2))
+                        .then(Commands.literal("status").executes(ctx -> {
+                            var server = ctx.getSource().getServer();
+                            LandData data = LandData.get(server);
+                            int n = 0, sold = 0, owing = 0;
+                            for (Land l : data.lands()) {
+                                if (!l.shopLot) continue;
+                                n++;
+                                if (!l.forSale()) sold++;
+                                if (l.rentOwed > 0) owing++;
+                            }
+                            int fn = n, fs = sold, fo = owing;
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.shoplot.status", data.shopLotsInstalled, fn, fs, fo,
+                                    ShopLots.def().lots.size()), false);
+                            return 1;
+                        }))
+                        .then(Commands.literal("install").executes(ctx -> {
+                            int[] r = ShopLots.install(ctx.getSource().getServer());
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.shoplot.installed", r[0], r[1], r[2]), true);
+                            return r[0];
+                        }))
+                        .then(Commands.literal("remove").executes(ctx -> {
+                            int[] r = ShopLots.uninstall(ctx.getSource().getServer());
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.shoplot.removed", r[0], r[1]), true);
+                            return 1;
+                        }))
+                        .then(Commands.literal("here")
+                                .then(Commands.argument("w", IntegerArgumentType.integer(2, 32))
+                                        .then(Commands.argument("h", IntegerArgumentType.integer(2, 32))
+                                                .executes(ctx -> shopLotHere(ctx, ""))
+                                                .then(Commands.argument("name", StringArgumentType.greedyString())
+                                                        .executes(ctx -> shopLotHere(ctx, StringArgumentType.getString(ctx, "name")))))))
+                        .then(Commands.argument("id", IntegerArgumentType.integer(1)).suggests(PLOT_IDS)
+                                .then(Commands.literal("on").executes(ctx -> shopLot(ctx, true)))
+                                .then(Commands.literal("off").executes(ctx -> shopLot(ctx, false)))))
                 .then(Commands.literal("starter").requires(s -> s.hasPermission(2))
                         .then(Commands.argument("id", IntegerArgumentType.integer(1)).suggests(PLOT_IDS)
                                 .then(Commands.literal("on").executes(ctx -> starter(ctx, true)))
@@ -388,6 +424,34 @@ public final class PlotCommands {
         ctx.getSource().sendSystemMessage(Component.translatable("rtshop.plot.split_done", name, parts.size(), ids.toString())
                 .withStyle(ChatFormatting.GREEN));
         return parts.size();
+    }
+
+    private static int shopLot(CommandContext<CommandSourceStack> ctx, boolean on) {
+        Land l = plot(ctx);
+        if (l == null) {
+            return 0;
+        }
+        ShopLots.setShopLot(LandData.get(ctx.getSource().getServer()), l, on);
+        ctx.getSource().sendSystemMessage(Component.translatable(on ? "rtshop.shoplot.on" : "rtshop.shoplot.off", l.id, l.name, PlotManager.money(l.price)));
+        return 1;
+    }
+
+    /** 서 있는 블록을 북서 모서리로 w×h 상점 토지를 만든다 (이름이 없으면 「상점 토지 #번호」). */
+    private static int shopLotHere(CommandContext<CommandSourceStack> ctx, String name) throws CommandSyntaxException {
+        ServerPlayer p = ctx.getSource().getPlayerOrException();
+        int w = IntegerArgumentType.getInteger(ctx, "w"), h = IntegerArgumentType.getInteger(ctx, "h");
+        Land l = ShopLots.create(p.serverLevel(), name.isBlank() ? "" : name.trim(), p.getBlockX(), p.getBlockZ(), w, h);
+        if (l == null) {
+            ctx.getSource().sendFailure(Component.translatable("rtshop.shoplot.here_taken", w, h));
+            return 0;
+        }
+        if (name.isBlank()) {
+            l.name = "상점 토지 " + l.id;   // 서버에는 번역 파일이 없으므로 글자로 직접 (구획 이름과 같게)
+            LandData.get(p.server).touch();
+        }
+        ctx.getSource().sendSystemMessage(Component.translatable("rtshop.shoplot.made", l.id, l.name, w, h, PlotManager.money(l.price),
+                PlotManager.money(ShopLots.rentOf(l))).withStyle(ChatFormatting.GREEN));
+        return 1;
     }
 
     private static int starter(CommandContext<CommandSourceStack> ctx, boolean on) {

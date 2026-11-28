@@ -42,6 +42,8 @@ public final class PlayerShops {
     public static final int RENAME = 6;
     public static final int REFRESH = 7;
     public static final int PAY_WAGE = 8;
+    /** 3.79: 진열대가 놓인 상점 토지의 밀린 자릿세를 낸다. */
+    public static final int PAY_RENT = 9;
 
     static PlayerShopBlockEntity at(ServerPlayer p, BlockPos pos) {
         if (p.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64) return null;
@@ -103,6 +105,7 @@ public final class PlayerShops {
         o.addProperty("employee", emp == null ? "" : emp.name);
         o.addProperty("working", Employees.working(p.serverLevel(), pos));
         o.addProperty("wage", Employees.wage());
+        o.addProperty("rentOwed", com.rtshop.land.ShopLots.owedAt(p.serverLevel(), pos));   // 3.79: 밀린 자릿세 (0 보다 크면 문을 닫음)
         JsonArray ls = new JsonArray();
         for (int i = 0; i < be.listings.size(); i++) {
             PlayerShopBlockEntity.Listing l = be.listings.get(i);
@@ -190,6 +193,7 @@ public final class PlayerShops {
                 }
                 case PAY_WAGE -> result = owner ? Employees.payNow(p, p.serverLevel(), pos)
                         : Component.translatable("rtshop.pshop.not_owner").withStyle(ChatFormatting.RED);
+                case PAY_RENT -> result = com.rtshop.land.ShopLots.payNow(p, com.rtshop.land.ShopLots.lotAt(p.serverLevel(), pos));
                 default -> {
                     if (!owner) {
                         result = Component.translatable("rtshop.pshop.not_owner").withStyle(ChatFormatting.RED);
@@ -210,6 +214,9 @@ public final class PlayerShops {
         if (i < 0 || i >= be.listings.size() || n <= 0) return null;
         PlayerShopBlockEntity.Listing l = be.listings.get(i);
         if (be.owner.equals(p.getUUID())) return Component.translatable("rtshop.pshop.own_shop").withStyle(ChatFormatting.RED);
+        if (com.rtshop.land.ShopLots.closedAt(p.serverLevel(), be.getBlockPos())) {
+            return Component.translatable("rtshop.shoplot.closed_rent").withStyle(ChatFormatting.RED);
+        }
         if (!Employees.working(p.serverLevel(), be.getBlockPos())) {
             Employees.Entry emp = Employees.entry(p.serverLevel(), be.getBlockPos());
             return Component.translatable("rtshop.pshop.closed_today", emp == null ? "" : emp.name).withStyle(ChatFormatting.RED);

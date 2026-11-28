@@ -68,8 +68,13 @@ public class SurveyCompassItem extends Item {
             int dist = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
             int idx = Math.floorMod((int) Math.round(Math.toDegrees(Math.atan2(-dx, dz)) / 45.0), 8);
             boolean ko = !"en".equals(com.rtshop.story.Loc.lang(p));
-            com.rtshop.notice.Notice.send(p, Component.translatable("item.rtshop.survey_compass.found", label, ko ? DIRS[idx] : DIRS_EN[idx], dist)
-                    .withStyle(ChatFormatting.GOLD), true);
+            // 3.79 (사용자 11-28 10:35): 거리는 서 있는 자리에서이므로, 마을에서의 거리(500칸 이상만 가리킴)도 함께 보여 준다
+            double town = com.rtshop.story.StructureFinder.townDistance(p.serverLevel(), at.getX(), at.getZ());
+            lastTownDistanceForTest = town;
+            Component msg = town < Double.MAX_VALUE / 2
+                    ? Component.translatable("item.rtshop.survey_compass.found_town", label, ko ? DIRS[idx] : DIRS_EN[idx], dist, (int) Math.round(town))
+                    : Component.translatable("item.rtshop.survey_compass.found", label, ko ? DIRS[idx] : DIRS_EN[idx], dist);
+            com.rtshop.notice.Notice.send(p, msg.copy().withStyle(ChatFormatting.GOLD), true);
             level.playSound(null, p.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1F, 1F);
         }
         return InteractionResultHolder.consume(stack);
@@ -133,6 +138,8 @@ public class SurveyCompassItem extends Item {
 
     /** 마을(성 영역)에서 최소 이만큼 떨어진 건축물만 안내한다 (3.78: 1000 → 500, 사용자가 정함 11-28). */
     public static final double MIN_TOWN = 500;
+    /** 시험용: 마지막으로 찾은 자리의 마을에서의 거리. */
+    public static double lastTownDistanceForTest = -1;
 
     /**
      * 구조물 ID, #태그 또는 "모드:*" 가운데 실제로 생긴 가장 가까운 자리 (반경 200 청크, 마을에서 MIN_TOWN(500)블럭 이상).

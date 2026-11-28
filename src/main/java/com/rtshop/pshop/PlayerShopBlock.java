@@ -40,8 +40,21 @@ public class PlayerShopBlock extends HorizontalDirectionalBlock implements Entit
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        // 3.79 (사용자 메모 W-4): 진열대는 상점 토지 안에만 새로 놓는다 (이미 놓인 진열대는 그대로). 서버에서만 판단한다 —
+        // 놓지 못하면 null 이라 아이템도 줄지 않고, 직원도 고용되지 않는다.
+        if (ctx.getPlayer() instanceof ServerPlayer sp) {
+            Component why = com.rtshop.land.ShopLots.standDenied(sp, ctx.getClickedPos());
+            if (why != null) {
+                lastDeniedForTest = why;
+                com.rtshop.notice.Notice.send(sp, why.copy().withStyle(ChatFormatting.RED), true);
+                return null;
+            }
+        }
         return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
+
+    /** 시험용: 마지막으로 진열대를 놓지 못한 까닭. */
+    public static Component lastDeniedForTest;
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {

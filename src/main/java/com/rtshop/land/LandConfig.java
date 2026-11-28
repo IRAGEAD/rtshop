@@ -84,6 +84,26 @@ public final class LandConfig {
     /** 성 영역(아모노스 맵의 강·바다로 둘러싸인 성과 농경지): 블록 부수기·놓기·상호작용 금지, 몬스터 스폰 금지. */
     public boolean castleZoneProtect = true;
 
+    // ---- 상점 토지 (3.79, W-4)
+    /** 아모노스 맵이면 기본 장터(동문 안 광장의 상점 토지)를 자동으로 등록한다. */
+    public boolean shopLotsAuto = true;
+    /** 상점 토지 값 = 토지 문서(16×16) 값의 블록당 값 × 넓이 × 이 배수. 사용자 답 (11-28): 2배. */
+    public double shopLotPriceFactor = 2.0;
+    /** 값의 바탕이 되는 토지 문서 (토지 상인이 파는 값을 쓴다, 못 찾으면 shopLotDeedPrice). */
+    public String shopLotDeedItem = "rtshop:land_deed";
+    public long shopLotDeedPrice = 40000;
+    /** 한 사람이 가질 수 있는 상점 토지 수 (0 = 제한 없음). 사용자 답: 제한 없음. */
+    public int shopLotMaxPerPlayer = 0;
+    /** 주마다 내는 자릿세 = 산 값의 이 % (사용자 답: 약간). 0 = 없음. */
+    public double shopLotRentPercent = 2.0;
+    /** 자릿세를 셈하는 때 (주간 초기화와 같게: 1 = 월요일, 시각). */
+    public int shopLotRentDay = 1;
+    public int shopLotRentHour = 6;
+    /** 밀린 자릿세는 이 주 수만큼까지만 쌓인다 (오래 비운 사람이 돌아왔을 때 빚이 끝없이 커지지 않게). */
+    public int shopLotRentMaxWeeks = 4;
+    /** 플레이어 상점 진열대는 상점 토지 안에만 새로 놓을 수 있다 (이미 놓인 진열대는 그대로). 사용자 메모 W-4. */
+    public boolean shopStandsOnlyOnShopLots = true;
+
     public LandConfig() {
         rangedBlocks.put("better_farming_plus:farming_crate", 5);
     }
@@ -166,6 +186,21 @@ public final class LandConfig {
                 if (o.has("castlePlotPrice")) c.castlePlotPrice = Math.max(0, o.get("castlePlotPrice").getAsLong());
                 if (o.has("plotMerchantRange")) c.plotMerchantRange = Math.max(2, o.get("plotMerchantRange").getAsInt());
                 if (o.has("castleZoneProtect")) c.castleZoneProtect = o.get("castleZoneProtect").getAsBoolean();
+                if (o.has("shopLotsAuto")) c.shopLotsAuto = o.get("shopLotsAuto").getAsBoolean();
+                if (o.has("shopLotPriceFactor")) c.shopLotPriceFactor = Math.max(0, o.get("shopLotPriceFactor").getAsDouble());
+                if (o.has("shopLotDeedItem")) c.shopLotDeedItem = o.get("shopLotDeedItem").getAsString().trim();
+                if (o.has("shopLotDeedPrice")) c.shopLotDeedPrice = Math.max(0, o.get("shopLotDeedPrice").getAsLong());
+                if (o.has("shopLotMaxPerPlayer")) c.shopLotMaxPerPlayer = Math.max(0, o.get("shopLotMaxPerPlayer").getAsInt());
+                if (o.has("shopLotRentPercent")) c.shopLotRentPercent = Math.max(0, Math.min(100, o.get("shopLotRentPercent").getAsDouble()));
+                if (o.has("shopLotRentDay")) c.shopLotRentDay = Math.max(1, Math.min(7, o.get("shopLotRentDay").getAsInt()));
+                if (o.has("shopLotRentHour")) c.shopLotRentHour = Math.max(0, Math.min(23, o.get("shopLotRentHour").getAsInt()));
+                if (o.has("shopLotRentMaxWeeks")) c.shopLotRentMaxWeeks = Math.max(1, o.get("shopLotRentMaxWeeks").getAsInt());
+                if (o.has("shopStandsOnlyOnShopLots")) c.shopStandsOnlyOnShopLots = o.get("shopStandsOnlyOnShopLots").getAsBoolean();
+                if (!o.has("shopLotPriceFactor")) {
+                    // 3.79 이전 파일: 값은 그대로 두고 상점 토지 설정만 덧붙인다
+                    addShopLotKeys(o, c);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                }
                 if (!o.has("castleZoneProtect") && o.has("castlePlotPrice")) {
                     o.addProperty("castleZoneProtect", c.castleZoneProtect);
                     Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -210,6 +245,7 @@ public final class LandConfig {
                 addPlotKeys(o, c);
                 addStarterKeys(o, c);
                 addCastleKeys(o, c);
+                addShopLotKeys(o, c);
                 Files.createDirectories(p.getParent());
                 Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
             }
@@ -230,6 +266,26 @@ public final class LandConfig {
         o.addProperty("castlePlotPrice", c.castlePlotPrice);
         o.addProperty("plotMerchantRange", c.plotMerchantRange);
         o.addProperty("castleZoneProtect", c.castleZoneProtect);
+    }
+
+    private static void addShopLotKeys(JsonObject o, LandConfig c) {
+        JsonArray help = new JsonArray();
+        help.add("상점 토지 (3.79): 플레이어 상점 진열대를 놓는 땅. 아모노스 맵이면 동문 안 광장(중앙 호수와 동문 사이)에 장터 10칸(6×4)을 자동으로 등록합니다 (shopLotsAuto)");
+        help.add("토지 상인 창의 [구획 토지] → [상점 토지] 에서 지도로 보고 삽니다. 값 = 토지 문서(shopLotDeedItem, 못 찾으면 shopLotDeedPrice) 의 블록당 값 × 넓이 × shopLotPriceFactor");
+        help.add("shopLotMaxPerPlayer: 한 사람이 가질 수 있는 수 (0 = 제한 없음) · 운영자는 구획 지팡이로 만든 구획을 /rtshop plot shoplot on 으로 상점 토지로 바꿀 수 있습니다");
+        help.add("shopLotRentPercent: 주마다 내는 자릿세 = 산 값의 % (예금 → 지갑 순, 접속하지 않아도). 못 내면 밀린 만큼(shopLotRentMaxWeeks 주까지) 쌓이고 그 토지의 진열대가 문을 닫습니다. 돈이 생기면 저절로 냅니다");
+        help.add("shopStandsOnlyOnShopLots: true 면 진열대는 상점 토지(내 것, 또는 놓기 권한을 받은 곳) 안에만 새로 놓을 수 있습니다. 이미 놓인 진열대는 그대로 씁니다");
+        o.add("_상점토지_설명", help);
+        o.addProperty("shopLotsAuto", c.shopLotsAuto);
+        o.addProperty("shopLotPriceFactor", c.shopLotPriceFactor);
+        o.addProperty("shopLotDeedItem", c.shopLotDeedItem);
+        o.addProperty("shopLotDeedPrice", c.shopLotDeedPrice);
+        o.addProperty("shopLotMaxPerPlayer", c.shopLotMaxPerPlayer);
+        o.addProperty("shopLotRentPercent", c.shopLotRentPercent);
+        o.addProperty("shopLotRentDay", c.shopLotRentDay);
+        o.addProperty("shopLotRentHour", c.shopLotRentHour);
+        o.addProperty("shopLotRentMaxWeeks", c.shopLotRentMaxWeeks);
+        o.addProperty("shopStandsOnlyOnShopLots", c.shopStandsOnlyOnShopLots);
     }
 
     private static void addStarterKeys(JsonObject o, LandConfig c) {

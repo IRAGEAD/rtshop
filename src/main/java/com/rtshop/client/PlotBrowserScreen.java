@@ -32,7 +32,7 @@ import java.util.zip.Inflater;
  */
 public class PlotBrowserScreen extends Screen {
     public record Entry(int id, String name, String kind, int area, long price, String status, String owner,
-                        int x0, int z0, int x1, int z1, int castleNo, int group, boolean cleared, int clearWith) {
+                        int x0, int z0, int x1, int z1, int castleNo, int group, boolean cleared, int clearWith, long rent, long owed) {
         boolean sale() {
             return "sale".equals(status);
         }
@@ -149,7 +149,9 @@ public class PlotBrowserScreen extends Screen {
     private static final ResourceLocation AFTER_TEX = new ResourceLocation(RtShop.MODID, "dynamic/plot_after");
     private static Preview preview;
 
-    private static final String[] TAB_KINDS = {"castle", "plot", "starter"};
+    /** 3.79: 상점 토지 탭(shop)은 맨 뒤 (앞의 셋의 번호는 그대로). */
+    private static final String[] TAB_KINDS = {"castle", "plot", "starter", "shop"};
+    private static final String[] TAB_KEYS = {"rtshop.plotui.tab_castle", "rtshop.plotui.tab_plot", "rtshop.plotui.tab_starter", "rtshop.plotui.tab_shop"};
     private static final int MODE_MAP = 0, MODE_NOW = 1, MODE_AFTER = 2;
 
     private final List<Entry> all = new ArrayList<>();
@@ -287,7 +289,8 @@ public class PlotBrowserScreen extends Screen {
                     e.get("price").getAsLong(), e.get("status").getAsString(), e.get("owner").getAsString(),
                     e.get("x0").getAsInt(), e.get("z0").getAsInt(), e.get("x1").getAsInt(), e.get("z1").getAsInt(),
                     e.get("castleNo").getAsInt(), e.get("group").getAsInt(), e.get("cleared").getAsBoolean(),
-                    e.has("clearWith") ? e.get("clearWith").getAsInt() : 0));
+                    e.has("clearWith") ? e.get("clearWith").getAsInt() : 0,
+                    e.has("rent") ? e.get("rent").getAsLong() : 0, e.has("owed") ? e.get("owed").getAsLong() : 0));
         }
         all.sort((a, b) -> a.castleNo != b.castleNo ? Integer.compare(a.castleNo, b.castleNo) : Integer.compare(a.id, b.id));
         starter = o.has("starter") ? o.getAsJsonObject("starter") : new JsonObject();
@@ -409,15 +412,16 @@ public class PlotBrowserScreen extends Screen {
         Ui.coin(g, fx + fw - 25 - font.width(money), fy + 7, 11);
         g.drawString(font, money, fx + fw - 10 - font.width(money), fy + 9, Ui.C_CREAM, false);
 
-        // 탭
-        String[] tabKeys = {"rtshop.plotui.tab_castle", "rtshop.plotui.tab_plot", "rtshop.plotui.tab_starter"};
+        // 탭 (3.79: 넷이 되어 좁으면 글자를 줄인다 — 오른쪽 보기 버튼과 겹치지 않게)
         int tx = fx + 8;
-        for (int i = 0; i < 3; i++) {
-            String label = Component.translatable(tabKeys[i], count(TAB_KINDS[i])).getString();
-            int w = font.width(label) + 12;
+        float ts = tabScale();
+        for (int i = 0; i < TAB_KINDS.length; i++) {
+            String label = Component.translatable(TAB_KEYS[i], count(TAB_KINDS[i])).getString();
+            int w = tabWidth(i, ts);
             boolean hov = Ui.inside(mx, my, tx, fy + 25, w, 15);
             Ui.bevel(g, tx, fy + 25, w, 15, i == tab ? Ui.C_PARCH : hov ? Ui.C_WOOD_HI : Ui.C_WOOD, Ui.C_WOOD_HI, Ui.C_SHADOW);
-            g.drawString(font, label, tx + 6, fy + 29, i == tab ? Ui.C_INK : Ui.C_CREAM, false);
+            if (ts >= 1F) g.drawString(font, label, tx + 6, fy + 29, i == tab ? Ui.C_INK : Ui.C_CREAM, false);
+            else Ui.scaledText(g, font, label, tx + 6, fy + 28 + (int) (4 * (1 - ts)), ts, i == tab ? Ui.C_INK : Ui.C_CREAM, false);
             tx += w + 3;
         }
         // 보기 버튼
@@ -442,6 +446,32 @@ public class PlotBrowserScreen extends Screen {
         }
         renderBottom(g, mx, my);
         super.render(g, mx, my, partial);
+    }
+
+    /** 탭 하나의 너비 (글자 배율 scale). */
+    private int tabWidth(int i, float scale) {
+        return (int) Math.ceil(font.width(Component.translatable(TAB_KEYS[i], count(TAB_KINDS[i])).getString()) * scale) + 12;
+    }
+
+    /** 탭 글자 배율: 탭들과 오른쪽 보기 버튼들이 한 줄에 들어가게 (최소 0.6). */
+    private float tabScale() {
+        int tabs = 0;
+        for (int i = 0; i < TAB_KINDS.length; i++) tabs += tabWidth(i, 1F) + 3;
+        int modesW = 0;
+        for (int m : modes()) modesW += font.width(Component.translatable("rtshop.plotui.mode" + m).getString()) + 10 + 3;
+        int avail = fw - 16 - modesW - 6;
+        if (tabs <= avail) return 1F;
+        int fixed = TAB_KINDS.length * 15;   // 테두리 · 틈은 줄지 않는다
+        return Math.max(0.6F, Math.min(1F, (float) (avail - fixed) / Math.max(1, tabs - fixed)));
+    }
+
+    public boolean tabsFitForTest() {
+        float ts = tabScale();
+        int tabs = 0;
+        for (int i = 0; i < TAB_KINDS.length; i++) tabs += tabWidth(i, ts) + 3;
+        int modesW = 0;
+        for (int m : modes()) modesW += font.width(Component.translatable("rtshop.plotui.mode" + m).getString()) + 10 + 3;
+        return 8 + tabs + modesW + 8 <= fw;
     }
 
     private int[] modes() {
@@ -469,7 +499,10 @@ public class PlotBrowserScreen extends Screen {
             g.drawString(font, Ui.clip(font, e.name, lw - 12), lx + 7, ry + 2, Ui.C_INK, false);
             String line2;
             int col;
-            if (e.mine()) {
+            if (e.mine() && e.owed > 0) {
+                line2 = Component.translatable("rtshop.shoplot.owed_short", Ui.num(e.owed)).getString();
+                col = Ui.C_RED;
+            } else if (e.mine()) {
                 line2 = Component.translatable("rtshop.plotui.st_mine").getString();
                 col = Ui.C_GREEN;
             } else if (e.sale()) {
@@ -766,6 +799,11 @@ public class PlotBrowserScreen extends Screen {
             if (e.kind.equals("castle") && e.sale() && !e.cleared) {
                 l2 += "  " + Component.translatable(e.clearWith > 0 ? "rtshop.plotui.clear_group" : "rtshop.plotui.clear_one", e.clearWith).getString();
             }
+            if (e.kind.equals("shop")) {
+                // 3.79: 상점 토지 — 주마다 자릿세, 밀린 자릿세
+                l2 += "  " + Component.translatable("rtshop.shoplot.rent_info", Ui.num(e.rent)).getString();
+                if (e.mine() && e.owed > 0) l2 += "  " + Component.translatable("rtshop.shoplot.owed_short", Ui.num(e.owed)).getString();
+            }
             int y = by + 15;
             for (FormattedCharSequence l : font.split(Component.literal(l2), textW)) {
                 g.drawString(font, l, fx + 14, y, Ui.C_INK_SOFT, false);
@@ -785,7 +823,13 @@ public class PlotBrowserScreen extends Screen {
         Ui.button(g, font, bx2, byy, bw, 16, Component.translatable("rtshop.plotui.border_btn").getString(), hovB, e != null);
     }
 
+    /** 3.79: 내 상점 토지의 밀린 자릿세를 낼 수 있는 때 (버튼이 [자릿세 내기] 가 된다). */
+    private static boolean rentDue(Entry e) {
+        return e != null && "shop".equals(e.kind) && e.mine() && e.owed > 0;
+    }
+
     private boolean canAct(Entry e) {
+        if (rentDue(e)) return true;
         if (tab == 2) {
             boolean hasJob = starter.has("hasJob") && starter.get("hasJob").getAsBoolean();
             boolean given = starter.has("given") && starter.get("given").getAsBoolean();
@@ -795,6 +839,7 @@ public class PlotBrowserScreen extends Screen {
     }
 
     private String actionLabel(Entry e) {
+        if (rentDue(e)) return Component.translatable("rtshop.shoplot.pay_rent", Ui.compact(e.owed)).getString();
         if (tab == 2) return Component.translatable("rtshop.plotui.starter_btn").getString();
         if (e == null) return Component.translatable("rtshop.plotui.buy_btn", "-").getString();
         if (e.mine()) return Component.translatable("rtshop.plotui.st_mine").getString();
@@ -817,10 +862,10 @@ public class PlotBrowserScreen extends Screen {
             return true;
         }
         // 탭
-        String[] tabKeys = {"rtshop.plotui.tab_castle", "rtshop.plotui.tab_plot", "rtshop.plotui.tab_starter"};
         int tx = fx + 8;
-        for (int i = 0; i < 3; i++) {
-            int w = font.width(Component.translatable(tabKeys[i], count(TAB_KINDS[i])).getString()) + 12;
+        float ts = tabScale();
+        for (int i = 0; i < TAB_KINDS.length; i++) {
+            int w = tabWidth(i, ts);
             if (Ui.inside(mx, my, tx, fy + 25, w, 15)) {
                 setTab(i);
                 click();
@@ -879,7 +924,9 @@ public class PlotBrowserScreen extends Screen {
         if (Ui.inside(mx, my, bxb, byy, buyW(), 16)) {
             if (!canAct(e)) return true;
             click();
-            if (tab == 2) {
+            if (rentDue(e)) {
+                ShopNet.CHANNEL.sendToServer(new PlotActionPacket(PlotBrowser.PAY_RENT, e.id));
+            } else if (tab == 2) {
                 ShopNet.CHANNEL.sendToServer(new PlotActionPacket(PlotBrowser.STARTER, 0));
             } else if (confirmId == e.id && System.currentTimeMillis() - confirmAt < 4000) {
                 confirmId = -1;

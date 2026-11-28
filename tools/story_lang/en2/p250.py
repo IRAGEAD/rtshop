@@ -15,7 +15,7 @@ EN = [
 "Each merchant handles different goods. Switch between buying and selling at the top of the window.\n\n· Mod weapons, armor, tools and trinkets cannot be crafted. Get them from shops or the gacha.\n· Staves are sold by the blacksmith.\n· Things that only bosses drop are not in any shop. You must win them yourself.\n· Things you pulled from the gacha cannot be sold to shops (dismantle them into shards instead).",
 "merchant buy sell price shop",
 "Player shops",
-"Buy a 'Player Shop Stand' at the general store and place it, and it becomes your shop.\n\n· Right-click the stand to put up goods from your bag and set a price and quantity.\n· What customers pay goes into your savings even while you are offline.\n· A clerk stands beside the stand. The clerk is paid a wage every day; if you cannot pay, the shop rests that day.\n· Anything at all can be put up in a player shop.",
+"Buy a 'Player Shop Stand' at the general store and place it on your shop lot, and it becomes your shop.\n\n· New stands can only be placed on a shop lot (Land and home → Shop lots). Stands placed before keep working.\n· Right-click the stand to put up goods from your bag and set a price and quantity.\n· What customers pay goes into your savings even while you are offline.\n· A clerk stands beside the stand. The clerk is paid a wage every day; if you cannot pay, the shop rests that day.\n· Anything at all can be put up in a player shop.",
 "stand clerk wage shop",
 "The restaurant",
 "Only cooks can sell dishes to the restaurant owner, who pays a little more than the food merchant.\n\n· The restaurant sells nothing at first.\n· A dish a cook has sold even once goes on the menu, and anyone can buy what is on the menu.",

@@ -347,7 +347,7 @@ public final class Employees {
     }
 
     /** 예금 → 지갑 순으로 amount 를 뺀다. 모자라면 아무것도 빼지 않고 null. 성공하면 {예금에서, 지갑에서}. */
-    static long[] charge(MinecraftServer server, UUID owner, long amount) {
+    public static long[] charge(MinecraftServer server, UUID owner, long amount) {
         EconomyData ed = EconomyData.get(server);
         long bank = ed.bank(owner), wallet = ed.wallet(owner);
         if (bank + wallet < amount) return null;
@@ -386,7 +386,7 @@ public final class Employees {
         return String.format("%,d", v);
     }
 
-    static void notify(MinecraftServer server, UUID owner, Component msg) {
+    public static void notify(MinecraftServer server, UUID owner, Component msg) {
         lastNotice = msg;
         ServerPlayer op = server.getPlayerList().getPlayer(owner);
         if (op != null) {

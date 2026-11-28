@@ -42,6 +42,8 @@ public final class PlotBrowser {
     public static final int STARTER = 4;
     public static final int BACK = 5;
     public static final int AREA = 6;
+    /** 3.79: 상점 토지의 밀린 자릿세를 낸다. */
+    public static final int PAY_RENT = 7;
 
     /** 가까이에 토지 상인(토지 문서를 파는 상인 NPC)이 있는가. OP 는 어디서나. */
     public static boolean nearMerchant(ServerPlayer p) {
@@ -74,6 +76,7 @@ public final class PlotBrowser {
     }
 
     public static String kind(Land l) {
+        if (l.shopLot) return "shop";
         if (l.castle()) return "castle";
         String starter = LandConfig.get().starterPlotGroup;
         if (!starter.isEmpty() && starter.equals(l.group)) return "starter";
@@ -116,6 +119,11 @@ public final class PlotBrowser {
             case AREA -> {
                 Land l = data.land(id);
                 if (l != null && l.plot) queueArea(p, l);
+            }
+            case PAY_RENT -> {
+                Land l = data.land(id);
+                Component r = ShopLots.payNow(p, l);
+                send(p, r == null ? Component.translatable("rtshop.shoplot.rent_none") : r);
             }
             case STARTER -> {
                 boolean before = data.starterGiven(p.getUUID());
@@ -171,6 +179,8 @@ public final class PlotBrowser {
         JsonObject o = new JsonObject();
         o.addProperty("wallet", Economy.wallet(p));
         o.addProperty("castleInstalled", data.castleInstalled);
+        o.addProperty("shopLotMax", cfg.shopLotMaxPerPlayer);
+        o.addProperty("shopLotRentPct", cfg.shopLotRentPercent);
         JsonObject st = new JsonObject();
         st.addProperty("job", cfg.starterPlotJob);
         st.addProperty("hasJob", !cfg.starterPlotJob.isEmpty() && com.rtshop.job.Jobs.has(p, cfg.starterPlotJob));
@@ -181,7 +191,7 @@ public final class PlotBrowser {
             if (!l.plot) continue;
             String kind = kind(l);
             boolean mine = l.owner.equals(p.getUUID());
-            if (!kind.equals("castle") && !kind.equals("starter") && !l.forSale() && !mine) continue;
+            if (!kind.equals("castle") && !kind.equals("starter") && !kind.equals("shop") && !l.forSale() && !mine) continue;
             Claim c = PlotManager.plotClaim(l);
             if (c == null) continue;
             JsonObject e = new JsonObject();
@@ -199,6 +209,10 @@ public final class PlotBrowser {
             e.addProperty("castleNo", l.castleNo);
             e.addProperty("group", -1);
             e.addProperty("cleared", l.cleared);
+            if (l.shopLot) {
+                e.addProperty("rent", ShopLots.rentOf(l));
+                if (mine) e.addProperty("owed", l.rentOwed);
+            }
             if (l.castle() && !l.cleared && l.forSale()) {
                 e.addProperty("clearWith", CastlePlots.objectColumns(l));
             }
