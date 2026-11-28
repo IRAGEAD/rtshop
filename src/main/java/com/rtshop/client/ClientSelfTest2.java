@@ -32,6 +32,8 @@ final class ClientSelfTest2 {
         void run(Minecraft mc);
     }
 
+    /** 3.84: 내려놓기 점검에 세운 직업 안내인. */
+    private static volatile int RESIGN_NPC_384 = -1;
     private static final List<Step> STEPS = new ArrayList<>();
     private static final List<String> PORTRAIT_IDS = new ArrayList<>(), PORTRAIT_SHOW = new ArrayList<>(), PORTRAIT_OLD_BLANK = new ArrayList<>(),
             PORTRAIT_OLD_CLIPPED = new ArrayList<>(), PORTRAIT_ICON = new ArrayList<>(), PORTRAIT_ODD = new ArrayList<>(), PORTRAIT_BAD = new ArrayList<>();
@@ -2847,8 +2849,6 @@ final class ClientSelfTest2 {
             waitTicks(5);
         });
     }
-
-    private static volatile int RESIGN_NPC_384 = -1;
 
     /** Epic Fight 가 이 아이템에 쓰는 렌더러 (Avalon mesh_item 이면 메쉬가 실제로 읽혔는지도). */
     static String efRendererInfo(net.minecraft.world.item.ItemStack st) {

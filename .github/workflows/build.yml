@@ -1062,6 +1062,9 @@ jobs:
           cp client/rtshop-shadertest*.txt /tmp/fpshots/ 2>/dev/null || true
           for f in client/logs/shadertest-*.log; do [ -f "$f" ] || continue; echo "===== $f"; grep -n -iE "rtshop-clienttest|using shaderpack|ShaderCompileException|error: |cinematic" "$f" | grep -viE "could not find (uniform|sampler)|Datapack animation|Error loading class" | cut -c1-400 | head -n 100; echo "----- exceptions"; grep -n -iE "Exception|Error" "$f" | grep -viE "could not find (uniform|sampler)|Datapack animation|Error loading class|ClassNotFoundException" | cut -c1-300 | head -n 40; done > /tmp/fpshots/shader-log.txt 2>/dev/null || true
           cp server/config/rtshop/export/diag.txt server/config/rtshop/export/audit.txt server/config/rtshop/export/item_policy.txt /tmp/fpshots/ 2>/dev/null || true
+          # 3.84 (M-67 경제 · 장비 밸런스 검토): 모드팩 전체의 상점 값 내보내기를 통째로
+          mkdir -p /tmp/fpshots/export && cp -r server/config/rtshop/export/. /tmp/fpshots/export/ 2>/dev/null || true
+          mkdir -p /tmp/fpshots/rtshop-config && cp server/config/rtshop/*.json /tmp/fpshots/rtshop-config/ 2>/dev/null || true
           # 3.74.0 (사용자 W-19): Fantasy Mounts 설정 파일이 어디에 어떤 모양으로 생기는지 (서버 · 세계 · 클라이언트)
           {
             for f in server/config/fantasy-*.toml client/config/fantasy-server.toml; do [ -f "$f" ] || continue; echo "===== $f"; grep -n -B2 -A12 -i "^\[quests" "$f" | head -n 60; done

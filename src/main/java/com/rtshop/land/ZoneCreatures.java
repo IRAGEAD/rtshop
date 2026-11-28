@@ -97,7 +97,8 @@ public final class ZoneCreatures {
             var t = event.getSpawnType();
             if (t == net.minecraft.world.entity.MobSpawnType.SPAWN_EGG || t == net.minecraft.world.entity.MobSpawnType.COMMAND
                     || t == net.minecraft.world.entity.MobSpawnType.BUCKET || t == net.minecraft.world.entity.MobSpawnType.MOB_SUMMONED) return;
-            if (!(event.getLevel().getLevel() instanceof ServerLevel sl)) return;
+            ServerLevel sl = event.getLevel().getLevel();
+            if (sl == null) return;
             Mob mob = event.getEntity();
             if (unwanted(sl, mob)) {
                 event.setSpawnCancelled(true);
