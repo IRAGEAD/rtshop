@@ -392,6 +392,33 @@ jobs:
               done
             done | head -n 60
           } > /tmp/inspect/cataclysm-eyes.txt 2>&1 || true
+      - name: Inspect spmovesets merchant (3.81)
+        run: |
+          mkdir -p /tmp/inspect /tmp/spm
+          J="$PWD/$(ls packcache/*.jar | grep -i "spmovesets" | head -1)"
+          {
+            echo "== $J"
+            echo "== entity-ish files"
+            unzip -l "$J" | awk '{print $4}' | grep -i -E "entit|merchant|trader|mercader|comerciante|vendedor|buhonero|tienda|spawn|biome_modifier" | head -n 200
+            echo "== lang entity keys"
+            for L in en_us es_es; do echo "-- $L"; unzip -p "$J" "assets/spmovesets/lang/$L.json" 2>/dev/null | grep -i -E '"entity\.|merchant|trader|mercader|comerciante|vendedor' | head -n 80; done
+            echo "== biome modifiers"
+            for p in $(unzip -l "$J" | awk '{print $4}' | grep -i -E "biome_modifier" | head -n 30); do echo "---- $p"; unzip -p "$J" "$p" | head -c 1500; echo; done
+            echo "== village structure overrides"
+            for p in $(unzip -l "$J" | awk '{print $4}' | grep -E "^data/minecraft/worldgen/structure/village_"); do echo "---- $p"; unzip -p "$J" "$p" | head -c 1500; echo; done
+            echo "== template pools and nbt structures"
+            unzip -l "$J" | awk '{print $4}' | grep -E "worldgen/template_pool|\.nbt$" | head -n 150
+            echo "== classes that use merchant APIs"
+            (cd /tmp/spm && unzip -q -o "$J" '*.class' 2>/dev/null || true)
+            (cd /tmp/spm && grep -rl -a -E "net/minecraft/world/item/trading/Merchant|AbstractVillager|WanderingTrader|MerchantOffers|CustomSpawner|LevelTickEvent|ServerTickEvent" --include=*.class . | head -n 80) > /tmp/spm-list.txt || true
+            cat /tmp/spm-list.txt
+            echo "== javap of those classes"
+            (cd /tmp/spm && for c in $(grep -i -E "merchant|trader|mercader|comerciante|vendedor|spawn|entity" /tmp/spm-list.txt | head -n 30); do echo "######## $c"; javap -p "$c" 2>&1 | head -n 50; done)
+            echo "== merchant-like strings in classes"
+            (cd /tmp/spm && grep -rh -a -o -E "[a-z0-9_]*(merchant|trader|mercader|comerciante|vendedor|buhonero)[a-z0-9_]*" --include=*.class . | sort | uniq -c | sort -rn | head -n 60)
+            echo "== registry strings near EntityType"
+            (cd /tmp/spm && for c in $(grep -rl -a "EntityType\$Builder" --include=*.class . | head -n 10); do echo "-- $c"; strings -n 3 "$c" | grep -E "^[a-z0-9_]{3,40}$" | head -n 80; done)
+          } > /tmp/inspect/spmovesets-merchant.txt 2>&1 || true
       - name: Inspect
         env:
           SPIRAL_CALLS: '/(FloorController|FloorProgress|AbyssPlayers|AbyssEncounters|ArenaSession|AbyssCycle|AbyssParties|BossProgress|FloorSelectionScreen|AbyssPlayerLifecycle|ChallengeRewards|ChestPayout|AbyssNetwork|AbyssDimension|ForgeGameplayEvents|AbyssPlatformImpl|PersistentEntityData|AbyssBlockProtection|CommandInit)(\$[^/]*)?\.class$'
