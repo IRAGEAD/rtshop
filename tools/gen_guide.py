@@ -6,7 +6,7 @@
 import json, os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'rtshop_defaults', 'guide.json')
-VERSION = 19
+VERSION = 20
 CATS = []
 
 
@@ -174,6 +174,7 @@ page(c, "shops", "마을 상점", """
 · 지팡이는 대장장이가 팝니다.
 · 보스에게서만 나오는 물건은 상점에 없습니다. 직접 잡아서 얻어야 합니다.
 · 뽑기로 얻은 물건은 상점에 팔 수 없습니다 (분해해서 조각으로 바꿉니다).
+· 무기 · 방어구 · 방패 · 활 · 지팡이 · 장신구는 세기에 따라 사는 값이 비쌉니다. 상점이 사 주는 값은 그대로라, 되팔면 산 값보다 훨씬 적게 받습니다.
 """, image="shop", keys="상인 구매 판매 가격")
 page(c, "pshop", "플레이어 상점", """
 잡화점에서 「플레이어 상점 진열대」를 사서, 내 상점 토지에 놓으면 내 가게가 됩니다.

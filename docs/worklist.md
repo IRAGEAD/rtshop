@@ -698,6 +698,12 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 추가 (13:43): "작업이 끝나면 게임을 처음 들어왔을 때에는 부두에 스폰되고, 귀환권 사용이나 사망 시에는 내가 직접 찍어놓은 마을의 분수 광장 위치로 돌아오게 해줘."
 - H-1. 처음 들어온 사람 = 부두(아모노스 맵의 스폰 −24042, 64, −5344 — 지도에서 동쪽 바다의 나무 부두), 귀환권 · 죽음(침대 없음) = /rtshop spawn set 으로 정한
   마을 기준 자리(분수 광장). 지금은 처음 들어온 사람도 마을 기준 자리로 보냄 → 도착 자리(arrival)를 따로 두고 /rtshop spawn arrival set|on|off.
+- 한 일 (3.80.0, 가지 v5-next33):
+  G-1 ✔ ItemPolicy.gearRaise (item_policy.json 7판: gearRaise · Low/Mid/High 2/3/5 · MidFrom/HighFrom 5,000/40,000 · StrongDps 14) — ShopLoader 의 값 배수 자리에서
+  max(priceFactor, gearRaise) 로 사는 값만 곱함 (매입가는 그 앞에서 정해져 그대로). raisedGear = Pricing gear(무기 · 활 · 방패 · 방어구) · 지팡이 · 장신구, 블록 · 낚싯대 · 도구 · rtshop 물건 제외.
+  meleeDps = PackDiag 와 같은 셈. 가격 점검 메모에 올린 수. 안내서 20판 「마을 상점」 한 줄 (source2 261 · en2/p250). balance_review 14절.
+  H-1 ✔ TownSpawn 3판: arrival · arrivalSet · arrival 좌표 — placeNewcomer = 도착 자리(직접 정한 자리, 아니면 아모노스 부두 castle_plots spawn, 지면 높이, 서쪽을 봄), 없으면 기준 자리.
+  귀환권 · 침대 없는 죽음은 그대로 기준 자리. /rtshop spawn arrival [set|dock|on|off].
 
 ## 사용자 답 (11-28 09:47) → 3.79.0 (3.78.0 을 올린 다음)
 

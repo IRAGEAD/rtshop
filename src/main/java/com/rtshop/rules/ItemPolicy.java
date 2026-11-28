@@ -65,8 +65,9 @@ public final class ItemPolicy {
          *  4 (3.58.1): Create 는 상점(shopBan)과 뽑기(gachaBan)에도 오르지 않는다.
          *  5 (3.66.0): Better Nether 의 모든 아이템 — 조합법 · 전리품 · 몹/블록 드롭 금지 (상점은 2판부터 금지).
          *  6 (3.78.0): spmovesets 의 모든 아이템 — NPC 상점 · 뽑기 · 조합법 · 전리품 · 몹/블록 드롭 금지 (사용자 "spmovesets 의 모든 아이템들을 상점에서 제거하고
-         *     드랍과 조합과 같은 얻는 방식도 모두 금지"). 전리품은 2판부터 막혀 있었다. */
-        public static final int VERSION = 6;
+         *     드랍과 조합과 같은 얻는 방식도 모두 금지"). 전리품은 2판부터 막혀 있었다.
+         *  7 (3.80.0): 상점의 무기 · 장비 값 올리기 (gearRaise*) — 파일에 새 칸을 적는다. */
+        public static final int VERSION = 7;
         /** 읽어 온 파일이 예전 판이라 고쳐 썼는가 (다시 저장한다). */
         transient boolean migrated;
         public boolean enabled = true;
@@ -105,6 +106,16 @@ public final class ItemPolicy {
          */
         public double extremeAttack = 25;
         public double extremeArmor = 20;
+        /**
+         * 상점의 무기 · 장비 값 올리기 (3.80.0, 사용자 11-28 13:35 "전체적인 상점의 무기와 장비의 값을 올리는 것이 좋을 것 같아. 대신 돈이 불어나거나 그래선 안돼" → 다안):
+         * 근접 무기 · 활 · 석궁 · 지팡이 · 방패 · 방어구 · 장신구의 사는 값에, 올리기 전의 값에 따라 곱한다 — gearRaiseMidFrom G 미만은 gearRaiseLow 배,
+         * gearRaiseHighFrom G 미만은 gearRaiseMid 배, 그 이상은 gearRaiseHigh 배. 초당 피해(DPS)가 gearRaiseStrongDps 이상인 근접 무기는 값과 상관없이 gearRaiseHigh 배.
+         * 상점이 사 주는 값(매입가)은 그대로라 돈이 불어나지 않는다. 곡괭이 · 삽 · 괭이 · 낚싯대 · 블록은 빼고, priceFactor 묶음은 둘 중 큰 배수만.
+         */
+        public boolean gearRaise = true;
+        public double gearRaiseLow = 2, gearRaiseMid = 3, gearRaiseHigh = 5;
+        public int gearRaiseMidFrom = 5000, gearRaiseHighFrom = 40000;
+        public double gearRaiseStrongDps = 14;
         public final Set<String> keep = new LinkedHashSet<>();
         /** 몬스터를 잡으면 따로 굴리는 드랍 (Iron's Spells 의 잉크): 아이템 → 확률(0~1). */
         public final Map<String, Double> mobDrops = new LinkedHashMap<>();
@@ -149,6 +160,8 @@ public final class ItemPolicy {
             help.add("extremeAttack / extremeArmor (3.65.0): 공격력이 이 값 이상이거나 갑옷 한 조각의 방어력이 이 값 이상인 터무니없는 장비는 전리품 · 몹과 보스의 드롭 · 조합법에서 뺀다 (keep · lootAllow 보다 먼저). 0 = 끔. 기본 25 / 20 (모드팩의 다른 장비는 17 / 13 이 가장 높다).");
             help.add("shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.");
             help.add("recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.");
+            help.add("gearRaise (3.80): 상점의 무기 · 활 · 지팡이 · 방패 · 방어구 · 장신구의 사는 값을 올린다 — 올리기 전 값이 gearRaiseMidFrom G 미만이면 gearRaiseLow 배, gearRaiseHighFrom G 미만이면 gearRaiseMid 배, 그 이상은 gearRaiseHigh 배. "
+                    + "초당 피해(DPS)가 gearRaiseStrongDps 이상인 근접 무기는 값과 상관없이 gearRaiseHigh 배. 상점이 사 주는 값(매입가)은 그대로. 도구 · 낚싯대는 빼고, priceFactor 와 겹치면 큰 쪽. false 면 끔.");
             o.add("_help", help);
             o.addProperty("version", VERSION);
             o.addProperty("enabled", enabled);
@@ -185,6 +198,13 @@ public final class ItemPolicy {
             o.addProperty("vanillaGearToo", vanillaGearToo);
             o.addProperty("extremeAttack", extremeAttack);
             o.addProperty("extremeArmor", extremeArmor);
+            o.addProperty("gearRaise", gearRaise);
+            o.addProperty("gearRaiseLow", gearRaiseLow);
+            o.addProperty("gearRaiseMid", gearRaiseMid);
+            o.addProperty("gearRaiseHigh", gearRaiseHigh);
+            o.addProperty("gearRaiseMidFrom", gearRaiseMidFrom);
+            o.addProperty("gearRaiseHighFrom", gearRaiseHighFrom);
+            o.addProperty("gearRaiseStrongDps", gearRaiseStrongDps);
             o.add("keep", arr(keep));
             return o;
         }
@@ -223,7 +243,15 @@ public final class ItemPolicy {
             c.extremeArmor = o.has("extremeArmor") && o.get("extremeArmor").isJsonPrimitive() ? o.get("extremeArmor").getAsDouble() : d.extremeArmor;
             strings(o, "keep", c.keep, d.keep);
             strings(o, "gachaBan", c.gachaBan, d.gachaBan);
+            c.gearRaise = bool(o, "gearRaise", d.gearRaise);
+            c.gearRaiseLow = num(o, "gearRaiseLow", d.gearRaiseLow);
+            c.gearRaiseMid = num(o, "gearRaiseMid", d.gearRaiseMid);
+            c.gearRaiseHigh = num(o, "gearRaiseHigh", d.gearRaiseHigh);
+            c.gearRaiseMidFrom = (int) num(o, "gearRaiseMidFrom", d.gearRaiseMidFrom);
+            c.gearRaiseHighFrom = (int) num(o, "gearRaiseHighFrom", d.gearRaiseHighFrom);
+            c.gearRaiseStrongDps = num(o, "gearRaiseStrongDps", d.gearRaiseStrongDps);
             int v = v0(o);
+            if (v < 7) c.migrated = true;   // 3.80.0: 무기 · 장비 값 올리기의 새 칸을 파일에 적는다 (켜짐)
             if (v < 6) {   // 3.78.0: spmovesets 의 아이템은 상점 · 뽑기에 오르지 않고, 만들거나 줍거나 캐서 얻지도 못한다 (운영자가 적은 다른 줄은 그대로)
                 c.shopBan.add("spmovesets:*");
                 c.gachaBan.add("spmovesets:*");
@@ -272,6 +300,11 @@ public final class ItemPolicy {
 
         private static boolean bool(JsonObject o, String k, boolean def) {
             return o.has(k) ? o.get(k).getAsBoolean() : def;
+        }
+
+        /** 0 이상의 수 (없거나 숫자가 아니면 def). */
+        private static double num(JsonObject o, String k, double def) {
+            return o.has(k) && o.get(k).isJsonPrimitive() ? Math.max(0, o.get(k).getAsDouble()) : def;
         }
 
         private static void strings(JsonObject o, String k, Set<String> into, Set<String> def) {
@@ -531,6 +564,63 @@ public final class ItemPolicy {
         if (ours(id)) return false;
         if (s.c.shopBanBossItems && s.boss.contains(item)) return true;
         return s.c.shopBanGuns && gun(item);
+    }
+
+    /**
+     * 상점의 무기 · 장비 값 올리기의 배수 (3.80.0, gearRaise*): 무기 · 장비가 아니거나 꺼져 있으면 1. price = 올리기 전의 사는 값(원가 계산 뒤).
+     * 사는 값에만 곱한다 — 상점이 사 주는 값(매입가)은 부르는 쪽(ShopLoader)에서 그대로 둔다.
+     */
+    public static double gearRaise(ItemStack stack, double price) {
+        State s = st();
+        if (!s.c.enabled || !s.c.gearRaise || stack == null || stack.isEmpty()) return 1;
+        Item item = stack.getItem();
+        ResourceLocation id = id(item);
+        if (id == null || ours(id) || !raisedGear(item)) return 1;
+        return gearRaiseFor(meleeDps(stack), price, s.c);
+    }
+
+    /** 배수를 고른다: 센 근접 무기(DPS) → 큰 배수, 아니면 올리기 전의 값으로 세 단계. */
+    static double gearRaiseFor(double meleeDps, double price, Config c) {
+        if (c.gearRaiseStrongDps > 0 && meleeDps >= c.gearRaiseStrongDps) return Math.max(1, c.gearRaiseHigh);
+        if (price < c.gearRaiseMidFrom) return Math.max(1, c.gearRaiseLow);
+        if (price < c.gearRaiseHighFrom) return Math.max(1, c.gearRaiseMid);
+        return Math.max(1, c.gearRaiseHigh);
+    }
+
+    /** 시험용: 지금 규칙으로 고른 배수. */
+    public static double gearRaiseForTest(double meleeDps, double price) {
+        return gearRaiseFor(meleeDps, price, st().c);
+    }
+
+    /**
+     * 값을 올리는 무기 · 장비인가 (3.80.0): 근접 무기 · 활 · 석궁 · 방패 · 방어구(Pricing 의 gear 갈래) · 지팡이 · 장신구.
+     * 곡괭이 · 삽 · 괭이(도구) · 낚싯대 · 블록(장신구 칸에 끼는 등불 같은 것)은 아니다.
+     */
+    public static boolean raisedGear(Item item) {
+        try {
+            if (item instanceof BlockItem || item instanceof net.minecraft.world.item.FishingRodItem) return false;
+            ItemStack one = new ItemStack(item);
+            if (one.getMaxStackSize() != 1) return false;
+            return com.rtshop.shop.Pricing.isClass(one, "gear") || staff(item) || trinket(item);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 근접 무기의 초당 피해 — 점검표(PackDiag)와 같게 (1 + 공격력) × (4 + 공격 속도). 근접 무기가 아니면 0. */
+    public static double meleeDps(ItemStack s) {
+        try {
+            Item i = s.getItem();
+            if (i instanceof net.minecraft.world.item.ProjectileWeaponItem || gun(i) || staff(i) || !com.rtshop.shop.Pricing.isClass(s, "weapon")) return 0;
+            double dmg = 0, spd = 0;
+            for (net.minecraft.world.entity.ai.attributes.AttributeModifier m : s.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND)
+                    .get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)) dmg += m.getAmount();
+            for (net.minecraft.world.entity.ai.attributes.AttributeModifier m : s.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND)
+                    .get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED)) spd += m.getAmount();
+            return (1 + dmg) * Math.max(0.1, 4 + spd);
+        } catch (Throwable t) {
+            return 0;
+        }
     }
 
     /** 상점가에 곱하는 수 (없으면 1). */

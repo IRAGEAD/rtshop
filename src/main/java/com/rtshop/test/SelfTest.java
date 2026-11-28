@@ -3602,6 +3602,33 @@ public final class SelfTest {
         ResourceLocation tntRecipe = new ResourceLocation("minecraft:tnt");
         ShopLoader.Price swordBefore = ShopServer.loaded().prices.get("minecraft:diamond_sword");
         int swordPrice = swordBefore == null ? -1 : swordBefore.price;
+        // 3.80.0 무기 · 장비 값 올리기 (사용자 11-28 13:35 다안): 올리기 전 값 = 매입가 ÷ 매입 비율 (매입가는 그대로라)
+        double sellRatio = com.rtshop.shop.PricingConfig.get().sellRatio;
+        double swordBase = swordBefore == null ? -1 : swordBefore.sellUnit / sellRatio;
+        check("3.80 the gear price raise follows the pick: under 5,000 G x2, 5,000 ~ 40,000 G x3, 40,000 G and up x5, and a melee weapon with DPS 14+ x5 whatever its price",
+                com.rtshop.rules.ItemPolicy.gearRaiseForTest(0, 2400) == 2 && com.rtshop.rules.ItemPolicy.gearRaiseForTest(0, 16000) == 3
+                        && com.rtshop.rules.ItemPolicy.gearRaiseForTest(0, 44402) == 5 && com.rtshop.rules.ItemPolicy.gearRaiseForTest(15.2, 9250) == 5
+                        && com.rtshop.rules.ItemPolicy.gearRaiseForTest(12.8, 4002) == 2 && com.rtshop.rules.ItemPolicy.get().gearRaise,
+                com.rtshop.rules.ItemPolicy.gearRaiseForTest(0, 2400) + " " + com.rtshop.rules.ItemPolicy.gearRaiseForTest(0, 16000) + " "
+                        + com.rtshop.rules.ItemPolicy.gearRaiseForTest(0, 44402) + " " + com.rtshop.rules.ItemPolicy.gearRaiseForTest(15.2, 9250));
+        check("3.80 weapons, bows, shields and armor are raised; pickaxes, fishing rods, blocks and food are not; DPS is measured like the gear report (netherite sword 12.8)",
+                com.rtshop.rules.ItemPolicy.raisedGear(Items.DIAMOND_SWORD) && com.rtshop.rules.ItemPolicy.raisedGear(Items.BOW)
+                        && com.rtshop.rules.ItemPolicy.raisedGear(Items.SHIELD) && com.rtshop.rules.ItemPolicy.raisedGear(Items.IRON_CHESTPLATE)
+                        && com.rtshop.rules.ItemPolicy.raisedGear(Items.NETHERITE_AXE)
+                        && !com.rtshop.rules.ItemPolicy.raisedGear(Items.DIAMOND_PICKAXE) && !com.rtshop.rules.ItemPolicy.raisedGear(Items.FISHING_ROD)
+                        && !com.rtshop.rules.ItemPolicy.raisedGear(Items.LANTERN) && !com.rtshop.rules.ItemPolicy.raisedGear(Items.BREAD)
+                        && Math.abs(com.rtshop.rules.ItemPolicy.meleeDps(new ItemStack(Items.NETHERITE_SWORD)) - 12.8) < 0.05
+                        && com.rtshop.rules.ItemPolicy.meleeDps(new ItemStack(Items.BOW)) == 0,
+                com.rtshop.rules.ItemPolicy.meleeDps(new ItemStack(Items.NETHERITE_SWORD)));
+        ShopLoader.Price netherSword = ShopServer.loaded().prices.get("minecraft:netherite_sword");
+        double netherBase = netherSword == null ? -1 : netherSword.sellUnit / sellRatio;
+        int[] raisedNow = ShopLoader.lastGearRaisedForTest;
+        check("3.80 in the shops a diamond sword costs about twice what it did and a netherite sword five times, while what the shop pays back stays half the old price (no money is made)",
+                swordBefore != null && swordBase > 0 && Math.abs(swordPrice - swordBase * com.rtshop.rules.ItemPolicy.gearRaise(new ItemStack(Items.DIAMOND_SWORD), swordBase)) <= swordBase * 0.03
+                        && (netherSword == null || Math.abs(netherSword.price - netherBase * 5) <= netherBase * 0.03)
+                        && raisedNow[0] + raisedNow[1] + raisedNow[2] > 0,
+                "diamond " + swordBase + " -> " + swordPrice + " (sell " + (swordBefore == null ? "-" : swordBefore.sellUnit) + "), netherite "
+                        + netherBase + " -> " + (netherSword == null ? "-" : netherSword.price) + ", raised " + java.util.Arrays.toString(raisedNow));
         com.rtshop.rules.ItemPolicy.Config ip = com.rtshop.rules.ItemPolicy.Config.defaults();
         ip.shopBan.add("minecraft:arrow");
         ip.priceFactor.put("minecraft:diamond_sword", 3.0);
@@ -3620,10 +3647,11 @@ public final class SelfTest {
             com.rtshop.rules.ItemPolicy.afterShops(server, trial);
             ShopData tb = trial.shops.get("blacksmith");
             ShopLoader.Price swordNow = trial.prices.get("minecraft:diamond_sword");
-            check("a shop ban removes the item from every NPC shop (arrows), and a price factor multiplies the shop price (diamond sword x3)",
+            // 3.80: 값 배수(x3)와 무기 · 장비 값 올리기(다이아 검은 x2)가 겹치면 큰 쪽만 — 올리기 전 값의 3배
+            check("a shop ban removes the item from every NPC shop (arrows), and a price factor multiplies the shop price (diamond sword x3, the larger of it and the gear raise)",
                     tb != null && findEntry(tb, e -> e.stack.is(Items.ARROW)) < 0 && findEntry(tb, e -> e.stack.is(Items.SPECTRAL_ARROW)) >= 0
-                            && swordNow != null && swordPrice > 0 && Math.abs(swordNow.price - swordPrice * 3.0) <= swordPrice * 0.1,
-                    swordPrice + " -> " + (swordNow == null ? "missing" : swordNow.price) + " skipped " + com.rtshop.rules.ItemPolicy.skippedForTest());
+                            && swordNow != null && swordBase > 0 && Math.abs(swordNow.price - swordBase * 3.0) <= swordBase * 0.1,
+                    swordBase + " -> " + (swordNow == null ? "missing" : swordNow.price) + " skipped " + com.rtshop.rules.ItemPolicy.skippedForTest());
             net.minecraft.world.item.crafting.RecipeManager prm = server.getRecipeManager();
             check("gear listed in a shop cannot be crafted (iron sword, with the rule widened to vanilla), a kept item still can (iron pickaxe), ordinary things too (bread), a banned recipe is gone (TNT)",
                     prm.byKey(new ResourceLocation("minecraft:iron_sword")).isEmpty() && prm.byKey(new ResourceLocation("minecraft:iron_pickaxe")).isPresent()
@@ -3922,6 +3950,39 @@ public final class SelfTest {
             } catch (Exception ex) {
                 check("repricing touches only entries still at the old default price", false, ex.toString());
             }
+            // 3.80 (사용자 11-28 13:43): 처음 들어온 사람은 부두(도착 자리)에서, 귀환권 · 침대 없는 죽음은 마을의 기준 자리(분수 광장)로
+            double sx = a.getX(), sy = a.getY(), sz = a.getZ();
+            ts.x = sx + 20.5;
+            ts.y = sy;
+            ts.z = sz + 0.5;
+            ts.arrival = true;
+            ts.arrivalSet = true;
+            ts.arrivalDim = ts.dim;
+            ts.ax = sx + 40.5;
+            ts.ay = sy;
+            ts.az = sz + 3.5;
+            boolean placed = com.rtshop.rules.TownSpawn.placeNewcomer(a);
+            boolean atArrival = Math.abs(a.getX() - ts.ax) < 0.01 && Math.abs(a.getZ() - ts.az) < 0.01;
+            boolean back = com.rtshop.rules.TownSpawn.send(a) && Math.abs(a.getX() - ts.x) < 0.01 && Math.abs(a.getZ() - ts.z) < 0.01;
+            ts.arrival = false;
+            boolean placed2 = com.rtshop.rules.TownSpawn.placeNewcomer(a);
+            boolean atTown = Math.abs(a.getX() - ts.x) < 0.01 && Math.abs(a.getZ() - ts.z) < 0.01;
+            ts.arrival = true;
+            ts.arrivalSet = false;
+            LandData ld = LandData.get(server);
+            int oldCastle = ld.castleInstalled;
+            ld.castleInstalled = 0;
+            boolean noDock = com.rtshop.rules.TownSpawn.arrival(server) == null;
+            ld.castleInstalled = 1;
+            com.rtshop.rules.TownSpawn.Arrival dock = com.rtshop.rules.TownSpawn.arrival(server);
+            ld.castleInstalled = oldCastle;
+            a.teleportTo(sx, sy, sz);
+            check("3.80 a newcomer starts at the arrival point, while return tickets and deaths still go to the town point (fountain square); arrival off → the town point; "
+                            + "unset on the Amonos map → the dock (-24042, -5344) facing the town, and no dock on other maps",
+                    placed && atArrival && back && placed2 && atTown && noDock && dock != null && dock.dock() && Math.abs(dock.x() + 24041.5) < 0.01
+                            && Math.abs(dock.z() + 5343.5) < 0.01 && dock.y() >= 64 && dock.yaw() == 90F,
+                    placed + " " + atArrival + " " + back + " " + placed2 + " " + atTown + " " + noDock + " "
+                            + (dock == null ? "no dock" : dock.x() + "," + dock.y() + "," + dock.z() + " yaw " + dock.yaw()));
         } finally {
             com.rtshop.rules.TownSpawn.testDay = null;
             com.rtshop.rules.TownSpawn.testNow = 0;

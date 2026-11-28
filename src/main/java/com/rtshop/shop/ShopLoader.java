@@ -57,6 +57,9 @@ import java.util.stream.Stream;
  *            price, multiplier, rarityScale, sellPrice, buy, sell, looseSell, fish, seed, dynamic
  */
 public final class ShopLoader {
+    /** 시험용: 마지막으로 가격표를 만들 때 무기 · 장비 값을 올린 수 {낮은 배수, 중간, 높은}. */
+    public static volatile int[] lastGearRaisedForTest = new int[3];
+
     private ShopLoader() {
     }
 
@@ -579,13 +582,28 @@ public final class ShopLoader {
             }
         }
         // 아이템 규칙: 묶음별 상점가 배수 (예: Weapons of Miracles x5). 매입가는 그대로 두고 사는 값만 바꾼다.
+        // 3.80.0: 무기 · 장비 값 올리기 (item_policy.json 의 gearRaise*, 사용자 11-28 13:35 다안) — 묶음 배수와 겹치면 큰 쪽만. 이것도 사는 값만.
+        int[] raised = new int[3];
         for (Price p : prices.values()) {
             double factor = com.rtshop.rules.ItemPolicy.priceFactor(p.stack);
-            if (factor != 1) {
-                p.price = (int) Math.max(Math.max(1, Math.ceil(p.sellUnit)), Pricing.nice(p.price * factor));
-                com.rtshop.rules.ItemPolicy.noteRaised(p.stack);
+            double gear = com.rtshop.rules.ItemPolicy.gearRaise(p.stack, p.price);
+            if (gear > 1) {
+                if (gear >= com.rtshop.rules.ItemPolicy.get().gearRaiseHigh) raised[2]++;
+                else if (gear >= com.rtshop.rules.ItemPolicy.get().gearRaiseMid) raised[1]++;
+                else raised[0]++;
+            }
+            double f = Math.max(factor, gear);
+            if (f != 1) {
+                p.price = (int) Math.max(Math.max(1, Math.ceil(p.sellUnit)), Pricing.nice(p.price * f));
+                if (factor != 1) com.rtshop.rules.ItemPolicy.noteRaised(p.stack);
             }
         }
+        if (raised[0] + raised[1] + raised[2] > 0) {
+            com.rtshop.rules.ItemPolicy.Config ip = com.rtshop.rules.ItemPolicy.get();
+            out.notes.add(String.format(java.util.Locale.ROOT, "무기 · 장비 %d종의 사는 값을 올렸습니다 (item_policy.json 의 gearRaise): %s배 %d종 · %s배 %d종 · %s배 %d종 — 상점이 사 주는 값(매입가)은 그대로",
+                    raised[0] + raised[1] + raised[2], Pricing.trim(ip.gearRaiseLow), raised[0], Pricing.trim(ip.gearRaiseMid), raised[1], Pricing.trim(ip.gearRaiseHigh), raised[2]));
+        }
+        lastGearRaisedForTest = raised.clone();
 
         FarmConfig fc = FarmConfig.get();
         for (Raw r : raws) {

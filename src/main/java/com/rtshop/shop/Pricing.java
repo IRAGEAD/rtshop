@@ -152,6 +152,11 @@ public final class Pricing {
         return nice(p);
     }
 
+    /** 배수를 글로 (2.0 → "2", 2.5 → "2.5"). */
+    public static String trim(double v) {
+        return v == Math.rint(v) ? Long.toString((long) v) : String.format(java.util.Locale.ROOT, "%.1f", v);
+    }
+
     public static int nice(double p) {
         long v;
         if (p < 100) {

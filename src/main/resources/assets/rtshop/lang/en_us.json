@@ -1706,7 +1706,7 @@
   "rtshop.return.too_far": "Too far from town. An ordinary return ticket works only within %s blocks in the town's world (a greater one works anywhere).",
   "rtshop.return.done": "You are back in town.",
   "rtshop.msg.daily_limit": "%s can be bought only %s times a day (left today: %s).",
-  "rtshop.spawn.set": "Town point set here (%s, %s, %s): where newcomers start and return tickets arrive.",
+  "rtshop.spawn.set": "Town point set here (%s, %s, %s): where return tickets arrive and players without a bed respawn.",
   "rtshop.spawn.cleared": "Town point cleared.",
   "rtshop.spawn.range": "Ordinary return ticket range: %s blocks",
   "rtshop.spawn.where": "Town point: %s (%s, %s, %s)",
@@ -2125,5 +2125,12 @@
   "rtshop.shoplot.on": "#%s %s is now a shop lot (price %s G).",
   "rtshop.shoplot.off": "#%s %s is an ordinary lot again.",
   "item.rtshop.survey_compass.found_town": "%s: about %3$s blocks to the %2$s (about %4$s blocks from town)",
-  "rtshop.pshop.sold_msg_fee": "[Your shop] %s bought %s x%s. +%sG (bank, after a %sG lot sales fee)"
+  "rtshop.pshop.sold_msg_fee": "[Your shop] %s bought %s x%s. +%sG (bank, after a %sG lot sales fee)",
+  "rtshop.spawn.arrival_set": "Newcomers now start here (%s, %s, %s). Return tickets and deaths still go to the town point.",
+  "rtshop.spawn.arrival_dock": "Newcomers start at the Amonos dock again.",
+  "rtshop.spawn.arrival_on": "Newcomers start at the arrival point.",
+  "rtshop.spawn.arrival_off": "Newcomers start at the town point (arrival point off).",
+  "rtshop.spawn.arrival_where": "Arrival point for newcomers: set by hand (%s, %s, %s)",
+  "rtshop.spawn.arrival_where_dock": "Arrival point for newcomers: the Amonos dock (%s, %s, %s)",
+  "rtshop.spawn.arrival_none": "No arrival point: newcomers start at the town point. Set one with /rtshop spawn arrival set."
 }
