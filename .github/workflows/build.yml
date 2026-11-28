@@ -465,6 +465,10 @@ jobs:
             rm -rf /tmp/i384/b && mkdir -p /tmp/i384/b && (cd /tmp/i384/b && unzip -q -o "$J" 2>/dev/null || true)
             for c in $(cd /tmp/i384/b && grep -rl -a -E 'entity/vehicle/Boat' --include=*.class . | grep -i mixin | head -n 6); do echo "#### $c"; (cd /tmp/i384/b && javap -c -p "$c" 2>&1 | grep -E 'Method|invoke|ldc|getstatic|putfield|getfield|class|Inject|At' | head -n 120); done
           } > /tmp/inspect/req384-mods.txt 2>&1 || true
+      - name: Inspect for the 11-29 request list, part 2 (3.84)
+        run: |
+          mkdir -p /tmp/inspect
+          python3 .github/scripts/inspect_384b.py packcache /tmp/inspect/req384b.txt > /tmp/inspect/req384b.log 2>&1 || true
       - name: Inspect spmovesets cartographer trades (3.82)
         run: |
           # 3.82 (사용자 11-28 17:39): 지도 제작자의 원소 지도 거래가 어디서 어떻게 붙는지 (VillagerTrades 표에는 없었음)
