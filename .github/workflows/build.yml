@@ -892,7 +892,7 @@ jobs:
     timeout-minutes: 105
     env:
       # 전용 서버에서는 켜지지 않는 클라이언트 전용 모드
-      SKIP_MODS: "cwb-,forgematica,mafglib,oculus,nightfall enhance,vix-,fancy-trail"
+      SKIP_MODS: "cwb-,forgematica,mafglib,oculus"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v5
