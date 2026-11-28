@@ -396,6 +396,14 @@ jobs:
         run: |
           mkdir -p /tmp/inspect
           {
+            ls packcache/*.jar | grep -i -E "nightfall enhance|enhance-|p1nero" | while IFS= read -r J; do
+              echo "################ CAPS $J"
+              unzip -l "$J" | awk '{print $4}' | grep -E "^data/[^/]+/capabilities/" | head -n 60
+              echo "== classes (top)"
+              unzip -l "$J" | awk '{print $4}' | grep "\.class$" | head -n 80
+              unzip -p "$J" META-INF/mods.toml 2>/dev/null | grep -v "^#" | head -n 50
+              for L in $(unzip -l "$J" | awk '{print $4}' | grep -E "lang/(en_us|ko_kr)\.json$" | head -n 2); do echo "-- $L"; unzip -p "$J" "$L" | head -c 4000; echo; done
+            done
             for J in $(ls packcache/*.jar | grep -i -E "efn|enhance|epic_x|epicx|p1nero|cataclysm_ef|smallships|small_ships|small-ships|vix|guhao|trail"); do
               echo "################ $J"
               unzip -p "$J" META-INF/mods.toml 2>/dev/null | grep -v "^#" | head -n 60
