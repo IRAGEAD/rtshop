@@ -9174,9 +9174,17 @@ public final class SelfTest {
         } catch (Exception e) {
             offWhere = String.valueOf(e);
         }
-        check("3.79 the default market is the 10 stalls of the south-east gate square (inside the castle zone, clear of house lots, not overlapping each other)",
-                lots.size() == 10 && inZone && clearOfHouses && apart && lots.stream().allMatch(t -> t.w >= 3 && t.h >= 3 && t.w * t.h <= 100),
-                lots.size() + " zone " + inZone + " houses " + clearOfHouses + " apart " + apart + " " + why);
+        // 3.82 (사용자 11-28 19:32): 남동문 광장 서쪽 3칸(가판대 3 · 6 · 8)을 빼고, 북쪽 광장의 가판대 2곳(가판대 11 · 12)을 더함
+        java.util.Set<String> lotNames = new java.util.HashSet<>();
+        for (com.rtshop.land.ShopLots.Lot t : lots) lotNames.add(t.name);
+        java.util.List<String> retiredNames = new java.util.ArrayList<>();
+        for (com.rtshop.land.ShopLots.Lot t : com.rtshop.land.ShopLots.def().retired) retiredNames.add(t.name);
+        boolean listOk = com.rtshop.land.ShopLots.VERSION == 2 && lots.size() == 9
+                && lotNames.containsAll(java.util.List.of("가판대 1", "가판대 2", "가판대 4", "가판대 5", "가판대 7", "가판대 9", "가판대 10", "가판대 11", "가판대 12"))
+                && retiredNames.equals(java.util.List.of("가판대 3", "가판대 6", "가판대 8")) && java.util.Collections.disjoint(lotNames, retiredNames);
+        check("3.79/3.82 the default market: 7 stalls of the south-east gate square (its 3 west stalls dropped) + 2 stalls of the north square (inside the castle zone, clear of house lots, not overlapping each other)",
+                listOk && inZone && clearOfHouses && apart && lots.stream().allMatch(t -> t.w >= 3 && t.h >= 3 && t.w * t.h <= 100),
+                lots.size() + " " + lotNames + " retired " + retiredNames + " zone " + inZone + " houses " + clearOfHouses + " apart " + apart + " " + why);
         check("3.79 every market lot covers an existing stall on the castle map (white awning stripes inside, the square's paving around it)",
                 offStall == 0, offStall + " " + offWhere);
         long[] deed = com.rtshop.land.ShopLots.deed();
@@ -9209,6 +9217,42 @@ public final class SelfTest {
                 stallLot != null && stallGround == gy - 1 && stallClaim != null && stallClaim.y0 <= gy,
                 stallGround + " vs " + (gy - 1) + " y0 " + (stallClaim == null ? "-" : stallClaim.y0));
         if (stallLot != null) data.removeLand(stallLot);
+        // 3.82 (사용자 11-28 19:32): 기본 장터에서 빠진 칸 — 이름과 자리가 같으면 판매 중인 것은 지우고, 주인이 있으면 남기고, 이름만 같은 다른 자리는 그대로
+        {
+            LandData.Land oldFree382 = com.rtshop.land.ShopLots.create(level, "옛 가판대 A", x, z + 5, 3, 2);
+            LandData.Land oldOwned382 = com.rtshop.land.ShopLots.create(level, "옛 가판대 B", x + 4, z + 5, 3, 2);
+            LandData.Land sameName382 = com.rtshop.land.ShopLots.create(level, "옛 가판대 A", x + 8, z + 5, 3, 2);
+            java.util.List<com.rtshop.land.ShopLots.Lot> old382 = new java.util.ArrayList<>();
+            for (int k382 = 0; k382 < 2; k382++) {
+                com.rtshop.land.ShopLots.Lot t382 = new com.rtshop.land.ShopLots.Lot();
+                t382.name = k382 == 0 ? "옛 가판대 A" : "옛 가판대 B";
+                t382.x0 = x + 4 * k382;
+                t382.z0 = z + 5;
+                t382.w = 3;
+                t382.h = 2;
+                old382.add(t382);
+            }
+            int[] gone382 = {-1, -1};
+            try {
+                if (oldOwned382 != null) {
+                    oldOwned382.owner = b.getUUID();
+                    oldOwned382.ownerName = b.getGameProfile().getName();
+                }
+                com.rtshop.land.ShopLots.retiredForTest = old382;
+                gone382 = com.rtshop.land.ShopLots.retire(data);
+            } finally {
+                com.rtshop.land.ShopLots.retiredForTest = null;
+            }
+            boolean freeGone382 = oldFree382 != null && data.land(oldFree382.id) != oldFree382;
+            boolean ownedKept382 = oldOwned382 != null && data.land(oldOwned382.id) == oldOwned382;
+            boolean otherKept382 = sameName382 != null && data.land(sameName382.id) == sameName382;
+            check("3.82 a market lot dropped from the default list is removed while for sale, kept when someone owns it, and a lot elsewhere with the same name stays",
+                    gone382[0] == 1 && gone382[1] == 1 && freeGone382 && ownedKept382 && otherKept382,
+                    gone382[0] + " removed " + gone382[1] + " kept · free gone " + freeGone382 + " owned kept " + ownedKept382 + " other kept " + otherKept382);
+            for (LandData.Land lz : new LandData.Land[]{oldFree382, oldOwned382, sameName382}) {
+                if (lz != null && data.land(lz.id) == lz) data.removeLand(lz);
+            }
+        }
         LandData.Land l1 = com.rtshop.land.ShopLots.create(level, "시험 장터 1", x, z, 6, 4);
         LandData.Land l2 = com.rtshop.land.ShopLots.create(level, "시험 장터 2", x + 6, z, 6, 4);
         LandData.Land clash = com.rtshop.land.ShopLots.create(level, "겹침", x + 3, z + 1, 6, 4);

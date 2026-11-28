@@ -362,11 +362,18 @@ public final class PlotCommands {
                             int fn = n, fs = sold, fo = owing;
                             ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.shoplot.status", data.shopLotsInstalled, fn, fs, fo,
                                     ShopLots.def().lots.size()), false);
+                            java.util.List<String> keptOld = ShopLots.retiredKept(data);
+                            if (!keptOld.isEmpty()) {
+                                ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.shoplot.retired_kept", String.join(", ", keptOld)), false);
+                            }
                             return 1;
                         }))
                         .then(Commands.literal("install").executes(ctx -> {
                             int[] r = ShopLots.install(ctx.getSource().getServer());
                             ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.shoplot.installed", r[0], r[1], r[2]), true);
+                            if (r[3] + r[4] > 0) {
+                                ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.shoplot.retired", r[3], r[4]), true);
+                            }
                             return r[0];
                         }))
                         .then(Commands.literal("remove").executes(ctx -> {

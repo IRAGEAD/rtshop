@@ -56,8 +56,11 @@ public final class ShopLots {
     private ShopLots() {
     }
 
-    /** 기본 장터의 판. 올리면 이미 깔린 서버에도 없는 칸만 더한다. */
-    public static final int VERSION = 1;
+    /**
+     * 기본 장터의 판. 올리면 이미 깔린 서버에도 없는 칸만 더하고, 판에서 빠진 칸(retired)은 판매 중이면 지운다 (주인이 있으면 남김).
+     * 2 (3.82, 사용자 11-28 19:32): 남동문 광장 서쪽 3칸(가판대 3 · 6 · 8)을 빼고, 북쪽 광장의 가판대 2곳(가판대 11 · 12)을 더함.
+     */
+    public static final int VERSION = 2;
 
     // ------------------------------------------------------------------ 기본 장터 (아모노스 맵)
 
@@ -69,7 +72,12 @@ public final class ShopLots {
     public static final class Def {
         public String dim = "minecraft:overworld";
         public final List<Lot> lots = new ArrayList<>();
+        /** 판에서 빠진 칸: 이름과 자리가 같은 상점 토지를 판매 중이면 지운다. */
+        public final List<Lot> retired = new ArrayList<>();
     }
+
+    /** 시험용: 판에서 빠진 칸 대신 쓸 목록. */
+    public static volatile List<Lot> retiredForTest;
 
     private static Def def;
 
@@ -80,15 +88,18 @@ public final class ShopLots {
                 if (in != null) {
                     JsonObject o = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
                     if (o.has("dimension")) d.dim = o.get("dimension").getAsString();
-                    for (JsonElement e : o.getAsJsonArray("lots")) {
-                        JsonObject lo = e.getAsJsonObject();
-                        Lot t = new Lot();
-                        t.name = lo.get("name").getAsString();
-                        t.x0 = lo.get("x0").getAsInt();
-                        t.z0 = lo.get("z0").getAsInt();
-                        t.w = lo.get("w").getAsInt();
-                        t.h = lo.get("h").getAsInt();
-                        d.lots.add(t);
+                    for (String key : new String[]{"lots", "retired"}) {
+                        if (!o.has(key)) continue;
+                        for (JsonElement e : o.getAsJsonArray(key)) {
+                            JsonObject lo = e.getAsJsonObject();
+                            Lot t = new Lot();
+                            t.name = lo.get("name").getAsString();
+                            t.x0 = lo.get("x0").getAsInt();
+                            t.z0 = lo.get("z0").getAsInt();
+                            t.w = lo.get("w").getAsInt();
+                            t.h = lo.get("h").getAsInt();
+                            (key.equals("lots") ? d.lots : d.retired).add(t);
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -185,15 +196,20 @@ public final class ShopLots {
             if (!LandConfig.get().shopLotsAuto || data.shopLotsInstalled < 0 || data.shopLotsInstalled >= VERSION) return;
             if (data.castleInstalled <= 0 || def().lots.isEmpty()) return;   // 아모노스 맵이 아니면: 운영자가 /rtshop plot shoplot 으로 직접
             int[] r = install(server);
-            RtShop.LOGGER.info("[rtshop] 상점 토지(장터) {}칸을 등록했습니다 (이미 있음 {}, 다른 토지와 겹쳐 뺀 칸 {})", r[0], r[1], r[2]);
+            RtShop.LOGGER.info("[rtshop] 상점 토지(장터) {}칸을 등록했습니다 (이미 있음 {}, 다른 토지와 겹쳐 뺀 칸 {}) · 판에서 빠진 칸 {}칸을 지움 (주인이 있어 남김 {})",
+                    r[0], r[1], r[2], r[3], r[4]);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop] 상점 토지 자동 등록 실패", t);
         }
     }
 
-    /** 기본 장터를 판매 중 상점 토지로 등록 (같은 이름이 있거나 다른 토지와 겹치는 칸은 건너뜀). {만든 수, 이미 있음, 겹쳐서 뺌}. */
+    /**
+     * 기본 장터를 판매 중 상점 토지로 등록 (같은 이름이 있거나 다른 토지와 겹치는 칸은 건너뜀). 판에서 빠진 칸은 먼저 정리한다 (retire).
+     * {만든 수, 이미 있음, 겹쳐서 뺌, 빠진 칸을 지운 수, 빠진 칸인데 주인이 있어 남긴 수}.
+     */
     public static int[] install(MinecraftServer server) {
         LandData data = LandData.get(server);
+        int[] gone = retire(data);
         ServerLevel level = level(server, def().dim);
         int made = 0, skipped = 0, dropped = 0;
         for (Lot t : def().lots) {
@@ -206,7 +222,46 @@ public final class ShopLots {
         }
         data.shopLotsInstalled = VERSION;
         data.touch();
-        return new int[]{made, skipped, dropped};
+        return new int[]{made, skipped, dropped, gone[0], gone[1]};
+    }
+
+    /**
+     * 판에서 빠진 칸 정리 (3.82): 이름과 자리(네모)가 같은 상점 토지를 찾아, 판매 중이면 지우고 주인이 있으면 남긴다
+     * (산 사람의 토지는 빼앗지 않는다 — 운영자가 /rtshop plot shoplot status 로 보고 정함). {지운 수, 남긴 수}.
+     */
+    public static int[] retire(LandData data) {
+        List<Lot> gone = retiredForTest != null ? retiredForTest : def().retired;
+        List<Land> rm = new ArrayList<>();
+        int kept = 0;
+        for (Land l : data.lands()) {
+            if (!l.shopLot || !l.plot) continue;
+            Claim c = PlotManager.plotClaim(l);
+            if (c == null) continue;
+            for (Lot t : gone) {
+                if (!t.name.equals(l.name) || c.x0 != t.x0 || c.z0 != t.z0 || c.x1 != t.x0 + t.w - 1 || c.z1 != t.z0 + t.h - 1) continue;
+                if (l.forSale()) rm.add(l);
+                else kept++;
+                break;
+            }
+        }
+        rm.forEach(data::removeLand);
+        if (!rm.isEmpty()) data.touch();
+        return new int[]{rm.size(), kept};
+    }
+
+    /** 판에서 빠졌는데 주인이 있어 남아 있는 칸의 이름 (운영자 status 용). */
+    public static List<String> retiredKept(LandData data) {
+        List<String> out = new ArrayList<>();
+        for (Land l : data.lands()) {
+            if (!l.shopLot || l.forSale()) continue;
+            for (Lot t : def().retired) {
+                if (t.name.equals(l.name)) {
+                    out.add(l.name + " (" + l.ownerName + ")");
+                    break;
+                }
+            }
+        }
+        return out;
     }
 
     /**

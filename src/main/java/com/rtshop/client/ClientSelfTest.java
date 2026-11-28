@@ -714,7 +714,7 @@ public final class ClientSelfTest {
                 mc.setScreen(null);
                 onServer(mc, sp -> {
                     com.rtshop.land.CastlePlots.install(sp.server);
-                    com.rtshop.land.ShopLots.install(sp.server);   // 3.79: 동문 안 광장의 장터 10칸
+                    com.rtshop.land.ShopLots.install(sp.server);   // 3.79/3.82: 기본 장터 9칸 (남동문 광장 7 + 북쪽 광장 2)
                     net.minecraft.world.phys.Vec3 look = sp.getLookAngle();
                     var v = ShopServer.spawnNpc(sp.serverLevel(), sp.position().add(look.x * 2, 0, look.z * 2), sp.getYRot() + 180, "land");
                     plotNpc = v == null ? -1 : v.getId();
@@ -769,7 +769,7 @@ public final class ClientSelfTest {
             }
             case 6 -> {
                 if (!SHOP_TAB_379) {
-                    // 3.79: [상점 토지] 탭 — 성 지도 위 남동문 광장의 기존 가판대 10곳 (11-28 11:21)
+                    // 3.79: [상점 토지] 탭 — 성 지도 위 기존 가판대 (11-28 11:21), 3.82: 남동문 광장 7곳 + 북쪽 광장 2곳
                     shot(mc, "89_plots_starter_tab");
                     SHOP_TAB_379 = true;
                     if (ps != null) {
@@ -781,8 +781,8 @@ public final class ClientSelfTest {
                     return;
                 }
                 var se = ps == null ? null : ps.selectedForTest();
-                check("3.79 the lot window has a [Shop lots] tab with the 10 stalls of the south-east gate square, priced at twice the deed (stall 1, 5×5 = 7,810 G, base rent 15% = 1,172 G)",
-                        ps != null && ps.countForTest("shop") == 10 && se != null && "shop".equals(se.kind()) && se.price() == 7810 && se.rent() == 1172,
+                check("3.79/3.82 the lot window has a [Shop lots] tab with the 9 market stalls (7 of the south-east gate square + 2 of the north square), priced at twice the deed (stall 1, 5×5 = 7,810 G, base rent 15% = 1,172 G)",
+                        ps != null && ps.countForTest("shop") == 9 && se != null && "shop".equals(se.kind()) && se.price() == 7810 && se.rent() == 1172,
                         ps == null ? mc.screen : ps.countForTest("shop") + " " + (se == null ? "none" : se.kind() + " " + se.price() + " " + se.rent()));
                 shot(mc, "89d_plots_shop_lots");
                 if (ps != null) ps.showForTest(1, 1, 0);
