@@ -59,6 +59,16 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
+- **(11-28 17:28) 3.81.0 올림 · 보냄** (main = b2eb061, 전체 시험 run 46121718036: 모드팩 서버 957 · 화면 366 · 셰이더 8 모두 통과, 빌드 서버 901 · 화면 늘 그런 5건).
+  worklist 「요청 (11-28 16:18) → 3.81.0」 J-1 · J-2. J-1 옮긴 마을 = CastlePlots.chunkExists/signatureSaved (스폰과 상관없이 이미 있는 청크, 지역 파일이 없으면 읽지 않음),
+  castleInstalled RECHECK(-2) 는 켤 때마다 다시 봄 (-1 = 운영자가 걷어 냄은 그대로) · TownSpawn.townPoint 는 기준 자리가 없으면 부두(dock).
+  J-2 spmovesets 밤 상인 = spmovesets:vendedor_nocturno + 수레 carro_vendedor → MobRules.neverSpawn (EntityJoinLevelEvent 취소, mob_rules.json).
+  사용자에게 물은 것: spmovesets 가 지도 제작자(주민)에게 원소 지도 · 뽑기 열쇠를 팔게 하는 것도 막을지.
+- **(11-28 17:00~) 모드팩 검토 K (팩 15 = 14 와 내용이 같음, 사용자가 맞다고 함)**: 가지 v5-next34-p14 (pack_files 160 · overrides Arcane Vortex · Dragon Bar), run 46123749936.
+  11 → 15: 더함 Nightfall Enhance(EFN-Enhance) · P1nero's Epic Cataclysm(p1nero_ec) · Small Ships · VIX · Fancy Trail · Dragon Bar(overrides, 직접 만든 듯, 엔더 드래곤 막대 + EF 드래곤 패치 끔),
+  뺌 Farsight · Forgematica · dhcompat · Iron's 덮어쓰기 jar, 판 바뀜 diorama 0.12.0 · geckolib 4.8.6 · handson_delight 1.7.1 · modernfix 5.28.9 · showthelyrics 2.1.5 · irons 3.16.4, DH 필수로 켬,
+  RT Shop 3.80.0, immediatelyfast 빠른 버퍼 켬, DH 설정은 11 그대로. compat 두 zip 은 데이터팩(사용자가 실수로 mods 에 넣음 — 빼고 검토).
+  팩에 실린 config/rtshop 의 개인 파일(talk_history · compat_done(내 PC 경로) · map_marks_client · backup · .bak) · showthelyrics 캐시, KubeJS gamerules.js 의 doFireTick true(마을 나무 건물).
 - **(11-28 15:55) 3.80.0 올림 · 보냄** (main = 4bd4b57, 전체 시험 run 46114556277: 모드팩 서버 951 · 화면 366 · 셰이더 8 모두 통과, 빌드 서버 896 · 화면 늘 그런 5건).
   worklist 「사용자 답 (11-28 13:35) → 3.80.0」 G-1 · H-1 · I-1 + F-3 · F-4. 상점 무기 · 장비 값 올리기(다안, 사는 값만, 모드팩 542종: ×2 266 · ×3 132 · ×5 144) ·
   처음 들어온 사람은 부두(TownSpawn 3판 arrival, `/rtshop spawn arrival`) · 귀환권 · 침대 없는 죽음은 분수 광장(기준 자리) ·
