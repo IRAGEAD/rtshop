@@ -6720,18 +6720,30 @@ public final class SelfTest {
                                 && com.rtshop.story.StructureRarity.load().off.contains("spmovesets"), offSet);
                 if (net.minecraftforge.fml.ModList.get().isLoaded("spmovesets")) {
                     // 실제 세계의 구조물 배치 등록부에서: spmovesets 의 세트는 모두 확률 0 (데이터팩이 가장 위에 얹혀 모드의 원래 파일을 덮음)
+                    // 배치 확률은 StructurePlacement 의 하나뿐인 float 칸 (frequency). 코덱으로 JSON 을 만들면 안 됨 —
+                    // 등록부 없는 JsonOps 는 제외 구역의 다른 세트 → 구조물 → 빈 조각 풀(자기 자신이 대체 풀)까지 펼쳐 StackOverflowError (3.80 첫 모드팩 시험)
                     int spSets = 0, spOff = 0;
                     StringBuilder spWhy = new StringBuilder();
-                    var reg = server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE_SET);
-                    for (var en : reg.entrySet()) {
-                        if (!en.getKey().location().getNamespace().equals("spmovesets")) continue;
-                        spSets++;
-                        var enc = net.minecraft.world.level.levelgen.structure.placement.StructurePlacement.CODEC
-                                .encodeStart(com.mojang.serialization.JsonOps.INSTANCE, en.getValue().placement()).result();
-                        double freq = enc.isPresent() && enc.get().isJsonObject() && enc.get().getAsJsonObject().has("frequency")
-                                ? enc.get().getAsJsonObject().get("frequency").getAsDouble() : 1.0;
-                        if (freq == 0.0) spOff++;
-                        else spWhy.append(' ').append(en.getKey().location()).append('=').append(freq);
+                    try {
+                        java.lang.reflect.Field spFreq = null;
+                        for (java.lang.reflect.Field spF : net.minecraft.world.level.levelgen.structure.placement.StructurePlacement.class.getDeclaredFields()) {
+                            if (spF.getType() == float.class && !java.lang.reflect.Modifier.isStatic(spF.getModifiers())) {
+                                spF.setAccessible(true);
+                                spFreq = spF;
+                            }
+                        }
+                        var reg = server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE_SET);
+                        for (var en : reg.entrySet()) {
+                            if (!en.getKey().location().getNamespace().equals("spmovesets")) continue;
+                            spSets++;
+                            double freq = spFreq == null ? -1 : spFreq.getFloat(en.getValue().placement());
+                            if (freq == 0.0) spOff++;
+                            else spWhy.append(' ').append(en.getKey().location()).append('=').append(freq);
+                        }
+                        info("spmovesets structure sets: " + spSets + " " + reg.keySet().stream()
+                                .filter(spK -> spK.getNamespace().equals("spmovesets")).map(Object::toString).sorted().toList());
+                    } catch (Throwable spErr) {
+                        spWhy.append(" error ").append(spErr);
                     }
                     long spLast = com.rtshop.story.StructureRarity.LAST.entrySet().stream().filter(e -> e.getKey().startsWith("spmovesets:") && "off".equals(e.getValue())).count();
                     check("3.80 spmovesets structures never generate in new land: every spmovesets structure set in the world has placement frequency 0",
