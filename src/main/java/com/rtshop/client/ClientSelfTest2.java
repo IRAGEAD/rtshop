@@ -1922,7 +1922,14 @@ final class ClientSelfTest2 {
             }
             shot(mc, "127b_ranks");
             onServer(mc, sp -> {
+                // 3.79: 경쟁자가 있어야 보상이 나간다 → 아래 자리에 한 사람을 둔다 (처치 1)
+                java.util.UUID rivalId = java.util.UUID.nameUUIDFromBytes("rtshop_rival".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                com.rtshop.rank.Ranks.Rec rival = new com.rtshop.rank.Ranks.Rec();
+                rival.name = "rtshop_rival";
+                rival.week.put(com.rtshop.rank.Ranks.KILLS, 1L);
+                com.rtshop.rank.Ranks.data(sp.server).recs.put(rivalId, rival);
                 com.rtshop.rank.Ranks.settle(sp.server);
+                com.rtshop.rank.Ranks.data(sp.server).recs.remove(rivalId);
                 com.rtshop.rank.Ranks.openRanks(sp);
             });
             waitTicks(15);
