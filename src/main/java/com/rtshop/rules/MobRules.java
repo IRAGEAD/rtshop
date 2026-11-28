@@ -70,13 +70,16 @@ public final class MobRules {
         /** 최대 체력이 이 값 이상이면 보스로 친다 (0 = 쓰지 않음). */
         public double bossHealth = 300;
         public final List<String> extraBosses = new ArrayList<>();
+        /** 3.81: 세계에 아예 나오지 않는 몹 (ID 또는 "모드ID:*") — 생기려는 순간 막고, 저장돼 있던 것도 불러올 때 지운다. */
+        public final List<String> neverSpawn = new ArrayList<>();
 
         public JsonObject toJson() {
             JsonObject o = new JsonObject();
             o.addProperty("_설명", "몹 규칙. spawn: 모드 몹(바닐라가 아닌 몹)의 자연 스폰 가운데 modMobKeep 만큼만 남긴다 (0.2 = 약 80% 감소). keepByName: 이름(ID 나 영어 이름)에 그 글이 들어가는 몹의 비율. "
                     + "exempt: 이름에 그 글이 들어가면 줄이지 않는다 (hollow = 기사). exemptMods: 줄이지 않는 모드. 보스·구조물 안·스포너·소환은 언제나 그대로. "
                     + "drops: 보스가 아닌 몹의 드랍에서 무기·스킬북·인챈트·모드 아이템을 뺀다. keepItems: 남길 아이템 ID 또는 '모드ID:*'. 퀘스트가 건네 달라는 아이템은 자동으로 남는다. "
-                    + "bossHealth: 최대 체력이 이 이상이면 보스로 본다. extraBosses: 보스로 볼 몹 ID. 고친 뒤 /rtshop reload.");
+                    + "bossHealth: 최대 체력이 이 이상이면 보스로 본다. extraBosses: 보스로 볼 몹 ID. "
+                    + "neverSpawn: 세계에 아예 나오지 않게 할 몹 ID 또는 '모드ID:*' (기본: spmovesets 의 밤 상인 칸딜과 그 수레). 고친 뒤 /rtshop reload.");
             JsonObject s = new JsonObject();
             s.addProperty("enabled", spawnEnabled);
             s.addProperty("modMobKeep", modMobKeep);
@@ -96,6 +99,7 @@ public final class MobRules {
             o.add("drops", d);
             o.addProperty("bossHealth", bossHealth);
             o.add("extraBosses", arr(extraBosses));
+            o.add("neverSpawn", arr(neverSpawn));
             return o;
         }
     }
@@ -117,6 +121,8 @@ public final class MobRules {
         c.keepByName.put("lycanth", 0.1);
         c.spawnExempt.add("hollow");
         c.keepItems.add("rtshop:*");
+        c.neverSpawn.add("spmovesets:vendedor_nocturno");   // 3.81: 밤 상인 칸딜 (사용자 11-28 16:18 "spmovesets 모드의 상인이 스폰되지 않게")
+        c.neverSpawn.add("spmovesets:carro_vendedor");      // 그 수레 (수레가 먼저 들어가야 상인이 오므로 수레만 막아도 오지 않음)
         return c;
     }
 
@@ -169,6 +175,11 @@ public final class MobRules {
                 }
                 if (o.has("bossHealth")) c.bossHealth = Math.max(0, o.get("bossHealth").getAsDouble());
                 list(o, "extraBosses", c.extraBosses);
+                list(o, "neverSpawn", c.neverSpawn);
+                if (!o.has("neverSpawn")) {
+                    // 3.81 앞의 파일: 기본 neverSpawn 을 더해 다시 쓴다 (다른 값은 읽은 그대로)
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
+                }
             } else {
                 Files.createDirectories(p.getParent());
                 Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
@@ -177,6 +188,33 @@ public final class MobRules {
             RtShop.LOGGER.error("[rtshop] mob_rules.json 을 읽지 못했습니다: {}", e.getMessage());
         }
         return c;
+    }
+
+    // ------------------------------------------------------------------ 아예 나오지 않는 몹 (3.81)
+
+    /** 이 몹은 세계에 들어오지 못하는가 (mob_rules.json 의 neverSpawn). */
+    public static boolean neverSpawn(EntityType<?> type) {
+        List<String> l = get().neverSpawn;
+        if (l.isEmpty()) return false;
+        ResourceLocation id = ForgeRegistries.ENTITY_TYPES.getKey(type);
+        return id != null && (l.contains(id.toString()) || l.contains(id.getNamespace() + ":*"));
+    }
+
+    private static final java.util.Set<String> NEVER_LOGGED = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    /** 점검용: 막은 수. */
+    public static volatile int neverBlockedForTest;
+
+    /** 생기려는 순간(소환 · 자연 스폰 · 모드의 등장) 막고, 저장돼 있던 것은 청크를 불러올 때 넣지 않아 지워진다. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onJoin(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide() || !neverSpawn(event.getEntity().getType())) return;
+        event.setCanceled(true);
+        neverBlockedForTest++;
+        String id = String.valueOf(ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType()));
+        if (NEVER_LOGGED.add(id)) {
+            RtShop.LOGGER.info("[rtshop] {} 은(는) mob_rules.json 의 neverSpawn 이라 세계에 넣지 않습니다 ({})", id,
+                    event.loadedFromDisk() ? "저장돼 있던 것을 지움" : "새로 생기려던 것");
+        }
     }
 
     // ------------------------------------------------------------------ 보스인가

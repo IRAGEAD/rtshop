@@ -234,6 +234,8 @@ public final class CastlePlots {
      */
     public static boolean chunkExists(ServerLevel level, int cx, int cz) {
         if (level.getChunkSource().getChunkNow(cx, cz) != null) return true;
+        // 지역 파일이 없으면 읽지도 않는다 (읽으려 하면 빈 지역 파일이 생기므로)
+        if (!Files.exists(regionFile(level, cx, cz))) return false;
         try {
             java.util.Optional<CompoundTag> tag = level.getChunkSource().chunkMap.read(new net.minecraft.world.level.ChunkPos(cx, cz)).join();
             return tag.isPresent() && net.minecraft.world.level.chunk.storage.ChunkSerializer.getChunkTypeFromTag(tag.get())
@@ -241,6 +243,12 @@ public final class CastlePlots {
         } catch (Throwable t) {
             return false;
         }
+    }
+
+    /** 이 청크가 들어 있을 지역 파일의 자리 (세계 폴더 / 차원 / region / r.X.Z.mca). */
+    public static Path regionFile(ServerLevel level, int cx, int cz) {
+        Path dim = net.minecraft.world.level.dimension.DimensionType.getStorageFolder(level.dimension(), level.getServer().getWorldPath(LevelResource.ROOT));
+        return dim.resolve("region").resolve("r." + (cx >> 5) + "." + (cz >> 5) + ".mca");
     }
 
     /** 표지 블록(성 안 건물 몇 곳) 가운데 {맞는 수, 청크가 이미 있어 본 수}. 없는 청크는 만들지 않고 건너뛴다. */

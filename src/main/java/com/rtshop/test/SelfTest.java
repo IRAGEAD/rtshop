@@ -1814,8 +1814,10 @@ public final class SelfTest {
                 cleaned = castlesAfter == castlesBefore;
             }
             boolean farAfter = com.rtshop.land.CastlePlots.chunkExists(level, farCx, farCz);
-            check("3.81 looking for the castle never makes new chunks: a far chunk that did not exist still does not",
-                    !farBefore && !farAfter && level.getChunkSource().getChunkNow(farCx, farCz) == null && cleaned, farBefore + " " + farAfter + " " + cleaned);
+            boolean noFile = !java.nio.file.Files.exists(com.rtshop.land.CastlePlots.regionFile(level, farCx, farCz));
+            check("3.81 looking for the castle never makes new chunks (nor empty region files): a far chunk that did not exist still does not",
+                    !farBefore && !farAfter && level.getChunkSource().getChunkNow(farCx, farCz) == null && noFile && cleaned,
+                    farBefore + " " + farAfter + " " + noFile + " " + cleaned + " " + com.rtshop.land.CastlePlots.regionFile(level, farCx, farCz));
         }
         check("only land merchants open the lot browser", com.rtshop.land.PlotBrowser.isLandShop("land") && !com.rtshop.land.PlotBrowser.isLandShop("farmer"));
         check("lots can no longer be bought by command", server.getCommands().getDispatcher().parse("rtshop plot buy", server.createCommandSourceStack()).getReader().canRead());
@@ -4044,7 +4046,7 @@ public final class SelfTest {
             // 3.81: 마을의 기준 자리를 정하지 않은 서버(마을을 옮겨 온 새 서버)에서는 귀환권 · 죽음도 아모노스 부두로, 아모노스 맵이 아니면 자리 없음
             ts.set = false;
             ld.castleInstalled = 0;
-            boolean noSpot = com.rtshop.rules.TownSpawn.townPoint(server) == null
+            boolean noSpot381 = com.rtshop.rules.TownSpawn.townPoint(server) == null
                     && com.rtshop.item.ReturnTicketItem.refusal(a, true) != null
                     && com.rtshop.item.ReturnTicketItem.refusal(a, true).getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc0
                     && "rtshop.return.no_spot".equals(tc0.getKey());
@@ -4054,7 +4056,7 @@ public final class SelfTest {
             ld.castleInstalled = oldCastle;
             ts.set = true;
             check("3.81 with no town point set, return tickets and deaths go to the Amonos dock on the Amonos map; elsewhere there is still no spot",
-                    noSpot && dockFallback, noSpot + " " + (dockBack == null ? "none" : dockBack.kind() + " " + dockBack.x()));
+                    noSpot381 && dockFallback, noSpot381 + " " + (dockBack == null ? "none" : dockBack.kind() + " " + dockBack.x()));
             ld.castleInstalled = oldCastle;
             a.teleportTo(sx, sy, sz);
             check("3.80 a newcomer starts at the arrival point, while return tickets and deaths still go to the town point (fountain square); arrival off → the town point; "
@@ -4072,6 +4074,45 @@ public final class SelfTest {
         }
         witherProbe.discard();
         zombieProbe.discard();
+        // 3.81 (사용자 11-28 16:18 "spmovesets 모드의 상인이 스폰되지 않게"): mob_rules.json 의 neverSpawn — 기본은 밤 상인 칸딜과 그 수레
+        {
+            boolean neverDefaults = mr.neverSpawn.contains("spmovesets:vendedor_nocturno") && mr.neverSpawn.contains("spmovesets:carro_vendedor")
+                    && com.rtshop.rules.MobRules.fresh().toJson().has("neverSpawn");
+            mr.neverSpawn.add("minecraft:wandering_trader");   // 모드가 없는 시험에서는 떠돌이 상인으로 대신 본다
+            net.minecraft.world.entity.Entity wt = EntityType.WANDERING_TRADER.create(level);
+            wt.moveTo(a.getX() + 4, a.getY(), a.getZ() + 4);
+            int blockedBefore = com.rtshop.rules.MobRules.neverBlockedForTest;
+            boolean wtIn = level.addFreshEntity(wt);
+            boolean wtGone = !wtIn && level.getEntity(wt.getUUID()) == null && com.rtshop.rules.MobRules.neverBlockedForTest > blockedBefore;
+            net.minecraft.world.entity.Entity cow = EntityType.COW.create(level);
+            cow.moveTo(a.getX() + 5, a.getY(), a.getZ() + 5);
+            boolean cowIn = level.addFreshEntity(cow);
+            cow.discard();
+            mr.neverSpawn.remove("minecraft:wandering_trader");
+            check("3.81 a mob on the neverSpawn list never enters the world (a wandering trader stands in), other mobs still do; by default the list has the spmovesets night peddler and his cart",
+                    neverDefaults && wtGone && cowIn, neverDefaults + " " + wtIn + " " + cowIn);
+            if (net.minecraftforge.fml.ModList.get().isLoaded("spmovesets")) {
+                StringBuilder spm = new StringBuilder();
+                int spmTypes = 0, spmIn = 0;
+                for (String sid : List.of("spmovesets:vendedor_nocturno", "spmovesets:carro_vendedor")) {
+                    net.minecraft.resources.ResourceLocation srl = new net.minecraft.resources.ResourceLocation(sid);
+                    if (!net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.containsKey(srl)) {
+                        spm.append(' ').append(sid).append("=missing");
+                        continue;
+                    }
+                    spmTypes++;
+                    net.minecraft.world.entity.Entity se = net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.getValue(srl).create(level);
+                    if (se == null) continue;
+                    se.moveTo(a.getX() + 6, a.getY(), a.getZ() + 6);
+                    if (level.addFreshEntity(se)) {
+                        spmIn++;
+                        se.discard();
+                    }
+                    spm.append(' ').append(sid).append('=').append(se.getClass().getSimpleName());
+                }
+                check("3.81 in the pack the spmovesets night peddler (Candil) and his cart cannot enter the world", spmTypes == 2 && spmIn == 0, spmTypes + " " + spmIn + spm);
+            }
+        }
         com.rtshop.rules.MobRules.reload();
         // 운영자 기능은 크리에이티브(관전)일 때만: 서바이벌의 OP 는 보통 플레이어와 같다
         com.rtshop.util.Perm.enforceForTest = true;
