@@ -128,8 +128,11 @@ public final class BorderRenderer {
         int ref = (int) Math.floor(mc.player.getY());
         double max = 0;
         for (Corner c : corners) {
-            int top = Math.max(Math.max(mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x, c.z), mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x - 1, c.z)),
-                    Math.max(mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x, c.z - 1), mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, c.x - 1, c.z - 1)));
+            // 땅의 윗면 = 무엇이든 놓인 가장 높은 칸 (WORLD_SURFACE: 눈 · 반 블록 · 길 블록도 셈). MOTION_BLOCKING 은 두 겹 이상의 눈 · 반 블록을 빼서,
+            // 그 위에 바닥을 잡는 테두리가 1칸 높게 재였다 (팩 15 의 눈 덮인 시험 땅에서 2.7).
+            Heightmap.Types surface = Heightmap.Types.WORLD_SURFACE;
+            int top = Math.max(Math.max(mc.level.getHeight(surface, c.x, c.z), mc.level.getHeight(surface, c.x - 1, c.z)),
+                    Math.max(mc.level.getHeight(surface, c.x, c.z - 1), mc.level.getHeight(surface, c.x - 1, c.z - 1)));
             max = Math.max(max, vertexY(mc.level, c.x, c.z, ref) + POST - top);
         }
         return max;

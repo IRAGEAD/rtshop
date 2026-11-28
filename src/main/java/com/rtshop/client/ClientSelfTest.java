@@ -1461,6 +1461,8 @@ public final class ClientSelfTest {
                             pos = pos.offset(cx + 1 < c.x1 ? 1 : -1, 0, 0);
                         }
                     }
+                    // 상자 위가 막혀 있으면(나무 기둥 · 바위 속) 바닐라 규칙상 열리지 않는다 — 시험 땅은 무작위 지형이므로 위 칸을 비운다 (팩 15 의 눈 덮인 숲에서 실패)
+                    sp.serverLevel().setBlock(pos.above(), Blocks.AIR.defaultBlockState(), 3);
                     sp.serverLevel().setBlock(pos, Blocks.CHEST.defaultBlockState(), 3);
                     chestPos = pos;
                     LandManager.openStorage(sp, pos);
