@@ -694,6 +694,7 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 - K-1. 팩 11 ↔ 13 비교: 매니페스트(더한 · 뺀 · 판이 바뀐 모드, 선택 모드), overrides/mods(RT Shop 판 · dhcompat 등), config 의 바뀐 파일과 값
   (DistantHorizons · ImmediatelyFast · Farsight · Diorama …), 알려진 충돌(Canary 등) · 11-27 성능 추천이 들어갔는지.
 - K-2. CI 의 팩을 13 으로 (pack_files.json · pack_overrides.json) → 모드팩 전체 시험 (서버 · 화면 · 셰이더) → 결과와 고칠 것을 보고.
+추가 (16:47): "최신 모드팩이야." (첨부: RT1_-_2_14.zip) → 검토 대상을 14 로. 14 = 13 + GUHAO's VIX · Fancy Trail (둘 다 EFN-Enhance 와 같은 만든이). 13 시험(run 46122744652)은 멈추고 14 로(run 46123100312, 가지 v5-next34-p14).
 
 ## 요청 (11-28 16:18) → 3.81.0 (3.80.0 을 올린 다음, 가지 v5-next34)
 
