@@ -1374,6 +1374,45 @@ public final class SelfTest {
         return FakePlayerFactory.get(level, new GameProfile(id, name));
     }
 
+    /**
+     * 3.82: 진짜 순서 그대로 주민을 눌러 본다 — 상호작용 이벤트에서 RT Shop(HIGH)이 정리한 뒤 다른 모드(NORMAL)가 later 의 거래를
+     * 붙이고, 주민이 거래 창을 연다. 돌려주는 값: {거래 창이 열렸나 1/0, 상호작용이 끝날 때 붙어 있던 금지 거래 수,
+     * 창이 열린 뒤 남은 금지 거래 수, 상호작용이 막혔나 1/0}.
+     */
+    static int[] tradeFlow382(FakePlayer p, net.minecraft.world.entity.npc.AbstractVillager v,
+            java.util.function.Supplier<java.util.List<MerchantOffer>> later) {
+        int[] seen = {0, 0};
+        java.util.function.Consumer<net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract> add = ev -> {
+            if (ev.getTarget() == v && !ev.getLevel().isClientSide()) v.getOffers().addAll(later.get());
+        };
+        java.util.function.Consumer<net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract> peek = ev -> {
+            if (ev.getTarget() != v) return;
+            seen[0] = (int) v.getOffers().stream().filter(com.rtshop.rules.TradeGuard::banned).count();
+            seen[1] = ev.isCanceled() ? 1 : 0;
+        };
+        ItemStack held = p.getMainHandItem().copy();
+        p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL, false,
+                net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract.class, add);
+        MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST, true,
+                net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract.class, peek);
+        boolean opened;
+        int left;
+        try {
+            v.setTradingPlayer(null);
+            p.interactOn(v, InteractionHand.MAIN_HAND);
+            opened = p.containerMenu instanceof net.minecraft.world.inventory.MerchantMenu;
+            left = (int) v.getOffers().stream().filter(com.rtshop.rules.TradeGuard::banned).count();
+        } finally {
+            MinecraftForge.EVENT_BUS.unregister(add);
+            MinecraftForge.EVENT_BUS.unregister(peek);
+            if (p.containerMenu != p.inventoryMenu) p.closeContainer();
+            v.setTradingPlayer(null);
+            p.setItemInHand(InteractionHand.MAIN_HAND, held);
+        }
+        return new int[] {opened ? 1 : 0, seen[0], left, seen[1]};
+    }
+
     private static long count(ServerPlayer p, Predicate<ItemStack> f) {
         long n = 0;
         for (ItemStack s : p.getInventory().items) {
@@ -3763,10 +3802,14 @@ public final class SelfTest {
                 ItemStack tagged = new ItemStack(Items.FILLED_MAP);
                 tagged.getOrCreateTag().putString("rtshopTestMark", "spmovesets:mapa_pyro");
                 vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 3), tagged, 4, 1, 0.05f));
+                // 예전 판 spmovesets 의 아레나 지도: 바닐라 지도에 그 모드의 번역 키 이름 (filled_map.spmovesets.arena)
+                ItemStack arenaOld = new ItemStack(Items.FILLED_MAP);
+                arenaOld.setHoverName(net.minecraft.network.chat.Component.translatable("filled_map.spmovesets.arena"));
+                vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 12), arenaOld, 12, 10, 0.2f));
                 // 남는 거래: 밀 → 에메랄드 (상인 NPC 가 사 주는 물건을 파는 주민 거래는 EconomyGuards 가 따로 지우므로, 결과가 에메랄드인 것으로)
                 vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.WHEAT, 20), new ItemStack(Items.EMERALD, 1), 16, 1, 0.05f));
                 int removed382 = com.rtshop.rules.TradeGuard.strip(vil);
-                boolean stripped = removed382 == 3 && vil.getOffers().size() == 1 && vil.getOffers().get(0).getResult().is(Items.EMERALD);
+                boolean stripped = removed382 == 4 && vil.getOffers().size() == 1 && vil.getOffers().get(0).getResult().is(Items.EMERALD);
                 // 거래 창을 열기 전(상호작용)에도 빠지는지
                 vil.getOffers().add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 3), tagged.copy(), 4, 1, 0.05f));
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract(
@@ -3775,41 +3818,78 @@ public final class SelfTest {
                         && vil.getOffers().stream().anyMatch(o -> o.getResult().is(Items.EMERALD));
                 check("3.82 a villager's trades that sell or cost a tradeBan item (or an item whose NBT names a banned mod) are removed before the trade window opens; others stay; spmovesets is banned by default",
                         tradeDefaults && stripped && onInteract, tradeDefaults + " " + removed382 + " " + vil.getOffers().size() + " " + onInteract);
+                // 진짜 순서 그대로: 누름 → RT Shop(HIGH) 정리 → 다른 모드(NORMAL)가 거래를 붙임 (spmovesets 의 지도 제작자처럼) → 주민이 거래 창을 엶
+                // (이때 다시 정리) → 거래 목록이 화면으로 감. 거래 창을 연 상인은 세상 안에서 찾으므로 주민을 세상에 넣는다.
+                boolean joined382 = level.addFreshEntity(vil);
+                boolean land382 = com.rtshop.land.LandManager.guardAt(level, vil.blockPosition()) != null;
+                int[] flow382 = tradeFlow382(a, vil, () -> java.util.List.of(
+                        new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 2), new ItemStack(Items.COMPASS), 4, 1, 0.05f)));
+                check("3.82 trades another mod adds after RT Shop's interact check (like spmovesets' cartographer maps) are removed as the trade window opens, before the list is sent; the other trades stay",
+                        joined382 && flow382[0] == 1 && flow382[1] == 1 && flow382[2] == 0 && vil.getOffers().stream().anyMatch(o -> o.getResult().is(Items.EMERALD)),
+                        "joined " + joined382 + " opened " + flow382[0] + " added " + flow382[1] + " left " + flow382[2] + " canceled " + flow382[3] + " land " + land382
+                                + " offers " + vil.getOffers().size());
                 if (net.minecraftforge.fml.ModList.get().isLoaded("spmovesets")) {
-                    // Forge 가 모드의 거래를 더한 지도 제작자의 거래 목록에서 spmovesets 의 것을 만들어 보고, 정리하면 남지 않는지
-                    int spListings = 0, spOffers = 0;
-                    StringBuilder spWhere = new StringBuilder();
-                    var trades = net.minecraft.world.entity.npc.VillagerTrades.TRADES.get(net.minecraft.world.entity.npc.VillagerProfession.CARTOGRAPHER);
-                    vil.setVillagerData(vil.getVillagerData().setProfession(net.minecraft.world.entity.npc.VillagerProfession.CARTOGRAPHER));
-                    vil.getOffers().clear();
-                    if (trades != null) {
-                        for (var lv : trades.int2ObjectEntrySet()) {
-                            for (net.minecraft.world.entity.npc.VillagerTrades.ItemListing li : lv.getValue()) {
-                                if (!li.getClass().getName().toLowerCase(java.util.Locale.ROOT).contains("spmovesets")) continue;   // 바닐라 지도(구조물 찾기)는 부르지 않음
-                                spListings++;
-                                spWhere.append(' ').append(lv.getIntKey()).append(':').append(li.getClass().getSimpleName());
-                                try {
-                                    for (int kk382 = 0; kk382 < 4; kk382++) {
-                                        net.minecraft.world.item.trading.MerchantOffer mo = li.getOffer(vil, level.getRandom());
-                                        if (mo != null) {
-                                            vil.getOffers().add(mo);
-                                            spOffers++;
-                                        }
-                                    }
-                                } catch (Throwable t) {
-                                    spWhere.append("(error ").append(t.getClass().getSimpleName()).append(')');
-                                }
+                    // spmovesets 는 VillagerTrades 표를 쓰지 않는다: 플레이어가 지도 제작자를 누를 때(EntityInteract, ArenaMapTrade.giveMaps)
+                    // 원소 지도가 없으면 붙인다 — 값 에메랄드 12 + 뽑기 열쇠 1~3, 파는 것 spmovesets:mapa_*. 그 모드의 offer() 로 똑같이 만들어 본다.
+                    com.rtshop.rules.ItemPolicy.reload();   // 진짜 규칙(spmovesets:*)으로
+                    int spOffers = 0, spBanned = 0, spRemoved = -1;
+                    int[] spFlow = {-1, -1, -1, -1};
+                    String spInfo = "";
+                    try {
+                        Class<?> amt = Class.forName("spmovesets.spmovesets.survival.world.arena.ArenaMapTrade");
+                        @SuppressWarnings("unchecked")
+                        java.util.List<String> fruits = new java.util.ArrayList<>((java.util.List<String>) amt.getMethod("onSale").invoke(null));
+                        if (fruits.isEmpty()) {   // 설정에서 열매가 모두 꺼져 있으면 모든 열매로
+                            @SuppressWarnings("unchecked")
+                            java.util.List<String> all = (java.util.List<String>) Class.forName("spmovesets.spmovesets.survival.SurvivalItems").getField("FRUITS").get(null);
+                            fruits.addAll(all);
+                        }
+                        java.lang.reflect.Method mk = amt.getMethod("offer", String.class, int.class);
+                        java.util.List<net.minecraft.world.item.trading.MerchantOffer> real = new java.util.ArrayList<>();
+                        for (String f : fruits) {
+                            try {
+                                real.add((net.minecraft.world.item.trading.MerchantOffer) mk.invoke(null, f, 2));
+                            } catch (Throwable t) {
+                                spInfo += " (" + f + " " + t.getClass().getSimpleName() + ")";
                             }
                         }
+                        ItemStack arena = new ItemStack(Items.FILLED_MAP);   // 예전 판의 아레나 지도 (바닐라 지도 + 그 모드의 이름)
+                        arena.setHoverName(net.minecraft.network.chat.Component.translatable("filled_map.spmovesets.arena"));
+                        real.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 12), arena, 12, 10, 0.2f));
+                        String surv;
+                        try {
+                            surv = String.valueOf(Class.forName("spmovesets.spmovesets.survival.SurvivalMode")
+                                    .getMethod("isOn", net.minecraft.world.level.Level.class).invoke(null, level));
+                        } catch (Throwable t) {
+                            surv = "? " + t.getClass().getSimpleName();
+                        }
+                        net.minecraft.world.item.trading.MerchantOffer m0 = real.get(0);
+                        spInfo += " fruits " + fruits + " survival " + surv + " e.g. " + m0.getBaseCostA() + " + " + m0.getCostB() + " -> " + m0.getResult();
+                        vil.setVillagerData(vil.getVillagerData().setProfession(net.minecraft.world.entity.npc.VillagerProfession.CARTOGRAPHER));
+                        vil.getOffers().clear();
+                        vil.getOffers().add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.PAPER, 24), new ItemStack(Items.EMERALD), 16, 2, 0.05f));
+                        for (net.minecraft.world.item.trading.MerchantOffer mo : real) {
+                            vil.getOffers().add(new net.minecraft.world.item.trading.MerchantOffer(mo.createTag()));
+                            spOffers++;
+                        }
+                        for (net.minecraft.world.item.trading.MerchantOffer mo : vil.getOffers()) if (com.rtshop.rules.TradeGuard.banned(mo)) spBanned++;
+                        spRemoved = com.rtshop.rules.TradeGuard.strip(vil);
+                        // 진짜 순서: 누름 → RT Shop(HIGH) → 그 모드(NORMAL)가 지도를 붙임 → 거래 창이 열림 (이때 빠져야 함)
+                        spFlow = tradeFlow382(a, vil, () -> {
+                            java.util.List<net.minecraft.world.item.trading.MerchantOffer> l = new java.util.ArrayList<>();
+                            for (net.minecraft.world.item.trading.MerchantOffer mo : real) l.add(new net.minecraft.world.item.trading.MerchantOffer(mo.createTag()));
+                            return l;
+                        });
+                    } catch (Throwable t) {
+                        spInfo += " error " + t;
                     }
-                    com.rtshop.rules.ItemPolicy.reload();   // 진짜 규칙(spmovesets:*)으로
-                    int bannedBefore = 0;
-                    for (net.minecraft.world.item.trading.MerchantOffer mo : vil.getOffers()) if (com.rtshop.rules.TradeGuard.banned(mo)) bannedBefore++;
-                    int removed = com.rtshop.rules.TradeGuard.strip(vil);
-                    info("spmovesets cartographer listings: " + spListings + " offers " + spOffers + " banned " + bannedBefore + " removed " + removed + spWhere);
-                    check("3.82 in the pack the spmovesets trades a cartographer can get (element maps for emeralds and gacha keys) are all removed",
-                            removed == bannedBefore && vil.getOffers().stream().noneMatch(com.rtshop.rules.TradeGuard::banned),
-                            spListings + " listings, " + spOffers + " offers, " + bannedBefore + " banned, " + removed + " removed" + spWhere);
+                    String spDetail = spOffers + " offers, " + spBanned + " banned, " + spRemoved + " removed; flow opened " + spFlow[0] + " added " + spFlow[1]
+                            + " left " + spFlow[2] + " canceled " + spFlow[3] + ";" + spInfo;
+                    info("spmovesets cartographer trades: " + spDetail);
+                    check("3.82 in the pack the spmovesets trades a cartographer gets (element maps for 12 emeralds and gacha keys; the old arena map) are all removed, also when the mod adds them after RT Shop's interact check (removed as the trade window opens)",
+                            spOffers > 1 && spBanned == spOffers && spRemoved == spOffers && spFlow[0] == 1 && spFlow[1] >= spOffers && spFlow[2] == 0
+                                    && vil.getOffers().stream().anyMatch(o -> o.getBaseCostA().is(Items.PAPER)),
+                            spDetail);
                 }
             } finally {
                 vil.discard();

@@ -161,7 +161,7 @@ public final class ItemPolicy {
             help.add("gachaBan: 뽑기에 오르지 않는 것 — 무기·장신구·펫 묶음의 아이템 ID 와 마법 뽑기의 인챈트 ID (Create: 상점·뽑기 어디에서도 얻지 못하게). gacha.json 의 목록은 지우지 않고 건너뛰기만 한다.");
             help.add("recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).");
             help.add("extremeAttack / extremeArmor (3.65.0): 공격력이 이 값 이상이거나 갑옷 한 조각의 방어력이 이 값 이상인 터무니없는 장비는 전리품 · 몹과 보스의 드롭 · 조합법에서 뺀다 (keep · lootAllow 보다 먼저). 0 = 끔. 기본 25 / 20 (모드팩의 다른 장비는 17 / 13 이 가장 높다).");
-            help.add("tradeBan (3.82): 주민 · 떠돌이 상인의 거래에서 뺄 아이템 — 파는 것이든 값이든 이 아이템이 들어간 거래는 거래 창이 열리기 전에 빠진다. \"모드:*\" 는 NBT 에 그 모드가 적힌 물건(모드가 만든 지도 등)도. 기본: spmovesets 전부.");
+            help.add("tradeBan (3.82): 주민 · 떠돌이 상인의 거래에서 뺄 아이템 — 파는 것이든 값이든 이 아이템이 들어간 거래는 거래 창이 열리기 전에 빠진다. \"모드:*\" 는 NBT 에 그 모드의 ID 나 번역 키가 적힌 물건(모드가 만든 지도 등)도. 기본: spmovesets 전부.");
             help.add("shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.");
             help.add("recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.");
             help.add("gearRaise (3.80): 상점의 무기 · 활 · 지팡이 · 방패 · 방어구 · 장신구의 사는 값을 올린다 — 올리기 전 값이 gearRaiseMidFrom G 미만이면 gearRaiseLow 배, gearRaiseHighFrom G 미만이면 gearRaiseMid 배, 그 이상은 gearRaiseHigh 배. "
@@ -383,7 +383,7 @@ public final class ItemPolicy {
     private static final class State {
         final Config c;
         final Pat shopBan, bossItems, notBoss, lootBan, lootAllow, recipeBan, keep, blockDropBan, gachaBan, tradeBan;
-        /** tradeBan 의 "모드:*" 에서 뽑은 "모드:" — NBT 글에 들어 있으면 그 모드의 물건으로 본다. */
+        /** tradeBan 의 "모드:*" 에서 뽑은 "모드:" 와 ".모드." (번역 키) — NBT 글에 들어 있으면 그 모드의 물건으로 본다. */
         final List<String> tradeBanTags = new ArrayList<>();
         final List<Map.Entry<Pat, Double>> factors = new ArrayList<>();
         volatile Set<Item> boss = Set.of();
@@ -403,7 +403,11 @@ public final class ItemPolicy {
             tradeBan = new Pat(c.tradeBan);
             for (String t : c.tradeBan) {
                 String v = t.trim().toLowerCase(Locale.ROOT);
-                if (v.endsWith(":*") && v.indexOf('*') == v.length() - 1) tradeBanTags.add(v.substring(0, v.length() - 1));
+                if (v.endsWith(":*") && v.indexOf('*') == v.length() - 1 && v.length() > 2) {
+                    String ns = v.substring(0, v.length() - 2);
+                    tradeBanTags.add(ns + ":");          // 아이템 · 구조물 ID (모드:이름)
+                    tradeBanTags.add("." + ns + ".");    // 번역 키 (예: 예전 판의 아레나 지도 이름 filled_map.spmovesets.arena)
+                }
             }
             recipeBan = new Pat(c.recipeBan);
             keep = new Pat(c.keep);
