@@ -698,6 +698,9 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 추가 (13:43): "작업이 끝나면 게임을 처음 들어왔을 때에는 부두에 스폰되고, 귀환권 사용이나 사망 시에는 내가 직접 찍어놓은 마을의 분수 광장 위치로 돌아오게 해줘."
 - H-1. 처음 들어온 사람 = 부두(아모노스 맵의 스폰 −24042, 64, −5344 — 지도에서 동쪽 바다의 나무 부두), 귀환권 · 죽음(침대 없음) = /rtshop spawn set 으로 정한
   마을 기준 자리(분수 광장). 지금은 처음 들어온 사람도 마을 기준 자리로 보냄 → 도착 자리(arrival)를 따로 두고 /rtshop spawn arrival set|on|off.
+추가 (14:05): "야생에서 spmovesets의 보스 구조물과 같은 구조물들이 나오지 않도록 해줘."
+- I-1. spmovesets 의 구조물(보스 구조물 등)이 새로 만들어지는 땅에 생기지 않게 — StructureRarity 의 데이터팩(구조물 배치를 모드 jar 에서 읽어 고쳐 가장 위에 얹음)에
+  "끔" 을 더해 그 모드의 structure_set 배치 확률(frequency)을 0 으로. 이미 만들어진 땅의 구조물은 남음 (알리기).
 - 한 일 (3.80.0, 가지 v5-next33):
   G-1 ✔ ItemPolicy.gearRaise (item_policy.json 7판: gearRaise · Low/Mid/High 2/3/5 · MidFrom/HighFrom 5,000/40,000 · StrongDps 14) — ShopLoader 의 값 배수 자리에서
   max(priceFactor, gearRaise) 로 사는 값만 곱함 (매입가는 그 앞에서 정해져 그대로). raisedGear = Pricing gear(무기 · 활 · 방패 · 방어구) · 지팡이 · 장신구, 블록 · 낚싯대 · 도구 · rtshop 물건 제외.
