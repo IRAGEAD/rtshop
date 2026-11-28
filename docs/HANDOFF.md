@@ -59,6 +59,19 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
+- **(11-28 20:52) 3.82.0 올림 · 보냄** (main = fb95b0b, 배포 run 46139681483, 마지막 시험 run 46136755575: 모드팩 서버 962 · 화면 366 · 셰이더 8 모두 통과, 빌드 서버 905 · 화면 늘 그런 5건, 통합 921).
+  worklist 「요청 (11-28 17:39) → 3.82.0」 J-3 · J-4 · J-5.
+  J-3 TradeGuard: 거래의 파는 것 · 값에 tradeBan(item_policy.json 8판, 기본 spmovesets:*, NBT 의 "모드:" · ".모드." 도)이 있으면 뺌 — 누를 때(HIGH) · 거래 창이 열릴 때
+  (PlayerContainerEvent.Open, 목록이 화면으로 가기 전) · 거래 뒤. ★ spmovesets 는 VillagerTrades 표가 아니라 ArenaMapTrade.onInteract → giveMaps 로 누를 때마다
+  (원소 지도가 없으면) 에메랄드 12 + gacha_fruta_key 1~3 → mapa_<열매> 를 붙인다 (Survival 모드일 때). 처음 시험이 표에서 찾아 0건을 보고도 통과했던 것을 고침 —
+  모드팩 시험은 그 모드의 offer() 로 만든 11건 + 실제 순서(누름 → 다른 모드가 붙임 → 창)로 확인.
+  J-4 FireGuard + FireBlockMixin(불의 틱 처음, 이름 tick / m_213897_ 둘 다 — refmap 없음): 성 영역 + 둘레 1칸에서는 번지기 · 태우기 없이 꺼짐(지옥암 · 마그마 위는 그대로),
+  용암 불(FluidPlaceBlockEvent) 막음, doFireTick 이 꺼져 있으면 손대지 않음, land.json castleNoFireSpread (기본 켬).
+  J-5 shop_lots.json 2판: 남동문 광장 서쪽 3칸(가판대 3 · 6 · 8) retired, 북쪽 광장 가판대 11 (-24358,-5480 5×4) · 12 (-24352,-5478 5×5),
+  ShopLots.VERSION 2 — install 이 먼저 retire(이름 · 자리가 같고 판매 중이면 지움, 주인이 있으면 남김 → status 가 알림). 남은 칸 이름 그대로.
+- **팩 15 화면 시험**: 처음 run 46123749936 이 55분 넘게 돌다 러너가 끊김 → 효과 모드 셋(Nightfall Enhance · VIX 1.3.6 · Fancy Trail)을 하나씩 · 다 넣어 다시 돌려 보니
+  모두 끝남 (셋 다 넣은 p14v run 46136823483 도 화면 22분 통과) = 한 번의 러너 문제. 흔들리는 화면 시험 둘: 「내 토지의 상자가 열림」(상자 자리가 나무 기둥이면
+  위가 막혀 안 열림) · 「경계가 땅을 따라 낮게」(무작위 지형, 2.7 > 2.0). 다음 일: CI 를 팩 15 로 (가지 v5-next34-p14 의 pack_files · overrides), 두 시험을 지형에 덜 흔들리게.
 - **(11-28 17:28) 3.81.0 올림 · 보냄** (main = b2eb061, 전체 시험 run 46121718036: 모드팩 서버 957 · 화면 366 · 셰이더 8 모두 통과, 빌드 서버 901 · 화면 늘 그런 5건).
   worklist 「요청 (11-28 16:18) → 3.81.0」 J-1 · J-2. J-1 옮긴 마을 = CastlePlots.chunkExists/signatureSaved (스폰과 상관없이 이미 있는 청크, 지역 파일이 없으면 읽지 않음),
   castleInstalled RECHECK(-2) 는 켤 때마다 다시 봄 (-1 = 운영자가 걷어 냄은 그대로) · TownSpawn.townPoint 는 기준 자리가 없으면 부두(dock).
