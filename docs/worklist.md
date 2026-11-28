@@ -721,6 +721,14 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   D-2 검토 docs/balance_review.md 13절 — 고침 R-1 주간 순위 경쟁 없는 자리 보상 없음 (ranks.json rewardNeedsOthers). 지켜볼 것: 주식 한 사람 영향 · 고용비 · 싼 모드 무기 · 황혼불 갑옷.
   사용자가 고를 것: 뽑기 전설 < 상점 무기 (가 등급 보정 / 나 상점 값 올림 / 다 그대로).
   D-3 ScyllaClues 4판 (storm_coin 천장 0, migrate4). D-4 나침반 알림 found_town.
+  E-3 ✔ shop_lots.json 을 남동문 안 가판대 광장으로: 5×5 장터 9칸, 맵 서쪽 열 (285,319) (288,333) (289,342) (283,358) (283,370) (288,380) · 동쪽 열 (314,335) (312,346) (310,358)
+  (맵 왼쪽 위 모서리, 월드 = (-24620 + x, -5660 + z)). 지도 빛깔로 칸과 둘레 한 칸이 모두 포장된 길, 어느 두 칸 사이도 4칸 이상, 가운데 큰길은 비움. 그림 docs/design/w4/w4_5_se_gate_market.png.
+  시험이 성 지도 그림(castle_map.png)을 읽어 길 위인지 본다.
+  E-4 ✔ 기본 자릿세 shopLotRentPercent 2 → 15 (한 칸 7,810 G → 주 1,172 G) + 판매 자릿세 shopLotSalesFeePercent 5 (PlayerShops.buy 에서 떼고 주인 예금, 알림 sold_msg_fee).
+  상점 토지 밖에 전부터 놓인 진열대는 판매 자릿세 없음 (shopSalesFeeAllStands=false). 토지 상인 창 · 구입 안내 · 안내서에 두 가지 자릿세.
+  E-1 ✔ 강화 입자: createTrackingEmitter(몸을 따라 틱마다 16개 × 25~40틱, 눈앞까지) → EnhanceFx.burst (모루 윗면 · 아니면 눈앞 2칸 아래에 한 번만 6~14개). client.json enhanceParticles 로 끔.
+  E-2 ✔ MobPortrait: 재는 칸을 자홍으로 지우고 알파 또는 빛깔 차이로 칠해진 곳을 셈 · 그릴 수 있는 몹이 비면 바닐라 몹이거나 대신 그릴 몹 · 돼지 · 좀비도 비는지 보고 그러면
+  화면 밖 재기를 그만두고 모두 예전 방식(3D 그대로)으로 (알 대신) · 그리다 오류 나는 몹은 그 몹만 알 · client.json measuredMobPortraits · 셰이더 켠 시험에도 도감 그림 확인 추가.
 
 ## 사용자 답 (11-28 07:20) → 3.78.0 (가지 v5-next31)
 

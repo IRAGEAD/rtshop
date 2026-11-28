@@ -1640,6 +1640,49 @@ final class ClientSelfTest2 {
             mc.setScreen(null);
             waitTicks(5);
         });
+        // 3.79 (사용자 11-28 10:51 "도감과 현상금 게시판의 몹은 몹의 모습이 아니라 스폰 알로"): 화면 밖 그림이 (처음 돼지는 되다가) 비게 나오는 컴퓨터 —
+        // 알 대신 예전 방식(3D 를 히트박스로 칸에 맞춤)으로 돌아가야 한다. 바닐라 몹이 빌 때와 모드 몹이 빌 때(대신 그릴 몹 · 돼지 · 좀비도 빔) 둘 다
+        add(mc -> {
+            String modded = null;
+            for (String id : com.rtshop.story.Codex.mobs().keySet()) {
+                if (!id.startsWith("minecraft:") && MobPortrait.model(id) != null) {
+                    modded = id;
+                    break;
+                }
+            }
+            MobPortrait.resetForTest();
+            MobPortrait.Fit pig = MobPortrait.fitNowForTest("minecraft:pig");
+            MobPortrait.blankForTest = true;
+            MobPortrait.Fit zombie = MobPortrait.fitNowForTest("minecraft:zombie");
+            boolean vanillaBack = pig != null && !pig.isIcon() && zombie == null && !MobPortrait.pipelineOkForTest()
+                    && MobPortrait.pipelineInfo.startsWith("gave up") && MobPortrait.fitNowForTest("minecraft:pig") == null;
+            String info1 = MobPortrait.pipelineInfo;
+            MobPortrait.resetForTest();
+            MobPortrait.fitNowForTest("minecraft:pig");
+            MobPortrait.blankForTest = true;
+            MobPortrait.Fit mod = modded == null ? null : MobPortrait.fitNowForTest(modded);
+            boolean moddedBack = modded == null || mod == null && !MobPortrait.pipelineOkForTest() && MobPortrait.pipelineInfo.startsWith("gave up");
+            String info2 = MobPortrait.pipelineInfo;
+            MobPortrait.resetForTest();
+            ClientConfig.get().measuredMobPortraits = false;
+            boolean offBack = MobPortrait.fitNowForTest("minecraft:zombie") == null;
+            ClientConfig.get().measuredMobPortraits = true;
+            MobPortrait.Fit again = MobPortrait.fitNowForTest("minecraft:zombie");
+            check("3.79 where the off-screen picture comes out blank (vanilla mob, or a mod mob with the pig and zombie blank too), portraits go back to the old 3D drawing, never spawn eggs; client.json measuredMobPortraits=false does the same",
+                    vanillaBack && moddedBack && offBack && again != null && !again.isIcon(),
+                    info1 + " | " + modded + ": " + info2 + " | off " + offBack + " | again " + (again == null ? "null" : again.why));
+            // 그렇게 돌아간 모습 (화면 밖 그림이 비는 채로 격자를 그린다)
+            MobPortrait.resetForTest();
+            MobPortrait.blankForTest = true;
+            mc.setScreen(new PortraitGrid(PORTRAIT_SHOW.isEmpty() ? List.of("minecraft:zombie", "minecraft:pig") : PORTRAIT_SHOW, false));
+            waitTicks(15);
+        });
+        add(mc -> {
+            shot(mc, "128f_codex_portraits_fallback");
+            MobPortrait.resetForTest();
+            mc.setScreen(null);
+            waitTicks(5);
+        });
         // 안내서(가이드북): 갈래별 쪽, 그림과 글, 낱말로 찾기
         add(mc -> {
             onServer(mc, sp -> com.rtshop.story.Guide.open(sp));

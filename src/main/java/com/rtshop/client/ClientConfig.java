@@ -124,6 +124,16 @@ public final class ClientConfig {
     public String magicFont = "sans";
     /** 강화 정보 창을 전용 글꼴(송명 + Playfair Display)로 그릴까. false 면 게임 글꼴. */
     public boolean enhanceLuxFont = true;
+    /**
+     * 강화 성공 · 파괴 때의 입자 (3.79, 사용자 11-28 10:51 "초록색 파티클이 시야를 너무 가리는"): 몸을 따라다니던 수백 개 대신 모루 위에 한 번만 조금 뿌린다.
+     * false 면 강화 입자를 아예 뿌리지 않는다.
+     */
+    public boolean enhanceParticles = true;
+    /**
+     * 도감 · 현상금 게시판의 몹 그림을 잰 크기로 맞춰 그린다 (3.78). 그림이 비거나 그래픽 카드가 재기를 못 하면 저절로 예전 방식(크기만 맞춘 3D 모습)으로 돌아간다.
+     * false 면 처음부터 예전 방식으로 (3.79, 사용자 11-28 10:51 "몹의 모습이 아니라 스폰 알로").
+     */
+    public boolean measuredMobPortraits = true;
     public double magicScale = 1.0;
     public boolean magicShadow = false;
     public int magicFx = 0;
@@ -275,6 +285,8 @@ public final class ClientConfig {
             o.addProperty("altarOrbColorVersion", ORB_COLOR_VERSION);
             o.addProperty("magicFont", magicFont);
             o.addProperty("enhanceLuxFont", enhanceLuxFont);
+            o.addProperty("enhanceParticles", enhanceParticles);
+            o.addProperty("measuredMobPortraits", measuredMobPortraits);
             o.addProperty("magicScale", magicScale);
             o.addProperty("magicShadow", magicShadow);
             o.addProperty("magicFx", magicFx);
@@ -354,13 +366,15 @@ public final class ClientConfig {
                 if (o.has("enhPanelScale")) c.enhPanelScale = Math.max(0.6, Math.min(1.5, o.get("enhPanelScale").getAsDouble()));
                 if (o.has("magicFont")) c.magicFont = o.get("magicFont").getAsString();
                 if (o.has("enhanceLuxFont")) c.enhanceLuxFont = o.get("enhanceLuxFont").getAsBoolean();
+                if (o.has("enhanceParticles")) c.enhanceParticles = o.get("enhanceParticles").getAsBoolean();
+                if (o.has("measuredMobPortraits")) c.measuredMobPortraits = o.get("measuredMobPortraits").getAsBoolean();
                 if (o.has("magicScale")) c.magicScale = Math.max(0.7, Math.min(1.3, o.get("magicScale").getAsDouble()));
                 if (o.has("magicShadow")) c.magicShadow = o.get("magicShadow").getAsBoolean();
                 if (o.has("magicFx")) c.magicFx = Math.max(0, Math.min(2, o.get("magicFx").getAsInt()));
                 if (o.has("magicPanelLeft")) c.magicPanelLeft = o.get("magicPanelLeft").getAsBoolean();
                 c.clamp();
                 c.clampQuest();
-                if (!o.has("questHudEnabled") || orbMoved) {
+                if (!o.has("questHudEnabled") || orbMoved || !o.has("enhanceParticles")) {   // 3.79: 새 설정 두 개를 파일에 적어 둔다
                     c.save();
                 }
             } else {

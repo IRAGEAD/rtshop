@@ -586,6 +586,10 @@ public final class ClientSelfTest {
             case 4 -> {
                 shot(mc, "82_enhance_success");
                 check("success: +4 -> +5 with the result banner", EnhanceFx.last.startsWith("SUCCESS:4:5") && EnhanceFx.active(), EnhanceFx.last);
+                // 3.79 (사용자 11-28 10:51): 초록 입자는 몸을 따라다니지 않고 모루 위에 한 번만 몇 개 (눈에서 1칸 넘게 떨어진 곳)
+                check("3.79 the success particles are a small one-time burst away from the eyes (at the anvil), not hundreds following the body",
+                        EnhanceFx.lastBurstForTest > 0 && EnhanceFx.lastBurstForTest <= 14 && EnhanceFx.lastBurstEyeDistForTest > 1.0,
+                        EnhanceFx.lastBurstForTest + " at " + EnhanceFx.lastBurstEyeDistForTest);
                 onServer(mc, sp -> {
                     if (sp.containerMenu instanceof com.rtshop.enhance.EnhanceMenu m) {
                         ItemStack got = m.getCarried();

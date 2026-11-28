@@ -256,5 +256,40 @@ final class ClientShaderTest {
             shot(mc, "155_" + LABEL + "_orb_chosen");
             waitTicks(60);   // 사진이 다 써질 때까지
         });
+        // 3.79 (사용자 11-28 10:51 "도감과 현상금 게시판의 몹이 스폰 알로"): 셰이더를 켠 채로 도감 그림을 재 본다 — 알이 되면 안 된다
+        // (화면 밖에서 잰 그림이 비면 예전 방식으로 돌아간다)
+        add(mc -> {
+            if (mc.screen != null) mc.setScreen(null);
+            MobPortrait.resetForTest();
+            List<String> ids = new ArrayList<>(List.of("minecraft:pig", "minecraft:zombie", "minecraft:skeleton", "minecraft:creeper", "minecraft:spider",
+                    "minecraft:enderman", "minecraft:ravager", "minecraft:wither"));
+            for (String id : com.rtshop.story.Codex.mobs().keySet()) {
+                if (!id.startsWith("minecraft:") && ids.size() < 16) ids.add(id);
+            }
+            StringBuilder sb = new StringBuilder();
+            int eggs = 0, legacy = 0;
+            for (String id : ids) {
+                MobPortrait.Fit f;
+                try {
+                    f = MobPortrait.fitNowForTest(id);
+                } catch (Throwable t) {
+                    f = null;
+                    sb.append("threw ").append(t).append(' ');
+                }
+                if (f == null) legacy++;
+                else if (f.isIcon() && MobPortrait.model(id) != null && id.startsWith("minecraft:")) eggs++;
+                sb.append(id.substring(id.indexOf(':') + 1)).append('=').append(f == null ? "old" : f.isIcon() ? "EGG" : f.why).append(' ');
+            }
+            RtShop.LOGGER.info("[rtshop-clienttest] portraits with the shader on: {} | {}", sb, MobPortrait.pipelineInfo);
+            check("3.79 with the shader on, codex and bounty portraits are mobs, not spawn eggs (measured off-screen, or drawn the old way if that comes out blank)",
+                    eggs == 0, "old " + legacy + " | " + sb + "| " + MobPortrait.pipelineInfo);
+            mc.setScreen(new ClientSelfTest2.PortraitGrid(ids, false));
+            waitTicks(20);
+        });
+        add(mc -> {
+            shot(mc, "156_" + LABEL + "_portraits");
+            mc.setScreen(null);
+            waitTicks(40);   // 사진이 다 써질 때까지
+        });
     }
 }

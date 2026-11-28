@@ -74,6 +74,39 @@ public final class EnhanceFx {
         showNow(o, guarded, from, to, item, false);
     }
 
+    /** 시험용: 마지막으로 뿌린 강화 입자의 수와 자리, 그때 눈과의 거리. */
+    public static volatile int lastBurstForTest;
+    public static volatile double lastBurstEyeDistForTest = -1;
+
+    /**
+     * 강화 입자 (3.79, 사용자 11-28 10:51 "강화 시 생기는 초록색 파티클이 시야를 너무 가리는"): 몸을 따라다니는 입자(createTrackingEmitter — 틱마다 16개씩,
+     * 눈앞까지) 대신 모루 위(바라보는 블록이 8칸 안이면 그 위, 아니면 눈앞 2칸 아래쪽)에 한 번만 count 개를 뿌린다. 게임의 입자 설정(전부 · 줄임 · 최소)을 따른다.
+     */
+    static void burst(net.minecraft.core.particles.ParticleOptions type, int count, double spread, double speed) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null || count <= 0 || !ClientConfig.get().enhanceParticles) return;
+        net.minecraft.world.phys.Vec3 eye = mc.player.getEyePosition();
+        net.minecraft.world.phys.Vec3 c = burstCenter(mc, eye);
+        net.minecraft.util.RandomSource r = mc.player.getRandom();
+        for (int i = 0; i < count; i++) {
+            double dx = (r.nextDouble() - 0.5) * 2 * spread, dz = (r.nextDouble() - 0.5) * 2 * spread, dy = r.nextDouble() * spread;
+            mc.level.addParticle(type, c.x + dx, c.y + dy, c.z + dz, (r.nextDouble() - 0.5) * speed, r.nextDouble() * speed, (r.nextDouble() - 0.5) * speed);
+        }
+        lastBurstForTest = count;
+        lastBurstEyeDistForTest = c.distanceTo(eye);
+    }
+
+    /** 모루(바라보는 블록) 윗면 가운데. 블록을 보고 있지 않거나 너무 가까우면(1.2칸 안) 눈앞 2칸, 눈높이보다 0.7칸 아래. */
+    static net.minecraft.world.phys.Vec3 burstCenter(Minecraft mc, net.minecraft.world.phys.Vec3 eye) {
+        if (mc.hitResult instanceof net.minecraft.world.phys.BlockHitResult bh && bh.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
+            net.minecraft.world.phys.Vec3 top = net.minecraft.world.phys.Vec3.atBottomCenterOf(bh.getBlockPos().above());
+            double d = top.distanceTo(eye);
+            if (d < 8 && d > 1.2) return top;
+        }
+        net.minecraft.world.phys.Vec3 look = mc.player.getViewVector(1F);
+        return eye.add(look.x * 2.0, look.y * 2.0 - 0.7, look.z * 2.0);
+    }
+
     /** 결과 표시 (grand = 큰 성공 연출이 이미 글자를 그리므로 띠는 생략). */
     public static void showNow(Enhance.Outcome o, boolean guarded, int from, int to, ItemStack item, boolean grand) {
         Minecraft mc = Minecraft.getInstance();
@@ -89,8 +122,10 @@ public final class EnhanceFx {
                     play(SoundEvents.PLAYER_LEVELUP, 1.2F, 0.9F);
                     play(SoundEvents.ANVIL_USE, 1.4F, 0.6F);
                 }
-                if (mc.player != null && !grand) {
-                    mc.particleEngine.createTrackingEmitter(mc.player, to >= 10 ? ParticleTypes.TOTEM_OF_UNDYING : ParticleTypes.HAPPY_VILLAGER, 25);
+                if (!grand) {
+                    // 3.79: 예전에는 몸을 따라다니며 25틱 동안 400개쯤 뿌려 시야를 가렸다 → 모루 위에 한 번만 조금
+                    if (to >= 10) burst(ParticleTypes.TOTEM_OF_UNDYING, 12, 0.35, 0.12);
+                    else burst(ParticleTypes.HAPPY_VILLAGER, 8, 0.4, 0.04);
                 }
             }
             case MAINTAIN -> {
@@ -109,9 +144,7 @@ public final class EnhanceFx {
                 color = 0xFF3A3A;
                 play(SoundEvents.ITEM_BREAK, 0.5F, 1.0F);
                 play(SoundEvents.GENERIC_EXPLODE, 1.3F, 0.4F);
-                if (mc.player != null) {
-                    mc.particleEngine.createTrackingEmitter(mc.player, ParticleTypes.LARGE_SMOKE, 15);
-                }
+                burst(ParticleTypes.LARGE_SMOKE, 6, 0.3, 0.03);
             }
         }
         sub = guarded ? Component.translatable("rtshop.enhance.fx_guarded") : item.getHoverName();

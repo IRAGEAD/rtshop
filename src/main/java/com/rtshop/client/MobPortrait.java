@@ -101,6 +101,13 @@ public final class MobPortrait {
     private static long lastFitNanos;
     /** 시험용: 마지막으로 화면 밖 그리기가 안 된 까닭. */
     static String pipelineInfo = "";
+    /** 시험용: 화면 밖 그림이 늘 비는 컴퓨터처럼 (그만두고 예전 방식으로 돌아가는지 본다). */
+    static boolean blankForTest;
+    /**
+     * 재는 칸을 지우는 빛깔 (3.79): 자홍(1,0,1)에 투명. 칠해진 픽셀 = 불투명하거나(알파 > 16) 빛깔이 자홍에서 멀어진 곳.
+     * 그래픽 카드 · 셰이더 모드에 따라 알파를 적지 않는 경우에도 몹이 칠한 곳을 찾는다 (3.78 은 알파만 보았다).
+     */
+    private static final float KEY_R = 1F, KEY_G = 0F, KEY_B = 1F;
 
     /** 그림에 쓸 몹 (차원마다 한 번 만든다). 만들 수 없거나 살아 있는 몹이 아니면 null. */
     public static LivingEntity model(String id) {
@@ -130,7 +137,10 @@ public final class MobPortrait {
         return new ItemStack(Items.PAPER);
     }
 
-    /** 칸(box×box) 안에 맞춰 천천히 도는 3D 모습. 아직 재지 않았으면 재고(한 프레임에 하나), 그릴 수 없는 몹은 알 아이콘. */
+    /**
+     * 칸(box×box) 안에 맞춰 천천히 도는 3D 모습. 아직 재지 않았으면 재고(한 프레임에 하나), 그릴 수 없는 몹은 알 아이콘.
+     * 화면 밖 그림을 믿을 수 없는 컴퓨터(3.79 — 바닐라 몹 · 돼지까지 비게 나옴)에서는 모두 예전 방식(히트박스로 배율을 정한 3D)으로 그린다.
+     */
     public static void draw(GuiGraphics g, String id, int x, int y, int box, float spin) {
         Fit f = fit(id, false);
         if (f != null && f.isIcon()) {
@@ -148,17 +158,28 @@ public final class MobPortrait {
             e.tickCount = f.shownTick;
         }
         g.enableScissor(x, y, x + box, y + box);
-        pose(e, spin);
-        if (f == null) {
-            // 아직 재지 못함 (이번 프레임에 이미 하나를 쟀거나, 화면 밖 그리기가 안 되는 컴퓨터): 예전 방식
-            float size = Math.max(e.getBbHeight(), e.getBbWidth());
-            float scale = Math.max(2, (int) (box * 0.8F / Math.max(0.5F, size)));
-            renderAt(g, x + box / 2F, y + box - 2, scale, e);
-        } else {
-            float k = Math.min(FILL * box / f.w, FILL * box / f.h);
-            renderAt(g, x + box / 2F - f.cx * k, y + box / 2F - f.cy * k, f.probe * k, e);
+        try {
+            pose(e, spin);
+            if (f == null) {
+                // 아직 재지 못함 (이번 프레임에 이미 하나를 쟀거나, 화면 밖 그리기가 안 되는 컴퓨터): 예전 방식
+                float size = Math.max(e.getBbHeight(), e.getBbWidth());
+                float scale = Math.max(2, (int) (box * 0.8F / Math.max(0.5F, size)));
+                renderAt(g, x + box / 2F, y + box - 2, scale, e);
+            } else {
+                float k = Math.min(FILL * box / f.w, FILL * box / f.h);
+                renderAt(g, x + box / 2F - f.cx * k, y + box / 2F - f.cy * k, f.probe * k, e);
+            }
+        } catch (Throwable t) {
+            // 그리다 오류가 나는 몹: 창이 멈추지 않게 이 몹만 알 아이콘으로 (다음부터는 다시 그리지 않는다)
+            try {
+                Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
+            } catch (Throwable ignored) {
+            }
+            FITS.put(id, new Fit(0, 1, 1, 0, 0, iconOf(id), "draw error " + t, 0));
+            RtShop.LOGGER.warn("[rtshop] 도감 그림: {} 을(를) 그리다 오류가 나서 알 아이콘으로 대신합니다: {}", id, t.toString());
+        } finally {
+            g.disableScissor();
         }
-        g.disableScissor();
     }
 
     static void drawIcon(GuiGraphics g, ItemStack icon, int x, int y, int box) {
@@ -204,25 +225,69 @@ public final class MobPortrait {
     static Fit fit(String id, boolean now) {
         Fit f = FITS.get(id);
         if (f != null) return f;
-        if (Boolean.FALSE.equals(pipelineOk)) return null;
+        if (Boolean.FALSE.equals(pipelineOk) || !ClientConfig.get().measuredMobPortraits) return null;
         if (!now && System.nanoTime() - lastFitNanos < 30_000_000L) return null;
         if (pipelineOk == null) {
             pipelineOk = checkPipeline();
             if (!pipelineOk) return null;
         }
+        Throwable err = null;
         try {
             f = measure(id);
         } catch (Throwable t) {
+            err = t;
             try {
                 f = standInOrIcon(id, model(id), "error " + t);
             } catch (Throwable t2) {
                 f = new Fit(0, 1, 1, 0, 0, iconOf(id), "error " + t, 0);
             }
-            RtShop.LOGGER.warn("[rtshop] 도감 그림: {} 을(를) 그리다 오류가 나서 {} (으)로 대신합니다: {}", id, f.isIcon() ? "알 아이콘" : f.drawId, t.toString());
+        }
+        lastFitNanos = System.nanoTime();
+        if (f.isIcon() && model(id) != null) {
+            // 3.79 (사용자 11-28 10:51 "도감과 현상금 게시판의 몹이 몹의 모습이 아니라 스폰 알로"): 그릴 수 있는 몹이 비게 나왔다.
+            // 컴퓨터 탓인지 몹 탓인지 가린다 — 바닐라 몹이 비었거나, 대신 그릴 바닐라 몹까지 비었거나, 지금 다시 그린 돼지 · 좀비가 비면 컴퓨터 탓:
+            // 화면 밖 재기를 그만두고 모두 예전 방식으로 (알보다 낫다). 아니면(돼지는 잘 그려지는데 그 몹만 아무것도 그리지 않음) 알 그대로.
+            String canary = canaryProblem();
+            String why = id.startsWith("minecraft:") ? "vanilla mob blank: " + id + " (" + f.why + ")"
+                    : f.why.contains("stand-in blank") ? "stand-in blank too: " + id + " (" + f.why + ")"
+                    : canary != null ? canary + " after " + id + " (" + f.why + ")" : null;
+            if (why != null) {
+                giveUp(why);
+                return null;
+            }
+        }
+        if (err != null) {
+            RtShop.LOGGER.warn("[rtshop] 도감 그림: {} 을(를) 그리다 오류가 나서 {} (으)로 대신합니다: {}", id, f.isIcon() ? "알 아이콘" : f.drawId, err.toString());
+        } else if (f.isIcon()) {
+            RtShop.LOGGER.info("[rtshop] 도감 그림: {} 은(는) 화면 밖에서 아무것도 그리지 않아 알 아이콘으로 ({})", id, f.why);
         }
         FITS.put(id, f);
-        lastFitNanos = System.nanoTime();
         return f;
+    }
+
+    /** 화면 밖 재기를 그만두고, 이미 잰 것(알 아이콘 포함)도 버려 모두 예전 방식으로 그린다. 까닭은 한 번 로그에. */
+    private static void giveUp(String why) {
+        if (Boolean.FALSE.equals(pipelineOk)) return;
+        pipelineOk = false;
+        pipelineInfo = "gave up: " + why;
+        FITS.clear();
+        RtShop.LOGGER.warn("[rtshop] 도감 그림: 화면 밖에서 잰 그림이 비게 나와 예전 방식(3D 를 그대로 칸에 맞춤)으로 그립니다: {}", why);
+    }
+
+    /** 돼지와 좀비를 지금 다시 그려 본다: 둘 다 칠해지면 null, 아니면 까닭. */
+    private static String canaryProblem() {
+        try {
+            for (String c : new String[]{"minecraft:pig", "minecraft:zombie"}) {
+                LivingEntity e = model(c);
+                if (e == null) continue;
+                float size = Math.max(0.5F, Math.max(e.getBbHeight(), e.getBbWidth()));
+                int[] u = probe(e, S * 0.35F / size, 30F);
+                if (u[4] <= 50) return c + " blank now (" + u[4] + " px)";
+            }
+            return null;
+        } catch (Throwable t) {
+            return "canary error " + t;
+        }
     }
 
     /** 화면 밖 그리기가 되는가: 돼지를 그려 칠해진 픽셀이 있는지 본다. */
@@ -310,6 +375,7 @@ public final class MobPortrait {
             LivingEntity s = model(sid);
             Fit f = s == null ? null : measureEntity(s);
             if (f != null) return f.drawing(sid, "stand-in " + sid + " (" + why + ")");
+            if (s != null) why = why + ", stand-in blank " + sid;
         }
         return new Fit(0, 1, 1, 0, 0, iconOf(id), why, 0);
     }
@@ -400,7 +466,7 @@ public final class MobPortrait {
             if (target == null) {
                 target = new TextureTarget(S, S, true, Minecraft.ON_OSX);
             }
-            target.setClearColor(0F, 0F, 0F, 0F);
+            target.setClearColor(KEY_R, KEY_G, KEY_B, 0F);
             target.clear(Minecraft.ON_OSX);
             target.bindWrite(true);
             float far = ForgeHooksClient.getGuiFarPlane();
@@ -441,7 +507,7 @@ public final class MobPortrait {
             for (int row = 0; row < S; row++) {
                 int y = S - 1 - row; // GL 의 아래가 0 → 화면의 위가 0
                 for (int x = 0; x < S; x++) {
-                    if (((img.getPixelRGBA(x, row) >>> 24) & 0xFF) > 16) {
+                    if (!blankForTest && painted(img.getPixelRGBA(x, row))) {
                         if (x < r[0]) r[0] = x;
                         if (y < r[1]) r[1] = y;
                         if (x > r[2]) r[2] = x;
@@ -462,6 +528,13 @@ public final class MobPortrait {
             r[8] = ty[1];
         }
         return r;
+    }
+
+    /** 칠해진 픽셀인가 (NativeImage 의 ABGR): 불투명하거나, 빛깔이 지운 빛깔(자홍)에서 멀어졌다. */
+    static boolean painted(int abgr) {
+        int a = (abgr >>> 24) & 0xFF, r = abgr & 0xFF, g = (abgr >> 8) & 0xFF, b = (abgr >> 16) & 0xFF;
+        if (a > 16) return true;
+        return Math.abs(r - (int) (KEY_R * 255)) + Math.abs(g - (int) (KEY_G * 255)) + Math.abs(b - (int) (KEY_B * 255)) > 60;
     }
 
     /** 양 끝에서 칠해진 양을 cut 만큼씩 덜어 낸 범위 {처음, 끝}. */
@@ -497,6 +570,14 @@ public final class MobPortrait {
 
     static boolean pipelineOkForTest() {
         return Boolean.TRUE.equals(pipelineOk);
+    }
+
+    /** 시험용: 처음처럼 (다시 돼지부터 재기). */
+    static void resetForTest() {
+        pipelineOk = null;
+        pipelineInfo = "";
+        FITS.clear();
+        blankForTest = false;
     }
 
     /**
