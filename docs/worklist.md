@@ -708,7 +708,8 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   H-1 ✔ TownSpawn 3판: arrival · arrivalSet · arrival 좌표 — placeNewcomer = 도착 자리(직접 정한 자리, 아니면 아모노스 부두 castle_plots spawn, 지면 높이, 서쪽을 봄), 없으면 기준 자리.
   귀환권 · 침대 없는 죽음은 그대로 기준 자리. /rtshop spawn arrival [set|dock|on|off].
   I-1 ✔ StructureRarity: structures.json 에 off (기본 ["spmovesets"], 옛 파일에는 넣어 다시 씀) — 그 모드 jar 의 structure_set 을 읽어 placement.frequency 0 으로 데이터팩에.
-  시험: disable() 의 JSON, 모드팩에서는 세계의 등록부에서 spmovesets 세트가 모두 확률 0 인지 (StructurePlacement.CODEC 으로 읽음).
+  시험: disable() 의 JSON, 모드팩에서는 세계의 등록부에서 spmovesets 세트가 모두 확률 0 인지 (StructurePlacement 의 float 칸 frequency 를 직접 읽음 —
+  처음엔 CODEC 으로 JSON 을 만들었다가 등록부 없는 JsonOps 가 제외 구역 → 구조물 → 빈 조각 풀(자기 자신이 대체 풀)까지 펼쳐 StackOverflowError, run 46110842414).
 
 ## 사용자 답 (11-28 09:47) → 3.79.0 (3.78.0 을 올린 다음)
 
