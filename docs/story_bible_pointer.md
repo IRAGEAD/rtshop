@@ -223,6 +223,7 @@
 - **아이템 쓰임새 설명** (`rules/ItemNotes`, `item_notes.json`, 화면 `client/ItemNoteTips`): Shift 를 누르면 파는 곳·사 주는 곳·강화 재료·뽑기·보스 전리품·퀘스트. 상점을 읽을 때마다 다시 만든다.
 - **강화 정보 창**: 연한 금빛 판(`tools/gen_enhance_panel.py`), 전용 글꼴 `assets/rtshop/font/enhance.json` (한글 송명, 숫자·영문 Playfair Display Bold). 글자는 `EnhancePanel.fit` 으로 칸 너비에 맞춰 줄인다. `client.json` 의 `enhanceLuxFont`. 숫자는 높이가 고른 라이닝 모양(`tools/gen_enhance_font.py`). 글꼴의 기준선은 게임 글꼴과 같은 y+7 에 맞춘다: TTF 의 기준선 = 어센트(px) - 3 + shift.
 - **아이템 규칙 2판** (`item_policy.json` 의 version 2): Better Nether 도 NPC 상점 금지, 전리품 금지의 `*fruit*:*` → `spmovesets:*`. 예전 파일은 읽을 때 저절로 고쳐 쓴다.
+- **아이템 규칙 6판** (3.78.0): spmovesets 의 모든 아이템 — NPC 상점(shopBan) · 뽑기(gachaBan) · 조합법(recipeBan · recipeBanMods) · 전리품(lootBan) · 블록 드롭(blockDropBan) 금지. 5판 이하 파일은 읽을 때 더해 쓴다 (운영자가 적은 줄은 그대로). 이미 가진 것은 지우지 않는다.
   `shopBannedKeepOwnWays`: 상점 금지 모드(Arcane Vortex·Better Nether·Nightfall)의 장비는 "상점에서만" 규칙에서 빠져 그 모드의 조합법으로 만든다 (Nightfall 은 전리품 금지가 따로 걸려 있다).
 
 ## 3.54 에서 더한 것

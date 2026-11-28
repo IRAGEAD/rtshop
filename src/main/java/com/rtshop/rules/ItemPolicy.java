@@ -63,8 +63,10 @@ public final class ItemPolicy {
     public static final class Config {
         /** 설정 파일의 판. 2 (3.53): Better Nether 도 상점 금지, 전리품 금지의 "*fruit*:*" 자리에 "spmovesets:*". 3 (3.58): Create 의 조합법·전리품·블록 드랍 금지.
          *  4 (3.58.1): Create 는 상점(shopBan)과 뽑기(gachaBan)에도 오르지 않는다.
-         *  5 (3.66.0): Better Nether 의 모든 아이템 — 조합법 · 전리품 · 몹/블록 드롭 금지 (상점은 2판부터 금지). */
-        public static final int VERSION = 5;
+         *  5 (3.66.0): Better Nether 의 모든 아이템 — 조합법 · 전리품 · 몹/블록 드롭 금지 (상점은 2판부터 금지).
+         *  6 (3.78.0): spmovesets 의 모든 아이템 — NPC 상점 · 뽑기 · 조합법 · 전리품 · 몹/블록 드롭 금지 (사용자 "spmovesets 의 모든 아이템들을 상점에서 제거하고
+         *     드랍과 조합과 같은 얻는 방식도 모두 금지"). 전리품은 2판부터 막혀 있었다. */
+        public static final int VERSION = 6;
         /** 읽어 온 파일이 예전 판이라 고쳐 썼는가 (다시 저장한다). */
         transient boolean migrated;
         public boolean enabled = true;
@@ -110,8 +112,8 @@ public final class ItemPolicy {
 
         public static Config defaults() {
             Config c = new Config();
-            c.shopBan.addAll(List.of("arcanevortex:*", "betternether:*", "efn:*", "rtshop:enhance_anvil", "create:*"));
-            c.gachaBan.add("create:*");
+            c.shopBan.addAll(List.of("arcanevortex:*", "betternether:*", "efn:*", "rtshop:enhance_anvil", "create:*", "spmovesets:*"));
+            c.gachaBan.addAll(List.of("create:*", "spmovesets:*"));
             c.gunWords.addAll(List.of("gun", "pistol", "rifle", "revolver", "musket", "shotgun", "blaster", "bullet"));
             c.priceFactor.put("wom:*", 5.0);
             c.bossMods.addAll(List.of("cataclysm", "fdbosses", "block_factorys_bosses", "witherreincarnated", "enderdragonplus"));
@@ -119,10 +121,10 @@ public final class ItemPolicy {
             c.lootBan.addAll(List.of("spmovesets:*", "artifacts:*", "relics_rpgs:*", "jewelry:*", "simplehats:*",
                     "adorablehamsterpets:*", "crittersandcompanions:*", "rpg_companions_tiny_dragons:*", "fantasymounts:*",
                     "efn:*", "tacz:*", "lrtactical:*", "create:*", "betternether:*"));
-            c.blockDropBan.addAll(List.of("create:*", "betternether:*"));
+            c.blockDropBan.addAll(List.of("create:*", "betternether:*", "spmovesets:*"));
             c.lootAllow.addAll(List.of("irons_spellbooks:*_ink", "irons_spellbooks:ink_*"));
-            c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil", "create:*", "betternether:*"));
-            c.recipeBanMods.addAll(List.of("tacz", "create", "betternether"));
+            c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil", "create:*", "betternether:*", "spmovesets:*"));
+            c.recipeBanMods.addAll(List.of("tacz", "create", "betternether", "spmovesets"));
             c.staffWords.addAll(List.of("staff", "wand", "scepter", "sceptre"));
             c.mobDrops.put("irons_spellbooks:common_ink", 0.03);
             c.mobDrops.put("irons_spellbooks:uncommon_ink", 0.012);
@@ -141,6 +143,7 @@ public final class ItemPolicy {
             help.add("보스 아이템 = bossMods 의 모든 아이템 + bossItems + 보스가 떨어뜨리는 그 모드의 아이템(sampleBossDrops) + 그것으로만 만드는 물건. notBossItems 는 뺀다.");
             help.add("lootBan: 상자·몹·낚시 전리품에서 빠지는 아이템. lootAllow: 그래도 나오는 것 (잉크). mobDrops: 몬스터를 잡으면 따로 굴리는 드랍(확률 0~1), 보스는 bossDropFactor 배.");
             help.add("blockDropBan: 블록을 캤을 때도 나오지 않는 아이템 (Create: 던전의 건축물에 놓인 블록을 캐서 얻지 못하게). 비우면 캐서 얻을 수 있다.");
+            help.add("어떤 모드의 아이템을 아예 얻지 못하게 하려면 (Better Nether · spmovesets 처럼): shopBan · gachaBan · recipeBan 에 \"모드:*\", recipeBanMods 에 \"모드\", lootBan · blockDropBan 에 \"모드:*\". 이미 가진 것은 그대로 남는다.");
             help.add("gachaBan: 뽑기에 오르지 않는 것 — 무기·장신구·펫 묶음의 아이템 ID 와 마법 뽑기의 인챈트 ID (Create: 상점·뽑기 어디에서도 얻지 못하게). gacha.json 의 목록은 지우지 않고 건너뛰기만 한다.");
             help.add("recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).");
             help.add("extremeAttack / extremeArmor (3.65.0): 공격력이 이 값 이상이거나 갑옷 한 조각의 방어력이 이 값 이상인 터무니없는 장비는 전리품 · 몹과 보스의 드롭 · 조합법에서 뺀다 (keep · lootAllow 보다 먼저). 0 = 끔. 기본 25 / 20 (모드팩의 다른 장비는 17 / 13 이 가장 높다).");
@@ -221,6 +224,15 @@ public final class ItemPolicy {
             strings(o, "keep", c.keep, d.keep);
             strings(o, "gachaBan", c.gachaBan, d.gachaBan);
             int v = v0(o);
+            if (v < 6) {   // 3.78.0: spmovesets 의 아이템은 상점 · 뽑기에 오르지 않고, 만들거나 줍거나 캐서 얻지도 못한다 (운영자가 적은 다른 줄은 그대로)
+                c.shopBan.add("spmovesets:*");
+                c.gachaBan.add("spmovesets:*");
+                c.recipeBanMods.add("spmovesets");
+                c.recipeBan.add("spmovesets:*");
+                c.lootBan.add("spmovesets:*");
+                c.blockDropBan.add("spmovesets:*");
+                c.migrated = true;
+            }
             if (v < 5) {   // 3.66.0: Better Nether 의 아이템은 만들거나 줍거나 캐서 얻지 못한다 (조합으로 만드는 무기가 뽑기 전설 무기보다 셌다)
                 c.recipeBanMods.add("betternether");
                 c.recipeBan.add("betternether:*");
@@ -376,7 +388,7 @@ public final class ItemPolicy {
                 Config c = Config.fromJson(JsonParser.parseString(Files.readString(path(), StandardCharsets.UTF_8)).getAsJsonObject());
                 if (c.migrated) {
                     Files.writeString(path(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
-                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음, 5: Better Nether 의 조합법·전리품·드롭 금지).", Config.VERSION);
+                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음, 5: Better Nether 의 조합법·전리품·드롭 금지, 6: spmovesets 의 상점·뽑기·조합법·전리품·드롭 금지).", Config.VERSION);
                 }
                 return c;
             }

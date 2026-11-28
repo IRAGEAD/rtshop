@@ -3521,7 +3521,7 @@ public final class SelfTest {
             check("Create: nothing of it is sold in an NPC shop or comes out of a gacha (shopBan + the new gachaBan), an installed version-3 file gains both, and a version-4 file is left as the operator wrote it",
                     crDef.shopBan.contains("create:*") && crDef.gachaBan.contains("create:*")
                             && crOld3.shopBan.contains("create:*") && crOld3.shopBan.contains("efn:*") && crOld3.gachaBan.contains("create:*") && crOld3.gachaBan.contains("mymod:thing")
-                            && !crKeep4.shopBan.contains("create:*") && crKeep4.gachaBan.isEmpty()
+                            && !crKeep4.shopBan.contains("create:*") && !crKeep4.gachaBan.contains("create:*")
                             && com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("create:goggles")) && com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("create:capacity"))
                             && !com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("minecraft:diamond")) && com.rtshop.gacha.GachaConfig.valid(crProbe)
                             && crLeft.isEmpty(),
@@ -3647,6 +3647,28 @@ public final class SelfTest {
                             && fresh.recipeBanMods.contains("betternether") && fresh.lootBan.contains("betternether:*") && fresh.blockDropBan.contains("betternether:*"),
                     migrated.lootBan + " " + migrated.recipeBanMods + " " + migrated.blockDropBan);
         }
+        {
+            // 3.78.0 (사용자 11-28 09:23 "spmovesets의 모든 아이템들을 상점에서 제거하고 드랍과 조합과 같은 얻는 방식도 모두 금지"): 기본 규칙과,
+            // 옛 판(5판) 파일을 읽을 때 더해지는 것 (운영자가 적은 줄은 그대로, 6판 파일은 적힌 그대로)
+            com.rtshop.rules.ItemPolicy.Config sp5 = com.rtshop.rules.ItemPolicy.Config.fromJson(JsonParser.parseString(
+                    "{\"version\":5,\"shopBan\":[\"efn:*\"],\"gachaBan\":[],\"recipeBan\":[\"mymod:thing\"],\"recipeBanMods\":[],\"lootBan\":[],\"blockDropBan\":[]}").getAsJsonObject());
+            com.rtshop.rules.ItemPolicy.Config sp6 = com.rtshop.rules.ItemPolicy.Config.fromJson(JsonParser.parseString(
+                    "{\"version\":6,\"shopBan\":[\"efn:*\"],\"gachaBan\":[],\"recipeBan\":[],\"recipeBanMods\":[],\"lootBan\":[],\"blockDropBan\":[]}").getAsJsonObject());
+            com.rtshop.rules.ItemPolicy.Config spDef = com.rtshop.rules.ItemPolicy.Config.defaults();
+            java.util.function.Predicate<com.rtshop.rules.ItemPolicy.Config> spAll = spc -> spc.shopBan.contains("spmovesets:*") && spc.gachaBan.contains("spmovesets:*")
+                    && spc.recipeBan.contains("spmovesets:*") && spc.recipeBanMods.contains("spmovesets") && spc.lootBan.contains("spmovesets:*") && spc.blockDropBan.contains("spmovesets:*");
+            // 지금 서버의 규칙으로도 (모드가 없어도 이름으로 막힘)
+            ResourceLocation spProbe = new ResourceLocation("spmovesets", "pulseras_choque");
+            boolean spLive = com.rtshop.rules.ItemPolicy.gachaBanned(spProbe)
+                    && com.rtshop.rules.ItemPolicy.recipeBanned(new ResourceLocation("spmovesets", "some_recipe"), new ResourceLocation("minecraft", "stick"))
+                    && com.rtshop.rules.ItemPolicy.recipeBanned(new ResourceLocation("minecraft", "some_recipe"), spProbe)
+                    && !com.rtshop.rules.ItemPolicy.gachaBanned(new ResourceLocation("minecraft", "diamond_sword"));
+            check("3.78.0 item rules: every spmovesets item is kept out of NPC shops and gachas and cannot be crafted, looted or dropped — by default and in an older rules file (its own lines kept; a version-6 file is left as written)",
+                    spAll.test(spDef) && spAll.test(sp5) && sp5.shopBan.contains("efn:*") && sp5.recipeBan.contains("mymod:thing")
+                            && !sp6.shopBan.contains("spmovesets:*") && sp6.gachaBan.isEmpty() && sp6.recipeBanMods.isEmpty()
+                            && com.rtshop.rules.ItemPolicy.Config.VERSION == 6 && spLive,
+                    sp5.shopBan + " " + sp5.gachaBan + " " + sp5.recipeBanMods + " " + sp5.blockDropBan + " / " + sp6.shopBan + " live " + spLive);
+        }
         if (net.minecraftforge.fml.ModList.get().isLoaded("wom") || net.minecraftforge.fml.ModList.get().isLoaded("efn") || net.minecraftforge.fml.ModList.get().isLoaded("tacz")) {
             int banned = 0, womListed = 0, gunsListed = 0, bossListed = 0, tacz = 0, craftableListed = 0;
             String sample = "";
@@ -3689,6 +3711,43 @@ public final class SelfTest {
                 check("3.66.0 mod pack: no Better Nether item can be crafted, and none comes from chests, mobs, bosses or broken blocks",
                         bnRecipes == 0 && bnLoot, bnRecipes + " recipes " + bnSample + " loot " + bnLoot);
                 betterNetherDrops(level, a);
+            }
+            if (net.minecraftforge.fml.ModList.get().isLoaded("spmovesets")) {
+                // 3.78.0: spmovesets 의 아이템은 NPC 상점 · 뽑기에 없고, 만들 수도 · 상자 · 몹 · 보스 · 블록에서 얻을 수도 없다
+                List<String> spLeft = new ArrayList<>();
+                List<String> spNames = new ArrayList<>();
+                for (Map.Entry<String, ShopData> spSh : ShopServer.shops().entrySet()) {
+                    for (ShopData.Entry spEn : spSh.getValue().entries) {
+                        ResourceLocation spId = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(spEn.stack.getItem());
+                        if (spId != null && spId.getNamespace().equals("spmovesets")) spLeft.add("shop " + spSh.getKey() + ":" + spId);
+                    }
+                }
+                for (String spCat : com.rtshop.gacha.GachaConfig.CATEGORIES) {
+                    for (com.rtshop.gacha.GachaConfig.Entry spGe : com.rtshop.gacha.GachaConfig.get().pool(spCat)) {
+                        if ((spGe.item.startsWith("spmovesets:") || spGe.entity.startsWith("spmovesets:")) && com.rtshop.gacha.GachaConfig.valid(spGe)) spLeft.add("gacha " + spCat + ":" + spGe.item + spGe.entity);
+                    }
+                }
+                for (com.rtshop.magic.MagicConfig.Ench spMe : com.rtshop.magic.MagicConfig.get().enchants) {
+                    if (spMe.id.startsWith("spmovesets:") && spMe.enchantment() != null) spLeft.add("magic enchant:" + spMe.id);
+                }
+                for (net.minecraft.world.item.crafting.Recipe<?> rec : server.getRecipeManager().getRecipes()) {
+                    ResourceLocation out = com.rtshop.rules.RecipeRules.outputId(rec, server);
+                    if (rec.getId().getNamespace().equals("spmovesets") || out != null && out.getNamespace().equals("spmovesets")) spLeft.add("recipe " + rec.getId());
+                }
+                for (net.minecraft.world.item.Item spIt : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+                    ResourceLocation spId = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(spIt);
+                    if (spId == null || !spId.getNamespace().equals("spmovesets")) continue;
+                    spNames.add(spId.getPath());
+                    ItemStack spSt = new ItemStack(spIt);
+                    if (!com.rtshop.rules.ItemPolicy.shopBanned(spSt) || !com.rtshop.rules.ItemPolicy.gachaBanned(spId) || !com.rtshop.rules.ItemPolicy.lootBanned(spSt, false)
+                            || !com.rtshop.rules.ItemPolicy.lootBanned(spSt, true) || !com.rtshop.rules.ItemPolicy.lootListed(spSt) || !com.rtshop.rules.ItemPolicy.blockDropBanned(spSt)) {
+                        spLeft.add("rule " + spId);
+                    }
+                }
+                info("spmovesets items (" + spNames.size() + "): " + spNames);
+                check("3.78.0 mod pack: no spmovesets item is sold in an NPC shop or comes out of a gacha, and none can be crafted or comes from chests, mobs, bosses or broken blocks",
+                        !spNames.isEmpty() && spLeft.isEmpty(),
+                        spNames.size() + " items, left " + (spLeft.size() > 12 ? spLeft.subList(0, 12) + " … (" + spLeft.size() + ")" : spLeft));
             }
             if (net.minecraftforge.fml.ModList.get().isLoaded("distanthorizons") && net.minecraftforge.fml.ModList.get().isLoaded("chunky")) {
                 // 3.70.0: DH 3.3.3 은 Chunky 가 등록되기 전(세계를 여는 동안)에 연결하려다 튕겼다 → RT Shop 이 Chunky 가 켜질 때까지 미룬다
@@ -5235,10 +5294,13 @@ public final class SelfTest {
         // 3.78 (사용자 11-28 08:31): Bosses'Rise 의 구르기(Dodge Roll · Z 키 · 핫바 오른쪽 초록 화살표)는 서버에서 꺼 둔다
         if (com.rtshop.compat.BossesRiseRollOff.loaded()) {
             net.minecraftforge.common.ForgeConfigSpec.ConfigValue<Boolean> roll378 = com.rtshop.compat.BossesRiseRollOff.canUseRoll();
+            // 서버가 다 켜진 뒤(ServerStartedEvent)에 끄므로, 이 시험이 그보다 먼저 돌면 처음 부를 때 끄고("off") 이미 꺼져 있으면 "already"
+            String first378 = com.rtshop.compat.BossesRiseRollOff.apply();
             String again378 = com.rtshop.compat.BossesRiseRollOff.apply();
             check("3.78 Bosses'Rise's dodge roll is switched off on the server (its Can use roll setting), and stays off",
-                    roll378 != null && !Boolean.TRUE.equals(roll378.get()) && "already".equals(again378) && !com.rtshop.rules.WorldRules.get().bossesRiseRoll,
-                    (roll378 == null ? "no field" : String.valueOf(roll378.get())) + " " + again378);
+                    roll378 != null && !Boolean.TRUE.equals(roll378.get()) && ("off".equals(first378) || "already".equals(first378)) && "already".equals(again378)
+                            && !com.rtshop.rules.WorldRules.get().bossesRiseRoll,
+                    (roll378 == null ? "no field" : String.valueOf(roll378.get())) + " " + first378 + " " + again378);
         } else {
             check("3.78 without Bosses'Rise the dodge roll switch does nothing", "absent".equals(com.rtshop.compat.BossesRiseRollOff.apply()));
         }

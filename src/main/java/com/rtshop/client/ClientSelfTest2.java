@@ -1622,8 +1622,8 @@ final class ClientSelfTest2 {
             ClientSelfTest.LINES.add("  codex portraits blank before: " + PORTRAIT_OLD_BLANK);
             ClientSelfTest.LINES.add("  codex portraits clipped before: " + PORTRAIT_OLD_CLIPPED);
             ClientSelfTest.LINES.add("  codex portraits as eggs now: " + PORTRAIT_ICON);
-            ClientSelfTest.LINES.add("  codex portraits re-measured (far/shown/big): " + PORTRAIT_ODD);
-            check("3.78 every codex mob shows inside its box: the 3D model is measured off-screen and fitted, or its spawn egg when the model draws nothing",
+            ClientSelfTest.LINES.add("  codex portraits re-measured (far/shown/big/stand-in): " + PORTRAIT_ODD);
+            check("3.78 every codex mob shows inside its box: the 3D model is measured off-screen and fitted; a mob whose model draws nothing is shown as the vanilla mob it is built on, else its spawn egg",
                     MobPortrait.pipelineOkForTest() && PORTRAIT_BAD.isEmpty() && n >= Math.min(30, PORTRAIT_IDS.size()) && PORTRAIT_ICON.size() <= Math.max(3, n / 7),
                     "mobs " + n + " egg " + PORTRAIT_ICON.size() + " bad " + PORTRAIT_BAD);
             if (PORTRAIT_SHOW.isEmpty()) PORTRAIT_SHOW.addAll(PORTRAIT_IDS.subList(0, Math.min(36, n)));

@@ -32,7 +32,8 @@ import java.util.Map;
  * 몹 그림 (도감 · 현상금 게시판). 3.78 (사용자 "도감에서 몹들의 3D 모습이 일부 보이지 않는 문제"):
  * 예전에는 히트박스 크기로만 배율을 정해, 모델이 히트박스보다 훨씬 큰 몹은 칸 밖으로 나가 잘리거나 엉뚱한 데 그려져 빈칸으로 보였다.
  * 이제 몹마다 한 번, 화면 밖 버퍼에 여러 각도로 그려 실제로 칠해지는 자리를 재고 칸에 꼭 맞는 배율 · 위치를 기억한다.
- * 처음엔 안 보이는 몹(투명 · 나타나는 중)은 보이게 해서 다시 재고, 그래도 아무것도 그려지지 않거나 그리다 오류가 나는 몹은 알 아이콘으로 대신한다.
+ * 처음엔 안 보이는 몹(투명 · 나타나는 중)은 보이게 해서 다시 재고, 그래도 아무것도 그려지지 않거나 그리다 오류가 나는 몹은
+ * 그 몹이 바탕으로 삼은 바닐라 몹(클래스, 없으면 이름 — Illusioner 의 유령 라바저 → 라바저)의 모습으로 대신 그린다. 그것도 없으면 알 아이콘.
  * 화면 밖 그리기가 이 컴퓨터에서 안 되면(돼지를 그려 확인) 예전 방식 그대로 그린다.
  */
 public final class MobPortrait {
@@ -58,8 +59,16 @@ public final class MobPortrait {
         public final ItemStack icon;
         public final String why;
         public final int pixels;
+        /** 대신 그리는 몹 (그 몹이 아무것도 그리지 않아 바탕이 된 바닐라 몹으로). null = 그 몹 그대로. */
+        public final String drawId;
+        /** 보이게 해서 잰 몹: 그릴 때 이 나이(틱)로 (0 = 그대로). */
+        public final int shownTick;
 
         Fit(float probe, float w, float h, float cx, float cy, ItemStack icon, String why, int pixels) {
+            this(probe, w, h, cx, cy, icon, why, pixels, null, 0);
+        }
+
+        Fit(float probe, float w, float h, float cx, float cy, ItemStack icon, String why, int pixels, String drawId, int shownTick) {
             this.probe = probe;
             this.w = w;
             this.h = h;
@@ -68,12 +77,22 @@ public final class MobPortrait {
             this.icon = icon;
             this.why = why;
             this.pixels = pixels;
+            this.drawId = drawId;
+            this.shownTick = shownTick;
         }
 
         public boolean isIcon() {
             return !icon.isEmpty();
         }
+
+        /** 이 잰 결과를 다른 몹(standIn)의 모습으로 쓴다. */
+        Fit drawing(String standIn, String reason) {
+            return new Fit(probe, w, h, cx, cy, icon, reason, pixels, standIn, shownTick);
+        }
     }
+
+    /** 처음엔 안 보이는 몹을 보이게 해서 잴 때 쓰는 나이(틱): 나타나는 데 걸리는 시간이 몹마다 달라 몇 가지로. */
+    private static final int[] SHOW_TICKS = {100, 20, 40, 5, 200};
 
     private static final Map<String, LivingEntity> MODELS = new HashMap<>();
     private static final Map<String, Fit> FITS = new HashMap<>();
@@ -118,15 +137,15 @@ public final class MobPortrait {
             drawIcon(g, f.icon, x, y, box);
             return;
         }
-        LivingEntity e = model(id);
+        LivingEntity e = model(f != null && f.drawId != null ? f.drawId : id);
         if (e == null) {
             drawIcon(g, iconOf(id), x, y, box);
             return;
         }
-        if (f != null && f.why.equals("shown")) {
+        if (f != null && f.shownTick > 0) {
             // 잴 때 보이게 한 몹 (차원이 바뀌어 새로 만든 몹에도 같게)
             e.setInvisible(false);
-            e.tickCount = Math.max(e.tickCount, 100);
+            e.tickCount = f.shownTick;
         }
         g.enableScissor(x, y, x + box, y + box);
         pose(e, spin);
@@ -194,8 +213,12 @@ public final class MobPortrait {
         try {
             f = measure(id);
         } catch (Throwable t) {
-            f = new Fit(0, 1, 1, 0, 0, iconOf(id), "error " + t, 0);
-            RtShop.LOGGER.warn("[rtshop] 도감 그림: {} 을(를) 그리지 못해 알 아이콘으로 대신합니다: {}", id, t.toString());
+            try {
+                f = standInOrIcon(id, model(id), "error " + t);
+            } catch (Throwable t2) {
+                f = new Fit(0, 1, 1, 0, 0, iconOf(id), "error " + t, 0);
+            }
+            RtShop.LOGGER.warn("[rtshop] 도감 그림: {} 을(를) 그리다 오류가 나서 {} (으)로 대신합니다: {}", id, f.isIcon() ? "알 아이콘" : f.drawId, t.toString());
         }
         FITS.put(id, f);
         lastFitNanos = System.nanoTime();
@@ -222,33 +245,53 @@ public final class MobPortrait {
 
     private static Fit measure(String id) {
         LivingEntity e = model(id);
-        if (e == null) return new Fit(0, 1, 1, 0, 0, iconOf(id), "no entity", 0);
+        if (e == null) return standInOrIcon(id, null, "no entity");
+        Fit f = measureEntity(e);
+        return f != null ? f : standInOrIcon(id, e, "blank");
+    }
+
+    /** 몹 하나를 잰다. 어떻게 해도 아무것도 그려지지 않으면 null. */
+    private static Fit measureEntity(LivingEntity e) {
         float size = Math.max(0.5F, Math.max(e.getBbHeight(), e.getBbWidth()));
         float probe = S * 0.35F / size;
         int[] u = union(e, probe);
         String why = "ok";
+        int shownTick = 0;
         if (u[4] == 0) {
             // 모델이 기준점에서 멀리 떨어져 그려지는 몹: 훨씬 넓게 보며 다시
-            probe *= 0.15F;
-            u = union(e, probe);
-            why = "far";
+            u = union(e, probe * 0.15F);
+            if (u[4] > 0) {
+                probe *= 0.15F;
+                why = "far";
+            }
         }
         if (u[4] == 0) {
-            // 처음엔 안 보이는 몹 (투명 · 땅에서 나타나는 중): 보이게 하고 시간이 조금 흐른 것처럼 해서 다시
+            // 처음엔 안 보이는 몹 (투명 · 땅에서 나타나는 중 · 서서히 나타나는 유령): 보이게 하고 시간이 조금 흐른 것처럼 해서 다시
+            boolean wasInvisible = e.isInvisible();
+            int wasTick = e.tickCount;
             e.setInvisible(false);
-            e.tickCount = 100;
-            probe /= 0.15F;
-            u = union(e, probe);
-            if (u[4] == 0) {
-                probe *= 0.15F;
+            for (int tick : SHOW_TICKS) {
+                e.tickCount = tick;
                 u = union(e, probe);
+                if (u[4] == 0) {
+                    u = union(e, probe * 0.15F);
+                    if (u[4] > 0) probe *= 0.15F;
+                }
+                if (u[4] > 0) {
+                    why = "shown";
+                    shownTick = tick;
+                    break;
+                }
             }
-            why = "shown";
+            if (u[4] == 0) {
+                e.setInvisible(wasInvisible);
+                e.tickCount = wasTick;
+                return null;
+            }
         }
-        if (u[4] == 0) return new Fit(0, 1, 1, 0, 0, iconOf(id), "blank", 0);
-        // 가장자리에 닿으면(재는 칸보다 큼) 작게 해서 다시 (세 번까지)
-        for (int tries = 0; tries < 3 && touches(u); tries++) {
-            probe *= 0.4F;
+        // 가장자리에 닿으면(재는 칸보다 큼) 작게 해서 다시 (여섯 번까지 — 모래벌레처럼 몸이 아주 긴 몹)
+        for (int tries = 0; tries < 6 && touches(u); tries++) {
+            probe *= 0.35F;
             int[] v = union(e, probe);
             if (v[4] == 0) break;
             u = v;
@@ -257,7 +300,60 @@ public final class MobPortrait {
         // 칸에 맞추는 것은 가는 끝을 뺀 몸 (끝이 칸 밖으로 조금 나가 잘려도 몸이 작아지지 않게)
         float w = u[7] - u[5] + 1, h = u[8] - u[6] + 1;
         float cx = (u[5] + u[7] + 1) / 2F - S / 2F, cy = (u[6] + u[8] + 1) / 2F - S * ANCHOR_Y;
-        return new Fit(probe, w, h, cx, cy, ItemStack.EMPTY, why, u[4]);
+        return new Fit(probe, w, h, cx, cy, ItemStack.EMPTY, why, u[4], null, shownTick);
+    }
+
+    /** 그리지 못하는 몹: 바탕이 된 바닐라 몹의 모습으로 대신, 그것도 안 되면 알(없으면 종이) 아이콘. */
+    private static Fit standInOrIcon(String id, LivingEntity e, String why) {
+        String sid = standIn(id, e);
+        if (sid != null) {
+            LivingEntity s = model(sid);
+            Fit f = s == null ? null : measureEntity(s);
+            if (f != null) return f.drawing(sid, "stand-in " + sid + " (" + why + ")");
+        }
+        return new Fit(0, 1, 1, 0, 0, iconOf(id), why, 0);
+    }
+
+    /** 바닐라의 살아 있는 몹: 클래스 → ID (처음 부를 때 한 번 만든다). */
+    private static Map<Class<?>, String> vanillaByClass;
+
+    private static Map<Class<?>, String> vanillaByClass() {
+        if (vanillaByClass != null) return vanillaByClass;
+        Map<Class<?>, String> m = new HashMap<>();
+        for (Map.Entry<net.minecraft.resources.ResourceKey<EntityType<?>>, EntityType<?>> en : ForgeRegistries.ENTITY_TYPES.getEntries()) {
+            ResourceLocation rl = en.getKey().location();
+            if (!rl.getNamespace().equals("minecraft")) continue;
+            LivingEntity v = model(rl.toString());
+            if (v != null) m.putIfAbsent(v.getClass(), rl.toString());
+        }
+        if (Minecraft.getInstance().level != null) vanillaByClass = m;   // 세계가 없을 때 만든 빈 표는 기억하지 않는다
+        return m;
+    }
+
+    /**
+     * 아무것도 그리지 않는 몹 대신 그릴 바닐라 몹. 먼저 그 몹의 바탕 클래스(유령 라바저 → Ravager), 없으면 ID 의 낱말
+     * (ghosted_ravager → ravager, pillagers_patrol → pillager, ice_spider → spider). 바닐라 몹이거나 찾지 못하면 null.
+     */
+    static String standIn(String id, LivingEntity e) {
+        if (id == null || id.startsWith("minecraft:")) return null;
+        Map<Class<?>, String> vanilla = vanillaByClass();
+        if (e != null) {
+            for (Class<?> c = e.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+                String v = vanilla.get(c);
+                if (v != null) return v;
+            }
+        }
+        java.util.Set<String> ids = new java.util.HashSet<>(vanilla.values());
+        String[] parts = id.substring(id.indexOf(':') + 1).split("[_/]");
+        // 긴 이름부터 (cave_spider · polar_bear 처럼 두 낱말인 바닐라 몹)
+        for (int len = parts.length; len >= 1; len--) {
+            for (int i = 0; i + len <= parts.length; i++) {
+                String name = String.join("_", java.util.Arrays.copyOfRange(parts, i, i + len));
+                if (ids.contains("minecraft:" + name)) return "minecraft:" + name;
+                if (name.endsWith("s") && ids.contains("minecraft:" + name.substring(0, name.length() - 1))) return "minecraft:" + name.substring(0, name.length() - 1);
+            }
+        }
+        return null;
     }
 
     private static boolean touches(int[] u) {
@@ -408,8 +504,13 @@ public final class MobPortrait {
      * 칸 밖은 잘려 보이지 않는 부분이다.
      */
     static int[] boxCheckForTest(String id, int box, boolean legacy) {
-        LivingEntity e = model(id);
+        Fit f0 = legacy ? null : fit(id, true);
+        LivingEntity e = model(f0 != null && f0.drawId != null ? f0.drawId : id);
         if (e == null) return new int[]{0, 0};
+        if (f0 != null && f0.shownTick > 0) {
+            e.setInvisible(false);
+            e.tickCount = f0.shownTick;
+        }
         float bx = (S - box) / 2F, by = (S - box) / 2F;
         float ax, ay, scale;
         if (legacy) {
