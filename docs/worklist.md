@@ -721,6 +721,11 @@ Arcane Vortex는 일단 유지, W-13은 스토리 및 히든 아이템에도 사
 추가 (08:31): "인벤토리 핫바 우측의 화살표 모양이 어떤 기능이고 어느 모드에서 나온 것인지 알려줘. 기본 키 설정은 z이고 대쉬 비슷한 역할인 것 같은데, 없애는 것이 낫겠어."
 - C-18. Bosses'Rise(block_factorys_bosses) 의 「Dodge Roll」(구르기, 키 이름 key.block_factorys_bosses.dodge_roll, HUD textures/gui/roll/dash_green.png · 숫자 = 남은 구르기) →
   서버 설정 CAN_USE_ROLL 끔 (`compat/BossesRiseRollOff`, world_rules bossesRiseRoll=false), 화면 표시 ROLL_GUI 끔 · Z 키 한 번 풀기 (`client/BossesRiseRollClient`).
+추가 (09:23): "작업이 끝나면 spmovesets의 모든 아이템들을 상점에서 제거하고 드랍과 조합과 같은 얻는 방식도 모두 금지해줘."
+- C-19. spmovesets 의 모든 아이템: NPC 상점 · 뽑기에서 빼고, 조합법 · 상자/몹/낚시 전리품 · 몹 드롭 · 블록 드롭 모두 막기
+  (item_policy.json 6판: shopBan · gachaBan · recipeBan · recipeBanMods · lootBan · blockDropBan 에 spmovesets — Better Nether(5판)와 같은 방식).
+  이미 가진 것은 지우지 않음 (보고에 적기). 3.78.0 에 함께 (다시 돌리는 CI 에 묶음).
+- C-11 보강: 도감 그림에서 알 대신 종이가 크게 보이던 몹 (Illusioner 의 유령 몹 4종 등) → 바탕이 된 바닐라 몹 모습으로 대신 그리기, 큰 몹(모래벌레)은 더 줄여서 다시 재기.
 - 한 일 (3.78.0, 가지 v5-next31):
   C-1 tools/gen_forgery_icons.py CHOSEN 돋보기 C. C-2/C-3 `ScyllaClues` 기본값 · `migrate3` (scylla.json 3판: 옛 기본값 그대로일 때만). C-4 `SurveyCompassItem.MIN_TOWN` 500, 설명 · 안내서(18판) · 영어.
   C-5 food.json skipItemsOf ["farmer","fisher"] + `ShopLoader.migrateFoodSkipFisher` (MIGRATED food-skip-fisher@1). C-7 `story/Examine` + examine.json · StoryPacket.EXAMINE · ItemMarks 「?」 ·
