@@ -705,14 +705,36 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   실린 개인 파일 · doFireTick · DH 설정 · Small Ships · Arcane Vortex.
 - K-2: 팩 15 전체 시험(run 46123749936) 서버 모두 통과, 화면 시험은 55분 넘게 끝나지 않다가 "The hosted runner lost communication" (11 은 17분) —
   Nightfall Enhance · VIX · Fancy Trail 을 빼고 다시 (run 46129394347, 가지 v5-next34-p14, SKIP_MODS).
+  → 결과: 셋을 빼니 화면 시험이 17분에 끝남 (서버 957 모두 통과 · 화면 366 중 3 실패 · 셰이더 8 통과). 3 실패는 시험 땅의 지형 탓 — 팩 15 에서는 그 자리가
+  눈 덮인 산 · 큰 나무 숲: 상자를 나무 기둥 자리에 놓아 위가 막힘(바닐라: 위가 막힌 상자는 안 열림) → 「상자가 열림」 · 「PIN 단추」, 경계 모서리가 땅 위 2.7 (기준 2.0).
+  VIX 는 efn 에 묶여 온 1.3.2 가 11 에도 있었음 (15 는 따로 1.3.6 jar). 19:08 사용자에게 알림.
+  셋 중 무엇인지 가리기 (동시에): p14x = VIX 1.3.6 만 넣음 (run 46133552028) · p14y = Nightfall Enhance + Fancy Trail (VIX 는 1.3.2, run 46133556100) ·
+  p14z = Fancy Trail 만 (run 46133560123).
+  다음: 3.82 뒤에 CI 를 팩 15 로 (효과 모드는 시험에서만 뺌), 상자 위 칸을 비우고 경계 시험을 지형에 덜 흔들리게.
 
 ## 요청 (11-28 17:39) → 3.82.0 (3.81.0 을 올린 다음, 가지 v5-next34)
+
+추가 (19:08): "3. 마을 안에서만 번지지 않게 해줘." (팩 15 검토 보고의 3번 = KubeJS 가 켤 때마다 doFireTick true → 마을의 나무 건물이 탈 수 있음 — 의 답)
+- J-4. 마을(성 영역) 안에서만 불이 번지지 않게 (밖은 doFireTick 그대로): 불 블록의 틱을 성 영역(+ 둘레 1칸)에서는 번지기 · 옆 블록 태우기 없이 처리 —
+  지옥암 · 마그마 위의 불(벽난로)은 그대로, 그 밖의 불은 첫 틱에 꺼짐. 용암이 붙이는 불도 성 영역에서는 막음. land.json 의 castleNoFireSpread (기본 켬).
+  3.82.0 에 묶어 냄 (3.82 시험 중에 받음) → 배포 예정 20:15 → 약 21:00.
 
 "마을의 지도 제작자가 원소 지도와 열쇠를 판매하는 것도 막아줘." (3.81 보고에서 물은 것의 답)
 - J-3. spmovesets 의 주민 거래 막기: 설명(spmovesets.manual.survival.bosses.map)을 다시 보니 지도 제작자는 원소 지도를 팔고 값으로 에메랄드 + 뽑기 열쇠를 받음
   (열쇠를 파는 것이 아님 — 사용자에게 바로잡음). ArenaMapTrade.mapa(RandomSource) 가 거래를 만든다.
   → item_policy.json 8판 tradeBan (기본 "spmovesets:*"): 주민 · 떠돌이 상인의 거래 가운데 파는 것 · 값(둘)이 금지 아이템이거나 NBT 에 그 모드가 적힌 것을 뺌,
   거래 창이 열리기 전(EntityInteract)과 거래한 뒤(TradeWithVillagerEvent, 레벨이 올라 새 거래가 생김).
+- 한 일 (3.82.0, 가지 v5-next34):
+  J-3 ✔ TradeGuard (새 파일): 거래의 파는 것 · 값 A · 값 B 중 하나라도 ItemPolicy.tradeBanned 면 뺌 — 누를 때(EntityInteract HIGH) · 거래 창이 열릴 때
+  (PlayerContainerEvent.Open: 16칸 안에서 이 사람과 거래 중인 상인, 거래 목록은 그 뒤에 화면으로 감) · 거래한 뒤(TradeWithVillagerEvent).
+  item_policy.json 8판 tradeBan (기본 spmovesets:*, 옛 파일에는 더해 씀) — "모드:*" 는 NBT 에 "모드:"(ID) 나 ".모드."(번역 키)가 적힌 물건도.
+  ★ 처음 시험(run 46128534328)은 통과했지만 진짜 거래를 0건 봄 (VillagerTrades 표에서 찾았음) → inspect(ci-inspect/spmovesets-trades.txt):
+  spmovesets 는 표를 쓰지 않는다. ArenaMapTrade.onInteract(EntityInteract) → giveMaps: Survival 모드 · 어른 · 지도 제작자이고 원소 지도(ElementMapItem)가
+  하나도 없으면 onSale() 의 열매마다 offer(열매, 열쇠 1~3) = 에메랄드 12 + spmovesets:gacha_fruta_key → spmovesets:mapa_<열매> (12번, xp 10)를 붙임
+  (Goddy · Nita 지도는 칸딜만), 예전 판의 아레나 지도(바닐라 지도 + 이름 filled_map.spmovesets.arena)는 그때 지움. → 누를 때마다 다시 붙고 그 모드의 처리기는
+  RT Shop(HIGH) 뒤(NORMAL)라, 거래 창이 열릴 때 빼는 것이 핵심. (위의 "ArenaMapTrade.mapa" 는 틀림: mapa 는 칸딜의 VendedorTienda.)
+  시험을 고침: 그 모드의 offer() 로 만든 거래 + 아레나 지도가 모두 막히는지, 실제 순서(누름 → RT Shop → 다른 모드가 붙임 → 거래 창)로 눌러 화면으로 가기 전에
+  빠지는지 (빌드 시험은 나침반으로 같은 순서).
 
 ## 요청 (11-28 16:18) → 3.81.0 (3.80.0 을 올린 다음, 가지 v5-next34)
 
