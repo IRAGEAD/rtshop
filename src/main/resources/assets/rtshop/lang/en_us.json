@@ -2135,5 +2135,6 @@
   "rtshop.spawn.arrival_none": "No arrival point: newcomers start at the town point. Set one with /rtshop spawn arrival set.",
   "rtshop.spawn.where_dock": "No town point is set yet, so return tickets and deaths without a bed go to the Amonos dock (%s, %s, %s). Stand on the fountain square and use /rtshop spawn set.",
   "rtshop.shoplot.retired": "Removed %s lots that were dropped from the default market (kept %s that have owners).",
-  "rtshop.shoplot.retired_kept": "Lots dropped from the default market but kept because someone owns them: %s"
+  "rtshop.shoplot.retired_kept": "Lots dropped from the default market but kept because someone owns them: %s",
+  "rtshop.msg.npc_stands_in": "%s is not placed on its own — in town %s is that person (quests, talk and the shop in one). To place it: /rtshop npc %s"
 }

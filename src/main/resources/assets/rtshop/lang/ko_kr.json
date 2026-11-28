@@ -2135,5 +2135,6 @@
   "rtshop.spawn.arrival_none": "도착 자리가 없어 처음 들어온 사람은 마을의 기준 자리에서 시작합니다. /rtshop spawn arrival set 으로 정할 수 있습니다.",
   "rtshop.spawn.where_dock": "마을의 기준 자리를 아직 정하지 않아, 귀환권 · 침대 없는 죽음은 아모노스 부두(%s, %s, %s)로 갑니다. 분수 광장에 서서 /rtshop spawn set 으로 정하세요.",
   "rtshop.shoplot.retired": "기본 장터에서 빠진 칸 %s칸을 지웠습니다 (주인이 있어 남긴 칸 %s).",
-  "rtshop.shoplot.retired_kept": "기본 장터에서 빠졌지만 주인이 있어 남은 칸: %s"
+  "rtshop.shoplot.retired_kept": "기본 장터에서 빠졌지만 주인이 있어 남은 칸: %s",
+  "rtshop.msg.npc_stands_in": "%s 는 따로 세우지 않습니다 — 마을에서는 %s 가 그 사람입니다 (퀘스트 · 대화 · 상점을 함께 맡음). 세우려면 /rtshop npc %s"
 }

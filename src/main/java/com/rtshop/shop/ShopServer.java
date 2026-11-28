@@ -209,7 +209,7 @@ public final class ShopServer {
         all.add("gacha");
         all.add("raid_guide");
         for (String id : QuestManager.loaded().npcs.keySet()) {
-            all.add("quest_" + id);
+            if (!QuestManager.STANDS_IN.containsKey(id)) all.add("quest_" + id);   // 3.83: 오스카 · 브람은 상점 NPC 가 그 사람
         }
         return SharedSuggestionProvider.suggest(all, b);
     };
@@ -618,6 +618,12 @@ public final class ShopServer {
     private static int cmdSpawnNpc(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack src = ctx.getSource();
         String type = StringArgumentType.getString(ctx, "type");
+        String shopKey = QuestManager.standIn(type);
+        if (shopKey != null) {   // 3.83: 마을에서는 상점 NPC 가 그 사람 — 따로 세우지 않는다
+            feedback(src, Component.translatable("rtshop.msg.npc_stands_in", QuestManager.npcName(type),
+                    NpcNames.display(shopKey.substring(5), QuestManager.npcName(shopKey)), shopKey.substring(5)));
+            return 0;
+        }
         Villager v = spawnNpc(src.getLevel(), src.getPosition(), src.getRotation().y, type);
         if (v == null) {
             feedback(src, Component.translatable("rtshop.msg.unknown_shop", type));

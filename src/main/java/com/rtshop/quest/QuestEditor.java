@@ -124,6 +124,7 @@ public final class QuestEditor {
             keys.add(new String[]{"shop_" + d.id, d.npcName});
         }
         for (QuestManager.NpcDef n : l.npcs.values()) {
+            if (QuestManager.STANDS_IN.containsKey(n.id)) continue;   // 3.83: 오스카 · 브람의 퀘스트는 상점 NPC 가 주고받는다
             keys.add(new String[]{"quest_" + n.id, n.name});
         }
         return new QuestEditorPacket(quests, npcs, keys, new ArrayList<>(l.problems));

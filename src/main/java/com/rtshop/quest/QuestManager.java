@@ -157,6 +157,12 @@ public final class QuestManager {
                 l.problems.add("퀘스트 ID 가 겹칩니다: " + q.id + " (뒤의 것은 무시)");
                 continue;
             }
+            // 3.83: 따로 서지 않는 인물(quest_oscar · quest_bram)을 가리키는 퀘스트(운영자가 만든 것 등)는 그 인물을 맡는 상점 NPC 로
+            if (standIn(q.giver) != null) q.giver = standIn(q.giver);
+            if (standIn(q.turnIn) != null) q.turnIn = standIn(q.turnIn);
+            for (QuestDef.Objective ob : q.objectives) {
+                if (ob.type == QuestDef.Type.TALK && standIn(ob.target) != null) ob.target = standIn(ob.target);
+            }
             l.quests.put(q.id, q);
             l.questFile.put(q.id, fileOf.get(q));
         }
@@ -473,10 +479,48 @@ public final class QuestManager {
         return key;
     }
 
-    /** 퀘스트 NPC 를 소환한다. 알 수 없는 NPC 면 null. */
+    // ------------------------------------------------------------------ 3.83 상점 NPC 가 맡는 인물
+
+    /**
+     * 3.83 (사용자 11-28 22:19 "상인이 두명인 문제는 가 방법을 통해 수정"): 이야기 인물 가운데 마을에서는 상점 NPC 가 바로 그 사람인 경우.
+     * 오스카(수산물 상인) · 브람(장비 상인)의 퀘스트 · 대화는 처음부터 상점 NPC(shop_fisher · shop_blacksmith)가 맡았고, 이야기 NPC 정의(oscar · bram)는
+     * 동행으로 따라나설 때의 이름 · 모습에만 쓴다. 그런데 소환 목록에 함께 올라 따로 세울 수 있어서, 마을에 같은 사람이 둘 서게 됐다.
+     * → 따로 세우지 않는다 (소환 · 자리 배치 · 목록에서 빠짐), 이미 서 있던 것은 불러올 때 치운다.
+     */
+    public static final Map<String, String> STANDS_IN = Map.of("oscar", "shop_fisher", "bram", "shop_blacksmith");
+
+    /** 이 NPC 열쇠(quest_<id>)의 인물을 마을에서 맡는 상점 NPC 열쇠 (따로 서는 NPC 면 null). */
+    public static String standIn(String key) {
+        if (key == null || !key.startsWith("quest_")) return null;
+        return STANDS_IN.get(key.substring(6));
+    }
+
+    /** 점검용: 불러올 때 치운 따로 선 이야기 NPC 수. */
+    public static volatile int standInRemovedForTest;
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onStandInJoin(net.minecraftforge.event.entity.EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide() || !(event.getEntity() instanceof Villager v)) return;
+        for (String tag : v.getTags()) {
+            if (!tag.startsWith(QUEST_TAG_PREFIX)) continue;
+            String shop = STANDS_IN.get(tag.substring(QUEST_TAG_PREFIX.length()));
+            if (shop == null) continue;
+            event.setCanceled(true);
+            standInRemovedForTest++;
+            try {
+                if (event.getLevel().getServer() != null) NpcLayout.forget(event.getLevel().getServer(), v.getUUID());
+            } catch (Throwable ignored) {
+            }
+            RtShop.LOGGER.info("[rtshop] 따로 서 있던 이야기 NPC '{}' 를 치웠습니다 — 마을에서는 상점 NPC '{}' 가 그 사람입니다 (3.83)",
+                    v.getCustomName() == null ? tag : v.getCustomName().getString(), npcName(shop));
+            return;
+        }
+    }
+
+    /** 퀘스트 NPC 를 소환한다. 알 수 없는 NPC 면 null. 마을에서 상점 NPC 가 맡는 인물(STANDS_IN)도 null. */
     public static Villager spawnNpc(ServerLevel level, Vec3 pos, float yaw, String npcId) {
         NpcDef n = loaded.npcs.get(npcId);
-        if (n == null) {
+        if (n == null || STANDS_IN.containsKey(npcId)) {
             return null;
         }
         Villager v = EntityType.VILLAGER.create(level);

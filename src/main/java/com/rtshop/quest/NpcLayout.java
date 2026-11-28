@@ -289,6 +289,34 @@ public final class NpcLayout extends SavedData {
         d.setDirty();
     }
 
+    /** 3.83: 이 NPC 를 배치에서 뺀다 (세계에 들어오기 전에 치운 NPC — 떠나는 이벤트가 오지 않는다). */
+    public static void forget(MinecraftServer server, UUID id) {
+        NpcLayout d = get(server);
+        if (d.known.remove(id) != null) {
+            d.changed = true;
+            d.setDirty();
+        }
+        d.retired.remove(id);
+    }
+
+    /** 3.83: 상점 NPC 가 맡는 인물의 따로 선 자리(quest_oscar · quest_bram)는 배치에서 빼 둔다. 뺀 수. */
+    public static int dropStandIns(MinecraftServer server) {
+        NpcLayout d = get(server);
+        int n = 0;
+        for (UUID id : new ArrayList<>(d.known.keySet())) {
+            if (QuestManager.standIn(d.known.get(id).key) != null) {
+                d.known.remove(id);
+                n++;
+            }
+        }
+        if (d.pending.removeIf(s -> QuestManager.standIn(s.key) != null)) n++;
+        if (n > 0) {
+            d.changed = true;
+            d.setDirty();
+        }
+        return n;
+    }
+
     @SubscribeEvent
     public static void onLeave(EntityLeaveLevelEvent event) {
         Entity e = event.getEntity();
@@ -315,6 +343,7 @@ public final class NpcLayout extends SavedData {
         d.pending.clear();
         Map<UUID, Spot> free = new LinkedHashMap<>(d.known);
         for (Spot want : f.npcs) {
+            if (QuestManager.standIn(want.key) != null) continue;   // 3.83: 상점 NPC 가 맡는 인물은 따로 세우지 않는다
             UUID best = null;
             double bd = Double.MAX_VALUE;
             for (Map.Entry<UUID, Spot> e : free.entrySet()) {
@@ -407,6 +436,12 @@ public final class NpcLayout extends SavedData {
     @SubscribeEvent
     public static void onStarted(ServerStartedEvent event) {
         if (!live()) return;
+        try {
+            int dropped = dropStandIns(event.getServer());
+            if (dropped > 0) RtShop.LOGGER.info("[rtshop] NPC 배치: 상점 NPC 가 맡는 인물(오스카 · 브람)의 따로 선 자리 {}곳을 뺐습니다 (3.83)", dropped);
+        } catch (Throwable t) {
+            RtShop.LOGGER.warn("[rtshop] NPC 배치 정리 실패: {}", t.toString());
+        }
         try {
             apply(event.getServer(), false);
         } catch (Throwable t) {

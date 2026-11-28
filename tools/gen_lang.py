@@ -1436,6 +1436,7 @@ NEW = {
  "rtshop.pshop.sold_msg_fee": ("[내 상점] %s 님이 %s x%s 을(를) 샀습니다. +%sG (예금, 판매 자릿세 %sG 를 뗌)", "[Your shop] %s bought %s x%s. +%sG (bank, after a %sG lot sales fee)"),
  "rtshop.shoplot.status": ("상점 토지: 설치 판 %s · %s칸 (팔림 %s · 자릿세 밀림 %s) · 기본 장터 %s칸", "Shop lots: install version %s · %s lots (sold %s · rent owed %s) · default market %s lots"),
  "rtshop.shoplot.installed": ("장터를 등록했습니다: 새로 %s칸 · 이미 있음 %s · 다른 토지와 겹쳐 뺌 %s", "Market registered: %s new lots · %s already there · %s skipped (overlapping other land)"),
+ "rtshop.msg.npc_stands_in": ("%s 는 따로 세우지 않습니다 — 마을에서는 %s 가 그 사람입니다 (퀘스트 · 대화 · 상점을 함께 맡음). 세우려면 /rtshop npc %s", "%s is not placed on its own — in town %s is that person (quests, talk and the shop in one). To place it: /rtshop npc %s"),
  "rtshop.shoplot.retired": ("기본 장터에서 빠진 칸 %s칸을 지웠습니다 (주인이 있어 남긴 칸 %s).", "Removed %s lots that were dropped from the default market (kept %s that have owners)."),
  "rtshop.shoplot.retired_kept": ("기본 장터에서 빠졌지만 주인이 있어 남은 칸: %s", "Lots dropped from the default market but kept because someone owns them: %s"),
  "rtshop.shoplot.removed": ("판매 중인 상점 토지 %s칸을 지웠습니다 (주인이 있어 남긴 칸 %s). 다시 자동으로 넣지 않습니다.", "Removed %s shop lots for sale (kept %s with owners). They will not be added again automatically."),

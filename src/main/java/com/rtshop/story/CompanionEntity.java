@@ -162,7 +162,7 @@ public class CompanionEntity extends PathfinderMob implements VillagerDataHolder
         CompanionEntity c = Companions.TYPE.get().create(level);
         if (c == null) return null;
         c.npcId = npc;
-        c.setLook(com.rtshop.npc.NpcLooks.lookOf("quest_" + npc));
+        c.setLook(com.rtshop.npc.NpcLooks.lookOf(com.rtshop.npc.NpcLooks.personKey(npc)));
         c.ownerId = owner.getUUID();
         c.questId = "test";
         c.testStay = true;

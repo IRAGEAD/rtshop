@@ -155,12 +155,18 @@ public final class NpcLooks {
         return ALL.contains(best) ? best : "";
     }
 
+    /** 3.83: 이야기 인물(동행)의 모습을 찾는 열쇠 — 마을에서 상점 NPC 가 맡는 인물(오스카 · 브람)은 그 상점 NPC 의 모습을 따른다. */
+    public static String personKey(String npcId) {
+        String shop = com.rtshop.quest.QuestManager.STANDS_IN.get(npcId);
+        return shop != null ? shop : "quest_" + npcId;
+    }
+
     /** 3.77.0: 이야기 속에서 자리를 비운 NPC 에게 보내는 모습 — 화면은 그 NPC 를 그리지 않는다 (그 사람에게만). */
     public static final String ABSENT = "_absent";
 
     /** 이 사람에게 이 엔티티를 어떤 모습으로 보일지: 자리를 비웠으면 ABSENT (동행은 그 자리에 있는 그 사람이므로 제외). */
     public static String lookFor(ServerPlayer p, Entity e) {
-        if (e instanceof com.rtshop.story.CompanionEntity c) return lookOf("quest_" + c.npcId());
+        if (e instanceof com.rtshop.story.CompanionEntity c) return lookOf(personKey(c.npcId()));
         String key = keyOf(e);
         if (key != null && com.rtshop.story.Dialogue.hiddenFor(p, key)) return ABSENT;
         String look = lookOf(key);

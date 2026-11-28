@@ -3960,6 +3960,45 @@ public final class SelfTest {
                 fireRule.set(fireRuleWas, server);
             }
         }
+        // 3.83 (사용자 11-28 22:19 "상인이 두명인 문제는 가 방법을 통해 수정"): 오스카 · 브람은 상점 NPC 하나 — 이야기 NPC 는 따로 세우지 않고,
+        // 예전에 세운 것은 불러올 때 치우고, 퀘스트는 모두 상점 NPC 가 주고받고, 동행으로 나올 때는 그 상점 NPC 의 모습
+        {
+            boolean noSpawn383 = com.rtshop.quest.QuestManager.spawnNpc(level, a.position(), 0F, "oscar") == null
+                    && ShopServer.spawnNpc(level, a.position(), 0F, "quest_bram") == null
+                    && com.rtshop.quest.QuestManager.spawnNpc(level, a.position().add(-6, 0, 6), 0F, "order_archivist") != null;
+            // (위의 기록관은 따로 서는 인물: 세워지는지만 보고 바로 치운다)
+            for (net.minecraft.world.entity.Entity e383 : level.getEntities((net.minecraft.world.entity.Entity) null,
+                    new net.minecraft.world.phys.AABB(a.position().add(-6, 0, 6), a.position().add(-6, 0, 6)).inflate(1.5),
+                    x383 -> x383.getTags().contains(com.rtshop.quest.QuestManager.QUEST_TAG_PREFIX + "order_archivist"))) {
+                e383.discard();
+            }
+            Villager old383 = EntityType.VILLAGER.create(level);
+            old383.moveTo(a.getX() + 2, a.getY(), a.getZ() - 4);
+            old383.addTag(com.rtshop.quest.QuestManager.QUEST_TAG_PREFIX + "oscar");
+            int before383 = com.rtshop.quest.QuestManager.standInRemovedForTest;
+            boolean added383 = level.addFreshEntity(old383);
+            boolean removed383 = !added383 && com.rtshop.quest.QuestManager.standInRemovedForTest == before383 + 1;
+            if (added383) old383.discard();
+            // 자리 배치(npc_layout)에 적혀 있던 따로 선 자리도 뺀다
+            Villager ghost383 = EntityType.VILLAGER.create(level);
+            ghost383.moveTo(a.getX() + 2, a.getY(), a.getZ() - 6);
+            ghost383.addTag(com.rtshop.quest.QuestManager.QUEST_TAG_PREFIX + "bram");
+            com.rtshop.quest.NpcLayout.note(ghost383);
+            int dropped383 = com.rtshop.quest.NpcLayout.dropStandIns(server);
+            int bad383 = 0;
+            for (com.rtshop.quest.QuestDef q383 : com.rtshop.quest.QuestManager.loaded().quests.values()) {
+                if (com.rtshop.quest.QuestManager.standIn(q383.giver) != null || com.rtshop.quest.QuestManager.standIn(q383.turnInNpc()) != null) bad383++;
+                for (com.rtshop.quest.QuestDef.Objective ob383 : q383.objectives) {
+                    if (ob383.type == com.rtshop.quest.QuestDef.Type.TALK && com.rtshop.quest.QuestManager.standIn(ob383.target) != null) bad383++;
+                }
+            }
+            boolean quests383 = bad383 == 0 && com.rtshop.quest.QuestManager.hasQuests("shop_fisher") && com.rtshop.quest.QuestManager.hasQuests("shop_blacksmith");
+            boolean looks383 = com.rtshop.npc.NpcLooks.personKey("oscar").equals("shop_fisher") && com.rtshop.npc.NpcLooks.personKey("bram").equals("shop_blacksmith")
+                    && com.rtshop.npc.NpcLooks.personKey("order_archivist").equals("quest_order_archivist");
+            check("3.83 Oscar and Bram are one NPC each (their shop NPC with quests, talk and the shop): the story NPC is not spawned on its own, one placed before is removed when it loads and dropped from the NPC layout, all their quests go through the shop NPC, and as a companion they wear the shop NPC's look",
+                    noSpawn383 && removed383 && dropped383 >= 1 && quests383 && looks383,
+                    noSpawn383 + " removed " + removed383 + "(" + added383 + ") layout " + dropped383 + " quests " + bad383 + "/" + quests383 + " looks " + looks383);
+        }
         check("after the trial the real rules are back: the iron sword and TNT can be crafted again",
                 server.getRecipeManager().byKey(new ResourceLocation("minecraft:iron_sword")).isPresent() && server.getRecipeManager().byKey(tntRecipe).isPresent());
         {
