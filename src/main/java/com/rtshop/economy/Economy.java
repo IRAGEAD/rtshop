@@ -124,6 +124,103 @@ public final class Economy {
         return String.format("%,d", v);
     }
 
+    /**
+     * 들고 있는 수표의 가치를 pct% 줄인다: 가방 칸 · 갑옷 칸 · 보조 손, 그리고 가방 안의 셜커 상자(BlockEntityTag.Items) · 배낭(아이템 칸을 가진 물건) 속 수표까지.
+     * 같은 수표(일련번호)는 한 번만 센다. 줄어든 Gold 합계를 돌려준다.
+     */
+    public static long checkLoss(ServerPlayer sp, double pct) {
+        EconomyData d = data(sp);
+        java.util.Set<UUID> seen = new java.util.HashSet<>();
+        long[] total = {0};
+        Inventory inv = sp.getInventory();
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack s = inv.getItem(i);
+            if (s.isEmpty()) continue;
+            if (s.is(ModItems.GOLD_CHECK.get())) {
+                total[0] += lose(d, s, pct, seen);
+                continue;
+            }
+            total[0] += insideBox(d, s, pct, seen, 0);
+            total[0] += insideHandler(d, s, pct, seen, 0);
+        }
+        return total[0];
+    }
+
+    /** 수표 하나의 가치를 줄인다 (장부와 아이템 모두). 다 깎이면 수표가 사라진다. */
+    private static long lose(EconomyData d, ItemStack s, double pct, java.util.Set<UUID> seen) {
+        UUID id = CheckItem.id(s);
+        if (id == null || !seen.add(id)) return 0;
+        long a = d.checkAmount(id);
+        if (a <= 0) return 0;
+        long l = Math.min(a, Math.round(a * pct / 100.0D));
+        if (l <= 0) return 0;
+        d.setCheck(id, a - l);
+        if (a - l <= 0) {
+            s.shrink(1);
+        } else {
+            CheckItem.setAmount(s, a - l);
+        }
+        return l;
+    }
+
+    /** 셜커 상자처럼 내용물을 BlockEntityTag.Items 에 적어 두는 물건 속 수표. */
+    private static long insideBox(EconomyData d, ItemStack box, double pct, java.util.Set<UUID> seen, int depth) {
+        if (depth > 2) return 0;
+        net.minecraft.nbt.CompoundTag be = box.getTagElement("BlockEntityTag");
+        if (be == null || !be.contains("Items", net.minecraft.nbt.Tag.TAG_LIST)) return 0;
+        net.minecraft.nbt.ListTag items = be.getList("Items", net.minecraft.nbt.Tag.TAG_COMPOUND);
+        long sum = 0;
+        for (int i = 0; i < items.size(); i++) {
+            net.minecraft.nbt.CompoundTag e = items.getCompound(i);
+            ItemStack in = ItemStack.of(e);
+            if (in.isEmpty()) continue;
+            long l;
+            if (in.is(ModItems.GOLD_CHECK.get())) {
+                l = lose(d, in, pct, seen);
+            } else {
+                l = insideBox(d, in, pct, seen, depth + 1);
+            }
+            if (l <= 0) continue;
+            sum += l;
+            if (in.isEmpty()) {
+                items.remove(i);
+                i--;
+            } else {
+                byte slot = e.getByte("Slot");
+                net.minecraft.nbt.CompoundTag ne = in.save(new net.minecraft.nbt.CompoundTag());
+                ne.putByte("Slot", slot);
+                items.set(i, ne);
+            }
+        }
+        return sum;
+    }
+
+    /** 배낭처럼 아이템 칸(Forge 아이템 핸들러)을 가진 물건 속 수표. */
+    private static long insideHandler(EconomyData d, ItemStack bag, double pct, java.util.Set<UUID> seen, int depth) {
+        if (depth > 1) return 0;
+        long[] sum = {0};
+        try {
+            bag.getCapability(net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> {
+                for (int i = 0; i < h.getSlots(); i++) {
+                    ItemStack in = h.getStackInSlot(i);
+                    if (in.isEmpty() || !in.is(ModItems.GOLD_CHECK.get())) continue;
+                    ItemStack copy = in.copy();
+                    long l = lose(d, copy, pct, seen);
+                    if (l <= 0) continue;
+                    sum[0] += l;
+                    if (h instanceof net.minecraftforge.items.IItemHandlerModifiable m) {
+                        m.setStackInSlot(i, copy);
+                    } else {
+                        h.extractItem(i, in.getCount(), false);
+                        if (!copy.isEmpty()) h.insertItem(i, copy, false);
+                    }
+                }
+            });
+        } catch (Throwable ignored) {
+        }
+        return sum[0];
+    }
+
     private static List<ItemStack> carriedChecks(ServerPlayer p) {
         List<ItemStack> out = new ArrayList<>();
         Inventory inv = p.getInventory();
@@ -182,28 +279,11 @@ public final class Economy {
             com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.msg.death_loss",
                     fmt(loss), String.format("%.1f", pct), fmt(w - loss)).withStyle(ChatFormatting.RED));
         }
-        // 들고 있던 수표도 같은 비율로 가치가 줄어든다 (보관함에 넣어 둔 수표는 영향 없음)
+        // 들고 있던 수표도 같은 비율로 가치가 줄어든다 (보관함에 넣어 둔 수표는 영향 없음).
+        // 3.84 (사용자 11-29 "수표도 사망 시에 골드처럼 일부를 잃어버리게"): 가방 안의 셜커 상자 · 배낭 속 수표도 들고 있는 것으로 본다
+        // (모두에게 셜커 상자를 하나씩 주므로, 상자에 넣어 들고 다니면 잃지 않던 틈을 막는다)
         if (c.checkDeathLoss) {
-            long checkLoss = 0;
-            EconomyData d = data(sp);
-            for (ItemStack s : carriedChecks(sp)) {
-                UUID id = CheckItem.id(s);
-                long a = id == null ? 0 : d.checkAmount(id);
-                if (a <= 0) {
-                    continue;
-                }
-                long l = Math.min(a, Math.round(a * pct / 100.0D));
-                if (l <= 0) {
-                    continue;
-                }
-                checkLoss += l;
-                d.setCheck(id, a - l);
-                if (a - l <= 0) {
-                    s.shrink(1);
-                } else {
-                    CheckItem.setAmount(s, a - l);
-                }
-            }
+            long checkLoss = checkLoss(sp, pct);
             if (checkLoss > 0) {
                 com.rtshop.notice.Notice.send(sp, Component.translatable("rtshop.msg.death_loss_check", fmt(checkLoss)).withStyle(ChatFormatting.RED));
             }

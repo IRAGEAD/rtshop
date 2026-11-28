@@ -86,6 +86,32 @@ public final class LandConfig {
     /** 3.82 (사용자 11-28 "마을 안에서만 번지지 않게 해줘"): 성 영역(+ 둘레 1칸)에서는 불이 번지거나 블록을 태우지 않는다 — 불은 첫 틱에 꺼지고
      *  지옥암 · 마그마 위의 불(벽난로)은 그대로, 용암도 불을 붙이지 않는다. 마을 밖은 doFireTick 그대로. */
     public boolean castleNoFireSpread = true;
+    /**
+     * 3.84 (사용자 11-29 "마을 구역 내에서 작업대, 강화 모루, 룬 제단 사용 가능하게" · "요리사 - 식당 주인이 위치한 곳의 조리 도구를 사용할 수 있도록" ·
+     * "의자를 마을 영역 안에서 사용할 수 있도록" · "카지노 블럭들의 상호작용이 가능하게(파괴는 불가)"): 성 영역(산 토지 밖)에서 누구나 쓸 수 있는 블록.
+     * "모드:블록", "모드:*", "*낱말*" (블록 ID 에 그 낱말이 든 것). 보관함(물건을 넣는 블록)은 여기 적어도 열리지 않는다 — 그런 블록은 castleZoneUsableStorage 에.
+     * 부수기 · 놓기는 언제나 막힌다.
+     */
+    public final List<String> castleZoneUsable = new ArrayList<>(ZONE_USABLE_384);
+    /** 3.84: 물건을 넣는 블록이라도 성 영역에서 누구나 쓸 수 있는 것 (조리 도구 · 카지노). 같은 적는 법. */
+    public final List<String> castleZoneUsableStorage = new ArrayList<>(ZONE_USABLE_STORAGE_384);
+    /**
+     * 3.84 (사용자 11-29 "마을 구역에서 플레이어를 제외한 모든 생명체 스폰, 진입 금지" → "이미 있는 동물도 삭제"): 성 영역(공용 구역)에서는
+     * 플레이어 · NPC · 동료 · 주인 있는 펫과 탈것 · 목줄 · 탄 것 · 이름표 붙인 것 · castleCreatureKeep 말고는 생기지 않고, 들어오거나 이미 있으면 지운다 (land/ZoneCreatures).
+     * 플레이어가 산 땅 위의 동물은 그대로, 몬스터는 어디서든 지운다.
+     */
+    public boolean castleNoCreatures = true;
+    public final List<String> castleCreatureKeep = new ArrayList<>(List.of("roulettecasino:*", "casinodeco:*", "irons_spellbooks:summoned_*"));
+
+    public static final List<String> ZONE_USABLE_384 = List.of(
+            "minecraft:crafting_table", "rtshop:enhance_anvil", "rtshop:arcane_orb",
+            "*chair*", "*stool*", "*bench*", "*sofa*", "*couch*", "*seat*", "*throne*");
+    public static final List<String> ZONE_USABLE_STORAGE_384 = List.of(
+            "kaleidoscope_cookery:*", "kaleidoscope_tavern:*",
+            "farmersdelight:stove", "farmersdelight:cooking_pot", "farmersdelight:skillet", "farmersdelight:cutting_board",
+            "farm_and_charm:*pot*", "farm_and_charm:stove", "farm_and_charm:roaster", "farm_and_charm:crafting_bowl", "farm_and_charm:mincer",
+            "minecraft:smoker", "minecraft:furnace", "minecraft:campfire", "minecraft:soul_campfire",
+            "casinodeco:*", "roulettecasino:*", "minevegas:*");
 
     // ---- 상점 토지 (3.79, W-4)
     /** 아모노스 맵이면 기본 장터(동문 안 광장의 상점 토지)를 자동으로 등록한다. */
@@ -194,6 +220,19 @@ public final class LandConfig {
                 if (o.has("plotMerchantRange")) c.plotMerchantRange = Math.max(2, o.get("plotMerchantRange").getAsInt());
                 if (o.has("castleZoneProtect")) c.castleZoneProtect = o.get("castleZoneProtect").getAsBoolean();
                 if (o.has("castleNoFireSpread")) c.castleNoFireSpread = o.get("castleNoFireSpread").getAsBoolean();
+                if (o.has("castleZoneUsable")) {
+                    c.castleZoneUsable.clear();
+                    c.castleZoneUsable.addAll(strings(o.get("castleZoneUsable")));
+                }
+                if (o.has("castleNoCreatures")) c.castleNoCreatures = o.get("castleNoCreatures").getAsBoolean();
+                if (o.has("castleCreatureKeep")) {
+                    c.castleCreatureKeep.clear();
+                    c.castleCreatureKeep.addAll(strings(o.get("castleCreatureKeep")));
+                }
+                if (o.has("castleZoneUsableStorage")) {
+                    c.castleZoneUsableStorage.clear();
+                    c.castleZoneUsableStorage.addAll(strings(o.get("castleZoneUsableStorage")));
+                }
                 if (o.has("shopLotsAuto")) c.shopLotsAuto = o.get("shopLotsAuto").getAsBoolean();
                 if (o.has("shopLotPriceFactor")) c.shopLotPriceFactor = Math.max(0, o.get("shopLotPriceFactor").getAsDouble());
                 if (o.has("shopLotDeedItem")) c.shopLotDeedItem = o.get("shopLotDeedItem").getAsString().trim();
@@ -213,6 +252,11 @@ public final class LandConfig {
                 }
                 if (!o.has("castleZoneProtect") && o.has("castlePlotPrice")) {
                     o.addProperty("castleZoneProtect", c.castleZoneProtect);
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
+                }
+                if (!o.has("castleZoneUsable") && o.has("castlePlotPrice")) {
+                    // 3.84 이전 파일: 값은 그대로 두고 마을에서 쓸 수 있는 블록 목록만 덧붙인다
+                    addZoneUseKeys(o, c);
                     Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
                 }
                 if (!o.has("castleNoFireSpread") && o.has("castlePlotPrice")) {
@@ -284,7 +328,31 @@ public final class LandConfig {
         o.addProperty("castleZoneProtect", c.castleZoneProtect);
         o.addProperty("_불번짐_설명", FIRE_HELP);
         o.addProperty("castleNoFireSpread", c.castleNoFireSpread);
+        addZoneUseKeys(o, c);
     }
+
+    private static void addZoneUseKeys(JsonObject o, LandConfig c) {
+        o.addProperty("_마을에서쓰는블록_설명", ZONE_USE_HELP);
+        JsonArray a = new JsonArray();
+        c.castleZoneUsable.forEach(a::add);
+        o.add("castleZoneUsable", a);
+        JsonArray b = new JsonArray();
+        c.castleZoneUsableStorage.forEach(b::add);
+        o.add("castleZoneUsableStorage", b);
+        o.addProperty("_마을생물_설명", CREATURE_HELP);
+        o.addProperty("castleNoCreatures", c.castleNoCreatures);
+        JsonArray k = new JsonArray();
+        c.castleCreatureKeep.forEach(k::add);
+        o.add("castleCreatureKeep", k);
+    }
+
+    static final String CREATURE_HELP = "castleNoCreatures (3.84): true 면 마을(성 영역의 공용 구역)에는 플레이어 · RT Shop NPC · 동료 · 주인 있는 펫과 탈것 · 목줄에 묶인 것 · 탄 것 · 이름표 붙인 것 · "
+            + "castleCreatureKeep 에 적은 것(\"모드:*\", \"모드:이름\", \"*낱말*\")만 남는다 — 저절로 생기지 않고, 들어오거나 이미 있던 것은 1초마다 지운다 (떨어뜨리는 것 없이). "
+            + "플레이어가 산 땅 위의 동물은 그대로, 몬스터는 어디서든 지운다. 남기고 싶은 동물은 이름표를 붙이면 된다";
+
+    static final String ZONE_USE_HELP = "castleZoneUsable (3.84): 마을(성 영역, 산 토지 밖)에서 누구나 쓸 수 있는 블록 — 작업대 · 강화 모루 · 룬 제단 · 의자 · 벤치 … "
+            + "적는 법: \"모드:블록\", \"모드:*\", \"*낱말*\". 보관함은 여기 적어도 열리지 않는다. castleZoneUsableStorage: 물건을 넣는 블록이라도 쓸 수 있는 것 (조리 도구 · 카지노). "
+            + "부수기 · 놓기는 언제나 막힘. 그 밖의 블록 하나하나는 운영자가 바라보고 /rtshop plot use 로 켜고 끈다 (/rtshop plot use list · clear)";
 
     static final String FIRE_HELP = "castleNoFireSpread (3.82): true 면 마을(성 영역) 안에서는 불이 번지거나 블록을 태우지 않음 — 불은 1~2초 뒤 꺼지고, "
             + "지옥암 · 마그마 위의 불(벽난로)은 그대로, 용암도 불을 붙이지 않음. 마을 밖은 doFireTick 그대로. false 면 마을 안도 원래대로 번짐";

@@ -66,8 +66,13 @@ public final class ItemPolicy {
          *  5 (3.66.0): Better Nether 의 모든 아이템 — 조합법 · 전리품 · 몹/블록 드롭 금지 (상점은 2판부터 금지).
          *  6 (3.78.0): spmovesets 의 모든 아이템 — NPC 상점 · 뽑기 · 조합법 · 전리품 · 몹/블록 드롭 금지 (사용자 "spmovesets 의 모든 아이템들을 상점에서 제거하고
          *     드랍과 조합과 같은 얻는 방식도 모두 금지"). 전리품은 2판부터 막혀 있었다.
-         *  7 (3.80.0): 상점의 무기 · 장비 값 올리기 (gearRaise*) — 파일에 새 칸을 적는다. */
-        public static final int VERSION = 8;
+         *  7 (3.80.0): 상점의 무기 · 장비 값 올리기 (gearRaise*) — 파일에 새 칸을 적는다.
+         *  8 (3.82.0): 주민 거래에서 spmovesets 를 뺀다 (tradeBan).
+         *  9 (3.84.0, 사용자 11-29 "새로 추가한 모드 아이템(nightfall enhance, smallships) 드랍, 전리품, 조합 금지" ·
+         *     "epic fight와 관련된 모든 스킬북들을 제작하지 못하도록" · "aquamirae 관련 장비를 상점에서 삭제"):
+         *     Nightfall Enhance · Small Ships 의 조합법 · 전리품 · 몹/블록 드롭 금지, Epic Fight 스킬북(epicfight:skillbook) 조합 금지,
+         *     Aquamirae 의 장비(무기 · 방어구 · 도구 · 장신구)는 NPC 상점에 오르지 않는다 (shopBanGearMods). */
+        public static final int VERSION = 9;
         /** 읽어 온 파일이 예전 판이라 고쳐 썼는가 (다시 저장한다). */
         transient boolean migrated;
         public boolean enabled = true;
@@ -90,6 +95,8 @@ public final class ItemPolicy {
         public final Set<String> recipeBanMods = new LinkedHashSet<>();
         /** 3.82: 주민 · 떠돌이 상인의 거래에 오르면 안 되는 아이템 (파는 것 · 값 모두, "모드:*" 는 NBT 에 그 모드가 적힌 것도). */
         public final Set<String> tradeBan = new LinkedHashSet<>();
+        /** 3.84: 이 모드들의 장비(무기 · 방어구 · 방패 · 활 · 도구 · 장신구)는 NPC 상점에 오르지 않는다 (재료 · 음식은 그대로). */
+        public final Set<String> shopBanGearMods = new LinkedHashSet<>();
         public boolean recipeBanStaffs = true;
         public final Set<String> staffWords = new LinkedHashSet<>();
         public boolean listStaffs = true;
@@ -123,6 +130,12 @@ public final class ItemPolicy {
         public final Map<String, Double> mobDrops = new LinkedHashMap<>();
         public double bossDropFactor = 10;
 
+        /** 3.84: 조합 · 전리품 · 드롭을 막은 새 모드 (Nightfall Enhance, Small Ships). */
+        public static final List<String> NEW_MOD_IDS_384 = List.of("efn_enhance", "smallships");
+        public static final List<String> NEW_MODS_384 = List.of("efn_enhance:*", "smallships:*");
+        /** 3.84: 만들 수 없는 Epic Fight 스킬북 (스킬은 NBT 에 적힌다 — 어느 스킬이든 이 아이템이다). */
+        public static final List<String> SKILL_BOOKS_384 = List.of("epicfight:skillbook");
+
         public static Config defaults() {
             Config c = new Config();
             c.shopBan.addAll(List.of("arcanevortex:*", "betternether:*", "efn:*", "rtshop:enhance_anvil", "create:*", "spmovesets:*"));
@@ -134,11 +147,17 @@ public final class ItemPolicy {
             c.lootBan.addAll(List.of("spmovesets:*", "artifacts:*", "relics_rpgs:*", "jewelry:*", "simplehats:*",
                     "adorablehamsterpets:*", "crittersandcompanions:*", "rpg_companions_tiny_dragons:*", "fantasymounts:*",
                     "efn:*", "tacz:*", "lrtactical:*", "create:*", "betternether:*"));
+            c.lootBan.addAll(NEW_MODS_384);
             c.blockDropBan.addAll(List.of("create:*", "betternether:*", "spmovesets:*"));
+            c.blockDropBan.addAll(NEW_MODS_384);
+            c.shopBanGearMods.add("aquamirae");
             c.tradeBan.add("spmovesets:*");   // 3.82: 지도 제작자의 원소 지도(값: 에메랄드 + 뽑기 열쇠) 등
             c.lootAllow.addAll(List.of("irons_spellbooks:*_ink", "irons_spellbooks:ink_*"));
             c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil", "create:*", "betternether:*", "spmovesets:*"));
+            c.recipeBan.addAll(NEW_MODS_384);
+            c.recipeBan.addAll(SKILL_BOOKS_384);
             c.recipeBanMods.addAll(List.of("tacz", "create", "betternether", "spmovesets"));
+            c.recipeBanMods.addAll(NEW_MOD_IDS_384);
             c.staffWords.addAll(List.of("staff", "wand", "scepter", "sceptre"));
             c.mobDrops.put("irons_spellbooks:common_ink", 0.03);
             c.mobDrops.put("irons_spellbooks:uncommon_ink", 0.012);
@@ -161,6 +180,7 @@ public final class ItemPolicy {
             help.add("gachaBan: 뽑기에 오르지 않는 것 — 무기·장신구·펫 묶음의 아이템 ID 와 마법 뽑기의 인챈트 ID (Create: 상점·뽑기 어디에서도 얻지 못하게). gacha.json 의 목록은 지우지 않고 건너뛰기만 한다.");
             help.add("recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).");
             help.add("extremeAttack / extremeArmor (3.65.0): 공격력이 이 값 이상이거나 갑옷 한 조각의 방어력이 이 값 이상인 터무니없는 장비는 전리품 · 몹과 보스의 드롭 · 조합법에서 뺀다 (keep · lootAllow 보다 먼저). 0 = 끔. 기본 25 / 20 (모드팩의 다른 장비는 17 / 13 이 가장 높다).");
+            help.add("shopBanGearMods (3.84): 이 모드들의 장비(무기 · 방어구 · 방패 · 활 · 도구 · 장신구)는 NPC 상점에 오르지 않는다 — 재료 · 음식 같은 다른 물건은 그대로. 기본: aquamirae.");
             help.add("tradeBan (3.82): 주민 · 떠돌이 상인의 거래에서 뺄 아이템 — 파는 것이든 값이든 이 아이템이 들어간 거래는 거래 창이 열리기 전에 빠진다. \"모드:*\" 는 NBT 에 그 모드의 ID 나 번역 키가 적힌 물건(모드가 만든 지도 등)도. 기본: spmovesets 전부.");
             help.add("shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.");
             help.add("recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.");
@@ -171,6 +191,7 @@ public final class ItemPolicy {
             o.addProperty("enabled", enabled);
             o.add("shopBan", arr(shopBan));
             o.add("tradeBan", arr(tradeBan));
+            o.add("shopBanGearMods", arr(shopBanGearMods));
             o.addProperty("shopBanBossItems", shopBanBossItems);
             o.addProperty("shopBanGuns", shopBanGuns);
             o.add("gunWords", arr(gunWords));
@@ -220,6 +241,7 @@ public final class ItemPolicy {
             c.enabled = bool(o, "enabled", true);
             strings(o, "shopBan", c.shopBan, d.shopBan);
             strings(o, "tradeBan", c.tradeBan, d.tradeBan);
+            strings(o, "shopBanGearMods", c.shopBanGearMods, v0(o) < 9 ? Set.<String>of() : d.shopBanGearMods);
             c.shopBanBossItems = bool(o, "shopBanBossItems", true);
             c.shopBanGuns = bool(o, "shopBanGuns", true);
             strings(o, "gunWords", c.gunWords, d.gunWords);
@@ -257,6 +279,15 @@ public final class ItemPolicy {
             c.gearRaiseHighFrom = (int) num(o, "gearRaiseHighFrom", d.gearRaiseHighFrom);
             c.gearRaiseStrongDps = num(o, "gearRaiseStrongDps", d.gearRaiseStrongDps);
             int v = v0(o);
+            if (v < 9) {   // 3.84.0: Nightfall Enhance · Small Ships 는 만들거나 줍거나 캐서 얻지 못한다, Epic Fight 스킬북은 만들 수 없다, Aquamirae 장비는 상점에 없다
+                c.lootBan.addAll(NEW_MODS_384);
+                c.blockDropBan.addAll(NEW_MODS_384);
+                c.recipeBan.addAll(NEW_MODS_384);
+                c.recipeBan.addAll(SKILL_BOOKS_384);
+                c.recipeBanMods.addAll(NEW_MOD_IDS_384);
+                c.shopBanGearMods.add("aquamirae");
+                c.migrated = true;
+            }
             if (v < 8) {   // 3.82.0: spmovesets 가 주민(지도 제작자)에게 붙인 거래를 뺀다 (운영자가 적은 다른 줄은 그대로)
                 c.tradeBan.add("spmovesets:*");
                 c.migrated = true;
@@ -442,7 +473,7 @@ public final class ItemPolicy {
                 Config c = Config.fromJson(JsonParser.parseString(Files.readString(path(), StandardCharsets.UTF_8)).getAsJsonObject());
                 if (c.migrated) {
                     Files.writeString(path(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
-                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음, 5: Better Nether 의 조합법·전리품·드롭 금지, 6: spmovesets 의 상점·뽑기·조합법·전리품·드롭 금지, 7: 무기 · 장비 값 올리기, 8: 주민 거래에서 spmovesets 뺌).", Config.VERSION);
+                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음, 5: Better Nether 의 조합법·전리품·드롭 금지, 6: spmovesets 의 상점·뽑기·조합법·전리품·드롭 금지, 7: 무기 · 장비 값 올리기, 8: 주민 거래에서 spmovesets 뺌, 9: Nightfall Enhance · Small Ships 조합법·전리품·드롭 금지, 스킬북 조합 금지, Aquamirae 장비 상점에서 뺌).", Config.VERSION);
                 }
                 return c;
             }
@@ -583,6 +614,7 @@ public final class ItemPolicy {
         if (id == null) return false;
         if (s.shopBan.hit(id)) return true;
         if (ours(id)) return false;
+        if (s.c.shopBanGearMods.contains(id.getNamespace()) && gear(item)) return true;   // 3.84: Aquamirae 의 장비
         if (s.c.shopBanBossItems && s.boss.contains(item)) return true;
         return s.c.shopBanGuns && gun(item);
     }

@@ -207,6 +207,13 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
         return Component.translatable(k, a).getString();
     }
 
+    /** 3.84: 아직 닫힌 뽑기 종류면 그 장 이름 ("1장"), 아니면 null. */
+    String lockOf(int c) {
+        if (data == null || !data.has("locked") || !data.get("locked").isJsonObject()) return null;
+        JsonObject l = data.getAsJsonObject("locked");
+        return c >= 0 && c < CATS.length && l.has(CATS[c]) ? l.get(CATS[c]).getAsString() : null;
+    }
+
     private boolean b(String k) {
         return data.has(k) && data.get(k).getAsBoolean();
     }
@@ -358,8 +365,9 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                 final int tt = t;
                 int px = fx + 8 + t * (pw + 4);
                 int by = bodyY() + bodyH() - 40;
-                buttons.add(new Btn(px + 4, by, (pw - 12) / 2, 16, tr("rtshop.gacha.pull1"), at && tickets(t) >= 1, () -> pull(tt, 1)));
-                buttons.add(new Btn(px + 8 + (pw - 12) / 2, by, (pw - 12) / 2, 16, tr("rtshop.gacha.pull10"), at && tickets(t) >= 10, () -> pull(tt, 10)));
+                boolean open = lockOf(cat) == null;   // 3.84: 무기 뽑기는 1장 뒤에
+                buttons.add(new Btn(px + 4, by, (pw - 12) / 2, 16, tr("rtshop.gacha.pull1"), at && open && tickets(t) >= 1, () -> pull(tt, 1)));
+                buttons.add(new Btn(px + 8 + (pw - 12) / 2, by, (pw - 12) / 2, 16, tr("rtshop.gacha.pull10"), at && open && tickets(t) >= 10, () -> pull(tt, 10)));
                 buttons.add(new Btn(px + 4, by + 18, pw - 8, 14, tr("rtshop.gacha.odds"), true, () -> {
                     probTier = tt;
                     scroll = 0;
@@ -372,8 +380,9 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                 final int tt = t;
                 int y = bodyY() + 6 + t * 30;
                 int cost = ticketCost(t);
-                buttons.add(new Btn(fx + W - 8 - 112, y + 5, 52, 16, tr("rtshop.gacha.trade1"), at && shards >= cost, () -> trade(tt, 1)));
-                buttons.add(new Btn(fx + W - 8 - 56, y + 5, 52, 16, tr("rtshop.gacha.trade5"), at && shards >= cost * 5, () -> trade(tt, 5)));
+                boolean open = lockOf(cat) == null;
+                buttons.add(new Btn(fx + W - 8 - 112, y + 5, 52, 16, tr("rtshop.gacha.trade1"), at && open && shards >= cost, () -> trade(tt, 1)));
+                buttons.add(new Btn(fx + W - 8 - 56, y + 5, 52, 16, tr("rtshop.gacha.trade5"), at && open && shards >= cost * 5, () -> trade(tt, 5)));
             }
         } else {
             JsonArray inv = data.getAsJsonArray("inventory");
@@ -605,6 +614,16 @@ public class GachaScreen extends Screen implements NpcButtons.Host {
                 String s = tr("rtshop.gacha.guarantee_short", GachaColors.name(gu));
                 g.drawString(this.font, Ui.clip(this.font, s, pw - 8), px + 4, py + bodyH() - 50, Ui.C_INK_SOFT, false);
             }
+        }
+        if (lockOf(cat) != null) {
+            // 3.84: 무기 뽑기는 1장을 마친 뒤에 — 판 전체에 어두운 막과 안내
+            int x0 = fx + 8, y0 = bodyY(), x1 = fx + W - 8, y1 = bodyY() + bodyH() - 44;
+            g.fill(x0, y0, x1, y1, 0xB0101010);
+            String l1 = tr("rtshop.gacha.locked_ch1_ui");
+            String l2 = tr("rtshop.gacha.locked_ch1_sub");
+            int cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+            g.drawString(this.font, l1, cx - this.font.width(l1) / 2, cy - 10, Ui.C_GOLD, true);
+            g.drawString(this.font, Ui.clip(this.font, l2, x1 - x0 - 12), cx - Math.min(this.font.width(l2), x1 - x0 - 12) / 2, cy + 4, 0xFFDDDDDD, false);
         }
     }
 

@@ -94,7 +94,7 @@ public final class Jobs {
     public static double[] weapon(ServerPlayer p, String type) {
         JobConfig cfg = JobConfig.get();
         JobConfig.JobDef c = cfg.job(entry(p).combat);
-        if (c == null || WeaponTypes.PREMIUM.equals(type)) { // 뽑기의 고급 무기는 직업의 보정도 불이익도 받지 않는다
+        if (c == null || WeaponTypes.PREMIUM.equals(type) || WeaponTypes.VANILLA.equals(type)) { // 뽑기의 고급 무기 · 바닐라 무기(3.84)는 직업의 보정도 불이익도 받지 않는다
             return new double[]{0, 0};
         }
         return new double[]{c.weaponDamage(type), c.weaponSpeed(type)};
@@ -146,7 +146,7 @@ public final class Jobs {
     public static long cooldownLeft(ServerPlayer p, String slot) {
         JobData.Entry e = entry(p);
         long at = e.changedAt(slot);
-        if (at <= 0 || e.get(slot).isEmpty()) {
+        if (at <= 0 || e.get(slot).isEmpty() && e.last(slot).isEmpty()) {   // 3.84: 내려놓은 뒤 다른 직업을 고르는 것도 바꾸기
             return 0;
         }
         return Math.max(0, at + JobConfig.get().cooldownMillis(slot) - now());
@@ -197,8 +197,11 @@ public final class Jobs {
         if (d.hidden && cfg.hiddenJobCap > 0 && data.count(d.slot, jobId, p.getUUID()) >= cfg.hiddenJobCap) {
             return new Result(false, Component.translatable("rtshop.job.hidden_full", com.rtshop.story.StoryText.t(p, d.name), cfg.hiddenJobCap));
         }
-        if (current.isEmpty()) {
-            e.set(d.slot, jobId, 0);
+        String last = e.last(d.slot);
+        if (current.isEmpty() && (last.isEmpty() || last.equals(jobId))) {
+            // 처음 고르기 (무료), 또는 3.84: 내려놓은 직업으로 돌아오기 (무료, 바꾼 시각은 그대로)
+            e.set(d.slot, jobId, last.isEmpty() ? 0 : e.changedAt(d.slot));
+            e.setLast(d.slot, "");
             data.dirty();
             applyAttributes(p);
             RtShop.LOGGER.info("[rtshop] {} 이(가) 직업 '{}' 을(를) 골랐습니다", p.getGameProfile().getName(), d.name);
@@ -215,8 +218,10 @@ public final class Jobs {
         }
         Economy.addWallet(p, -cost);
         com.rtshop.rank.Ranks.spent(p, cost);
+        if (current.isEmpty()) current = last;   // 3.84: 내려놓은 직업에서 다른 직업으로
         JobConfig.JobDef old = cfg.job(current);
         e.set(d.slot, jobId, now());
+        e.setLast(d.slot, "");
         data.dirty();
         applyAttributes(p);
         com.rtshop.land.StarterPlots.check(p);
@@ -226,10 +231,36 @@ public final class Jobs {
                 String.format("%,d", cost), durationText(cfg.cooldownMillis(d.slot))));
     }
 
+    /**
+     * 3.84 (사용자 11-29 "직업 내려놓기가 불가능한 오류도 수정해줘"): 지금 직업을 내려놓는다 — 무료, 언제든. 버프 · 디버프가 바로 사라지고,
+     * 다른 직업의 선행 퀘스트를 받을 수 있게 된다. 같은 직업으로 돌아오는 것은 무료, 다른 직업을 고르면 바꾸기와 같다 (값 · 대기 시간).
+     */
+    public static Result resign(ServerPlayer p, String slot) {
+        if (!JobConfig.COMBAT.equals(slot) && !JobConfig.LIFE.equals(slot)) {
+            return new Result(false, Component.translatable("rtshop.job.unknown", slot));
+        }
+        JobData data = JobData.get(p.server);
+        JobData.Entry e = data.of(p.getUUID());
+        String current = e.get(slot);
+        if (current.isEmpty()) {
+            return new Result(false, Component.translatable("rtshop.job.resign_none"));
+        }
+        JobConfig.JobDef d = JobConfig.get().job(current);
+        e.set(slot, "", e.changedAt(slot));
+        e.setLast(slot, current);
+        data.dirty();
+        applyAttributes(p);
+        com.rtshop.land.StarterPlots.check(p);
+        String name = d == null ? current : com.rtshop.story.StoryText.t(p, d.name);
+        RtShop.LOGGER.info("[rtshop] {} 이(가) 직업 '{}' 을(를) 내려놓았습니다", p.getGameProfile().getName(), name);
+        return new Result(true, Component.translatable("rtshop.job.resigned", name, String.format("%,d", JobConfig.get().cost(slot))));
+    }
+
     /** 관리자용: 비용·쿨타임·해금과 상관없이 바로 정한다. 빈 문자열이면 그 칸을 비운다. */
     public static void force(ServerPlayer p, String slot, String jobId) {
         JobData data = JobData.get(p.server);
         data.of(p.getUUID()).set(slot, jobId, 0);
+        data.of(p.getUUID()).setLast(slot, "");
         data.dirty();
         applyAttributes(p);
         com.rtshop.land.StarterPlots.check(p);
@@ -263,7 +294,7 @@ public final class Jobs {
             list.add(new JobOpenPacket.JobView(d.id, d.slot, com.rtshop.story.StoryText.t(p, d.name), d.icon, cfg.describe(d, com.rtshop.shop.PricingConfig.get().handCookedMargin, p), state, lock));
         }
         return new JobOpenPacket(atNpc, e.combat, e.life, cooldownLeft(p, JobConfig.COMBAT), cooldownLeft(p, JobConfig.LIFE),
-                cfg.changeCostCombat, cfg.changeCostLife, cfg.cooldownHoursCombat, cfg.cooldownHoursLife, list);
+                cfg.changeCostCombat, cfg.changeCostLife, cfg.cooldownHoursCombat, cfg.cooldownHoursLife, list, e.combatLast, e.lifeLast);
     }
 
     public static void open(ServerPlayer p, int npcEntityId) {
@@ -286,11 +317,16 @@ public final class Jobs {
         return e != null && e.isAlive() && e.getTags().contains(NPC_TAG) && e.distanceToSqr(p) <= r * r;
     }
 
-    /** 화면에서 '이 직업 선택'을 눌렀을 때. */
+    /** 화면에서 직업을 내려놓을 때 보내는 이름의 머리 (JobChoosePacket 을 같이 쓴다). */
+    public static final String RESIGN = "!resign:";
+
+    /** 화면에서 '이 직업 선택'을 눌렀을 때 (3.84: "!resign:칸" 이면 그 칸의 직업을 내려놓기). */
     public static void handleChoose(ServerPlayer p, String jobId) {
         Result r;
         if (!nearNpc(p)) {
             r = new Result(false, Component.translatable("rtshop.job.need_npc", com.rtshop.story.StoryText.t(p, JobConfig.get().npcName)));
+        } else if (jobId.startsWith(RESIGN)) {
+            r = resign(p, jobId.substring(RESIGN.length()));
         } else {
             r = choose(p, jobId);
         }
@@ -326,7 +362,25 @@ public final class Jobs {
     private static final UUID MAGE_MANA = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e04");
     private static final UUID MAGE_POWER = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e05");
     private static final UUID MOVE_SPEED = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e06");
-    private static final Set<String> SPELL_SCHOOLS = Set.of("arcane", "fire", "frost", "healing", "lightning", "soul");
+    /** 3.84 (M-47): 마법사가 아닌 직업의 주문 위력 · 시전 시간 · 재사용 대기 · (Spell Engine) 서두름. */
+    private static final UUID NONMAGE_POWER = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e07");
+    private static final UUID NONMAGE_CAST = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e08");
+    private static final UUID NONMAGE_COOLDOWN = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e09");
+    private static final UUID NONMAGE_HASTE = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e0a");
+    /** 3.84 (M-64): 지팡이를 들지 않고 쓰는 주문의 위력 (모든 직업). */
+    private static final UUID NOSTAFF_POWER = UUID.fromString("6f1d2a40-5b1e-4c7e-9d3a-1a2b3c4d5e0b");
+    private static final Set<String> SPELL_SCHOOLS = Set.of("arcane", "fire", "frost", "healing", "lightning", "soul", "air");
+
+    /** 지팡이를 들었는가 (주 손 · 다른 손). 3.84 (M-64): 들지 않고 쓰는 주문은 위력이 낮다 (SpellItems). */
+    public static boolean staffHeld(net.minecraft.world.entity.player.Player p) {
+        return p != null && (SpellItems.staff(p.getMainHandItem()) || SpellItems.staff(p.getOffhandItem()));
+    }
+
+    /** 이 사람이 쓰는 주문의 위력 배수 (마법사 보너스는 빼고): 마법사가 아니면 nonMagePower, 지팡이가 없으면 noStaffPower 를 곱한다. 설명 · 점검용. */
+    public static double spellPenalty(ServerPlayer p) {
+        JobConfig cfg = JobConfig.get();
+        return (has(p, MagicLock.MAGE) ? 1 : cfg.nonMagePower) * (staffHeld(p) ? 1 : cfg.noStaffPower);
+    }
 
     private static void modifier(ServerPlayer p, Attribute attr, UUID id, String name, double amount, AttributeModifier.Operation op) {
         if (attr == null) {
@@ -376,6 +430,23 @@ public final class Jobs {
         for (String school : SPELL_SCHOOLS) {
             modifier(p, attribute("spell_power:" + school), MAGE_POWER, "mage", power, AttributeModifier.Operation.MULTIPLY_TOTAL);
         }
+        // 3.84 (사용자 11-29, M-47 · M-64): 마법사가 아니면 주문 위력 60% · 시전 · 재사용 1.3배, 지팡이를 들지 않으면 위력 60% (모든 직업). 둘 다면 곱한다 (36%)
+        boolean mage = has(p, MagicLock.MAGE);
+        double nonMage = mage ? 0 : cfg.nonMagePower - 1;
+        double noStaff = staffHeld(p) ? 0 : cfg.noStaffPower - 1;
+        double slow = mage ? 0 : cfg.nonMageCastTime - 1;          // Iron's: 실제 시간 = 기본 × (2 − 값) → 값 −0.3 = 1.3배
+        double haste = mage ? 0 : 1.0 / cfg.nonMageCastTime - 1;   // Spell Engine: 시간 = 기본 ÷ 서두름 → 서두름 ×(1/1.3)
+        Attribute ironPower = attribute("irons_spellbooks:spell_power");
+        modifier(p, ironPower, NONMAGE_POWER, "non-mage", nonMage, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        modifier(p, ironPower, NOSTAFF_POWER, "no staff", noStaff, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        for (String school : SPELL_SCHOOLS) {
+            Attribute a = attribute("spell_power:" + school);
+            modifier(p, a, NONMAGE_POWER, "non-mage", nonMage, AttributeModifier.Operation.MULTIPLY_TOTAL);
+            modifier(p, a, NOSTAFF_POWER, "no staff", noStaff, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        }
+        modifier(p, attribute("irons_spellbooks:cast_time_reduction"), NONMAGE_CAST, "non-mage", -slow, AttributeModifier.Operation.ADDITION);
+        modifier(p, attribute("irons_spellbooks:cooldown_reduction"), NONMAGE_COOLDOWN, "non-mage", -slow, AttributeModifier.Operation.ADDITION);
+        modifier(p, attribute("spell_power:haste"), NONMAGE_HASTE, "non-mage", haste, AttributeModifier.Operation.MULTIPLY_TOTAL);
         // 채굴 속도는 클라이언트도 알아야 블록이 빨리 깨진다
         // 지금 직업의 이름과 패시브 설명도 함께 보낸다 (가방 창의 직업 딱지)
         double mine = stat(p, "mineSpeed");
@@ -384,12 +455,19 @@ public final class Jobs {
         double margin = com.rtshop.shop.PricingConfig.get().handCookedMargin;
         List<String> cDesc = cd == null ? List.of() : cfg.describe(cd, margin, p), lDesc = ld == null ? List.of() : cfg.describe(ld, margin, p);
         boolean spellLocked = !MagicLock.canCast(p);
-        String key = mine + "|" + (cd == null ? "" : cd.name) + cDesc + "|" + (ld == null ? "" : ld.name) + lDesc + "|" + spellLocked;
+        // 3.84: 음식 설명이 실제와 같게 — 요리사 보너스 · 양산 음식 규칙도 함께 보낸다 (rules/FoodScale)
+        double foodBonus = stat(p, "foodBonus");
+        com.rtshop.rules.FoodRules.Config fr = com.rtshop.rules.FoodRules.get();
+        List<String> foodItems = List.copyOf(fr.items);
+        String key = mine + "|" + (cd == null ? "" : cd.name) + cDesc + "|" + (ld == null ? "" : ld.name) + lDesc + "|" + spellLocked
+                + "|" + foodBonus + "|" + fr.enabled + "|" + fr.factor + "|" + foodItems
+                + "|" + mage + "|" + cfg.nonMagePower + "|" + cfg.nonMageCastTime + "|" + cfg.noStaffPower;
         if (!key.equals(SENT_MINE.get(p.getUUID()))) {
             SENT_MINE.put(p.getUUID(), key);
             if (p.connection != null) {
                 ShopNet.CHANNEL.send(PacketDistributor.PLAYER.with(() -> p),
-                        new com.rtshop.net.JobSyncPacket(mine, cd == null ? "" : com.rtshop.story.StoryText.t(p, cd.name), cDesc, ld == null ? "" : com.rtshop.story.StoryText.t(p, ld.name), lDesc, spellLocked));
+                        new com.rtshop.net.JobSyncPacket(mine, cd == null ? "" : com.rtshop.story.StoryText.t(p, cd.name), cDesc, ld == null ? "" : com.rtshop.story.StoryText.t(p, ld.name), lDesc, spellLocked,
+                                foodBonus, fr.enabled, fr.factor, foodItems, mage, cfg.nonMagePower, cfg.nonMageCastTime, cfg.noStaffPower));
             }
         }
     }
@@ -411,6 +489,14 @@ public final class Jobs {
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            applyAttributes(sp);
+        }
+    }
+
+    /** 3.84: 손에 든 것이 바뀌면 바로 맞춘다 (지팡이를 들고 놓을 때 주문 위력 · 무기 보정이 0.5초를 기다리지 않게). */
+    @SubscribeEvent
+    public static void onEquipment(net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent event) {
+        if (event.getEntity() instanceof ServerPlayer sp && !(sp instanceof net.minecraftforge.common.util.FakePlayer) && event.getSlot().getType() == net.minecraft.world.entity.EquipmentSlot.Type.HAND) {
             applyAttributes(sp);
         }
     }

@@ -203,7 +203,9 @@ public final class ShopLoader {
     /** 기존 상점 파일에 품목을 덧붙임: "상점+조각파일@판" (조각의 categories/items 중 없는 것만 추가, 한 번만). */
     public static final String[] APPENDED = {"blacksmith+blacksmith_enhance@1", "blacksmith+blacksmith_enhance@2", "general+general_pshop@1",
             "gacha_shop+gacha_shop_magic@1", "general+general_return@1", "general+general_books@1",
-            "general+general_books@2"};   // 3.75.0: 조사 수첩 (이미 있는 것은 건너뛰고 새 것만)
+            "general+general_books@2",   // 3.75.0: 조사 수첩 (이미 있는 것은 건너뛰고 새 것만)
+            "general+general_travel@1",  // 3.84: 성 이동권 · 귀가권
+            "general+general_ships@1"};  // 3.84: Small Ships 의 배 (만들기 · 전리품 금지, 잡화점에서만)
 
     /** 한 번만 하는 상점 파일 고치기 (3.74.0 부터): 이름 → 할 일. 기록(added_shops.txt)에 이름이 없을 때 한 번. */
     public static final String[] MIGRATED = {"food-skip-farmer@1", "food-skip-fisher@1"};
@@ -616,18 +618,20 @@ public final class ShopLoader {
             }
             JsonObject o = r.json;
             List<ShopData.Category> cats = r.categories;
-            if (!r.skipItemsOf.isEmpty()) {
-                // 겹치는 품목을 빼서 비게 된 구분(예: 예전 기본값의 '농산물')은 탭을 보이지 않는다
+            {
+                // 겹치는 품목을 빼서 비게 된 구분(예: 예전 기본값의 '농산물')은 탭을 보이지 않는다.
+                // 3.84: 모든 상점 — 덧붙인 구분의 아이템이 이 모드팩에 없을 때(예: Small Ships 가 없는 서버의 '배')도 빈 탭을 보이지 않는다
                 Set<String> used = new HashSet<>();
                 for (ShopData.Entry e : entries) {
                     used.add(e.category);
                 }
-                cats = new ArrayList<>();
+                List<ShopData.Category> kept = new ArrayList<>();
                 for (ShopData.Category c : r.categories) {
                     if (used.contains(c.id)) {
-                        cats.add(c);
+                        kept.add(c);
                     }
                 }
+                if (!kept.isEmpty() || !r.skipItemsOf.isEmpty()) cats = kept;
             }
             out.shops.put(r.id, new ShopData(r.id, versionCounter, str(o, "title", r.id), str(o, "npcName", r.id),
                     str(o, "profession", ""), cats, entries,

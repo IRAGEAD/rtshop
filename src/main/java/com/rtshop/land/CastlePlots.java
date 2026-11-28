@@ -192,6 +192,13 @@ public final class CastlePlots {
         return Math.max(0, Math.round(p / 500.0) * 500);
     }
 
+    /** 성 영역 다각형을 감싸는 네모 {x0, z0, x1, z1} (없으면 null). */
+    public static int[] zoneBox() {
+        Def d = def();
+        if (d.zone.length < 3) return null;
+        return new int[]{d.zx0, d.zz0, d.zx1, d.zz1};
+    }
+
     /** 다각형 안인가 (성 영역). */
     public static boolean inZone(int x, int z) {
         Def d = def();

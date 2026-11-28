@@ -174,6 +174,8 @@ public final class GachaConfig {
     /** 조각으로 뽑기 티켓 한 장을 바꿀 때 드는 조각 [종류][단계]. 티켓값의 약 9% 를 돌려받는 셈. */
     public final int[][] ticketCost = {{20, 40, 100}, {15, 30, 75}, {15, 30, 75}};
     public boolean exchangeEnabled = true;
+    /** 3.84 (사용자 11-29 "무기 뽑기는 1장 이후부터, 펫, 장신구 뽑기는 처음부터 가능하게"): 무기 뽑기(와 그 티켓 사기 · 조각 교환)는 이야기 1장을 마친 뒤에 열린다. */
+    public boolean weaponAfterChapter1 = true;
     /** 펫 뽑기의 일반·고급 등급 보상(펫 대신 조각). */
     public static final int[] PET_SHARDS = {2, 5};
     public static final int CONFIG_VERSION = 4;
@@ -657,6 +659,7 @@ public final class GachaConfig {
         help.add("pools: 뽑기 종류별 목록 {item, count, nbt} 또는 {entity} + grade, weight(같은 등급 안에서의 비율).");
         help.add("tenGuarantee: 10회 뽑기에서 하나는 반드시 이 등급 이상. shards.dismantle: 등급별 분해 조각 수, shards.tickets: 티켓 한 장과 바꾸는 데 드는 조각 수.");
         help.add("unbreakableFrom: 이 등급 이상으로 뽑은 장비는 내구도가 닳지 않습니다 (기본 epic = 영웅 이상, 빈 값이면 끔).");
+        help.add("weaponAfterChapter1 (3.84): true 면 무기 뽑기 · 무기 티켓 사기 · 무기 조각 교환은 이야기 1장을 마친 뒤에 열립니다 (펫 · 장신구는 처음부터). 이야기 퀘스트를 지운 서버는 막지 않습니다.");
         help.add("item 에 rtshop:gacha_shard 를 넣은 칸은 뽑기 표시 없는 조각 보상입니다 (펫 뽑기의 일반·고급 등급).");
         help.add("weaponMods: 자동 분류에서 일반~희귀 무기를 가져올 모드 (기본 epicfight). topWeaponMods: 정해 둔 무기 말고 영웅·전설 무기를 가져올 모드.");
         help.add("excludeMods/excludeItems: 자동 분류에서 뺄 모드·아이템 (보스 무기 등). 뽑기 티켓 가격은 config/rtshop/shops/gacha_shop.json.");
@@ -667,6 +670,7 @@ public final class GachaConfig {
         o.addProperty("shop", shop);
         o.addProperty("tenGuarantee", tenGuarantee);
         o.addProperty("unbreakableFrom", unbreakableFrom);
+        o.addProperty("weaponAfterChapter1", weaponAfterChapter1);
         JsonObject t = new JsonObject();
         for (Tier tr : tiers.values()) {
             JsonObject w = new JsonObject();
@@ -740,6 +744,7 @@ public final class GachaConfig {
         if (o.has("shop")) c.shop = o.get("shop").getAsString().trim();
         if (o.has("tenGuarantee")) c.tenGuarantee = o.get("tenGuarantee").getAsString().trim();
         if (o.has("unbreakableFrom")) c.unbreakableFrom = o.get("unbreakableFrom").getAsString().trim();
+        if (o.has("weaponAfterChapter1")) c.weaponAfterChapter1 = o.get("weaponAfterChapter1").getAsBoolean();
         if (!c.unbreakableFrom.isEmpty() && gradeIndex(c.unbreakableFrom) < 0) {
             throw new IllegalArgumentException("내구도 보호 등급을 알 수 없습니다: " + c.unbreakableFrom);
         }
@@ -872,6 +877,7 @@ public final class GachaConfig {
             c.shop = old.shop;
             c.tenGuarantee = old.tenGuarantee;
             c.unbreakableFrom = old.unbreakableFrom;
+            c.weaponAfterChapter1 = old.weaponAfterChapter1;
             c.tiers.clear();
             c.tiers.putAll(old.tiers);
             for (int i = 0; i < TIERS.length; i++) {

@@ -58,7 +58,17 @@ public final class TownSpawn {
         public String arrivalDim = "minecraft:overworld";
         public double ax, ay, az;
         public float ayaw = 90, apitch;
-        public static final int VERSION = 3;
+        /**
+         * 3.84 (사용자 11-29 "마을 내에 있을 때만 사용할 수 있는 성으로 이동하는 이동 티켓과 내 침대 혹은 내토지, 둘 모두 없으면 분수 광장(내가 설정한 스폰 포인트)로
+         * 이동하는 귀가권을 새롭게 추가해줘"): 성의 도착 자리 (/rtshop spawn castle set). castleRange = 성에서 이만큼(칸) 안이면 성 이동권이 분수 광장으로 데려다준다.
+         * townRange = 성 영역을 모르는 세계에서 마을로 치는 거리 (분수 광장에서). 다시 쓰기까지: 성 이동권 castleCooldownSeconds(초), 귀가권 homeCooldownMinutes(분).
+         */
+        public boolean castleSet;
+        public String castleDim = "minecraft:overworld";
+        public double cx, cy, cz;
+        public float cyaw, cpitch;
+        public int castleRange = 48, townRange = 600, castleCooldownSeconds = 30, homeCooldownMinutes = 20;
+        public static final int VERSION = 4;
         public int version = VERSION;
         public int normalRange = 3000;
         public int premiumDailyLimit = 5;
@@ -102,6 +112,19 @@ public final class TownSpawn {
             o.addProperty("channelTicks", channelTicks);
             o.addProperty("normalCooldownMinutes", normalCooldownMinutes);
             o.addProperty("premiumCooldownMinutes", premiumCooldownMinutes);
+            o.addProperty("_성이동권_귀가권", "3.84: 성 이동권은 마을(성 영역, 모르면 분수 광장에서 townRange 칸) 안에서만 — 성(/rtshop spawn castle set 으로 정한 자리)으로, "
+                    + "성에서 castleRange 칸 안이면 분수 광장으로. 귀가권: 내 침대(리스폰 자리) → 없으면 내 토지 → 둘 다 없으면 분수 광장. "
+                    + "castleCooldownSeconds / homeCooldownMinutes = 다시 쓰기까지의 시간 (실제 시간, 0 = 없음).");
+            o.addProperty("castleSet", castleSet);
+            o.addProperty("castleDim", castleDim);
+            o.addProperty("castleX", cx);
+            o.addProperty("castleY", cy);
+            o.addProperty("castleZ", cz);
+            o.addProperty("castleYaw", cyaw);
+            o.addProperty("castleRange", castleRange);
+            o.addProperty("townRange", townRange);
+            o.addProperty("castleCooldownSeconds", castleCooldownSeconds);
+            o.addProperty("homeCooldownMinutes", homeCooldownMinutes);
             return o;
         }
 
@@ -129,6 +152,16 @@ public final class TownSpawn {
             if (o.has("channelTicks")) c.channelTicks = Math.max(1, Math.min(600, o.get("channelTicks").getAsInt()));
             if (o.has("normalCooldownMinutes")) c.normalCooldownMinutes = Math.max(0, o.get("normalCooldownMinutes").getAsInt());
             if (o.has("premiumCooldownMinutes")) c.premiumCooldownMinutes = Math.max(0, o.get("premiumCooldownMinutes").getAsInt());
+            if (o.has("castleSet")) c.castleSet = o.get("castleSet").getAsBoolean();
+            if (o.has("castleDim")) c.castleDim = o.get("castleDim").getAsString();
+            if (o.has("castleX")) c.cx = o.get("castleX").getAsDouble();
+            if (o.has("castleY")) c.cy = o.get("castleY").getAsDouble();
+            if (o.has("castleZ")) c.cz = o.get("castleZ").getAsDouble();
+            if (o.has("castleYaw")) c.cyaw = o.get("castleYaw").getAsFloat();
+            if (o.has("castleRange")) c.castleRange = Math.max(4, o.get("castleRange").getAsInt());
+            if (o.has("townRange")) c.townRange = Math.max(16, o.get("townRange").getAsInt());
+            if (o.has("castleCooldownSeconds")) c.castleCooldownSeconds = Math.max(0, o.get("castleCooldownSeconds").getAsInt());
+            if (o.has("homeCooldownMinutes")) c.homeCooldownMinutes = Math.max(0, o.get("homeCooldownMinutes").getAsInt());
             int v = o.has("version") ? o.get("version").getAsInt() : 1;
             if (v < 2) {
                 // 3.53: 일반 귀환권의 거리 10000 -> 3000 (운영자가 따로 바꿔 둔 값은 그대로), 쿨타임은 새 기본값(60분 / 30분)
@@ -136,6 +169,7 @@ public final class TownSpawn {
                 c.migrated = true;
             }
             if (v < 3) c.migrated = true;   // 3.80: 도착 자리(arrival)의 칸을 파일에 적는다 (켜짐 · 아모노스 부두)
+            if (v < 4) c.migrated = true;   // 3.84: 성 이동권 · 귀가권의 칸을 파일에 적는다
             c.version = VERSION;
             return c;
         }
@@ -457,6 +491,31 @@ public final class TownSpawn {
                                     (int) Math.floor(a.x()), (int) Math.floor(a.y()), (int) Math.floor(a.z())), false);
                             return 1;
                         }))
+                .then(Commands.literal("castle").requires(s -> s.hasPermission(2))
+                        .then(Commands.literal("set").executes(ctx -> {
+                            ServerPlayer p = ctx.getSource().getPlayerOrException();
+                            if (!Perm.op(p)) {
+                                com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.perm.survival_op").withStyle(ChatFormatting.RED));
+                                return 0;
+                            }
+                            setCastleHere(p);
+                            com.rtshop.notice.Notice.send(p, Component.translatable("rtshop.spawn.castle_set", (int) Math.floor(p.getX()), (int) Math.floor(p.getY()),
+                                    (int) Math.floor(p.getZ())).withStyle(ChatFormatting.GREEN));
+                            return 1;
+                        }))
+                        .then(Commands.literal("clear").executes(ctx -> {
+                            Config c = get();
+                            c.castleSet = false;
+                            save(c);
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.spawn.castle_cleared"), true);
+                            return 1;
+                        }))
+                        .executes(ctx -> {
+                            Config c = get();
+                            ctx.getSource().sendSuccess(() -> c.castleSet ? Component.translatable("rtshop.spawn.castle_where", c.castleDim, (int) Math.floor(c.cx),
+                                    (int) Math.floor(c.cy), (int) Math.floor(c.cz)) : Component.translatable("rtshop.spawn.castle_none"), false);
+                            return 1;
+                        }))
                 .then(Commands.literal("range").requires(s -> s.hasPermission(2)).then(Commands.argument("blocks", IntegerArgumentType.integer(0)).executes(ctx -> {
                     Config c = get();
                     c.normalRange = IntegerArgumentType.getInteger(ctx, "blocks");
@@ -485,6 +544,65 @@ public final class TownSpawn {
                             : Component.translatable("rtshop.spawn.none"), false);
                     return 1;
                 })));
+    }
+
+    /** 3.84: 이 사람이 선 자리를 성의 도착 자리로 삼는다 (성 이동권). */
+    public static void setCastleHere(ServerPlayer p) {
+        Config c = get();
+        c.castleSet = true;
+        c.castleDim = p.level().dimension().location().toString();
+        c.cx = Math.floor(p.getX()) + 0.5;
+        c.cy = p.getY();
+        c.cz = Math.floor(p.getZ()) + 0.5;
+        c.cyaw = p.getYRot();
+        c.cpitch = 0;
+        save(c);
+    }
+
+    /** 3.84: 성의 도착 자리 (정하지 않았으면 null). */
+    public static Arrival castlePoint(MinecraftServer server) {
+        Config c = get();
+        if (!c.castleSet) return null;
+        ResourceLocation rl = ResourceLocation.tryParse(c.castleDim);
+        ServerLevel l = rl == null ? null : server.getLevel(ResourceKey.create(Registries.DIMENSION, rl));
+        return new Arrival(l == null ? server.overworld() : l, c.cx, c.cy, c.cz, c.cyaw, c.cpitch, "castle");
+    }
+
+    /** 3.84: 이 사람이 마을 안에 있는가 — 성 영역을 아는 세계는 그 안, 모르면 분수 광장(마을의 기준 자리)에서 townRange 칸 안. */
+    public static boolean inTown(ServerPlayer p) {
+        if (p.level() instanceof ServerLevel sl && com.rtshop.land.CastlePlots.zoneActive(p.server)) {
+            if (com.rtshop.land.LandManager.inCastleZone(sl, p.blockPosition())) return true;
+        }
+        Arrival t = townPoint(p.server);
+        if (t == null || p.level().dimension() != t.level().dimension()) return false;
+        double dx = p.getX() - t.x(), dz = p.getZ() - t.z(), r = get().townRange;
+        return dx * dx + dz * dz <= r * r;
+    }
+
+    /** 3.84: 성 가까이(castleRange 칸 안)에 있는가 — 그때 성 이동권은 분수 광장으로 데려다준다. */
+    public static boolean atCastle(ServerPlayer p) {
+        Arrival c = castlePoint(p.server);
+        if (c == null || p.level().dimension() != c.level().dimension()) return false;
+        double dx = p.getX() - c.x(), dz = p.getZ() - c.z(), r = get().castleRange;
+        return dx * dx + dz * dz <= r * r;
+    }
+
+    /** 3.84: 다시 쓰기까지 남은 시간 (kind: "castle" · "home"). */
+    public static long travelCooldownLeft(ServerPlayer p, String kind) {
+        Config c = get();
+        long span = "castle".equals(kind) ? c.castleCooldownSeconds * 1000L : c.homeCooldownMinutes * 60000L;
+        if (span <= 0) return 0;
+        long used = kept(p).getCompound(CD_KEY).getLong(kind);
+        if (used <= 0) return 0;
+        return Math.max(0, Math.min(used + span - now(), span));
+    }
+
+    public static void travelUsed(ServerPlayer p, String kind) {
+        net.minecraft.nbt.CompoundTag keep = kept(p);
+        net.minecraft.nbt.CompoundTag t = keep.getCompound(CD_KEY);
+        t.putLong(kind, now());
+        keep.put(CD_KEY, t);
+        p.getPersistentData().put(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG, keep);
     }
 
     /** 이 사람이 선 자리를 처음 들어온 사람의 도착 자리로 삼는다 (3.80). 마을의 기준 자리 · 세계의 기본 스폰은 그대로. */

@@ -66,7 +66,7 @@ public final class RulesScreens {
                     || it instanceof net.minecraft.world.item.ElytraItem) return "armor";
             if (it.isEdible()) return "food";
             if (it instanceof net.minecraft.world.item.BlockItem) return "block";
-            String wt = com.rtshop.job.JobConfig.get().weaponType(new net.minecraft.world.item.ItemStack(it));
+            String wt = com.rtshop.job.JobConfig.get().baseWeaponType(new net.minecraft.world.item.ItemStack(it));   // 3.84: 바닐라 규칙과 상관없이 원래 종류로
             if ("tool".equals(wt)) return "tool";
             if (wt != null && !wt.isEmpty() && !com.rtshop.job.WeaponTypes.NONE.equals(wt) && !com.rtshop.job.WeaponTypes.FIST.equals(wt)) return "weapon";
             if (it instanceof net.minecraft.world.item.DiggerItem || it instanceof net.minecraft.world.item.ShearsItem

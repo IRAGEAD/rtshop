@@ -57,6 +57,9 @@ public class PetSummonItem extends Item {
     }
 
     /** 펫을 소환해 주인으로 길들인다. 성공하면 그 엔티티, 실패하면 null. */
+    /** 3.84: 뽑기로 부른 펫에 붙이는 태그. */
+    public static final String PET_TAG = "rtshop_pet";
+
     public static Entity summon(ServerPlayer p, ItemStack stack, Vec3 at) {
         EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(entityOf(stack)));
         if (type == null || !(p.level() instanceof ServerLevel level)) {
@@ -67,6 +70,7 @@ public class PetSummonItem extends Item {
             return null;
         }
         e.moveTo(at.x, at.y, at.z, p.getYRot() + 180, 0);
+        e.addTag(PET_TAG);   // 3.84: 뽑기로 부른 펫 — 마을의 생물 금지(land/ZoneCreatures)에서 빠진다
         if (e instanceof Mob m) {
             m.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(at)), MobSpawnType.SPAWN_EGG, null, null);
             m.setPersistenceRequired();

@@ -39,14 +39,17 @@ public final class FoodRules {
 
     public static final class Config {
         public boolean enabled = true;
-        /** 채워지는 배고픔·포만감의 비율 (0.5 = 절반). */
-        public double factor = 0.5;
+        /** 채워지는 배고픔·포만감의 비율. 3.84 (사용자 11-29 "양산 가능한 음식이 채워주는 배고픔 수치를 30% 감소시키기"): 0.5 → 0.7. */
+        public double factor = 0.7;
+        /** 파일의 판. 2 (3.84): 옛 기본값 0.5 를 0.7 로. */
+        public int version = 2;
         public final List<String> items = new ArrayList<>();
 
         public JsonObject toJson() {
             JsonObject o = new JsonObject();
             o.addProperty("_설명", "양산 음식: items 에 적은 음식은 배고픔과 포만감이 factor 배만 찬다 (0.5 = 절반, 적어도 1칸). "
                     + "목록에 없는 음식(요리사가 조리 도구로 만드는 요리)은 그대로다. 케이크(minecraft:cake)는 조각마다 적용된다. 고친 뒤 /rtshop reload.");
+            o.addProperty("version", version);
             o.addProperty("enabled", enabled);
             o.addProperty("factor", factor);
             JsonArray a = new JsonArray();
@@ -96,6 +99,13 @@ public final class FoodRules {
                     c.items.clear();
                     o.getAsJsonArray("items").forEach(e -> c.items.add(e.getAsString()));
                 }
+                int v = o.has("version") ? o.get("version").getAsInt() : 1;
+                if (v < 2) {   // 3.84: 옛 기본값(절반)이면 70% 로, 운영자가 고친 값은 그대로. 판 번호를 적어 다시 쓴다
+                    if (Math.abs(c.factor - 0.5) < 1e-9) c.factor = 0.7;
+                    c.version = 2;
+                    Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
+                    RtShop.LOGGER.info("[rtshop] food_rules.json 을 새 판으로 고쳤습니다: 양산 음식은 원래의 {}% 만 찹니다.", Math.round(c.factor * 100));
+                }
             } else {
                 Files.createDirectories(p.getParent());
                 Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
@@ -124,6 +134,7 @@ public final class FoodRules {
     public static void onEat(LivingEntityUseItemEvent.Finish event) {
         try {
             if (!(event.getEntity() instanceof ServerPlayer sp)) return;
+            if (FoodScale.mixed()) return;   // 3.84: 음식 값 자체가 줄어 있다 (먹는 순간 · 설명이 같은 값)
             ItemStack used = event.getItem();
             FoodProperties food = used.getFoodProperties(sp);
             if (food == null || !weak(used)) return;

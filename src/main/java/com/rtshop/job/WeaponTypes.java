@@ -36,6 +36,11 @@ public final class WeaponTypes {
     public static final String NONE = "none";
     /** 뽑기의 고급 무기(야마토·무라사마 등): 어느 직업의 무기 분류에도 들지 않는다 — 직업의 보정도 불이익도 받지 않는다 (3.50). */
     public static final String PREMIUM = "premium";
+    /**
+     * 3.84 (사용자 11-29 "기존 바닐라 마인크래프트의 아이템은 무기 카테고리 분류에서 제외" → "장비 상점에서 상품을 제거하지는 말고, 직업에 따른 패시브 효과의 적용만 되지 않게"):
+     * 바닐라 무기 · 활 · 석궁 · 삼지창 … — 직업의 무기 보정 · 불이익 · 무기 패시브(검사 치명타, 궁수 거리 · 화살 아끼기)가 걸리지 않는다. 맨손은 그대로 fist.
+     */
+    public static final String VANILLA = "vanilla";
 
     /** 무기 종류 하나: 화면 이름, 아이콘, 근접인지(공격 속도 적용 여부), 분류 규칙. */
     public static final class Type {

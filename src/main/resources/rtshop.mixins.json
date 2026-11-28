@@ -24,6 +24,7 @@
     "AbyssFloorLockMixin",
     "DhChunkyMixin",
     "DhChunkyBindMixin",
-    "FireBlockMixin"
+    "FireBlockMixin",
+    "ItemFoodMixin"
   ]
 }

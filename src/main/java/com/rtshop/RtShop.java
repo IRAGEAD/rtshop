@@ -46,6 +46,7 @@ public class RtShop {
             if (net.minecraftforge.fml.ModList.get().isLoaded("cinematic")) com.rtshop.magic.CinematicCompat.register();
             if (net.minecraftforge.fml.ModList.get().isLoaded("spell_engine") && net.minecraftforge.fml.ModList.get().isLoaded("irons_spellbooks")) com.rtshop.compat.SpellMana.hook();
             com.rtshop.job.MagicLock.hook();
+            com.rtshop.land.HarvestGuard.hook();   // 3.84: Quark 의 오른쪽 클릭 수확도 땅 권한으로
         });
     }
 

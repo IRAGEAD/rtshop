@@ -11,5 +11,8 @@ public final class ClientJobCache {
     public static volatile String combat = "", life = "";
     /** 마법사가 아니라서 마법을 쓸 수 없다 (서버가 알려 준다). */
     public static volatile boolean spellLocked;
+    /** 3.84: 마법사인가, 마법사가 아닌 직업의 주문 위력 · 시간 배수, 지팡이 없이 쓰는 주문의 위력 (주문 물건의 설명). */
+    public static volatile boolean mage;
+    public static volatile double nonMagePower = 0.6, nonMageCastTime = 1.3, noStaffPower = 0.6;
     public static volatile java.util.List<String> combatDesc = java.util.List.of(), lifeDesc = java.util.List.of();
 }

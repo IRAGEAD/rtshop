@@ -162,6 +162,43 @@ public final class LandData extends SavedData {
     public int castleInstalled = 0;
     /** 기본 상점 토지(장터)를 설치한 판 (0 = 아직 안 함, -1 = 운영자가 걷어 냄). */
     public int shopLotsInstalled = 0;
+    /**
+     * 3.84 (사용자 11-29 "선택한 블록을 op가 없는 플레이어들도 상호작용할 수 있게 하기(파괴, 설치 금지, 기능만 이용 가능하게)"):
+     * 운영자가 고른 블록 자리 — 차원 ID → BlockPos.asLong. 이 자리의 블록은 남의 토지 · 성 영역에서도 누구나 쓸 수 있다 (부수기 · 놓기는 그대로 막힘).
+     */
+    private final Map<String, Set<Long>> usable = new HashMap<>();
+
+    public boolean usable(String dim, BlockPos pos) {
+        Set<Long> s = usable.get(dim);
+        return s != null && s.contains(pos.asLong());
+    }
+
+    /** 고른 자리를 켜거나 끈다. 켜졌으면 true. */
+    public boolean toggleUsable(String dim, BlockPos pos) {
+        Set<Long> s = usable.computeIfAbsent(dim, k -> new HashSet<>());
+        boolean on = !s.remove(pos.asLong());
+        if (on) s.add(pos.asLong());
+        if (s.isEmpty()) usable.remove(dim);
+        setDirty();
+        return on;
+    }
+
+    public void setUsable(String dim, BlockPos pos, boolean on) {
+        if (usable(dim, pos) != on) toggleUsable(dim, pos);
+    }
+
+    /** 고른 자리 모두 (차원 → 자리). */
+    public Map<String, Set<Long>> usableAll() {
+        return java.util.Collections.unmodifiableMap(usable);
+    }
+
+    public int clearUsable() {
+        int n = 0;
+        for (Set<Long> s : usable.values()) n += s.size();
+        usable.clear();
+        setDirty();
+        return n;
+    }
 
     public static LandData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(LandData::load, LandData::new, NAME);
@@ -511,6 +548,12 @@ public final class LandData extends SavedData {
         }
         d.castleInstalled = tag.getInt("castleInstalled");
         d.shopLotsInstalled = tag.getInt("shopLotsInstalled");
+        CompoundTag ut = tag.getCompound("usable");
+        for (String dim : ut.getAllKeys()) {
+            Set<Long> set = new HashSet<>();
+            for (long v : ut.getLongArray(dim)) set.add(v);
+            if (!set.isEmpty()) d.usable.put(dim, set);
+        }
         return d;
     }
 
@@ -591,6 +634,12 @@ public final class LandData extends SavedData {
         tag.put("starterGiven", sl);
         tag.putInt("castleInstalled", castleInstalled);
         tag.putInt("shopLotsInstalled", shopLotsInstalled);
+        CompoundTag ut = new CompoundTag();
+        for (Map.Entry<String, Set<Long>> e : usable.entrySet()) {
+            long[] arr = e.getValue().stream().mapToLong(Long::longValue).toArray();
+            ut.putLongArray(e.getKey(), arr);
+        }
+        tag.put("usable", ut);
         return tag;
     }
 }

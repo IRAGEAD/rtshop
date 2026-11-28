@@ -324,11 +324,19 @@ public final class ClientEvents {
             if (ClientConfig.get().weaponTypeTooltip) {
                 com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
                 String type = jc.weaponType(event.getItemStack());
-                if (!type.equals(com.rtshop.job.WeaponTypes.NONE) && !type.equals(com.rtshop.job.WeaponTypes.FIST)) {
-                    event.getToolTip().add(Math.min(1, event.getToolTip().size()),
-                            net.minecraft.network.chat.Component.translatable("rtshop.job.weapon_type_line", com.rtshop.story.StoryText.tl(HudLang.storyCode(), jc.typeName(type)))
-                                    .withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
+                List<Component> tips = event.getToolTip();
+                int at = Math.min(1, tips.size());
+                if (com.rtshop.job.WeaponTypes.VANILLA.equals(type)) {
+                    // 3.84 (M-37): 바닐라 무기 — 원래 종류와 함께 "직업 보정 없음"
+                    String base = jc.baseWeaponType(event.getItemStack());
+                    tips.add(at++, Component.translatable("rtshop.job.weapon_type_vanilla", com.rtshop.story.StoryText.tl(HudLang.storyCode(), jc.typeName(base)))
+                            .withStyle(ChatFormatting.DARK_AQUA));
+                } else if (!type.equals(com.rtshop.job.WeaponTypes.NONE) && !type.equals(com.rtshop.job.WeaponTypes.FIST)) {
+                    tips.add(at++, Component.translatable("rtshop.job.weapon_type_line", com.rtshop.story.StoryText.tl(HudLang.storyCode(), jc.typeName(type)))
+                            .withStyle(ChatFormatting.DARK_AQUA));
                 }
+                // 3.84 (M-34 · M-47 · M-64): 주문 물건(지팡이 · 주문서 · 두루마리)에는 직업 · 지팡이 규칙을 알린다
+                spellLines(event.getItemStack(), tips, at);
             }
         } catch (Throwable ignored) {
         }
@@ -340,6 +348,30 @@ public final class ClientEvents {
             ItemNoteTips.onTooltip(event);
         } catch (Throwable ignored) {
         }
+    }
+
+    /** 주문 물건의 설명 줄 (지팡이 · 주문서 · 두루마리): 지팡이의 위력 규칙과 지금 직업으로 쓰면 어떤지. 넣은 줄 수를 돌려준다. */
+    public static int spellLines(ItemStack stack, List<Component> tips, int at) {
+        String kind = com.rtshop.job.SpellItems.kind(stack);
+        if (kind == null) return 0;
+        int n = 0;
+        at = Math.max(0, Math.min(at, tips.size()));
+        String noStaff = com.rtshop.job.SpellItems.pct(com.rtshop.job.ClientJobCache.noStaffPower);
+        if (com.rtshop.job.SpellItems.STAFF.equals(kind)) {
+            tips.add(at + n++, Component.translatable("rtshop.spell.tip_staff", noStaff).withStyle(ChatFormatting.AQUA));
+        } else if (com.rtshop.job.ClientJobCache.noStaffPower < 1) {
+            tips.add(at + n++, Component.translatable("rtshop.spell.tip_no_staff", noStaff).withStyle(ChatFormatting.GRAY));
+        }
+        String power = com.rtshop.job.SpellItems.pct(com.rtshop.job.ClientJobCache.nonMagePower);
+        String slow = com.rtshop.job.SpellItems.times(com.rtshop.job.ClientJobCache.nonMageCastTime);
+        if (com.rtshop.job.ClientJobCache.spellLocked) {
+            tips.add(at + n++, Component.translatable("rtshop.spell.tip_locked").withStyle(ChatFormatting.RED));
+        } else if (!com.rtshop.job.ClientJobCache.mage) {
+            tips.add(at + n++, Component.translatable("rtshop.spell.tip_non_mage", power, slow).withStyle(ChatFormatting.GOLD));
+        } else {
+            tips.add(at + n++, Component.translatable("rtshop.spell.tip_mage", power, slow).withStyle(ChatFormatting.DARK_GRAY));
+        }
+        return n;
     }
 
     // ------------------------------------------------------------------ 아이템 설명

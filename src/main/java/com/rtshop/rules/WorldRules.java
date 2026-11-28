@@ -52,8 +52,25 @@ public final class WorldRules {
     /** 룬 제단(별빛 수정 구체): 운영자만 세우고, 정해 둔 하나만 쓸 수 있다. */
     public static final String ALTAR_KEY = "rtshop:arcane_orb";
     public boolean altarOpOnly = true;
-    /** 마법(Iron's Spells 의 주문, Spell Engine 의 마법 계열 주문)은 마법사 직업만 쓴다. */
-    public boolean magicOnlyForMage = true;
+    /**
+     * 마법(Iron's Spells 의 주문, Spell Engine 의 마법 계열 주문)은 마법사 직업만 쓴다.
+     * 3.84 (사용자 11-29 "마법사를 제외한 직업들도 마법을 사용할 수 있게 하되 … 많이 떨어지게"): 기본 false — 누구나 쓰되 마법사가 아니면 약하다 (jobs.json 의 nonMagePower · nonMageCastTime).
+     */
+    public boolean magicOnlyForMage = false;
+    /** world_rules.json 의 판. 2 (3.84): magicOnlyForMage 를 끈다. */
+    public int rulesVersion = 2;
+    /** 옛 판을 읽어 고쳤다 (다시 쓴다). */
+    transient boolean migrated384;
+    /** spmovesets 의 생존 시작 꾸러미(안내서 + 열매 뽑기 열쇠)를 접속할 때 주는가 (3.84: 기본 false = 주지 않는다, compat/SpMovesetsKitOff). */
+    public boolean spmovesetsStarterKit = false;
+    /** 배고픔을 바닐라처럼 (3.84, compat/HungerVanilla): Kaleidoscope Cookery 의 포만 보호막(맞으면 피해 대신 배고픔이 닳음)과 Spell Engine 주문의 배고픔 소모를 끈다. */
+    public boolean vanillaHunger = true;
+    /** Small Ships 가 바닐라 보트를 느리게 만드는 것을 끈다 (3.84, compat/SmallShipsBoats). */
+    public boolean vanillaBoatSpeed = true;
+    /** RPG 주문(Spell Engine)의 물건(룬) 값을 끈다 (3.84, compat/SpellEngineTweaks): 모드팩에 Runes 모드가 없어 '공기 부족'으로 막히던 것. */
+    public boolean spellItemCostOff = true;
+    /** 처음 들어온 사람에게 무작위 색의 셜커 상자를 하나 준다 (3.84, rules/WelcomeGift). */
+    public boolean welcomeShulker = true;
     /** 무기를 바꿔도 특수기의 스택·게이지가 사라지지 않는다 (compat/EfStacks). */
     public boolean keepSkillStacks = true;
     /** 스킬북으로 배운 기술(Epic Fight)은 죽어도 남는다: 서버가 켜질 때 게임 규칙 keepSkills 를 켠다. */
@@ -132,7 +149,17 @@ public final class WorldRules {
         if (o.has("bossesRiseRoll")) w.bossesRiseRoll = o.get("bossesRiseRoll").getAsBoolean();
         if (o.has("keepSkillsOnDeath")) w.keepSkillsOnDeath = o.get("keepSkillsOnDeath").getAsBoolean();
         if (o.has("magicOnlyForMage")) w.magicOnlyForMage = o.get("magicOnlyForMage").getAsBoolean();
+        int rv = o.has("rulesVersion") ? o.get("rulesVersion").getAsInt() : 1;
+        if (rv < 2) {   // 3.84: 마법사가 아니어도 주문을 쓴다 (약하게). 다음에 저장할 때 판 번호가 적힌다
+            w.magicOnlyForMage = false;
+            w.migrated384 = true;
+        }
         if (o.has("keepSkillStacks")) w.keepSkillStacks = o.get("keepSkillStacks").getAsBoolean();
+        if (o.has("spmovesetsStarterKit")) w.spmovesetsStarterKit = o.get("spmovesetsStarterKit").getAsBoolean();
+        if (o.has("vanillaHunger")) w.vanillaHunger = o.get("vanillaHunger").getAsBoolean();
+        if (o.has("vanillaBoatSpeed")) w.vanillaBoatSpeed = o.get("vanillaBoatSpeed").getAsBoolean();
+        if (o.has("spellItemCostOff")) w.spellItemCostOff = o.get("spellItemCostOff").getAsBoolean();
+        if (o.has("welcomeShulker")) w.welcomeShulker = o.get("welcomeShulker").getAsBoolean();
         if (o.has("abyssPortal") && o.get("abyssPortal").isJsonObject()) {
             JsonObject p = o.getAsJsonObject("abyssPortal");
             w.abyssPortalSet = p.has("set") && p.get("set").getAsBoolean();
@@ -173,11 +200,16 @@ public final class WorldRules {
         JsonObject o = new JsonObject();
         JsonArray help = new JsonArray();
         help.add("월드 규칙. neverStructures: 새 지형에 절대 생기지 않는 건축물 ID. neverRecipes: 막는 조합법 (item:아이템ID). lootBlockedMods: 전리품에서 빼는 모드 ID.");
-        help.add("magicOnlyForMage: true 면 마법사 직업만 마법을 쓴다 (Iron's Spells 의 모든 주문, Spell Engine 의 마법 계열 주문; 근접·활 계열의 무기 기술은 누구나). 크리에이티브는 언제나 쓸 수 있다.");
+        help.add("magicOnlyForMage (3.84 부터 기본 false): false 면 누구나 주문을 쓰되 마법사가 아니면 위력 · 시전 속도가 떨어진다 (jobs.json 의 nonMagePower · nonMageCastTime, 지팡이 없이는 noStaffPower). true 면 마법사 직업만 마법을 쓴다 (Iron's Spells 의 모든 주문, Spell Engine 의 마법 계열 주문; 근접·활 계열의 무기 기술은 누구나). 크리에이티브는 언제나 쓸 수 있다.");
         help.add("keepSkillStacks: true 면 무기를 바꿔도 특수기의 스택(충전 횟수)과 게이지가 사라지지 않는다: 그 무기를 다시 들면 돌아오고, 처음 드는 무기에는 방금 것의 스택이 넘어간다.");
         help.add("keepSkillsOnDeath: true 면 스킬북으로 배운 기술이 죽어도 사라지지 않는다 (서버가 켜질 때 Epic Fight 의 게임 규칙 keepSkills 를 켠다).");
         help.add("weaponManuals: true 면 특수기가 있는 무기(Epic Fight)를 처음 얻었을 때 그 무기의 설명서를 한 권 준다 (같은 종류·같은 특수기는 한 권).");
         help.add("bossesRiseRoll: false 면 Bosses'Rise 모드의 구르기(Dodge Roll, 기본 Z 키 · 핫바 오른쪽의 초록 화살표)를 서버에서 끈다 (서버가 켜질 때 그 모드의 Can use roll 을 끔). true 면 그 모드 설정 그대로.");
+        help.add("spmovesetsStarterKit (3.84): false 면 spmovesets 가 접속할 때 주던 생존 시작 꾸러미(안내서 · 열매 뽑기 열쇠)를 주지 않는다. 이미 받은 것은 그대로.");
+        help.add("vanillaHunger (3.84): true 면 배고픔이 바닐라처럼 닳는다 — Kaleidoscope Cookery 의 포만 보호막(맞으면 피해 대신 배고픔이 닳던 효과)과 RPG(Spell Engine) 주문의 배고픔 소모를 서버가 켜질 때 끈다.");
+        help.add("vanillaBoatSpeed (3.84): true 면 Small Ships 가 바닐라 보트를 느리게 만드는 설정(vanilla boat slowdown)을 서버가 켜질 때 끈다.");
+        help.add("welcomeShulker (3.84): true 면 처음 들어온 사람(이미 놀던 사람은 이 판에서 처음 들어올 때)에게 무작위 색의 셜커 상자를 하나씩 준다 (한 사람에 한 번).");
+        help.add("spellItemCostOff (3.84): true 면 RPG 주문(Spell Engine)이 룬 같은 물건을 값으로 치르지 않는다 — 모드팩에 Runes 모드가 없어 '공기 부족'으로 주문이 막히던 것. 주문 값은 Iron's 마나(spell_mana.json).");
         help.add("abyssPortal: 나선 비경으로 들어갈 수 있는 단 하나의 문. 게임 안에서 문 앞에 서서 /rtshop abyss portal here (OP). abyssPortalOpOnly: 문은 운영자(크리에이티브)만 세울 수 있음.");
         help.add("enhanceAnvil: 쓸 수 있는 단 하나의 강화 모루. 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 모루 곁에서 /rtshop anvil here (풀기: /rtshop anvil clear). enhanceAnvilOpOnly: 운영자(크리에이티브)만 놓고 치울 수 있음.");
         help.add("runeAltar: 쓸 수 있는 단 하나의 룬 제단(별빛 수정 구체). 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 제단 곁에서 /rtshop altar here. runeAltarOpOnly: 운영자(크리에이티브)만 놓을 수 있음.");
@@ -196,8 +228,14 @@ public final class WorldRules {
         o.addProperty("weaponManuals", weaponManuals);
         o.addProperty("bossesRiseRoll", bossesRiseRoll);
         o.addProperty("keepSkillsOnDeath", keepSkillsOnDeath);
+        o.addProperty("rulesVersion", rulesVersion);
         o.addProperty("magicOnlyForMage", magicOnlyForMage);
         o.addProperty("keepSkillStacks", keepSkillStacks);
+        o.addProperty("spmovesetsStarterKit", spmovesetsStarterKit);
+        o.addProperty("vanillaHunger", vanillaHunger);
+        o.addProperty("vanillaBoatSpeed", vanillaBoatSpeed);
+        o.addProperty("spellItemCostOff", spellItemCostOff);
+        o.addProperty("welcomeShulker", welcomeShulker);
         JsonObject p = new JsonObject();
         p.addProperty("set", abyssPortalSet);
         p.addProperty("dim", abyssPortalDim);
@@ -233,7 +271,15 @@ public final class WorldRules {
 
     private static WorldRules load() {
         try {
-            if (Files.exists(file())) return parse(JsonParser.parseString(Files.readString(file(), StandardCharsets.UTF_8)).getAsJsonObject());
+            if (Files.exists(file())) {
+                WorldRules w = parse(JsonParser.parseString(Files.readString(file(), StandardCharsets.UTF_8)).getAsJsonObject());
+                if (w.migrated384) {
+                    w.migrated384 = false;
+                    Files.writeString(file(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(w.toJson()), StandardCharsets.UTF_8);
+                    RtShop.LOGGER.info("[rtshop] world_rules.json 을 새 판으로 고쳤습니다: 마법사가 아니어도 주문을 쓰되 약하게 (magicOnlyForMage=false).");
+                }
+                return w;
+            }
             WorldRules w = defaults();
             save(w);
             return w;

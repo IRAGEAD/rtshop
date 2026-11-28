@@ -29,9 +29,18 @@ public final class JobOpenPacket {
     public final double hoursCombat;
     public final double hoursLife;
     public final List<JobView> jobs;
+    /** 3.84: 내려놓은 직업 (같은 직업은 무료로 돌아온다, 다른 직업은 바꾸기와 같다). */
+    public final String lastCombat, lastLife;
 
     public JobOpenPacket(boolean atNpc, String combat, String life, long combatCooldown, long lifeCooldown, long costCombat, long costLife,
                          double hoursCombat, double hoursLife, List<JobView> jobs) {
+        this(atNpc, combat, life, combatCooldown, lifeCooldown, costCombat, costLife, hoursCombat, hoursLife, jobs, "", "");
+    }
+
+    public JobOpenPacket(boolean atNpc, String combat, String life, long combatCooldown, long lifeCooldown, long costCombat, long costLife,
+                         double hoursCombat, double hoursLife, List<JobView> jobs, String lastCombat, String lastLife) {
+        this.lastCombat = lastCombat == null ? "" : lastCombat;
+        this.lastLife = lastLife == null ? "" : lastLife;
         this.atNpc = atNpc;
         this.combat = combat;
         this.life = life;
@@ -67,6 +76,8 @@ public final class JobOpenPacket {
             buf.writeVarInt(j.state());
             buf.writeUtf(j.lockQuest(), 256);
         }
+        buf.writeUtf(m.lastCombat, 64);
+        buf.writeUtf(m.lastLife, 64);
     }
 
     public static JobOpenPacket decode(FriendlyByteBuf buf) {
@@ -95,7 +106,7 @@ public final class JobOpenPacket {
             String lock = buf.readUtf(256);
             jobs.add(new JobView(id, slot, name, icon, desc, state, lock));
         }
-        return new JobOpenPacket(atNpc, combat, life, cc, lc, costC, costL, hc, hl, jobs);
+        return new JobOpenPacket(atNpc, combat, life, cc, lc, costC, costL, hc, hl, jobs, buf.readUtf(64), buf.readUtf(64));
     }
 
     public static void handle(JobOpenPacket msg, Supplier<NetworkEvent.Context> ctx) {

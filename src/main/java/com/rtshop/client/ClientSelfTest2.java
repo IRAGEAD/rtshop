@@ -455,6 +455,8 @@ final class ClientSelfTest2 {
         add(mc -> {
             mc.setScreen(null);
             onServer(mc, sp -> {
+                // 3.84: 바닐라 음식은 처음부터 메뉴에 있다 — 이 장면은 예전처럼 빈 메뉴에서 시작하려고 잠깐 끈다 (아래 장면 끝에서 되돌림)
+                com.rtshop.shop.Restaurant.config().vanillaAlways = false;
                 com.rtshop.shop.Restaurant.reset(sp.server);
                 com.rtshop.shop.ShopData rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
                 dishIdx = -1;
@@ -540,6 +542,7 @@ final class ClientSelfTest2 {
                     net.minecraft.world.item.Item it = rest.entries.get(idx).stack.getItem();
                     sp.getInventory().clearOrCountMatchingItems(st -> st.is(it), -1, sp.inventoryMenu.getCraftSlots());
                 }
+                com.rtshop.shop.Restaurant.config().vanillaAlways = true;   // 3.84: 위에서 잠깐 끈 것을 되돌린다
                 com.rtshop.shop.Restaurant.reset(sp.server);
                 com.rtshop.job.Jobs.force(sp, com.rtshop.job.JobConfig.LIFE, job == null ? "" : job);
             });
@@ -2771,7 +2774,81 @@ final class ClientSelfTest2 {
             mc.setScreen(null);
             waitTicks(5);
         });
+        // ---- 3.84 (11-29 요청 목록)
+        add(mc -> {
+            // M-28 · M-39: 바닐라 튜토리얼 안내(이동 · 나무 캐기 · 소셜 상호작용) 끔, Spiral Abyss 일지 키는 한 번 풀어 둔다
+            boolean abyssBound = false;
+            for (net.minecraft.client.KeyMapping km : mc.options.keyMappings) {
+                if (QuietClient.ABYSS_KEY.equals(km.getName()) && !km.isUnbound()) abyssBound = true;
+            }
+            check("3.84 vanilla tutorial hints are off (tutorial step none, first-server social toast seen) and the Spiral Abyss journal key is not bound",
+                    mc.options.tutorialStep == net.minecraft.client.tutorial.TutorialSteps.NONE && mc.options.joinedFirstServer && !abyssBound
+                            && ("unbound".equals(QuietClient.keyForTest) || "already".equals(QuietClient.keyForTest) || "absent".equals(QuietClient.keyForTest)),
+                    mc.options.tutorialStep + " " + mc.options.joinedFirstServer + " key " + QuietClient.keyForTest + " bound " + abyssBound);
+            // M-34 · M-37: 아이템 설명 — 바닐라 무기는 "직업 보정 없음", 지팡이는 지팡이 · 직업 규칙
+            com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
+            List<net.minecraft.network.chat.Component> sword = new ItemStack(Items.IRON_SWORD).getTooltipLines(mc.player, net.minecraft.world.item.TooltipFlag.NORMAL);
+            String vanillaLine = net.minecraft.network.chat.Component.translatable("rtshop.job.weapon_type_vanilla",
+                    com.rtshop.story.StoryText.tl(HudLang.storyCode(), jc.typeName("sword"))).getString();
+            boolean swordOk = sword.stream().anyMatch(c -> c.getString().equals(vanillaLine));
+            String stickWas = jc.weaponOverrides.get("minecraft:stick");
+            int lines = -1;
+            List<net.minecraft.network.chat.Component> tip = new ArrayList<>();
+            try {
+                jc.weaponOverrides.put("minecraft:stick", "staff");
+                jc.clearWeaponCache();
+                lines = ClientEvents.spellLines(new ItemStack(Items.STICK), tip, 0);
+            } finally {
+                if (stickWas == null) jc.weaponOverrides.remove("minecraft:stick");
+                else jc.weaponOverrides.put("minecraft:stick", stickWas);
+                jc.clearWeaponCache();
+            }
+            String staffLine = net.minecraft.network.chat.Component.translatable("rtshop.spell.tip_staff",
+                    com.rtshop.job.SpellItems.pct(com.rtshop.job.ClientJobCache.noStaffPower)).getString();
+            check("3.84 a vanilla sword's tooltip says it gets no job modifiers, and a staff's tooltip tells the staff rule and what this job does to spells",
+                    swordOk && lines == 2 && tip.get(0).getString().equals(staffLine) && ClientEvents.spellLines(new ItemStack(Items.DIRT), new ArrayList<>(), 0) == 0,
+                    swordOk + " " + lines + " " + tip.stream().map(net.minecraft.network.chat.Component::getString).toList());
+            // M-66: 직업 안내인의 화면에서 지금 직업의 단추가 [내려놓기]
+            onServer(mc, sp -> {
+                for (String id : com.rtshop.job.JobConfig.get().jobs.keySet()) com.rtshop.quest.QuestManager.setFlag(sp, "unlock_job_" + id, true);
+                com.rtshop.job.Jobs.force(sp, "combat", "warrior");
+                net.minecraft.world.entity.npc.Villager v = com.rtshop.job.Jobs.spawnNpc(sp.serverLevel(), sp.position().add(sp.getLookAngle().scale(2)), 0);
+                RESIGN_NPC_384 = v == null ? -1 : v.getId();
+                com.rtshop.job.Jobs.open(sp, RESIGN_NPC_384);
+            });
+            waitTicks(20);
+        });
+        add(mc -> {
+            JobScreen js = mc.screen instanceof JobScreen x ? x : null;
+            String label = "";
+            if (js != null) {
+                js.selectForTest("combat", "warrior");
+                label = js.buttonLabelForTest();
+            }
+            check("3.84 at the job guide the current job's button reads [Resign]", js != null
+                            && label.equals(net.minecraft.network.chat.Component.translatable("rtshop.job.btn_resign").getString()),
+                    js == null ? String.valueOf(mc.screen) : label);
+            shot(mc, "384_job_resign");
+            if (js != null) js.resignForTest();
+            waitTicks(20);
+        });
+        add(mc -> {
+            JobScreen js = mc.screen instanceof JobScreen x ? x : null;
+            check("3.84 pressing [Resign] lays the job down and the screen shows no combat job", js != null && js.currentForTest("combat").isEmpty()
+                            && mc.player != null && Math.abs(mc.player.getMaxHealth() - 20.0F) < 1e-3,
+                    js == null ? String.valueOf(mc.screen) : js.currentForTest("combat") + " hp " + (mc.player == null ? null : mc.player.getMaxHealth()));
+            mc.setScreen(null);
+            onServer(mc, sp -> {
+                net.minecraft.world.entity.Entity v = RESIGN_NPC_384 < 0 ? null : sp.serverLevel().getEntity(RESIGN_NPC_384);
+                if (v != null) v.discard();
+                com.rtshop.job.Jobs.force(sp, "combat", "");
+            });
+            mc.setScreen(null);
+            waitTicks(5);
+        });
     }
+
+    private static volatile int RESIGN_NPC_384 = -1;
 
     /** Epic Fight 가 이 아이템에 쓰는 렌더러 (Avalon mesh_item 이면 메쉬가 실제로 읽혔는지도). */
     static String efRendererInfo(net.minecraft.world.item.ItemStack st) {

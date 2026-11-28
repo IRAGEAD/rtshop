@@ -20,6 +20,18 @@ public final class JobData extends SavedData {
         /** 마지막으로 '바꾼'(처음 고른 것 제외) 시각, 실제 시간 ms. 0 = 아직 바꾼 적 없음. */
         public long combatChangedAt;
         public long lifeChangedAt;
+        /** 3.84: 내려놓은 직업 ("" = 없음). 같은 직업으로 돌아오면 무료, 다른 직업을 고르면 바꾸기와 같다 (값 · 대기 시간). */
+        public String combatLast = "";
+        public String lifeLast = "";
+
+        public String last(String slot) {
+            return JobConfig.COMBAT.equals(slot) ? combatLast : lifeLast;
+        }
+
+        public void setLast(String slot, String id) {
+            if (JobConfig.COMBAT.equals(slot)) combatLast = id == null ? "" : id;
+            else lifeLast = id == null ? "" : id;
+        }
 
         public String get(String slot) {
             return JobConfig.COMBAT.equals(slot) ? combat : life;
@@ -81,6 +93,8 @@ public final class JobData extends SavedData {
             e.life = c.getString("life");
             e.combatChangedAt = c.getLong("combatAt");
             e.lifeChangedAt = c.getLong("lifeAt");
+            e.combatLast = c.getString("combatLast");
+            e.lifeLast = c.getString("lifeLast");
         }
         return d;
     }
@@ -90,7 +104,7 @@ public final class JobData extends SavedData {
         ListTag list = new ListTag();
         for (Map.Entry<UUID, Entry> e : players.entrySet()) {
             Entry v = e.getValue();
-            if (v.combat.isEmpty() && v.life.isEmpty()) {
+            if (v.combat.isEmpty() && v.life.isEmpty() && v.combatLast.isEmpty() && v.lifeLast.isEmpty()) {
                 continue;
             }
             CompoundTag c = new CompoundTag();
@@ -99,6 +113,8 @@ public final class JobData extends SavedData {
             c.putString("life", v.life);
             c.putLong("combatAt", v.combatChangedAt);
             c.putLong("lifeAt", v.lifeChangedAt);
+            if (!v.combatLast.isEmpty()) c.putString("combatLast", v.combatLast);
+            if (!v.lifeLast.isEmpty()) c.putString("lifeLast", v.lifeLast);
             list.add(c);
         }
         tag.put("players", list);

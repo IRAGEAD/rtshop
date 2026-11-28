@@ -171,21 +171,37 @@ public class JobScreen extends Screen implements NpcButtons.Host {
         return COMBAT.equals(tab) ? data.combat : data.life;
     }
 
+    /** 3.84: 이 칸에서 내려놓은 직업 ("" = 없음). */
+    private String last() {
+        return COMBAT.equals(tab) ? data.lastCombat : data.lastLife;
+    }
+
+    /** 이 직업을 고르는 것이 무료인가: 처음 고르기, 또는 내려놓은 직업으로 돌아오기. */
+    private boolean freePick(JobOpenPacket.JobView j) {
+        return current().isEmpty() && (last().isEmpty() || last().equals(j.id()));
+    }
+
     private String buttonLabel(JobOpenPacket.JobView j) {
         if (j.state() == JobOpenPacket.CURRENT) {
-            return Component.translatable("rtshop.job.btn_current").getString();
+            return Component.translatable("rtshop.job.btn_resign").getString();   // 3.84: 지금 직업 → 내려놓기
         }
-        if (current().isEmpty()) {
+        if (freePick(j)) {
             return Component.translatable("rtshop.job.btn_choose").getString();
         }
         return Component.translatable("rtshop.job.btn_change", Ui.num(cost())).getString();
     }
 
     private boolean buttonEnabled(JobOpenPacket.JobView j) {
-        if (!data.atNpc || j.state() != JobOpenPacket.AVAILABLE) {
+        if (!data.atNpc) {
             return false;
         }
-        if (current().isEmpty()) {
+        if (j.state() == JobOpenPacket.CURRENT) {
+            return true;   // 내려놓기는 언제든 무료
+        }
+        if (j.state() != JobOpenPacket.AVAILABLE) {
+            return false;
+        }
+        if (freePick(j)) {
             return true;
         }
         return cooldown() <= 0 && ClientEconomy.wallet >= cost();
@@ -299,12 +315,13 @@ public class JobScreen extends Screen implements NpcButtons.Host {
             int infoColor = Ui.C_INK_SOFT;
             if (j.state() == JobOpenPacket.CURRENT) {
                 info.add(Component.translatable("rtshop.job.info_current"));
+                info.add(Component.translatable("rtshop.job.info_resign"));
             } else if (j.state() == JobOpenPacket.LOCKED) {
                 infoColor = Ui.C_RED;
                 info.add(j.lockQuest().isEmpty() ? Component.translatable("rtshop.job.info_locked")
                         : Component.translatable("rtshop.job.info_locked_quest", j.lockQuest()));
-            } else if (current().isEmpty()) {
-                info.add(Component.translatable("rtshop.job.info_free"));
+            } else if (freePick(j)) {
+                info.add(Component.translatable(last().isEmpty() ? "rtshop.job.info_free" : "rtshop.job.info_return_free"));
             } else {
                 double h = COMBAT.equals(tab) ? data.hoursCombat : data.hoursLife;
                 info.add(Component.translatable("rtshop.job.info_change", Ui.num(cost()), hours(h)));
@@ -361,9 +378,11 @@ public class JobScreen extends Screen implements NpcButtons.Host {
         g.fill(0, 0, this.width, this.height, 0xA0000000);
         int[] b = confirmBox();
         Ui.woodFrame(g, b[0], b[1], b[2], b[3]);
-        String title = Component.translatable(current().isEmpty() ? "rtshop.job.confirm_title" : "rtshop.job.confirm_change_title", j.name()).getString();
+        boolean resign = j.state() == JobOpenPacket.CURRENT;
+        String title = Component.translatable(resign ? "rtshop.job.confirm_resign_title" : freePick(j) ? "rtshop.job.confirm_title" : "rtshop.job.confirm_change_title", j.name()).getString();
         g.drawCenteredString(this.font, Ui.clip(this.font, title, b[2] - 16), b[0] + b[2] / 2, b[1] + 10, Ui.C_GOLD);
-        String body = current().isEmpty() ? Component.translatable("rtshop.job.confirm_body").getString()
+        String body = resign ? Component.translatable("rtshop.job.confirm_resign_body", Ui.num(cost())).getString()
+                : freePick(j) ? Component.translatable("rtshop.job.confirm_body").getString()
                 : Component.translatable("rtshop.job.confirm_change_body", Ui.num(cost())).getString();
         List<net.minecraft.util.FormattedCharSequence> ls = this.font.split(Component.literal(body), b[2] - 20);
         for (int i = 0; i < Math.min(3, ls.size()); i++) {
@@ -393,7 +412,7 @@ public class JobScreen extends Screen implements NpcButtons.Host {
             if (button == 0 && Ui.inside(mx, my, b[0] + 10, by, bw, 16) && j != null) {
                 click();
                 confirm = false;
-                ShopNet.CHANNEL.sendToServer(new JobChoosePacket(j.id()));
+                ShopNet.CHANNEL.sendToServer(new JobChoosePacket(j.state() == JobOpenPacket.CURRENT ? com.rtshop.job.Jobs.RESIGN + tab : j.id()));
             } else if (button != 0 || Ui.inside(mx, my, b[0] + 20 + bw, by, bw, 16) || !Ui.inside(mx, my, b[0], b[1], b[2], b[3])) {
                 click();
                 confirm = false;
@@ -446,13 +465,27 @@ public class JobScreen extends Screen implements NpcButtons.Host {
 
     public void pressForTest() {
         JobOpenPacket.JobView j = find(selected);
-        if (j != null && buttonEnabled(j)) {
+        if (j != null && j.state() != JobOpenPacket.CURRENT && buttonEnabled(j)) {
             if (!current().isEmpty() && !confirm) {
                 confirm = true;
             }
             confirm = false;
             ShopNet.CHANNEL.sendToServer(new JobChoosePacket(j.id()));
         }
+    }
+
+    /** 점검용: 지금 직업을 내려놓는다 (확인 창의 [예] 와 같다). */
+    public void resignForTest() {
+        JobOpenPacket.JobView j = find(selected);
+        if (j != null && j.state() == JobOpenPacket.CURRENT && buttonEnabled(j)) {
+            confirm = false;
+            ShopNet.CHANNEL.sendToServer(new JobChoosePacket(com.rtshop.job.Jobs.RESIGN + tab));
+        }
+    }
+
+    public String buttonLabelForTest() {
+        JobOpenPacket.JobView j = find(selected);
+        return j == null ? "" : buttonLabel(j);
     }
 
     public String currentForTest(String slot) {

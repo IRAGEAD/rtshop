@@ -58,9 +58,17 @@ public final class Restaurant {
         public String profession = "butcher";
         /** 새 메뉴가 올라오면 서버 전체에 알린다. */
         public boolean announce = true;
-        /** false 면 식품 상인은 요리를 사 주기만 하고 팔지는 않는다 (요리는 식당에서만 살 수 있게). */
-        public boolean sourceSellsDishes = true;
+        /**
+         * false 면 식품 상인은 요리를 사 주기만 하고 팔지는 않는다 (요리는 식당에서만 살 수 있게).
+         * 3.84 (사용자 11-29 "식품 상인이 음식을 팔지 않도록"): 기본 false.
+         */
+        public boolean sourceSellsDishes = false;
+        /** 3.84 (사용자 11-29 "빵, 구운 요리와 같은 마크 기본 음식은 식당 주인이 팔도록"): 바닐라 음식은 요리사가 팔지 않아도 처음부터 메뉴에 있다. */
+        public boolean vanillaAlways = true;
     }
+
+    /** restaurant.json 의 판. 2 (3.84): 식품 상인은 요리를 팔지 않고, 바닐라 음식은 처음부터 식당 메뉴에. */
+    public static final int CONFIG_VERSION = 2;
 
     private static Config config;
 
@@ -100,6 +108,14 @@ public final class Restaurant {
                 if (o.has("profession")) c.profession = o.get("profession").getAsString();
                 if (o.has("announce")) c.announce = o.get("announce").getAsBoolean();
                 if (o.has("sourceSellsDishes")) c.sourceSellsDishes = o.get("sourceSellsDishes").getAsBoolean();
+                if (o.has("vanillaAlways")) c.vanillaAlways = o.get("vanillaAlways").getAsBoolean();
+                int v = o.has("configVersion") ? o.get("configVersion").getAsInt() : 1;
+                if (v < 2) {   // 3.84: 요청대로 바꾸고 다시 쓴다 (다른 값은 읽은 그대로)
+                    c.sourceSellsDishes = false;
+                    c.vanillaAlways = true;
+                    saveConfig(c);
+                    RtShop.LOGGER.info("[rtshop] restaurant.json 을 새 판으로 고쳤습니다: 식품 상인은 요리를 팔지 않고, 바닐라 음식은 처음부터 식당 메뉴에 있습니다.");
+                }
                 return c;
             }
         } catch (Exception ex) {
@@ -117,9 +133,11 @@ public final class Restaurant {
             help.add("식당 주인 (/rtshop npc restaurant): 요리사(sellJob) 직업을 가진 플레이어만 요리를 팔 수 있고, 식품 상인보다 bonus(0.05 = 5%) 더 받습니다. 요리사 패시브 보너스와는 따로 곱해집니다.");
             help.add("처음에는 아무것도 팔지 않습니다. 요리사가 한 번이라도 판 요리가 메뉴에 하나씩 올라가고, 메뉴에 오른 요리는 직업과 상관없이 누구나 살 수 있습니다.");
             help.add("품목과 가격은 sourceShop(식품 상인)의 categories(요리·음료) 구분에서 가져옵니다. priceMultiplier: 식당 판매가 = 식품 상인 판매가 × 이 값");
-            help.add("sourceSellsDishes: false 로 바꾸면 식품 상인은 요리를 사 주기만 하고 팔지 않습니다 (요리는 식당에서만 살 수 있게 하려면).");
+            help.add("sourceSellsDishes: false(기본, 3.84) 면 식품 상인은 요리·음료를 사 주기만 하고 팔지 않습니다 — 요리는 식당에서만 삽니다. true 면 식품 상인도 팝니다.");
+            help.add("vanillaAlways (3.84): true 면 빵 · 구운 고기 같은 바닐라 음식은 요리사가 팔지 않아도 처음부터 식당 메뉴에 있습니다.");
             help.add("메뉴 관리 (OP): /rtshop restaurant status · unlock <아이템> · unlock all · lock <아이템> · reset");
             o.add("_설명", help);
+            o.addProperty("configVersion", CONFIG_VERSION);
             o.addProperty("enabled", c.enabled);
             o.addProperty("sourceShop", c.sourceShop);
             JsonArray cats = new JsonArray();
@@ -133,6 +151,7 @@ public final class Restaurant {
             o.addProperty("profession", c.profession);
             o.addProperty("announce", c.announce);
             o.addProperty("sourceSellsDishes", c.sourceSellsDishes);
+            o.addProperty("vanillaAlways", c.vanillaAlways);
             Path p = path();
             Files.createDirectories(p.getParent());
             Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(o), StandardCharsets.UTF_8);
@@ -230,8 +249,9 @@ public final class Restaurant {
             double sell = e.sellUnit * (1 + c.bonus);
             long price = Math.max(Math.round(e.price * c.priceMultiplier), (long) Math.ceil(e.sellUnit * worst + 1.0e-6) + 1);
             price = Math.max(1, Math.min(2_000_000_000L, price));
+            boolean onMenu = unlocked.containsKey(ShopLoader.key(e.stack)) || c.vanillaAlways && vanilla(e.stack);
             entries.add(new ShopData.Entry(e.stack, (int) price, sell, e.category, e.looseSell,
-                    unlocked.containsKey(ShopLoader.key(e.stack)), true, false, e.recipe, e.recipeOut).withFlex(e.flexUnit * (1 + c.bonus)));
+                    onMenu, true, false, e.recipe, e.recipeOut).withFlex(e.flexUnit * (1 + c.bonus)));
         }
         ShopData d = new ShopData(ID, version, c.title, c.npcName, c.profession, cats, entries,
                 src.starMult, src.fishBase, src.fishBonus, src.fishGolden, src.fishNoInfo);
@@ -262,6 +282,12 @@ public final class Restaurant {
             out.shops.put(ID, d);
             RtShop.LOGGER.info("[rtshop] 식당 '{}' 준비: 요리 {}종 (메뉴에 오른 것 {})", ID, d.entries.size(), menuCount(d));
         }
+    }
+
+    /** 바닐라(마인크래프트 기본) 음식인가. */
+    public static boolean vanilla(ItemStack s) {
+        net.minecraft.resources.ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(s.getItem());
+        return id != null && id.getNamespace().equals("minecraft");
     }
 
     public static int menuCount(ShopData d) {

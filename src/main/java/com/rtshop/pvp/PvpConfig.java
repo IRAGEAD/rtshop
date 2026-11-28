@@ -40,8 +40,10 @@ public final class PvpConfig {
 
     /** false 면 이 시스템을 끈다 (바닐라 규칙 그대로). */
     public boolean enabled = true;
-    /** 마을·구역 밖에서도 PvP 를 켤 수 있는가 (기본: 불가). */
-    public boolean outside = false;
+    /** 마을·구역 밖에서도 PvP 를 켤 수 있는가. 3.84 (사용자 11-29 "pvp는 마을 영역 밖에서는 서로 pvp를 킨 경우에는 가능하도록"): 기본 true. */
+    public boolean outside = true;
+    /** 파일의 판. 2 (3.84): outside 를 켠다. */
+    public int version = 2;
     /** 성 영역(아모노스 맵의 성 안)을 안전 구역으로 고정한다. */
     public boolean castleSafe = true;
     /** server.properties 의 pvp=false 여도 이 시스템이 PvP 를 관리하도록 서버 PvP 를 켠다. */
@@ -91,10 +93,11 @@ public final class PvpConfig {
         JsonArray help = new JsonArray();
         help.add("PvP 켜기/끄기: 플레이어는 /pvp (또는 조작 설정의 'PvP 켜기/끄기' 키)로 자기 PvP 를 켜고 끕니다. 둘 다 켜고 있어야 서로 피해가 들어갑니다.");
         help.add("마을(성 영역)과 안전 구역(safe: true)에서는 아무도 PvP 를 할 수 없습니다. 그 밖에서는 PvP 가능 구역 안에서만 켤 수 있습니다.");
-        help.add("outside: true 로 바꾸면 마을 밖 어디서나 PvP 를 켤 수 있습니다 (기본 false). 게임 안에서는 /rtshop pvp outside on|off");
+        help.add("outside: true(기본, 3.84) 면 마을 밖 어디서나 PvP 를 켤 수 있습니다 — 둘 다 켜야 서로 피해가 들어갑니다. false 면 PvP 가능 구역 안에서만. 게임 안에서는 /rtshop pvp outside on|off");
         help.add("zones: PvP 가능 구역(safe: false)·안전 구역(safe: true). 게임 안에서 /rtshop pvp pos1, pos2, zone add <이름> [safe] 로 만듭니다.");
         help.add("combatSeconds: PvP 로 때리거나 맞은 뒤 이 시간 동안은 PvP 를 끌 수 없습니다 · switchSeconds: 켜고 끄기 사이 최소 간격");
         o.add("_설명", help);
+        o.addProperty("version", version);
         o.addProperty("enabled", enabled);
         o.addProperty("outside", outside);
         o.addProperty("castleSafe", castleSafe);
@@ -163,7 +166,15 @@ public final class PvpConfig {
         Path p = path();
         try {
             if (Files.exists(p)) {
-                PvpConfig c = parse(JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject());
+                JsonObject o = JsonParser.parseString(Files.readString(p, StandardCharsets.UTF_8)).getAsJsonObject();
+                PvpConfig c = parse(o);
+                int v = o.has("version") ? o.get("version").getAsInt() : 1;
+                if (v < 2) {   // 3.84: 마을 밖에서는 서로 켜면 PvP (예전 기본값 false 를 true 로; 다른 값은 그대로)
+                    c.outside = true;
+                    c.version = 2;
+                    c.save();
+                    RtShop.LOGGER.info("[rtshop] pvp.json 을 새 판으로 고쳤습니다: 마을 밖에서는 서로 PvP 를 켜면 싸울 수 있습니다 (outside).");
+                }
                 return c;
             }
         } catch (Exception ex) {

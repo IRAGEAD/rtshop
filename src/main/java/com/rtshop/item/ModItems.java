@@ -63,6 +63,12 @@ public final class ModItems {
             () -> new ReturnTicketItem(new Item.Properties().stacksTo(16), false));
     public static final RegistryObject<Item> RETURN_TICKET_PLUS = ITEMS.register("return_ticket_plus",
             () -> new ReturnTicketItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.RARE), true));
+    /** 3.84: 성 이동권 — 마을 안에서 성으로 (성 곁이면 분수 광장으로). */
+    public static final RegistryObject<Item> CASTLE_PASS = ITEMS.register("castle_pass",
+            () -> new TravelTicketItem(new Item.Properties().stacksTo(64), TravelTicketItem.Kind.CASTLE));
+    /** 3.84: 귀가권 — 내 침대 → 내 토지 → 분수 광장. */
+    public static final RegistryObject<Item> HOME_TICKET = ITEMS.register("home_ticket",
+            () -> new TravelTicketItem(new Item.Properties().stacksTo(16).rarity(net.minecraft.world.item.Rarity.UNCOMMON), TravelTicketItem.Kind.HOME));
 
     /** 이야기 물건: 서장에서 꿈속의 기사가 건네는 불씨 (버릴 수 있지만 끝까지 필요하다). */
     public static final RegistryObject<Item> UNDYING_EMBER = ITEMS.register("undying_ember",

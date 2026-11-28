@@ -110,16 +110,16 @@ public final class SelfTest {
 
     // ------------------------------------------------------------------ 도우미
 
-    private static void section(String name) {
+    static void section(String name) {
         LINES.add("");
         LINES.add("== " + name);
     }
 
-    private static void check(String name, boolean ok) {
+    static void check(String name, boolean ok) {
         check(name, ok, null);
     }
 
-    private static void check(String name, boolean ok, Object detail) {
+    static void check(String name, boolean ok, Object detail) {
         if (ok) {
             passed++;
         } else {
@@ -134,7 +134,7 @@ public final class SelfTest {
         }
     }
 
-    private static void info(String text) {
+    static void info(String text) {
         LINES.add("      " + text);
         RtShop.LOGGER.info("[rtshop-selftest] {}", text);
     }
@@ -1639,6 +1639,11 @@ public final class SelfTest {
             crash("restaurant", t);
         }
         try {
+            Test384.run(server, level, a, b, gx, y, gz);
+        } catch (Throwable t) {
+            crash("3.84", t);
+        }
+        try {
             cleanup(server, level, a, b, gx, y, gz);
         } catch (Throwable t) {
             RtShop.LOGGER.warn("[rtshop-selftest] cleanup failed", t);
@@ -2148,6 +2153,9 @@ public final class SelfTest {
     private static void pvp(MinecraftServer server, ServerLevel level, FakePlayer a, FakePlayer b) throws Exception {
         section("pvp toggle");
         com.rtshop.pvp.PvpConfig cfg = new com.rtshop.pvp.PvpConfig();
+        // 3.84 (사용자 11-29 "pvp는 마을 영역 밖에서는 서로 pvp를 킨 경우에는 가능하도록"): 기본은 마을 밖 어디서나 켤 수 있다. 옛 파일(판 없음)은 고쳐 읽는다
+        check("3.84 PvP can be turned on anywhere outside town by default (both players must have it on)", cfg.outside && cfg.version >= 2);
+        cfg.outside = false;   // 아래는 예전처럼 '구역 안에서만' 을 먼저 본다
         com.rtshop.pvp.PvpConfig.setForTest(cfg);
         LandData data = LandData.get(server);
         int installedBefore = data.castleInstalled;
@@ -2156,7 +2164,7 @@ public final class SelfTest {
             com.rtshop.pvp.Pvp.forgetForTest(b);
             a.setPos(700.5, 100, 700.5);
             b.setPos(703.5, 100, 700.5);
-            check("by default there is no PvP anywhere: PvP cannot be turned on outside a PvP zone",
+            check("with 'outside' off there is no PvP outside a PvP zone: PvP cannot be turned on there",
                     com.rtshop.pvp.Pvp.area(a) == com.rtshop.pvp.Pvp.AREA_OFF && !com.rtshop.pvp.Pvp.set(a, true, false) && !com.rtshop.pvp.Pvp.on(a)
                             && "rtshop.pvp.hit_area".equals(com.rtshop.pvp.Pvp.denyReason(a, b)));
             com.rtshop.pvp.PvpConfig.Zone zone = new com.rtshop.pvp.PvpConfig.Zone();
@@ -2792,7 +2800,32 @@ public final class SelfTest {
         com.rtshop.shop.Restaurant.Config rc = com.rtshop.shop.Restaurant.config();
         com.rtshop.shop.Restaurant.reset(server);
         rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
-        check("the restaurant starts with an empty menu (nothing to buy)", com.rtshop.shop.Restaurant.menuCount(rest) == 0);
+        // 3.84 (사용자 11-29 "빵, 구운 요리와 같은 마크 기본 음식은 식당 주인이 팔도록" · "식품 상인이 음식을 팔지 않도록")
+        int vanillaN = 0;
+        List<String> wrongMenu = new ArrayList<>();
+        for (ShopData.Entry e : rest.entries) {
+            boolean v = com.rtshop.shop.Restaurant.vanilla(e.stack);
+            if (v) vanillaN++;
+            if (e.buyable != (v && rc.vanillaAlways)) wrongMenu.add(ShopLoader.itemId(e.stack) + (e.buyable ? " open" : " shut"));
+        }
+        check("3.84 the restaurant starts with only the vanilla foods (bread, cooked meat …) on the menu; mod dishes wait for a cook", wrongMenu.isEmpty() && rc.vanillaAlways
+                        && com.rtshop.shop.Restaurant.menuCount(rest) == vanillaN,
+                vanillaN + " vanilla " + (wrongMenu.isEmpty() ? "" : wrongMenu.subList(0, Math.min(6, wrongMenu.size()))));
+        int breadAt = findEntry(rest, e -> e.stack.is(net.minecraft.world.item.Items.BREAD));
+        if (breadAt >= 0) check("3.84 bread can be bought at the restaurant from the start", rest.entries.get(breadAt).buyable);
+        List<String> foodSells = new ArrayList<>();
+        for (ShopData.Entry e : food.entries) {
+            if (rc.categories.contains(e.category) && e.buyable) foodSells.add(ShopLoader.itemId(e.stack));
+        }
+        check("3.84 the food merchant no longer sells dishes or drinks (it still buys them)", !rc.sourceSellsDishes && foodSells.isEmpty()
+                        && food.entries.stream().anyMatch(e -> rc.categories.contains(e.category) && e.sellable),
+                foodSells.isEmpty() ? null : foodSells.subList(0, Math.min(6, foodSells.size())));
+        // 아래의 팔기 · 메뉴 점검은 예전처럼 빈 메뉴에서 (개발 환경의 요리는 거의 다 바닐라라서): 잠깐 바닐라 상시 메뉴를 끈다
+        final boolean vanillaWas = rc.vanillaAlways;
+        rc.vanillaAlways = false;
+        ShopServer.rebuildRestaurant(server);
+        rest = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
+        final int vanillaMenu = 0;
         double worst = (1 + rc.bonus) * (1 + com.rtshop.job.JobConfig.get().job("cook").param("dishSell", 0));
         List<String> bad = new ArrayList<>();
         for (ShopData.Entry e : rest.entries) {
@@ -2805,11 +2838,13 @@ public final class SelfTest {
         }
         check("every dish pays 5% more than the food merchant, and buying it back never pays (even for a cook)", bad.isEmpty(),
                 bad.isEmpty() ? null : bad.subList(0, Math.min(5, bad.size())));
-        // 팔 요리: 값이 1G 이상 나오는 것
+        // 팔 요리: 값이 1G 이상 나오는 것 (처음부터 메뉴에 있는 바닐라 음식은 빼고)
         int idx = findEntry(rest, e -> e.sellUnit >= 2 && e.stack.getMaxStackSize() >= 8);
         if (idx < 0) idx = findEntry(rest, e -> e.sellUnit >= 1);
         if (idx < 0) {
             info("no dish with a sell price; skipping the selling checks");
+            rc.vanillaAlways = vanillaWas;
+            ShopServer.rebuildRestaurant(server);
             return;
         }
         ShopData.Entry dish = rest.entries.get(idx);
@@ -2845,7 +2880,7 @@ public final class SelfTest {
                             && com.rtshop.shop.Restaurant.viewFor(a, rest).sellLockNote.isEmpty(), Economy.wallet(a) + " / " + expect + " / food " + atFood);
             ShopData now = ShopServer.shops().get(com.rtshop.shop.Restaurant.ID);
             check("the dish a cook sold appears on the menu (only that one), same shop version",
-                    com.rtshop.shop.Restaurant.menuCount(now) == 1 && now.entries.get(idx).buyable && now.version == rest.version, com.rtshop.shop.Restaurant.menuCount(now));
+                    com.rtshop.shop.Restaurant.menuCount(now) == vanillaMenu + 1 && now.entries.get(idx).buyable && now.version == rest.version, com.rtshop.shop.Restaurant.menuCount(now));
             // 메뉴에 오른 요리는 직업과 상관없이 누구나 산다 (b 는 직업 없음)
             clear(b);
             Economy.setWallet(b, 1_000_000);
@@ -2867,11 +2902,12 @@ public final class SelfTest {
             boolean fullMenu = com.rtshop.shop.Restaurant.menuCount(full) == full.entries.size() && all == full.entries.size() - 1;
             int cleared = com.rtshop.shop.Restaurant.reset(server);
             check("an OP can put every dish on the menu and clear it again", fullMenu && cleared == full.entries.size()
-                    && com.rtshop.shop.Restaurant.menuCount(ShopServer.shops().get(com.rtshop.shop.Restaurant.ID)) == 0, all + " " + cleared);
+                    && com.rtshop.shop.Restaurant.menuCount(ShopServer.shops().get(com.rtshop.shop.Restaurant.ID)) == vanillaMenu, all + " " + cleared);
             check("the restaurant owner NPC can be spawned like other merchants (/rtshop npc restaurant)",
                     !server.getCommands().getDispatcher().parse("rtshop npc restaurant", server.createCommandSourceStack()).getReader().canRead()
                             && !server.getCommands().getDispatcher().parse("rtshop restaurant unlock all", server.createCommandSourceStack()).getReader().canRead());
         } finally {
+            rc.vanillaAlways = vanillaWas;
             com.rtshop.job.Jobs.force(a, com.rtshop.job.JobConfig.LIFE, lifeBefore == null ? "" : lifeBefore);
             com.rtshop.shop.Restaurant.reset(server);
             ShopServer.closeSession(a);
@@ -3548,8 +3584,8 @@ public final class SelfTest {
         // 몹 규칙: 모드 몹의 자연 스폰은 줄이고(기사 hollow 는 그대로, lycanth 는 더 많이), 보스가 아닌 몹은 무기·스킬북·인챈트·모드 아이템을 떨어뜨리지 않는다
         com.rtshop.rules.MobRules.Config mr = com.rtshop.rules.MobRules.fresh();
         com.rtshop.rules.MobRules.setForTest(mr);
-        String hollowId = "", lycanId = "", otherId = "";
-        double hollowKeep = -1, lycanKeep = -1, otherKeep = -1;
+        String hollowId = "", lycanId = "", otherId = "", bruteId = "";
+        double hollowKeep = -1, lycanKeep = -1, otherKeep = -1, bruteKeep = -1;
         for (EntityType<?> et : net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES) {
             net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.getKey(et);
             if (rl == null || rl.getNamespace().equals("minecraft") || rl.getNamespace().equals("rtshop") || et.getCategory() != net.minecraft.world.entity.MobCategory.MONSTER) continue;
@@ -3559,15 +3595,18 @@ public final class SelfTest {
                 if (hollowId.isEmpty()) { hollowId = rl.toString(); hollowKeep = k; }
             } else if (nm.contains("lycanth")) {
                 if (lycanId.isEmpty()) { lycanId = rl.toString(); lycanKeep = k; }
+            } else if (nm.contains("deepling_brute")) {
+                if (bruteId.isEmpty()) { bruteId = rl.toString(); bruteKeep = k; }
             } else if (otherId.isEmpty() && k < 1) {
                 otherId = rl.toString();
                 otherKeep = k;
             }
         }
-        check("spawn rule: vanilla mobs spawn as before; a mod monster keeps 20% of its natural spawns, a hollow (knight) all of them, a lycanth 10%",
+        check("spawn rule: vanilla mobs spawn as before; a mod monster keeps 20% of its natural spawns, a lycanth 10%; 3.84: a hollow 60%, a deepling brute 5%",
                 com.rtshop.rules.MobRules.keepChance(EntityType.ZOMBIE) == 1 && (otherId.isEmpty() || Math.abs(otherKeep - 0.2) < 1e-9)
-                        && (hollowId.isEmpty() || hollowKeep == 1) && (lycanId.isEmpty() || Math.abs(lycanKeep - 0.1) < 1e-9),
-                "other " + otherId + "=" + otherKeep + " hollow " + hollowId + "=" + hollowKeep + " lycanth " + lycanId + "=" + lycanKeep);
+                        && (hollowId.isEmpty() || Math.abs(hollowKeep - 0.6) < 1e-9) && (lycanId.isEmpty() || Math.abs(lycanKeep - 0.1) < 1e-9)
+                        && (bruteId.isEmpty() || Math.abs(bruteKeep - 0.05) < 1e-9) && !mr.spawnExempt.contains("hollow"),
+                "other " + otherId + "=" + otherKeep + " hollow " + hollowId + "=" + hollowKeep + " lycanth " + lycanId + "=" + lycanKeep + " brute " + bruteId + "=" + bruteKeep);
         ItemStack enchSword = new ItemStack(Items.GOLDEN_HELMET);
         enchSword.enchant(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, 1);
         ItemStack modThing = ItemStack.EMPTY;
@@ -4375,8 +4414,13 @@ public final class SelfTest {
         } finally {
             com.rtshop.util.Perm.enforceForTest = false;
         }
-        // 마법은 마법사만: 다른 전투 직업(과 직업이 없는 사람)은 주문을 쓸 수 없다
+        // 마법은 마법사만 (magicOnlyForMage 를 켰을 때): 다른 전투 직업(과 직업이 없는 사람)은 주문을 쓸 수 없다.
+        // 3.84 (사용자 11-29): 기본은 꺼져 있다 — 누구나 쓰되 마법사가 아니면 약하다 (아래 magic384)
+        check("3.84 by default anyone may cast (magicOnlyForMage is off): non-mages are weaker instead",
+                !com.rtshop.rules.WorldRules.defaults().magicOnlyForMage);
         String combatWas = com.rtshop.job.Jobs.entry(a).combat;
+        boolean ruleWas = com.rtshop.rules.WorldRules.get().magicOnlyForMage;
+        com.rtshop.rules.WorldRules.get().magicOnlyForMage = true;
         com.rtshop.job.MagicLock.testFake = true;
         try {
             com.rtshop.job.Jobs.force(a, "combat", "warrior");
@@ -4394,6 +4438,7 @@ public final class SelfTest {
                     warriorNo + "/" + mageYes + "/" + noneNo + "/" + offYes + " hooked=" + com.rtshop.job.MagicLock.hookedForTest());
         } finally {
             com.rtshop.job.MagicLock.testFake = false;
+            com.rtshop.rules.WorldRules.get().magicOnlyForMage = ruleWas;
             com.rtshop.job.Jobs.force(a, "combat", combatWas == null ? "" : combatWas);
         }
         check("the skill-stack keeper can reach Epic Fight's innate-skill slot whenever Epic Fight is installed (also on a dedicated server)",
@@ -4413,12 +4458,12 @@ public final class SelfTest {
         check("a premium gacha weapon (epic or above) is outside the jobs' weapon classes: no bonus and no penalty, while a rare one is classed as usual",
                 jcfg.weaponType(prizeSword).equals(com.rtshop.job.WeaponTypes.PREMIUM) && jcfg.weaponType(rareSword).equals(jcfg.weaponType(plainSword))
                         && onPrize[0] == 0 && onPrize[1] == 0, jcfg.weaponType(plainSword) + " " + java.util.Arrays.toString(onPlain) + " / " + jcfg.weaponType(prizeSword) + " " + java.util.Arrays.toString(onPrize));
-        // 양산 음식은 배고픔이 적게 찬다 (빵 5칸 → 3칸, 쿠키 2칸 → 1칸; 스테이크는 그대로)
+        // 양산 음식은 배고픔이 적게 찬다. 3.84 (사용자 11-29 "양산 가능한 음식이 채워주는 배고픔 수치를 30% 감소"): 70% — 빵 5칸 → 4칸, 쿠키 2칸 → 1칸; 스테이크는 그대로
         com.rtshop.rules.FoodRules.setForTest(com.rtshop.rules.FoodRules.fresh());
-        check("mass-produced food fills less: bread and cookies are on the list (bread 5 -> 3, cookie 2 -> 1, never below 1), steak is not",
+        check("mass-produced food fills 70%: bread and cookies are on the list (bread 5 -> 4, cookie 2 -> 1, never below 1), steak is not",
                 com.rtshop.rules.FoodRules.weak(new ItemStack(Items.BREAD)) && com.rtshop.rules.FoodRules.weak(new ItemStack(Items.COOKIE))
-                        && !com.rtshop.rules.FoodRules.weak(new ItemStack(Items.COOKED_BEEF)) && com.rtshop.rules.FoodRules.cut(5) == 2
-                        && com.rtshop.rules.FoodRules.cut(2) == 1 && com.rtshop.rules.FoodRules.cut(1) == 0,
+                        && !com.rtshop.rules.FoodRules.weak(new ItemStack(Items.COOKED_BEEF)) && com.rtshop.rules.FoodRules.cut(5) == 1
+                        && com.rtshop.rules.FoodRules.cut(2) == 1 && com.rtshop.rules.FoodRules.cut(1) == 0 && Math.abs(com.rtshop.rules.FoodRules.get().factor - 0.7) < 1e-9,
                 com.rtshop.rules.FoodRules.cut(5) + " / " + com.rtshop.rules.FoodRules.cut(2));
         com.rtshop.rules.FoodRules.reload();
         // 스킬북으로 배운 기술은 죽어도 남는다: Epic Fight 의 keepSkills 규칙을 켠다 (Epic Fight 가 없으면 규칙도 없다)
@@ -7138,6 +7183,94 @@ public final class SelfTest {
 
     // ------------------------------------------------------------------ 직업
 
+    /**
+     * 3.84 (사용자 11-29, M-47 · M-64): 마법사가 아니면 주문 위력 60% · 시전 · 재사용 1.3배, 지팡이를 들지 않으면 위력 60% (모든 직업, 곱한다).
+     * 위력 배수는 어디서나 보고, 속성 수치는 Iron's Spells · Spell Power 가 있을 때만 본다.
+     */
+    private static void magic384(FakePlayer a) {
+        com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
+        String combatWas = com.rtshop.job.Jobs.entry(a).combat;
+        String stickWas = jc.weaponOverrides.get("minecraft:stick");
+        try {
+            com.rtshop.job.JobConfig fresh = com.rtshop.job.JobConfig.fromJson(new com.google.gson.JsonObject());
+            check("3.84 the non-mage and no-staff numbers are the chosen ones (power 60%, cast time and cooldown 1.3x, no staff 60%)",
+                    fresh.nonMagePower == 0.6 && fresh.nonMageCastTime == 1.3 && fresh.noStaffPower == 0.6,
+                    fresh.nonMagePower + " " + fresh.nonMageCastTime + " " + fresh.noStaffPower);
+            jc.weaponOverrides.put("minecraft:stick", "staff");   // 시험용 지팡이 (모드 없이도 보이게)
+            jc.clearWeaponCache();
+            ItemStack staff = new ItemStack(Items.STICK);
+            boolean staffSeen = com.rtshop.job.SpellItems.staff(staff) && com.rtshop.job.SpellItems.STAFF.equals(com.rtshop.job.SpellItems.kind(staff))
+                    && com.rtshop.job.SpellItems.kind(new ItemStack(Items.BOOK)) == null && !com.rtshop.job.SpellItems.staff(new ItemStack(Items.BLAZE_ROD));
+            com.rtshop.job.Jobs.force(a, "combat", "swordsman");
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            double bareSw = com.rtshop.job.Jobs.spellPenalty(a);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, staff.copy());
+            double staffSw = com.rtshop.job.Jobs.spellPenalty(a);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            a.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, staff.copy());
+            double offSw = com.rtshop.job.Jobs.spellPenalty(a);
+            a.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, ItemStack.EMPTY);
+            com.rtshop.job.Jobs.force(a, "combat", "mage");
+            double bareMage = com.rtshop.job.Jobs.spellPenalty(a);
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, staff.copy());
+            double staffMage = com.rtshop.job.Jobs.spellPenalty(a);
+            check("3.84 spell power: a swordsman casts at 36% bare-handed (60% x 60%) and 60% with a staff (either hand); a mage at 60% bare-handed and full power with a staff",
+                    staffSeen && Math.abs(bareSw - 0.36) < 1e-9 && Math.abs(staffSw - 0.6) < 1e-9 && Math.abs(offSw - 0.6) < 1e-9
+                            && Math.abs(bareMage - 0.6) < 1e-9 && Math.abs(staffMage - 1.0) < 1e-9,
+                    staffSeen + " sw " + bareSw + "/" + staffSw + "/" + offSw + " mage " + bareMage + "/" + staffMage);
+            check("3.84 the spell-item tooltip numbers read 60% and 1.3x", "60".equals(com.rtshop.job.SpellItems.pct(0.6)) && "1.3".equals(com.rtshop.job.SpellItems.times(1.3))
+                    && "2".equals(com.rtshop.job.SpellItems.times(2.0)));
+
+            net.minecraft.world.entity.ai.attributes.Attribute iron = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("irons_spellbooks:spell_power"));
+            net.minecraft.world.entity.ai.attributes.Attribute cast = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("irons_spellbooks:cast_time_reduction"));
+            net.minecraft.world.entity.ai.attributes.Attribute cool = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("irons_spellbooks:cooldown_reduction"));
+            net.minecraft.world.entity.ai.attributes.Attribute haste = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("spell_power:haste"));
+            net.minecraft.world.entity.ai.attributes.Attribute fire = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("spell_power:fire"));
+            com.rtshop.job.Jobs.force(a, "combat", "swordsman");
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            com.rtshop.job.Jobs.applyAttributes(a);
+            if (iron != null && a.getAttribute(iron) != null && cast != null && a.getAttribute(cast) != null && cool != null && a.getAttribute(cool) != null) {
+                double p0 = a.getAttributeValue(iron), c0 = a.getAttributeValue(cast), d0 = a.getAttributeValue(cool);
+                a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, staff.copy());
+                com.rtshop.job.Jobs.applyAttributes(a);
+                double p1 = a.getAttributeValue(iron);
+                com.rtshop.job.Jobs.force(a, "combat", "mage");
+                com.rtshop.job.Jobs.applyAttributes(a);
+                double p2 = a.getAttributeValue(iron), c2 = a.getAttributeValue(cast), d2 = a.getAttributeValue(cool);
+                check("3.84 Iron's Spells: a swordsman bare-handed has spell power 0.36 and cast-time / cooldown attributes 0.7 (= 1.3x); with a staff 0.6; a mage with a staff full power (+ mage bonus) and normal times",
+                        Math.abs(p0 - 0.36) < 1e-6 && Math.abs(c0 - 0.7) < 1e-6 && Math.abs(d0 - 0.7) < 1e-6 && Math.abs(p1 - 0.6) < 1e-6
+                                && p2 >= 1.0 - 1e-6 && Math.abs(c2 - 1.0) < 1e-6 && Math.abs(d2 - 1.0) < 1e-6,
+                        "sw " + p0 + " cast " + c0 + " cd " + d0 + " staff " + p1 + " / mage " + p2 + " cast " + c2 + " cd " + d2);
+            } else {
+                info("3.84 Iron's Spells is not here: its spell power / cast-time attributes were not checked");
+            }
+            com.rtshop.job.Jobs.force(a, "combat", "swordsman");
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            com.rtshop.job.Jobs.applyAttributes(a);
+            if (haste != null && a.getAttribute(haste) != null) {
+                double h0 = a.getAttributeValue(haste), hb = a.getAttribute(haste).getBaseValue();
+                boolean fireOk = fire == null || a.getAttribute(fire) == null || a.getAttribute(fire).getModifiers().stream().anyMatch(m -> m.getName().equals("rtshop job: non-mage"))
+                        && a.getAttribute(fire).getModifiers().stream().anyMatch(m -> m.getName().equals("rtshop job: no staff"));
+                com.rtshop.job.Jobs.force(a, "combat", "mage");
+                com.rtshop.job.Jobs.applyAttributes(a);
+                double h2 = a.getAttributeValue(haste);
+                info("3.84 Spell Engine haste: swordsman " + h0 + " (base " + hb + "), mage " + h2);
+                check("3.84 Spell Engine (Wizards): a non-mage's spell haste is cut to 1/1.3 (slower casts and cooldowns) and school power gets the non-mage and no-staff cuts; a mage keeps full haste",
+                        Math.abs(h0 - hb / 1.3) < 1e-3 * Math.max(1, hb) && Math.abs(h2 - hb) < 1e-6 && fireOk, "swordsman " + h0 + " / mage " + h2 + " base " + hb + " fire " + fireOk);
+            } else {
+                info("3.84 Spell Power is not here: its haste attribute was not checked");
+            }
+        } finally {
+            if (stickWas == null) jc.weaponOverrides.remove("minecraft:stick");
+            else jc.weaponOverrides.put("minecraft:stick", stickWas);
+            jc.clearWeaponCache();
+            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            a.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, ItemStack.EMPTY);
+            com.rtshop.job.Jobs.force(a, "combat", combatWas == null ? "" : combatWas);
+            com.rtshop.job.Jobs.applyAttributes(a);
+        }
+    }
+
     /** 모드팩 전체에서 무기가 어떻게 분류되는지 보고서에 적는다 (무기 같은데 분류되지 않은 것 포함). */
     private static void weaponReport(com.rtshop.job.JobConfig jc) {
         java.util.Map<String, java.util.Map<String, Integer>> byMod = new java.util.TreeMap<>();
@@ -7147,7 +7280,7 @@ public final class SelfTest {
                 continue;
             }
             ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
-            String type = jc.weaponType(new ItemStack(item));
+            String type = jc.baseWeaponType(new ItemStack(item));   // 3.84: 바닐라 규칙과 상관없이 원래 종류 (바닐라는 따로 VANILLA)
             byMod.computeIfAbsent(rl.getNamespace(), k -> new java.util.TreeMap<>()).merge(type, 1, Integer::sum);
             if ("none".equals(type)) {
                 unknown.add(rl.toString());
@@ -7270,24 +7403,42 @@ public final class SelfTest {
 
             com.rtshop.job.JobConfig jc = com.rtshop.job.JobConfig.get();
             check("weapons are sorted into types (sword, axe, bow, crossbow, trident=spear, pickaxe=tool, empty hand=fist)",
-                    "sword".equals(jc.weaponType(new ItemStack(Items.IRON_SWORD))) && "axe".equals(jc.weaponType(new ItemStack(Items.IRON_AXE)))
-                            && "bow".equals(jc.weaponType(new ItemStack(Items.BOW))) && "crossbow".equals(jc.weaponType(new ItemStack(Items.CROSSBOW)))
-                            && "spear".equals(jc.weaponType(new ItemStack(Items.TRIDENT))) && "tool".equals(jc.weaponType(new ItemStack(Items.IRON_PICKAXE)))
+                    "sword".equals(jc.baseWeaponType(new ItemStack(Items.IRON_SWORD))) && "axe".equals(jc.baseWeaponType(new ItemStack(Items.IRON_AXE)))
+                            && "bow".equals(jc.baseWeaponType(new ItemStack(Items.BOW))) && "crossbow".equals(jc.baseWeaponType(new ItemStack(Items.CROSSBOW)))
+                            && "spear".equals(jc.baseWeaponType(new ItemStack(Items.TRIDENT))) && "tool".equals(jc.baseWeaponType(new ItemStack(Items.IRON_PICKAXE)))
                             && "fist".equals(jc.weaponType(ItemStack.EMPTY)),
-                    jc.weaponType(new ItemStack(Items.TRIDENT)) + "/" + jc.weaponType(new ItemStack(Items.IRON_PICKAXE)));
+                    jc.baseWeaponType(new ItemStack(Items.TRIDENT)) + "/" + jc.baseWeaponType(new ItemStack(Items.IRON_PICKAXE)));
+            // 3.84 (사용자 11-29 M-37 "바닐라 아이템에는 직업에 따른 패시브 효과의 적용만 되지 않게"): 바닐라 무기는 VANILLA (보정 없음), 무기가 아닌 바닐라 물건은 그대로 none
+            check("3.84 vanilla weapons are outside the job weapon classes (vanilla), vanilla non-weapons stay none, and an operator override still wins",
+                    com.rtshop.job.WeaponTypes.VANILLA.equals(jc.weaponType(new ItemStack(Items.IRON_SWORD))) && com.rtshop.job.WeaponTypes.VANILLA.equals(jc.weaponType(new ItemStack(Items.BOW)))
+                            && "none".equals(jc.weaponType(new ItemStack(Items.DIRT)))
+                            && com.rtshop.job.Jobs.weapon(a, com.rtshop.job.WeaponTypes.VANILLA)[0] == 0,
+                    jc.weaponType(new ItemStack(Items.IRON_SWORD)) + " " + jc.weaponType(new ItemStack(Items.DIRT)));
             check("non-weapons are not weapons (sugar cane is not a staff, a bowl is not a bow)",
                     "none".equals(jc.weaponType(new ItemStack(Items.SUGAR_CANE))) && "none".equals(jc.weaponType(new ItemStack(Items.BOWL))));
             weaponReport(jc);
             com.rtshop.job.Jobs.force(a, "combat", "swordsman");
-            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SWORD));
-            double base = a.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
-            com.rtshop.job.Jobs.applyAttributes(a);
-            double withSword = a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
-            a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-            com.rtshop.job.Jobs.applyAttributes(a);
-            double bare = a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+            boolean vanWas = jc.vanillaNoWeaponPassives;
+            double base, withSword, bare, vanillaSword;
+            try {
+                jc.vanillaNoWeaponPassives = false;   // 바닐라 검으로 옛 규칙(검 보정)을 본다
+                a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SWORD));
+                base = a.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+                com.rtshop.job.Jobs.applyAttributes(a);
+                withSword = a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+                jc.vanillaNoWeaponPassives = true;    // 3.84: 바닐라 검에는 직업 보정이 없다
+                com.rtshop.job.Jobs.applyAttributes(a);
+                vanillaSword = a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+                a.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                com.rtshop.job.Jobs.applyAttributes(a);
+                bare = a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+            } finally {
+                jc.vanillaNoWeaponPassives = vanWas;
+            }
             check("swordsman attacks faster only while holding a sword", withSword > bare + 1e-6 && Math.abs(bare - base) < 1e-6,
                     base + " / " + withSword + " / " + bare);
+            check("3.84 a vanilla sword gets no job weapon bonus (no faster swings) while vanillaNoWeaponPassives is on", Math.abs(vanillaSword - base) < 1e-6,
+                    base + " / " + vanillaSword);
 
             com.rtshop.job.Jobs.force(a, "combat", "mage");
             int found = 0;
@@ -7316,6 +7467,7 @@ public final class SelfTest {
             com.rtshop.job.Jobs.force(a, "combat", "swordsman");
             check("the mage bonus is removed after leaving the job", ForgeRegistries.ATTRIBUTES.getValues().stream().noneMatch(at ->
                     a.getAttribute(at) != null && a.getAttribute(at).getModifiers().stream().anyMatch(m -> m.getName().equals("rtshop job: mage"))));
+            magic384(a);
 
             ShopData fisher = ShopServer.shops().get("fisher");
             int codIdx = fisher == null ? -1 : findEntry(fisher, e -> e.stack.is(Items.COD) && e.fish);

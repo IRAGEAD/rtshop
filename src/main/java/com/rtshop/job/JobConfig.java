@@ -100,6 +100,22 @@ public final class JobConfig {
 
     /** 이 뽑기 등급 이상의 무기는 직업의 무기 분류에서 뺀다 ("" = 끔). */
     public String premiumFromGrade = "epic";
+    /** 3.84: 바닐라 아이템은 직업의 무기 분류에서 뺀다 — 직업의 무기 보정 · 무기 패시브가 걸리지 않는다 (WeaponTypes.VANILLA). */
+    public boolean vanillaNoWeaponPassives = true;
+    /**
+     * 3.84 (사용자 11-29 "마법사를 제외한 직업들도 마법을 사용할 수 있게 하되, 공격력, 시전 속도와 같은 수치가 마법사에 비해 많이 떨어지게" → 가: 위력 60%, 시전 · 재사용 1.3배):
+     * 마법사가 아닌 직업의 주문 위력 배수와 시전 시간 · 재사용 대기 배수 (Iron's Spells · Spell Engine 모두).
+     */
+    public double nonMagePower = 0.6, nonMageCastTime = 1.3;
+    /** 3.84 (사용자 11-29 "마법사가 지팡이를 들었을 때와 들지 않았을 때 데미지를 다르게 하기" → 나: 60%): 지팡이를 들지 않고 쓰는 주문의 위력 배수 (모든 직업). */
+    public double noStaffPower = 0.6;
+
+    /** 바닐라(마인크래프트 기본) 아이템인가. */
+    public static boolean vanillaItem(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        net.minecraft.resources.ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
+        return id != null && id.getNamespace().equals("minecraft");
+    }
 
     /** 뽑기에서 나온 고급 무기인가 (등급 표시가 premiumFromGrade 이상). */
     public boolean premium(ItemStack stack) {
@@ -108,9 +124,28 @@ public final class JobConfig {
         return from >= 0 && com.rtshop.gacha.GachaConfig.gradeIndex(com.rtshop.gacha.Gacha.gradeOf(stack)) >= from;
     }
 
+    /** 무기 분류의 캐시를 비운다 (weaponOverrides 를 코드에서 바꾼 뒤 — 점검용). */
+    public synchronized void clearWeaponCache() {
+        cache.clear();
+    }
+
+    /** 바닐라 · 고급 무기 규칙을 빼고 본 무기 종류 (설명에 원래 종류를 보일 때). */
+    public synchronized String baseWeaponType(ItemStack stack) {
+        return WeaponTypes.categoryOf(stack, weaponTypes, weaponOverrides, cache);
+    }
+
+    /**
+     * 직업의 무기 상성에 쓰는 무기 종류. 뽑기의 고급 무기는 PREMIUM, 바닐라 무기는 VANILLA (3.84: 둘 다 직업 보정 없음).
+     * 운영자가 weaponOverrides 에 직접 적은 아이템은 바닐라여도 그 종류를 따른다. 무기가 아닌 물건(none)은 바닐라여도 none.
+     */
     public synchronized String weaponType(ItemStack stack) {
         if (premium(stack)) return WeaponTypes.PREMIUM;
-        return WeaponTypes.categoryOf(stack, weaponTypes, weaponOverrides, cache);
+        String base = WeaponTypes.categoryOf(stack, weaponTypes, weaponOverrides, cache);
+        if (vanillaNoWeaponPassives && vanillaItem(stack) && !WeaponTypes.NONE.equals(base) && !WeaponTypes.FIST.equals(base)) {
+            net.minecraft.resources.ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
+            if (id == null || !weaponOverrides.containsKey(id.toString())) return WeaponTypes.VANILLA;
+        }
+        return base;
     }
 
     public WeaponTypes.Type type(String id) {
@@ -125,6 +160,9 @@ public final class JobConfig {
     public String typeName(String id) {
         if (WeaponTypes.MAGIC.equals(id)) {
             return "주문";
+        }
+        if (WeaponTypes.VANILLA.equals(id)) {
+            return "바닐라 · 직업 보정 없음";
         }
         if (WeaponTypes.PREMIUM.equals(id)) {
             return "고급 무기 · 직업 보정 없음";
@@ -462,6 +500,10 @@ public final class JobConfig {
             c.weaponTypes.addAll(defs.weaponTypes);
         }
         if (o.has("premiumFromGrade")) c.premiumFromGrade = o.get("premiumFromGrade").getAsString();
+        if (o.has("vanillaNoWeaponPassives")) c.vanillaNoWeaponPassives = o.get("vanillaNoWeaponPassives").getAsBoolean();
+        if (o.has("nonMagePower")) c.nonMagePower = Math.max(0, Math.min(1, o.get("nonMagePower").getAsDouble()));
+        if (o.has("nonMageCastTime")) c.nonMageCastTime = Math.max(1, Math.min(5, o.get("nonMageCastTime").getAsDouble()));
+        if (o.has("noStaffPower")) c.noStaffPower = Math.max(0, Math.min(1, o.get("noStaffPower").getAsDouble()));
         if (o.has("weaponOverrides") && o.get("weaponOverrides").isJsonObject()) {
             for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("weaponOverrides").entrySet()) {
                 c.weaponOverrides.put(e.getKey(), e.getValue().getAsString());
@@ -584,6 +626,10 @@ public final class JobConfig {
         weaponOverrides.forEach(over::addProperty);
         o.add("weaponOverrides", over);
         o.addProperty("premiumFromGrade", premiumFromGrade);
+        o.addProperty("vanillaNoWeaponPassives", vanillaNoWeaponPassives);
+        o.addProperty("nonMagePower", nonMagePower);
+        o.addProperty("nonMageCastTime", nonMageCastTime);
+        o.addProperty("noStaffPower", noStaffPower);
         return o;
     }
 }

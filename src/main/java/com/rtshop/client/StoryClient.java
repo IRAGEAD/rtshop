@@ -128,6 +128,7 @@ public final class StoryClient {
                 JsonObject o = JsonParser.parseString(json).getAsJsonObject();
                 GATE_RARE = o.has("rare") ? o.get("rare").getAsString() : "";
                 GATE_EPIC = o.has("epic") ? o.get("epic").getAsString() : "";
+                GATE_WEAPON_GACHA = o.has("weaponGacha") ? o.get("weaponGacha").getAsString() : "";
             } catch (Exception ignored) {
             }
         } else if (kind == StoryPacket.LORE) {
@@ -148,12 +149,17 @@ public final class StoryClient {
 
     /** 서버가 알려 준 장비 잠금: 희귀/서사 장비를 사려면 마쳐야 하는 장 ("" = 열림). */
     public static String GATE_RARE = "", GATE_EPIC = "";
+    /** 3.84: 무기 뽑기(티켓)가 닫혀 있으면 "1장". */
+    public static String GATE_WEAPON_GACHA = "";
 
     /** 상점에서 이 장비가 잠겨 있으면 "1장" 같은 장 이름, 아니면 null (서버 StoryGates 와 같은 규칙). */
     public static String lockedChapter(net.minecraft.world.item.ItemStack s) {
-        if (s.isEmpty() || !(s.isDamageableItem() || s.getItem() instanceof net.minecraft.world.item.ArmorItem)) return null;
+        if (s.isEmpty()) return null;
         net.minecraft.world.entity.player.Player p = net.minecraft.client.Minecraft.getInstance().player;
         if (p != null && p.isCreative()) return null;
+        // 3.84: 무기 뽑기 티켓은 1장을 마친 뒤에 (서버가 보낸 epic 잠금 = 1장)
+        if (com.rtshop.gacha.Gacha.weaponTicket(s)) return GATE_WEAPON_GACHA.isEmpty() ? null : GATE_WEAPON_GACHA;
+        if (!(s.isDamageableItem() || s.getItem() instanceof net.minecraft.world.item.ArmorItem)) return null;
         net.minecraft.world.item.Rarity r = s.getRarity();
         if (r == net.minecraft.world.item.Rarity.EPIC && !GATE_EPIC.isEmpty()) return GATE_EPIC;
         if ((r == net.minecraft.world.item.Rarity.RARE || r == net.minecraft.world.item.Rarity.EPIC) && !GATE_RARE.isEmpty()) return GATE_RARE;

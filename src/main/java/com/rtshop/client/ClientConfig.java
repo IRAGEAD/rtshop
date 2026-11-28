@@ -63,6 +63,12 @@ public final class ClientConfig {
     public boolean hideBossesRiseRoll = true;
     /** 그 키를 이미 한 번 풀었다 (다시 묶으면 그대로 둔다). */
     public boolean bossesRiseKeyCleared = false;
+    /** Spiral Abyss 의 일지 창(` 키로 열리던 창)을 열지 않는다 (3.84, 사용자 11-29 "spiral abyss의 `단축키를 눌렀을 때 나오는 창 기능을 삭제"). */
+    public boolean noAbyssJournal = true;
+    /** 그 키(`)를 이미 한 번 풀었다. */
+    public boolean abyssKeyCleared = false;
+    /** 바닐라의 튜토리얼 안내(화면 오른쪽 위: 움직이기 · 나무 캐기 · 가방 열기 …)를 띄우지 않는다 (3.84, 사용자 11-29). */
+    public boolean hideVanillaTutorial = true;
     /** 보스 등장 때 카메라가 보스 곁에서 움직이는 3D 연출 (3.61). 끄면 화면 위의 2D 연출만 나온다. */
     public boolean bossCamera = true;
     /** RT Shop NPC 를 주민 대신 인물별 사람 모습으로 그린다 (3.61). 끄면 예전의 주민 모습. */
@@ -272,6 +278,9 @@ public final class ClientConfig {
             o.addProperty("fitLongTooltips", fitLongTooltips);
             o.addProperty("hideBossesRiseRoll", hideBossesRiseRoll);
             o.addProperty("bossesRiseKeyCleared", bossesRiseKeyCleared);
+            o.addProperty("noAbyssJournal", noAbyssJournal);
+            o.addProperty("abyssKeyCleared", abyssKeyCleared);
+            o.addProperty("hideVanillaTutorial", hideVanillaTutorial);
             o.addProperty("bossCamera", bossCamera);
             o.addProperty("npcLooks", npcLooks);
             o.addProperty("oneBossMusic", oneBossMusic);
@@ -351,6 +360,9 @@ public final class ClientConfig {
                 if (o.has("fitLongTooltips")) c.fitLongTooltips = o.get("fitLongTooltips").getAsBoolean();
                 if (o.has("hideBossesRiseRoll")) c.hideBossesRiseRoll = o.get("hideBossesRiseRoll").getAsBoolean();
                 if (o.has("bossesRiseKeyCleared")) c.bossesRiseKeyCleared = o.get("bossesRiseKeyCleared").getAsBoolean();
+                if (o.has("noAbyssJournal")) c.noAbyssJournal = o.get("noAbyssJournal").getAsBoolean();
+                if (o.has("abyssKeyCleared")) c.abyssKeyCleared = o.get("abyssKeyCleared").getAsBoolean();
+                if (o.has("hideVanillaTutorial")) c.hideVanillaTutorial = o.get("hideVanillaTutorial").getAsBoolean();
                 if (o.has("bossCamera")) c.bossCamera = o.get("bossCamera").getAsBoolean();
                 if (o.has("npcLooks")) c.npcLooks = o.get("npcLooks").getAsBoolean();
                 if (o.has("oneBossMusic")) c.oneBossMusic = o.get("oneBossMusic").getAsBoolean();

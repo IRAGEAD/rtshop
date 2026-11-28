@@ -376,9 +376,30 @@ public final class Gacha {
         send(p, GachaPacket.VIEW, view(p));
     }
 
+    /** 무기 뽑기 티켓인가 (세 단계). */
+    public static boolean weaponTicket(ItemStack s) {
+        if (s == null || s.isEmpty()) return false;
+        for (String t : GachaConfig.TIERS) if (s.is(ticket("weapon", t))) return true;
+        return false;
+    }
+
+    /** 3.84: 이 사람에게 아직 닫혀 있는 뽑기 종류면 그 장 이름("1장"), 아니면 null. 크리에이티브는 언제나 열림. */
+    public static String lockedFor(ServerPlayer p, String cat) {
+        if (!"weapon".equals(cat) || !GachaConfig.get().weaponAfterChapter1 || p.isCreative()) return null;
+        if (p instanceof net.minecraftforge.common.util.FakePlayer && !lockFakeForTest) return null;
+        return com.rtshop.story.StoryGates.chapter1Done(p) ? null : "1장";
+    }
+
+    /** 점검용: 가짜 플레이어에게도 1장 잠금을 건다. */
+    public static boolean lockFakeForTest;
+
     /** 뽑기. 성공하면 뽑은 칸들 (점검에서 쓰려고 돌려준다), 실패하면 null. needNpc=false 는 점검용. */
     public static List<GachaConfig.Entry> doPull(ServerPlayer p, String cat, String tier, int n, boolean needNpc) {
         GachaConfig c = GachaConfig.get();
+        if (lockedFor(p, cat) != null) {
+            result(p, Component.translatable("rtshop.gacha.locked_ch1"), false);
+            return null;
+        }
         if (needNpc && !nearNpc(p)) {
             result(p, Component.translatable("rtshop.gacha.need_npc", com.rtshop.story.StoryText.t(p, c.npcName)), false);
             return null;
@@ -503,6 +524,10 @@ public final class Gacha {
             result(p, Component.translatable("rtshop.gacha.need_npc", com.rtshop.story.StoryText.t(p, c.npcName)), false);
             return false;
         }
+        if (lockedFor(p, cat) != null) {   // 3.84: 무기 티켓은 1장 뒤에
+            result(p, Component.translatable("rtshop.gacha.locked_ch1"), false);
+            return false;
+        }
         int ti = java.util.Arrays.asList(GachaConfig.TIERS).indexOf(tier);
         int ci = java.util.Arrays.asList(GachaConfig.CATEGORIES).indexOf(cat);
         if (!c.exchangeEnabled || ti < 0 || ci < 0 || n < 1 || n > 64) {
@@ -623,6 +648,12 @@ public final class Gacha {
         o.addProperty("shards", count(p, ModItems.SHARD.get()));
         o.addProperty("tenGuarantee", c.tenGuarantee);
         o.addProperty("exchangeEnabled", c.exchangeEnabled);
+        JsonObject locked = new JsonObject();   // 3.84: 아직 닫힌 뽑기 종류 → 장 이름
+        for (String cat : GachaConfig.CATEGORIES) {
+            String l = lockedFor(p, cat);
+            if (l != null) locked.addProperty(cat, l);
+        }
+        o.add("locked", locked);
         JsonObject tickets = new JsonObject();
         JsonObject costs = new JsonObject();
         JsonObject chances = new JsonObject();

@@ -24,8 +24,11 @@ public final class StoryGates {
 
     /** 막혀 있으면 "1장"/"2장", 아니면 null. */
     public static String lockedChapter(ServerPlayer p, ItemStack s) {
-        if (!enabled || p.isCreative() || s.isEmpty() || !gear(s)) return null;
+        if (!enabled || p.isCreative() || s.isEmpty()) return null;
         if (p instanceof net.minecraftforge.common.util.FakePlayer && !applyToFakeForTest) return null;
+        // 3.84: 무기 뽑기 티켓은 1장을 마친 뒤에 산다 (무기 뽑기가 1장 뒤에 열리므로)
+        if (com.rtshop.gacha.Gacha.weaponTicket(s) && com.rtshop.gacha.GachaConfig.get().weaponAfterChapter1 && !passed(p, "story_ch1_done", "story_1_41")) return "1장";
+        if (!gear(s)) return null;
         Rarity r = s.getRarity();
         // 3판: 1장이 위더·워든·엔더 드래곤까지 이어지므로 희귀는 '세 끝'을 떠날 때, 영웅은 1장을 마치면
         if (r == Rarity.EPIC && !passed(p, "story_ch1_done", "story_1_41")) return "1장";
@@ -48,8 +51,14 @@ public final class StoryGates {
         String epic = enabled && !passed(p, "story_ch1_done", "story_1_41") ? "1장" : "";
         o.addProperty("rare", rare);
         o.addProperty("epic", epic);
+        o.addProperty("weaponGacha", com.rtshop.gacha.GachaConfig.get().weaponAfterChapter1 && !p.isCreative() && !chapter1Done(p) ? "1장" : "");
         com.rtshop.net.ShopNet.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
                 new com.rtshop.net.StoryPacket(com.rtshop.net.StoryPacket.GATE, o.toString()));
+    }
+
+    /** 1장을 마쳤는가 (1장 마지막 퀘스트가 없는 서버는 마친 것으로 본다). */
+    public static boolean chapter1Done(ServerPlayer p) {
+        return !enabled || passed(p, "story_ch1_done", "story_1_41");
     }
 
     static boolean passed(ServerPlayer p, String flag, String questId) {

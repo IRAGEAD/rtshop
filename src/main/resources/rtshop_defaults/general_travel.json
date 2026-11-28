@@ -1,0 +1,17 @@
+{
+  "_설명": "3.84: 잡화점에 덧붙이는 성 이동권 · 귀가권 (사용자 11-29 \"가격은 귀환권보다는 저렴하게 해주되, 밸런스를 생각해서 잘 책정해줘\"). 이미 있는 품목은 건드리지 않습니다. 다시 쓰기까지의 시간은 config/rtshop/town_spawn.json.",
+  "items": [
+    {
+      "item": "rtshop:castle_pass",
+      "price": 300,
+      "category": "misc",
+      "sell": false
+    },
+    {
+      "item": "rtshop:home_ticket",
+      "price": 5000,
+      "category": "misc",
+      "sell": false
+    }
+  ]
+}

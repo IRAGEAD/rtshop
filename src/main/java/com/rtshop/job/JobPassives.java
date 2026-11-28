@@ -36,16 +36,27 @@ public final class JobPassives {
         }
         String main = cfg.weaponType(attacker.getMainHandItem());
         if (source.is(DamageTypeTags.IS_PROJECTILE) && source.getDirectEntity() != attacker) {
-            if (!cfg.isMelee(main) && !WeaponTypes.NONE.equals(main)) {
+            if (!cfg.isMelee(main) && !WeaponTypes.NONE.equals(main) && !WeaponTypes.VANILLA.equals(main)) {
                 return main;
             }
             String off = cfg.weaponType(attacker.getOffhandItem());
-            if (!cfg.isMelee(off) && !WeaponTypes.NONE.equals(off) && !WeaponTypes.FIST.equals(off)) {
+            if (!cfg.isMelee(off) && !WeaponTypes.NONE.equals(off) && !WeaponTypes.FIST.equals(off) && !WeaponTypes.VANILLA.equals(off)) {
                 return off;
             }
+            // 3.84: 바닐라 활 · 석궁으로 쏜 것은 직업 보정 없음
+            if (vanillaLauncher(attacker)) return WeaponTypes.VANILLA;
             return source.getDirectEntity() instanceof AbstractArrow ? "bow" : main;
         }
         return main;
+    }
+
+    /** 손에 든 발사 무기(활 · 석궁 · 삼지창 …)가 바닐라인가 (3.84: 바닐라 무기에는 직업 패시브가 없다). */
+    public static boolean vanillaLauncher(ServerPlayer p) {
+        if (!JobConfig.get().vanillaNoWeaponPassives) return false;
+        ItemStack main = p.getMainHandItem(), off = p.getOffhandItem();
+        ItemStack launcher = main.getItem() instanceof net.minecraft.world.item.ProjectileWeaponItem || main.getItem() instanceof net.minecraft.world.item.TridentItem ? main
+                : off.getItem() instanceof net.minecraft.world.item.ProjectileWeaponItem || off.getItem() instanceof net.minecraft.world.item.TridentItem ? off : ItemStack.EMPTY;
+        return JobConfig.vanillaItem(launcher);
     }
 
     /** 공격자 쪽 피해 배율 (직업의 무기 상성). */
@@ -107,8 +118,9 @@ public final class JobPassives {
         Entity src = event.getSource().getEntity();
         boolean thorns = event.getSource().is(net.minecraft.world.damagesource.DamageTypes.THORNS);
         if (src instanceof ServerPlayer attacker && src != event.getEntity() && !thorns) {
-            amount *= (float) outgoing(attacker, attackType(attacker, event.getSource()));
-            if (event.getSource().is(DamageTypeTags.IS_PROJECTILE) && event.getSource().getDirectEntity() != attacker) {
+            String at = attackType(attacker, event.getSource());
+            amount *= (float) outgoing(attacker, at);
+            if (event.getSource().is(DamageTypeTags.IS_PROJECTILE) && event.getSource().getDirectEntity() != attacker && !WeaponTypes.VANILLA.equals(at)) {
                 amount *= (float) distanceMultiplier(attacker, attacker.distanceTo(event.getEntity()));
             }
         }
@@ -139,7 +151,7 @@ public final class JobPassives {
             return;
         }
         double chance = Jobs.stat(sp, "arrowSave");
-        if (chance <= 0 || sp.getRandom().nextDouble() >= chance) {
+        if (chance <= 0 || vanillaLauncher(sp) || sp.getRandom().nextDouble() >= chance) {   // 3.84: 바닐라 활 · 석궁은 화살을 아끼지 않는다
             return;
         }
         ItemStack back;
@@ -176,6 +188,9 @@ public final class JobPassives {
     public static void onEat(LivingEntityUseItemEvent.Finish event) {
         if (!(event.getEntity() instanceof ServerPlayer sp)) {
             return;
+        }
+        if (com.rtshop.rules.FoodScale.mixed()) {
+            return;   // 3.84: 요리사 보너스는 음식 값에 이미 들어 있다 (rules/FoodScale)
         }
         ItemStack used = event.getItem();
         FoodProperties food = used.getFoodProperties(sp);

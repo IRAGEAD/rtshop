@@ -63,6 +63,45 @@ public final class PlotCommands {
         return PlotManager.create(ctx.getSource().getPlayerOrException(), price, name) != null ? 1 : 0;
     }
 
+    /** 3.84: 바라보는 블록(6칸 안)을 "누구나 쓸 수 있음"으로 켜고 끈다. */
+    static int useToggle(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = ctx.getSource().getPlayerOrException();
+        net.minecraft.world.phys.HitResult hit = p.pick(6.0D, 0F, false);
+        if (!(hit instanceof net.minecraft.world.phys.BlockHitResult bh) || hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) {
+            ctx.getSource().sendFailure(Component.translatable("rtshop.plot.use_none"));
+            return 0;
+        }
+        net.minecraft.core.BlockPos pos = bh.getBlockPos();
+        String dim = p.level().dimension().location().toString();
+        boolean on = LandData.get(ctx.getSource().getServer()).toggleUsable(dim, pos);
+        Component name = p.level().getBlockState(pos).getBlock().getName();
+        String at = pos.getX() + " " + pos.getY() + " " + pos.getZ();
+        ctx.getSource().sendSuccess(() -> Component.translatable(on ? "rtshop.plot.use_on" : "rtshop.plot.use_off", name, at)
+                .withStyle(on ? ChatFormatting.GREEN : ChatFormatting.YELLOW), true);
+        return 1;
+    }
+
+    static int useList(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var all = LandData.get(ctx.getSource().getServer()).usableAll();
+        int n = 0;
+        StringBuilder b = new StringBuilder();
+        for (var e : all.entrySet()) {
+            for (long v : e.getValue()) {
+                n++;
+                if (n <= 20) {
+                    net.minecraft.core.BlockPos q = net.minecraft.core.BlockPos.of(v);
+                    if (b.length() > 0) b.append(", ");
+                    b.append(q.getX()).append(' ').append(q.getY()).append(' ').append(q.getZ());
+                    if (!e.getKey().equals("minecraft:overworld")) b.append(" (").append(e.getKey()).append(')');
+                }
+            }
+        }
+        int total = n;
+        String list = b.toString() + (n > 20 ? " …" : "");
+        ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.plot.use_list", total, list), false);
+        return 1;
+    }
+
     private static int castleInstall(CommandContext<CommandSourceStack> ctx, boolean force) {
         var server = ctx.getSource().getServer();
         if (!force && !CastlePlots.worldMatches(server)) {
@@ -126,6 +165,15 @@ public final class PlotCommands {
                                     }
                                     return ok ? 1 : 0;
                                 }))))
+                // ---- 3.84: 누구나 쓸 수 있게 고른 블록 (OP) — 바라보는 블록을 켜고 끈다
+                .then(Commands.literal("use").requires(src -> src.hasPermission(2))
+                        .executes(PlotCommands::useToggle)
+                        .then(Commands.literal("list").executes(PlotCommands::useList))
+                        .then(Commands.literal("clear").executes(ctx -> {
+                            int n = LandData.get(ctx.getSource().getServer()).clearUsable();
+                            ctx.getSource().sendSuccess(() -> Component.translatable("rtshop.plot.use_cleared", n), true);
+                            return 1;
+                        })))
                 .then(Commands.literal("info").executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
                     Land l = PlotManager.plotAt(p);

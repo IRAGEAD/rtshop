@@ -1,0 +1,78 @@
+{
+  "_설명": "3.84: 잡화점에 덧붙이는 Small Ships 의 배 (사용자 11-29 \"나, 매우 비싼 값에\"): 배는 만들거나 줍거나 떨어뜨려 얻을 수 없고(item_policy.json), 여기서만 삽니다. 종류마다 참나무 배 한 가지. 되팔 수 없습니다. 이미 있는 품목은 건드리지 않습니다.",
+  "categories": [
+    {
+      "id": "ship",
+      "name": "배",
+      "icon": "smallships:oak_cog"
+    }
+  ],
+  "items": [
+    {
+      "item": "smallships:oak_rowboat",
+      "price": 20000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_cog",
+      "price": 60000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_dhow",
+      "price": 80000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_drakkar",
+      "price": 100000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_galley",
+      "price": 120000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_war_galley",
+      "price": 180000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_brigg",
+      "price": 220000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_caravel",
+      "price": 280000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:oak_galleon",
+      "price": 400000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:cannon",
+      "price": 30000,
+      "category": "ship",
+      "sell": false
+    },
+    {
+      "item": "smallships:cannon_ball",
+      "price": 200,
+      "category": "ship",
+      "sell": false
+    }
+  ]
+}

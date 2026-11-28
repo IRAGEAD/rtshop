@@ -72,14 +72,21 @@ public final class MobRules {
         public final List<String> extraBosses = new ArrayList<>();
         /** 3.81: 세계에 아예 나오지 않는 몹 (ID 또는 "모드ID:*") — 생기려는 순간 막고, 저장돼 있던 것도 불러올 때 지운다. */
         public final List<String> neverSpawn = new ArrayList<>();
+        /**
+         * 3.84 (사용자 11-29 "펫 모드의 생물들 자연 스폰 금지"): 저절로(자연 · 지형이 만들어질 때 · 구조물 · 무리) 생기지 않는 몹 (ID 또는 "모드ID:*").
+         * 뽑기로 부른 펫(스폰 알 방식) · 새끼 낳기 · 명령어 · 스폰 알은 그대로. 이미 세계에 있는 것은 남는다.
+         */
+        public final List<String> noNaturalSpawn = new ArrayList<>();
 
         public JsonObject toJson() {
             JsonObject o = new JsonObject();
             o.addProperty("_설명", "몹 규칙. spawn: 모드 몹(바닐라가 아닌 몹)의 자연 스폰 가운데 modMobKeep 만큼만 남긴다 (0.2 = 약 80% 감소). keepByName: 이름(ID 나 영어 이름)에 그 글이 들어가는 몹의 비율. "
-                    + "exempt: 이름에 그 글이 들어가면 줄이지 않는다 (hollow = 기사). exemptMods: 줄이지 않는 모드. 보스·구조물 안·스포너·소환은 언제나 그대로. "
+                    + "exempt: 이름에 그 글이 들어가면 줄이지 않는다. exemptMods: 줄이지 않는 모드. 보스·구조물 안·스포너·소환은 언제나 그대로. "
+                    + "(3.84: hollow 60%, 난폭한 심연꾼 deepling_brute 5%) "
                     + "drops: 보스가 아닌 몹의 드랍에서 무기·스킬북·인챈트·모드 아이템을 뺀다. keepItems: 남길 아이템 ID 또는 '모드ID:*'. 퀘스트가 건네 달라는 아이템은 자동으로 남는다. "
                     + "bossHealth: 최대 체력이 이 이상이면 보스로 본다. extraBosses: 보스로 볼 몹 ID. "
-                    + "neverSpawn: 세계에 아예 나오지 않게 할 몹 ID 또는 '모드ID:*' (기본: spmovesets 의 밤 상인 칸딜과 그 수레). 고친 뒤 /rtshop reload.");
+                    + "neverSpawn: 세계에 아예 나오지 않게 할 몹 ID 또는 '모드ID:*' (기본: spmovesets 의 밤 상인 칸딜과 그 수레). "
+                    + "noNaturalSpawn (3.84): 저절로는 생기지 않는 몹 — 펫 모드의 생물 (뽑기 펫 · 새끼 · 스폰 알 · 명령어는 그대로). 고친 뒤 /rtshop reload.");
             JsonObject s = new JsonObject();
             s.addProperty("enabled", spawnEnabled);
             s.addProperty("modMobKeep", modMobKeep);
@@ -100,6 +107,7 @@ public final class MobRules {
             o.addProperty("bossHealth", bossHealth);
             o.add("extraBosses", arr(extraBosses));
             o.add("neverSpawn", arr(neverSpawn));
+            o.add("noNaturalSpawn", arr(noNaturalSpawn));
             return o;
         }
     }
@@ -116,13 +124,20 @@ public final class MobRules {
         o.getAsJsonArray(k).forEach(e -> into.add(e.getAsString()));
     }
 
+    /** 3.84: 펫 모드 — 햄스터, Critters and Companions, 작은 용, Fantasy Mounts 의 탈것(뽑기의 펫 묶음에 오르는 생물). */
+    public static final List<String> PET_MODS_384 = List.of("adorablehamsterpets:*", "crittersandcompanions:*", "rpg_companions_tiny_dragons:*",
+            "fantasy:*", "fantasymounts:*");
+
     public static Config fresh() {
         Config c = new Config();
         c.keepByName.put("lycanth", 0.1);
-        c.spawnExempt.add("hollow");
+        // 3.84 (사용자 11-29 "hollow 스폰률 조금 줄이기" → 60%, "난폭한 심연꾼의 스폰률 낮추기" → 5%): 예전에는 hollow 를 줄이지 않았다 (spawnExempt)
+        c.keepByName.put("hollow", 0.6);
+        c.keepByName.put("deepling_brute", 0.05);
         c.keepItems.add("rtshop:*");
         c.neverSpawn.add("spmovesets:vendedor_nocturno");   // 3.81: 밤 상인 칸딜 (사용자 11-28 16:18 "spmovesets 모드의 상인이 스폰되지 않게")
         c.neverSpawn.add("spmovesets:carro_vendedor");      // 그 수레 (수레가 먼저 들어가야 상인이 오므로 수레만 막아도 오지 않음)
+        c.noNaturalSpawn.addAll(PET_MODS_384);
         return c;
     }
 
@@ -176,8 +191,15 @@ public final class MobRules {
                 if (o.has("bossHealth")) c.bossHealth = Math.max(0, o.get("bossHealth").getAsDouble());
                 list(o, "extraBosses", c.extraBosses);
                 list(o, "neverSpawn", c.neverSpawn);
-                if (!o.has("neverSpawn")) {
-                    // 3.81 앞의 파일: 기본 neverSpawn 을 더해 다시 쓴다 (다른 값은 읽은 그대로)
+                list(o, "noNaturalSpawn", c.noNaturalSpawn);
+                if (!o.has("noNaturalSpawn")) {
+                    // 3.84 앞의 파일: hollow 는 줄이지 않던 것(exempt)에서 빼고 60% 로, 난폭한 심연꾼은 5% 로 (운영자가 적은 다른 줄은 그대로)
+                    c.spawnExempt.removeIf(x -> x.trim().equalsIgnoreCase("hollow"));
+                    c.keepByName.putIfAbsent("hollow", 0.6);
+                    c.keepByName.putIfAbsent("deepling_brute", 0.05);
+                }
+                if (!o.has("neverSpawn") || !o.has("noNaturalSpawn")) {
+                    // 3.81 앞의 파일: 기본 neverSpawn 을 더해 다시 쓴다 (다른 값은 읽은 그대로). 3.84 앞의 파일: 기본 noNaturalSpawn 도
                     Files.writeString(p, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
                 }
             } else {
@@ -191,6 +213,23 @@ public final class MobRules {
     }
 
     // ------------------------------------------------------------------ 아예 나오지 않는 몹 (3.81)
+
+    /** 이 몹은 저절로 생기지 않는가 (mob_rules.json 의 noNaturalSpawn, 3.84). */
+    public static boolean noNaturalSpawn(EntityType<?> type) {
+        List<String> l = get().noNaturalSpawn;
+        if (l.isEmpty()) return false;
+        ResourceLocation id = ForgeRegistries.ENTITY_TYPES.getKey(type);
+        return id != null && (l.contains(id.toString()) || l.contains(id.getNamespace() + ":*"));
+    }
+
+    /** 저절로 생기는 방식인가 (자연 · 지형이 만들어질 때 · 구조물 · 무리 · 순찰 · 행사). */
+    public static boolean naturalWay(MobSpawnType t) {
+        return t == MobSpawnType.NATURAL || t == MobSpawnType.CHUNK_GENERATION || t == MobSpawnType.STRUCTURE || t == MobSpawnType.PATROL
+                || t == MobSpawnType.EVENT || t == MobSpawnType.REINFORCEMENT || t == MobSpawnType.JOCKEY;
+    }
+
+    /** 점검용: noNaturalSpawn 으로 막은 수. */
+    public static int petSpawnBlockedForTest;
 
     /** 이 몹은 세계에 들어오지 못하는가 (mob_rules.json 의 neverSpawn). */
     public static boolean neverSpawn(EntityType<?> type) {
@@ -250,6 +289,11 @@ public final class MobRules {
     public static void onSpawn(MobSpawnEvent.FinalizeSpawn event) {
         try {
             MobSpawnType t = event.getSpawnType();
+            if (naturalWay(t) && noNaturalSpawn(event.getEntity().getType())) {   // 3.84: 펫 모드의 생물은 저절로 생기지 않는다
+                event.setSpawnCancelled(true);
+                petSpawnBlockedForTest++;
+                return;
+            }
             if (t != MobSpawnType.NATURAL && t != MobSpawnType.CHUNK_GENERATION && t != MobSpawnType.REINFORCEMENT) return;
             double keep = keepChance(event.getEntity().getType());
             if (keep >= 1) return;

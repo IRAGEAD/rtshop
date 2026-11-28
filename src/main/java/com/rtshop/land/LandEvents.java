@@ -72,7 +72,8 @@ public final class LandEvents {
     /** 마지막으로 우클릭한 보관함: 플레이어 -> {x, y, z, 게임 시각}. */
     private static final Map<UUID, long[]> LAST_STORAGE = new HashMap<>();
 
-    private static void deny(ServerPlayer p, Land land) {
+    /** 막았음을 알린다 (한 줄, 1초에 한 번). 3.84: 농작물 수확을 막는 HarvestGuard 도 쓴다. */
+    static void deny(ServerPlayer p, Land land) {
         long now = p.level().getGameTime();
         Long last = LAST_MSG.get(p.getUUID());
         if (last == null || now - last >= 20 || now < last) {
@@ -256,7 +257,8 @@ public final class LandEvents {
         boolean itemOk = allowed(sp, land, LandData.PLACE) && allowed(sp, frontLand, LandData.PLACE);
         if (land != null) {
             int perm = storage ? LandData.CONTAINER : LandData.USE;
-            if (!allowed(sp, land, perm) && !zoneDoor(land, level.getBlockState(pos))) {
+            // 3.84: 운영자가 고른 블록 · 마을에서 누구나 쓰는 블록(작업대 · 강화 모루 · 룬 제단 · 조리 도구 · 의자 · 카지노)은 쓸 수 있다 (부수기 · 놓기는 그대로 막힘)
+            if (!allowed(sp, land, perm) && !ZoneUse.usable(level, pos, land, level.getBlockState(pos), storage)) {
                 BlockState st = level.getBlockState(pos);
                 if (storage || st.getMenuProvider(level, pos) != null || interactive(st)) {
                     deny(sp, land);
