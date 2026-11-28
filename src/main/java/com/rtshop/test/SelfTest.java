@@ -6712,6 +6712,32 @@ public final class SelfTest {
                     check("the story structure pack spreads Mowzie's boss structures out", com.rtshop.story.StructureRarity.LAST.containsKey("mowziesmobs:wrought_chambers")
                             && server.getPackRepository().getSelectedIds().contains(com.rtshop.story.StructureRarity.PACK_ID), com.rtshop.story.StructureRarity.LAST);
                 }
+                // 3.80 (사용자 11-28 14:05 "야생에서 spmovesets의 보스 구조물과 같은 구조물들이 나오지 않도록"): 끈 구조물은 배치 확률 0
+                com.google.gson.JsonObject offSet = com.rtshop.story.StructureRarity.disable(ss);
+                check("3.80 a switched-off structure set keeps its spacing but has placement frequency 0 (never placed), and spmovesets is switched off by default",
+                        offSet != null && offSet.getAsJsonObject("placement").get("frequency").getAsDouble() == 0.0
+                                && offSet.getAsJsonObject("placement").get("spacing").getAsInt() == 25 && !ss.getAsJsonObject("placement").has("frequency")
+                                && com.rtshop.story.StructureRarity.load().off.contains("spmovesets"), offSet);
+                if (net.minecraftforge.fml.ModList.get().isLoaded("spmovesets")) {
+                    // 실제 세계의 구조물 배치 등록부에서: spmovesets 의 세트는 모두 확률 0 (데이터팩이 가장 위에 얹혀 모드의 원래 파일을 덮음)
+                    int spSets = 0, spOff = 0;
+                    StringBuilder spWhy = new StringBuilder();
+                    var reg = server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE_SET);
+                    for (var en : reg.entrySet()) {
+                        if (!en.getKey().location().getNamespace().equals("spmovesets")) continue;
+                        spSets++;
+                        var enc = net.minecraft.world.level.levelgen.structure.placement.StructurePlacement.CODEC
+                                .encodeStart(com.mojang.serialization.JsonOps.INSTANCE, en.getValue().placement()).result();
+                        double freq = enc.isPresent() && enc.get().isJsonObject() && enc.get().getAsJsonObject().has("frequency")
+                                ? enc.get().getAsJsonObject().get("frequency").getAsDouble() : 1.0;
+                        if (freq == 0.0) spOff++;
+                        else spWhy.append(' ').append(en.getKey().location()).append('=').append(freq);
+                    }
+                    long spLast = com.rtshop.story.StructureRarity.LAST.entrySet().stream().filter(e -> e.getKey().startsWith("spmovesets:") && "off".equals(e.getValue())).count();
+                    check("3.80 spmovesets structures never generate in new land: every spmovesets structure set in the world has placement frequency 0",
+                            spSets > 0 && spOff == spSets && spLast == spSets && server.getPackRepository().getSelectedIds().contains(com.rtshop.story.StructureRarity.PACK_ID),
+                            spOff + "/" + spSets + " (pack " + spLast + ")" + spWhy);
+                }
             } finally {
                 com.rtshop.story.StorySeals.forceActiveForTest = false;
                 com.rtshop.story.StorySeals.TEST_PLAYERS.clear();

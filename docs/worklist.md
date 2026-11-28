@@ -707,6 +707,8 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   meleeDps = PackDiag 와 같은 셈. 가격 점검 메모에 올린 수. 안내서 20판 「마을 상점」 한 줄 (source2 261 · en2/p250). balance_review 14절.
   H-1 ✔ TownSpawn 3판: arrival · arrivalSet · arrival 좌표 — placeNewcomer = 도착 자리(직접 정한 자리, 아니면 아모노스 부두 castle_plots spawn, 지면 높이, 서쪽을 봄), 없으면 기준 자리.
   귀환권 · 침대 없는 죽음은 그대로 기준 자리. /rtshop spawn arrival [set|dock|on|off].
+  I-1 ✔ StructureRarity: structures.json 에 off (기본 ["spmovesets"], 옛 파일에는 넣어 다시 씀) — 그 모드 jar 의 structure_set 을 읽어 placement.frequency 0 으로 데이터팩에.
+  시험: disable() 의 JSON, 모드팩에서는 세계의 등록부에서 spmovesets 세트가 모두 확률 0 인지 (StructurePlacement.CODEC 으로 읽음).
 
 ## 사용자 답 (11-28 09:47) → 3.79.0 (3.78.0 을 올린 다음)
 
