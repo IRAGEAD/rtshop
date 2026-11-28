@@ -700,6 +700,11 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
 추가 (16:57): "이 모드팩으로 진행해줘." (첨부: RT1_-_2-15.zip) → 15 는 14 와 내용이 같음 (4,639 항목의 CRC · 크기 모두 같음, 이름만 다름) — 사용자에게 알리고 그대로 진행.
   CI 가지 v5-next34-p14 (팩 14 = 15) 로 run 46123749936.
 추가 (17:00): "내가 잘못봤어. 저 파일이 맞아." → 15(= 14) 로 그대로 검토.
+추가 (17:14): "mowzie's mob compat, cataclysm compat은 내가 데이터팩에 넣어야 할 것을 모드에 실수로 넣었으니 모드 폴더에서는 제외하고 진행해줘."
+- K-1 ✔ 18:15 보고 보냄 (docs/modpack_check.md 「팩 15 검토」): 바뀐 것 · 데이터팩 정리한 판 둘(P1nero 와 겹치는 무기 4개 뺌 · dual_greatsword 뺌) ·
+  실린 개인 파일 · doFireTick · DH 설정 · Small Ships · Arcane Vortex.
+- K-2: 팩 15 전체 시험(run 46123749936) 서버 모두 통과, 화면 시험은 55분 넘게 끝나지 않다가 "The hosted runner lost communication" (11 은 17분) —
+  Nightfall Enhance · VIX · Fancy Trail 을 빼고 다시 (run 46129394347, 가지 v5-next34-p14, SKIP_MODS).
 
 ## 요청 (11-28 17:39) → 3.82.0 (3.81.0 을 올린 다음, 가지 v5-next34)
 
