@@ -1668,6 +1668,7 @@ final class ClientSelfTest2 {
             boolean offBack = MobPortrait.fitNowForTest("minecraft:zombie") == null;
             ClientConfig.get().measuredMobPortraits = true;
             MobPortrait.Fit again = MobPortrait.fitNowForTest("minecraft:zombie");
+            MobPortrait.resetForTest();   // 앞에서 잰 좀비가 남아 있으면 다시 그리지 않으므로 처음부터
             int look0 = MobPortrait.vanillaLookForTest;
             MobPortrait.Fit zf = MobPortrait.fitNowForTest("minecraft:zombie");
             boolean lookUsed = MobPortrait.vanillaLookForTest > look0;
