@@ -267,7 +267,8 @@ final class ClientShaderTest {
                 if (!id.startsWith("minecraft:") && ids.size() < 16) ids.add(id);
             }
             StringBuilder sb = new StringBuilder();
-            int eggs = 0, legacy = 0;
+            int eggs = 0, legacy = 0, hostileOk = 0;
+            java.util.Set<String> hostile = java.util.Set.of("minecraft:zombie", "minecraft:skeleton", "minecraft:creeper", "minecraft:spider", "minecraft:enderman", "minecraft:ravager");
             for (String id : ids) {
                 MobPortrait.Fit f;
                 try {
@@ -278,11 +279,15 @@ final class ClientShaderTest {
                 }
                 if (f == null) legacy++;
                 else if (f.isIcon() && MobPortrait.model(id) != null && id.startsWith("minecraft:")) eggs++;
+                if (hostile.contains(id) && f != null && !f.isIcon()) hostileOk++;
                 sb.append(id.substring(id.indexOf(':') + 1)).append('=').append(f == null ? "old" : f.isIcon() ? "EGG" : f.why).append(' ');
             }
             RtShop.LOGGER.info("[rtshop-clienttest] portraits with the shader on: {} | {}", sb, MobPortrait.pipelineInfo);
             check("3.79 with the shader on, codex and bounty portraits are mobs, not spawn eggs (measured off-screen, or drawn the old way if that comes out blank)",
                     eggs == 0, "old " + legacy + " | " + sb + "| " + MobPortrait.pipelineInfo);
+            // 3.78 · 3.79 첫 판: 셰이더를 켜면 Epic Fight 가 바꿔 그리는 몹(좀비 · 스켈레톤 · 크리퍼 · 거미 · 엔더맨 · 파괴수)이 창 안에서 아무것도 그리지 않았다
+            check("3.79 with the shader on, the zombie, skeleton, creeper, spider, enderman and ravager portraits are drawn and measured (their own model, not Epic Fight's)",
+                    hostileOk == hostile.size() && MobPortrait.pipelineOkForTest(), hostileOk + "/" + hostile.size() + " | " + MobPortrait.pipelineInfo);
             mc.setScreen(new ClientSelfTest2.PortraitGrid(ids, false));
             waitTicks(20);
         });

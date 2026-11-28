@@ -211,13 +211,47 @@ public final class MobPortrait {
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher d = Minecraft.getInstance().getEntityRenderDispatcher();
         d.setRenderShadow(false);
+        drawing = e;
         try {
             RenderSystem.runAsFancy(() -> d.render(e, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, g.pose(), g.bufferSource(), 15728880));
             g.flush();
         } finally {
+            drawing = null;
             d.setRenderShadow(true);
             g.pose().popPose();
             Lighting.setupFor3DItems();
+        }
+    }
+
+    /** 지금 그림으로 그리는 몹 (그동안만). */
+    private static volatile LivingEntity drawing;
+    /** 시험용: 그림을 그릴 때 다른 모드가 모델을 바꿔 그리려던 것을 막은 횟수 (RenderLivingEvent.Pre 를 맨 앞에서 막고 맨 끝에서 풂). */
+    static int vanillaLookForTest;
+
+    /**
+     * 그림은 몹의 원래(바닐라 · 그 모드의) 모델로 그린다 (3.79). Epic Fight 는 RenderLivingEvent.Pre 를 취소하고 자기 뼈대 모델로 바꿔 그리는데,
+     * 셰이더(Oculus)를 켜면 창 안에서는 그것이 아무것도 그리지 않아 좀비 · 스켈레톤 · 크리퍼 · 거미 · 엔더맨 · 파괴수가 빈칸이 되었다 (CI 셰이더 시험,
+     * 사용자 11-28 10:51 "도감과 현상금 게시판의 몹은 몹의 모습이 아니라 스폰 알로"). 그림을 그리는 동안만: 맨 앞(HIGHEST)에서 이벤트를 취소해 다른 모드가
+     * 끼어들지 않게 하고, 맨 끝(LOWEST, 취소된 것도 받음)에서 취소를 풀어 원래 모델이 그려지게 한다.
+     */
+    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = RtShop.MODID, value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+    public static final class VanillaLook {
+        private VanillaLook() {
+        }
+
+        @net.minecraftforge.eventbus.api.SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+        public static void first(net.minecraftforge.client.event.RenderLivingEvent.Pre<?, ?> ev) {
+            LivingEntity e = drawing;
+            if (e != null && ev.getEntity() == e) ev.setCanceled(true);
+        }
+
+        @net.minecraftforge.eventbus.api.SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST, receiveCanceled = true)
+        public static void last(net.minecraftforge.client.event.RenderLivingEvent.Pre<?, ?> ev) {
+            LivingEntity e = drawing;
+            if (e != null && ev.getEntity() == e && ev.isCanceled()) {
+                ev.setCanceled(false);
+                vanillaLookForTest++;
+            }
         }
     }
 
@@ -245,14 +279,11 @@ public final class MobPortrait {
         lastFitNanos = System.nanoTime();
         if (f.isIcon() && model(id) != null) {
             // 3.79 (사용자 11-28 10:51 "도감과 현상금 게시판의 몹이 몹의 모습이 아니라 스폰 알로"): 그릴 수 있는 몹이 비게 나왔다.
-            // 컴퓨터 탓인지 몹 탓인지 가린다 — 바닐라 몹이 비었거나, 대신 그릴 바닐라 몹까지 비었거나, 지금 다시 그린 돼지 · 좀비가 비면 컴퓨터 탓:
-            // 화면 밖 재기를 그만두고 모두 예전 방식으로 (알보다 낫다). 아니면(돼지는 잘 그려지는데 그 몹만 아무것도 그리지 않음) 알 그대로.
+            // 컴퓨터 탓인지 몹 탓인지 가린다 — 지금 다시 그린 돼지 · 소가 비면 화면 밖 그리기가 망가진 것: 재기를 그만두고 모두 예전 방식으로.
+            // 돼지 · 소는 잘 그려지면 그 몹이 이 화면에서 정말 아무것도 그리지 않는 것이라(예전 방식으로도 빈칸) 알 그대로.
             String canary = canaryProblem();
-            String why = id.startsWith("minecraft:") ? "vanilla mob blank: " + id + " (" + f.why + ")"
-                    : f.why.contains("stand-in blank") ? "stand-in blank too: " + id + " (" + f.why + ")"
-                    : canary != null ? canary + " after " + id + " (" + f.why + ")" : null;
-            if (why != null) {
-                giveUp(why);
+            if (canary != null) {
+                giveUp(canary + " after " + id + " (" + f.why + ")");
                 return null;
             }
         }
@@ -274,10 +305,10 @@ public final class MobPortrait {
         RtShop.LOGGER.warn("[rtshop] 도감 그림: 화면 밖에서 잰 그림이 비게 나와 예전 방식(3D 를 그대로 칸에 맞춤)으로 그립니다: {}", why);
     }
 
-    /** 돼지와 좀비를 지금 다시 그려 본다: 둘 다 칠해지면 null, 아니면 까닭. */
+    /** 돼지와 소(다른 모드가 모델을 바꾸지 않는 순한 몹)를 지금 다시 그려 본다: 둘 다 칠해지면 null, 아니면 까닭. */
     private static String canaryProblem() {
         try {
-            for (String c : new String[]{"minecraft:pig", "minecraft:zombie"}) {
+            for (String c : new String[]{"minecraft:pig", "minecraft:cow"}) {
                 LivingEntity e = model(c);
                 if (e == null) continue;
                 float size = Math.max(0.5F, Math.max(e.getBbHeight(), e.getBbWidth()));

@@ -1668,9 +1668,14 @@ final class ClientSelfTest2 {
             boolean offBack = MobPortrait.fitNowForTest("minecraft:zombie") == null;
             ClientConfig.get().measuredMobPortraits = true;
             MobPortrait.Fit again = MobPortrait.fitNowForTest("minecraft:zombie");
-            check("3.79 where the off-screen picture comes out blank (vanilla mob, or a mod mob with the pig and zombie blank too), portraits go back to the old 3D drawing, never spawn eggs; client.json measuredMobPortraits=false does the same",
+            int look0 = MobPortrait.vanillaLookForTest;
+            MobPortrait.Fit zf = MobPortrait.fitNowForTest("minecraft:zombie");
+            boolean lookUsed = MobPortrait.vanillaLookForTest > look0;
+            check("3.79 where the off-screen picture comes out blank (and the pig and cow drawn again come out blank too), portraits go back to the old 3D drawing, not spawn eggs; client.json measuredMobPortraits=false does the same",
                     vanillaBack && moddedBack && offBack && again != null && !again.isIcon(),
                     info1 + " | " + modded + ": " + info2 + " | off " + offBack + " | again " + (again == null ? "null" : again.why));
+            check("3.79 portraits are drawn with the mob's own model: other mods (Epic Fight's skeleton models) cannot swap it while a portrait is drawn",
+                    lookUsed && zf != null && !zf.isIcon(), MobPortrait.vanillaLookForTest - look0 + " " + (zf == null ? "null" : zf.why));
             // 그렇게 돌아간 모습 (화면 밖 그림이 비는 채로 격자를 그린다)
             MobPortrait.resetForTest();
             MobPortrait.blankForTest = true;
