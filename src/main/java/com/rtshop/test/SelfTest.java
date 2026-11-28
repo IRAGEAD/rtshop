@@ -1149,7 +1149,10 @@ public final class SelfTest {
                 }
             }
             long walletA = Economy.wallet(a), pendingBefore = com.rtshop.rank.Ranks.rec(b).pendingGold;
+            int needs379 = c.rewardNeedsOthers;
+            c.rewardNeedsOthers = 0;   // 예전 규칙(늘 줌)으로 아래를 본다 — 3.79 의 새 규칙은 그다음에 따로
             com.rtshop.rank.Ranks.settle(server);
+            c.rewardNeedsOthers = needs379;
             com.rtshop.rank.Ranks.Rec ra = com.rtshop.rank.Ranks.rec(a), rb = com.rtshop.rank.Ranks.rec(b);
             long[] rw = c.rewards;
             boolean wonB = rb.weekWon.contains(com.rtshop.rank.Ranks.EARNED) && rb.weekWon.contains(com.rtshop.rank.Ranks.SPENT) && !ra.weekWon.contains(com.rtshop.rank.Ranks.EARNED);
@@ -1167,6 +1170,22 @@ public final class SelfTest {
             check("titles: the keeper's list shows every category with its steps and the week's titles a player won",
                     tv.getAsJsonArray("cats").size() == com.rtshop.rank.Ranks.CATS.length && tv.getAsJsonArray("week").size() >= 2 && tv.get("max").getAsInt() == 2,
                     tv.getAsJsonArray("week").size());
+            {
+                // 3.79 (밸런스 검토): 그 자리 아래에 다른 사람이 있어야 보상 — 2명 중 1위는 받고, 2위와 혼자 오른 1위는 못 받는다
+                com.rtshop.rank.Ranks.earned(a, 3000);
+                com.rtshop.rank.Ranks.earned(b, 1000);
+                com.rtshop.rank.Ranks.spent(b, 500);
+                int na = ra.pendingNotes.size(), nb = rb.pendingNotes.size();
+                com.rtshop.rank.Ranks.settle(server);
+                List<String> newA = new ArrayList<>(ra.pendingNotes.subList(Math.min(na, ra.pendingNotes.size()), ra.pendingNotes.size()));
+                List<String> newB = new ArrayList<>(rb.pendingNotes.subList(Math.min(nb, rb.pendingNotes.size()), rb.pendingNotes.size()));
+                check("3.79 weekly ranking: a place pays only when someone else is ranked below it (1st of two is paid; 2nd of two and a lone 1st are not)",
+                        c.rewardNeedsOthers == 1 && newA.contains(com.rtshop.rank.Ranks.EARNED + ":1:" + rw[0])
+                                && newB.stream().noneMatch(note379 -> note379.startsWith(com.rtshop.rank.Ranks.EARNED + ":") || note379.startsWith(com.rtshop.rank.Ranks.SPENT + ":")),
+                        newA + " / " + newB);
+                com.rtshop.rank.Ranks.claim(a);
+                com.rtshop.rank.Ranks.claim(b);
+            }
             check("ranks: the three keepers exist (bounty board, weekly ranking, titles) and have their own lines",
                     QuestManager.loaded().npcs.containsKey("bounty") && QuestManager.loaded().npcs.containsKey("ranks") && QuestManager.loaded().npcs.containsKey("titles")
                             && com.rtshop.story.Dialogue.npcForTest("quest_ranks") != null && com.rtshop.story.Dialogue.npcForTest("quest_titles") != null

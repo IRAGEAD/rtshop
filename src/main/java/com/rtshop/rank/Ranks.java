@@ -102,6 +102,7 @@ public final class Ranks {
 
     public static class Config {
         public String _help = "기록·주간 순위·칭호. categories: 종목을 끄려면 false. rewards: 주간 1·2·3위 보상 Gold (종목마다 같다, categoryRewards 로 종목별로 따로). "
+                + "rewardNeedsOthers: 그 자리 아래에 이만큼의 사람이 있어야 보상 (기본 1 = 경쟁자가 있는 자리만, 0 = 늘 줌). "
                 + "resetDay 1=월 … 7=일, resetHour 0~23 (서버 컴퓨터 시간). titles: need = 그 종목의 평생 기록, effect = mob_damage·boss_damage(%) · sell_bonus·buy_discount(%) · "
                 + "death_keep(죽을 때 잃는 Gold 감소 %) · quest_gold·bounty_gold(%) · max_health(체력). 직접 고쳤으면 \"edited\": true.";
         public int version = VERSION;
@@ -115,12 +116,18 @@ public final class Ranks {
         public boolean weekTitles = true;
         public Map<String, Boolean> categories = new LinkedHashMap<>();
         public long[] rewards = {20000, 10000, 5000};
+        /**
+         * 3.79 (밸런스 검토): 그 자리 아래에 이만큼의 사람이 순위에 있어야 그 자리의 보상이 나간다 (기본 1 = 경쟁자가 있는 자리만).
+         * 사람이 적은 서버에서 혼자 오른 1위 · 경쟁 없는 자리에 매주 보상이 그냥 나가던 것(혼자면 8종목 × 2만 = 16만 G)을 막는다. 0 = 예전처럼 늘 줌.
+         */
+        public int rewardNeedsOthers = 1;
         public Map<String, long[]> categoryRewards = new LinkedHashMap<>();
         public List<TitleDef> titles = new ArrayList<>();
     }
 
     public static final int VERSION = 1;
     private static Config config;
+    private static boolean needsWrite379;
 
     public static Path file() {
         return FMLPaths.CONFIGDIR.get().resolve("rtshop").resolve("ranks.json");
@@ -174,12 +181,18 @@ public final class Ranks {
             Config c = null;
             Path f = file();
             try {
-                if (Files.exists(f)) c = GSON.fromJson(Files.readString(f, StandardCharsets.UTF_8), Config.class);
+                if (Files.exists(f)) {
+                    String raw = Files.readString(f, StandardCharsets.UTF_8);
+                    c = GSON.fromJson(raw, Config.class);
+                    if (c != null && !raw.contains("\"rewardNeedsOthers\"")) needsWrite379 = true;   // 3.79 이전 파일: 새 설정을 적어 둔다
+                }
             } catch (Exception e) {
                 RtShop.LOGGER.warn("[rtshop] ranks.json 을 읽지 못해 기본값을 씁니다: {}", e.toString());
             }
-            boolean write = c == null;
+            boolean write = c == null || needsWrite379;
+            needsWrite379 = false;
             if (c == null) c = new Config();
+            c.rewardNeedsOthers = Math.max(0, c.rewardNeedsOthers);
             if (c.categories == null) c.categories = new LinkedHashMap<>();
             for (String cat : CATS) if (!c.categories.containsKey(cat)) { c.categories.put(cat, true); write = true; }
             if (c.rewards == null) c.rewards = new long[]{20000, 10000, 5000};
@@ -614,7 +627,9 @@ public final class Ranks {
             long[] rw = rewards(cat);
             for (int i = 0; i < rows.size() && i < rw.length; i++) {
                 Rec r = d.of(rows.get(i).id);
-                if (rw[i] > 0) {
+                // 3.79: 그 자리 아래에 경쟁자가 있어야 보상 (혼자 오른 자리는 칭호만)
+                boolean contested = rows.size() - (i + 1) >= c.rewardNeedsOthers;
+                if (rw[i] > 0 && contested) {
                     r.pendingGold += rw[i];
                     r.pendingNotes.add(cat + ":" + (i + 1) + ":" + rw[i]);
                     while (r.pendingNotes.size() > 40) r.pendingNotes.remove(0);

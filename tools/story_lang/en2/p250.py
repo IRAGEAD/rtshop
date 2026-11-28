@@ -49,7 +49,7 @@ EN = [
 "magic rune enchant reroll",
 "Monsters slain, bosses slain, earnings, spending, Gold held, quests, bounties, raids. Titles open in each category as you build it up.\n\n· Choose them at the title keeper.\n· Up to two titles lend their power (from different categories). Titles of one category share an effect, a little stronger the higher they are.\n· One title is shown. It appears before your name when you speak.",
 "title passive effect show",
-"The ranking clerk ranks everyone by this week's record in each category.\n\n· When the week ends, the top three of each category get rewards. Collect them from the clerk.\n· First place may show an 'of the Week' title for the next week.\n· Earnings and spending count only money made and spent at shops, quests and the like. Money passed between people is not counted.",
+"The ranking clerk ranks everyone by this week's record in each category.\n\n· When the week ends, the top three of each category get rewards. Collect them from the clerk. A place pays only when someone else is ranked below it (no reward for a place reached alone).\n· First place may show an 'of the Week' title for the next week.\n· Earnings and spending count only money made and spent at shops, quests and the like. Money passed between people is not counted.",
 "ranking leaderboard weekly reward",
 "Attendance",
 "Talk to the town clerk to open the attendance book. Check in once a day for that day's reward.\n\n· Weekly rewards depend on how many days you checked in that week.\n· If your streak breaks, the first time is forgiven. After that it starts over.\n· A 'restore ticket' from the attendance shop brings back a broken streak.",
