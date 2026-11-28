@@ -92,6 +92,8 @@ public final class ClientSelfTest {
     private static final int FX_END = LAST + 18 + 5 + FX_COUNT;
     private static final int NPC_END = FX_END + NPCS.length * 3;
     private static volatile int gachaNpc = -1;
+    /** 3.84: 뽑기 점검 전에 1장을 마친 표시가 있었는가 (점검 뒤 되돌림). */
+    private static volatile boolean ch1Had384;
     private static volatile int testNpc = -1;
     private static final int EN_STEPS = 6;
     private static final int ENH_STEPS = 16;
@@ -2044,6 +2046,9 @@ public final class ClientSelfTest {
                 shot(mc, "44_attendance_settings");
                 mc.setScreen(null);
                 onServer(mc, sp -> {
+                    // 3.84: 무기 뽑기는 1장을 마친 뒤에 열린다 — 이 점검 동안만 마친 것으로 둔다 (LAST + 15 에서 되돌림)
+                    ch1Had384 = com.rtshop.quest.QuestManager.hasFlag(sp, "story_ch1_done");
+                    com.rtshop.quest.QuestManager.setFlag(sp, "story_ch1_done", true);
                     sp.getInventory().add(new ItemStack(com.rtshop.item.ModItems.TICKET_NORMAL.get(), 10));
                     sp.getInventory().add(new ItemStack(com.rtshop.item.ModItems.TICKET_HIGH.get(), 10));
                     net.minecraft.world.entity.npc.Villager v = com.rtshop.shop.ShopServer.spawnNpc(sp.serverLevel(),
@@ -2093,6 +2098,7 @@ public final class ClientSelfTest {
                 wait = 20;
             }
             case LAST + 15 -> {
+                onServer(mc, sp -> com.rtshop.quest.QuestManager.setFlag(sp, "story_ch1_done", ch1Had384));
                 check("the gacha editor opens for an operator", mc.screen instanceof GachaEditScreen, mc.screen);
                 if (mc.screen instanceof GachaEditScreen s) {
                     s.selectForTest(0, 0);
