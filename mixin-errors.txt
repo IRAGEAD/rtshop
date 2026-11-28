@@ -1,0 +1,12 @@
+7607-[19:46:41] [Render thread/INFO]: Loaded 27 flute songs
+7608-[19:46:41] [Render thread/INFO]: Successfully loaded millstone bindable data
+7609-[19:46:41] [Render thread/WARN]: Not all defined tags for registry ResourceKey[minecraft:root / minecraft:worldgen/biome] are present in data pack: idas:has_structure/bopmahogany_biomes, idas:has_structure/bopredwood_biomes, idas:has_structure/bygmahogany_biomes, idas:has_structure/bygredwood_biomes
+7610:[19:46:41] [Render thread/ERROR]: Injection error: LVT in net/minecraft/world/entity/npc/VillagerTrades$EmeraldsForVillagerTypeItem::m_213663_(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/util/RandomSource;)Lnet/minecraft/world/item/trading/MerchantOffer; has incompatible changes at opcode 34 in callback fabric-object-builder-v1.mixins.json:TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin->@Inject::failOnNullItem(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/util/RandomSource;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/minecraft/world/item/ItemStac
+7611- Expected: [Lnet/minecraft/world/item/ItemStack;]
+7612-    Found: [Lnet/minecraft/world/item/Item;]
+7613-Available: [Lnet/minecraft/world/item/Item;, Lnet/minecraft/world/item/ItemStack;]
+7614-[19:46:41] [Render thread/INFO]: Applied 18 data villager trades
+7615-[19:46:41] [Render thread/INFO]: Finished additional setup in 0 ms
+7616-[19:46:41] [Render thread/INFO]: [bclib] Updating Pickers for BCLib - Nether BiomeSource (592a3369)
+7617-[19:46:41] [Render thread/INFO]: [bclib] [BiomeSourceCompat] Combined possible biomes for BCLib - Nether BiomeSource (592a3369): owned=28, external=0, combined=28
+7618-[19:46:41] [Render thread/INFO]: [bclib] Updating Pickers for BCLib - The End  BiomeSource (34df4ee7)

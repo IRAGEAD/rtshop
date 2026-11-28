@@ -1,0 +1,18 @@
+{
+  "_help": "보스 구조물을 드물게: mods 는 모드별 구조물 간격 배율(1.8 이면 1.8배 멀리), sets 는 구조물 세트별 배율(우선). 1 은 그대로. off (3.80): 아예 생기지 않게 할 구조물 — \"모드\" 또는 \"모드:세트\" (기본 spmovesets). 새로 만들어지는 땅에만 적용되며 서버를 다시 켜야 바뀐다.",
+  "enabled": true,
+  "mods": {
+    "cataclysm": 1.8,
+    "mowziesmobs": 1.6,
+    "aquamirae": 1.4
+  },
+  "sets": {
+    "cataclysm:amethyst_nest": 1.0,
+    "cataclysm:abandoned_structures": 1.0,
+    "aquamirae:surface": 1.0,
+    "aquamirae:outpost": 1.0
+  },
+  "off": [
+    "spmovesets"
+  ]
+}

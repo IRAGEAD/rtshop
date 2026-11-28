@@ -1,0 +1,14 @@
+8402-[epicfight] {key:key.epicfight.switch_mode} 키로 전투 모드로 바꾸면, 공격을 이어서 누를 때 연속 베기가 나간다. 블록을 캘 때는 같은 키로 채광 모드로 돌아가라.]
+8403-[19:48:54] [Render thread/INFO]: [rtshop-clienttest] PASS  every key named in the job quest tips exists in this game  [[]]
+8404-[19:48:55] [Render thread/INFO]: [rtshop-clienttest] PASS  talking to the attendance NPC opens the attendance window  [com.rtshop.client.AttendanceScreen@4ea6dc5a]
+8405-[19:48:55] [Render thread/INFO]: [rtshop-clienttest] PASS  the attendance window lets you check in at the NPC
+8406-[19:48:55] [Render thread/INFO]: [RT Shop notice] 보상: 500 G
+8407-[19:48:55] [Render thread/INFO]: [RT Shop notice] 출석 완료! 연속 1일차 (1일차 보상)
+8408-[19:48:56] [Render thread/INFO]: [rtshop-clienttest] PASS  checking in from the window works and gives the day-1 Gold  [500]
+8409-[19:48:57] [Render thread/INFO]: [rtshop-clienttest] PASS  the attendance editor opens for an operator  [com.rtshop.client.AttendanceEditScreen@11cf2fda]
+8410-[19:48:58] [Server thread/INFO]: [rtshop] Dev 이(가) 출석 보상을 고쳤습니다
+8411-[19:48:59] [Render thread/INFO]: [rtshop-clienttest] PASS  saving in the attendance editor changes the reward table  [3333]
+8412-[19:49:01] [Render thread/INFO]: [rtshop-clienttest] PASS  talking to the gacha merchant opens the gacha window  [com.rtshop.client.GachaScreen@33a8b04a]
+8413-[19:49:01] [Render thread/INFO]: [rtshop-clienttest] PASS  the gacha window shows the tickets you carry
+8414:[19:49:02] [Render thread/INFO]: [rtshop-clienttest] FAIL  a premium 10-pull from the window shows 10 result cards
+8415:[19:49:03] [Render thread/INFO]: [rtshop-clienttest] FAIL  the dismantle tab lists the pulled items

@@ -1,0 +1,124 @@
+{
+  "_help": "이야기 보스전 공간(기억의 문). 보스 ID 마다 theme(stone, iron, frost, sun, deep, abyss, ember, sand, mech, void, curse, mirror), radius(경기장 반지름), height(천장 높이), water(물을 채움). 여기에 있는 보스를 잡는 퀘스트에는 [보스전 입장] 단추가 생깁니다.",
+  "bosses": {
+    "mowziesmobs:ferrous_wroughtnaut": {
+      "theme": "iron",
+      "radius": 18,
+      "height": 16,
+      "water": false
+    },
+    "mowziesmobs:frostmaw": {
+      "theme": "frost",
+      "radius": 26,
+      "height": 24,
+      "water": false
+    },
+    "mowziesmobs:umvuthi": {
+      "theme": "sun",
+      "radius": 24,
+      "height": 24,
+      "water": false
+    },
+    "mowziesmobs:elokosa_howler": {
+      "theme": "stone",
+      "radius": 22,
+      "height": 18,
+      "water": false
+    },
+    "aquamirae:maze_mother": {
+      "theme": "abyss",
+      "radius": 26,
+      "height": 22,
+      "water": true
+    },
+    "aquamirae:captain_cornelia": {
+      "theme": "frost",
+      "radius": 24,
+      "height": 22,
+      "water": false
+    },
+    "ydtwo:twisted_warden": {
+      "theme": "deep",
+      "radius": 24,
+      "height": 22,
+      "water": false
+    },
+    "minecraft:warden": {
+      "theme": "deep",
+      "radius": 22,
+      "height": 20,
+      "water": false
+    },
+    "minecraft:elder_guardian": {
+      "theme": "abyss",
+      "radius": 22,
+      "height": 18,
+      "water": true
+    },
+    "cataclysm:netherite_monstrosity": {
+      "theme": "ember",
+      "radius": 30,
+      "height": 28,
+      "water": false
+    },
+    "cataclysm:ancient_remnant": {
+      "theme": "sand",
+      "radius": 30,
+      "height": 26,
+      "water": false
+    },
+    "cataclysm:the_harbinger": {
+      "theme": "mech",
+      "radius": 28,
+      "height": 32,
+      "water": false
+    },
+    "cataclysm:the_leviathan": {
+      "theme": "abyss",
+      "radius": 32,
+      "height": 30,
+      "water": true
+    },
+    "cataclysm:ender_guardian": {
+      "theme": "void",
+      "radius": 26,
+      "height": 26,
+      "water": false
+    },
+    "cataclysm:maledictus": {
+      "theme": "curse",
+      "radius": 26,
+      "height": 26,
+      "water": false
+    },
+    "cataclysm:ignis": {
+      "theme": "ember",
+      "radius": 30,
+      "height": 28,
+      "water": false
+    },
+    "minecraft:wither": {
+      "theme": "curse",
+      "radius": 30,
+      "height": 34,
+      "water": false
+    },
+    "illusioner:illusioner": {
+      "theme": "mirror",
+      "radius": 18,
+      "height": 16,
+      "water": false
+    },
+    "minecraft:evoker": {
+      "theme": "stone",
+      "radius": 20,
+      "height": 16,
+      "water": false
+    }
+  },
+  "_help_gate": "walkIn: 단추를 누르면 그 자리 앞에 문이 열리고 걸어 들어가야 넘어간다 (false \u003d 누르는 즉시 이동). gateSeconds: 문이 열려 있는 시간(초). partyRange: 문을 연 사람이 들어갈 때 함께 넘어가는 파티원의 거리(칸); 그 뒤에도 보스가 깨어나기 전까지는 파티원이 문으로 걸어 들어와 합류할 수 있다. waitSeconds: 보스 구역에서 가운데의 불씨를 우클릭하면 보스가 깨어나고, 건드리지 않아도 이 시간(초)이 지나면 깨어난다 (0 \u003d 건드려야만).",
+  "walkIn": true,
+  "gateSeconds": 60,
+  "partyRange": 16,
+  "waitSeconds": 45
+}

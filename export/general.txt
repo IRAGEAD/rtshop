@@ -1,0 +1,128 @@
+# 상점: 잡화점 (general)
+# 아이템 | 구매가 | 기본 매입가 | 구분 | 원가 | 가격 근거(레시피)
+minecraft:oak_log | 20 | 10.00 | building | - | 
+minecraft:spruce_log | 20 | 10.00 | building | - | 
+minecraft:birch_log | 20 | 10.00 | building | - | 
+minecraft:jungle_log | 20 | 10.00 | building | - | 
+minecraft:acacia_log | 20 | 10.00 | building | - | 
+minecraft:dark_oak_log | 20 | 10.00 | building | - | 
+minecraft:mangrove_log | 20 | 10.00 | building | - | 
+minecraft:cherry_log | 20 | 10.00 | building | - | 
+minecraft:torch | 30 | 5.25 | building | 5.25 | minecraft:torch
+minecraft:lantern | 300 | 138.58 | building | 138.58 | minecraft:lantern
+minecraft:glowstone | 80 | 40.00 | building | 80.00 | 
+minecraft:ladder | 5 | - | building | 2.00 | 
+minecraft:chest | 40 | - | building | 16.00 | 
+minecraft:crafting_table | 20 | - | building | 8.00 | 
+minecraft:furnace | 10 | - | building | 4.00 | 
+minecraft:bookshelf | 150 | - | building | 33.00 | 
+minecraft:white_bed | 80 | - | building | 15.00 | 
+minecraft:glass | 2 | - | building | 1.00 | 
+minecraft:bricks | 2 | - | building | 1.00 | 
+minecraft:stone_bricks | 2 | - | building | 0.50 | 
+minecraft:cobblestone | 1 | - | building | 0.50 | 
+minecraft:stone | 2 | - | building | 1.00 | 
+minecraft:sand | 1 | - | building | 1.00 | 
+minecraft:gravel | 1 | - | building | - | 
+minecraft:dirt | 1 | - | building | 1.00 | 
+minecraft:clay_ball | 1 | - | building | 0.25 | 
+minecraft:bone | 5 | 2.50 | material | 5.00 | 
+minecraft:string | 1 | 0.50 | material | 1.00 | 
+minecraft:gunpowder | 20 | 2.00 | material | - | 
+minecraft:slime_ball | 4 | 2.00 | material | 4.00 | 
+minecraft:spider_eye | 2 | 1.00 | material (품질 반영) | - | 
+minecraft:leather | 1 | 0.50 | material | 1.00 | 
+minecraft:feather | 4 | 2.00 | material | 4.00 | 
+minecraft:paper | 2 | 1.00 | material | 2.00 | 
+minecraft:book | 30 | 7.00 | material | 7.00 | minecraft:book
+minecraft:ender_pearl | 20 | 1.00 | material | - | 
+minecraft:blaze_rod | 100 | 50.00 | material | - | 
+minecraft:flint | 10 | 1.00 | material | - | 
+minecraft:coal | 50 | 25.00 | material | 50.00 | 
+minecraft:glass_bottle | 1 | - | material | 1.00 | 
+minecraft:stick | 1 | - | material | 1.00 | 
+minecraft:bowl | 1 | - | material | 1.50 | 
+minecraft:ice | 2 | - | material | - | 
+minecraft:snowball | 1 | - | material | - | 
+minecraft:cod_bucket | - | - | material | - | 
+minecraft:salmon_bucket | - | - | material | - | 
+minecraft:pufferfish_bucket | - | - | material | - | 
+minecraft:tropical_fish_bucket | - | - | material | - | 
+farmersdelight:tree_bark | - | - | material | - | 
+minecraft:potion | - | - | material | - | 
+minecraft:netherrack | - | - | material | 1.00 | 
+minecraft:carved_pumpkin | - | - | material | - | 
+minecraft:rotten_flesh | - | 0.50 | material (품질 반영) | 1.00 | 
+minecraft:compass | 1300 | 640.00 | misc | 640.00 | minecraft:compass
+minecraft:clock | 2500 | 1240.00 | misc | 1240.00 | minecraft:clock
+minecraft:spyglass | 150 | 66.00 | misc | 66.00 | minecraft:spyglass
+minecraft:name_tag | 1000 | 500.00 | misc | - | 
+minecraft:saddle | 1500 | 150.00 | misc | - | 
+minecraft:lead | 20 | 4.00 | misc | 4.00 | minecraft:lead
+minecraft:shears | 600 | 300.00 | misc | 300.00 | minecraft:shears
+minecraft:lava_bucket | 600 | 525.00 | misc | - | 
+minecraft:experience_bottle | 300 | 20.00 | misc | - | 
+minecraft:composter | 20 | - | misc | 7.00 | 
+minecraft:oak_boat | 30 | - | misc | 10.00 | 
+minecraft:bucket | - | 450.00 | misc | - | 
+rtshop:survey_compass | 6000 | - | misc | 946.00 | 
+rtshop:player_shop | 5000 | - | misc | - | 
+rtshop:return_ticket | 10000 | - | misc | - | 
+rtshop:return_ticket_plus | 30000 | - | misc | - | 
+rtshop:codex | 3000 | - | misc | - | 
+rtshop:guidebook | 2000 | - | misc | - | 
+rtshop:survey_notebook | 1500 | - | misc | - | 
+rtshop:castle_pass | 300 | - | misc | - | 
+rtshop:home_ticket | 5000 | - | misc | - | 
+smallships:oak_cog | 60000 | - | ship | - | 
+smallships:oak_dhow | 80000 | - | ship | - | 
+smallships:oak_drakkar | 100000 | - | ship | - | 
+smallships:oak_galley | 120000 | - | ship | - | 
+smallships:oak_brigg | 220000 | - | ship | - | 
+smallships:oak_caravel | 280000 | - | ship | - | 
+smallships:oak_galleon | 400000 | - | ship | - | 
+smallships:cannon | 30000 | - | ship | 4089.00 | 
+smallships:cannon_ball | 200 | - | ship | 43.33 | 
+minecraft:acacia_planks | 2 | - | building | 2.00 | 
+minecraft:bamboo_planks | 2 | - | building | 2.00 | 
+minecraft:birch_planks | 2 | - | building | 2.00 | 
+minecraft:cherry_planks | 2 | - | building | 2.00 | 
+minecraft:crimson_planks | 2 | - | building | 2.00 | 
+minecraft:dark_oak_planks | 2 | - | building | 2.00 | 
+minecraft:jungle_planks | 2 | - | building | 2.00 | 
+minecraft:mangrove_planks | 2 | - | building | 2.00 | 
+minecraft:oak_planks | 2 | - | building | 2.00 | 
+minecraft:spruce_planks | 2 | - | building | 2.00 | 
+minecraft:warped_planks | 2 | - | building | 2.00 | 
+minecraft:black_wool | 3 | 1.50 | material | 5.00 | 
+minecraft:blue_wool | 3 | 1.50 | material | 7.00 | 
+minecraft:brown_wool | 3 | 1.50 | material | 7.00 | 
+minecraft:cyan_wool | 3 | 1.50 | material | 5.50 | 
+minecraft:gray_wool | 3 | 1.50 | material | 4.50 | 
+minecraft:green_wool | 3 | 1.50 | material | 4.00 | 
+minecraft:light_blue_wool | 3 | 1.50 | material | 5.50 | 
+minecraft:light_gray_wool | 3 | 1.50 | material | 4.25 | 
+minecraft:lime_wool | 3 | 1.50 | material | 4.00 | 
+minecraft:magenta_wool | 3 | 1.50 | material | 6.25 | 
+minecraft:orange_wool | 3 | 1.50 | material | 7.00 | 
+minecraft:pink_wool | 3 | 1.50 | material | 5.50 | 
+minecraft:purple_wool | 3 | 1.50 | material | 7.00 | 
+minecraft:red_wool | 3 | 1.50 | material | 7.00 | 
+minecraft:white_wool | 3 | 1.50 | material | 4.00 | 
+minecraft:yellow_wool | 3 | 1.50 | material | 7.00 | 
+minecraft:black_dye | 4 | 2.00 | material | 2.00 | farmersdelight:cutting/ink_sac
+minecraft:blue_dye | 4 | 2.00 | material | 60.00 | 
+minecraft:brown_dye | 4 | 2.00 | material | 20.00 | 
+minecraft:cyan_dye | 5 | 2.50 | material | 2.50 | minecraft:cyan_dye
+minecraft:gray_dye | 4 | 1.50 | material | 1.50 | minecraft:gray_dye
+minecraft:green_dye | 4 | 1.00 | material | 1.00 | kaleidoscope_cookery:millstone/green_dye_from_cactus
+minecraft:light_blue_dye | 5 | 2.50 | material | 2.50 | minecraft:light_blue_dye_from_blue_white_dye
+minecraft:light_gray_dye | 4 | 1.25 | material | 1.25 | minecraft:light_gray_dye_from_gray_white_dye
+minecraft:lime_dye | 4 | 1.00 | material | 1.00 | minecraft:lime_dye
+minecraft:magenta_dye | 4 | 2.00 | material | 3.25 | 
+minecraft:orange_dye | 4 | 2.00 | material | 4.00 | 
+minecraft:pink_dye | 5 | 2.50 | material | 2.50 | minecraft:pink_dye_from_red_white_dye
+minecraft:purple_dye | 4 | 2.00 | material | 4.00 | 
+minecraft:red_dye | 4 | 2.00 | material | 20.00 | 
+minecraft:white_dye | 4 | 1.00 | material | 1.00 | minecraft:white_dye
+minecraft:yellow_dye | 4 | 2.00 | material | 133.33 | 

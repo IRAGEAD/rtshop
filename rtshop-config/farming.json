@@ -1,0 +1,58 @@
+{
+  "_설명": [
+    "removeSeedDrops: 작물·풀·상자 등에서 씨앗이 나오지 않게 함",
+    "requireShopSeeds: 상점에서 산 씨앗만 심을 수 있음 (조합해서 만든 씨앗, 수확한 당근·감자 등은 심을 수 없음)",
+    "dualPurpose: 작물 자체가 씨앗인 아이템. 상점의 '심기 전용' 품목만 심을 수 있음",
+    "autoListMissingSeeds: 가격표에 없는 모드 씨앗을 씨앗 상점에 자동으로 올림 (autoSeedPrice G, 작물 겸 씨앗은 작물 가격 x autoDualSeedFactor)",
+    "rightClickHarvest: 다 자란 작물을 우클릭하면 수확하고 인벤토리의 상점 씨앗으로 다시 심음 · harvestSweep: 괭이별 범위(1=3x3)",
+    "removeUnlicensedSprouts: 다른 모드나 주민이 씨앗 없이 다시 심은 싹을 치움",
+    "starChances: 1별/2별/3별 확률(%) · starMultipliers: 별 등급별 매입가 배율(기준 = 가격표 가격의 50%, 1.8 = 90%)"
+  ],
+  "removeSeedDrops": true,
+  "requireShopSeeds": true,
+  "blockEatingShopSeeds": true,
+  "autoListMissingSeeds": true,
+  "autoSeedPrice": 20,
+  "autoDualSeedFactor": 2.5,
+  "dualPurpose": [
+    "minecraft:carrot",
+    "minecraft:potato",
+    "minecraft:nether_wart",
+    "minecraft:cocoa_beans",
+    "minecraft:sweet_berries",
+    "minecraft:glow_berries",
+    "farmersdelight:onion",
+    "farmersdelight:rice",
+    "kaleidoscope_cookery:rice",
+    "kaleidoscope_cookery:wild_rice",
+    "farm_and_charm:onion"
+  ],
+  "extraSeeds": [
+    "kaleidoscope_cookery:tea_seed"
+  ],
+  "notSeeds": [],
+  "notCrops": [],
+  "rightClickHarvest": true,
+  "harvestSweep": {
+    "minecraft:iron_hoe": 1,
+    "minecraft:golden_hoe": 1,
+    "minecraft:diamond_hoe": 2,
+    "minecraft:netherite_hoe": 3
+  },
+  "harvestToolDamage": 1,
+  "noRightClickHarvest": [
+    "kaleidoscope_cookery:rice_crop"
+  ],
+  "removeUnlicensedSprouts": true,
+  "starsEnabled": true,
+  "starChances": [
+    65.0,
+    27.0,
+    8.0
+  ],
+  "starMultipliers": [
+    1.8,
+    2.2,
+    2.8
+  ]
+}

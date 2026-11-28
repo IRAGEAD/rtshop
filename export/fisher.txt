@@ -1,0 +1,304 @@
+# 상점: 수산물 상점 (fisher)
+# 아이템 | 구매가 | 기본 매입가 | 구분 | 원가 | 가격 근거(레시피)
+minecraft:cod | 120 | 60.00 | fish (품질 반영) | - | 
+minecraft:salmon | 120 | 60.00 | fish (품질 반영) | - | 
+minecraft:pufferfish | 220 | 110.00 | fish (품질 반영) | - | 
+minecraft:tropical_fish | 400 | 200.00 | fish (품질 반영) | - | 
+starcatcher:worm | 20 | 10.00 | bait | - | 
+minecraft:string | 1 | 0.50 | bait | 1.00 | 
+minecraft:oak_boat | 30 | - | gear | 10.00 | 
+minecraft:water_bucket | 451 | 450.00 | gear | - | 
+minecraft:bucket | - | 450.00 | gear | - | 
+starcatcher:pearl | 600 | 300.00 | treasure | - | 
+minecraft:nautilus_shell | 1000 | 100.00 | treasure | - | 
+minecraft:heart_of_the_sea | 10000 | 5000.00 | treasure | - | 
+minecraft:scute | 60 | 30.00 | treasure | 42.00 | 
+minecraft:sponge | 400 | 200.00 | treasure | 400.00 | 
+minecraft:lily_pad | 4 | 2.00 | sea | - | 
+minecraft:seagrass | 1 | - | sea | 1601.00 | 
+minecraft:sea_pickle | 4 | 2.00 | sea | - | 
+minecraft:ink_sac | 4 | 2.00 | sea | - | 
+minecraft:glow_ink_sac | 10 | 5.00 | sea | - | 
+minecraft:prismarine_shard | 4 | 2.00 | sea | 4.00 | 
+minecraft:prismarine_crystals | 8 | 4.00 | sea | 8.00 | 
+minecraft:kelp | 1 | - | sea | 1.00 | 
+minecraft:dried_kelp | 1 | 0.10 | sea (품질 반영) | - | 
+starcatcher:aurora | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:azure_crystalback_minnow | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:cerberay | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:cloudfin | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:deepslatefish | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:joel | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:king_of_the_frost | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:oasis_sturgeon | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:obsidian_eel | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:scorched_bloodsucker | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:shroomfish | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:stonefish | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:vesani | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:voidbiter | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:ward | - | 650.00 | fish (품질 반영) | - | 
+starcatcher:amethystback | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:bigeye_tuna | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:blue_ice_pike | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:boreal | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:bright_amethyst_snapper | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:cactifish | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:carpenjoe | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:chorus_crab | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:dark_amethyst_snapper | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:eel_dynamo | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:frostbit_jelly | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:geode_eel | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:lava_crab | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:lightning_bass | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:livid_bamboo | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:lush_pike | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:molten_deepslate_crab | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:nebula_squid | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:obsidian_crab | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:purple_carp | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:rose_siamese_fish | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:sage_catfish | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:sculkfish | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:thunder_bass | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:voidfin | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:willow_bream | - | 375.00 | fish (품질 반영) | - | 
+starcatcher:agave_bream | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:blue_crystal_fin | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:blue_herring | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:bluegigi | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:charfish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:cinder_squid | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:cogtopus | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:crystalback_boreal | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:drive_pike | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:fossilized_angelfish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:glowing_dark | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:glowstone_pufferfish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:lilac_minnow | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:lily_snapper | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:mechanical_brass_snail | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:meka_agave_bream | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:molten_shrimp | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:mothfish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:pale_pinfish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:petal_bass | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:pipehead | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:ripple_catfish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:spacejelly | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:sporefish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:sun_seeking_carp | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:suneater | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:sunflower_carp | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:the_quarrish | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:twilight_koi | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:wintery_pike | - | 200.00 | fish (품질 반영) | - | 
+starcatcher:black_eel | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:brassgill | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:chorus_minnow | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:coggill | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:cryospine | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:crystalback_minnow | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:crystalback_trout | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:downfall_bream | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:dreamliner | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:elderscale | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:end_glow | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:ghostly_pike | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:icetooth_sturgeon | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:ironjaw_herring | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:magma_fish | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:mechanical_snail | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:mirage_carp | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:morganite | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:mossfin | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:petaldrift_carp | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:pinfish | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:pyrotrout | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:redscaled_tuna | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:scalding_pike | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:shadowfin | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:silverfin_pike | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:silverveil_perch | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:sludge_catfish | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:sunny_sturgeon | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:willish | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:yellowstone_fish | - | 110.00 | fish (품질 반영) | - | 
+starcatcher:aquamarine_pike | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:blossomfish | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:crystalback_sturgeon | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:deepjaw_herring | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:driftfin | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:drifting_bream | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:dripfin | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:dusktail_snapper | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:embergill | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:frostgill_chub | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:frostjaw_trout | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:garnet_mackerel | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:glimmergill | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:glowstone_seeker | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:gold_fan | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:hollowbelly_darter | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:mistback_chub | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:obidontiee | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:pale_carp | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:peakdweller | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:phillipsfish | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:pink_koi | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:rainfin | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:rockgill | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:sandtail | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:scorchfish | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:sea_bass | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:valve | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:vivid_moss | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:whiteveil | - | 60.00 | fish (품질 반영) | - | 
+starcatcher:azure_crystal_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:azure_rod
+starcatcher:bamboo_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:bamboo_rod
+starcatcher:boner_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:boner_rod
+starcatcher:humble_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:humble_rod
+starcatcher:iceborn_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:iceborn_rod
+starcatcher:lush_glowberry_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:lush_rod
+starcatcher:magmaforged_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:magmaforged_rod
+starcatcher:naturalist_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:naturalist_rod
+starcatcher:obsidian_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:obsidian_rod
+starcatcher:sharktooth_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:sharktooth_rod
+starcatcher:sky_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:sky_rod
+starcatcher:slimed_rod | 10000 | 2417.00 | gear | 2417.00 | starcatcher:slimed_rod
+starcatcher:starcatcher_rod | 834 | 417.00 | gear | 417.00 | starcatcher:starcatcher_rod
+minecraft:fishing_rod | 10 | 5.00 | gear | 5.00 | minecraft:fishing_rod
+starcatcher:tackle_box | 1200 | 600.00 | gear | - | 
+starcatcher:tackle_box_black | 1200 | 600.00 | gear | 908.67 | 
+starcatcher:tackle_box_blue | 1200 | 600.00 | gear | 910.67 | 
+starcatcher:tackle_box_brown | 1200 | 600.00 | gear | 910.67 | 
+starcatcher:tackle_box_cyan | 1200 | 600.00 | gear | 909.17 | 
+starcatcher:tackle_box_gray | 1200 | 600.00 | gear | 908.17 | 
+starcatcher:tackle_box_green | 1200 | 600.00 | gear | 907.67 | 
+starcatcher:tackle_box_light_blue | 1200 | 600.00 | gear | 909.17 | 
+starcatcher:tackle_box_light_gray | 1200 | 600.00 | gear | 907.92 | 
+starcatcher:tackle_box_lime | 1200 | 600.00 | gear | 907.67 | 
+starcatcher:tackle_box_magenta | 1200 | 600.00 | gear | 909.92 | 
+starcatcher:tackle_box_orange | 1200 | 600.00 | gear | 910.67 | 
+starcatcher:tackle_box_pink | 1200 | 600.00 | gear | 909.17 | 
+starcatcher:tackle_box_purple | 1200 | 600.00 | gear | 910.67 | 
+starcatcher:tackle_box_red | 1200 | 600.00 | gear | 910.67 | 
+starcatcher:tackle_box_white | 1200 | 600.00 | gear | 907.67 | 
+starcatcher:tackle_box_yellow | 1200 | 600.00 | gear | 910.67 | 
+starcatcher:fish_radar | 2500 | 1250.00 | gear | 2350.00 | 
+starcatcher:fisherman_hat_black | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_blue | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_brown | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_cyan | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_gray | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_green | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_light_blue | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_light_gray | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_lime | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_magenta | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_orange | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_pink | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_purple | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_red | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_white | 400 | 200.00 | gear | 608.00 | 
+starcatcher:fisherman_hat_yellow | 400 | 200.00 | gear | 608.00 | 
+starcatcher:almighty_worm | 60 | 30.00 | bait | 80.00 | 
+starcatcher:cherry_bait | 60 | 30.00 | bait | - | 
+starcatcher:dripstone_bait | 60 | 30.00 | bait | - | 
+starcatcher:gunpowder_bait | 11 | 5.25 | bait | 5.25 | starcatcher:gunpowder_bait
+starcatcher:legendary_bait | 60 | 30.00 | bait | 81.31 | 
+starcatcher:lush_bait | 1 | 0.13 | bait | 0.13 | starcatcher:lust_bait_from_mossy_boot
+starcatcher:meteorological_bait | 60 | 30.00 | bait | 93.88 | 
+starcatcher:murkwater_bait | 3 | 1.25 | bait | 1.25 | starcatcher:murkwater_bait_from_lilypad
+starcatcher:sculk_bait | 60 | 30.00 | bait | 46.94 | 
+starcatcher:seeking_worm | 60 | 30.00 | bait | 240.00 | 
+starcatcher:targeted_bait | 60 | 30.00 | bait | 180.00 | 
+starcatcher:amethyst_hook | 400 | 200.00 | bait | 1418.00 | 
+starcatcher:copper_hook | 400 | 200.00 | bait | 760.00 | 
+starcatcher:echoing_hook | 400 | 200.00 | bait | 3200.00 | 
+starcatcher:exposed_copper_hook | 400 | 200.00 | bait | - | 
+starcatcher:frozen_hook | 400 | 200.00 | bait | 616.00 | 
+starcatcher:gold_hook | 400 | 200.00 | bait | 1330.00 | 
+starcatcher:heavy_hook | 400 | 200.00 | bait | 4466.67 | 
+starcatcher:hook | 400 | 200.00 | bait | 466.67 | 
+starcatcher:mossy_hook | 400 | 200.00 | bait | - | 
+starcatcher:oxidised_copper_hook | 400 | 200.00 | bait | 760.00 | 
+starcatcher:rusty_hook | 400 | 200.00 | bait | 466.67 | 
+starcatcher:shiny_hook | 400 | 200.00 | bait | 3416.67 | 
+starcatcher:split_hook | 400 | 200.00 | bait | 966.67 | 
+starcatcher:stone_hook | 400 | 200.00 | bait | 419.67 | 
+starcatcher:vanilla_hook | 44 | 21.67 | bait | 21.67 | starcatcher:vanilla_hook
+starcatcher:weathered_copper_hook | 400 | 200.00 | bait | - | 
+starcatcher:bobber | 26 | 13.00 | bait | 13.00 | starcatcher:bobber
+starcatcher:clear_bobber | 38 | 19.00 | bait | 19.00 | starcatcher:clear_bobber
+starcatcher:cloud_bobber | 348 | 174.00 | bait | 174.00 | starcatcher:cloud_bobber
+starcatcher:dripstone_bobber | 300 | 150.00 | bait | - | 
+starcatcher:glowing_bobber | 98 | 49.00 | bait | 49.00 | starcatcher:glowing_bobber
+starcatcher:golden_bobber | 300 | 150.00 | bait | 3615.00 | 
+starcatcher:leaf_bobber | 300 | 150.00 | bait | - | 
+starcatcher:slimey_bobber | 62 | 31.00 | bait | 31.00 | starcatcher:slimey_bobber
+starcatcher:steady_bobber | 300 | 150.00 | bait | 255.00 | 
+starcatcher:vanilla_bobber | 10 | 5.00 | bait | 5.00 | starcatcher:vanilla_bobber_from_vanilla_fishing_rod
+starcatcher:azure_crystal_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:bamboo_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:boner_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:clear_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:colorful_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:frog_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:humble_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:iceborn_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:kimbe_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:king_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:lush_glowberry_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:magmaforged_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:naturalist_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:obsidian_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:pearl_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:sharktooth_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:sky_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:slimed_skin_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:survivor_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:valley_smithing_template | - | 1000.00 | treasure | - | 
+starcatcher:acacia_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:acacia_fish_plaque
+starcatcher:acacia_tackle_box_boat | - | 907.67 | treasure | 907.67 | starcatcher:acacia_tackle_box_boat
+starcatcher:aquarium | - | 3.00 | treasure | 3.00 | starcatcher:aquarium
+starcatcher:bamboo_fish_plaque | - | 10.00 | treasure | 10.00 | starcatcher:bamboo_fish_plaque
+starcatcher:bamboo_tackle_box_boat | - | 907.67 | treasure | 907.67 | starcatcher:bamboo_tackle_box_boat
+starcatcher:birch_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:birch_fish_plaque
+starcatcher:birch_tackle_box_boat | - | 907.67 | treasure | 907.67 | starcatcher:birch_tackle_box_boat
+starcatcher:boot | - | 800.00 | treasure | - | 
+starcatcher:bottled_letter | - | 11.00 | treasure | 11.00 | starcatcher:bottled_letter
+starcatcher:broken_bottle | - | 800.00 | treasure | - | 
+starcatcher:cherry_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:cherry_fish_plaque
+starcatcher:cherry_tackle_box_boat | - | 917.67 | treasure | 917.67 | starcatcher:cherry_tackle_box_boat
+starcatcher:clam | - | 800.00 | treasure | - | 
+starcatcher:conch | - | 800.00 | treasure | - | 
+starcatcher:cooked_starcaught_fish | - | 14.00 | treasure (품질 반영) | 14.00 | starcatcher:starcaught_fish_from_campfire_from_starcaught_fish
+starcatcher:dark_oak_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:dark_oak_fish_plaque
+starcatcher:dark_oak_tackle_box_boat | - | 917.67 | treasure | 917.67 | starcatcher:dark_oak_tackle_box_boat
+starcatcher:display | - | 5.00 | treasure | 5.00 | starcatcher:display
+starcatcher:dried_seaweed | - | 800.00 | treasure | - | 
+starcatcher:fish_bones | - | 800.00 | treasure | - | 
+starcatcher:jungle_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:jungle_fish_plaque
+starcatcher:jungle_tackle_box_boat | - | 917.67 | treasure | 917.67 | starcatcher:jungle_tackle_box_boat
+starcatcher:lava_crab_claw | - | 800.00 | treasure | - | 
+starcatcher:letter | - | 10.00 | treasure | 10.00 | starcatcher:letter
+starcatcher:mangrove_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:mangrove_fish_plaque
+starcatcher:mangrove_tackle_box_boat | - | 917.67 | treasure | 917.67 | starcatcher:mangrove_tackle_box_boat
+starcatcher:message | - | 800.00 | treasure | - | 
+starcatcher:message_in_a_bottle | - | 800.00 | treasure | - | 
+starcatcher:mossy_boot | - | 800.00 | treasure | - | 
+starcatcher:oak_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:oak_fish_plaque
+starcatcher:oak_tackle_box_boat | - | 917.67 | treasure | 917.67 | starcatcher:oak_tackle_box_boat
+starcatcher:oculi | - | 800.00 | treasure | - | 
+starcatcher:spruce_fish_plaque | - | 28.00 | treasure | 28.00 | starcatcher:spruce_fish_plaque
+starcatcher:spruce_tackle_box_boat | - | 917.67 | treasure | 917.67 | starcatcher:spruce_tackle_box_boat
+starcatcher:tournament_stand | - | 27.00 | treasure | 27.00 | starcatcher:tournament_stand
+starcatcher:treasure | - | 800.00 | treasure | - | 
+starcatcher:trophy_copper | - | 800.00 | treasure | - | 
+starcatcher:trophy_diamond | - | 800.00 | treasure | - | 
+starcatcher:trophy_emerald | - | 800.00 | treasure | - | 
+starcatcher:trophy_gold | - | 800.00 | treasure | - | 
+starcatcher:trophy_iron | - | 800.00 | treasure | - | 
+starcatcher:trophy_of_the_older_angler | - | 800.00 | treasure | - | 

@@ -1,0 +1,11 @@
+{
+  "_help": "이야기 모드 몹이 저절로 생기는 비율 (0~1, 1 \u003d 줄이지 않음). 그 모드의 구조물 안과 storyBiomes 생물군계에서는 줄이지 않습니다.",
+  "keep": {
+    "mowziesmobs": 0.15,
+    "aquamirae": 0.15
+  },
+  "storyBiomes": [
+    "aquamirae:ice_maze"
+  ],
+  "keepInStructures": true
+}

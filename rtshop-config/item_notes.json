@@ -1,0 +1,6 @@
+{
+  "_help": "아이템 쓰임새 설명. enabled=false 면 끈다. auto: 상점·강화·뽑기·퀘스트에서 저절로 만드는 줄. notes: \"아이템 ID\": \"직접 적는 짧은 설명\" (\\n 으로 줄바꿈).",
+  "enabled": true,
+  "auto": true,
+  "notes": {}
+}

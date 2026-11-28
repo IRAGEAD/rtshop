@@ -1,0 +1,20 @@
+{
+  "_help": "상인 NPC 의 이름. format 의 {role} 은 직함(상점 설정의 npcName), {name} 은 아래 이름입니다. 이름을 비우면 직함만 보입니다. 저장한 뒤 /rtshop reload",
+  "format": "{role} {name}",
+  "names": {
+    "farmer": "한나",
+    "fisher": "오스카",
+    "food": "마르타",
+    "blacksmith": "브람",
+    "general": "피터",
+    "land": "에드먼드",
+    "raid": "세라",
+    "gacha_shop": "루시",
+    "attendance_shop": "엘리",
+    "bank": "그레고리",
+    "job": "알버트",
+    "attendance": "하루",
+    "raid_guide": "발터",
+    "restaurant": "로렌초"
+  }
+}

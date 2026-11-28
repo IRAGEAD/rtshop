@@ -1,0 +1,98 @@
+{
+  "_설명": [
+    "Spiral Abyss 주간 보상: endless 가 true 면 무한 모드에서 endlessStep 웨이브(10·20·…·60)를 넘길 때마다 한 단계씩 받습니다 (단계마다 주 1회, 매주 resetDay 요일 resetHour 시에 초기화. 1 = 월요일). false 면 1~6층 클리어 때.",
+    "storyOnlyFloors: true 면 층 모드(1~6층)는 이야기 퀘스트가 그 층을 부를 때만 들어갈 수 있습니다 (무한 모드는 언제든).",
+    "rewards: group 이 floor1~floor6 인 항목이 1~6단계의 보상. chance 는 받을 확률(%). gold: 단계마다 함께 주는 Gold.",
+    "게임 안에서 /rtshop abyss edit (OP) 로 고칠 수 있습니다: 아이템을 손에 들고 [손에 든 아이템 추가], 개수·확률 변경, 삭제."
+  ],
+  "enabled": true,
+  "resetDay": 1,
+  "resetHour": 6,
+  "endless": true,
+  "endlessStep": 10,
+  "storyOnlyFloors": true,
+  "gold": [
+    500,
+    1000,
+    2000,
+    3500,
+    5000,
+    8000
+  ],
+  "texts": {
+    "title": "주간 보상",
+    "reset": "초기화까지 %s일 %s시간",
+    "floor": "%s층 클리어",
+    "got": "[주간 보상] %s층 클리어 보상을 받았습니다: %s",
+    "gotNothing": "[주간 보상] %s층 클리어! (이번에는 확률 보상이 나오지 않았습니다)",
+    "gotEndless": "[주간 보상] 무한 모드 %s웨이브 보상을 받았습니다: %s",
+    "gotNothingEndless": "[주간 보상] 무한 모드 %s웨이브 돌파! (이번에는 확률 보상이 나오지 않았습니다)",
+    "storyOnly": "이 층은 이야기가 부를 때만 열립니다. 무한 모드는 언제든 들어갈 수 있습니다.",
+    "done": "받음"
+  },
+  "rewards": [
+    {
+      "group": "floor1",
+      "grade": 0,
+      "item": "minecraft:iron_ingot",
+      "count": 8,
+      "chance": 100.0
+    },
+    {
+      "group": "floor2",
+      "grade": 0,
+      "item": "minecraft:gold_ingot",
+      "count": 8,
+      "chance": 100.0
+    },
+    {
+      "group": "floor3",
+      "grade": 0,
+      "item": "minecraft:diamond",
+      "count": 2,
+      "chance": 100.0
+    },
+    {
+      "group": "floor4",
+      "grade": 0,
+      "item": "minecraft:diamond",
+      "count": 4,
+      "chance": 100.0
+    },
+    {
+      "group": "floor5",
+      "grade": 0,
+      "item": "minecraft:emerald",
+      "count": 16,
+      "chance": 100.0
+    },
+    {
+      "group": "floor6",
+      "grade": 0,
+      "item": "minecraft:netherite_scrap",
+      "count": 1,
+      "chance": 100.0
+    },
+    {
+      "group": "floor3",
+      "grade": 0,
+      "item": "rtshop:gacha_ticket_normal",
+      "count": 1,
+      "chance": 50.0
+    },
+    {
+      "group": "floor5",
+      "grade": 0,
+      "item": "rtshop:gacha_ticket_mid",
+      "count": 1,
+      "chance": 50.0
+    },
+    {
+      "group": "floor6",
+      "grade": 0,
+      "item": "rtshop:gacha_ticket_high",
+      "count": 1,
+      "chance": 25.0
+    }
+  ]
+}

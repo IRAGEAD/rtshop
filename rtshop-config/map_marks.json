@@ -1,0 +1,12 @@
+{
+  "_help": "지도 표시. 말을 걸어 본 NPC 와 가 본 장소의 이름이 지도 모드(Diorama)의 웨이포인트로 남습니다. folder = 웨이포인트 폴더 이름, npcs = NPC 표시 켜기, showInWorld = 이 표시들을 세계 안에도 띄우기(기본 false: M 지도에서만 보임), npcColor / placeColor = 표시 색(#RRGGBB). places = 장소 목록 (게임 안에서 /rtshop mapmark add <반경> <이름> 으로 서 있는 자리를 더하고, remove <이름> 으로 지웁니다).",
+  "enabled": true,
+  "folder": "베스탈리아",
+  "npcs": true,
+  "showInWorld": false,
+  "radarKnownOnly": true,
+  "npcColor": "#E8C56A",
+  "placeColor": "#8FC7F0",
+  "npcIcons": true,
+  "places": []
+}

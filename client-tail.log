@@ -1,0 +1,400 @@
+[19:59:16] [Render thread/INFO]: Interface themes: [fantasy:overworld, fantasy:starlit, fantasy:vanilla, fantasy:wildwood]
+[19:59:21] [Render thread/INFO]: Loaded 56 train hat configurations.
+[19:59:21] [Render thread/INFO]: Created: 256x256x0 moonlight:textures/atlas/map_markers.png-atlas
+[19:59:21] [Render thread/INFO]: Discovered 1067 English spell translation entries from installed resources.
+[19:59:21] [Render thread/INFO]: Successfully loaded image 'supplementaries:textures/block/gottem.gif'
+[19:59:21] [Render thread/INFO]: Successfully loaded item render replacer data
+[19:59:21] [Render thread/WARN]: [LambDynLights] Failed to parse item light source "supplementaries:dynamiclights/item/candle_holder", invalid format: missing required fields.
+[19:59:21] [Render thread/INFO]: Cleared Hamster Texture caches on resource reload.
+[19:59:22] [Render thread/INFO]: Stopping worker threads
+[19:59:22] [Render thread/INFO]: Started 1 worker threads
+[19:59:22] [Render thread/INFO]: [ETF]: reloading ETF data.
+[19:59:22] [Render thread/INFO]: [ETF]: emissive suffixes loaded: [_e]
+[19:59:24] [Render thread/INFO]: The last block color table worked out 516 looks in 116 ms
+[19:59:24] [Render thread/INFO]: Block color table for 454813 states set up in 3 ms; each state's colors are worked out when the map first meets it
+[19:59:28] [Render thread/INFO]: [rtshop-clienttest] PASS  English gacha tabs fit inside their buttons  []
+[19:59:30] [Render thread/INFO]: [rtshop-clienttest] PASS  no server-side error happened
+[19:59:30] [Render thread/INFO]: [rtshop-clienttest] RESULT: FAILED (2 of 370 checks)
+[19:59:35] [Render thread/INFO]: Stopping JEI
+[19:59:35] [Render thread/INFO]: Sending Runtime Unavailable...
+[19:59:35] [Render thread/INFO]: Stopping JEI GUI
+[19:59:35] [Render thread/INFO]: Sending Runtime Unavailable took 13.26 milliseconds
+[19:59:39] [CullThread/INFO]: [dev.tr7zw.entityculling.CullTask:run:94]: Shutting down culling task!
+[19:59:39] [Render thread/INFO]: Stopping!
+[19:59:39] [Render thread/INFO]: Client on ClientOnly mode disconnecting.
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [3] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [0] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [0] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [3] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [0] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [0] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:the_nether}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:the_nether}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@irons_spellbooks:pocket_dimension}].
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spmovesets:empireo}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@irons_spellbooks:pocket_dimension}
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spmovesets:empireo}
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spiral_abyss:spiral_abyss}].
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [0] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spiral_abyss:spiral_abyss}
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:the_end}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:the_end}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@rtshop:memory}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@rtshop:memory}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spmovesets:abismo}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spmovesets:abismo}
+[19:59:39] [level shutdown/INFO]: Closing world gen queue
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [0] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[19:59:39] [level shutdown/INFO]: Shutting down world generator thread pool...
+[19:59:39] [level shutdown/INFO]: World generator thread pool shutdown with [0] incomplete tasks.
+[19:59:39] [level shutdown/INFO]: Closing [DhChunkGenerator_forge]
+[19:59:39] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@illusioner:corrupted_void}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@illusioner:corrupted_void}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:overworld}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:overworld}
+[19:59:39] [Server thread/INFO]: Dev lost connection: Disconnected
+[19:59:39] [Server thread/INFO]: Dev left the game
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:overworld}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:overworld}
+[19:59:39] [Render thread/INFO]: Closed DhWorld of type [CLIENT_SERVER].
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@irons_spellbooks:pocket_dimension}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@irons_spellbooks:pocket_dimension}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:the_nether}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:the_nether}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@illusioner:corrupted_void}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@illusioner:corrupted_void}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spiral_abyss:spiral_abyss}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spiral_abyss:spiral_abyss}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spmovesets:empireo}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spmovesets:empireo}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@rtshop:memory}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@rtshop:memory}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:the_end}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:the_end}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spmovesets:abismo}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spmovesets:abismo}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:overworld}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:overworld}
+[19:59:39] [Render thread/INFO]: Closed DhWorld of type [CLIENT_SERVER].
+[19:59:39] [Render thread/INFO]: Closed DhWorld of type [CLIENT_SERVER].
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@irons_spellbooks:pocket_dimension}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@irons_spellbooks:pocket_dimension}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:the_nether}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:the_nether}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@illusioner:corrupted_void}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@illusioner:corrupted_void}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spiral_abyss:spiral_abyss}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spiral_abyss:spiral_abyss}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@rtshop:memory}].
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spmovesets:empireo}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spmovesets:empireo}
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@rtshop:memory}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:the_end}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:the_end}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@spmovesets:abismo}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@spmovesets:abismo}
+[19:59:39] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[world]@minecraft:overworld}].
+[19:59:39] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[world]@minecraft:overworld}
+[19:59:39] [Render thread/INFO]: Closed DhWorld of type [CLIENT_SERVER].
+[19:59:39] [Render thread/INFO]: Shutting down PriorityTaskPicker thread pool...
+[19:59:39] [Server thread/INFO]: Player [Dev] disconnected.
+[19:59:39] [Server thread/INFO]: Stopping singleplayer server as player logged out
+[19:59:39] [Server thread/INFO]: [Party] Sistema de party reiniciado
+[19:59:40] [Server thread/INFO]: Stopping server
+[19:59:40] [Server thread/INFO]: Saving players
+[19:59:40] [Server thread/INFO]: Saving worlds
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/spmovesets:abismo
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/irons_spellbooks:pocket_dimension
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/spiral_abyss:spiral_abyss
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/illusioner:corrupted_void
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/spmovesets:empireo
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/rtshop:memory
+[19:59:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (rtshoptest): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (abismo): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (pocket_dimension): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (spiral_abyss): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (corrupted_void): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (empireo): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (memory): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[19:59:40] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:basic_attack_active, epicfight:combo_counter] for epicfight:basic_attack
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:penalty_restore_counter, epicfight:penalty] for epicfight:guard
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:penalty_restore_counter, epicfight:penalty, epicfight:last_active, epicfight:parry_motion_counter] for epicfight:parrying
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:penalty_restore_counter, epicfight:penalty] for epicfight:impact_guard
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:stacks, epicfight:tick_record, epicfight:resisting_damage_type] for epicfight:adaptive_skin
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:tick_record] for epicfight:adrenaline_fiend
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:stacks, epicfight:entity_id] for epicfight:bonebreaker
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:tick_record, epicfight:entity_id] for epicfight:vengeance
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:fall_distance, epicfight:slam_protect_next_fall] for epicfight:meteor_slam
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:stacks] for epicfight:revelation
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:slam_protect_next_fall] for epicfight:demolition_leap
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:jump_count, epicfight:jump_key_pressed_last_tick, epicfight:slam_protect_next_fall] for epicfight:phantom_ascent
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:last_hit_count] for epicfight:grasping_spire
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:sheath] for epicfight:battojutsu_passive
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:sheath] for epicfight:battojutsu
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:combo_counter] for epicfight:blade_rush
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:thrown_trident_entity_id] for epicfight:everlasting_allegiance
+[19:59:40] [Server thread/INFO]: Data keys [wom:target_id] for wom:ender_obscuris
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:dodge, wom:timer] for wom:dodge_master
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:dodge, wom:registered_position, wom:registered_health, wom:active, wom:timer, wom:cooldown] for wom:time_travel
+[19:59:40] [Server thread/INFO]: Data keys [wom:cooldown] for wom:punishment_kick
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:penalty_restore_counter, wom:parrying, wom:holding_rmb, wom:last_active, epicfight:penalty, wom:consumprion_value] for wom:counter_attack
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, epicfight:penalty_restore_counter, wom:holding_stance, epicfight:penalty, wom:consumprion_value, wom:timer, wom:vengence_duration, wom:cooldown, wom:charge] for wom:vengeful_parry
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:penalty_restore_counter, wom:parrying, wom:holding_rmb, epicfight:penalty, wom:cooldown, wom:charge] for wom:perfect_bulwark
+[19:59:40] [Server thread/INFO]: Data keys [wom:cycle, wom:charge] for wom:soul_protection
+[19:59:40] [Server thread/INFO]: Data keys [wom:cycle, wom:charge] for wom:shulker_cloak
+[19:59:40] [Server thread/INFO]: Data keys [epicfight:penalty_restore_counter, wom:holding_rmb, wom:active, epicfight:penalty, wom:timer] for wom:buster_parade
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:active, wom:duree, wom:timer] for wom:pain_anticipation
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:active, wom:duree, wom:timer] for wom:latent_retribution
+[19:59:40] [Server thread/INFO]: Data keys [wom:rate, wom:power] for wom:critical_knowledge
+[19:59:40] [Server thread/INFO]: Data keys [wom:recovery_rate, wom:max_shield, wom:cooldown] for wom:heart_shield
+[19:59:40] [Server thread/INFO]: Data keys [wom:melody_index, wom:step, wom:saved_elapsed_time] for wom:dancing_blade
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:cycle, wom:active, wom:duree, wom:stage, wom:timer] for wom:meditation
+[19:59:40] [Server thread/INFO]: Data keys [wom:cooldown] for wom:dopamine
+[19:59:40] [Server thread/INFO]: Data keys [wom:last_active] for wom:manipulator
+[19:59:40] [Server thread/INFO]: Data keys [wom:rate, wom:power, wom:stack, wom:timer] for wom:lethal_focus
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:angle, wom:jump_key_up, wom:wall_running, wom:wall_glide, wom:timer] for wom:spider_techniques
+[19:59:40] [Server thread/INFO]: Data keys [wom:jump_key_up, wom:crawling, wom:water_dashing, wom:mermaid_movement, wom:diving, wom:consumprion_value, wom:cooldown] for wom:aqua_maneuvre
+[19:59:40] [Server thread/INFO]: Data keys [wom:wall_running, wom:wall_glide, wom:buffing, wom:active, wom:stage, wom:consumprion_value, wom:timer, wom:verso] for wom:natural_sprinter
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer] for wom:lunatic_vivacity
+[19:59:40] [Server thread/INFO]: Data keys [wom:holding_rmb, wom:registered_health, wom:consumprion_value, wom:timer] for wom:voodoo_magic
+[19:59:40] [Server thread/INFO]: Data keys [wom:target_id, wom:target_distance] for wom:back_and_forth
+[19:59:40] [Server thread/INFO]: Data keys [wom:combo, wom:cooldown] for wom:shooting_style
+[19:59:40] [Server thread/INFO]: Data keys [wom:active, wom:timer] for wom:proximity_exploiter
+[19:59:40] [Server thread/INFO]: Data keys [wom:stack, wom:timer] for wom:all_eyes_on_you
+[19:59:40] [Server thread/INFO]: Data keys [wom:stack, wom:timer] for wom:all_eyes_on_me
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer, wom:cooldown] for wom:avatar_of_might
+[19:59:40] [Server thread/INFO]: Data keys [wom:attacks, wom:active, wom:stack] for wom:agony_plunge
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:charging_time, wom:movespeed, wom:charged, wom:charged_attack, wom:holding_rmb, wom:saved_charge, wom:active, wom:timer, wom:charging] for wom:torment_passive
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:active, wom:timer] for wom:true_berserk
+[19:59:40] [Server thread/INFO]: Data keys [wom:stack] for wom:herrscher_passive
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:strenght, wom:buffing, wom:redemptioon, wom:expiation, wom:buffed, wom:timer, wom:verso] for wom:plunder_perdition
+[19:59:40] [Server thread/INFO]: Data keys [wom:sheath] for wom:satsujin_passive
+[19:59:40] [Server thread/INFO]: Data keys [wom:holding_stance, wom:holding_rmb, wom:saved_charge, wom:active, wom:damage, wom:cooldown, wom:timedslash, wom:charge, wom:timer_refresh, wom:attacks, wom:frequency, wom:stack, wom:timer, wom:charging, wom:second_draw] for wom:sakura_state
+[19:59:40] [Server thread/INFO]: Data keys [wom:reload_cooldown, wom:nofalldamage, wom:combo, wom:holding_rmb, wom:shoot, wom:zoom, wom:using_item, wom:cooldown, wom:zoom_cooldown] for wom:ender_blast
+[19:59:40] [Server thread/INFO]: Data keys [wom:reload_cooldown, wom:nofalldamage, wom:combo, wom:holding_rmb, wom:shoot, wom:zoom, wom:using_item, wom:cooldown, wom:zoom_cooldown, wom:side] for wom:ender_fusion
+[19:59:40] [Server thread/INFO]: Data keys [wom:charging_time, wom:combo, wom:charged, wom:parrying, wom:holding_stance, wom:guard_point_result, wom:holding_rmb, wom:guard_point, wom:gesetz_sprengkopf, wom:cooldown] for wom:regierung
+[19:59:40] [Server thread/INFO]: Data keys [wom:timer_refresh, wom:lunar_eclipse_stack, wom:crescent, wom:timer, wom:echo] for wom:lunar_eclipse
+[19:59:40] [Server thread/INFO]: Data keys [wom:idle, wom:verso] for wom:lunar_echo_passive
+[19:59:40] [Server thread/INFO]: Data keys [wom:darkness_target, wom:blackhole, wom:darkness_target_reaped, wom:darkness_portal_vec, wom:holding_rmb, wom:shoot, wom:shoot_cooldown, wom:darkness_portal_timer, wom:darkness_target_hited, wom:serius_focus, wom:zoom, wom:timer, wom:zoom_cooldown, wom:darkness_target_vec, wom:darkness_activate_portal, wom:active, wom:timer_refresh, wom:witherccatharsis, wom:witheraftereffect, wom:serius_focus_cooldown, wom:blackhole_active, wom:blackhole_timer, wom:darkness_portal_angle, wom:ascending, wom:blackhole_vec] for wom:demonic_ascension
+[19:59:40] [Server thread/INFO]: Data keys [wom:catharsis, wom:withercurse, wom:idle, wom:blink, wom:basic_attack, wom:lapse, wom:particle] for wom:demon_mark_passive
+[19:59:40] [Server thread/INFO]: Data keys [wom:solar_infernio, wom:stored_heat_level, wom:cycle, wom:holding_rmb, wom:solar_crematorio, wom:charge, wom:timed_attack, wom:solar_obscuridad_ta_timer, wom:timer_refresh, wom:solar_obscuridad, wom:heating_speed, wom:heat_level, wom:timer, wom:charging, wom:particle] for wom:solar_arcano
+[19:59:40] [Server thread/INFO]: Data keys [wom:solar_infernio, wom:stored_heat_level, wom:cycle, wom:solar_crematorio, wom:charge, wom:timed_attack, wom:solar_obscuridad_ta_timer, wom:timer_refresh, wom:solar_obscuridad, wom:heating_speed, wom:heat_level, wom:timer, wom:charging, wom:particle] for wom:solar_passive
+[19:59:40] [Server thread/INFO]: Data keys [wom:serius_focus_cooldown, wom:serius_focus] for wom:rechargement
+[19:59:40] [Server thread/INFO]: Data keys [wom:super_reload, wom:charged, wom:bullet_loaded, wom:bullet_overloaded, wom:shell_delay, wom:cycle, wom:shell_anim, wom:active, wom:shell_number, wom:bullet_loaded_old, wom:charge] for wom:napoleon_passive
+[19:59:40] [Server thread/INFO]: Data keys [wom:stack, wom:timer] for wom:unbreakable
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:health_boost1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:health_boost2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:health_boost3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:health_boost4
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:absorb1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:absorb2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:absorb3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:absorb4
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:heal1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:heal2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:heal3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:heal4
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:resist1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:resist2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:resist3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:resist4
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stun_imm1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stun_imm2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stun_imm3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stun_imm4
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:damage_boost1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:damage_boost2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:damage_boost3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:damage_boost4
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:speed1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:speed2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:speed3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:speed4
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stamina1
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stamina2
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stamina3
+[19:59:40] [Server thread/INFO]: Data keys [dodge_parry_reward:delay_timer] for dodge_parry_reward:stamina4
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:dodge_attacking] for epicfightx:roll
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:dodge_attacking] for epicfightx:step
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:counter_available, epicfightx:is_special_animation, epicfightx:dodge_start_time] for epicfightx:combat_mastery_i
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:sprint_available, epicfightx:dodge_start_time, epicfightx:sprint_active] for epicfightx:combat_mastery_ii
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:cooldown] for epicfightx:pickaxe_skill
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:great_tachi_marked_entities] for epicfightx:otachi_skill
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:attack_count_snapshot, epicfightx:attack_count, epicfightx:sheath_form] for epicfightx:katana_skill
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:sheath, epicfightx:sheath_killed] for epicfightx:battojutsu_passive
+[19:59:40] [Server thread/INFO]: Data keys [epicfightx:sheath] for epicfightx:battojutsu
+[19:59:40] [Server thread/INFO]: Data keys [invincible:down, invincible:dodge_success_timer, invincible:parry_timer, invincible:left, invincible:right, invincible:cooldown, invincible:up] for invincible:combo_demo
+[19:59:40] [Server thread/INFO]: Data keys [efn:scythe_sheath, efn:scythe_blood_power] for efn:scythe_skill
+[19:59:40] [Server thread/INFO]: Data keys [efn:press_innate, efn:thornwheel_loop, efn:thornwheel_loop_available] for efn:thornwheel
+[19:59:40] [Server thread/INFO]: Data keys [efn:yamato_dodge_jump_count] for efn:yamato_step
+[19:59:40] [Server thread/INFO]: Data keys [efn:jump_key_pressed_last_tick, efn:jump_count, efn:murasama_forward_dodge] for efn:murasama_dodge
+[19:59:40] [Server thread/INFO]: Data keys [efn:puncture_increment, efn:base_puncture_chance, efn:current_puncture_chance, efn:max_puncture_chance] for efn:parry_master
+[19:59:40] [Server thread/INFO]: Data keys [efn:defense_start_tick, efn:buff_end_tick, efn:buff_active] for efn:precise_parry
+[19:59:40] [Server thread/INFO]: Data keys [efn:cooldown_2, efn:cooldown, efn:cooldown_1] for efn:judgementcutend
+[19:59:40] [Server thread/INFO]: Data keys [efn:cooldown_2, efn:cooldown, efn:cooldown_1] for efn:stomp
+[19:59:40] [Server thread/INFO]: Data keys [efn:murasama_zansetsu_end_time, efn:murasama_zandatsu_start_time, efn:murasama_zansetsu_active, efn:murasama_opposite_triggered, efn:murasama_zansetsu_timer, efn:murasama_left_mouse_pressed, efn:murasama_pair_flag, efn:murasama_zansetsu_sector, efn:murasama_zansetsu_slash_release, efn:murasama_key_right_down, efn:arts_key, efn:murasama_zandatsu_available, efn:murasama_last_triggered_sector, efn:murasama_zansetsu_start_time, efn:murasama_zandatsu_end_time, efn:murasama_input_mode_switch_pressed, efn:arts_key_pressed, efn:murasama_zansetsu_input_mode, efn:murasama_key_left_down, efn:murasama_zansetsu_attack_counter] for efn:zansetsu
+[19:59:40] [Server thread/INFO]: Data keys [efn:cooldown_2, efn:cooldown, efn:cooldown_1] for efn:execution
+[19:59:40] [Server thread/INFO]: Data keys [efn:efn_shake_detected, efn:efn_last_active, efn:efn_delay_protection_end, epicfight:penalty_restore_counter, efn:efn_starting_parry, efn:efn_first_shake, efn:efn_parry_motion_counter, efn:efn_last_parry_time, epicfight:penalty, efn:efn_last_guard_start_tick, efn:efn_shake_penalty_count, efn:efn_last_successful_defense_tick] for efn:efn_parry
+[19:59:40] [Server thread/INFO]: Data keys [efn:efn_shake_detected, efn:efn_last_active, efn:efn_delay_protection_end, epicfight:penalty_restore_counter, efn:efn_starting_parry, efn:efn_first_shake, efn:efn_parry_motion_counter, efn:efn_last_parry_time, epicfight:penalty, efn:efn_last_guard_start_tick, efn:efn_shake_penalty_count, efn:efn_last_successful_defense_tick] for efn:murasama_parry
+[19:59:40] [Server thread/INFO]: Data keys [efn:arts_input_buffer, efn:arts_key, efn:cooldown_2, efn:sekiro_art_index, efn:arts_key_pressed, efn:cooldown, efn:cooldown_1] for efn:mortal_blade
+[19:59:40] [Server thread/INFO]: Data keys [efn:have_doppelganger, efn:pressing_key1, efn:pressing_key4, invincible:down, efn:guard_key, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, efn:doppelganger_tick, invincible:right, efn:doppelganger_delay, efn:press_key1, efn:was_long_pressed, efn:press_key4, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:doppelganger_style, invincible:left, efn:yamato_dodge_jump_count, efn:full_charge_message, efn:is_charging, invincible:cooldown, efn:arts_key_pressed, efn:up_key, efn:innate_press_timer, efn:key1_press_timer, efn:press_doppelganger, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:energy_check, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:press_summon_sword, efn:pressing_key3, efn:down_key, efn:key3_press_timer, efn:key4_press_timer, efn:sneak_key, efn:pressing_innate, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, efn:charge_power, efn:demon_key, efn:charge_message, invincible:up] for efn:yamato
+[19:59:40] [Server thread/INFO]: Data keys [efn:have_doppelganger, efn:doppelganger_style, efn:stun_cooldown, efn:parry_cooldown, efn:doppelganger_tick, efn:doppelganger_delay] for efn:yamato_passive
+[19:59:40] [Server thread/INFO]: Data keys [efn:pressing_key1, efn:pressing_key4, invincible:down, efn:guard_key, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:was_long_pressed, efn:press_key4, efn:cooldown, efn:is_pressing, efn:pressing_key2, invincible:left, efn:full_charge_message, efn:is_charging, invincible:cooldown, efn:arts_key_pressed, efn:up_key, efn:damage_history, efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:energy_check, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:press_summon_sword, efn:pressing_key3, efn:down_key, efn:key3_press_timer, efn:key4_press_timer, efn:sneak_key, efn:is_replay_damage, efn:pressing_innate, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:replay_enhanced, efn:sprint_key, efn:press_key2, efn:angel_key, efn:charge_power, efn:demon_key, efn:charge_message, invincible:up] for efn:shortsword
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:ruinsgreatsword
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:pioneer
+[19:59:40] [Server thread/INFO]: Data keys [efn:efn_delay_protection_end, efn:murasama_zansetsu_active, efn:murasama_sheath, efn:efn_last_parry_time, efn:pressing_key1, efn:murasama_zansetsu_slash_release, efn:pressing_key4, invincible:down, efn:efn_last_active, efn:guard_key, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, efn:murasama_zansetsu_start_time, efn:murasama_zandatsu_end_time, invincible:right, efn:murasama_input_mode_switch_pressed, efn:press_key1, efn:was_long_pressed, efn:press_key4, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:efn_shake_detected, efn:murasama_air_borne, efn:murasama_sheath_timer, invincible:left, efn:murasama_pair_flag, efn:full_charge_message, efn:is_charging, efn:murasama_key_right_down, efn:murasama_last_triggered_sector, invincible:cooldown, efn:arts_key_pressed, efn:up_key, efn:murasama_key_left_down, efn:murasama_zansetsu_attack_counter, efn:murasama_zansetsu_end_time, efn:murasama_zandatsu_start_time, efn:innate_press_timer, efn:key1_press_timer, efn:murasama_zansetsu_timer, efn:efn_starting_parry, efn:efn_first_shake, efn:efn_parry_motion_counter, efn:murasama_left_mouse_pressed, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:murasama_zansetsu_sector, efn:efn_last_guard_start_tick, efn:murasama_forward_dodge, efn:efn_shake_penalty_count, efn:weapon_guard_penalty, efn:efn_last_successful_defense_tick, efn:energy_check, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:press_summon_sword, efn:pressing_key3, efn:weapon_guard_active, efn:down_key, efn:key3_press_timer, efn:murasama_opposite_triggered, efn:manual_unsheath, efn:key4_press_timer, efn:sneak_key, efn:pressing_innate, efn:cooldown_1, efn:murasama_zandatsu_available, efn:arts_key, efn:press_innate, efn:press_key3, efn:weapon_guard_restore_tick, efn:sprint_key, efn:press_key2, efn:angel_key, efn:charge_power, efn:murasama_zansetsu_input_mode, efn:jump_count, efn:demon_key, efn:sprint_sheath_timer, efn:charge_message, invincible:up] for efn:murasama
+[19:59:40] [Server thread/INFO]: Data keys [efn:murasama_zansetsu_end_time, efn:murasama_zandatsu_start_time, efn:murasama_zansetsu_active, efn:murasama_zansetsu_timer, efn:murasama_sheath, efn:murasama_left_mouse_pressed, efn:murasama_zansetsu_sector, efn:murasama_forward_dodge, efn:murasama_zansetsu_slash_release, efn:forward_backward_timer, efn:was_double_tap_sprint, efn:murasama_zansetsu_start_time, efn:murasama_zandatsu_end_time, efn:murasama_input_mode_switch_pressed, efn:forward_backward_window_active, efn:forward_backward_remaining_ticks, efn:murasama_sheath_timer, efn:murasama_opposite_triggered, efn:manual_unsheath, efn:is_double_tap_sprint, efn:backward_pressed_last_tick, efn:forward_backward_success, efn:murasama_pair_flag, efn:jump_key_pressed_last_tick, efn:forward_backward_end_tick, efn:murasama_key_right_down, efn:murasama_zandatsu_available, efn:forward_pressed_last_tick, efn:murasama_last_triggered_sector, efn:double_tap_timer, efn:murasama_zansetsu_input_mode, efn:jump_count, efn:murasama_key_left_down, efn:murasama_zansetsu_attack_counter, efn:up_key_pressed_last_tick, efn:sprint_sheath_timer] for efn:murasama_passive
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:meenlance
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:kusabimaru
+[19:59:40] [Server thread/INFO]: Data keys [efn:efn_delay_protection_end, efn:murasama_zansetsu_active, efn:murasama_sheath, efn:efn_last_parry_time, efn:pressing_key1, efn:murasama_zansetsu_slash_release, efn:pressing_key4, invincible:down, efn:efn_last_active, efn:guard_key, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, efn:murasama_zansetsu_start_time, efn:murasama_zandatsu_end_time, invincible:right, efn:murasama_input_mode_switch_pressed, efn:press_key1, efn:was_long_pressed, efn:press_key4, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:efn_shake_detected, efn:murasama_air_borne, efn:murasama_sheath_timer, invincible:left, efn:murasama_pair_flag, efn:full_charge_message, efn:is_charging, efn:murasama_key_right_down, efn:murasama_last_triggered_sector, invincible:cooldown, efn:arts_key_pressed, efn:up_key, efn:murasama_key_left_down, efn:murasama_zansetsu_attack_counter, efn:murasama_zansetsu_end_time, efn:murasama_zandatsu_start_time, efn:innate_press_timer, efn:key1_press_timer, efn:murasama_zansetsu_timer, efn:efn_starting_parry, efn:efn_first_shake, efn:efn_parry_motion_counter, efn:murasama_left_mouse_pressed, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:murasama_zansetsu_sector, efn:efn_last_guard_start_tick, efn:murasama_forward_dodge, efn:efn_shake_penalty_count, efn:weapon_guard_penalty, efn:efn_last_successful_defense_tick, efn:energy_check, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:press_summon_sword, efn:pressing_key3, efn:weapon_guard_active, efn:down_key, efn:key3_press_timer, efn:murasama_opposite_triggered, efn:manual_unsheath, efn:key4_press_timer, efn:sneak_key, efn:pressing_innate, efn:cooldown_1, efn:murasama_zandatsu_available, efn:arts_key, efn:press_innate, efn:press_key3, efn:weapon_guard_restore_tick, efn:sprint_key, efn:press_key2, efn:angel_key, efn:charge_power, efn:murasama_zansetsu_input_mode, efn:jump_count, efn:demon_key, efn:sprint_sheath_timer, efn:charge_message, invincible:up] for efn:hf_blade
+[19:59:40] [Server thread/INFO]: Data keys [efn:murasama_zansetsu_end_time, efn:murasama_zandatsu_start_time, efn:murasama_zansetsu_active, efn:murasama_zansetsu_timer, efn:murasama_sheath, efn:murasama_left_mouse_pressed, efn:murasama_zansetsu_sector, efn:murasama_forward_dodge, efn:murasama_zansetsu_slash_release, efn:forward_backward_timer, efn:was_double_tap_sprint, efn:murasama_zansetsu_start_time, efn:murasama_zandatsu_end_time, efn:murasama_input_mode_switch_pressed, efn:forward_backward_window_active, efn:forward_backward_remaining_ticks, efn:murasama_sheath_timer, efn:murasama_opposite_triggered, efn:manual_unsheath, efn:is_double_tap_sprint, efn:backward_pressed_last_tick, efn:forward_backward_success, efn:murasama_pair_flag, efn:jump_key_pressed_last_tick, efn:forward_backward_end_tick, efn:murasama_key_right_down, efn:murasama_zandatsu_available, efn:forward_pressed_last_tick, efn:murasama_last_triggered_sector, efn:double_tap_timer, efn:murasama_zansetsu_input_mode, efn:jump_count, efn:murasama_key_left_down, efn:murasama_zansetsu_attack_counter, efn:up_key_pressed_last_tick, efn:sprint_sheath_timer] for efn:hf_blade_passive
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:exsiliumgladius
+[19:59:40] [Server thread/INFO]: Data keys [invincible:down, invincible:dodge_success_timer, invincible:parry_timer, invincible:left, invincible:right, invincible:cooldown, invincible:up] for efn:examplecombo
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:crescentmoon
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:broadblade
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:bloodlust
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:beastclaw
+[19:59:40] [Server thread/INFO]: Data keys [efn:innate_press_timer, efn:key1_press_timer, efn:charge_stage, efn:charge_ticks, efn:force_release, efn:pressing_key1, efn:pressing_key4, efn:energy_check, invincible:down, invincible:dodge_success_timer, efn:combo_counter, invincible:parry_timer, efn:guard_key, efn:press_summon_sword, efn:jump_key, efn:cooldown_2, efn:key2_press_timer, invincible:right, efn:press_key1, efn:pressing_key3, efn:was_long_pressed, efn:press_key4, efn:down_key, efn:cooldown, efn:is_pressing, efn:pressing_key2, efn:key3_press_timer, efn:key4_press_timer, invincible:left, efn:full_charge_message, efn:sneak_key, efn:pressing_innate, efn:is_charging, efn:cooldown_1, efn:arts_key, efn:press_innate, efn:press_key3, efn:sprint_key, efn:press_key2, efn:angel_key, invincible:cooldown, efn:charge_power, efn:arts_key_pressed, efn:up_key, efn:demon_key, efn:charge_message, invincible:up] for efn:aetherialdusk
+[19:59:44] [Render thread/INFO]: Closing all [9] databases...
+[19:59:47] [Render thread/INFO]: EFX: Replacing Epic Fight Weapon Types...
+[19:59:47] [Render thread/INFO]: Dual-wield layer registered for greatsword, spear, longsword, tachi and axe
+[19:59:47] [Render thread/ERROR]: Exception caught during firing event: Task com.meuuser.voicecmd.client.VoiceClientController$$Lambda$45385/0x00007f6f94db23f0@20e6c9c9 rejected from java.util.concurrent.ThreadPoolExecutor@96cdf60[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 1]
+	Index: 42
+	Listeners:
+		0: HIGH
+		1: ASM: class dev.architectury.event.forge.EventHandlerImplClient event(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		2: NORMAL
+		3: ASM: class com.guhao.vix.hitstop.client.HitStopClientEvents onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		4: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@4af45bdb
+		5: ASM: class com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler loggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		6: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@b3da92a
+		7: ASM: class io.redspace.ironslib.internal.client.ClientEvents onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		8: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@74cfaac8
+		9: ASM: class dev.dyslexic.cinematic.client.CinematicClient$Events onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		10: ASM: class yesman.epicfight.client.events.ClientEvents clientLogoutEvent(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		11: ASM: class com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticleEngine onLogoff(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		12: ASM: class com.finderfeed.fdlib.systems.music.FDMusicSystem clearSounds(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		13: ASM: class com.finderfeed.fdlib.systems.hud.bossbars.FDBossbars onLogoff(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		14: ASM: class com.finderfeed.fdlib.systems.cutscenes.CutsceneCameraHandler onLogoff(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		15: ASM: class com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenEffectHandler onLogoff(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		16: ASM: class com.finderfeed.fdlib.ClientMixinHandler onLogoff(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		17: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@1b319f11
+		18: ASM: class org.toame.food.compat.FirstPersonMod onClientLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		19: ASM: class spmovesets.spmovesets.survival.world.realm.client.PortalLockClick onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		20: ASM: class spmovesets.spmovesets.survival.world.realm.client.PortalClient onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		21: ASM: class spmovesets.spmovesets.survival.client.SurvivalClientEvents onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		22: ASM: class com.rtshop.client.NpcLookClient onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		23: ASM: class com.rtshop.client.MapMarkClient onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		24: ASM: class com.rtshop.client.DhViewGuard onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		25: ASM: class com.rtshop.client.ClientEvents onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		26: ASM: class dev.architectury.networking.forge.ClientNetworkingManager loggedOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		27: ASM: com.vecoo.extraquests.network.ExtraQuestsClientListener@4146735a onClientPlayerNetworkLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		28: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@73f3252f
+		29: ASM: class com.github.mcmodderanchor.simplebedrockmodel.v1.particle.world.WorldEmitterManager onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		30: ASM: class com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler onPlayerLoggedOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		31: ASM: class com.github.mcmodderanchor.simplebedrockmodel.v1.client.event.ClientAnimationClockTicker onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		32: ASM: class spmovesets.spmovesets.events.ClientLoginHandler onClientLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		33: ASM: class com.pla.spiral_abyss.forge.client.ForgeClientEvents AbyssEncounterOverlay_logout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		34: ASM: class com.pla.spiral_abyss.forge.client.ForgeClientEvents RareRewardOverlay_logout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		35: ASM: class com.pla.spiral_abyss.forge.client.ForgeClientEvents PortalEntryAnimation_logout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		36: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@15e1a682
+		37: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@1c71d71c
+		38: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@baf0a94
+		39: ASM: class com.tacz.guns.client.event.InventoryEvent onPlayerLoggedOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		40: ASM: class com.tacz.guns.client.event.CommonNetworkCacheEvent onClientPlayerLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		41: ASM: class net.mehvahdjukaar.moonlight.forge.MoonlightForgeClient onPlayerLoggedOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		42: ASM: class com.meuuser.voicecmd.client.VoiceClientEvents onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		43: ASM: class io.redspace.ironsspellbooks.player.ClientPlayerEvents onPlayerLogOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		44: ASM: class io.redspace.ironsspellbooks.particle.ClientShieldHelper onPlayerLogOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		45: ASM: class com.hm.efn.client.effek.StatusEffekManager onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		46: ASM: class com.simibubi.create.foundation.events.ClientEvents onLeave(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		47: ASM: class com.luoee.arcanevortex.TimeStop.Client.TimeStopClient onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		48: ASM: class com.luoee.arcanevortex.Content.TexGen.TexGenClientEvents$ForgeBus onLoggedOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		49: ASM: class com.luoee.arcanevortex.Content.PhysicsBlackHole.Client.PhysicsBlackHoleClient onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		50: ASM: class com.luoee.arcanevortex.Content.Item.StructureTool.Client.ToolInput onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		51: ASM: class com.luoee.arcanevortex.Content.Hidden.HiddenClient onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		52: ASM: class com.luoee.arcanevortex.Content.Font3D.Client.Font3DClient onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+		53: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@619f8c93
+		54: net.minecraftforge.eventbus.EventBus$$Lambda$1709/0x00007f6f906ea800@7952f394
+		55: LOWEST
+		56: ASM: class com.tacz.guns.client.event.ClientGunTimeResetEvent onLoggingOut(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+java.util.concurrent.RejectedExecutionException: Task com.meuuser.voicecmd.client.VoiceClientController$$Lambda$45385/0x00007f6f94db23f0@20e6c9c9 rejected from java.util.concurrent.ThreadPoolExecutor@96cdf60[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 1]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2065)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:833)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:1365)
+	at java.base/java.util.concurrent.Executors$DelegatedExecutorService.execute(Executors.java:721)
+	at TRANSFORMER/voicecmd@0.3.4/com.meuuser.voicecmd.client.VoiceClientController.stop(VoiceClientController.java:115)
+	at TRANSFORMER/voicecmd@0.3.4/com.meuuser.voicecmd.client.VoiceClientEvents.onLogout(VoiceClientEvents.java:88)
+	at TRANSFORMER/voicecmd@0.3.4/com.meuuser.voicecmd.client.__VoiceClientEvents_onLogout_LoggingOut.invoke(.dynamic)
+	at MC-BOOTSTRAP/net.minecraftforge.eventbus/net.minecraftforge.eventbus.ASMEventHandler.invoke(ASMEventHandler.java:55)
+	at MC-BOOTSTRAP/net.minecraftforge.eventbus/net.minecraftforge.eventbus.EventBus.post(EventBus.java:312)
+	at MC-BOOTSTRAP/net.minecraftforge.eventbus/net.minecraftforge.eventbus.EventBus.post(EventBus.java:298)
+	at TRANSFORMER/forge@47.4.29/net.minecraftforge.client.ForgeHooksClient.firePlayerLogout(ForgeHooksClient.java:945)
+	at TRANSFORMER/minecraft@1.20.1/net.minecraft.client.Minecraft.m_91320_(Minecraft.java:2107)
+	at TRANSFORMER/minecraft@1.20.1/net.minecraft.client.Minecraft.m_91399_(Minecraft.java:2089)
+	at TRANSFORMER/minecraft@1.20.1/net.minecraft.client.Minecraft.m_91393_(Minecraft.java:1035)
+	at TRANSFORMER/minecraft@1.20.1/net.minecraft.client.main.Main.main(Main.java:234)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at MC-BOOTSTRAP/fmlloader@1.20.1-47.4.29/net.minecraftforge.fml.loading.targets.CommonLaunchHandler.runTarget(CommonLaunchHandler.java:111)
+	at MC-BOOTSTRAP/fmlloader@1.20.1-47.4.29/net.minecraftforge.fml.loading.targets.CommonLaunchHandler.clientService(CommonLaunchHandler.java:99)
+	at MC-BOOTSTRAP/fmlloader@1.20.1-47.4.29/net.minecraftforge.fml.loading.targets.CommonClientLaunchHandler.lambda$makeService$0(CommonClientLaunchHandler.java:25)
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@10.0.9/cpw.mods.modlauncher.LaunchServiceHandlerDecorator.launch(LaunchServiceHandlerDecorator.java:30)
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@10.0.9/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:53)
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@10.0.9/cpw.mods.modlauncher.LaunchServiceHandler.launch(LaunchServiceHandler.java:71)
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@10.0.9/cpw.mods.modlauncher.Launcher.run(Launcher.java:108)
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@10.0.9/cpw.mods.modlauncher.Launcher.main(Launcher.java:78)
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@10.0.9/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:26)
+	at MC-BOOTSTRAP/cpw.mods.modlauncher@10.0.9/cpw.mods.modlauncher.BootstrapLaunchConsumer.accept(BootstrapLaunchConsumer.java:23)
+	at cpw.mods.bootstraplauncher@1.1.2/cpw.mods.bootstraplauncher.BootstrapLauncher.main(BootstrapLauncher.java:141)
+

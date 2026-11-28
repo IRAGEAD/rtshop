@@ -1,0 +1,138 @@
+# 상점: 농작물 상점 (farmer)
+# 아이템 | 구매가 | 기본 매입가 | 구분 | 원가 | 가격 근거(레시피)
+minecraft:wheat | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+minecraft:beetroot | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+minecraft:carrot | 20 | 10.00 | crops (품질 반영) | 20.00 | 
+minecraft:potato | 20 | 10.00 | crops (품질 반영) | 20.00 | 
+minecraft:nether_wart | 30 | 15.00 | crops (품질 반영) | 30.00 | 
+minecraft:cocoa_beans | 20 | 10.00 | crops (품질 반영) | 20.00 | 
+minecraft:brown_mushroom | 8 | 4.00 | crops (품질 반영) | - | 
+minecraft:red_mushroom | 8 | 4.00 | crops (품질 반영) | - | 
+minecraft:apple | 50 | 25.00 | crops (품질 반영) | 50.00 | 
+minecraft:sweet_berries | 6 | 3.00 | crops (품질 반영) | 6.00 | 
+minecraft:glow_berries | 8 | 4.00 | crops (품질 반영) | 8.00 | 
+minecraft:chorus_fruit | 6 | 3.00 | crops (품질 반영) | 6.00 | 
+minecraft:melon_slice | 1 | 0.50 | crops (품질 반영) | 1.00 | 
+minecraft:melon | 9 | 4.50 | crops (품질 반영) | 9.00 | 
+minecraft:pumpkin | 4 | 2.00 | crops (품질 반영) | 4.00 | 
+minecraft:sugar_cane | 2 | 1.00 | crops (품질 반영) | 2.00 | 
+minecraft:cactus | 2 | 1.00 | crops (품질 반영) | 2.00 | 
+farmersdelight:cabbage | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farmersdelight:cabbage_leaf | 20 | 10.00 | crops (품질 반영) | 20.00 | 
+farmersdelight:tomato | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farmersdelight:onion | 20 | 10.00 | crops (품질 반영) | 20.00 | 
+farmersdelight:rice | 4 | 2.00 | crops (품질 반영) | 4.00 | 
+kaleidoscope_cookery:tomato | 40 | 20.00 | crops (품질 반영) | - | 
+kaleidoscope_cookery:red_chili | 40 | 20.00 | crops (품질 반영) | - | 
+kaleidoscope_cookery:green_chili | 40 | 20.00 | crops (품질 반영) | - | 
+kaleidoscope_cookery:lettuce | 40 | 20.00 | crops (품질 반영) | - | 
+kaleidoscope_cookery:rice | 4 | 2.00 | crops (품질 반영) | 4.00 | 
+kaleidoscope_cookery:wild_rice | 20 | 10.00 | crops (품질 반영) | - | 
+kaleidoscope_cookery:fresh_tea_leaves | 10 | 5.00 | crops (품질 반영) | 10.00 | 
+farm_and_charm:barley | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farm_and_charm:oat | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farm_and_charm:corn | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farm_and_charm:strawberry | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farm_and_charm:tomato | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farm_and_charm:lettuce | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+farm_and_charm:onion | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+kaleidoscope_tavern:grape | 20 | 10.00 | crops (품질 반영) | - | 
+kaleidoscope_tavern:green_grape | 24 | 12.00 | crops (품질 반영) | - | 
+kaleidoscope_tavern:ice_grape | 60 | 30.00 | crops (품질 반영) | - | 
+kaleidoscope_tavern:gold_grape | 120 | 60.00 | crops (품질 반영) | - | 
+farmersdelight:rice_panicle | - | 4.00 | crops (품질 반영) | 8.00 | 
+kaleidoscope_cookery:rice_panicle | - | 6.00 | crops (품질 반영) | 12.00 | 
+minecraft:bamboo | 1 | - | crops | 1.27 | 
+minecraft:kelp | 1 | - | crops | 1.00 | 
+minecraft:wheat_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+minecraft:beetroot_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+minecraft:carrot {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.minecraft.carrot"}]}'},rtshop_seed:1b} | 30 | 15.00 | seeds | - | 
+minecraft:potato {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.minecraft.potato"}]}'},rtshop_seed:1b} | 30 | 15.00 | seeds | - | 
+minecraft:nether_wart {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.minecraft.nether_wart"}]}'},rtshop_seed:1b} | 60 | 30.00 | seeds | - | 
+minecraft:cocoa_beans {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.minecraft.cocoa_beans"}]}'},rtshop_seed:1b} | 40 | 20.00 | seeds | - | 
+minecraft:sweet_berries {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.minecraft.sweet_berries"}]}'},rtshop_seed:1b} | 300 | 150.00 | seeds | - | 
+minecraft:glow_berries {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.minecraft.glow_berries"}]}'},rtshop_seed:1b} | 300 | 150.00 | seeds | - | 
+minecraft:melon_seeds {rtshop_seed:1b} | 600 | 300.00 | seeds | - | 
+minecraft:pumpkin_seeds {rtshop_seed:1b} | 600 | 300.00 | seeds | - | 
+minecraft:torchflower_seeds {rtshop_seed:1b} | 250 | 125.00 | seeds | - | 
+minecraft:pitcher_pod {rtshop_seed:1b} | 250 | 125.00 | seeds | - | 
+farmersdelight:cabbage_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+farmersdelight:tomato_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+farmersdelight:onion {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.farmersdelight.onion"}]}'},rtshop_seed:1b} | 30 | 15.00 | seeds | - | 
+farmersdelight:rice {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.farmersdelight.rice"}]}'},rtshop_seed:1b} | 4 | 2.00 | seeds | - | 
+kaleidoscope_cookery:tomato_seed {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+kaleidoscope_cookery:chili_seed {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+kaleidoscope_cookery:lettuce_seed {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+kaleidoscope_cookery:wild_rice {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.kaleidoscope_cookery.wild_rice"}]}'},rtshop_seed:1b} | 30 | 15.00 | seeds | - | 
+kaleidoscope_cookery:rice {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.kaleidoscope_cookery.rice"}]}'},rtshop_seed:1b} | 30 | 15.00 | seeds | - | 
+kaleidoscope_cookery:tea_seed {rtshop_seed:1b} | 400 | 200.00 | seeds | - | 
+farm_and_charm:barley_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+farm_and_charm:oat_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+farm_and_charm:kernels {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+farm_and_charm:strawberry_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+farm_and_charm:tomato_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+farm_and_charm:lettuce_seeds {rtshop_seed:1b} | 40 | 20.00 | seeds | - | 
+farm_and_charm:onion {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.farm_and_charm.onion"}]}'},rtshop_seed:1b} | 40 | 20.00 | seeds | - | 
+minecraft:oak_sapling | 20 | 10.00 | seeds | - | 
+minecraft:spruce_sapling | 20 | 10.00 | seeds | - | 
+minecraft:birch_sapling | 20 | 10.00 | seeds | - | 
+minecraft:jungle_sapling | 20 | 10.00 | seeds | - | 
+minecraft:acacia_sapling | 20 | 10.00 | seeds | - | 
+minecraft:dark_oak_sapling | 20 | 10.00 | seeds | - | 
+minecraft:cherry_sapling | 20 | 10.00 | seeds | - | 
+kaleidoscope_tavern:grapevine | 600 | 300.00 | seeds | - | 
+minecraft:shears | 600 | 300.00 | tools | 300.00 | minecraft:shears
+minecraft:water_bucket | 451 | 450.00 | tools | - | 
+minecraft:lead | 20 | 4.00 | tools | 4.00 | minecraft:lead
+minecraft:composter | 20 | - | tools | 7.00 | 
+kaleidoscope_cookery:sickle | 130 | 33.00 | tools | 33.00 | kaleidoscope_cookery:sickle
+better_farming_plus:sprinkler | 1140 | 570.00 | tools | 570.00 | better_farming_plus:sprinkler
+minecraft:bone_meal | 1 | 0.50 | supplies | 1.00 | 
+minecraft:dirt | 1 | - | supplies | 1.00 | 
+farmersdelight:straw | 4 | 2.00 | supplies | 4.00 | 
+farmersdelight:rope | 10 | 2.00 | supplies | 2.00 | farmersdelight:rope
+farmersdelight:canvas | 40 | 16.00 | supplies | 16.00 | farmersdelight:canvas
+farmersdelight:organic_compost | 60 | 15.00 | supplies | 15.00 | farmersdelight:organic_compost_from_rotten_flesh
+farmersdelight:rich_soil | 120 | 60.00 | supplies | - | 
+farm_and_charm:fertilizer | 4 | 1.00 | supplies | 1.00 | farm_and_charm:drying/fertilizer_from_bone_meal
+minecraft:egg | 6 | 3.00 | animal | - | 
+minecraft:milk_bucket | 452 | 451.00 | animal | - | 
+minecraft:honey_bottle | 16 | 8.00 | animal (품질 반영) | 16.00 | 
+minecraft:honeycomb | 6 | 3.00 | animal | - | 
+minecraft:leather | 1 | 0.50 | animal | 1.00 | 
+minecraft:rabbit_hide | 20 | 10.00 | animal | 20.00 | 
+minecraft:rabbit_foot | 200 | 100.00 | animal | - | 
+minecraft:feather | 4 | 2.00 | animal | 4.00 | 
+minecraft:white_wool | 3 | 1.50 | animal | 4.00 | 
+minecraft:beef | 80 | 40.00 | animal (품질 반영) | - | 
+minecraft:porkchop | 50 | 25.00 | animal (품질 반영) | 50.00 | 
+minecraft:mutton | 80 | 40.00 | animal (품질 반영) | - | 
+minecraft:rabbit | 80 | 40.00 | animal (품질 반영) | - | 
+minecraft:chicken | 40 | 20.00 | animal (품질 반영) | - | 
+farmersdelight:ham | - | 52.50 | animal (품질 반영) | - | 
+minecraft:bucket | - | 450.00 | animal | - | 
+farm_and_charm:pitchfork | 450 | 18.67 | tools | 18.67 | farm_and_charm:pitchfork
+minecraft:diamond_hoe | 4004 | 2002.00 | tools | 2002.00 | minecraft:diamond_hoe
+minecraft:golden_hoe | 1204 | 602.00 | tools | 602.00 | minecraft:golden_hoe
+minecraft:iron_hoe | 604 | 302.00 | tools | 302.00 | minecraft:iron_hoe
+minecraft:netherite_hoe | 44300 | 22150.00 | tools | 22150.00 | minecraft:netherite_hoe_smithing
+minecraft:stone_hoe | 4 | 2.00 | tools | 2.00 | quark:tweaks/crafting/utility/tools/stone_hoe
+minecraft:wooden_hoe | 12 | 6.00 | tools | 6.00 | minecraft:wooden_hoe
+adorablehamsterpets:cucumber_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+adorablehamsterpets:green_bean_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+adorablehamsterpets:sunflower_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+mowziesmobs:foliaath_seed {rtshop_seed:1b} | - | 10.00 | seeds | - | 
+supplementaries:flax_seeds {rtshop_seed:1b} | 20 | 10.00 | seeds | - | 
+spelunkery:button_mushroom | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:conk_fungus | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:crimini | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:inkcap_mushroom | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:milly_bubcap | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:mushgloom | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:phosphor_fungus | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:portabella | 8 | 4.00 | crops (품질 반영) | - | 
+spelunkery:white_inkcap_mushroom | 8 | 4.00 | crops (품질 반영) | - | 
+adorablehamsterpets:cucumber | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+adorablehamsterpets:green_beans | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+supplementaries:flax | 40 | 20.00 | crops (품질 반영) | 40.00 | 
+fantasy:blossom_berries {display:{Name:'{"translate":"rtshop.seed.named","italic":false,"with":[{"translate":"item.fantasy.blossom_berries"}]}'},rtshop_seed:1b} | 50 | 25.00 | seeds | - | 

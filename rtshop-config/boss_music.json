@@ -1,0 +1,11 @@
+{
+  "_설명": "보스·레이드 음악. tracks: 보스 ID → 곡 이름 ('*' = 따로 정하지 않은 모든 보스, '' = 음악 없음). raid: 레이드 구역에서 보스가 깨어 있는 동안의 곡. 곡 이름 x 는 소리 rtshop:music.x (모드 파일 안의 assets/rtshop/sounds/music/x.ogg) 를 가리킨다. 그 소리가 없으면 틀지 않는다. range: 이 거리 안의 보스와 싸우는 동안 흐른다. fadeSeconds: 잦아드는 시간. muteOtherBossMusic: 우리 곡이 흐르는 동안 다른 모드의 보스 음악을 막는다. 고친 뒤 /rtshop reload. 미리 듣기: /rtshop music play <곡 이름>, 멈추기: /rtshop music stop",
+  "enabled": true,
+  "range": 48,
+  "fadeSeconds": 2.5,
+  "muteOtherBossMusic": true,
+  "raid": "raid",
+  "tracks": {
+    "*": "boss"
+  }
+}

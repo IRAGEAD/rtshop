@@ -1,0 +1,440 @@
+lines: 10586, levels: {'INFO': 3534, 'WARN': 4710, 'ERROR': 515}
+from 19:44:02 to 19:59:47
+
+== ERROR by logger (top 40)
+   458  Render thread
+    25  Worker-ResourceReload-2
+    12  main
+    11  Worker-ResourceReload-0
+     2  Worker-ResourceReload-5
+     2  Worker-ResourceReload-3
+     1  pool-7-thread-1
+     1  Worker-ResourceReload-1
+     1  ForkJoinPool.commonPool-worker-1
+     1  pool-29-thread-1
+     1  pool-7-thread-9
+
+== ERROR messages, same shape grouped (top 70)
+   172  Render thread | Found an empty itemStack in 'net.minecraft.world.item.CreativeModeTab@NcNfNd' creative tab's displayItems: N air minecraft:air nbt:{}
+    86  Render thread | Found an empty itemStack in 'net.minecraft.world.item.CreativeModeTab@NcNfNd' creative tab's displayItems: N air minecraft:air
+     5  Render thread | [Announcements] -> Could not mark adorablehamsterpets:announcement_whats-new-N.N.N as unread (was it already unread?).
+     4  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/sekiro/fushigiri/visual_effect/fushigiri_N
+     4  Render thread | Datapack animation reading failed: No constructor information has provided: efn:effect/summoned_sword/summoned_sword_shoot_downN
+     4  Render thread | Datapack animation reading failed: No constructor information has provided: efn:effect/summoned_sword/summoned_sword_shoot_upN
+     4  Render thread | Datapack animation reading failed: No constructor information has provided: efn_enhance:biped/sekiro/fushigiri/fushigiri_N
+     4  Render thread | Datapack animation reading failed: No constructor information has provided: efn_enhance:biped/sekiro/fushigiri/visual_effect/fushigiri_N
+     2  Render thread | Error starting SoundSystem. Turning off sounds & music
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/arc_test/timepause
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/dmcN_v_jc
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_c
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_c_b
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_c_f
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_c_l
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_c_r
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_ca
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_caa
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_caaa
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_cb
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_cba
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_cbb
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_fall
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/exsiliumgladius_reborn/exsiliumgladius_jump
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/living/hf_blade_idle_to_combat
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_air_y
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_air_y_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_dash_y_sp
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_xxxy
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_xxxy_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_xxy
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_xxy_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_xy
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_xy_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_y
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_y_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_blade/skill/visual_effect/hf_blade_y_charge_through
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/living/hf_murasama_idle_to_combat
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_air_y
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_air_y_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_dash_y_sp
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_xxxy
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_xxxy_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_xxy
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_xxy_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_xy
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_xy_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_y
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_y_charge
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/hf_murasama/skill/visual_effect/hf_murasama_y_charge_through
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_meen/nf_meen_charge_loop
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_meen/nf_meen_charge_max
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_meen/nf_meen_charge_pre
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_meen/nf_meen_charge_start
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_meen/nf_meen_chargebegin
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_meen/nf_meen_charging
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_meen/nf_meen_idle_N
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/nf_skill/visual_effect/biped_execute
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/ng_greatsword/ng_great_chargeNgp
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/ng_greatsword/ng_great_push
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/scythe/skill/visual_effect/scythe_scarlet_end
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/thornwheel/visual_effect/thornwheel_loop
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/thornwheel/visual_effect/thornwheel_start
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/yamato/dmcyamato_dodge_l
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/yamato/dmcyamato_dodge_r
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/yamato/dmcyamato_orbit
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/yamato/visual_effect/dmcyamato_killerbee
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/yamato/visual_effect/dmcyamato_rapidslash
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:biped/yamato/void_slash
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: efn:effect/summoned_sword/sin_summoned_sword_shoot
+
+== WARN by logger (top 40)
+  3679  modloading-worker-0
+   575  Render thread
+   138  Worker-ResourceReload-2
+   127  Worker-ResourceReload-5
+    82  main
+    43  Worker-ResourceReload-4
+    26  Worker-ResourceReload-1
+    13  Worker-ResourceReload-0
+    12  pool-4-thread-1
+    12  Server thread
+     3  Worker-Main-8
+
+== WARN messages, same shape grouped (top 50)
+    59  Worker-ResourceReload-2 | Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=N'
+    59  Worker-ResourceReload-5 | Exception loading blockstate definition: 'ydtwo:blockstates/wraithlight_lantern.json' missing model for variant: 'ydtwo:wraithlight_lantern#souls=N'
+    10  modloading-worker-0 | Incorrect key general was corrected from null to its default, SimpleCommentedConfig:{}. 
+     9  Render thread | defineId called for: class net.minecraft.world.entity.boss.wither.WitherBoss from class yesman.epicfight.world.capabilities.entitypatch.boss.WitherPat
+     9  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'lookat_xyz' is not yet implemented, falling back to rotate_xyz
+     9  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'lookat_xyz' is not yet implemented, falling back to rotate_xyz
+     8  Worker-ResourceReload-2 | Exception loading blockstate definition: 'epic_fight_avalon:blockstates/test_door.json' missing model for variant: 'epic_fight_avalon:test_door#facing
+     8  Server thread | Can't keep up! Is the server overloaded? Running Nms or N ticks behind
+     8  Worker-ResourceReload-5 | Exception loading blockstate definition: 'epic_fight_avalon:blockstates/test_door.json' missing model for variant: 'epic_fight_avalon:test_door#facing
+     7  modloading-worker-0 | Incorrect key client was corrected from null to its default, SimpleCommentedConfig:{}. 
+     6  Render thread | Registry entry listened Registry Entry [minecraft:entity_type / artifacts:mimic] was not realized!
+     5  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'rotate_y' is not yet implemented, falling back to rotate_xyz
+     5  Render thread | [bclib] No Center Island Biomes found. Forcing use of vanilla center.
+     5  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'rotate_y' is not yet implemented, falling back to rotate_xyz
+     4  pool-4-thread-1 | defineId called for: class net.minecraft.world.entity.LivingEntity from class yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch
+     4  modloading-worker-0 | Incorrect key mobs was corrected from null to its default, SimpleCommentedConfig:{}. 
+     4  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'direction_z' is not yet implemented, falling back to rotate_xyz
+     4  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'emitter_transform_xz' is not yet implemented, falling back to rotate_xyz
+     4  modloading-worker-0 | Incorrect key General was corrected from null to its default, SimpleCommentedConfig:{}. 
+     4  Render thread | Shader ydtwo:rendertype_warden_death_dissolve could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:dragon_wing_glow could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:legend_fx could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:myriad_fx could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:nova_fx could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:nova_fx_trans could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp could not find sampler named TargetTexture in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp could not find uniform named ColorModulator in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp could not find uniform named uColor in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp could not find uniform named uType in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp could not find uniform named time in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp_world could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp_world could not find sampler named TargetTexture in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp_world could not find uniform named ColorModulator in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp_world could not find uniform named uColor in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp_world could not find uniform named uType in the specified shader program.
+     4  Render thread | Shader arcanevortex:warp_world could not find uniform named screenSize in the specified shader program.
+     4  Render thread | Can't find a particle type epicfight:entity.hit.blunt in invincible:custom_combo_demo
+     4  Render thread | Recipe irons_spellbooks:netherite_spell_book (of type minecraft:crafting) not found
+     4  Render thread | Recipe irons_spellbooks:dragonskin_spell_book (of type minecraft:crafting) not found
+     4  Render thread | Recipe irons_spellbooks:copper_spell_book (of type minecraft:crafting) not found
+     4  Render thread | Recipe irons_spellbooks:gold_spell_book (of type minecraft:crafting) not found
+     4  Render thread | Recipe irons_spellbooks:diamond_spell_book (of type minecraft:crafting) not found
+     4  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'direction_z' is not yet implemented, falling back to rotate_xyz
+     4  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'emitter_transform_xz' is not yet implemented, falling back to rotate_xyz
+     3  main | Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sod
+     3  main | Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodiu
+     3  main | Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.
+     3  pool-4-thread-1 | Method overwrite conflict for m_N_ in mixins.irons_spellbooks.json:LecternBlockEntityMixin, previously written by net.mehvahdjukaar.amendments.mixins.
+     3  modloading-worker-0 | Incorrect key misc was corrected from null to its default, SimpleCommentedConfig:{}. 
+
+== ERROR messages, resource paths collapsed to the mod name (all, up to 250)
+   172  Render thread | Found an empty itemStack in 'net.minecraft.world.item.CreativeModeTab@NcNfNd' creative tab's displayItems: N air minecraft:* nbt:{}
+   140  Render thread | Datapack animation reading failed: No constructor information has provided: efn:*
+    86  Render thread | Found an empty itemStack in 'net.minecraft.world.item.CreativeModeTab@NcNfNd' creative tab's displayItems: N air minecraft:*
+    34  Render thread | Datapack animation reading failed: No constructor information has provided: epicfightx:*
+     8  Render thread | Datapack animation reading failed: No constructor information has provided: efn_enhance:*
+     6  Render thread | [Announcements] -> Could not mark adorablehamsterpets:* as unread (was it already unread?).
+     2  Worker-ResourceReload-2 | Failed to load model mowziesmobs:*
+          -> com.google.gson.JsonParseException: for LLibrary bug not putting particle into textures set is not valid resource location
+     2  Render thread | Error starting SoundSystem. Turning off sounds & music
+          -> java.lang.IllegalStateException: Failed to open OpenAL device
+     2  Render thread | Datapack animation reading failed: No constructor information has provided: wom:*
+     2  Worker-ResourceReload-2 | Couldn't load tag idas:* as it is missing following references: byg:* (from idas_forge-N.N.N+N.N.N.jar)
+     2  Worker-ResourceReload-2 | Couldn't load tag idas:* as it is missing following references: biomesoplenty:* (from idas_forge-N.N.N+N.N.N.jar)
+     2  Worker-ResourceReload-0 | Couldn't load tag minecraft:* as it is missing following references: #minecraft:* (from vanilla)
+     2  Render thread | Integrated API Error: Couldn't parse spawner mob list idas:*
+          -> java.lang.Exception: Error: iceandfire:dread_lich is not a valid entity ID!
+     2  Worker-ResourceReload-5 | Failed to load model mowziesmobs:*
+          -> com.google.gson.JsonParseException: for LLibrary bug not putting particle into textures set is not valid resource location
+     1  main | Mixin config betternether.mixins.common.json does not specify "minVersion" property
+     1  main | Mixin config betternether.mixins.client.json does not specify "minVersion" property
+     1  main | Mixin config extralib.mixins.json does not specify "minVersion" property
+     1  main | Mixin config cwb.mixins.json does not specify "minVersion" property
+     1  main | Mixin config fabric-item-group-api-vN.mixins.json does not specify "minVersion" property
+     1  main | Mixin config fabric-item-group-api-vN.client.mixins.json does not specify "minVersion" property
+     1  main | Mixin config fabric-item-api-vN.client.mixins.json does not specify "minVersion" property
+     1  main | Mixin config fabric-data-attachment-api-vN.mixins.json does not specify "minVersion" property
+     1  main | Mixin config fabric-data-attachment-api-vN.client.mixins.json does not specify "minVersion" property
+     1  main | Mixin config extraquests.mixins.json does not specify "minVersion" property
+     1  main | Mixin config yacl.mixins.json does not specify "minVersion" property
+     1  main | accessories-common.mixins.json:ContainerMixin: Interface mixin contains a non-public method! Found extendHasAnyMatching(Ljava/util/function/Predicate;Lorg/spongepowered/a
+          -> org.spongepowered.asm.mixin.transformer.throwables.InvalidInterfaceMixinException: Interface mixin contains a non-public method! Found extendHasAnyMatching(Ljava/util/function/Predicate;Lorg/spongepowered/asm/mixin/injec
+     1  Render thread | Failed to verify authentication
+          -> com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401
+     1  Render thread | Mod mixin into Embeddium internals detected. This instance is now tainted. The Embeddium team does not provide any guarantee of support for issues encountered while such 
+     1  pool-7-thread-1 | fromAnimatedImage - Palette mask cataclysm:* needs to be at least as large as the target image amendments:* and have the same frame count. You must alter the mask's NxN t
+     1  Worker-ResourceReload-0 | Unable to parse animation: melee_N
+     1  Worker-ResourceReload-0 | Couldn't parse data file epic_fight_avalon:* from epic_fight_avalon:*
+          -> com.google.gson.JsonParseException: java.io.EOFException: End of input at line 1 column 1 path $
+     1  Render thread | Fabric API detected! This is not a Fabric mod, so please dont report related issues to MoonlightLib or its dependant. This can usually happen with connector or when havin
+          -> Mods that bundled Fabric API: [net.minecraftforge.fml.loading.moddiscovery.ModInfo@1e1eeedd]
+     1  Worker-ResourceReload-1 | A mod is calling registerReloadListener at the wrong time. This will cause random concurrency crashes when ModernFix is not installed. Please report this to them. If you 
+          -> java.lang.Exception: registerReloadListener called on wrong thread
+     1  Worker-ResourceReload-0 | Couldn't load tag minecraft:* as it is missing following references: arcanevortex:* (from ArcaneVortex_[Alpha]-N.N.N-N.N.N-Forge.jar), 
+          -> arcanevortex:entity_remover (from ArcaneVortex_[Alpha]-0.7.10-1.20.1-Forge.jar),
+     1  Worker-ResourceReload-0 | Couldn't load tag forge:* as it is missing following references: arcanevortex:* (from ArcaneVortex_[Alpha]-N.N.N-N.N.N-Forge.jar)
+     1  Worker-ResourceReload-0 | Couldn't load tag forge:* as it is missing following references: #minecraft:* (from forge-N.N.N-N.N.N-universal.jar), 
+          -> #forge:tools/bows (from forge-1.20.1-47.4.29-universal.jar),
+     1  Worker-ResourceReload-0 | Couldn't load tag forge:* as it is missing following references: arcanevortex:* (from ArcaneVortex_[Alpha]-N.N.N-N.N.N-Forge.jar), 
+          -> arcanevortex:entity_remover (from ArcaneVortex_[Alpha]-0.7.10-1.20.1-Forge.jar),
+     1  Worker-ResourceReload-0 | Couldn't load tag kaleidoscope_cookery:* as it is missing following references: #forge:* (from kaleidoscopecookery-N.N.N-forge-mcN.N.N.jar)
+     1  Worker-ResourceReload-0 | Couldn't load tag spell_engine:* as it is missing following references: #minecraft:* (from spell_engine-forge-N.N.N+N.N.N.jar)
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/apocalypse_slab
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:apocalypse_slab'
+     1  Worker-ResourceReload-0 | Invalid boss environment in spiral_abyss:* for mowziesmobs:*: flat_room cannot contain decorations, water or pillars
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/dread_citadel/dread_citadel
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'iceandfire:dread_shard'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/apocalypse_stairs
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:apocalypse_stairs'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/enchantingtower/enchantingtower_basic_ars
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'ars_nouveau:magebloom_fiber'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/neon_frame_fence
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:neon_frame_fence'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/dread_citadel/dread_citadel_throne
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'iceandfire:dread_shard'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/haunted_manor/if_haunted_manor
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'iceandfire:silver_nugget'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/labyrinth/if_labyrinth_tomb
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'iceandfire:sapphire_gem'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/dread_citadel/dread_citadel_library
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'iceandfire:dread_shard'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/archmages_tower/archmages_tower_treasure
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'ars_nouveau:ritual_burrowing'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/quantum_lattice_fence
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:quantum_lattice_fence'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/apocalypse_wall
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:apocalypse_wall'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/quantum_lattice_fence_gate
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:quantum_lattice_fence_gate'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/archmages_tower/archmages_tower_library
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'ars_nouveau:worn_notebook'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/enchantingtower/enchantingtower_top_ars
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'ars_nouveau:scryer_scroll'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:chests/archmages_tower/archmages_tower
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'ars_nouveau:magebloom_fiber'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/neon_frame_fence_gate
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:neon_frame_fence_gate'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/reinforced_ash_planks_fence_gate
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:reinforced_ash_planks_fence_gate'
+     1  Worker-ResourceReload-2 | Couldn't parse element loot_tables:*:blocks/reinforced_ash_planks_fence
+          -> com.google.gson.JsonSyntaxException: Expected name to be an item, was unknown string 'arcanevortex:reinforced_ash_planks_fence'
+     1  Render thread | Parsing error loading recipe arcanevortex:*: com.google.gson.JsonSyntaxException: Unknown item 'arcanevortex:*'
+     1  Render thread | Injection error: LVT in net/minecraft/world/entity/npc/VillagerTrades$EmeraldsForVillagerTypeItem::m_N_(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/util/RandomSourc
+          -> Expected: [Lnet/minecraft/world/item/ItemStack;]
+     1  ForkJoinPool.commonPool-worker-1 | Failed at connecting Epic Fight web server: java.net.ConnectException
+     1  pool-29-thread-1 | Registering recipes: jei:* is running and has taken N.N seconds so far
+     1  pool-7-thread-9 | fromAnimatedImage - Palette mask cataclysm:* needs to be at least as large as the target image amendments:* and have the same frame count. You must alter the mask's NxN t
+     1  Worker-ResourceReload-3 | Unable to parse animation: melee_N
+     1  Worker-ResourceReload-3 | Couldn't parse data file epic_fight_avalon:* from epic_fight_avalon:*
+          -> com.google.gson.JsonParseException: java.io.EOFException: End of input at line 1 column 1 path $
+     1  Render thread | Exception caught during firing event: Task com.meuuser.voicecmd.client.VoiceClientController$$Lambda$N/NxNfNfNdbNfN@NeNcNcN rejected from java.util.concurrent.ThreadPoolE
+          -> Index: 42
+
+== WARN messages, resource paths collapsed to the mod name (top 120)
+    59  Worker-ResourceReload-2 | Exception loading blockstate definition: 'ydtwo:*' missing model for variant: 'ydtwo:*'
+    59  Worker-ResourceReload-5 | Exception loading blockstate definition: 'ydtwo:*' missing model for variant: 'ydtwo:*'
+    52  Render thread | Shader arcanevortex:* could not find sampler named SamplerN in the specified shader program.
+    48  Render thread | Registry entry listened Registry Entry [minecraft:* / crittersandcompanions:*] was not realized!
+    34  Render thread | Recipe irons_spellbooks:* (of type minecraft:*) not found
+    27  Worker-ResourceReload-2 | Unknown geometry json version found for model food:* Last known version: N.N.N Some features may not work as expected.
+    27  Worker-ResourceReload-5 | Unknown geometry json version found for model food:* Last known version: N.N.N Some features may not work as expected.
+    20  Render thread | Shader arcanevortex:* could not find uniform named ProjMat in the specified shader program.
+    20  Render thread | Shader arcanevortex:* could not find uniform named ModelViewMat in the specified shader program.
+    20  Render thread | Shader arcanevortex:* could not find uniform named screenSize in the specified shader program.
+    16  Render thread | Shader arcanevortex:* could not find uniform named ColorModulator in the specified shader program.
+    14  Render thread | Shader arcanevortex:* could not find uniform named yaw in the specified shader program.
+    14  Render thread | Shader arcanevortex:* could not find uniform named pitch in the specified shader program.
+    11  Worker-ResourceReload-2 | Unable to load model: 'efn:*' referenced from: efn:*: java.io.FileNotFoundException: efn:*
+    11  Worker-ResourceReload-5 | Unable to load model: 'efn:*' referenced from: efn:*: java.io.FileNotFoundException: efn:*
+    10  modloading-worker-0 | Incorrect key general was corrected from null to its default, SimpleCommentedConfig:{}. 
+    10  Render thread | Shader arcanevortex:* could not find uniform named uColor in the specified shader program.
+    10  Render thread | Shader arcanevortex:* could not find sampler named TargetTexture in the specified shader program.
+    10  Render thread | Recipe starcatcher:* has a result with an 'id' field, probably caused by using Itemstack.CODEC. Please use BackportCodecs.ITEM_STACK_RECIPE codec or change the field to '
+     9  Render thread | defineId called for: class net.minecraft.world.entity.boss.wither.WitherBoss from class yesman.epicfight.world.capabilities.entitypatch.boss.WitherPatch
+     9  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'lookat_xyz' is not yet implemented, falling back to rotate_xyz
+     9  Worker-ResourceReload-2 | Exception loading blockstate definition: 'epic_fight_avalon:*' missing model for variant: 'epic_fight_avalon:*'
+     9  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'lookat_xyz' is not yet implemented, falling back to rotate_xyz
+     9  Worker-ResourceReload-5 | Exception loading blockstate definition: 'epic_fight_avalon:*' missing model for variant: 'epic_fight_avalon:*'
+     8  Render thread | Shader arcanevortex:* could not find uniform named time in the specified shader program.
+     8  Render thread | Shader arcanevortex:* could not find uniform named uType in the specified shader program.
+     8  Server thread | Can't keep up! Is the server overloaded? Running Nms or N ticks behind
+     7  modloading-worker-0 | Incorrect key client was corrected from null to its default, SimpleCommentedConfig:{}. 
+     6  Render thread | Registry entry listened Registry Entry [minecraft:* / artifacts:*] was not realized!
+     6  Render thread | Shader arcanevortex:* could not find sampler named ColorSampler in the specified shader program.
+     6  Render thread | Shader arcanevortex:* could not find sampler named TextureSampler in the specified shader program.
+     6  Render thread | Shader fdlib:* could not find uniform named InSize in the specified shader program.
+     5  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'rotate_y' is not yet implemented, falling back to rotate_xyz
+     5  Render thread | [bclib] No Center Island Biomes found. Forcing use of vanilla center.
+     5  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'rotate_y' is not yet implemented, falling back to rotate_xyz
+     4  pool-4-thread-1 | defineId called for: class net.minecraft.world.entity.LivingEntity from class yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch
+     4  modloading-worker-0 | Incorrect key mobs was corrected from null to its default, SimpleCommentedConfig:{}. 
+     4  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'direction_z' is not yet implemented, falling back to rotate_xyz
+     4  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'emitter_transform_xz' is not yet implemented, falling back to rotate_xyz
+     4  modloading-worker-0 | Incorrect key General was corrected from null to its default, SimpleCommentedConfig:{}. 
+     4  Worker-ResourceReload-2 | Missing textures in model block_factorys_bosses:*:
+     4  Worker-ResourceReload-2 | Missing textures in model supplementaries:*:
+     4  Render thread | Missing sound for event: minecraft:*
+     4  Render thread | Missing sound for event: irons_spellbooks:*
+     4  Render thread | Shader fdbosses:* could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader fdbosses:* could not find uniform named ColorModulator in the specified shader program.
+     4  Render thread | Shader fancy_trail:* could not find uniform named Time in the specified shader program.
+     4  Render thread | Shader ydtwo:* could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader supplementaries:* could not find sampler named SamplerN in the specified shader program.
+     4  Render thread | Shader arcanevortex:* could not find uniform named FogColor in the specified shader program.
+     4  Render thread | Shader arcanevortex:* could not find uniform named GameTime in the specified shader program.
+     4  Render thread | Shader arcanevortex:* could not find uniform named cameraPos in the specified shader program.
+     4  Render thread | Can't find a particle type epicfight:* in invincible:*
+     4  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'direction_z' is not yet implemented, falling back to rotate_xyz
+     4  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'emitter_transform_xz' is not yet implemented, falling back to rotate_xyz
+     4  Worker-ResourceReload-4 | Missing textures in model block_factorys_bosses:*:
+     4  Worker-ResourceReload-4 | Missing textures in model supplementaries:*:
+     3  main | Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.lig
+     3  main | Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light
+     3  main | Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.d
+     3  modloading-worker-0 | Incorrect key misc was corrected from null to its default, SimpleCommentedConfig:{}. 
+     3  modloading-worker-0 | Incorrect key tweaks was corrected from null to its default, SimpleCommentedConfig:{}. 
+     3  modloading-worker-0 | Incorrect key general.testN was corrected from null to its default, N.N. 
+     3  Worker-ResourceReload-1 | Bedrock particle facing_camera_mode 'direction_y' is not yet implemented, falling back to rotate_xyz
+     3  Worker-ResourceReload-2 | Unable to load model: 'betternether:*' referenced from: betternether:*: java.io.FileNotFoundException: betternether:*
+     3  Worker-ResourceReload-2 | Exception loading blockstate definition: 'arcanevortex:*' missing model for variant: 'arcanevortex:*'
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/void_assault_shoulder_weapon
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/the_immolator
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/wrath_of_the_desert
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/ignitium_elytra_chestplate
+     3  Render thread | Unknown recipe category: [!!!com.mojang.logging.LogUtils$NToString@NcN=>java.lang.NullPointerException:Cannot invoke "Object.toString()" because the return value of "java
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/brontes
+     3  Render thread | Unknown recipe category: [!!!com.mojang.logging.LogUtils$NToString@NdN=>java.lang.NullPointerException:Cannot invoke "Object.toString()" because the return value of "java
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/void_forge
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/gauntlet_of_bulwark
+     3  Render thread | Unknown recipe category: cataclysm:*:weapon_infusion/gauntlet_of_maelstrom
+     3  Render thread | Item Group has no display items and no search tab display items. Items from this group will be missing from the JEI ingredient list. KubeJS
+     3  Render thread | Item Group has no display items and no search tab display items. Items from this group will be missing from the JEI ingredient list. Avalon Items
+     3  Worker-ResourceReload-4 | Bedrock particle facing_camera_mode 'direction_y' is not yet implemented, falling back to rotate_xyz
+     3  Worker-ResourceReload-5 | Unable to load model: 'betternether:*' referenced from: betternether:*: java.io.FileNotFoundException: betternether:*
+     3  Worker-ResourceReload-5 | Exception loading blockstate definition: 'arcanevortex:*' missing model for variant: 'arcanevortex:*'
+     2  main | Attempted to select two dependency jars from JarJar which have the same identification: Mod File:  and Mod File: . Using Mod File: 
+     2  main | Error loading class: xaero/map/gui/GuiMap (java.lang.ClassNotFoundException: xaero.map.gui.GuiMap)
+     2  pool-4-thread-1 | @Final field f_N_:[I in mixins.epicfight.json:*MixinWitherBoss should be final
+     2  pool-4-thread-1 | Method overwrite conflict for m_N_ in mixins.irons_spellbooks.json:LecternBlockEntityMixin, previously written by net.mehvahdjukaar.amendments.mixins.LecternBlockEntityUp
+     2  modloading-worker-0 | Incorrect key worldgen was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key ingame was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key default_gamerule was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key building was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key tools was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key blocks was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key blocks.wind_vane.max_angle_N was corrected from null to its default, N.N. 
+     2  modloading-worker-0 | Incorrect key blocks.wind_vane.period_N was corrected from null to its default, N.N. 
+     2  modloading-worker-0 | Incorrect key general.tooltip_hints was corrected from null to its default, true. 
+     2  modloading-worker-0 | Incorrect key general.custom_configured_screen was corrected from null to its default, true. 
+     2  modloading-worker-0 | Incorrect key cauldron was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key tripwire_hook was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key lantern was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key bell was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key lily_pad was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key world was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key camera was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key effek.redDragonFlashFinishN was corrected from null to its default, true. 
+     2  modloading-worker-0 | Incorrect key cookery was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key tools_and_abilities was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key animation_speed was corrected from null to its default, SimpleCommentedConfig:{}. 
+     2  modloading-worker-0 | Incorrect key animation_speed.enable_animation_playspeed_lock was corrected from null to its default, true. 
+     2  Worker-ResourceReload-2 | Unable to load model: 'minecraft:*' referenced from: betternether:*: java.io.FileNotFoundException: minecraft:*
+     2  Worker-ResourceReload-2 | Exception loading blockstate definition: 'spelunkery:*' missing model for variant: 'spelunkery:*'
+     2  Worker-ResourceReload-2 | Unable to load model: 'arcanevortex:*' referenced from: arcanevortex:*: java.io.FileNotFoundException: arcanevortex:*
+     2  Worker-ResourceReload-2 | Missing textures in model rpg_companions_tiny_dragons:*:
+     2  Render thread | Missing sound for event: starcatcher:*
+     2  Render thread | Missing sound for event: cataclysm:*
+     2  Render thread | Missing sound for event: efn:*
+     2  Render thread | Shader rendertype_entity_translucent_emissive could not find sampler named SamplerN in the specified shader program.
+     2  Render thread | Shader fdbosses:* could not find uniform named sections in the specified shader program.
+     2  Render thread | Shader fdbosses:* could not find uniform named octaves in the specified shader program.
+     2  Render thread | Shader fdlib:* could not find sampler named SamplerN in the specified shader program.
+     2  Render thread | Shader fdlib:* could not find uniform named ColorModulator in the specified shader program.
+     2  Render thread | Shader fancy_trail:* could not find uniform named ColorShift in the specified shader program.
+
+== by topic (ERROR + WARN)
+    56  mixin
+          e.g. Mixin config betternether.mixins.common.json does not specify "minVersion" property
+          e.g. Mixin config betternether.mixins.client.json does not specify "minVersion" property
+          e.g. Mixin config extralib.mixins.json does not specify "minVersion" property
+          e.g. Mixin config cwb.mixins.json does not specify "minVersion" property
+   141  recipe
+          e.g. Incorrect key tweaks.sus_recipes was corrected from null to its default, SimpleCommentedConfig:{}. 
+          e.g. Incorrect key tweaks.sus_recipes.enabled was corrected from null to its default, true. 
+          e.g. Incorrect key cauldron.dye_recipes_per_layer was corrected from null to its default, 4. 
+          e.g. Incorrect key cauldron.potion_recipes_per_layer was corrected from null to its default, 2. 
+    28  loot table
+          e.g. Incorrect key functional.rope.replace_in_loot_tables was corrected from null to its default, NONE. 
+          e.g. Incorrect key tools.ancient_tomes.Loot Tables was corrected from null to its default, [minecraft:chests/stronghold_library,20, minecraft:chests/simple_dungeon,20, minecraft:chests/bastion_treasure,25,
+          e.g. Incorrect key world.monster_box.Enable Extra Loot Table was corrected from null to its default, true. 
+          e.g. Incorrect key dragon.enhancedLootTable was corrected from null to its default, minecraft:entities/ender_dragon. 
+     6  advancement
+          e.g. Incorrect key general.Enable Advancement Modification was corrected from null to its default, true. 
+          e.g. Incorrect key general.Enable Modded Advancements was corrected from null to its default, true. 
+          e.g. Incorrect key general.Advancement Visibility Depth was corrected from null to its default, 2. 
+          e.g. Incorrect key tweaks.automatic_recipe_unlock.Filter Recipe Advancements was corrected from null to its default, true. 
+    12  tag
+          e.g. Couldn't load tag idas:has_structure/byg_redwood_biomes as it is missing following references: byg:redwood_thicket (from idas_forge-1.13.0+1.20.1.jar)
+          e.g. Couldn't load tag idas:has_structure/bopmohogany_biomes as it is missing following references: biomesoplenty:rainforest (from idas_forge-1.13.0+1.20.1.jar)
+          e.g. Couldn't load tag idas:has_structure/bygmohogany_biomes as it is missing following references: byg:tropical_rainforest (from idas_forge-1.13.0+1.20.1.jar)
+          e.g. Couldn't load tag idas:has_structure/bopredwood_biomes as it is missing following references: biomesoplenty:redwood_forest (from idas_forge-1.13.0+1.20.1.jar)
+    22  missing texture
+          e.g. Missing textures in model block_factorys_bosses:crate#inventory:
+          e.g. Missing textures in model supplementaries:rope_tomatoes#age=2,east=false,knot=true,north=false,ropelogged=false,south=true,west=false:
+          e.g. Missing textures in model supplementaries:confetti_popper#inventory:
+          e.g. Missing textures in model selling_bin:selling_bin#inventory:
+   198  missing model
+          e.g. Unable to load model: 'betternether:block/basalt_slab_bottom' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_
+          e.g. Unable to load model: 'betternether:block/basalt_slab_top' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_top
+          e.g. Unable to load model: 'betternether:block/basalt_slab_double' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_
+          e.g. Unable to load model: 'minecraft:block/chest_right' referenced from: betternether:mushroom_fir_trimmed_chest#facing=north,type=single,waterlogged=true: java.io.FileNotFoundException: minecraft:models/
+    43  sound
+          e.g. Incorrect key nether_portals_and_portal_fluid.portal_creation_sound was corrected from null to its default, true. 
+          e.g. Incorrect key nether_portals_and_portal_fluid.portal_destruction_sound was corrected from null to its default, true. 
+          e.g. Incorrect key tweaks.More Note Block Sounds was corrected from null to its default, true. 
+          e.g. Incorrect key tweaks.more_note_block_sounds was corrected from null to its default, SimpleCommentedConfig:{}. 
+    77  lang / translation
+          e.g. Mod file /home/runner/work/rtshop/rtshop/mc/libraries/net/minecraftforge/javafmllanguage/1.20.1-47.4.29/javafmllanguage-1.20.1-47.4.29.jar is missing mods.toml file
+          e.g. Mod file /home/runner/work/rtshop/rtshop/mc/libraries/net/minecraftforge/lowcodelanguage/1.20.1-47.4.29/lowcodelanguage-1.20.1-47.4.29.jar is missing mods.toml file
+          e.g. Mod file /home/runner/work/rtshop/rtshop/mc/libraries/net/minecraftforge/mclanguage/1.20.1-47.4.29/mclanguage-1.20.1-47.4.29.jar is missing mods.toml file
+          e.g. Error loading class: tschipp/carryon/common/config/ListHandler (java.lang.ClassNotFoundException: tschipp.carryon.common.config.ListHandler)
+     8  can't keep up
+          e.g. Can't keep up! Is the server overloaded? Running 2800ms or 56 ticks behind
+          e.g. Can't keep up! Is the server overloaded? Running 2127ms or 42 ticks behind
+          e.g. Can't keep up! Is the server overloaded? Running 4910ms or 98 ticks behind
+          e.g. Can't keep up! Is the server overloaded? Running 18990ms or 379 ticks behind
+   289  exception
+          e.g. Error loading class: tschipp/carryon/common/config/ListHandler (java.lang.ClassNotFoundException: tschipp.carryon.common.config.ListHandler)
+          e.g. Error loading class: tschipp/carryon/common/carry/PickupHandler (java.lang.ClassNotFoundException: tschipp.carryon.common.carry.PickupHandler)
+          e.g. Error loading class: io/homo/superresolution/common/config/SuperResolutionConfig (java.lang.ClassNotFoundException: io.homo.superresolution.common.config.SuperResolutionConfig)
+          e.g. Error loading class: org/tastytrash/spatialGUI/client/SpatialGUIClient (java.lang.ClassNotFoundException: org.tastytrash.spatialGUI.client.SpatialGUIClient)
+     1  registry / missing
+          e.g. Parsing error loading recipe arcanevortex:little_wooden_sword: com.google.gson.JsonSyntaxException: Unknown item 'arcanevortex:little_wooden_sword'
+     3  network / packet
+          e.g. Error loading class: net/minecraft/server/network/ServerCommonPacketListenerImpl (java.lang.ClassNotFoundException: net.minecraft.server.network.ServerCommonPacketListenerImpl)
+          e.g. @Mixin target net.minecraft.server.network.ServerCommonPacketListenerImpl was not found e4mc.mixins.json:ServerCommonPacketListenerImplAccessor
+          e.g. Incorrect key oddities.matrix_enchanting.Influences List was corrected from null to its default, [minecraft:unbreaking, minecraft:fire_protection, minecraft:knockback,minecraft:punch, minecraft:feathe

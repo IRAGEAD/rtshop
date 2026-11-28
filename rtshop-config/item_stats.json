@@ -1,0 +1,4 @@
+{
+  "_help": "장비 능력치 설정. \"items\" 안에 \"아이템 ID\": {\"속성 ID\": 값} 으로 적는다. 값은 툴팁에 보이는 숫자 그대로 (공격력 8, 공격 속도 1.6, 방어력 6 …). 쓸 수 있는 속성 예: minecraft:generic.attack_damage, minecraft:generic.attack_speed, minecraft:generic.armor, minecraft:generic.armor_toughness, minecraft:generic.knockback_resistance, minecraft:generic.max_health, minecraft:generic.movement_speed, minecraft:generic.luck, 모드 속성(epicfight:impact 등). 적지 않은 속성은 원래 값 그대로. 게임 안에서는 OP 가 /rtshop itemstats 로 편집기를 연다. 고친 뒤 /rtshop itemstats reload.",
+  "items": {}
+}

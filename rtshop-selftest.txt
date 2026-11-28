@@ -1,0 +1,1541 @@
+RT Shop self-test
+
+== economy
+PASS  wallet can be set
+PASS  deposit moves gold to the bank
+PASS  withdraw moves gold back
+PASS  cannot deposit more than carried
+PASS  cannot withdraw more than saved
+PASS  check is issued from carried gold
+PASS  check item holds the amount
+PASS  check larger than wallet is refused
+PASS  redeeming adds to carried gold, not the bank
+PASS  redeemed check is consumed
+PASS  a copied check cannot be redeemed twice
+PASS  a forged check is worthless
+PASS  an edited check still pays only the recorded amount
+PASS  death takes 5.0-30.0% of carried gold  [573]
+PASS  death does not touch the bank
+PASS  a carried check loses value on death too  [143]
+PASS  3.69.0 death takes 5~30% of carried gold by default; an old file with the old default 50 moves to 30, a value the server set stays  [30.0 30.0 40.0]
+
+== shops
+PASS  shop 'blacksmith' is loaded  [648 items]
+PASS  shop 'farmer' is loaded  [136 items]
+PASS  shop 'fisher' is loaded  [302 items]
+PASS  shop 'food' is loaded  [329 items]
+PASS  shop 'general' is loaded  [126 items]
+PASS  shop 'land' is loaded  [3 items]
+PASS  farmer sells plantable wheat seeds
+PASS  farmer sells planting-only carrots, separate from the crop
+PASS  farmer buys wheat
+PASS  every seed and plantable crop in the game is sold as a shop seed  [34 plantable items]
+PASS  buying takes the listed price  [9900]
+PASS  bought seeds are plantable shop seeds
+PASS  selling back pays 50%  [50]
+PASS  a full inventory blocks buying
+PASS  no gold, no purchase
+PASS  graded wheat is accepted as wheat
+PASS  3 stars > 1 star > ungraded  [5600 / 3600 / 2000]
+PASS  ungraded produce sells at exactly 50%  [2000]
+PASS  3-star wheat pays the 3-star price  [560]
+PASS  lower grades cannot be sold at the 3-star price
+PASS  sell-all sells every grade at its own price  [560]
+PASS  fisher buys cod
+PASS  caught fish with weight data are accepted
+PASS  heavier fish sell for more  [1.275 < 1.7 < 2.125]
+PASS  weight swing stays within the configured band
+PASS  golden fish use the golden multiplier
+PASS  fish without weight data sell at the plain resale rate
+PASS  heavy fish are paid at the heavy price  [382]
+
+== farming
+PASS  seeds that are not from the shop cannot be planted
+PASS  shop seeds can be planted
+PASS  the planted spot is recorded
+PASS  a harvested carrot cannot be planted
+PASS  the planting-only carrot is a different stack with its own name
+PASS  the planting-only carrot can be planted
+PASS  harvesting drops wheat
+PASS  harvesting never drops seeds
+PASS  harvested wheat gets a star grade
+PASS  the planting record is cleared by the harvest
+PASS  an unripe crop gives nothing back (no seed refund)
+PASS  harvested carrots are graded produce, not seeds  [[1 carrot, 2 carrot]]
+PASS  crops not grown from shop seeds give ungraded produce
+PASS  right-click harvest replants using one shop seed  [Block{minecraft:carrots}[age=0] seeds=2]
+PASS  right-click harvest hands over graded produce
+PASS  the replanted crop is recorded again
+PASS  without a shop seed the field is left empty
+PASS  an iron hoe harvests and replants its whole area  [9 replanted, seeds left 0]
+PASS  the hoe wears down per crop  [9]
+PASS  a sprout replanted for free by something else is removed
+PASS  a sprout planted from a shop seed stays
+
+== other mods
+      installed: farmersdelight kaleidoscope_cookery kaleidoscope_tavern handson_delight farm_and_charm starcatcher better_farming_plus
+PASS  the Kaleidoscope sickle is hooked (no free replanting)
+PASS  Starcatcher fish are listed at the fisher by rarity  [136 fish]
+PASS  kaleidoscope_cookery:tomato_crop: right-click gives graded produce, no seeds, and no free replant  [[1 tomato] -> Block{minecraft:air}]
+PASS  kaleidoscope_cookery:chili_crop: right-click gives graded produce, no seeds, and no free replant  [[1 red_chili] -> Block{minecraft:air}]
+PASS  kaleidoscope_cookery:lettuce_crop: right-click gives graded produce, no seeds, and no free replant  [[1 lettuce, 1 caterpillar] -> Block{minecraft:air}]
+PASS  farmersdelight:cabbages: right-click gives graded produce, no seeds, and no free replant  [[1 cabbage] -> Block{minecraft:air}]
+PASS  farmersdelight:onions: right-click gives graded produce, no seeds, and no free replant  [[4 onion] -> Block{minecraft:air}]
+PASS  farmersdelight:tomatoes: right-click gives graded produce, no seeds, and no free replant  [[1 tomato] -> Block{minecraft:air}]
+PASS  farm_and_charm:barley_crop: right-click gives graded produce, no seeds, and no free replant  [[1 barley] -> Block{minecraft:air}]
+PASS  farm_and_charm:oat_crop: right-click gives graded produce, no seeds, and no free replant  [[1 oat] -> Block{minecraft:air}]
+PASS  farm_and_charm:corn_crop: right-click gives graded produce, no seeds, and no free replant  [[1 corn] -> Block{minecraft:air}]
+PASS  farm_and_charm:strawberry_crop: right-click gives graded produce, no seeds, and no free replant  [[1 strawberry] -> Block{minecraft:air}]
+PASS  farm_and_charm:tomato_crop: breaking gives graded produce, no seeds, and no free replant  [[1 tomato] -> Block{minecraft:air}]
+PASS  farm_and_charm:lettuce_crop: right-click gives graded produce, no seeds, and no free replant  [[1 lettuce] -> Block{minecraft:air}]
+PASS  farm_and_charm:onion_crop: right-click gives graded produce, no seeds, and no free replant  [[2 onion] -> Block{minecraft:air}]
+
+== land
+PASS  a deed creates a land and is used up
+PASS  the land is 16x16 on the grid, from below the feet up to the top of the world  [-32,246,-96 ~ y319]
+PASS  building high above the floor of the land is still protected
+PASS  the owner may do everything
+PASS  by default nobody else may do anything
+PASS  outside the land is unaffected
+PASS  a stranger cannot break blocks
+PASS  a stranger cannot place blocks
+PASS  the owner can let everyone place blocks
+PASS  ...which still does not allow breaking
+PASS  only the owner can change the settings
+PASS  a player given the break permission can break
+PASS  per-player permissions can be changed at any time
+PASS  a chest counts as storage
+PASS  only the owner can set a PIN
+PASS  a PIN must be 4-8 digits
+PASS  the owner sets a PIN
+PASS  the owner is never asked for the PIN
+PASS  anyone else must enter the PIN
+PASS  a locked chest does not open without the PIN
+PASS  a wrong PIN is rejected
+PASS  the right PIN unlocks
+PASS  the chest opens after the right PIN
+PASS  too many wrong tries lock the player out for a while
+PASS  a PIN chest cannot be broken by others
+PASS  the owner can remove the PIN
+PASS  the owner can break the chest, which clears its PIN
+PASS  a stranger cannot open storage
+PASS  the owner can open storage
+PASS  a deed is not wasted inside your own land
+PASS  looking up does not waste a deed (the land already reaches the sky)
+PASS  looking down adds a 16-block box below the same land
+PASS  an adjacent box joins the existing land
+PASS  a box somewhere else becomes a separate land
+PASS  the large deed makes a 32x32 land up to the sky
+PASS  old lands are raised to the sky, stopping under someone else's land  [289 / 319]
+PASS  land that is already owned cannot be claimed
+PASS  the neighbouring plot can be claimed by someone else
+PASS  neighbours cannot build on each other's land
+PASS  lands survive a save and reload
+PASS  returning a land frees it
+PASS  returning a land gives the deeds back
+PASS  the land merchant sells all three deeds
+PASS  first deed < normal deed < large deed  [15000 / 40000 / 140000]
+PASS  deeds cannot be sold back for gold
+PASS  the first-land deed can be bought once
+PASS  ...and only once per player
+
+== plots
+PASS  auto fill picks exactly the curved field, its tree and water, and the grass rim, but not the path  [484 vs 484 (missing 0, extra 0)]
+PASS  auto fill does not start on a path
+PASS  a polygon covers its inside and its edges
+PASS  a plot claim keeps the exact shape  [484 y246]
+PASS  the bounding-box corner is outside the plot shape
+PASS  a plot for sale is protected from everyone
+PASS  right outside the curved edge nothing is protected
+PASS  a land deed cannot be used over a plot
+PASS  a lot's shape survives packing for the merchant's map
+PASS  the merchant's list carries the real shape of a non-square lot
+PASS  the border display is off until the player turns it on
+PASS  /rtshop border toggles it
+PASS  buying needs enough carried Gold
+PASS  standing in the plot you can buy it
+PASS  after buying the owner may farm it and others may not
+PASS  it cannot be bought twice
+PASS  plots and their shape survive a save and reload
+PASS  returning a plot refunds part of the price and puts it back on sale  [3500]
+PASS  a plot's shape can be edited
+PASS  splitting a plot makes several plots that cover exactly the same blocks  [9 parts, 484 blocks]
+PASS  tiny leftover pieces are joined to a neighbour
+PASS  a new farmer gets one starter field for free  [1]
+PASS  checking again does not give a second starter field
+PASS  leaving the farmer job takes the starter field back for the next farmer
+PASS  only one starter field per player, ever (no new one after coming back)
+PASS  starter fields cannot be bought
+PASS  returning a starter field gives no Gold and puts it back for the next farmer
+
+== pricing
+PASS  recipe costs were calculated
+      price table: 1522 prices, 8767 recipes, built in 1931 ms (recipe pricing 1076 ms)
+PASS  the price table is built quickly enough not to stall the server  [1931 ms]
+      302 craftable foods priced from their recipes
+PASS  no food sells for less than its ingredients cost
+PASS  nothing sells for more than the shop charges for it
+PASS  no crafted item sells for more than its materials
+PASS  3.65.0 a golden carrot is bought back near what its gold costs (no buy-gold, craft, sell loop)  [315.33333333333337 vs gold 266.6666666666667]
+PASS  3.65.0 food price floors only use recipes that exist in game (Create's cake recipe is removed by the pack, the vanilla one is not)
+PASS  3.65.0 price costs skip removed mods' recipes for other mods' things (Create's cake), but keep the ones for their own things (Create's flour)
+PASS  3.65.0 nothing but food is bought back for more than its materials cost in the shops (no buy, craft, sell loop)  [0 ]
+PASS  buying ingredients from the shops and cooking never loses money, and a hopper-fed furnace cannot farm money
+      243 foods have at least one recipe whose ingredients can all be bought
+PASS  anything bought from a merchant resells for at most 50%
+PASS  the price table has the reference items
+PASS  bread made from bought wheat sells for its ingredients plus the hand-made margin  [132.0 (wheat 40, farmersdelight:bread_from_smelting)]
+PASS  ...and costs at least twice that to buy back  [264]
+PASS  cooking bought meat is break-even (no fuel bonus that a furnace array could farm)  [80.0 vs 80]
+PASS  smelting does not add value  [150 / 150]
+PASS  an iron sword sells for the value of its materials  [301.0 (shop 1200) cost=301.0 basis=minecraft:iron_sword exact=true ingotCost=150.0 via=null]
+PASS  tools made from free materials are not worth crafting for sale  [2.0 (shop 4)]
+PASS  3.65.0 things anyone can craft from priced materials are not sold for many times what they cost to make (wooden shovel, bricks, stone pickaxe)  [8 / 2 / 4]
+PASS  3.65.0 rare materials (nether star, elytra, totem, echo shard, dragon breath) use real values in recipe costs, not the 2 G guess  [198 guessed]
+PASS  an empty bucket is bought back for three iron ingots  [450.0]
+PASS  a milk bucket costs the bucket deposit plus a little for the milk  [452]
+PASS  basic ingredients are sold at or below what they cost to make  [2 / 2 sell 1.0 finished false]
+PASS  iron, gold and netherite ingots sell back for the usual share of their price (ore processing mods don't lower it)  [75.0 / 150.0 / 6600.0]
+PASS  the food merchant shows which ingredients a dish is priced from  [1 parts]
+      rtshop:enhance_anvil: 아이템 규칙(item_policy.json)으로 NPC 상점에 올릴 수 없어 상점 'blacksmith'에서 뺐습니다
+      가격표에 없던 씨앗 1종을 상점 'farmer' 에 자동으로 올렸습니다 (farming.json 의 autoListMissingSeeds): fantasy:blossom_berries=50
+      어느 상점도 팔지 않던 지팡이 15종을 상점 'blacksmith' 에 올렸습니다 (item_policy.json 의 listStaffs): irons_spellbooks:artificer_cane=6000, irons_spellbooks:graybeard_staff=6000, irons_spellbooks:hither_thither_wand=24000, irons_spellbooks:staff_of_the_nines=24000, paladins:acolyte_wand=6000, paladins:diamond_holy_wand=6000, paladins:holy_wand=6000, paladins:netherite_holy_wand=6000, wizards:wand_arcane=6000, wizards:wand_fire=6000, wizards:wand_frost=6000, wizards:wand_netherite_arcane=6000, wizards:wand_netherite_fire=6000, wizards:wand_netherite_frost=6000, wizards:wand_novice=6000
+      팔 곳이 없던 광석의 돌 변형 35종을 바닐라 광석과 같은 값의 매입 품목으로 올렸습니다: spelunkery:andesite_coal_ore=150, spelunkery:andesite_copper_ore=180, spelunkery:andesite_diamond_ore=2000, spelunkery:andesite_emerald_ore=800, spelunkery:andesite_gold_ore=900, spelunkery:andesite_iron_ore=450, spelunkery:andesite_lapis_ore=420, spelunkery:andesite_redstone_ore=280, spelunkery:calcite_redstone_ore=280, spelunkery:diorite_coal_ore=150, spelunkery:diorite_copper_ore=180, spelunkery:diorite_diamond_ore=2000, spelunkery:diorite_emerald_ore=800, spelunkery:diorite_gold_ore=900, spelunkery:diorite_iron_ore=450, spelunkery:diorite_lapis_ore=420, spelunkery:diorite_redstone_ore=280, spelunkery:granite_coal_ore=150, spelunkery:granite_copper_ore=180, spelunkery:granite_diamond_ore=2000, spelunkery:granite_emerald_ore=800, spelunkery:granite_gold_ore=900, spelunkery:granite_iron_ore=450, spelunkery:granite_lapis_ore=420, spelunkery:granite_redstone_ore=280, spelunkery:sandstone_lapis_ore=420, spelunkery:smooth_basalt_diamond_ore=2000, spelunkery:tuff_coal_ore=150, spelunkery:tuff_copper_ore=180, spelunkery:tuff_diamond_ore=2000, spelunkery:tuff_emerald_ore=800, spelunkery:tuff_gold_ore=900, spelunkery:tuff_iron_ore=450, spelunkery:tuff_lapis_ore=420, spelunkery:tuff_redstone_ore=280
+      상점에서 살 수 없던 요리 재료 10종을 식품 상인에 올렸습니다 (pricing.json 의 autoListFoodIngredients): aquamirae:spinefish=16, quark:crab_leg=10, aquamirae:esca=26, aquamirae:cooked_spinefish=74, aquamirae:fin=10, starcatcher:agave_bream=400, starcatcher:starcaught_fish=14, kaleidoscope_cookery:barley_tea_bag=20, kaleidoscope_cookery:oolong_tea_bag=20, kaleidoscope_cookery:sakura_fubuki_tea_bag=20
+      상점 'food': farmer, fisher 상점이 다루는 품목 39개를 뺐습니다 (skipItemsOf)
+      만들면 훨씬 싼데 비싸게 팔던 품목 26종의 상점가를 만드는 값의 2배로 내렸습니다: minecraft:leather_boots 95→8, minecraft:leather_chestplate 330→16, minecraft:leather_helmet 85→10, minecraft:leather_leggings 210→14, minecraft:bow 850→12, minecraft:stone_axe 775→4, minecraft:stone_sword 190→2, minecraft:wooden_axe 225→16, minecraft:wooden_sword 55→10, minecraft:stone_pickaxe 390→4, minecraft:stone_shovel 390→4, minecraft:wooden_pickaxe 205→16, minecraft:wooden_shovel 205→8, minecraft:stone_hoe 270→4, minecraft:wooden_hoe 140→12, starcatcher:starcatcher_rod 10000→834, minecraft:fishing_rod 220→10, starcatcher:gunpowder_bait 60→11, starcatcher:lush_bait 60→1, starcatcher:murkwater_bait 60→3, starcatcher:vanilla_hook 400→44, starcatcher:bobber 300→26, starcatcher:clear_bobber 300→38, starcatcher:glowing_bobber 300→98, starcatcher:slimey_bobber 300→62, starcatcher:vanilla_bobber 300→10
+      사서 만들면 더 싸서 매입가를 재료비로 내린 품목 1종: minecraft:charcoal 10.0→8.0 (spelunkery:charcoal_from_lump)
+      재료를 모두 상점에서 사서 만들어도 손해가 없도록 매입가를 올린 음식: 189종 (pricing.json 의 purchaseFloor)
+      화로에 바로 넣어 싸게 만드는 길을 막으려고 판매가를 올린 중간 재료: farmersdelight:mutton_chops=88, farmersdelight:salmon_slice=132, farmersdelight:wheat_dough=132, kaleidoscope_cookery:raw_cow_offal=59, kaleidoscope_cookery:raw_cut_small_meats=59, kaleidoscope_cookery:raw_lamb_chops=59, kaleidoscope_cookery:raw_pork_belly=37
+      레시피 파일 10310개 중 9199개 해석, 계산에 쓰지 못한 레시피 1543개, 가격을 추정한 재료 198종, 원가 기준으로 가격을 정한 음식 302종
+      무기 · 장비 521종의 사는 값을 올렸습니다 (item_policy.json 의 gearRaise): 2배 260종 · 3배 127종 · 5배 134종 — 상점이 사 주는 값(매입가)은 그대로
+
+== guards
+PASS  an iron golem killed by a farm drops nothing
+PASS  an iron golem killed by a player still drops iron
+PASS  villager trades that hand out goods the merchants buy are removed  [2]
+PASS  villagers still buy goods for emeralds and sell enchanted books
+PASS  balances saved by RT Shop 2.x are converted to the new price scale (x10)  [1230 / 450]
+PASS  ...and only once
+
+== upgrade
+PASS  the installed price table is marked with its version
+PASS  upgrading from 2.x installs the new shops (food and land merchants included)  [[attendance_shop, blacksmith, farmer, fisher, food, gacha_shop, general, land, raid, restaurant]]
+PASS  ...with the new price table instead of the old one  [40]
+PASS  ...and keeps the old files in config/rtshop/backup
+PASS  the upgrade happens only once
+
+== quests
+PASS  quest files load without problems  [[]]
+PASS  the tutorial chain and the guide NPC are installed
+PASS  a quest NPC can be spawned from its definition
+PASS  the quest NPC is recognised as an NPC (no trading, no damage)
+PASS  merchants with job quests always get a [Quests] button, even when nothing can be taken yet
+PASS  the empty merchant quest window says which quest to finish first  [rtshop.quest.locked_hint첫 밭농부의 길직업 안내인]
+PASS  only the first tutorial quest (and the prologue that wraps it) is offered at the start  [[tutorial_1, story_0_01]]
+PASS  a quest cannot be taken from the wrong NPC
+PASS  a quest can be accepted
+PASS  it cannot be accepted twice
+PASS  a quest cannot be turned in before its goals
+PASS  talking to some other NPC does not count
+PASS  a quest must be turned in at the right NPC
+PASS  turning in pays the reward  [1000]
+PASS  a finished quest cannot be taken again
+PASS  finishing step 1 unlocks step 2 and not step 3
+PASS  delivery quest is accepted
+PASS  7 of 8 items are not enough
+PASS  8 items complete the delivery, are taken, and pay the reward  [1800]
+PASS  kill quest is accepted
+PASS  a cow does not count and 4 of 5 monsters are not enough
+PASS  5 monsters complete the hunt and pay gold and items  [3300]
+PASS  last tutorial quest is accepted
+PASS  a quest with choices cannot be finished without choosing
+PASS  an invalid choice is refused
+PASS  choosing finishes it and sets the chosen flags only  [5300]
+PASS  quest records survive saving and loading
+PASS  visit quest is accepted
+PASS  being far away does not complete a visit
+PASS  arriving at the place completes the visit
+PASS  pay quest is accepted
+PASS  cannot pay without the gold
+PASS  paying takes the gold and pays the reward  [410]
+PASS  a quest needing a flag is hidden until the flag is set
+PASS  setting the flag reveals it
+PASS  a blocking flag hides it again
+PASS  at most 10 quests can be active  [10]
+PASS  abandoning frees a slot
+PASS  an abandoned quest can be taken again later
+PASS  quest files with an unknown goal type or a bad id are rejected
+PASS  a missing prerequisite and a prerequisite loop are reported and those quests are dropped  [3]
+
+== quest editor
+PASS  a quest written back to a file reads the same
+PASS  editing a quest saves it in its own file and applies at once  ['고친 제목' 을(를) 저장했습니다 (tutorial.json). 바로 적용됩니다.]
+PASS  the rest of that file is kept (other quests, help text, order)
+PASS  a mod update never overwrites an edited quest file
+PASS  a default file the owner deleted is not put back
+PASS  the id of an existing quest cannot be changed
+PASS  a new quest goes to my_quests.json and is usable at once  ['새 이야기' 을(를) 저장했습니다 (my_quests.json). 바로 적용됩니다.]
+PASS  line breaks in story text survive saving
+PASS  a second new quest with the same id is refused
+PASS  a quest without a giver is refused
+PASS  broken JSON is refused
+PASS  a quest with a missing prerequisite is saved but reported as unused  [저장했지만 지금은 쓰이지 않습니다: 선행 퀘스트 'nope' 가 없습니다]
+PASS  the editor still lists an unused quest with the reason, so it can be fixed
+PASS  fixing it makes it usable
+PASS  a dependent quest is saved
+PASS  a quest another quest depends on cannot be deleted
+PASS  deleting works once nothing depends on it
+PASS  a new NPC is saved and can be spawned  [NPC '편집 NPC' 을(를) 저장했습니다.]
+PASS  renaming an NPC also renames the spawned one  [NPC '바뀐 이름' 을(를) 저장했습니다. 소환되어 있는 NPC 1명의 이름도 바꿨습니다.]
+PASS  an NPC used by a quest cannot be deleted
+PASS  an unused NPC can be deleted
+PASS  an NPC id with spaces or capitals is refused
+PASS  the editor snapshot lists quests, NPCs and every NPC to pick from
+
+== jobs
+PASS  9 jobs are defined (5 combat, 4 life) plus 2 hidden life jobs (forger, investigator)
+PASS  the first combat job is free
+PASS  choosing the same job again does nothing
+PASS  there is no waiting time after the first pick
+PASS  changing costs 8000 G and applies at once  [12000]
+PASS  after a change the combat slot is locked for 48.0 hours  [172800000]
+PASS  changing again during the wait is refused and costs nothing
+PASS  the life slot is separate (first pick free even while combat waits)
+PASS  after the wait (real time) the combat job can be changed again
+PASS  changing without enough Gold is refused
+PASS  a life job change costs 5000 G
+PASS  a job whose unlock quest exists is locked until the quest is done
+PASS  the job screen shows it as locked with the quest to do
+PASS  finishing the quest unlocks it
+PASS  tank takes 10% less damage  [0.9]
+PASS  tank has 4 more max health  [24.0]
+PASS  tank has knockback resistance
+PASS  warrior has 2 more max health  [22.0]
+PASS  knockback resistance is removed when no longer a tank
+PASS  warrior deals 10% more with an axe, the same with a sword, 20% less with a bow
+PASS  warrior moves 10% faster
+PASS  archer deals 15% more with a bow and 20% less with an axe
+PASS  archer has 2 less max health (the warrior bonus is gone)  [18.0]
+PASS  archer moves at normal speed
+PASS  archer distance bonus: none up close, half way at mid range, +15% at 32 blocks or more  [1.075]
+PASS  a non-archer gets no distance bonus
+PASS  a tank's shield block pushes the attacker away and reflects 5% of the damage (less the attacker's armor)  [0.7000000178813934 / 0.46500015]
+PASS  mage deals 25% less with physical weapons and loses 2 health
+PASS  swordsman: sword +10%, axe -15%, spells -15%
+PASS  without a combat job there is no weapon bonus or penalty
+PASS  weapons are sorted into types (sword, axe, bow, crossbow, trident=spear, pickaxe=tool, empty hand=fist)  [spear/tool]
+PASS  3.84 vanilla weapons are outside the job weapon classes (vanilla), vanilla non-weapons stay none, and an operator override still wins  [vanilla none]
+PASS  non-weapons are not weapons (sugar cane is not a staff, a bowl is not a bow)
+      weapons in aquamirae: {dagger=1, spear=2, sword=6}
+      weapons in arcanevortex: {axe=6, bow=7, crossbow=1, spear=4, sword=27, tool=15}
+      weapons in archers: {bow=5, crossbow=6, spear=6}
+      weapons in arsenal: {axe=3, blunt=6, bow=3, crossbow=3, dagger=6, spear=6, staff=10, sword=4}
+      weapons in betternether: {axe=4, sword=4, tool=12}
+      weapons in block_factorys_bosses: {dagger=1, fist=1, none=1, spear=1, sword=4}
+      weapons in cataclysm: {axe=2, bow=1, fist=4, spear=6, staff=1, sword=5, tool=6}
+      weapons in create: {bow=1, sword=1}
+      weapons in ef_weapon_extended: {fist=4}
+      weapons in efn: {fist=1, spear=2, sword=31}
+      weapons in epicfight: {dagger=6, spear=6, sword=21}
+      weapons in epicfightx: {spear=1, sword=3}
+      weapons in farm_and_charm: {tool=1}
+      weapons in farmersdelight: {blunt=1, dagger=5}
+      weapons in invincible: {sword=3}
+      weapons in irons_spellbooks: {crossbow=1, spear=1, staff=6, sword=10}
+      weapons in kaleidoscope_cookery: {dagger=5, tool=1}
+      weapons in minecraft: {axe=6, bow=1, crossbow=1, spear=1, sword=6, tool=18}
+      weapons in miningmaster: {axe=4, bow=1, sword=6, tool=4}
+      weapons in mowziesmobs: {axe=1, bow=1, dagger=1, fist=1, spear=1, staff=1}
+      weapons in paladins: {blunt=12, staff=8, sword=6}
+      weapons in quark: {none=2}
+      weapons in rogues: {axe=6, dagger=11, spear=5}
+      weapons in spmovesets: {fist=1, sword=11}
+      weapons in supplementaries: {bow=1, none=1}
+      weapons in wizards: {staff=15}
+      weapons in wom: {axe=4, fist=1, staff=8, sword=15}
+      weapon-like items without a type (4): block_factorys_bosses:undying_tentacle, quark:pickarang, quark:flamerang, supplementaries:wrench
+PASS  swordsman attacks faster only while holding a sword  [4.0 / 4.4 / 4.0]
+PASS  3.84 a vanilla sword gets no job weapon bonus (no faster swings) while vanillaNoWeaponPassives is on  [4.0 / 4.0]
+      mage bonus applied to 8 of 8 magic attributes: [irons_spellbooks:max_mana, irons_spellbooks:spell_power, spell_power:arcane, spell_power:fire, spell_power:frost, spell_power:healing, spell_power:lightning, spell_power:soul]
+PASS  mage raises Iron's Spells max mana and spell power  [[irons_spellbooks:max_mana, irons_spellbooks:spell_power, spell_power:arcane, spell_power:fire, spell_power:frost, spell_power:healing, spell_power:lightning, spell_power:soul]]
+PASS  mage raises Wizards (Spell Power) school power  [[irons_spellbooks:max_mana, irons_spellbooks:spell_power, spell_power:arcane, spell_power:fire, spell_power:frost, spell_power:healing, spell_power:lightning, spell_power:soul]]
+PASS  the mage bonus is removed after leaving the job
+PASS  3.84 the non-mage and no-staff numbers are the chosen ones (power 60%, cast time and cooldown 1.3x, no staff 60%)  [0.6 1.3 0.6]
+PASS  3.84 spell power: a swordsman casts at 36% bare-handed (60% x 60%) and 60% with a staff (either hand); a mage at 60% bare-handed and full power with a staff  [true sw 0.36/0.6/0.6 mage 0.6/1.0]
+PASS  3.84 the spell-item tooltip numbers read 60% and 1.3x
+PASS  3.84 Iron's Spells: a swordsman bare-handed has spell power 0.36 and cast-time / cooldown attributes 0.7 (= 1.3x); with a staff 0.6; a mage with a staff full power (+ mage bonus) and normal times  [sw 0.36 cast 0.7 cd 0.7 staff 0.6 / mage 1.1 cast 1.0 cd 1.0]
+      3.84 Spell Engine haste: swordsman 76.92307692307692 (base 100.0), mage 100.0
+PASS  3.84 Spell Engine (Wizards): a non-mage's spell haste is cut to 1/1.3 (slower casts and cooldowns) and school power gets the non-mage and no-staff cuts; a mage keeps full haste  [swordsman 76.92307692307692 / mage 100.0 base 100.0 fire true]
+PASS  fisher sells fish for 20% more
+PASS  a cook gets no bonus on furnace food (no hopper money farm)
+PASS  a fisher bonus does not apply to a cook
+PASS  3.67.0 a miner sells mined goods (raw iron) for 20% more, but not ingots or fish  [1.2]
+PASS  3.67.0 life jobs are brought closer: farmer star-up 35% · extra crop 20%, cook dish bonus 20%, miner ore sale +20%, fish bought at 85% of the list  [{starUp=0.35, extraHarvest=0.2} {foodBonus=0.2, dishSell=0.2} {mineSpeed=0.15, extraOre=0.1, oreSell=0.2} fish 1.7]
+PASS  3.67.0 an older jobs.json gets the new life-job numbers where it still had the old defaults, and keeps numbers the server changed  [2 {starUp=0.35, extraHarvest=0.15} {foodBonus=0.2, dishSell=0.2}]
+PASS  3.68.0 income is written to the earner's life and combat job with its source; time adds up; per hour = gold / hours (none under 10 minutes)  [3600s {sell_fish=2500, sell_farm=0, sell_mined=0, sell_food=0, sell_other=0, pshop=0, quest=500, bounty=0, title=0, attendance=0, raid=0, abyss=0} / 300s / 3700 3900]
+PASS  3.68.0 the report line and the exported table show the job, hours and gold per hour  [어부: 1명 · 1.0시간 · 시간당 3,000 G (판매 2,500 · 퀘스트 · 현상금 500 · 그 밖 0)]
+PASS  3.68.0 only active time counts: standing still for over 5 minutes stops the clock, moving starts it again  [true false true]
+PASS  3.68.0 shop sales are sorted by source: fish, farm goods, food  [sell_fish sell_farm sell_food]
+      222 hand-made foods
+PASS  hand-made food pays everyone 10% over the ingredients and a cook the cook's bonus on top (about 132%)
+PASS  bread pays at least 110% of its 3 wheat (also when dough can be baked)  [132.0]
+PASS  a cook gets the bonus on hand-made food but not on anything a furnace can make from shop goods
+PASS  the job editor saves and applies at once
+PASS  a broken job file from the editor is refused
+PASS  an old (3.4) job file is replaced by the new defaults but keeps its costs
+PASS  jobs survive saving and loading
+
+== job quests
+PASS  job quest file loads without problems  [[]]
+PASS  an edited job quest file is never replaced
+PASS  every job has a 7-step quest line (63 quests)  [63]
+PASS  mentor NPC 'sword_master' is defined
+PASS  mentor NPC 'war_chief' is defined
+PASS  mentor NPC 'shield_keeper' is defined
+PASS  mentor NPC 'hunter' is defined
+PASS  mentor NPC 'archmage' is defined
+PASS  every item and monster the job quests ask for exists in this game  [[]]
+PASS  mod conditions: always / with / without a mod
+PASS  the swordsman asks for the Epic Fight tachi only when Epic Fight is installed (else an iron sword)  [[epicfight:iron_tachi]]
+PASS  the fisher's tool step follows Starcatcher (parts and a Starcatcher rod as reward, or a plain rod)  [[starcatcher:hook, starcatcher:bobber, minecraft:string] 1]
+PASS  mod conditions survive saving from the editor
+PASS  the job quests name the mods they explain  [[epicfight, rogues, paladins, archers, irons_spellbooks, wizards, kaleidoscope_cookery, starcatcher, farmersdelight, handson_delight]]
+PASS  every mod the job quests explain is in the pack  [[]]
+PASS  job 'swordsman' is locked until its quest line is done
+PASS  the 검사 quest line can be played from start to end and unlocks the job  []
+PASS  job 'warrior' is locked until its quest line is done
+PASS  the 전사 quest line can be played from start to end and unlocks the job  []
+PASS  job 'tank' is locked until its quest line is done
+PASS  the 탱커 quest line can be played from start to end and unlocks the job  []
+PASS  job 'archer' is locked until its quest line is done
+PASS  the 궁수 quest line can be played from start to end and unlocks the job  []
+PASS  job 'mage' is locked until its quest line is done
+PASS  the 마법사 quest line can be played from start to end and unlocks the job  []
+PASS  job 'farmer' is locked until its quest line is done
+PASS  the 농부 quest line can be played from start to end and unlocks the job  []
+PASS  job 'fisher' is locked until its quest line is done
+PASS  the 어부 quest line can be played from start to end and unlocks the job  []
+PASS  job 'miner' is locked until its quest line is done
+PASS  the 광부 quest line can be played from start to end and unlocks the job  []
+PASS  job 'cook' is locked until its quest line is done
+PASS  the 요리사 quest line can be played from start to end and unlocks the job  []
+PASS  job 'forger' is locked until its quest line is done
+PASS  job 'investigator' is locked until its quest line is done
+PASS  only one combat job line at a time (a second combat line is refused, a life line is fine)  [true/false/true]
+PASS  abandoning a job line frees the slot for another job (life slot stays taken by the farmer line)  [true/false]
+
+== attendance
+PASS  attendance.json is created with a 28-day reward table and weekly tiers  [28 3]
+PASS  every default attendance reward item exists  [[]]
+PASS  attendance settings survive saving
+PASS  a wrong attendance setting is refused with a reason
+PASS  a 3.7.0 attendance file moves from 09:00 to 06:00 and keeps its rewards  [6 1234]
+PASS  ...but 09:00 chosen later in the editor is kept
+PASS  the attendance day changes at 06:00 Korean time (not at 09:00)
+PASS  the week starts on Monday 06:00 (2026-11-23 is a Monday)
+PASS  first check-in: day 1 reward
+PASS  checking in twice on one day is refused
+PASS  three days in a row → day 3 and the 3-day weekly reward  [3]
+PASS  missing one day the first time keeps the streak (with a warning)
+PASS  ...and the next check-in continues it
+PASS  after that, missing a single day resets to day 0
+PASS  a restore ticket within 24 h brings the streak back (+ today's check-in)  [OK 5]
+PASS  the restored streak keeps going the next day
+PASS  missing two days resets at once even with the free miss unused
+PASS  the restore window closes 24 h after the reset
+PASS  coming back long after the reset cannot be restored
+PASS  a ticket cannot be used again within 24 h
+PASS  a ticket does nothing when there is nothing to restore
+PASS  after day 28 the rewards start again from day 1
+PASS  seven days in one week earn all three weekly rewards
+PASS  a new week starts the weekly count again
+PASS  players can't check in without the attendance NPC
+PASS  checking in gives the day-1 reward  [500]
+PASS  day 2 gives its item
+PASS  the first missed day is forgiven for a real player too
+PASS  the reset is applied when the player shows up
+PASS  right-clicking a restore ticket restores the streak and uses one ticket  [20 1]
+PASS  a ticket that can't be used is not consumed
+PASS  players who are not OP can't edit the attendance rewards
+PASS  ...and a save sent by a non-OP is ignored
+PASS  the attendance shop is installed for existing servers too
+PASS  the attendance shop sells the restore ticket at a high price and never buys it back  [30000]
+PASS  the attendance NPC can be placed with /rtshop npc attendance
+PASS  the attendance NPC also takes part in quests
+PASS  the quest HUD reminds a player who has not checked in today (with where the clerk stands) until they do; check-ins are kept with date and time  [minecraft:overworld;-32;77;-80 true true true 1]
+PASS  job trial quests stop counting as available once that slot (combat or life, separately) has a job or a trial under way  [true true true 9>4]
+
+== npc guard
+PASS  fisher NPC takes no damage and does not die  [20.0]
+PASS  fisher NPC cannot be killed by damage that skips the hurt events  [1.0]
+PASS  bank NPC takes no damage and does not die  [20.0]
+PASS  bank NPC cannot be killed by damage that skips the hurt events  [1.0]
+PASS  job NPC takes no damage and does not die  [20.0]
+PASS  job NPC cannot be killed by damage that skips the hurt events  [1.0]
+PASS  attendance NPC takes no damage and does not die  [20.0]
+PASS  attendance NPC cannot be killed by damage that skips the hurt events  [1.0]
+PASS  gacha NPC takes no damage and does not die  [20.0]
+PASS  gacha NPC cannot be killed by damage that skips the hurt events  [1.0]
+
+== castle lots
+PASS  castle lots v4: only the new lots (A~D), each about 256 blocks and in one piece, inside the castle zone, no cell shared  [25 true true true true false]
+PASS  the lots fill their areas without gaps: every lot touches a neighbour  [25/25]
+PASS  no lot (and nothing a lot removes) touches the two buildings marked to be left alone
+PASS  lots are named by area: 101 -> A-1, 304 -> C-4
+PASS  the castle zone polygon covers the city and the farmland but not across the river
+PASS  a 256-block castle lot costs castlePlotPrice; the price follows the number of blocks  [50000 / 44500]
+PASS  a world that is not the Amonos map gets no castle lots and no castle zone
+PASS  with castle lots installed the castle zone is protected: nothing allowed outside bought land
+PASS  in the castle zone (outside bought lots) anyone may use doors and buttons, but not chests
+PASS  3.81 the Amonos castle is recognised from blocks in chunks that already exist, wherever the world spawn is (a town moved to a new server); 3 of 5 marks is enough, 2 is not  [3/4 true true]
+PASS  3.81 on start a world not decided yet (0) installs the castle lots and turns the castle zone on; 'not found' (-2) is checked again next time; one an operator cleared (-1) is left alone  [true true true]
+PASS  3.81 looking for the castle never makes new chunks (nor empty region files): a far chunk that did not exist still does not  [false false true true ./world/./region/r.1906.-1907.mca]
+PASS  only land merchants open the lot browser
+PASS  lots can no longer be bought by command
+PASS  castle lot height works like normal land (from depthBelowFeet under the ground up to the sky)
+PASS  the preview marks the whole lot (no holes) and the outside parts of objects that will be removed  [256 54]
+PASS  buying a castle lot from the merchant works
+PASS  a building crossing the border is removed whole, also the part outside the lot
+PASS  a tree touching the lot is removed whole (logs and leaves) but other things next to it stay
+PASS  objects are never removed from someone else's land
+PASS  the lot is flat grass with dirt below; holes under it are filled
+PASS  the neighbour lot stays for sale
+PASS  the look before buying is backed up
+PASS  giving a castle lot back keeps it level and puts it up for sale again (owner-only rules)
+PASS  an OP can restore a lot and the removed objects (backup)
+PASS  moving to the new castle layout removes ownerless old lots, keeps owned ones and adds the new lots  [25 25/1 true true]
+PASS  new lots are named by area (성 안 토지 A-1) and are for sale  [성 안 토지 A-1]
+PASS  a lot's land is exactly its own cells (not its bounding box), so touching lots do not overlap  [235]
+
+== recipe and loot rules
+PASS  TNT can be crafted normally
+PASS  a blocked recipe disappears (TNT)
+PASS  item:... blocks every recipe of that item, but a custom recipe for it still works  [1]
+PASS  the custom recipe crafts in a crafting grid (3 dirt -> 2 bread)
+PASS  removing the rules brings the original recipes back
+PASS  the recipe editor gets the full recipe list  [9593]
+PASS  chest loot tables are listed for the loot editor  [345]
+PASS  sampling shows the real odds (dungeon saddle about 15-45%)  [57]
+PASS  the loot editor also lists mob drops and samples them (zombie drops rotten flesh)  [[minecraft:rotten_flesh, simplehats:hatbag_rare, simplehats:hatbag_common, simplehats:hatbag_epic, minecraft:iron_ingot, simplehats:hatbag_uncommon, minecraft:carrot]]
+PASS  loot tables can be found by item (saddle -> dungeon chest, rotten flesh -> zombie, an unknown item -> none)  [58 66 0 of 552]
+PASS  the editors are told which items the NPC shops sell (the return ticket is one of them)  [970]
+PASS  a dish from a free-form pot recipe (it carries a quality tag) is bought for its own ingredient cost; the standard dish and a Superb one keep the full price  [200.0 60.0 200.0]
+PASS  a recipe the operator blocked (by id, by mod or by item) is left out of the food price basis; others stay in
+PASS  with the cooking mod: braised beef keeps its full-recipe price, and the free-form version is bought for well under it  [327.8 / flex 110.00000000000001]
+PASS  rules apply to real chest loot: no saddle, always 2 diamonds  [300 2]
+PASS  a group rule (minecraft:chests/*) applies to every chest at its chance (about 50%)  [206]
+PASS  a placed dungeon chest gets the changed loot when opened  [2]
+
+== enhance
+PASS  11 enhancement levels: success falls, damage/destroy rise, cost rises, odds add up to 100  []
+PASS  3.65.0 bows and crossbows can be enhanced as ranged weapons; swords, tridents and armour keep their kinds  [RANGED RANGED]
+PASS  3.65.0 an arrow from a +7 bow carries the level and hits 28% harder (even after the bow is put away); a spell does not use the bow's level  [7 12.8 12.8 10.0 want 12.8]
+PASS  3.65.0 a +11 staff or wand makes spells stronger by the +11 bonus (its melee swing is not raised this way)  [paladins:acolyte_wand 20.0 10.0]
+PASS  3.65.0 in the pack: a TaCZ gun is a ranged weapon, Iron's staffs are magic weapons, the Wandering Magician chestplate is armour, a Weapons of Miracles fighting staff stays a melee weapon and Create's wand of symmetry is not a weapon  [modern_kinetic_gun graybeard_staff wandering_magician_chestplate iron_staff wand_of_symmetry]
+      3.65.0 enhanceable as magic weapons: 39, as ranged weapons: 34
+PASS  3.65.0 extreme gear (59 items: arcanevortex) is kept out of chests, mob and boss loot and recipes, and taken out of a survival player's bag; normal top gear (netherite, the strongest pack weapon) is not  [arcanevortex:van_sh_helmet loot=true recipe=true removed=1]
+PASS  from +4 success drops sharply and keep has a big share
+PASS  an old enhance.json with default odds is upgraded; edited levels are kept  [90.0 83.0 70.5]
+PASS  3.66.0 an enhance.json from 3.65 moves its default levels to the new odds and Gold, keeps a level the server changed, and gets the new bonus table  [5.0/40000 6.0/40000 100.0]
+PASS  the OP editor saves odds and applies them at once
+PASS  the editor refuses a level whose odds are all zero
+PASS  the first levels cannot destroy, high levels can
+      enhance materials: +1 needs 2 kinds, +11 needs 4 kinds (miningmaster true, spelunkery true)
+PASS  materials of uninstalled mods are skipped, installed ones are required  [2 / 4]
+PASS  +10 and +11 need the rarest Mining Master gems (divine beryl / air malachite)
+PASS  the equipment merchant sells the guard tickets but not the enhance anvil (there is one in town)
+PASS  3.69.0 guard tickets fit their levels: destruction guard is the cheapest (+5 ~ +6), protection the dearest (+7 and up), damage guard in between (gear that cannot break)  [15000 / 4000 / 35000]
+PASS  new enhance items are added to an existing blacksmith file once, keeping edited prices  [23 0]
+PASS  the OP shop editor saves items and prices and reloads the shops  [12345]
+PASS  the enhance anvil is an anvil (Cinematic Interactions plays its anvil scene on it)
+PASS  Cinematic Interactions treats the enhance anvil as an anvil station  [ANVIL]
+PASS  its menu is a vanilla anvil menu with its own type
+PASS  a stick cannot be enhanced (no result)
+PASS  a sword shows a +1 preview
+PASS  without Gold and materials it cannot be taken
+PASS  ...and clicking does nothing
+PASS  closing the anvil gives the sword back
+PASS  success: +0 -> +1, Gold and materials are used  [1 999700]
+PASS  shift-click works too (result goes to the bag)
+PASS  keep: the level stays
+PASS  damage: the level drops by one
+PASS  destroy: the item is gone
+PASS  +7 success: the server-wide notice waits for the on-screen build-up  [ / 1]
+PASS  ...and is then sent to everyone  [7:rtshop_test_a]
+PASS  3.66.0 each failure raises the next success chance by 10% of that level's chance, up to 5 times; the other outcomes shrink so the total stays 100  [5.0 -> 6.5 / cap 7.5 sum 100.0]
+PASS  3.66.0 on the anvil a failed attempt adds one to the item's failure count, and a success clears it  [6/1 2 7/0]
+PASS  3.69.0 guard ticket prices fit their levels: damage 15,000 (gear that cannot break) · destruction 4,000 (+5 ~ +6) · full 35,000 G (+7 and up)  [15000 / 4000 / 35000]
+PASS  3.66.0 high levels give much more: +8 ~ +11 attack bonus 40 / 55 / 75 / 100%, armour 40 / 50 / 60 / 75%; +11 costs 40,000 G at 5%  [[0.0, 3.0, 6.0, 9.0, 13.0, 17.0, 22.0, 28.0, 40.0, 55.0, 75.0, 100.0] 40000]
+PASS  3.66.0 armour from +8 also cuts damage taken: four +11 pieces take 30% less (10 -> 7), one +8 piece 1.5%  [30.0 7.0 1.5]
+PASS  3.66.0 the magic gacha has no pity (the old 80-pull setting is not used)
+PASS  3.66.0 carrot and potato seeds cost 30 G (were 50 G, more than the crop is worth)  [2 at 30, 0 at 50]
+PASS  the scene bands are +7~8, +9~10 and +11, each with a longer build-up
+PASS  the test's hand slot is free
+PASS  right-clicking a guard ticket no longer uses it (it only says to put it on the anvil): nothing is spent, nothing is armed  [0 3 3]
+PASS  damage guard on the anvil: only guard tickets fit the second slot, damage becomes keep, and exactly one ticket is used  [true 6 1]
+PASS  3.64.2 protection set the old way (right-click) comes back once as a guard ticket and no longer applies by itself  [1 0 0->1]
+PASS  spawn rule: vanilla mobs spawn as before; a mod monster keeps 20% of its natural spawns, a lycanth 10%; 3.84: a hollow 60%, a deepling brute 5%  [other betternether:naga=0.2 hollow wom:hollow=0.6 lycanth wom:lycanth=0.1 brute cataclysm:deepling_brute=0.05]
+PASS  drop rule: a common mob keeps its ordinary drops but loses weapons, enchanted things, enchanted books and mod items (RT Shop's own items stay); bosses are left alone  [1 test_block]
+PASS  a weapon a mob picked up from the ground (a player's) is still dropped: only the mob's own gear is removed  [true / [1 diamond_sword]]
+PASS  item patterns: a whole mod, a wildcard inside the name, a wildcard in the mod id, one exact item
+PASS  the cheap duplicate cooking recipes are blocked by default, once: what the operator opens again stays open, and the vanilla soups are blocked only with Farmer's Delight  [true true true true [cook_gaps@1, cook_gaps_fd@1]]
+PASS  Create: its recipes, loot and block drops are banned by default, and an installed item_policy.json (version 2) is brought up to that  [[tacz, efn_enhance, smallships, spmovesets, betternether, create] [efn:*, efn_enhance:*, smallships:*, spmovesets:*, betternether:*, create:*] [efn_enhance:*, smallships:*, spmovesets:*, betternether:*, create:*]]
+PASS  Create: nothing of it is sold in an NPC shop or comes out of a gacha (shopBan + the new gachaBan), an installed version-3 file gains both, and a version-4 file is left as the operator wrote it  [[] [efn:*, spmovesets:*, create:*] [mymod:thing, spmovesets:*, create:*] [efn:*, spmovesets:*]]
+PASS  /rtshop shop defaults puts a shop back on the bundled defaults and keeps the operator's file; /rtshop shop mine brings that file back, as often as wanted  [true RESET true ALREADY RESTORED true SAME NO_DEFAULT NO_SAVED]
+PASS  by default the NPC shops never list the enhance anvil or a boss item (nether star); ordinary goods are untouched, and nothing vanilla loses its recipe  [431 boss items, 1026 listed gear]
+PASS  3.80 the gear price raise follows the pick: under 5,000 G x2, 5,000 ~ 40,000 G x3, 40,000 G and up x5, and a melee weapon with DPS 14+ x5 whatever its price  [2.0 3.0 5.0 5.0]
+PASS  3.80 weapons, bows, shields and armor are raised; pickaxes, fishing rods, blocks and food are not; DPS is measured like the gear report (netherite sword 12.8)  [12.799999237060547]
+PASS  3.80 in the shops a diamond sword costs about twice what it did and a netherite sword five times, while what the shop pays back stays half the old price (no money is made)  [diamond 4002.0 -> 8000 (sell 2001.0), netherite 44402.0 -> 222000, raised [260, 127, 134]]
+PASS  a shop ban removes the item from every NPC shop (arrows), and a price factor multiplies the shop price (diamond sword x3, the larger of it and the gear raise)  [4002.0 -> 12000 skipped {blacksmith=[aquamirae:abyssal_boots, aquamirae:abyssal_brigantine, aquamirae:abyssal_heaume, aquamirae:abyssal_leggings, aquamirae:abyssal_tiara, aquamirae:coral_lance, aquamirae:dagger_of_greed, aquamirae:divider, aquamirae:fin_cutter, aquamirae:poisoned_blade, aquamirae:remnants_saber, aquamirae:sweet_lance, aquamirae:terrible_boots, aquamirae:terrible_chestplate, aquamirae:terrible_helmet, aquamirae:terrible_leggings, aquamirae:terrible_sword, aquamirae:three_bolt_boots, aquamirae:three_bolt_helmet, aquamirae:three_bolt_leggings, aquamirae:three_bolt_suit, aquamirae:whisper_of_the_abyss, arcanevortex:annihilation, arcanevortex:annivire_axe, arcanevortex:annivire_bow, arcanevortex:annivire_pickaxe, arcanevortex:annivire_shovel, arcanevortex:annivire_sword, arcanevortex:apocalypse_axe, arcanevortex:apocalypse_boots, arcanevortex:apocalypse_chestplate, arcanevortex:apocalypse_crossbow, arcanevortex:apocalypse_helmet, arcanevortex:apocalypse_leggings, arcanevortex:apocalypse_pickaxe, arcanevortex:apocalypse_shovel, arcanevortex:apocalypse_sword, arcanevortex:ash_burial, arcanevortex:black_golden_axe, arcanevortex:black_golden_pickaxe, arcanevortex:black_golden_shovel, arcanevortex:black_golden_sword, arcanevortex:black_meteor_rainbow_trace, arcanevortex:black_steel_frying_pan, arcanevortex:crimson, arcanevortex:crimson_rift, arcanevortex:direlock_axe, arcanevortex:direlock_pickaxe, arcanevortex:direlock_shovel, arcanevortex:direlock_sword, arcanevortex:direlock_trident, arcanevortex:fox_blade, arcanevortex:glory_sword, arcanevortex:glory_trident, arcanevortex:hero_alloy_scythe, arcanevortex:hero_alloy_sword, arcanevortex:lchen, arcanevortex:lh_amethyst_sword, arcanevortex:lost_soul_sword, arcanevortex:luo, arcanevortex:mumu, arcanevortex:myriad_abyss_boots, arcanevortex:myriad_abyss_chestplate, arcanevortex:myriad_abyss_helmet, arcanevortex:myriad_abyss_leggings, arcanevortex:nebula_bow, arcanevortex:odin, arcanevortex:orange_summer, arcanevortex:overlord, arcanevortex:pestilence_sting, arcanevortex:prismal_abyss, arcanevortex:qiong_qi_battle_axe, arcanevortex:relic_brass_sword, arcanevortex:rouge_snow, arcanevortex:scythe_of_yhiyhiy, arcanevortex:sky_ripper, arcanevortex:stellar_vortex, arcanevortex:van_sh, arcanevortex:van_sh_axe, arcanevortex:van_sh_boots, arcanevortex:van_sh_bow, arcanevortex:van_sh_chestplate, arcanevortex:van_sh_helmet, arcanevortex:van_sh_leggings, arcanevortex:van_sh_pickaxe, arcanevortex:van_sh_radiant_sun, arcanevortex:van_sh_shovel, arcanevortex:xvvaa, arcanevortex:zswj, betternether:cincinnasite_axe, betternether:cincinnasite_axe_diamond, betternether:cincinnasite_boots, betternether:cincinnasite_chestplate, betternether:cincinnasite_helmet, betternether:cincinnasite_leggings, betternether:cincinnasite_pickaxe, betternether:cincinnasite_pickaxe_diamond, betternether:cincinnasite_shovel, betternether:cincinnasite_shovel_diamond, betternether:cincinnasite_sword, betternether:cincinnasite_sword_diamond, betternether:flaming_ruby_axe, betternether:flaming_ruby_boots, betternether:flaming_ruby_chestplate, betternether:flaming_ruby_helmet, betternether:flaming_ruby_leggings, betternether:flaming_ruby_pickaxe, betternether:flaming_ruby_shovel, betternether:flaming_ruby_sword, betternether:nether_ruby_axe, betternether:nether_ruby_boots, betternether:nether_ruby_chestplate, betternether:nether_ruby_helmet, betternether:nether_ruby_leggings, betternether:nether_ruby_pickaxe, betternether:nether_ruby_shovel, betternether:nether_ruby_sword, block_factorys_bosses:dagger, block_factorys_bosses:dragon_bones_boots, block_factorys_bosses:dragon_bones_chestplate, block_factorys_bosses:dragon_bones_leggings, block_factorys_bosses:dragon_guard_shield, block_factorys_bosses:enhanced_shield, block_factorys_bosses:ice_gauntlet, block_factorys_bosses:knight_boots, block_factorys_bosses:knight_chestplate, block_factorys_bosses:knight_helmet, block_factorys_bosses:knight_leggings, block_factorys_bosses:knight_sword, block_factorys_bosses:kraken_trident, block_factorys_bosses:large_sword, block_factorys_bosses:pirate_saber, block_factorys_bosses:warrior_sword, cataclysm:ancient_spear, cataclysm:astrape, cataclysm:athame, cataclysm:azure_sea_shield, cataclysm:black_steel_axe, cataclysm:black_steel_pickaxe, cataclysm:black_steel_shovel, cataclysm:black_steel_sword, cataclysm:black_steel_targe, cataclysm:bloom_stone_pauldrons, cataclysm:bone_reptile_chestplate, cataclysm:bone_reptile_helmet, cataclysm:brontes, cataclysm:bulwark_of_the_flame, cataclysm:ceraunus, cataclysm:coral_bardiche, cataclysm:coral_spear, cataclysm:cursed_bow, cataclysm:cursium_boots, cataclysm:cursium_chestplate, cataclysm:cursium_helmet, cataclysm:cursium_leggings, cataclysm:gauntlet_of_bulwark, cataclysm:gauntlet_of_guard, cataclysm:gauntlet_of_maelstrom, cataclysm:ignitium_boots, cataclysm:ignitium_chestplate, cataclysm:ignitium_elytra_chestplate, cataclysm:ignitium_helmet, cataclysm:ignitium_leggings, cataclysm:infernal_forge, cataclysm:khopesh, cataclysm:meat_shredder, cataclysm:monstrous_helm, cataclysm:soul_render, cataclysm:the_annihilator, cataclysm:the_immolator, cataclysm:the_incinerator, cataclysm:tidal_claws, cataclysm:void_forge, create:cardboard_boots, create:cardboard_chestplate, create:cardboard_helmet, create:cardboard_leggings, create:cardboard_sword, create:copper_backtank, create:copper_diving_boots, create:copper_diving_helmet, create:netherite_backtank, create:netherite_diving_boots, create:netherite_diving_helmet, create:potato_cannon, efn:air_tachi, efn:air_tachi_e, efn:arc_tachi, efn:broadblade, efn:co_tachi, efn:crescent_moon, efn:crescent_moon_e, efn:crimson_moon, efn:crimson_moon_e, efn:duskfire_boots, efn:duskfire_chestplate, efn:duskfire_helmet, efn:duskfire_leggings, efn:excalibur, efn:exsiliumgladius, efn:exsiliumgladius_e, efn:fire_exsiliumgladius, efn:fire_exsiliumgladius_e, efn:flag_bearer, efn:flag_bearer_e, efn:hf_blade, efn:hf_murasama, efn:kusabimaru, efn:meen_spear, efn:meen_spear_e, efn:nf_claw, efn:nf_dual_sword, efn:nf_shortsword, efn:nf_shortsword_2, efn:nf_shortsword_2_e, efn:nf_shortsword_e, efn:ruinfighter_boots, efn:ruinfighter_chestplate, efn:ruinfighter_helmet, efn:ruinfighter_leggings, efn:ruinsgreatsword, efn:sword_of_pioneer, efn:thornwheel, efn:yamato_dmc, efn:yamato_dmc4, efn:yamato_dmc4_in_sheath, efn:yamato_dmc_in_sheath, irons_spellbooks:blood_staff, irons_spellbooks:decrepit_scythe, irons_spellbooks:infernal_sorcerer_chestplate, irons_spellbooks:paladin_chestplate, irons_spellbooks:speed_boots, minecraft:arrow, mowziesmobs:blowgun, mowziesmobs:geomancer_belt, mowziesmobs:geomancer_robe, mowziesmobs:geomancer_sandals, mowziesmobs:sculptor_staff, mowziesmobs:sol_visage, mowziesmobs:wrought_axe, mowziesmobs:wrought_helmet, rtshop:enhance_anvil, spmovesets:aro_zodiacal, spmovesets:baculo_arbol, spmovesets:baston_tesla, spmovesets:colmillo_salamandra, spmovesets:cuchillas_festival, spmovesets:guadana_heraldo, spmovesets:katana_niebla, spmovesets:lanza_glacial, spmovesets:lanza_serafin, spmovesets:mazo_gravitatorio, spmovesets:nodachi_cirujano, spmovesets:pulseras_choque, wom:ender_blaster], farmer=[arcanevortex:annivire_hoe, arcanevortex:apocalypse_hoe, arcanevortex:black_golden_hoe, arcanevortex:direlock_hoe, arcanevortex:van_sh_hoe, betternether:cincinnasite_hoe, betternether:cincinnasite_hoe_diamond, betternether:flaming_ruby_hoe, betternether:nether_ruby_hoe, cataclysm:black_steel_hoe]}]
+PASS  gear listed in a shop cannot be crafted (iron sword, with the rule widened to vanilla), a kept item still can (iron pickaxe), ordinary things too (bread), a banned recipe is gone (TNT)  [listed 512 gear 30 ban 16]
+PASS  loot: a banned item never comes out (saddle), an allowed one does (golden apple), gear comes only from bosses (iron sword), kept items and plain goods are left alone
+PASS  extra monster drops (ink): rolled only when a player made the kill, and bosses roll with a higher chance  [1 1 2]
+PASS  3.82 a villager's trades that sell or cost a tradeBan item (or an item whose NBT names a banned mod) are removed before the trade window opens; others stay; spmovesets is banned by default  [true 4 1 true]
+PASS  3.82 trades another mod adds after RT Shop's interact check (like spmovesets' cartographer maps) are removed as the trade window opens, before the list is sent; the other trades stay  [joined true opened 1 added 1 left 0 canceled 0 land false offers 1]
+      spmovesets cartographer trades: 11 offers, 11 banned, 11 removed; flow opened 1 added 11 left 0 canceled 0; fruits [pyro, nebu, lectro, nowy, darky, zyra, atsu, vita, sonna, ope] survival false e.g. 12 emerald + 2 gacha_fruta_key -> 1 mapa_pyro
+PASS  3.82 in the pack the spmovesets trades a cartographer gets (element maps for 12 emeralds and gacha keys; the old arena map) are all removed, also when the mod adds them after RT Shop's interact check (removed as the trade window opens)  [11 offers, 11 banned, 11 removed; flow opened 1 added 11 left 0 canceled 0; fruits [pyro, nebu, lectro, nowy, darky, zyra, atsu, vita, sonna, ope] survival false e.g. 12 emerald + 2 gacha_fruta_key -> 1 mapa_pyro]
+PASS  3.82 inside the town (castle zone) fire does not spread or burn blocks: a fire on planks goes out on its first tick and the planks stay, a fire on netherrack (fireplace) stays, lava lights no fire; outside the town (2+ blocks away) fire follows doFireTick; land.json castleNoFireSpread (on by default) turns it off  [out true (placed true, now Block{minecraft:air}) hearth true edge true lava true off true rule true default true stopped 3]
+PASS  3.83 Oscar and Bram are one NPC each (their shop NPC with quests, talk and the shop): the story NPC is not spawned on its own, one placed before is removed when it loads and dropped from the NPC layout, all their quests go through the shop NPC, and as a companion they wear the shop NPC's look  [true removed true(false) layout 1 quests 0/true looks true]
+PASS  after the trial the real rules are back: the iron sword and TNT can be crafted again
+PASS  3.66.0 item rules: Better Nether's recipes, loot and block drops are banned by default and added to an older rules file (keeping its own lines)  [[minecraft:saddle, efn_enhance:*, smallships:*, spmovesets:*, betternether:*] [tacz, create, betternether, spmovesets, efn_enhance, smallships] [create:*, betternether:*, spmovesets:*, efn_enhance:*, smallships:*]]
+PASS  3.78.0 item rules: every spmovesets item is kept out of NPC shops and gachas and cannot be crafted, looted or dropped — by default and in an older rules file (its own lines kept; a version-6 file is left as written)  [[efn:*, spmovesets:*] [spmovesets:*] [efn_enhance, smallships, spmovesets] [efn_enhance:*, smallships:*, spmovesets:*] / [efn:*] live true]
+PASS  3.66.0 mod pack: no Better Nether item can be crafted, and none comes from chests, mobs, bosses or broken blocks  [0 recipes  loot true]
+PASS  3.68.1 breaking Better Nether blocks drops none of their items (a coal ore broken the same way still drops coal)  [coal true tried 6 leaked [] stopped by the guard 4]
+      spmovesets items (118): [fruta_pyro, fruta_nebu, fruta_lectro, fruta_nowy, fruta_darky, fruta_goddy, fruta_nita, fruta_zyra, fruta_atsu, fruta_vita, fruta_sonna, fruta_ope, dark_root, gacha_fruta_key, fragmento_llave, maxear_fruta, heartitem, colmillo_salamandra, guadana_heraldo, lanza_serafin, lanza_glacial, pulseras_choque, baston_tesla, katana_niebla, mazo_gravitatorio, nodachi_cirujano, cuchillas_festival, aro_zodiacal, baculo_arbol, orbe_pyro, orbe_nebu, orbe_lectro, orbe_nowy, orbe_darky, orbe_goddy, orbe_nita, orbe_zyra, orbe_atsu, orbe_vita, orbe_sonna, orbe_ope, manual, calavera_resonancia_1, calavera_resonancia_2, calavera_resonancia_3, calavera_resonancia_4, gacha, goofy_goblin_spawn_egg, training_dummy, sello_jefe, coloso_magma_spawn_egg, salamandra_reina_spawn_egg, ciervo_glacial_spawn_egg, dama_ventisca_spawn_egg, asura_choque_spawn_egg, ronin_bruma_spawn_egg, kitsune_niebla_spawn_egg, custodio_inmovil_spawn_egg, serafin_caido_spawn_egg, ofanim_spawn_egg, leviatan_spawn_egg, tejedora_estrellas_spawn_egg, rey_liche_spawn_egg, dragon_tormenta_spawn_egg, monje_vacio_spawn_egg, oni_taiko_spawn_egg, bufon_pirotecnico_spawn_egg, ent_ancestral_spawn_egg, mantis_orquidea_spawn_egg, pangolin_sismico_spawn_egg, cubo_vacio_spawn_egg, artefacto_hyper_charge, artefacto_blood_pact, artefacto_last_reserve, artefacto_catalyst, artefacto_idle_recovery, artefacto_elemental_leech, artefacto_primed_edge, artefacto_double_edge, artefacto_double_echo, artefacto_broken_bond, artefacto_stone_skin, artefacto_second_wind, artefacto_false_step, artefacto_juggler, artefacto_long_chain, artefacto_knuckles, artefacto_summon_bond, artefacto_patient_guard, artefacto_short_fuse, artefacto_sustain, artefacto_quarry, artefacto_shared_root, artefacto_trail, artefacto_hourglass, artefacto_metronome, artefacto_field_owner, artefacto_repertoire, artefacto_finisher, manual_survival, te_candil, mapa_pyro, mapa_nebu, mapa_lectro, mapa_nowy, mapa_darky, mapa_goddy, mapa_nita, mapa_zyra, mapa_atsu, mapa_vita, mapa_sonna, mapa_ope, oro_celestial, oro_celestial_cincelado, oro_celestial_slab, oro_celestial_stairs, piedra_estelar]
+PASS  3.78.0 mod pack: no spmovesets item is sold in an NPC shop or comes out of a gacha, and none can be crafted or comes from chests, mobs, bosses or broken blocks  [118 items, left []]
+PASS  3.70.0 Distant Horizons waits until Chunky is loaded before linking to it (no crash on the first chunk without dhcompat)  [handler$bin000$rtshop$waitForChunky ready true probe field deferred true]
+PASS  mod pack: no Nightfall or Arcane Vortex item, no gun and no boss item is listed in an NPC shop; no gun recipe and no recipe of shop-only gear is left  [banned 0 guns 0 boss 0 tacz recipes 0 craftable 0 ]
+PASS  mod pack: common materials a boss also drops (arcane essence) and the gear made from them are not boss items  [8 irons_spellbooks boss items]
+PASS  3.64.2 the Wandering Magician armour is armour, not a staff (its class name has 'wand' in 'wandering'), while a real staff still is  [wandering_magician_chestplate graybeard_staff]
+PASS  3.65.0 stone-variant ores (Spelunkery's andesite iron ore) can be sold like the plain ore, for the same price  [225.0 vs 225.0]
+PASS  3.65.0 wands are priced by what they are made of (novice wand cheap, netherite wand near the netherite staff), not all 6,000 G  [novice 205 netherite 205050 netherite staff 205350]
+      item policy: 431 boss items, 1026 listed gear, wom listed 45, recipes blocked: mod 1579 ban 15 staff 33 listed 456 gear 30
+PASS  return tickets: nothing works until the town point is set; the ordinary one works within 3000 blocks (height ignored) in the town's world, the greater one anywhere  [true true true true]
+PASS  return ticket cooldowns run on real time and per kind: the ordinary one 60 minutes, the greater one 30 minutes, kept through death and relog  [true true true true true true true true]
+PASS  the greater return ticket can be bought 5 times a day (the count starts again the next day); the ordinary one has no limit  [5 2 0 5]
+PASS  the general store sells both return tickets: 10000 G and 30000 G (3.55; an installed shop still at an old default price is updated)  [10000 30000]
+PASS  repricing touches only entries still at the old default price  [1 0 {
+  "items": [
+    {
+      "item": "rtshop:return_ticket",
+      "price": 5000
+    },
+    {
+      "item": "rtshop:return_ticket_plus",
+      "price": 9999
+    }
+  ]
+}]
+PASS  the plain return ticket's default price rises to 10000 G on installed shops too (old defaults only)  [1 1 {
+  "items": [
+    {
+      "item": "rtshop:return_ticket",
+      "price": 10000
+    },
+    {
+      "item": "rtshop:return_ticket",
+      "price": 7777
+    }
+  ]
+}]
+PASS  3.81 with no town point set, return tickets and deaths go to the Amonos dock on the Amonos map; elsewhere there is still no spot  [true dock -24041.5]
+PASS  3.80 a newcomer starts at the arrival point, while return tickets and deaths still go to the town point (fountain square); arrival off → the town point; unset on the Amonos map → the dock (-24042, -5344) facing the town, and no dock on other maps  [true true true true true true -24041.5,126.0,-5343.5 yaw 90.0]
+PASS  3.81 a mob on the neverSpawn list never enters the world (a wandering trader stands in), other mobs still do; by default the list has the spmovesets night peddler and his cart  [true false true]
+PASS  3.81 in the pack the spmovesets night peddler (Candil) and his cart cannot enter the world  [2 0 spmovesets:vendedor_nocturno=VendedorNocturno spmovesets:carro_vendedor=CarroVendedor]
+PASS  operator features need creative mode: a non-operator has none either way (and is not 'a locked operator')  [false]
+PASS  3.84 by default anyone may cast (magicOnlyForMage is off): non-mages are weaker instead
+PASS  only a mage can cast magic (a warrior and a jobless player cannot; with the rule off anyone can); Iron's Spells is hooked when installed  [true/true/true/true hooked=true]
+PASS  the skill-stack keeper can reach Epic Fight's innate-skill slot whenever Epic Fight is installed (also on a dedicated server)  []
+PASS  a premium gacha weapon (epic or above) is outside the jobs' weapon classes: no bonus and no penalty, while a rare one is classed as usual  [vanilla [0.0, 0.0] / premium [0.0, 0.0]]
+PASS  mass-produced food fills 70%: bread and cookies are on the list (bread 5 -> 4, cookie 2 -> 1, never below 1), steak is not  [1 / 1]
+PASS  skills learned from skill books are kept after death (Epic Fight's keepSkills game rule is switched on when Epic Fight is installed)  [true / true / true]
+PASS  only the one enhance anvil of the town opens once it is set (any anvil opens while none is set)  [true / true]
+PASS  legendary (or higher) gear cannot be destroyed: the destroy chance is split between keep and damage, and the worst roll only damages it  [18.0 45.0/36.0 -> 1 iron_sword]
+PASS  damage guard does not stop destruction (and is used up anyway)
+PASS  destruction guard: destroy becomes damage
+PASS  protection ticket: both destroy and damage become keep
+PASS  success still succeeds with a ticket
+PASS  a used guard is spent on the next attempt whatever happens, even at +1
+PASS  +11 is the top: no further preview
+PASS  a +7 sword hits harder (5.00 -> 7.80)
+PASS  ...only in the main hand
+PASS  a +8 chestplate has more armor and some toughness (6.0 -> 8.40, +1.5)
+PASS  rolls follow the configured odds (+5: 37.0425/36.916/16.9945/9.047)
+
+== gacha
+PASS  an old gacha.json is upgraded: name and odds kept, lists rebuilt with the new rules  [4 옛 이름 true]
+PASS  ...and saved as the new version
+      gacha pools: weapons 65, pets 54, accessories 481
+PASS  gacha.json is filled automatically (weapons and pets from the game)  [65 / 54 / 481]
+PASS  boss weapons (Cataclysm etc.) are left out of the gacha  [[]]
+PASS  pets are only rare or better; common/uncommon pet pulls give shards  [[]]
+PASS  accessories: cosmetic hats are common..rare, Artifacts epic/legendary, others at most rare  [293 hats, bad []]
+PASS  hamsters and tiny dragons are epic pets  [[]]
+PASS  weapons: the 12 fixed Nightfall weapons, the karambit and the 17 Blade of Shadow weapons are epic+ (Yamato alone is YAMATO), the rest are Epic Fight base weapons  [[]]
+      gacha weapon epic+legendary (28): efn:ruinsgreatsword efn:nf_dual_sword efn:sword_of_pioneer efn:nf_shortsword efn:nf_shortsword_2 efn:kusabimaru efn:nf_claw efn:hf_murasama efn:hf_blade efn:crescent_moon lrtactical:melee tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun tacz:modern_kinetic_gun lrtactical:melee lrtactical:melee lrtactical:melee lrtactical:melee lrtactical:melee
+      gacha weapon mods: {efn=12, epicfight=33, lrtactical=8, tacz=12}
+      gacha pet epic+legendary (36): rpg_companions_tiny_dragons:tiny_dragon_01 rpg_companions_tiny_dragons:tiny_dragon_02 rpg_companions_tiny_dragons:tiny_dragon_03 rpg_companions_tiny_dragons:tiny_dragon_04 rpg_companions_tiny_dragons:tiny_dragon_05 rpg_companions_tiny_dragons:tiny_dragon_06 rpg_companions_tiny_dragons:tiny_dragon_07 rpg_companions_tiny_dragons:tiny_dragon_08 rpg_companions_tiny_dragons:tiny_dragon_09 rpg_companions_tiny_dragons:tiny_dragon_10 fantasy:unicorn fantasy:polar_bear fantasy:doom_horse fantasy:pegasus fantasy:giant_spider fantasy:war_mammoth fantasy:dragon_turtle fantasy:frost_sabrecat fantasy:phoenix fantasy:crystal_stag fantasy:griffin fantasy:qilin fantasy:luna_moth fantasy:hearthshell_snail fantasy:kitsune fantasy:bog_toad fantasy:frost_drake fantasy:moonwolf fantasy:mossback_treant fantasy:tide_narwhal fantasy:sky_whale fantasy:emerald_dragonfly fantasy:warhorn_rhino fantasy:jackalope fantasy:nimbus_ram adorablehamsterpets:hamster
+      gacha pet mods: {adorablehamsterpets=1, crittersandcompanions=11, fantasy=25, minecraft=3, quark=2, rpg_companions_tiny_dragons=10, rtshop=2}
+      gacha pets: =common =uncommon minecraft:cat=rare minecraft:parrot=rare minecraft:wolf=rare rpg_companions_tiny_dragons:tiny_dragon_01=epic rpg_companions_tiny_dragons:tiny_dragon_02=epic rpg_companions_tiny_dragons:tiny_dragon_03=epic rpg_companions_tiny_dragons:tiny_dragon_04=epic rpg_companions_tiny_dragons:tiny_dragon_05=epic rpg_companions_tiny_dragons:tiny_dragon_06=epic rpg_companions_tiny_dragons:tiny_dragon_07=epic rpg_companions_tiny_dragons:tiny_dragon_08=epic rpg_companions_tiny_dragons:tiny_dragon_09=epic rpg_companions_tiny_dragons:tiny_dragon_10=epic fantasy:unicorn=epic fantasy:polar_bear=epic fantasy:doom_horse=epic fantasy:pegasus=legendary fantasy:giant_spider=epic fantasy:war_mammoth=epic fantasy:dragon_turtle=epic fantasy:frost_sabrecat=epic fantasy:phoenix=legendary fantasy:crystal_stag=epic fantasy:griffin=legendary fantasy:qilin=epic fantasy:luna_moth=epic fantasy:hearthshell_snail=epic fantasy:kitsune=epic fantasy:bog_toad=epic fantasy:frost_drake=legendary fantasy:moonwolf=epic fantasy:mossback_treant=epic fantasy:tide_narwhal=epic fantasy:sky_whale=legendary fantasy:emerald_dragonfly=legendary fantasy:warhorn_rhino=epic fantasy:jackalope=epic fantasy:nimbus_ram=epic adorablehamsterpets:hamster=epic crittersandcompanions:dragonfly=rare crittersandcompanions:ferret=rare crittersandcompanions:jumping_spider=rare crittersandcompanions:red_panda=rare crittersandcompanions:shima_enaga=rare crittersandcompanions:ladybug=rare crittersandcompanions:stag_beetle=rare crittersandcompanions:roly_poly=rare crittersandcompanions:snail=rare crittersandcompanions:stick_bug=rare crittersandcompanions:weevil=rare quark:foxhound=rare quark:shiba=rare
+      gacha accessory epic+legendary (40): artifacts:plastic_drinking_hat artifacts:novelty_drinking_hat artifacts:snorkel artifacts:night_vision_goggles artifacts:villager_hat artifacts:superstitious_hat artifacts:cowboy_hat artifacts:anglers_hat artifacts:lucky_scarf artifacts:scarf_of_invisibility artifacts:cross_necklace artifacts:panic_necklace artifacts:shock_pendant artifacts:flame_pendant artifacts:thorn_pendant artifacts:charm_of_sinking artifacts:cloud_in_a_bottle artifacts:obsidian_skull artifacts:antidote_vessel artifacts:universal_attractor artifacts:crystal_heart artifacts:helium_flamingo artifacts:chorus_totem artifacts:digging_claws artifacts:feral_claws artifacts:power_glove artifacts:fire_gauntlet artifacts:pocket_piston artifacts:vampiric_glove artifacts:golden_hook artifacts:onion_ring artifacts:pickaxe_heater artifacts:aqua_dashers artifacts:bunny_hoppers artifacts:kitty_slippers artifacts:running_shoes artifacts:snowshoes artifacts:steadfast_spikes artifacts:flippers artifacts:rooted_boots
+      gacha accessory mods: {adorablehamsterpets=1, archers=3, artifacts=40, crittersandcompanions=3, irons_spellbooks=20, jewelry=50, kaleidoscope_tavern=17, minecraft=2, relics_rpgs=48, simplehats=293, spell_engine=2, supplementaries=2}
+      gacha grades: weapon[15, 11, 9, 25, 3, 2] pet[1, 1, 16, 30, 6, 0] accessory[134, 134, 173, 30, 10, 0] 
+PASS  grade odds add up to 100% and legendary is rare  [[0.0, 0.6995999999999999, 0.265, 0.032, 0.003, 4.0E-4]]
+PASS  YAMATO is 0.04% in the high weapon draw (only when the Yamato exists), never in pet/accessory draws or lower tiers  [[0.0, 0.6995999999999999, 0.265, 0.032, 0.003, 4.0E-4]]
+PASS  upgrading an old gacha.json moves Yamato to YAMATO, adds the 17 Blade of Shadow weapons as epic and sets 0.04% (keeping the list)  [65 vs 48]
+PASS  gacha settings survive saving
+PASS  an unknown grade in gacha.json is refused
+PASS  a custom grade is added between the built-in ones (and a missing built-in grade is put back in its place): common … legendary, mythic, yamato  [[common, uncommon, rare, epic, legendary, mythic, yamato] [1, 3, 10, 40, 150, 300, 600]]
+PASS  a switched-off grade never drops and its share goes to the others; the custom grade drops at its own odds (20 of 70)  [[0.7142857142857143, 0.0, 0.0, 0.0, 0.0, 0.2857142857142857, 0.0] rare 0 mythic 553]
+PASS  the grade list is written to gacha.json and read back the same
+PASS  the magic gacha follows the new grade list: its odds move with their grades (the fail slot stays on the common grade, the new grade starts at 0)  [[40.0, 41.98, 15.9, 1.92, 0.18, 0.0, 0.02]]
+PASS  a bad grade list is refused: the same ID twice, an ID with capitals or spaces, built-in grades out of order  [3]
+PASS  after the trial the six built-in grades are back, and the magic gacha's odds are where they were  [[common, uncommon, rare, epic, legendary, yamato]]
+PASS  pulls follow the published odds (40,000 simulated pulls)  [[0, 27881, 10677, 1327, 115]]
+PASS  10 pulls always include a rare or better, even when single pulls can't give one
+PASS  pulling needs the gacha merchant
+PASS  a 10-pull uses 10 tickets and gives 10 marked items  [10 10]
+PASS  with 2 tickets left a 10-pull is refused
+PASS  gacha items can't be sold to any shop  [1 wooden_tachi]
+PASS  dismantling gives shards and removes the items  [21]
+PASS  shards can be traded for gacha tickets  [149]
+PASS  ...but not without enough shards
+PASS  a pull is refused (tickets kept) when the inventory lacks free slots for every item  [true true]
+PASS  a weapon ticket can't be used for the pet gacha
+PASS  pet tickets pull pets; low-grade results arrive as plain shards  [21 / 21]
+PASS  epic+ gacha gear does not lose durability (rare still does)  [{Damage:0,Unbreakable:1b,rtshop_gacha:{c:"weapon",g:"epic",k:"minecraft:diamond_sword"}} / {Damage:0,rtshop_gacha:{c:"weapon",g:"rare",k:"minecraft:diamond_sword"}}]
+PASS  old epic+ gacha gear gets protected and repaired  [{Damage:0,Unbreakable:1b,rtshop_gacha:{c:"weapon",g:"epic",k:"minecraft:diamond_sword"}}]
+PASS  every pet in the gacha appears tamed to the player (52 pets)  [[]]
+PASS  players who are not OP can't edit the gacha
+PASS  ...and a save sent by a non-OP is ignored
+PASS  the ticket shop is installed
+PASS  weapon tickets cost 1,000 / 5,000 / 20,000 G and can't be sold back
+PASS  pet and accessory tickets are 25% cheaper (750 / 15,000 G)
+PASS  the gacha merchant can be placed with /rtshop npc gacha
+
+[player shop]
+PASS  the player shop block has its block entity
+PASS  an item from an NPC shop was found for the comparison
+PASS  NPC shops selling the item are listed with their price
+PASS  someone else cannot put items on your shop
+PASS  the owner lists 30 items at 7G each  [30]
+PASS  a buyer without enough money cannot buy
+PASS  buying 5 takes 35G and gives the items  [15G, 15]
+PASS  the money goes to the owner's bank  [35]
+PASS  the owner cannot buy from their own shop
+PASS  someone else cannot change the price
+PASS  the owner changes the price and takes 5 back
+PASS  restocking from the bag
+PASS  the shop is saved with its owner and listings
+PASS  taking the listing down returns the stock
+PASS  someone else cannot break the shop
+
+[player shop clerks]
+PASS  a stand with an owner gets a clerk standing right next to it  [Villager['선우 · rtshop_test_a's clerk'/1107, l='ServerLevel[world]', x=-25.50, y=250.00, z=-88.50]]
+PASS  the clerk is a protected NPC with a name tag  [translation{key='rtshop.pshop.emp_label', args=[선우, rtshop_test_a]}]
+PASS  hiring again keeps the same clerk
+PASS  right-clicking the clerk opens the stand (no villager trading)
+PASS  each owner's clerk has a different name  [선우 / 지호]
+PASS  a newly hired clerk works on the first day for free
+PASS  at the daily reset the wage is taken from the bank first, then the wallet  [0 / 200]
+PASS  an owner who cannot pay keeps the money and the clerk takes the day off
+PASS  the owner gets a wage notice (kept for when they log in)  [[{"color":"red","translate":"rtshop.pshop.wage_short","with":["지호","1,000"]}]]
+PASS  the wage is taken only once a day
+PASS  customers cannot buy while the clerk is off  [rtshop.pshop.closed_today]
+PASS  [Pay wage] brings the clerk back to work right away  [1500]
+PASS  ...and customers can buy again
+PASS  a missing clerk comes back to the stand
+PASS  breaking the stand sends the clerk away
+PASS  the first clerk leaves with the stand too
+
+[3.79 shop lots]
+PASS  3.79 shop lot settings follow the answers: twice the deed price, no limit per player, weekly base rent 15% + 5% of each sale, stands only on shop lots  [2.0 0 15.0 5.0 true]
+PASS  3.79/3.82 the default market: 7 stalls of the south-east gate square (its 3 west stalls dropped) + 2 stalls of the north square (inside the castle zone, clear of house lots, not overlapping each other)  [9 [가판대 9, 가판대 10, 가판대 4, 가판대 5, 가판대 11, 가판대 7, 가판대 12, 가판대 1, 가판대 2] retired [가판대 3, 가판대 6, 가판대 8] zone true houses true apart true ]
+PASS  3.79 every market lot covers an existing stall on the castle map (white awning stripes inside, the square's paving around it)  [0 ]
+PASS  3.79 a 6×4 shop lot costs twice the land deed's price per block (40,000 G / 256 × 24 × 2 = 7,500 G)  [40000 / 256 → 7500]
+PASS  3.79 a lot over a stall measures its ground from the road around it, not from the awning on top (the floor under the awning is inside the lot)  [62 vs 62 y0 59]
+PASS  3.82 a market lot dropped from the default list is removed while for sale, kept when someone owns it, and a lot elsewhere with the same name stays  [1 removed 1 kept · free gone true owned kept true other kept true]
+PASS  3.79 shop lots are made for sale (one overlapping another is refused): price 7,500 G, base rent 15% = 1,125 G a week  [7500 1125 clash false]
+PASS  3.79 the land merchant's window lists shop lots under their own tab (kind shop) with the weekly rent and the sales %  [2 rows, rent 1125 fee 5.0]
+PASS  3.79 a stand cannot be placed outside a shop lot  [rtshop.shoplot.stand_only]
+PASS  3.79 ...nor on a shop lot still for sale
+PASS  3.79 buying shop lots: 7,500 G each, no limit per player (two in a row), and the week you buy is free  [true true true rtshop.shoplot.limit 85000]
+PASS  3.79 the owner may place stands on their shop lot, others may not  [rtshop.shoplot.stand_not_yours]
+PASS  3.79 really placing a stand: refused outside a shop lot (item kept, no block), placed on your own shop lot  [FAIL true / CONSUME true rtshop.shoplot.stand_only]
+PASS  3.79 next week the base rent of both lots (1,125 G each) is taken from the bank first, then the wallet  [[2, 0] bank 0 wallet 1250]
+PASS  3.79 ...only once a week
+PASS  3.79 rent that cannot be paid is owed and the stands on that lot close (customers cannot buy)  [1125 true sold false rtshop.shoplot.closed_rent]
+PASS  3.79 owed rent stops growing at 4 weeks' worth  [4500]
+PASS  3.79 [Pay rent] needs the whole amount, then opens the stands again  [rtshop.shoplot.rent_cant rtshop.shoplot.rent_paid_now 500]
+PASS  3.79 a sale on a shop lot gives up 5% (1,000 G → owner's bank +950 G); stands off shop lots pay no sales fee unless shopSalesFeeAllStands  [true fee 50 bank 950 b 4000 off true all true rtshop.pshop.bought]
+PASS  3.79 owed rent is paid by itself once the money is there  [0 bank 5500]
+PASS  3.79 shop lots are saved with their rent state
+PASS  3.79 giving a shop lot back: refused while a stand is on it, then half the price minus owed rent (3,750 − 1,125)  [true true 2625]
+PASS  3.79 an operator can turn a lot into a shop lot (priced like one) and back, and has /rtshop plot shoplot
+
+== farmland lot is cleared on purchase
+PASS  buying a farmland lot removes the crops and structures standing on it  [true Block{minecraft:air} Block{minecraft:air} Block{minecraft:air} ground=Block{minecraft:farmland}[moisture=0] surface=101 (Y=100)]
+PASS  ...but keeps the farmland, the ground and the water channel
+PASS  ...and touches nothing outside the lot's own cells  [Block{minecraft:oak_planks} Block{minecraft:oak_planks} Block{minecraft:oak_planks}]
+PASS  the removed blocks are saved as a backup
+
+== land sweep
+PASS  a tree cut by the lot's edge is removed whole (trunk and leaves); the same tree on someone else's land is left alone  [trees 1 leaf clumps 0 floating 1 blocks 65 trunk Block{minecraft:air} leaf Block{minecraft:air} other Block{minecraft:oak_log}[axis=y]]
+PASS  a piece left floating beside the cleared space is removed; a log wall, a post standing on the ground and the ground itself stay  [trees 1 leaf clumps 0 floating 1 blocks 65 plank Block{minecraft:air} wall Block{minecraft:oak_log}[axis=y] post Block{minecraft:oak_fence}[east=false,north=false,south=false,waterlogged=false,west=false]]
+
+== pvp toggle
+PASS  3.84 PvP can be turned on anywhere outside town by default (both players must have it on)
+PASS  with 'outside' off there is no PvP outside a PvP zone: PvP cannot be turned on there
+PASS  inside a PvP zone PvP can be turned on; hits need both players on
+PASS  PvP cannot be turned off during combat, only after the combat lock
+PASS  arrows count as their shooter's attack
+PASS  leaving the PvP zone turns PvP off by itself
+PASS  with 'outside' on, PvP can be turned on anywhere outside safe zones
+PASS  a safe zone blocks every hit, turns PvP off on entry and refuses /pvp on
+PASS  the castle area is always a safe zone, even with 'outside' on
+PASS  PvP settings and zones survive saving and loading
+PASS  the /pvp command exists for everyone and /rtshop pvp for OPs
+
+== weekly raid
+PASS  raid settings, texts and rewards survive saving and loading
+PASS  the week starts on Monday 06:00 (weekly rewards reset then)  [2026-11-23T06:00Z[Etc/UTC]]
+PASS  entering needs one regular boss kill and a raid ticket  [입장 조건: 이그니스를 1번 이상 처치해야 합니다 (현재 0번). / 레이드 참가 티켓이 필요합니다. 레이드 상인에게서 살 수 있습니다.]
+PASS  entering uses a ticket, builds the arena with an altar in the middle and hands out the summoning eye and the escape ticket  [true 2 Block{cataclysm:altar_of_fire}]
+PASS  blocks in the raid arena cannot be broken, and there is no PvP there
+PASS  using the eye on the altar wakes the boss; it takes 1/3 damage (= three times the health, without hitting the 1024 health limit)  [3.0]
+PASS  once the boss is awake nobody else can enter
+PASS  the raid boss hits harder by the configured factor  [8.0 vs 4.0]
+PASS  the escape ticket returns the player; with nobody left the boss disappears without counting as a kill
+PASS  a kill by a player pays the weekly reward once and rolls the boss drops (top grade is announced with its custom name)  [777 3 rtshop_test_a 님이 [태초의 불씨] 등급 보상 Nether Star 을(를) 획득했습니다!]
+PASS  after the kill players wait for the countdown, or leave at once when everyone agrees
+PASS  the same week again: no weekly reward and lower drop odds (a 60 roll drops nothing where it would before)  [0]
+PASS  the weekly reward is available again after the Monday reset
+PASS  a boss that dies without a player's attack gives nothing
+PASS  when everyone is down the raid fails: the boss goes, and players return after confirming
+PASS  in the pack the raid summons Cataclysm's Ignis at full health, on Cataclysm's altar of fire  [Ignis_Entity 450.0 cataclysm:altar_of_fire]
+PASS  the in-game editor changes numbers, texts and rewards (held items can be added with their count)  [4.5 2]
+PASS  the raid guide and the raid merchant can be spawned, and the OP commands exist
+PASS  raid NPCs (guide, raid merchant) answer only after a first named boss is down; each boss kill is written per boss  [false/true/true/true/true]
+PASS  NPCs do not get into boats or minecarts (they cannot be carried off)  [false]
+PASS  boss music: nothing plays before the fight, the boss's own track plays while fighting, '' silences a boss, '*' is the common track  [/husk_theme//boss | minecraft:husk husk=true gone=false alive=true raid=0 near=1 boss=true dealt=4.0]
+PASS  a weapon manual remembers its weapon and is named after it  [How to Use: Iron Sword]
+PASS  Epic Fight's weapon data can be reached whenever Epic Fight is installed (also on a dedicated server)  [true / ]
+PASS  Epic Fight weapon data is readable: an iron sword is a sword with an innate skill  [sword|epicfightx:dancing_edge,epicfightx:sweeping_edge x5]
+PASS  weapon manuals are handed out only for mod weapons with a skill of their own (a vanilla iron sword gets none; the common sword skill is not 'special')  [0 air / true]
+PASS  a mod axe that works exactly like the vanilla iron axe gets no manual (skills every axe has are not 'special')  [betternether:cincinnasite_axe axe|efdualwield_expansion:spinning_death,epicfightx:the_guillotine x5]
+PASS  a mod weapon with its own skill gives its manual the first time only  [wom:agony spear|wom:agony_plunge x4]
+PASS  weaponManuals=false gives nothing; turned on, the bag scan hands out that weapon's manual once (and nothing for the iron sword)  [0 / 1 / 0]
+
+== spiral abyss weekly rewards
+PASS  clearing a floor pays that floor's weekly reward (Gold + items by their chance)  [1234 2]
+PASS  ...only once a week per floor, and the list sent to the screen marks it as received
+PASS  after the Monday 06:00 reset the reward can be earned again
+PASS  with weekly rewards on the endless mode: a floor clear pays nothing (the story mark is still set), wave 20 pays stages 1 and 2 once  [1334 3]
+PASS  floor modes open only while a story quest calls for that floor (floors below it too); the endless mode is always open  [true/true/true/true]
+PASS  the rune altar is one for the whole town: only the chosen orb opens, it is neither handed out by the story nor craftable  [true/true/true]
+PASS  world rules: the ruined abyss gate never generates, its key cannot be crafted, blocked mods fall out of loot, and only the one chosen portal lets people in  [true/true/true/true]
+PASS  abyss floor chests: an edited chest becomes a real loot table the mod rolls and previews, and turning it off brings the mod's own rewards back  [true true true 1 133 3243 ]
+PASS  the in-game editor sets each floor's rewards, their chance and the Gold  [999 1]
+PASS  the abyss commands exist
+      spiral abyss detected: true
+PASS  Spiral Abyss is installed and its progress can be read (floor clears are detected)
+
+== party and boss credit
+PASS  a party can be made and an invited player joins it
+PASS  the party size limit is 12 and a boss kill needs 10% of its health
+PASS  merchants have personal names (farmer: 농작물 상인 한나)  [농작물 상인 한나]
+PASS  party members cannot hurt each other
+PASS  a boss kill counts only for players who dealt at least 10% of its health (11% yes, 9% no)  [1]
+PASS  a story boss plays its entrance once (marked as seen)
+PASS  every story boss has an entrance and a life story (13 bosses)
+PASS  seals turn on only when a quest grants their flag (story quests open the fire altar; an unknown flag stays off)
+PASS  a seal blocks a player without its flag, opens with it, and a party member with it carries others  [true true true true]
+PASS  the fire altar is sealed until the seven seals are broken
+PASS  boss structures are spread further apart (25/8 x1.6 -> 40/13)  [{"structures":[],"placement":{"type":"minecraft:random_spread","spacing":40,"separation":13,"salt":1}}]
+PASS  the story structure pack spreads Mowzie's boss structures out  [{cataclysm:sunken_city=100 → 180, cataclysm:soul_black_smith=60 → 108, cataclysm:ruined_citadel=50 → 90, cataclysm:frosted_prison=80 → 144, cataclysm:desert_structures=30 → 54, cataclysm:cursed_pyramid=80 → 144, cataclysm:burning_arena=80 → 144, cataclysm:ancient_factory=112 → 202, cataclysm:acropolis=80 → 144, mowziesmobs:wrought_chambers=15 → 24, mowziesmobs:umvuthana_groves=25 → 40, mowziesmobs:monasteries=25 → 40, mowziesmobs:frostmaw_spawns=25 → 40, aquamirae:ship=25 → 35, aquamirae:shelter=40 → 56, spmovesets:arena_wyvern_tormenta=off, spmovesets:arena_tejedora_estrellas=off, spmovesets:arena_serafin_caido=off, spmovesets:arena_salamandra_reina=off, spmovesets:arena_ronin_bruma=off, spmovesets:arena_rey_liche=off, spmovesets:arena_pangolin_sismico=off, spmovesets:arena_oni_taiko=off, spmovesets:arena_ofanim=off, spmovesets:arena_monje_vacio=off, spmovesets:arena_mantis_orquidea=off, spmovesets:arena_leviatan=off, spmovesets:arena_kitsune_niebla=off, spmovesets:arena_ent_ancestral=off, spmovesets:arena_dama_ventisca=off, spmovesets:arena_custodio_inmovil=off, spmovesets:arena_cubo_vacio=off, spmovesets:arena_coloso_magma=off, spmovesets:arena_ciervo_glacial=off, spmovesets:arena_bufon_pirotecnico=off, spmovesets:arena_asura_choque=off}]
+PASS  3.80 a switched-off structure set keeps its spacing but has placement frequency 0 (never placed), and spmovesets is switched off by default  [{"structures":[],"placement":{"type":"minecraft:random_spread","spacing":25,"separation":8,"salt":1,"frequency":0.0}}]
+      spmovesets structure sets: 21 [spmovesets:arena_asura_choque, spmovesets:arena_bufon_pirotecnico, spmovesets:arena_ciervo_glacial, spmovesets:arena_coloso_magma, spmovesets:arena_cubo_vacio, spmovesets:arena_custodio_inmovil, spmovesets:arena_dama_ventisca, spmovesets:arena_ent_ancestral, spmovesets:arena_kitsune_niebla, spmovesets:arena_leviatan, spmovesets:arena_mantis_orquidea, spmovesets:arena_monje_vacio, spmovesets:arena_ofanim, spmovesets:arena_oni_taiko, spmovesets:arena_pangolin_sismico, spmovesets:arena_rey_liche, spmovesets:arena_ronin_bruma, spmovesets:arena_salamandra_reina, spmovesets:arena_serafin_caido, spmovesets:arena_tejedora_estrellas, spmovesets:arena_wyvern_tormenta]
+PASS  3.80 spmovesets structures never generate in new land: every spmovesets structure set in the world has placement frequency 0  [21/21 (pack 21)]
+PASS  a member can leave the party
+PASS  Fantasy Mounts quests are off by default (its quest settings were found)  [fantasymounts []]
+PASS  3.74 Fantasy Mounts' own settings file says [quests] enabled = false (common and this world's file)  [world/serverconfig/fantasy-server.toml=false  | [./world/./serverconfig/fantasy-server.toml (그대로)]]
+PASS  IDAS no longer switches off vanilla structures the story needs (desert pyramid etc.)  [0 []]
+PASS  the story's vanilla structure can be found in this world: #minecraft:ruined_portal  [BlockPos{x=-528, y=0, z=-448}]
+PASS  the story's vanilla structure can be found in this world: minecraft:desert_pyramid  [BlockPos{x=-1472, y=0, z=-1696}]
+PASS  the story's vanilla structure can be found in this world: minecraft:ancient_city  [BlockPos{x=-1344, y=0, z=176}]
+PASS  vanilla illagers never appear inside a woodland mansion (the hidden boss and raids are left alone)
+PASS  merchants and service NPCs open with a dialogue first, their own window being the first choice; story-only NPCs have none
+PASS  long small talk can let slip hints toward the hidden bosses; the lucky merchant calls himself Lucky
+PASS  world-generation log spam (empty height range, unknown structure entities) is filtered, other warnings are not
+PASS  falling into the void in the Memory Gate brings you back to solid ground (the Illusioner's own void is left alone)
+PASS  staged story structures: locked at first, plain structures are not, and world generation really asks (mixin applied)  [true asked=2]
+PASS  taking the quest that leads to a story structure starts generating it for the whole server; later ones stay locked  [true true true true]
+PASS  pressing the Memory Gate button only opens a gate in front of the player (only with the quest, or OP force); nobody is moved yet  [true true true]
+PASS  walking into the gate takes the player to a private arena; the boss sleeps there until the ember is touched, then wakes after a short scene  [true true true true true true Evoker['Evoker'/1137, l='ServerLevel[world]', x=-29999.50, y=291.00, z=-29999.50] gates 0]
+PASS  party members come along only from within 16 blocks of the one who walks in (story_arenas.json: partyRange), and the wait is set there too  [16 45]
+PASS  after the boss falls the player is sent back where they came from and the arena closes  [true 0 (0.5, 120.0, 0.5)]
+PASS  the Memory Gate dimension is installed (rtshop:memory)
+PASS  story mods spawn far less in the open (Mowzie's / Aquamirae keep 15%), normal in their own structures and story biomes  [{mowziesmobs=0.15, aquamirae=0.15}]
+PASS  the main story (3rd edition: prologue, 4 chapters, finale + hidden story) is installed  [218]
+PASS  the story quests load without problems  [[]]
+PASS  the order's three NPCs exist
+PASS  every story quest points at real monsters, structures, items and NPCs  [[]]
+PASS  advancements, dimensions, sealed/staged structures and arena bosses named by the story are real  [[]]
+PASS  full pack: every mod the story names is installed (no misspelled mod ids)  [[]]
+PASS  every text in the bundled quest files has an English version (3572/3572)  [[]]
+PASS  3.64 NPC talk follows the story language everywhere: an English player sees no Korean in any NPC's greeting, small talk or topic (the job masters and the two-language topics included), a Korean player gets the original, the fallback greeting is the player's language and not the server's, and the old language command sets the same setting  [588 lines, korean left: [] / A sword is an honest weapon. It gives back only what you swing. …What is it? / 검은 정직한 무기다. 휘두른 만큼만 돌려주지. …무슨 일이냐. / What can I do for you? / 무슨 일이세요?]
+PASS  story language: English players get the English story, Korean players the original (and ids stay untouched)  [The Torn Chronicle / 찢긴 연대기]
+PASS  almost every story line has an English version (872/872)  [[]]
+PASS  every default config text (raid, weekly reward, boss intros, seals, Scylla clues, jobs, weapon types, world rules) has an English version (253/253)  [[]]
+PASS  English players get job passives, weapon lines and raid notices in English; Korean players keep the original  [+Sword critical damage +10% | +Sword: damage +10%, attack speed +10% | -Gun / Crossbow / Bow: damage -20% | -Staff·Spellbook: damage -20%, attack speed -10% | -Spear / Blunt weapon / Axe: damage -15%, attack speed -10% | -Fist·Knuckle: damage -10% | -Spells: damage -15% // Entry requirement: defeat Ignis at least 3 time(s) (currently 1). // 입장 조건: 이그니스를 3번 이상 처치해야 합니다 (현재 1번).]
+FAIL  3.69.0 the shop window's title, merchant name and category names follow the player's language; a name the server typed stays as it is (55/56)  [Equipment Shop [general:배]]
+PASS  the reward editors' titles and field names are English for an English operator and Korean for a Korean one  [ // 주간 레이드 설정 // Could not save: x // 2690]
+PASS  a FLAG goal is met by an existing flag and the prologue's first quest can be handed in  [true true]
+PASS  every NPC has things to talk about (18+ NPCs)
+PASS  a talk goal with a scene waits until the scene is seen, then fills  [true true true true]
+PASS  a DIMENSION goal is met in that dimension
+PASS  an ADVANCEMENT goal finds the advancement and an unknown one never counts
+PASS  story quests carry their scenes (chapter title on taking 1-1, dream on finishing 1-2)
+PASS  the dream gives the undying ember (needed until the very end)
+PASS  story-gated gear: common gear is free, rare gear waits for the middle of chapter 1 (the three ends)  [null 1장 중반 null true]
+PASS  the seal eyes are quest/clue rewards only (flame eye and storm eye locked, others untouched)
+PASS  every Scylla clue points at a real monster and has villager hints  [[]]
+PASS  a villager gives a profession-specific rumour, others a general one
+PASS  3.78/3.79 the gacha Scylla clue is 0.05% with no pity (removed in 3.79) and the sea-fishing clue 0.1% with no pity  [5.0E-4/0 0.001/0]
+PASS  an installed scylla.json moves to the 3.78 chances only where the old defaults are untouched  [5.0E-4 0.001/0 own 0.003]
+PASS  3.79 an installed scylla.json (3.78, gacha pity 300) loses the gacha clue's pity; a pity the owner changed stays  [0 / 120]
+PASS  Scylla has five clues: gacha, story boss, wild chest, fishing and one from story choices  [[boss, fish, gacha, quest, wild]]
+PASS  an unlucky player still gets a luck clue at the pity cap (tries are counted, and no second copy while one is carried)  [false 149 true true true]
+PASS  3.79 the gacha clue has no pity: no number of draws forces it (only its own luck)  [0 true]
+PASS  the choice clue comes either way: early for those who freed Kas, later for those who handed him over
+PASS  the Scylla seal is on because the clues grant its flag
+PASS  a clue item knows which clue it is
+PASS  collecting every clue completes the storm eye and opens Scylla's seal, but only after the main story ends (not before, and a clue counts once)  [true false true true]
+PASS  Cataclysm's flame eye has no crafting recipe on the server
+PASS  the bounty board offers today's and this week's bounties (nothing taken yet), only from the opening chapter's mobs  [[{accepted:0b,done:0b,entity:"minecraft:creeper",gold:400L,have:0,need:10,stars:2,weekly:0b},{accepted:0b,done:0b,entity:"minecraft:enderman",gold:450L,have:0,need:6,stars:3,weekly:0b},{accepted:0b,done:0b,entity:"minecraft:witch",gold:220L,have:0,need:4,stars:3,weekly:0b},{accepted:0b,done:0b,entity:"minecraft:pillager",gold:315L,have:0,need:7,stars:2,weekly:0b},{accepted:0b,done:0b,entity:"minecraft:husk",gold:325L,have:0,need:13,stars:2,weekly:0b},{accepted:0b,done:0b,entity:"minecraft:slime",gold:210L,have:0,need:14,stars:1,weekly:0b},{accepted:0b,done:0b,entity:"minecraft:slime",gold:844L,have:0,need:45,stars:1,weekly:1b},{accepted:0b,done:0b,entity:"minecraft:witch",gold:825L,have:0,need:12,stars:3,weekly:1b},{accepted:0b,done:0b,entity:"minecraft:skeleton",gold:938L,have:0,need:30,stars:2,weekly:1b}]]
+PASS  a bounty is taken at the board; taking it twice does nothing; no more than the daily limit  [0 1 2 2]
+PASS  bounties can only be taken next to the board NPC (not from anywhere)  [3]
+PASS  every bounty and bestiary mob exists (when its mod is installed)  [[]]
+PASS  bounty rewards follow the mob's difficulty: an enderman pays more per kill and asks for fewer than a zombie  [25G 8-15 / 75G 3-6]
+PASS  an OP can add a mob to the bounty list (auto or with set count/reward) and remove it again  [true true true true true true]
+PASS  a bounty pays out once its count is reached (100 G, more with a combat job), and the first kill fills the bestiary  [1834 1834 1934]
+PASS  3.75 a finished bounty is paid at the bounty board, not on the spot; the quest HUD points back to the board until then  [1834 1834 owed 1/100 hud true]
+PASS  a finished bounty does not pay twice
+PASS  finishing chapter 1 adds Mowzie's mobs to the bounty pool (when installed)
+PASS  clearing a Spiral Abyss floor leaves a lasting flag for the story
+
+== Survey compass / locate / equipment stats
+  compass search: checked=1 rejected=0 townSkipped=62 ms=1284 at=283, 98, -506 holders=31 staged=0 placements=26 cands=1653 placementOk=8 predictedNo=7 other=0 genStructures=true
+PASS  the survey compass finds a structure that really generated (its start exists in the chunk)  [283, 98, -506]
+PASS  the place it points to is at least 500 blocks from town (3.78, was 1000)  [529]
+PASS  the compass search stays quick (under 6 s)  [1284 ms]
+PASS  the compass item uses the same verified search
+  ruined portal search: at=-300, 90, 364 holders=7 staged=0 placements=6 cands=468 placementOk=5 predictedNo=4 other=0 genStructures=true
+PASS  a structure that cannot generate in this world is never pointed to (or, if found, it is really there)
+PASS  /locate structure (verified) finds a real one
+PASS  an unknown structure target resolves to nothing
+  /locate output: [The nearest minecraft:village_savanna is at [3, ~, -142] (71 blocks away)]
+PASS  /locate structure answers with a verified place  [[The nearest minecraft:village_savanna is at [3, ~, -142] (71 blocks away)]]
+PASS  equipment stats: a diamond sword set to damage 12 / speed 2 shows exactly that  [dmg+1=12.0 spd+4=2.0]
+PASS  equipment stats: an iron chestplate set to armor 11 gives 11 when worn and nothing in the hand  [11.0 / 0.0]
+PASS  equipment stats: clearing an item gives back its original stats (diamond sword 7)  [7.0]
+PASS  equipment stats are written to item_stats.json with a help line
+PASS  every main story item has a guide line in its tooltip (14)  [14]
+PASS  a story item's tooltip shows the 'main story item' header and where it is used
+PASS  mod notices go to the notice box instead of chat
+PASS  a notice with a clickable link stays in chat (it can only be clicked there)
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:protection",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fire_protection",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:feather_falling",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:blast_protection",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:projectile_protection",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:respiration",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:aqua_affinity",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:thorns",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:depth_strider",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:frost_walker",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:binding_curse",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:soul_speed",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:swift_sneak",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sharpness",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:smite",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:bane_of_arthropods",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:knockback",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fire_aspect",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:looting",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sweeping",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:efficiency",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:silk_touch",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:unbreaking",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fortune",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:power",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:punch",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:flame",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:infinity",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:luck_of_the_sea",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:lure",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:loyalty",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:impaling",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:riptide",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:channeling",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:multishot",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:quick_charge",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:piercing",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:mending",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:vanishing_curse",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"betternether:obsidian_breaker",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"betternether:ruby_fire",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"illusioner:hallucinate",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"illusioner:wingbeat",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_engine:spell_infinity",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"wom:invigoration",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"farmersdelight:backstabbing",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:spell_power",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:sunfire",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:soulfrost",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:energize",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:haste",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_chance",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_damage",lvl:5s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:magic_protection",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"lrtactical:backstab",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"create:potato_recovery",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"create:capacity",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"supplementaries:stasis",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:yamato_summoned_sword",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:yamato_summoned_sword_end",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:yamato_judgement_cut_end",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:yamato_guard",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:yamato_doppelganger",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:yamato_heavy_rain",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:scythe_enhance",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"efn:broad_blade_enhance",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"kaleidoscope_cookery:quick_knife",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"kaleidoscope_cookery:sweep",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:protection",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:protection",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:protection",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fire_protection",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fire_protection",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fire_protection",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:feather_falling",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:feather_falling",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:feather_falling",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:blast_protection",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:blast_protection",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:blast_protection",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:projectile_protection",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:projectile_protection",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:projectile_protection",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:respiration",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:respiration",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:thorns",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:thorns",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:depth_strider",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:depth_strider",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:frost_walker",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:soul_speed",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:soul_speed",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:swift_sneak",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:swift_sneak",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sharpness",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sharpness",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sharpness",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sharpness",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:smite",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:smite",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:smite",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:smite",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:bane_of_arthropods",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:bane_of_arthropods",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:bane_of_arthropods",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:bane_of_arthropods",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:knockback",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fire_aspect",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:looting",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:looting",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sweeping",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:sweeping",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:efficiency",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:efficiency",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:efficiency",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:efficiency",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:unbreaking",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:unbreaking",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fortune",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:fortune",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:power",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:power",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:power",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:power",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:punch",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:luck_of_the_sea",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:luck_of_the_sea",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:lure",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:lure",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:loyalty",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:loyalty",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:impaling",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:impaling",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:impaling",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:impaling",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:riptide",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:riptide",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:quick_charge",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:quick_charge",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:piercing",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:piercing",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"minecraft:piercing",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"betternether:obsidian_breaker",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"betternether:obsidian_breaker",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"wom:invigoration",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"wom:invigoration",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"wom:invigoration",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"wom:invigoration",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"farmersdelight:backstabbing",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"farmersdelight:backstabbing",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:spell_power",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:spell_power",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:spell_power",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:spell_power",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:sunfire",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:sunfire",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:sunfire",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:sunfire",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:soulfrost",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:soulfrost",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:soulfrost",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:soulfrost",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:energize",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:energize",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:energize",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:energize",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:haste",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:haste",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:haste",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:haste",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_chance",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_chance",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_chance",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_chance",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_damage",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_damage",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_damage",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:critical_damage",lvl:4s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:magic_protection",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:magic_protection",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"spell_power:magic_protection",lvl:3s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"lrtactical:backstab",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"create:potato_recovery",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"create:potato_recovery",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"create:capacity",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"create:capacity",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"kaleidoscope_cookery:quick_knife",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"kaleidoscope_cookery:sweep",lvl:1s}]} | Enchanted Book | cat=
+  skillbook: minecraft:enchanted_book | {StoredEnchantments:[{id:"kaleidoscope_cookery:sweep",lvl:2s}]} | Enchanted Book | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"archers:item/spell_book/archer",item_name:"item.archers.spell_book/archer",spell_container:{pool:"archers:spell_book/archer"}}} | Archery Manual | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"paladins:item/spell_book/paladin",item_name:"item.paladins.spell_book/paladin",spell_container:{pool:"paladins:spell_book/paladin"}}} | Paladin Libram | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"paladins:item/spell_book/priest",item_name:"item.paladins.spell_book/priest",spell_container:{pool:"paladins:spell_book/priest"}}} | Holy Book | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"rogues:item/spell_book/rogue",item_name:"item.rogues.spell_book/rogue",spell_container:{pool:"rogues:spell_book/rogue"}}} | Rogue Handbook | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"rogues:item/spell_book/warrior",item_name:"item.rogues.spell_book/warrior",spell_container:{pool:"rogues:spell_book/warrior"}}} | Warriors' Codex | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"wizards:item/spell_book/arcane",item_name:"item.wizards.spell_book/arcane",spell_container:{pool:"wizards:spell_book/arcane"}}} | Tome of Arcane | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"wizards:item/spell_book/fire",item_name:"item.wizards.spell_book/fire",spell_container:{pool:"wizards:spell_book/fire"}}} | Tome of Fire | cat=
+  skillbook: spell_engine:spell_book | {spell_engine:{item_model:"wizards:item/spell_book/frost",item_name:"item.wizards.spell_book/frost",spell_container:{pool:"wizards:spell_book/frost"}}} | Tome of Frost | cat=
+  skillbook: epicfight:skillbook | {skill:"efs_iss:magic_sword"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efs_iss:blood_into_mana"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efs_iss:auto_heal"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efs_iss:rapid_chant"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efs_iss:breathe_again"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efs_iss:against_magic"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efs_iss:reserve_mana"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efs_iss:connect_root"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"efs_iss:hasty_casting"} | Skill Book | cat=MOVER
+  skillbook: epicfight:skillbook | {skill:"efs_iss:mana_shield"} | Skill Book | cat=GUARD
+  skillbook: epicfight:skillbook | {skill:"epicfight:roll"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"epicfight:step"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"epicfight:guard"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:parrying"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:impact_guard"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:adaptive_skin"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:adrenaline_fiend"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:berserker"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:bonebreaker"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:catharsis"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:death_harvest"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:emergency_escape"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:endurance"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:forbidden_strength"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:hypervitality"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:stamina_pillager"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:swordmaster"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:technician"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:vengeance"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfight:meteor_slam"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:revelation"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"epicfight:demolition_leap"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfight:phantom_ascent"} | Skill Book | cat=MOVER
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:health_boost1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:health_boost2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:health_boost3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:health_boost4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:absorb1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:absorb2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:absorb3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:absorb4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:heal1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:heal2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:heal3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:heal4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:resist1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:resist2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:resist3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:resist4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stun_imm1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stun_imm2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stun_imm3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stun_imm4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:damage_boost1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:damage_boost2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:damage_boost3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:damage_boost4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:speed1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:speed2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:speed3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:speed4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stamina1"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stamina2"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stamina3"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"dodge_parry_reward:stamina4"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:ender_step"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"wom:ender_obscuris"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"wom:shadow_step"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"wom:precise_roll"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"wom:dodge_master"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"wom:bull_charge"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"wom:time_travel"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"wom:punishment_kick"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"wom:counter_attack"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"wom:vengeful_parry"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"wom:perfect_bulwark"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"wom:soul_protection"} | Skill Book | cat=GUARD
+  skillbook: epicfight:skillbook | {skill:"wom:shulker_cloak"} | Skill Book | cat=GUARD
+  skillbook: epicfight:skillbook | {skill:"wom:buster_parade"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"wom:arrow_tenacity"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:pain_anticipation"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:latent_retribution"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:vampirize"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:critical_knowledge"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:heart_shield"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:mindset"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:adrenaline"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:dancing_blade"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:meditation"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:inner_growth"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:dopamine"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"wom:manipulator"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:lethal_focus"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"wom:spider_techniques"} | Skill Book | cat=MOVER
+  skillbook: epicfight:skillbook | {skill:"wom:aqua_maneuvre"} | Skill Book | cat=MOVER
+  skillbook: epicfight:skillbook | {skill:"wom:natural_sprinter"} | Skill Book | cat=MOVER
+  skillbook: epicfight:skillbook | {skill:"wom:lunatic_vivacity"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"wom:voodoo_magic"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"wom:back_and_forth"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"wom:shooting_style"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"wom:proximity_exploiter"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"wom:all_eyes_on_you"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"wom:all_eyes_on_me"} | Skill Book | cat=IDENTITY
+  skillbook: epicfight:skillbook | {skill:"wom:avatar_of_might"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"epicfightx:roll"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"epicfightx:step"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"epicfightx:combat_mastery_i"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"epicfightx:combat_mastery_ii"} | Skill Book | cat=PASSIVE
+  skillbook: minecraft:written_book | {"aquamirae:author":"book.aquamirae.pillager_ship_logbook.author",author:"Unknown",display:{Name:'{"translate":"book.aquamirae.pillager_ship_logbook.title"}'},generation:3,pages:['{"translate":"book.aquamirae.pillager_ship_logbook.page_1"}','{"translate":"book.aquamirae.pillager_ship_logbook.page_2"}'],resolved:1b,title:"Logbook"} | Pillager Ship Logbook | cat=
+  skillbook: minecraft:written_book | {"aquamirae:author":"book.aquamirae.pillager_outpost_logbook.author",author:"Unknown",display:{Name:'{"translate":"book.aquamirae.pillager_outpost_logbook.title"}'},generation:3,pages:['{"translate":"book.aquamirae.pillager_outpost_logbook.page_1"}','{"translate":"book.aquamirae.pillager_outpost_logbook.page_2"}','{"extra":[{"translate":"book.aquamirae.pillager_outpost_logbook.page_3.start"},{"color":"dark_green","translate":"book.aquamirae.pillager_outpost_logbook.page_3.accent"},{"translate":"book.aquamirae.pillager_outpost_logbook.page_3.end"}],"text":""}','{"translate":"book.aquamirae.pillager_outpost_logbook.page_4"}','{"extra":[{"translate":"book.aquamirae.pillager_outpost_logbook.page_5.start"},{"color":"dark_green","translate":"book.aquamirae.pillager_outpost_logbook.page_5.accent"},{"translate":"book.aquamirae.pillager_outpost_logbook.page_5.end"}],"text":""}'],resolved:1b,title:"Logbook"} | Pillager Outpost Logbook | cat=
+  skillbook: minecraft:written_book | {"aquamirae:author":"book.aquamirae.pillager_shelter_logbook.author",author:"Unknown",display:{Name:'{"translate":"book.aquamirae.pillager_shelter_logbook.title"}'},generation:3,pages:['{"translate":"book.aquamirae.pillager_shelter_logbook.page_1"}','{"translate":"book.aquamirae.pillager_shelter_logbook.page_2"}','{"translate":"book.aquamirae.pillager_shelter_logbook.page_3"}','{"translate":"book.aquamirae.pillager_shelter_logbook.page_4"}'],resolved:1b,title:"Logbook"} | Pillager Shelter Logbook | cat=
+  skillbook: farmersdelight:skillet | {Damage:0} | Skillet | cat=
+  skillbook: irons_spellbooks:netherite_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:12,mustEquip:1b,spellWheel:1b}} | Ancient Codex | cat=
+  skillbook: irons_spellbooks:diamond_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:10,mustEquip:1b,spellWheel:1b}} | Enchanted Spell Book | cat=
+  skillbook: irons_spellbooks:gold_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:8,mustEquip:1b,spellWheel:1b}} | Apprentice's Spell Book | cat=
+  skillbook: irons_spellbooks:iron_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:6,mustEquip:1b,spellWheel:1b}} | Ironbound Tome | cat=
+  skillbook: irons_spellbooks:copper_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:5,mustEquip:1b,spellWheel:1b}} | Flimsy Journal | cat=
+  skillbook: irons_spellbooks:evoker_spell_book | {"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:fang_strike",index:0,level:6,locked:1b},{id:"irons_spellbooks:fang_ward",index:1,level:4,locked:1b},{id:"irons_spellbooks:summon_vex",index:2,level:4,locked:1b}],maxSpells:10,mustEquip:1b,spellWheel:1b}} | Grimoire of Evokation | cat=
+  skillbook: irons_spellbooks:necronomicon_spell_book | {"irons_spellbooks:affinity_data":{bonuses:{"irons_spellbooks:raise_dead":2}},"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:blood_slash",index:0,level:5,locked:1b},{id:"irons_spellbooks:blood_step",index:1,level:5,locked:1b},{id:"irons_spellbooks:ray_of_siphoning",index:2,level:5,locked:1b},{id:"irons_spellbooks:blaze_storm",index:3,level:5,locked:1b}],maxSpells:10,mustEquip:1b,spellWheel:1b}} | Necronomicon | cat=
+  skillbook: irons_spellbooks:rotten_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:8,mustEquip:1b,spellWheel:1b}} | Rotten Spell Book | cat=
+  skillbook: irons_spellbooks:blaze_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:10,mustEquip:1b,spellWheel:1b}} | Blaze Instruction Manual | cat=
+  skillbook: irons_spellbooks:dragonskin_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:12,mustEquip:1b,spellWheel:1b}} | Dragonskin Spell Book | cat=
+  skillbook: irons_spellbooks:villager_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:10,mustEquip:1b,spellWheel:1b}} | Villager Bible | cat=
+  skillbook: irons_spellbooks:druidic_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:10,mustEquip:1b,spellWheel:1b}} | Druidic Tome | cat=
+  skillbook: irons_spellbooks:cursed_doll_spell_book | {"irons_spellbooks:affinity_data":{bonuses:{"irons_spellbooks:blood_slash":1,"irons_spellbooks:blood_step":1}},"irons_spellbooks:spell_container":{data:[],maxSpells:10,mustEquip:1b,spellWheel:1b}} | Vampiric Spell Book | cat=
+  skillbook: irons_spellbooks:ice_spell_book | {"irons_spellbooks:spell_container":{data:[],maxSpells:12,mustEquip:1b,spellWheel:1b}} | Frostbranded Book | cat=
+  skillbook: epicfight:skillbook | {skill:"efn:yamato_step"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"efn:efn_parry"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"efn:murasama_parry"} | Skill Book | cat=?
+  skillbook: epicfight:skillbook | {skill:"efn:efn_dodge"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"efn:efn_step"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"efn:murasama_dodge"} | Skill Book | cat=DODGE
+  skillbook: epicfight:skillbook | {skill:"efn:indestructible"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efn:parry_master"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efn:precise_parry"} | Skill Book | cat=PASSIVE
+  skillbook: epicfight:skillbook | {skill:"efn:judgementcutend"} | Skill Book | cat=JUDGMENTCUT_END
+  skillbook: epicfight:skillbook | {skill:"efn:stomp"} | Skill Book | cat=EFN_ARTS
+  skillbook: epicfight:skillbook | {skill:"efn:zansetsu"} | Skill Book | cat=EFN_ZANSETSU
+  skillbook: epicfight:skillbook | {skill:"efn:execution"} | Skill Book | cat=EFN_ARTS
+  skillbook: epicfight:skillbook | {skill:"efn:mortal_blade"} | Skill Book | cat=EFN_SEKIRO
+  skillbook: patchouli:guide_book | {"patchouli:book":"adorablehamsterpets:hamster_tips_guide_book"} | §f§lHamster Tips§r | cat=
+  skillbook: patchouli:guide_book | {"patchouli:book":"irons_spellbooks:iss_guide_book"} | Iron's Guidebook | cat=
+  skillbook total: 339
+PASS  dream-knight scenes wait for a bed, pile up instead of replacing each other, survive death, come one a night, and run through chapters 3 and 4  [3 true true 10]
+PASS  config care: old town names are rewritten, untouched default files move to the new edition (edited ones wait for the operator), boss lore matches the rewritten story  [true 2 true 0 0 true 1 true]
+PASS  the five job mentors (Leon, Bron, Garen, Ria, Elise) have small talk and story topics  [5]
+PASS  quest NPCs open the dialogue first (Dialogue claims the click)
+
+== Magic gacha
+  magic pools: 122 books, 177 enchants (epicfight: 227 skills)
+PASS  with Epic Fight installed the magic gacha fills itself with this pack's skill books  [122]
+PASS  the yamato grade is only in the attack field
+  magic attack: efn:execution=epic efn:judgementcutend=yamato efn:mortal_blade=legendary efn:stomp=epic efn:zansetsu=legendary efs_iss:connect_root=epic epicfight:meteor_slam=epic epicfight:revelation=epic wom:all_eyes_on_me=legendary wom:all_eyes_on_you=legendary wom:avatar_of_might=legendary wom:back_and_forth=legendary wom:lunatic_vivacity=legendary wom:proximity_exploiter=legendary wom:shooting_style=legendary wom:voodoo_magic=legendary 
+  magic guard: efn:efn_parry=epic efn:murasama_parry=legendary efs_iss:mana_shield=epic epicfight:guard=uncommon epicfight:impact_guard=uncommon epicfight:parrying=uncommon wom:buster_parade=legendary wom:counter_attack=epic wom:perfect_bulwark=legendary wom:shulker_cloak=epic wom:soul_protection=epic wom:vengeful_parry=legendary 
+  magic dodge: efn:efn_dodge=epic efn:efn_step=epic efn:murasama_dodge=legendary efn:yamato_step=legendary epicfight:roll=uncommon epicfight:step=uncommon epicfightx:roll=uncommon epicfightx:step=uncommon wom:bull_charge=epic wom:dodge_master=legendary wom:ender_obscuris=legendary wom:ender_step=epic wom:precise_roll=epic wom:punishment_kick=epic wom:shadow_step=epic wom:time_travel=legendary 
+  magic passive: dodge_parry_reward:absorb1=uncommon dodge_parry_reward:absorb2=uncommon dodge_parry_reward:absorb3=rare dodge_parry_reward:absorb4=epic dodge_parry_reward:damage_boost1=uncommon dodge_parry_reward:damage_boost2=uncommon dodge_parry_reward:damage_boost3=rare dodge_parry_reward:damage_boost4=epic dodge_parry_reward:heal1=uncommon dodge_parry_reward:heal2=uncommon dodge_parry_reward:heal3=rare dodge_parry_reward:heal4=epic dodge_parry_reward:health_boost1=uncommon dodge_parry_reward:health_boost2=uncommon dodge_parry_reward:health_boost3=rare dodge_parry_reward:health_boost4=epic dodge_parry_reward:resist1=uncommon dodge_parry_reward:resist2=uncommon dodge_parry_reward:resist3=rare dodge_parry_reward:resist4=epic dodge_parry_reward:speed1=uncommon dodge_parry_reward:speed2=uncommon dodge_parry_reward:speed3=rare dodge_parry_reward:speed4=epic dodge_parry_reward:stamina1=uncommon dodge_parry_reward:stamina2=uncommon dodge_parry_reward:stamina3=rare dodge_parry_reward:stamina4=epic dodge_parry_reward:stun_imm1=uncommon dodge_parry_reward:stun_imm2=uncommon dodge_parry_reward:stun_imm3=rare dodge_parry_reward:stun_imm4=epic efn:indestructible=legendary efn:parry_master=legendary efn:precise_parry=legendary efs_iss:against_magic=rare efs_iss:auto_heal=rare efs_iss:blood_into_mana=rare efs_iss:breathe_again=rare efs_iss:magic_sword=rare efs_iss:rapid_chant=rare efs_iss:reserve_mana=rare epicfight:adaptive_skin=rare epicfight:adrenaline_fiend=rare epicfight:berserker=rare epicfight:bonebreaker=rare epicfight:catharsis=rare epicfight:death_harvest=rare epicfight:emergency_escape=rare epicfight:endurance=uncommon epicfight:forbidden_strength=rare epicfight:hypervitality=rare epicfight:stamina_pillager=uncommon epicfight:swordmaster=rare epicfight:technician=uncommon epicfight:vengeance=rare epicfightx:combat_mastery_i=uncommon epicfightx:combat_mastery_ii=rare wom:adrenaline=epic wom:arrow_tenacity=rare wom:critical_knowledge=epic wom:dancing_blade=epic wom:dopamine=epic wom:heart_shield=epic wom:inner_growth=rare wom:latent_retribution=epic wom:lethal_focus=legendary wom:manipulator=epic wom:meditation=rare wom:mindset=epic wom:pain_anticipation=epic wom:vampirize=epic 
+  magic mover: efs_iss:hasty_casting=epic epicfight:demolition_leap=epic epicfight:phantom_ascent=epic wom:aqua_maneuvre=rare wom:natural_sprinter=rare wom:spider_techniques=epic 
+PASS  the enchant reroll list is filled from this world's enchantments (no curses)  [177]
+PASS  a yamato prize outside the attack field is moved down to legendary
+PASS  the common grade is the 'fail' place: a prize listed as common is lifted to uncommon
+PASS  default odds start with a fail chance (books 40%, enchant 50%) and the enchant list reaches legendary  [59]
+PASS  armour and tools can be laid on the altar too, and their enchantments are in the list
+PASS  an old magic gacha file is moved to the new rules (fail column, enchant grades one step up to legendary)  [uncommon/legendary]
+PASS  the 10× draw is gone: asking for it is refused and uses no ticket
+PASS  a chosen-field draw gives one prize from the chosen field  [1]
+PASS  the draw used one chosen-field ticket
+PASS  drawn prizes carry the gacha mark (can be dismantled for shards)  [1]
+PASS  without a ticket the draw is refused
+PASS  a random draw uses the cheap ticket and can give any field
+PASS  the attack field has the yamato grade, other fields do not  [4.761904761904762E-4 / 0.0]
+PASS  the window's odds show the fail chance first (40% at the default)  [0.48792388387411567]
+PASS  a failed skill-book draw takes the ticket and gives nothing  [1]
+PASS  a field with no books has no fail entry either (it is simply empty)  [0.0]
+PASS  holding a weapon is not enough any more: with nothing on the altar the reroll is refused
+PASS  the altar menu has one altar slot in front of the 36 bag slots, and it takes gear but not dirt  [37]
+PASS  shift-clicking gear in the bag lays it on the altar
+PASS  the window data follows what lies on the altar
+PASS  enchant reroll leaves exactly one enchantment that fits the gear on the altar  [{net.minecraft.world.item.enchantment.DamageEnchantment@3df0224a=1}]
+PASS  enchant reroll used one scroll
+PASS  a failed reroll takes the scroll and leaves the gear as it was
+PASS  shift-clicking the altar slot takes the gear back into the bag
+PASS  closing the altar gives back what was left on it  [true/1]
+PASS  enchant reroll refuses things that are not gear
+PASS  the magic gacha config survives save and load
+PASS  there is no pity any more: draws are not counted and nothing is turned into a guaranteed grade  [0]
+PASS  today's rune is gone: every field costs the same and the window data carries no blessing
+PASS  the window data carries one-ticket prices only (no 10x, no pity gauge)
+PASS  an inspect goal keeps its trace id, place, shape and lines through saving (and the companion too)  [{"id":"t_inspect","title":"t_inspect","giver":"quest_guide","companion":{"npc":"t_comp","style":"melee","lines":{"arrive":["Here."],"idle":["One.","Two."],"fight":["Ha!","Ho!"],"spot":{"t_far":"See that."},"done":["Bye."]}},"objectives":[{"type":"INSPECT","target":"t_circle","count":1,"text":"Old circle","lines":["A ring of soot."],"shape":"mural"},{"type":"INSPECT","target":"t_far","count":1,"at":"minecraft:end_city"},{"type":"KILL","target":"minecraft:zombie","count":1}],"reward":{"gold":1}}]
+PASS  giving a quest up clears its waiting trace; taking it again puts the trace next to the player anew  [true true true BlockPos{x=0, y=120, z=0}]
+PASS  inspect quest is accepted
+PASS  two traces wait to be looked at  [2]
+PASS  a trace with no place appears next to the player right away; one tied to a structure waits until the player gets there  [BlockPos{x=0, y=120, z=0}]
+PASS  the quest HUD points to a trace that is waiting to be looked at (so a player who walked off can find it again)  [minecraft:overworld;0;120;0]
+PASS  a trace can not be looked at from far away
+PASS  the quest HUD follows the trace when it is somewhere else  [minecraft:overworld;30;120;0]
+PASS  looking closer opens the text first (the goal is not filled yet)
+PASS  finishing the look fills the goal, removes the trace and leaves a mark for the notebook
+PASS  the same trace can not be looked at twice
+PASS  the field notebook lists what was looked at, with its text  [[{"chapter":"t_inspect","quest":"t_inspect","label":"Old circle","lines":["A ring of soot."]}]]
+PASS  a trace can be a thing to do: it needs its item (taken when done), and the next trace shows only after it  [true/true/true/1/true]
+PASS  the companion appears beside the player with the npc's name  [Tess]
+PASS  a companion greets once, says each idle line once (never two lines within seconds), and shouts in a fight only now and then  [true/false/true/false/true/false/true/false]
+PASS  a companion speaks about a trace only when that trace has its own line, and only once  [false/true/0]
+PASS  a companion never dies (it only falls back for a moment)  [1.0]
+PASS  a kill by the companion counts for its owner's quest  [[1, 0, 1]]
+PASS  playing together: a second player with the same companion joins the one already there (no twin), is greeted once, and shares its kills  [true/true/true/[0, 0, 1]]
+PASS  when the one in front leaves, the companion stays and walks with the rest  [false/true]
+PASS  the companion leaves when its quest is no longer active (and what it said there is forgotten)
+PASS  by default the rune altar opens once chapter 1 is done  [story_ch1_done]
+PASS  the rune altar stays shut until the story mark is earned (and is open to all when no mark is set)  [true/false]
+PASS  the dragon rite does nothing outside the End
+PASS  with nobody in the End (no dragon loaded) the rite waits and changes nothing  [false]
+PASS  spell mana: cost follows the spell's tier, the highest tier covers anything above, and a per-spell value wins  [{0=8, 1=12, 2=20, 3=32, 4=48}]
+PASS  spell mana: hooked into Spell Engine when it and Iron's Spells are both present (and idle otherwise)  [true hooked=true]
+PASS  spell mana: a player's Iron's Spells mana can be read  [0.0]
+PASS  spell mana: with no mana an RPG Series spell (wizards:fireball) can not be cast, with mana it can  [ON_COOLDOWN / SUCCESS]
+PASS  a conversation can depend on an item being carried (Duskfire's hidden talk) and the item has its story text  [false/true]
+PASS  a greeting can be said only the first time, and another only now and then; people point at the spear without saying its name and its text says whose name was left off  [hello / what is that / what is that / now and then / hello]
+PASS  story papers can be read: the oath shows its third line only after the ending, the chronicle page lists the names written so far, other items are not readable  [0 -> 2 / 1]
+PASS  ranks: every category is on by default and each has titles in rising steps  [30]
+PASS  titles: the first hunter title opens at 10 kills, a locked one can not be used, a used one gives its small effect  [true/true/rtshop.title.err.locked/null/0.5]
+PASS  titles: a higher step replaces the lower one of its category, two different categories can be used at once and a third is refused  [null/null/rtshop.title.err.full/[kills_2, quests_1]]
+PASS  titles: the expedition title adds a little max health while it is used and takes it back when it is not  [20.0 -> 21.0 -> 20.0]
+PASS  titles: one opened title can be shown in front of the name (chat, tab list) and taken down again; it need not be one of the used ones  [[Fledgling Hunter] rtshop_test_a / rtshop_test_a]
+PASS  ranks: this week's ranking orders players by what they did this week and a player sees their own place  [0 < 1 / 8]
+PASS  ranks: when the week ends the top places get rewards kept for them, the first place may show the week's title, weekly counts start over and lifetime counts stay  [true/true/true/null/rtshop.title.err.locked/40000/90000/90000]
+PASS  titles: the keeper's list shows every category with its steps and the week's titles a player won  [2]
+PASS  3.79 weekly ranking: a place pays only when someone else is ranked below it (1st of two is paid; 2nd of two and a lone 1st are not)  [[earned:1:20000, gold:1:20000] / []]
+PASS  ranks: the three keepers exist (bounty board, weekly ranking, titles) and have their own lines  [[sword_master, war_chief, shield_keeper, hunter, archmage, guide, bounty, ranks, titles, order_elder, order_archivist, order_captain, felix, bram, oscar]]
+PASS  codex: the list holds monsters, animals and bosses (not armor stands or players), and every kind of gear  [300 mobs, 1099 gear]
+PASS  codex: a mob is unknown, then met (look and name only), then slain (stats and drops are written)  [0/1/2 {"id":"minecraft:zombie","state":2,"kills":2,"first":1795894982031,"hp":20.0,"atk":3.0,"armor":2.0,"speed":0.23000000417232513,"drops":[["minecraft:rotten_flesh",1,2,65],["epicfight:skillbook",1,1,5],["farmersdelight:onion",1,1,3]],"note":""}]
+PASS  codex: gear is written once it is carried (food is not gear), and the whole book is sent with what is known  [1/0]
+PASS  guidebook: every page has a title and text, its picture exists and its rtshop item icons are real items; the store sells the book again  [44 pages / texts true / images true]
+PASS  codex: the book is an item that the general store sells again
+PASS  map marks: a place is noted once when the player steps inside its radius (not from outside, not twice)  [0 1 0 {"folder":"베스탈리아","world":false,"radar":true,"view":4,"marks":[{"id":"place:점검 광장","name":"점검 광장","dim":"minecraft:overworld","x":6,"y":120,"z":0,"color":-7354384}],"gone":[],"notify":true,"force":false}]
+PASS  map marks: talking to an NPC notes its name and place once; a moved NPC is corrected without a new notice; other creatures are not noted  [true false true true true 2]
+PASS  K-1 an NPC mark carries the picture of what the NPC does (the bank: a coin) and its group colour; an older mark without one gets it when sent again  [true [] {"folder":"베스탈리아","world":false,"radar":true,"view":4,"marks":[{"id":"npc:ef02c5d1-d292-45a3-ab95-6c841bf46338","name":"은행원 그레고리","dim":"minecraft:overworld","x":2,"y":120,"z":0,"color":-11163558,"icon":"rtshop:coin"}],"gone":[],"notify":false,"force":true} // {"folder":"베스탈리아","world":false,"radar":true,"view":4,"marks":[{"id":"npc:ef02c5d1-d292-45a3-ab95-6c841bf46338","name":"은행원 그레고리","dim":"minecraft:overworld","x":14,"y":120,"z":0,"color":-11163558,"icon":"rtshop:coin"},{"id":"place:점검 광장","name":"점검 광장","dim":"minecraft:overworld","x":6,"y":120,"z":0,"color":-7354384}],"gone":[],"notify":false,"force":false}]
+PASS  map marks: a place the operator removed leaves the player's record and is sent as gone  [{"folder":"베스탈리아","world":false,"radar":true,"view":4,"marks":[{"id":"npc:ef02c5d1-d292-45a3-ab95-6c841bf46338","name":"은행원 그레고리","dim":"minecraft:overworld","x":14,"y":120,"z":0,"color":-11163558,"icon":"rtshop:coin"}],"gone":["place:점검 광장"],"notify":false,"force":false}]
+PASS  map marks can be switched off in map_marks.json (then the minimap shows every NPC icon again)  [{"folder":"베스탈리아","world":false,"radar":false,"view":4,"marks":[],"gone":[],"notify":false,"force":false}]
+PASS  item notes: an item says who buys it (wheat), boss loot says shops do not trade it, and things with no use have no note  [2381 items, wheat 3 sold true bought true boss true]
+PASS  the rewritten prologue and chapter 1 are installed (lesson at the practice gate, Isabel walks along, the orb after the chapter) and Helvar waits in chapter 2  [{"id":"story_2_06b","chain":"2장 녹슨 맹세 (10/46)","order":1540,"title":"저승의 기사 헬바르","giver":"quest_order_captain","requires":["story_2_06h2"],"intro":"브람이 붙인 검을 가져가라. 싸우기 전에 내밀어라. 받든 안 받든. 지옥은 내 길이 아니다. 뭐가 어떻게 생겼는지 나는 모른다. 그래도 저놈은 내가 안다. 지킬 게 없어진 자리를 지키는 놈. 헬바르는 봉인에 묶인 수호자가 아니라 제 발로 남은 사람이다. 기억의 문은 필요 없다. 터질 봉인이 없으니까. 대신 봐주는 것도 없다. 투기장 열쇠는 그의 기사들이 갖고 있다. 등 뒤의 표식이 약점이라더군. 호르스와 같다. 주군의 사람들은 다 등을 비워 둔다.","progress":"저승의 투기장에서 저승의 기사 헬바르를 잠재워라. (최대 체력의 10% 이상 피해)","done":"브람의 검을 내밀었더니 싸움을 멈췄다고. 받아 들고 이음매를 한참 봤다고. 그러고는 다시 덤볐다고. 제대로 된 검으로. …그게 예의였던 거다. 그리고 쓰러지면서 그 검을 바닥에 꽂고 길을 비켰다고. 빈 받침 셋을 보고서. …알았던 거다. 머리 셋이 이미 없다는 걸. 그래도 누가 와서 끝났다고 말해 줄 때까지 섰던 거다. (로란이 한참 말이 없다.) 기록관에게 가라. 빈 줄을 채우라고.","sceneAccept":{"kind":"line","speaker":"기록관 이사벨","text":"헬바르. 저승의 문턱을 지키는 이. …그날 비워 둔 줄, 오늘 채울게요.","color":"E8C878"},"sceneDone":{"kind":"names","title":"베스탈리아 연대기 · 잠든 이름","text":"헬바르, 불꽃 기사단 부단장\n서약을 거절하고, 서약의 자리를 끝까지 지킨 사람","speaker":"기록관 이사벨","sound":"minecraft:item.book.page_turn"},"objectives":[{"type":"KILL","target":"block_factorys_bosses:underworld_knight","count":1,"text":"저승의 기사 헬바르","mod":"block_factorys_bosses"}],"reward":{"gold":3400}}]
+PASS  every trace in the story has its own id  [[]]
+PASS  moving to the rewritten story: mid-chapter players restart chapter 1 (prologue kept), finished players keep chapter 1 done  [true/true]
+PASS  chapter 2 is rewritten (Roran walks along, those who wait: Helvar, Sirok, Ashlord; Skor; Kael's letter; the roster is written) and the antidote replaces milk  [{"id":"story_2_13","chain":"2장 녹슨 맹세 (24/46)","order":1680,"title":"설원의 장의사","giver":"quest_order_captain","requires":["story_2_12k2"],"intro":"스코르. 덮지 않는 자. 서리 왕국이 가르친 장의사다. 놈에게 우리는 도둑이다. 세워 둔 걸 가져가려는. 말이 통하면 좋겠지만 통하지 않는다. 놈은 천 년 동안 가져가려는 놈들만 봤다. 늑대, 약탈자, 그리고 이제 우리. 놈은 봉인에 묶인 수호자가 아니다. 문은 필요 없다. 그래도 명패는 대장이 거둔다. 길을 열어라.","progress":"설원의 은신처에서 예티 스코르를 잠재워라. (최대 체력의 10% 이상 피해)","done":"놈이 쓰러지기 전에 셋 앞을 막아섰다고. 마지막까지. …명패 셋을 거뒀다. 목도리는 두고 왔다. 놈들은 거기 서 있게 뒀다. 세워 준 놈 옆에. 덮이지 않게. (로란이 수첩에 줄을 긋고 고쳐 쓴다. '실종' 위에 '스코르가 거둠'.)","sceneAccept":{"kind":"line","speaker":"기록관 이사벨","text":"스코르. 덮지 않는 자. …잊히지 않게 세워 두는 건, 제가 하는 일이랑 같아요.","color":"E8C878"},"sceneDone":{"kind":"names","title":"베스탈리아 연대기 · 잠든 이름","text":"스코르, 설원의 장의사\n눈에 덮이지 않게, 죽은 이들을 세워 둔 짐승","speaker":"기록관 이사벨","sound":"minecraft:item.book.page_turn"},"objectives":[{"type":"KILL","target":"block_factorys_bosses:yeti","count":1,"text":"예티 스코르","mod":"block_factorys_bosses"}],"reward":{"gold":3600,"items":[{"item":"rtshop:expedition_tag","count":3}]}}]
+PASS  chapter 2 progress moves over the same way  [true/true]
+PASS  chapter 3 is rebuilt (the village's night, the twentieth boat, Nerakyss, the giving king under the sea, and the captain last)  [{"id":"story_3_20","chain":"3장 얼어붙은 바다의 항해일지 (20/39)","order":2100,"title":"배를 품는 것","giver":"shop_fisher","requires":["story_3_19"],"intro":"저녁별이 물길 끝에 닿았소. 놈이 올라올 거요. 네라키스는 봉인에 묶인 놈이 아니라 문 안으로 못 부른다고 기록관이 그럽디다. 해적선 곁에서 그대로 싸워야 하오. 다리가 배를 감을 때가 틈이오. 다리부터 치시오. 놈은 화가 난 게 아니오. 열다섯 해 굶다가 겨우 얻은 배를 뺏기는 줄 아는 거요. 그래도 재워야 하오. 선장이 서른 해 동안 못 한 일이오.","progress":"얼음에 갇힌 해적선 곁에서 크라켄 네라키스를 잠재우세요. (최대 체력의 10% 이상 피해)","done":"놈이 가라앉으면서 다리를 풀었소. 품고 있던 걸 전부. 얼음이 갈라지며 배들이 올라왔소. 서른 해 묵은 것, 백 해 묵은 것. 그리고 뱃머리에 별이 달린 배가 하나. 아침별이오. 삭지도 않았더이다. …갑판에 서른둘이 그대로 있었소. 선장이 그린 대로. 서 있는 버릇까지. 이름을 불러 줘야겠소. 엘레나 씨가 받아 적은 그 명단으로. 마을로 모셔 갑시다. 서른 해 만에.","sceneAccept":{"kind":"line","speaker":"어부 오스카","text":"저녁별, 출항. …선장, 듣고 있소? 당신 배를 데리러 가오.","color":"E8C878"},"sceneDone":{"kind":"names","title":"베스탈리아 연대기 · 돌아온 이름","text":"네라키스, 배를 품는 것\n배를 사랑해서 가져간 짐승. 품었던 것을 모두 돌려줌.\n아침별의 서른둘. 서른 해 만에 뭍에 오름.","speaker":"기록관 이사벨","sound":"minecraft:item.book.page_turn"},"objectives":[{"type":"KILL","target":"block_factorys_bosses:kraken","count":1,"text":"크라켄 네라키스","mod":"block_factorys_bosses"}],"reward":{"gold":7000,"flags":["ch3_morning_star"]}}]
+PASS  chapter 2 ends under the first cave (Chesed), and some goals are things to do rather than look at (a verb, an item used, one trace after another)  [{"id":"story_2_24f","chain":"2장 녹슨 맹세 (44/46)","order":1880,"title":"이름을 받지 못한 돌","giver":"quest_order_captain","requires":["story_2_24e"],"intro":"굴 맨 안쪽에 놈을 깨우는 자리가 있다. 다가가면 놈에 대해 적힌 것이 보일 거다. 읽고 들어가라. 브람 말을 잊지 마라. 수정은 도끼로, 벼락을 싣고, 거울돌 앞에. 선돌 넷은 먼저. 나는 입구에 선다. 다리가 이래서 안에서는 짐이다. 대신 이번에는 문 앞에 끝까지 서 있는다. 누가 뒤처지는지 내가 본다.","progress":"광맥 밑의 굴에서 케세드를 잠재워라. (굴 맨 안쪽의 소환 자리에서 싸움을 시작한다. 함께 싸운 모두가 인정된다.)","done":"놈이 갈라졌다. 검푸른 게 재처럼 떨어져 나갔다. 흰 돌만 남았다. 사람 키만 한, 잘 깎은 돌이다. 한 단어가 새겨져 있고, 그 밑에 이름 새길 자리가 비어 있다. 여덟 글자 들어갈 자리다. 기록관이 재 봤다. …천 년 동안 그 빈자리에 딴 게 들어찬 거다. 잊힌 게. 토마스와 리아의 투구는 돌 앞에 내려놨다. 거기가 맞는 자리 같아서. 올라가자. 명단을 마저 해야 한다.","sceneAccept":{"kind":"title","chapter":"제 2 장 · 첫 굴 밑","title":"이름을 받지 못한 돌","subtitle":"스무 해 전, 원정이 처음 사람을 잃은 자리","color":"6FD8FF","theme":"curse","sound":"minecraft:entity.lightning_bolt.thunder"},"sceneDone":{"kind":"names","title":"베스탈리아 연대기 · 버려진 돌","text":"여덟째 돌. 이름 대신 한 단어: 케세드(자비)\n이름 새길 자리 여덟 글자, 비어 있음\n그 앞에 투구 둘. 토마스, 리아. 등을 맞대고 섬.","speaker":"기록관 이사벨","sound":"minecraft:item.book.page_turn"},"objectives":[{"type":"KILL","target":"fdbosses:chesed","count":1,"text":"케세드, 이름을 받지 못한 돌","mod":"fdbosses"}],"reward":{"gold":9000,"items":[{"item":"rtshop:chronicle_page","count":1}],"flags":["clue_eighth_stone"]}}]
+PASS  chapter 3 progress moves over the same way (the lantern choice is kept)  [true/true]
+PASS  a player in the middle of the old chapter 3 starts the rebuilt chapter from its beginning  [true]
+PASS  chapter 4 is rewritten (six seals walked six ways, the portraits, the council, through the door, under the glove)  [{"id":"story_4_26","chain":"4장 일곱 봉인 (49/53)","order":2780,"title":"문 사이로","giver":"quest_order_archivist","requires":["story_4_25a"],"intro":"묘실 문 틈에 서 주세요. 왕이 말을 걸 거예요. 듣고, 대답해 주세요. 저는 한 글자도 안 빼고 적을게요. 그리고 왕이 뭘 물으면… 조사대원님 마음대로 대답하세요. 정답은 없을 거예요.","progress":"서리 감옥의 묘실 문 틈으로 왕의 말을 듣고 대답하세요.","done":"(이사벨의 펜이 멈춰 있다.) 다 적었어요. '회색 망토는 한 달 전에도 왔다. 천 년 동안 백 번은 왔다. 올 때마다 얼굴이 조금씩 달랐다. 장갑은 같았다.' 그리고 약속이요. '끝나지 않는 삶.' 왕은 그걸 받고 문을 열어 주기로 했어요. 눈을 내주기로요. 그런데 조사대원님 대답을 듣고 한참 조용했죠. 그러고 그랬어요. '그럼 나를 재워라. 약속은 그 사람과 한 것이니, 너희는 지킬 것 없다.' …문이 안에서 열렸어요.","objectives":[{"type":"INSPECT","target":"c4_door","count":1,"text":"묘실 문 틈의 목소리","mod":"cataclysm","lines":["문 틈으로 찬 김이 나온다. 그 안에서 누가 말한다. 왕의 목소리가 아니다. 소년의 목소리다. \"형이 아니구나. 발소리가 달라.\"","\"너희가 다섯을 재웠다지. 소리가 들렸다. 눈이 하나 감길 때마다 여기 얼음이 한 겹씩 얇아졌다. 나는 무섭다. 천 년째 무섭다. 그런데 이제 지겹기도 하다.\"","\"회색 망토가 그랬다. 문을 열어 주면 끝나지 않는 삶을 주겠다고. 자기처럼. 나는 그게 좋은 건 줄 알았다. 그 사람 얼굴을 보기 전까지는. 그 사람은 천 년 동안 한 번도 안 웃었다.\"","\"그 사람은 올 때마다 같은 걸 물었다. '그분의 이름을 기억하느냐'고. 나는 기억 못 한다. 아무도 못 한다. 그분이 스스로… 아니다. 이건 내가 말할 것이 아니다. 그 사람이 직접 들어야 한다.\"","\"하나만 묻자. 너는 불씨를 쥐었으니 한 번은 안 죽는다. 그 한 번을 다 쓰고 나면, 너는 무섭지 않으냐.\""],"at":"cataclysm:frosted_prison","shape":"circle"},{"type":"TALK","target":"quest_order_archivist","count":1,"text":"받아 적는 이사벨","lines":["기록관 이사벨: (작게) 대답해 주세요. 저는 적기만 할게요.","▷ …대답하겠습니다."]}],"reward":{"gold":5000},"choices":[{"text":"\"무섭다. 그래서 이름을 적어 줄 사람 곁에서 싸운다.\"","flags":["ch4_mal_afraid"]},{"text":"\"무섭지 않다. 끝이 있으니까 걷는 거다.\"","flags":["ch4_mal_brave"]}]}]
+PASS  chapter 4 progress moves over the same way (the answer to Erwin is kept)  [true/true]
+PASS  chapter 4 has its added steps (pegs, canal, drawers, song, the court of the scale, the cells) and steps slipped in behind a player count as walked  [true/true]
+PASS  the finale is rewritten (the empty room, ink dots, a name on a palm, the third line, one line of ash) and the mirror story ends with the name  [{"id":"story_5_11","chain":"종장 연대기의 마지막 장 (11/12)","order":2930,"title":"천 년 묵은 재","giver":"quest_order_archivist","requires":["story_5_10"],"intro":"이그니스가 쓰러진 자리에 남은 회색 재요. 그건 불의 재가 아니에요. 장로님 낙인에서 떨어진 거예요. 천 년 치예요. 재의 잉크는 재로 만들어요. 그 재로 잉크를 개면 한 줄을 쓸 수 있어요. 딱 한 줄요. 연대기에 '에르윈'이라는 이름을 적을지 말지, 그 한 줄이에요. 저는 못 정하겠어요. 저는 그분 손에 글씨를 배웠고, 그분 때문에 어머니를 잃었어요. 조사대원님이 정해 주세요. 어느 쪽이든 저는 그대로 쓸게요.","progress":"천 년 묵은 재를 기록관 이사벨에게 건네고, 그 한 줄을 정하세요.","done":"썼어요. 정해 주신 대로요. 잉크가 마르는 동안 장로님이 옆에서 보고 계셨어요. 아무 말도 안 하셨어요. 다 마르고 나서 한 마디 하셨어요. '획이 좋구나.' …그게 다예요. 장로님은 수도회 지하로 내려가셨어요. 카스가 있던 방으로요. 스스로요. 문은 안 잠갔대요. 로란 대장님이 그러래요. '나오고 싶으면 나와라, 대신 나올 때마다 열한 명 이름을 외고 나와라.'","objectives":[{"type":"DELIVER","target":"rtshop:grey_ash","count":1,"text":"천 년 묵은 재"}],"reward":{"gold":10000},"choices":[{"text":"이름을 적는다. \"에르윈. 스승이 지어 준 이름. 천 년을 거역했고, 마지막에 놓았다.\"","flags":["fin_forgave"]},{"text":"이름을 적지 않는다. 그 한 줄에는 그가 지운 사람들의 이름을 적는다. 엘레나부터.","flags":["fin_erased"]}]}]
+PASS  3.60: the igloo step needs no personal advancement (a golden apple at a trace instead) and the frost giant's leftover choice is gone  [false true]
+PASS  3.61 reports: a category is kept (an unknown one becomes 'etc'), and the clerk's window gets the categories, my reports (newest first) and the open count  [7 8 {"max":300,"maxOpen":5,"op":false,"cats":["bug","idea","player","land","etc"],"mine":[{"id":8,"cat":"etc","state":0,"when":"11-28 19:43","text":"분류가 없는 글","answer":"","by":""},{"id":7,"cat":"land","state":0,"when":"11-28 19:43","text":"옆 땅과 경계가 겹쳐요","answer":"","by":""}],"open":2,"msg":"","filed":false}]
+PASS  3.71 reports: the limits come from petitions.json (length · open count), operators get every report in the window and can answer, close and delete there; others cannot  [-2 9 10 -3 limits true defaults true denied true (op before false) answered true closed true deleted true view true cmd true 5 10 true]
+PASS  3.72 stocks: six unions; the daily price follows the day's work against the last days (one person's share capped), story news once, within ±10%  [start true prices 400/400 424/376 466/365 news true 0.0]
+PASS  3.72 stocks: buying and selling back pay a 2% fee into the fund; limits per day · per certificate; a copied certificate is not in the ledger  [bought true (0, paid 4754) item true refused 5/4/3 sell 4566/-8 true]
+PASS  3.72 stocks: weekly dividends come only from the fund, for certificates held since last week, once (stamped); certificates are kept on death  [dividend true (early 0 per 6 got 60 again 0 fund 282→222) kept true back true]
+PASS  3.72 stocks: the window gets prices · history · my certificates · news; the banker offers [Exchange]; commands  [view true desk true cmd true {"trade":true,"enabled":true,"fee":0.02,"dailyMove":0.1,"fund":222,"wallet":9995118,"maxPer":100,"buyPerDay":200,"buyLeft":200,"today":"12-08","wanted":false,"checking":true,"resetIn":868617,"weekIn":1300617,"msg":"rtshop.stock.claimed","args":["80"],"ok":true,"mine":[{"id":"35df332c-d523-47a3-9a2b-80de046f3601","union":"fish","shares":10,"no":2,"valid":true,"issued":"12-01","bought":466,"value":3120,"eligible":false,"paid":true,"due":0,"checkFee":100}],"unions":[{"id":"farm","name":"농업 조합","nameEn":"Farmers' Union","color":8364602,"price":343,"start":400,"change":0.0,"dividend":0,"outstanding":0,"held":0,"history":[400,400,376,365,358,353,349,346,343,343,343],"pending":false},{"id":"fish","name":"어업 조합","nameEn":"Fishers' Union","color":4161464,"price":312,"start":400,"change":-0.060240963855421686,"dividend":6,"outstanding":10,"held":10,"history":[400,400,424,466,451,424,399,375,353,332,312],"pending":false},{"id":"smith","name":"대장간 조합","nameEn":"Smiths' Union","color":11558970,"price":600,"start":600,"change":0.0,"dividend":0,"outstanding":0,"held":0,"history":[600,600,600,600,600,600,600,600,600,600,600],"pending":false},{"id":"food","name":"식품 조합","nameEn":"Grocers' Union","color":13145658,"price":400,"start":400,"change":0.0,"dividend":0,"outstanding":0,"held":0,"history":[400,400,400,400,400,400,400,400,400,400,400],"pending":false},{"id":"land","name":"토지 조합","nameEn":"Land Union","color":9071178,"price":800,"start":800,"change":0.0,"dividend":0,"outstanding":0,"held":0,"history":[800,800,800,800,800,800,800,800,800,800,800],"pending":false},{"id":"survey","name":"조사대 기금","nameEn":"Survey Corps Fund","color":8014496,"price":1000,"start":1000,"change":0.0,"dividend":0,"outstanding":0,"held":0,"history":[1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000],"pending":false}],"news":[{"date":"11-30","union":"fish","text":"얼어붙은 바다가 풀렸다 — 다시 던지는 그물","textEn":"The frozen sea has thawed — nets go out again","change":0.08,"kind":"story"}]}]
+PASS  3.73 stocks: market events — after a long thunderstorm a storm warning for the fishers, one random event a day when it rolls (3~8%), part of it returns the next day; events can be turned off  [events 2 storm true follow true range true consumed true off true last land_road]
+PASS  3.76 hidden jobs: the forger and the inspector are unseen at the Job Guide until their mark is earned, then can be chosen (life slot); their guidebook page shows only to them  [hidden true open true chosen true desc true [+위조 증서의 완성도 +15% (위조 도구를 들고, 다른 손에 본으로 삼을 증서), +하루에 위조 증서 3장까지 (종이 · 먹물 주머니 · 벌집 조각)] guide true/true]
+PASS  3.76 forger: with paper, ink and honeycomb a real certificate is copied; the copy looks exactly the same (item, name, serial, exchange list) — only the server knows  [buy 0 noPaper 7 notJob 2 forge 0 q 0.65 same true listed true {"id":"215f5596-43d3-4acb-85b2-c22d89754126","union":"fish","shares":10,"no":3,"valid":true,"issued":"11-29","bought":400,"value":4000,"eligible":false,"paid":false,"due":0,"checkFee":100}]
+PASS  3.76 forger: a copy of a copy comes out worse (−10%); three a day  [0 q2 0.55 f3 0 f4 6 left 0]
+PASS  3.76 exchange: a forgery that fools the exchange is paid from the fees fund only; one that is caught is stamped 'forged' and its forger is fined (into the fund)  [sold 3920/3920 passed true caught -10 ok true fine 1200 tpl 5]
+PASS  3.76 inspector: finding a forgery's flaw stamps it and pays half of the forger's fine; a real one always shows no flaw; one look per certificate a day  [found 11 ok true fine 1200 share 600 fund 600 clean 12 again 13 notInspector 2]
+PASS  3.76 seal check: anyone pays a small fee to have a certificate checked (a real one is always fine); the third forgery found out in two weeks puts its forger on the wanted notice, barred from the exchange  [forge 0 real 12 fake 11 fee 100 wanted true buy 11 sell -11 view true]
+PASS  3.76 dividends: stamping a forged certificate always gives it away, whoever holds it (the holder gets nothing for it)  [forge 0 div 6 got 0 exposed 1 wanted false]
+PASS  3.76 the forgery records (forged copies, times found out, wanted, totals) are saved with the world  [0/0 {9b597807-335b-3eb2-9a64-ade29b8750de=20793} 4560]
+PASS  3.76 hidden paths: the pedestal scene in chapter 4 forks once (read the added line to Isabel / keep it); those past it choose through Isabel's short quest; one path per person  [fork true makeup true conceal true reveal true once true]
+PASS  3.76 hidden paths: the hidden teacher shows only at set times and rarely — at night by the rune altar once a night (forger), on rainy days with Isabel once a day (inspector)  [day true missed true sameNight true seenF true dry true rainMiss true sameDay true seenI true]
+PASS  3.76 hidden paths: the teacher asks a price and a test that can be failed (a wrong answer locks it for seven days); passing gives the tool and opens the job  [f1 true wrong true locked true reopened true right true kit true i1 true i2 true loupe true]
+PASS  3.76 hidden paths: each hidden job has a server limit (2 by default); when it is full the Job Guide says so  [There is no place for a 위조자 right now (up to 1 per server). One opens when someone changes jobs. / You are now a 위조자. Passives are active.]
+PASS  3.77 every quest whose dream comes in the night says so gently in its closing words (sleep early …), never naming the dream  [[]]
+PASS  3.77 every choice in the story comes back later — in what people say (greeting or topic) or in a quest that asks for it; both sides of each fork  [[]]
+PASS  3.77 Isabel remembers the pedestal fork: read to her → she copied the line; kept → she lets it be (no word of the hidden ways); gone once the mirror story is done  [[_chatter, hj_reveal] / [_chatter, hj_conceal] / [_chatter]]
+PASS  3.77 once the Elder's glove has come off in the story he is seen without it (bare hands, a cooled stroke on the back of one), only by those who saw it  [erwin_bare / erwin / 225]
+PASS  3.77 while Isabel is taken (after Roran's 'The Last Ember' until Ignis sleeps) and while the Elder is gone, they are not drawn for that player and their place shows only an empty desk — no topics, no quests, even when crouching; they come back after  [isabel _absent {"npc":"quest_order_archivist","entity":-1,"name":"기록관 이사벨","mode":"talk","greet":"(기록고 책상이 비어 있다. 펼친 연대기 위에 펜이 놓여 있다. 마지막 줄의 잉크가 아직 마르지 않았다.)","topics":[],"absent":true} shift true back isabel true erwin true seated "(장갑 없는 노인이 앉아 있다. 손등의 획은 식어서 흉터가 됐다.) …자네군. 앉게. 이제 서 있을 힘이 없네." 5_07 quest_order_captain]
+PASS  3.77 greetings follow the story: Isabel's after the Elder's betrayal is no longer hidden behind her chapter-1 one, and she and the Elder greet differently once the story is done  […아직도 믿기지 않아요. 그분이 우리 곁에 그렇게 오래 있었다니. / 조사대원님! 오늘은 뭘 적을까요? (왼손바닥의 흉터를 펜 끝으로 톡 친다.) 빈 줄은 아직 그대로예요. / …자네군. 발소리로 아네. 문은 열려 있네. 잠그지 말라더군, 로란이.]
+PASS  3.77 you report to whoever speaks the closing words, and no quest is handed out by someone who is trapped or taken (4_09 · 5_07 relayed; 2_14 · 3_11 reported where it happened)  [quest_order_elder>quest_order_archivist quest_order_captain quest_order_captain shop_fisher]
+PASS  3.77 the way chosen at Morris's first question (life / combat) is picked up by Albert the Job Guide  [[_chatter, choose, path_life] / [_chatter, choose, path_combat] / [_chatter, choose]]
+PASS  3.78 story items and hidden items (the hidden job tools) need examining; ordinary items do not  [rtshop:undying_ember rtshop:appraisal_loupe null]
+PASS  3.78 each Scylla clue is examined on its own (its key names the clue)  [clue:storm_coin]
+PASS  3.78 right-clicking an unknown item starts examining instead of using it; switching items stops it; after about 2 seconds it is known (only that kind, only this player)  [true true true null rtshop:undying_ember true true true]
+PASS  3.78 what a player already carried before this version is known on the first login; things found afterwards still need examining  [true true true]
+PASS  3.78 examine.json has the switches (enabled, seconds, storyItems, hiddenItems with both hidden job tools) and the guide explains it  [{"_help":"살펴보기 (타르코프식). 이야기 물건 · 히든 아이템은 처음엔 「처음 보는 물건」으로 보이고, 들고 우클릭해 seconds 초 동안 살펴봐야 이름과 설명이 보인다 (사람마다, 종류마다 한 번). storyItems: 이야기 물건과 스킬라 단서. hiddenItems: 히든 아이템 ID 목록. enhanceSafeItems: 강화 설정의 히든 장비(safeItems)도. enabled=false 면 끈다. 고친 뒤 /rtshop reload.","enabled":true,"seconds":2.0,"storyItems":true,"hiddenItems":["rtshop:forger_kit","rtshop:appraisal_loupe"],"enhanceSafeItems":true} guide true]
+PASS  3.78 Bosses'Rise's dodge roll is switched off on the server (its Can use roll setting), and stays off  [false off already]
+PASS  3.73 performance check: a sampled stack is charged to the innermost mod (RT Shop here, not Minecraft), a mixin handler to its mod id, and the report lists them  [rtshop-forge-1.20.1-3.84.0.jar {rtshop-forge-1.20.1-3.84.0.jar=1} {rtshop-forge-1.20.1-3.84.0.jar=1, mixin:spiral_abyss=1}]
+PASS  3.74 the food merchant lists nothing the farmer sells (crops, raw meat, eggs, milk go to the farmer); no empty tab; installed food.json files get skipItemsOf once  [dup [] empty [] wheat@farmer true bread@food true mig true/false {
+  "categories": [
+    {
+      "id": "ingredient",
+      "name": "식재료",
+      "icon": "farmersdelight:wheat_dough"
+    },
+    {
+      "id": "dish",
+      "name": "요리"
+    }
+  ],
+  "items": [],
+  "skipItemsOf": [
+    "farmer"
+  ]
+}]
+PASS  3.78 Haru the town clerk no longer opens the bounty board (only the board keeper does); an untouched old hunts.json drops him, a custom list and the pools stay  [[] [] [attendance, general] pool true]
+PASS  3.78 the food merchant lists nothing the fish merchant sells (fish, dried kelp, lily pads); installed food.json files get fisher once, owner lists untouched  [dup [] cod@fisher true cod@food false kelp@food false empty [] mig true/false/false {
+  "items": [],
+  "skipItemsOf": [
+    "farmer",
+    "fisher"
+  ]
+}]
+PASS  3.74 the quest HUD tells about job trial quests only after 「조사대원의 밑천」 and only while the player has no job and no trial under way (taking them still works)  [true true true true true]
+PASS  3.74 talking to an NPC again sends its map mark again (so a mark deleted on the map comes back); other unchanged marks stay quiet  [true true true false true true]
+PASS  3.74 Morris's quest-window greeting speaks like his other lines (해요체) and has an English line  [어서 오세요, 새내기 모험가님! 이 땅에서 살아남는 법을 하나씩 알려 드릴게요. / Welcome, new adventurer! I'll show you how to survive in this land, one step at a time.]
+PASS  3.74 the survey compass leaves Cataclysm boss buildings to that mod's eyes (it points to the quest's other places first; amethyst nests stay on the compass)  [true eye monstrous_eye both minecraft:stronghold eyeOnly cataclysm:soul_black_smith took truetrue]
+PASS  3.74 Fantasy Mounts quests start switched off: [quests] enabled becomes false once per world file (sub-sections untouched, a later switch-on stays), new worlds get it from defaultconfigs  [2 0 | configVersion = 2/[quests]/	#Turn quests on./	enabled = false/	introduction = true//	[quests.earnMounts]/		enabled = true/ | 188]
+PASS  3.75 dialogue topics about another NPC open after talking to that NPC once, topics about something after hearing of it (the Seven Kings); older saves count finished quests  [true true true true true true true true]
+PASS  3.75 the field notebook is an item like the codex and guidebook: given once, sold again at the general store  [true true true]
+PASS  3.75 the codex gear tab lists only gear you can buy, pull from the gacha or find as loot (chests, mob drops); the rest is left out  [1099 shown, 218 hidden, loot true av true]
+PASS  3.75 the guidebook's enhance page explains how to use guard tickets (middle slot, one per attempt) and what each of the three does, as the anvil really does it, in Korean and English  [745 / en 1519 protect true]
+PASS  3.62 boss cutscenes: with Cinematic Cataclysm installed its four boss cutscenes start in the arena; without it bosses are raised directly; every boss has a camera style  [true ancient_remnant=ok the_leviathan=ok maledictus=ok ignis=ok ]
+PASS  3.61 npc looks: every look has its model file, and NPC keys find their look (exact first, then the longest prefix; unknown keys stay villagers)  [/isabel/m_general]
+PASS  3.60 reports: filing trims the text and records the place, the cooldown, empty and long texts and the open limit refuse, an answer and a close change the state, an answered one cannot be withdrawn, the data survives saving, the commands exist  [1 -4 -1 -2 true true true true -3 true true]
+PASS  finale progress moves over the same way (the line of ash is kept)  [true/true]
+PASS  3.63 story: Isabel stays behind for the pyramid and the swamp hut (she still walks to the portal and the tower), both quests end on a quiet scene, the dark wood and the cursed pyramid have theirs when their mods are in, and no filler kill in chapters 2 to 5 asks for more than 4  [true true 0 ]
+PASS  3.63 a quest that gained a goal: someone already on it gets a progress slot for the new goal (what was done is kept, the new goal starts at 0, nothing to fix the second time)  [true 3 2 1 3]
+PASS  3.63 a trace can be tied to a biome: it appears only while the player stands in that biome  [minecraft:stony_shore]
+
+== npc layout
+PASS  an NPC set down in the game is written to npc_layout.json with its key and place  [1 438 "x": -7.5]
+PASS  a server that gets the file sets the NPC down at the same place by itself, once (the same file is not applied twice)  [1 1 1 at BlockPos{x=-8, y=150, z=-72} entities tick there: true]
+PASS  a changed file moves the NPC: the old one is taken away and a new one stands at the new place  [1 1 1]
+PASS  where there is no floor (a world with other terrain) the NPC is not set down; the place keeps waiting  [1 0 1]
+PASS  3.74 /rtshop npc remove picks the NPC you look at (else the nearest); /rtshop npc layout reset takes the NPCs away and forgets their places  [bank / shop_fisher reset [2, 0] left 0 known 1,1 cmd true]
+
+== restaurant owner
+PASS  the restaurant shop exists and lists the food merchant's dishes  [272]
+PASS  3.84 the restaurant starts with only the vanilla foods (bread, cooked meat …) on the menu; mod dishes wait for a cook  [17 vanilla ]
+PASS  3.84 bread can be bought at the restaurant from the start
+PASS  3.84 the food merchant no longer sells dishes or drinks (it still buys them)
+PASS  every dish pays 5% more than the food merchant, and buying it back never pays (even for a cook)
+PASS  a player without the cook job cannot sell to the restaurant owner
+PASS  'sell all' is refused for non-cooks as well
+PASS  a cook sells dishes for the food merchant's price +5%, on top of the cook bonus  [3226 / 3226 / food 3072]
+PASS  the dish a cook sold appears on the menu (only that one), same shop version  [1]
+PASS  anyone can buy a dish on the menu; dishes not yet on the menu cannot be bought  [997438]
+PASS  the menu survives saving and loading
+PASS  an OP can put every dish on the menu and clear it again  [271 272]
+PASS  the restaurant owner NPC can be spawned like other merchants (/rtshop npc restaurant)
+
+== 3.84 (11-29 requests)
+PASS  3.84 item_policy 9: Nightfall Enhance and Small Ships items cannot be crafted, looted or dropped from blocks, the Epic Fight skill book cannot be crafted, Aquamirae gear is off the NPC shops
+PASS  3.84 an item_policy.json of version 8 gets the 3.84 bans added (and keeps its other lines)  [16 / 16]
+      3.84 Nightfall Enhance (efn_enhance) items (0): 
+FAIL  3.84 every Nightfall Enhance item is kept out of loot and block drops, and cannot be crafted  [0 / 0 of 0]
+PASS  3.84 a Small Ships ship cannot be crafted, looted or dropped, yet may be sold in shops  [1 oak_cog]
+PASS  3.84 the Epic Fight skill book cannot be crafted (any recipe making it is removed)
+PASS  3.84 Aquamirae gear (weapons, armour, tools, curios) is never on an NPC shop, its other items are not touched  [22 gear, 22 banned, 0 still listed []; other 45 (2 banned)]
+PASS  3.84 world rules: no spmovesets starter kit, vanilla hunger, vanilla boat speed, no rune cost for RPG spells, a welcome shulker box, magic open to all (weaker for non-mages)
+PASS  3.84 PvP outside the castle zone is on by default
+      3.84 spmovesets survival mode off, StarterKit.give -> false
+PASS  3.84 a newcomer is marked as having had the spmovesets survival kit before that mod looks, so it gives nothing  [true false items 0]
+PASS  3.84 Kaleidoscope Cookery's satiated shield (damage turned into hunger) is off  [off / at start: ]
+FAIL  3.84 RPG (Spell Engine) spells cost no hunger and no rune items (the pack has no Runes mod: '공기 부족')  [1.0 / true (, )]
+FAIL  3.84 Small Ships no longer slows vanilla boats  [true / ]
+PASS  3.84 a check kept inside a shulker box loses value on death like a carried one (counted once even if copied into two boxes)  [true lost 100 left 900 in box 900]
+PASS  3.84 pet-mod creatures never spawn on their own (gacha pets, eggs, breeding and commands still work); hollow 60%, deepling brute 5%
+      3.84 pet-mod creatures kept from spawning naturally (68): rpg_companions_tiny_dragons:tiny_dragon_01, rpg_companions_tiny_dragons:dragon_fireball, rpg_companions_tiny_dragons:tiny_dragon_02, rpg_companions_tiny_dragons:tiny_dragon_03, rpg_companions_tiny_dragons:tiny_dragon_04, rpg_companions_tiny_dragons:tiny_dragon_05, rpg_companions_tiny_dragons:tiny_dragon_06, rpg_companions_tiny_dragons:tiny_dragon_07, rpg_companions_tiny_dragons:tiny_dragon_08, rpg_companions_tiny_dragons:tiny_dragon_09, rpg_companions_tiny_dragons:tiny_dragon_10, fantasy:unicorn, fantasy:polar_bear, fantasy:doom_horse, fantasy:pegasus, fantasy:giant_spider, fantasy:war_mammoth, fantasy:dragon_turtle, fantasy:frost_sabrecat, fantasy:phoenix, fantasy:crystal_stag, fantasy:griffin, fantasy:qilin, fantasy:luna_moth, fantasy:hearthshell_snail, fantasy:kitsune, fantasy:bog_toad, fantasy:frost_drake, fantasy:moonwolf, fantasy:mossback_treant, fantasy:tide_narwhal, fantasy:sky_whale, fantasy:emerald_dragonfly, fantasy:warhorn_rhino, fantasy:jackalope, fantasy:nimbus_ram, fantasy:mount_projectile, fantasy:mount_tornado, fantasy:mount_zone, fantasy:mount_decoy
+PASS  3.84 every creature of the pet mods is on the no-natural-spawn list  [68 / 68]
+PASS  3.84 the weapon gacha (pulls and trades) stays shut until Chapter 1 is done; other gachas are open  [quest true weapon 1장 pet null pulled null after null]
+PASS  3.84 weapon tickets are recognised as weapon tickets (the shop shows them as 'Chapter 1')
+PASS  3.84 a block the operator picks (/rtshop plot use) can be used by anyone, even on someone's land: both halves of a large chest; picking it again locks it  [false [true, true] true true [false, false] true]
+PASS  3.84 in the castle zone anyone may use the crafting table, enhance anvil, rune altar, chairs, cooking blocks and the casino, but not chests  [[minecraft:crafting_table, rtshop:enhance_anvil, rtshop:arcane_orb, *chair*, *stool*, *bench*, *sofa*, *couch*, *seat*, *throne*] / [kaleidoscope_cookery:*, kaleidoscope_tavern:*, farmersdelight:stove, farmersdelight:cooking_pot, farmersdelight:skillet, farmersdelight:cutting_board, farm_and_charm:*pot*, farm_and_charm:stove, farm_and_charm:roaster, farm_and_charm:crafting_bowl, farm_and_charm:mincer, minecraft:smoker, minecraft:furnace, minecraft:campfire, minecraft:soul_campfire, casinodeco:*, roulettecasino:*, minevegas:*]]
+PASS  3.84 in the castle zone wild animals, villagers and monsters go; named, tamed, RT Shop NPCs and armour stands stay; outside the zone nothing changes  [true cow true named false wolf false zombie true npc false outside false]
+PASS  3.84 the castle-zone sweep removes the animal already inside and leaves the named one  [true swept 1 cow true named false]
+PASS  3.84 on a bought lot inside the castle zone animals stay but monsters still go
+PASS  3.84 the castle pass: refused until the castle point is set, works in town (to the castle; near the castle, back to the fountain square), refused outside town  [rtshop.travel.no_castle null castle town rtshop.travel.not_in_town]
+PASS  3.84 the home ticket works anywhere: to my bed, else my land, else the fountain square  [town land 2058.5 bed null]
+PASS  3.84 using a ticket spends one and starts its own wait (home ticket 20 min, castle pass 30 s); the two do not share a wait  [1 rtshop.travel.cooldown 1200000 / pass 2 30000]
+PASS  3.84 a newcomer gets one shulker box of a random colour, only once  [true false 1 purple]
+PASS  3.84 crops (wheat, carrots, berries, cocoa, nether wart, stems) are what the harvest guard watches
+PASS  3.84 someone else's ripe crop cannot be harvested or bone-mealed by right-click (bone meal in hand or empty-handed); the owner may  [false true Block{minecraft:wheat}[age=7] meal 8 FAIL FAIL guard 2]
+PASS  3.84 the town's own fields (castle zone outside bought lots) cannot be harvested by right-click either  [Block{minecraft:wheat}[age=7]]
+PASS  3.84 Quark's right-click harvest is hooked too (its harvest event is cancelled for other people's crops)
+      3.84 the owner's empty-hand right-click on the ripe wheat with Quark: Block{minecraft:air} (age 0 = harvested and replanted)
+PASS  3.84 what a food shows is what it fills: bread 5 -> 4 (70%), cookie 2 -> 1, steak 8 unchanged, and eating bread fills exactly 4 (no second cut)  [true bread 4 cookie 1 steak 8 ate 4]
+PASS  3.84 a cook's food bonus shows in the food value too (bread 4 + 20% -> 5)  [5 bonus 0.2]
+PASS  3.84 a job can be laid down for free (its buffs end at once) and taken up again for free; with no job there is nothing to lay down  [true true rtshop.job.resign_none true rtshop.job.chosen wallet 0]
+PASS  3.84 after laying a job down, a different job costs the usual change fee  [rtshop.job.no_money rtshop.job.changed swordsman wallet 0]
+PASS  3.84 the job screen's [Resign] button works at the job guide (and not away from it)  [true ]
+PASS  3.84 the general merchant sells the castle pass (300 G) and the home ticket (5,000 G), cheaper than return tickets (10,000 / 30,000 G)  [300 / 5000]
+PASS  3.84 the general merchant sells Small Ships ships at a very high price (cog 60,000 G) under a 'ship' tab  [60000 true]
+      exported 1830 price lines to config/rtshop/export
+
+RESULT: FAILED (4 of 1011 checks)

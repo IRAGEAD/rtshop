@@ -1,0 +1,603 @@
+{
+  "_help": [
+    "직업 설정. 게임 안에서는 /rtshop job edit (OP) 로 고칠 수 있습니다. 메모장으로 고쳤다면 /rtshop reload.",
+    "changeCost*: 직업을 바꿀 때 드는 Gold (처음 고를 때는 무료) · cooldownHours*: 바꾼 뒤 다시 바꿀 수 있을 때까지의 실제 시간",
+    "jobs[].params: 패시브 수치 (0.10 = 10%, maxHealth 는 체력 수치: 2 = 하트 1칸). 음수는 단점.",
+    "jobs[].weapons: 무기 종류별 {damage: 피해 증감, speed: 공격 속도 증감} (0.10 = +10%, -0.15 = -15%). magic 은 주문 피해. 공격 속도는 근접 무기에만 적용.",
+    "weaponTypes: 무기 종류와 분류 규칙 (위에서부터 처음 맞는 종류). weaponOverrides: 아이템 ID -> 종류 (자동 분류가 틀렸을 때, none = 무기 아님)",
+    "jobs[].unlockFlag: 이 표식을 보상으로 주는 퀘스트가 있으면 그 퀘스트를 깨야 고를 수 있습니다.",
+    "jobs[].hidden: 표식을 얻기 전에는 직업 창에 보이지도 않는 히든 직업. hiddenJobCap = 히든 직업마다 서버에 둘 수 있는 사람 수 (0 = 한도 없음), hiddenNightChance = 위조자의 길이 열릴 확률 (밤에 룬 제단 곁, 한 밤에 한 번), hiddenRainChance = 조사관의 길이 열릴 확률 (비 오는 날 기록관과 이야기할 때, 하루에 한 번), hiddenRetryDays = 숨은 시험에서 틀리면 다시 볼 수 있을 때까지의 날 수."
+  ],
+  "configVersion": 2,
+  "paramsVersion": 2,
+  "changeCostCombat": 8000,
+  "changeCostLife": 5000,
+  "cooldownHoursCombat": 48.0,
+  "cooldownHoursLife": 24.0,
+  "npcName": "직업 안내인",
+  "hiddenJobCap": 2,
+  "hiddenNightChance": 0.15,
+  "hiddenRainChance": 0.3,
+  "hiddenRetryDays": 7,
+  "jobs": [
+    {
+      "id": "swordsman",
+      "slot": "combat",
+      "name": "검사",
+      "icon": "minecraft:iron_sword",
+      "unlockFlag": "unlock_job_swordsman",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "critDamage": 0.1
+      },
+      "weapons": {
+        "sword": {
+          "damage": 0.1,
+          "speed": 0.1
+        },
+        "dagger": {
+          "damage": 0.0,
+          "speed": 0.0
+        },
+        "axe": {
+          "damage": -0.15,
+          "speed": -0.1
+        },
+        "blunt": {
+          "damage": -0.15,
+          "speed": -0.1
+        },
+        "spear": {
+          "damage": -0.15,
+          "speed": -0.1
+        },
+        "fist": {
+          "damage": -0.1,
+          "speed": 0.0
+        },
+        "bow": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "crossbow": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "gun": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "staff": {
+          "damage": -0.2,
+          "speed": -0.1
+        },
+        "magic": {
+          "damage": -0.15,
+          "speed": 0.0
+        }
+      }
+    },
+    {
+      "id": "warrior",
+      "slot": "combat",
+      "name": "전사",
+      "icon": "minecraft:iron_axe",
+      "unlockFlag": "unlock_job_warrior",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "maxHealth": 2.0,
+        "moveSpeed": 0.1
+      },
+      "weapons": {
+        "axe": {
+          "damage": 0.1,
+          "speed": 0.0
+        },
+        "blunt": {
+          "damage": 0.1,
+          "speed": 0.0
+        },
+        "dagger": {
+          "damage": -0.1,
+          "speed": -0.05
+        },
+        "bow": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "crossbow": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "gun": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "staff": {
+          "damage": -0.2,
+          "speed": -0.1
+        },
+        "magic": {
+          "damage": -0.2,
+          "speed": 0.0
+        }
+      }
+    },
+    {
+      "id": "tank",
+      "slot": "combat",
+      "name": "탱커",
+      "icon": "minecraft:shield",
+      "unlockFlag": "unlock_job_tank",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "damageTaken": 0.1,
+        "knockbackResist": 0.2,
+        "maxHealth": 4.0,
+        "shieldKnockback": 0.6,
+        "shieldReflect": 0.05,
+        "moveSpeed": -0.05
+      },
+      "weapons": {
+        "sword": {
+          "damage": -0.05,
+          "speed": 0.0
+        },
+        "axe": {
+          "damage": -0.05,
+          "speed": 0.0
+        },
+        "dagger": {
+          "damage": -0.1,
+          "speed": -0.1
+        },
+        "fist": {
+          "damage": -0.05,
+          "speed": 0.0
+        },
+        "bow": {
+          "damage": -0.25,
+          "speed": 0.0
+        },
+        "crossbow": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "gun": {
+          "damage": -0.2,
+          "speed": 0.0
+        },
+        "staff": {
+          "damage": -0.2,
+          "speed": -0.1
+        },
+        "magic": {
+          "damage": -0.15,
+          "speed": 0.0
+        }
+      }
+    },
+    {
+      "id": "archer",
+      "slot": "combat",
+      "name": "궁수",
+      "icon": "minecraft:bow",
+      "unlockFlag": "unlock_job_archer",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "arrowSave": 0.1,
+        "distanceBonus": 0.15,
+        "distanceFull": 32.0,
+        "maxHealth": -2.0
+      },
+      "weapons": {
+        "bow": {
+          "damage": 0.15,
+          "speed": 0.0
+        },
+        "crossbow": {
+          "damage": 0.1,
+          "speed": 0.0
+        },
+        "gun": {
+          "damage": 0.05,
+          "speed": 0.0
+        },
+        "sword": {
+          "damage": -0.15,
+          "speed": -0.1
+        },
+        "axe": {
+          "damage": -0.2,
+          "speed": -0.1
+        },
+        "blunt": {
+          "damage": -0.2,
+          "speed": -0.15
+        },
+        "spear": {
+          "damage": -0.15,
+          "speed": -0.1
+        },
+        "fist": {
+          "damage": -0.1,
+          "speed": 0.0
+        },
+        "staff": {
+          "damage": -0.15,
+          "speed": -0.1
+        },
+        "magic": {
+          "damage": -0.1,
+          "speed": 0.0
+        }
+      }
+    },
+    {
+      "id": "mage",
+      "slot": "combat",
+      "name": "마법사",
+      "icon": "minecraft:enchanted_book",
+      "unlockFlag": "unlock_job_mage",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "maxMana": 0.1,
+        "spellPower": 0.1,
+        "maxHealth": -2.0
+      },
+      "weapons": {
+        "sword": {
+          "damage": -0.25,
+          "speed": -0.1
+        },
+        "axe": {
+          "damage": -0.25,
+          "speed": -0.1
+        },
+        "blunt": {
+          "damage": -0.25,
+          "speed": -0.1
+        },
+        "spear": {
+          "damage": -0.25,
+          "speed": -0.1
+        },
+        "dagger": {
+          "damage": -0.25,
+          "speed": -0.1
+        },
+        "fist": {
+          "damage": -0.25,
+          "speed": -0.1
+        },
+        "bow": {
+          "damage": -0.25,
+          "speed": 0.0
+        },
+        "crossbow": {
+          "damage": -0.25,
+          "speed": 0.0
+        },
+        "gun": {
+          "damage": -0.25,
+          "speed": 0.0
+        }
+      }
+    },
+    {
+      "id": "farmer",
+      "slot": "life",
+      "name": "농부",
+      "icon": "minecraft:iron_hoe",
+      "unlockFlag": "unlock_job_farmer",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "starUp": 0.35,
+        "extraHarvest": 0.2
+      },
+      "weapons": {}
+    },
+    {
+      "id": "fisher",
+      "slot": "life",
+      "name": "어부",
+      "icon": "minecraft:fishing_rod",
+      "unlockFlag": "unlock_job_fisher",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "fishSell": 0.2,
+        "extraFish": 0.1
+      },
+      "weapons": {}
+    },
+    {
+      "id": "miner",
+      "slot": "life",
+      "name": "광부",
+      "icon": "minecraft:iron_pickaxe",
+      "unlockFlag": "unlock_job_miner",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "mineSpeed": 0.15,
+        "extraOre": 0.1,
+        "oreSell": 0.2
+      },
+      "weapons": {}
+    },
+    {
+      "id": "cook",
+      "slot": "life",
+      "name": "요리사",
+      "icon": "minecraft:cooked_beef",
+      "unlockFlag": "unlock_job_cook",
+      "hidden": false,
+      "notes": [],
+      "params": {
+        "foodBonus": 0.2,
+        "dishSell": 0.2
+      },
+      "weapons": {}
+    },
+    {
+      "id": "forger",
+      "slot": "life",
+      "name": "위조자",
+      "icon": "rtshop:forger_kit",
+      "unlockFlag": "unlock_job_forger",
+      "hidden": true,
+      "notes": [],
+      "params": {
+        "forgeSkill": 0.15,
+        "forgeDaily": 3.0
+      },
+      "weapons": {}
+    },
+    {
+      "id": "investigator",
+      "slot": "life",
+      "name": "조사관",
+      "icon": "rtshop:appraisal_loupe",
+      "unlockFlag": "unlock_job_investigator",
+      "hidden": true,
+      "notes": [],
+      "params": {
+        "inspectSkill": 0.25
+      },
+      "weapons": {}
+    }
+  ],
+  "weaponTypes": [
+    {
+      "id": "gun",
+      "name": "총",
+      "icon": "minecraft:crossbow",
+      "melee": false,
+      "classes": [],
+      "nameHas": [],
+      "nameEnds": [],
+      "mods": [
+        "tacz"
+      ]
+    },
+    {
+      "id": "crossbow",
+      "name": "석궁",
+      "icon": "minecraft:crossbow",
+      "melee": false,
+      "classes": [
+        "crossbow"
+      ],
+      "nameHas": [
+        "crossbow"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "bow",
+      "name": "활",
+      "icon": "minecraft:bow",
+      "melee": false,
+      "classes": [
+        "bow",
+        "ranged"
+      ],
+      "nameHas": [
+        "longbow",
+        "shortbow",
+        "recurve"
+      ],
+      "nameEnds": [
+        "_bow"
+      ],
+      "mods": []
+    },
+    {
+      "id": "staff",
+      "name": "지팡이·마법서",
+      "icon": "minecraft:blaze_rod",
+      "melee": true,
+      "classes": [],
+      "nameHas": [
+        "staff",
+        "wand",
+        "scepter",
+        "spell_book",
+        "spellbook",
+        "grimoire",
+        "tome",
+        "cane",
+        "orb"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "dagger",
+      "name": "단검",
+      "icon": "minecraft:iron_sword",
+      "melee": true,
+      "classes": [],
+      "nameHas": [
+        "dagger",
+        "knife",
+        "sickle",
+        "kunai",
+        "sai",
+        "tanto",
+        "dirk"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "spear",
+      "name": "창",
+      "icon": "minecraft:trident",
+      "melee": true,
+      "classes": [
+        "trident"
+      ],
+      "nameHas": [
+        "spear",
+        "glaive",
+        "halberd",
+        "lance",
+        "pike",
+        "naginata",
+        "scythe",
+        "trident",
+        "polearm",
+        "javelin"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "blunt",
+      "name": "둔기",
+      "icon": "minecraft:bone",
+      "melee": true,
+      "classes": [],
+      "nameHas": [
+        "mace",
+        "hammer",
+        "club",
+        "flail",
+        "morning_star",
+        "warhammer",
+        "maul",
+        "cudgel",
+        "staff_of"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "fist",
+      "name": "주먹·너클",
+      "icon": "minecraft:leather",
+      "melee": true,
+      "classes": [],
+      "nameHas": [
+        "knuckle",
+        "gauntlet",
+        "claw",
+        "fist",
+        "cestus",
+        "tonfa"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "tool",
+      "name": "채집 도구",
+      "icon": "minecraft:iron_pickaxe",
+      "melee": true,
+      "classes": [
+        "tool"
+      ],
+      "nameHas": [
+        "pickaxe",
+        "shovel",
+        "hoe",
+        "paxel"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "axe",
+      "name": "도끼",
+      "icon": "minecraft:iron_axe",
+      "melee": true,
+      "classes": [
+        "axe"
+      ],
+      "nameHas": [
+        "axe",
+        "hatchet",
+        "tomahawk"
+      ],
+      "nameEnds": [],
+      "mods": []
+    },
+    {
+      "id": "sword",
+      "name": "검",
+      "icon": "minecraft:iron_sword",
+      "melee": true,
+      "classes": [
+        "sword"
+      ],
+      "nameHas": [
+        "sword",
+        "claymore",
+        "katana",
+        "rapier",
+        "saber",
+        "sabre",
+        "blade",
+        "cutlass",
+        "scimitar",
+        "longsword",
+        "greatsword",
+        "uchigatana",
+        "tachi",
+        "estoc",
+        "falchion"
+      ],
+      "nameEnds": [],
+      "mods": []
+    }
+  ],
+  "weaponOverrides": {
+    "cataclysm:coral_bardiche": "spear",
+    "cataclysm:soul_render": "spear",
+    "cataclysm:astrape": "spear",
+    "cataclysm:ceraunus": "spear",
+    "cataclysm:the_incinerator": "sword",
+    "cataclysm:the_annihilator": "axe",
+    "cataclysm:the_immolator": "staff",
+    "cataclysm:meat_shredder": "sword",
+    "wom:gesetz": "staff",
+    "wom:demon_bracelet": "fist",
+    "spmovesets:pulseras_choque": "fist",
+    "irons_spellbooks:lightning_rod": "staff",
+    "farmersdelight:skillet": "blunt"
+  },
+  "premiumFromGrade": "epic",
+  "vanillaNoWeaponPassives": true,
+  "nonMagePower": 0.6,
+  "nonMageCastTime": 1.3,
+  "noStaffPower": 0.6
+}

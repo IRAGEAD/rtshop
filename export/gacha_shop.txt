@@ -1,0 +1,14 @@
+# 상점: 뽑기 티켓 상점 (gacha_shop)
+# 아이템 | 구매가 | 기본 매입가 | 구분 | 원가 | 가격 근거(레시피)
+rtshop:gacha_ticket_normal | 1000 | - | weapon_ticket | - | 
+rtshop:gacha_ticket_mid | 5000 | - | weapon_ticket | - | 
+rtshop:gacha_ticket_high | 20000 | - | weapon_ticket | - | 
+rtshop:gacha_ticket_pet_normal | 750 | - | pet_ticket | - | 
+rtshop:gacha_ticket_pet_mid | 3750 | - | pet_ticket | - | 
+rtshop:gacha_ticket_pet_high | 15000 | - | pet_ticket | - | 
+rtshop:gacha_ticket_accessory_normal | 750 | - | accessory_ticket | - | 
+rtshop:gacha_ticket_accessory_mid | 3750 | - | accessory_ticket | - | 
+rtshop:gacha_ticket_accessory_high | 15000 | - | accessory_ticket | - | 
+rtshop:magic_ticket | 12000 | - | magic_ticket | - | 
+rtshop:magic_ticket_select | 30000 | - | magic_ticket | - | 
+rtshop:enchant_scroll | 8000 | - | magic_ticket | - | 

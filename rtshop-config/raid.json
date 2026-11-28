@@ -1,0 +1,195 @@
+{
+  "_설명": [
+    "주간 레이드: 레이드 상인(/rtshop npc raid)에게서 참가 티켓을 사고, 레이드 안내인(/rtshop npc raid_guide)에게 말을 걸어 들어갑니다.",
+    "게임 안에서 /rtshop raid edit 로 수치·문구·보상을 고칠 수 있습니다. 위치: /rtshop raid arena here (구역을 지금 서 있는 곳에 다시 지음) · /rtshop raid return here (돌아갈 곳)",
+    "boss: 레이드 보스 엔티티 ID (예: cataclysm:ignis, cataclysm:ender_guardian, cataclysm:netherite_monstrosity, cataclysm:the_harbinger, cataclysm:the_leviathan, cataclysm:ancient_remnant)",
+    "requireKill / requireKills: 입장 조건 (이 몬스터를 몇 번 처치) · healthMultiplier / damageMultiplier: 일반 보스 대비 체력·공격력 배율",
+    "npcsAfterFirstBoss: true 면 레이드 안내인과 레이드 상점 NPC 는 보스(party.json 의 보스 목록)를 처음 쓰러뜨린 사람에게만 말을 받아 준다. 레이드 자체는 그 레이드의 보스(requireKill)를 쓰러뜨려야 열린다.",
+    "chanceFresh / chanceRepeat: 드랍 굴림 한 번에 각 등급이 나올 확률(%) [일반, 고급, 희귀, 영웅, 전설, ???]. Fresh = 이번 주 주간 보상을 아직 안 받은 사람, Repeat = 이미 받은 사람",
+    "rewards: group 이 weekly 면 주간 보상(매주 처음 성공할 때 모두 지급), drop 이면 보스 드랍(등급 굴림으로 그 등급의 아이템 중 하나)"
+  ],
+  "enabled": true,
+  "boss": "cataclysm:ignis",
+  "requireKill": "cataclysm:ignis",
+  "requireKills": 1,
+  "npcsAfterFirstBoss": true,
+  "healthMultiplier": 2.0,
+  "damageMultiplier": 1.5,
+  "resetDay": 1,
+  "resetHour": 6,
+  "returnSeconds": 30,
+  "failReturnSeconds": 60,
+  "rollsFresh": 3,
+  "rollsRepeat": 1,
+  "chanceFresh": [
+    40.0,
+    30.0,
+    18.0,
+    8.0,
+    3.95,
+    0.05
+  ],
+  "chanceRepeat": [
+    30.0,
+    15.0,
+    6.0,
+    2.0,
+    0.5,
+    0.01
+  ],
+  "weeklyGold": 10000,
+  "arena": {
+    "dim": "minecraft:overworld",
+    "x": 20000,
+    "y": 200,
+    "z": 20000,
+    "radius": 26,
+    "height": 30,
+    "built": false
+  },
+  "return": {
+    "set": false,
+    "dim": "minecraft:overworld",
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "texts": {
+    "npcName": "레이드 안내인",
+    "bossName": "화염의 군주 이그니스",
+    "dialogue1": "…뜨거운 바람이 느껴지나? 이 문 너머가 화염의 군주, 이그니스의 처소다.",
+    "dialogue2": "제단에 불꽃을 바쳐 군주가 깨어나면 문은 닫힌다. 안에 있는 자들만으로 끝을 봐야 하지.",
+    "dialogue3": "참가 티켓을 내고 들어가겠나? …부디 살아서 돌아오게.",
+    "uiTitle": "화염의 군주 · 이그니스",
+    "uiSub": "주간 레이드",
+    "enterButton": "레이드 입장",
+    "confirmTitle": "정말 입장하시겠습니까?",
+    "confirmBody": "참가 티켓 1장을 사용합니다. 이그니스가 소환된 뒤에는 다른 플레이어가 들어올 수 없습니다.",
+    "confirmYes": "입장한다",
+    "confirmNo": "돌아간다",
+    "needKill": "입장 조건: 이그니스를 %s번 이상 처치해야 합니다 (현재 %s번).",
+    "npcLocked": "…아직 자네에게 보여 줄 것이 없네. 이름 있는 것을 하나 쓰러뜨리고 오게. 이야기는 그다음일세.",
+    "npcOpened": "이제 레이드 안내인과 레이드 상점이 말을 받아 줍니다.",
+    "needTicket": "레이드 참가 티켓이 필요합니다. 레이드 상인에게서 살 수 있습니다.",
+    "locked": "이그니스가 이미 깨어났습니다. 레이드가 끝난 뒤에 다시 오세요.",
+    "entered": "레이드 구역에 들어왔습니다. 중앙 제단에 소환의 눈을 사용하면 이그니스가 깨어납니다.",
+    "summoned": "%s 님이 제단에 불꽃을 바쳤습니다. 이그니스가 깨어납니다!",
+    "alreadySummoned": "이그니스는 이미 깨어났습니다.",
+    "successTitle": "레이드 성공",
+    "successSub": "화염의 군주가 쓰러졌습니다",
+    "failTitle": "레이드 실패",
+    "failSub": "불꽃이 모두를 삼켰습니다",
+    "returnNotice": "%s초 뒤 마을로 돌아갑니다. 구역 안의 모두가 동의하면 바로 이동합니다.",
+    "voteTitle": "바로 마을로 이동할까요?",
+    "voteAgree": "지금 이동",
+    "voteStay": "조금 더 머물기",
+    "voteCount": "동의 %s / %s명",
+    "failConfirm": "마을로 이동",
+    "failBody": "확인을 누르면 마을로 이동합니다.",
+    "despawn": "레이드 구역에 아무도 남지 않아 이그니스가 사라졌습니다. (처치로 인정되지 않습니다)",
+    "notByPlayer": "이그니스가 플레이어의 공격이 아닌 이유로 쓰러져 보상이 없습니다.",
+    "downed": "쓰러졌습니다. 남은 동료가 싸우는 동안 지켜봅니다.",
+    "escaped": "레이드 구역에서 탈출했습니다.",
+    "weeklyGot": "이번 주 주간 보상을 받았습니다!",
+    "weeklyAlready": "이번 주 주간 보상은 이미 받았습니다. (드랍 확률이 낮아집니다)",
+    "dropGot": "보스 드랍: %s",
+    "dropNone": "이번에는 드랍 보상이 나오지 않았습니다.",
+    "mysteryName": "태초의 불씨",
+    "mysteryGot": "%s 님이 [%s] 등급 보상 %s 을(를) 획득했습니다!",
+    "rewardWeekly": "주간 보상 (매주 월요일 오전 6시 초기화)",
+    "rewardDrops": "보스 드랍"
+  },
+  "rewards": [
+    {
+      "group": "weekly",
+      "grade": 3,
+      "item": "minecraft:diamond",
+      "count": 8,
+      "chance": 100.0
+    },
+    {
+      "group": "weekly",
+      "grade": 3,
+      "item": "rtshop:gacha_ticket_high",
+      "count": 1,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 0,
+      "item": "minecraft:iron_ingot",
+      "count": 16,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 0,
+      "item": "minecraft:gold_ingot",
+      "count": 8,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 1,
+      "item": "minecraft:gold_ingot",
+      "count": 24,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 1,
+      "item": "minecraft:emerald",
+      "count": 12,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 2,
+      "item": "minecraft:diamond",
+      "count": 4,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 2,
+      "item": "rtshop:gacha_ticket_mid",
+      "count": 2,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 3,
+      "item": "minecraft:netherite_scrap",
+      "count": 2,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 3,
+      "item": "rtshop:gacha_ticket_high",
+      "count": 1,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 4,
+      "item": "minecraft:netherite_ingot",
+      "count": 2,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 4,
+      "item": "cataclysm:ignitium_ingot",
+      "count": 2,
+      "chance": 100.0
+    },
+    {
+      "group": "drop",
+      "grade": 5,
+      "item": "minecraft:nether_star",
+      "count": 1,
+      "chance": 100.0
+    }
+  ]
+}

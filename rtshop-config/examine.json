@@ -1,0 +1,11 @@
+{
+  "_help": "살펴보기 (타르코프식). 이야기 물건 · 히든 아이템은 처음엔 「처음 보는 물건」으로 보이고, 들고 우클릭해 seconds 초 동안 살펴봐야 이름과 설명이 보인다 (사람마다, 종류마다 한 번). storyItems: 이야기 물건과 스킬라 단서. hiddenItems: 히든 아이템 ID 목록. enhanceSafeItems: 강화 설정의 히든 장비(safeItems)도. enabled=false 면 끈다. 고친 뒤 /rtshop reload.",
+  "enabled": true,
+  "seconds": 2.0,
+  "storyItems": true,
+  "hiddenItems": [
+    "rtshop:forger_kit",
+    "rtshop:appraisal_loupe"
+  ],
+  "enhanceSafeItems": true
+}

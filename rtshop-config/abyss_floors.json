@@ -1,0 +1,81 @@
+{
+  "_help": [
+    "Spiral Abyss 층 보상. 게임 안에서 /rtshop abyss floor <1~6> (OP) 으로 고칩니다.",
+    "use: true 면 아래 상자들을 쓰고, false 면 모드 원래 보상. weights: 상자 1~5 가 뽑히는 비중(0 = 안 나옴). experience: 경험치(-1 = 모드 원래 값).",
+    "rewards: group 이 c1~c5 인 줄이 그 상자의 내용물. chance 는 그 상자가 뽑혔을 때 그 아이템이 나올 확률(%)."
+  ],
+  "floors": {
+    "1": {
+      "use": false,
+      "experience": -1,
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "rewards": []
+    },
+    "2": {
+      "use": false,
+      "experience": -1,
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "rewards": []
+    },
+    "3": {
+      "use": false,
+      "experience": -1,
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "rewards": []
+    },
+    "4": {
+      "use": false,
+      "experience": -1,
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "rewards": []
+    },
+    "5": {
+      "use": false,
+      "experience": -1,
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "rewards": []
+    },
+    "6": {
+      "use": false,
+      "experience": -1,
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "rewards": []
+    }
+  }
+}

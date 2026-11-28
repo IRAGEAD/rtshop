@@ -1,0 +1,271 @@
+{
+  "_help": "기록·주간 순위·칭호. categories: 종목을 끄려면 false. rewards: 주간 1·2·3위 보상 Gold (종목마다 같다, categoryRewards 로 종목별로 따로). rewardNeedsOthers: 그 자리 아래에 이만큼의 사람이 있어야 보상 (기본 1 = 경쟁자가 있는 자리만, 0 = 늘 줌). resetDay 1=월 … 7=일, resetHour 0~23 (서버 컴퓨터 시간). titles: need = 그 종목의 평생 기록, effect = mob_damage·boss_damage(%) · sell_bonus·buy_discount(%) · death_keep(죽을 때 잃는 Gold 감소 %) · quest_gold·bounty_gold(%) · max_health(체력). 직접 고쳤으면 \"edited\": true.",
+  "version": 1,
+  "edited": false,
+  "enabled": true,
+  "resetDay": 1,
+  "resetHour": 5,
+  "topShown": 10,
+  "maxEffectTitles": 2,
+  "countSpawnerMobs": false,
+  "weekTitles": true,
+  "categories": {
+    "kills": true,
+    "bosses": true,
+    "earned": true,
+    "spent": true,
+    "gold": true,
+    "quests": true,
+    "bounties": true,
+    "raids": true
+  },
+  "rewards": [
+    20000,
+    10000,
+    5000
+  ],
+  "rewardNeedsOthers": 1,
+  "categoryRewards": {},
+  "titles": [
+    {
+      "id": "kills_1",
+      "category": "kills",
+      "name": "풋내기 사냥꾼",
+      "effect": "mob_damage",
+      "need": 10,
+      "value": 0.5
+    },
+    {
+      "id": "kills_2",
+      "category": "kills",
+      "name": "숙련된 사냥꾼",
+      "effect": "mob_damage",
+      "need": 100,
+      "value": 1.0
+    },
+    {
+      "id": "kills_3",
+      "category": "kills",
+      "name": "노련한 추적자",
+      "effect": "mob_damage",
+      "need": 1000,
+      "value": 2.0
+    },
+    {
+      "id": "kills_4",
+      "category": "kills",
+      "name": "마물 사냥꾼",
+      "effect": "mob_damage",
+      "need": 5000,
+      "value": 3.0
+    },
+    {
+      "id": "kills_5",
+      "category": "kills",
+      "name": "마물의 천적",
+      "effect": "mob_damage",
+      "need": 20000,
+      "value": 4.0
+    },
+    {
+      "id": "bosses_1",
+      "category": "bosses",
+      "name": "첫 토벌",
+      "effect": "boss_damage",
+      "need": 1,
+      "value": 1.0
+    },
+    {
+      "id": "bosses_2",
+      "category": "bosses",
+      "name": "수호자를 재운 자",
+      "effect": "boss_damage",
+      "need": 10,
+      "value": 2.0
+    },
+    {
+      "id": "bosses_3",
+      "category": "bosses",
+      "name": "거수 토벌자",
+      "effect": "boss_damage",
+      "need": 50,
+      "value": 3.0
+    },
+    {
+      "id": "bosses_4",
+      "category": "bosses",
+      "name": "왕들을 재운 손",
+      "effect": "boss_damage",
+      "need": 200,
+      "value": 5.0
+    },
+    {
+      "id": "earned_1",
+      "category": "earned",
+      "name": "잔돈 모으는 이",
+      "effect": "sell_bonus",
+      "need": 10000,
+      "value": 0.5
+    },
+    {
+      "id": "earned_2",
+      "category": "earned",
+      "name": "수완 좋은 장사꾼",
+      "effect": "sell_bonus",
+      "need": 100000,
+      "value": 1.0
+    },
+    {
+      "id": "earned_3",
+      "category": "earned",
+      "name": "거상",
+      "effect": "sell_bonus",
+      "need": 1000000,
+      "value": 1.5
+    },
+    {
+      "id": "earned_4",
+      "category": "earned",
+      "name": "황금 손",
+      "effect": "sell_bonus",
+      "need": 10000000,
+      "value": 2.0
+    },
+    {
+      "id": "spent_1",
+      "category": "spent",
+      "name": "단골손님",
+      "effect": "buy_discount",
+      "need": 10000,
+      "value": 0.5
+    },
+    {
+      "id": "spent_2",
+      "category": "spent",
+      "name": "큰손",
+      "effect": "buy_discount",
+      "need": 100000,
+      "value": 1.0
+    },
+    {
+      "id": "spent_3",
+      "category": "spent",
+      "name": "귀빈",
+      "effect": "buy_discount",
+      "need": 1000000,
+      "value": 1.5
+    },
+    {
+      "id": "spent_4",
+      "category": "spent",
+      "name": "상단의 후원자",
+      "effect": "buy_discount",
+      "need": 10000000,
+      "value": 2.0
+    },
+    {
+      "id": "gold_1",
+      "category": "gold",
+      "name": "알뜰한 저축가",
+      "effect": "death_keep",
+      "need": 50000,
+      "value": 5.0
+    },
+    {
+      "id": "gold_2",
+      "category": "gold",
+      "name": "금고지기",
+      "effect": "death_keep",
+      "need": 500000,
+      "value": 10.0
+    },
+    {
+      "id": "gold_3",
+      "category": "gold",
+      "name": "대부호",
+      "effect": "death_keep",
+      "need": 5000000,
+      "value": 20.0
+    },
+    {
+      "id": "quests_1",
+      "category": "quests",
+      "name": "부지런한 심부름꾼",
+      "effect": "quest_gold",
+      "need": 10,
+      "value": 1.0
+    },
+    {
+      "id": "quests_2",
+      "category": "quests",
+      "name": "믿음직한 조사대원",
+      "effect": "quest_gold",
+      "need": 50,
+      "value": 2.0
+    },
+    {
+      "id": "quests_3",
+      "category": "quests",
+      "name": "베스탈리아의 해결사",
+      "effect": "quest_gold",
+      "need": 150,
+      "value": 3.0
+    },
+    {
+      "id": "quests_4",
+      "category": "quests",
+      "name": "연대기의 증인",
+      "effect": "quest_gold",
+      "need": 300,
+      "value": 5.0
+    },
+    {
+      "id": "bounties_1",
+      "category": "bounties",
+      "name": "견습 현상금 사냥꾼",
+      "effect": "bounty_gold",
+      "need": 5,
+      "value": 2.0
+    },
+    {
+      "id": "bounties_2",
+      "category": "bounties",
+      "name": "현상금 사냥꾼",
+      "effect": "bounty_gold",
+      "need": 25,
+      "value": 4.0
+    },
+    {
+      "id": "bounties_3",
+      "category": "bounties",
+      "name": "이름난 추적자",
+      "effect": "bounty_gold",
+      "need": 100,
+      "value": 6.0
+    },
+    {
+      "id": "raids_1",
+      "category": "raids",
+      "name": "첫 원정",
+      "effect": "max_health",
+      "need": 1,
+      "value": 1.0
+    },
+    {
+      "id": "raids_2",
+      "category": "raids",
+      "name": "노련한 원정대원",
+      "effect": "max_health",
+      "need": 10,
+      "value": 2.0
+    },
+    {
+      "id": "raids_3",
+      "category": "raids",
+      "name": "원정대의 기둥",
+      "effect": "max_health",
+      "need": 50,
+      "value": 4.0
+    }
+  ]
+}

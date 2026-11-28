@@ -1,0 +1,1982 @@
+{
+  "_help": "마법 뽑기 설정. pools: 분야(attack 공격·guard 방어·dodge 회피·passive 패시브·mover 이동)별 스킬북 목록 (item, nbt, grade 등급, weight 같은 등급 안 가중치). odds: 등급별 확률 (실패, uncommon, rare, epic, legendary, yamato 순). 첫 칸은 '실패' 확률이다: 스킬북 뽑기는 아무것도 나오지 않고, 인챈트 재설정은 주문서만 쓰이고 장비는 그대로다. 목록에는 일반(common) 등급을 둘 수 없다 (고급으로 올라간다). 야마토 등급은 공격 분야에만 둘 수 있다. enchants: 인챈트 재설정 목록 (enchant, level, grade, weight). costs: 한 번에 쓰는 티켓 수. 천장(확정)은 없다. rerollKinds: 제단에 올릴 수 있는 장비 (weapon·bow·crossbow·trident·armor·tool). 게임 안에서는 OP 가 룬 제단의 [편집] 으로 고친다. 고친 뒤 /rtshop reload.",
+  "configVersion": 2,
+  "tenGuarantee": "rare",
+  "oddsGrades": [
+    "common",
+    "uncommon",
+    "rare",
+    "epic",
+    "legendary",
+    "yamato"
+  ],
+  "odds": {
+    "select": [
+      40.0,
+      41.98,
+      15.9,
+      1.92,
+      0.18,
+      0.02
+    ],
+    "random": [
+      40.0,
+      41.98,
+      15.9,
+      1.92,
+      0.18,
+      0.02
+    ],
+    "enchant": [
+      50.0,
+      32.0,
+      13.0,
+      4.3,
+      0.7,
+      0.0
+    ]
+  },
+  "costs": {
+    "select": 1,
+    "random": 1,
+    "reroll": 1
+  },
+  "rerollKinds": [
+    "weapon",
+    "bow",
+    "crossbow",
+    "trident",
+    "armor",
+    "tool"
+  ],
+  "pools": {
+    "attack": [
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:execution\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:judgementcutend\"}",
+        "grade": "yamato",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:mortal_blade\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:stomp\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:zansetsu\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:connect_root\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:meteor_slam\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:revelation\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:all_eyes_on_me\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:all_eyes_on_you\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:avatar_of_might\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:back_and_forth\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:lunatic_vivacity\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:proximity_exploiter\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:shooting_style\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:voodoo_magic\"}",
+        "grade": "legendary",
+        "weight": 10
+      }
+    ],
+    "guard": [
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:efn_parry\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:murasama_parry\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:mana_shield\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:guard\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:impact_guard\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:parrying\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:buster_parade\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:counter_attack\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:perfect_bulwark\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:shulker_cloak\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:soul_protection\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:vengeful_parry\"}",
+        "grade": "legendary",
+        "weight": 10
+      }
+    ],
+    "dodge": [
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:efn_dodge\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:efn_step\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:murasama_dodge\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:yamato_step\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:roll\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:step\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfightx:roll\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfightx:step\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:bull_charge\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:dodge_master\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:ender_obscuris\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:ender_step\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:precise_roll\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:punishment_kick\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:shadow_step\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:time_travel\"}",
+        "grade": "legendary",
+        "weight": 10
+      }
+    ],
+    "passive": [
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:absorb1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:absorb2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:absorb3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:absorb4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:damage_boost1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:damage_boost2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:damage_boost3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:damage_boost4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:heal1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:heal2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:heal3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:heal4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:health_boost1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:health_boost2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:health_boost3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:health_boost4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:resist1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:resist2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:resist3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:resist4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:speed1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:speed2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:speed3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:speed4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stamina1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stamina2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stamina3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stamina4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stun_imm1\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stun_imm2\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stun_imm3\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"dodge_parry_reward:stun_imm4\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:indestructible\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:parry_master\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efn:precise_parry\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:against_magic\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:auto_heal\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:blood_into_mana\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:breathe_again\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:magic_sword\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:rapid_chant\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:reserve_mana\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:adaptive_skin\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:adrenaline_fiend\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:berserker\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:bonebreaker\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:catharsis\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:death_harvest\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:emergency_escape\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:endurance\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:forbidden_strength\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:hypervitality\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:stamina_pillager\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:swordmaster\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:technician\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:vengeance\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfightx:combat_mastery_i\"}",
+        "grade": "uncommon",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfightx:combat_mastery_ii\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:adrenaline\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:arrow_tenacity\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:critical_knowledge\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:dancing_blade\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:dopamine\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:heart_shield\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:inner_growth\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:latent_retribution\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:lethal_focus\"}",
+        "grade": "legendary",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:manipulator\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:meditation\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:mindset\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:pain_anticipation\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:vampirize\"}",
+        "grade": "epic",
+        "weight": 10
+      }
+    ],
+    "mover": [
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"efs_iss:hasty_casting\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:demolition_leap\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"epicfight:phantom_ascent\"}",
+        "grade": "epic",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:aqua_maneuvre\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:natural_sprinter\"}",
+        "grade": "rare",
+        "weight": 10
+      },
+      {
+        "item": "epicfight:skillbook",
+        "count": 1,
+        "nbt": "{skill:\"wom:spider_techniques\"}",
+        "grade": "epic",
+        "weight": 10
+      }
+    ]
+  },
+  "enchants": [
+    {
+      "enchant": "minecraft:protection",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:protection",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:protection",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:protection",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fire_protection",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fire_protection",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fire_protection",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fire_protection",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:feather_falling",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:feather_falling",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:feather_falling",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:feather_falling",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:blast_protection",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:blast_protection",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:blast_protection",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:blast_protection",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:projectile_protection",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:projectile_protection",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:projectile_protection",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:projectile_protection",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:respiration",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:respiration",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:respiration",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:aqua_affinity",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:thorns",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:thorns",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:thorns",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:depth_strider",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:depth_strider",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:depth_strider",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:frost_walker",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:frost_walker",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:soul_speed",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:soul_speed",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:soul_speed",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:swift_sneak",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:swift_sneak",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:swift_sneak",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sharpness",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sharpness",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sharpness",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sharpness",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sharpness",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:smite",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:smite",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:smite",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:smite",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:smite",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:bane_of_arthropods",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:bane_of_arthropods",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:bane_of_arthropods",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:bane_of_arthropods",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:bane_of_arthropods",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:knockback",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:knockback",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fire_aspect",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fire_aspect",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:looting",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:looting",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:looting",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sweeping",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sweeping",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:sweeping",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:efficiency",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:efficiency",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:efficiency",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:efficiency",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:efficiency",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:silk_touch",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:unbreaking",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:unbreaking",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:unbreaking",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fortune",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fortune",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:fortune",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:power",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:power",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:power",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:power",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:power",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:punch",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:punch",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:flame",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:infinity",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:loyalty",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:loyalty",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:loyalty",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:impaling",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:impaling",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:impaling",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:impaling",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:impaling",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:riptide",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:riptide",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:riptide",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:channeling",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:multishot",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:quick_charge",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:quick_charge",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:quick_charge",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:piercing",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:piercing",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:piercing",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:piercing",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "minecraft:mending",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "illusioner:hallucinate",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "illusioner:wingbeat",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_engine:spell_infinity",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "wom:invigoration",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "wom:invigoration",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "wom:invigoration",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "wom:invigoration",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "wom:invigoration",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:spell_power",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:spell_power",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:spell_power",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:spell_power",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:spell_power",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:sunfire",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:sunfire",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:sunfire",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:sunfire",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:sunfire",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:soulfrost",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:soulfrost",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:soulfrost",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:soulfrost",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:soulfrost",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:energize",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:energize",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:energize",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:energize",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:energize",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:haste",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:haste",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:haste",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:haste",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:haste",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_chance",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_chance",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_chance",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_chance",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_chance",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_damage",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_damage",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_damage",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_damage",
+      "level": 4,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:critical_damage",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:magic_protection",
+      "level": 1,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:magic_protection",
+      "level": 2,
+      "grade": "uncommon",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:magic_protection",
+      "level": 3,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "spell_power:magic_protection",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "lrtactical:backstab",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "lrtactical:backstab",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:freezing",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:freezing",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:leeching",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:smelting",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:stonebreaker",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:runner",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:runner",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:runner",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:heartfelt",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:heartfelt",
+      "level": 2,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:floatation",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:floatation",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:floatation",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:knight_jump",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:knight_jump",
+      "level": 2,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:knight_jump",
+      "level": 3,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:snowpiercer",
+      "level": 1,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:grace",
+      "level": 1,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:grace",
+      "level": 2,
+      "grade": "rare",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:grace",
+      "level": 3,
+      "grade": "epic",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:grace",
+      "level": 4,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "miningmaster:grace",
+      "level": 5,
+      "grade": "legendary",
+      "weight": 10
+    },
+    {
+      "enchant": "supplementaries:stasis",
+      "level": 1,
+      "grade": "legendary",
+      "weight": 10
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "_help": "이야기 건축물을 단계적으로 생성한다: 누군가 그 건축물로 가는 퀘스트를 받으면(또는 적힌 표식을 얻으면) 그때부터 새 지형에 생긴다. 막혀 있는 동안 처음 만들어진 지형에는 나중에도 생기지 않는다. 월드를 미리 생성하려면 enabled 를 false 로 하거나 /rtshop staged unlock all.",
+  "enabled": true,
+  "structures": {
+    "mowziesmobs:wrought_chamber": "",
+    "mowziesmobs:frostmaw_spawn": "",
+    "mowziesmobs:monastery": "",
+    "mowziesmobs:umvuthana_grove": "",
+    "aquamirae:ship": "",
+    "cataclysm:soul_black_smith": "",
+    "cataclysm:cursed_pyramid": "",
+    "cataclysm:ancient_factory": "",
+    "cataclysm:sunken_city": "",
+    "cataclysm:amethyst_nest": "",
+    "cataclysm:ruined_citadel": "",
+    "cataclysm:frosted_prison": "",
+    "cataclysm:burning_arena": "",
+    "minecraft:mansion": "",
+    "cataclysm:acropolis": "seal_scylla"
+  }
+}

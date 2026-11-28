@@ -1,0 +1,24 @@
+{
+  "_설명": [
+    "startingGold: 첫 접속 시 지급 Gold / deathLoss*: 사망 시 소지금 손실 범위(%) / npcRange: NPC와 거래 가능한 거리(블록)",
+    "checkDeathLoss: 사망 시 들고 있던 수표 금액도 같은 비율로 감소 / minCheckAmount: 수표 최소 금액",
+    "playerKillOnlyDrops: 플레이어가 직접 잡아야만 전리품을 주는 몹 (자동 농장으로 철·금이 무한히 쌓이는 것 방지). 바닐라처럼 하려면 [] 로 비우세요",
+    "employeeWage: 플레이어 상점 직원의 하루 고용비 (출석 초기화 시각에 예금 → 지갑 순으로 지출, 모자라면 그날 휴무). 0 이면 무료",
+    "villagerTrading: filtered = 상인 NPC 가 매입하는 물건을 파는 주민 거래만 제거 (기본) / allow = 바닐라 그대로 / block = 주민 거래 전체 차단"
+  ],
+  "configVersion": 4,
+  "startingGold": 1000,
+  "deathLossMinPercent": 5.0,
+  "deathLossMaxPercent": 30.0,
+  "bankNpcName": "은행원",
+  "npcRange": 10.0,
+  "checkDeathLoss": true,
+  "minCheckAmount": 1,
+  "playerKillOnlyDrops": [
+    "minecraft:iron_golem",
+    "minecraft:zombified_piglin",
+    "minecraft:guardian"
+  ],
+  "employeeWage": 1000,
+  "villagerTrading": "filtered"
+}

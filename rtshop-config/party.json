@@ -1,0 +1,41 @@
+{
+  "_help": "파티: maxMembers 최대 인원, bossCreditPercent 보스 처치로 인정받는 최소 피해(보스 최대 체력의 %), shareRadius 일반 몹 처치를 함께 채우는 파티원 거리, bosses 보스로 다루는 몹 ID, arenaBosses 직접 때릴 수 없어 피해량 대신 arenaRadius 칸 안에서 함께 싸운 사람을 처치로 치는 보스. 저장한 뒤 /rtshop reload",
+  "version": 2,
+  "maxMembers": 12,
+  "bossCreditPercent": 10.0,
+  "shareRadius": 64,
+  "noFriendlyFire": true,
+  "bosses": [
+    "minecraft:wither",
+    "minecraft:ender_dragon",
+    "minecraft:elder_guardian",
+    "minecraft:warden",
+    "mowziesmobs:ferrous_wroughtnaut",
+    "mowziesmobs:frostmaw",
+    "mowziesmobs:umvuthi",
+    "mowziesmobs:sculptor",
+    "aquamirae:captain_cornelia",
+    "aquamirae:maze_mother",
+    "cataclysm:ignis",
+    "cataclysm:netherite_monstrosity",
+    "cataclysm:ender_guardian",
+    "cataclysm:the_harbinger",
+    "cataclysm:the_leviathan",
+    "cataclysm:ancient_remnant",
+    "cataclysm:maledictus",
+    "cataclysm:scylla",
+    "illusioner:illusioner",
+    "block_factorys_bosses:underworld_knight",
+    "block_factorys_bosses:yeti",
+    "block_factorys_bosses:kraken",
+    "block_factorys_bosses:sandworm",
+    "block_factorys_bosses:infernal_dragon"
+  ],
+  "bossesAdded": 333,
+  "arenaBosses": [
+    "fdbosses:chesed",
+    "fdbosses:malkuth",
+    "fdbosses:geburah"
+  ],
+  "arenaRadius": 64
+}

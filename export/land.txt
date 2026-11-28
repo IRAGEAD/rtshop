@@ -1,0 +1,5 @@
+# 상점: 토지 상점 (land)
+# 아이템 | 구매가 | 기본 매입가 | 구분 | 원가 | 가격 근거(레시피)
+rtshop:first_land_deed | 15000 | - | deed | - | 
+rtshop:land_deed | 40000 | - | deed | - | 
+rtshop:large_land_deed | 140000 | - | deed | - | 

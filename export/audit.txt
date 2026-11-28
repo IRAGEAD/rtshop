@@ -1,0 +1,325 @@
+# RT Shop 가격 점검
+- rtshop:enhance_anvil: 아이템 규칙(item_policy.json)으로 NPC 상점에 올릴 수 없어 상점 'blacksmith'에서 뺐습니다
+- 가격표에 없던 씨앗 1종을 상점 'farmer' 에 자동으로 올렸습니다 (farming.json 의 autoListMissingSeeds): fantasy:blossom_berries=50
+- 어느 상점도 팔지 않던 지팡이 15종을 상점 'blacksmith' 에 올렸습니다 (item_policy.json 의 listStaffs): irons_spellbooks:artificer_cane=6000, irons_spellbooks:graybeard_staff=6000, irons_spellbooks:hither_thither_wand=24000, irons_spellbooks:staff_of_the_nines=24000, paladins:acolyte_wand=6000, paladins:diamond_holy_wand=6000, paladins:holy_wand=6000, paladins:netherite_holy_wand=6000, wizards:wand_arcane=6000, wizards:wand_fire=6000, wizards:wand_frost=6000, wizards:wand_netherite_arcane=6000, wizards:wand_netherite_fire=6000, wizards:wand_netherite_frost=6000, wizards:wand_novice=6000
+- 팔 곳이 없던 광석의 돌 변형 35종을 바닐라 광석과 같은 값의 매입 품목으로 올렸습니다: spelunkery:andesite_coal_ore=150, spelunkery:andesite_copper_ore=180, spelunkery:andesite_diamond_ore=2000, spelunkery:andesite_emerald_ore=800, spelunkery:andesite_gold_ore=900, spelunkery:andesite_iron_ore=450, spelunkery:andesite_lapis_ore=420, spelunkery:andesite_redstone_ore=280, spelunkery:calcite_redstone_ore=280, spelunkery:diorite_coal_ore=150, spelunkery:diorite_copper_ore=180, spelunkery:diorite_diamond_ore=2000, spelunkery:diorite_emerald_ore=800, spelunkery:diorite_gold_ore=900, spelunkery:diorite_iron_ore=450, spelunkery:diorite_lapis_ore=420, spelunkery:diorite_redstone_ore=280, spelunkery:granite_coal_ore=150, spelunkery:granite_copper_ore=180, spelunkery:granite_diamond_ore=2000, spelunkery:granite_emerald_ore=800, spelunkery:granite_gold_ore=900, spelunkery:granite_iron_ore=450, spelunkery:granite_lapis_ore=420, spelunkery:granite_redstone_ore=280, spelunkery:sandstone_lapis_ore=420, spelunkery:smooth_basalt_diamond_ore=2000, spelunkery:tuff_coal_ore=150, spelunkery:tuff_copper_ore=180, spelunkery:tuff_diamond_ore=2000, spelunkery:tuff_emerald_ore=800, spelunkery:tuff_gold_ore=900, spelunkery:tuff_iron_ore=450, spelunkery:tuff_lapis_ore=420, spelunkery:tuff_redstone_ore=280
+- 상점에서 살 수 없던 요리 재료 10종을 식품 상인에 올렸습니다 (pricing.json 의 autoListFoodIngredients): aquamirae:spinefish=16, quark:crab_leg=10, aquamirae:esca=26, aquamirae:cooked_spinefish=74, aquamirae:fin=10, starcatcher:agave_bream=400, starcatcher:starcaught_fish=14, kaleidoscope_cookery:barley_tea_bag=20, kaleidoscope_cookery:oolong_tea_bag=20, kaleidoscope_cookery:sakura_fubuki_tea_bag=20
+- 상점 'food': farmer, fisher 상점이 다루는 품목 39개를 뺐습니다 (skipItemsOf)
+- 만들면 훨씬 싼데 비싸게 팔던 품목 26종의 상점가를 만드는 값의 2배로 내렸습니다: minecraft:leather_boots 95→8, minecraft:leather_chestplate 330→16, minecraft:leather_helmet 85→10, minecraft:leather_leggings 210→14, minecraft:bow 850→12, minecraft:stone_axe 775→4, minecraft:stone_sword 190→2, minecraft:wooden_axe 225→16, minecraft:wooden_sword 55→10, minecraft:stone_pickaxe 390→4, minecraft:stone_shovel 390→4, minecraft:wooden_pickaxe 205→16, minecraft:wooden_shovel 205→8, minecraft:stone_hoe 270→4, minecraft:wooden_hoe 140→12, starcatcher:starcatcher_rod 10000→834, minecraft:fishing_rod 220→10, starcatcher:gunpowder_bait 60→11, starcatcher:lush_bait 60→1, starcatcher:murkwater_bait 60→3, starcatcher:vanilla_hook 400→44, starcatcher:bobber 300→26, starcatcher:clear_bobber 300→38, starcatcher:glowing_bobber 300→98, starcatcher:slimey_bobber 300→62, starcatcher:vanilla_bobber 300→10
+- 사서 만들면 더 싸서 매입가를 재료비로 내린 품목 1종: minecraft:charcoal 10.0→8.0 (spelunkery:charcoal_from_lump)
+- 재료를 모두 상점에서 사서 만들어도 손해가 없도록 매입가를 올린 음식: 189종 (pricing.json 의 purchaseFloor)
+- 화로에 바로 넣어 싸게 만드는 길을 막으려고 판매가를 올린 중간 재료: farmersdelight:mutton_chops=88, farmersdelight:salmon_slice=132, farmersdelight:wheat_dough=132, kaleidoscope_cookery:raw_cow_offal=59, kaleidoscope_cookery:raw_cut_small_meats=59, kaleidoscope_cookery:raw_lamb_chops=59, kaleidoscope_cookery:raw_pork_belly=37
+- 레시피 파일 10310개 중 9199개 해석, 계산에 쓰지 못한 레시피 1543개, 가격을 추정한 재료 198종, 원가 기준으로 가격을 정한 음식 302종
+- 무기 · 장비 521종의 사는 값을 올렸습니다 (item_policy.json 의 gearRaise): 2배 260종 · 3배 127종 · 5배 134종 — 상점이 사 주는 값(매입가)은 그대로
+적자 가능 음식: 0종
+
+# 재료를 모두 상점에서 사서 만들어 팔 때 손해인 조리법
+재료를 사서 만들면 손해인 조리법: 0개
+
+# 같은 음식인데 조리법에 따라 재료비 차이가 큰 경우 (음식 | 매입가 | 가장 싼 조리법 재료비 | 조리법)
+# 매입가는 가장 비싼 조리법 기준이라, 싼 조리법으로 만들면 차액만큼 남습니다. 한쪽 조리법을 /rtshop recipes 에서 막으면 기준에서 빠집니다.
+# (Kaleidoscope Cookery 의 자유 조리법 flex_pot · flex_stockpot 은 따로 값을 매기므로 여기에 넣지 않습니다: pricing.json 의 flexDishPricing)
+kaleidoscope_cookery:candied_chorus_fruit_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_chorus_fruit_4 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_chorus_fruit_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_chorus_fruit_5 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_chorus_fruit_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_chorus_fruit_6 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_chorus_fruit_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_chorus_fruit_7 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_chorus_fruit_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_chorus_fruit_8 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_chorus_fruit_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_chorus_fruit_9 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_glow_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_glow_berry_5 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_glow_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_glow_berry_6 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_glow_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_glow_berry_7 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_glow_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_glow_berry_8 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_glow_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_glow_berry_9 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_sweet_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_sweet_berry_4 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_sweet_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_sweet_berry_5 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_sweet_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_sweet_berry_6 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_sweet_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_sweet_berry_7 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_sweet_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_sweet_berry_8 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:candied_sweet_berry_skewer | 보호 안 함: kaleidoscope_cookery:stockpot/sugar_syrup_sweet_berry_9 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:chopping_board/cooked_cut_small_meats_from_rabbit [kaleidoscope_cookery:chopping_board] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: minecraft:cooked_cut_small_meats_from_campfire_cooking [minecraft:campfire_cooking] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: minecraft:cooked_cut_small_meats_from_smelting [minecraft:smelting] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: minecraft:cooked_cut_small_meats_from_smoking [minecraft:smoking] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_1 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_2 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_3 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_4 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_5 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_6 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_7 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_8 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_cut_small_meats | 보호 안 함: kaleidoscope_cookery:pot/raw_cut_small_meats_to_cooked_cut_small_meats_9 [kaleidoscope_cookery:pot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:cooked_rice | 보호 안 함: kaleidoscope_cookery:stockpot/rice_1 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:shengjian_mantou | 보호 안 함: kaleidoscope_cookery:stockpot/shengjian_mantou_count_1 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:shengjian_mantou | 보호 안 함: kaleidoscope_cookery:stockpot/shengjian_mantou_count_2 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:shengjian_mantou | 보호 안 함: kaleidoscope_cookery:stockpot/shengjian_mantou_count_3 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:shengjian_mantou | 보호 안 함: kaleidoscope_cookery:stockpot/shengjian_mantou_count_4 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:shengjian_mantou | 보호 안 함: kaleidoscope_cookery:stockpot/shengjian_mantou_count_5 [kaleidoscope_cookery:stockpot] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+minecraft:cooked_porkchop | 보호 안 함: farmersdelight:cutting/smoked_ham [farmersdelight:cutting] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+kaleidoscope_cookery:raw_cut_small_meats | 보호 안 함: kaleidoscope_cookery:chopping_board/raw_cut_small_meats_from_rabbit [kaleidoscope_cookery:chopping_board] (더 싼 길이 있음: 상점 재료를 화로에 바로 넣거나, 가장 싼 조리법 재료비의 1.15배를 넘음)
+재료비 차이가 큰 음식: 0종
+
+# 요리 재료 중 직접 만들면 더 싼 품목 (아이템 | 상점가 | 만드는 원가 | 조리법)
+# 음식값은 가장 싼 방법 기준으로 매겨지므로, 아래 품목을 상점에서 사서 재료로 쓰면 차액만큼 손해입니다.
+minecraft:bricks | 2 | 1.00 | minecraft:bricks
+minecraft:cobblestone | 1 | 0.50 | farm_and_charm:mincer/cobblestone
+minecraft:wooden_shovel | 8 | 4.00 | minecraft:wooden_shovel
+해당 품목: 3종
+
+# 가격표에 없어 추정가를 쓴 재료 (상점 파일에 가격을 적으면 더 정확해집니다)
+obscure_api:astral_dust = 2
+crittersandcompanions:acorn = 8
+betternether:agave_leaf = 2
+minecraft:allium = 2
+arcanevortex:apocalypse_ingot = 2
+supplementaries:ash = 2
+arcanevortex:ash_planks = 2
+minecraft:azure_bluet = 2
+minecraft:lily_of_the_valley = 2
+minecraft:oxeye_daisy = 2
+minecraft:pink_petals = 2
+betternether:black_apple = 28
+roulettecasino:croupier_badge = 2
+minecraft:cornflower = 2
+betternether:blue_obsidian = 2
+betternether:golden_vine = 2
+crittersandcompanions:clam = 2
+aquamirae:sharp_bones = 8
+betternether:bone_stalactite = 2
+minecraft:soul_sand = 2
+minecraft:acacia_leaves = 2
+quark:ancient_log = 2
+quark:stripped_ancient_log = 2
+quark:ancient_leaves = 2
+quark:azalea_log = 2
+quark:stripped_azalea_log = 2
+minecraft:azalea_leaves = 2
+minecraft:birch_leaves = 2
+quark:blossom_log = 2
+quark:stripped_blossom_log = 2
+quark:blue_blossom_leaves = 2
+minecraft:warped_wart_block = 2
+minecraft:cherry_leaves = 2
+minecraft:dark_oak_leaves = 2
+quark:dusky_myalite = 2
+minecraft:flowering_azalea_leaves = 2
+minecraft:crimson_stem = 2
+minecraft:warped_stem = 2
+minecraft:jungle_leaves = 2
+quark:lavender_blossom_leaves = 2
+minecraft:mangrove_leaves = 2
+minecraft:oak_leaves = 2
+quark:orange_blossom_leaves = 2
+quark:red_blossom_leaves = 2
+minecraft:spruce_leaves = 2
+quark:yellow_blossom_leaves = 2
+quark:jasper = 2
+quark:limestone = 2
+quark:myalite = 2
+quark:shale = 2
+minecraft:exposed_copper = 2
+quark:permafrost = 2
+minecraft:weathered_copper = 2
+mowziesmobs:clawed_log = 2
+betternether:nether_reed_stem = 2
+betternether:cincinnasite = 2
+betternether:cincinnasite_ore = 2
+block_factorys_bosses:corpse = 2
+minecraft:horn_coral = 2
+minecraft:brain_coral = 2
+minecraft:tube_coral = 2
+minecraft:bubble_coral = 2
+minecraft:fire_coral = 2
+create:precision_mechanism = 2
+mowziesmobs:red_raked_sand = 2
+minecraft:red_sand = 2
+minecraft:poppy = 2
+spelunkery:andesite_zinc_ore = 2
+spelunkery:diorite_zinc_ore = 2
+spelunkery:granite_zinc_ore = 2
+spelunkery:tuff_zinc_ore = 2
+minecraft:blue_orchid = 2
+farmersdelight:brown_mushroom_colony = 2
+minecraft:dandelion = 2
+minecraft:orange_tulip = 2
+minecraft:pink_tulip = 2
+farmersdelight:red_mushroom_colony = 2
+minecraft:red_tulip = 2
+betternether:gloomwood_transition_log = 2
+betternether:mushroom_fir_stem = 2
+betternether:nether_mushroom_stem = 2
+betternether:stalagnate_stem = 2
+minecraft:white_tulip = 2
+farmersdelight:wild_beetroots = 2
+farmersdelight:wild_cabbages = 2
+farmersdelight:wild_carrots = 2
+farmersdelight:wild_onions = 2
+farmersdelight:wild_potatoes = 2
+farmersdelight:wild_rice = 2
+farmersdelight:wild_tomatoes = 2
+aquamirae:elodea = 2
+irons_spellbooks:decrepit_scythe = 2
+minecraft:dead_bush = 2
+minecraft:amethyst_cluster = 2
+irons_spellbooks:rotten_spell_book = 2
+farm_and_charm:wild_barley = 2
+farm_and_charm:wild_beetroots = 2
+farm_and_charm:wild_carrots = 2
+farm_and_charm:wild_corn = 2
+farm_and_charm:wild_emmer = 2
+farm_and_charm:wild_lettuce = 2
+farm_and_charm:wild_oat = 2
+farm_and_charm:wild_onions = 2
+farm_and_charm:wild_potatoes = 2
+farm_and_charm:wild_ribwort = 2
+farm_and_charm:wild_strawberries = 2
+farm_and_charm:wild_tomatoes = 2
+minecraft:podzol = 2
+minecraft:sculk_vein = 2
+spelunkery:portal_fluid_bottle = 6
+crittersandcompanions:pearl = 2
+artifacts:everlasting_beef = 54
+minecraft:crimson_fungus = 2
+minecraft:warped_fungus = 2
+minecraft:tadpole_bucket = 2
+spmovesets:fragmento_llave = 2
+supplementaries:antique_ink = 2
+betternether:gloomsculk_geode_crystal = 2
+betternether:gloomsculk_geode = 2
+crittersandcompanions:silk = 2
+minecraft:grass = 2
+aquamirae:wisteria_niveis = 2
+simplehats:hatscraps_common = 2
+simplehats:hatscraps_easter = 2
+simplehats:hatscraps_festive = 2
+simplehats:hatscraps_halloween = 2
+simplehats:hatscraps_summer = 2
+betternether:hook_mushroom = 2
+supplementaries:bamboo_spikes_tipped = 2
+arcanevortex:limestone = 2
+aquamirae:oxygelium = 2
+minecraft:lilac = 2
+minecraft:fern = 2
+minecraft:large_fern = 2
+minecraft:peony = 2
+minecraft:rose_bush = 2
+minecraft:vine = 2
+minecraft:mangrove_roots = 2
+adorablehamsterpets:music_disc_blue_cheese = 2
+adorablehamsterpets:music_disc_parmesan = 2
+irons_spellbooks:disc_fragment_flame_still_burns = 2
+idas:disc_fragment_slither = 2
+arcanevortex:neon_frame = 2
+spelunkery:raw_nephrite = 2
+arcanevortex:polished_calcite = 2
+farm_and_charm:wild_nettle = 2
+create:pulp = 2
+arcanevortex:quantum_lattice_block = 2
+rpg_companions_tiny_dragons:dragon_skull = 2
+arcanevortex:reinforced_ash_planks = 2
+block_factorys_bosses:bone_remains_legs = 2
+block_factorys_bosses:bone_remains_rib_cage = 2
+block_factorys_bosses:bone_remains = 2
+arcanevortex:riveted_steel = 2
+crittersandcompanions:sea_bunny_slime_bottle = 2
+aquamirae:jellyfish_jelly = 30
+create:powdered_obsidian = 2
+crittersandcompanions:snail_slime_bottle = 2
+quark:dirty_shard = 2
+minecraft:filled_map = 2
+minecraft:tipped_arrow = 2
+minecraft:soul_soil = 2
+minecraft:cobweb = 2
+arcanevortex:sunbaked_tile = 2
+spmovesets:fruta_nita = 12
+spmovesets:fruta_vita = 12
+spmovesets:fruta_lectro = 12
+spmovesets:fruta_pyro = 12
+spmovesets:fruta_sonna = 12
+spmovesets:fruta_darky = 12
+spmovesets:fruta_nebu = 12
+spmovesets:fruta_nowy = 12
+spmovesets:fruta_goddy = 12
+spmovesets:fruta_atsu = 12
+spmovesets:fruta_ope = 12
+spmovesets:fruta_zyra = 12
+quark:diamond_heart = 2
+quark:black_shard = 2
+quark:blue_shard = 2
+quark:brown_shard = 2
+quark:cyan_shard = 2
+quark:gray_shard = 2
+quark:green_shard = 2
+quark:light_blue_shard = 2
+quark:light_gray_shard = 2
+quark:lime_shard = 2
+quark:magenta_shard = 2
+quark:orange_shard = 2
+quark:pink_shard = 2
+quark:purple_shard = 2
+quark:red_shard = 2
+quark:white_shard = 2
+quark:yellow_shard = 2
+adorablehamsterpets:sunflower_block = 2
+arcanevortex:void_obsidian = 2
+arcanevortex:voodoo_tile = 2
+betternether:nether_grass = 2
+betternether:whispering_gourd = 2
+
+# 해석하지 못한 레시피 종류 (종류 = 개수). 이 조리법으로 만드는 물건은 원가 계산에 반영되지 않습니다.
+amendments:dye_bottle = 1
+aquamirae:rune_smithing = 1
+arcanevortex:genesis_recipe = 1
+arcanevortex:van_sh_workbench_shaped = 2
+cataclysm:amethyst_bless = 1
+create:compacting = 5
+create:filling = 29
+create:item_copying = 1
+create:mixing = 11
+create:splashing = 1
+create:toolbox_dyeing = 1
+fantasy:scent_lure = 1
+farmersdelight:dough = 1
+farmersdelight:food_serving = 1
+fdbosses:weapon_core = 1
+irons_spellbooks:alchemist_cauldron_brew = 15
+kaleidoscope_tavern:pressing_tub = 6
+minecraft:crafting_decorated_pot = 1
+minecraft:crafting_special_armordye = 1
+minecraft:crafting_special_bannerduplicate = 1
+minecraft:crafting_special_bookcloning = 1
+minecraft:crafting_special_firework_rocket = 1
+minecraft:crafting_special_firework_star = 1
+minecraft:crafting_special_firework_star_fade = 1
+minecraft:crafting_special_mapcloning = 1
+minecraft:crafting_special_mapextending = 1
+minecraft:crafting_special_repairitem = 1
+minecraft:crafting_special_shielddecoration = 1
+minecraft:crafting_special_shulkerboxcoloring = 1
+minecraft:crafting_special_suspiciousstew = 1
+minecraft:crafting_special_tippedarrow = 1
+minecraft:smithing_trim = 16
+miningmaster:gem_smithing_recipe = 13
+quark:dye_item = 1
+quark:elytra_duplication = 1
+quark:mixed_exclusion = 3
+quark:slab_to_block = 1
+quark:smithing_rune = 18
+simplehats:custom_hatscraps = 1
+simplehats:custom_hatvariants = 1
+supplementaries:antique_book = 1
+supplementaries:bamboo_spikes_tipped = 1
+supplementaries:blackboard_duplicate = 1
+supplementaries:bubble_blower_charge = 1
+supplementaries:flag_from_banner = 1
+supplementaries:item_lore = 1
+supplementaries:present_dye = 1
+supplementaries:rope_arrow_add = 1
+supplementaries:rope_arrow_create = 1
+supplementaries:safe = 1
+supplementaries:soap_clearing = 1
+supplementaries:trapped_present = 1
+supplementaries:weathered_map = 1
+tacz:ammo_storage_upgrade = 2
+tacz:gun_pegboard_dye = 1
+tacz:gun_smith_table_crafting = 219

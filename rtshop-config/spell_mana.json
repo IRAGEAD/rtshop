@@ -1,0 +1,13 @@
+{
+  "_help": "마나 통일: RPG Series(Spell Engine: 마법사·성기사·도적·궁수 무기의 주문)도 Iron's Spells 의 마나를 쓴다. enabled 를 false 로 하면 끈다. tierMana: 주문 등급(tier)별 마나. spellMana: 주문 ID 별 예외 (예: \"wizards:fireball\": 15, 0 이면 마나를 쓰지 않음). channelPercent: 집중(계속 쏘는) 주문이 한 번 나갈 때마다 드는 몫(등급 마나의 %). 룬·쿨타임은 원래대로다. 고친 뒤 /rtshop reload.",
+  "enabled": true,
+  "tierMana": {
+    "0": 8,
+    "1": 12,
+    "2": 20,
+    "3": 32,
+    "4": 48
+  },
+  "spellMana": {},
+  "channelPercent": 25
+}

@@ -1,0 +1,206 @@
+{
+  "_help": "결계: flag 표식이 없는 사람은 bosses 의 보스에게 다가가거나 blocks 의 블록(보스 소환)을 쓸 수 없다. 그 표식을 주는 퀘스트가 있을 때만 켜진다 (always: true 면 늘). rewardOnly: 퀘스트 보상으로만 얻게 조합법을 막을 물건 (그 물건을 주는 퀘스트가 있을 때만). partyCarry: 표식을 가진 파티원이 carryRadius 안에 있으면 함께 지나간다. 저장한 뒤 /rtshop reload",
+  "enabled": true,
+  "rewardOnly": [
+    "cataclysm:monstrous_eye",
+    "cataclysm:desert_eye",
+    "cataclysm:mech_eye",
+    "cataclysm:abyss_eye",
+    "cataclysm:void_eye",
+    "cataclysm:cursed_eye",
+    "cataclysm:flame_eye",
+    "cataclysm:storm_eye"
+  ],
+  "partyCarry": true,
+  "carryRadius": 48,
+  "seals": {
+    "wroughtnaut": {
+      "flag": "seal_wroughtnaut",
+      "message": "녹슨 문 앞에 보이지 않는 벽이 있다. 수도회의 기록관이 먼저 할 이야기가 있다고 했다.",
+      "bosses": [
+        "mowziesmobs:ferrous_wroughtnaut"
+      ],
+      "blocks": [],
+      "structures": [
+        "mowziesmobs:wrought_chamber"
+      ],
+      "radius": 20
+    },
+    "frostmaw": {
+      "flag": "seal_frostmaw",
+      "message": "눈보라가 길을 막는다. 거인이 품은 것이 무엇인지 아직 모른다.",
+      "bosses": [
+        "mowziesmobs:frostmaw"
+      ],
+      "blocks": [],
+      "structures": [
+        "mowziesmobs:frostmaw_spawn"
+      ],
+      "radius": 28
+    },
+    "umvuthi": {
+      "flag": "seal_umvuthi",
+      "message": "태양 가면의 부족이 이방인을 들이지 않는다. 탐험대장의 소개장이 필요하다.",
+      "bosses": [
+        "mowziesmobs:umvuthi"
+      ],
+      "blocks": [],
+      "structures": [
+        "mowziesmobs:umvuthana_grove"
+      ],
+      "radius": 24
+    },
+    "sculptor": {
+      "flag": "seal_sculptor",
+      "message": "산꼭대기의 바람이 등을 떠민다. 아직 오를 때가 아니다.",
+      "bosses": [
+        "mowziesmobs:sculptor"
+      ],
+      "blocks": [],
+      "structures": [
+        "mowziesmobs:monastery"
+      ],
+      "radius": 24
+    },
+    "cornelia": {
+      "flag": "seal_cornelia",
+      "message": "얼음 위의 유령선이 안개 속으로 물러난다. 선장의 이름을 아직 모른다.",
+      "bosses": [
+        "aquamirae:captain_cornelia"
+      ],
+      "blocks": [],
+      "structures": [
+        "aquamirae:ship"
+      ],
+      "radius": 28
+    },
+    "maze_mother": {
+      "flag": "seal_maze_mother",
+      "message": "물 밑의 미로가 닫혀 있다.",
+      "bosses": [
+        "aquamirae:maze_mother"
+      ],
+      "blocks": [],
+      "radius": 24
+    },
+    "netherite_monstrosity": {
+      "flag": "seal_monstrosity",
+      "message": "대장간의 불이 꺼져 있다. 봉인의 순서를 지켜야 한다.",
+      "bosses": [
+        "cataclysm:netherite_monstrosity"
+      ],
+      "blocks": [],
+      "structures": [
+        "cataclysm:soul_black_smith"
+      ],
+      "radius": 28
+    },
+    "ender_guardian": {
+      "flag": "seal_ender_guardian",
+      "message": "공허의 제단이 응답하지 않는다. 봉인의 순서를 지켜야 한다.",
+      "bosses": [
+        "cataclysm:ender_guardian"
+      ],
+      "blocks": [
+        "cataclysm:altar_of_void"
+      ],
+      "structures": [
+        "cataclysm:ruined_citadel"
+      ],
+      "radius": 28
+    },
+    "harbinger": {
+      "flag": "seal_harbinger",
+      "message": "기계의 심장이 잠들어 있다. 봉인의 순서를 지켜야 한다.",
+      "bosses": [
+        "cataclysm:the_harbinger"
+      ],
+      "blocks": [],
+      "structures": [
+        "cataclysm:ancient_factory"
+      ],
+      "radius": 28
+    },
+    "leviathan": {
+      "flag": "seal_leviathan",
+      "message": "심연의 제단이 차갑다. 봉인의 순서를 지켜야 한다.",
+      "bosses": [
+        "cataclysm:the_leviathan"
+      ],
+      "blocks": [
+        "cataclysm:altar_of_abyss"
+      ],
+      "structures": [
+        "cataclysm:sunken_city"
+      ],
+      "radius": 32
+    },
+    "ancient_remnant": {
+      "flag": "seal_remnant",
+      "message": "봉인의 문이 꿈쩍도 하지 않는다. 봉인의 순서를 지켜야 한다.",
+      "bosses": [
+        "cataclysm:ancient_remnant"
+      ],
+      "blocks": [
+        "cataclysm:door_of_seal",
+        "cataclysm:door_of_seal_part"
+      ],
+      "structures": [
+        "cataclysm:cursed_pyramid"
+      ],
+      "radius": 28
+    },
+    "maledictus": {
+      "flag": "seal_maledictus",
+      "message": "저주받은 묘비가 침묵한다. 봉인의 순서를 지켜야 한다.",
+      "bosses": [
+        "cataclysm:maledictus"
+      ],
+      "blocks": [
+        "cataclysm:cursed_tombstone"
+      ],
+      "structures": [
+        "cataclysm:frosted_prison"
+      ],
+      "radius": 28
+    },
+    "ignis": {
+      "flag": "seal_ignis",
+      "message": "불의 제단이 당신을 밀어낸다. 여섯 눈이 감기기 전에는 이 문이 열리지 않는다.",
+      "bosses": [
+        "cataclysm:ignis"
+      ],
+      "blocks": [
+        "cataclysm:altar_of_fire"
+      ],
+      "structures": [
+        "cataclysm:burning_arena"
+      ],
+      "radius": 32
+    },
+    "scylla": {
+      "flag": "seal_scylla",
+      "message": "폭풍이 당신을 알아보지 못한다. 지워진 이름을 먼저 찾아야 한다.",
+      "bosses": [
+        "cataclysm:scylla"
+      ],
+      "blocks": [],
+      "structures": [
+        "cataclysm:acropolis"
+      ],
+      "radius": 32
+    },
+    "illusioner": {
+      "flag": "seal_illusioner",
+      "message": "저택이 보랏빛 안개에 싸여 있다. 거울이 당신의 얼굴을 비추지 않는다. 연대기의 빈 쪽을 먼저 찾아야 한다.",
+      "bosses": [
+        "illusioner:illusioner"
+      ],
+      "blocks": [],
+      "structures": [
+        "minecraft:mansion"
+      ],
+      "radius": 24
+    }
+  }
+}

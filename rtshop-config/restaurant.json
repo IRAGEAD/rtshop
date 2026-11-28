@@ -1,0 +1,26 @@
+{
+  "_설명": [
+    "식당 주인 (/rtshop npc restaurant): 요리사(sellJob) 직업을 가진 플레이어만 요리를 팔 수 있고, 식품 상인보다 bonus(0.05 = 5%) 더 받습니다. 요리사 패시브 보너스와는 따로 곱해집니다.",
+    "처음에는 아무것도 팔지 않습니다. 요리사가 한 번이라도 판 요리가 메뉴에 하나씩 올라가고, 메뉴에 오른 요리는 직업과 상관없이 누구나 살 수 있습니다.",
+    "품목과 가격은 sourceShop(식품 상인)의 categories(요리·음료) 구분에서 가져옵니다. priceMultiplier: 식당 판매가 = 식품 상인 판매가 × 이 값",
+    "sourceSellsDishes: false(기본, 3.84) 면 식품 상인은 요리·음료를 사 주기만 하고 팔지 않습니다 — 요리는 식당에서만 삽니다. true 면 식품 상인도 팝니다.",
+    "vanillaAlways (3.84): true 면 빵 · 구운 고기 같은 바닐라 음식은 요리사가 팔지 않아도 처음부터 식당 메뉴에 있습니다.",
+    "메뉴 관리 (OP): /rtshop restaurant status · unlock <아이템> · unlock all · lock <아이템> · reset"
+  ],
+  "configVersion": 2,
+  "enabled": true,
+  "sourceShop": "food",
+  "categories": [
+    "dish",
+    "drink"
+  ],
+  "sellJob": "cook",
+  "bonus": 0.05,
+  "priceMultiplier": 1.0,
+  "title": "식당",
+  "npcName": "식당 주인",
+  "profession": "butcher",
+  "announce": true,
+  "sourceSellsDishes": false,
+  "vanillaAlways": true
+}

@@ -1,0 +1,78 @@
+{
+  "_help": [
+    "월드 규칙. neverStructures: 새 지형에 절대 생기지 않는 건축물 ID. neverRecipes: 막는 조합법 (item:아이템ID). lootBlockedMods: 전리품에서 빼는 모드 ID.",
+    "magicOnlyForMage (3.84 부터 기본 false): false 면 누구나 주문을 쓰되 마법사가 아니면 위력 · 시전 속도가 떨어진다 (jobs.json 의 nonMagePower · nonMageCastTime, 지팡이 없이는 noStaffPower). true 면 마법사 직업만 마법을 쓴다 (Iron's Spells 의 모든 주문, Spell Engine 의 마법 계열 주문; 근접·활 계열의 무기 기술은 누구나). 크리에이티브는 언제나 쓸 수 있다.",
+    "keepSkillStacks: true 면 무기를 바꿔도 특수기의 스택(충전 횟수)과 게이지가 사라지지 않는다: 그 무기를 다시 들면 돌아오고, 처음 드는 무기에는 방금 것의 스택이 넘어간다.",
+    "keepSkillsOnDeath: true 면 스킬북으로 배운 기술이 죽어도 사라지지 않는다 (서버가 켜질 때 Epic Fight 의 게임 규칙 keepSkills 를 켠다).",
+    "weaponManuals: true 면 특수기가 있는 무기(Epic Fight)를 처음 얻었을 때 그 무기의 설명서를 한 권 준다 (같은 종류·같은 특수기는 한 권).",
+    "bossesRiseRoll: false 면 Bosses'Rise 모드의 구르기(Dodge Roll, 기본 Z 키 · 핫바 오른쪽의 초록 화살표)를 서버에서 끈다 (서버가 켜질 때 그 모드의 Can use roll 을 끔). true 면 그 모드 설정 그대로.",
+    "spmovesetsStarterKit (3.84): false 면 spmovesets 가 접속할 때 주던 생존 시작 꾸러미(안내서 · 열매 뽑기 열쇠)를 주지 않는다. 이미 받은 것은 그대로.",
+    "vanillaHunger (3.84): true 면 배고픔이 바닐라처럼 닳는다 — Kaleidoscope Cookery 의 포만 보호막(맞으면 피해 대신 배고픔이 닳던 효과)과 RPG(Spell Engine) 주문의 배고픔 소모를 서버가 켜질 때 끈다.",
+    "vanillaBoatSpeed (3.84): true 면 Small Ships 가 바닐라 보트를 느리게 만드는 설정(vanilla boat slowdown)을 서버가 켜질 때 끈다.",
+    "welcomeShulker (3.84): true 면 처음 들어온 사람(이미 놀던 사람은 이 판에서 처음 들어올 때)에게 무작위 색의 셜커 상자를 하나씩 준다 (한 사람에 한 번).",
+    "spellItemCostOff (3.84): true 면 RPG 주문(Spell Engine)이 룬 같은 물건을 값으로 치르지 않는다 — 모드팩에 Runes 모드가 없어 '공기 부족'으로 주문이 막히던 것. 주문 값은 Iron's 마나(spell_mana.json).",
+    "abyssPortal: 나선 비경으로 들어갈 수 있는 단 하나의 문. 게임 안에서 문 앞에 서서 /rtshop abyss portal here (OP). abyssPortalOpOnly: 문은 운영자(크리에이티브)만 세울 수 있음.",
+    "enhanceAnvil: 쓸 수 있는 단 하나의 강화 모루. 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 모루 곁에서 /rtshop anvil here (풀기: /rtshop anvil clear). enhanceAnvilOpOnly: 운영자(크리에이티브)만 놓고 치울 수 있음.",
+    "runeAltar: 쓸 수 있는 단 하나의 룬 제단(별빛 수정 구체). 운영자가 처음 놓은 것이 자동으로 정해지고, 바꾸려면 새 제단 곁에서 /rtshop altar here. runeAltarOpOnly: 운영자(크리에이티브)만 놓을 수 있음.",
+    "이미 만들어진 지형에 있는 건축물은 사라지지 않습니다. 고친 뒤 /rtshop reload."
+  ],
+  "neverStructures": [
+    "spiral_abyss:ruined_portal",
+    "idas:tinkers_citadel",
+    "idas:tinkers_workshop",
+    "idas:train_ruins",
+    "idas:nether_pump_camp",
+    "idas:washing_camp"
+  ],
+  "neverRecipes": [
+    "item:spiral_abyss:abyss_gate_activate_block",
+    "item:spiral_abyss:abyss_gate_vertical",
+    "item:spiral_abyss:abyss_gate_horizontal",
+    "item:spiral_abyss:abyss_gate_curve"
+  ],
+  "lootBlockedMods": [
+    "create"
+  ],
+  "abyssPortalOpOnly": true,
+  "weaponManuals": true,
+  "bossesRiseRoll": false,
+  "keepSkillsOnDeath": true,
+  "rulesVersion": 2,
+  "magicOnlyForMage": false,
+  "keepSkillStacks": true,
+  "spmovesetsStarterKit": false,
+  "vanillaHunger": true,
+  "vanillaBoatSpeed": true,
+  "spellItemCostOff": true,
+  "welcomeShulker": true,
+  "abyssPortal": {
+    "set": false,
+    "dim": "minecraft:overworld",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "radius": 24
+  },
+  "runeAltarOpOnly": true,
+  "runeAltar": {
+    "set": false,
+    "dim": "minecraft:overworld",
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "enhanceAnvilOpOnly": true,
+  "enhanceAnvil": {
+    "set": false,
+    "dim": "minecraft:overworld",
+    "x": 0,
+    "y": 120,
+    "z": 4000
+  },
+  "textAnvilOnly": "강화 모루는 마을에 있는 하나뿐입니다. 그 모루를 이용하세요.",
+  "textAnvilBuild": "강화 모루는 새로 놓을 수 없습니다. 마을의 모루를 이용하세요.",
+  "textAltarOnly": "룬 제단은 마을에 있는 하나뿐입니다. 그 제단을 이용하세요.",
+  "textAltarBuild": "룬 제단은 새로 세울 수 없습니다. 마을의 제단을 이용하세요.",
+  "textPortalOnly": "나선 비경으로 가는 문은 마을에 있는 하나뿐입니다.",
+  "textPortalBuild": "나선 비경의 문은 새로 세울 수 없습니다. 마을의 문을 이용하세요."
+}

@@ -1,0 +1,650 @@
+# 상점: 장비 상점 (blacksmith)
+# 아이템 | 구매가 | 기본 매입가 | 구분 | 원가 | 가격 근거(레시피)
+minecraft:arrow | 5 | 2.50 | ammo | 3.75 | 
+minecraft:spectral_arrow | 50 | 25.00 | ammo | 41.88 | 
+minecraft:firework_rocket | 5 | 2.50 | ammo | 7.33 | 
+minecraft:coal | 50 | 25.00 | mineral | 50.00 | 
+minecraft:charcoal | 20 | 8.00 | mineral | 20.00 | 
+minecraft:raw_copper | 30 | 15.00 | mineral | 30.00 | 
+minecraft:copper_ingot | 30 | 15.00 | mineral | 30.00 | 
+minecraft:raw_iron | 150 | 75.00 | mineral | 150.00 | 
+minecraft:iron_ingot | 150 | 75.00 | mineral | 150.00 | 
+minecraft:raw_gold | 300 | 150.00 | mineral | 300.00 | 
+minecraft:gold_ingot | 300 | 150.00 | mineral | 300.00 | 
+minecraft:redstone | 40 | 20.00 | mineral | 40.00 | 
+minecraft:lapis_lazuli | 60 | 30.00 | mineral | 60.00 | 
+minecraft:quartz | 20 | 10.00 | mineral | 20.00 | 
+minecraft:amethyst_shard | 6 | 3.00 | mineral | 6.00 | 
+minecraft:diamond | 1000 | 500.00 | mineral | 1000.00 | 
+minecraft:netherite_scrap | 3000 | 1500.00 | mineral | 3000.00 | 
+minecraft:netherite_ingot | 13200 | 6600.00 | mineral | 13200.00 | 
+minecraft:netherite_upgrade_smithing_template | 7000 | 3500.00 | mineral | 7000.00 | 
+minecraft:flint | 10 | 1.00 | mineral | - | 
+minecraft:gunpowder | 20 | 2.00 | mineral | - | 
+minecraft:obsidian | 20 | 10.00 | mineral | 20.00 | 
+minecraft:glowstone_dust | 20 | 10.00 | mineral | 20.00 | 
+minecraft:emerald | - | 3.00 | mineral | - | 
+minecraft:coal_ore | - | 75.00 | mineral | - | 
+minecraft:deepslate_coal_ore | - | 75.00 | mineral | - | 
+minecraft:copper_ore | - | 90.00 | mineral | - | 
+minecraft:deepslate_copper_ore | - | 90.00 | mineral | - | 
+minecraft:iron_ore | - | 225.00 | mineral | - | 
+minecraft:deepslate_iron_ore | - | 225.00 | mineral | - | 
+minecraft:gold_ore | - | 450.00 | mineral | - | 
+minecraft:deepslate_gold_ore | - | 450.00 | mineral | - | 
+minecraft:nether_gold_ore | - | 150.00 | mineral | - | 
+minecraft:redstone_ore | - | 140.00 | mineral | - | 
+minecraft:deepslate_redstone_ore | - | 140.00 | mineral | - | 
+minecraft:lapis_ore | - | 210.00 | mineral | - | 
+minecraft:deepslate_lapis_ore | - | 210.00 | mineral | - | 
+minecraft:diamond_ore | - | 1000.00 | mineral | - | 
+minecraft:deepslate_diamond_ore | - | 1000.00 | mineral | - | 
+minecraft:nether_quartz_ore | - | 30.00 | mineral | - | 
+minecraft:ancient_debris | - | 600.00 | mineral | 600.00 | irons_spellbooks:ancient_debris_from_pyrium
+minecraft:emerald_ore | - | 400.00 | mineral | - | 
+minecraft:deepslate_emerald_ore | - | 400.00 | mineral | - | 
+rtshop:enhance_guard_damage | 15000 | - | enhance | - | 
+rtshop:enhance_guard_destroy | 4000 | - | enhance | - | 
+rtshop:enhance_guard_full | 35000 | - | enhance | - | 
+miningmaster:ice_sapphire | - | 600.00 | mineral | 1200.00 | 
+miningmaster:spirit_garnet | - | 600.00 | mineral | 1200.00 | 
+miningmaster:dive_aquamarine | - | 600.00 | mineral | 1200.00 | 
+miningmaster:spider_kunzite | - | 600.00 | mineral | 1200.00 | 
+miningmaster:fire_ruby | - | 1000.00 | mineral | 2000.00 | 
+miningmaster:haste_peridot | - | 1000.00 | mineral | 2000.00 | 
+miningmaster:lucky_citrine | - | 1000.00 | mineral | 2000.00 | 
+miningmaster:unbreaking_iolite | - | 1000.00 | mineral | 2000.00 | 
+miningmaster:heart_rhodonite | - | 1750.00 | mineral | 3500.00 | 
+miningmaster:power_pyrite | - | 1750.00 | mineral | 3500.00 | 
+miningmaster:kinetic_opal | - | 1750.00 | mineral | 3500.00 | 
+miningmaster:divine_beryl | - | 3000.00 | mineral | 6000.00 | 
+miningmaster:air_malachite | - | 3000.00 | mineral | 6000.00 | 
+spelunkery:salt | 40 | 20.00 | enhance | 40.00 | 
+spelunkery:raw_magnetite | 150 | 75.00 | enhance | 150.00 | 
+spelunkery:cinnabar | 300 | 60.54 | enhance | 60.54 | spelunkery:sandpaper_polishing/cinnabar
+spelunkery:sulfur | 250 | 125.00 | enhance | 250.00 | 
+spelunkery:rough_emerald | 2500 | 6.35 | enhance | 6.35 | spelunkery:rough_emerald_from_shard
+spelunkery:rough_diamond | 3000 | 1500.00 | enhance | 2117.65 | 
+archers:archer_armor_chest | 1600 | 372.67 | armor | 372.67 | archers:archer_armor_chest
+archers:archer_armor_feet | 1500 | 368.67 | armor | 368.67 | archers:archer_armor_feet
+archers:archer_armor_head | 1500 | 369.67 | armor | 369.67 | archers:archer_armor_head
+archers:archer_armor_legs | 2200 | 554.00 | armor | 554.00 | archers:archer_armor_legs
+archers:netherite_ranger_armor_chest | 202850 | 20287.00 | armor | 20287.00 | archers:netherite_ranger_armor_chest_smithing
+archers:netherite_ranger_armor_feet | 202400 | 20242.00 | armor | 20242.00 | archers:netherite_ranger_armor_feet_smithing
+archers:netherite_ranger_armor_head | 203050 | 20306.00 | armor | 20306.00 | archers:netherite_ranger_armor_head_smithing
+archers:netherite_ranger_armor_legs | 203100 | 20308.00 | armor | 20308.00 | archers:netherite_ranger_armor_legs_smithing
+archers:ranger_armor_chest | 2400 | 87.00 | armor | 87.00 | archers:ranger_armor_chest
+archers:ranger_armor_feet | 1350 | 42.00 | armor | 42.00 | archers:ranger_armor_feet
+archers:ranger_armor_head | 1200 | 106.00 | armor | 106.00 | archers:ranger_armor_head
+archers:ranger_armor_legs | 2300 | 108.00 | armor | 108.00 | archers:ranger_armor_legs
+armory_rpgs:absolution_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:absolution_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:absolution_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:absolution_robe_legs | 24750 | 4125.00 | armor | - | 
+armory_rpgs:astral_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:astral_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:astral_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:astral_robe_legs | 24750 | 4125.00 | armor | - | 
+armory_rpgs:avatar_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:avatar_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:avatar_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:avatar_robe_legs | 24750 | 4125.00 | armor | - | 
+armory_rpgs:deathmantle_armor_chest | 52500 | 8750.00 | armor | - | 
+armory_rpgs:deathmantle_armor_feet | 22500 | 3750.00 | armor | - | 
+armory_rpgs:deathmantle_armor_head | 19500 | 3250.00 | armor | - | 
+armory_rpgs:deathmantle_armor_legs | 49500 | 8250.00 | armor | - | 
+armory_rpgs:destroyer_armor_chest | 105000 | 17500.00 | armor | - | 
+armory_rpgs:destroyer_armor_feet | 22500 | 3750.00 | armor | - | 
+armory_rpgs:destroyer_armor_head | 29250 | 4875.00 | armor | - | 
+armory_rpgs:destroyer_armor_legs | 75000 | 12500.00 | armor | - | 
+armory_rpgs:glacier_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:glacier_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:glacier_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:glacier_robe_legs | 24750 | 4125.00 | armor | - | 
+armory_rpgs:justicar_armor_chest | 105000 | 17500.00 | armor | - | 
+armory_rpgs:justicar_armor_feet | 33000 | 5500.00 | armor | - | 
+armory_rpgs:justicar_armor_head | 29250 | 4875.00 | armor | - | 
+armory_rpgs:justicar_armor_legs | 75000 | 12500.00 | armor | - | 
+armory_rpgs:lightbringer_armor_chest | 105000 | 17500.00 | armor | - | 
+armory_rpgs:lightbringer_armor_feet | 33000 | 5500.00 | armor | - | 
+armory_rpgs:lightbringer_armor_head | 29250 | 4875.00 | armor | - | 
+armory_rpgs:lightbringer_armor_legs | 75000 | 12500.00 | armor | - | 
+armory_rpgs:onslaught_armor_chest | 105000 | 17500.00 | armor | - | 
+armory_rpgs:onslaught_armor_feet | 22500 | 3750.00 | armor | - | 
+armory_rpgs:onslaught_armor_head | 29250 | 4875.00 | armor | - | 
+armory_rpgs:onslaught_armor_legs | 75000 | 12500.00 | armor | - | 
+armory_rpgs:riftstalker_armor_chest | 52500 | 8750.00 | armor | - | 
+armory_rpgs:riftstalker_armor_feet | 22500 | 3750.00 | armor | - | 
+armory_rpgs:riftstalker_armor_head | 19500 | 3250.00 | armor | - | 
+armory_rpgs:riftstalker_armor_legs | 49500 | 8250.00 | armor | - | 
+armory_rpgs:rimeweave_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:rimeweave_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:rimeweave_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:rimeweave_robe_legs | 24750 | 4125.00 | armor | - | 
+armory_rpgs:scarlet_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:scarlet_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:scarlet_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:scarlet_robe_legs | 24750 | 4125.00 | armor | - | 
+armory_rpgs:slayer_armor_chest | 52500 | 8750.00 | armor | - | 
+armory_rpgs:slayer_armor_feet | 22500 | 3750.00 | armor | - | 
+armory_rpgs:slayer_armor_head | 19500 | 3250.00 | armor | - | 
+armory_rpgs:slayer_armor_legs | 49500 | 8250.00 | armor | - | 
+armory_rpgs:smouldering_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:smouldering_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:smouldering_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:smouldering_robe_legs | 24750 | 4125.00 | armor | - | 
+armory_rpgs:strider_armor_chest | 52500 | 8750.00 | armor | - | 
+armory_rpgs:strider_armor_feet | 22500 | 3750.00 | armor | - | 
+armory_rpgs:strider_armor_head | 19500 | 3250.00 | armor | - | 
+armory_rpgs:strider_armor_legs | 49500 | 8250.00 | armor | - | 
+armory_rpgs:tempest_robe_chest | 39750 | 6625.00 | armor | - | 
+armory_rpgs:tempest_robe_feet | 7400 | 1850.00 | armor | - | 
+armory_rpgs:tempest_robe_head | 6500 | 1625.00 | armor | - | 
+armory_rpgs:tempest_robe_legs | 24750 | 4125.00 | armor | - | 
+crittersandcompanions:acorn_hat | 170 | 42.50 | armor | - | 
+epicfight:stray_hat | 170 | 42.50 | armor | - | 
+epicfight:stray_pants | 350 | 87.50 | armor | - | 
+epicfight:stray_robe | 550 | 137.50 | armor | - | 
+farm_and_charm:dungarees | 1050 | 262.50 | armor | - | 
+irons_spellbooks:archevoker_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:archevoker_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:archevoker_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:archevoker_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:cryomancer_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:cryomancer_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:cryomancer_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:cryomancer_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:cultist_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:cultist_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:cultist_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:cultist_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:electromancer_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:electromancer_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:electromancer_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:electromancer_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:gold_crown | 860 | 215.00 | armor | - | 
+irons_spellbooks:netherite_mage_boots | 216500 | 21650.00 | armor | 21650.00 | irons_spellbooks:netherite_mage_boots
+irons_spellbooks:netherite_mage_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 108750 | 18125.00 | armor | - | 
+irons_spellbooks:netherite_mage_helmet | 214500 | 21450.00 | armor | 21450.00 | irons_spellbooks:netherite_mage_helmet
+irons_spellbooks:netherite_mage_leggings | 230200 | 23021.00 | armor | 23021.00 | irons_spellbooks:netherite_mage_leggings
+irons_spellbooks:plagued_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:plagued_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:plagued_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:plagued_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:priest_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:priest_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:priest_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:priest_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:pumpkin_boots | 6100 | 1526.00 | armor | 1526.00 | irons_spellbooks:pumpkin_boots
+irons_spellbooks:pumpkin_chestplate | 9350 | 2334.00 | armor | 2334.00 | irons_spellbooks:pumpkin_chestplate
+irons_spellbooks:pumpkin_helmet | 4850 | 1218.00 | armor | 1218.00 | irons_spellbooks:pumpkin_helmet
+irons_spellbooks:pumpkin_leggings | 6100 | 1529.00 | armor | 1529.00 | irons_spellbooks:pumpkin_leggings
+irons_spellbooks:pyromancer_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:pyromancer_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:pyromancer_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:pyromancer_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:shadowwalker_boots | 2900 | 725.00 | armor | - | 
+irons_spellbooks:shadowwalker_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:shadowwalker_helmet | 2500 | 625.00 | armor | - | 
+irons_spellbooks:shadowwalker_leggings | 6400 | 1600.00 | armor | - | 
+irons_spellbooks:tarnished_helmet {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 320 | 80.00 | armor | - | 
+irons_spellbooks:wandering_magician_boots | 650 | 54.00 | armor | 54.00 | irons_spellbooks:wandering_magician_boots
+irons_spellbooks:wandering_magician_chestplate | 1900 | 58.00 | armor | 58.00 | irons_spellbooks:wandering_magician_chestplate
+irons_spellbooks:wandering_magician_helmet | 570 | 55.00 | armor | 55.00 | irons_spellbooks:wandering_magician_helmet
+irons_spellbooks:wandering_magician_leggings | 2200 | 57.00 | armor | 57.00 | irons_spellbooks:wandering_magician_leggings
+irons_spellbooks:wizard_boots | 6450 | 1612.00 | armor | 1612.00 | irons_spellbooks:wizard_boots
+irons_spellbooks:wizard_chestplate {Damage:0,"irons_spellbooks:spell_container":{data:[],maxSpells:1,mustEquip:1b,spellWheel:1b}} | 9000 | 2250.00 | armor | - | 
+irons_spellbooks:wizard_hat {Damage:0,"irons_spellbooks:clothing_variant":"hat"} | 2500 | 625.00 | armor | - | 
+irons_spellbooks:wizard_helmet | 8050 | 2015.00 | armor | 2015.00 | irons_spellbooks:wizard_helmet_hood
+irons_spellbooks:wizard_leggings | 16950 | 2821.00 | armor | 2821.00 | irons_spellbooks:wizard_leggings
+kaleidoscope_cookery:farmer_boots | 1200 | 302.00 | armor | 302.00 | kaleidoscope_cookery:farmer_boots
+kaleidoscope_cookery:farmer_chest_plate | 2200 | 306.00 | armor | 306.00 | kaleidoscope_cookery:farmer_chest_plate
+kaleidoscope_cookery:farmer_leggings | 2600 | 156.00 | armor | 156.00 | kaleidoscope_cookery:farmer_leggings
+kaleidoscope_cookery:straw_hat | 1200 | 161.00 | armor | 161.00 | kaleidoscope_cookery:straw_hat
+kaleidoscope_cookery:straw_hat_flower | 2250 | 561.00 | armor | 561.00 | kaleidoscope_cookery:straw_hat_flower
+minecraft:chainmail_boots | 450 | 112.50 | armor | - | 
+minecraft:chainmail_chestplate | 2700 | 675.00 | armor | - | 
+minecraft:chainmail_helmet | 790 | 197.50 | armor | - | 
+minecraft:chainmail_leggings | 2000 | 500.00 | armor | - | 
+minecraft:diamond_boots | 24000 | 4000.00 | armor | 4000.00 | minecraft:diamond_boots
+minecraft:diamond_chestplate | 48000 | 8000.00 | armor | 8000.00 | minecraft:diamond_chestplate
+minecraft:diamond_helmet | 30000 | 5000.00 | armor | 5000.00 | minecraft:diamond_helmet
+minecraft:diamond_leggings | 42000 | 7000.00 | armor | 7000.00 | minecraft:diamond_leggings
+minecraft:golden_boots | 4800 | 1200.00 | armor | 1200.00 | minecraft:golden_boots
+minecraft:golden_chestplate | 9600 | 2400.00 | armor | 2400.00 | minecraft:golden_chestplate
+minecraft:golden_helmet | 6000 | 1500.00 | armor | 1500.00 | minecraft:golden_helmet
+minecraft:golden_leggings | 8400 | 2100.00 | armor | 2100.00 | minecraft:golden_leggings
+minecraft:iron_boots | 2400 | 600.00 | armor | 600.00 | minecraft:iron_boots
+minecraft:iron_chestplate | 4800 | 1200.00 | armor | 1200.00 | minecraft:iron_chestplate
+minecraft:iron_helmet | 3000 | 750.00 | armor | 750.00 | minecraft:iron_helmet
+minecraft:iron_leggings | 4200 | 1050.00 | armor | 1050.00 | minecraft:iron_leggings
+minecraft:leather_boots | 16 | 4.00 | armor | 4.00 | minecraft:leather_boots
+minecraft:leather_chestplate | 32 | 8.00 | armor | 8.00 | minecraft:leather_chestplate
+minecraft:leather_helmet | 20 | 5.00 | armor | 5.00 | minecraft:leather_helmet
+minecraft:leather_leggings | 28 | 7.00 | armor | 7.00 | minecraft:leather_leggings
+minecraft:netherite_boots | 242000 | 24200.00 | armor | 24200.00 | minecraft:netherite_boots_smithing
+minecraft:netherite_chestplate | 282000 | 28200.00 | armor | 28200.00 | minecraft:netherite_chestplate_smithing
+minecraft:netherite_helmet | 247000 | 24700.00 | armor | 24700.00 | minecraft:netherite_helmet_smithing
+minecraft:netherite_leggings | 272000 | 27200.00 | armor | 27200.00 | minecraft:netherite_leggings_smithing
+minecraft:shulker_shell | 1650 | 825.00 | armor | - | 
+minecraft:turtle_helmet | 1200 | 210.00 | armor | 210.00 | minecraft:turtle_helmet
+miningmaster:paragon_boots | 254000 | 25400.00 | armor | 25400.00 | miningmaster:forging/paragon_boots
+miningmaster:paragon_chestplate | 268000 | 26800.00 | armor | 26800.00 | miningmaster:forging/paragon_chestplate
+miningmaster:paragon_helmet | 107400 | 17900.00 | armor | 17900.00 | miningmaster:forging/paragon_helmet
+miningmaster:paragon_leggings | 262000 | 26200.00 | armor | 26200.00 | miningmaster:forging/paragon_leggings
+mowziesmobs:geomancer_beads | - | 1825.00 | armor | - | 
+mowziesmobs:umvuthana_mask_bliss | - | 42.50 | armor | - | 
+mowziesmobs:umvuthana_mask_faith | - | 42.50 | armor | - | 
+mowziesmobs:umvuthana_mask_fear | - | 42.50 | armor | - | 
+mowziesmobs:umvuthana_mask_fury | - | 42.50 | armor | - | 
+mowziesmobs:umvuthana_mask_misery | - | 42.50 | armor | - | 
+mowziesmobs:umvuthana_mask_rage | - | 42.50 | armor | - | 
+paladins:crusader_armor_chest | 7200 | 1800.00 | armor | 1800.00 | paladins:crusader_armor_chest
+paladins:crusader_armor_feet | 3600 | 900.00 | armor | 900.00 | paladins:crusader_armor_feet
+paladins:crusader_armor_head | 6600 | 1650.00 | armor | 1650.00 | paladins:crusader_armor_head
+paladins:crusader_armor_legs | 7200 | 1800.00 | armor | 1800.00 | paladins:crusader_armor_legs
+paladins:netherite_crusader_armor_chest | 220000 | 22000.00 | armor | 22000.00 | paladins:netherite_crusader_armor_chest_smithing
+paladins:netherite_crusader_armor_feet | 211000 | 21100.00 | armor | 21100.00 | paladins:netherite_crusader_armor_feet_smithing
+paladins:netherite_crusader_armor_head | 211000 | 21100.00 | armor | 21100.00 | paladins:netherite_crusader_armor_head_smithing
+paladins:netherite_crusader_armor_legs | 220000 | 22000.00 | armor | 22000.00 | paladins:netherite_crusader_armor_legs_smithing
+paladins:netherite_prior_robe_chest | 211150 | 21115.00 | armor | 21115.00 | paladins:netherite_prior_robe_chest_smithing
+paladins:netherite_prior_robe_feet | 204850 | 20485.00 | armor | 20485.00 | paladins:netherite_prior_robe_feet_smithing
+paladins:netherite_prior_robe_head | 204500 | 20450.00 | armor | 20450.00 | paladins:netherite_prior_robe_head_smithing
+paladins:netherite_prior_robe_legs | 208250 | 20825.00 | armor | 20825.00 | paladins:netherite_prior_robe_legs_smithing
+paladins:paladin_armor_chest | 4300 | 1080.00 | armor | 1080.00 | paladins:paladin_armor_chest
+paladins:paladin_armor_feet | 1450 | 360.00 | armor | 360.00 | paladins:paladin_armor_feet
+paladins:paladin_armor_head | 2500 | 630.00 | armor | 630.00 | paladins:paladin_armor_head
+paladins:paladin_armor_legs | 2750 | 690.00 | armor | 690.00 | paladins:paladin_armor_legs
+paladins:priest_robe_chest | 1550 | 384.67 | armor | 384.67 | paladins:priest_robe_chest
+paladins:priest_robe_feet | 1500 | 372.67 | armor | 372.67 | paladins:priest_robe_feet
+paladins:priest_robe_head | 780 | 195.33 | armor | 195.33 | paladins:priest_robe_head
+paladins:priest_robe_legs | 2250 | 562.00 | armor | 562.00 | paladins:priest_robe_legs
+paladins:prior_robe_chest | 3650 | 915.00 | armor | 915.00 | paladins:prior_robe_chest
+paladins:prior_robe_feet | 2400 | 606.00 | armor | 606.00 | paladins:prior_robe_feet
+paladins:prior_robe_head | 3600 | 906.00 | armor | 906.00 | paladins:prior_robe_head
+paladins:prior_robe_legs | 3650 | 912.00 | armor | 912.00 | paladins:prior_robe_legs
+quark:backpack | 1650 | 412.50 | armor | - | 
+quark:forgotten_hat | 410 | 102.50 | armor | - | 
+rogues:assassin_armor_chest | 3200 | 408.00 | armor | 408.00 | rogues:assassin_armor_chest
+rogues:assassin_armor_feet | 2600 | 644.00 | armor | 644.00 | rogues:assassin_armor_feet
+rogues:assassin_armor_head | 1400 | 348.00 | armor | 348.00 | rogues:assassin_armor_head
+rogues:assassin_armor_legs | 3100 | 388.00 | armor | 388.00 | rogues:assassin_armor_legs
+rogues:berserker_armor_chest | 39300 | 6553.00 | armor | 6553.00 | rogues:berserker_armor_chest
+rogues:berserker_armor_feet | 38200 | 6366.67 | armor | 6366.67 | rogues:berserker_armor_feet
+rogues:berserker_armor_head | 26200 | 4366.67 | armor | 4366.67 | rogues:berserker_armor_head
+rogues:berserker_armor_legs | 41500 | 6916.67 | armor | 6916.67 | rogues:berserker_armor_legs
+rogues:netherite_assassin_armor_chest | 206100 | 20608.00 | armor | 20608.00 | rogues:netherite_assassin_armor_chest_smithing
+rogues:netherite_assassin_armor_feet | 208450 | 20844.00 | armor | 20844.00 | rogues:netherite_assassin_armor_feet_smithing
+rogues:netherite_assassin_armor_head | 205500 | 20548.00 | armor | 20548.00 | rogues:netherite_assassin_armor_head_smithing
+rogues:netherite_assassin_armor_legs | 205900 | 20588.00 | armor | 20588.00 | rogues:netherite_assassin_armor_legs_smithing
+rogues:netherite_berserker_armor_chest | 234000 | 23400.00 | armor | 23400.00 | rogues:netherite_berserker_armor_chest_smithing
+rogues:netherite_berserker_armor_feet | 208750 | 20875.00 | armor | 20875.00 | rogues:netherite_berserker_armor_feet_smithing
+rogues:netherite_berserker_armor_head | 211000 | 21100.00 | armor | 21100.00 | rogues:netherite_berserker_armor_head_smithing
+rogues:netherite_berserker_armor_legs | 225000 | 22500.00 | armor | 22500.00 | rogues:netherite_berserker_armor_legs_smithing
+rogues:rogue_armor_chest | 1600 | 14.00 | armor | 14.00 | rogues:rogue_armor_chest
+rogues:rogue_armor_feet | 450 | 8.00 | armor | 8.00 | rogues:rogue_armor_feet
+rogues:rogue_armor_head | 390 | 13.00 | armor | 13.00 | rogues:rogue_armor_head
+rogues:rogue_armor_legs | 1500 | 17.00 | armor | 17.00 | rogues:rogue_armor_legs
+rogues:warrior_armor_chest | 2700 | 455.00 | armor | 455.00 | rogues:warrior_armor_chest
+rogues:warrior_armor_feet | 1200 | 302.00 | armor | 302.00 | rogues:warrior_armor_feet
+rogues:warrior_armor_head | 2400 | 601.00 | armor | 601.00 | rogues:warrior_armor_head
+rogues:warrior_armor_legs | 3000 | 752.00 | armor | 752.00 | rogues:warrior_armor_legs
+wizards:arcane_robe_chest | 2000 | 75.00 | armor | 75.00 | wizards:arcane_robe_chest
+wizards:arcane_robe_feet | 570 | 46.00 | armor | 46.00 | wizards:arcane_robe_feet
+wizards:arcane_robe_head | 500 | 32.00 | armor | 32.00 | wizards:arcane_robe_head
+wizards:arcane_robe_legs | 1250 | 72.00 | armor | 72.00 | wizards:arcane_robe_legs
+wizards:fire_robe_chest | 2000 | 165.00 | armor | 165.00 | wizards:fire_robe_chest
+wizards:fire_robe_feet | 570 | 106.00 | armor | 106.00 | wizards:fire_robe_feet
+wizards:fire_robe_head | 500 | 62.00 | armor | 62.00 | wizards:fire_robe_head
+wizards:fire_robe_legs | 1250 | 162.00 | armor | 162.00 | wizards:fire_robe_legs
+wizards:frost_robe_chest | 2000 | 27.00 | armor | 27.00 | wizards:frost_robe_chest
+wizards:frost_robe_feet | 570 | 14.00 | armor | 14.00 | wizards:frost_robe_feet
+wizards:frost_robe_head | 500 | 16.00 | armor | 16.00 | wizards:frost_robe_head
+wizards:frost_robe_legs | 1250 | 24.00 | armor | 24.00 | wizards:frost_robe_legs
+wizards:netherite_arcane_robe_chest | 202750 | 20275.00 | armor | 20275.00 | wizards:netherite_arcane_robe_chest_smithing
+wizards:netherite_arcane_robe_feet | 202450 | 20246.00 | armor | 20246.00 | wizards:netherite_arcane_robe_feet_smithing
+wizards:netherite_arcane_robe_head | 202300 | 20232.00 | armor | 20232.00 | wizards:netherite_arcane_robe_head_smithing
+wizards:netherite_arcane_robe_legs | 202700 | 20272.00 | armor | 20272.00 | wizards:netherite_arcane_robe_legs_smithing
+wizards:netherite_fire_robe_chest | 203650 | 20365.00 | armor | 20365.00 | wizards:netherite_fire_robe_chest_smithing
+wizards:netherite_fire_robe_feet | 203050 | 20306.00 | armor | 20306.00 | wizards:netherite_fire_robe_feet_smithing
+wizards:netherite_fire_robe_head | 202600 | 20262.00 | armor | 20262.00 | wizards:netherite_fire_robe_head_smithing
+wizards:netherite_fire_robe_legs | 203600 | 20362.00 | armor | 20362.00 | wizards:netherite_fire_robe_legs_smithing
+wizards:netherite_frost_robe_chest | 202250 | 20227.00 | armor | 20227.00 | wizards:netherite_frost_robe_chest_smithing
+wizards:netherite_frost_robe_feet | 202150 | 20214.00 | armor | 20214.00 | wizards:netherite_frost_robe_feet_smithing
+wizards:netherite_frost_robe_head | 202150 | 20216.00 | armor | 20216.00 | wizards:netherite_frost_robe_head_smithing
+wizards:netherite_frost_robe_legs | 202250 | 20224.00 | armor | 20224.00 | wizards:netherite_frost_robe_legs_smithing
+wizards:wizard_robe_chest | 1150 | 195.00 | armor | 195.00 | wizards:wizard_robe_chest
+wizards:wizard_robe_feet | 505 | 126.00 | armor | 126.00 | wizards:wizard_robe_feet
+wizards:wizard_robe_head | 290 | 72.00 | armor | 72.00 | wizards:wizard_robe_head
+wizards:wizard_robe_legs | 770 | 192.00 | armor | 192.00 | wizards:wizard_robe_legs
+wom:cursed_mask | 950 | 95.00 | armor | - | 
+wom:diamond_armbracelet | 153000 | 15300.00 | armor | 15300.00 | wom:diamond_armbracelet
+wom:diamond_crown | 118000 | 11800.00 | armor | 11800.00 | wom:diamond_crown
+wom:diamond_legbottomseal | 113000 | 11300.00 | armor | 11300.00 | wom:diamond_legbottomseal
+wom:diamond_legtopseal | 143000 | 14300.00 | armor | 14300.00 | wom:diamond_legtopseal
+wom:emerald_anklebracelet | 19500 | 312.00 | armor | 312.00 | wom:emerald_anklebracelet
+wom:emerald_chakra | 28750 | 324.00 | armor | 324.00 | wom:emerald_chakra
+wom:emerald_earrings | 22500 | 315.00 | armor | 315.00 | wom:emerald_earrings
+wom:emerald_tasset | 25000 | 321.00 | armor | 321.00 | wom:emerald_tasset
+wom:golden_chrono | 24000 | 2400.00 | armor | 2400.00 | wom:golden_chrono
+wom:golden_kit | 27000 | 2700.00 | armor | 2700.00 | wom:golden_kit
+wom:golden_mokassin | 15000 | 1500.00 | armor | 1500.00 | wom:golden_mokassin
+wom:golden_monocle | 18000 | 1800.00 | armor | 1800.00 | wom:golden_monocle
+wom:netherite_belt | 241500 | 24150.00 | armor | 24150.00 | wom:netherite_belt_smithing
+wom:netherite_chains | 231000 | 23100.00 | armor | 23100.00 | wom:netherite_chains_smithing
+wom:netherite_manicle | 247000 | 24700.00 | armor | 24700.00 | wom:netherite_manicle_smithing
+wom:netherite_mask | 236500 | 23650.00 | armor | 23650.00 | wom:netherite_mask
+wom:unholy_cursed_mask | 6000 | 600.00 | armor | - | 
+arsenal:unique_shield_1 | 101250 | 16875.00 | shield | - | 
+arsenal:unique_shield_2 | 101250 | 16875.00 | shield | - | 
+arsenal:unique_shield_sw | 101250 | 16875.00 | shield | - | 
+kaleidoscope_cookery:stockpot_lid | 1800 | 450.25 | shield | 450.25 | kaleidoscope_cookery:stockpot_lid
+minecraft:shield | 1900 | 162.00 | shield | 162.00 | minecraft:shield
+paladins:diamond_kite_shield | 36000 | 6001.00 | shield | 6001.00 | paladins:diamond_kite_shield
+paladins:golden_kite_shield | 7200 | 1801.00 | shield | 1801.00 | paladins:golden_kite_shield
+paladins:iron_kite_shield | 3600 | 901.00 | shield | 901.00 | paladins:iron_kite_shield
+paladins:netherite_kite_shield | 218500 | 21850.00 | shield | 21850.00 | paladins:netherite_kite_shield_smithing
+paladins:ruby_kite_shield | 40500 | 6750.00 | shield | - | 
+wom:gesetz | 56250 | 5625.00 | shield | - | 
+archers:composite_longbow | 1950 | 10.00 | ranged | 10.00 | archers:composite_longbow
+archers:heavy_crossbow | 6100 | 1528.50 | ranged | 1528.50 | archers:heavy_crossbow
+archers:mechanic_shortbow | 5200 | 343.00 | ranged | 343.00 | archers:mechanic_shortbow
+archers:netherite_heavy_crossbow | 217300 | 21728.50 | ranged | 21728.50 | archers:netherite_heavy_crossbow_smithing
+archers:netherite_longbow | 218050 | 21803.00 | ranged | 21803.00 | archers:netherite_longbow_smithing
+archers:netherite_rapid_crossbow | 207700 | 20768.50 | ranged | 20768.50 | archers:netherite_rapid_crossbow_smithing
+archers:netherite_shortbow | 205450 | 20543.00 | ranged | 20543.00 | archers:netherite_shortbow_smithing
+archers:rapid_crossbow | 5200 | 568.50 | ranged | 568.50 | archers:rapid_crossbow
+archers:royal_longbow | 6400 | 1603.00 | ranged | 1603.00 | archers:royal_longbow
+archers:ruby_heavy_crossbow | 32250 | 5375.00 | ranged | - | 
+archers:ruby_rapid_crossbow | 32250 | 5375.00 | ranged | - | 
+arsenal:unique_heavy_crossbow_1 | 81000 | 13500.00 | ranged | - | 
+arsenal:unique_heavy_crossbow_2 | 81000 | 13500.00 | ranged | - | 
+arsenal:unique_heavy_crossbow_sw | 81000 | 13500.00 | ranged | - | 
+arsenal:unique_longbow_1 | 81000 | 13500.00 | ranged | - | 
+arsenal:unique_longbow_2 | 81000 | 13500.00 | ranged | - | 
+arsenal:unique_longbow_sw | 81000 | 13500.00 | ranged | - | 
+irons_spellbooks:autoloader_crossbow | 1950 | 487.50 | ranged | - | 
+minecraft:bow | 24 | 6.00 | ranged | 6.00 | minecraft:bow
+minecraft:crossbow | 1950 | 231.50 | ranged | 231.50 | minecraft:crossbow
+miningmaster:air_malachite_bow | 300050 | 30006.00 | ranged | 30006.00 | miningmaster:forging/air_malachite_bow
+supplementaries:slingshot | 970 | 29.00 | ranged | 29.00 | supplementaries:slingshot
+archers:diamond_spear | 6300 | 1002.00 | weapon | 1002.00 | archers:diamond_spear
+archers:flint_spear | 380 | 12.00 | weapon | 12.00 | archers:flint_spear
+archers:golden_spear | 1200 | 302.00 | weapon | 302.00 | archers:golden_spear
+archers:iron_spear | 1000 | 152.00 | weapon | 152.00 | archers:iron_spear
+archers:netherite_spear | 212000 | 21202.00 | weapon | 21202.00 | archers:netherite_spear_smithing
+archers:ruby_spear | 61500 | 10250.00 | weapon | - | 
+arsenal:unique_claymore_1 | 677500 | 67750.00 | weapon | - | 
+arsenal:unique_claymore_2 | 677500 | 67750.00 | weapon | - | 
+arsenal:unique_claymore_sw | 677500 | 67750.00 | weapon | - | 
+arsenal:unique_dagger_1 | 121250 | 12125.00 | weapon | - | 
+arsenal:unique_dagger_2 | 121250 | 12125.00 | weapon | - | 
+arsenal:unique_dagger_sw | 121250 | 12125.00 | weapon | - | 
+arsenal:unique_double_axe_1 | 485000 | 48500.00 | weapon | - | 
+arsenal:unique_double_axe_2 | 485000 | 48500.00 | weapon | - | 
+arsenal:unique_double_axe_sw | 485000 | 48500.00 | weapon | - | 
+arsenal:unique_glaive_1 | 346250 | 34625.00 | weapon | - | 
+arsenal:unique_glaive_2 | 346250 | 34625.00 | weapon | - | 
+arsenal:unique_glaive_sw | 346250 | 34625.00 | weapon | - | 
+arsenal:unique_hammer_1 | 1026250 | 102625.00 | weapon | - | 
+arsenal:unique_hammer_2 | 1026250 | 102625.00 | weapon | - | 
+arsenal:unique_hammer_sw | 1026250 | 102625.00 | weapon | - | 
+arsenal:unique_longsword_sw | 256250 | 25625.00 | weapon | - | 
+arsenal:unique_mace_1 | 485000 | 48500.00 | weapon | - | 
+arsenal:unique_mace_2 | 485000 | 48500.00 | weapon | - | 
+arsenal:unique_mace_sw | 485000 | 48500.00 | weapon | - | 
+arsenal:unique_sickle_1 | 185000 | 18500.00 | weapon | - | 
+arsenal:unique_sickle_2 | 185000 | 18500.00 | weapon | - | 
+arsenal:unique_sickle_sw | 185000 | 18500.00 | weapon | - | 
+arsenal:unique_spear_1 | 256250 | 25625.00 | weapon | - | 
+arsenal:unique_spear_2 | 256250 | 25625.00 | weapon | - | 
+arsenal:unique_spear_sw | 256250 | 25625.00 | weapon | - | 
+arsenal:unique_staff_damage_1 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_damage_2 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_damage_3 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_damage_4 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_damage_5 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_damage_6 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_damage_sw | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_heal_1 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_heal_2 | 38250 | 6375.00 | weapon | - | 
+arsenal:unique_staff_heal_sw | 38250 | 6375.00 | weapon | - | 
+ef_weapon_extended:diamond_knuckles | 10000 | 1002.00 | weapon | 1002.00 | ef_weapon_extended:diamondknucklesrecipe
+ef_weapon_extended:gold_knuckles | 1200 | 302.00 | weapon | 302.00 | ef_weapon_extended:goldknucklesrecipe
+ef_weapon_extended:iron_knuckles | 610 | 152.00 | weapon | 152.00 | ef_weapon_extended:ironknucklesrecipe
+ef_weapon_extended:netherite_knuckles | 209750 | 20975.00 | weapon | 20975.00 | ef_weapon_extended:netheriteknucklesrecipe
+epicfight:bokken | 110 | 27.50 | weapon | - | 
+epicfight:diamond_dagger | 4000 | 1001.00 | weapon | 1001.00 | epicfight:diamond_dagger
+epicfight:diamond_greatsword | 85000 | 6002.00 | weapon | 6002.00 | epicfight:diamond_greatsword
+epicfight:diamond_longsword | 24000 | 4001.00 | weapon | 4001.00 | epicfight:diamond_longsword
+epicfight:diamond_spear | 8000 | 2003.00 | weapon | 2003.00 | epicfight:diamond_spear
+epicfight:diamond_tachi | 24000 | 4001.00 | weapon | 4001.00 | epicfight:diamond_tachi
+epicfight:glove | 200 | 35.33 | weapon | 35.33 | epicfight:glove
+epicfight:golden_dagger | 1200 | 301.00 | weapon | 301.00 | epicfight:golden_dagger
+epicfight:golden_greatsword | 7200 | 1802.00 | weapon | 1802.00 | epicfight:golden_greatsword
+epicfight:golden_longsword | 2600 | 655.00 | weapon | 655.00 | epicfight:golden_longsword
+epicfight:golden_spear | 230 | 57.00 | weapon | 57.00 | epicfight:golden_spear
+epicfight:golden_tachi | 2600 | 655.00 | weapon | 655.00 | epicfight:golden_tachi
+epicfight:iron_dagger | 605 | 151.00 | weapon | 151.00 | epicfight:iron_dagger
+epicfight:iron_greatsword | 17000 | 902.00 | weapon | 902.00 | epicfight:iron_greatsword
+epicfight:iron_longsword | 2400 | 601.00 | weapon | 601.00 | epicfight:iron_longsword
+epicfight:iron_spear | 1200 | 303.00 | weapon | 303.00 | epicfight:iron_spear
+epicfight:iron_tachi | 2400 | 601.00 | weapon | 601.00 | epicfight:iron_tachi
+epicfight:netherite_dagger | 212000 | 21201.00 | weapon | 21201.00 | epicfight:netherite_dagger
+epicfight:netherite_greatsword | 361250 | 26202.00 | weapon | 26202.00 | epicfight:netherite_greatsword
+epicfight:netherite_longsword | 242000 | 24201.00 | weapon | 24201.00 | epicfight:netherite_longsword
+epicfight:netherite_spear | 222050 | 22203.00 | weapon | 22203.00 | epicfight:netherite_spear
+epicfight:netherite_tachi | 242000 | 24201.00 | weapon | 24201.00 | epicfight:netherite_tachi
+epicfight:stone_dagger | 120 | 1.50 | weapon | 1.50 | epicfight:stone_dagger
+epicfight:stone_greatsword | 8750 | 5.00 | weapon | 5.00 | epicfight:stone_greatsword
+epicfight:stone_longsword | 600 | 2.00 | weapon | 2.00 | epicfight:stone_longsword
+epicfight:stone_spear | 380 | 3.00 | weapon | 3.00 | epicfight:stone_spear
+epicfight:stone_tachi | 600 | 2.00 | weapon | 2.00 | epicfight:stone_tachi
+epicfight:uchigatana | 40000 | 4000.00 | weapon | - | 
+epicfight:wooden_dagger | 60 | 3.00 | weapon | 3.00 | epicfight:wooden_dagger
+epicfight:wooden_greatsword | 1500 | 14.00 | weapon | 14.00 | epicfight:wooden_greatsword
+epicfight:wooden_longsword | 200 | 9.00 | weapon | 9.00 | epicfight:wooden_longsword
+epicfight:wooden_spear | 110 | 7.00 | weapon | 7.00 | epicfight:wooden_spear
+epicfight:wooden_tachi | 200 | 9.00 | weapon | 9.00 | epicfight:wooden_tachi
+epicfightx:efx_uchigatana | 192500 | 19250.00 | weapon | - | 
+epicfightx:eternal_night_scythe | 923750 | 92375.00 | weapon | - | 
+epicfightx:great_tachi | 8500 | 2125.00 | weapon | - | 
+epicfightx:yoto | 8500 | 2125.00 | weapon | - | 
+farmersdelight:skillet | 1201 | 600.25 | weapon | 600.25 | farmersdelight:skillet
+invincible:custom_combo_demo | 110 | 27.50 | weapon | - | 
+invincible:custom_skill_demo | 110 | 27.50 | weapon | - | 
+invincible:debug | 110 | 27.50 | weapon | - | 
+irons_spellbooks:amethyst_rapier {Damage:0,"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:echoing_strikes",index:0,level:5,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:1b}} | 313750 | 31375.00 | weapon | - | 
+irons_spellbooks:boreal_blade {Damage:0,"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:frostbite",index:0,level:3,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:1b}} | 901250 | 90125.00 | weapon | - | 
+irons_spellbooks:claymore | 44250 | 7375.00 | weapon | - | 
+irons_spellbooks:hellrazor {Damage:0,"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:raise_hell",index:0,level:3,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:1b}} | 231250 | 23125.00 | weapon | - | 
+irons_spellbooks:ice_staff | 28500 | 1990.00 | weapon | 1990.00 | irons_spellbooks:ice_staff
+irons_spellbooks:keeper_flamberge | 136250 | 13625.00 | weapon | - | 
+irons_spellbooks:legionnaire_flamberge | 302500 | 30251.00 | weapon | 30251.00 | irons_spellbooks:legionnaire_flamberge_repair
+irons_spellbooks:lightning_rod | 17250 | 2875.00 | weapon | - | 
+irons_spellbooks:magehunter | 27750 | 4625.00 | weapon | - | 
+irons_spellbooks:misery {Damage:0,"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:wither_skull",index:0,level:8,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:1b}} | 46250 | 4625.00 | weapon | - | 
+irons_spellbooks:pyrium_staff | 117600 | 19603.00 | weapon | 19603.00 | irons_spellbooks:pyrium_staff
+irons_spellbooks:spellbreaker {Damage:0,"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:counterspell",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:1b}} | 520000 | 52000.00 | weapon | - | 
+irons_spellbooks:twilight_gale {Damage:0,"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:volt_strike",index:0,level:5,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:1b}} | 577500 | 57750.00 | weapon | - | 
+kaleidoscope_cookery:diamond_kitchen_knife | 18000 | 3001.00 | weapon | 3001.00 | kaleidoscope_cookery:diamond_kitchen_knife
+kaleidoscope_cookery:gold_kitchen_knife | 3600 | 901.00 | weapon | 901.00 | kaleidoscope_cookery:gold_kitchen_knife
+kaleidoscope_cookery:iron_kitchen_knife | 1800 | 451.00 | weapon | 451.00 | kaleidoscope_cookery:iron_kitchen_knife
+kaleidoscope_cookery:netherite_kitchen_knife | 232000 | 23201.00 | weapon | 23201.00 | minecraft:netherite_kitchen_knife_smithing
+kaleidoscope_cookery:sickle | 130 | 33.00 | weapon | 33.00 | kaleidoscope_cookery:sickle
+minecraft:diamond_axe | 18000 | 3002.00 | weapon | 3002.00 | minecraft:diamond_axe
+minecraft:diamond_sword | 8000 | 2001.00 | weapon | 2001.00 | minecraft:diamond_sword
+minecraft:golden_axe | 3600 | 902.00 | weapon | 902.00 | minecraft:golden_axe
+minecraft:golden_sword | 2400 | 601.00 | weapon | 601.00 | minecraft:golden_sword
+minecraft:iron_axe | 2600 | 452.00 | weapon | 452.00 | minecraft:iron_axe
+minecraft:iron_sword | 1200 | 301.00 | weapon | 301.00 | minecraft:iron_sword
+minecraft:netherite_axe | 232000 | 23202.00 | weapon | 23202.00 | minecraft:netherite_axe_smithing
+minecraft:netherite_sword | 222000 | 22201.00 | weapon | 22201.00 | minecraft:netherite_sword_smithing
+minecraft:stone_axe | 8 | 2.00 | weapon | 2.00 | quark:tweaks/crafting/utility/tools/stone_axe
+minecraft:stone_sword | 4 | 1.00 | weapon | 1.00 | quark:tweaks/crafting/utility/tools/stone_sword
+minecraft:trident | 2600 | 650.00 | weapon | - | 
+minecraft:wooden_axe | 32 | 8.00 | weapon | 8.00 | minecraft:wooden_axe
+minecraft:wooden_sword | 20 | 5.00 | weapon | 5.00 | minecraft:wooden_sword
+miningmaster:fire_ruby_sword | 48000 | 8001.00 | weapon | 8001.00 | miningmaster:forging/fire_ruby_sword
+miningmaster:haste_peridot_axe | 78000 | 13002.00 | weapon | 13002.00 | miningmaster:forging/haste_peridot_axe
+miningmaster:ice_sapphire_sword | 33600 | 5601.00 | weapon | 5601.00 | miningmaster:forging/ice_sapphire_sword
+miningmaster:kinetic_opal_axe | 81000 | 13502.00 | weapon | 13502.00 | miningmaster:forging/kinetic_opal_axe
+miningmaster:lucky_citrine_sword | 48000 | 8001.00 | weapon | 8001.00 | miningmaster:forging/lucky_citrine_sword
+miningmaster:power_pyrite_axe | 205000 | 20502.00 | weapon | 20502.00 | miningmaster:forging/power_pyrite_axe
+miningmaster:power_pyrite_sword | 117000 | 19501.00 | weapon | 19501.00 | miningmaster:forging/power_pyrite_sword
+miningmaster:spirit_garnet_sword | 33600 | 5601.00 | weapon | 5601.00 | miningmaster:forging/spirit_garnet_sword
+miningmaster:ultima_axe | 202500 | 20250.00 | weapon | 20250.00 | miningmaster:forging/ultima_axe_2
+miningmaster:ultima_sword | 73200 | 12200.00 | weapon | 12200.00 | miningmaster:forging/ultima_sword_2
+paladins:diamond_claymore | 25500 | 4001.00 | weapon | 4001.00 | paladins:diamond_claymore
+paladins:diamond_great_hammer | 39000 | 4001.00 | weapon | 4001.00 | paladins:diamond_great_hammer
+paladins:diamond_holy_staff | 21600 | 3600.00 | weapon | 3600.00 | paladins:diamond_holy_staff
+paladins:diamond_mace | 18000 | 2001.00 | weapon | 2001.00 | paladins:diamond_mace
+paladins:golden_claymore | 4800 | 1201.00 | weapon | 1201.00 | paladins:golden_claymore
+paladins:golden_great_hammer | 4800 | 1201.00 | weapon | 1201.00 | paladins:golden_great_hammer
+paladins:golden_mace | 2400 | 601.00 | weapon | 601.00 | paladins:golden_mace
+paladins:holy_staff | 4800 | 1200.00 | weapon | 1200.00 | paladins:holy_staff
+paladins:iron_claymore | 2800 | 601.00 | weapon | 601.00 | paladins:iron_claymore
+paladins:iron_great_hammer | 4300 | 601.00 | weapon | 601.00 | paladins:iron_great_hammer
+paladins:iron_mace | 1950 | 301.00 | weapon | 301.00 | paladins:iron_mace
+paladins:netherite_claymore | 242000 | 24201.00 | weapon | 24201.00 | paladins:netherite_claymore_smithing
+paladins:netherite_great_hammer | 318750 | 24201.00 | weapon | 24201.00 | paladins:netherite_great_hammer_smithing
+paladins:netherite_holy_staff | 216000 | 21600.00 | weapon | 21600.00 | paladins:netherite_holy_staff_smithing
+paladins:netherite_mace | 222000 | 22201.00 | weapon | 22201.00 | paladins:netherite_mace_smithing
+paladins:ruby_claymore | 271250 | 27125.00 | weapon | - | 
+paladins:ruby_great_hammer | 410000 | 41000.00 | weapon | - | 
+paladins:ruby_holy_staff | 15750 | 2625.00 | weapon | - | 
+paladins:ruby_mace | 193750 | 19375.00 | weapon | - | 
+paladins:stone_claymore | 1100 | 3.00 | weapon | 3.00 | paladins:stone_claymore
+paladins:stone_great_hammer | 1700 | 3.00 | weapon | 3.00 | paladins:stone_great_hammer
+paladins:wooden_great_hammer | 550 | 77.00 | weapon | 77.00 | paladins:wooden_great_hammer
+rogues:diamond_dagger | 4000 | 1001.00 | weapon | 1001.00 | rogues:diamond_dagger
+rogues:diamond_double_axe | 24000 | 4003.00 | weapon | 4003.00 | rogues:diamond_double_axe
+rogues:diamond_glaive | 18000 | 3002.00 | weapon | 3002.00 | rogues:diamond_glaive
+rogues:diamond_sickle | 8000 | 2001.00 | weapon | 2001.00 | rogues:diamond_sickle
+rogues:flint_dagger | 160 | 11.00 | weapon | 11.00 | rogues:flint_dagger
+rogues:golden_dagger | 1200 | 301.00 | weapon | 301.00 | rogues:golden_dagger
+rogues:golden_double_axe | 4800 | 1203.00 | weapon | 1203.00 | rogues:golden_double_axe
+rogues:golden_glaive | 3600 | 902.00 | weapon | 902.00 | rogues:golden_glaive
+rogues:golden_sickle | 2400 | 601.00 | weapon | 601.00 | rogues:golden_sickle
+rogues:iron_dagger | 605 | 151.00 | weapon | 151.00 | rogues:iron_dagger
+rogues:iron_double_axe | 2400 | 603.00 | weapon | 603.00 | rogues:iron_double_axe
+rogues:iron_glaive | 1800 | 452.00 | weapon | 452.00 | rogues:iron_glaive
+rogues:iron_sickle | 1200 | 301.00 | weapon | 301.00 | rogues:iron_sickle
+rogues:netherite_dagger | 212000 | 21201.00 | weapon | 21201.00 | rogues:netherite_dagger_smithing
+rogues:netherite_double_axe | 242050 | 24203.00 | weapon | 24203.00 | rogues:netherite_double_axe_smithing
+rogues:netherite_glaive | 232000 | 23202.00 | weapon | 23202.00 | rogues:netherite_glaive_smithing
+rogues:netherite_sickle | 222000 | 22201.00 | weapon | 22201.00 | rogues:netherite_sickle_smithing
+rogues:ruby_dagger | 48750 | 4875.00 | weapon | - | 
+rogues:ruby_double_axe | 193750 | 19375.00 | weapon | - | 
+rogues:ruby_glaive | 138750 | 13875.00 | weapon | - | 
+rogues:ruby_sickle | 73750 | 7375.00 | weapon | - | 
+rogues:stone_double_axe | 750 | 5.00 | weapon | 5.00 | rogues:stone_double_axe
+wizards:staff_arcane | 2800 | 333.00 | weapon | 333.00 | wizards:staff_arcane
+wizards:staff_fire | 2800 | 353.00 | weapon | 353.00 | wizards:staff_fire
+wizards:staff_frost | 2800 | 161.00 | weapon | 161.00 | wizards:staff_frost
+wizards:staff_netherite_arcane | 205350 | 20533.00 | weapon | 20533.00 | wizards:staff_netherite_arcane_smithing
+wizards:staff_netherite_fire | 205550 | 20553.00 | weapon | 20553.00 | wizards:staff_netherite_fire_smithing
+wizards:staff_netherite_frost | 203600 | 20361.00 | weapon | 20361.00 | wizards:staff_netherite_frost_smithing
+wizards:staff_ruby_fire | 15750 | 2625.00 | weapon | - | 
+wizards:staff_wizard | 640 | 22.00 | weapon | 22.00 | wizards:staff_wizard
+wom:agony | 27500 | 2750.00 | weapon | - | 
+wom:antitheus | 300000 | 30000.00 | weapon | 30000.00 | wom:antitheus
+wom:blackstar | 96250 | 9625.00 | weapon | - | 
+wom:demon_bracelet | 13500 | 1350.00 | weapon | - | 
+wom:diamond_greataxe | 60050 | 6004.00 | weapon | 6004.00 | wom:diamond_greataxe
+wom:diamond_staff | 20000 | 2001.00 | weapon | 2001.00 | wom:diamond_staff
+wom:evil_tachi | 65000 | 6500.00 | weapon | - | 
+wom:golden_greataxe | 11150 | 1117.00 | weapon | 1117.00 | wom:golden_greataxe
+wom:golden_staff | 6000 | 601.00 | weapon | 601.00 | wom:golden_staff
+wom:herrscher | 27500 | 2750.00 | weapon | - | 
+wom:hollow_longsword | 9000 | 900.00 | weapon | - | 
+wom:iron_greataxe | 9050 | 904.00 | weapon | 904.00 | wom:iron_greataxe
+wom:iron_staff | 3000 | 301.00 | weapon | 301.00 | wom:iron_staff
+wom:jabberwocky | 27500 | 800.00 | weapon | 800.00 | wom:jabberwocky
+wom:moonless | 63750 | 6375.00 | weapon | - | 
+wom:napoleon | 695000 | 69500.00 | weapon | 69500.00 | wom:napoleon
+wom:netherite_greataxe | 262050 | 26204.00 | weapon | 26204.00 | wom:netherite_greataxe
+wom:netherite_staff | 221500 | 22150.00 | weapon | 22150.00 | wom:netherite_staff
+wom:nova | 24000 | 2400.00 | weapon | - | 
+wom:orbit | 55000 | 5500.00 | weapon | - | 
+wom:ruine | 40000 | 4000.00 | weapon | - | 
+wom:satsujin | 180000 | 18000.00 | weapon | 18000.00 | wom:satsujin
+wom:solar | 690000 | 69000.00 | weapon | 69000.00 | wom:solar
+wom:stone_staff | 625 | 2.00 | weapon | 2.00 | wom:stone_staff
+wom:tormented_mind | 71250 | 7125.00 | weapon | - | 
+wom:wooden_staff | 325 | 3.00 | weapon | 3.00 | wom:wooden_staff
+farmersdelight:diamond_knife | 2002 | 1001.00 | tool | 1001.00 | farmersdelight:diamond_knife
+farmersdelight:flint_knife | 22 | 11.00 | tool | 11.00 | farmersdelight:flint_knife
+farmersdelight:golden_knife | 602 | 301.00 | tool | 301.00 | farmersdelight:golden_knife
+farmersdelight:iron_knife | 302 | 151.00 | tool | 151.00 | farmersdelight:iron_knife
+farmersdelight:netherite_knife | 42402 | 21201.00 | tool | 21201.00 | farmersdelight:netherite_knife_smithing
+kaleidoscope_cookery:kitchen_shovel | 336 | 167.67 | tool | 167.67 | kaleidoscope_cookery:kitchen_shovel
+minecraft:diamond_pickaxe | 6004 | 3002.00 | tool | 3002.00 | minecraft:diamond_pickaxe
+minecraft:diamond_shovel | 2850 | 1002.00 | tool | 1002.00 | minecraft:diamond_shovel
+minecraft:golden_pickaxe | 1804 | 902.00 | tool | 902.00 | minecraft:golden_pickaxe
+minecraft:golden_shovel | 604 | 302.00 | tool | 302.00 | minecraft:golden_shovel
+minecraft:iron_pickaxe | 904 | 452.00 | tool | 452.00 | minecraft:iron_pickaxe
+minecraft:iron_shovel | 650 | 152.00 | tool | 152.00 | minecraft:iron_shovel
+minecraft:netherite_pickaxe | 46100 | 23050.00 | tool | 23050.00 | minecraft:netherite_pickaxe_smithing
+minecraft:netherite_shovel | 42404 | 21202.00 | tool | 21202.00 | minecraft:netherite_shovel_smithing
+minecraft:stone_pickaxe | 4 | 2.00 | tool | 2.00 | quark:tweaks/crafting/utility/tools/stone_pickaxe
+minecraft:stone_shovel | 4 | 2.00 | tool | 2.00 | quark:tweaks/crafting/utility/tools/stone_shovel
+minecraft:wooden_pickaxe | 16 | 8.00 | tool | 8.00 | minecraft:wooden_pickaxe
+minecraft:wooden_shovel | 8 | 4.00 | tool | 4.00 | minecraft:wooden_shovel
+miningmaster:haste_peridot_pickaxe | 25700 | 12850.00 | tool | 12850.00 | miningmaster:forging/haste_peridot_pickaxe
+miningmaster:lucky_citrine_pickaxe | 17700 | 8850.00 | tool | 8850.00 | miningmaster:forging/lucky_citrine_pickaxe
+miningmaster:ultima_pickaxe | 26500 | 13250.00 | tool | 13250.00 | miningmaster:forging/ultima_pickaxe_3
+miningmaster:unbreaking_iolite_pickaxe | 25700 | 12850.00 | tool | 12850.00 | miningmaster:forging/unbreaking_iolite_pickaxe
+mowziesmobs:earthrend_gauntlet | - | 1200.00 | tool | - | 
+mowziesmobs:naga_fang_dagger | - | 651.00 | tool | 651.00 | mowziesmobs:naga_fang_dagger
+mowziesmobs:spear | - | 16.00 | tool | 16.00 | mowziesmobs:spear
+irons_spellbooks:artificer_cane | 2450 | 612.00 | weapon | 612.00 | irons_spellbooks:artificer_cane
+irons_spellbooks:graybeard_staff | 815 | 204.00 | weapon | 204.00 | irons_spellbooks:graybeard_staff
+irons_spellbooks:hither_thither_wand {"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:portal",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:1b}} | 72000 | 12000.00 | weapon | - | 
+irons_spellbooks:staff_of_the_nines | 72000 | 12000.00 | weapon | - | 
+paladins:acolyte_wand | 20 | 5.00 | weapon | 5.00 | paladins:acolyte_wand
+paladins:diamond_holy_wand | 5200 | 1300.00 | weapon | 1300.00 | paladins:diamond_holy_wand
+paladins:holy_wand | 1800 | 450.00 | weapon | 450.00 | paladins:holy_wand
+paladins:netherite_holy_wand | 215000 | 21500.00 | weapon | 21500.00 | paladins:netherite_holy_wand_smithing
+wizards:wand_arcane | 1200 | 306.00 | weapon | 306.00 | wizards:wand_arcane
+wizards:wand_fire | 1300 | 320.00 | weapon | 320.00 | wizards:wand_fire
+wizards:wand_frost | 605 | 151.00 | weapon | 151.00 | wizards:wand_frost
+wizards:wand_netherite_arcane | 205050 | 20506.00 | weapon | 20506.00 | wizards:wand_netherite_arcane_smithing
+wizards:wand_netherite_fire | 205200 | 20520.00 | weapon | 20520.00 | wizards:wand_netherite_fire_smithing
+wizards:wand_netherite_frost | 203500 | 20351.00 | weapon | 20351.00 | wizards:wand_netherite_frost_smithing
+wizards:wand_novice | 205 | 51.00 | weapon | 51.00 | wizards:wand_novice
+spelunkery:andesite_coal_ore | - | 75.00 | mineral | - | 
+spelunkery:andesite_copper_ore | - | 90.00 | mineral | - | 
+spelunkery:andesite_diamond_ore | - | 1000.00 | mineral | - | 
+spelunkery:andesite_emerald_ore | - | 400.00 | mineral | - | 
+spelunkery:andesite_gold_ore | - | 450.00 | mineral | - | 
+spelunkery:andesite_iron_ore | - | 225.00 | mineral | - | 
+spelunkery:andesite_lapis_ore | - | 210.00 | mineral | - | 
+spelunkery:andesite_redstone_ore | - | 140.00 | mineral | - | 
+spelunkery:calcite_redstone_ore | - | 140.00 | mineral | - | 
+spelunkery:diorite_coal_ore | - | 75.00 | mineral | - | 
+spelunkery:diorite_copper_ore | - | 90.00 | mineral | - | 
+spelunkery:diorite_diamond_ore | - | 1000.00 | mineral | - | 
+spelunkery:diorite_emerald_ore | - | 400.00 | mineral | - | 
+spelunkery:diorite_gold_ore | - | 450.00 | mineral | - | 
+spelunkery:diorite_iron_ore | - | 225.00 | mineral | - | 
+spelunkery:diorite_lapis_ore | - | 210.00 | mineral | - | 
+spelunkery:diorite_redstone_ore | - | 140.00 | mineral | - | 
+spelunkery:granite_coal_ore | - | 75.00 | mineral | - | 
+spelunkery:granite_copper_ore | - | 90.00 | mineral | - | 
+spelunkery:granite_diamond_ore | - | 1000.00 | mineral | - | 
+spelunkery:granite_emerald_ore | - | 400.00 | mineral | - | 
+spelunkery:granite_gold_ore | - | 450.00 | mineral | - | 
+spelunkery:granite_iron_ore | - | 225.00 | mineral | - | 
+spelunkery:granite_lapis_ore | - | 210.00 | mineral | - | 
+spelunkery:granite_redstone_ore | - | 140.00 | mineral | - | 
+spelunkery:sandstone_lapis_ore | - | 210.00 | mineral | - | 
+spelunkery:smooth_basalt_diamond_ore | - | 1000.00 | mineral | - | 
+spelunkery:tuff_coal_ore | - | 75.00 | mineral | - | 
+spelunkery:tuff_copper_ore | - | 90.00 | mineral | - | 
+spelunkery:tuff_diamond_ore | - | 1000.00 | mineral | - | 
+spelunkery:tuff_emerald_ore | - | 400.00 | mineral | - | 
+spelunkery:tuff_gold_ore | - | 450.00 | mineral | - | 
+spelunkery:tuff_iron_ore | - | 225.00 | mineral | - | 
+spelunkery:tuff_lapis_ore | - | 210.00 | mineral | - | 
+spelunkery:tuff_redstone_ore | - | 140.00 | mineral | - | 

@@ -1,0 +1,149 @@
+{
+  "_help": [
+    "아이템을 어디서 얻는가의 규칙. 적는 법: \"모드:아이템\", \"모드:*\", * 가 낀 무늬(\"irons_spellbooks:*_ink\"). 고친 뒤 /rtshop reload.",
+    "shopBan: NPC 상점에 오르지 않는 아이템 (플레이어 상점은 제한 없음). shopBanBossItems: 보스와 얽힌 아이템도 팔지 않음. shopBanGuns + gunWords: 이름에 이 낱말이 든 무기(총)는 팔지 않음.",
+    "priceFactor: 이 묶음의 상점가에 곱하는 수 (예: \"wom:*\": 5).",
+    "보스 아이템 = bossMods 의 모든 아이템 + bossItems + 보스가 떨어뜨리는 그 모드의 아이템(sampleBossDrops) + 그것으로만 만드는 물건. notBossItems 는 뺀다.",
+    "lootBan: 상자·몹·낚시 전리품에서 빠지는 아이템. lootAllow: 그래도 나오는 것 (잉크). mobDrops: 몬스터를 잡으면 따로 굴리는 드랍(확률 0~1), 보스는 bossDropFactor 배.",
+    "blockDropBan: 블록을 캤을 때도 나오지 않는 아이템 (Create: 던전의 건축물에 놓인 블록을 캐서 얻지 못하게). 비우면 캐서 얻을 수 있다.",
+    "어떤 모드의 아이템을 아예 얻지 못하게 하려면 (Better Nether · spmovesets 처럼): shopBan · gachaBan · recipeBan 에 \"모드:*\", recipeBanMods 에 \"모드\", lootBan · blockDropBan 에 \"모드:*\". 이미 가진 것은 그대로 남는다.",
+    "gachaBan: 뽑기에 오르지 않는 것 — 무기·장신구·펫 묶음의 아이템 ID 와 마법 뽑기의 인챈트 ID (Create: 상점·뽑기 어디에서도 얻지 못하게). gacha.json 의 목록은 지우지 않고 건너뛰기만 한다.",
+    "recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).",
+    "extremeAttack / extremeArmor (3.65.0): 공격력이 이 값 이상이거나 갑옷 한 조각의 방어력이 이 값 이상인 터무니없는 장비는 전리품 · 몹과 보스의 드롭 · 조합법에서 뺀다 (keep · lootAllow 보다 먼저). 0 = 끔. 기본 25 / 20 (모드팩의 다른 장비는 17 / 13 이 가장 높다).",
+    "shopBanGearMods (3.84): 이 모드들의 장비(무기 · 방어구 · 방패 · 활 · 도구 · 장신구)는 NPC 상점에 오르지 않는다 — 재료 · 음식 같은 다른 물건은 그대로. 기본: aquamirae.",
+    "tradeBan (3.82): 주민 · 떠돌이 상인의 거래에서 뺄 아이템 — 파는 것이든 값이든 이 아이템이 들어간 거래는 거래 창이 열리기 전에 빠진다. \"모드:*\" 는 NBT 에 그 모드의 ID 나 번역 키가 적힌 물건(모드가 만든 지도 등)도. 기본: spmovesets 전부.",
+    "shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.",
+    "recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.",
+    "gearRaise (3.80): 상점의 무기 · 활 · 지팡이 · 방패 · 방어구 · 장신구의 사는 값을 올린다 — 올리기 전 값이 gearRaiseMidFrom G 미만이면 gearRaiseLow 배, gearRaiseHighFrom G 미만이면 gearRaiseMid 배, 그 이상은 gearRaiseHigh 배. 초당 피해(DPS)가 gearRaiseStrongDps 이상인 근접 무기는 값과 상관없이 gearRaiseHigh 배. 상점이 사 주는 값(매입가)은 그대로. 도구 · 낚싯대는 빼고, priceFactor 와 겹치면 큰 쪽. false 면 끔."
+  ],
+  "version": 9,
+  "enabled": true,
+  "shopBan": [
+    "arcanevortex:*",
+    "betternether:*",
+    "efn:*",
+    "rtshop:enhance_anvil",
+    "create:*",
+    "spmovesets:*"
+  ],
+  "tradeBan": [
+    "spmovesets:*"
+  ],
+  "shopBanGearMods": [
+    "aquamirae"
+  ],
+  "shopBanBossItems": true,
+  "shopBanGuns": true,
+  "gunWords": [
+    "gun",
+    "pistol",
+    "rifle",
+    "revolver",
+    "musket",
+    "shotgun",
+    "blaster",
+    "bullet"
+  ],
+  "priceFactor": {
+    "wom:*": 5.0
+  },
+  "bossMods": [
+    "cataclysm",
+    "fdbosses",
+    "block_factorys_bosses",
+    "witherreincarnated",
+    "enderdragonplus"
+  ],
+  "bossItems": [
+    "minecraft:nether_star",
+    "minecraft:dragon_egg",
+    "minecraft:dragon_head"
+  ],
+  "notBossItems": [],
+  "sampleBossDrops": true,
+  "lootBan": [
+    "spmovesets:*",
+    "artifacts:*",
+    "relics_rpgs:*",
+    "jewelry:*",
+    "simplehats:*",
+    "adorablehamsterpets:*",
+    "crittersandcompanions:*",
+    "rpg_companions_tiny_dragons:*",
+    "fantasymounts:*",
+    "efn:*",
+    "tacz:*",
+    "lrtactical:*",
+    "create:*",
+    "betternether:*",
+    "efn_enhance:*",
+    "smallships:*"
+  ],
+  "lootAllow": [
+    "irons_spellbooks:*_ink",
+    "irons_spellbooks:ink_*"
+  ],
+  "gachaBan": [
+    "create:*",
+    "spmovesets:*"
+  ],
+  "blockDropBan": [
+    "create:*",
+    "betternether:*",
+    "spmovesets:*",
+    "efn_enhance:*",
+    "smallships:*"
+  ],
+  "mobDrops": {
+    "irons_spellbooks:common_ink": 0.03,
+    "irons_spellbooks:uncommon_ink": 0.012,
+    "irons_spellbooks:rare_ink": 0.005,
+    "irons_spellbooks:epic_ink": 0.0015,
+    "irons_spellbooks:legendary_ink": 3.0E-4
+  },
+  "bossDropFactor": 10.0,
+  "recipeBan": [
+    "tacz:*",
+    "lrtactical:*",
+    "rtshop:enhance_anvil",
+    "create:*",
+    "betternether:*",
+    "spmovesets:*",
+    "efn_enhance:*",
+    "smallships:*",
+    "epicfight:skillbook"
+  ],
+  "recipeBanMods": [
+    "tacz",
+    "create",
+    "betternether",
+    "spmovesets",
+    "efn_enhance",
+    "smallships"
+  ],
+  "recipeBanStaffs": true,
+  "staffWords": [
+    "staff",
+    "wand",
+    "scepter",
+    "sceptre"
+  ],
+  "listStaffs": true,
+  "staffShop": "blacksmith",
+  "staffCategory": "weapon",
+  "staffPrice": 6000,
+  "recipeBanListedGear": true,
+  "modGearShopOnly": true,
+  "shopBannedKeepOwnWays": true,
+  "vanillaGearToo": false,
+  "extremeAttack": 25.0,
+  "extremeArmor": 20.0,
+  "gearRaise": true,
+  "gearRaiseLow": 2.0,
+  "gearRaiseMid": 3.0,
+  "gearRaiseHigh": 5.0,
+  "gearRaiseMidFrom": 5000,
+  "gearRaiseHighFrom": 40000,
+  "gearRaiseStrongDps": 14.0,
+  "keep": []
+}

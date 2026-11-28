@@ -1,0 +1,331 @@
+# 상점: 식품 상점 (food)
+# 아이템 | 구매가 | 기본 매입가 | 구분 | 원가 | 가격 근거(레시피)
+minecraft:sugar | 2 | 1.00 | base | 2.00 | 
+kaleidoscope_cookery:oil | 1 | 0.50 | base | 1.00 | 
+minecraft:bowl | 1 | - | base | 1.50 | 
+minecraft:glass_bottle | 1 | - | base | 1.00 | 
+minecraft:stick | 1 | - | base | 1.00 | 
+minecraft:paper | 2 | 1.00 | base | 2.00 | 
+minecraft:ice | 2 | - | base | - | 
+minecraft:snowball | 1 | - | base | - | 
+minecraft:bone | 5 | 2.50 | base | 5.00 | 
+minecraft:coal | 50 | 25.00 | base | 50.00 | 
+minecraft:charcoal | 20 | 8.00 | base | 20.00 | 
+minecraft:cake | - | 149.60 | dish | 131.50 | minecraft:cake
+kaleidoscope_cookery:pot | 2100 | 1050.00 | tool | 1050.00 | kaleidoscope_cookery:pot
+kaleidoscope_cookery:stockpot | 1501 | 750.50 | tool | 750.50 | kaleidoscope_cookery:stockpot
+kaleidoscope_cookery:stockpot_lid | 1800 | 450.25 | tool | 450.25 | kaleidoscope_cookery:stockpot_lid
+kaleidoscope_cookery:steamer | 90 | 45.00 | tool | 45.00 | kaleidoscope_cookery:steamer
+kaleidoscope_cookery:teapot | 1260 | 630.00 | tool | 630.00 | kaleidoscope_cookery:teapot
+kaleidoscope_cookery:millstone | 25 | 12.33 | tool | 12.33 | kaleidoscope_cookery:millstone
+kaleidoscope_cookery:chopping_board | 48 | 24.00 | tool | 24.00 | kaleidoscope_cookery:chopping_board
+kaleidoscope_cookery:kitchen_shovel | 336 | 167.67 | tool | 167.67 | kaleidoscope_cookery:kitchen_shovel
+kaleidoscope_cookery:iron_kitchen_knife | 1800 | 451.00 | tool | 451.00 | kaleidoscope_cookery:iron_kitchen_knife
+kaleidoscope_cookery:gold_kitchen_knife | 3600 | 901.00 | tool | 901.00 | kaleidoscope_cookery:gold_kitchen_knife
+kaleidoscope_cookery:diamond_kitchen_knife | 18000 | 3001.00 | tool | 3001.00 | kaleidoscope_cookery:diamond_kitchen_knife
+kaleidoscope_cookery:stove | 168 | 84.00 | tool | 84.00 | kaleidoscope_cookery:stove_campfire
+kaleidoscope_cookery:oil_pot | 1502 | 751.00 | tool | 751.00 | kaleidoscope_cookery:oil_pot
+kaleidoscope_cookery:bamboo_tray | 20 | 10.00 | tool | 10.00 | kaleidoscope_cookery:bamboo_tray
+kaleidoscope_cookery:enamel_basin | 1502 | 751.00 | tool | 751.00 | kaleidoscope_cookery:enamel_basin
+kaleidoscope_cookery:shawarma_spit | 1787 | 893.33 | tool | 893.33 | kaleidoscope_cookery:shawarma_spit
+kaleidoscope_cookery:kitchenware_racks | 640 | 319.67 | tool | 319.67 | kaleidoscope_cookery:kitchenware_racks
+kaleidoscope_tavern:barrel | 252 | 126.00 | tool | 126.00 | kaleidoscope_tavern:barrel
+kaleidoscope_tavern:pressing_tub | 14 | 7.00 | tool | 7.00 | kaleidoscope_tavern:pressing_tub
+kaleidoscope_tavern:shaker | 1200 | 600.00 | tool | 600.00 | kaleidoscope_tavern:shaker
+kaleidoscope_tavern:tap | 1535 | 767.50 | tool | 767.50 | kaleidoscope_tavern:tap
+kaleidoscope_tavern:empty_bottle | 2 | 1.00 | tool | 1.00 | kaleidoscope_tavern:empty_bottle
+kaleidoscope_tavern:empty_glassware | 3 | 1.13 | tool | 1.13 | kaleidoscope_tavern:empty_glassware
+kaleidoscope_tavern:trellis | 450 | 225.00 | tool | 225.00 | kaleidoscope_tavern:trellis
+farmersdelight:cooking_pot | 1509 | 754.50 | tool | 754.50 | farmersdelight:cooking_pot
+farmersdelight:skillet | 1201 | 600.25 | tool | 600.25 | farmersdelight:skillet
+farmersdelight:stove | 1068 | 534.00 | tool | 534.00 | farmersdelight:stove
+farmersdelight:cutting_board | 20 | 10.00 | tool | 10.00 | farmersdelight:cutting_board
+farmersdelight:flint_knife | 22 | 11.00 | tool | 11.00 | farmersdelight:flint_knife
+farmersdelight:iron_knife | 302 | 151.00 | tool | 151.00 | farmersdelight:iron_knife
+farmersdelight:golden_knife | 602 | 301.00 | tool | 301.00 | farmersdelight:golden_knife
+farmersdelight:diamond_knife | 2002 | 1001.00 | tool | 1001.00 | farmersdelight:diamond_knife
+farm_and_charm:cooking_pot | 1508 | 754.00 | tool | 754.00 | farm_and_charm:cooking_pot
+farm_and_charm:roaster | 1600 | 800.00 | tool | 800.00 | farm_and_charm:roaster
+farm_and_charm:stove | 1070 | 535.00 | tool | 535.00 | farm_and_charm:stove
+farm_and_charm:mincer | 1042 | 520.67 | tool | 520.67 | farm_and_charm:mincer
+farm_and_charm:crafting_bowl | 312 | 156.00 | tool | 156.00 | farm_and_charm:crafting_bowl
+kaleidoscope_tavern:allium_garden | - | 640.20 | drink (품질 반영) | 120.00 | kaleidoscope_tavern:shaker/allium_garden
+kaleidoscope_tavern:bloody_mary | - | 442.20 | drink (품질 반영) | 42.00 | kaleidoscope_tavern:shaker/bloody_mary
+kaleidoscope_tavern:brandy | - | 154.65 | drink (품질 반영) | 91.00 | kaleidoscope_tavern:barrel/brandy
+kaleidoscope_tavern:brass_heart | - | 2204.40 | drink (품질 반영) | 738.00 | kaleidoscope_tavern:shaker/brass_heart
+kaleidoscope_tavern:carignan | - | 104.05 | drink (품질 반영) | 47.00 | kaleidoscope_tavern:barrel/carignan
+kaleidoscope_tavern:champagne | - | 99.45 | drink (품질 반영) | 43.00 | kaleidoscope_tavern:barrel/champagne
+kaleidoscope_tavern:depth_charge | - | 745.80 | drink (품질 반영) | 161.00 | kaleidoscope_tavern:shaker/depth_charge
+kaleidoscope_tavern:emerald | - | 729.30 | drink (품질 반영) | 156.00 | kaleidoscope_tavern:shaker/emerald
+kaleidoscope_tavern:glowflower_brew | - | 92.55 | drink (품질 반영) | 37.00 | kaleidoscope_tavern:barrel/glowflower_brew
+kaleidoscope_tavern:godfather | - | 1029.60 | drink (품질 반영) | 274.00 | kaleidoscope_tavern:shaker/godfather
+kaleidoscope_tavern:grasshopper | - | 602.80 | drink (품질 반영) | 105.00 | kaleidoscope_tavern:shaker/grasshopper
+kaleidoscope_tavern:honey_wine | - | 334.05 | drink (품질 반영) | 247.00 | kaleidoscope_tavern:barrel/honey_wine
+kaleidoscope_tavern:ice_wine | - | 189.15 | drink (품질 반영) | 121.00 | kaleidoscope_tavern:barrel/ice_wine
+kaleidoscope_tavern:luminous_bride | - | 81.05 | drink (품질 반영) | 27.00 | kaleidoscope_tavern:barrel/luminous_bride
+kaleidoscope_tavern:madame_shexiang | - | 361.65 | drink (품질 반영) | 271.00 | kaleidoscope_tavern:barrel/madame_shexiang
+kaleidoscope_tavern:miners_star | - | 346.32 | drink (품질 반영) | 257.67 | kaleidoscope_tavern:barrel/miners_star
+kaleidoscope_tavern:mojito | - | 476.30 | drink (품질 반영) | 54.00 | kaleidoscope_tavern:shaker/mojito
+kaleidoscope_tavern:molotov | - | 223.65 | drink (품질 반영) | 151.00 | kaleidoscope_tavern:barrel/molotov
+kaleidoscope_tavern:mother_snow | - | 191.45 | drink (품질 반영) | 123.00 | kaleidoscope_tavern:barrel/mother_snow
+kaleidoscope_tavern:nether_special | - | 806.30 | drink (품질 반영) | 186.00 | kaleidoscope_tavern:shaker/nether_special
+kaleidoscope_tavern:plum_wine | - | 67.25 | drink (품질 반영) | 15.00 | kaleidoscope_tavern:barrel/plum_wine
+kaleidoscope_tavern:polaris_sweet_white | - | 209.85 | drink (품질 반영) | 139.00 | kaleidoscope_tavern:barrel/polaris_sweet_white
+kaleidoscope_tavern:red_queen | - | 110.95 | drink (품질 반영) | 53.00 | kaleidoscope_tavern:barrel/red_queen
+kaleidoscope_tavern:riesling_dry_white | - | 131.65 | drink (품질 반영) | 71.00 | kaleidoscope_tavern:barrel/riesling_dry_white
+kaleidoscope_tavern:rum | - | 53.45 | drink (품질 반영) | 3.00 | kaleidoscope_tavern:barrel/rum
+kaleidoscope_tavern:sakura_wine | - | 99.45 | drink (품질 반영) | 43.00 | kaleidoscope_tavern:barrel/sakura_wine
+kaleidoscope_tavern:sauvignon_blanc_dry_white | - | 110.95 | drink (품질 반영) | 53.00 | kaleidoscope_tavern:barrel/sauvignon_blanc_dry_white
+kaleidoscope_tavern:screwdriver | - | 1091.20 | drink (품질 반영) | 298.00 | kaleidoscope_tavern:shaker/screwdriver
+kaleidoscope_tavern:sculk_special | - | 1045.00 | drink (품질 반영) | 280.00 | kaleidoscope_tavern:shaker/sculk_special
+kaleidoscope_tavern:sherry | - | 375.45 | drink (품질 반영) | 283.00 | kaleidoscope_tavern:barrel/sherry
+kaleidoscope_tavern:sunset_glow | - | 384.65 | drink (품질 반영) | 291.00 | kaleidoscope_tavern:barrel/sunset_glow
+kaleidoscope_tavern:sweet_berry_wine | - | 71.85 | drink (품질 반영) | 19.00 | kaleidoscope_tavern:barrel/sweet_berry_wine
+kaleidoscope_tavern:vodka | - | 74.15 | drink (품질 반영) | 21.00 | kaleidoscope_tavern:barrel/vodka
+kaleidoscope_tavern:whiskey | - | 97.15 | drink (품질 반영) | 41.00 | kaleidoscope_tavern:barrel/whiskey
+kaleidoscope_tavern:white_lady | - | 537.90 | drink (품질 반영) | 79.00 | kaleidoscope_tavern:shaker/white_lady
+kaleidoscope_tavern:wine | - | 97.15 | drink (품질 반영) | 41.00 | kaleidoscope_tavern:barrel/wine
+farm_and_charm:bacon_with_eggs | - | 45.47 | dish (품질 반영) | 21.04 | farm_and_charm:roaster/bacon_with_eggs
+farm_and_charm:baked_lamb_ham | - | 215.60 | dish (품질 반영) | 100.00 | farm_and_charm:stove/baked_lamb_ham
+farm_and_charm:barley_patties_with_potatoes | - | 70.40 | dish (품질 반영) | 63.56 | farm_and_charm:roaster/barley_patties_with_potatoes
+farm_and_charm:barley_soup | - | 96.80 | dish (품질 반영) | 87.00 | farm_and_charm:pot_cooking/barley_soup
+farm_and_charm:beef_patty_with_vegetables | - | 100.10 | dish (품질 반영) | 90.56 | farm_and_charm:roaster/beef_patty_with_vegetables
+farm_and_charm:butter | - | 0.41 | dish (품질 반영) | 0.13 | farm_and_charm:crafting_bowl/butter
+farm_and_charm:chicken_wrapped_in_bacon | - | 104.50 | dish (품질 반영) | 40.82 | farm_and_charm:roaster/chicken_wrapped_in_bacon
+farm_and_charm:cooked_cod | - | 178.20 | dish (품질 반영) | 161.13 | farm_and_charm:roaster/cooked_cod
+farm_and_charm:cooked_salmon | - | 200.20 | dish (품질 반영) | 181.13 | farm_and_charm:roaster/cooked_salmon
+farm_and_charm:corn_grits | - | 100.10 | dish (품질 반영) | 91.00 | farm_and_charm:pot_cooking/corn_grits
+farm_and_charm:dough | - | 3.23 | dish (품질 반영) | 2.72 | farm_and_charm:crafting_bowl/dough
+farm_and_charm:farmer_salad | - | 66.00 | dish (품질 반영) | 60.00 | farm_and_charm:crafting_bowl/farmer_salad
+farm_and_charm:farmers_bread | - | 2.93 | dish (품질 반영) | 0.91 | farm_and_charm:stove/farmers_bread
+farm_and_charm:goulash | - | 398.20 | dish (품질 반영) | 170.67 | farm_and_charm:pot_cooking/goulash
+farm_and_charm:grandmothers_strawberry_cake | - | 26.95 | dish (품질 반영) | 22.36 | farm_and_charm:stove/grandmothers_strawberry_cake
+farm_and_charm:lamb_with_corn | - | 261.80 | dish (품질 반영) | 141.13 | farm_and_charm:roaster/lamb_with_corn
+farm_and_charm:nettle_tea | - | 5.00 | dish (품질 반영) | 5.00 | farm_and_charm:pot_cooking/nettle_tea
+farm_and_charm:oat_pancake | - | 61.97 | dish (품질 반영) | 54.61 | farm_and_charm:roaster/oat_pancake
+farm_and_charm:oatmeal_with_strawberries | - | 44.83 | dish (품질 반영) | 40.25 | farm_and_charm:crafting_bowl/oatmeal_with_strawberries
+farm_and_charm:onion_soup | - | 51.70 | dish (품질 반영) | 41.91 | farm_and_charm:pot_cooking/onion_soup
+farm_and_charm:pasta_with_onion_sauce | - | 13.20 | dish (품질 반영) | 10.34 | farm_and_charm:stove/pasta_with_onion_sauce
+farm_and_charm:potato_soup | - | 45.10 | dish (품질 반영) | 41.00 | farm_and_charm:pot_cooking/potato_soup
+farm_and_charm:potato_with_roast_meat | - | 63.80 | dish (품질 반영) | 57.50 | farm_and_charm:stove/potato_with_roast_meat
+farm_and_charm:ribwort_tea | - | 5.00 | dish (품질 반영) | 5.00 | farm_and_charm:pot_cooking/ribwort_tea
+farm_and_charm:roasted_chicken | - | 21.27 | dish (품질 반영) | 11.56 | farm_and_charm:stove/roasted_chicken
+farm_and_charm:roasted_corn | - | 89.10 | dish (품질 반영) | 80.13 | farm_and_charm:stove/roasted_corn
+farm_and_charm:sausage_with_oat_patty | - | 238.70 | dish (품질 반영) | 120.56 | farm_and_charm:roaster/sausage_with_oat_patty
+farm_and_charm:simple_tomato_soup | - | 91.30 | dish (품질 반영) | 83.00 | farm_and_charm:pot_cooking/simple_tomato_soup
+farm_and_charm:strawberry_tea | - | 90.20 | dish (품질 반영) | 81.00 | farm_and_charm:pot_cooking/strawberry_tea
+farm_and_charm:stuffed_chicken | - | 88.00 | dish (품질 반영) | 80.00 | farm_and_charm:stove/stuffed_chicken
+farm_and_charm:stuffed_rabbit | - | 132.00 | dish (품질 반영) | 120.00 | farm_and_charm:stove/stuffed_rabbit
+farmersdelight:apple_cider | - | 112.20 | dish (품질 반영) | 102.00 | farmersdelight:cooking/apple_cider
+farmersdelight:baked_cod_stew | - | 204.60 | dish (품질 반영) | 125.50 | farmersdelight:cooking/baked_cod_stew
+farmersdelight:beef_stew | - | 108.90 | dish (품질 반영) | 66.67 | farmersdelight:cooking/beef_stew
+farmersdelight:bone_broth | - | 14.30 | dish (품질 반영) | 13.00 | farmersdelight:cooking/bone_broth
+farmersdelight:cabbage_rolls | - | 30.80 | dish (품질 반영) | 28.00 | farmersdelight:cooking/cabbage_rolls
+farmersdelight:chicken_soup | - | 99.00 | dish (품질 반영) | 73.33 | farmersdelight:cooking/chicken_soup
+farmersdelight:cooked_rice | - | 4.40 | dish (품질 반영) | 4.00 | farmersdelight:cooking/cooked_rice
+farmersdelight:dog_food | - | 39.60 | dish (품질 반영) | 19.33 | farmersdelight:cooking/dog_food
+farmersdelight:dumplings | - | 30.25 | dish (품질 반영) | 25.36 | farmersdelight:cooking/dumplings
+farmersdelight:fish_stew | - | 315.70 | dish (품질 반영) | 139.00 | farmersdelight:cooking/fish_stew
+farmersdelight:fried_rice | - | 55.00 | dish (품질 반영) | 50.00 | farmersdelight:cooking/fried_rice
+farmersdelight:glow_berry_custard | - | 19.25 | dish (품질 반영) | 16.50 | farmersdelight:cooking/glow_berry_custard
+farmersdelight:mushroom_rice | - | 44.00 | dish (품질 반영) | 40.00 | farmersdelight:cooking/mushroom_rice
+farmersdelight:noodle_soup | - | 57.20 | dish (품질 반영) | 25.03 | farmersdelight:cooking/noodle_soup
+farmersdelight:onion_soup | - | 52.25 | dish (품질 반영) | 41.41 | farmersdelight:cooking/onion_soup
+farmersdelight:pasta_with_meatballs | - | 302.50 | dish (품질 반영) | 120.36 | farmersdelight:cooking/pasta_with_meatballs
+farmersdelight:pasta_with_mutton_chop | - | 270.60 | dish (품질 반영) | 107.03 | farmersdelight:cooking/pasta_with_mutton_chop
+farmersdelight:pumpkin_soup | - | 66.55 | dish (품질 반영) | 38.17 | farmersdelight:cooking/pumpkin_soup
+farmersdelight:ratatouille | - | 132.00 | dish (품질 반영) | 120.00 | farmersdelight:cooking/ratatouille
+farmersdelight:squid_ink_pasta | - | 154.00 | dish (품질 반영) | 85.36 | farmersdelight:cooking/squid_ink_pasta
+farmersdelight:tomato_sauce | - | 89.10 | dish (품질 반영) | 80.00 | farmersdelight:integration/create/mixing/tomato_sauce_from_mixing
+farmersdelight:vegetable_noodles | - | 83.60 | dish (품질 반영) | 69.36 | farmersdelight:cooking/vegetable_noodles
+farmersdelight:vegetable_soup | - | 110.00 | dish (품질 반영) | 100.00 | farmersdelight:cooking/vegetable_soup
+kaleidoscope_cookery:bamboo_tube_rice | - | 38.50 | dish (품질 반영) | 16.67 | kaleidoscope_cookery:steamer/bamboo_tube_rice
+kaleidoscope_cookery:baozi | - | 62.70 | dish (품질 반영) | 34.38 | kaleidoscope_cookery:steamer/baozi
+kaleidoscope_cookery:beef_meatball_soup | - | 520.30 | dish (품질 반영) | 84.33 | kaleidoscope_cookery:stockpot/beef_meatball_soup
+kaleidoscope_cookery:beef_noodle | - | 268.40 | dish (품질 반영) | 28.57 | kaleidoscope_cookery:stockpot/beef_noodle
+kaleidoscope_cookery:blaze_lamb_chop | - | 360.80 | dish (품질 반영) | 77.67 | kaleidoscope_cookery:pot/blaze_lamb_chop
+kaleidoscope_cookery:borscht | - | 306.90 | dish (품질 반영) | 67.67 | kaleidoscope_cookery:stockpot/borscht
+kaleidoscope_cookery:braised_beef | - | 327.80 | dish (품질 반영) | 67.67 | kaleidoscope_cookery:pot/braised_beef
+kaleidoscope_cookery:braised_beef_rice_bowl | - | 731.50 | dish (품질 반영) | 70.67 | kaleidoscope_cookery:braised_beef_rice_bowl
+kaleidoscope_cookery:braised_beef_with_potatoes | - | 196.90 | dish (품질 반영) | 47.67 | kaleidoscope_cookery:stockpot/braised_beef_with_potatoes
+kaleidoscope_cookery:braised_pork_ribs | - | 185.90 | dish (품질 반영) | 22.67 | kaleidoscope_cookery:pot/braised_pork_ribs
+kaleidoscope_cookery:brown_mushroom_pot_soup | - | 69.19 | dish (품질 반영) | 8.75 | kaleidoscope_cookery:flex_stockpot/brown_mushroom_pot_soup
+kaleidoscope_cookery:buddha_jumps_over_the_wall | - | 266.59 | dish (품질 반영) | 196.75 | kaleidoscope_cookery:flex_stockpot/buddha_jumps_over_the_wall
+kaleidoscope_cookery:candied_apple_skewer | - | 265.10 | dish (품질 반영) | 103.00 | kaleidoscope_cookery:stockpot/sugar_syrup_apple_9
+kaleidoscope_cookery:candied_caterpillar_skewer | - | 749.10 | dish (품질 반영) | 303.00 | kaleidoscope_cookery:stockpot/sugar_syrup_caterpillar_9
+kaleidoscope_cookery:candied_chorus_fruit_skewer | - | 75.75 | dish (품질 반영) | 15.00 | kaleidoscope_cookery:stockpot/sugar_syrup_chorus_fruit_1
+kaleidoscope_cookery:candied_glow_berry_skewer | - | 79.95 | dish (품질 반영) | 19.00 | kaleidoscope_cookery:stockpot/sugar_syrup_glow_berry_1
+kaleidoscope_cookery:candied_potato | - | 104.15 | dish (품질 반영) | 23.00 | kaleidoscope_cookery:flex_pot/candied_potato
+kaleidoscope_cookery:candied_sweet_berry_skewer | - | 75.75 | dish (품질 반영) | 15.00 | kaleidoscope_cookery:stockpot/sugar_syrup_sweet_berry_1
+kaleidoscope_cookery:chicken_and_mushroom_stew | - | 93.50 | dish (품질 반영) | 22.33 | kaleidoscope_cookery:stockpot/chicken_and_mushroom_stew
+kaleidoscope_cookery:chorus_fried_egg | - | 93.65 | dish (품질 반영) | 13.00 | kaleidoscope_cookery:flex_pot/chorus_fried_egg
+kaleidoscope_cookery:cooked_cow_offal | - | 59.00 | dish (품질 반영) | 26.67 | minecraft:cooked_cow_offal_from_campfire_cooking
+kaleidoscope_cookery:cooked_cut_small_meats | - | 29.33 | dish (품질 반영) | 11.67 | kaleidoscope_cookery:chopping_board/cooked_cut_small_meats_from_chicken
+kaleidoscope_cookery:cooked_lamb_chops | - | 59.00 | dish (품질 반영) | 26.67 | minecraft:cooked_lamb_chops_from_campfire_cooking
+kaleidoscope_cookery:cooked_meatball | - | 176.00 | dish (품질 반영) | 43.33 | minecraft:cooked_meatball_from_campfire_cooking
+kaleidoscope_cookery:cooked_pork_belly | - | 37.00 | dish (품질 반영) | 16.67 | minecraft:cooked_pork_belly_from_campfire_cooking
+kaleidoscope_cookery:cooked_rice | - | 10.98 | dish (품질 반영) | 4.11 | kaleidoscope_cookery:stockpot/rice_9
+kaleidoscope_cookery:crimson_fungus_pot_soup | - | 62.89 | dish (품질 반영) | 2.75 | kaleidoscope_cookery:flex_stockpot/crimson_fungus_pot_soup
+kaleidoscope_cookery:crystal_lamb_chop | - | 215.60 | dish (품질 반영) | 33.67 | kaleidoscope_cookery:pot/crystal_lamb_chop
+kaleidoscope_cookery:dongpo_pork | - | 247.50 | dish (품질 반영) | 18.67 | kaleidoscope_cookery:pot/dongpo_pork
+kaleidoscope_cookery:donkey_burger | - | 233.20 | dish (품질 반영) | 54.38 | kaleidoscope_cookery:pot/donkey_burger
+kaleidoscope_cookery:dough_drop_soup | - | 265.10 | dish (품질 반영) | 81.00 | kaleidoscope_cookery:stockpot/dough_drop_soup
+kaleidoscope_cookery:dumpling | - | 62.70 | dish (품질 반영) | 34.38 | kaleidoscope_cookery:stockpot/dumpling_count_1
+kaleidoscope_cookery:egg_fried_rice | - | 90.50 | dish (품질 반영) | 10.00 | kaleidoscope_cookery:flex_pot/egg_fried_rice
+kaleidoscope_cookery:fearsome_thick_soup | - | 1007.10 | dish (품질 반영) | 902.00 | kaleidoscope_cookery:flex_stockpot/fearsome_thick_soup
+kaleidoscope_cookery:fish_flavored_shredded_pork | - | 188.10 | dish (품질 반영) | 65.67 | kaleidoscope_cookery:pot/fish_flavored_shredded_pork
+kaleidoscope_cookery:fish_flavored_shredded_pork_rice_bowl | - | 424.60 | dish (품질 반영) | 68.67 | kaleidoscope_cookery:fish_flavored_shredded_pork_rice_bowl
+kaleidoscope_cookery:fondant_pie | - | 128.70 | dish (품질 반영) | 15.00 | kaleidoscope_cookery:pot/fondant_pie
+kaleidoscope_cookery:fondant_spider_eye | - | 85.25 | dish (품질 반영) | 5.00 | kaleidoscope_cookery:flex_pot/fondant_spider_eye
+kaleidoscope_cookery:four_joy_meatball_soup | - | 775.50 | dish (품질 반영) | 44.33 | kaleidoscope_cookery:stockpot/four_joy_meatball_soup
+kaleidoscope_cookery:fried_caterpillar | - | 991.10 | dish (품질 반영) | 301.00 | kaleidoscope_cookery:pot/fried_caterpillar
+kaleidoscope_cookery:fried_egg | - | 15.19 | dish (품질 반영) | 6.00 | kaleidoscope_cookery:pot/egg_to_fried_egg_9
+kaleidoscope_cookery:fried_spring_roll | - | 264.45 | dish (품질 반영) | 175.67 | kaleidoscope_cookery:flex_pot/fried_spring_roll
+kaleidoscope_cookery:frost_lamb_chop | - | 730.40 | dish (품질 반영) | 189.67 | kaleidoscope_cookery:pot/frost_lamb_chop
+kaleidoscope_cookery:hot_dry_noodles | - | 305.80 | dish (품질 반영) | 191.91 | kaleidoscope_cookery:stockpot/hot_dry_noodles
+kaleidoscope_cookery:hui_noodle | - | 268.40 | dish (품질 반영) | 28.57 | kaleidoscope_cookery:stockpot/hui_noodle
+kaleidoscope_cookery:laba_congee | - | 64.20 | dish (품질 반영) | 4.00 | kaleidoscope_cookery:flex_stockpot/laba_congee
+kaleidoscope_cookery:lamb_and_radish_soup | - | 196.90 | dish (품질 반영) | 47.67 | kaleidoscope_cookery:stockpot/lamb_and_radish_soup
+kaleidoscope_cookery:mantou | - | 12.85 | dish (품질 반영) | 2.72 | kaleidoscope_cookery:steamer/mantou
+kaleidoscope_cookery:meat_pie | - | 62.70 | dish (품질 반영) | 34.38 | kaleidoscope_cookery:pot/stuffed_dough_food_to_meat_pie_1
+kaleidoscope_cookery:numbing_spicy_chicken | - | 353.10 | dish (품질 반영) | 204.33 | kaleidoscope_cookery:stockpot/numbing_spicy_chicken
+kaleidoscope_cookery:oil_splashed_fish | - | 669.90 | dish (품질 반영) | 81.00 | kaleidoscope_cookery:pot/oil_splashed_fish
+kaleidoscope_cookery:pan_seared_knight_steak | - | 167.20 | dish (품질 반영) | 38.67 | kaleidoscope_cookery:pot/pan_seared_knight_steak
+kaleidoscope_cookery:pork_bone_soup | - | 66.30 | dish (품질 반영) | 6.00 | kaleidoscope_cookery:flex_stockpot/pork_bone_soup
+kaleidoscope_cookery:pufferfish_soup | - | 617.10 | dish (품질 반영) | 261.00 | kaleidoscope_cookery:stockpot/pufferfish_soup
+kaleidoscope_cookery:qingtuan | - | 14.20 | dish (품질 반영) | 4.00 | kaleidoscope_cookery:steamer/qingtuan
+kaleidoscope_cookery:red_mushroom_pot_soup | - | 69.19 | dish (품질 반영) | 8.75 | kaleidoscope_cookery:flex_stockpot/red_mushroom_pot_soup
+kaleidoscope_cookery:scramble_egg_with_tomatoes | - | 152.90 | dish (품질 반영) | 47.00 | kaleidoscope_cookery:pot/scramble_egg_with_tomatoes
+kaleidoscope_cookery:scramble_egg_with_tomatoes_rice_bowl | - | 346.50 | dish (품질 반영) | 50.00 | kaleidoscope_cookery:scramble_egg_with_tomatoes_rice_bowl
+kaleidoscope_cookery:seafood_miso_soup | - | 326.70 | dish (품질 반영) | 81.00 | kaleidoscope_cookery:stockpot/seafood_miso_soup
+kaleidoscope_cookery:shengjian_mantou | - | 90.20 | dish (품질 반영) | 51.05 | kaleidoscope_cookery:stockpot/shengjian_mantou_count_6
+kaleidoscope_cookery:slime_ball_meal | - | 85.25 | dish (품질 반영) | 5.00 | kaleidoscope_cookery:flex_pot/slime_ball_meal
+kaleidoscope_cookery:spicy_blood_stew | - | 559.90 | dish (품질 반영) | 257.67 | kaleidoscope_cookery:stockpot/spicy_blood_stew
+kaleidoscope_cookery:spicy_chicken | - | 309.10 | dish (품질 반영) | 54.33 | kaleidoscope_cookery:pot/spicy_chicken
+kaleidoscope_cookery:spicy_rabbit_head | - | 397.10 | dish (품질 반영) | 121.00 | kaleidoscope_cookery:pot/spicy_rabbit_head
+kaleidoscope_cookery:stargazy_pie | - | 514.80 | dish (품질 반영) | 53.00 | kaleidoscope_cookery:pot/stargazy_pie
+kaleidoscope_cookery:sticky_candy | - | 83.15 | dish (품질 반영) | 3.00 | kaleidoscope_cookery:flex_pot/sticky_candy
+kaleidoscope_cookery:sticky_rice_cake | - | 24.20 | dish (품질 반영) | 3.11 | kaleidoscope_cookery:pot/cooked_rice_to_sticky_rice_cake_1
+kaleidoscope_cookery:stir_fried_pork_with_peppers | - | 255.20 | dish (품질 반영) | 57.67 | kaleidoscope_cookery:pot/stir_fried_pork_with_peppers
+kaleidoscope_cookery:stir_fried_pork_with_peppers_rice_bowl | - | 572.00 | dish (품질 반영) | 60.67 | kaleidoscope_cookery:stir_fried_pork_with_peppers_rice_bowl
+kaleidoscope_cookery:stuffed_tiger_skin_pepper | - | 436.70 | dish (품질 반영) | 52.67 | kaleidoscope_cookery:pot/stuffed_tiger_skin_pepper
+kaleidoscope_cookery:sweet_and_sour_ender_pearls | - | 175.55 | dish (품질 반영) | 91.00 | kaleidoscope_cookery:flex_pot/sweet_and_sour_ender_pearls
+kaleidoscope_cookery:sweet_and_sour_pork | - | 129.80 | dish (품질 반영) | 19.67 | kaleidoscope_cookery:pot/sweet_and_sour_pork
+kaleidoscope_cookery:sweet_and_sour_pork_rice_bowl | - | 295.90 | dish (품질 반영) | 22.67 | kaleidoscope_cookery:sweet_and_sour_pork_rice_bowl
+kaleidoscope_cookery:tea_egg | - | 31.80 | dish (품질 반영) | 16.00 | kaleidoscope_cookery:stockpot/tea_egg_count_4
+kaleidoscope_cookery:udon_noodle | - | 110.30 | dish (품질 반영) | 47.91 | kaleidoscope_cookery:flex_stockpot/udon_noodle
+kaleidoscope_cookery:warped_fungus_pot_soup | - | 62.89 | dish (품질 반영) | 2.75 | kaleidoscope_cookery:flex_stockpot/warped_fungus_pot_soup
+kaleidoscope_cookery:wild_mushroom_rabbit_soup | - | 203.50 | dish (품질 반영) | 89.00 | kaleidoscope_cookery:stockpot/wild_mushroom_rabbit_soup
+kaleidoscope_cookery:zongzi | - | 15.07 | dish (품질 반영) | 8.00 | kaleidoscope_cookery:stockpot/zongzi_count_9
+minecraft:baked_potato | - | 20.00 | dish (품질 반영) | 20.00 | minecraft:baked_potato
+minecraft:beetroot_soup | - | 133.10 | dish (품질 반영) | 121.00 | farmersdelight:cooking/beetroot_soup
+minecraft:cooked_beef | - | 80.00 | dish (품질 반영) | 80.00 | minecraft:cooked_beef
+minecraft:cooked_chicken | - | 40.00 | dish (품질 반영) | 40.00 | minecraft:cooked_chicken
+minecraft:cooked_cod | - | 120.00 | dish (품질 반영) | 120.00 | minecraft:cooked_cod
+minecraft:cooked_mutton | - | 80.00 | dish (품질 반영) | 80.00 | minecraft:cooked_mutton
+minecraft:cooked_porkchop | - | 50.00 | dish (품질 반영) | 50.00 | minecraft:cooked_porkchop
+minecraft:cooked_rabbit | - | 80.00 | dish (품질 반영) | 80.00 | minecraft:cooked_rabbit
+minecraft:cooked_salmon | - | 120.00 | dish (품질 반영) | 120.00 | minecraft:cooked_salmon
+minecraft:mushroom_stew | - | 18.70 | dish (품질 반영) | 17.00 | farmersdelight:cooking/mushroom_stew
+minecraft:rabbit_stew | - | 141.90 | dish (품질 반영) | 129.00 | farmersdelight:cooking/rabbit_stew
+farmersdelight:bacon_and_eggs | - | 269.50 | dish (품질 반영) | 63.00 | farmersdelight:bacon_and_eggs
+farmersdelight:gleaming_salad | - | 150.00 | dish (품질 반영) | - | 
+farmersdelight:gleaming_salad_block | - | 906.40 | dish (품질 반영) | 452.00 | farmersdelight:gleaming_salad_block
+farmersdelight:grilled_salmon | - | 315.70 | dish (품질 반영) | 106.50 | farmersdelight:grilled_salmon
+farmersdelight:honey_glazed_ham | - | 150.00 | dish (품질 반영) | - | 
+farmersdelight:honey_glazed_ham_block | - | 295.90 | dish (품질 반영) | 151.00 | farmersdelight:honey_glazed_ham_block
+farmersdelight:mixed_salad | - | 111.10 | dish (품질 반영) | 101.00 | farmersdelight:mixed_salad
+farmersdelight:rice_roll_medley_block | - | 1877.70 | dish (품질 반영) | 335.00 | farmersdelight:rice_roll_medley_block
+farmersdelight:roast_chicken | - | 150.00 | dish (품질 반영) | - | 
+farmersdelight:roast_chicken_block | - | 540.10 | dish (품질 반영) | 189.00 | farmersdelight:roast_chicken_block
+farmersdelight:roasted_mutton_chops | - | 292.60 | dish (품질 반영) | 124.00 | farmersdelight:roasted_mutton_chops
+farmersdelight:shepherds_pie | - | 150.00 | dish (품질 반영) | - | 
+farmersdelight:shepherds_pie_block | - | 524.15 | dish (품질 반영) | 161.50 | farmersdelight:shepherds_pie_block
+farmersdelight:steak_and_potatoes | - | 253.00 | dish (품질 반영) | 124.00 | farmersdelight:steak_and_potatoes
+farmersdelight:stuffed_pumpkin | - | 150.00 | dish (품질 반영) | - | 
+farmersdelight:stuffed_pumpkin_block | - | 90.20 | dish (품질 반영) | 82.00 | farmersdelight:cooking/stuffed_pumpkin_block
+kaleidoscope_cookery:apple_skewer | - | 111.10 | dish (품질 반영) | 101.00 | kaleidoscope_cookery:apple_skewer
+kaleidoscope_cookery:caterpillar | - | 150.00 | dish (품질 반영) | - | 
+kaleidoscope_cookery:caterpillar_skewer | - | 331.10 | dish (품질 반영) | 301.00 | kaleidoscope_cookery:caterpillar_skewer
+kaleidoscope_cookery:chorus_fruit_skewer | - | 14.30 | dish (품질 반영) | 13.00 | kaleidoscope_cookery:chorus_fruit_skewer
+kaleidoscope_cookery:cold_roasted_meat | - | 529.10 | dish (품질 반영) | 241.00 | kaleidoscope_cookery:cold_roasted_meat
+kaleidoscope_cookery:cold_style_sashimi | - | 391.60 | dish (품질 반영) | 164.00 | kaleidoscope_cookery:cold_style_sashimi
+kaleidoscope_cookery:dark_cuisine | - | 150.00 | dish (품질 반영) | - | 
+kaleidoscope_cookery:desert_style_sashimi | - | 392.70 | dish (품질 반영) | 165.00 | kaleidoscope_cookery:desert_style_sashimi
+kaleidoscope_cookery:end_style_sashimi | - | 408.10 | dish (품질 반영) | 179.00 | kaleidoscope_cookery:end_style_sashimi
+kaleidoscope_cookery:glow_berry_skewer | - | 18.70 | dish (품질 반영) | 17.00 | kaleidoscope_cookery:glow_berry_skewer
+kaleidoscope_cookery:golden_salad | - | 13836.17 | dish (품질 반영) | 5903.00 | kaleidoscope_cookery:golden_salad
+kaleidoscope_cookery:nether_style_sashimi | - | 165.00 | dish (품질 반영) | 165.00 | kaleidoscope_cookery:nether_style_sashimi
+kaleidoscope_cookery:raw_cow_offal | - | 29.33 | dish (품질 반영) | 26.67 | kaleidoscope_cookery:chopping_board/raw_cow_offal
+kaleidoscope_cookery:raw_cut_small_meats | - | 14.67 | dish (품질 반영) | 11.67 | kaleidoscope_cookery:chopping_board/raw_cut_small_meats_from_chicken
+kaleidoscope_cookery:raw_lamb_chops | - | 29.33 | dish (품질 반영) | 26.67 | kaleidoscope_cookery:chopping_board/raw_lamb_chops
+kaleidoscope_cookery:raw_meatball | - | 88.00 | dish (품질 반영) | 43.33 | kaleidoscope_cookery:raw_meatball
+kaleidoscope_cookery:raw_pork_belly | - | 18.33 | dish (품질 반영) | 16.67 | kaleidoscope_cookery:chopping_board/raw_pork_belly
+kaleidoscope_cookery:samsa | - | 62.70 | dish (품질 반영) | 34.38 | minecraft:samsa_from_campfire_cooking
+kaleidoscope_cookery:sashimi | - | 44.00 | dish (품질 반영) | 40.00 | kaleidoscope_cookery:chopping_board/sashimi_from_cod
+kaleidoscope_cookery:suspicious_stir_fry | - | 150.00 | dish (품질 반영) | - | 
+kaleidoscope_cookery:sweet_berry_skewer | - | 14.30 | dish (품질 반영) | 13.00 | kaleidoscope_cookery:sweet_berry_skewer
+kaleidoscope_cookery:tundra_style_sashimi | - | 261.00 | dish (품질 반영) | 261.00 | kaleidoscope_cookery:tundra_style_sashimi
+farm_and_charm:bacon | - | 27.50 | dish (품질 반영) | 25.00 | farm_and_charm:mincer/bacon
+farm_and_charm:chicken_feed | - | 53.33 | dish (품질 반영) | 53.33 | farm_and_charm:chicken_feed
+farm_and_charm:chicken_parts | - | 14.67 | dish (품질 반영) | 13.33 | farm_and_charm:mincer/chicken_parts
+farm_and_charm:farmers_breakfast | - | 303.60 | dish (품질 반영) | 102.07 | farm_and_charm:farmers_breakfast
+farm_and_charm:lamb_ham | - | 88.00 | dish (품질 반영) | 80.00 | farm_and_charm:mincer/lamb_ham
+farm_and_charm:minced_beef | - | 88.00 | dish (품질 반영) | 80.00 | farm_and_charm:mincer/minced_beef
+farm_and_charm:nettle_tea_cup | - | 12.00 | dish (품질 반영) | - | 
+farm_and_charm:raw_pasta | - | 3.85 | dish (품질 반영) | 1.36 | farm_and_charm:mincer/raw_pasta
+farm_and_charm:ribwort_tea_cup | - | 12.00 | dish (품질 반영) | - | 
+farm_and_charm:strawberry_tea_cup | - | 12.00 | dish (품질 반영) | - | 
+farmersdelight:apple_pie_slice | - | 98.63 | dish (품질 반영) | 98.63 | farmersdelight:cutting/apple_pie
+farmersdelight:bacon | - | 27.50 | dish (품질 반영) | 25.00 | farmersdelight:cutting/porkchop
+farmersdelight:bacon_sandwich | - | 193.60 | dish (품질 반영) | 85.91 | farmersdelight:bacon_sandwich
+farmersdelight:barbecue_stick | - | 114.40 | dish (품질 반영) | 72.56 | farmersdelight:barbecue_stick
+farmersdelight:beef_patty | - | 88.00 | dish (품질 반영) | 40.00 | farmersdelight:beef_patty
+farmersdelight:cake_slice | - | 18.79 | dish (품질 반영) | 18.79 | farmersdelight:cutting/cake
+farmersdelight:chicken_cuts | - | 22.00 | dish (품질 반영) | 19.50 | farmersdelight:cutting/chicken
+farmersdelight:chicken_sandwich | - | 97.90 | dish (품질 반영) | 52.47 | farmersdelight:chicken_sandwich
+farmersdelight:chocolate_pie_slice | - | 46.50 | dish (품질 반영) | 46.50 | farmersdelight:cutting/chocolate_pie
+farmersdelight:cod_roll | - | 150.15 | dish (품질 반영) | 61.00 | farmersdelight:cod_roll
+farmersdelight:cod_slice | - | 66.00 | dish (품질 반영) | 59.50 | farmersdelight:cutting/cod
+farmersdelight:cooked_bacon | - | 55.00 | dish (품질 반영) | 25.00 | farmersdelight:cooked_bacon
+farmersdelight:cooked_chicken_cuts | - | 44.00 | dish (품질 반영) | 19.50 | farmersdelight:cooked_chicken_cuts
+farmersdelight:cooked_cod_slice | - | 132.00 | dish (품질 반영) | 59.50 | farmersdelight:cooked_cod_slice
+farmersdelight:cooked_mutton_chops | - | 88.00 | dish (품질 반영) | 40.00 | farmersdelight:cooked_mutton_chops
+farmersdelight:cooked_salmon_slice | - | 132.00 | dish (품질 반영) | 59.50 | farmersdelight:cooked_salmon_slice
+farmersdelight:egg_sandwich | - | 33.00 | dish (품질 반영) | 12.91 | farmersdelight:egg_sandwich
+farmersdelight:fried_egg | - | 6.00 | dish (품질 반영) | 6.00 | farmersdelight:fried_egg
+farmersdelight:fruit_salad | - | 73.70 | dish (품질 반영) | 66.00 | farmersdelight:fruit_salad
+farmersdelight:hamburger | - | 288.20 | dish (품질 반영) | 120.91 | farmersdelight:hamburger
+farmersdelight:honey_cookie | - | 13.20 | dish (품질 반영) | 11.88 | farmersdelight:honey_cookie
+farmersdelight:kelp_roll | - | 45.10 | dish (품질 반영) | 29.00 | farmersdelight:kelp_roll
+farmersdelight:kelp_roll_slice | - | 33.37 | dish (품질 반영) | 9.67 | farmersdelight:cutting/kelp_roll
+farmersdelight:melon_popsicle | - | 9.90 | dish (품질 반영) | 9.00 | farmersdelight:melon_popsicle
+farmersdelight:minced_beef | - | 44.00 | dish (품질 반영) | 40.00 | farmersdelight:cutting/beef
+farmersdelight:mutton_chops | - | 44.00 | dish (품질 반영) | 40.00 | farmersdelight:cutting/mutton
+farmersdelight:mutton_wrap | - | 180.40 | dish (품질 반영) | 67.57 | farmersdelight:mutton_wrap
+farmersdelight:nether_salad | - | 5.00 | dish (품질 반영) | 5.00 | farmersdelight:nether_salad
+farmersdelight:pie_crust | - | 133.65 | dish (품질 반영) | 120.50 | farmersdelight:pie_crust
+farmersdelight:pumpkin_pie_slice | - | 3.00 | dish (품질 반영) | 3.00 | farmersdelight:cutting/pumpkin_pie
+farmersdelight:pumpkin_slice | - | 1.00 | dish (품질 반영) | 1.00 | farmersdelight:cutting/pumpkin
+farmersdelight:raw_pasta | - | 7.70 | dish (품질 반영) | 2.72 | farmersdelight:cutting/tag_dough
+farmersdelight:salmon_roll | - | 150.15 | dish (품질 반영) | 61.00 | farmersdelight:salmon_roll
+farmersdelight:salmon_slice | - | 66.00 | dish (품질 반영) | 59.50 | farmersdelight:cutting/salmon
+farmersdelight:smoked_ham | - | 105.00 | dish (품질 반영) | 105.00 | farmersdelight:smoked_ham
+farmersdelight:stuffed_potato | - | 175.45 | dish (품질 반영) | 47.17 | farmersdelight:stuffed_potato
+farmersdelight:sweet_berry_cheesecake_slice | - | 39.38 | dish (품질 반영) | 39.38 | farmersdelight:cutting/sweet_berry_cheesecake
+farmersdelight:sweet_berry_cookie | - | 11.83 | dish (품질 반영) | 10.75 | farmersdelight:sweet_berry_cookie
+farmersdelight:wheat_dough | - | 46.20 | dish (품질 반영) | 42.00 | farmersdelight:wheat_dough_from_egg
+minecraft:bread | - | 132.00 | dish (품질 반영) | 42.00 | farmersdelight:bread_from_smelting
+minecraft:cookie | - | 13.75 | dish (품질 반영) | 12.50 | minecraft:cookie
+minecraft:golden_apple | - | 2695.00 | dish (품질 반영) | 2450.00 | minecraft:golden_apple
+minecraft:golden_carrot | - | 315.33 | dish (품질 반영) | 260.00 | minecraft:golden_carrot
+minecraft:pumpkin_pie | - | 13.20 | dish (품질 반영) | 12.00 | minecraft:pumpkin_pie
+aquamirae:spinefish | 16 | 8.00 | ingredient (품질 반영) | - | 
+quark:crab_leg | 10 | 5.00 | ingredient (품질 반영) | - | 
+aquamirae:esca | 26 | 13.00 | ingredient (품질 반영) | - | 
+aquamirae:cooked_spinefish | 74 | 16.00 | ingredient (품질 반영) | 16.00 | aquamirae:cooked_spinefish
+aquamirae:fin | 10 | 5.00 | ingredient (품질 반영) | - | 
+starcatcher:starcaught_fish | 14 | 7.00 | ingredient (품질 반영) | 120.00 | 
+kaleidoscope_cookery:barley_tea_bag | 20 | 10.00 | ingredient (품질 반영) | 100.00 | 
+kaleidoscope_cookery:oolong_tea_bag | 20 | 10.00 | ingredient (품질 반영) | 379.00 | 
+kaleidoscope_cookery:sakura_fubuki_tea_bag | 20 | 10.00 | ingredient (품질 반영) | - | 

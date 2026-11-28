@@ -1,0 +1,21 @@
+{
+  "_설명": "양산 음식: items 에 적은 음식은 배고픔과 포만감이 factor 배만 찬다 (0.5 = 절반, 적어도 1칸). 목록에 없는 음식(요리사가 조리 도구로 만드는 요리)은 그대로다. 케이크(minecraft:cake)는 조각마다 적용된다. 고친 뒤 /rtshop reload.",
+  "version": 2,
+  "enabled": true,
+  "factor": 0.7,
+  "items": [
+    "minecraft:bread",
+    "minecraft:cake",
+    "minecraft:cookie",
+    "minecraft:pumpkin_pie",
+    "minecraft:baked_potato",
+    "minecraft:dried_kelp",
+    "minecraft:melon_slice",
+    "minecraft:sweet_berries",
+    "minecraft:glow_berries",
+    "minecraft:apple",
+    "minecraft:carrot",
+    "minecraft:potato",
+    "minecraft:beetroot"
+  ]
+}

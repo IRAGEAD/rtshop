@@ -1,0 +1,336 @@
+{
+  "_help": "토벌 의뢰판(/bounty)과 몹 도감(/bestiary). pools: flag 표식을 가진 사람에게 그 몹들이 의뢰로 나온다 (\"\" = 누구나). targets: [몹 ID, 최소, 최대, 마리당 Gold] (0 이면 몹의 체력·공격력·방어력으로 잰 난이도로 자동. 몹 ID 만 적어도 된다). 게임 안에서는 OP 가 /bounty pool add|remove|list 로 고칠 수 있다. weekly 의뢰는 weeklyMultiplier 배로 많고 비싸다. jobBonus: 전투 직업이 있으면 보상 +비율. books: 장별 도감, 들어 있는 몹(설치된 모드만)을 모두 잡으면 gold 를 한 번 준다.",
+  "version": 3,
+  "enabled": true,
+  "dailyCount": 3,
+  "weeklyCount": 1,
+  "dailyOffers": 6,
+  "weeklyOffers": 3,
+  "boardNpcs": [],
+  "weeklyMultiplier": 3.0,
+  "resetHour": 6,
+  "jobBonus": 0.2,
+  "pools": [
+    {
+      "flag": "",
+      "targets": [
+        [
+          "minecraft:zombie",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:skeleton",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:spider",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:creeper",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:drowned",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:husk",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:stray",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:witch",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:enderman",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:pillager",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:vindicator",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:slime",
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "flag": "story_ch1_done",
+      "targets": [
+        [
+          "mowziesmobs:foliaath",
+          0,
+          0,
+          0
+        ],
+        [
+          "mowziesmobs:lantern",
+          0,
+          0,
+          0
+        ],
+        [
+          "mowziesmobs:naga",
+          0,
+          0,
+          0
+        ],
+        [
+          "mowziesmobs:umvuthana",
+          0,
+          0,
+          0
+        ],
+        [
+          "mowziesmobs:umvuthana_raptor",
+          0,
+          0,
+          0
+        ],
+        [
+          "mowziesmobs:grottol",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:wither_skeleton",
+          0,
+          0,
+          0
+        ],
+        [
+          "minecraft:blaze",
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "flag": "story_ch2_done",
+      "targets": [
+        [
+          "aquamirae:tortured_soul",
+          0,
+          0,
+          0
+        ],
+        [
+          "aquamirae:anglerfish",
+          0,
+          0,
+          0
+        ],
+        [
+          "aquamirae:eel",
+          0,
+          0,
+          0
+        ],
+        [
+          "aquamirae:maw",
+          0,
+          0,
+          0
+        ],
+        [
+          "aquamirae:spinefish",
+          0,
+          0,
+          0
+        ],
+        [
+          "aquamirae:abyssal_scyphoid",
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "flag": "story_ch3_done",
+      "targets": [
+        [
+          "cataclysm:koboleton",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:the_watcher",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:deepling",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:deepling_brute",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:draugr",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:elite_draugr",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:endermaptera",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:ignited_revenant",
+          0,
+          0,
+          0
+        ],
+        [
+          "cataclysm:the_prowler",
+          0,
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "books": [
+    {
+      "id": "vanilla",
+      "name": "베스탈리아의 들짐승",
+      "gold": 3000,
+      "entities": [
+        "minecraft:zombie",
+        "minecraft:skeleton",
+        "minecraft:spider",
+        "minecraft:creeper",
+        "minecraft:drowned",
+        "minecraft:husk",
+        "minecraft:stray",
+        "minecraft:witch",
+        "minecraft:enderman",
+        "minecraft:pillager",
+        "minecraft:slime",
+        "minecraft:phantom",
+        "minecraft:blaze",
+        "minecraft:wither_skeleton",
+        "minecraft:piglin_brute"
+      ]
+    },
+    {
+      "id": "guardians",
+      "name": "깨어난 수호자들",
+      "gold": 8000,
+      "entities": [
+        "mowziesmobs:foliaath",
+        "mowziesmobs:lantern",
+        "mowziesmobs:naga",
+        "mowziesmobs:umvuthana",
+        "mowziesmobs:umvuthana_raptor",
+        "mowziesmobs:grottol",
+        "mowziesmobs:ferrous_wroughtnaut",
+        "mowziesmobs:frostmaw",
+        "mowziesmobs:sculptor",
+        "mowziesmobs:umvuthi"
+      ]
+    },
+    {
+      "id": "frozen_sea",
+      "name": "얼어붙은 바다",
+      "gold": 12000,
+      "entities": [
+        "aquamirae:tortured_soul",
+        "aquamirae:anglerfish",
+        "aquamirae:eel",
+        "aquamirae:maw",
+        "aquamirae:spinefish",
+        "aquamirae:abyssal_scyphoid",
+        "aquamirae:maze_mother",
+        "aquamirae:captain_cornelia"
+      ]
+    },
+    {
+      "id": "seven_seals",
+      "name": "일곱 봉인",
+      "gold": 20000,
+      "entities": [
+        "cataclysm:koboleton",
+        "cataclysm:kobolediator",
+        "cataclysm:the_watcher",
+        "cataclysm:the_prowler",
+        "cataclysm:deepling",
+        "cataclysm:deepling_brute",
+        "cataclysm:deepling_priest",
+        "cataclysm:endermaptera",
+        "cataclysm:draugr",
+        "cataclysm:elite_draugr",
+        "cataclysm:royal_draugr",
+        "cataclysm:ignited_revenant",
+        "cataclysm:netherite_monstrosity",
+        "cataclysm:ancient_remnant",
+        "cataclysm:the_harbinger",
+        "cataclysm:the_leviathan",
+        "cataclysm:ender_guardian",
+        "cataclysm:maledictus",
+        "cataclysm:ignis"
+      ]
+    },
+    {
+      "id": "hidden",
+      "name": "지워진 이름들",
+      "gold": 15000,
+      "entities": [
+        "cataclysm:scylla",
+        "illusioner:illusioner"
+      ]
+    }
+  ]
+}

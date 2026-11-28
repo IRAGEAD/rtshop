@@ -1,0 +1,24 @@
+{
+  "_help": [
+    "서버 조합법 규칙. 게임 안에서 /rtshop recipes (OP) 로도 고칠 수 있습니다.",
+    "disabled: 막을 조합법. 조합법 ID(예: minecraft:tnt), item:아이템ID(그 아이템을 만드는 조합법 전부), mod:모드ID(그 모드의 조합법 전부)",
+    "custom: 직접 만든 조합법. {id, recipe: 데이터팩 형식}. 기존 조합법과 ID 가 같으면 그 조합법을 바꿉니다",
+    "고친 뒤 /rtshop reload 또는 /reload"
+  ],
+  "disabled": [
+    "create:smelting/bread",
+    "create:smoking/bread",
+    "create:campfire_cooking/bread",
+    "farmersdelight:pumpkin_pie_from_pie_crust",
+    "create:crafting/curiosities/cake",
+    "kaleidoscope_cookery:chopping_board/sashimi_from_tropical_fish",
+    "minecraft:beetroot_soup",
+    "minecraft:rabbit_stew_from_brown_mushroom",
+    "minecraft:rabbit_stew_from_red_mushroom"
+  ],
+  "custom": [],
+  "_applied": [
+    "cook_gaps@1",
+    "cook_gaps_fd@1"
+  ]
+}

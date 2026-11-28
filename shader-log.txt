@@ -1,0 +1,85 @@
+===== client/logs/shadertest-photon.log
+29:[19:59:55] [main/INFO]: Found mod file Cinematic Interaction-Forge-1.20.1-0.18.30.jar of type MOD with provider {mods folder locator at /home/runner/work/rtshop/rtshop/client/mods}
+30:[19:59:55] [main/INFO]: Found mod file cinematic_respawn-1.20.1-forge-1.5.0.jar of type MOD with provider {mods folder locator at /home/runner/work/rtshop/rtshop/client/mods}
+31:[19:59:55] [main/INFO]: Found mod file cinematiccataclysm-1.0.1-1.20.1.jar of type MOD with provider {mods folder locator at /home/runner/work/rtshop/rtshop/client/mods}
+271:[19:59:57] [main/WARN]: cinematiccataclysm-1.0.1-1.20.1.jar contains an invalid 'accessTransformers' TOML entry. Should be e.g. accessTransformers = ["META-INF/accesstransformer.cfg", "META-INF/extra_at.cfg"] or accessTransformers = [] for no ATs. Falling back to default.
+522:[20:00:15] [Render thread/INFO]: OpenGL debug message: id=1, source=SHADER COMPILER, type=ERROR, severity=HIGH, message='0:1(10): error: GLSL 4.60 is not supported. Supported versions are: 1.10, 1.20, 1.30, 1.40, 1.50, 3.30, 4.00, 4.10, 4.20, 4.30, 4.40, 4.50, 1.00 ES, 3.00 ES, 3.10 ES, and 3.20 ES'
+893:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [Load-jvmHook-win-x86_64] System.load UnsatisfiedLinkError: /tmp/av_131d069dab1/av_core_jvmHook-win-x86_64_131d070a077.arcane: /tmp/av_131d069dab1/av_core_jvmHook-win-x86_64_131d070a077.arcane: invalid ELF header
+894:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [方法1] 异常: java.lang.UnsatisfiedLinkError: 'long org.lwjgl.system.windows.WinBase.nLoadLibrary(long)'
+896:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [方法2] 异常: java.lang.UnsatisfiedLinkError: Unable to load library 'kernel32':
+901:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [方法3] 异常: java.lang.UnsatisfiedLinkError: 'long org.lwjgl.system.windows.WinBase.nGetModuleHandle(long)'
+912:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [Load-jvmHook-linux-arm64] System.load UnsatisfiedLinkError: /tmp/av_131d63f5f3e/av_core_jvmHook-linux-arm64_131d6418832.arcane: /tmp/av_131d63f5f3e/av_core_jvmHook-linux-arm64_131d6418832.arcane: cannot open shared object file: No such file or directory (Possible cause: can't load AARCH64 .so on a AMD 64
+914:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [Load-jvmHook-linux-arm32] System.load UnsatisfiedLinkError: /tmp/av_131d6985e87/av_core_jvmHook-linux-arm32_131d699cb48.arcane: /tmp/av_131d6985e87/av_core_jvmHook-linux-arm32_131d699cb48.arcane: wrong ELF class: ELFCLASS32 (Possible cause: can't load ARM .so on a AMD 64 platform)
+1378:[20:01:29] [Render thread/INFO]: [rtshop] 별빛 수정 구체를 Cinematic Interactions 장면으로 등록했습니다.
+1650:[20:01:34] [Worker-ResourceReload-1/WARN]: Unable to load model: 'cinematiccataclysm:debug_stick#inventory' referenced from: cinematiccataclysm:debug_stick#inventory: java.io.FileNotFoundException: cinematiccataclysm:models/item/debug_stick.json
+1679:[20:01:36] [Render thread/INFO]: Using shaderpack: photon_v1.4.zip
+2379:[20:02:19] [Render thread/INFO]: Key bindings sharing a key with another control: [key.fantasy.descend with [key.horsingaround.freelook (horsingaround), keybindings.spell_engine.bypass_spell_hotbar (spell_engine), key.epicfight.dodge (epicfight), key.cinematic.look (cinematic), key.spmovesets.dodge (spmovesets), key.tacz.unload.desc (tacz), key.tacz.open_config.desc (tacz), create.keyinfo.too
+2383:[20:02:25] [Render thread/INFO]: [rtshop-clienttest] closing com.bonfyre.fantasy.client.gui.KeyClashScreen
+2390:[20:02:27] [Render thread/INFO]: [rtshop-clienttest] opening the test world from the title screen
+3668:[20:02:33] [Render thread/ERROR]: Integrated API Error: Couldn't parse spawner mob list idas:dread_citadel
+3669:java.lang.Exception: Error: iceandfire:dread_lich is not a valid entity ID!
+3714:[20:02:33] [Render thread/ERROR]: Integrated API Error: Couldn't parse spawner mob list idas:archmages_tower
+3715:java.lang.Exception: Error: ars_nouveau:wilden_hunter is not a valid entity ID!
+3780:[20:02:34] [Render thread/ERROR]: Injection error: LVT in net/minecraft/world/entity/npc/VillagerTrades$EmeraldsForVillagerTypeItem::m_213663_(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/util/RandomSource;)Lnet/minecraft/world/item/trading/MerchantOffer; has incompatible changes at opcode 34 in callback fabric-object-builder-v1.mixins.json:TradeOffersTypeAwareBuyForOneEmeraldFactoryMixi
+4447:[20:04:11] [Render thread/INFO]: [rtshop-clienttest] shader state: on photon_v1.4.zip
+4448:[20:04:11] [Render thread/INFO]: [rtshop-clienttest] PASS  the shader pack is on for these pictures (Oculus with the pack's photon)  [on photon_v1.4.zip]
+4450:[20:04:21] [Render thread/INFO]: [rtshop-clienttest] PASS  with the shader on, the enhance anvil's runes and gem light up when someone stands near it, and the glow is really drawn  [1.0 drawn=11]
+4451:[20:04:21] [Render thread/INFO]: [rtshop-clienttest] PASS  3.75 with the shader on, the anvil glow is one see-through layer only (the opaque self-glowing layer that popped and bled is not drawn)  [sh=11 add=0]
+4454:[20:04:46] [Render thread/INFO]: [rtshop-clienttest] PASS  with the shader on, the trace to look at is listed on the screen side  [1]
+4457:[20:04:57] [Render thread/INFO]: [rtshop-clienttest] PASS  with the shader on, the orb on its pedestal is drawn (orb, rim glow and rings) with the extra glowing layer the shader needs  [6 core=6]
+4458:[20:05:00] [Render thread/INFO]: [rtshop-clienttest] altar scene after the click: INTRO
+4459:[20:05:03] [Render thread/INFO]: [rtshop-clienttest] altar scene: INTRO
+4460:[20:05:07] [Render thread/INFO]: [rtshop-clienttest] altar scene: ACTIVE
+4461:[20:05:07] [Render thread/INFO]: [rtshop-clienttest] altar scene: ACTIVE
+4462:[20:05:07] [Render thread/INFO]: [rtshop-clienttest] altar scene: ACTIVE
+4463:[20:05:07] [Render thread/INFO]: [rtshop-clienttest] altar scene: ACTIVE
+4464:[20:05:07] [Render thread/INFO]: [rtshop-clienttest] altar scene: ACTIVE
+4465:[20:05:07] [Render thread/INFO]: [rtshop-clienttest] altar scene: ACTIVE
+4466:[20:05:08] [Render thread/INFO]: [rtshop-clienttest] altar scene: ACTIVE
+4467:[20:05:08] [Render thread/INFO]: [rtshop-clienttest] PASS  with the shader on, the rune altar scene draws the orb with its glow kept close around it  [ACTIVE rim=0.17959343023029284]
+4468:[20:05:16] [Render thread/INFO]: [rtshop-clienttest] portraits with the shader on: pig=ok zombie=ok skeleton=ok creeper=ok spider=ok enderman=ok ravager=ok wither=ok firefly=big hydrogen_jellyfish=ok naga=big flying_pig=big jungle_skeleton=ok skull=ok chesed=ok chesed_monolith=ok  | pig pixels 2708
+4469:[20:05:16] [Render thread/INFO]: [rtshop-clienttest] PASS  3.79 with the shader on, codex and bounty portraits are mobs, not spawn eggs (measured off-screen, or drawn the old way if that comes out blank)  [old 0 | pig=ok zombie=ok skeleton=ok creeper=ok spider=ok enderman=ok ravager=ok wither=ok firefly=big hydrogen_jellyfish=ok naga=big flying_pig=big jungle_skeleton=ok skull=ok chesed=ok ch
+4470:[20:05:16] [Render thread/INFO]: [rtshop-clienttest] PASS  3.79 with the shader on, the zombie, skeleton, creeper, spider, enderman and ravager portraits are drawn and measured (their own model, not Epic Fight's)  [6/6 | pig pixels 2708]
+4481:[20:05:21] [Render thread/INFO]: [rtshop-clienttest] RESULT: ALL PASS (8 checks)
+4785:		9: ASM: class dev.dyslexic.cinematic.client.CinematicClient$Events onLogout(Lnet/minecraftforge/client/event/ClientPlayerNetworkEvent$LoggingOut;)V
+----- exceptions
+273:[20:00:01] [main/ERROR]: Mixin config betternether.mixins.common.json does not specify "minVersion" property
+274:[20:00:01] [main/ERROR]: Mixin config betternether.mixins.client.json does not specify "minVersion" property
+275:[20:00:01] [main/ERROR]: Mixin config extralib.mixins.json does not specify "minVersion" property
+276:[20:00:01] [main/ERROR]: Mixin config cwb.mixins.json does not specify "minVersion" property
+277:[20:00:01] [main/ERROR]: Mixin config fabric-item-group-api-v1.mixins.json does not specify "minVersion" property
+278:[20:00:01] [main/ERROR]: Mixin config fabric-item-group-api-v1.client.mixins.json does not specify "minVersion" property
+279:[20:00:01] [main/ERROR]: Mixin config fabric-item-api-v1.client.mixins.json does not specify "minVersion" property
+280:[20:00:01] [main/ERROR]: Mixin config fabric-data-attachment-api-v1.mixins.json does not specify "minVersion" property
+281:[20:00:01] [main/ERROR]: Mixin config fabric-data-attachment-api-v1.client.mixins.json does not specify "minVersion" property
+282:[20:00:01] [main/ERROR]: Mixin config extraquests.mixins.json does not specify "minVersion" property
+283:[20:00:01] [main/ERROR]: Mixin config yacl.mixins.json does not specify "minVersion" property
+411:[20:00:05] [main/ERROR]: accessories-common.mixins.json:ContainerMixin: Interface mixin contains a non-public method! Found extendHasAnyMatching(Ljava/util/function/Predicate;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V in accessories-common.mixins.json:ContainerMixi
+412:org.spongepowered.asm.mixin.transformer.throwables.InvalidInterfaceMixinException: Interface mixin contains a non-public method! Found extendHasAnyMatching(Ljava/util/function/Predicate;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V in accessories-common.mixins.json:Co
+478:[20:00:14] [Render thread/ERROR]: Failed to verify authentication
+479:com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401
+480:	at com.mojang.authlib.exceptions.MinecraftClientHttpException.toAuthenticationException(MinecraftClientHttpException.java:56) ~[authlib-4.0.43.jar%2399!/:?]
+502:Caused by: com.mojang.authlib.exceptions.MinecraftClientHttpException: Status: 401
+513:[20:00:14] [Render thread/ERROR]: Mod mixin into Embeddium internals detected. This instance is now tainted. The Embeddium team does not provide any guarantee of support for issues encountered while such mods are installed.
+522:[20:00:15] [Render thread/INFO]: OpenGL debug message: id=1, source=SHADER COMPILER, type=ERROR, severity=HIGH, message='0:1(10): error: GLSL 4.60 is not supported. Supported versions are: 1.10, 1.20, 1.30, 1.40, 1.50, 3.30, 4.00, 4.10, 4.20, 4.30, 4.40, 4.50, 1.00 ES, 3.00 ES, 3.10 ES, and 3.20
+703:[20:00:22] [modloading-worker-0/INFO]: Loaded 1/1 KubeJS startup scripts in 0.709 s with 0 errors and 0 warnings
+706:[20:00:22] [modloading-worker-0/INFO]: Loaded 1/1 KubeJS client scripts in 0.239 s with 0 errors and 0 warnings
+716:[20:00:22] [modloading-worker-0/INFO]: Registering S2C receiver with id kubejs:display_server_errors
+717:[20:00:22] [modloading-worker-0/INFO]: Registering S2C receiver with id kubejs:display_client_errors
+893:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [Load-jvmHook-win-x86_64] System.load UnsatisfiedLinkError: /tmp/av_131d069dab1/av_core_jvmHook-win-x86_64_131d070a077.arcane: /tmp/av_131d069dab1/av_core_jvmHook-win-x86_64_131d070a077.arcane: invalid ELF 
+894:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [方法1] 异常: java.lang.UnsatisfiedLinkError: 'long org.lwjgl.system.windows.WinBase.nLoadLibrary(long)'
+896:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [方法2] 异常: java.lang.UnsatisfiedLinkError: Unable to load library 'kernel32':
+901:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [方法3] 异常: java.lang.UnsatisfiedLinkError: 'long org.lwjgl.system.windows.WinBase.nGetModuleHandle(long)'
+912:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [Load-jvmHook-linux-arm64] System.load UnsatisfiedLinkError: /tmp/av_131d63f5f3e/av_core_jvmHook-linux-arm64_131d6418832.arcane: /tmp/av_131d63f5f3e/av_core_jvmHook-linux-arm64_131d6418832.arcane: cannot op
+914:[20:00:23] [modloading-worker-0/INFO]: [com.luoee.arcanevortex.NativeAgent.oo0:OOO00:-1]: [Load-jvmHook-linux-arm32] System.load UnsatisfiedLinkError: /tmp/av_131d6985e87/av_core_jvmHook-linux-arm32_131d699cb48.arcane: /tmp/av_131d6985e87/av_core_jvmHook-linux-arm32_131d699cb48.arcane: wrong ELF
+1032:[20:01:16] [pool-6-thread-1/ERROR]: fromAnimatedImage - Palette mask cataclysm:item/music_disc_maledictus needs to be at least as large as the target image amendments:block/music_discs/music_disc_mask and have the same frame count. You must alter the mask's 16x16 to match the texture size's 16x
+1105:[20:01:18] [Worker-ResourceReload-1/ERROR]: Failed to load model mowziesmobs:models/block/black_pink_grottol.json
+1106:com.google.gson.JsonParseException: for LLibrary bug not putting particle into textures set is not valid resource location
+1125:[20:01:19] [Worker-ResourceReload-2/INFO]: [software.bernie.geckolib.core.molang.MolangParser:parseSymbolsMolang:285]: java.lang.IndexOutOfBoundsException: Index -1 out of bounds for length 0
+1156:[20:01:19] [Worker-ResourceReload-2/ERROR]: Unable to parse animation: melee_3
+1157:[20:01:19] [Worker-ResourceReload-2/INFO]: [software.bernie.geckolib.loading.json.typeadapter.BakedAnimationsAdapter:deserialize:43]: software.bernie.geckolib.core.molang.MolangException: Couldn't parse '0-' expression!
+1180:[20:01:19] [Worker-ResourceReload-1/ERROR]: Failed to load model mowziesmobs:models/block/diamond_grottol.json
+1181:com.google.gson.JsonParseException: for LLibrary bug not putting particle into textures set is not valid resource location
+1201:[20:01:24] [Worker-ResourceReload-1/WARN]: Unable to load model: 'betternether:block/basalt_slab_bottom' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_bottom.json
+1202:[20:01:24] [Worker-ResourceReload-1/WARN]: Unable to load model: 'betternether:block/basalt_slab_top' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_top.json
+1203:[20:01:24] [Worker-ResourceReload-1/WARN]: Unable to load model: 'betternether:block/basalt_slab_double' referenced from: betternether:basalt_slab#type=top,waterlogged=true: java.io.FileNotFoundException: betternether:models/block/basalt_slab_double.json

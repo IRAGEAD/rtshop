@@ -1,0 +1,37 @@
+{
+  "_설명": "몹 규칙. spawn: 모드 몹(바닐라가 아닌 몹)의 자연 스폰 가운데 modMobKeep 만큼만 남긴다 (0.2 = 약 80% 감소). keepByName: 이름(ID 나 영어 이름)에 그 글이 들어가는 몹의 비율. exempt: 이름에 그 글이 들어가면 줄이지 않는다. exemptMods: 줄이지 않는 모드. 보스·구조물 안·스포너·소환은 언제나 그대로. (3.84: hollow 60%, 난폭한 심연꾼 deepling_brute 5%) drops: 보스가 아닌 몹의 드랍에서 무기·스킬북·인챈트·모드 아이템을 뺀다. keepItems: 남길 아이템 ID 또는 '모드ID:*'. 퀘스트가 건네 달라는 아이템은 자동으로 남는다. bossHealth: 최대 체력이 이 이상이면 보스로 본다. extraBosses: 보스로 볼 몹 ID. neverSpawn: 세계에 아예 나오지 않게 할 몹 ID 또는 '모드ID:*' (기본: spmovesets 의 밤 상인 칸딜과 그 수레). noNaturalSpawn (3.84): 저절로는 생기지 않는 몹 — 펫 모드의 생물 (뽑기 펫 · 새끼 · 스폰 알 · 명령어는 그대로). 고친 뒤 /rtshop reload.",
+  "spawn": {
+    "enabled": true,
+    "modMobKeep": 0.2,
+    "keepByName": {
+      "lycanth": 0.1,
+      "hollow": 0.6,
+      "deepling_brute": 0.05
+    },
+    "exempt": [],
+    "exemptMods": []
+  },
+  "drops": {
+    "enabled": true,
+    "removeWeapons": true,
+    "removeSkillBooks": true,
+    "removeEnchanted": true,
+    "removeModItems": true,
+    "keepItems": [
+      "rtshop:*"
+    ]
+  },
+  "bossHealth": 300.0,
+  "extraBosses": [],
+  "neverSpawn": [
+    "spmovesets:vendedor_nocturno",
+    "spmovesets:carro_vendedor"
+  ],
+  "noNaturalSpawn": [
+    "adorablehamsterpets:*",
+    "crittersandcompanions:*",
+    "rpg_companions_tiny_dragons:*",
+    "fantasy:*",
+    "fantasymounts:*"
+  ]
+}

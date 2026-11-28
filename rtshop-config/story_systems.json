@@ -1,0 +1,6 @@
+{
+  "_help": "이야기 시스템 설정. dragonRite: true 면 허공(엔드)의 용이 처음부터 잠들어 있고, 출구 받침대 네 모서리에 수정을 놓는 의식으로 불러낸다 (파티마다 다시 부를 수 있다). altarLockFlag: 이 표식을 가진 사람만 룬 제단(별빛 수정 구체)을 쓸 수 있다. 비우면 누구나. 고친 뒤 /rtshop reload.",
+  "dragonRite": true,
+  "altarLockFlag": "story_ch1_done",
+  "version": 2
+}

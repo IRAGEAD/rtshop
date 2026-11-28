@@ -1,0 +1,11 @@
+RT Shop client self-test (shader on: on photon_v1.4.zip)
+PASS  the shader pack is on for these pictures (Oculus with the pack's photon)  [on photon_v1.4.zip]
+PASS  with the shader on, the enhance anvil's runes and gem light up when someone stands near it, and the glow is really drawn  [1.0 drawn=11]
+PASS  3.75 with the shader on, the anvil glow is one see-through layer only (the opaque self-glowing layer that popped and bled is not drawn)  [sh=11 add=0]
+PASS  with the shader on, the trace to look at is listed on the screen side  [1]
+PASS  with the shader on, the orb on its pedestal is drawn (orb, rim glow and rings) with the extra glowing layer the shader needs  [6 core=6]
+PASS  with the shader on, the rune altar scene draws the orb with its glow kept close around it  [ACTIVE rim=0.17959343023029284]
+PASS  3.79 with the shader on, codex and bounty portraits are mobs, not spawn eggs (measured off-screen, or drawn the old way if that comes out blank)  [old 0 | pig=ok zombie=ok skeleton=ok creeper=ok spider=ok enderman=ok ravager=ok wither=ok firefly=big hydrogen_jellyfish=ok naga=big flying_pig=big jungle_skeleton=ok skull=ok chesed=ok chesed_monolith=ok | pig pixels 2708]
+PASS  3.79 with the shader on, the zombie, skeleton, creeper, spider, enderman and ravager portraits are drawn and measured (their own model, not Epic Fight's)  [6/6 | pig pixels 2708]
+
+RESULT: ALL PASS (8 checks)

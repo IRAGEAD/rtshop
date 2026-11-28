@@ -1,0 +1,4 @@
+slot,job,people,hours,total_gold,gold_per_hour,sell_fish_per_hour,sell_farm_per_hour,sell_mined_per_hour,sell_food_per_hour,sell_other_per_hour,pshop_per_hour,quest_per_hour,bounty_per_hour,title_per_hour,attendance_per_hour,raid_per_hour,abyss_per_hour
+life,farmer,1,0.1,700,0,0,0,0,0,0,0,0,0,0,0,0,0
+life,fisher,1,1.0,3000,3000,2500,0,0,0,0,0,500,0,0,0,0,0
+combat,swordsman,1,1.1,3700,3415,2308,646,0,0,0,0,462,0,0,0,0,0
