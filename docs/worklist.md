@@ -728,6 +728,15 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   브람도 같음 (장비 상인 브람 / 대장장이 브람). 고르기를 물음: 가 하나로 합치기(추천, 반나절) / 나 상점 쪽을 다른 인물로(2~3시간) / 다 그대로.
   → 사용자 답 (22:19): "상인이 두명인 문제는 가 방법을 통해 수정" → L-3. 오스카 · 브람을 상점 NPC 하나로 합침: 이야기 NPC(quest_oscar · quest_bram)는 마을에서 빼고,
   상점 NPC(수산물 상인 오스카 · 장비 상인 브람)를 누르면 대화 · 퀘스트 · [상점] 이 함께. 퀘스트 목표(oscar · bram)는 그 상점 NPC 를 가리킴. 이미 선 이야기 NPC 는 치움. 3.83.0.
+  ★ 살펴보니 앞의 답(「퀘스트 목표는 이야기 NPC 만 가리킴」)이 틀렸음 — 22:26 사용자에게 바로잡음: 오스카 · 브람의 퀘스트(giver shop_fisher 32 · shop_blacksmith 18,
+  TALK 목표 11 · 9)와 대화(dialogue.json shop_fisher · shop_blacksmith)는 처음부터 상점 NPC 가 맡았고, story.json npcs 의 oscar · bram 은 동행(comp)의 이름 · 모습에만 쓰임.
+  그런데 /rtshop npc 목록 · 퀘스트 편집기 NPC 목록에 quest_oscar · quest_bram 이 올라 따로 세울 수 있었음 → 마을에 둘.
+- 한 일 (3.83.0, 가지 v5-next34): QuestManager.STANDS_IN {oscar → shop_fisher, bram → shop_blacksmith} · standIn(key):
+  spawnNpc 가 null (따로 세우지 않음) · /rtshop npc quest_oscar 는 rtshop.msg.npc_stands_in 으로 상점 NPC 를 알림 · 소환 목록 · 퀘스트 편집기 NPC 목록에서 뺌 ·
+  EntityJoinLevelEvent(HIGH)에서 quest_oscar · quest_bram 태그의 주민은 들어오지 못하게(불러올 때 치움) + NpcLayout.forget · 서버가 켜질 때 NpcLayout.dropStandIns(배치의 따로 선 자리 뺌),
+  apply 도 건너뜀 · 퀘스트를 불러올 때 giver · turnIn · TALK 목표가 quest_oscar · quest_bram 이면 상점 NPC 로 (운영자가 만든 퀘스트도 이어짐) ·
+  동행의 모습 = NpcLooks.personKey (상점 NPC 의 모습을 따름). 이름표는 그대로 (수산물 상인 오스카 · 장비 상인 브람 — 이야기 속 「어부 오스카」 · 「대장장이 브람」과 같은 사람).
+  시험: 따로 안 세워짐 · 예전 것은 들어오지 못함 · 배치에서 빠짐 · 두 사람을 가리키는 퀘스트 없음 + 상점 NPC 에 퀘스트 있음 · 동행 모습. 화면 시험의 NPC 모습 셋은 브람 대신 펠릭스.
 추가 (21:38): "랜선 기준으로 포트포워딩 방법을 상세하게 알려줘."
 - L-2. 답함 (7단계 카드 + 막힐 때 순서): 이더넷 IPv4 · 내부 IP 고정 · ipTIME NAT/라우터 관리 → 포트포워드 설정(TCP 25565) · KT 장치설정 → 트래픽 관리 ·
   Windows 방화벽 인바운드 · 이중 NAT / 통신사 공용 IP 확인 · 집 밖에서 시험 · DDNS(iptime.org). 모드팩에 음성 채팅 없음(25565 하나), e4mc 는 랜으로 열기용.
