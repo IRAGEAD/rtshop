@@ -59,7 +59,9 @@ git checkout -q tools/story_lang/__pycache__                      # (추적되�
 
 ## 4. 지금 상태
 
-- **(11-28 09:30) 3.78.0 작업 중 (가지 v5-next31, worklist 「사용자 답 (11-28 07:20) → 3.78.0」 C-1 ~ C-19)**: 사용자 답 반영 + 추가 요청 다섯.
+- **(11-28 10:20) 3.78.0 올림 · 보냄** (main = 59fee9e, 전체 시험 run 46088117658: 모드팩 서버 920 · 화면 363 · 셰이더 6 모두 통과, 빌드 서버 866 · 화면 5건만 실패(늘 그런 팩 모드 것)).
+  보낸 것: jar · 도감 전후 그림 · W-4 시안 3장 · 보고(바뀐 것 · 구르기 정체 · 타르코프식 설명 · 가이드 문서 둘 · 인게임 확인 14) — 사용자가 W-4 를 답함 → 3.79.0 (worklist D-1 · D-2).
+- **3.78.0 (가지 v5-next31, worklist 「사용자 답 (11-28 07:20) → 3.78.0」 C-1 ~ C-19)**: 사용자 답 반영 + 추가 요청 다섯.
   C-1 돋보기 아이콘 C · C-2/C-3 스킬라 단서 확률 (scylla.json 3판 `ScyllaClues.migrate3`) · C-4 나침반 500칸 (`SurveyCompassItem.MIN_TOWN`, 안내서 18판) ·
   C-5 식품 상인 skipItemsOf ["farmer","fisher"] (`ShopLoader.migrateFoodSkipFisher`) · C-7 살펴보기 `story/Examine` (examine.json, StoryPacket.EXAMINE, ItemMarks 의 「?」, 안내서 「물건 살펴보기」) ·
   C-8 상점 토지 시안 그림 `tools/mock/w4_shop_land.py` → docs/design/w4/ · C-9 자리 비운 NPC 의 미니맵 아이콘 · 셰이더 시험의 제단 잠금 ·

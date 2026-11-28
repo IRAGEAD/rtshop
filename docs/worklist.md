@@ -744,6 +744,9 @@ Arcane Vortex는 일단 유지, W-13은 스토리 및 히든 아이템에도 사
   안 보이면 멀리 · 보이게 해서 다시 · 그래도 없으면 알) — 바닐라 79마리 중 예전에 잘리던 32마리가 칸 안으로. C-12 `EnhancePanel.blend()` (섞기가 꺼져 빛무리가 불투명하게 찍히던 것) + 룬 그림을 홈 굵기로.
   C-14 `Hunts` boardNpcs 기본 빈 목록 · hunts.json 3판 · 안내 글 가렛으로. C-15 `ClientEvents.abyssButton` (client.json hideAbyssInventoryButton).
   C-10 · C-13 가이드는 문서로 (맵 이식 · NPC 배치), C-16 은 review_checklist 0장.
+  C-17 `client/TooltipFit` · C-18 `compat/BossesRiseRollOff` + `client/BossesRiseRollClient` · C-19 item_policy.json 6판 (spmovesets 118종).
+  C-11 보강 `MobPortrait.standIn` (유령 몹 4 · 순찰대 · twisted warden · ice spider → 바닐라 모습), 큰 몹 0.35 배 여섯 번.
+  → 11-28 10:20 올림 (main 59fee9e, run 46088117658 모두 통과).
 
 ## 3.77.0 — ⑥ 스토리 완성 점검 + W-21 전개 · 연출 · 대사 검토 (가지 v5-next30)
 
