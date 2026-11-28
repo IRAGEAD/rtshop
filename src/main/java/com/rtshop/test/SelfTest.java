@@ -3763,12 +3763,18 @@ public final class SelfTest {
                 ItemStack tagged = new ItemStack(Items.FILLED_MAP);
                 tagged.getOrCreateTag().putString("rtshopTestMark", "spmovesets:mapa_pyro");
                 vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 3), tagged, 4, 1, 0.05f));
-                vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(Items.BREAD, 6), 16, 1, 0.05f));
+                // 남는 거래: 밀 → 에메랄드 (상인 NPC 가 사 주는 물건을 파는 주민 거래는 EconomyGuards 가 따로 지우므로, 결과가 에메랄드인 것으로)
+                vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.WHEAT, 20), new ItemStack(Items.EMERALD, 1), 16, 1, 0.05f));
+                int removed382 = com.rtshop.rules.TradeGuard.strip(vil);
+                boolean stripped = removed382 == 3 && vil.getOffers().size() == 1 && vil.getOffers().get(0).getResult().is(Items.EMERALD);
+                // 거래 창을 열기 전(상호작용)에도 빠지는지
+                vil.getOffers().add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 3), tagged.copy(), 4, 1, 0.05f));
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract(
                         a, net.minecraft.world.InteractionHand.MAIN_HAND, vil));
-                boolean stripped = vil.getOffers().size() == 1 && vil.getOffers().get(0).getResult().is(Items.BREAD);
+                boolean onInteract = vil.getOffers().stream().noneMatch(com.rtshop.rules.TradeGuard::banned)
+                        && vil.getOffers().stream().anyMatch(o -> o.getResult().is(Items.EMERALD));
                 check("3.82 a villager's trades that sell or cost a tradeBan item (or an item whose NBT names a banned mod) are removed before the trade window opens; others stay; spmovesets is banned by default",
-                        tradeDefaults && stripped, tradeDefaults + " " + vil.getOffers().size());
+                        tradeDefaults && stripped && onInteract, tradeDefaults + " " + removed382 + " " + vil.getOffers().size() + " " + onInteract);
                 if (net.minecraftforge.fml.ModList.get().isLoaded("spmovesets")) {
                     // Forge 가 모드의 거래를 더한 지도 제작자의 거래 목록에서 spmovesets 의 것을 만들어 보고, 정리하면 남지 않는지
                     int spListings = 0, spOffers = 0;
