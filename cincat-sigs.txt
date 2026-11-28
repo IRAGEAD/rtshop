@@ -1,0 +1,354 @@
+######## ./com/finderfeed/cataclysm_custscenes/CatCutClientEvents.class
+Compiled from "CatCutClientEvents.java"
+public class com.finderfeed.cataclysm_custscenes.CatCutClientEvents {
+  public com.finderfeed.cataclysm_custscenes.CatCutClientEvents();
+  public static void registerRenderers(net.minecraftforge.client.event.EntityRenderersEvent$RegisterRenderers);
+}
+######## ./com/finderfeed/cataclysm_custscenes/CatCutEvents.class
+Compiled from "CatCutEvents.java"
+public class com.finderfeed.cataclysm_custscenes.CatCutEvents {
+  private static java.util.HashMap<net.minecraft.server.level.ServerPlayer, java.lang.Integer> PLAYER_INVULNERABILITY;
+  public com.finderfeed.cataclysm_custscenes.CatCutEvents();
+  public static void serverTickEvent(net.minecraftforge.event.TickEvent$ServerTickEvent);
+  private static void tickPlayerInvulnerability();
+  public static boolean isPlayerInvulnerable(net.minecraft.server.level.ServerPlayer);
+  public static void setPlayerInvulnerable(net.minecraft.server.level.ServerPlayer, int);
+  public static void livingHurtEvent(net.minecraftforge.event.entity.living.LivingHurtEvent);
+  public static void targetEvent(net.minecraftforge.event.entity.living.LivingChangeTargetEvent);
+  public static void airEvent(net.minecraftforge.event.entity.living.LivingBreatheEvent);
+  static {};
+}
+######## ./com/finderfeed/cataclysm_custscenes/CatCutMixinHandler.class
+Compiled from "CatCutMixinHandler.java"
+public class com.finderfeed.cataclysm_custscenes.CatCutMixinHandler {
+  public com.finderfeed.cataclysm_custscenes.CatCutMixinHandler();
+  public static void cursedTombstoneMixin(net.minecraft.world.level.Level, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, com.github.L_Ender.cataclysm.blockentities.Cursed_tombstone_Entity, org.spongepowered.asm.mixin.injection.callback.CallbackInfo);
+}
+######## ./com/finderfeed/cataclysm_custscenes/CatCutModEvents.class
+Compiled from "CatCutModEvents.java"
+public class com.finderfeed.cataclysm_custscenes.CatCutModEvents {
+  public com.finderfeed.cataclysm_custscenes.CatCutModEvents();
+  public static void entityAttributes(net.minecraftforge.event.entity.EntityAttributeCreationEvent);
+}
+######## ./com/finderfeed/cataclysm_custscenes/CatCutUtil.class
+Compiled from "CatCutUtil.java"
+public class com.finderfeed.cataclysm_custscenes.CatCutUtil {
+  public com.finderfeed.cataclysm_custscenes.CatCutUtil();
+  public static java.util.List<net.minecraft.server.level.ServerPlayer> startCutsceneForPlayers(net.minecraft.server.level.ServerLevel, net.minecraft.world.phys.Vec3, float, int, com.finderfeed.fdlib.systems.cutscenes.CutsceneData);
+  public static java.util.List<net.minecraft.server.level.ServerPlayer> startCutsceneForPlayersCylinder(net.minecraft.server.level.ServerLevel, net.minecraft.world.phys.Vec3, float, float, int, com.finderfeed.fdlib.systems.cutscenes.CutsceneData);
+  public static void setBossWasSpawned(net.minecraft.world.level.block.entity.BlockEntity, boolean);
+  public static boolean wasBossSpawned(net.minecraft.world.level.block.entity.BlockEntity);
+}
+######## ./com/finderfeed/cataclysm_custscenes/CataclysmCutscenes.class
+Compiled from "CataclysmCutscenes.java"
+public class com.finderfeed.cataclysm_custscenes.CataclysmCutscenes {
+  public static final java.lang.String MODID;
+  public static final net.minecraftforge.registries.DeferredRegister<net.minecraft.world.item.Item> ITEMS;
+  public static final java.util.function.Supplier<net.minecraft.world.item.Item> DEBUG_STICK;
+  public static final net.minecraftforge.registries.DeferredRegister<net.minecraft.world.entity.EntityType<?>> ENTITIES;
+  public static final java.util.function.Supplier<net.minecraft.world.entity.EntityType<com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntity>> MALEDICTUS_CUTSCENE;
+  public static final java.util.function.Supplier<net.minecraft.world.entity.EntityType<com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity>> IGNIS_CUTSCENE_ENTITY;
+  public static final java.util.function.Supplier<net.minecraft.world.entity.EntityType<com.finderfeed.cataclysm_custscenes.entities.scylla.ScyllaCutsceneEntity>> SCYLLA_CUTSCENE_ENTITY;
+  public static final java.util.function.Supplier<net.minecraft.world.entity.EntityType<com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntity>> ANCIENT_REMNANT_CUTSCENE;
+  public static final java.util.function.Supplier<net.minecraft.world.entity.EntityType<com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntity>> LEVIATHAN_CUTSCENE;
+  public com.finderfeed.cataclysm_custscenes.CataclysmCutscenes();
+  private static net.minecraft.world.entity.EntityType lambda$static$5();
+  private static net.minecraft.world.entity.EntityType lambda$static$4();
+  private static net.minecraft.world.entity.EntityType lambda$static$3();
+  private static net.minecraft.world.entity.EntityType lambda$static$2();
+  private static net.minecraft.world.entity.EntityType lambda$static$1();
+  private static net.minecraft.world.item.Item lambda$static$0();
+  static {};
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/ancient_remnant/AncientRemnantCutsceneEntity$Events.class
+Compiled from "AncientRemnantCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntity$Events {
+  public com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntity$Events();
+  public static void livingDestroyBlockEvent(net.minecraftforge.event.entity.living.LivingDestroyBlockEvent);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/ancient_remnant/AncientRemnantCutsceneEntity.class
+Compiled from "AncientRemnantCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntity extends com.github.L_Ender.cataclysm.entity.InternalAnimationMonster.IABossMonsters.Ancient_Remnant.Ancient_Remnant_Entity implements com.finderfeed.fdlib.nbt.AutoSerializable {
+  private net.minecraft.world.phys.Vec3 cutsceneDirection;
+  public static void summon(net.minecraft.world.level.Level, net.minecraft.world.phys.Vec3, net.minecraft.core.GlobalPos);
+  public static com.finderfeed.fdlib.systems.cutscenes.CutsceneData cutsceneData(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  public static net.minecraft.world.phys.Vec3 decideCutsceneDirection(net.minecraft.world.level.Level, net.minecraft.world.phys.Vec3);
+  public com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntity(net.minecraft.world.entity.EntityType, net.minecraft.world.level.Level);
+  public void m_8119_();
+  private void tickCutscene();
+  public int m_21529_();
+  public boolean m_6000_(double, double, double);
+  public boolean m_6783_(double);
+  protected void m_8099_();
+  public boolean m_20068_();
+  public boolean m_21532_();
+  public void m_6457_(net.minecraft.server.level.ServerPlayer);
+  public void m_6452_(net.minecraft.server.level.ServerPlayer);
+  public void m_7334_(net.minecraft.world.entity.Entity);
+  public void m_5997_(double, double, double);
+  protected void m_6138_();
+  public boolean m_6469_(net.minecraft.world.damagesource.DamageSource, float);
+  protected void m_6153_();
+  protected net.minecraft.sounds.SoundEvent m_5592_();
+  protected net.minecraft.sounds.SoundEvent m_7515_();
+  protected net.minecraft.sounds.SoundEvent m_7975_(net.minecraft.world.damagesource.DamageSource);
+  protected net.minecraft.sounds.SoundEvent m_5501_();
+  protected void ReturnToHome();
+  public void m_7378_(net.minecraft.nbt.CompoundTag);
+  public void m_7380_(net.minecraft.nbt.CompoundTag);
+  private static boolean lambda$summon$0(net.minecraft.server.level.ServerPlayer);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/ancient_remnant/AncientRemnantCutsceneEntityRenderer.class
+Compiled from "AncientRemnantCutsceneEntityRenderer.java"
+public class com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntityRenderer extends com.github.L_Ender.cataclysm.client.render.entity.Ancient_Remnant_Renderer {
+  public com.finderfeed.cataclysm_custscenes.entities.ancient_remnant.AncientRemnantCutsceneEntityRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+  public boolean shouldRender(com.github.L_Ender.cataclysm.entity.InternalAnimationMonster.IABossMonsters.Ancient_Remnant.Ancient_Remnant_Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Mob, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/ignis/IgnisCutsceneEntity$Events.class
+Compiled from "IgnisCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity$Events {
+  public com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity$Events();
+  public static void livingDestroyBlockEvent(net.minecraftforge.event.entity.living.LivingDestroyBlockEvent);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/ignis/IgnisCutsceneEntity.class
+Compiled from "IgnisCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity extends com.github.L_Ender.cataclysm.entity.AnimationMonster.BossMonsters.Ignis_Entity implements com.finderfeed.fdlib.nbt.AutoSerializable {
+  private com.finderfeed.fdlib.util.ProjectileMovementPath movementPath;
+  private net.minecraft.core.GlobalPos homepos;
+  public static com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity summon(net.minecraft.world.level.Level, net.minecraft.world.phys.Vec3, net.minecraft.core.GlobalPos);
+  private static com.finderfeed.fdlib.util.ProjectileMovementPath createPath(net.minecraft.world.phys.Vec3);
+  private static com.finderfeed.fdlib.systems.cutscenes.CutsceneData createCutsceneData(net.minecraft.world.phys.Vec3);
+  public com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity(net.minecraft.world.entity.EntityType<? extends com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntity>, net.minecraft.world.level.Level);
+  public void m_8119_();
+  private void tickCutscene();
+  private void particlesFromAltar(float);
+  private void startingRitualParticles(int);
+  private void ignisSpawnExplosion(net.minecraft.world.phys.Vec3);
+  private void createParticlesOnCircle(net.minecraft.core.particles.ParticleOptions, net.minecraft.world.phys.Vec3, float, int, float);
+  public boolean m_6000_(double, double, double);
+  public boolean m_6783_(double);
+  protected void m_8099_();
+  public boolean m_20068_();
+  public boolean m_21532_();
+  public void m_6457_(net.minecraft.server.level.ServerPlayer);
+  public void m_6452_(net.minecraft.server.level.ServerPlayer);
+  public void m_7334_(net.minecraft.world.entity.Entity);
+  public void m_5997_(double, double, double);
+  protected void m_6138_();
+  public boolean m_6469_(net.minecraft.world.damagesource.DamageSource, float);
+  protected void m_6153_();
+  protected net.minecraft.sounds.SoundEvent m_5592_();
+  protected net.minecraft.sounds.SoundEvent m_7515_();
+  protected net.minecraft.sounds.SoundEvent m_7975_(net.minecraft.world.damagesource.DamageSource);
+  protected net.minecraft.sounds.SoundEvent m_5501_();
+  protected void ReturnToHome();
+  public void m_7378_(net.minecraft.nbt.CompoundTag);
+  public void m_7380_(net.minecraft.nbt.CompoundTag);
+  private static boolean lambda$summon$0(net.minecraft.server.level.ServerPlayer);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/ignis/IgnisCutsceneEntityRenderer.class
+Compiled from "IgnisCutsceneEntityRenderer.java"
+public class com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntityRenderer extends com.github.L_Ender.cataclysm.client.render.entity.Ignis_Renderer {
+  public com.finderfeed.cataclysm_custscenes.entities.ignis.IgnisCutsceneEntityRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+  public boolean shouldRender(com.github.L_Ender.cataclysm.entity.AnimationMonster.BossMonsters.Ignis_Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Mob, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/leviathan/LeviathanCutsceneEntity$Events.class
+Compiled from "LeviathanCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntity$Events {
+  public com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntity$Events();
+  public static void livingDestroyBlockEvent(net.minecraftforge.event.entity.living.LivingDestroyBlockEvent);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/leviathan/LeviathanCutsceneEntity.class
+Compiled from "LeviathanCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntity extends com.github.L_Ender.cataclysm.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity implements com.finderfeed.fdlib.nbt.AutoSerializable {
+  private net.minecraft.world.phys.Vec3 summonedPos;
+  private net.minecraft.core.GlobalPos homepos;
+  public static void summon(net.minecraft.world.level.Level, net.minecraft.world.phys.Vec3, net.minecraft.core.GlobalPos);
+  private net.minecraft.world.phys.Vec3 findOptimalPlayerTpPos(net.minecraft.world.phys.Vec3, float);
+  public static com.finderfeed.fdlib.systems.cutscenes.CutsceneData cutsceneData(net.minecraft.world.phys.Vec3);
+  public com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntity(net.minecraft.world.entity.EntityType, net.minecraft.world.level.Level);
+  public void m_8119_();
+  private void tickCutscene();
+  private void removeAndSpawn();
+  private net.minecraft.world.phys.Vec3 calculateSwimmingPos(int, int);
+  public boolean m_6000_(double, double, double);
+  public boolean m_6783_(double);
+  protected void m_8099_();
+  public boolean m_20068_();
+  public boolean m_21532_();
+  public void m_6457_(net.minecraft.server.level.ServerPlayer);
+  public void m_6452_(net.minecraft.server.level.ServerPlayer);
+  public void m_7334_(net.minecraft.world.entity.Entity);
+  public void m_5997_(double, double, double);
+  protected void m_6138_();
+  public boolean m_6469_(net.minecraft.world.damagesource.DamageSource, float);
+  protected void m_6153_();
+  protected net.minecraft.sounds.SoundEvent m_5592_();
+  protected net.minecraft.sounds.SoundEvent m_7515_();
+  protected net.minecraft.sounds.SoundEvent m_7975_(net.minecraft.world.damagesource.DamageSource);
+  protected net.minecraft.sounds.SoundEvent m_5501_();
+  protected void ReturnToHome();
+  public void m_7378_(net.minecraft.nbt.CompoundTag);
+  public void m_7380_(net.minecraft.nbt.CompoundTag);
+  private static boolean lambda$summon$0(net.minecraft.server.level.ServerPlayer);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/leviathan/LeviathanCutsceneEntityRenderer.class
+Compiled from "LeviathanCutsceneEntityRenderer.java"
+public class com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntityRenderer extends com.github.L_Ender.cataclysm.client.render.entity.The_Leviathan_Renderer {
+  public com.finderfeed.cataclysm_custscenes.entities.leviathan.LeviathanCutsceneEntityRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+  public boolean shouldRender(com.github.L_Ender.cataclysm.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Mob, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/maledictus/MaledictusCutsceneEntity$Events.class
+Compiled from "MaledictusCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntity$Events {
+  public com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntity$Events();
+  public static void livingDestroyBlockEvent(net.minecraftforge.event.entity.living.LivingDestroyBlockEvent);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/maledictus/MaledictusCutsceneEntity.class
+Compiled from "MaledictusCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntity extends com.github.L_Ender.cataclysm.entity.InternalAnimationMonster.IABossMonsters.Maledictus.Maledictus_Entity implements com.finderfeed.fdlib.nbt.AutoSerializable {
+  public static final int IDLE;
+  public static final int MACE_STRIKE;
+  public static final int BOW_PULL_1;
+  public static final int BOW_PULL_2;
+  public static final int AIR_IDLE_FALLING;
+  public static final int END_FLY;
+  public static final int DEATH;
+  public static final int BIG_STRIKE_FLAME;
+  public static final int START_FLYING_HANDS_UP;
+  public static final int STRIKE_WITH_BLOCKS;
+  private com.finderfeed.fdlib.util.ProjectileMovementPath movementPath;
+  private int afterPathTicks;
+  public static com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntity summon(net.minecraft.world.level.Level, net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3, net.minecraft.core.GlobalPos, net.minecraft.core.Direction);
+  private static com.finderfeed.fdlib.systems.cutscenes.CutsceneData createCutsceneData(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  private static com.finderfeed.fdlib.util.ProjectileMovementPath createMovementPath(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  public com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntity(net.minecraft.world.entity.EntityType, net.minecraft.world.level.Level);
+  public void m_8119_();
+  private void serverTick();
+  private void clientTick();
+  protected void m_8099_();
+  public boolean m_21532_();
+  public boolean m_6000_(double, double, double);
+  public boolean m_6783_(double);
+  public void m_6457_(net.minecraft.server.level.ServerPlayer);
+  public void m_6452_(net.minecraft.server.level.ServerPlayer);
+  public void m_7334_(net.minecraft.world.entity.Entity);
+  public void m_5997_(double, double, double);
+  protected void m_6138_();
+  public boolean m_6469_(net.minecraft.world.damagesource.DamageSource, float);
+  protected void m_6153_();
+  protected net.minecraft.sounds.SoundEvent m_5592_();
+  protected net.minecraft.sounds.SoundEvent m_7515_();
+  protected net.minecraft.sounds.SoundEvent m_7975_(net.minecraft.world.damagesource.DamageSource);
+  protected net.minecraft.sounds.SoundEvent m_5501_();
+  public void m_7380_(net.minecraft.nbt.CompoundTag);
+  protected void AfterDefeatBoss(net.minecraft.world.entity.LivingEntity);
+  public void m_7378_(net.minecraft.nbt.CompoundTag);
+  protected void ReturnToHome();
+  public void smashEffect(float, int, float);
+  private static boolean lambda$summon$0(net.minecraft.server.level.ServerPlayer);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/maledictus/MaledictusCutsceneEntityRenderer.class
+Compiled from "MaledictusCutsceneEntityRenderer.java"
+public class com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntityRenderer extends com.github.L_Ender.cataclysm.client.render.entity.Maledictus_Renderer {
+  public com.finderfeed.cataclysm_custscenes.entities.maledictus.MaledictusCutsceneEntityRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+  public boolean shouldRender(com.github.L_Ender.cataclysm.entity.InternalAnimationMonster.IABossMonsters.Maledictus.Maledictus_Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Mob, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/scylla/ScyllaCutsceneEntity$Events.class
+Compiled from "ScyllaCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.scylla.ScyllaCutsceneEntity$Events {
+  public com.finderfeed.cataclysm_custscenes.entities.scylla.ScyllaCutsceneEntity$Events();
+  public static void livingDestroyBlockEvent(net.minecraftforge.event.entity.living.LivingDestroyBlockEvent);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/scylla/ScyllaCutsceneEntity.class
+Compiled from "ScyllaCutsceneEntity.java"
+public class com.finderfeed.cataclysm_custscenes.entities.scylla.ScyllaCutsceneEntity extends com.github.L_Ender.cataclysm.entity.InternalAnimationMonster.IABossMonsters.Scylla.Scylla_Entity implements com.finderfeed.fdlib.nbt.AutoSerializable {
+  public static void summon(net.minecraft.world.level.Level, net.minecraft.world.phys.Vec3, net.minecraft.core.GlobalPos);
+  private static com.finderfeed.fdlib.systems.cutscenes.CutsceneData createCutscene(net.minecraft.world.phys.Vec3);
+  public com.finderfeed.cataclysm_custscenes.entities.scylla.ScyllaCutsceneEntity(net.minecraft.world.entity.EntityType, net.minecraft.world.level.Level);
+  public void m_8119_();
+  private void tickCutscene();
+  public void smashEffect(net.minecraft.world.phys.Vec3, float, int, float);
+  private void summonLightningBolt(net.minecraft.world.phys.Vec3);
+  public boolean m_5825_();
+  public boolean m_6060_();
+  public boolean m_6000_(double, double, double);
+  public boolean m_6783_(double);
+  protected void m_8099_();
+  public boolean m_20068_();
+  public boolean m_21532_();
+  public void m_6457_(net.minecraft.server.level.ServerPlayer);
+  public void m_6452_(net.minecraft.server.level.ServerPlayer);
+  public void m_7334_(net.minecraft.world.entity.Entity);
+  public void m_5997_(double, double, double);
+  protected void m_6138_();
+  public boolean m_6469_(net.minecraft.world.damagesource.DamageSource, float);
+  protected void m_6153_();
+  protected net.minecraft.sounds.SoundEvent m_5592_();
+  protected net.minecraft.sounds.SoundEvent m_7515_();
+  protected net.minecraft.sounds.SoundEvent m_7975_(net.minecraft.world.damagesource.DamageSource);
+  protected net.minecraft.sounds.SoundEvent m_5501_();
+  protected void ReturnToHome();
+  public void m_7378_(net.minecraft.nbt.CompoundTag);
+  public void m_7380_(net.minecraft.nbt.CompoundTag);
+  private static boolean lambda$summon$0(net.minecraft.server.level.ServerPlayer);
+}
+######## ./com/finderfeed/cataclysm_custscenes/entities/scylla/ScyllaCutsceneRenderer.class
+Compiled from "ScyllaCutsceneRenderer.java"
+public class com.finderfeed.cataclysm_custscenes.entities.scylla.ScyllaCutsceneRenderer extends com.github.L_Ender.cataclysm.client.render.entity.Scylla_Renderer {
+  public com.finderfeed.cataclysm_custscenes.entities.scylla.ScyllaCutsceneRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+  public boolean shouldRender(com.github.L_Ender.cataclysm.entity.InternalAnimationMonster.IABossMonsters.Scylla.Scylla_Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Mob, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public boolean m_5523_(net.minecraft.world.entity.Entity, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+}
+######## ./com/finderfeed/cataclysm_custscenes/items/CatCutDebugStick.class
+Compiled from "CatCutDebugStick.java"
+public class com.finderfeed.cataclysm_custscenes.items.CatCutDebugStick extends net.minecraft.world.item.Item {
+  public com.finderfeed.cataclysm_custscenes.items.CatCutDebugStick(net.minecraft.world.item.Item$Properties);
+  public net.minecraft.world.InteractionResultHolder<net.minecraft.world.item.ItemStack> m_7203_(net.minecraft.world.level.Level, net.minecraft.world.entity.player.Player, net.minecraft.world.InteractionHand);
+}
+######## ./com/finderfeed/cataclysm_custscenes/mixin/AltarOfAbyssBlockEntityMixin.class
+Compiled from "AltarOfAbyssBlockEntityMixin.java"
+public class com.finderfeed.cataclysm_custscenes.mixin.AltarOfAbyssBlockEntityMixin {
+  public com.finderfeed.cataclysm_custscenes.mixin.AltarOfAbyssBlockEntityMixin();
+  private void tick(net.minecraft.world.level.Level, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.BlockPos, org.spongepowered.asm.mixin.injection.callback.CallbackInfo);
+}
+######## ./com/finderfeed/cataclysm_custscenes/mixin/AltarOfFireBlockEntityMixin.class
+Compiled from "AltarOfFireBlockEntityMixin.java"
+public class com.finderfeed.cataclysm_custscenes.mixin.AltarOfFireBlockEntityMixin {
+  public boolean summoningthis;
+  public com.finderfeed.cataclysm_custscenes.mixin.AltarOfFireBlockEntityMixin();
+  public void tick(net.minecraft.world.level.Level, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.BlockPos, org.spongepowered.asm.mixin.injection.callback.CallbackInfo);
+}
+######## ./com/finderfeed/cataclysm_custscenes/mixin/AncientRemnantMixin.class
+Compiled from "AncientRemnantMixin.java"
+public class com.finderfeed.cataclysm_custscenes.mixin.AncientRemnantMixin {
+  public com.finderfeed.cataclysm_custscenes.mixin.AncientRemnantMixin();
+  public void interact(net.minecraft.world.entity.player.Player, net.minecraft.world.InteractionHand, org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<net.minecraft.world.InteractionResult>);
+}
+######## ./com/finderfeed/cataclysm_custscenes/mixin/CursedTombstoneMixin.class
+Compiled from "CursedTombstoneMixin.java"
+public class com.finderfeed.cataclysm_custscenes.mixin.CursedTombstoneMixin {
+  public com.finderfeed.cataclysm_custscenes.mixin.CursedTombstoneMixin();
+  private static void commonTick(net.minecraft.world.level.Level, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, com.github.L_Ender.cataclysm.blockentities.Cursed_tombstone_Entity, org.spongepowered.asm.mixin.injection.callback.CallbackInfo);
+}
+######## ./com/finderfeed/cataclysm_custscenes/mixin/MaledictusEntityMixin.class
+Compiled from "MaledictusEntityMixin.java"
+public class com.finderfeed.cataclysm_custscenes.mixin.MaledictusEntityMixin {
+  public com.finderfeed.cataclysm_custscenes.mixin.MaledictusEntityMixin();
+  public void afterDefeatBoss(net.minecraft.world.entity.LivingEntity, org.spongepowered.asm.mixin.injection.callback.CallbackInfo, net.minecraft.core.BlockPos);
+}
+######## ./com/finderfeed/cataclysm_custscenes/mixin/ScyllaEntityMixin.class
+Compiled from "ScyllaEntityMixin.java"
+public class com.finderfeed.cataclysm_custscenes.mixin.ScyllaEntityMixin {
+  public com.finderfeed.cataclysm_custscenes.mixin.ScyllaEntityMixin();
+  public void mobInteract(net.minecraft.world.entity.player.Player, net.minecraft.world.InteractionHand, org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<net.minecraft.world.InteractionResult>);
+}

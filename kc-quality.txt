@@ -1,0 +1,13 @@
+advancements
+datamap
+loot_modifiers
+loot_tables
+recipes
+structures
+tags
+worldgen
+  "tooltip.kaleidoscope_cookery.cuisine_quality.superb": "Superb",
+  "tooltip.kaleidoscope_cookery.cuisine_quality.excellent": "Excellent",
+  "tooltip.kaleidoscope_cookery.cuisine_quality.standard": "Standard",
+  "tooltip.kaleidoscope_cookery.cuisine_quality.poor": "Poor",
+  "advancements.kaleidoscope_cookery.feed_chicken.title": "High-Quality Protein",

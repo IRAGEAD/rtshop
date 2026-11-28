@@ -1,0 +1,352 @@
+---- META-INF/mods.toml
+modLoader="javafml" #mandatory
+
+loaderVersion="[47,)" #mandatory
+
+license="All Rights Reserved"
+
+[[mods]] #mandatory
+
+# The modid of the mod
+modId="cinematiccataclysm" #mandatory
+
+version="1.0.1" #mandatory
+
+displayName="Cinematic Cataclysm" #mandatory
+
+authors="FINDERFEED" #optional
+
+description='''Adds one-time intro cutscenes for some L_Enders_Cataclysm bosses'''
+
+[[mixins]]
+config="cinematiccataclysm.mixins.json"
+
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
+[[dependencies.cinematiccataclysm]] #optional
+modId="forge" #mandatory
+
+type="required" #mandatory
+
+versionRange="[47.1.1,)" #mandatory
+
+ordering="NONE"
+
+side="BOTH"
+
+mandatory = true
+
+[[dependencies.cinematiccataclysm]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
+    mandatory = true
+
+[[dependencies.cinematiccataclysm]]
+    modId="fdlib"
+    type="required"
+    versionRange="[1.0.2,2.0.0)"
+    ordering="NONE"
+    side="BOTH"
+    mandatory = true
+
+
+
+---- assets/cinematiccataclysm/lang/en_us.json (keys matching)
+---- cinematiccataclysm.mixins.json
+{
+  "required": true,
+  "package": "com.finderfeed.cataclysm_custscenes.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "refmap": "cinematiccataclysm.refmap.json",
+  "mixins": [
+    "AltarOfAbyssBlockEntityMixin",
+    "AltarOfFireBlockEntityMixin",
+    "AncientRemnantMixin",
+    "CursedTombstoneMixin",
+    "MaledictusEntityMixin",
+    "ScyllaEntityMixin"
+  ]
+}
+---- pack.mcmeta
+{
+  "pack": {
+    "description": "cataclysmcutscenes resources",
+    "pack_format": 9
+  }
+}
+---- META-INF/mods.toml
+modLoader="javafml" #mandatory
+
+# A version range to match for said mod loader - for regular FML @Mod it will be the FML version. This is currently 2.
+loaderVersion="[47,)" #mandatory
+
+# The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
+# Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
+license="${mod_license}"
+
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+
+# A list of mods - how many allowed here is determined by the individual mod loader
+[[mods]] #mandatory
+# The modid of the mod
+modId = "cataclysm"
+
+
+# The version number of the mod
+version = "3.31" #mandatory
+
+# A display name for the mod
+displayName = "cataclysm" #mandatory
+credits="0dyss2y,HedwigOwls,danimodder,Gibb50,poogy" #optional
+authors="L_Ender" #optional
+description='''
+Hello
+Also Listen Cataclysmic Tunes
+https://www.curseforge.com/minecraft/texture-packs/cataclysmic-tunes
+Artist=dogulkkun,mango03034,Gytator,LegendNoob
+Patron
+[Adam,
+Angry Mutant Enderman,
+darkMind204,
+DENOBODY2,
+Hippo0824,
+printa,
+walker,
+참치,
+3T,
+danimodder,
+EternalOne,
+Karat Feng,
+lucy,
+nameed,
+PeopleMcNugget,
+qwerqweqq,
+Svmf2023,
+Th3P3dr3nder99]
+'''
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies.cataclysm]] #optional
+# the modid of the dependency
+modId="lionfishapi" #mandatory
+# Does this dependency have to exist - if not, ordering below must be specified
+mandatory=true #mandatory
+# The version range of the dependency
+versionRange="[3.0,)" #mandatory
+# An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
+ordering="AFTER"
+# Side this dependency is applied on - BOTH, CLIENT or SERVER
+side="BOTH"
+[[dependencies.cataclysm]]
+modId="forge"
+mandatory=true
+versionRange="[36.0.42,)"
+ordering="NONE"
+side="BOTH"
+
+
+---- assets/cataclysm/lang/en_us.json (keys matching)
+item.cataclysm.ignitium_helmet.desc = Gaze of Heat
+item.cataclysm.ignitium_helmet.desc2 = Press %s to give a Blazing Brand effect to the LivingEntity.
+item.cataclysm.ignitium_chestplate.desc = Can be combined with an elytra
+item.cataclysm.ignitium_leggings.desc = Flame Reflex
+item.cataclysm.ignitium_boots.desc = Lava Walker
+item.cataclysm.ignitium_upgrade.desc = Ignitium Upgrade
+item.cataclysm.ignitium_upgrade.applies_to.desc = Netherite Equipment
+item.cataclysm.ignitium_upgrade.ingredients.desc = Ignitium Ingot
+entity.cataclysm.you_cant_escape = You can't escape
+entity.cataclysm.rage_meter = 
+entity.cataclysm.the_leviathan_immune = The Leviathan is invincible outside of water!
+item.cataclysm.ignitium_ingot = Ignitium Ingot
+item.cataclysm.ignitium_upgrade_smithing_template = Smithing Template
+item.cataclysm.ignitium_helmet = Ignitium Helmet
+item.cataclysm.ignitium_chestplate = Ignitium Chestplate
+item.cataclysm.ignitium_elytra_chestplate = Ignitium Elytra Chestplate
+item.cataclysm.ignitium_leggings = Ignitium Leggings
+item.cataclysm.ignitium_boots = Ignitium Boots
+item.cataclysm.burning_ashes = Burning Ashes
+item.cataclysm.mech_eye = Eye of Mech
+item.cataclysm.monstrous_eye = Eye of Monstrous
+item.cataclysm.void_eye = Eye of Void
+item.cataclysm.flame_eye = Eye of Flame
+item.cataclysm.abyss_eye = Eye of Abyss
+item.cataclysm.desert_eye = Eye of Desert
+item.cataclysm.cursed_eye = Eye of Curse
+item.cataclysm.storm_eye = Eye of Storm
+item.cataclysm.ignited_revenant_spawn_egg = Ignited Revenant Spawn Egg
+item.cataclysm.ignited_berserker_spawn_egg = Ignited Berserker Spawn Egg
+block.cataclysm.altar_of_fire = Altar of Fire
+block.cataclysm.altar_of_void = Altar of Void
+block.cataclysm.altar_of_amethyst = Altar of Amethyst
+block.cataclysm.altar_of_abyss = Altar of Abyss
+entity.cataclysm.ender_golem = Ender Golem
+entity.cataclysm.ender_guardian = Ender Guardian
+entity.cataclysm.ender_guardian_bullet = Ender Guardian Bullet
+entity.cataclysm.lava_bomb = Lava Bomb
+entity.cataclysm.void_rune = Void Rune
+entity.cataclysm.nameless_sorcerer = Nameless Sorcerer(W.I.P)
+entity.cataclysm.old_netherite_monstrosity = Old Netherite Monstrosity
+entity.cataclysm.netherite_monstrosity = Netherite Monstrosity
+entity.cataclysm.netherite_ministrosity = Netherite Ministrosity
+entity.cataclysm.endermaptera = Endermaptera
+entity.cataclysm.void_scatter_arrow = Void Scatter Arrow
+entity.cataclysm.void_shard = Void Shard
+entity.cataclysm.ignis = Ignis
+entity.cataclysm.ignis.defeat_message = Within Nether Fortresses, Ignited Beserkers have awakend...
+entity.cataclysm.cm_falling_block = Cataclysm Falling Block
+entity.cataclysm.ignis_abyss_fireball = Ignis' Abyss Fireball
+entity.cataclysm.ignis_fireball = Ignis' Fireball
+entity.cataclysm.flame_strike = Flame Strike
+entity.cataclysm.wither_smoke_effect = Wither Smoke
+entity.cataclysm.ignited_revenant = Ignited Revenant
+entity.cataclysm.ignited_berserker = Ignited Berserker
+entity.cataclysm.ashen_breath = Ashen Breath
+entity.cataclysm.the_harbinger = The Harbinger
+entity.cataclysm.wither_missile = Wither Missile
+entity.cataclysm.wither_homing_missile = Wither Homing Missile
+entity.cataclysm.wither_howitzer = Wither Howitzer
+entity.cataclysm.void_howitzer = Void Howitzer
+entity.cataclysm.laser_beam = Laser Beam
+entity.cataclysm.death_laser_beam = Death Laser Beam
+entity.cataclysm.void_vortex = Void Vortex
+entity.cataclysm.the_leviathan = The Leviathan
+entity.cataclysm.the_leviathan.defeat_message = The Abyss gazes into you, Coral Golems will now appear in the ocean...
+entity.cataclysm.the_baby_leviathan = The Baby Leviathan
+entity.cataclysm.deepling = Deepling
+entity.cataclysm.abyss_blast = Abyss Blast
+entity.cataclysm.mini_abyss_blast = Mini Abyss Blast
+entity.cataclysm.porta_abyss_blast = Abyss Blast
+entity.cataclysm.abyss_blast_portal = Abyss Blast Portal
+entity.cataclysm.abyss_mine = Abyss Mine
+entity.cataclysm.abyss_portal = Abyss Portal
+entity.cataclysm.coral_spear = Coral Spear
+entity.cataclysm.coral_bardiche = Coral Bardiche
+entity.cataclysm.deepling_brute = Deepling Brute
+entity.cataclysm.deepling_angler = Deepling Angler
+entity.cataclysm.deepling_priest = Deepling Priest
+entity.cataclysm.deepling_warlock = Deepling Warlock
+entity.cataclysm.coral_golem = Coral Golem
+entity.cataclysm.coralssus = Coralssus
+entity.cataclysm.lionfish = Lionfish
+entity.cataclysm.dimensional_rift = Dimensional Rift
+entity.cataclysm.abyss_orb = Abyss Orb
+entity.cataclysm.portal_abyss_blast = Portal's Abyss Blast
+entity.cataclysm.lionfish_spike = Lionfish's Spike
+entity.cataclysm.tidal_tentacle = Tidal Tentacle
+entity.cataclysm.sandstorm = Sandstorm
+entity.cataclysm.sandstorm_projectile = Sandstorm Projectile
+entity.cataclysm.tidal_hook = Tidal Hook
+entity.cataclysm.amethyst_crab = Amethyst Crab
+entity.cataclysm.amethyst_cluster_projectile = Amethyst Cluster
+entity.cataclysm.earthquake = Earthquake
+entity.cataclysm.ancient_remnant = Ancient Remnant
+entity.cataclysm.ancient_ancient_remnant = Ancient Ancient Remnant
+entity.cataclysm.modern_remnant = Modern Remnant
+entity.cataclysm.the_watcher = The Watcher
+entity.cataclysm.the_prowler = The Prowler
+entity.cataclysm.ancient_desert_stele = Ancient Desert Stele
+entity.cataclysm.koboleton = Koboleton
+entity.cataclysm.kobolediator = Kobolediator
+entity.cataclysm.wadjet = Wadjet
+entity.cataclysm.maledictus = Maledictus
+entity.cataclysm.draugr = Draugr
+entity.cataclysm.aptrgangr = Aptrgangr
+entity.cataclysm.axe_blade = Axe Blade
+entity.cataclysm.royal_draugr = Royal Draugr
+entity.cataclysm.elite_draugr = Elite Draugr
+entity.cataclysm.phantom_arrow = Phantom Arrow
+entity.cataclysm.phantom_halberd = Phantom Halberd
+entity.cataclysm.flare_bomb = Flare Bomb
+entity.cataclysm.flame_jet = Flame Jet
+entity.cataclysm.storm_serpent = Storm Serpent
+entity.cataclysm.octo_ink = Octo Ink
+entity.cataclysm.hippocamtus = Hippocamtus
+entity.cataclysm.cindaria = Cindaria
+entity.cataclysm.clawdian = Clawdian
+entity.cataclysm.scylla = Scylla
+entity.cataclysm.urchinkin = Urchinkin
+entity.cataclysm.drowned_host = Drowned Host
+entity.cataclysm.symbiocto = Symbiocto
+entity.cataclysm.water_spear = Water Spear
+entity.cataclysm.lightning_spear = Lightning Spear
+entity.cataclysm.scylla_ceraunus = Ceraunus
+entity.cataclysm.wave = Wave
+entity.cataclysm.bolt_strike = Bolt Strike
+entity.cataclysm.lightning_storm = Lightning Storm
+entity.cataclysm.lightning_area_effect = Lightning Area Effect
+entity.cataclysm.onyx = Onyx
+entity.cataclysm.all.command_0 = %s is wandering
+entity.cataclysm.all.command_1 = %s is following
+entity.cataclysm.all.command_2 = %s is staying
+death.attack.cataclysm.laser = %s was exterminated by %s 's laser
+death.attack.cataclysm.deathlaser = %s was exterminated by %s 's laser
+death.attack.cataclysm.maledictio_sagitta = %s was cursed by %s 's Arrow
+death.attack.cataclysm.maledictio_magicae = %s was cursed by %s 's Magic
+death.attack.cataclysm.emp = %s has become Electric Grilled Chicken
+death.attack.cataclysm.emp.player = %s has become Electric Grilled Chicken
+death.attack.cataclysm.abyssal_burn = %s has left this dimension
+death.attack.cataclysm.abyssal_burn.player = %s has left this dimension
+death.attack.cataclysm.shredder = %s was shattered by %s
+death.attack.cataclysm.sword_dance = %s was cut by %s
+death.attack.cataclysm.maledictio = %s was cursed by %s
+death.attack.cataclysm.maledictio_anima = %s was cursed by %s
+death.attack.cataclysm.penetrate = %s was penetrated by %s
+death.attack.cataclysm.lightning = %s was electrocuted by %s
+death.attack.cataclysm.flame_strike = %s was consumed by the flames
+death.attack.cataclysm.storm_bringer = %s was hunted by %s
+---- cataclysm.mixins.json
+{
+  "required": true,
+  "package": "com.github.L_Ender.cataclysm.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "target": "@env(DEFAULT)",
+  "refmap": "cataclysm.refmap.json",
+  "mixins": [
+    "FoodDataMixin",
+    "ItemMixin",
+    "LivingEntityMixin",
+    "NoBasaltColumnsInStructuresMixin",
+    "NoDeltasInStructuresMixin",
+    "NoGeodeInStructuresMixin",
+    "NoLakesInStructuresMixin",
+    "NoMagmaBlockInStructuresMixin",
+    "NoMultifaceGrowthFeatureInStructuresMixin",
+    "NoOreInStructuresMixin",
+    "NoteBlockInstrumentMixin",
+    "NoteBlockMixin",
+    "StructureTemplateMixin",
+    "accessor.BeardifierAccessor",
+    "accessor.BoundingBoxAccessor",
+    "accessor.CriteriaTriggersAccessor",
+    "accessor.FeaturePoolElementAccessor",
+    "accessor.ListPoolElementAccessor",
+    "accessor.SinglePoolElementAccessor",
+    "accessor.StructureManagerAccessor",
+    "accessor.StructureProcessorAccessor",
+    "accessor.StructureTemplatePoolAccessor",
+    "accessor.WorldGenRegionAccessor"
+  ],
+  "client": [
+    "Client.HumanoidArmorLayerMixin",
+    "Client.HumanoidModelMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}
+---- pack.mcmeta
+{
+    "pack": {
+        "description": "examplemod resources",
+        "pack_format": 12,
+        "forge:resource_pack_format": 12,
+        "forge:data_pack_format": 10
+    }
+}
+

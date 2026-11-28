@@ -1,0 +1,891 @@
+jar: packcache/spell_engine-forge-1.10.10+1.20.1.jar
+architectury_inject_spell_engine_common_2ca280d8daba4bbb8efd062b71bfc411_2d4ee81eb4f2403de86401a4c9bbdc7ac03b5ced7143deaca5a310de17f125a2spell_enginecommon110101201devjar/PlatformMethods.class
+net/spell_engine/Platform$Type.class
+net/spell_engine/Platform$Util.class
+net/spell_engine/Platform.class
+net/spell_engine/PlatformClient$Util.class
+net/spell_engine/PlatformClient.class
+net/spell_engine/PlatformEvents$AllowEnchanting.class
+net/spell_engine/PlatformEvents$CommandRegistration.class
+net/spell_engine/PlatformEvents$IncomingDamage.class
+net/spell_engine/PlatformEvents$ItemGroupModifier.class
+net/spell_engine/PlatformEvents$LootTableModifyContext.class
+net/spell_engine/PlatformEvents.class
+net/spell_engine/SpellEngineMod.class
+net/spell_engine/api/datagen/SpellBuilder$Casting.class
+net/spell_engine/api/datagen/SpellBuilder$Complex.class
+net/spell_engine/api/datagen/SpellBuilder$Cost.class
+net/spell_engine/api/datagen/SpellBuilder$Deliver.class
+net/spell_engine/api/datagen/SpellBuilder$ImpactModifiers.class
+net/spell_engine/api/datagen/SpellBuilder$Impacts.class
+net/spell_engine/api/datagen/SpellBuilder$Particles.class
+net/spell_engine/api/datagen/SpellBuilder$Placements$RowOrder.class
+net/spell_engine/api/datagen/SpellBuilder$Placements.class
+net/spell_engine/api/datagen/SpellBuilder$ProjectileModels.class
+net/spell_engine/api/datagen/SpellBuilder$Release.class
+net/spell_engine/api/datagen/SpellBuilder$Target.class
+net/spell_engine/api/datagen/SpellBuilder$TargetConditions.class
+net/spell_engine/api/datagen/SpellBuilder$Triggers.class
+net/spell_engine/api/datagen/SpellBuilder.class
+net/spell_engine/api/effect/ActionImpairing.class
+net/spell_engine/api/effect/BleedStatusEffect.class
+net/spell_engine/api/effect/CustomModelStatusEffect$Args.class
+net/spell_engine/api/effect/CustomModelStatusEffect$Entry.class
+net/spell_engine/api/effect/CustomModelStatusEffect$Renderer.class
+net/spell_engine/api/effect/CustomModelStatusEffect.class
+net/spell_engine/api/effect/CustomParticleStatusEffect$Spawner.class
+net/spell_engine/api/effect/CustomParticleStatusEffect.class
+net/spell_engine/api/effect/CustomStatusEffect.class
+net/spell_engine/api/effect/Effects$Entry.class
+net/spell_engine/api/effect/Effects.class
+net/spell_engine/api/effect/EntityActionsAllowed$Common.class
+net/spell_engine/api/effect/EntityActionsAllowed$ControlledEntity.class
+net/spell_engine/api/effect/EntityActionsAllowed$Mob.class
+net/spell_engine/api/effect/EntityActionsAllowed$MobsAllowed.class
+net/spell_engine/api/effect/EntityActionsAllowed$Player.class
+net/spell_engine/api/effect/EntityActionsAllowed$PlayersAllowed.class
+net/spell_engine/api/effect/EntityActionsAllowed$SemanticType.class
+net/spell_engine/api/effect/EntityActionsAllowed.class
+net/spell_engine/api/effect/EntityTints$Current.class
+net/spell_engine/api/effect/EntityTints$Provider.class
+net/spell_engine/api/effect/EntityTints$Tint.class
+net/spell_engine/api/effect/EntityTints.class
+net/spell_engine/api/effect/GlowingItemStatusEffect$Glow.class
+net/spell_engine/api/effect/GlowingItemStatusEffect.class
+net/spell_engine/api/effect/InstantCast$Args.class
+net/spell_engine/api/effect/InstantCast$Selection.class
+net/spell_engine/api/effect/InstantCast.class
+net/spell_engine/api/effect/KnockbackImmunity$Bearer.class
+net/spell_engine/api/effect/KnockbackImmunity.class
+net/spell_engine/api/effect/OnRemoval$Context.class
+net/spell_engine/api/effect/OnRemoval.class
+net/spell_engine/api/effect/Protection$Entry.class
+net/spell_engine/api/effect/Protection$Pop.class
+net/spell_engine/api/effect/Protection.class
+net/spell_engine/api/effect/RemoveOnHit$Args.class
+net/spell_engine/api/effect/RemoveOnHit$Trigger.class
+net/spell_engine/api/effect/RemoveOnHit.class
+net/spell_engine/api/effect/SpellEngineEffects.class
+net/spell_engine/api/effect/StatusEffectClassification$1.class
+net/spell_engine/api/effect/StatusEffectClassification.class
+net/spell_engine/api/effect/Synchronized$Effect.class
+net/spell_engine/api/effect/Synchronized$Provider.class
+net/spell_engine/api/effect/Synchronized.class
+net/spell_engine/api/effect/TickingStatusEffect.class
+net/spell_engine/api/enchantment/SpellEngineEnchantments$EnchantmentsConfig.class
+net/spell_engine/api/enchantment/SpellEngineEnchantments.class
+net/spell_engine/api/entity/EvasionLogic$Evader.class
+net/spell_engine/api/entity/EvasionLogic.class
+net/spell_engine/api/entity/LivingEntityImmunity$Entry.class
+net/spell_engine/api/entity/LivingEntityImmunity$Owner.class
+net/spell_engine/api/entity/LivingEntityImmunity.class
+net/spell_engine/api/entity/SpellEngineAttributes$Entry.class
+net/spell_engine/api/entity/SpellEngineAttributes.class
+net/spell_engine/api/entity/SpellEntity$Spawned$Args.class
+net/spell_engine/api/entity/SpellEntity$Spawned.class
+net/spell_engine/api/entity/SpellEntity.class
+net/spell_engine/api/entity/SpellEntityPredicates$Entry.class
+net/spell_engine/api/entity/SpellEntityPredicates$Input.class
+net/spell_engine/api/entity/SpellEntityPredicates.class
+net/spell_engine/api/entity/TwoWayCollisionChecker$CollisionResult.class
+net/spell_engine/api/entity/TwoWayCollisionChecker.class
+net/spell_engine/api/event/CombatEvents$EntityAttack$Args.class
+net/spell_engine/api/event/CombatEvents$EntityAttack.class
+net/spell_engine/api/event/CombatEvents$EntityDamageTaken$Args.class
+net/spell_engine/api/event/CombatEvents$EntityDamageTaken.class
+net/spell_engine/api/event/CombatEvents$EntityEvasion$Args.class
+net/spell_engine/api/event/CombatEvents$EntityEvasion.class
+net/spell_engine/api/event/CombatEvents$EntityShieldBlock$Args.class
+net/spell_engine/api/event/CombatEvents$EntityShieldBlock.class
+net/spell_engine/api/event/CombatEvents$ItemUse$Args.class
+net/spell_engine/api/event/CombatEvents$ItemUse$Stage.class
+net/spell_engine/api/event/CombatEvents$ItemUse.class
+net/spell_engine/api/event/CombatEvents$PlayerAttack$Args.class
+net/spell_engine/api/event/CombatEvents$PlayerAttack.class
+net/spell_engine/api/event/CombatEvents$PlayerDamageTaken$Args.class
+net/spell_engine/api/event/CombatEvents$PlayerDamageTaken.class
+net/spell_engine/api/event/CombatEvents$PlayerShieldBlock$Args.class
+net/spell_engine/api/event/CombatEvents$PlayerShieldBlock.class
+net/spell_engine/api/event/CombatEvents.class
+net/spell_engine/api/event/Event.class
+net/spell_engine/api/event/StagedEvent.class
+net/spell_engine/api/item/ItemAttributeModifiers$1.class
+net/spell_engine/api/item/ItemAttributeModifiers$Builder.class
+net/spell_engine/api/item/ItemAttributeModifiers$Entry.class
+net/spell_engine/api/item/ItemAttributeModifiers$Slot.class
+net/spell_engine/api/item/ItemAttributeModifiers.class
+net/spell_engine/api/item/SpellItemData$Defaults.class
+net/spell_engine/api/item/SpellItemData$DefaultsReader.class
+net/spell_engine/api/item/SpellItemData.class
+net/spell_engine/api/item/set/EquipmentSet$Bonus.class
+net/spell_engine/api/item/set/EquipmentSet$Definition.class
+net/spell_engine/api/item/set/EquipmentSet$Owner.class
+net/spell_engine/api/item/set/EquipmentSet$Result.class
+net/spell_engine/api/item/set/EquipmentSet$SourcedItemStack.class
+net/spell_engine/api/item/set/EquipmentSet.class
+net/spell_engine/api/item/set/EquipmentSetFeature$1.class
+net/spell_engine/api/item/set/EquipmentSetFeature.class
+net/spell_engine/api/item/set/EquipmentSetRegistry.class
+net/spell_engine/api/item/set/EquipmentSetTooltip.class
+net/spell_engine/api/item/weapon/SpellSwordItem.class
+net/spell_engine/api/item/weapon/SpellWeaponItem.class
+net/spell_engine/api/item/weapon/StaffItem.class
+net/spell_engine/api/render/BuffParticleSpawner$Spacing.class
+net/spell_engine/api/render/BuffParticleSpawner.class
+net/spell_engine/api/render/CustomLayers$1.class
+net/spell_engine/api/render/CustomLayers.class
+net/spell_engine/api/render/CustomModels.class
+net/spell_engine/api/render/LightEmission.class
+net/spell_engine/api/render/ModelFxEffectRenderer$EntityScaling.class
+net/spell_engine/api/render/ModelFxEffectRenderer$Playback.class
+net/spell_engine/api/render/ModelFxEffectRenderer$SizeAxis.class
+net/spell_engine/api/render/ModelFxEffectRenderer.class
+net/spell_engine/api/render/OrbitingEffectRenderer$Model.class
+net/spell_engine/api/render/OrbitingEffectRenderer.class
+net/spell_engine/api/render/StunParticleSpawner.class
+net/spell_engine/api/spell/ExternalSpellSchools$RangedWeaponApiBridge.class
+net/spell_engine/api/spell/ExternalSpellSchools.class
+net/spell_engine/api/spell/Spell$Active$Cast$Channel.class
+net/spell_engine/api/spell/Spell$Active$Cast$Charge$Curve.class
+net/spell_engine/api/spell/Spell$Active$Cast$Charge.class
+net/spell_engine/api/spell/Spell$Active$Cast$Type.class
+net/spell_engine/api/spell/Spell$Active$Cast.class
+net/spell_engine/api/spell/Spell$Active.class
+net/spell_engine/api/spell/Spell$AreaImpact$ExtraRadius.class
+net/spell_engine/api/spell/Spell$AreaImpact.class
+net/spell_engine/api/spell/Spell$ArrowPerks.class
+net/spell_engine/api/spell/Spell$Cost$Cooldown.class
+net/spell_engine/api/spell/Spell$Cost$Item.class
+net/spell_engine/api/spell/Spell$Cost.class
+net/spell_engine/api/spell/Spell$Delivery$AffectArrow.class
+net/spell_engine/api/spell/Spell$Delivery$Cloud$ClientData.class
+net/spell_engine/api/spell/Spell$Delivery$Cloud$Despawn.class
+net/spell_engine/api/spell/Spell$Delivery$Cloud$Growth.class
+net/spell_engine/api/spell/Spell$Delivery$Cloud$Spawn.class
+net/spell_engine/api/spell/Spell$Delivery$Cloud.class
+net/spell_engine/api/spell/Spell$Delivery$Custom.class
+net/spell_engine/api/spell/Spell$Delivery$Melee$Attack.class
+net/spell_engine/api/spell/Spell$Delivery$Melee$HitBox.class
+net/spell_engine/api/spell/Spell$Delivery$Melee.class
+net/spell_engine/api/spell/Spell$Delivery$Meteor.class
+net/spell_engine/api/spell/Spell$Delivery$ShootArrow.class
+net/spell_engine/api/spell/Spell$Delivery$ShootProjectile$DirectionOffset.class
+net/spell_engine/api/spell/Spell$Delivery$ShootProjectile.class
+net/spell_engine/api/spell/Spell$Delivery$StashEffect$ImpactMode.class
+net/spell_engine/api/spell/Spell$Delivery$StashEffect.class
+net/spell_engine/api/spell/Spell$Delivery$Type.class
+net/spell_engine/api/spell/Spell$Delivery.class
+net/spell_engine/api/spell/Spell$EntityPlacement.class
+net/spell_engine/api/spell/Spell$ExtendedArchetype.class
+net/spell_engine/api/spell/Spell$Impact$Action$Aggro$Mode.class
+net/spell_engine/api/spell/Spell$Impact$Action$Aggro.class
+net/spell_engine/api/spell/Spell$Impact$Action$Cooldown$Modify.class
+net/spell_engine/api/spell/Spell$Impact$Action$Cooldown.class
+net/spell_engine/api/spell/Spell$Impact$Action$Custom.class
+net/spell_engine/api/spell/Spell$Impact$Action$Damage.class
+net/spell_engine/api/spell/Spell$Impact$Action$Disrupt.class
+net/spell_engine/api/spell/Spell$Impact$Action$Fire.class
+net/spell_engine/api/spell/Spell$Impact$Action$Heal.class
+net/spell_engine/api/spell/Spell$Impact$Action$Immunity.class
+net/spell_engine/api/spell/Spell$Impact$Action$Spawn.class
+net/spell_engine/api/spell/Spell$Impact$Action$StatusEffect$ApplyLimit.class
+net/spell_engine/api/spell/Spell$Impact$Action$StatusEffect$ApplyMode.class
+net/spell_engine/api/spell/Spell$Impact$Action$StatusEffect$Remove$Selector.class
+net/spell_engine/api/spell/Spell$Impact$Action$StatusEffect$Remove.class
+net/spell_engine/api/spell/Spell$Impact$Action$StatusEffect.class
+net/spell_engine/api/spell/Spell$Impact$Action$Summon.class
+net/spell_engine/api/spell/Spell$Impact$Action$Teleport$BehindTarget.class
+net/spell_engine/api/spell/Spell$Impact$Action$Teleport$Fizzle.class
+net/spell_engine/api/spell/Spell$Impact$Action$Teleport$Forward.class
+net/spell_engine/api/spell/Spell$Impact$Action$Teleport$Mode.class
+net/spell_engine/api/spell/Spell$Impact$Action$Teleport.class
+net/spell_engine/api/spell/Spell$Impact$Action$Type.class
+net/spell_engine/api/spell/Spell$Impact$Action$Velocity$Frame.class
+net/spell_engine/api/spell/Spell$Impact$Action$Velocity.class
+net/spell_engine/api/spell/Spell$Impact$Action.class
+net/spell_engine/api/spell/Spell$Impact$Modifier.class
+net/spell_engine/api/spell/Spell$Impact$PowerBlend.class
+net/spell_engine/api/spell/Spell$Impact$TargetModifier.class
+net/spell_engine/api/spell/Spell$Impact.class
+net/spell_engine/api/spell/Spell$LaunchProperties.class
+net/spell_engine/api/spell/Spell$Learn.class
+net/spell_engine/api/spell/Spell$Modifier$Cloud.class
+net/spell_engine/api/spell/Spell$Modifier$ImpactFilter.class
+net/spell_engine/api/spell/Spell$Modifier$ImpactListModifier.class
+net/spell_engine/api/spell/Spell$Modifier$SummonBehaviourModifier$Lifespan.class
+net/spell_engine/api/spell/Spell$Modifier$SummonBehaviourModifier.class
+net/spell_engine/api/spell/Spell$Modifier.class
+net/spell_engine/api/spell/Spell$Passive.class
+net/spell_engine/api/spell/Spell$ProjectileData$Client.class
+net/spell_engine/api/spell/Spell$ProjectileData$HitBox.class
+net/spell_engine/api/spell/Spell$ProjectileData$Motion$FluidOverride.class
+net/spell_engine/api/spell/Spell$ProjectileData$Motion.class
+net/spell_engine/api/spell/Spell$ProjectileData$Perks.class
+net/spell_engine/api/spell/Spell$ProjectileData.class
+net/spell_engine/api/spell/Spell$ProjectileModelComposite$Model.class
+net/spell_engine/api/spell/Spell$ProjectileModelComposite$Orientation.class
+net/spell_engine/api/spell/Spell$ProjectileModelComposite.class
+net/spell_engine/api/spell/Spell$RangeMechanic.class
+net/spell_engine/api/spell/Spell$Release.class
+net/spell_engine/api/spell/Spell$Target$Aim.class
+net/spell_engine/api/spell/Spell$Target$Area$DropoffCurve.class
+net/spell_engine/api/spell/Spell$Target$Area.class
+net/spell_engine/api/spell/Spell$Target$Beam$Luminance.class
+net/spell_engine/api/spell/Spell$Target$Beam.class
+net/spell_engine/api/spell/Spell$Target$Type.class
+net/spell_engine/api/spell/Spell$Target.class
+net/spell_engine/api/spell/Spell$TargetCondition.class
+net/spell_engine/api/spell/Spell$Tooltip$LineOptions.class
+net/spell_engine/api/spell/Spell$Tooltip.class
+net/spell_engine/api/spell/Spell$Trigger$ArrowShotCondition.class
+net/spell_engine/api/spell/Spell$Trigger$DamageCondition.class
+net/spell_engine/api/spell/Spell$Trigger$EffectCondition.class
+net/spell_engine/api/spell/Spell$Trigger$ImpactCondition.class
+net/spell_engine/api/spell/Spell$Trigger$MeleeCondition.class
+net/spell_engine/api/spell/Spell$Trigger$SpellCondition.class
+net/spell_engine/api/spell/Spell$Trigger$Stage.class
+net/spell_engine/api/spell/Spell$Trigger$TargetSelector.class
+net/spell_engine/api/spell/Spell$Trigger$Type.class
+net/spell_engine/api/spell/Spell$Trigger.class
+net/spell_engine/api/spell/Spell$Type.class
+net/spell_engine/api/spell/Spell.class
+net/spell_engine/api/spell/container/SpellChoice.class
+net/spell_engine/api/spell/container/SpellContainer$ContentType.class
+net/spell_engine/api/spell/container/SpellContainer.class
+net/spell_engine/api/spell/container/SpellContainerHelper.class
+net/spell_engine/api/spell/container/SpellContainerTemplates$Config.class
+net/spell_engine/api/spell/container/SpellContainerTemplates.class
+net/spell_engine/api/spell/container/SpellContainers.class
+net/spell_engine/api/spell/event/SpellBindingEvents$SpellBound$Args.class
+net/spell_engine/api/spell/event/SpellBindingEvents$SpellBound.class
+net/spell_engine/api/spell/event/SpellBindingEvents.class
+net/spell_engine/api/spell/event/SpellEvents$CastingAttemptEvent$Args.class
+net/spell_engine/api/spell/event/SpellEvents$CastingAttemptEvent.class
+net/spell_engine/api/spell/event/SpellEvents$HealEvent$Args.class
+net/spell_engine/api/spell/event/SpellEvents$HealEvent.class
+net/spell_engine/api/spell/event/SpellEvents$ProjectileLaunch.class
+net/spell_engine/api/spell/event/SpellEvents$ProjectileLaunchEvent.class
+net/spell_engine/api/spell/event/SpellEvents$SpellCastEvent$Args.class
+net/spell_engine/api/spell/event/SpellEvents$SpellCastEvent.class
+net/spell_engine/api/spell/event/SpellEvents$SpellCostConsumeEvent$Args.class
+net/spell_engine/api/spell/event/SpellEvents$SpellCostConsumeEvent.class
+net/spell_engine/api/spell/event/SpellEvents.class
+net/spell_engine/api/spell/event/SpellHandlers$CustomDelivery.class
+net/spell_engine/api/spell/event/SpellHandlers$CustomImpact.class
+net/spell_engine/api/spell/event/SpellHandlers$ImpactResult.class
+net/spell_engine/api/spell/event/SpellHandlers.class
+net/spell_engine/api/spell/fx/Easing$Curve.class
+net/spell_engine/api/spell/fx/Easing.class
+net/spell_engine/api/spell/fx/Fx$Context.class
+net/spell_engine/api/spell/fx/Fx$ScaleWith.class
+net/spell_engine/api/spell/fx/Fx$Visuals.class
+net/spell_engine/api/spell/fx/Fx.class
+net/spell_engine/api/spell/fx/ModelEffect$Animation.class
+net/spell_engine/api/spell/fx/ModelEffect$Positioning.class
+net/spell_engine/api/spell/fx/ModelEffect$Transform.class
+net/spell_engine/api/spell/fx/ModelEffect.class
+net/spell_engine/api/spell/fx/ModelEffectAttachment$Entry.class
+net/spell_engine/api/spell/fx/ModelEffectAttachment$Provider.class
+net/spell_engine/api/spell/fx/ModelEffectAttachment.class
+net/spell_engine/api/spell/fx/ModelEffectBuilder$Preset.class
+net/spell_engine/api/spell/fx/ModelEffectBuilder.class
+net/spell_engine/api/spell/fx/ParticleGroup$Alignment.class
+net/spell_engine/api/spell/fx/ParticleGroup$Anchor.class
+net/spell_engine/api/spell/fx/ParticleGroup$Appearance.class
+net/spell_engine/api/spell/fx/ParticleGroup$Attachment.class
+net/spell_engine/api/spell/fx/ParticleGroup$Batch.class
+net/spell_engine/api/spell/fx/ParticleGroup$Facing.class
+net/spell_engine/api/spell/fx/ParticleGroup$Motion.class
+net/spell_engine/api/spell/fx/ParticleGroup$Render.class
+net/spell_engine/api/spell/fx/ParticleGroup$Shape.class
+net/spell_engine/api/spell/fx/ParticleGroup.class
+net/spell_engine/api/spell/fx/ParticleGroupBuilder$Batches.class
+net/spell_engine/api/spell/fx/ParticleGroupBuilder.class
+net/spell_engine/api/spell/fx/PlayerAnimation$Override$Equipment.class
+net/spell_engine/api/spell/fx/PlayerAnimation$Override.class
+net/spell_engine/api/spell/fx/PlayerAnimation.class
+net/spell_engine/api/spell/fx/Sound.class
+net/spell_engine/api/spell/fx/SoundRandom.class
+net/spell_engine/api/spell/registry/SpellRegistry$1.class
+net/spell_engine/api/spell/registry/SpellRegistry.class
+net/spell_engine/api/spell/summon/AttributeScaling$Entry$OwnerModifier.class
+net/spell_engine/api/spell/summon/AttributeScaling$Entry.class
+net/spell_engine/api/spell/summon/AttributeScaling.class
+net/spell_engine/api/spell/summon/SpellSummoned$Args.class
+net/spell_engine/api/spell/summon/SpellSummoned.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action$Entry.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action$MeleeAttack.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action$SpellCast$Aiming$Fallback.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action$SpellCast$Aiming.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action$SpellCast$Range.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action$SpellCast.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action$Type.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Action.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Dimensions.class
+net/spell_engine/api/spell/summon/SummonBehaviour$ExistenceParticles.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Lifespan.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Movement$CollisionMode.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Movement$Follow.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Movement$Wander.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Movement.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Sounds.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting$AutoTarget.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting$ClearCondition$AfterTicks.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting$ClearCondition$OnActionCompleted.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting$ClearCondition$OutOfDetectionRange.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting$ClearCondition.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting$DetectionRange$Mode.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting$DetectionRange.class
+net/spell_engine/api/spell/summon/SummonBehaviour$Targeting.class
+net/spell_engine/api/spell/summon/SummonBehaviour.class
+net/spell_engine/api/spell/summon/SummonedEntities.class
+net/spell_engine/api/spell/summon/SummonedEntityConfig$CommonAttributes.class
+net/spell_engine/api/spell/summon/SummonedEntityConfig$CustomAttribute.class
+net/spell_engine/api/spell/summon/SummonedEntityConfig$Entry.class
+net/spell_engine/api/spell/summon/SummonedEntityConfig.class
+net/spell_engine/api/spell/tooltip/TooltipTokens$1.class
+net/spell_engine/api/spell/tooltip/TooltipTokens$Custom$Args.class
+net/spell_engine/api/spell/tooltip/TooltipTokens$Custom.class
+net/spell_engine/api/spell/tooltip/TooltipTokens$Format.class
+net/spell_engine/api/spell/tooltip/TooltipTokens.class
+net/spell_engine/api/spell/weakness/ScopedWeakness.class
+net/spell_engine/api/spell/weakness/SpellSchoolWeakness.class
+net/spell_engine/api/tags/SpellEngineDamageTypeTags.class
+net/spell_engine/api/tags/SpellEngineEntityTags$Vulnerability$Category.class
+net/spell_engine/api/tags/SpellEngineEntityTags$Vulnerability$Entry.class
+net/spell_engine/api/tags/SpellEngineEntityTags$Vulnerability.class
+net/spell_engine/api/tags/SpellEngineEntityTags.class
+net/spell_engine/api/tags/SpellEngineItemTags.class
+net/spell_engine/api/tags/SpellTags.class
+net/spell_engine/api/util/AlwaysGenerate.class
+net/spell_engine/api/util/NeverGenerate.class
+net/spell_engine/api/util/TriState.class
+net/spell_engine/client/ClientNetwork.class
+net/spell_engine/client/SpellEngineClient$ParticleAppearanceRegistrar.class
+net/spell_engine/client/SpellEngineClient$SpriteFactory.class
+net/spell_engine/client/SpellEngineClient.class
+net/spell_engine/client/animation/AnimatablePlayer.class
+net/spell_engine/client/animation/AnimationRegistry.class
+net/spell_engine/client/animation/AnimationSubStack.class
+net/spell_engine/client/animation/StateCollectionHelper.class
+net/spell_engine/client/casting/ClientCastController$1.class
+net/spell_engine/client/casting/ClientCastController$Reaction$Type.class
+net/spell_engine/client/casting/ClientCastController$Reaction.class
+net/spell_engine/client/casting/ClientCastController.class
+net/spell_engine/client/compatibility/CompatFeatures.class
+net/spell_engine/client/compatibility/FirstPersonAnimationCompatibility$1.class
+net/spell_engine/client/compatibility/FirstPersonAnimationCompatibility.class
+net/spell_engine/client/compatibility/IrisCompatibility$Decal.class
+net/spell_engine/client/compatibility/IrisCompatibility.class
+net/spell_engine/client/compatibility/ShaderCompatibility.class
+net/spell_engine/client/compatibility/ShoulderSurfingCompatibility.class
+net/spell_engine/client/input/GuiKeyBinding.class
+net/spell_engine/client/input/Keybindings$Wrapped.class
+net/spell_engine/client/input/Keybindings.class
+net/spell_engine/client/input/MinecraftClientExtension.class
+net/spell_engine/client/input/SpellHotbar$1.class
+net/spell_engine/client/input/SpellHotbar$Handle.class
+net/spell_engine/client/input/SpellHotbar$ItemUseExpectation.class
+net/spell_engine/client/input/SpellHotbar$Slot.class
+net/spell_engine/client/input/SpellHotbar$StructuredSlots.class
+net/spell_engine/client/input/SpellHotbar$UseCase.class
+net/spell_engine/client/input/SpellHotbar.class
+net/spell_engine/client/input/WrappedKeybinding$Category.class
+net/spell_engine/client/input/WrappedKeybinding$Unwrapped.class
+net/spell_engine/client/input/WrappedKeybinding$VanillaAlternative.class
+net/spell_engine/client/input/WrappedKeybinding.class
+net/spell_engine/client/particle/SpellParticle$1.class
+net/spell_engine/client/particle/SpellParticle$Factory.class
+net/spell_engine/client/particle/SpellParticle.class
+net/spell_engine/client/render/BeamEmitterEntity.class
+net/spell_engine/client/render/BeamRenderer$1.class
+grep: write error: Broken pipe
+grep: write error: Broken pipe
+==== mods.toml
+modLoader = "javafml"
+loaderVersion = "[47,)"
+issueTrackerURL = "https://github.com/ZsoltMolnarrr/SpellEngine/issues"
+license = "GPL-3.0"
+
+[[mods]]
+modId = "spell_engine"
+version = "1.10.10+1.20.1"
+displayName = "Spell Engine"
+authors = "Daedelus"
+description = '''
+Data driven magic library.
+'''
+logoFile = "icon.png"
+
+[[dependencies.spell_engine]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.spell_engine]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.spell_engine]]
+modId = "cloth_config"
+mandatory = true
+versionRange = "[11.1.106,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.spell_engine]]
+modId = "playeranimator"
+mandatory = true
+# Any version. Modrinth publishes exactly one PlayerAnimator build for MC 1.20.1 --
+# `1.0.2-rc1+1.20` -- and `1.0.2-rc1` sorts BELOW `1.0.2` under Maven ordering, so the
+# previous `[1.0.2,)` excluded the only artifact a player can actually install.
+versionRange = "[1.0.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.spell_engine]]
+modId = "spell_power"
+mandatory = true
+versionRange = "[1.6.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.spell_engine]]
+modId = "curios"
+mandatory = false
+versionRange = "[5,)"
+ordering = "AFTER"
+side = "BOTH"
+
+==== wizards spells
+assets/wizards/models/item/spell_book/
+assets/wizards/models/item/spell_book/arcane.json
+assets/wizards/models/item/spell_book/fire.json
+assets/wizards/models/item/spell_book/frost.json
+assets/wizards/models/item/spell_scroll/
+assets/wizards/models/item/spell_scroll/arcane.json
+assets/wizards/models/item/spell_scroll/fire.json
+assets/wizards/models/item/spell_scroll/frost.json
+assets/wizards/models/spell_effect/
+assets/wizards/models/spell_effect/arcane_charge.json
+assets/wizards/models/spell_effect/frost_shield_base.json
+assets/wizards/models/spell_effect/frost_shield_overlay.json
+assets/wizards/models/spell_effect/frost_spike_1.json
+assets/wizards/models/spell_effect/frost_spike_2.json
+assets/wizards/models/spell_effect/frost_trap.json
+assets/wizards/models/spell_effect/ice_block.json
+assets/wizards/models/spell_projectile/
+assets/wizards/models/spell_projectile/arcane_bolt.json
+assets/wizards/models/spell_projectile/arcane_missile.json
+assets/wizards/models/spell_projectile/fire_blast.json
+assets/wizards/models/spell_projectile/fire_meteor.json
+assets/wizards/models/spell_projectile/fire_slash.json
+assets/wizards/models/spell_projectile/fire_wave.json
+assets/wizards/models/spell_projectile/fireball.json
+assets/wizards/models/spell_projectile/frost_shard.json
+assets/wizards/models/spell_projectile/frostbolt.json
+assets/wizards/models/spell_projectile/frostbolt_inner.json
+assets/wizards/models/spell_projectile/frostbolt_outer.json
+assets/wizards/models/spell_projectile/ice_lance.json
+assets/wizards/textures/item/spell_book/
+assets/wizards/textures/item/spell_book/arcane.png
+assets/wizards/textures/item/spell_book/fire.png
+assets/wizards/textures/item/spell_book/frost.png
+assets/wizards/textures/spell/
+assets/wizards/textures/spell/arcane_barrage.png
+assets/wizards/textures/spell/arcane_beam.png
+assets/wizards/textures/spell/arcane_blast.png
+assets/wizards/textures/spell/arcane_blink.png
+assets/wizards/textures/spell/arcane_bolt.png
+assets/wizards/textures/spell/arcane_evocation.png
+assets/wizards/textures/spell/arcane_explosion.png
+assets/wizards/textures/spell/arcane_missile.png
+assets/wizards/textures/spell/fire_blast.png
+assets/wizards/textures/spell/fire_breath.png
+assets/wizards/textures/spell/fire_hydra.png
+assets/wizards/textures/spell/fire_meteor.png
+assets/wizards/textures/spell/fire_scorch.png
+assets/wizards/textures/spell/fire_slash.png
+assets/wizards/textures/spell/fire_storm.png
+assets/wizards/textures/spell/fire_wall.png
+assets/wizards/textures/spell/fireball.png
+assets/wizards/textures/spell/frost_blizzard.png
+assets/wizards/textures/spell/frost_elemental.png
+assets/wizards/textures/spell/frost_lance.png
+assets/wizards/textures/spell/frost_nova.png
+assets/wizards/textures/spell/frost_shard.png
+assets/wizards/textures/spell/frost_shield.png
+assets/wizards/textures/spell/frost_spikes.png
+assets/wizards/textures/spell/frostbolt.png
+assets/wizards/textures/spell_effect/
+grep: write error: Broken pipe
+---- data/wizards/spell/arcane_barrage.json
+{
+  "school": "spell_power:arcane",
+  "range": 16.0,
+  "tier": 3,
+  "group": "arcane_conjuration",
+  "learn": {},
+  "active": {},
+  "release": {
+    "animation": {
+      "id": "spell_engine:one_handed_area_release_air_wave"
+    },
+    "sound": {
+      "id": "wizards:arcane_barrage_release"
+    }
+  },
+  "impacts": [
+    {
+      "action": {
+        "type": "SUMMON",
+        "summon": {
+          "entity_type_id": "wizards:arcane_emitter",
+          "behaviour": {
+            "is_attackable": false,
+            "spawn_fx": {
+              "particles": [
+                {
+                  "id": "spell_engine:magic_arcane",
+                  "appearance": {
+                    "color": 4284940287,
+                    "motion": "DECELERATE"
+                  },
+                  "batch": {
+                    "count": 15.0,
+                    "shape": "SPHERE",
+                    "anchor": "ENTITY",
+                    "min_speed": 0.3,
+                    "max_speed": 0.5
+                  }
+                },
+                {
+                  "id": "firework",
+                  "appearance": {},
+                  "batch": {
+                    "count": 10.0,
+                    "shape": "SPHERE",
+                    "anchor": "ENTITY",
+                    "min_speed": 0.05,
+                    "max_speed": 0.15
+                  }
+                }
+              ]
+            },
+            "dimensions": {
+              "height": 0.6
+            },
+            "movement": {
+              "can_move": false,
+              "affected_by_gravity": false,
+              "is_pushable": false,
+              "collision": "NONE"
+            },
+            "targeting": {
+              "revenge": false,
+              "look_around": false
+            },
+            "lifespan": {
+              "active_seconds": 12
+            },
+            "sounds": {
+              "spawn": {
+                "id": "wizards:arcane_emitter_spawn"
+              },
+              "despawn": {
+                "id": "wizards:arcane_emitter_despawn"
+              }
+            },
+            "actions": [
+              {
+                "type": "SPELL_CAST",
+                "spell_cast": {
+                  "spell_id": "wizards:arcane_bolt",
+                  "cooldown": 5,
+                  "aiming": {
+                    "fallback": "FORWARD"
+                  }
+                }
+              }
+            ]
+          },
+          "attribute_scaling": {
+            "entries": [
+             
+---- data/wizards/spell/arcane_beam.json
+{
+  "school": "spell_power:arcane",
+  "range": 32.0,
+  "tier": 3,
+  "group": "arcane_sorcery",
+  "learn": {},
+  "active": {
+    "cast": {
+      "duration": 5.0,
+      "type": "CHANNEL",
+      "channel": {
+        "ticks": 25
+      },
+      "animation": {
+        "id": "spell_engine:two_handed_channeling"
+      },
+      "start_sound": {
+        "id": "wizards:arcane_beam_start"
+      },
+      "sound": {
+        "id": "wizards:arcane_beam_casting",
+        "randomness": 0.0
+      },
+      "particles": [
+        {
+          "id": "spell_engine:magic_spell",
+          "appearance": {
+            "color": 4284940287,
+            "motion": "ASCEND"
+          },
+          "batch": {
+            "count": 0.5,
+            "shape": "PIPE",
+            "anchor": "LAUNCH_POINT",
+            "alignment": "LOOK",
+            "min_speed": 0.1,
+            "max_speed": 0.2
+          }
+        },
+        {
+          "id": "firework",
+          "appearance": {},
+          "batch": {
+            "count": 0.5,
+            "shape": "PIPE",
+            "anchor": "LAUNCH_POINT",
+            "alignment": "LOOK",
+            "min_speed": 0.1,
+            "max_speed": 0.2,
+            "width_factor": 2.0
+          }
+        }
+      ]
+    }
+  },
+  "release": {
+    "sound": {
+      "id": "wizards:arcane_beam_release"
+    }
+  },
+  "target": {
+    "type": "BEAM",
+    "beam": {
+      "color_rgba": 4284940287,
+      "width": 0.08,
+      "flow": 1.5,
+      "block_hit": {
+        "particles": [
+          {
+            "id": "spell_engine:magic_spell",
+            "appearance": {
+              "color": 4284940287,
+              "motion": "ASCEND"
+            },
+            "batch": {
+              "count": 1.0,
+              "shape": "CIRCLE",
+              "anchor": "ENTITY",
+              "alignment": "LOOK",
+              "min_speed": 0.1,
+              "max_speed": 0.2
+            }
+          },
+          {
+            "id": "firework",
+            "appearance": {},
+            "batch": {
+              "count": 1.0,
+              "shape": "CIRCLE",
+              "anchor": "ENTITY",
+              "alignment": "LOOK",
+              "min_speed": 0.1,
+              "max_speed": 0.2
+            }
+          },
+          {
+            "id": "spell_engine:magic_arcane",
+            "appearance": {
+              "color": 4284940287,
+              "motion": "BURST"
+            },
+            "batch": {
+              "count": 3.0,
+              "shape": "SPHERE",
+              "anchor": "ENTITY",
+
+---- data/wizards/spell/arcane_blast.json
+{
+  "school": "spell_power:arcane",
+  "range": 16.0,
+  "tier": 1,
+  "group": "arcane_weapon",
+  "learn": {},
+  "active": {
+    "cast": {
+      "duration": 1.5,
+      "animation": {
+        "id": "spell_engine:one_handed_projectile_charge"
+      },
+      "sound": {
+        "id": "spell_engine:generic_arcane_casting",
+        "randomness": 0.0
+      },
+      "particles": [
+        {
+          "id": "spell_engine:magic_spell",
+          "appearance": {
+            "color": 4284940287,
+            "motion": "ASCEND"
+          },
+          "batch": {
+            "count": 1.0,
+            "shape": "PIPE",
+            "anchor": "ENTITY",
+            "vertical_origin": 0.1,
+            "min_speed": 0.05,
+            "max_speed": 0.1,
+            "width_factor": 2.0
+          }
+        }
+      ]
+    }
+  },
+  "release": {
+    "animation": {
+      "id": "spell_engine:one_handed_projectile_release"
+    },
+    "sound": {
+      "id": "wizards:arcane_missile_release"
+    }
+  },
+  "target": {
+    "type": "AIM",
+    "aim": {
+      "sticky": true
+    }
+  },
+  "impacts": [
+    {
+      "action": {
+        "type": "DAMAGE",
+        "damage": {
+          "spell_power_coefficient": 0.8,
+          "knockback": 0.5
+        }
+      },
+      "visuals": {
+        "particles": [
+          {
+            "id": "spell_engine:magic_arcane",
+            "appearance": {
+              "color": 4284940287,
+              "motion": "BURST"
+            },
+            "batch": {
+              "count": 30.0,
+              "shape": "SPHERE",
+              "anchor": "ENTITY",
+              "min_speed": 0.2,
+              "max_speed": 0.7
+            }
+          },
+          {
+            "id": "firework",
+            "appearance": {},
+            "batch": {
+              "count": 20.0,
+              "shape": "SPHERE",
+              "anchor": "ENTITY",
+              "min_speed": 0.05,
+              "max_speed": 0.2
+            }
+          }
+        ]
+      },
+      "sound": {
+        "id": "wizards:arcane_blast_impact"
+      }
+    },
+    {
+      "action": {
+        "type": "STATUS_EFFECT",
+        "apply_to_caster": true,
+        "status_effect": {
+          "effect_id": "wizards:arcane_charge",
+          "amplifier": 1,
+          "amplifier_cap": 2,
+          "apply_mode": "ADD"
+        }
+      }
+    }
+  ],
+  "cost": {
+    "cooldown": {
+      "group": "weapon"
+    },
+    "item": {
+      "id": "runes:arcane_stone"
+    }
+  }
+}
+---- data/rpg_series/tags/items/loot_tier/tier_0_weapons.json
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "wizards:wand_novice",
+      "required": false
+    }
+  ]
+}
+---- data/rpg_series/tags/items/loot_tier/tier_1_weapons.json
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "wizards:staff_wizard",
+      "required": false
+    }
+  ]
+}
+---- data/rpg_series/tags/items/loot_tier/tier_2_weapons.json
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "wizards:wand_arcane",
+      "required": false
+    },
+    {
+      "id": "wizards:wand_fire",
+      "required": false
+    },
+    {
+      "id": "wizards:wand_frost",
+      "required": false
+    },
+    {
+      "id": "wizards:staff_arcane",
+      "required": false
+    },
+    {
+      "id": "wizards:staff_fire",
+      "required": false
+    },
+    {
+      "id": "wizards:staff_frost",
+      "required": false
+    }
+  ]
+}

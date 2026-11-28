@@ -1,0 +1,183 @@
+Compiled from "Settings.java"
+public final class dev.diorama.Settings {
+  public static final double[] ZOOMS;
+  private static final int STEPS_BEFORE_OLD_ZOOMS;
+  private static final int OLD_ZOOMS;
+  public static final int[] RANGES;
+  public static final int[] WAYPOINT_DISTANCES;
+  public static final int MIN_SIZE;
+  public static final int MAX_SIZE;
+  public static final int SIZE_STEP;
+  public static final int MIN_ENLARGED;
+  public static final int MAX_ENLARGED;
+  public static final int ENLARGED_STEP;
+  public static final int MIN_OPACITY;
+  public static final int MAX_OPACITY;
+  public static final int OPACITY_STEP;
+  public static final java.lang.String DEFAULT_TELEPORT_COMMAND;
+  private static final com.google.gson.Gson GSON;
+  private static dev.diorama.Settings current;
+  public boolean minimap;
+  public int minimapSize;
+  public dev.diorama.Settings$Corner minimapCorner;
+  public int minimapOffsetX;
+  public int minimapOffsetY;
+  public boolean minimapCentered;
+  public int minimapEnlarged;
+  public boolean minimapEnlargeToggle;
+  public double minimapPixelsPerBlock;
+  private java.lang.Integer minimapZoom;
+  public int minimapOpacity;
+  public boolean compass;
+  public boolean coordinates;
+  public boolean biome;
+  public dev.diorama.Settings$GameTime gameTime;
+  public int minimapTextSize;
+  public int minimapCompassSize;
+  public dev.diorama.Settings$DayNight dayNight;
+  public boolean autoCaves;
+  public boolean preferSurface;
+  public boolean legibleCaves;
+  public dev.diorama.Settings$Frame minimapFrame;
+  public dev.diorama.Settings$Shape minimapShape;
+  public boolean minimapLockNorth;
+  public boolean radarOnMinimap;
+  public boolean radarOnMap;
+  public boolean radarPlayers;
+  public boolean radarHostile;
+  public boolean radarNeutral;
+  public boolean radarPassive;
+  public boolean radarItems;
+  public boolean radarItemPictures;
+  public int radarRange;
+  public dev.diorama.Settings$RadarStyle radarStyle;
+  public int radarIconScale;
+  public boolean radarTypeOutline;
+  public boolean radarHeightArrows;
+  public dev.diorama.Settings$NameTags playerNames;
+  public java.util.List<dev.diorama.RadarCategories$Category> radarCategories;
+  public java.util.Map<java.lang.String, dev.diorama.RadarCategories$KindLook> radarKinds;
+  public boolean radarPokemonAdded;
+  public int arrowColor;
+  public int arrowSize;
+  public boolean waypointsOnMap;
+  public boolean waypointsInWorld;
+  public boolean deathMarkers;
+  public boolean removeReachedDeaths;
+  public boolean bedMarkers;
+  public boolean portalMarkers;
+  public boolean portalMarkersInWorld;
+  public dev.diorama.Settings$WaypointLabels waypointLabels;
+  public dev.diorama.Settings$Beams waypointBeams;
+  public int waypointDistance;
+  public int waypointMinimapSize;
+  public int waypointMapSize;
+  public int waypointWorldSize;
+  public int waypointWorldTextSize;
+  public int waypointWorldOpacity;
+  public boolean newWaypointInWorld;
+  public boolean newWaypointOnMinimap;
+  public boolean newWaypointOnMap;
+  public boolean mapWaypointsButton;
+  public boolean mapSettingsButton;
+  public boolean mapMapsButton;
+  public boolean mapDimensionButton;
+  public boolean mapCoordinates;
+  public boolean mapAddWaypoints;
+  public java.lang.String teleportCommand;
+  public boolean outlines;
+  public boolean roundedFog;
+  public boolean alwaysFogOfWar;
+  public boolean mapSavedChunks;
+  public java.util.Set<java.lang.String> mapOffDimensions;
+  public java.util.Set<java.lang.String> addonHidesOff;
+  public dev.diorama.Settings$Quality quality;
+  public boolean gpuBaking;
+  public int defaultsMoved;
+  public boolean chunkGrid;
+  public boolean slimeChunks;
+  public dev.diorama.Settings$SpawnSpots spawnSpots;
+  public dev.diorama.Settings$ClaimsShown claims;
+  public dev.diorama.Settings$WebMap webMap;
+  public int webMapPort;
+  public static final int DEFAULT_WEB_MAP_PORT;
+  public dev.diorama.Settings$DrawingsShown drawings;
+  public dev.diorama.Settings$WorldBorderShown worldBorder;
+  public static final int MIN_SCALE;
+  public static final int MAX_SCALE;
+  public static final int SCALE_STEP;
+  public static final int MIN_WAYPOINT_SIZE;
+  public static final int DEFAULT_WAYPOINT_SIZE;
+  public static final int MIN_TEXT_SIZE;
+  public static final int MAX_TEXT_SIZE;
+  public static final int[] ARROW_COLORS;
+  public static final java.lang.String[] ARROW_COLOR_NAMES;
+  public static final int MIN_ARROW_SIZE;
+  public static final int MAX_ARROW_SIZE;
+  public static final int ARROW_SIZE_STEP;
+  public dev.diorama.Settings();
+  private static int clampTextSize(int);
+  private static int clampWaypointSize(int);
+  public static int snapScale(int);
+  public static int snapArrowSize(int);
+  public float arrowScale();
+  public int arrowRgb();
+  public static dev.diorama.Settings get();
+  public static dev.diorama.Settings reload();
+  public double zoom();
+  public int zoomStep();
+  public void zoomStep(int);
+  public float opacity();
+  public dev.diorama.MapStyle style();
+  public void save();
+  public void apply();
+  private static dev.diorama.Settings load();
+  public static java.lang.String cleanCommand(java.lang.String);
+  static int nearest(int[], int);
+  public static int snapSize(int);
+  public static int snapEnlarged(int);
+  public static int snapOpacity(int);
+  private static java.nio.file.Path file();
+  static {};
+}
+174:  static boolean has(dev.diorama.waypoint.Waypoint, dev.diorama.Settings$Beams);
+175-    Code:
+176-         0: getstatic     #207                // Field dev/diorama/waypoint/WaypointBeams$1.$SwitchMap$dev$diorama$Settings$Beams:[I
+177-         3: aload_1
+178-         4: invokevirtual #211                // Method dev/diorama/Settings$Beams.ordinal:()I
+179-         7: iaload
+180-         8: tableswitch   { // 1 to 3
+181-                       1: 44
+182-                       2: 48
+183-                       3: 76
+184-                 default: 36
+185-            }
+186-        36: new           #213                // class java/lang/IncompatibleClassChangeError
+187-        39: dup
+188-        40: invokespecial #214                // Method java/lang/IncompatibleClassChangeError."<init>":()V
+189-        43: athrow
+190-        44: iconst_0
+191-        45: goto          77
+192-        48: aload_0
+193-        49: getfield      #218                // Field dev/diorama/waypoint/Waypoint.kind:Ldev/diorama/waypoint/Waypoint$Kind;
+194-        52: getstatic     #221                // Field dev/diorama/waypoint/Waypoint$Kind.TEMPORARY:Ldev/diorama/waypoint/Waypoint$Kind;
+195-        55: if_acmpeq     68
+196-        58: aload_0
+197-        59: getfield      #218                // Field dev/diorama/waypoint/Waypoint.kind:Ldev/diorama/waypoint/Waypoint$Kind;
+198-        62: getstatic     #224                // Field dev/diorama/waypoint/Waypoint$Kind.DEATH:Ldev/diorama/waypoint/Waypoint$Kind;
+199-        65: if_acmpne     72
+200-        68: iconst_1
+201-        69: goto          77
+202-        72: iconst_0
+203-        73: goto          77
+204-        76: iconst_1
+205-        77: ireturn
+206-
+207-  void begin(net.minecraft.client.multiplayer.ClientLevel, net.minecraft.world.phys.Vec3, float, float, float, float);
+208-    Code:
+209-         0: aload_0
+210-         1: iconst_0
+211-         2: putfield      #232                // Field quads:I
+212-         5: aload_0
+213-         6: fload         6
+214-         8: putfield      #200                // Field opacity:F

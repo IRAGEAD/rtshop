@@ -1,0 +1,121 @@
+== packcache/BetterNether-20.0.13-forge.jar
+data/minecraft/tags/worldgen/biome/has_structure/ruined_portal_nether.json
+---- data/minecraft/tags/worldgen/biome/has_structure/ruined_portal_nether.json
+{
+    "values":  [
+                   "betternether:bone_reef",
+                   "betternether:crimson_glowing_woods",
+                   "betternether:crimson_pinewood",
+                   "betternether:flooded_deltas",
+                   "betternether:gravel_desert",
+                   "betternether:magma_land",
+                   "betternether:nether_grasslands",
+                   "betternether:nether_jungle",
+                   "betternether:nether_mushroom_forest",
+                   "betternether:nether_mushroom_forest_edge",
+                   "betternether:nether_swampland",
+                   "betternether:nether_swampland_terraces",
+                   "betternether:old_fungiwoods",
+                   "betternether:old_swampland",
+                   "betternether:old_warped_woods",
+                   "betternether:poor_nether_grasslands",
+                   "betternether:soul_plain",
+                   "betternether:sulfuric_bone_reef",
+                   "betternether:upside_down_forest",
+                   "betternether:upside_down_forest_cleared",
+                   "betternether:wart_forest",
+                   "betternether:wart_forest_edge",
+                   "betternether:gloomwood"
+               ]
+}
+== packcache/Towns-and-Towers-1.12-Fabric+Forge.jar
+data/minecraft/tags/worldgen/biome/has_structure/desert_pyramid.json
+---- data/minecraft/tags/worldgen/biome/has_structure/desert_pyramid.json
+{
+  "replace": true,
+  "values": [
+    "minecraft:desert",
+    {
+      "id": "byg:mojave_desert",
+      "required": false
+    },
+    {
+      "id": "terralith:desert_oasis",
+      "required": false
+    }
+  ]
+}
+== mixin configs mentioning structures
+-- packcache/DistantHorizons-3.3.3-1.20.1-fabric-forge.jar DistantHorizons.fabric.mixins.json
+    "server.MixinChunkGenerator",
+    "client.MixinImmersivePortalsRenderStates",
+-- packcache/DistantHorizons-3.3.3-1.20.1-fabric-forge.jar DistantHorizons.forge.mixins.json
+    "server.MixinChunkGenerator",
+    "server.MixinTFChunkGenerator",
+-- packcache/L_Enders_Cataclysm-3.31.jar cataclysm.mixins.json
+    "NoBasaltColumnsInStructuresMixin",
+    "NoDeltasInStructuresMixin",
+    "NoGeodeInStructuresMixin",
+    "NoLakesInStructuresMixin",
+    "NoMagmaBlockInStructuresMixin",
+    "NoMultifaceGrowthFeatureInStructuresMixin",
+    "NoOreInStructuresMixin",
+    "StructureTemplateMixin",
+    "accessor.StructureManagerAccessor",
+    "accessor.StructureProcessorAccessor",
+-- packcache/Quark-4.0-462.jar quark.mixins.json
+    "ChunkGeneratorMixin",
+-- packcache/SpiralAbyss-forge-1.20.1-1.0.8.jar spiral_abyss.mixins.json
+    "PortalEntryCameraMixin"
+-- packcache/YungsApi-1.20-Forge-4.0.6.jar yungsapi.mixins.json
+    "accessor.StructureTemplatePoolAccessor"
+-- packcache/YungsApi-1.20-Forge-4.0.6.jar yungsapi_forge.mixins.json
+    "IncreaseStructureWeightLimitMixinForge"
+-- packcache/YungsBetterDungeons-1.20-Forge-4.0.4.jar betterdungeons.mixins.json
+    "NoBasaltColumnsInStructuresMixin",
+    "NoDeltasInStructuresMixin",
+    "StructureTemplateMixin",
+    "accessor.StructureProcessorAccessor",
+-- packcache/Zeta-1.0-31.jar zeta.mixins.json
+    "AccessorPistonStructureResolver",
+    "StructurePieceMixin",
+    "StructureStartMixin",
+    "StructureTemplateMixin"
+-- packcache/adorablehamsterpets-3.7.0-1.20.1+forge.jar adorablehamsterpets.mixins.json
+    "server.EndPortalBlockMixin",
+-- packcache/aquamirae-forge-1.20.1-6.4.0.jar aquamirae.mixins.json
+    "MixinStructureTemplate",
+-- packcache/idas_forge-1.13.0+1.20.1.jar idas.mixins.json
+    "iceandfire.DisableStructures",
+    "iceandfire.LocateStructuresCommandMixin",
+-- packcache/integrated_api-forge-1.20.1-1.10.0.jar integrated_api-common.mixins.json
+    "blocks.StructureBlockUnlimit",
+    "blocks.UpdateStructureBlockUnlimit",
+    "features.NoGeodesInStructuresMixin",
+    "features.NoTreesInStructuresMixin",
+    "structures.BeardifierAccessor",
+    "structures.BeardifierMixin",
+    "structures.DisableStructuresMixin",
+    "structures.JigsawJunctionAccessor",
+    "structures.JigsawPlacementUnlimit",
+    "structures.ListPoolElementAccessor",
+-- packcache/integrated_api-forge-1.20.1-1.10.0.jar integrated_api-forge.mixins.json
+    "structures.StructurePoolMixin"
+-- packcache/modernfix-forge-5.28.9-mc1.20.1.jar modernfix-modernfix.mixins.json
+    "perf.cache_strongholds.ChunkGeneratorMixin",
+    "perf.cache_strongholds.ConcentricRingsStructurePlacementMixin",
+    "perf.faster_structure_location.ServerLevelMixin",
+    "perf.faster_structure_location.StructureCheckMixin",
+    "perf.optimize_surface_rules.NoiseBasedChunkGeneratorMixin",
+    "perf.cache_upgraded_structures.StructureManagerMixin",
+    "perf.dynamic_structure_manager.StructureManagerMixin",
+-- packcache/spelunkery-1.20.1-0.3.16-forge.jar spelunkery-common.mixins.json
+    "NetherPortalBlockMixin",
+    "NetherPortalSoundMixin",
+-- packcache/structure_pool_api-forge-1.2.1+1.20.1.jar structure_pool.mixins.json
+  "package": "net.fabric_extras.structure_pool.mixin",
+    "StructurePoolAccessor",
+    "StructurePoolBasedGenerator_StructurePoolGeneratorMixin",
+    "StructurePoolMixin"
+-- packcache/the-illusioner-1.2.0-1.20.1-forge.jar illusioner.mixins.json
+		"TemplateStructurePieceAccessor",

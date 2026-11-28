@@ -1,0 +1,2900 @@
+== /home/runner/work/rtshop/rtshop/packcache/spmovesets-1.20.1-2.0-SU.jar
+== entity-ish files
+assets/spmovesets/animations/carro_vendedor.animation.json
+assets/spmovesets/animations/vendedor_nocturno.animation.json
+assets/spmovesets/geo/carro_vendedor.geo.json
+assets/spmovesets/geo/vendedor_nocturno.geo.json
+assets/spmovesets/models/item/asura_choque_spawn_egg.json
+assets/spmovesets/models/item/bufon_pirotecnico_spawn_egg.json
+assets/spmovesets/models/item/ciervo_glacial_spawn_egg.json
+assets/spmovesets/models/item/coloso_magma_spawn_egg.json
+assets/spmovesets/models/item/cubo_vacio_spawn_egg.json
+assets/spmovesets/models/item/custodio_inmovil_spawn_egg.json
+assets/spmovesets/models/item/dama_ventisca_spawn_egg.json
+assets/spmovesets/models/item/dragon_tormenta_spawn_egg.json
+assets/spmovesets/models/item/ent_ancestral_spawn_egg.json
+assets/spmovesets/models/item/goofy_goblin_spawn_egg.json
+assets/spmovesets/models/item/kitsune_niebla_spawn_egg.json
+assets/spmovesets/models/item/leviatan_spawn_egg.json
+assets/spmovesets/models/item/mantis_orquidea_spawn_egg.json
+assets/spmovesets/models/item/monje_vacio_spawn_egg.json
+assets/spmovesets/models/item/ofanim_spawn_egg.json
+assets/spmovesets/models/item/oni_taiko_spawn_egg.json
+assets/spmovesets/models/item/pangolin_sismico_spawn_egg.json
+assets/spmovesets/models/item/rey_liche_spawn_egg.json
+assets/spmovesets/models/item/ronin_bruma_spawn_egg.json
+assets/spmovesets/models/item/salamandra_reina_spawn_egg.json
+assets/spmovesets/models/item/serafin_caido_spawn_egg.json
+assets/spmovesets/models/item/tejedora_estrellas_spawn_egg.json
+assets/spmovesets/sounds/vendedor/
+assets/spmovesets/sounds/vendedor/apaga_1.ogg
+assets/spmovesets/sounds/vendedor/apaga_2.ogg
+assets/spmovesets/sounds/vendedor/arrive_1.ogg
+assets/spmovesets/sounds/vendedor/arrive_2.ogg
+assets/spmovesets/sounds/vendedor/brasa_1.ogg
+assets/spmovesets/sounds/vendedor/brasa_2.ogg
+assets/spmovesets/sounds/vendedor/brasa_3.ogg
+assets/spmovesets/sounds/vendedor/brasa_4.ogg
+assets/spmovesets/sounds/vendedor/enciende_1.ogg
+assets/spmovesets/sounds/vendedor/enciende_2.ogg
+assets/spmovesets/sounds/vendedor/jingle_1.ogg
+assets/spmovesets/sounds/vendedor/jingle_2.ogg
+assets/spmovesets/sounds/vendedor/jingle_3.ogg
+assets/spmovesets/sounds/vendedor/musica.ogg
+assets/spmovesets/sounds/vendedor/poof_1.ogg
+assets/spmovesets/sounds/vendedor/poof_2.ogg
+assets/spmovesets/sounds/vendedor/voz_1.ogg
+assets/spmovesets/sounds/vendedor/voz_2.ogg
+assets/spmovesets/sounds/vendedor/voz_3.ogg
+assets/spmovesets/sounds/vendedor/voz_4.ogg
+assets/spmovesets/sounds/vendedor/voz_5.ogg
+assets/spmovesets/sounds/vendedor/voz_6.ogg
+assets/spmovesets/textures/entity/
+assets/spmovesets/textures/entity/altar_gacha_aro.png
+assets/spmovesets/textures/entity/altar_gacha_aro_glowmask.png
+assets/spmovesets/textures/entity/altar_gacha_capullo.png
+assets/spmovesets/textures/entity/altar_gacha_capullo_glowmask.png
+assets/spmovesets/textures/entity/asura_choque.png
+assets/spmovesets/textures/entity/asura_choque_glowmask.png
+assets/spmovesets/textures/entity/bufon_pirotecnico.png
+assets/spmovesets/textures/entity/bufon_pirotecnico_glowmask.png
+assets/spmovesets/textures/entity/carro_vendedor.png
+assets/spmovesets/textures/entity/carro_vendedor_glowmask.png
+assets/spmovesets/textures/entity/ciervo_glacial.png
+assets/spmovesets/textures/entity/ciervo_glacial_glowmask.png
+assets/spmovesets/textures/entity/coloso_magma.png
+assets/spmovesets/textures/entity/coloso_magma_glowmask.png
+assets/spmovesets/textures/entity/cubo_vacio.png
+assets/spmovesets/textures/entity/cubo_vacio_glowmask.png
+assets/spmovesets/textures/entity/custodio_inmovil.png
+assets/spmovesets/textures/entity/custodio_inmovil_glowmask.png
+assets/spmovesets/textures/entity/dama_ventisca.png
+assets/spmovesets/textures/entity/dama_ventisca_glowmask.png
+assets/spmovesets/textures/entity/ent_ancestral.png
+assets/spmovesets/textures/entity/ent_ancestral_glowmask.png
+assets/spmovesets/textures/entity/goddy_choir_angel.png
+assets/spmovesets/textures/entity/goddy_choir_angel_glowmask.png
+assets/spmovesets/textures/entity/goddy_guardian.png
+assets/spmovesets/textures/entity/goddy_guardian_glowmask.png
+assets/spmovesets/textures/entity/goddy_hand.png
+assets/spmovesets/textures/entity/goddy_hand_glowmask.png
+assets/spmovesets/textures/entity/goofy_goblin.png
+assets/spmovesets/textures/entity/goofy_goblin_titan.png
+assets/spmovesets/textures/entity/goofy_goblin_titan_glow.png
+assets/spmovesets/textures/entity/heraldo_oscuridad.png
+assets/spmovesets/textures/entity/heraldo_oscuridad_glowmask.png
+assets/spmovesets/textures/entity/kitsune_niebla.png
+assets/spmovesets/textures/entity/kitsune_niebla_glowmask.png
+assets/spmovesets/textures/entity/leviatan.png
+assets/spmovesets/textures/entity/leviatan_glowmask.png
+assets/spmovesets/textures/entity/mantis_orquidea.png
+assets/spmovesets/textures/entity/mantis_orquidea_glowmask.png
+assets/spmovesets/textures/entity/monje_vacio.png
+assets/spmovesets/textures/entity/monje_vacio_glowmask.png
+assets/spmovesets/textures/entity/ofanim.png
+assets/spmovesets/textures/entity/ofanim_glowmask.png
+assets/spmovesets/textures/entity/oni_taiko.png
+assets/spmovesets/textures/entity/oni_taiko_glowmask.png
+assets/spmovesets/textures/entity/pangolin_placa.png
+assets/spmovesets/textures/entity/pangolin_placa_glowmask.png
+assets/spmovesets/textures/entity/pangolin_sismico.png
+assets/spmovesets/textures/entity/pangolin_sismico_glowmask.png
+assets/spmovesets/textures/entity/prision_huesos.png
+assets/spmovesets/textures/entity/prision_huesos_glowmask.png
+assets/spmovesets/textures/entity/pulseras_choque.png
+assets/spmovesets/textures/entity/pyro_dragon.png
+assets/spmovesets/textures/entity/pyro_dragon_glowmask.png
+assets/spmovesets/textures/entity/rey_liche.png
+assets/spmovesets/textures/entity/rey_liche_glowmask.png
+assets/spmovesets/textures/entity/ronin_bruma.png
+assets/spmovesets/textures/entity/ronin_bruma_glowmask.png
+assets/spmovesets/textures/entity/salamandra_reina.png
+assets/spmovesets/textures/entity/salamandra_reina_glowmask.png
+assets/spmovesets/textures/entity/serafin_caido.png
+assets/spmovesets/textures/entity/serafin_caido_glowmask.png
+assets/spmovesets/textures/entity/serpiente_fuego.png
+assets/spmovesets/textures/entity/serpiente_fuego_glowmask.png
+assets/spmovesets/textures/entity/shadow_skeleton.png
+assets/spmovesets/textures/entity/shadow_skeleton_leader.png
+assets/spmovesets/textures/entity/tejedora_estrellas.png
+assets/spmovesets/textures/entity/tejedora_estrellas_glowmask.png
+assets/spmovesets/textures/entity/training_dummy.png
+assets/spmovesets/textures/entity/training_dummy_glowmask.png
+assets/spmovesets/textures/entity/vendedor_nocturno.png
+assets/spmovesets/textures/entity/vendedor_nocturno_glowmask.png
+assets/spmovesets/textures/entity/wyvern_tormenta.png
+assets/spmovesets/textures/entity/wyvern_tormenta_glowmask.png
+assets/spmovesets/textures/item/asura_choque_spawn_egg.png
+assets/spmovesets/textures/item/asura_choque_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/bufon_pirotecnico_spawn_egg.png
+assets/spmovesets/textures/item/bufon_pirotecnico_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/ciervo_glacial_spawn_egg.png
+assets/spmovesets/textures/item/ciervo_glacial_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/coloso_magma_spawn_egg.png
+assets/spmovesets/textures/item/coloso_magma_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/cubo_vacio_spawn_egg.png
+assets/spmovesets/textures/item/cubo_vacio_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/custodio_inmovil_spawn_egg.png
+assets/spmovesets/textures/item/custodio_inmovil_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/dama_ventisca_spawn_egg.png
+assets/spmovesets/textures/item/dama_ventisca_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/dragon_tormenta_spawn_egg.png
+assets/spmovesets/textures/item/dragon_tormenta_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/ent_ancestral_spawn_egg.png
+assets/spmovesets/textures/item/ent_ancestral_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/kitsune_niebla_spawn_egg.png
+assets/spmovesets/textures/item/kitsune_niebla_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/leviatan_spawn_egg.png
+assets/spmovesets/textures/item/leviatan_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/mantis_orquidea_spawn_egg.png
+assets/spmovesets/textures/item/mantis_orquidea_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/monje_vacio_spawn_egg.png
+assets/spmovesets/textures/item/monje_vacio_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/ofanim_spawn_egg.png
+assets/spmovesets/textures/item/ofanim_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/oni_taiko_spawn_egg.png
+assets/spmovesets/textures/item/oni_taiko_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/pangolin_sismico_spawn_egg.png
+assets/spmovesets/textures/item/pangolin_sismico_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/rey_liche_spawn_egg.png
+assets/spmovesets/textures/item/rey_liche_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/ronin_bruma_spawn_egg.png
+assets/spmovesets/textures/item/ronin_bruma_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/salamandra_reina_spawn_egg.png
+assets/spmovesets/textures/item/salamandra_reina_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/serafin_caido_spawn_egg.png
+assets/spmovesets/textures/item/serafin_caido_spawn_egg.png.mcmeta
+assets/spmovesets/textures/item/tejedora_estrellas_spawn_egg.png
+assets/spmovesets/textures/item/tejedora_estrellas_spawn_egg.png.mcmeta
+spmovesets/spmovesets/Gacha/GachaBlockEntity.class
+spmovesets/spmovesets/Gacha/ModBlockEntities.class
+spmovesets/spmovesets/entities/
+spmovesets/spmovesets/entities/GoofyGoblin.class
+spmovesets/spmovesets/entities/ModEntities$Attributes.class
+spmovesets/spmovesets/entities/ModEntities.class
+spmovesets/spmovesets/entities/boss/
+spmovesets/spmovesets/entities/boss/BossCinematic.class
+spmovesets/spmovesets/entities/boss/BossCinematicPacket.class
+spmovesets/spmovesets/entities/boss/BossDamageScaling.class
+spmovesets/spmovesets/entities/boss/BossEvents$Defeated.class
+spmovesets/spmovesets/entities/boss/BossEvents$Discarded.class
+spmovesets/spmovesets/entities/boss/BossEvents$PhaseShift.class
+spmovesets/spmovesets/entities/boss/BossEvents$Rewards.class
+spmovesets/spmovesets/entities/boss/BossEvents.class
+spmovesets/spmovesets/entities/boss/BossRock$Kind.class
+spmovesets/spmovesets/entities/boss/BossRock.class
+spmovesets/spmovesets/entities/boss/BossWarn.class
+spmovesets/spmovesets/entities/boss/BossWarnPacket.class
+spmovesets/spmovesets/entities/boss/ModBoss$1.class
+spmovesets/spmovesets/entities/boss/ModBoss$Attack.class
+spmovesets/spmovesets/entities/boss/ModBoss$Event.class
+spmovesets/spmovesets/entities/boss/ModBoss$Ticker.class
+spmovesets/spmovesets/entities/boss/ModBoss$Usable.class
+spmovesets/spmovesets/entities/boss/ModBoss.class
+spmovesets/spmovesets/entities/boss/asura/
+spmovesets/spmovesets/entities/boss/asura/AsuraChoque.class
+spmovesets/spmovesets/entities/boss/asura/AsuraWave.class
+spmovesets/spmovesets/entities/boss/bufon/
+spmovesets/spmovesets/entities/boss/bufon/BufonBomb.class
+spmovesets/spmovesets/entities/boss/bufon/BufonPirotecnico.class
+spmovesets/spmovesets/entities/boss/ciervo/
+spmovesets/spmovesets/entities/boss/ciervo/CiervoGlacial$Later.class
+spmovesets/spmovesets/entities/boss/ciervo/CiervoGlacial.class
+grep: write error: Broken pipe
+== lang entity keys
+-- en_us
+  "entity.spmovesets.goofy_goblin": "Goblin",
+  "entity.spmovesets.coloso_magma": "Magma Colossus",
+  "entity.spmovesets.salamandra_reina": "Salamander Queen",
+  "entity.spmovesets.ciervo_glacial": "Glacial Stag",
+  "entity.spmovesets.dama_ventisca": "Lady of the Blizzard",
+  "entity.spmovesets.asura_choque": "Shock Asura",
+  "entity.spmovesets.asura_wave": "Air Fist Wave",
+  "entity.spmovesets.ronin_bruma": "Mist Ronin",
+  "entity.spmovesets.kitsune_niebla": "Mist Kitsune",
+  "entity.spmovesets.custodio_inmovil": "Still Custodian",
+  "entity.spmovesets.mantis_orquidea": "Orchid Mantis",
+  "entity.spmovesets.mantis_flower": "Giant Orchid",
+  "entity.spmovesets.ronin_echo": "Mist Echo",
+  "entity.spmovesets.serafin_caido": "Fallen Seraph",
+  "entity.spmovesets.seraph_lance": "Seraph Lance",
+  "entity.spmovesets.ofanim": "Ophanim",
+  "entity.spmovesets.leviatan": "Nebula Leviathan",
+  "entity.spmovesets.tejedora_estrellas": "Star Weaver",
+  "entity.spmovesets.leviathan_orb": "Leviathan Orb",
+  "entity.spmovesets.rey_liche": "Lich King",
+  "entity.spmovesets.lich_spell": "Lich Spell",
+  "entity.spmovesets.dragon_tormenta": "Storm Dragon",
+  "entity.spmovesets.storm_spell": "Storm Spell",
+  "entity.spmovesets.monje_vacio": "Void Monk",
+  "entity.spmovesets.void_spell": "Void Spell",
+  "entity.spmovesets.oni_taiko": "Taiko Oni",
+  "entity.spmovesets.bufon_pirotecnico": "Pyrotechnic Jester",
+  "entity.spmovesets.taiko_spell": "Taiko Spell",
+  "entity.spmovesets.ent_ancestral": "Ancient Ent",
+  "entity.spmovesets.ent_spell": "Ent Spell",
+  "entity.spmovesets.cubo_vacio": "Void Cube",
+  "entity.spmovesets.cube_spell": "Cube Spell",
+  "entity.spmovesets.ice_spike": "Ice spike",
+  "entity.spmovesets.boss_rock": "Boss rock",
+  "entity.spmovesets.shadow_stand": "Shadow",
+  "entity.spmovesets.shadow_bats": "Shadow Bats",
+  "entity.spmovesets.shadow_skeleton": "Shadow Skeleton",
+  "entity.spmovesets.shadow_ram": "Herald of Darkness",
+  "entity.spmovesets.choir_angel": "Choir Angel",
+  "entity.spmovesets.training_dummy": "Training Dummy",
+  "entity.spmovesets.avalanche_ball": "Avalanche",
+  "entity.spmovesets.pyro_dragon": "Fire Dragon",
+  "entity.spmovesets.ope_room": "Calm Sphere",
+  "entity.spmovesets.ope_island": "Island",
+  "entity.spmovesets.thrown_glacial": "Glacial Lance",
+  "entity.spmovesets.thrown_lanza": "Seraph's Lance",
+  "entity.spmovesets.fire_tornado": "Fire Tornado",
+  "entity.spmovesets.pangolin_sismico": "Seismic Pangolin",
+  "entity.spmovesets.pangolin_plate": "Embedded Plate",
+  "entity.spmovesets.vendedor_nocturno": "Candil, the Night Peddler",
+  "entity.spmovesets.carro_vendedor": "Candil's Cart",
+  "spmovesets.vendedor.llega": "A little bell jingles through the village: %s has set up shop.",
+  "spmovesets.vendedor.se_va": "%s packs up the stall and bids you farewell until another night.",
+  "spmovesets.vendedor.ofendido": "%s leaves in a huff. He won't be back until %s nights from now.",
+  "spmovesets.vendedor.aviso": "\"Treat me kindly, traveler: raise a hand against me and I'll leave, and won't be back until %s nights from now.\"",
+  "spmovesets.vendedor.ocupado": "%s is busy with another customer.",
+  "spmovesets.vendedor.tienda": "Candil's Shop",
+  "spmovesets.vendedor.tienda.elige": "Pick a deal from the list",
+  "spmovesets.vendedor.tienda.noche": "Tonight only",
+  "spmovesets.vendedor.tienda.siempre": "Always for sale",
+  "spmovesets.vendedor.tienda.queda": "%s left",
+  "spmovesets.vendedor.tienda.quedan": "%s left",
+  "spmovesets.vendedor.tienda.agotado": "Sold out",
+  "spmovesets.vendedor.tienda.leyenda": "Every night brings different deals.",
+  "spmovesets.vendedor.frase.saludo.1": "Come in, come in, I don't bite... hardly ever!",
+  "spmovesets.vendedor.frase.saludo.2": "A customer! And here I am with cold hands.",
+  "spmovesets.vendedor.frase.saludo.3": "The moon told me you would come.",
+  "spmovesets.vendedor.frase.saludo.4": "Welcome to the only stall open at this hour.",
+  "spmovesets.vendedor.frase.saludo.5": "Look all you like. Touching, we'll see.",
+  "spmovesets.vendedor.frase.vuelta.1": "You're back! I knew you couldn't resist.",
+  "spmovesets.vendedor.frase.vuelta.2": "Back again? Glad, so glad.",
+  "spmovesets.vendedor.frase.charla.1": "I've brought something shiny tonight.",
+  "spmovesets.vendedor.frase.charla.2": "Come back before dawn, or I vanish.",
+  "spmovesets.vendedor.frase.charla.3": "Hear the bells? They bring good luck. I think.",
+  "spmovesets.vendedor.frase.charla.4": "The fireflies aren't for sale. They're friends.",
+  "spmovesets.vendedor.frase.charla.5": "The tea's almost ready. For customers, of course.",
+  "spmovesets.vendedor.frase.charla.6": "Nobody haggles with Candil. Well, nobody wins.",
+  "spmovesets.vendedor.frase.compra.1": "Good choice!",
+  "spmovesets.vendedor.frase.compra.2": "It's a deal. Hee hee!",
+  "spmovesets.vendedor.frase.compra.3": "Take good care of it, it has a temper.",
+-- es_es
+  "entity.spmovesets.goofy_goblin": "Goblin",
+  "entity.spmovesets.coloso_magma": "Coloso de Magma",
+  "entity.spmovesets.salamandra_reina": "Salamandra Reina",
+  "entity.spmovesets.ciervo_glacial": "Ciervo Glacial",
+  "entity.spmovesets.dama_ventisca": "Dama de la Ventisca",
+  "entity.spmovesets.asura_choque": "Asura de Choque",
+  "entity.spmovesets.asura_wave": "Onda del Puño de Aire",
+  "entity.spmovesets.ronin_bruma": "Rōnin de la Bruma",
+  "entity.spmovesets.kitsune_niebla": "Kitsune de Niebla",
+  "entity.spmovesets.custodio_inmovil": "Custodio Inmóvil",
+  "entity.spmovesets.mantis_orquidea": "Mantis Orquídea",
+  "entity.spmovesets.mantis_flower": "Orquídea gigante",
+  "entity.spmovesets.ronin_echo": "Eco de Niebla",
+  "entity.spmovesets.serafin_caido": "Serafín Caído",
+  "entity.spmovesets.seraph_lance": "Lanza del Serafín",
+  "entity.spmovesets.ofanim": "Ofanim",
+  "entity.spmovesets.leviatan": "Leviatán Nebular",
+  "entity.spmovesets.tejedora_estrellas": "Tejedora de Estrellas",
+  "entity.spmovesets.leviathan_orb": "Orbe del Leviatán",
+  "entity.spmovesets.rey_liche": "Rey Liche",
+  "entity.spmovesets.lich_spell": "Hechizo del Liche",
+  "entity.spmovesets.dragon_tormenta": "Dragón de Tormenta",
+  "entity.spmovesets.storm_spell": "Hechizo de Tormenta",
+  "entity.spmovesets.monje_vacio": "Monje del Vacío",
+  "entity.spmovesets.void_spell": "Hechizo del Vacío",
+  "entity.spmovesets.oni_taiko": "Oni del Taiko",
+  "entity.spmovesets.bufon_pirotecnico": "Bufón Pirotécnico",
+  "entity.spmovesets.taiko_spell": "Hechizo del Taiko",
+  "entity.spmovesets.ent_ancestral": "Ent Ancestral",
+  "entity.spmovesets.ent_spell": "Hechizo del Ent",
+  "entity.spmovesets.cubo_vacio": "Cubo del Vacío",
+  "entity.spmovesets.cube_spell": "Hechizo del Cubo",
+  "entity.spmovesets.ice_spike": "Pincho de hielo",
+  "entity.spmovesets.boss_rock": "Roca de boss",
+  "entity.spmovesets.shadow_stand": "Sombra",
+  "entity.spmovesets.shadow_bats": "Murciélagos de Sombra",
+  "entity.spmovesets.shadow_skeleton": "Esqueleto Sombrío",
+  "entity.spmovesets.shadow_ram": "Heraldo de la Oscuridad",
+  "entity.spmovesets.choir_angel": "Ángel del Coro",
+  "entity.spmovesets.training_dummy": "Muñeco de entrenamiento",
+  "entity.spmovesets.avalanche_ball": "Alud",
+  "entity.spmovesets.pyro_dragon": "Dragón de Fuego",
+  "entity.spmovesets.ope_room": "Esfera de Calma",
+  "entity.spmovesets.ope_island": "Isla",
+  "entity.spmovesets.thrown_glacial": "Lanza Glacial",
+  "entity.spmovesets.thrown_lanza": "Lanza del Serafín",
+  "entity.spmovesets.fire_tornado": "Tornado de Fuego",
+  "spmovesets.manual.survival.bosses.map": "Todo cartógrafo de las aldeas vende además de %s a %s mapas de elemento, cada uno de un elemento distinto, por %s esmeraldas y de %s a %s llaves del gacha cada uno. Los hay de todos los elementos menos de Goddy y de la Nita: esos dos solo los vende el vendedor nocturno. Al usarlo, un mapa se despliega y marca el jefe sin derrotar más cercano de su elemento (los de Goddy y la Nita, en su portal). Si no queda ninguno a tu alcance, no se gasta: pruébalo en otro sitio.",
+  "entity.spmovesets.pangolin_sismico": "Pangolín Sísmico",
+  "entity.spmovesets.pangolin_plate": "Placa clavada",
+  "entity.spmovesets.vendedor_nocturno": "Candil, el vendedor nocturno",
+  "entity.spmovesets.carro_vendedor": "Carro de Candil",
+  "spmovesets.vendedor.llega": "Se oye un cascabel por la aldea: %s ha montado su puesto.",
+  "spmovesets.vendedor.se_va": "%s recoge su puesto y se despide hasta otra noche.",
+  "spmovesets.vendedor.ofendido": "%s se marcha ofendido. No volverá hasta dentro de %s noches.",
+  "spmovesets.vendedor.aviso": "«Trátame bien, viajero: si me levantas la mano, me iré y tardaré %s noches en volver.»",
+  "spmovesets.vendedor.ocupado": "%s está atendiendo a otro cliente.",
+  "spmovesets.vendedor.tienda": "La tienda de Candil",
+  "spmovesets.vendedor.tienda.elige": "Elige un trato de la lista",
+  "spmovesets.vendedor.tienda.noche": "Solo esta noche",
+  "spmovesets.vendedor.tienda.siempre": "Siempre a la venta",
+  "spmovesets.vendedor.tienda.queda": "queda %s",
+  "spmovesets.vendedor.tienda.quedan": "quedan %s",
+  "spmovesets.vendedor.tienda.agotado": "Agotado",
+  "spmovesets.vendedor.tienda.leyenda": "Cada noche trae tratos distintos.",
+  "spmovesets.vendedor.frase.saludo.1": "¡Pasa, pasa, que no muerdo... casi nunca!",
+  "spmovesets.vendedor.frase.saludo.2": "¡Un cliente! Y yo con las manos frías.",
+  "spmovesets.vendedor.frase.saludo.3": "La luna me dijo que vendrías.",
+  "spmovesets.vendedor.frase.saludo.4": "Bienvenido al único puesto abierto a estas horas.",
+  "spmovesets.vendedor.frase.saludo.5": "Mira cuanto quieras. Tocar, ya veremos.",
+  "spmovesets.vendedor.frase.vuelta.1": "¡Has vuelto! Sabía que no podrías resistirte.",
+  "spmovesets.vendedor.frase.vuelta.2": "¿Otra vez por aquí? Me alegro, me alegro.",
+  "spmovesets.vendedor.frase.charla.1": "Esta noche traigo algo que brilla.",
+  "spmovesets.vendedor.frase.charla.2": "Vuelve antes del alba, que me esfumo.",
+  "spmovesets.vendedor.frase.charla.3": "¿Oyes los cascabeles? Dan buena suerte. Creo.",
+  "spmovesets.vendedor.frase.charla.4": "Las luciérnagas no se venden. Son amigas.",
+  "spmovesets.vendedor.frase.charla.5": "El té está casi listo. Para los clientes, claro.",
+  "spmovesets.vendedor.frase.charla.6": "Nadie regatea con Candil. Bueno, nadie gana.",
+  "spmovesets.vendedor.frase.compra.1": "¡Buena elección!",
+  "spmovesets.vendedor.frase.compra.2": "Trato hecho. ¡Ji, ji!",
+== biome modifiers
+== village structure overrides
+---- data/minecraft/worldgen/structure/village_desert.json
+{
+  "type": "spmovesets:village",
+  "biomes": "#minecraft:has_structure/village_desert",
+  "max_distance_from_center": 80,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "santuario": "desert",
+  "size": 6,
+  "spawn_overrides": {},
+  "start_height": {
+    "absolute": 0
+  },
+  "start_pool": "minecraft:village/desert/town_centers",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "use_expansion_hack": true
+}
+
+---- data/minecraft/worldgen/structure/village_plains.json
+{
+  "type": "spmovesets:village",
+  "biomes": "#minecraft:has_structure/village_plains",
+  "max_distance_from_center": 80,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "santuario": "plains",
+  "size": 6,
+  "spawn_overrides": {},
+  "start_height": {
+    "absolute": 0
+  },
+  "start_pool": "minecraft:village/plains/town_centers",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "use_expansion_hack": true
+}
+
+---- data/minecraft/worldgen/structure/village_savanna.json
+{
+  "type": "spmovesets:village",
+  "biomes": "#minecraft:has_structure/village_savanna",
+  "max_distance_from_center": 80,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "santuario": "savanna",
+  "size": 6,
+  "spawn_overrides": {},
+  "start_height": {
+    "absolute": 0
+  },
+  "start_pool": "minecraft:village/savanna/town_centers",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "use_expansion_hack": true
+}
+
+---- data/minecraft/worldgen/structure/village_snowy.json
+{
+  "type": "spmovesets:village",
+  "biomes": "#minecraft:has_structure/village_snowy",
+  "max_distance_from_center": 80,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "santuario": "snowy",
+  "size": 6,
+  "spawn_overrides": {},
+  "start_height": {
+    "absolute": 0
+  },
+  "start_pool": "minecraft:village/snowy/town_centers",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "use_expansion_hack": true
+}
+
+---- data/minecraft/worldgen/structure/village_taiga.json
+{
+  "type": "spmovesets:village",
+  "biomes": "#minecraft:has_structure/village_taiga",
+  "max_distance_from_center": 80,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "santuario": "taiga",
+  "size": 6,
+  "spawn_overrides": {},
+  "start_height": {
+    "absolute": 0
+  },
+  "start_pool": "minecraft:village/taiga/town_centers",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "use_expansion_hack": true
+}
+
+== template pools and nbt structures
+data/spmovesets/structures/arena/asura_choque.nbt
+data/spmovesets/structures/arena/bufon_pirotecnico.nbt
+data/spmovesets/structures/arena/ciervo_glacial.nbt
+data/spmovesets/structures/arena/coloso_magma.nbt
+data/spmovesets/structures/arena/cubo_vacio.nbt
+data/spmovesets/structures/arena/custodio_inmovil.nbt
+data/spmovesets/structures/arena/dama_ventisca.nbt
+data/spmovesets/structures/arena/ent_ancestral.nbt
+data/spmovesets/structures/arena/goddy_ofanim.nbt
+data/spmovesets/structures/arena/goddy_serafin.nbt
+data/spmovesets/structures/arena/kitsune_niebla.nbt
+data/spmovesets/structures/arena/leviatan.nbt
+data/spmovesets/structures/arena/mantis_orquidea.nbt
+data/spmovesets/structures/arena/monje_vacio.nbt
+data/spmovesets/structures/arena/nita_leviatan.nbt
+data/spmovesets/structures/arena/nita_tejedora.nbt
+data/spmovesets/structures/arena/ofanim.nbt
+data/spmovesets/structures/arena/oni_taiko.nbt
+data/spmovesets/structures/arena/pangolin_sismico.nbt
+data/spmovesets/structures/arena/portal_leviatan.nbt
+data/spmovesets/structures/arena/portal_ofanim.nbt
+data/spmovesets/structures/arena/portal_serafin_caido.nbt
+data/spmovesets/structures/arena/portal_tejedora_estrellas.nbt
+data/spmovesets/structures/arena/rey_liche.nbt
+data/spmovesets/structures/arena/ronin_bruma.nbt
+data/spmovesets/structures/arena/salamandra_reina.nbt
+data/spmovesets/structures/arena/serafin_caido.nbt
+data/spmovesets/structures/arena/tejedora_estrellas.nbt
+data/spmovesets/structures/arena/wyvern_tormenta.nbt
+data/spmovesets/structures/boss_arena.nbt
+data/spmovesets/structures/realm/goddy_pasillo.nbt
+data/spmovesets/structures/realm/nita_pasillo.nbt
+data/spmovesets/structures/santuario/desert.nbt
+data/spmovesets/structures/santuario/plains.nbt
+data/spmovesets/structures/santuario/savanna.nbt
+data/spmovesets/structures/santuario/snowy.nbt
+data/spmovesets/structures/santuario/taiga.nbt
+== classes that use merchant APIs
+./spmovesets/spmovesets/identity/FruitIdentity.class
+./spmovesets/spmovesets/survival/ElementMapSearch.class
+./spmovesets/spmovesets/survival/SurvivalMilestones.class
+./spmovesets/spmovesets/survival/world/realm/RealmPortals.class
+./spmovesets/spmovesets/survival/world/arena/ArenaCleanup.class
+./spmovesets/spmovesets/survival/world/arena/ArenaManager.class
+./spmovesets/spmovesets/survival/world/arena/ArenaMapTrade.class
+./spmovesets/spmovesets/survival/vendedor/VendedorAparicion.class
+./spmovesets/spmovesets/survival/vendedor/VendedorDatos.class
+./spmovesets/spmovesets/survival/vendedor/VendedorTienda.class
+./spmovesets/spmovesets/survival/vendedor/VendedorNocturno.class
+./spmovesets/spmovesets/survival/vendedor/client/TiendaCandilScreen.class
+./spmovesets/spmovesets/config/BalanceSync.class
+./spmovesets/spmovesets/trades/TradeManager.class
+./spmovesets/spmovesets/events/activar_fruta/FruitAuraHandler.class
+./spmovesets/spmovesets/entities/boss/spawn/BossSpawnPoints.class
+./spmovesets/spmovesets/gametest/ArenaMapGameTests.class
+./spmovesets/spmovesets/gametest/GameTestLeftovers.class
+./spmovesets/spmovesets/gametest/VendedorGameTests.class
+./spmovesets/spmovesets/gametest/GameTestChunks.class
+./spmovesets/spmovesets/gametest/VendedorGameTests$Catalog.class
+./spmovesets/spmovesets/party/PartyStatusSync.class
+./spmovesets/spmovesets/movesets/artifacts/Sustain.class
+./spmovesets/spmovesets/movesets/artifacts/FieldOwner.class
+./spmovesets/spmovesets/movesets/artifacts/FalseStep.class
+./spmovesets/spmovesets/movesets/artifacts/Metronome.class
+./spmovesets/spmovesets/movesets/artifacts/Repertoire.class
+./spmovesets/spmovesets/movesets/artifacts/LongChain.class
+./spmovesets/spmovesets/movesets/artifacts/Hourglass.class
+./spmovesets/spmovesets/movesets/motion/OwnTickTeleport.class
+./spmovesets/spmovesets/movesets/dodge/DodgeManager.class
+./spmovesets/spmovesets/movesets/meditation/MeditationManager.class
+./spmovesets/spmovesets/movesets/Elementos/Ope/OpeTimeStop.class
+./spmovesets/spmovesets/movesets/Elementos/Ope/Ab5/Ope_Ab5.class
+./spmovesets/spmovesets/movesets/Elementos/Ope/Ab1/Ope_Ab1.class
+./spmovesets/spmovesets/movesets/Elementos/Ope/Ab6/Ope_Ab6.class
+./spmovesets/spmovesets/movesets/Elementos/Ope/Ab2/TectonicLift.class
+./spmovesets/spmovesets/movesets/Elementos/Ope/Ab4/Ope_Ab4.class
+./spmovesets/spmovesets/movesets/Elementos/Ope/Ab7/Ope_Ab7.class
+./spmovesets/spmovesets/movesets/Elementos/Pyro/Ab5/FireComboStrikes.class
+./spmovesets/spmovesets/movesets/Elementos/Pyro/Ab6/FireWheel.class
+./spmovesets/spmovesets/movesets/Elementos/Pyro/Ab3/PyroRetribution.class
+./spmovesets/spmovesets/movesets/Elementos/Pyro/Ab4/FlameWaves.class
+./spmovesets/spmovesets/movesets/Elementos/Pyro/Ab7/FireSerpent.class
+./spmovesets/spmovesets/movesets/Elementos/Darky/Ab3/ShadowTrapHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Atsu/Ab1/GravityImpacts.class
+./spmovesets/spmovesets/movesets/Elementos/Atsu/Ab1/GravityWell.class
+./spmovesets/spmovesets/movesets/Elementos/Atsu/Ab2/MarkHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab5/BambooFieldEventHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab1/GoblinEventHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab6/titan/GoblinTitan.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab2/LotusHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab2/serpent/PetalSerpentHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab3/SporeTrapsEventHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab3/shift/SporeCloudEventHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab3/spore/SporeHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab4/whip/WhipHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Vita/Ab4/root/RootSwapHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Nebu/Ab5/Nebu_Ab5.class
+./spmovesets/spmovesets/movesets/Elementos/Nebu/Ab6/Nebu_Ult.class
+./spmovesets/spmovesets/movesets/Elementos/Nebu/Ab3/Nebu_Ab3.class
+./spmovesets/spmovesets/movesets/Elementos/Nebu/Ab3/Nebu_Ab3_Step.class
+./spmovesets/spmovesets/movesets/Elementos/Nebu/Ab4/Nebu_Ab4.class
+./spmovesets/spmovesets/movesets/Elementos/Zyra/Ab4/ShockwaveProjectileManager.class
+./spmovesets/spmovesets/movesets/Elementos/Nita/Ab6_t/comet/CometHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Goddy/Ab1/DivineSpearHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Goddy/Ab3/DivineProjectileHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Goddy/Ab7/DarkPinnacleSafetyHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Goddy/Ab7/DemonFormSync.class
+./spmovesets/spmovesets/movesets/Elementos/Goddy/ModoDemonio/Ab10/CrescentXTickHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Goddy/ModoDemonio/Ab9/DemonDashTickHandler.class
+./spmovesets/spmovesets/movesets/Elementos/Goddy/ModoDemonio/Ab8/DemonXSlashTickHandler.class
+./spmovesets/spmovesets/movesets/cooldowns/CastLock.class
+./spmovesets/spmovesets/movesets/ultclash/UltClash.class
+./spmovesets/spmovesets/movesets/ultclash/UltCastManager.class
+./spmovesets/spmovesets/movesets/ultclash/UltReadyNotice.class
+./spmovesets/spmovesets/movesets/armas/baculo/BaculoFotosintesis.class
+./spmovesets/spmovesets/movesets/armas/baculo/BaculoRaices.class
+./spmovesets/spmovesets/movesets/armas/nodachi/NodachiImpulso.class
+./spmovesets/spmovesets/movesets/armas/nodachi/NodachiDiagnostico.class
+== javap of those classes
+######## ./spmovesets/spmovesets/identity/FruitIdentity.class
+Compiled from "FruitIdentity.java"
+public final class spmovesets.spmovesets.identity.FruitIdentity {
+  public static final net.minecraft.resources.ResourceLocation FONT;
+  public static final java.util.List<java.lang.String> ORDER;
+  private static final java.util.Map<java.lang.String, java.lang.Integer> COLORS;
+  private static final int EVERY;
+  private static final java.util.Map<java.util.UUID, java.lang.String> SEEN;
+  private spmovesets.spmovesets.identity.FruitIdentity();
+  public static java.lang.String fruitOf(net.minecraft.server.level.ServerPlayer);
+  public static boolean masters(net.minecraft.server.level.ServerPlayer, java.lang.String);
+  public static net.minecraft.network.chat.MutableComponent title(java.lang.String);
+  public static net.minecraft.network.chat.MutableComponent icon(java.lang.String);
+  public static int color(java.lang.String);
+  private static net.minecraft.network.chat.MutableComponent fruitName(java.lang.String);
+  static net.minecraft.network.chat.Component decorate(net.minecraft.server.level.ServerPlayer, net.minecraft.network.chat.Component, boolean);
+  public static void onNameFormat(net.minecraftforge.event.entity.player.PlayerEvent$NameFormat);
+  public static void onTabListName(net.minecraftforge.event.entity.player.PlayerEvent$TabListNameFormat);
+  public static void onLogin(net.minecraftforge.event.entity.player.PlayerEvent$PlayerLoggedInEvent);
+  public static void onLogout(net.minecraftforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent);
+  public static void onAdvancement(net.minecraftforge.event.entity.player.AdvancementEvent$AdvancementEarnEvent);
+  public static void onServerTick(net.minecraftforge.event.TickEvent$ServerTickEvent);
+  public static void update(net.minecraft.server.level.ServerPlayer);
+  private static java.lang.String state(net.minecraft.server.level.ServerPlayer);
+  private static void refresh(net.minecraft.server.level.ServerPlayer);
+  private static void announce(net.minecraft.server.level.ServerPlayer, java.lang.String);
+  private static net.minecraft.network.chat.Style lambda$announce$3(java.lang.String, net.minecraft.network.chat.Style);
+  private static net.minecraft.network.chat.Style lambda$decorate$2(int, net.minecraft.network.chat.MutableComponent, net.minecraft.network.chat.Style);
+  private static net.minecraft.network.chat.Style lambda$decorate$1(int, net.minecraft.network.chat.Style);
+  private static net.minecraft.network.chat.Style lambda$icon$0(net.minecraft.network.chat.Style);
+  static {};
+}
+######## ./spmovesets/spmovesets/survival/vendedor/VendedorAparicion.class
+Compiled from "VendedorAparicion.java"
+public final class spmovesets.spmovesets.survival.vendedor.VendedorAparicion {
+  public static final int NOCHE_DESDE;
+  public static final int NOCHE_HASTA;
+  public static final int ULTIMA_LLEGADA;
+  public static final int ULTIMA_VUELTA;
+  public static final int RADIO_CAMPANA;
+  public static final int RADIO_AVISO;
+  private static final int RELOJ_CADA;
+  private static final int BUSCA_CADA;
+  private static final int PERDIDO_TICKS;
+  private static final net.minecraft.server.level.TicketType<net.minecraft.world.level.ChunkPos> TICKET;
+  private static final int TICKET_RADIO;
+  private static final int INTENTOS;
+  private static final int ANILLO_MIN;
+  private static final int ANILLO_MAX;
+  private static final int BAJA_MAX;
+  private static final int SUBE_MAX;
+  private static final int LADO;
+  private spmovesets.spmovesets.survival.vendedor.VendedorAparicion();
+  public static int hora(net.minecraft.world.level.Level);
+  public static boolean esDeNoche(net.minecraft.world.level.Level);
+  public static boolean puedeLlegar(net.minecraft.world.level.Level);
+  public static void onServerTick(net.minecraftforge.event.TickEvent$ServerTickEvent);
+  static void reloj(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos);
+  private static void vigilarActivo(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos);
+  static boolean sobraCongelado(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos, spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+  static void sujetarPuesto(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity);
+  private static spmovesets.spmovesets.survival.vendedor.VendedorNocturno buscarCampana(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos);
+  public static spmovesets.spmovesets.survival.vendedor.VendedorNocturno intentarLlegada(net.minecraft.server.level.ServerLevel);
+  public static spmovesets.spmovesets.survival.vendedor.VendedorNocturno colocar(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource, boolean);
+  private static net.minecraft.core.BlockPos suelo(net.minecraft.server.level.ServerLevel, int, int, int, int);
+  private static boolean pisable(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos);
+  private static boolean cabeCarro(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos);
+  private static net.minecraft.core.BlockPos sitioVendedor(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, float, net.minecraft.util.RandomSource);
+  private static int lado(float);
+  private static boolean libre(net.minecraft.server.level.ServerLevel, net.minecraft.world.phys.AABB);
+  private static spmovesets.spmovesets.survival.vendedor.VendedorNocturno montar(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.core.BlockPos, float, boolean);
+  private static void anunciar(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+  public static spmovesets.spmovesets.survival.vendedor.VendedorNocturno vendedorActivo(net.minecraft.server.MinecraftServer);
+  public static void onVendedorGolpeado(net.minecraftforge.event.entity.player.AttackEntityEvent);
+  public static void onModeChanged(spmovesets.spmovesets.survival.WorldModeChangedEvent);
+  public static int esfumarTodos(net.minecraft.server.MinecraftServer);
+  private static boolean lambda$esfumarTodos$2(spmovesets.spmovesets.survival.vendedor.CarroVendedor);
+  private static boolean lambda$esfumarTodos$1(spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+  private static boolean lambda$buscarCampana$0(net.minecraft.core.Holder);
+  static {};
+}
+######## ./spmovesets/spmovesets/survival/vendedor/VendedorDatos.class
+Compiled from "VendedorDatos.java"
+public final class spmovesets.spmovesets.survival.vendedor.VendedorDatos extends net.minecraft.world.level.saveddata.SavedData {
+  public static final java.lang.String NAME;
+  private int probabilidad;
+  private int nochesCastigo;
+  private long nocheActual;
+  private boolean eraDeNoche;
+  private long nocheTirada;
+  private boolean tiradaGanada;
+  private java.util.UUID activo;
+  private long visitaNoche;
+  private net.minecraft.nbt.CompoundTag visitaTratos;
+  private final java.util.Set<java.util.UUID> visitaCompradores;
+  long perdidoDesde;
+  public spmovesets.spmovesets.survival.vendedor.VendedorDatos();
+  public static spmovesets.spmovesets.survival.vendedor.VendedorDatos get(net.minecraft.server.MinecraftServer);
+  public int probabilidad();
+  public void ponerProbabilidad(int);
+  public java.util.UUID activo();
+  public void activar(java.util.UUID);
+  public void olvidar(java.util.UUID);
+  public void empezarVisita(long);
+  public void apuntarTratos(net.minecraft.world.item.trading.MerchantOffers);
+  public void apuntarComprador(java.util.UUID);
+  public void acabarVisita();
+  public boolean visitaCortada();
+  public net.minecraft.world.item.trading.MerchantOffers tratosDeLaVisita();
+  public java.util.Set<java.util.UUID> compradoresDeLaVisita();
+  public int nochesCastigo();
+  public void castigar(int);
+  public void perdonar();
+  public long nocheActual();
+  public boolean eraDeNoche();
+  public void ponerEraDeNoche(boolean);
+  public long nocheTirada();
+  public boolean tiradaGanada();
+  public void tirar(long, boolean);
+  public void nuevaNoche();
+  public static spmovesets.spmovesets.survival.vendedor.VendedorDatos load(net.minecraft.nbt.CompoundTag);
+  public net.minecraft.nbt.CompoundTag m_7176_(net.minecraft.nbt.CompoundTag);
+}
+######## ./spmovesets/spmovesets/survival/vendedor/VendedorTienda.class
+Compiled from "VendedorTienda.java"
+public final class spmovesets.spmovesets.survival.vendedor.VendedorTienda {
+  public static final int TRATOS_FIJOS;
+  private static final int USOS_UNICO;
+  private spmovesets.spmovesets.survival.vendedor.VendedorTienda();
+  public static net.minecraft.world.item.trading.MerchantOffers generar(net.minecraft.util.RandomSource);
+  public static net.minecraft.world.item.trading.MerchantOffer deLaNoche(spmovesets.spmovesets.survival.vendedor.VendedorTienda$Clase, net.minecraft.util.RandomSource);
+  public static net.minecraft.world.item.trading.MerchantOffer cuenco(net.minecraft.util.RandomSource);
+  public static net.minecraft.world.item.trading.MerchantOffer fragmentos();
+  public static spmovesets.spmovesets.Gacha.GachaFruits$Rarity rareza(net.minecraft.util.RandomSource);
+  public static net.minecraft.world.item.trading.MerchantOffer fruta(net.minecraft.util.RandomSource);
+  public static net.minecraft.world.item.trading.MerchantOffer orbe(net.minecraft.util.RandomSource);
+  public static net.minecraft.world.item.trading.MerchantOffer runa(net.minecraft.util.RandomSource);
+  public static java.util.List<java.lang.String> mapasDelVendedor();
+  public static net.minecraft.world.item.trading.MerchantOffer mapa(net.minecraft.util.RandomSource);
+  private static net.minecraft.world.item.trading.MerchantOffer trato(int, int, net.minecraft.world.item.ItemStack, int);
+  private static java.util.List<java.lang.String> frutasActivas();
+  private static java.util.List<spmovesets.spmovesets.Gacha.GachaFruits$Rarity> ordenDeBusqueda(spmovesets.spmovesets.Gacha.GachaFruits$Rarity);
+  private static int esmeraldas(spmovesets.spmovesets.Gacha.GachaFruits$Rarity);
+  private static int llaves(spmovesets.spmovesets.Gacha.GachaFruits$Rarity);
+}
+######## ./spmovesets/spmovesets/survival/vendedor/VendedorNocturno.class
+Compiled from "VendedorNocturno.java"
+public class spmovesets.spmovesets.survival.vendedor.VendedorNocturno extends net.minecraft.world.entity.PathfinderMob implements net.minecraft.world.item.trading.Merchant,software.bernie.geckolib.animatable.GeoEntity {
+  public static final int LLEGADA_TICKS;
+  public static final int MARCHA_TICKS;
+  public static final int OFENDIDO_TICKS;
+  public static final int[] APAGA_TICKS;
+  public static final int CARRO_SE_VA;
+  private static final int FRASE_TICKS;
+  private static final int CHARLA_MIN;
+  private static final int CHARLA_MAS;
+  private static final double RADIO_CHARLA;
+  private static final int COMPRA_ESPERA;
+  private static final double RADIO_TE;
+  public static final java.lang.String CONTROLADOR_GESTO;
+  public static final java.lang.String ANIM_SALUDO;
+  public static final java.lang.String TITULO_TIENDA;
+  public static final int SALUDO_TICKS;
+  private static final double RADIO_AVISO;
+  private static final double RADIO_SALUDO;
+  private static final int SALUDO_ESPERA;
+  private static final double ALCANCE_TIENDA;
+  private static final java.lang.String AVISO_TAG;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Byte> FASE;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> FASE_DESDE;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Boolean> COMERCIANDO;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> CARRO_ID;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> FRASE;
+  private static final software.bernie.geckolib.core.animation.RawAnimation IDLE;
+  private static final software.bernie.geckolib.core.animation.RawAnimation WALK;
+  private static final software.bernie.geckolib.core.animation.RawAnimation TRADE;
+  private static final software.bernie.geckolib.core.animation.RawAnimation ARRIVE;
+  private static final software.bernie.geckolib.core.animation.RawAnimation LEAVE;
+  private static final software.bernie.geckolib.core.animation.RawAnimation OFFENDED;
+  private static final software.bernie.geckolib.core.animation.RawAnimation GREET;
+  private final software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache cache;
+  private net.minecraft.core.BlockPos casa;
+  private java.util.UUID carroUuid;
+  private net.minecraft.world.entity.player.Player tradingPlayer;
+  private net.minecraft.world.item.trading.MerchantOffers offers;
+  private double alcanceTienda;
+  private long nochePropia;
+  private boolean pufLlegada;
+  private boolean cascabelLlegada;
+  private boolean pufSalida;
+  private final java.util.Map<java.util.UUID, java.lang.Long> saludados;
+  private final java.util.Set<java.util.UUID> salieron;
+  private long saludoHasta;
+  private net.minecraft.world.entity.player.Player saludado;
+  private long ultimoAvisoTrato;
+  private int frasesDichas;
+######## ./spmovesets/spmovesets/survival/vendedor/client/TiendaCandilScreen.class
+Compiled from "TiendaCandilScreen.java"
+public class spmovesets.spmovesets.survival.vendedor.client.TiendaCandilScreen extends net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<net.minecraft.world.inventory.MerchantMenu> {
+  private static final int PX0;
+  private static final int PY0;
+  private static final int PX1;
+  private static final int PY1;
+  private static final int GORRO;
+  private static final int NX;
+  private static final int NY;
+  private static final int NW;
+  private static final int NH;
+  private static final int LX;
+  private static final int LY;
+  private static final int ROW_W;
+  private static final int ROW_H;
+  private static final int ROW_STEP;
+  private static final int ROWS;
+  private static final int CX0;
+  private static final int CY0;
+  private static final int CX1;
+  private static final int CY1;
+  private static final int RES_X;
+  private static final int RES_Y;
+  private static final int RES;
+  private int shopItem;
+  private int scrollOff;
+  private final long openedAt;
+  public spmovesets.spmovesets.survival.vendedor.client.TiendaCandilScreen(net.minecraft.world.inventory.MerchantMenu, net.minecraft.world.entity.player.Inventory, net.minecraft.network.chat.Component);
+  protected void m_7856_();
+  protected boolean m_7467_(double, double, int, int, int);
+  private float time();
+  public void m_88315_(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  protected void m_7286_(net.minecraft.client.gui.GuiGraphics, float, int, int);
+  protected void m_280003_(net.minecraft.client.gui.GuiGraphics, int, int);
+  public int getSlotColor(int);
+  private void bells(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  private void candil(net.minecraft.client.gui.GuiGraphics, int, int, int, int);
+  private spmovesets.spmovesets.survival.vendedor.VendedorNocturno candilCercano();
+  private void offers(net.minecraft.client.gui.GuiGraphics, int, int, int, int, float);
+  private void item(net.minecraft.client.gui.GuiGraphics, net.minecraft.world.item.ItemStack, int, int);
+  private static boolean esDeLaNoche(int);
+  private void legend(net.minecraft.client.gui.GuiGraphics, int, int);
+  private void counter(net.minecraft.client.gui.GuiGraphics, int, int);
+  private static boolean inside(double, double, int, int, int, int);
+  private int rowAt(double, double);
+  public boolean m_6375_(double, double, int);
+  public boolean m_6050_(double, double, double);
+  private void offerTooltip(net.minecraft.client.gui.GuiGraphics, int, int);
+  private static void lambda$renderBg$1(spmovesets.spmovesets.movesets.ui.rosal.PixelCanvas);
+  private static void lambda$renderBg$0(int, int, int, spmovesets.spmovesets.movesets.ui.rosal.PixelCanvas);
+######## ./spmovesets/spmovesets/entities/boss/spawn/BossSpawnPoints.class
+Compiled from "BossSpawnPoints.java"
+public final class spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoints extends net.minecraft.world.level.saveddata.SavedData {
+  private static final java.lang.String NAME;
+  public static final int SPAWN_RANGE;
+  public static final int SYNC_RANGE;
+  private static final long MISSING_GRACE;
+  private static final long RETRY_AFTER;
+  private final java.util.List<spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint> points;
+  private int nextId;
+  private static final java.util.Set<java.util.UUID> HAD_POINTS;
+  public spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoints();
+  public static spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoints get(net.minecraft.server.level.ServerLevel);
+  public java.util.List<spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint> points();
+  public spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint byId(int);
+  public spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint near(net.minecraft.core.BlockPos, double);
+  public spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint create(net.minecraft.core.BlockPos);
+  public void remove(spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint);
+  public static void onBossRemoved(net.minecraft.server.level.ServerLevel, int, java.util.UUID);
+  private void gone(spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint, long);
+  public spmovesets.spmovesets.entities.boss.ModBoss spawn(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint);
+  public static boolean claim(net.minecraft.server.level.ServerLevel, int, spmovesets.spmovesets.entities.boss.ModBoss);
+  public static spmovesets.spmovesets.entities.boss.ModBoss aliveBoss(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoint);
+  public static void onServerTick(net.minecraftforge.event.TickEvent$ServerTickEvent);
+  private void tick(net.minecraft.server.level.ServerLevel, long);
+  private static void sync(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoints, long);
+  public static spmovesets.spmovesets.entities.boss.spawn.BossSpawnPoints load(net.minecraft.nbt.CompoundTag);
+  public net.minecraft.nbt.CompoundTag m_7176_(net.minecraft.nbt.CompoundTag);
+  private static net.minecraft.server.level.ServerPlayer lambda$sync$1(net.minecraft.server.level.ServerPlayer);
+  private static boolean lambda$tick$0(net.minecraft.world.entity.Entity);
+  static {};
+}
+######## ./spmovesets/spmovesets/gametest/VendedorGameTests.class
+Compiled from "VendedorGameTests.java"
+public final class spmovesets.spmovesets.gametest.VendedorGameTests {
+  private static final org.apache.logging.log4j.Logger LOG;
+  private static final java.lang.String ARENA;
+  private static final long NOON;
+  private static final long NIGHT;
+  private static final long DAWN;
+  private static final java.lang.String AVISO_TAG;
+  private static final java.util.UUID MACHINE;
+  private static final double CARRO_MAX;
+  private static final double VENDEDOR_MAX;
+  private spmovesets.spmovesets.gametest.VendedorGameTests();
+  public static void theShopHasTheFixedDealsAndOneOrTwoOfTheNight(net.minecraft.gametest.framework.GameTestHelper);
+  private static void price(net.minecraft.gametest.framework.GameTestHelper, net.minecraft.world.item.trading.MerchantOffer, java.lang.String, int, int, int);
+  public static void merchantDataCountsNightsAndSurvivesASave(net.minecraft.gametest.framework.GameTestHelper);
+  public static void eachNightIsCountedAndRolledOnce(net.minecraft.gametest.framework.GameTestHelper);
+  public static void placedMerchantArrivesWithItsCartAndNothingTargetsHim(net.minecraft.gametest.framework.GameTestHelper);
+  public static void hittingHimMakesHimLeaveOffended(net.minecraft.gametest.framework.GameTestHelper);
+  public static void atDawnHePacksUpAndLeaves(net.minecraft.gametest.framework.GameTestHelper);
+  public static void whoBoughtSomethingGetsATeaAtDawn(net.minecraft.gametest.framework.GameTestHelper);
+  private static java.util.List<net.minecraft.world.entity.item.ItemEntity> teasNear(spmovesets.spmovesets.gametest.VendedorGameTests$Scene, net.minecraft.world.phys.Vec3);
+  public static void switchingToServerModeRemovesHimAtOnce(net.minecraft.gametest.framework.GameTestHelper);
+  public static void theMerchantsChunkIsHeldSoHeNeverFreezes(net.minecraft.gametest.framework.GameTestHelper);
+  private static boolean ticketEn(net.minecraft.server.level.ServerLevel, net.minecraft.world.level.ChunkPos);
+  private static spmovesets.spmovesets.survival.vendedor.VendedorNocturno placeFrozen(spmovesets.spmovesets.gametest.VendedorGameTests$Scene);
+  public static void withTheNightWonHeArrivesByTheVillageBell(net.minecraft.gametest.framework.GameTestHelper);
+  public static void twoBuyersGetOneTeaEachAndNobodyTakesTheOther(net.minecraft.gametest.framework.GameTestHelper);
+  public static void greetsEachPlayerOnceAndWelcomesBackWhoReturns(net.minecraft.gametest.framework.GameTestHelper);
+  public static void offendedByOneWhileAnotherTradesReturnsThePayment(net.minecraft.gametest.framework.GameTestHelper);
+  public static void splashesExplosionsAndMachinesDoNotOffendHim(net.minecraft.gametest.framework.GameTestHelper);
+  public static void anInterruptedVisitComesBackTheSameNightWithItsDeals(net.minecraft.gametest.framework.GameTestHelper);
+  private static java.util.List<java.lang.String> describir(net.minecraft.world.item.trading.MerchantOffers);
+  private static <T> T privado(spmovesets.spmovesets.survival.vendedor.VendedorNocturno, java.lang.String);
+  private static int fraseCruda(spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+  private static void clean(spmovesets.spmovesets.survival.vendedor.VendedorDatos);
+  private static net.minecraft.core.BlockPos surface(spmovesets.spmovesets.gametest.VendedorGameTests$Scene, int, int);
+  private static double flat(net.minecraft.world.phys.Vec3, net.minecraft.core.BlockPos);
+  private static void check(net.minecraft.gametest.framework.GameTestHelper, boolean, java.lang.String);
+  private static void lambda$anInterruptedVisitComesBackTheSameNightWithItsDeals$16(int[], spmovesets.spmovesets.survival.vendedor.VendedorNocturno, spmovesets.spmovesets.gametest.VendedorGameTests$Scene, spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer, java.util.List, spmovesets.spmovesets.survival.vendedor.CarroVendedor, net.minecraft.core.BlockPos, spmovesets.spmovesets.survival.vendedor.VendedorNocturno[], net.minecraft.world.phys.Vec3[], int[]);
+  private static void lambda$splashesExplosionsAndMachinesDoNotOffendHim$15(int[], spmovesets.spmovesets.survival.vendedor.VendedorNocturno, spmovesets.spmovesets.gametest.VendedorGameTests$Scene, net.minecraft.world.entity.projectile.ThrownPotion[], spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer);
+  private static void lambda$offendedByOneWhileAnotherTradesReturnsThePayment$14(spmovesets.spmovesets.survival.vendedor.VendedorNocturno, spmovesets.spmovesets.gametest.VendedorGameTests$Scene, spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer, spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer);
+  private static void lambda$greetsEachPlayerOnceAndWelcomesBackWhoReturns$13(spmovesets.spmovesets.survival.vendedor.VendedorNocturno, int[], java.util.List, int[], java.util.Map, spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer, spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer, spmovesets.spmovesets.gametest.VendedorGameTests$Scene, net.minecraft.world.phys.Vec3, int[], net.minecraft.world.phys.Vec3);
+  private static void lambda$twoBuyersGetOneTeaEachAndNobodyTakesTheOther$12(spmovesets.spmovesets.survival.vendedor.VendedorNocturno, net.minecraft.world.phys.Vec3[], int[], spmovesets.spmovesets.gametest.VendedorGameTests$Scene, int[], spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer, spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer, spmovesets.spmovesets.survival.vendedor.CarroVendedor, spmovesets.spmovesets.gametest.ArtifactRuneGameTests$TestPlayer);
+  private static void lambda$withTheNightWonHeArrivesByTheVillageBell$11(spmovesets.spmovesets.gametest.VendedorGameTests$Scene, net.minecraft.core.BlockPos);
+  private static boolean lambda$withTheNightWonHeArrivesByTheVillageBell$10(spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+  private static void lambda$theMerchantsChunkIsHeldSoHeNeverFreezes$9(int[], spmovesets.spmovesets.survival.vendedor.VendedorNocturno, spmovesets.spmovesets.gametest.VendedorGameTests$Scene, int[], int[]);
+  private static void lambda$switchingToServerModeRemovesHimAtOnce$8(int[], spmovesets.spmovesets.gametest.VendedorGameTests$Scene, spmovesets.spmovesets.survival.vendedor.VendedorNocturno, spmovesets.spmovesets.survival.vendedor.CarroVendedor, net.minecraft.core.BlockPos, java.util.List, java.util.List);
+  private static boolean lambda$switchingToServerModeRemovesHimAtOnce$7(spmovesets.spmovesets.survival.vendedor.CarroVendedor);
+  private static boolean lambda$switchingToServerModeRemovesHimAtOnce$6(spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+  private static boolean lambda$teasNear$5(net.minecraft.world.entity.item.ItemEntity);
+######## ./spmovesets/spmovesets/gametest/VendedorGameTests$Catalog.class
+Compiled from "VendedorGameTests.java"
+final class spmovesets.spmovesets.gametest.VendedorGameTests$Catalog {
+  final java.util.Set<net.minecraft.world.item.Item> bowls;
+  final java.util.Map<net.minecraft.world.item.Item, java.lang.Integer> fruits;
+  final java.util.Map<net.minecraft.world.item.Item, java.lang.String> orbs;
+  final java.util.Map<net.minecraft.world.item.Item, spmovesets.spmovesets.movesets.artifacts.ArtifactType> runes;
+  final java.util.Map<net.minecraft.world.item.Item, java.lang.String> maps;
+  spmovesets.spmovesets.gametest.VendedorGameTests$Catalog();
+  spmovesets.spmovesets.gametest.VendedorGameTests$Kind classify(net.minecraft.gametest.framework.GameTestHelper, net.minecraft.world.item.trading.MerchantOffer, java.util.Map<spmovesets.spmovesets.Gacha.GachaFruits$Rarity, java.lang.Integer>, java.util.Set<java.lang.String>, java.util.Set<spmovesets.spmovesets.movesets.artifacts.ArtifactType>);
+  private void lambda$new$2(java.lang.String, net.minecraftforge.registries.RegistryObject);
+  private void lambda$new$1(spmovesets.spmovesets.movesets.artifacts.ArtifactType, net.minecraftforge.registries.RegistryObject);
+  private void lambda$new$0(java.lang.String, net.minecraftforge.registries.RegistryObject);
+}
+== merchant-like strings in classes
+    583 vendedor
+      6 merchant
+      4 vendedor_nocturno
+      4 carro_vendedor
+      3 spmovesets_vendedor
+      2 vendedor_te
+      2 vendedor_regla
+      2 jvendedor
+      1 vendedortest
+      1 vendedor_vuelve
+      1 vendedor_voz
+      1 vendedor_varios_te
+      1 vendedor_varios_saludo
+      1 vendedor_varios_ofendido
+      1 vendedor_valor
+      1 vendedor_title
+      1 vendedor_tienda
+      1 vendedor_solo_survival
+      1 vendedor_reloj
+      1 vendedor_rebote
+      1 vendedor_puf
+      1 vendedor_precios
+      1 vendedor_ofendido
+      1 vendedor_note
+      1 vendedor_noche
+      1 vendedor_musica
+      1 vendedor_modo_server
+      1 vendedor_llega
+      1 vendedor_fijos
+      1 vendedor_farolillo_enciende
+      1 vendedor_farolillo_apaga
+      1 vendedor_datos
+      1 vendedor_congelado
+      1 vendedor_colocar
+      1 vendedor_cascabel
+      1 vendedor_campana
+      1 vendedor_brasas
+      1 vendedor_aviso_title
+      1 vendedor_aviso
+      1 vendedor_amanecer
+      1 spmovesets_vendedor_mirada
+      1 mvendedor
+      1 lvendedor
+      1 hvendedor
+      1 fvendedor
+      1 dvendedor
+== bytecode of the merchant arrival and its saved data
+######## spmovesets/spmovesets/survival/vendedor/VendedorAparicion.class
+Compiled from "VendedorAparicion.java"
+public final class spmovesets.spmovesets.survival.vendedor.VendedorAparicion {
+  public static final int NOCHE_DESDE;
+
+  public static final int NOCHE_HASTA;
+
+  public static final int ULTIMA_LLEGADA;
+
+  public static final int ULTIMA_VUELTA;
+
+  public static final int RADIO_CAMPANA;
+
+  public static final int RADIO_AVISO;
+
+  private static final int RELOJ_CADA;
+
+  private static final int BUSCA_CADA;
+
+  private static final int PERDIDO_TICKS;
+
+  private static final net.minecraft.server.level.TicketType<net.minecraft.world.level.ChunkPos> TICKET;
+
+  private static final int TICKET_RADIO;
+
+  private static final int INTENTOS;
+
+  private static final int ANILLO_MIN;
+
+  private static final int ANILLO_MAX;
+
+  private static final int BAJA_MAX;
+
+  private static final int SUBE_MAX;
+
+  private static final int LADO;
+
+  private spmovesets.spmovesets.survival.vendedor.VendedorAparicion();
+    Code:
+         0: aload_0
+         1: invokespecial #84                 // Method java/lang/Object."<init>":()V
+         4: return
+
+  public static int hora(net.minecraft.world.level.Level);
+    Code:
+         0: aload_0
+         1: invokevirtual #94                 // Method net/minecraft/world/level/Level.m_46468_:()J
+         4: ldc2_w        #95                 // long 24000l
+         7: invokestatic  #102                // Method java/lang/Math.floorMod:(JJ)J
+        10: l2i
+        11: ireturn
+
+  public static boolean esDeNoche(net.minecraft.world.level.Level);
+    Code:
+         0: aload_0
+         1: ifnonnull     6
+         4: iconst_0
+         5: ireturn
+         6: aload_0
+         7: invokestatic  #109                // Method hora:(Lnet/minecraft/world/level/Level;)I
+        10: istore_1
+        11: iload_1
+        12: sipush        12542
+        15: if_icmplt     29
+        18: iload_1
+        19: sipush        23460
+        22: if_icmpge     29
+        25: iconst_1
+        26: goto          30
+        29: iconst_0
+        30: ireturn
+
+  public static boolean puedeLlegar(net.minecraft.world.level.Level);
+    Code:
+         0: aload_0
+         1: invokestatic  #112                // Method esDeNoche:(Lnet/minecraft/world/level/Level;)Z
+         4: ifeq          21
+         7: aload_0
+         8: invokestatic  #109                // Method hora:(Lnet/minecraft/world/level/Level;)I
+        11: sipush        18000
+        14: if_icmpge     21
+        17: iconst_1
+        18: goto          22
+        21: iconst_0
+        22: ireturn
+
+  public static void onServerTick(net.minecraftforge.event.TickEvent$ServerTickEvent);
+    Code:
+         0: aload_0
+         1: getfield      #119                // Field net/minecraftforge/event/TickEvent$ServerTickEvent.phase:Lnet/minecraftforge/event/TickEvent$Phase;
+         4: getstatic     #122                // Field net/minecraftforge/event/TickEvent$Phase.END:Lnet/minecraftforge/event/TickEvent$Phase;
+         7: if_acmpeq     11
+        10: return
+        11: aload_0
+        12: invokevirtual #126                // Method net/minecraftforge/event/TickEvent$ServerTickEvent.getServer:()Lnet/minecraft/server/MinecraftServer;
+        15: astore_1
+        16: aload_1
+        17: invokevirtual #132                // Method net/minecraft/server/MinecraftServer.m_129921_:()I
+        20: bipush        20
+        22: irem
+        23: ifne          32
+        26: invokestatic  #138                // Method spmovesets/spmovesets/survival/SurvivalMode.isOnServer:()Z
+        29: ifne          33
+        32: return
+        33: aload_1
+        34: invokevirtual #142                // Method net/minecraft/server/MinecraftServer.m_129783_:()Lnet/minecraft/server/level/ServerLevel;
+        37: astore_2
+        38: aload_1
+        39: invokestatic  #148                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.get:(Lnet/minecraft/server/MinecraftServer;)Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;
+        42: astore_3
+        43: aload_2
+        44: aload_3
+        45: invokestatic  #152                // Method reloj:(Lnet/minecraft/server/level/ServerLevel;Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;)V
+        48: aload_2
+        49: aload_3
+        50: invokestatic  #155                // Method vigilarActivo:(Lnet/minecraft/server/level/ServerLevel;Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;)V
+        53: aload_1
+        54: invokevirtual #132                // Method net/minecraft/server/MinecraftServer.m_129921_:()I
+        57: sipush        200
+        60: irem
+        61: ifne          70
+        64: aload_2
+        65: aload_3
+        66: invokestatic  #159                // Method buscarCampana:(Lnet/minecraft/server/level/ServerLevel;Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;)Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno;
+        69: pop
+        70: return
+
+  static void reloj(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos);
+    Code:
+         0: aload_0
+         1: invokestatic  #112                // Method esDeNoche:(Lnet/minecraft/world/level/Level;)Z
+         4: istore_2
+         5: iload_2
+         6: ifeq          20
+         9: aload_1
+        10: invokevirtual #171                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.eraDeNoche:()Z
+        13: ifne          20
+        16: aload_1
+        17: invokevirtual #174                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nuevaNoche:()V
+        20: aload_1
+        21: iload_2
+        22: invokevirtual #178                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.ponerEraDeNoche:(Z)V
+        25: aload_0
+        26: invokestatic  #180                // Method puedeLlegar:(Lnet/minecraft/world/level/Level;)Z
+        29: ifeq          44
+        32: aload_1
+        33: invokevirtual #183                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheTirada:()J
+        36: aload_1
+        37: invokevirtual #186                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheActual:()J
+        40: lcmp
+        41: ifne          45
+        44: return
+        45: aload_1
+        46: invokevirtual #189                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nochesCastigo:()I
+        49: ifne          87
+        52: aload_0
+        53: invokevirtual #193                // Method net/minecraft/server/level/ServerLevel.m_46469_:()Lnet/minecraft/world/level/GameRules;
+        56: getstatic     #197                // Field net/minecraft/world/level/GameRules.f_46125_:Lnet/minecraft/world/level/GameRules$Key;
+        59: invokevirtual #201                // Method net/minecraft/world/level/GameRules.m_46207_:(Lnet/minecraft/world/level/GameRules$Key;)Z
+        62: ifeq          87
+        65: aload_0
+        66: getfield      #205                // Field net/minecraft/server/level/ServerLevel.f_46441_:Lnet/minecraft/util/RandomSource;
+        69: bipush        100
+        71: invokeinterface #211,  2          // InterfaceMethod net/minecraft/util/RandomSource.m_188503_:(I)I
+        76: aload_1
+        77: invokevirtual #214                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.probabilidad:()I
+        80: if_icmpge     87
+        83: iconst_1
+        84: goto          88
+        87: iconst_0
+        88: istore_3
+        89: aload_1
+        90: aload_1
+        91: invokevirtual #186                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheActual:()J
+        94: iload_3
+        95: invokevirtual #218                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.tirar:(JZ)V
+        98: return
+
+  private static void vigilarActivo(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos);
+    Code:
+         0: aload_1
+         1: invokevirtual #225                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.activo:()Ljava/util/UUID;
+         4: astore_2
+         5: aload_2
+         6: ifnonnull     17
+         9: aload_1
+        10: ldc2_w        #226                // long -1l
+        13: putfield      #231                // Field spmovesets/spmovesets/survival/vendedor/VendedorDatos.perdidoDesde:J
+        16: return
+        17: aload_0
+        18: aload_2
+        19: invokevirtual #237                // Method net/minecraft/server/level/ServerLevel.m_8791_:(Ljava/util/UUID;)Lnet/minecraft/world/entity/Entity;
+        22: astore_3
+        23: aload_3
+        24: ifnull        72
+        27: aload_1
+        28: ldc2_w        #226                // long -1l
+        31: putfield      #231                // Field spmovesets/spmovesets/survival/vendedor/VendedorDatos.perdidoDesde:J
+        34: aload_3
+        35: instanceof    #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        38: ifeq          71
+        41: aload_3
+        42: checkcast     #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        45: astore        4
+        47: aload_0
+        48: aload_1
+        49: aload         4
+        51: invokestatic  #241                // Method sobraCongelado:(Lnet/minecraft/server/level/ServerLevel;Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno;)Z
+        54: ifeq          65
+        57: aload         4
+        59: invokevirtual #244                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.esfumar:()V
+        62: goto          71
+        65: aload_0
+        66: aload         4
+        68: invokestatic  #250                // Method sujetarPuesto:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)V
+        71: return
+        72: aload_0
+        73: invokevirtual #253                // Method net/minecraft/server/level/ServerLevel.m_46467_:()J
+        76: lstore        4
+        78: aload_1
+        79: getfield      #231                // Field spmovesets/spmovesets/survival/vendedor/VendedorDatos.perdidoDesde:J
+        82: lconst_0
+        83: lcmp
+        84: ifge          96
+        87: aload_1
+        88: lload         4
+        90: putfield      #231                // Field spmovesets/spmovesets/survival/vendedor/VendedorDatos.perdidoDesde:J
+        93: goto          115
+        96: lload         4
+        98: aload_1
+        99: getfield      #231                // Field spmovesets/spmovesets/survival/vendedor/VendedorDatos.perdidoDesde:J
+       102: lsub
+       103: ldc2_w        #254                // long 100l
+       106: lcmp
+       107: iflt          115
+       110: aload_1
+       111: aload_2
+       112: invokevirtual #259                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.olvidar:(Ljava/util/UUID;)V
+       115: return
+
+  static boolean sobraCongelado(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos, spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+    Code:
+         0: aload_0
+         1: aload_2
+         2: invokevirtual #269                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_20183_:()Lnet/minecraft/core/BlockPos;
+         5: invokevirtual #273                // Method net/minecraft/server/level/ServerLevel.m_143340_:(Lnet/minecraft/core/BlockPos;)Z
+         8: ifeq          24
+        11: aload_2
+        12: aload_0
+        13: invokevirtual #253                // Method net/minecraft/server/level/ServerLevel.m_46467_:()J
+        16: invokevirtual #277                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.congelado:(J)Z
+        19: ifne          24
+        22: iconst_0
+        23: ireturn
+        24: aload_2
+        25: invokevirtual #281                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.fase:()Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno$Fase;
+        28: astore_3
+        29: aload_0
+        30: invokestatic  #112                // Method esDeNoche:(Lnet/minecraft/world/level/Level;)Z
+        33: ifeq          62
+        36: aload_2
+        37: invokevirtual #284                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.nochePropia:()J
+        40: aload_1
+        41: invokevirtual #186                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheActual:()J
+        44: lcmp
+        45: ifne          62
+        48: aload_3
+        49: getstatic     #288                // Field spmovesets/spmovesets/survival/vendedor/VendedorNocturno$Fase.MARCHANDOSE:Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno$Fase;
+        52: if_acmpeq     62
+        55: aload_3
+        56: getstatic     #291                // Field spmovesets/spmovesets/survival/vendedor/VendedorNocturno$Fase.OFENDIDO:Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno$Fase;
+        59: if_acmpne     66
+        62: iconst_1
+        63: goto          67
+        66: iconst_0
+        67: ireturn
+
+  static void sujetarPuesto(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity);
+    Code:
+         0: aload_1
+         1: invokevirtual #295                // Method net/minecraft/world/entity/Entity.m_146902_:()Lnet/minecraft/world/level/ChunkPos;
+         4: astore_2
+         5: aload_0
+         6: invokevirtual #299                // Method net/minecraft/server/level/ServerLevel.m_7726_:()Lnet/minecraft/server/level/ServerChunkCache;
+         9: getstatic     #301                // Field TICKET:Lnet/minecraft/server/level/TicketType;
+        12: aload_2
+        13: iconst_3
+        14: aload_2
+        15: invokevirtual #307                // Method net/minecraft/server/level/ServerChunkCache.m_8387_:(Lnet/minecraft/server/level/TicketType;Lnet/minecraft/world/level/ChunkPos;ILjava/lang/Object;)V
+        18: return
+
+  private static spmovesets.spmovesets.survival.vendedor.VendedorNocturno buscarCampana(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorDatos);
+    Code:
+         0: aload_1
+         1: invokevirtual #225                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.activo:()Ljava/util/UUID;
+         4: ifnonnull     14
+         7: aload_1
+         8: invokevirtual #189                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nochesCastigo:()I
+        11: ifle          16
+        14: aconst_null
+        15: areturn
+        16: aload_1
+        17: invokevirtual #313                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.visitaCortada:()Z
+        20: ifeq          42
+        23: aload_0
+        24: invokestatic  #112                // Method esDeNoche:(Lnet/minecraft/world/level/Level;)Z
+        27: ifeq          40
+        30: aload_0
+        31: invokestatic  #109                // Method hora:(Lnet/minecraft/world/level/Level;)I
+        34: sipush        22000
+        37: if_icmplt     70
+        40: aconst_null
+        41: areturn
+        42: aload_0
+        43: invokestatic  #180                // Method puedeLlegar:(Lnet/minecraft/world/level/Level;)Z
+        46: ifeq          68
+        49: aload_1
+        50: invokevirtual #183                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheTirada:()J
+        53: aload_1
+        54: invokevirtual #186                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheActual:()J
+        57: lcmp
+        58: ifne          68
+        61: aload_1
+        62: invokevirtual #316                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.tiradaGanada:()Z
+        65: ifne          70
+        68: aconst_null
+        69: areturn
+        70: new           #318                // class it/unimi/dsi/fastutil/objects/ObjectArrayList
+        73: dup
+        74: invokespecial #319                // Method it/unimi/dsi/fastutil/objects/ObjectArrayList."<init>":()V
+        77: astore_2
+        78: aload_0
+        79: invokevirtual #323                // Method net/minecraft/server/level/ServerLevel.m_6907_:()Ljava/util/List;
+        82: invokeinterface #329,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        87: astore_3
+        88: aload_3
+        89: invokeinterface #334,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        94: ifeq          126
+        97: aload_3
+        98: invokeinterface #338,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       103: checkcast     #340                // class net/minecraft/server/level/ServerPlayer
+       106: astore        4
+       108: aload         4
+       110: invokevirtual #343                // Method net/minecraft/server/level/ServerPlayer.m_5833_:()Z
+       113: ifne          123
+       116: aload_2
+       117: aload         4
+       119: invokevirtual #347                // Method it/unimi/dsi/fastutil/objects/ObjectArrayList.add:(Ljava/lang/Object;)Z
+       122: pop
+       123: goto          88
+       126: aload_2
+       127: aload_0
+       128: getfield      #205                // Field net/minecraft/server/level/ServerLevel.f_46441_:Lnet/minecraft/util/RandomSource;
+       131: invokestatic  #353                // Method net/minecraft/Util.m_214673_:(Lit/unimi/dsi/fastutil/objects/ObjectArrayList;Lnet/minecraft/util/RandomSource;)V
+       134: new           #355                // class java/util/HashSet
+       137: dup
+       138: invokespecial #356                // Method java/util/HashSet."<init>":()V
+       141: astore_3
+       142: aload_0
+       143: invokevirtual #360                // Method net/minecraft/server/level/ServerLevel.m_8904_:()Lnet/minecraft/world/entity/ai/village/poi/PoiManager;
+       146: astore        4
+       148: aload_2
+       149: invokevirtual #363                // Method it/unimi/dsi/fastutil/objects/ObjectArrayList.iterator:()Lit/unimi/dsi/fastutil/objects/ObjectListIterator;
+       152: astore        5
+       154: aload         5
+       156: invokeinterface #334,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       161: ifeq          265
+       164: aload         5
+       166: invokeinterface #338,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       171: checkcast     #340                // class net/minecraft/server/level/ServerPlayer
+       174: astore        6
+       176: aload         4
+       178: invokedynamic #383,  0            // InvokeDynamic #0:test:()Ljava/util/function/Predicate;
+       183: aload         6
+       185: invokevirtual #384                // Method net/minecraft/server/level/ServerPlayer.m_20183_:()Lnet/minecraft/core/BlockPos;
+       188: bipush        48
+       190: getstatic     #388                // Field net/minecraft/world/entity/ai/village/poi/PoiManager$Occupancy.ANY:Lnet/minecraft/world/entity/ai/village/poi/PoiManager$Occupancy;
+       193: invokevirtual #392                // Method net/minecraft/world/entity/ai/village/poi/PoiManager.m_27192_:(Ljava/util/function/Predicate;Lnet/minecraft/core/BlockPos;ILnet/minecraft/world/entity/ai/village/poi/PoiManager$Occupancy;)Ljava/util/Optional;
+       196: astore        7
+       198: aload         7
+       200: invokevirtual #397                // Method java/util/Optional.isEmpty:()Z
+       203: ifne          154
+       206: aload_3
+       207: aload         7
+       209: invokevirtual #399                // Method java/util/Optional.get:()Ljava/lang/Object;
+       212: checkcast     #401                // class net/minecraft/core/BlockPos
+       215: invokeinterface #402,  2          // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+       220: ifne          226
+       223: goto          154
+       226: aload_0
+       227: aload         7
+       229: invokevirtual #399                // Method java/util/Optional.get:()Ljava/lang/Object;
+       232: checkcast     #401                // class net/minecraft/core/BlockPos
+       235: aload_0
+       236: getfield      #205                // Field net/minecraft/server/level/ServerLevel.f_46441_:Lnet/minecraft/util/RandomSource;
+       239: iconst_1
+       240: invokestatic  #406                // Method colocar:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;Z)Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno;
+       243: astore        8
+       245: aload         8
+       247: ifnull        262
+       250: aload_1
+       251: aload_1
+       252: invokevirtual #186                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheActual:()J
+       255: iconst_0
+       256: invokevirtual #218                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.tirar:(JZ)V
+       259: aload         8
+       261: areturn
+       262: goto          154
+       265: aconst_null
+       266: areturn
+
+  public static spmovesets.spmovesets.survival.vendedor.VendedorNocturno intentarLlegada(net.minecraft.server.level.ServerLevel);
+    Code:
+         0: aload_0
+         1: invokevirtual #426                // Method net/minecraft/server/level/ServerLevel.m_46472_:()Lnet/minecraft/resources/ResourceKey;
+         4: getstatic     #430                // Field net/minecraft/world/level/Level.f_46428_:Lnet/minecraft/resources/ResourceKey;
+         7: if_acmpne     17
+        10: aload_0
+        11: invokestatic  #433                // Method spmovesets/spmovesets/survival/SurvivalMode.isOn:(Lnet/minecraft/world/level/Level;)Z
+        14: ifne          19
+        17: aconst_null
+        18: areturn
+        19: aload_0
+        20: aload_0
+        21: invokevirtual #436                // Method net/minecraft/server/level/ServerLevel.m_7654_:()Lnet/minecraft/server/MinecraftServer;
+        24: invokestatic  #148                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.get:(Lnet/minecraft/server/MinecraftServer;)Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;
+        27: invokestatic  #159                // Method buscarCampana:(Lnet/minecraft/server/level/ServerLevel;Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;)Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno;
+        30: areturn
+
+  public static spmovesets.spmovesets.survival.vendedor.VendedorNocturno colocar(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource, boolean);
+    Code:
+         0: aload_0
+         1: invokevirtual #426                // Method net/minecraft/server/level/ServerLevel.m_46472_:()Lnet/minecraft/resources/ResourceKey;
+         4: getstatic     #430                // Field net/minecraft/world/level/Level.f_46428_:Lnet/minecraft/resources/ResourceKey;
+         7: if_acmpne     17
+        10: aload_0
+        11: invokestatic  #433                // Method spmovesets/spmovesets/survival/SurvivalMode.isOn:(Lnet/minecraft/world/level/Level;)Z
+        14: ifne          19
+        17: aconst_null
+        18: areturn
+        19: iconst_0
+        20: istore        4
+        22: iload         4
+        24: bipush        24
+        26: if_icmpge     220
+        29: aload_2
+        30: invokeinterface #440,  1          // InterfaceMethod net/minecraft/util/RandomSource.m_188500_:()D
+        35: ldc2_w        #441                // double 3.141592653589793d
+        38: dmul
+        39: ldc2_w        #443                // double 2.0d
+        42: dmul
+        43: dstore        5
+        45: ldc2_w        #445                // double 3.0d
+        48: aload_2
+        49: invokeinterface #440,  1          // InterfaceMethod net/minecraft/util/RandomSource.m_188500_:()D
+        54: ldc2_w        #447                // double 6.0d
+        57: dmul
+        58: dadd
+        59: dstore        7
+        61: aload_1
+        62: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+        65: dload         5
+        67: invokestatic  #455                // Method java/lang/Math.cos:(D)D
+        70: dload         7
+        72: dmul
+        73: ldc2_w        #456                // double 0.5d
+        76: dadd
+        77: invokestatic  #463                // Method net/minecraft/util/Mth.m_14107_:(D)I
+        80: iadd
+        81: istore        9
+        83: aload_1
+        84: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+        87: dload         5
+        89: invokestatic  #469                // Method java/lang/Math.sin:(D)D
+        92: dload         7
+        94: dmul
+        95: ldc2_w        #456                // double 0.5d
+        98: dadd
+        99: invokestatic  #463                // Method net/minecraft/util/Mth.m_14107_:(D)I
+       102: iadd
+       103: istore        10
+       105: aload_0
+       106: iload         9
+       108: iload         10
+       110: aload_1
+       111: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+       114: iconst_4
+       115: isub
+       116: aload_1
+       117: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+       120: iconst_2
+       121: iadd
+       122: invokestatic  #476                // Method suelo:(Lnet/minecraft/server/level/ServerLevel;IIII)Lnet/minecraft/core/BlockPos;
+       125: astore        11
+       127: aload         11
+       129: ifnull        214
+       132: aload_0
+       133: aload         11
+       135: invokestatic  #480                // Method cabeCarro:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)Z
+       138: ifne          144
+       141: goto          214
+       144: aload_1
+       145: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+       148: aload         11
+       150: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+       153: isub
+       154: i2d
+       155: aload_1
+       156: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+       159: aload         11
+       161: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+       164: isub
+       165: i2d
+       166: invokestatic  #484                // Method net/minecraft/util/Mth.m_14136_:(DD)D
+       169: ldc2_w        #485                // double 57.2957763671875d
+       172: dmul
+       173: d2f
+       174: ldc_w         #487                // float 90.0f
+       177: fsub
+       178: invokestatic  #491                // Method net/minecraft/util/Mth.m_14177_:(F)F
+       181: fstore        12
+       183: aload_0
+       184: aload         11
+       186: fload         12
+       188: aload_2
+       189: invokestatic  #495                // Method sitioVendedor:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FLnet/minecraft/util/RandomSource;)Lnet/minecraft/core/BlockPos;
+       192: astore        13
+       194: aload         13
+       196: ifnonnull     202
+       199: goto          214
+       202: aload_0
+       203: aload         11
+       205: aload         13
+       207: fload         12
+       209: iload_3
+       210: invokestatic  #499                // Method montar:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;FZ)Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno;
+       213: areturn
+       214: iinc          4, 1
+       217: goto          22
+       220: aconst_null
+       221: areturn
+
+  private static net.minecraft.core.BlockPos suelo(net.minecraft.server.level.ServerLevel, int, int, int, int);
+    Code:
+         0: new           #401                // class net/minecraft/core/BlockPos
+         3: dup
+         4: iload_1
+         5: iload_3
+         6: iload_2
+         7: invokespecial #516                // Method net/minecraft/core/BlockPos."<init>":(III)V
+        10: astore        5
+        12: aload_0
+        13: invokevirtual #520                // Method net/minecraft/server/level/ServerLevel.m_6857_:()Lnet/minecraft/world/level/border/WorldBorder;
+        16: aload         5
+        18: invokevirtual #525                // Method net/minecraft/world/level/border/WorldBorder.m_61937_:(Lnet/minecraft/core/BlockPos;)Z
+        21: ifeq          33
+        24: aload_0
+        25: aload         5
+        27: invokevirtual #273                // Method net/minecraft/server/level/ServerLevel.m_143340_:(Lnet/minecraft/core/BlockPos;)Z
+        30: ifne          35
+        33: aconst_null
+        34: areturn
+        35: aload_0
+        36: getstatic     #529                // Field net/minecraft/world/level/levelgen/Heightmap$Types.MOTION_BLOCKING_NO_LEAVES:Lnet/minecraft/world/level/levelgen/Heightmap$Types;
+        39: iload_1
+        40: iload_2
+        41: invokevirtual #533                // Method net/minecraft/server/level/ServerLevel.m_6924_:(Lnet/minecraft/world/level/levelgen/Heightmap$Types;II)I
+        44: istore        6
+        46: iload         6
+        48: iload_3
+        49: if_icmplt     59
+        52: iload         6
+        54: iload         4
+        56: if_icmple     61
+        59: aconst_null
+        60: areturn
+        61: new           #401                // class net/minecraft/core/BlockPos
+        64: dup
+        65: iload_1
+        66: iload         6
+        68: iload_2
+        69: invokespecial #516                // Method net/minecraft/core/BlockPos."<init>":(III)V
+        72: astore        7
+        74: aload_0
+        75: aload         7
+        77: invokevirtual #536                // Method net/minecraft/core/BlockPos.m_7495_:()Lnet/minecraft/core/BlockPos;
+        80: invokestatic  #539                // Method pisable:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)Z
+        83: ifeq          91
+        86: aload         7
+        88: goto          92
+        91: aconst_null
+        92: areturn
+
+  private static boolean pisable(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokevirtual #548                // Method net/minecraft/server/level/ServerLevel.m_8055_:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+         5: astore_2
+         6: aload_2
+         7: invokevirtual #554                // Method net/minecraft/world/level/block/state/BlockState.m_60819_:()Lnet/minecraft/world/level/material/FluidState;
+        10: invokevirtual #559                // Method net/minecraft/world/level/material/FluidState.m_76178_:()Z
+        13: ifne          18
+        16: iconst_0
+        17: ireturn
+        18: aload_2
+        19: aload_0
+        20: aload_1
+        21: getstatic     #565                // Field net/minecraft/core/Direction.UP:Lnet/minecraft/core/Direction;
+        24: invokevirtual #569                // Method net/minecraft/world/level/block/state/BlockState.m_60783_:(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z
+        27: ifne          40
+        30: aload_2
+        31: getstatic     #575                // Field net/minecraft/world/level/block/Blocks.f_152481_:Lnet/minecraft/world/level/block/Block;
+        34: invokevirtual #579                // Method net/minecraft/world/level/block/state/BlockState.m_60713_:(Lnet/minecraft/world/level/block/Block;)Z
+        37: ifeq          44
+        40: iconst_1
+        41: goto          45
+        44: iconst_0
+        45: ireturn
+
+  private static boolean cabeCarro(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos);
+    Code:
+         0: new           #583                // class net/minecraft/world/phys/AABB
+         3: dup
+         4: aload_1
+         5: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+         8: iconst_1
+         9: isub
+        10: i2d
+        11: aload_1
+        12: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+        15: i2d
+        16: aload_1
+        17: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+        20: iconst_1
+        21: isub
+        22: i2d
+        23: aload_1
+        24: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+        27: iconst_2
+        28: iadd
+        29: i2d
+        30: aload_1
+        31: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+        34: iconst_3
+        35: iadd
+        36: i2d
+        37: aload_1
+        38: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+        41: iconst_2
+        42: iadd
+        43: i2d
+        44: invokespecial #586                // Method net/minecraft/world/phys/AABB."<init>":(DDDDDD)V
+        47: astore_2
+        48: aload_0
+        49: aload_2
+        50: invokestatic  #590                // Method libre:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/AABB;)Z
+        53: ifne          58
+        56: iconst_0
+        57: ireturn
+        58: iconst_m1
+        59: istore_3
+        60: iload_3
+        61: iconst_1
+        62: if_icmpgt     116
+        65: iconst_m1
+        66: istore        4
+        68: iload         4
+        70: iconst_1
+        71: if_icmpgt     110
+        74: aload_1
+        75: iload_3
+        76: iconst_m1
+        77: iload         4
+        79: invokevirtual #594                // Method net/minecraft/core/BlockPos.m_7918_:(III)Lnet/minecraft/core/BlockPos;
+        82: astore        5
+        84: aload_0
+        85: aload         5
+        87: invokevirtual #548                // Method net/minecraft/server/level/ServerLevel.m_8055_:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        90: aload_0
+        91: aload         5
+        93: invokevirtual #598                // Method net/minecraft/world/level/block/state/BlockState.m_60812_:(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/shapes/VoxelShape;
+        96: invokevirtual #603                // Method net/minecraft/world/phys/shapes/VoxelShape.m_83281_:()Z
+        99: ifeq          104
+       102: iconst_0
+       103: ireturn
+       104: iinc          4, 1
+       107: goto          68
+       110: iinc          3, 1
+       113: goto          60
+       116: iconst_1
+       117: ireturn
+
+  private static net.minecraft.core.BlockPos sitioVendedor(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, float, net.minecraft.util.RandomSource);
+    Code:
+         0: fload_2
+         1: ldc_w         #609                // float 0.017453292f
+         4: fmul
+         5: fstore        4
+         7: fload         4
+         9: invokestatic  #612                // Method net/minecraft/util/Mth.m_14089_:(F)F
+        12: invokestatic  #616                // Method lado:(F)I
+        15: istore        5
+        17: fload         4
+        19: invokestatic  #619                // Method net/minecraft/util/Mth.m_14031_:(F)F
+        22: invokestatic  #616                // Method lado:(F)I
+        25: istore        6
+        27: aload_3
+        28: invokeinterface #622,  1          // InterfaceMethod net/minecraft/util/RandomSource.m_188499_:()Z
+        33: istore        7
+        35: iconst_0
+        36: istore        8
+        38: iload         8
+        40: iconst_2
+        41: if_icmpge     181
+        44: iload         8
+        46: ifne          53
+        49: iconst_1
+        50: goto          54
+        53: iconst_0
+        54: iload         7
+        56: if_icmpne     63
+        59: iconst_1
+        60: goto          64
+        63: iconst_m1
+        64: istore        9
+        66: aload_0
+        67: aload_1
+        68: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+        71: iload         9
+        73: iload         5
+        75: imul
+        76: iadd
+        77: aload_1
+        78: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+        81: iload         9
+        83: iload         6
+        85: imul
+        86: iadd
+        87: aload_1
+        88: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+        91: iconst_1
+        92: isub
+        93: aload_1
+        94: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+        97: iconst_1
+        98: iadd
+        99: invokestatic  #476                // Method suelo:(Lnet/minecraft/server/level/ServerLevel;IIII)Lnet/minecraft/core/BlockPos;
+       102: astore        10
+       104: aload         10
+       106: ifnonnull     112
+       109: goto          175
+       112: new           #583                // class net/minecraft/world/phys/AABB
+       115: dup
+       116: aload         10
+       118: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+       121: i2d
+       122: aload         10
+       124: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+       127: i2d
+       128: aload         10
+       130: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+       133: i2d
+       134: aload         10
+       136: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+       139: iconst_1
+       140: iadd
+       141: i2d
+       142: aload         10
+       144: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+       147: iconst_3
+       148: iadd
+       149: i2d
+       150: aload         10
+       152: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+       155: iconst_1
+       156: iadd
+       157: i2d
+       158: invokespecial #586                // Method net/minecraft/world/phys/AABB."<init>":(DDDDDD)V
+       161: astore        11
+       163: aload_0
+       164: aload         11
+       166: invokestatic  #590                // Method libre:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/AABB;)Z
+       169: ifeq          175
+       172: aload         10
+       174: areturn
+       175: iinc          8, 1
+       178: goto          38
+       181: aconst_null
+       182: areturn
+
+  private static int lado(float);
+    Code:
+         0: fload_0
+         1: invokestatic  #631                // Method java/lang/Math.abs:(F)F
+         4: ldc_w         #632                // float 0.383f
+         7: fcmpg
+         8: ifge          13
+        11: iconst_0
+        12: ireturn
+        13: fload_0
+        14: fconst_0
+        15: fcmpl
+        16: ifle          23
+        19: iconst_2
+        20: goto          25
+        23: bipush        -2
+        25: ireturn
+
+  private static boolean libre(net.minecraft.server.level.ServerLevel, net.minecraft.world.phys.AABB);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokevirtual #636                // Method net/minecraft/server/level/ServerLevel.m_45772_:(Lnet/minecraft/world/phys/AABB;)Z
+         5: ifeq          37
+         8: aload_0
+         9: aload_1
+        10: invokevirtual #639                // Method net/minecraft/server/level/ServerLevel.m_46855_:(Lnet/minecraft/world/phys/AABB;)Z
+        13: ifne          37
+        16: aload_0
+        17: aconst_null
+        18: checkcast     #246                // class net/minecraft/world/entity/Entity
+        21: aload_1
+        22: invokevirtual #643                // Method net/minecraft/server/level/ServerLevel.m_45933_:(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;
+        25: invokeinterface #644,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+        30: ifeq          37
+        33: iconst_1
+        34: goto          38
+        37: iconst_0
+        38: ireturn
+
+  private static spmovesets.spmovesets.survival.vendedor.VendedorNocturno montar(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.core.BlockPos, float, boolean);
+    Code:
+         0: getstatic     #650                // Field spmovesets/spmovesets/entities/ModEntities.CARRO_VENDEDOR:Lnet/minecraftforge/registries/RegistryObject;
+         3: invokevirtual #653                // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+         6: checkcast     #655                // class net/minecraft/world/entity/EntityType
+         9: aload_0
+        10: invokevirtual #659                // Method net/minecraft/world/entity/EntityType.m_20615_:(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;
+        13: checkcast     #661                // class spmovesets/spmovesets/survival/vendedor/CarroVendedor
+        16: astore        5
+        18: getstatic     #664                // Field spmovesets/spmovesets/entities/ModEntities.VENDEDOR_NOCTURNO:Lnet/minecraftforge/registries/RegistryObject;
+        21: invokevirtual #653                // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        24: checkcast     #655                // class net/minecraft/world/entity/EntityType
+        27: aload_0
+        28: invokevirtual #659                // Method net/minecraft/world/entity/EntityType.m_20615_:(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;
+        31: checkcast     #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        34: astore        6
+        36: aload         5
+        38: ifnull        46
+        41: aload         6
+        43: ifnonnull     48
+        46: aconst_null
+        47: areturn
+        48: aload         5
+        50: aload         6
+        52: invokevirtual #667                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_20148_:()Ljava/util/UUID;
+        55: fload_3
+        56: invokevirtual #671                // Method spmovesets/spmovesets/survival/vendedor/CarroVendedor.preparar:(Ljava/util/UUID;F)V
+        59: aload         6
+        61: aload_2
+        62: fload_3
+        63: aload         5
+        65: invokevirtual #672                // Method spmovesets/spmovesets/survival/vendedor/CarroVendedor.m_20148_:()Ljava/util/UUID;
+        68: invokevirtual #675                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.preparar:(Lnet/minecraft/core/BlockPos;FLjava/util/UUID;)V
+        71: aload         5
+        73: aload_1
+        74: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+        77: i2d
+        78: ldc2_w        #456                // double 0.5d
+        81: dadd
+        82: aload_1
+        83: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+        86: i2d
+        87: aload_1
+        88: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+        91: i2d
+        92: ldc2_w        #456                // double 0.5d
+        95: dadd
+        96: fload_3
+        97: fconst_0
+        98: invokevirtual #679                // Method spmovesets/spmovesets/survival/vendedor/CarroVendedor.m_7678_:(DDDFF)V
+       101: aload         6
+       103: aload_2
+       104: invokevirtual #451                // Method net/minecraft/core/BlockPos.m_123341_:()I
+       107: i2d
+       108: ldc2_w        #456                // double 0.5d
+       111: dadd
+       112: aload_2
+       113: invokevirtual #472                // Method net/minecraft/core/BlockPos.m_123342_:()I
+       116: i2d
+       117: aload_2
+       118: invokevirtual #466                // Method net/minecraft/core/BlockPos.m_123343_:()I
+       121: i2d
+       122: ldc2_w        #456                // double 0.5d
+       125: dadd
+       126: fload_3
+       127: fconst_0
+       128: invokevirtual #680                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_7678_:(DDDFF)V
+       131: aload         6
+       133: fload_3
+       134: invokevirtual #684                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_5618_:(F)V
+       137: aload         6
+       139: fload_3
+       140: invokevirtual #687                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_5616_:(F)V
+       143: aload_0
+       144: aload         5
+       146: invokevirtual #691                // Method net/minecraft/server/level/ServerLevel.m_7967_:(Lnet/minecraft/world/entity/Entity;)Z
+       149: ifne          154
+       152: aconst_null
+       153: areturn
+       154: aload_0
+       155: aload         6
+       157: invokevirtual #691                // Method net/minecraft/server/level/ServerLevel.m_7967_:(Lnet/minecraft/world/entity/Entity;)Z
+       160: ifne          170
+       163: aload         5
+       165: invokevirtual #694                // Method spmovesets/spmovesets/survival/vendedor/CarroVendedor.quitar:()V
+       168: aconst_null
+       169: areturn
+       170: aload_0
+       171: invokevirtual #436                // Method net/minecraft/server/level/ServerLevel.m_7654_:()Lnet/minecraft/server/MinecraftServer;
+       174: invokestatic  #148                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.get:(Lnet/minecraft/server/MinecraftServer;)Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;
+       177: astore        7
+       179: aload         7
+       181: invokevirtual #313                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.visitaCortada:()Z
+       184: istore        8
+       186: aload         7
+       188: aload         6
+       190: invokevirtual #667                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_20148_:()Ljava/util/UUID;
+       193: invokevirtual #697                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.activar:(Ljava/util/UUID;)V
+       196: iload         8
+       198: ifeq          219
+       201: aload         6
+       203: aload         7
+       205: invokevirtual #701                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.tratosDeLaVisita:()Lnet/minecraft/world/item/trading/MerchantOffers;
+       208: aload         7
+       210: invokevirtual #705                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.compradoresDeLaVisita:()Ljava/util/Set;
+       213: invokevirtual #709                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.reanudar:(Lnet/minecraft/world/item/trading/MerchantOffers;Ljava/util/Set;)V
+       216: goto          229
+       219: aload         7
+       221: aload         7
+       223: invokevirtual #186                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.nocheActual:()J
+       226: invokevirtual #713                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.empezarVisita:(J)V
+       229: aload_0
+       230: aload         6
+       232: invokestatic  #250                // Method sujetarPuesto:(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)V
+       235: iload         4
+       237: ifeq          246
+       240: aload_0
+       241: aload         6
+       243: invokestatic  #716                // Method anunciar:(Lnet/minecraft/server/level/ServerLevel;Lspmovesets/spmovesets/survival/vendedor/VendedorNocturno;)V
+       246: aload         6
+       248: areturn
+
+  private static void anunciar(net.minecraft.server.level.ServerLevel, spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+    Code:
+         0: ldc_w         #722                // String spmovesets.vendedor.llega
+         3: iconst_1
+         4: anewarray     #4                  // class java/lang/Object
+         7: dup
+         8: iconst_0
+         9: aload_1
+        10: invokevirtual #726                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_5446_:()Lnet/minecraft/network/chat/Component;
+        13: aastore
+        14: invokestatic  #732                // InterfaceMethod net/minecraft/network/chat/Component.m_237110_:(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;
+        17: iconst_2
+        18: anewarray     #734                // class net/minecraft/ChatFormatting
+        21: dup
+        22: iconst_0
+        23: getstatic     #738                // Field net/minecraft/ChatFormatting.GOLD:Lnet/minecraft/ChatFormatting;
+        26: aastore
+        27: dup
+        28: iconst_1
+        29: getstatic     #741                // Field net/minecraft/ChatFormatting.ITALIC:Lnet/minecraft/ChatFormatting;
+        32: aastore
+        33: invokevirtual #747                // Method net/minecraft/network/chat/MutableComponent.m_130944_:([Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+        36: astore_2
+        37: ldc2_w        #748                // double 9216.0d
+        40: dstore_3
+        41: aload_0
+        42: invokevirtual #323                // Method net/minecraft/server/level/ServerLevel.m_6907_:()Ljava/util/List;
+        45: invokeinterface #329,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        50: astore        5
+        52: aload         5
+        54: invokeinterface #334,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        59: ifeq          118
+        62: aload         5
+        64: invokeinterface #338,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        69: checkcast     #340                // class net/minecraft/server/level/ServerPlayer
+        72: astore        6
+        74: aload         6
+        76: aload_1
+        77: invokevirtual #753                // Method net/minecraft/server/level/ServerPlayer.m_20280_:(Lnet/minecraft/world/entity/Entity;)D
+        80: dload_3
+        81: dcmpl
+        82: ifle          88
+        85: goto          52
+        88: aload         6
+        90: getstatic     #758                // Field spmovesets/spmovesets/sonidos/RegistrarSonidos.VENDEDOR_LLEGA:Lnet/minecraftforge/registries/RegistryObject;
+        93: invokevirtual #653                // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        96: checkcast     #760                // class net/minecraft/sounds/SoundEvent
+        99: getstatic     #766                // Field net/minecraft/sounds/SoundSource.NEUTRAL:Lnet/minecraft/sounds/SoundSource;
+       102: ldc_w         #767                // float 0.8f
+       105: fconst_1
+       106: invokevirtual #771                // Method net/minecraft/server/level/ServerPlayer.m_6330_:(Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V
+       109: aload         6
+       111: aload_2
+       112: invokevirtual #775                // Method net/minecraft/server/level/ServerPlayer.m_213846_:(Lnet/minecraft/network/chat/Component;)V
+       115: goto          52
+       118: return
+
+  public static spmovesets.spmovesets.survival.vendedor.VendedorNocturno vendedorActivo(net.minecraft.server.MinecraftServer);
+    Code:
+         0: aload_0
+         1: invokestatic  #148                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.get:(Lnet/minecraft/server/MinecraftServer;)Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;
+         4: invokevirtual #225                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.activo:()Ljava/util/UUID;
+         7: astore_1
+         8: aload_1
+         9: ifnonnull     14
+        12: aconst_null
+        13: areturn
+        14: aload_0
+        15: invokevirtual #142                // Method net/minecraft/server/MinecraftServer.m_129783_:()Lnet/minecraft/server/level/ServerLevel;
+        18: aload_1
+        19: invokevirtual #237                // Method net/minecraft/server/level/ServerLevel.m_8791_:(Ljava/util/UUID;)Lnet/minecraft/world/entity/Entity;
+        22: astore_3
+        23: aload_3
+        24: instanceof    #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        27: ifeq          46
+        30: aload_3
+        31: checkcast     #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        34: astore_2
+        35: aload_2
+        36: invokevirtual #783                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_6084_:()Z
+        39: ifeq          46
+        42: aload_2
+        43: goto          47
+        46: aconst_null
+        47: areturn
+
+  public static void onVendedorGolpeado(net.minecraftforge.event.entity.player.AttackEntityEvent);
+    Code:
+         0: aload_0
+         1: invokevirtual #795                // Method net/minecraftforge/event/entity/player/AttackEntityEvent.getEntity:()Lnet/minecraft/world/entity/player/Player;
+         4: astore_3
+         5: aload_3
+         6: instanceof    #340                // class net/minecraft/server/level/ServerPlayer
+         9: ifeq          49
+        12: aload_3
+        13: checkcast     #340                // class net/minecraft/server/level/ServerPlayer
+        16: astore_1
+        17: aload_0
+        18: invokevirtual #799                // Method net/minecraftforge/event/entity/player/AttackEntityEvent.getTarget:()Lnet/minecraft/world/entity/Entity;
+        21: astore_3
+        22: aload_3
+        23: instanceof    #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        26: ifeq          49
+        29: aload_3
+        30: checkcast     #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        33: astore_2
+        34: aload_2
+        35: invokevirtual #803                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.m_9236_:()Lnet/minecraft/world/level/Level;
+        38: getfield      #806                // Field net/minecraft/world/level/Level.f_46443_:Z
+        41: ifne          49
+        44: aload_2
+        45: aload_1
+        46: invokevirtual #810                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.ofender:(Lnet/minecraft/server/level/ServerPlayer;)V
+        49: return
+
+  public static void onModeChanged(spmovesets.spmovesets.survival.WorldModeChangedEvent);
+    Code:
+         0: aload_0
+         1: invokevirtual #819                // Method spmovesets/spmovesets/survival/WorldModeChangedEvent.getNewMode:()Lspmovesets/spmovesets/survival/WorldMode;
+         4: getstatic     #825                // Field spmovesets/spmovesets/survival/WorldMode.SERVER:Lspmovesets/spmovesets/survival/WorldMode;
+         7: if_acmpeq     11
+        10: return
+        11: aload_0
+        12: invokevirtual #826                // Method spmovesets/spmovesets/survival/WorldModeChangedEvent.getServer:()Lnet/minecraft/server/MinecraftServer;
+        15: invokestatic  #830                // Method esfumarTodos:(Lnet/minecraft/server/MinecraftServer;)I
+        18: pop
+        19: return
+
+  public static int esfumarTodos(net.minecraft.server.MinecraftServer);
+    Code:
+         0: iconst_0
+         1: istore_1
+         2: aload_0
+         3: invokevirtual #835                // Method net/minecraft/server/MinecraftServer.m_129785_:()Ljava/lang/Iterable;
+         6: invokeinterface #838,  1          // InterfaceMethod java/lang/Iterable.iterator:()Ljava/util/Iterator;
+        11: astore_2
+        12: aload_2
+        13: invokeinterface #334,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        18: ifeq          147
+        21: aload_2
+        22: invokeinterface #338,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        27: checkcast     #161                // class net/minecraft/server/level/ServerLevel
+        30: astore_3
+        31: aload_3
+        32: getstatic     #664                // Field spmovesets/spmovesets/entities/ModEntities.VENDEDOR_NOCTURNO:Lnet/minecraftforge/registries/RegistryObject;
+        35: invokevirtual #653                // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        38: checkcast     #840                // class net/minecraft/world/level/entity/EntityTypeTest
+        41: invokedynamic #847,  0            // InvokeDynamic #1:test:()Ljava/util/function/Predicate;
+        46: invokevirtual #851                // Method net/minecraft/server/level/ServerLevel.m_143280_:(Lnet/minecraft/world/level/entity/EntityTypeTest;Ljava/util/function/Predicate;)Ljava/util/List;
+        49: invokeinterface #329,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        54: astore        4
+        56: aload         4
+        58: invokeinterface #334,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        63: ifeq          89
+        66: aload         4
+        68: invokeinterface #338,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        73: checkcast     #25                 // class spmovesets/spmovesets/survival/vendedor/VendedorNocturno
+        76: astore        5
+        78: aload         5
+        80: invokevirtual #244                // Method spmovesets/spmovesets/survival/vendedor/VendedorNocturno.esfumar:()V
+        83: iinc          1, 1
+        86: goto          56
+        89: aload_3
+        90: getstatic     #650                // Field spmovesets/spmovesets/entities/ModEntities.CARRO_VENDEDOR:Lnet/minecraftforge/registries/RegistryObject;
+        93: invokevirtual #653                // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        96: checkcast     #840                // class net/minecraft/world/level/entity/EntityTypeTest
+        99: invokedynamic #858,  0            // InvokeDynamic #2:test:()Ljava/util/function/Predicate;
+       104: invokevirtual #851                // Method net/minecraft/server/level/ServerLevel.m_143280_:(Lnet/minecraft/world/level/entity/EntityTypeTest;Ljava/util/function/Predicate;)Ljava/util/List;
+       107: invokeinterface #329,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+       112: astore        4
+       114: aload         4
+       116: invokeinterface #334,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       121: ifeq          144
+       124: aload         4
+       126: invokeinterface #338,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       131: checkcast     #661                // class spmovesets/spmovesets/survival/vendedor/CarroVendedor
+       134: astore        5
+       136: aload         5
+       138: invokevirtual #694                // Method spmovesets/spmovesets/survival/vendedor/CarroVendedor.quitar:()V
+       141: goto          114
+       144: goto          12
+       147: aload_0
+       148: invokestatic  #148                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.get:(Lnet/minecraft/server/MinecraftServer;)Lspmovesets/spmovesets/survival/vendedor/VendedorDatos;
+       151: astore_2
+       152: aload_2
+       153: invokevirtual #225                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.activo:()Ljava/util/UUID;
+       156: astore_3
+       157: aload_3
+       158: ifnull        166
+       161: aload_2
+       162: aload_3
+       163: invokevirtual #259                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.olvidar:(Ljava/util/UUID;)V
+       166: aload_2
+       167: invokevirtual #861                // Method spmovesets/spmovesets/survival/vendedor/VendedorDatos.acabarVisita:()V
+       170: iload_1
+       171: ireturn
+
+  private static boolean lambda$esfumarTodos$2(spmovesets.spmovesets.survival.vendedor.CarroVendedor);
+    Code:
+         0: iconst_1
+         1: ireturn
+
+  private static boolean lambda$esfumarTodos$1(spmovesets.spmovesets.survival.vendedor.VendedorNocturno);
+    Code:
+         0: iconst_1
+         1: ireturn
+
+  private static boolean lambda$buscarCampana$0(net.minecraft.core.Holder);
+    Code:
+         0: aload_0
+         1: getstatic     #869                // Field net/minecraft/world/entity/ai/village/poi/PoiTypes.f_218061_:Lnet/minecraft/resources/ResourceKey;
+         4: invokeinterface #875,  2          // InterfaceMethod net/minecraft/core/Holder.m_203565_:(Lnet/minecraft/resources/ResourceKey;)Z
+         9: ireturn
+
+  static {};
+    Code:
+         0: ldc_w         #880                // String spmovesets_vendedor
+         3: invokedynamic #894,  0            // InvokeDynamic #3:applyAsLong:()Ljava/util/function/ToLongFunction;
+         8: invokestatic  #900                // InterfaceMethod java/util/Comparator.comparingLong:(Ljava/util/function/ToLongFunction;)Ljava/util/Comparator;
+        11: bipush        100
+        13: invokestatic  #906                // Method net/minecraft/server/level/TicketType.m_9465_:(Ljava/lang/String;Ljava/util/Comparator;I)Lnet/minecraft/server/level/TicketType;
+        16: putstatic     #301                // Field TICKET:Lnet/minecraft/server/level/TicketType;
+        19: return
+}
+######## spmovesets/spmovesets/survival/vendedor/VendedorDatos.class
+Compiled from "VendedorDatos.java"
+public final class spmovesets.spmovesets.survival.vendedor.VendedorDatos extends net.minecraft.world.level.saveddata.SavedData {
+  public static final java.lang.String NAME;
+
+  private int probabilidad;
+
+  private int nochesCastigo;
+
+  private long nocheActual;
+
+  private boolean eraDeNoche;
+
+  private long nocheTirada;
+
+  private boolean tiradaGanada;
+
+  private java.util.UUID activo;
+
+  private long visitaNoche;
+
+  private net.minecraft.nbt.CompoundTag visitaTratos;
+
+  private final java.util.Set<java.util.UUID> visitaCompradores;
+
+  long perdidoDesde;
+
+  public spmovesets.spmovesets.survival.vendedor.VendedorDatos();
+    Code:
+         0: aload_0
+         1: invokespecial #37                 // Method net/minecraft/world/level/saveddata/SavedData."<init>":()V
+         4: aload_0
+         5: bipush        20
+         7: putfield      #39                 // Field probabilidad:I
+        10: aload_0
+        11: ldc2_w        #40                 // long -1l
+        14: putfield      #43                 // Field nocheTirada:J
+        17: aload_0
+        18: ldc2_w        #40                 // long -1l
+        21: putfield      #45                 // Field visitaNoche:J
+        24: aload_0
+        25: new           #47                 // class java/util/HashSet
+        28: dup
+        29: invokespecial #48                 // Method java/util/HashSet."<init>":()V
+        32: putfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+        35: aload_0
+        36: ldc2_w        #40                 // long -1l
+        39: putfield      #52                 // Field perdidoDesde:J
+        42: return
+
+  public static spmovesets.spmovesets.survival.vendedor.VendedorDatos get(net.minecraft.server.MinecraftServer);
+    Code:
+         0: aload_0
+         1: invokevirtual #62                 // Method net/minecraft/server/MinecraftServer.m_129783_:()Lnet/minecraft/server/level/ServerLevel;
+         4: invokevirtual #68                 // Method net/minecraft/server/level/ServerLevel.m_8895_:()Lnet/minecraft/world/level/storage/DimensionDataStorage;
+         7: invokedynamic #87,  0             // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+        12: invokedynamic #96,  0             // InvokeDynamic #1:get:()Ljava/util/function/Supplier;
+        17: ldc           #14                 // String spmovesets_vendedor
+        19: invokevirtual #102                // Method net/minecraft/world/level/storage/DimensionDataStorage.m_164861_:(Ljava/util/function/Function;Ljava/util/function/Supplier;Ljava/lang/String;)Lnet/minecraft/world/level/saveddata/SavedData;
+        22: checkcast     #2                  // class spmovesets/spmovesets/survival/vendedor/VendedorDatos
+        25: areturn
+
+  public int probabilidad();
+    Code:
+         0: aload_0
+         1: getfield      #39                 // Field probabilidad:I
+         4: ireturn
+
+  public void ponerProbabilidad(int);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: iconst_0
+         3: bipush        100
+         5: invokestatic  #113                // Method net/minecraft/util/Mth.m_14045_:(III)I
+         8: putfield      #39                 // Field probabilidad:I
+        11: aload_0
+        12: invokevirtual #116                // Method m_77762_:()V
+        15: return
+
+  public java.util.UUID activo();
+    Code:
+         0: aload_0
+         1: getfield      #120                // Field activo:Ljava/util/UUID;
+         4: areturn
+
+  public void activar(java.util.UUID);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: putfield      #120                // Field activo:Ljava/util/UUID;
+         5: aload_0
+         6: ldc2_w        #40                 // long -1l
+         9: putfield      #52                 // Field perdidoDesde:J
+        12: aload_0
+        13: invokevirtual #116                // Method m_77762_:()V
+        16: return
+
+  public void olvidar(java.util.UUID);
+    Code:
+         0: aload_1
+         1: ifnull        15
+         4: aload_1
+         5: aload_0
+         6: getfield      #120                // Field activo:Ljava/util/UUID;
+         9: invokevirtual #130                // Method java/util/UUID.equals:(Ljava/lang/Object;)Z
+        12: ifne          16
+        15: return
+        16: aload_0
+        17: aconst_null
+        18: putfield      #120                // Field activo:Ljava/util/UUID;
+        21: aload_0
+        22: ldc2_w        #40                 // long -1l
+        25: putfield      #52                 // Field perdidoDesde:J
+        28: aload_0
+        29: invokevirtual #116                // Method m_77762_:()V
+        32: return
+
+  public void empezarVisita(long);
+    Code:
+         0: aload_0
+         1: lload_1
+         2: putfield      #45                 // Field visitaNoche:J
+         5: aload_0
+         6: aconst_null
+         7: putfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+        10: aload_0
+        11: getfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+        14: invokeinterface #139,  1          // InterfaceMethod java/util/Set.clear:()V
+        19: aload_0
+        20: invokevirtual #116                // Method m_77762_:()V
+        23: return
+
+  public void apuntarTratos(net.minecraft.world.item.trading.MerchantOffers);
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field visitaNoche:J
+         4: lconst_0
+         5: lcmp
+         6: ifge          10
+         9: return
+        10: aload_0
+        11: aload_1
+        12: invokevirtual #148                // Method net/minecraft/world/item/trading/MerchantOffers.m_45388_:()Lnet/minecraft/nbt/CompoundTag;
+        15: putfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+        18: aload_0
+        19: invokevirtual #116                // Method m_77762_:()V
+        22: return
+
+  public void apuntarComprador(java.util.UUID);
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field visitaNoche:J
+         4: lconst_0
+         5: lcmp
+         6: iflt          26
+         9: aload_0
+        10: getfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+        13: aload_1
+        14: invokeinterface #154,  2          // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+        19: ifeq          26
+        22: aload_0
+        23: invokevirtual #116                // Method m_77762_:()V
+        26: return
+
+  public void acabarVisita();
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field visitaNoche:J
+         4: lconst_0
+         5: lcmp
+         6: ifge          29
+         9: aload_0
+        10: getfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+        13: ifnonnull     29
+        16: aload_0
+        17: getfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+        20: invokeinterface #160,  1          // InterfaceMethod java/util/Set.isEmpty:()Z
+        25: ifeq          29
+        28: return
+        29: aload_0
+        30: ldc2_w        #40                 // long -1l
+        33: putfield      #45                 // Field visitaNoche:J
+        36: aload_0
+        37: aconst_null
+        38: putfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+        41: aload_0
+        42: getfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+        45: invokeinterface #139,  1          // InterfaceMethod java/util/Set.clear:()V
+        50: aload_0
+        51: invokevirtual #116                // Method m_77762_:()V
+        54: return
+
+  public boolean visitaCortada();
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field visitaNoche:J
+         4: lconst_0
+         5: lcmp
+         6: iflt          32
+         9: aload_0
+        10: getfield      #45                 // Field visitaNoche:J
+        13: aload_0
+        14: getfield      #163                // Field nocheActual:J
+        17: lcmp
+        18: ifne          32
+        21: aload_0
+        22: getfield      #120                // Field activo:Ljava/util/UUID;
+        25: ifnonnull     32
+        28: iconst_1
+        29: goto          33
+        32: iconst_0
+        33: ireturn
+
+  public net.minecraft.world.item.trading.MerchantOffers tratosDeLaVisita();
+    Code:
+         0: aload_0
+         1: getfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+         4: ifnonnull     11
+         7: aconst_null
+         8: goto          25
+        11: new           #144                // class net/minecraft/world/item/trading/MerchantOffers
+        14: dup
+        15: aload_0
+        16: getfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+        19: invokevirtual #170                // Method net/minecraft/nbt/CompoundTag.m_6426_:()Lnet/minecraft/nbt/CompoundTag;
+        22: invokespecial #173                // Method net/minecraft/world/item/trading/MerchantOffers."<init>":(Lnet/minecraft/nbt/CompoundTag;)V
+        25: areturn
+
+  public java.util.Set<java.util.UUID> compradoresDeLaVisita();
+    Code:
+         0: aload_0
+         1: getfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+         4: invokestatic  #182                // Method java/util/Collections.unmodifiableSet:(Ljava/util/Set;)Ljava/util/Set;
+         7: areturn
+
+  public int nochesCastigo();
+    Code:
+         0: aload_0
+         1: getfield      #184                // Field nochesCastigo:I
+         4: ireturn
+
+  public void castigar(int);
+    Code:
+         0: aload_0
+         1: aload_0
+         2: getfield      #184                // Field nochesCastigo:I
+         5: iconst_0
+         6: iload_1
+         7: invokestatic  #191                // Method java/lang/Math.max:(II)I
+        10: invokestatic  #191                // Method java/lang/Math.max:(II)I
+        13: putfield      #184                // Field nochesCastigo:I
+        16: aload_0
+        17: invokevirtual #116                // Method m_77762_:()V
+        20: return
+
+  public void perdonar();
+    Code:
+         0: aload_0
+         1: getfield      #184                // Field nochesCastigo:I
+         4: ifle          33
+         7: aload_0
+         8: getfield      #43                 // Field nocheTirada:J
+        11: aload_0
+        12: getfield      #163                // Field nocheActual:J
+        15: lcmp
+        16: ifne          33
+        19: aload_0
+        20: getfield      #195                // Field tiradaGanada:Z
+        23: ifne          33
+        26: aload_0
+        27: ldc2_w        #40                 // long -1l
+        30: putfield      #43                 // Field nocheTirada:J
+        33: aload_0
+        34: iconst_0
+        35: putfield      #184                // Field nochesCastigo:I
+        38: aload_0
+        39: invokevirtual #116                // Method m_77762_:()V
+        42: return
+
+  public long nocheActual();
+    Code:
+         0: aload_0
+         1: getfield      #163                // Field nocheActual:J
+         4: lreturn
+
+  public boolean eraDeNoche();
+    Code:
+         0: aload_0
+         1: getfield      #198                // Field eraDeNoche:Z
+         4: ireturn
+
+  public void ponerEraDeNoche(boolean);
+    Code:
+         0: aload_0
+         1: getfield      #198                // Field eraDeNoche:Z
+         4: iload_1
+         5: if_icmpne     9
+         8: return
+         9: aload_0
+        10: iload_1
+        11: putfield      #198                // Field eraDeNoche:Z
+        14: aload_0
+        15: invokevirtual #116                // Method m_77762_:()V
+        18: return
+
+  public long nocheTirada();
+    Code:
+         0: aload_0
+         1: getfield      #43                 // Field nocheTirada:J
+         4: lreturn
+
+  public boolean tiradaGanada();
+    Code:
+         0: aload_0
+         1: getfield      #195                // Field tiradaGanada:Z
+         4: ireturn
+
+  public void tirar(long, boolean);
+    Code:
+         0: aload_0
+         1: lload_1
+         2: putfield      #43                 // Field nocheTirada:J
+         5: aload_0
+         6: iload_3
+         7: putfield      #195                // Field tiradaGanada:Z
+        10: aload_0
+        11: invokevirtual #116                // Method m_77762_:()V
+        14: return
+
+  public void nuevaNoche();
+    Code:
+         0: aload_0
+         1: dup
+         2: getfield      #163                // Field nocheActual:J
+         5: lconst_1
+         6: ladd
+         7: putfield      #163                // Field nocheActual:J
+        10: aload_0
+        11: getfield      #184                // Field nochesCastigo:I
+        14: ifle          27
+        17: aload_0
+        18: dup
+        19: getfield      #184                // Field nochesCastigo:I
+        22: iconst_1
+        23: isub
+        24: putfield      #184                // Field nochesCastigo:I
+        27: aload_0
+        28: invokevirtual #116                // Method m_77762_:()V
+        31: return
+
+  public static spmovesets.spmovesets.survival.vendedor.VendedorDatos load(net.minecraft.nbt.CompoundTag);
+    Code:
+         0: new           #2                  // class spmovesets/spmovesets/survival/vendedor/VendedorDatos
+         3: dup
+         4: invokespecial #90                 // Method "<init>":()V
+         7: astore_1
+         8: aload_0
+         9: ldc           #207                // String Probabilidad
+        11: invokevirtual #211                // Method net/minecraft/nbt/CompoundTag.m_128441_:(Ljava/lang/String;)Z
+        14: ifeq          33
+        17: aload_1
+        18: aload_0
+        19: ldc           #207                // String Probabilidad
+        21: invokevirtual #215                // Method net/minecraft/nbt/CompoundTag.m_128451_:(Ljava/lang/String;)I
+        24: iconst_0
+        25: bipush        100
+        27: invokestatic  #113                // Method net/minecraft/util/Mth.m_14045_:(III)I
+        30: putfield      #39                 // Field probabilidad:I
+        33: aload_1
+        34: iconst_0
+        35: aload_0
+        36: ldc           #217                // String Castigo
+        38: invokevirtual #215                // Method net/minecraft/nbt/CompoundTag.m_128451_:(Ljava/lang/String;)I
+        41: invokestatic  #191                // Method java/lang/Math.max:(II)I
+        44: putfield      #184                // Field nochesCastigo:I
+        47: aload_1
+        48: aload_0
+        49: ldc           #219                // String Noche
+        51: invokevirtual #223                // Method net/minecraft/nbt/CompoundTag.m_128454_:(Ljava/lang/String;)J
+        54: putfield      #163                // Field nocheActual:J
+        57: aload_1
+        58: aload_0
+        59: ldc           #225                // String EraDeNoche
+        61: invokevirtual #228                // Method net/minecraft/nbt/CompoundTag.m_128471_:(Ljava/lang/String;)Z
+        64: putfield      #198                // Field eraDeNoche:Z
+        67: aload_1
+        68: aload_0
+        69: ldc           #230                // String NocheTirada
+        71: invokevirtual #211                // Method net/minecraft/nbt/CompoundTag.m_128441_:(Ljava/lang/String;)Z
+        74: ifeq          86
+        77: aload_0
+        78: ldc           #230                // String NocheTirada
+        80: invokevirtual #223                // Method net/minecraft/nbt/CompoundTag.m_128454_:(Ljava/lang/String;)J
+        83: goto          89
+        86: ldc2_w        #40                 // long -1l
+        89: putfield      #43                 // Field nocheTirada:J
+        92: aload_1
+        93: aload_0
+        94: ldc           #232                // String TiradaGanada
+        96: invokevirtual #228                // Method net/minecraft/nbt/CompoundTag.m_128471_:(Ljava/lang/String;)Z
+        99: putfield      #195                // Field tiradaGanada:Z
+       102: aload_0
+       103: ldc           #234                // String Visita
+       105: bipush        10
+       107: invokevirtual #238                // Method net/minecraft/nbt/CompoundTag.m_128425_:(Ljava/lang/String;I)Z
+       110: ifeq          201
+       113: aload_0
+       114: ldc           #234                // String Visita
+       116: invokevirtual #242                // Method net/minecraft/nbt/CompoundTag.m_128469_:(Ljava/lang/String;)Lnet/minecraft/nbt/CompoundTag;
+       119: astore_2
+       120: aload_1
+       121: aload_2
+       122: ldc           #219                // String Noche
+       124: invokevirtual #223                // Method net/minecraft/nbt/CompoundTag.m_128454_:(Ljava/lang/String;)J
+       127: putfield      #45                 // Field visitaNoche:J
+       130: aload_2
+       131: ldc           #244                // String Tratos
+       133: bipush        10
+       135: invokevirtual #238                // Method net/minecraft/nbt/CompoundTag.m_128425_:(Ljava/lang/String;I)Z
+       138: ifeq          151
+       141: aload_1
+       142: aload_2
+       143: ldc           #244                // String Tratos
+       145: invokevirtual #242                // Method net/minecraft/nbt/CompoundTag.m_128469_:(Ljava/lang/String;)Lnet/minecraft/nbt/CompoundTag;
+       148: putfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+       151: aload_2
+       152: ldc           #246                // String Compradores
+       154: bipush        11
+       156: invokevirtual #250                // Method net/minecraft/nbt/CompoundTag.m_128437_:(Ljava/lang/String;I)Lnet/minecraft/nbt/ListTag;
+       159: invokevirtual #256                // Method net/minecraft/nbt/ListTag.iterator:()Ljava/util/Iterator;
+       162: astore_3
+       163: aload_3
+       164: invokeinterface #261,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       169: ifeq          201
+       172: aload_3
+       173: invokeinterface #264,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       178: checkcast     #266                // class net/minecraft/nbt/Tag
+       181: astore        4
+       183: aload_1
+       184: getfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+       187: aload         4
+       189: invokestatic  #272                // Method net/minecraft/nbt/NbtUtils.m_129233_:(Lnet/minecraft/nbt/Tag;)Ljava/util/UUID;
+       192: invokeinterface #154,  2          // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+       197: pop
+       198: goto          163
+       201: aload_1
+       202: areturn
+
+  public net.minecraft.nbt.CompoundTag m_7176_(net.minecraft.nbt.CompoundTag);
+    Code:
+         0: aload_1
+         1: ldc           #207                // String Probabilidad
+         3: aload_0
+         4: getfield      #39                 // Field probabilidad:I
+         7: invokevirtual #283                // Method net/minecraft/nbt/CompoundTag.m_128405_:(Ljava/lang/String;I)V
+        10: aload_1
+        11: ldc           #217                // String Castigo
+        13: aload_0
+        14: getfield      #184                // Field nochesCastigo:I
+        17: invokevirtual #283                // Method net/minecraft/nbt/CompoundTag.m_128405_:(Ljava/lang/String;I)V
+        20: aload_1
+        21: ldc           #219                // String Noche
+        23: aload_0
+        24: getfield      #163                // Field nocheActual:J
+        27: invokevirtual #287                // Method net/minecraft/nbt/CompoundTag.m_128356_:(Ljava/lang/String;J)V
+        30: aload_1
+        31: ldc           #225                // String EraDeNoche
+        33: aload_0
+        34: getfield      #198                // Field eraDeNoche:Z
+        37: invokevirtual #291                // Method net/minecraft/nbt/CompoundTag.m_128379_:(Ljava/lang/String;Z)V
+        40: aload_1
+        41: ldc           #230                // String NocheTirada
+        43: aload_0
+        44: getfield      #43                 // Field nocheTirada:J
+        47: invokevirtual #287                // Method net/minecraft/nbt/CompoundTag.m_128356_:(Ljava/lang/String;J)V
+        50: aload_1
+        51: ldc           #232                // String TiradaGanada
+        53: aload_0
+        54: getfield      #195                // Field tiradaGanada:Z
+        57: invokevirtual #291                // Method net/minecraft/nbt/CompoundTag.m_128379_:(Ljava/lang/String;Z)V
+        60: aload_0
+        61: getfield      #45                 // Field visitaNoche:J
+        64: lconst_0
+        65: lcmp
+        66: iflt          175
+        69: new           #167                // class net/minecraft/nbt/CompoundTag
+        72: dup
+        73: invokespecial #292                // Method net/minecraft/nbt/CompoundTag."<init>":()V
+        76: astore_2
+        77: aload_2
+        78: ldc           #219                // String Noche
+        80: aload_0
+        81: getfield      #45                 // Field visitaNoche:J
+        84: invokevirtual #287                // Method net/minecraft/nbt/CompoundTag.m_128356_:(Ljava/lang/String;J)V
+        87: aload_0
+        88: getfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+        91: ifnull        105
+        94: aload_2
+        95: ldc           #244                // String Tratos
+        97: aload_0
+        98: getfield      #134                // Field visitaTratos:Lnet/minecraft/nbt/CompoundTag;
+       101: invokevirtual #296                // Method net/minecraft/nbt/CompoundTag.m_128365_:(Ljava/lang/String;Lnet/minecraft/nbt/Tag;)Lnet/minecraft/nbt/Tag;
+       104: pop
+       105: new           #252                // class net/minecraft/nbt/ListTag
+       108: dup
+       109: invokespecial #297                // Method net/minecraft/nbt/ListTag."<init>":()V
+       112: astore_3
+       113: aload_0
+       114: getfield      #50                 // Field visitaCompradores:Ljava/util/Set;
+       117: invokeinterface #298,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+       122: astore        4
+       124: aload         4
+       126: invokeinterface #261,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       131: ifeq          159
+       134: aload         4
+       136: invokeinterface #264,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       141: checkcast     #126                // class java/util/UUID
+       144: astore        5
+       146: aload_3
+       147: aload         5
+       149: invokestatic  #302                // Method net/minecraft/nbt/NbtUtils.m_129226_:(Ljava/util/UUID;)Lnet/minecraft/nbt/IntArrayTag;
+       152: invokevirtual #303                // Method net/minecraft/nbt/ListTag.add:(Ljava/lang/Object;)Z
+       155: pop
+       156: goto          124
+       159: aload_2
+       160: ldc           #246                // String Compradores
+       162: aload_3
+       163: invokevirtual #296                // Method net/minecraft/nbt/CompoundTag.m_128365_:(Ljava/lang/String;Lnet/minecraft/nbt/Tag;)Lnet/minecraft/nbt/Tag;
+       166: pop
+       167: aload_1
+       168: ldc           #234                // String Visita
+       170: aload_2
+       171: invokevirtual #296                // Method net/minecraft/nbt/CompoundTag.m_128365_:(Ljava/lang/String;Lnet/minecraft/nbt/Tag;)Lnet/minecraft/nbt/Tag;
+       174: pop
+       175: aload_1
+       176: areturn
+}
+ArenaCatalog.class
+ElementMapItem.class
+ElementMapSearch$Job.class
+ElementMapSearch.class
+GachaHarvest.class
+PendingWorldMode.class
+SurvivalItems.class
+SurvivalManualBook$1.class
+SurvivalManualBook$Reader.class
+SurvivalManualBook$Wanted.class
+SurvivalManualBook.class
+SurvivalManualItem.class
+SurvivalMilestones.class
+SurvivalMode.class
+SurvivalNumbers$RuneChests.class
+SurvivalNumbers.class
+SurvivalProgress$Step.class
+SurvivalProgress.class
+SurvivalRegistries.class
+SurvivalServerConfig$Data.class
+SurvivalServerConfig.class
+WorldMode.class
+WorldModeBootstrap.class
+WorldModeChangedEvent.class
+WorldModeCommand.class
+WorldModeData.class
+WorldModePacket.class
+WorldModeSetPacket.class
+client
+loot
+recipe
+start
+vendedor
+world
+######## spmovesets/spmovesets/survival/WorldMode.class
+Compiled from "WorldMode.java"
+public final class spmovesets.spmovesets.survival.WorldMode extends java.lang.Enum<spmovesets.spmovesets.survival.WorldMode> {
+  public static final spmovesets.spmovesets.survival.WorldMode SERVER;
+  public static final spmovesets.spmovesets.survival.WorldMode SURVIVAL;
+  public final java.lang.String id;
+  private static final spmovesets.spmovesets.survival.WorldMode[] $VALUES;
+  public static spmovesets.spmovesets.survival.WorldMode[] values();
+  public static spmovesets.spmovesets.survival.WorldMode valueOf(java.lang.String);
+  private spmovesets.spmovesets.survival.WorldMode(java.lang.String);
+  public java.lang.String nameKey();
+  public static spmovesets.spmovesets.survival.WorldMode parse(java.lang.String, spmovesets.spmovesets.survival.WorldMode);
+  private static spmovesets.spmovesets.survival.WorldMode[] $values();
+  static {};
+}
+######## spmovesets/spmovesets/survival/WorldModeBootstrap.class
+Compiled from "WorldModeBootstrap.java"
+public final class spmovesets.spmovesets.survival.WorldModeBootstrap {
+  private static final org.slf4j.Logger LOG;
+  private static spmovesets.spmovesets.survival.WorldModeData decided;
+  private spmovesets.spmovesets.survival.WorldModeBootstrap();
+  public static void onAboutToStart(net.minecraftforge.event.server.ServerAboutToStartEvent);
+  public static spmovesets.spmovesets.survival.WorldModeData decideFirstTime(boolean, spmovesets.spmovesets.survival.WorldMode, java.util.function.Supplier<spmovesets.spmovesets.survival.WorldMode>);
+  private static void warnIfConfigDiffers(spmovesets.spmovesets.survival.WorldMode, spmovesets.spmovesets.survival.WorldMode);
+  public static void onStarted(net.minecraftforge.event.server.ServerStartedEvent);
+  public static void onStopped(net.minecraftforge.event.server.ServerStoppedEvent);
+  public static void onLogin(net.minecraftforge.event.entity.player.PlayerEvent$PlayerLoggedInEvent);
+  private static spmovesets.spmovesets.survival.WorldMode lambda$onAboutToStart$0(spmovesets.spmovesets.survival.WorldMode);
+  static {};
+}
+######## spmovesets/spmovesets/survival/WorldModeChangedEvent.class
+Compiled from "WorldModeChangedEvent.java"
+public class spmovesets.spmovesets.survival.WorldModeChangedEvent extends net.minecraftforge.eventbus.api.Event {
+  private final net.minecraft.server.MinecraftServer server;
+  private final spmovesets.spmovesets.survival.WorldMode oldMode;
+  private final spmovesets.spmovesets.survival.WorldMode newMode;
+  public spmovesets.spmovesets.survival.WorldModeChangedEvent(net.minecraft.server.MinecraftServer, spmovesets.spmovesets.survival.WorldMode, spmovesets.spmovesets.survival.WorldMode);
+  public net.minecraft.server.MinecraftServer getServer();
+  public spmovesets.spmovesets.survival.WorldMode getOldMode();
+  public spmovesets.spmovesets.survival.WorldMode getNewMode();
+}
+######## spmovesets/spmovesets/survival/WorldModeCommand.class
+Compiled from "WorldModeCommand.java"
+public final class spmovesets.spmovesets.survival.WorldModeCommand {
+  private spmovesets.spmovesets.survival.WorldModeCommand();
+  public static void onRegister(net.minecraftforge.event.RegisterCommandsEvent);
+  public static void register(com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.CommandSourceStack>);
+  private static int lambda$register$6(spmovesets.spmovesets.survival.WorldMode, com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;
+  private static net.minecraft.network.chat.Component lambda$register$5(spmovesets.spmovesets.survival.WorldMode);
+  private static int lambda$register$4(spmovesets.spmovesets.survival.WorldMode, com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;
+  private static net.minecraft.network.chat.Component lambda$register$3(spmovesets.spmovesets.survival.WorldMode);
+  private static boolean lambda$register$2(net.minecraft.commands.CommandSourceStack);
+  private static int lambda$register$1(com.mojang.brigadier.context.CommandContext) throws com.mojang.brigadier.exceptions.CommandSyntaxException;
+  private static net.minecraft.network.chat.Component lambda$register$0();
+}
+######## spmovesets/spmovesets/survival/WorldModeData.class
+Compiled from "WorldModeData.java"
+public final class spmovesets.spmovesets.survival.WorldModeData extends net.minecraft.world.level.saveddata.SavedData {
+  public static final java.lang.String NAME;
+  spmovesets.spmovesets.survival.WorldMode mode;
+  boolean noticePending;
+  public spmovesets.spmovesets.survival.WorldModeData();
+  public static spmovesets.spmovesets.survival.WorldModeData get(net.minecraft.server.MinecraftServer);
+  public spmovesets.spmovesets.survival.WorldMode mode();
+  public boolean noticePending();
+  public static spmovesets.spmovesets.survival.WorldModeData load(net.minecraft.nbt.CompoundTag);
+  public net.minecraft.nbt.CompoundTag m_7176_(net.minecraft.nbt.CompoundTag);
+  public void saveNow(net.minecraft.server.MinecraftServer);
+  private static java.nio.file.Path file(net.minecraft.server.MinecraftServer);
+  public static spmovesets.spmovesets.survival.WorldModeData readEarly(net.minecraft.server.MinecraftServer) throws java.io.IOException;
+}
+######## spmovesets/spmovesets/survival/WorldModePacket.class
+Compiled from "WorldModePacket.java"
+public final class spmovesets.spmovesets.survival.WorldModePacket extends java.lang.Record {
+  private final spmovesets.spmovesets.survival.WorldMode mode;
+  public spmovesets.spmovesets.survival.WorldModePacket(net.minecraft.network.FriendlyByteBuf);
+  public spmovesets.spmovesets.survival.WorldModePacket(spmovesets.spmovesets.survival.WorldMode);
+  public void encode(net.minecraft.network.FriendlyByteBuf);
+  public static void handle(spmovesets.spmovesets.survival.WorldModePacket, java.util.function.Supplier<net.minecraftforge.network.NetworkEvent$Context>);
+  public static void sendTo(net.minecraft.server.level.ServerPlayer, spmovesets.spmovesets.survival.WorldMode);
+  public static void sendToAll(spmovesets.spmovesets.survival.WorldMode);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public spmovesets.spmovesets.survival.WorldMode mode();
+  private static net.minecraft.server.level.ServerPlayer lambda$sendTo$1(net.minecraft.server.level.ServerPlayer);
+  private static void lambda$handle$0(spmovesets.spmovesets.survival.WorldModePacket);
+}
+######## spmovesets/spmovesets/survival/WorldModeSetPacket.class
+Compiled from "WorldModeSetPacket.java"
+public final class spmovesets.spmovesets.survival.WorldModeSetPacket extends java.lang.Record {
+  private final spmovesets.spmovesets.survival.WorldMode mode;
+  public spmovesets.spmovesets.survival.WorldModeSetPacket(net.minecraft.network.FriendlyByteBuf);
+  public spmovesets.spmovesets.survival.WorldModeSetPacket(spmovesets.spmovesets.survival.WorldMode);
+  public void encode(net.minecraft.network.FriendlyByteBuf);
+  public static void handle(spmovesets.spmovesets.survival.WorldModeSetPacket, java.util.function.Supplier<net.minecraftforge.network.NetworkEvent$Context>);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public spmovesets.spmovesets.survival.WorldMode mode();
+  private static void lambda$handle$0(java.util.function.Supplier, spmovesets.spmovesets.survival.WorldModeSetPacket);
+}
+== registry strings near EntityType
+-- ./spmovesets/spmovesets/entities/ModEntities.class
+this
+metafactory
+m_20721_
+m_20704_
+m_20699_
+m_20702_
+m_20717_
+m_20698_
+m_20716_
+m_20719_
+carro_vendedor
+m_20712_
+vendedor_nocturno
+training_dummy
+thrown_aro
+thrown_glacial
+thrown_lanza
+fire_tornado
+avalanche_ball
+choir_angel
+shadow_bats
+shadow_stand
+shadow_skeleton
+shadow_ram
+pyro_dragon
+ope_island
+ope_room
+cube_spell
+cubo_vacio
+ent_ancestral
+kitsune_copy
+pangolin_plate
+pangolin_sismico
+mantis_flower
+mantis_orquidea
+custodio_shard
+custodio_inmovil
+kitsune_wisp
+kitsune_niebla
+bufon_bomb
+bufon_pirotecnico
+taiko_spell
+void_spell
+monje_vacio
+storm_spell
+dragon_tormenta
+prision_huesos
+lich_spell
+leviathan_orb
+tejedora_estrellas
+leviatan
+ofanim
+seraph_lance
+serafin_caido
+ronin_echo
+hand_of_god
+ronin_bruma
+asura_wave
+asura_choque
+dama_ventisca
+ciervo_glacial
+salamandra_reina
+coloso_magma
+goofy_goblin
+spmovesets
+create
+get
+register
+-- ./spmovesets/spmovesets/Gacha/ModBlockEntities.class
+this
+metafactory
+get
+m_58966_
+spmovesets
+create
+gacha_block_entity
+register

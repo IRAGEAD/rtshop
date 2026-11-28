@@ -1,0 +1,202 @@
+jar: packcache/diorama-0.12.0-forge-1.20.1.jar
+classes: 564
+== mods.toml
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "MIT"
+issueTrackerURL = "https://github.com/SunkenInTime/minecraft-orthogonal-map/issues"
+
+[[mods]]
+modId = "diorama"
+version = "0.12.0+forge-1.20.1"
+displayName = "Diorama"
+description = "A ray-traced, angled voxel map and minimap."
+authors = "Dara Adedeji"
+displayURL = "https://modrinth.com/mod/diorama-map"
+logoFile = "assets/diorama/icon.png"
+# Optional on both sides: servers with or without it let the player in, players with or without it get in.
+displayTest = "IGNORE_ALL_VERSION"
+
+[[dependencies.diorama]]
+modId = "forge"
+mandatory = true
+versionRange = "[47.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.diorama]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1]"
+ordering = "NONE"
+side = "BOTH"
+== packages
+     90 dev/diorama
+     86 dev/diorama/render
+     62 dev/diorama/bake
+     59 dev/diorama/waypoint
+     46 dev/diorama/data
+     41 dev/diorama/api
+     32 dev/diorama/web
+     27 dev/diorama/share
+     24 dev/diorama/render/gpu
+     23 dev/diorama/compat
+     22 dev/diorama/drawing
+     19 dev/diorama/mixin
+     14 dev/diorama/craft
+     11 dev/diorama/addon
+      6 dev/diorama/light
+      2 dev/diorama/forge
+== classes that look like an API, markers, labels, waypoints
+dev/diorama/NewWaypointsScreen
+dev/diorama/Settings$WaypointLabels
+dev/diorama/TrackedPlayers
+dev/diorama/TrackedPlayers$Tracked
+dev/diorama/WorldBorderOverlay
+dev/diorama/addon/AddonLayers
+dev/diorama/addon/AddonLayers$Layer
+dev/diorama/addon/AddonWaypoints
+dev/diorama/api/BlockCoord
+dev/diorama/api/Checks
+dev/diorama/api/DimensionId
+dev/diorama/api/DioramaAddon
+dev/diorama/api/DioramaApi
+dev/diorama/api/DioramaEntrypoint
+dev/diorama/api/EditResult
+dev/diorama/api/Handle
+dev/diorama/api/Hud
+dev/diorama/api/Hud$Part
+dev/diorama/api/LayerContent
+dev/diorama/api/LayerContent$Builder
+dev/diorama/api/MapId
+dev/diorama/api/MapLayer
+dev/diorama/api/MapLine
+dev/diorama/api/MapLine$Builder
+dev/diorama/api/MapView
+dev/diorama/api/MapView$Part
+dev/diorama/api/Marker
+dev/diorama/api/Marker$Builder
+dev/diorama/api/NewWaypoint
+dev/diorama/api/NewWaypoint$Builder
+dev/diorama/api/ResourceId
+dev/diorama/api/ScreenPos
+dev/diorama/api/ViewPlace
+dev/diorama/api/ViewPlace$Builder
+dev/diorama/api/Waypoint
+dev/diorama/api/Waypoint$Kind
+dev/diorama/api/WaypointBatch
+dev/diorama/api/WaypointBatch$Add
+dev/diorama/api/WaypointBatch$Builder
+dev/diorama/api/WaypointBatch$Remove
+dev/diorama/api/WaypointBatch$Step
+dev/diorama/api/WaypointBatch$Update
+dev/diorama/api/WaypointUpdate
+dev/diorama/api/WaypointUpdate$Builder
+dev/diorama/api/Waypoints
+dev/diorama/api/World
+dev/diorama/api/WorldId
+dev/diorama/api/WorldPos
+dev/diorama/api/package-info
+dev/diorama/bake/Overlays
+dev/diorama/bake/PinnedSource
+dev/diorama/bake/PinnedSource$Top
+dev/diorama/data/TileLabel
+dev/diorama/drawing/DrawingOverlay
+dev/diorama/drawing/DrawingOverlay$1
+dev/diorama/mixin/ChunkMapInvoker
+dev/diorama/mixin/EffectIconsMixin
+dev/diorama/render/AddonOverlay
+dev/diorama/render/AddonOverlay$Probe
+dev/diorama/render/AddonOverlay$Quads
+dev/diorama/render/IconBatch
+dev/diorama/render/IconBatch$ItemDraw
+dev/diorama/render/IconBatch$SampledTexture
+dev/diorama/render/MapIcons
+dev/diorama/render/MapIcons$Shape
+dev/diorama/render/MapViewport$LayerKey
+dev/diorama/render/MarkerAtlas
+dev/diorama/render/MarkerAtlas$1
+dev/diorama/render/Markers
+dev/diorama/render/PinArt
+dev/diorama/render/PinArt$Art
+dev/diorama/render/PinArt$Image
+dev/diorama/render/Pins
+dev/diorama/render/Pins$Sprite
+dev/diorama/render/WaypointIcons
+dev/diorama/render/WaypointIcons$1
+dev/diorama/render/XaeroRadarIcons
+dev/diorama/render/XaeroRadarIcons$Basic
+dev/diorama/render/XaeroRadarIcons$Definition
+dev/diorama/render/XaeroRadarIcons$Icon
+dev/diorama/render/XaeroRadarIcons$ItemIcon
+dev/diorama/render/XaeroRadarIcons$Sprite
+dev/diorama/render/XaeroRadarIcons$Sprite$Baked
+dev/diorama/render/XaeroRadarIcons$SpriteKey
+dev/diorama/render/gpu/FogLayer
+dev/diorama/share/FarPlayers
+dev/diorama/share/FarPlayers$FtbTeams
+dev/diorama/share/FarPlayers$OpenParties
+dev/diorama/share/FarPlayers$Teams
+dev/diorama/share/FarPlayers$Who
+dev/diorama/waypoint/FolderMenu
+dev/diorama/waypoint/FolderMenu$Entry
+dev/diorama/waypoint/MapPiece
+dev/diorama/waypoint/MapPiece$FaceKey
+dev/diorama/waypoint/MapPiece$Place
+dev/diorama/waypoint/MapPiece$SavedMap
+dev/diorama/waypoint/Portals
+dev/diorama/waypoint/Portals$1
+dev/diorama/waypoint/Portals$Spot
+dev/diorama/waypoint/ScreenArt
+dev/diorama/waypoint/Waypoint
+dev/diorama/waypoint/Waypoint$1
+dev/diorama/waypoint/Waypoint$Kind
+dev/diorama/waypoint/Waypoint$Surface
+dev/diorama/waypoint/WaypointBeams
+dev/diorama/waypoint/WaypointBeams$1
+dev/diorama/waypoint/WaypointBeams$Sight
+dev/diorama/waypoint/WaypointColours
+dev/diorama/waypoint/WaypointColours$Swatch
+dev/diorama/waypoint/WaypointEditScreen
+dev/diorama/waypoint/WaypointEditScreen$1
+dev/diorama/waypoint/WaypointEditScreen$Opened
+dev/diorama/waypoint/WaypointEdits
+dev/diorama/waypoint/WaypointEdits$Applied
+dev/diorama/waypoint/WaypointEdits$Before
+dev/diorama/waypoint/WaypointEdits$Planned
+dev/diorama/waypoint/WaypointEdits$Result
+dev/diorama/waypoint/WaypointExport
+dev/diorama/waypoint/WaypointExport$Result
+dev/diorama/waypoint/WaypointExport$Told
+dev/diorama/waypoint/WaypointFolderScreen
+dev/diorama/waypoint/WaypointHud
+dev/diorama/waypoint/WaypointIconScreen
+dev/diorama/waypoint/WaypointListScreen
+dev/diorama/waypoint/WaypointListScreen$Folder
+dev/diorama/waypoint/WaypointOverlay
+dev/diorama/waypoint/WaypointOverlay$Pin
+dev/diorama/waypoint/WaypointShare
+dev/diorama/waypoint/WaypointShare$Shared
+dev/diorama/waypoint/WaypointShare$XaeroInstalled
+dev/diorama/waypoint/WaypointSnapshots
+dev/diorama/waypoint/WaypointSnapshots$1
+dev/diorama/waypoint/WaypointSnapshots$Snapshot
+dev/diorama/waypoint/WaypointSort
+dev/diorama/waypoint/WaypointSort$1
+dev/diorama/waypoint/WaypointStore
+dev/diorama/waypoint/WaypointStore$1
+dev/diorama/waypoint/WaypointStore$Folders
+dev/diorama/waypoint/WaypointStore$ShownIn
+dev/diorama/waypoint/Waypoints
+dev/diorama/waypoint/Waystones
+dev/diorama/waypoint/Waystones$Handler
+dev/diorama/waypoint/WorldProjection
+dev/diorama/waypoint/XaeroImport
+dev/diorama/waypoint/XaeroImport$Entry
+dev/diorama/waypoint/XaeroImport$Found
+dev/diorama/waypoint/XaeroImport$World
+dev/diorama/waypoint/XaeroNotice
+dev/diorama/waypoint/XaeroWorldScreen
+dev/diorama/web/WebMarkers
+dev/diorama/web/WebMarkers$Marker
+dev/diorama/web/WebPlayers

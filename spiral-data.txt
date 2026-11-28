@@ -1,0 +1,287 @@
+---- META-INF/mods.toml
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+[[mods]]
+modId="spiral_abyss"
+version="1.0.8"
+displayName="SpiralAbyss"
+authors="pla_is_me"
+description='''A Spiral Abyss dimension for boss challenges.'''
+[[dependencies.spiral_abyss]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.4.4,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.spiral_abyss]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.20.2)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.spiral_abyss]]
+    modId="architectury"
+    mandatory=true
+    versionRange="[9.2.14,)"
+    ordering="AFTER"
+    side="BOTH"
+
+---- assets/spiral_abyss/lang/en_us.json (keys matching)
+screen.spiral_abyss.config.title = Spiral Abyss Client Settings
+screen.spiral_abyss.config.description = Drag the Abyss button. Changes apply instantly.
+screen.spiral_abyss.config.drag = Drag to move the Abyss Menu button
+screen.spiral_abyss.config.overlap = Button overlaps the inventory preview
+screen.spiral_abyss.config.x = Button X
+screen.spiral_abyss.config.y = Button Y
+screen.spiral_abyss.config.reset = Reset Position
+screen.spiral_abyss.config.hud = Abyss HUD Layout
+screen.spiral_abyss.config.hud_drag = Drag a group to move it. Hold its circle to resize.
+screen.spiral_abyss.config.hud_timer = Timer
+screen.spiral_abyss.config.hud_challenges = Floor / Wave / Challenges
+screen.spiral_abyss.config.hud_rejection = Abyssal Rejection
+screen.spiral_abyss.config.hud_reset = Reset Group
+screen.spiral_abyss.config.hud_scale = Scale: %s%%
+screen.spiral_abyss.config.preview_timer = Preview: Combat Timer
+screen.spiral_abyss.config.preview_countdown = Preview: Wave Countdown
+block.spiral_abyss.spinning_block = Spinning Block for Key Entity
+block.spiral_abyss.abyss_base_block = Abyss Base Block
+block.spiral_abyss.abyss_pillar = Abyss Pillar
+block.spiral_abyss.abyss_rune_1 = Abyss Rune I
+block.spiral_abyss.abyss_rune_2 = Abyss Rune II
+block.spiral_abyss.abyss_rune_3 = Abyss Rune III
+block.spiral_abyss.abyss_rune_4 = Abyss Rune IV
+block.spiral_abyss.abyss_border_middle = Abyss Border Middle
+block.spiral_abyss.abyss_border_outside = Abyss Border Outside
+block.spiral_abyss.abyss_gate_vertical = Abyss Gate Vertical Post
+block.spiral_abyss.abyss_gate_horizontal = Abyss Gate Horizontal Slab
+block.spiral_abyss.abyss_gate_curve = Abyss Gate Curve
+block.spiral_abyss.abyss_gate_activate_block = Abyss Gate Activation Block
+entity.spiral_abyss.key_entity = Key entity
+block.spiral_abyss.abyss_portal = Abyss Portal
+message.spiral_abyss.invalid_portal = Place the activation block in the top-center gap of a complete 5x6 Abyss gate, between two horizontal slabs, with its front and back faces pointing out of the g
+message.spiral_abyss.blocked_portal = The portal opening must be empty, dry and inside the world border.
+message.spiral_abyss.portal_overworld_only = Abyss portals can only be activated in the Overworld.
+message.spiral_abyss.portal_activated = Abyss portal activated. The first player to enter chooses the floor and hosts the party.
+message.spiral_abyss.travel_unavailable = Dismount and stop sleeping before entering the Spiral Abyss.
+message.spiral_abyss.spectator = Only living, non-spectator players can start or advance a floor.
+message.spiral_abyss.already_running = A floor attempt is already running.
+message.spiral_abyss.already_completed = This attempt is complete. Open its chest or use the Abyss menu to choose another floor.
+message.spiral_abyss.peaceful = The Spiral Abyss requires Easy, Normal, or Hard difficulty.
+message.spiral_abyss.missing_floor = Floor %s is unavailable. Add valid floor datapack files and /reload.
+message.spiral_abyss.wrong_dimension = You must be inside the Spiral Abyss.
+message.spiral_abyss.last_floor = You have finished all six Abyss floors.
+message.spiral_abyss.abandoned = You failed !
+message.spiral_abyss.spawn_failed = A wave could not spawn safely. Check the arena and server log, then retry.
+message.spiral_abyss.spectating = You were defeated. Spectate until your team finishes.
+message.spiral_abyss.party_defeated = You failed !
+message.spiral_abyss.reloaded = Datapacks reloaded; the current attempt was cancelled. Right-click the key to retry.
+message.spiral_abyss.time_up = You failed !
+hud.spiral_abyss.time = %s:%s
+hud.spiral_abyss.defeated = Opponents Defeated: %s/%s
+hud.spiral_abyss.floor_wave = Floor %s Wave %s
+entity.spiral_abyss.copper_chest = Copper Reward Chest
+entity.spiral_abyss.iron_chest = Iron Reward Chest
+entity.spiral_abyss.golden_chest = Golden Reward Chest
+entity.spiral_abyss.chest_loot = Chest Loot
+message.spiral_abyss.host_required = The host must be alive and present to start this floor.
+message.spiral_abyss.host_only = Only the host can do this in their own Abyss arena.
+message.spiral_abyss.claim_first = Open the reward chest before going to the next floor.
+message.spiral_abyss.arenas_full = All 16 Abyss arenas are occupied, or the dimension is unavailable. Try again later.
+message.spiral_abyss.party_unavailable = This party is already fighting. Join before the next attempt starts.
+message.spiral_abyss.reset = Your six Abyss floors have been reset.
+message.spiral_abyss.skip_floor = Floors 1-%s now have 9 stars and all chests marked looted. Selected floor: %s.
+message.spiral_abyss.skip_floor_party_looting = Finish the shared chest payout before skipping floors.
+message.spiral_abyss.floor_unavailable = That floor is unavailable. Choose a loaded floor from 1 to 6.
+screen.spiral_abyss.floors = Spiral Abyss
+screen.spiral_abyss.floor = Floor %s
+screen.spiral_abyss.claimed = Mastered: 9 stars
+screen.spiral_abyss.view_floor = View Floor %s challenges
+screen.spiral_abyss.wave = Wave %s
+screen.spiral_abyss.wave_stars = %s/3 stars earned
+screen.spiral_abyss.challenge = Challenge
+screen.spiral_abyss.wave_objective = Finish the wave before %s minutes
+screen.spiral_abyss.wave_objective_one = Finish the wave before %s minute
+screen.spiral_abyss.enemies = Enemies
+screen.spiral_abyss.enemy_count = x %s
+screen.spiral_abyss.fight = Fight
+screen.spiral_abyss.preview_unavailable = Enemy preview unavailable
+screen.spiral_abyss.unavailable = This floor is locked, or the current challenge or chest is unfinished.
+message.spiral_abyss.challenge_result = Floor %s finished: %s/9 stars this attempt. Claim an earned chest to save your result.
+message.spiral_abyss.menu_hint = Press %s to open the Abyss Menu to return to the Overworld or select a floor.
+screen.spiral_abyss.available = Enter this floor
+screen.spiral_abyss.locked = Locked
+screen.spiral_abyss.reset_remaining = %s days %s:%s:%s remaining until reset
+screen.spiral_abyss.reset_disabled = Automatic reset disabled
+message.spiral_abyss.global_reset = A new Abyss cycle has begun. All floors and rewards have reset; enter the portal to start again.
+message.spiral_abyss.floor_locked_player = %s hasn't unlocked floor %s yet.
+message.spiral_abyss.portal_selecting = The first player is choosing a floor. Enter again after they finish.
+message.spiral_abyss.portal_busy = This portal is updating its party. Try again in a moment.
+message.spiral_abyss.already_hosting = You already have a party in another arena. Return through its portal first.
+message.spiral_abyss.selection_expired = Floor selection is no longer valid. Reopen the floor menu.
+message.spiral_abyss.teleport_blocked = Teleport commands cannot move entities into, out of, or within the Spiral Abyss. Use the Abyss menu to leave.
+screen.spiral_abyss.return_overworld = Return to Overworld
+screen.spiral_abyss.close = Close
+message.spiral_abyss.personal_session = You entered your own floor %s. Continue here, or return through the Overworld portal to rejoin an idle host.
+message.spiral_abyss.host_moved = The host changed floors. Open the Abyss menu to follow one floor at a time.
+message.spiral_abyss.guest_transfer_blocked = Cannot change floors while %s cannot travel or has another reward chest pending.
+message.spiral_abyss.host_changed = %s is now the Abyss party host.
+itemGroup.spiral_abyss = Spiral Abyss
+challenge.spiral_abyss.progress = %s (%s/%s)
+challenge.spiral_abyss.time = Finish the wave in under %s minutes
+challenge.spiral_abyss.no_armor = Finish the wave without wearing: %2$s armor slot
+challenge.spiral_abyss.armor_enchantment = Finish the wave wearing armor enchanted with: %2$s
+challenge.spiral_abyss.players_progress = %1$s (%2$s/%3$s Players)
+challenge.spiral_abyss.weapon_enchantment = Defeat %s enemies using %s enchantment weapon
+challenge.spiral_abyss.weapon = Defeat %s enemies using %s
+challenge.spiral_abyss.projectile = Defeat %s enemies with projectiles
+challenge.spiral_abyss.player_effect = Defeat %s enemies while you are affected by the %s effect
+challenge.spiral_abyss.mob_effect = Damage %s different enemies while they are affected by the %s effect
+challenge.spiral_abyss.explosion = Defeat %s enemies with explosions
+challenge.spiral_abyss.player_burning = Defeat %s enemies while you are on fire
+challenge.spiral_abyss.mob_burning = Defeat %s enemies while they are on fire
+challenge.spiral_abyss.slot.head = helmet
+challenge.spiral_abyss.slot.chest = chestplate
+challenge.spiral_abyss.slot.legs = leggings
+challenge.spiral_abyss.slot.feet = boots
+message.spiral_abyss.challenges_unavailable = No achievable challenge set is available for this floor. Check the challenge datapack.
+challenge.spiral_abyss.time.one = Finish the wave in under %s minute
+challenge.spiral_abyss.take_damage = Take damage from enemies %s times
+challenge.spiral_abyss.take_damage.one = Take damage from an enemy %s time
+challenge.spiral_abyss.weapon_enchantment.one = Defeat %s enemy a %s enchantment weapon
+challenge.spiral_abyss.weapon.one = Defeat %s enemy using %s
+challenge.spiral_abyss.projectile.one = Defeat %s enemy with a projectile
+challenge.spiral_abyss.player_effect.one = Defeat %s enemy while you are affected by the %s effect
+challenge.spiral_abyss.mob_effect.one = Damage %s enemy while it is affected by the %s effect
+challenge.spiral_abyss.explosion.one = Defeat %s enemy with an explosion
+challenge.spiral_abyss.player_burning.one = Defeat %s enemy while you are on fire
+challenge.spiral_abyss.mob_burning.one = Defeat %s enemy while it is on fire
+challenge.spiral_abyss.fishing = Hook a wave enemy with a fishing rod %s times
+challenge.spiral_abyss.fishing.one = Hook a wave enemy with a fishing rod %s time
+challenge.spiral_abyss.totem = Use a Totem of Undying to survive a lethal hit
+challenge.spiral_abyss.trickshot = Hit wave enemies %s times with bow or crossbow arrows shot while airborne
+challenge.spiral_abyss.trickshot.one = Hit a wave enemy %s time with a bow or crossbow arrow shot while airborne
+challenge.spiral_abyss.ender_pearl_hit = Hit wave enemies with ender pearls %s times
+challenge.spiral_abyss.ender_pearl_hit.one = Hit a wave enemy with an ender pearl %s time
+challenge.spiral_abyss.shield_block = Block wave enemy attacks with a shield %s times
+challenge.spiral_abyss.shield_block.one = Block a wave enemy attack with a shield %s time
+screen.spiral_abyss.rewards = Possible Rewards
+screen.spiral_abyss.chest_loot = %s Chest Loot
+screen.spiral_abyss.no_rewards = No available rewards
+screen.spiral_abyss.possible_loot = Possible contents
+screen.spiral_abyss.known_loot = Known possible contents
+screen.spiral_abyss.loot_contents_unavailable = Contents unavailable
+screen.spiral_abyss.loot_page = Loot %s / %s
+screen.spiral_abyss.loot_partial = Additional items may be possible
+screen.spiral_abyss.loot_varies = Amounts and enchantments vary
+screen.spiral_abyss.loot_chance_basis = Chance: first attempt per roll. Retries may change final odds.
+message.spiral_abyss.rare_reward = %s has obtained %s at floor %s
+toast.spiral_abyss.rare_reward.title = RARE ABYSS REWARD
+toast.spiral_abyss.rare_reward.description = %s has obtained %s
+key.spiral_abyss.menu = Open Spiral Abyss menu
+key.categories.spiral_abyss = Spiral Abyss
+screen.spiral_abyss.journal.banner = Featured rewards
+screen.spiral_abyss.journal.help = Portal guide
+screen.spiral_abyss.journal.cycle = SPIRAL ABYSS
+screen.spiral_abyss.journal.reset_days = %s days until reset
+screen.spiral_abyss.journal.reset_today = Resets in less than a day
+screen.spiral_abyss.journal.rare = Rare Rewards
+screen.spiral_abyss.journal.rules = Earn 9 stars on a floor to unlock all 3 chests. Rare rewards appear only in floor 5 and 6 Golden Chests at 9 stars.
+screen.spiral_abyss.journal.featured = THIS CYCLE’S BOSSES
+screen.spiral_abyss.journal.scroll_rewards = %s / %s · Scroll for rewards
+ui.spiral_abyss.help.horizontal = Horizontal slab
+ui.spiral_abyss.help.horizontal.description = Connect the top and base of the gate with horizontal slabs. Find frame pieces in Ruined Abyss Gate loot chests. Match the slab heights shown.
+ui.spiral_abyss.help.vertical = Vertical post
+ui.spiral_abyss.help.vertical.description = Use two vertical posts on each side, facing outward along the gate width. Find these frame pieces in Ruined Abyss Gate loot chests.
+ui.spiral_abyss.help.curve = Curved corner
+ui.spiral_abyss.help.curve.description = Use four inward-facing curves: bottom-half curves above, top-half curves below. Find these frame pieces in Ruined Abyss Gate loot chests.
+ui.spiral_abyss.help.activation = Activation Block
+ui.spiral_abyss.help.activation.description = Craft with a lodestone in the center and a diamond above, below, left and right. Place the Activation Block in the top-center gap of your Abyss Gate.
+ui.spiral_abyss.help.recipe = Crafting recipe
+ui.spiral_abyss.help.recipe.ingredients = 4 Diamonds + 1 Lodestone
+ui.spiral_abyss.help.recipe.result = 1 Activation Block
+rejection.spiral_abyss.title = ABYSSAL REJECTION
+rejection.spiral_abyss.quote = "The Abyss does not recognize your strength."
+rejection.spiral_abyss.damage = Damage Dealt: -60%
+rejection.spiral_abyss.tooltip = The Abyss does not recognize your strength. You deal 60%% less damage to %s on floors 5 and 6. Defeat this boss outside the Abyss to overcome its rejection. Aby
+screen.spiral_abyss.entering = Entering the Spiral Abyss
+subtitles.spiral_abyss.portal.entry = Abyss portal swirls
+screen.spiral_abyss.entry_controls = Space / Enter: Skip    Esc: Cancel
+ui.spiral_abyss.help.overview = Build an Abyss Gate
+ui.spiral_abyss.help.overview.description = Build this 5 × 6 gate in the Overworld. Keep its opening empty and dry. Hover over any block or label to learn more.
+screen.spiral_abyss.endless = Endless Mode
+hud.spiral_abyss.endless_wave = Endless Mode Wave %s
+screen.spiral_abyss.endless_description = Clear every enemy within five minutes to advance. No challenges or Abyssal Rejection. Open an XP chest every 10 waves.
+entity.spiral_abyss.experience_chest = Experience Chest
+screen.spiral_abyss.reward_chest = Abyss Rewards
+screen.spiral_abyss.section_idle = Ready
+screen.spiral_abyss.section_fighting = Fighting
+screen.spiral_abyss.section_claiming = Claiming
+screen.spiral_abyss.section_players = %s players
+screen.spiral_abyss.section_players_scroll = Scroll to browse players (%s/%s)
+message.spiral_abyss.section_spectating = This section is busy. You are spectating; use the Abyss menu to choose another floor.
+---- pack.mcmeta
+{
+  "pack": {
+    "description": {
+      "text": "spiral_abyss resources"
+    },
+    "pack_format": 15
+  }
+}
+---- spiral_abyss.forge.mixins.json
+{
+  "required": true,
+  "package": "com.pla.spiral_abyss.forge.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "ChestLootLifetimeMixin",
+    "MonsterPartLootMixin",
+    "QliphothSpawnerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "refmap": "spiral_abyss.forge.refmap.json"
+}
+---- spiral_abyss.mixins.json
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.pla.spiral_abyss.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "BossProgressMixin",
+    "AbyssHealthAttributeMixin",
+    "EntityDropMixin",
+    "ChestLootMergeMixin",
+    "LivingEntityDropMixin",
+    "AbyssMobTickMixin",
+    "AbyssPlayerInventoryMixin",
+    "AbyssEnvironmentMixin",
+    "AbyssArchitectureMixin",
+    "AbyssWaterMixin",
+    "AbyssWaterBlockMixin",
+    "AbyssDrownedTridentMixin",
+    "AbyssSlimeSplitMixin",
+    "AbyssFallingBlockMixin",
+    "BossDeathBlocksMixin",
+    "BossDeathContainerMixin",
+    "AbyssTeleportCommandMixin",
+    "AbyssDragonMixin",
+    "ServerBossEventMixin",
+    "AbyssDragonLandingMixin",
+    "AbyssDragonPerchMixin",
+    "AbyssDragonTakeoffMixin",
+    "AbyssCrystalMixin"
+  ],
+  "client": [
+    "AbyssClientLightMixin",
+    "PortalEntryCameraMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "spiral_abyss.common.refmap.json"
+}

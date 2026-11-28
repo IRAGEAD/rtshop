@@ -1,0 +1,160 @@
+======== net/bettercombat/logic/WeaponRegistry.class
+  static final org.slf4j.Logger LOGGER;
+  static java.util.Map<net.minecraft.resources.ResourceLocation, net.bettercombat.api.WeaponAttributes> registrations;
+  static java.util.Map<net.minecraft.resources.ResourceLocation, net.bettercombat.api.AttributesContainer> containers;
+  private static net.minecraft.network.FriendlyByteBuf encodedRegistrations;
+  public net.bettercombat.logic.WeaponRegistry();
+         1: invokespecial #35                 // Method java/lang/Object."<init>":()V
+  public static void register(net.minecraft.resources.ResourceLocation, net.bettercombat.api.WeaponAttributes);
+         0: getstatic     #43                 // Field registrations:Ljava/util/Map;
+         5: invokeinterface #47,  3           // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  static net.bettercombat.api.WeaponAttributes getAttributes(net.minecraft.resources.ResourceLocation);
+         0: getstatic     #43                 // Field registrations:Ljava/util/Map;
+         4: invokeinterface #55,  2           // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+  public static net.bettercombat.api.WeaponAttributes getAttributes(net.minecraft.world.item.ItemStack);
+         7: invokevirtual #63                 // Method net/minecraft/world/item/ItemStack.m_41782_:()Z
+        14: invokestatic  #68                 // Method net/bettercombat/api/WeaponAttributesHelper.readFromNBT:(Lnet/minecraft/world/item/ItemStack;)Lnet/bettercombat/api/WeaponAttributes;
+        25: invokevirtual #72                 // Method net/minecraft/world/item/ItemStack.m_41720_:()Lnet/minecraft/world/item/Item;
+        29: getstatic     #78                 // Field net/minecraft/core/registries/BuiltInRegistries.f_257033_:Lnet/minecraft/core/DefaultedRegistry;
+        33: invokeinterface #84,  2           // InterfaceMethod net/minecraft/core/DefaultedRegistry.m_7981_:(Ljava/lang/Object;)Lnet/minecraft/resources/ResourceLocation;
+        40: invokestatic  #86                 // Method getAttributes:(Lnet/minecraft/resources/ResourceLocation;)Lnet/bettercombat/api/WeaponAttributes;
+  public static void loadAttributes(net.minecraft.server.packs.resources.ResourceManager);
+         1: invokestatic  #96                 // Method loadContainers:(Lnet/minecraft/server/packs/resources/ResourceManager;)V
+         4: getstatic     #98                 // Field containers:Ljava/util/Map;
+         7: invokedynamic #117,  0            // InvokeDynamic #0:accept:()Ljava/util/function/BiConsumer;
+        12: invokeinterface #121,  2          // InterfaceMethod java/util/Map.forEach:(Ljava/util/function/BiConsumer;)V
+  private static void loadContainers(net.minecraft.server.packs.resources.ResourceManager);
+         4: invokespecial #127                // Method com/google/gson/Gson."<init>":()V
+        12: invokespecial #130                // Method java/util/HashMap."<init>":()V
+        19: invokedynamic #144,  0            // InvokeDynamic #1:test:()Ljava/util/function/Predicate;
+        24: invokeinterface #150,  3          // InterfaceMethod net/minecraft/server/packs/resources/ResourceManager.m_214159_:(Ljava/lang/String;Ljava/util/function/Predicate;)Ljava/util/Map;
+        29: invokeinterface #154,  1          // InterfaceMethod java/util/Map.entrySet:()Ljava/util/Set;
+        34: invokeinterface #160,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+        41: invokeinterface #165,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        50: invokeinterface #169,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        62: invokeinterface #172,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+        74: invokeinterface #177,  1          // InterfaceMethod java/util/Map$Entry.getValue:()Ljava/lang/Object;
+        94: invokevirtual #187                // Method net/minecraft/server/packs/resources/Resource.m_215507_:()Ljava/io/InputStream;
+        97: invokespecial #190                // Method java/io/InputStreamReader."<init>":(Ljava/io/InputStream;)V
+       100: invokespecial #193                // Method com/google/gson/stream/JsonReader."<init>":(Ljava/io/Reader;)V
+       107: invokestatic  #197                // Method net/bettercombat/api/WeaponAttributesHelper.decode:(Lcom/google/gson/stream/JsonReader;)Lnet/bettercombat/api/AttributesContainer;
+       114: invokevirtual #201                // Method net/minecraft/resources/ResourceLocation.toString:()Ljava/lang/String;
+       121: invokevirtual #211                // Method java/lang/String.replace:(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
+       133: invokevirtual #215                // Method java/lang/String.lastIndexOf:(I)I
+       136: invokevirtual #219                // Method java/lang/String.substring:(II)Ljava/lang/String;
+       148: invokespecial #222                // Method net/minecraft/resources/ResourceLocation."<init>":(Ljava/lang/String;)V
+       153: invokeinterface #47,  3           // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       164: getstatic     #228                // Field java/lang/System.err:Ljava/io/PrintStream;
+       169: invokestatic  #232                // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+       172: invokedynamic #244,  0            // InvokeDynamic #2:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       177: invokevirtual #249                // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+       182: invokevirtual #252                // Method java/lang/Exception.printStackTrace:()V
+       189: putstatic     #98                 // Field containers:Ljava/util/Map;
+  public static net.bettercombat.api.WeaponAttributes resolveAttributes(net.minecraft.resources.ResourceLocation, net.bettercombat.api.AttributesContainer);
+         4: invokespecial #272                // Method java/util/ArrayList."<init>":()V
+        17: invokevirtual #277                // Method net/bettercombat/api/AttributesContainer.attributes:()Lnet/bettercombat/api/WeaponAttributes;
+        20: invokevirtual #281                // Method java/util/ArrayList.add:(ILjava/lang/Object;)V
+        24: invokevirtual #284                // Method net/bettercombat/api/AttributesContainer.parent:()Ljava/lang/String;
+        30: getstatic     #98                 // Field containers:Ljava/util/Map;
+        38: invokevirtual #284                // Method net/bettercombat/api/AttributesContainer.parent:()Ljava/lang/String;
+        41: invokespecial #222                // Method net/minecraft/resources/ResourceLocation."<init>":(Ljava/lang/String;)V
+        44: invokeinterface #55,  2           // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        69: invokestatic  #289                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+        74: invokespecial #292                // Method net/bettercombat/api/WeaponAttributes."<init>":(DLjava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;[Lnet/bettercombat/api/WeaponAttributes$Attack;)V
+        80: invokevirtual #296                // Method java/util/ArrayList.stream:()Ljava/util/stream/Stream;
+        85: invokedynamic #307,  0            // InvokeDynamic #3:apply:()Ljava/util/function/BinaryOperator;
+        90: invokeinterface #313,  3          // InterfaceMethod java/util/stream/Stream.reduce:(Ljava/lang/Object;Ljava/util/function/BinaryOperator;)Ljava/lang/Object;
+       102: invokestatic  #317                // Method net/bettercombat/api/WeaponAttributesHelper.validate:(Lnet/bettercombat/api/WeaponAttributes;)V
+       109: getstatic     #319                // Field LOGGER:Lorg/slf4j/Logger;
+       113: invokestatic  #232                // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+       117: invokevirtual #322                // Method java/lang/Exception.getMessage:()Ljava/lang/String;
+       120: invokedynamic #327,  0            // InvokeDynamic #4:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+       125: invokeinterface #332,  2          // InterfaceMethod org/slf4j/Logger.error:(Ljava/lang/String;)V
+       131: invokevirtual #252                // Method java/lang/Exception.printStackTrace:()V
+  public static void resolveAndRegisterAttributes(net.minecraft.resources.ResourceLocation, net.bettercombat.api.AttributesContainer);
+         2: invokestatic  #341                // Method resolveAttributes:(Lnet/minecraft/resources/ResourceLocation;Lnet/bettercombat/api/AttributesContainer;)Lnet/bettercombat/api/WeaponAttributes;
+        12: invokestatic  #343                // Method register:(Lnet/minecraft/resources/ResourceLocation;Lnet/bettercombat/api/WeaponAttributes;)V
+  public static void encodeRegistry();
+         0: invokestatic  #350                // Method net/bettercombat/fabricmc/fabric/api/networking/v1/PacketByteBufs.create:()Lnet/minecraft/network/FriendlyByteBuf;
+         8: invokespecial #127                // Method com/google/gson/Gson."<init>":()V
+        13: getstatic     #43                 // Field registrations:Ljava/util/Map;
+        16: invokevirtual #353                // Method com/google/gson/Gson.toJson:(Ljava/lang/Object;)Ljava/lang/String;
+        20: getstatic     #359                // Field net/bettercombat/BetterCombat.config:Lnet/bettercombat/config/ServerConfig;
+        29: getstatic     #319                // Field LOGGER:Lorg/slf4j/Logger;
+        33: invokedynamic #368,  0            // InvokeDynamic #5:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        38: invokeinterface #371,  2          // InterfaceMethod org/slf4j/Logger.info:(Ljava/lang/String;)V
+        43: getstatic     #359                // Field net/bettercombat/BetterCombat.config:Lnet/bettercombat/config/ServerConfig;
+        51: invokevirtual #380                // Method java/lang/String.length:()I
+        61: invokestatic  #385                // Method net/bettercombat/utils/CompressionHelper.gzipCompress:(Ljava/lang/String;)Ljava/lang/String;
+        69: invokespecial #272                // Method java/util/ArrayList."<init>":()V
+        85: invokevirtual #380                // Method java/lang/String.length:()I
+        97: invokevirtual #380                // Method java/lang/String.length:()I
+       105: invokestatic  #391                // Method java/lang/Math.min:(II)I
+       108: invokevirtual #219                // Method java/lang/String.substring:(II)Ljava/lang/String;
+       111: invokeinterface #395,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       129: invokevirtual #399                // Method net/minecraft/network/FriendlyByteBuf.writeBoolean:(Z)Lio/netty/buffer/ByteBuf;
+       136: invokeinterface #402,  1          // InterfaceMethod java/util/List.size:()I
+       141: invokevirtual #406                // Method net/minecraft/network/FriendlyByteBuf.writeInt:(I)Lio/netty/buffer/ByteBuf;
+       147: invokeinterface #407,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+       156: invokeinterface #165,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       166: invokeinterface #169,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       179: invokevirtual #411                // Method net/minecraft/network/FriendlyByteBuf.m_130070_:(Ljava/lang/String;)Lnet/minecraft/network/FriendlyByteBuf;
+       190: getstatic     #319                // Field LOGGER:Lorg/slf4j/Logger;
+       196: invokevirtual #380                // Method java/lang/String.length:()I
+       210: invokevirtual #380                // Method java/lang/String.length:()I
+       223: invokestatic  #420                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       227: invokestatic  #424                // Method java/lang/String.format:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+       232: invokeinterface #402,  1          // InterfaceMethod java/util/List.size:()I
+       239: invokedynamic #429,  0            // InvokeDynamic #6:makeConcatWithConstants:(IILjava/lang/String;II)Ljava/lang/String;
+       244: invokeinterface #371,  2          // InterfaceMethod org/slf4j/Logger.info:(Ljava/lang/String;)V
+       252: getstatic     #319                // Field LOGGER:Lorg/slf4j/Logger;
+       256: invokevirtual #432                // Method net/minecraft/network/FriendlyByteBuf.readableBytes:()I
+       261: invokeinterface #402,  1          // InterfaceMethod java/util/List.size:()I
+       268: invokedynamic #437,  0            // InvokeDynamic #7:makeConcatWithConstants:(III)Ljava/lang/String;
+       273: invokeinterface #371,  2          // InterfaceMethod org/slf4j/Logger.info:(Ljava/lang/String;)V
+       279: putstatic     #439                // Field encodedRegistrations:Lnet/minecraft/network/FriendlyByteBuf;
+  public static void decodeRegistry(net.minecraft.network.FriendlyByteBuf);
+         1: invokevirtual #455                // Method net/minecraft/network/FriendlyByteBuf.readBoolean:()Z
+         6: invokevirtual #458                // Method net/minecraft/network/FriendlyByteBuf.readInt:()I
+        24: invokevirtual #461                // Method net/minecraft/network/FriendlyByteBuf.m_130277_:()Ljava/lang/String;
+        27: invokevirtual #464                // Method java/lang/String.concat:(Ljava/lang/String;)Ljava/lang/String;
+        42: invokestatic  #467                // Method net/bettercombat/utils/CompressionHelper.gzipDecompress:(Ljava/lang/String;)Ljava/lang/String;
+grep: write error: Broken pipe
+======== net/bettercombat/logic/WeaponAttributesFallback.class
+  public net.bettercombat.logic.WeaponAttributesFallback();
+         1: invokespecial #19                 // Method java/lang/Object."<init>":()V
+  public static void initialize();
+         0: getstatic     #28                 // Field net/bettercombat/BetterCombat.fallbackConfig:Lnet/bettercombat/tinyconfig/ConfigManager;
+        10: getstatic     #40                 // Field net/minecraft/core/registries/BuiltInRegistries.f_257033_:Lnet/minecraft/core/DefaultedRegistry;
+        13: invokeinterface #46,  1           // InterfaceMethod net/minecraft/core/DefaultedRegistry.m_6566_:()Ljava/util/Set;
+        18: invokeinterface #52,  1           // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+        25: invokeinterface #58,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+        34: invokeinterface #62,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        43: getstatic     #40                 // Field net/minecraft/core/registries/BuiltInRegistries.f_257033_:Lnet/minecraft/core/DefaultedRegistry;
+        47: invokeinterface #68,  2           // InterfaceMethod net/minecraft/core/DefaultedRegistry.m_7745_:(Lnet/minecraft/resources/ResourceLocation;)Ljava/lang/Object;
+        57: invokevirtual #74                 // Method net/minecraft/resources/ResourceLocation.toString:()Ljava/lang/String;
+        64: invokestatic  #84                 // Method net/bettercombat/utils/PatternMatching.matches:(Ljava/lang/String;Ljava/lang/String;)Z
+        77: getstatic     #90                 // Field net/minecraft/world/entity/ai/attributes/Attributes.f_22281_:Lnet/minecraft/world/entity/ai/attributes/Attribute;
+        80: invokestatic  #94                 // Method hasAttributeModifier:(Lnet/minecraft/world/item/Item;Lnet/minecraft/world/entity/ai/attributes/Attribute;)Z
+       143: invokestatic  #110                // Method net/bettercombat/logic/WeaponRegistry.getAttributes:(Lnet/minecraft/resources/ResourceLocation;)Lnet/bettercombat/api/WeaponAttributes;
+       150: invokevirtual #74                 // Method net/minecraft/resources/ResourceLocation.toString:()Ljava/lang/String;
+       158: invokestatic  #84                 // Method net/bettercombat/utils/PatternMatching.matches:(Ljava/lang/String;Ljava/lang/String;)Z
+       164: getstatic     #117                // Field net/bettercombat/logic/WeaponRegistry.containers:Ljava/util/Map;
+       176: invokespecial #123                // Method net/minecraft/resources/ResourceLocation."<init>":(Ljava/lang/String;)V
+       179: invokeinterface #127,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       197: invokestatic  #133                // Method net/bettercombat/logic/WeaponRegistry.resolveAndRegisterAttributes:(Lnet/minecraft/resources/ResourceLocation;Lnet/bettercombat/api/AttributesContainer;)V
+  private static boolean hasAttributeModifier(net.minecraft.world.item.Item, net.minecraft.world.entity.ai.attributes.Attribute);
+         0: getstatic     #149                // Field net/minecraft/core/registries/BuiltInRegistries.f_256951_:Lnet/minecraft/core/Registry;
+         4: invokeinterface #155,  2          // InterfaceMethod net/minecraft/core/Registry.m_7981_:(Ljava/lang/Object;)Lnet/minecraft/resources/ResourceLocation;
+        11: getstatic     #161                // Field net/minecraft/world/entity/EquipmentSlot.MAINHAND:Lnet/minecraft/world/entity/EquipmentSlot;
+        14: invokevirtual #165                // Method net/minecraft/world/item/Item.m_7167_:(Lnet/minecraft/world/entity/EquipmentSlot;)Lcom/google/common/collect/Multimap;
+        19: invokeinterface #171,  1          // InterfaceMethod com/google/common/collect/Multimap.entries:()Ljava/util/Collection;
+        24: invokeinterface #174,  1          // InterfaceMethod java/util/Collection.iterator:()Ljava/util/Iterator;
+        33: invokeinterface #58,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+        43: invokeinterface #62,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        55: invokeinterface #177,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+        65: getstatic     #149                // Field net/minecraft/core/registries/BuiltInRegistries.f_256951_:Lnet/minecraft/core/Registry;
+        70: invokeinterface #155,  2          // InterfaceMethod net/minecraft/core/Registry.m_7981_:(Ljava/lang/Object;)Lnet/minecraft/resources/ResourceLocation;
+        85: invokevirtual #183                // Method net/minecraft/resources/ResourceLocation.equals:(Ljava/lang/Object;)Z
+/tmp/bc/net/bettercombat/BetterCombat.class
+/tmp/bc/net/bettercombat/logic/WeaponAttributesFallback.class

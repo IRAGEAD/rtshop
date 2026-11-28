@@ -1,0 +1,9 @@
+./dev/dyslexic/cinematic/station/MenuActions.class
+./dev/dyslexic/cinematic/station/Sessions.class
+./dev/dyslexic/cinematic/station/StationKind.class
+./dev/dyslexic/cinematic/api/AddonStations.class
+./dev/dyslexic/cinematic/api/AddonStations$Definition.class
+./dev/dyslexic/cinematic/api/client/AddonMenuStation.class
+./dev/dyslexic/cinematic/api/client/AddonScenes$Factory.class
+./dev/dyslexic/cinematic/api/client/AddonScenes.class
+./dev/dyslexic/cinematic/client/Scene.class

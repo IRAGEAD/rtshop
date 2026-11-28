@@ -1,0 +1,3795 @@
+######## dev/diorama/render/Radar
+Compiled from "Radar.java"
+public final class dev.diorama.render.Radar {
+  private static final double CARET_HEIGHT;
+
+  private static final float ITEM_PICTURE;
+
+  private static final int MAX_ITEM_PICTURES;
+
+  private static final int PILE_KINDS;
+
+  public static final net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> RADAR_SHOWN;
+
+  private dev.diorama.render.Radar();
+    Code:
+         0: aload_0
+         1: invokespecial #80                 // Method java/lang/Object."<init>":()V
+         4: return
+
+  public static dev.diorama.render.Radar$Kind kind(net.minecraft.world.entity.Entity);
+    Code:
+         0: aload_0
+         1: instanceof    #87                 // class net/minecraft/client/player/AbstractClientPlayer
+         4: ifeq          11
+         7: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        10: areturn
+        11: aload_0
+        12: instanceof    #93                 // class net/minecraft/world/entity/item/ItemEntity
+        15: ifeq          22
+        18: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+        21: areturn
+        22: aload_0
+        23: instanceof    #98                 // class net/minecraft/world/entity/NeutralMob
+        26: ifeq          33
+        29: getstatic     #101                // Field dev/diorama/render/Radar$Kind.NEUTRAL:Ldev/diorama/render/Radar$Kind;
+        32: areturn
+        33: aload_0
+        34: instanceof    #103                // class net/minecraft/world/entity/monster/Enemy
+        37: ifeq          44
+        40: getstatic     #106                // Field dev/diorama/render/Radar$Kind.HOSTILE:Ldev/diorama/render/Radar$Kind;
+        43: areturn
+        44: aload_0
+        45: instanceof    #108                // class net/minecraft/world/entity/Mob
+        48: ifne          67
+        51: aload_0
+        52: invokevirtual #114                // Method net/minecraft/world/entity/Entity.m_6095_:()Lnet/minecraft/world/entity/EntityType;
+        55: invokevirtual #120                // Method net/minecraft/world/entity/EntityType.m_204041_:()Lnet/minecraft/core/Holder$Reference;
+        58: getstatic     #122                // Field RADAR_SHOWN:Lnet/minecraft/tags/TagKey;
+        61: invokevirtual #126                // Method net/minecraft/core/Holder$Reference.m_203656_:(Lnet/minecraft/tags/TagKey;)Z
+        64: ifeq          71
+        67: getstatic     #129                // Field dev/diorama/render/Radar$Kind.PASSIVE:Ldev/diorama/render/Radar$Kind;
+        70: areturn
+        71: aconst_null
+        72: areturn
+
+  public static boolean hidden(net.minecraft.world.entity.Entity, net.minecraft.world.entity.player.Player);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokevirtual #137                // Method net/minecraft/world/entity/Entity.m_20177_:(Lnet/minecraft/world/entity/player/Player;)Z
+         5: ifeq          10
+         8: iconst_1
+         9: ireturn
+        10: aload_0
+        11: invokevirtual #141                // Method net/minecraft/world/entity/Entity.m_6144_:()Z
+        14: ifne          19
+        17: iconst_0
+        18: ireturn
+        19: aload_0
+        20: invokevirtual #145                // Method net/minecraft/world/entity/Entity.m_5647_:()Lnet/minecraft/world/scores/Team;
+        23: astore_2
+        24: aload_2
+        25: ifnull        36
+        28: aload_2
+        29: aload_1
+        30: invokevirtual #148                // Method net/minecraft/world/entity/player/Player.m_5647_:()Lnet/minecraft/world/scores/Team;
+        33: if_acmpeq     47
+        36: aload_0
+        37: invokestatic  #156                // Method dev/diorama/TrackedPlayers.tracks:(Lnet/minecraft/world/entity/Entity;)Z
+        40: ifne          47
+        43: iconst_1
+        44: goto          48
+        47: iconst_0
+        48: ireturn
+
+  public static java.util.List<dev.diorama.render.Radar$Blip> collect(dev.diorama.render.MapViewport$View, float, boolean);
+    Code:
+         0: invokestatic  #169                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+         3: astore_3
+         4: aload_3
+         5: getfield      #173                // Field net/minecraft/client/Minecraft.f_91073_:Lnet/minecraft/client/multiplayer/ClientLevel;
+         8: astore        4
+        10: aload_3
+        11: getfield      #177                // Field net/minecraft/client/Minecraft.f_91074_:Lnet/minecraft/client/player/LocalPlayer;
+        14: astore        5
+        16: invokestatic  #183                // Method dev/diorama/MapSession.viewer:()Lnet/minecraft/world/entity/Entity;
+        19: astore        6
+        21: new           #185                // class java/util/ArrayList
+        24: dup
+        25: invokespecial #186                // Method java/util/ArrayList."<init>":()V
+        28: astore        7
+        30: aload         4
+        32: ifnull        45
+        35: aload         5
+        37: ifnull        45
+        40: aload         6
+        42: ifnonnull     48
+        45: aload         7
+        47: areturn
+        48: aload         6
+        50: fload_1
+        51: invokevirtual #196                // Method net/minecraft/world/entity/Entity.m_20318_:(F)Lnet/minecraft/world/phys/Vec3;
+        54: getfield      #201                // Field net/minecraft/world/phys/Vec3.f_82480_:D
+        57: dstore        8
+        59: invokestatic  #205                // Method dev/diorama/Settings.get:()Ldev/diorama/Settings;
+        62: astore        10
+        64: ldc           #206                // float 12.0f
+        66: fstore        11
+        68: iload_2
+        69: ifne          89
+        72: aload_3
+        73: getfield      #210                // Field net/minecraft/client/Minecraft.f_91066_:Lnet/minecraft/client/Options;
+        76: getfield      #216                // Field net/minecraft/client/Options.f_92099_:Lnet/minecraft/client/KeyMapping;
+        79: invokevirtual #221                // Method net/minecraft/client/KeyMapping.m_90857_:()Z
+        82: ifeq          89
+        85: iconst_1
+        86: goto          90
+        89: iconst_0
+        90: istore        12
+        92: aload         4
+        94: invokevirtual #225                // Method net/minecraft/client/multiplayer/ClientLevel.m_104735_:()Ljava/lang/Iterable;
+        97: aload         4
+        99: invokestatic  #229                // Method dev/diorama/TrackedPlayers.unloaded:(Lnet/minecraft/client/multiplayer/ClientLevel;)Ljava/util/List;
+       102: invokestatic  #235                // Method com/google/common/collect/Iterables.concat:(Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/lang/Iterable;
+       105: invokeinterface #241,  1          // InterfaceMethod java/lang/Iterable.iterator:()Ljava/util/Iterator;
+       110: astore        13
+       112: aload         13
+       114: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       119: ifeq          518
+       122: aload         13
+       124: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       129: checkcast     #110                // class net/minecraft/world/entity/Entity
+       132: astore        14
+       134: aload         14
+       136: aload         5
+       138: if_acmpeq     112
+       141: aload         14
+       143: aload         6
+       145: if_acmpeq     112
+       148: aload         14
+       150: invokevirtual #253                // Method net/minecraft/world/entity/Entity.m_6084_:()Z
+       153: ifeq          112
+       156: aload         14
+       158: aload         5
+       160: invokestatic  #255                // Method hidden:(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;)Z
+       163: ifeq          169
+       166: goto          112
+       169: aload         14
+       171: invokestatic  #257                // Method kind:(Lnet/minecraft/world/entity/Entity;)Ldev/diorama/render/Radar$Kind;
+       174: astore        15
+       176: aload         15
+       178: ifnonnull     184
+       181: goto          112
+       184: aload         14
+       186: aload         15
+       188: invokestatic  #261                // Method dev/diorama/RadarCategories.of:(Lnet/minecraft/world/entity/Entity;Ldev/diorama/render/Radar$Kind;)Ldev/diorama/RadarCategories$Entry;
+       191: astore        16
+       193: aload         16
+       195: invokeinterface #264,  1          // InterfaceMethod dev/diorama/RadarCategories$Entry.shown:()Z
+       200: ifne          206
+       203: goto          112
+       206: aload         14
+       208: fload_1
+       209: invokevirtual #196                // Method net/minecraft/world/entity/Entity.m_20318_:(F)Lnet/minecraft/world/phys/Vec3;
+       212: astore        17
+       214: aload         17
+       216: getfield      #201                // Field net/minecraft/world/phys/Vec3.f_82480_:D
+       219: dload         8
+       221: dsub
+       222: invokestatic  #270                // Method java/lang/Math.abs:(D)D
+       225: aload         16
+       227: invokeinterface #274,  1          // InterfaceMethod dev/diorama/RadarCategories$Entry.reach:()D
+       232: dcmpl
+       233: ifle          247
+       236: aload         14
+       238: invokestatic  #156                // Method dev/diorama/TrackedPlayers.tracks:(Lnet/minecraft/world/entity/Entity;)Z
+       241: ifne          247
+       244: goto          112
+       247: aload         17
+       249: getfield      #277                // Field net/minecraft/world/phys/Vec3.f_82479_:D
+       252: aload         17
+       254: getfield      #280                // Field net/minecraft/world/phys/Vec3.f_82481_:D
+       257: invokestatic  #286                // Method dev/diorama/Projection.u:(DD)D
+       260: dstore        18
+       262: aload         17
+       264: getfield      #277                // Field net/minecraft/world/phys/Vec3.f_82479_:D
+       267: aload         17
+       269: getfield      #201                // Field net/minecraft/world/phys/Vec3.f_82480_:D
+       272: aload         17
+       274: getfield      #280                // Field net/minecraft/world/phys/Vec3.f_82481_:D
+       277: invokestatic  #290                // Method dev/diorama/Projection.v:(DDD)D
+       280: dstore        20
+       282: aload_0
+       283: dload         18
+       285: dload         20
+       287: invokevirtual #294                // Method dev/diorama/render/MapViewport$View.screenX:(DD)F
+       290: fstore        22
+       292: aload_0
+       293: dload         18
+       295: dload         20
+       297: invokevirtual #297                // Method dev/diorama/render/MapViewport$View.screenY:(DD)F
+       300: fstore        23
+       302: fload         22
+       304: aload_0
+       305: invokevirtual #301                // Method dev/diorama/render/MapViewport$View.x:()I
+       308: i2f
+       309: fload         11
+       311: fsub
+       312: fcmpg
+       313: iflt          112
+       316: fload         23
+       318: aload_0
+       319: invokevirtual #304                // Method dev/diorama/render/MapViewport$View.y:()I
+       322: i2f
+       323: fload         11
+       325: fsub
+       326: fcmpg
+       327: iflt          112
+       330: fload         22
+       332: aload_0
+       333: invokevirtual #301                // Method dev/diorama/render/MapViewport$View.x:()I
+       336: aload_0
+       337: invokevirtual #307                // Method dev/diorama/render/MapViewport$View.width:()I
+       340: iadd
+       341: i2f
+       342: fload         11
+       344: fadd
+       345: fcmpl
+       346: ifgt          112
+       349: fload         23
+       351: aload_0
+       352: invokevirtual #304                // Method dev/diorama/render/MapViewport$View.y:()I
+       355: aload_0
+       356: invokevirtual #310                // Method dev/diorama/render/MapViewport$View.height:()I
+       359: iadd
+       360: i2f
+       361: fload         11
+       363: fadd
+       364: fcmpl
+       365: ifle          371
+       368: goto          112
+       371: aload         16
+       373: invokeinterface #313,  1          // InterfaceMethod dev/diorama/RadarCategories$Entry.iconScale:()I
+       378: ifne          389
+       381: aload         10
+       383: getfield      #316                // Field dev/diorama/Settings.radarIconScale:I
+       386: goto          396
+       389: aload         16
+       391: invokeinterface #313,  1          // InterfaceMethod dev/diorama/RadarCategories$Entry.iconScale:()I
+       396: istore        24
+       398: aload         16
+       400: invokeinterface #319,  1          // InterfaceMethod dev/diorama/RadarCategories$Entry.hasNames:()Z
+       405: ifeq          418
+       408: aload         16
+       410: invokeinterface #323,  1          // InterfaceMethod dev/diorama/RadarCategories$Entry.names:()Ldev/diorama/Settings$NameTags;
+       415: goto          421
+       418: getstatic     #327                // Field dev/diorama/Settings$NameTags.NEVER:Ldev/diorama/Settings$NameTags;
+       421: astore        25
+       423: aload         25
+       425: getstatic     #330                // Field dev/diorama/Settings$NameTags.ALWAYS:Ldev/diorama/Settings$NameTags;
+       428: if_acmpeq     458
+       431: aload         25
+       433: getstatic     #333                // Field dev/diorama/Settings$NameTags.FULLSCREEN:Ldev/diorama/Settings$NameTags;
+       436: if_acmpne     443
+       439: iload_2
+       440: ifne          458
+       443: iload         12
+       445: ifeq          462
+       448: aload         16
+       450: invokeinterface #319,  1          // InterfaceMethod dev/diorama/RadarCategories$Entry.hasNames:()Z
+       455: ifeq          462
+       458: iconst_1
+       459: goto          463
+       462: iconst_0
+       463: istore        26
+       465: aload         7
+       467: new           #13                 // class dev/diorama/render/Radar$Blip
+       470: dup
+       471: aload         14
+       473: aload         15
+       475: fload         22
+       477: fload         23
+       479: aload         17
+       481: getfield      #201                // Field net/minecraft/world/phys/Vec3.f_82480_:D
+       484: dload         8
+       486: dsub
+       487: aload         15
+       489: iload         24
+       491: i2f
+       492: ldc_w         #334                // float 100.0f
+       495: fdiv
+       496: aload_0
+       497: invokevirtual #337                // Method dev/diorama/render/MapViewport$View.zoom:()D
+       500: iload_2
+       501: invokestatic  #341                // Method size:(Ldev/diorama/render/Radar$Kind;FDZ)F
+       504: iload         26
+       506: invokespecial #344                // Method dev/diorama/render/Radar$Blip."<init>":(Lnet/minecraft/world/entity/Entity;Ldev/diorama/render/Radar$Kind;FFDFZ)V
+       509: invokeinterface #348,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       514: pop
+       515: goto          112
+       518: aload         7
+       520: invokedynamic #367,  0            // InvokeDynamic #0:applyAsInt:()Ljava/util/function/ToIntFunction;
+       525: invokestatic  #373                // InterfaceMethod java/util/Comparator.comparingInt:(Ljava/util/function/ToIntFunction;)Ljava/util/Comparator;
+       528: invokeinterface #377,  2          // InterfaceMethod java/util/List.sort:(Ljava/util/Comparator;)V
+       533: aload         7
+       535: areturn
+
+  private static float size(dev.diorama.render.Radar$Kind, float, double, boolean);
+    Code:
+         0: aload_0
+         1: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+         4: if_acmpne     33
+         7: fload_1
+         8: iload         4
+        10: ifeq          30
+        13: ldc2_w        #400                // double 2.0d
+        16: ldc2_w        #402                // double 4.0d
+        19: dload_2
+        20: invokestatic  #406                // Method java/lang/Math.min:(DD)D
+        23: invokestatic  #409                // Method java/lang/Math.max:(DD)D
+        26: d2f
+        27: goto          31
+        30: fconst_2
+        31: fmul
+        32: freturn
+        33: aload_0
+        34: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        37: if_acmpne     72
+        40: fload_1
+        41: iload         4
+        43: ifeq          67
+        46: ldc2_w        #410                // double 8.0d
+        49: ldc2_w        #412                // double 16.0d
+        52: dload_2
+        53: ldc2_w        #64                 // double 3.0d
+        56: dmul
+        57: invokestatic  #406                // Method java/lang/Math.min:(DD)D
+        60: invokestatic  #409                // Method java/lang/Math.max:(DD)D
+        63: d2f
+        64: goto          70
+        67: ldc_w         #414                // float 7.0f
+        70: fmul
+        71: freturn
+        72: fload_1
+        73: iload         4
+        75: ifeq          99
+        78: ldc2_w        #402                // double 4.0d
+        81: ldc2_w        #415                // double 9.0d
+        84: dload_2
+        85: ldc2_w        #417                // double 2.2d
+        88: dmul
+        89: invokestatic  #406                // Method java/lang/Math.min:(DD)D
+        92: invokestatic  #409                // Method java/lang/Math.max:(DD)D
+        95: d2f
+        96: goto          101
+        99: ldc           #68                 // float 4.0f
+       101: fmul
+       102: freturn
+
+  public static void draw(net.minecraft.client.gui.GuiGraphics, dev.diorama.render.MapViewport$View, java.util.List<dev.diorama.render.Radar$Blip>, boolean, boolean);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokevirtual #301                // Method dev/diorama/render/MapViewport$View.x:()I
+         5: aload_1
+         6: invokevirtual #304                // Method dev/diorama/render/MapViewport$View.y:()I
+         9: aload_1
+        10: invokevirtual #301                // Method dev/diorama/render/MapViewport$View.x:()I
+        13: aload_1
+        14: invokevirtual #307                // Method dev/diorama/render/MapViewport$View.width:()I
+        17: iadd
+        18: aload_1
+        19: invokevirtual #304                // Method dev/diorama/render/MapViewport$View.y:()I
+        22: aload_1
+        23: invokevirtual #310                // Method dev/diorama/render/MapViewport$View.height:()I
+        26: iadd
+        27: invokevirtual #428                // Method net/minecraft/client/gui/GuiGraphics.m_280588_:(IIII)V
+        30: iload         4
+        32: ifeq          42
+        35: aload_0
+        36: invokestatic  #434                // Method dev/diorama/render/IconBatch.direct:(Lnet/minecraft/client/gui/GuiGraphics;)Ldev/diorama/render/IconBatch;
+        39: goto          46
+        42: aload_0
+        43: invokestatic  #437                // Method dev/diorama/render/IconBatch.batched:(Lnet/minecraft/client/gui/GuiGraphics;)Ldev/diorama/render/IconBatch;
+        46: astore        5
+        48: invokestatic  #205                // Method dev/diorama/Settings.get:()Ldev/diorama/Settings;
+        51: astore        6
+        53: aconst_null
+        54: astore        7
+        56: aload_1
+        57: invokevirtual #440                // Method dev/diorama/render/MapViewport$View.round:()Z
+        60: ifeq          70
+        63: aload_1
+        64: invokestatic  #446                // Method dev/diorama/render/Circle.in:(Ldev/diorama/render/MapViewport$View;)Ldev/diorama/render/Circle;
+        67: goto          71
+        70: aconst_null
+        71: astore        8
+        73: iload_3
+        74: ifeq          81
+        77: fconst_1
+        78: goto          89
+        81: aload         6
+        83: getfield      #449                // Field dev/diorama/Settings.minimapTextSize:I
+        86: invokestatic  #454                // Method dev/diorama/render/TextSize.scale:(I)F
+        89: fstore        9
+        91: aload         8
+        93: ifnonnull     100
+        96: aconst_null
+        97: goto          104
+       100: aload_0
+       101: invokestatic  #457                // Method dev/diorama/render/IconBatch.measuring:(Lnet/minecraft/client/gui/GuiGraphics;)Ldev/diorama/render/IconBatch;
+       104: astore        10
+       106: iload         4
+       108: ifne          144
+       111: aload_1
+       112: aload_2
+       113: iload_3
+       114: invokestatic  #461                // Method itemPictures:(Ldev/diorama/render/MapViewport$View;Ljava/util/List;Z)Ljava/util/List;
+       117: astore        11
+       119: aload         11
+       121: ifnonnull     135
+       124: aload         5
+       126: aload_2
+       127: aload         8
+       129: invokestatic  #465                // Method itemDots:(Ldev/diorama/render/IconBatch;Ljava/util/List;Ldev/diorama/render/Circle;)V
+       132: goto          144
+       135: aload         5
+       137: aload         11
+       139: aload         8
+       141: invokestatic  #467                // Method itemPictures:(Ldev/diorama/render/IconBatch;Ljava/util/List;Ldev/diorama/render/Circle;)V
+       144: aload_2
+       145: invokeinterface #468,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+       150: astore        11
+       152: aload         11
+       154: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       159: ifeq          344
+       162: aload         11
+       164: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       169: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+       172: astore        12
+       174: aload         12
+       176: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       179: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+       182: if_acmpeq     152
+       185: aload         12
+       187: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       190: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+       193: if_acmpne     200
+       196: iconst_1
+       197: goto          201
+       200: iconst_0
+       201: iload         4
+       203: if_icmpeq     209
+       206: goto          152
+       209: aload         12
+       211: invokevirtual #474                // Method dev/diorama/render/Radar$Blip.dy:()D
+       214: invokestatic  #478                // Method alphaFor:(D)I
+       217: istore        13
+       219: aload         10
+       221: ifnull        253
+       224: aload         10
+       226: invokevirtual #481                // Method dev/diorama/render/IconBatch.clear:()V
+       229: aload         10
+       231: aload         12
+       233: iload         13
+       235: aload         6
+       237: invokestatic  #485                // Method icon:(Ldev/diorama/render/IconBatch;Ldev/diorama/render/Radar$Blip;ILdev/diorama/Settings;)V
+       240: aload         10
+       242: aload         8
+       244: invokevirtual #489                // Method dev/diorama/render/IconBatch.inside:(Ldev/diorama/render/Circle;)Z
+       247: ifne          253
+       250: goto          152
+       253: aload         5
+       255: aload         12
+       257: iload         13
+       259: aload         6
+       261: invokestatic  #485                // Method icon:(Ldev/diorama/render/IconBatch;Ldev/diorama/render/Radar$Blip;ILdev/diorama/Settings;)V
+       264: aload         12
+       266: invokevirtual #491                // Method dev/diorama/render/Radar$Blip.named:()Z
+       269: ifeq          336
+       272: iload         4
+       274: ifne          294
+       277: aload         8
+       279: ifnull        294
+       282: aload         8
+       284: aload         12
+       286: fload         9
+       288: invokestatic  #495                // Method nameInside:(Ldev/diorama/render/Circle;Ldev/diorama/render/Radar$Blip;F)Z
+       291: ifeq          336
+       294: iload         4
+       296: ifeq          312
+       299: aload_0
+       300: aload         12
+       302: iload         13
+       304: fload         9
+       306: invokestatic  #499                // Method nameTag:(Lnet/minecraft/client/gui/GuiGraphics;Ldev/diorama/render/Radar$Blip;IF)V
+       309: goto          336
+       312: aload         7
+       314: ifnonnull     326
+       317: new           #185                // class java/util/ArrayList
+       320: dup
+       321: invokespecial #186                // Method java/util/ArrayList."<init>":()V
+       324: astore        7
+       326: aload         7
+       328: aload         12
+       330: invokeinterface #348,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       335: pop
+       336: aload         5
+       338: invokevirtual #502                // Method dev/diorama/render/IconBatch.endIcon:()V
+       341: goto          152
+       344: aload         5
+       346: invokevirtual #504                // Method dev/diorama/render/IconBatch.draw:()V
+       349: aload         7
+       351: ifnull        404
+       354: aload         7
+       356: invokeinterface #468,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+       361: astore        11
+       363: aload         11
+       365: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       370: ifeq          404
+       373: aload         11
+       375: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       380: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+       383: astore        12
+       385: aload_0
+       386: aload         12
+       388: aload         12
+       390: invokevirtual #474                // Method dev/diorama/render/Radar$Blip.dy:()D
+       393: invokestatic  #478                // Method alphaFor:(D)I
+       396: fload         9
+       398: invokestatic  #499                // Method nameTag:(Lnet/minecraft/client/gui/GuiGraphics;Ldev/diorama/render/Radar$Blip;IF)V
+       401: goto          363
+       404: aload         10
+       406: ifnull        414
+       409: aload         10
+       411: invokevirtual #504                // Method dev/diorama/render/IconBatch.draw:()V
+       414: aload_0
+       415: invokevirtual #507                // Method net/minecraft/client/gui/GuiGraphics.m_280618_:()V
+       418: return
+
+  private static void itemDots(dev.diorama.render.IconBatch, java.util.List<dev.diorama.render.Radar$Blip>, dev.diorama.render.Circle);
+    Code:
+         0: iconst_0
+         1: istore_3
+         2: iload_3
+         3: iconst_2
+         4: if_icmpge     269
+         7: aload_1
+         8: invokeinterface #468,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        13: astore        4
+        15: aload         4
+        17: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        22: ifeq          263
+        25: aload         4
+        27: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        32: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+        35: astore        5
+        37: aload         5
+        39: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+        42: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+        45: if_acmpeq     51
+        48: goto          263
+        51: aload         5
+        53: invokevirtual #474                // Method dev/diorama/render/Radar$Blip.dy:()D
+        56: invokestatic  #478                // Method alphaFor:(D)I
+        59: istore        6
+        61: iconst_1
+        62: aload         5
+        64: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+        67: invokestatic  #528                // Method java/lang/Math.round:(F)I
+        70: invokestatic  #531                // Method java/lang/Math.max:(II)I
+        73: istore        7
+        75: aload         5
+        77: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        80: iload         7
+        82: i2f
+        83: fconst_2
+        84: fdiv
+        85: fsub
+        86: fstore        8
+        88: aload         5
+        90: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        93: iload         7
+        95: i2f
+        96: fconst_2
+        97: fdiv
+        98: fsub
+        99: fstore        9
+       101: aload_2
+       102: ifnull        184
+       105: aload_2
+       106: fload         8
+       108: fconst_1
+       109: fsub
+       110: fload         9
+       112: fconst_1
+       113: fsub
+       114: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       117: ifeq          15
+       120: aload_2
+       121: fload         8
+       123: iload         7
+       125: i2f
+       126: fadd
+       127: fconst_1
+       128: fadd
+       129: fload         9
+       131: fconst_1
+       132: fsub
+       133: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       136: ifeq          15
+       139: aload_2
+       140: fload         8
+       142: fconst_1
+       143: fsub
+       144: fload         9
+       146: iload         7
+       148: i2f
+       149: fadd
+       150: fconst_1
+       151: fadd
+       152: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       155: ifeq          15
+       158: aload_2
+       159: fload         8
+       161: iload         7
+       163: i2f
+       164: fadd
+       165: fconst_1
+       166: fadd
+       167: fload         9
+       169: iload         7
+       171: i2f
+       172: fadd
+       173: fconst_1
+       174: fadd
+       175: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       178: ifne          184
+       181: goto          15
+       184: iload_3
+       185: ifne          227
+       188: aload_0
+       189: fload         8
+       191: fconst_1
+       192: fsub
+       193: fload         9
+       195: fconst_1
+       196: fsub
+       197: fload         8
+       199: iload         7
+       201: i2f
+       202: fadd
+       203: fconst_1
+       204: fadd
+       205: fload         9
+       207: iload         7
+       209: i2f
+       210: fadd
+       211: fconst_1
+       212: fadd
+       213: ldc_w         #540                // int -16777216
+       216: iload         6
+       218: invokestatic  #543                // Method withAlpha:(II)I
+       221: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       224: goto          260
+       227: aload_0
+       228: fload         8
+       230: fload         9
+       232: fload         8
+       234: iload         7
+       236: i2f
+       237: fadd
+       238: fload         9
+       240: iload         7
+       242: i2f
+       243: fadd
+       244: aload         5
+       246: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       249: getfield      #550                // Field dev/diorama/render/Radar$Kind.color:I
+       252: iload         6
+       254: invokestatic  #543                // Method withAlpha:(II)I
+       257: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       260: goto          15
+       263: iinc          3, 1
+       266: goto          2
+       269: aload_0
+       270: invokevirtual #502                // Method dev/diorama/render/IconBatch.endIcon:()V
+       273: return
+
+  public static java.util.List<dev.diorama.render.Radar$ItemPicture> itemPictures(dev.diorama.render.MapViewport$View, java.util.List<dev.diorama.render.Radar$Blip>, boolean);
+    Code:
+         0: aload_1
+         1: invokeinterface #558,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+         6: ifne          28
+         9: aload_1
+        10: iconst_0
+        11: invokeinterface #561,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+        16: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+        19: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+        22: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+        25: if_acmpeq     30
+        28: aconst_null
+        29: areturn
+        30: invokestatic  #205                // Method dev/diorama/Settings.get:()Ldev/diorama/Settings;
+        33: getfield      #564                // Field dev/diorama/Settings.radarItemPictures:Z
+        36: ifeq          73
+        39: iload_2
+        40: ifeq          58
+        43: invokestatic  #205                // Method dev/diorama/Settings.get:()Ldev/diorama/Settings;
+        46: getfield      #568                // Field dev/diorama/Settings.radarStyle:Ldev/diorama/Settings$RadarStyle;
+        49: getstatic     #571                // Field dev/diorama/Settings$RadarStyle.DOTS:Ldev/diorama/Settings$RadarStyle;
+        52: if_acmpne     75
+        55: goto          73
+        58: invokestatic  #169                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+        61: getfield      #210                // Field net/minecraft/client/Minecraft.f_91066_:Lnet/minecraft/client/Options;
+        64: getfield      #216                // Field net/minecraft/client/Options.f_92099_:Lnet/minecraft/client/KeyMapping;
+        67: invokevirtual #221                // Method net/minecraft/client/KeyMapping.m_90857_:()Z
+        70: ifne          75
+        73: aconst_null
+        74: areturn
+        75: new           #573                // class java/util/LinkedHashMap
+        78: dup
+        79: invokespecial #574                // Method java/util/LinkedHashMap."<init>":()V
+        82: astore_3
+        83: fconst_0
+        84: fstore        4
+        86: aload_1
+        87: invokeinterface #468,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        92: astore        5
+        94: aload         5
+        96: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       101: ifeq          316
+       104: aload         5
+       106: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       111: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+       114: astore        6
+       116: aload         6
+       118: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       121: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+       124: if_acmpeq     130
+       127: goto          316
+       130: aload         6
+       132: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       135: astore        8
+       137: aload         8
+       139: instanceof    #93                 // class net/minecraft/world/entity/item/ItemEntity
+       142: ifeq          94
+       145: aload         8
+       147: checkcast     #93                 // class net/minecraft/world/entity/item/ItemEntity
+       150: astore        7
+       152: aload         7
+       154: invokevirtual #582                // Method net/minecraft/world/entity/item/ItemEntity.m_32055_:()Lnet/minecraft/world/item/ItemStack;
+       157: astore        8
+       159: aload         8
+       161: invokevirtual #587                // Method net/minecraft/world/item/ItemStack.m_41619_:()Z
+       164: ifeq          170
+       167: goto          94
+       170: ldc_w         #588                // float 8.0f
+       173: aload         6
+       175: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+       178: ldc           #68                 // float 4.0f
+       180: fmul
+       181: invokestatic  #591                // Method java/lang/Math.max:(FF)F
+       184: fstore        4
+       186: aload         7
+       188: invokevirtual #594                // Method net/minecraft/world/entity/item/ItemEntity.m_20185_:()D
+       191: aload         7
+       193: invokevirtual #597                // Method net/minecraft/world/entity/item/ItemEntity.m_20189_:()D
+       196: invokestatic  #286                // Method dev/diorama/Projection.u:(DD)D
+       199: aload_0
+       200: invokevirtual #337                // Method dev/diorama/render/MapViewport$View.zoom:()D
+       203: dmul
+       204: dstore        9
+       206: aload         7
+       208: invokevirtual #594                // Method net/minecraft/world/entity/item/ItemEntity.m_20185_:()D
+       211: aload         7
+       213: invokevirtual #600                // Method net/minecraft/world/entity/item/ItemEntity.m_20186_:()D
+       216: aload         7
+       218: invokevirtual #597                // Method net/minecraft/world/entity/item/ItemEntity.m_20189_:()D
+       221: invokestatic  #290                // Method dev/diorama/Projection.v:(DDD)D
+       224: aload_0
+       225: invokevirtual #337                // Method dev/diorama/render/MapViewport$View.zoom:()D
+       228: dmul
+       229: dstore        11
+       231: dload         9
+       233: fload         4
+       235: fconst_2
+       236: fmul
+       237: f2d
+       238: ddiv
+       239: invokestatic  #603                // Method java/lang/Math.floor:(D)D
+       242: d2l
+       243: lstore        13
+       245: dload         11
+       247: fload         4
+       249: fconst_2
+       250: fmul
+       251: f2d
+       252: ddiv
+       253: invokestatic  #603                // Method java/lang/Math.floor:(D)D
+       256: d2l
+       257: lstore        15
+       259: aload_3
+       260: lload         13
+       262: bipush        32
+       264: lshl
+       265: lload         15
+       267: ldc2_w        #604                // long 4294967295l
+       270: land
+       271: lor
+       272: invokestatic  #611                // Method java/lang/Long.valueOf:(J)Ljava/lang/Long;
+       275: invokedynamic #623,  0            // InvokeDynamic #1:apply:()Ljava/util/function/Function;
+       280: invokeinterface #627,  3          // InterfaceMethod java/util/Map.computeIfAbsent:(Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;
+       285: checkcast     #9                  // class dev/diorama/render/Radar$Pile
+       288: astore        17
+       290: aload         17
+       292: lload         13
+       294: putfield      #631                // Field dev/diorama/render/Radar$Pile.squareX:J
+       297: aload         17
+       299: lload         15
+       301: putfield      #634                // Field dev/diorama/render/Radar$Pile.squareY:J
+       304: aload         17
+       306: aload         6
+       308: aload         8
+       310: invokevirtual #637                // Method dev/diorama/render/Radar$Pile.add:(Ldev/diorama/render/Radar$Blip;Lnet/minecraft/world/item/ItemStack;)V
+       313: goto          94
+       316: new           #185                // class java/util/ArrayList
+       319: dup
+       320: invokespecial #186                // Method java/util/ArrayList."<init>":()V
+       323: astore        5
+       325: iconst_0
+       326: istore        6
+       328: aload_3
+       329: invokeinterface #641,  1          // InterfaceMethod java/util/Map.values:()Ljava/util/Collection;
+       334: invokeinterface #644,  1          // InterfaceMethod java/util/Collection.iterator:()Ljava/util/Iterator;
+       339: astore        7
+       341: aload         7
+       343: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       348: ifeq          778
+       351: aload         7
+       353: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       358: checkcast     #9                  // class dev/diorama/render/Radar$Pile
+       361: astore        8
+       363: aload         8
+       365: getfield      #647                // Field dev/diorama/render/Radar$Pile.kinds:Ljava/util/List;
+       368: invokeinterface #649,  1          // InterfaceMethod java/util/List.size:()I
+       373: istore        9
+       375: iconst_2
+       376: iload         9
+       378: invokestatic  #651                // Method java/lang/Math.min:(II)I
+       381: istore        10
+       383: iload         9
+       385: iconst_1
+       386: iadd
+       387: iconst_2
+       388: idiv
+       389: istore        11
+       391: aload_0
+       392: aload         8
+       394: getfield      #631                // Field dev/diorama/render/Radar$Pile.squareX:J
+       397: l2d
+       398: fload         4
+       400: f2d
+       401: ldc2_w        #400                // double 2.0d
+       404: dmul
+       405: dmul
+       406: aload_0
+       407: invokevirtual #337                // Method dev/diorama/render/MapViewport$View.zoom:()D
+       410: ddiv
+       411: invokevirtual #654                // Method dev/diorama/render/MapViewport$View.screenX:(D)F
+       414: fstore        12
+       416: aload_0
+       417: aload         8
+       419: getfield      #634                // Field dev/diorama/render/Radar$Pile.squareY:J
+       422: l2d
+       423: fload         4
+       425: f2d
+       426: ldc2_w        #400                // double 2.0d
+       429: dmul
+       430: dmul
+       431: aload_0
+       432: invokevirtual #337                // Method dev/diorama/render/MapViewport$View.zoom:()D
+       435: ddiv
+       436: invokevirtual #656                // Method dev/diorama/render/MapViewport$View.screenY:(D)F
+       439: fstore        13
+       441: fload         12
+       443: iload         10
+       445: i2f
+       446: fload         4
+       448: fmul
+       449: fconst_2
+       450: fdiv
+       451: fadd
+       452: fload         12
+       454: fload         4
+       456: fconst_2
+       457: fmul
+       458: fadd
+       459: iload         10
+       461: i2f
+       462: fload         4
+       464: fmul
+       465: fconst_2
+       466: fdiv
+       467: fsub
+       468: aload         8
+       470: getfield      #658                // Field dev/diorama/render/Radar$Pile.x:F
+       473: aload         8
+       475: getfield      #661                // Field dev/diorama/render/Radar$Pile.count:I
+       478: i2f
+       479: fdiv
+       480: invokestatic  #663                // Method java/lang/Math.min:(FF)F
+       483: invokestatic  #591                // Method java/lang/Math.max:(FF)F
+       486: fstore        14
+       488: fload         13
+       490: iload         11
+       492: i2f
+       493: fload         4
+       495: fmul
+       496: fconst_2
+       497: fdiv
+       498: fadd
+       499: fload         13
+       501: fload         4
+       503: fconst_2
+       504: fmul
+       505: fadd
+       506: iload         11
+       508: i2f
+       509: fload         4
+       511: fmul
+       512: fconst_2
+       513: fdiv
+       514: fsub
+       515: aload         8
+       517: getfield      #665                // Field dev/diorama/render/Radar$Pile.y:F
+       520: aload         8
+       522: getfield      #661                // Field dev/diorama/render/Radar$Pile.count:I
+       525: i2f
+       526: fdiv
+       527: invokestatic  #663                // Method java/lang/Math.min:(FF)F
+       530: invokestatic  #591                // Method java/lang/Math.max:(FF)F
+       533: fstore        15
+       535: aload_0
+       536: invokevirtual #668                // Method dev/diorama/render/MapViewport$View.turn:()F
+       539: fconst_0
+       540: fcmpl
+       541: ifeq          572
+       544: aload         8
+       546: getfield      #658                // Field dev/diorama/render/Radar$Pile.x:F
+       549: aload         8
+       551: getfield      #661                // Field dev/diorama/render/Radar$Pile.count:I
+       554: i2f
+       555: fdiv
+       556: fstore        14
+       558: aload         8
+       560: getfield      #665                // Field dev/diorama/render/Radar$Pile.y:F
+       563: aload         8
+       565: getfield      #661                // Field dev/diorama/render/Radar$Pile.count:I
+       568: i2f
+       569: fdiv
+       570: fstore        15
+       572: iload         6
+       574: iload         9
+       576: iadd
+       577: bipush        64
+       579: if_icmple     636
+       582: aload         5
+       584: new           #11                 // class dev/diorama/render/Radar$ItemPicture
+       587: dup
+       588: aload         8
+       590: getfield      #647                // Field dev/diorama/render/Radar$Pile.kinds:Ljava/util/List;
+       593: iconst_0
+       594: invokeinterface #561,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+       599: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+       602: aconst_null
+       603: fload         14
+       605: fload         15
+       607: aload         8
+       609: getfield      #647                // Field dev/diorama/render/Radar$Pile.kinds:Ljava/util/List;
+       612: iconst_0
+       613: invokeinterface #561,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+       618: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+       621: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+       624: invokespecial #671                // Method dev/diorama/render/Radar$ItemPicture."<init>":(Ldev/diorama/render/Radar$Blip;Lnet/minecraft/world/item/ItemStack;FFF)V
+       627: invokeinterface #348,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       632: pop
+       633: goto          341
+       636: iload         6
+       638: iload         9
+       640: iadd
+       641: istore        6
+       643: iconst_0
+       644: istore        16
+       646: iload         16
+       648: iload         9
+       650: if_icmpge     775
+       653: aload         8
+       655: getfield      #647                // Field dev/diorama/render/Radar$Pile.kinds:Ljava/util/List;
+       658: iload         16
+       660: invokeinterface #561,  2          // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+       665: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+       668: astore        17
+       670: iload         16
+       672: iconst_2
+       673: idiv
+       674: iload         11
+       676: iconst_1
+       677: isub
+       678: if_icmpne     693
+       681: iload         9
+       683: iconst_2
+       684: iload         11
+       686: iconst_1
+       687: isub
+       688: imul
+       689: isub
+       690: goto          695
+       693: iload         10
+       695: istore        18
+       697: fload         14
+       699: iload         16
+       701: iconst_2
+       702: irem
+       703: i2f
+       704: iload         18
+       706: i2f
+       707: fconst_2
+       708: fdiv
+       709: fsub
+       710: fload         4
+       712: fmul
+       713: fadd
+       714: fstore        19
+       716: fload         15
+       718: iload         16
+       720: iconst_2
+       721: idiv
+       722: i2f
+       723: iload         11
+       725: i2f
+       726: fconst_2
+       727: fdiv
+       728: fsub
+       729: fload         4
+       731: fmul
+       732: fadd
+       733: fstore        20
+       735: aload         5
+       737: new           #11                 // class dev/diorama/render/Radar$ItemPicture
+       740: dup
+       741: aload         17
+       743: aload         17
+       745: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       748: checkcast     #93                 // class net/minecraft/world/entity/item/ItemEntity
+       751: invokevirtual #582                // Method net/minecraft/world/entity/item/ItemEntity.m_32055_:()Lnet/minecraft/world/item/ItemStack;
+       754: fload         19
+       756: fload         20
+       758: fload         4
+       760: invokespecial #671                // Method dev/diorama/render/Radar$ItemPicture."<init>":(Ldev/diorama/render/Radar$Blip;Lnet/minecraft/world/item/ItemStack;FFF)V
+       763: invokeinterface #348,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       768: pop
+       769: iinc          16, 1
+       772: goto          646
+       775: goto          341
+       778: aload         5
+       780: areturn
+
+  private static void itemPictures(dev.diorama.render.IconBatch, java.util.List<dev.diorama.render.Radar$ItemPicture>, dev.diorama.render.Circle);
+    Code:
+         0: iconst_0
+         1: istore_3
+         2: iload_3
+         3: iconst_2
+         4: if_icmpge     371
+         7: aload_1
+         8: invokeinterface #468,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        13: astore        4
+        15: aload         4
+        17: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        22: ifeq          365
+        25: aload         4
+        27: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        32: checkcast     #11                 // class dev/diorama/render/Radar$ItemPicture
+        35: astore        5
+        37: aload         5
+        39: invokevirtual #694                // Method dev/diorama/render/Radar$ItemPicture.stack:()Lnet/minecraft/world/item/ItemStack;
+        42: ifnull        152
+        45: aload         5
+        47: invokevirtual #695                // Method dev/diorama/render/Radar$ItemPicture.x:()F
+        50: fstore        6
+        52: aload         5
+        54: invokevirtual #696                // Method dev/diorama/render/Radar$ItemPicture.y:()F
+        57: fstore        7
+        59: aload         5
+        61: invokevirtual #697                // Method dev/diorama/render/Radar$ItemPicture.size:()F
+        64: fstore        8
+        66: iload_3
+        67: ifne          15
+        70: aload_2
+        71: ifnull        130
+        74: aload_2
+        75: fload         6
+        77: fload         7
+        79: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+        82: ifeq          15
+        85: aload_2
+        86: fload         6
+        88: fload         8
+        90: fadd
+        91: fload         7
+        93: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+        96: ifeq          15
+        99: aload_2
+       100: fload         6
+       102: fload         7
+       104: fload         8
+       106: fadd
+       107: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       110: ifeq          15
+       113: aload_2
+       114: fload         6
+       116: fload         8
+       118: fadd
+       119: fload         7
+       121: fload         8
+       123: fadd
+       124: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       127: ifeq          15
+       130: aload_0
+       131: aload         5
+       133: invokevirtual #694                // Method dev/diorama/render/Radar$ItemPicture.stack:()Lnet/minecraft/world/item/ItemStack;
+       136: fload         6
+       138: fload         7
+       140: fload         8
+       142: ldc_w         #698                // float 16.0f
+       145: fdiv
+       146: invokevirtual #702                // Method dev/diorama/render/IconBatch.itemUnder:(Lnet/minecraft/world/item/ItemStack;FFF)V
+       149: goto          15
+       152: aload         5
+       154: invokevirtual #705                // Method dev/diorama/render/Radar$ItemPicture.blip:()Ldev/diorama/render/Radar$Blip;
+       157: invokevirtual #474                // Method dev/diorama/render/Radar$Blip.dy:()D
+       160: invokestatic  #478                // Method alphaFor:(D)I
+       163: istore        6
+       165: iconst_1
+       166: aload         5
+       168: invokevirtual #697                // Method dev/diorama/render/Radar$ItemPicture.size:()F
+       171: invokestatic  #528                // Method java/lang/Math.round:(F)I
+       174: invokestatic  #531                // Method java/lang/Math.max:(II)I
+       177: istore        7
+       179: aload         5
+       181: invokevirtual #695                // Method dev/diorama/render/Radar$ItemPicture.x:()F
+       184: iload         7
+       186: i2f
+       187: fconst_2
+       188: fdiv
+       189: fsub
+       190: fstore        8
+       192: aload         5
+       194: invokevirtual #696                // Method dev/diorama/render/Radar$ItemPicture.y:()F
+       197: iload         7
+       199: i2f
+       200: fconst_2
+       201: fdiv
+       202: fsub
+       203: fstore        9
+       205: aload_2
+       206: ifnull        288
+       209: aload_2
+       210: fload         8
+       212: fconst_1
+       213: fsub
+       214: fload         9
+       216: fconst_1
+       217: fsub
+       218: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       221: ifeq          15
+       224: aload_2
+       225: fload         8
+       227: iload         7
+       229: i2f
+       230: fadd
+       231: fconst_1
+       232: fadd
+       233: fload         9
+       235: fconst_1
+       236: fsub
+       237: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       240: ifeq          15
+       243: aload_2
+       244: fload         8
+       246: fconst_1
+       247: fsub
+       248: fload         9
+       250: iload         7
+       252: i2f
+       253: fadd
+       254: fconst_1
+       255: fadd
+       256: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       259: ifeq          15
+       262: aload_2
+       263: fload         8
+       265: iload         7
+       267: i2f
+       268: fadd
+       269: fconst_1
+       270: fadd
+       271: fload         9
+       273: iload         7
+       275: i2f
+       276: fadd
+       277: fconst_1
+       278: fadd
+       279: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       282: ifne          288
+       285: goto          15
+       288: iload_3
+       289: ifne          331
+       292: aload_0
+       293: fload         8
+       295: fconst_1
+       296: fsub
+       297: fload         9
+       299: fconst_1
+       300: fsub
+       301: fload         8
+       303: iload         7
+       305: i2f
+       306: fadd
+       307: fconst_1
+       308: fadd
+       309: fload         9
+       311: iload         7
+       313: i2f
+       314: fadd
+       315: fconst_1
+       316: fadd
+       317: ldc_w         #540                // int -16777216
+       320: iload         6
+       322: invokestatic  #543                // Method withAlpha:(II)I
+       325: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       328: goto          362
+       331: aload_0
+       332: fload         8
+       334: fload         9
+       336: fload         8
+       338: iload         7
+       340: i2f
+       341: fadd
+       342: fload         9
+       344: iload         7
+       346: i2f
+       347: fadd
+       348: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+       351: getfield      #550                // Field dev/diorama/render/Radar$Kind.color:I
+       354: iload         6
+       356: invokestatic  #543                // Method withAlpha:(II)I
+       359: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       362: goto          15
+       365: iinc          3, 1
+       368: goto          2
+       371: aload_0
+       372: invokevirtual #502                // Method dev/diorama/render/IconBatch.endIcon:()V
+       375: return
+
+  private static void icon(dev.diorama.render.IconBatch, dev.diorama.render.Radar$Blip, int, dev.diorama.Settings);
+    Code:
+         0: getstatic     #712                // Field dev/diorama/render/Radar$1.$SwitchMap$dev$diorama$Settings$RadarStyle:[I
+         3: aload_3
+         4: getfield      #568                // Field dev/diorama/Settings.radarStyle:Ldev/diorama/Settings$RadarStyle;
+         7: invokevirtual #715                // Method dev/diorama/Settings$RadarStyle.ordinal:()I
+        10: iaload
+        11: lookupswitch  { // 2
+                       1: 36
+                       2: 45
+                 default: 54
+            }
+        36: aload_0
+        37: aload_1
+        38: iload_2
+        39: invokestatic  #719                // Method framed:(Ldev/diorama/render/IconBatch;Ldev/diorama/render/Radar$Blip;I)V
+        42: goto          64
+        45: aload_0
+        46: aload_1
+        47: iload_2
+        48: invokestatic  #722                // Method dot:(Ldev/diorama/render/IconBatch;Ldev/diorama/render/Radar$Blip;I)V
+        51: goto          64
+        54: aload_0
+        55: aload_1
+        56: iload_2
+        57: aload_3
+        58: getfield      #725                // Field dev/diorama/Settings.radarTypeOutline:Z
+        61: invokestatic  #729                // Method pixelHead:(Ldev/diorama/render/IconBatch;Ldev/diorama/render/Radar$Blip;IZ)V
+        64: aload_3
+        65: getfield      #732                // Field dev/diorama/Settings.radarHeightArrows:Z
+        68: ifeq          235
+        71: aload_1
+        72: invokevirtual #474                // Method dev/diorama/render/Radar$Blip.dy:()D
+        75: invokestatic  #270                // Method java/lang/Math.abs:(D)D
+        78: ldc2_w        #64                 // double 3.0d
+        81: dcmpl
+        82: ifle          235
+        85: aload_1
+        86: invokevirtual #474                // Method dev/diorama/render/Radar$Blip.dy:()D
+        89: dconst_0
+        90: dcmpg
+        91: ifge          98
+        94: iconst_1
+        95: goto          99
+        98: iconst_0
+        99: istore        4
+       101: aload_1
+       102: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+       105: fstore        5
+       107: aload_3
+       108: getfield      #568                // Field dev/diorama/Settings.radarStyle:Ldev/diorama/Settings$RadarStyle;
+       111: getstatic     #735                // Field dev/diorama/Settings$RadarStyle.FRAMED:Ldev/diorama/Settings$RadarStyle;
+       114: if_acmpne     204
+       117: ldc           #68                 // float 4.0f
+       119: fload         5
+       121: ldc_w         #736                // float 0.7f
+       124: fmul
+       125: invokestatic  #591                // Method java/lang/Math.max:(FF)F
+       128: fstore        6
+       130: aload_1
+       131: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       134: fload         5
+       136: ldc_w         #737                // float 0.55f
+       139: fmul
+       140: fadd
+       141: fload         6
+       143: ldc_w         #738                // float 0.3f
+       146: fmul
+       147: fadd
+       148: fstore        7
+       150: aload_1
+       151: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       154: fload         5
+       156: ldc_w         #739                // float 0.45f
+       159: fmul
+       160: fsub
+       161: fstore        8
+       163: aload_0
+       164: fload         7
+       166: fload         8
+       168: fload         6
+       170: fconst_2
+       171: fadd
+       172: ldc_w         #740                // int -535817192
+       175: iload_2
+       176: invokestatic  #543                // Method withAlpha:(II)I
+       179: iload         4
+       181: invokestatic  #746                // Method dev/diorama/render/MapIcons.caret:(Ldev/diorama/render/IconBatch;FFFIZ)V
+       184: aload_0
+       185: fload         7
+       187: fload         8
+       189: fload         6
+       191: iconst_m1
+       192: iload_2
+       193: invokestatic  #543                // Method withAlpha:(II)I
+       196: iload         4
+       198: invokestatic  #746                // Method dev/diorama/render/MapIcons.caret:(Ldev/diorama/render/IconBatch;FFFIZ)V
+       201: goto          235
+       204: aload_0
+       205: aload_1
+       206: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       209: fload         5
+       211: ldc_w         #736                // float 0.7f
+       214: fmul
+       215: fadd
+       216: fconst_1
+       217: fadd
+       218: aload_1
+       219: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       222: fload         5
+       224: ldc_w         #747                // float 0.5f
+       227: fmul
+       228: fsub
+       229: iload         4
+       231: iload_2
+       232: invokestatic  #751                // Method pixelCaret:(Ldev/diorama/render/IconBatch;FFZI)V
+       235: aload_1
+       236: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       239: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+       242: if_acmpeq     286
+       245: aload_1
+       246: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       249: invokestatic  #756                // Method dev/diorama/render/CobblemonPortraits.shiny:(Lnet/minecraft/world/entity/Entity;)Z
+       252: ifeq          286
+       255: aload_0
+       256: aload_1
+       257: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       260: aload_1
+       261: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+       264: ldc_w         #757                // float 0.8f
+       267: fmul
+       268: fsub
+       269: aload_1
+       270: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       273: aload_1
+       274: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+       277: ldc_w         #757                // float 0.8f
+       280: fmul
+       281: fsub
+       282: iload_2
+       283: invokestatic  #761                // Method sparkle:(Ldev/diorama/render/IconBatch;FFI)V
+       286: return
+
+  private static void sparkle(dev.diorama.render.IconBatch, float, float, int);
+    Code:
+         0: ldc_w         #540                // int -16777216
+         3: iload_3
+         4: invokestatic  #543                // Method withAlpha:(II)I
+         7: istore        4
+         9: sipush        -7862
+        12: iload_3
+        13: invokestatic  #543                // Method withAlpha:(II)I
+        16: istore        5
+        18: aload_0
+        19: fload_1
+        20: fconst_1
+        21: fsub
+        22: fload_2
+        23: fconst_2
+        24: fsub
+        25: fload_1
+        26: fconst_2
+        27: fadd
+        28: fload_2
+        29: ldc_w         #763                // float 3.0f
+        32: fadd
+        33: iload         4
+        35: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+        38: aload_0
+        39: fload_1
+        40: fconst_2
+        41: fsub
+        42: fload_2
+        43: fconst_1
+        44: fsub
+        45: fload_1
+        46: ldc_w         #763                // float 3.0f
+        49: fadd
+        50: fload_2
+        51: fconst_2
+        52: fadd
+        53: iload         4
+        55: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+        58: aload_0
+        59: fload_1
+        60: fload_2
+        61: fconst_1
+        62: fsub
+        63: fload_1
+        64: fconst_1
+        65: fadd
+        66: fload_2
+        67: fconst_2
+        68: fadd
+        69: iload         5
+        71: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+        74: aload_0
+        75: fload_1
+        76: fconst_1
+        77: fsub
+        78: fload_2
+        79: fload_1
+        80: fconst_2
+        81: fadd
+        82: fload_2
+        83: fconst_1
+        84: fadd
+        85: iload         5
+        87: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+        90: aload_0
+        91: fload_1
+        92: fload_2
+        93: fload_1
+        94: fconst_1
+        95: fadd
+        96: fload_2
+        97: fconst_1
+        98: fadd
+        99: iconst_m1
+       100: iload_3
+       101: invokestatic  #543                // Method withAlpha:(II)I
+       104: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       107: return
+
+  private static void framed(dev.diorama.render.IconBatch, dev.diorama.render.Radar$Blip, int);
+    Code:
+         0: aload_0
+         1: invokevirtual #768                // Method dev/diorama/render/IconBatch.graphics:()Lnet/minecraft/client/gui/GuiGraphics;
+         4: astore_3
+         5: aload_1
+         6: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+         9: fstore        4
+        11: aload_1
+        12: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+        15: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        18: if_acmpne     143
+        21: aload_1
+        22: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+        25: astore        6
+        27: aload         6
+        29: instanceof    #87                 // class net/minecraft/client/player/AbstractClientPlayer
+        32: ifeq          143
+        35: aload         6
+        37: checkcast     #87                 // class net/minecraft/client/player/AbstractClientPlayer
+        40: astore        5
+        42: aload_0
+        43: aload_1
+        44: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        47: aload_1
+        48: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        51: fload         4
+        53: ldc_w         #769                // float 1.55f
+        56: fmul
+        57: ldc_w         #770                // int -15723496
+        60: iload_2
+        61: invokestatic  #543                // Method withAlpha:(II)I
+        64: invokestatic  #773                // Method dev/diorama/render/MapIcons.dot:(Ldev/diorama/render/IconBatch;FFFI)V
+        67: aload_3
+        68: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        71: invokevirtual #782                // Method com/mojang/blaze3d/vertex/PoseStack.m_85836_:()V
+        74: aload_3
+        75: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        78: aload_1
+        79: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        82: fload         4
+        84: fconst_2
+        85: fdiv
+        86: fsub
+        87: aload_1
+        88: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        91: fload         4
+        93: fconst_2
+        94: fdiv
+        95: fsub
+        96: fconst_0
+        97: invokevirtual #786                // Method com/mojang/blaze3d/vertex/PoseStack.m_252880_:(FFF)V
+       100: aload_3
+       101: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       104: fload         4
+       106: ldc_w         #588                // float 8.0f
+       109: fdiv
+       110: fload         4
+       112: ldc_w         #588                // float 8.0f
+       115: fdiv
+       116: fconst_1
+       117: invokevirtual #789                // Method com/mojang/blaze3d/vertex/PoseStack.m_85841_:(FFF)V
+       120: aload_0
+       121: aload         5
+       123: iconst_0
+       124: iconst_0
+       125: bipush        8
+       127: iconst_m1
+       128: iload_2
+       129: invokestatic  #543                // Method withAlpha:(II)I
+       132: invokevirtual #793                // Method dev/diorama/render/IconBatch.playerFace:(Lnet/minecraft/client/player/AbstractClientPlayer;IIII)V
+       135: aload_3
+       136: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       139: invokevirtual #796                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+       142: return
+       143: aload_1
+       144: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       147: invokestatic  #799                // Method dev/diorama/render/XaeroRadarIcons.of:(Lnet/minecraft/world/entity/Entity;)Ldev/diorama/render/XaeroRadarIcons$Icon;
+       150: astore        5
+       152: aload         5
+       154: getstatic     #803                // Field dev/diorama/render/XaeroRadarIcons$Basic.DOT:Ldev/diorama/render/XaeroRadarIcons$Basic;
+       157: if_acmpeq     435
+       160: aload         5
+       162: ifnonnull     175
+       165: aload_1
+       166: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       169: invokestatic  #808                // Method dev/diorama/render/MobFaces.has:(Lnet/minecraft/world/entity/Entity;)Z
+       172: ifeq          435
+       175: fload         4
+       177: ldc_w         #809                // float 1.6f
+       180: fmul
+       181: invokestatic  #528                // Method java/lang/Math.round:(F)I
+       184: istore        6
+       186: aload_1
+       187: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       190: iload         6
+       192: i2f
+       193: fconst_2
+       194: fdiv
+       195: fsub
+       196: fstore        7
+       198: aload_1
+       199: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       202: iload         6
+       204: i2f
+       205: fconst_2
+       206: fdiv
+       207: fsub
+       208: fstore        8
+       210: aload_0
+       211: fload         7
+       213: fconst_1
+       214: fsub
+       215: fload         8
+       217: fconst_1
+       218: fsub
+       219: fload         7
+       221: iload         6
+       223: i2f
+       224: fadd
+       225: fconst_1
+       226: fadd
+       227: fload         8
+       229: iload         6
+       231: i2f
+       232: fadd
+       233: fconst_1
+       234: fadd
+       235: aload_1
+       236: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       239: getfield      #550                // Field dev/diorama/render/Radar$Kind.color:I
+       242: iload_2
+       243: invokestatic  #543                // Method withAlpha:(II)I
+       246: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       249: aload_0
+       250: fload         7
+       252: fload         8
+       254: fload         7
+       256: iload         6
+       258: i2f
+       259: fadd
+       260: fload         8
+       262: iload         6
+       264: i2f
+       265: fadd
+       266: ldc_w         #770                // int -15723496
+       269: iload_2
+       270: invokestatic  #543                // Method withAlpha:(II)I
+       273: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       276: aload         5
+       278: instanceof    #52                 // class dev/diorama/render/XaeroRadarIcons$Sprite
+       281: ifeq          326
+       284: aload         5
+       286: checkcast     #52                 // class dev/diorama/render/XaeroRadarIcons$Sprite
+       289: astore        9
+       291: aload         9
+       293: aload_0
+       294: fload         7
+       296: iload         6
+       298: i2f
+       299: fconst_2
+       300: fdiv
+       301: fadd
+       302: fload         8
+       304: iload         6
+       306: i2f
+       307: fconst_2
+       308: fdiv
+       309: fadd
+       310: iload         6
+       312: iconst_2
+       313: isub
+       314: i2f
+       315: iconst_m1
+       316: iload_2
+       317: invokestatic  #543                // Method withAlpha:(II)I
+       320: invokevirtual #812                // Method dev/diorama/render/XaeroRadarIcons$Sprite.drawFitted:(Ldev/diorama/render/IconBatch;FFFI)V
+       323: goto          432
+       326: aload         5
+       328: instanceof    #55                 // class dev/diorama/render/XaeroRadarIcons$ItemIcon
+       331: ifeq          370
+       334: aload         5
+       336: checkcast     #55                 // class dev/diorama/render/XaeroRadarIcons$ItemIcon
+       339: astore        10
+       341: aload_0
+       342: aload         10
+       344: invokevirtual #813                // Method dev/diorama/render/XaeroRadarIcons$ItemIcon.stack:()Lnet/minecraft/world/item/ItemStack;
+       347: fload         7
+       349: fconst_1
+       350: fadd
+       351: fload         8
+       353: fconst_1
+       354: fadd
+       355: iload         6
+       357: iconst_2
+       358: isub
+       359: i2f
+       360: ldc_w         #698                // float 16.0f
+       363: fdiv
+       364: invokevirtual #816                // Method dev/diorama/render/IconBatch.item:(Lnet/minecraft/world/item/ItemStack;FFF)V
+       367: goto          432
+       370: aload_0
+       371: aload_1
+       372: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       375: fload         7
+       377: iload         6
+       379: i2f
+       380: fconst_2
+       381: fdiv
+       382: fadd
+       383: fload         8
+       385: iload         6
+       387: i2f
+       388: fconst_2
+       389: fdiv
+       390: fadd
+       391: iload         6
+       393: iconst_2
+       394: isub
+       395: i2f
+       396: iconst_m1
+       397: iload_2
+       398: invokestatic  #543                // Method withAlpha:(II)I
+       401: invokestatic  #819                // Method dev/diorama/render/MobFaces.draw:(Ldev/diorama/render/IconBatch;Lnet/minecraft/world/entity/Entity;FFFI)Z
+       404: ifne          432
+       407: aload_0
+       408: aload_1
+       409: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       412: aload_1
+       413: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       416: fload         4
+       418: aload_1
+       419: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       422: getfield      #550                // Field dev/diorama/render/Radar$Kind.color:I
+       425: iload_2
+       426: invokestatic  #543                // Method withAlpha:(II)I
+       429: invokestatic  #773                // Method dev/diorama/render/MapIcons.dot:(Ldev/diorama/render/IconBatch;FFFI)V
+       432: goto          483
+       435: aload_0
+       436: aload_1
+       437: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       440: aload_1
+       441: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       444: fload         4
+       446: fconst_2
+       447: fadd
+       448: ldc_w         #740                // int -535817192
+       451: iload_2
+       452: invokestatic  #543                // Method withAlpha:(II)I
+       455: invokestatic  #773                // Method dev/diorama/render/MapIcons.dot:(Ldev/diorama/render/IconBatch;FFFI)V
+       458: aload_0
+       459: aload_1
+       460: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       463: aload_1
+       464: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       467: fload         4
+       469: aload_1
+       470: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       473: getfield      #550                // Field dev/diorama/render/Radar$Kind.color:I
+       476: iload_2
+       477: invokestatic  #543                // Method withAlpha:(II)I
+       480: invokestatic  #773                // Method dev/diorama/render/MapIcons.dot:(Ldev/diorama/render/IconBatch;FFFI)V
+       483: return
+
+  private static void pixelHead(dev.diorama.render.IconBatch, dev.diorama.render.Radar$Blip, int, boolean);
+    Code:
+         0: aload_0
+         1: invokevirtual #768                // Method dev/diorama/render/IconBatch.graphics:()Lnet/minecraft/client/gui/GuiGraphics;
+         4: astore        4
+         6: aload_1
+         7: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+        10: fstore        5
+        12: iload_3
+        13: ifeq          36
+        16: aload_1
+        17: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+        20: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        23: if_acmpeq     36
+        26: aload_1
+        27: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+        30: getfield      #550                // Field dev/diorama/render/Radar$Kind.color:I
+        33: goto          39
+        36: ldc_w         #540                // int -16777216
+        39: istore        6
+        41: aload_1
+        42: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+        45: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        48: if_acmpne     130
+        51: aload_1
+        52: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+        55: astore        8
+        57: aload         8
+        59: instanceof    #87                 // class net/minecraft/client/player/AbstractClientPlayer
+        62: ifeq          130
+        65: aload         8
+        67: checkcast     #87                 // class net/minecraft/client/player/AbstractClientPlayer
+        70: astore        7
+        72: fload         5
+        74: bipush        8
+        76: invokestatic  #830                // Method texel:(FI)F
+        79: fstore        8
+        81: aload_0
+        82: aload_1
+        83: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        86: aload_1
+        87: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        90: bipush        8
+        92: bipush        8
+        94: fload         8
+        96: iload         6
+        98: iload_2
+        99: invokestatic  #543                // Method withAlpha:(II)I
+       102: iload_2
+       103: invokestatic  #834                // Method pixelFrame:(Ldev/diorama/render/IconBatch;FFIIFII)V
+       106: aload_0
+       107: aload         7
+       109: iconst_0
+       110: iconst_0
+       111: bipush        8
+       113: iconst_m1
+       114: iload_2
+       115: invokestatic  #543                // Method withAlpha:(II)I
+       118: invokevirtual #793                // Method dev/diorama/render/IconBatch.playerFace:(Lnet/minecraft/client/player/AbstractClientPlayer;IIII)V
+       121: aload         4
+       123: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       126: invokevirtual #796                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+       129: return
+       130: aload_1
+       131: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       134: invokestatic  #799                // Method dev/diorama/render/XaeroRadarIcons.of:(Lnet/minecraft/world/entity/Entity;)Ldev/diorama/render/XaeroRadarIcons$Icon;
+       137: astore        7
+       139: aload         7
+       141: instanceof    #52                 // class dev/diorama/render/XaeroRadarIcons$Sprite
+       144: ifeq          189
+       147: aload         7
+       149: checkcast     #52                 // class dev/diorama/render/XaeroRadarIcons$Sprite
+       152: astore        8
+       154: aload         8
+       156: aload_0
+       157: aload_1
+       158: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       161: aload_1
+       162: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       165: fload         5
+       167: ldc_w         #809                // float 1.6f
+       170: fmul
+       171: iconst_m1
+       172: iload_2
+       173: invokestatic  #543                // Method withAlpha:(II)I
+       176: iload         6
+       178: iload_2
+       179: invokestatic  #543                // Method withAlpha:(II)I
+       182: iload_2
+       183: invokevirtual #838                // Method dev/diorama/render/XaeroRadarIcons$Sprite.drawPixel:(Ldev/diorama/render/IconBatch;FFFIII)V
+       186: goto          337
+       189: aload         7
+       191: instanceof    #55                 // class dev/diorama/render/XaeroRadarIcons$ItemIcon
+       194: ifeq          286
+       197: aload         7
+       199: checkcast     #55                 // class dev/diorama/render/XaeroRadarIcons$ItemIcon
+       202: astore        9
+       204: fload         5
+       206: ldc_w         #809                // float 1.6f
+       209: fmul
+       210: bipush        8
+       212: invokestatic  #830                // Method texel:(FI)F
+       215: fstore        10
+       217: aload_0
+       218: aload_1
+       219: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       222: aload_1
+       223: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       226: bipush        8
+       228: bipush        8
+       230: fload         10
+       232: iload         6
+       234: iload_2
+       235: invokestatic  #543                // Method withAlpha:(II)I
+       238: iload_2
+       239: invokestatic  #834                // Method pixelFrame:(Ldev/diorama/render/IconBatch;FFIIFII)V
+       242: aload         4
+       244: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       247: invokevirtual #796                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+       250: aload_0
+       251: aload         9
+       253: invokevirtual #813                // Method dev/diorama/render/XaeroRadarIcons$ItemIcon.stack:()Lnet/minecraft/world/item/ItemStack;
+       256: aload_1
+       257: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       260: ldc           #68                 // float 4.0f
+       262: fload         10
+       264: fmul
+       265: fsub
+       266: aload_1
+       267: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       270: ldc           #68                 // float 4.0f
+       272: fload         10
+       274: fmul
+       275: fsub
+       276: fload         10
+       278: fconst_2
+       279: fdiv
+       280: invokevirtual #816                // Method dev/diorama/render/IconBatch.item:(Lnet/minecraft/world/item/ItemStack;FFF)V
+       283: goto          337
+       286: aload         7
+       288: getstatic     #803                // Field dev/diorama/render/XaeroRadarIcons$Basic.DOT:Ldev/diorama/render/XaeroRadarIcons$Basic;
+       291: if_acmpeq     331
+       294: aload_0
+       295: aload_1
+       296: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+       299: aload_1
+       300: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       303: aload_1
+       304: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+       307: fload         5
+       309: ldc_w         #809                // float 1.6f
+       312: fmul
+       313: iconst_m1
+       314: iload_2
+       315: invokestatic  #543                // Method withAlpha:(II)I
+       318: iload         6
+       320: iload_2
+       321: invokestatic  #543                // Method withAlpha:(II)I
+       324: iload_2
+       325: invokestatic  #841                // Method dev/diorama/render/MobFaces.drawPixel:(Ldev/diorama/render/IconBatch;Lnet/minecraft/world/entity/Entity;FFFIII)Z
+       328: ifne          337
+       331: aload_0
+       332: aload_1
+       333: iload_2
+       334: invokestatic  #722                // Method dot:(Ldev/diorama/render/IconBatch;Ldev/diorama/render/Radar$Blip;I)V
+       337: return
+
+  static float texel(float, int);
+    Code:
+         0: invokestatic  #846                // Method guiScale:()D
+         3: dstore_2
+         4: lconst_1
+         5: fload_0
+         6: f2d
+         7: dload_2
+         8: dmul
+         9: iload_1
+        10: i2d
+        11: ddiv
+        12: invokestatic  #849                // Method java/lang/Math.round:(D)J
+        15: invokestatic  #852                // Method java/lang/Math.max:(JJ)J
+        18: lstore        4
+        20: lload         4
+        22: l2d
+        23: dload_2
+        24: ddiv
+        25: d2f
+        26: freturn
+
+  private static double guiScale();
+    Code:
+         0: dconst_1
+         1: invokestatic  #169                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+         4: invokevirtual #860                // Method net/minecraft/client/Minecraft.m_91268_:()Lcom/mojang/blaze3d/platform/Window;
+         7: invokevirtual #865                // Method com/mojang/blaze3d/platform/Window.m_85449_:()D
+        10: invokestatic  #409                // Method java/lang/Math.max:(DD)D
+        13: dreturn
+
+  static int pixelsPerGuiPixel();
+    Code:
+         0: invokestatic  #846                // Method guiScale:()D
+         3: d2i
+         4: ireturn
+
+  static void pixelFrame(dev.diorama.render.IconBatch, float, float, int, int, float, int, int);
+    Code:
+         0: aload_0
+         1: invokevirtual #768                // Method dev/diorama/render/IconBatch.graphics:()Lnet/minecraft/client/gui/GuiGraphics;
+         4: astore        8
+         6: fload_1
+         7: iload_3
+         8: i2f
+         9: fload         5
+        11: fmul
+        12: fconst_2
+        13: fdiv
+        14: fsub
+        15: fstore        9
+        17: fload_2
+        18: iload         4
+        20: i2f
+        21: fload         5
+        23: fmul
+        24: fconst_2
+        25: fdiv
+        26: fsub
+        27: fstore        10
+        29: aload         8
+        31: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        34: invokevirtual #782                // Method com/mojang/blaze3d/vertex/PoseStack.m_85836_:()V
+        37: aload         8
+        39: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        42: fload         9
+        44: fload         10
+        46: fconst_0
+        47: invokevirtual #786                // Method com/mojang/blaze3d/vertex/PoseStack.m_252880_:(FFF)V
+        50: aload         8
+        52: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        55: fload         5
+        57: fload         5
+        59: fconst_1
+        60: invokevirtual #789                // Method com/mojang/blaze3d/vertex/PoseStack.m_85841_:(FFF)V
+        63: aload_0
+        64: fconst_0
+        65: fconst_0
+        66: iload_3
+        67: iconst_2
+        68: iadd
+        69: i2f
+        70: iload         4
+        72: iconst_2
+        73: iadd
+        74: i2f
+        75: ldc_w         #867                // int 1610612736
+        78: iload         7
+        80: invokestatic  #543                // Method withAlpha:(II)I
+        83: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+        86: aload_0
+        87: ldc_w         #868                // float -1.0f
+        90: ldc_w         #868                // float -1.0f
+        93: iload_3
+        94: iconst_1
+        95: iadd
+        96: i2f
+        97: iload         4
+        99: iconst_1
+       100: iadd
+       101: i2f
+       102: iload         6
+       104: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       107: aload_0
+       108: fconst_0
+       109: fconst_0
+       110: iload_3
+       111: i2f
+       112: iload         4
+       114: i2f
+       115: ldc_w         #770                // int -15723496
+       118: iload         7
+       120: invokestatic  #543                // Method withAlpha:(II)I
+       123: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       126: return
+
+  private static void dot(dev.diorama.render.IconBatch, dev.diorama.render.Radar$Blip, int);
+    Code:
+         0: iconst_2
+         1: aload_1
+         2: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+         5: aload_1
+         6: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+         9: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        12: if_acmpne     21
+        15: ldc_w         #871                // float 0.6f
+        18: goto          24
+        21: ldc_w         #757                // float 0.8f
+        24: fmul
+        25: invokestatic  #528                // Method java/lang/Math.round:(F)I
+        28: invokestatic  #531                // Method java/lang/Math.max:(II)I
+        31: istore_3
+        32: aload_1
+        33: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        36: iload_3
+        37: i2f
+        38: fconst_2
+        39: fdiv
+        40: fsub
+        41: fstore        4
+        43: aload_1
+        44: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        47: iload_3
+        48: i2f
+        49: fconst_2
+        50: fdiv
+        51: fsub
+        52: fstore        5
+        54: aload_0
+        55: fload         4
+        57: fload         5
+        59: fload         4
+        61: iload_3
+        62: i2f
+        63: fadd
+        64: fconst_2
+        65: fadd
+        66: fload         5
+        68: iload_3
+        69: i2f
+        70: fadd
+        71: fconst_2
+        72: fadd
+        73: ldc_w         #867                // int 1610612736
+        76: iload_2
+        77: invokestatic  #543                // Method withAlpha:(II)I
+        80: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+        83: aload_0
+        84: fload         4
+        86: fconst_1
+        87: fsub
+        88: fload         5
+        90: fconst_1
+        91: fsub
+        92: fload         4
+        94: iload_3
+        95: i2f
+        96: fadd
+        97: fconst_1
+        98: fadd
+        99: fload         5
+       101: iload_3
+       102: i2f
+       103: fadd
+       104: fconst_1
+       105: fadd
+       106: ldc_w         #540                // int -16777216
+       109: iload_2
+       110: invokestatic  #543                // Method withAlpha:(II)I
+       113: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       116: aload_0
+       117: fload         4
+       119: fload         5
+       121: fload         4
+       123: iload_3
+       124: i2f
+       125: fadd
+       126: fload         5
+       128: iload_3
+       129: i2f
+       130: fadd
+       131: aload_1
+       132: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       135: getfield      #550                // Field dev/diorama/render/Radar$Kind.color:I
+       138: iload_2
+       139: invokestatic  #543                // Method withAlpha:(II)I
+       142: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       145: iload_3
+       146: iconst_3
+       147: if_icmplt     203
+       150: ldc_w         #872                // int 1358954495
+       153: iload_2
+       154: invokestatic  #543                // Method withAlpha:(II)I
+       157: istore        6
+       159: aload_0
+       160: fload         4
+       162: fload         5
+       164: fload         4
+       166: iload_3
+       167: i2f
+       168: fadd
+       169: fconst_1
+       170: fsub
+       171: fload         5
+       173: fconst_1
+       174: fadd
+       175: iload         6
+       177: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       180: aload_0
+       181: fload         4
+       183: fload         5
+       185: fconst_1
+       186: fadd
+       187: fload         4
+       189: fconst_1
+       190: fadd
+       191: fload         5
+       193: iload_3
+       194: i2f
+       195: fadd
+       196: fconst_1
+       197: fsub
+       198: iload         6
+       200: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       203: return
+
+  private static void pixelCaret(dev.diorama.render.IconBatch, float, float, boolean, int);
+    Code:
+         0: ldc_w         #540                // int -16777216
+         3: iload         4
+         5: invokestatic  #543                // Method withAlpha:(II)I
+         8: istore        5
+        10: iconst_m1
+        11: iload         4
+        13: invokestatic  #543                // Method withAlpha:(II)I
+        16: istore        6
+        18: iconst_0
+        19: istore        7
+        21: iload         7
+        23: iconst_2
+        24: if_icmpge     137
+        27: iload         7
+        29: ifne          36
+        32: iconst_1
+        33: goto          37
+        36: iconst_0
+        37: istore        8
+        39: iconst_0
+        40: istore        9
+        42: iload         9
+        44: iconst_3
+        45: if_icmpge     131
+        48: iload         9
+        50: istore        10
+        52: iload_3
+        53: ifeq          66
+        56: fload_2
+        57: fconst_1
+        58: fadd
+        59: iload         9
+        61: i2f
+        62: fsub
+        63: goto          73
+        66: fload_2
+        67: fconst_1
+        68: fsub
+        69: iload         9
+        71: i2f
+        72: fadd
+        73: fstore        11
+        75: aload_0
+        76: fload_1
+        77: iload         10
+        79: i2f
+        80: fsub
+        81: iload         8
+        83: i2f
+        84: fsub
+        85: fload         11
+        87: iload         8
+        89: i2f
+        90: fsub
+        91: fload_1
+        92: iload         10
+        94: i2f
+        95: fadd
+        96: fconst_1
+        97: fadd
+        98: iload         8
+       100: i2f
+       101: fadd
+       102: fload         11
+       104: fconst_1
+       105: fadd
+       106: iload         8
+       108: i2f
+       109: fadd
+       110: iload         7
+       112: ifne          120
+       115: iload         5
+       117: goto          122
+       120: iload         6
+       122: invokevirtual #547                // Method dev/diorama/render/IconBatch.fill:(FFFFI)V
+       125: iinc          9, 1
+       128: goto          42
+       131: iinc          7, 1
+       134: goto          21
+       137: return
+
+  private static float nameOffset(dev.diorama.render.Radar$Blip);
+    Code:
+         0: aload_0
+         1: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+         4: aload_0
+         5: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+         8: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        11: if_acmpne     20
+        14: ldc_w         #881                // float 0.75f
+        17: goto          23
+        20: ldc_w         #757                // float 0.8f
+        23: fmul
+        24: ldc_w         #763                // float 3.0f
+        27: fadd
+        28: freturn
+
+  private static boolean nameInside(dev.diorama.render.Circle, dev.diorama.render.Radar$Blip, float);
+    Code:
+         0: invokestatic  #169                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+         3: getfield      #885                // Field net/minecraft/client/Minecraft.f_91062_:Lnet/minecraft/client/gui/Font;
+         6: aload_1
+         7: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+        10: invokevirtual #889                // Method net/minecraft/world/entity/Entity.m_7755_:()Lnet/minecraft/network/chat/Component;
+        13: invokeinterface #895,  1          // InterfaceMethod net/minecraft/network/chat/Component.getString:()Ljava/lang/String;
+        18: invokevirtual #901                // Method net/minecraft/client/gui/Font.m_92895_:(Ljava/lang/String;)I
+        21: i2f
+        22: fload_2
+        23: fmul
+        24: fconst_2
+        25: fdiv
+        26: fstore_3
+        27: aload_1
+        28: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        31: aload_1
+        32: invokestatic  #903                // Method nameOffset:(Ldev/diorama/render/Radar$Blip;)F
+        35: fadd
+        36: fconst_1
+        37: fsub
+        38: fstore        4
+        40: aload_0
+        41: aload_1
+        42: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        45: fload_3
+        46: fsub
+        47: fload_2
+        48: fsub
+        49: fload         4
+        51: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+        54: ifeq          120
+        57: aload_0
+        58: aload_1
+        59: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        62: fload_3
+        63: fadd
+        64: fload         4
+        66: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+        69: ifeq          120
+        72: aload_0
+        73: aload_1
+        74: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        77: fload_3
+        78: fsub
+        79: fload_2
+        80: fsub
+        81: fload         4
+        83: ldc_w         #904                // float 9.0f
+        86: fload_2
+        87: fmul
+        88: fadd
+        89: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+        92: ifeq          120
+        95: aload_0
+        96: aload_1
+        97: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+       100: fload_3
+       101: fadd
+       102: fload         4
+       104: ldc_w         #904                // float 9.0f
+       107: fload_2
+       108: fmul
+       109: fadd
+       110: invokevirtual #539                // Method dev/diorama/render/Circle.contains:(FF)Z
+       113: ifeq          120
+       116: iconst_1
+       117: goto          121
+       120: iconst_0
+       121: ireturn
+
+  private static void nameTag(net.minecraft.client.gui.GuiGraphics, dev.diorama.render.Radar$Blip, int, float);
+    Code:
+         0: invokestatic  #169                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+         3: getfield      #885                // Field net/minecraft/client/Minecraft.f_91062_:Lnet/minecraft/client/gui/Font;
+         6: astore        4
+         8: aload_1
+         9: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+        12: invokevirtual #889                // Method net/minecraft/world/entity/Entity.m_7755_:()Lnet/minecraft/network/chat/Component;
+        15: invokeinterface #895,  1          // InterfaceMethod net/minecraft/network/chat/Component.getString:()Ljava/lang/String;
+        20: astore        5
+        22: aload         4
+        24: aload         5
+        26: invokevirtual #901                // Method net/minecraft/client/gui/Font.m_92895_:(Ljava/lang/String;)I
+        29: istore        6
+        31: aload_0
+        32: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        35: invokevirtual #782                // Method com/mojang/blaze3d/vertex/PoseStack.m_85836_:()V
+        38: aload_0
+        39: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        42: aload_1
+        43: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        46: iload         6
+        48: i2f
+        49: fload_3
+        50: fmul
+        51: fconst_2
+        52: fdiv
+        53: fsub
+        54: aload_1
+        55: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        58: aload_1
+        59: invokestatic  #903                // Method nameOffset:(Ldev/diorama/render/Radar$Blip;)F
+        62: fadd
+        63: fconst_1
+        64: fsub
+        65: fload_3
+        66: fadd
+        67: fconst_0
+        68: invokevirtual #786                // Method com/mojang/blaze3d/vertex/PoseStack.m_252880_:(FFF)V
+        71: aload_0
+        72: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+        75: fload_3
+        76: fload_3
+        77: fconst_1
+        78: invokevirtual #789                // Method com/mojang/blaze3d/vertex/PoseStack.m_85841_:(FFF)V
+        81: aload_0
+        82: iconst_m1
+        83: iconst_m1
+        84: iload         6
+        86: bipush        8
+        88: ldc_w         #905                // int 1073741824
+        91: iload_2
+        92: invokestatic  #543                // Method withAlpha:(II)I
+        95: invokevirtual #909                // Method net/minecraft/client/gui/GuiGraphics.m_280509_:(IIIII)V
+        98: aload_0
+        99: aload         4
+       101: aload         5
+       103: iconst_0
+       104: iconst_0
+       105: iconst_m1
+       106: iload_2
+       107: invokestatic  #543                // Method withAlpha:(II)I
+       110: iconst_0
+       111: invokevirtual #913                // Method net/minecraft/client/gui/GuiGraphics.m_280056_:(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I
+       114: pop
+       115: aload_0
+       116: invokevirtual #777                // Method net/minecraft/client/gui/GuiGraphics.m_280168_:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       119: invokevirtual #796                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+       122: return
+
+  public static dev.diorama.render.Radar$Blip under(dev.diorama.render.MapViewport$View, java.util.List<dev.diorama.render.Radar$Blip>, double, double);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: iconst_1
+         3: invokestatic  #461                // Method itemPictures:(Ldev/diorama/render/MapViewport$View;Ljava/util/List;Z)Ljava/util/List;
+         6: astore        6
+         8: aconst_null
+         9: astore        7
+        11: ldc2_w        #920                // double 1.7976931348623157E308d
+        14: dstore        8
+        16: aload_1
+        17: invokeinterface #468,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        22: astore        10
+        24: aload         10
+        26: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        31: ifeq          241
+        34: aload         10
+        36: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        41: checkcast     #13                 // class dev/diorama/render/Radar$Blip
+        44: astore        11
+        46: aload         6
+        48: ifnull        65
+        51: aload         11
+        53: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+        56: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+        59: if_acmpne     65
+        62: goto          24
+        65: aload         11
+        67: invokevirtual #533                // Method dev/diorama/render/Radar$Blip.x:()F
+        70: f2d
+        71: dload_2
+        72: dsub
+        73: dstore        12
+        75: aload         11
+        77: invokevirtual #535                // Method dev/diorama/render/Radar$Blip.y:()F
+        80: f2d
+        81: dload         4
+        83: dsub
+        84: dstore        14
+        86: dload         12
+        88: dload         12
+        90: dmul
+        91: dload         14
+        93: dload         14
+        95: dmul
+        96: dadd
+        97: invokestatic  #924                // Method java/lang/Math.sqrt:(D)D
+       100: dstore        16
+       102: aload         11
+       104: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       107: getstatic     #91                 // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+       110: if_acmpeq     124
+       113: aload         11
+       115: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       118: getstatic     #96                 // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+       121: if_acmpne     135
+       124: aload         11
+       126: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+       129: fconst_2
+       130: fdiv
+       131: f2d
+       132: goto          145
+       135: aload         11
+       137: invokevirtual #525                // Method dev/diorama/render/Radar$Blip.size:()F
+       140: f2d
+       141: ldc2_w        #925                // double 0.8d
+       144: dmul
+       145: ldc2_w        #64                 // double 3.0d
+       148: dadd
+       149: dstore        18
+       151: dload         12
+       153: invokestatic  #270                // Method java/lang/Math.abs:(D)D
+       156: dload         14
+       158: invokestatic  #270                // Method java/lang/Math.abs:(D)D
+       161: invokestatic  #409                // Method java/lang/Math.max:(DD)D
+       164: dload         18
+       166: dcmpl
+       167: ifle          173
+       170: goto          24
+       173: aload         7
+       175: ifnull        218
+       178: aload         11
+       180: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       183: invokevirtual #927                // Method dev/diorama/render/Radar$Kind.ordinal:()I
+       186: aload         7
+       188: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       191: invokevirtual #927                // Method dev/diorama/render/Radar$Kind.ordinal:()I
+       194: if_icmpgt     218
+       197: aload         11
+       199: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       202: aload         7
+       204: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+       207: if_acmpne     222
+       210: dload         16
+       212: dload         8
+       214: dcmpg
+       215: ifge          222
+       218: iconst_1
+       219: goto          223
+       222: iconst_0
+       223: istore        20
+       225: iload         20
+       227: ifeq          238
+       230: aload         11
+       232: astore        7
+       234: dload         16
+       236: dstore        8
+       238: goto          24
+       241: aload         7
+       243: ifnonnull     399
+       246: aload         6
+       248: ifnull        399
+       251: aload         6
+       253: invokeinterface #468,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+       258: astore        10
+       260: aload         10
+       262: invokeinterface #246,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       267: ifeq          399
+       270: aload         10
+       272: invokeinterface #250,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       277: checkcast     #11                 // class dev/diorama/render/Radar$ItemPicture
+       280: astore        11
+       282: aload         11
+       284: invokevirtual #694                // Method dev/diorama/render/Radar$ItemPicture.stack:()Lnet/minecraft/world/item/ItemStack;
+       287: ifnonnull     304
+       290: aload         11
+       292: invokevirtual #697                // Method dev/diorama/render/Radar$ItemPicture.size:()F
+       295: fconst_2
+       296: fdiv
+       297: ldc_w         #763                // float 3.0f
+       300: fadd
+       301: goto          305
+       304: fconst_0
+       305: fstore        12
+       307: aload         11
+       309: invokevirtual #695                // Method dev/diorama/render/Radar$ItemPicture.x:()F
+       312: fload         12
+       314: fsub
+       315: fstore        13
+       317: aload         11
+       319: invokevirtual #696                // Method dev/diorama/render/Radar$ItemPicture.y:()F
+       322: fload         12
+       324: fsub
+       325: fstore        14
+       327: aload         11
+       329: invokevirtual #694                // Method dev/diorama/render/Radar$ItemPicture.stack:()Lnet/minecraft/world/item/ItemStack;
+       332: ifnonnull     342
+       335: fload         12
+       337: fconst_2
+       338: fmul
+       339: goto          347
+       342: aload         11
+       344: invokevirtual #697                // Method dev/diorama/render/Radar$ItemPicture.size:()F
+       347: fstore        15
+       349: dload_2
+       350: fload         13
+       352: f2d
+       353: dcmpl
+       354: iflt          396
+       357: dload         4
+       359: fload         14
+       361: f2d
+       362: dcmpl
+       363: iflt          396
+       366: dload_2
+       367: fload         13
+       369: fload         15
+       371: fadd
+       372: f2d
+       373: dcmpg
+       374: ifge          396
+       377: dload         4
+       379: fload         14
+       381: fload         15
+       383: fadd
+       384: f2d
+       385: dcmpg
+       386: ifge          396
+       389: aload         11
+       391: invokevirtual #705                // Method dev/diorama/render/Radar$ItemPicture.blip:()Ldev/diorama/render/Radar$Blip;
+       394: astore        7
+       396: goto          260
+       399: aload         7
+       401: areturn
+
+  public static net.minecraft.network.chat.Component describe(dev.diorama.render.Radar$Blip, net.minecraft.world.entity.Entity);
+    Code:
+         0: aload_0
+         1: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+         4: aload_1
+         5: invokevirtual #940                // Method net/minecraft/world/entity/Entity.m_20270_:(Lnet/minecraft/world/entity/Entity;)F
+         8: invokestatic  #528                // Method java/lang/Math.round:(F)I
+        11: istore_2
+        12: aload_0
+        13: invokevirtual #474                // Method dev/diorama/render/Radar$Blip.dy:()D
+        16: invokestatic  #849                // Method java/lang/Math.round:(D)J
+        19: l2i
+        20: istore_3
+        21: iload_3
+        22: ifle          34
+        25: iload_3
+        26: invokedynamic #952,  0            // InvokeDynamic #2:makeConcatWithConstants:(I)Ljava/lang/String;
+        31: goto          51
+        34: iload_3
+        35: ifge          48
+        38: iload_3
+        39: ineg
+        40: invokedynamic #955,  0            // InvokeDynamic #3:makeConcatWithConstants:(I)Ljava/lang/String;
+        45: goto          51
+        48: ldc_w         #957                // String
+        51: astore        4
+        53: invokestatic  #963                // InterfaceMethod net/minecraft/network/chat/Component.m_237119_:()Lnet/minecraft/network/chat/MutableComponent;
+        56: aload_0
+        57: invokevirtual #578                // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+        60: invokevirtual #966                // Method net/minecraft/world/entity/Entity.m_5446_:()Lnet/minecraft/network/chat/Component;
+        63: invokevirtual #972                // Method net/minecraft/network/chat/MutableComponent.m_7220_:(Lnet/minecraft/network/chat/Component;)Lnet/minecraft/network/chat/MutableComponent;
+        66: iload_2
+        67: aload         4
+        69: invokedynamic #977,  0            // InvokeDynamic #4:makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;
+        74: invokevirtual #981                // Method net/minecraft/network/chat/MutableComponent.m_130946_:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        77: areturn
+
+  private static int alphaFor(double);
+    Code:
+         0: dconst_0
+         1: dload_0
+         2: invokestatic  #270                // Method java/lang/Math.abs:(D)D
+         5: ldc2_w        #410                // double 8.0d
+         8: dsub
+         9: invokestatic  #409                // Method java/lang/Math.max:(DD)D
+        12: ldc2_w        #983                // double 40.0d
+        15: ddiv
+        16: dstore_2
+        17: ldc2_w        #985                // double 255.0d
+        20: ldc2_w        #987                // double 0.45d
+        23: dconst_1
+        24: dload_2
+        25: dsub
+        26: invokestatic  #409                // Method java/lang/Math.max:(DD)D
+        29: dmul
+        30: invokestatic  #849                // Method java/lang/Math.round:(D)J
+        33: l2i
+        34: ireturn
+
+  static int withAlpha(int, int);
+    Code:
+         0: iload_0
+         1: bipush        24
+         3: iushr
+         4: iload_1
+         5: imul
+         6: sipush        255
+         9: idiv
+        10: istore_2
+        11: iload_2
+        12: bipush        24
+        14: ishl
+        15: iload_0
+        16: ldc_w         #990                // int 16777215
+        19: iand
+        20: ior
+        21: ireturn
+
+  private static dev.diorama.render.Radar$Pile lambda$itemPictures$1(java.lang.Long);
+    Code:
+         0: new           #9                  // class dev/diorama/render/Radar$Pile
+         3: dup
+         4: invokespecial #993                // Method dev/diorama/render/Radar$Pile."<init>":()V
+         7: areturn
+
+  private static int lambda$collect$0(dev.diorama.render.Radar$Blip);
+    Code:
+         0: aload_0
+         1: invokevirtual #471                // Method dev/diorama/render/Radar$Blip.kind:()Ldev/diorama/render/Radar$Kind;
+         4: invokevirtual #927                // Method dev/diorama/render/Radar$Kind.ordinal:()I
+         7: ireturn
+
+  static {};
+    Code:
+         0: getstatic     #1003               // Field net/minecraft/core/registries/Registries.f_256939_:Lnet/minecraft/resources/ResourceKey;
+         3: ldc_w         #1005               // String radar_shown
+         6: invokestatic  #1011               // Method dev/diorama/Diorama.id:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+         9: invokestatic  #1017               // Method net/minecraft/tags/TagKey.m_203882_:(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/tags/TagKey;
+        12: putstatic     #122                // Field RADAR_SHOWN:Lnet/minecraft/tags/TagKey;
+        15: return
+}
+######## dev/diorama/render/Radar$Blip
+Compiled from "Radar.java"
+public final class dev.diorama.render.Radar$Blip extends java.lang.Record {
+  private final net.minecraft.world.entity.Entity entity;
+
+  private final dev.diorama.render.Radar$Kind kind;
+
+  private final float x;
+
+  private final float y;
+
+  private final double dy;
+
+  private final float size;
+
+  private final boolean named;
+
+  public dev.diorama.render.Radar$Blip(net.minecraft.world.entity.Entity, dev.diorama.render.Radar$Kind, float, float, double, float, boolean);
+    Code:
+         0: aload_0
+         1: invokespecial #33                 // Method java/lang/Record."<init>":()V
+         4: aload_0
+         5: aload_1
+         6: putfield      #35                 // Field entity:Lnet/minecraft/world/entity/Entity;
+         9: aload_0
+        10: aload_2
+        11: putfield      #37                 // Field kind:Ldev/diorama/render/Radar$Kind;
+        14: aload_0
+        15: fload_3
+        16: putfield      #39                 // Field x:F
+        19: aload_0
+        20: fload         4
+        22: putfield      #41                 // Field y:F
+        25: aload_0
+        26: dload         5
+        28: putfield      #43                 // Field dy:D
+        31: aload_0
+        32: fload         7
+        34: putfield      #45                 // Field size:F
+        37: aload_0
+        38: iload         8
+        40: putfield      #47                 // Field named:Z
+        43: return
+
+  public final java.lang.String toString();
+    Code:
+         0: aload_0
+         1: invokedynamic #70,  0             // InvokeDynamic #0:toString:(Ldev/diorama/render/Radar$Blip;)Ljava/lang/String;
+         6: areturn
+
+  public final int hashCode();
+    Code:
+         0: aload_0
+         1: invokedynamic #75,  0             // InvokeDynamic #0:hashCode:(Ldev/diorama/render/Radar$Blip;)I
+         6: ireturn
+
+  public final boolean equals(java.lang.Object);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokedynamic #80,  0             // InvokeDynamic #0:equals:(Ldev/diorama/render/Radar$Blip;Ljava/lang/Object;)Z
+         7: ireturn
+
+  public net.minecraft.world.entity.Entity entity();
+    Code:
+         0: aload_0
+         1: getfield      #35                 // Field entity:Lnet/minecraft/world/entity/Entity;
+         4: areturn
+
+  public dev.diorama.render.Radar$Kind kind();
+    Code:
+         0: aload_0
+         1: getfield      #37                 // Field kind:Ldev/diorama/render/Radar$Kind;
+         4: areturn
+
+  public float x();
+    Code:
+         0: aload_0
+         1: getfield      #39                 // Field x:F
+         4: freturn
+
+  public float y();
+    Code:
+         0: aload_0
+         1: getfield      #41                 // Field y:F
+         4: freturn
+
+  public double dy();
+    Code:
+         0: aload_0
+         1: getfield      #43                 // Field dy:D
+         4: dreturn
+
+  public float size();
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field size:F
+         4: freturn
+
+  public boolean named();
+    Code:
+         0: aload_0
+         1: getfield      #47                 // Field named:Z
+         4: ireturn
+}
+######## dev/diorama/render/Radar$Kind
+Compiled from "Radar.java"
+public final class dev.diorama.render.Radar$Kind extends java.lang.Enum<dev.diorama.render.Radar$Kind> {
+  public static final dev.diorama.render.Radar$Kind ITEM;
+
+  public static final dev.diorama.render.Radar$Kind PASSIVE;
+
+  public static final dev.diorama.render.Radar$Kind NEUTRAL;
+
+  public static final dev.diorama.render.Radar$Kind HOSTILE;
+
+  public static final dev.diorama.render.Radar$Kind PLAYER;
+
+  final int color;
+
+  private static final dev.diorama.render.Radar$Kind[] $VALUES;
+
+  public static dev.diorama.render.Radar$Kind[] values();
+    Code:
+         0: getstatic     #23                 // Field $VALUES:[Ldev/diorama/render/Radar$Kind;
+         3: invokevirtual #28                 // Method "[Ldev/diorama/render/Radar$Kind;".clone:()Ljava/lang/Object;
+         6: checkcast     #24                 // class "[Ldev/diorama/render/Radar$Kind;"
+         9: areturn
+
+  public static dev.diorama.render.Radar$Kind valueOf(java.lang.String);
+    Code:
+         0: ldc           #2                  // class dev/diorama/render/Radar$Kind
+         2: aload_0
+         3: invokestatic  #33                 // Method java/lang/Enum.valueOf:(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;
+         6: checkcast     #2                  // class dev/diorama/render/Radar$Kind
+         9: areturn
+
+  private dev.diorama.render.Radar$Kind(int);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: iload_2
+         3: invokespecial #41                 // Method java/lang/Enum."<init>":(Ljava/lang/String;I)V
+         6: aload_0
+         7: iload_3
+         8: putfield      #43                 // Field color:I
+        11: return
+
+  private static dev.diorama.render.Radar$Kind[] $values();
+    Code:
+         0: iconst_5
+         1: anewarray     #2                  // class dev/diorama/render/Radar$Kind
+         4: dup
+         5: iconst_0
+         6: getstatic     #47                 // Field ITEM:Ldev/diorama/render/Radar$Kind;
+         9: aastore
+        10: dup
+        11: iconst_1
+        12: getstatic     #49                 // Field PASSIVE:Ldev/diorama/render/Radar$Kind;
+        15: aastore
+        16: dup
+        17: iconst_2
+        18: getstatic     #51                 // Field NEUTRAL:Ldev/diorama/render/Radar$Kind;
+        21: aastore
+        22: dup
+        23: iconst_3
+        24: getstatic     #53                 // Field HOSTILE:Ldev/diorama/render/Radar$Kind;
+        27: aastore
+        28: dup
+        29: iconst_4
+        30: getstatic     #55                 // Field PLAYER:Ldev/diorama/render/Radar$Kind;
+        33: aastore
+        34: areturn
+
+  static {};
+    Code:
+         0: new           #2                  // class dev/diorama/render/Radar$Kind
+         3: dup
+         4: ldc           #58                 // String ITEM
+         6: iconst_0
+         7: ldc           #59                 // int -11141121
+         9: invokespecial #61                 // Method "<init>":(Ljava/lang/String;II)V
+        12: putstatic     #47                 // Field ITEM:Ldev/diorama/render/Radar$Kind;
+        15: new           #2                  // class dev/diorama/render/Radar$Kind
+        18: dup
+        19: ldc           #62                 // String PASSIVE
+        21: iconst_1
+        22: ldc           #63                 // int -10299029
+        24: invokespecial #61                 // Method "<init>":(Ljava/lang/String;II)V
+        27: putstatic     #49                 // Field PASSIVE:Ldev/diorama/render/Radar$Kind;
+        30: new           #2                  // class dev/diorama/render/Radar$Kind
+        33: dup
+        34: ldc           #64                 // String NEUTRAL
+        36: iconst_2
+        37: ldc           #65                 // int -868018
+        39: invokespecial #61                 // Method "<init>":(Ljava/lang/String;II)V
+        42: putstatic     #51                 // Field NEUTRAL:Ldev/diorama/render/Radar$Kind;
+        45: new           #2                  // class dev/diorama/render/Radar$Kind
+        48: dup
+        49: ldc           #66                 // String HOSTILE
+        51: iconst_3
+        52: ldc           #67                 // int -1094837
+        54: invokespecial #61                 // Method "<init>":(Ljava/lang/String;II)V
+        57: putstatic     #53                 // Field HOSTILE:Ldev/diorama/render/Radar$Kind;
+        60: new           #2                  // class dev/diorama/render/Radar$Kind
+        63: dup
+        64: ldc           #68                 // String PLAYER
+        66: iconst_4
+        67: iconst_m1
+        68: invokespecial #61                 // Method "<init>":(Ljava/lang/String;II)V
+        71: putstatic     #55                 // Field PLAYER:Ldev/diorama/render/Radar$Kind;
+        74: invokestatic  #70                 // Method $values:()[Ldev/diorama/render/Radar$Kind;
+        77: putstatic     #23                 // Field $VALUES:[Ldev/diorama/render/Radar$Kind;
+        80: return
+}
+######## dev/diorama/render/Radar$Pile
+Compiled from "Radar.java"
+final class dev.diorama.render.Radar$Pile {
+  long squareX;
+
+  long squareY;
+
+  float x;
+
+  float y;
+
+  int count;
+
+  final java.util.List<dev.diorama.render.Radar$Blip> kinds;
+
+  private dev.diorama.render.Radar$Pile();
+    Code:
+         0: aload_0
+         1: invokespecial #26                 // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: new           #28                 // class java/util/ArrayList
+         8: dup
+         9: iconst_4
+        10: invokespecial #31                 // Method java/util/ArrayList."<init>":(I)V
+        13: putfield      #33                 // Field kinds:Ljava/util/List;
+        16: return
+
+  void add(dev.diorama.render.Radar$Blip, net.minecraft.world.item.ItemStack);
+    Code:
+         0: aload_0
+         1: dup
+         2: getfield      #39                 // Field x:F
+         5: aload_1
+         6: invokevirtual #42                 // Method dev/diorama/render/Radar$Blip.x:()F
+         9: fadd
+        10: putfield      #39                 // Field x:F
+        13: aload_0
+        14: dup
+        15: getfield      #44                 // Field y:F
+        18: aload_1
+        19: invokevirtual #46                 // Method dev/diorama/render/Radar$Blip.y:()F
+        22: fadd
+        23: putfield      #44                 // Field y:F
+        26: aload_0
+        27: dup
+        28: getfield      #48                 // Field count:I
+        31: iconst_1
+        32: iadd
+        33: putfield      #48                 // Field count:I
+        36: aload_2
+        37: invokevirtual #54                 // Method net/minecraft/world/item/ItemStack.m_41720_:()Lnet/minecraft/world/item/Item;
+        40: astore_3
+        41: iconst_0
+        42: istore        4
+        44: iload         4
+        46: aload_0
+        47: getfield      #33                 // Field kinds:Ljava/util/List;
+        50: invokeinterface #62,  1           // InterfaceMethod java/util/List.size:()I
+        55: if_icmpge     148
+        58: aload_0
+        59: getfield      #33                 // Field kinds:Ljava/util/List;
+        62: iload         4
+        64: invokeinterface #66,  2           // InterfaceMethod java/util/List.get:(I)Ljava/lang/Object;
+        69: checkcast     #10                 // class dev/diorama/render/Radar$Blip
+        72: invokevirtual #70                 // Method dev/diorama/render/Radar$Blip.entity:()Lnet/minecraft/world/entity/Entity;
+        75: checkcast     #72                 // class net/minecraft/world/entity/item/ItemEntity
+        78: invokevirtual #76                 // Method net/minecraft/world/entity/item/ItemEntity.m_32055_:()Lnet/minecraft/world/item/ItemStack;
+        81: invokevirtual #54                 // Method net/minecraft/world/item/ItemStack.m_41720_:()Lnet/minecraft/world/item/Item;
+        84: astore        5
+        86: aload         5
+        88: aload_3
+        89: if_acmpne     93
+        92: return
+        93: aload_3
+        94: invokestatic  #80                 // Method net/minecraft/world/item/Item.m_41393_:(Lnet/minecraft/world/item/Item;)I
+        97: aload         5
+        99: invokestatic  #80                 // Method net/minecraft/world/item/Item.m_41393_:(Lnet/minecraft/world/item/Item;)I
+       102: if_icmpge     142
+       105: aload_0
+       106: getfield      #33                 // Field kinds:Ljava/util/List;
+       109: iload         4
+       111: aload_1
+       112: invokeinterface #83,  3           // InterfaceMethod java/util/List.add:(ILjava/lang/Object;)V
+       117: aload_0
+       118: getfield      #33                 // Field kinds:Ljava/util/List;
+       121: invokeinterface #62,  1           // InterfaceMethod java/util/List.size:()I
+       126: iconst_4
+       127: if_icmple     141
+       130: aload_0
+       131: getfield      #33                 // Field kinds:Ljava/util/List;
+       134: iconst_4
+       135: invokeinterface #86,  2           // InterfaceMethod java/util/List.remove:(I)Ljava/lang/Object;
+       140: pop
+       141: return
+       142: iinc          4, 1
+       145: goto          44
+       148: aload_0
+       149: getfield      #33                 // Field kinds:Ljava/util/List;
+       152: invokeinterface #62,  1           // InterfaceMethod java/util/List.size:()I
+       157: iconst_4
+       158: if_icmpge     172
+       161: aload_0
+       162: getfield      #33                 // Field kinds:Ljava/util/List;
+       165: aload_1
+       166: invokeinterface #89,  2           // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       171: pop
+       172: return
+}
+######## dev/diorama/RadarCategories
+Compiled from "RadarCategories.java"
+public final class dev.diorama.RadarCategories {
+  public static final int SAME_SIZE;
+
+  public static final int SAME_RANGE;
+
+  public static final int ANY_RANGE;
+
+  public static final java.lang.String POKEMON;
+
+  private static final java.util.List<java.lang.String> POKEMON_MOBS;
+
+  private static final dev.diorama.RadarCategories$Entry[] KINDS;
+
+  private static final dev.diorama.render.Radar$Kind[] LISTED;
+
+  private static final java.util.Map<net.minecraft.world.entity.EntityType<?>, java.lang.Object> BY_TYPE;
+
+  private static java.util.List<dev.diorama.RadarCategories$Category> cachedFor;
+
+  private dev.diorama.RadarCategories();
+    Code:
+         0: aload_0
+         1: invokespecial #69                 // Method java/lang/Object."<init>":()V
+         4: return
+
+  public static dev.diorama.RadarCategories$Entry kind(dev.diorama.render.Radar$Kind);
+    Code:
+         0: getstatic     #75                 // Field KINDS:[Ldev/diorama/RadarCategories$Entry;
+         3: aload_0
+         4: invokevirtual #79                 // Method dev/diorama/render/Radar$Kind.ordinal:()I
+         7: aaload
+         8: areturn
+
+  public static java.util.List<dev.diorama.RadarCategories$Entry> all();
+    Code:
+         0: new           #85                 // class java/util/ArrayList
+         3: dup
+         4: invokestatic  #89                 // Method dev/diorama/Settings.get:()Ldev/diorama/Settings;
+         7: getfield      #92                 // Field dev/diorama/Settings.radarCategories:Ljava/util/List;
+        10: invokespecial #95                 // Method java/util/ArrayList."<init>":(Ljava/util/Collection;)V
+        13: astore_0
+        14: getstatic     #97                 // Field LISTED:[Ldev/diorama/render/Radar$Kind;
+        17: astore_1
+        18: aload_1
+        19: arraylength
+        20: istore_2
+        21: iconst_0
+        22: istore_3
+        23: iload_3
+        24: iload_2
+        25: if_icmpge     51
+        28: aload_1
+        29: iload_3
+        30: aaload
+        31: astore        4
+        33: aload_0
+        34: aload         4
+        36: invokestatic  #102                // Method kind:(Ldev/diorama/render/Radar$Kind;)Ldev/diorama/RadarCategories$Entry;
+        39: invokeinterface #106,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+        44: pop
+        45: iinc          3, 1
+        48: goto          23
+        51: aload_0
+        52: areturn
+
+  public static dev.diorama.RadarCategories$Entry of(net.minecraft.world.entity.Entity, dev.diorama.render.Radar$Kind);
+    Code:
+         0: aload_1
+         1: getstatic     #112                // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+         4: if_acmpeq     14
+         7: aload_1
+         8: getstatic     #115                // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+        11: if_acmpne     19
+        14: aload_1
+        15: invokestatic  #102                // Method kind:(Ldev/diorama/render/Radar$Kind;)Ldev/diorama/RadarCategories$Entry;
+        18: areturn
+        19: invokestatic  #89                 // Method dev/diorama/Settings.get:()Ldev/diorama/Settings;
+        22: getfield      #92                 // Field dev/diorama/Settings.radarCategories:Ljava/util/List;
+        25: astore_2
+        26: aload_2
+        27: invokeinterface #119,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+        32: ifeq          40
+        35: aload_1
+        36: invokestatic  #102                // Method kind:(Ldev/diorama/render/Radar$Kind;)Ldev/diorama/RadarCategories$Entry;
+        39: areturn
+        40: getstatic     #121                // Field cachedFor:Ljava/util/List;
+        43: aload_2
+        44: if_acmpeq     59
+        47: getstatic     #123                // Field BY_TYPE:Ljava/util/Map;
+        50: invokeinterface #128,  1          // InterfaceMethod java/util/Map.clear:()V
+        55: aload_2
+        56: putstatic     #121                // Field cachedFor:Ljava/util/List;
+        59: getstatic     #123                // Field BY_TYPE:Ljava/util/Map;
+        62: aload_0
+        63: invokevirtual #134                // Method net/minecraft/world/entity/Entity.m_6095_:()Lnet/minecraft/world/entity/EntityType;
+        66: invokeinterface #137,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        71: astore_3
+        72: aload_3
+        73: ifnonnull     153
+        76: aload_0
+        77: invokevirtual #134                // Method net/minecraft/world/entity/Entity.m_6095_:()Lnet/minecraft/world/entity/EntityType;
+        80: invokestatic  #143                // Method net/minecraft/world/entity/EntityType.m_20613_:(Lnet/minecraft/world/entity/EntityType;)Lnet/minecraft/resources/ResourceLocation;
+        83: invokevirtual #149                // Method net/minecraft/resources/ResourceLocation.toString:()Ljava/lang/String;
+        86: astore        4
+        88: aload_2
+        89: astore_3
+        90: aload_2
+        91: invokeinterface #153,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        96: astore        5
+        98: aload         5
+       100: invokeinterface #160,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       105: ifeq          139
+       108: aload         5
+       110: invokeinterface #164,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       115: checkcast     #15                 // class dev/diorama/RadarCategories$Category
+       118: astore        6
+       120: aload         6
+       122: aload         4
+       124: invokevirtual #168                // Method dev/diorama/RadarCategories$Category.has:(Ljava/lang/String;)Z
+       127: ifeq          136
+       130: aload         6
+       132: astore_3
+       133: goto          139
+       136: goto          98
+       139: getstatic     #123                // Field BY_TYPE:Ljava/util/Map;
+       142: aload_0
+       143: invokevirtual #134                // Method net/minecraft/world/entity/Entity.m_6095_:()Lnet/minecraft/world/entity/EntityType;
+       146: aload_3
+       147: invokeinterface #172,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       152: pop
+       153: aload_3
+       154: instanceof    #15                 // class dev/diorama/RadarCategories$Category
+       157: ifeq          171
+       160: aload_3
+       161: checkcast     #15                 // class dev/diorama/RadarCategories$Category
+       164: astore        4
+       166: aload         4
+       168: goto          175
+       171: aload_1
+       172: invokestatic  #102                // Method kind:(Ldev/diorama/render/Radar$Kind;)Ldev/diorama/RadarCategories$Entry;
+       175: areturn
+
+  public static void changed();
+    Code:
+         0: getstatic     #123                // Field BY_TYPE:Ljava/util/Map;
+         3: invokeinterface #128,  1          // InterfaceMethod java/util/Map.clear:()V
+         8: return
+
+  public static boolean matches(java.lang.String, java.lang.String);
+    Code:
+         0: aload_0
+         1: bipush        42
+         3: invokevirtual #187                // Method java/lang/String.indexOf:(I)I
+         6: istore_2
+         7: iload_2
+         8: ifge          17
+        11: aload_0
+        12: aload_1
+        13: invokevirtual #190                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+        16: ireturn
+        17: aload_1
+        18: aload_0
+        19: iconst_0
+        20: iload_2
+        21: invokevirtual #194                // Method java/lang/String.substring:(II)Ljava/lang/String;
+        24: invokevirtual #197                // Method java/lang/String.startsWith:(Ljava/lang/String;)Z
+        27: ifne          32
+        30: iconst_0
+        31: ireturn
+        32: iload_2
+        33: istore_3
+        34: iload_2
+        35: istore        4
+        37: aload_0
+        38: bipush        42
+        40: iload_3
+        41: iconst_1
+        42: iadd
+        43: invokevirtual #200                // Method java/lang/String.indexOf:(II)I
+        46: istore        5
+        48: aload_0
+        49: iload_3
+        50: iconst_1
+        51: iadd
+        52: iload         5
+        54: ifge          64
+        57: aload_0
+        58: invokevirtual #203                // Method java/lang/String.length:()I
+        61: goto          66
+        64: iload         5
+        66: invokevirtual #194                // Method java/lang/String.substring:(II)Ljava/lang/String;
+        69: astore        6
+        71: iload         5
+        73: ifge          106
+        76: aload_1
+        77: invokevirtual #203                // Method java/lang/String.length:()I
+        80: iload         4
+        82: isub
+        83: aload         6
+        85: invokevirtual #203                // Method java/lang/String.length:()I
+        88: if_icmplt     104
+        91: aload_1
+        92: aload         6
+        94: invokevirtual #206                // Method java/lang/String.endsWith:(Ljava/lang/String;)Z
+        97: ifeq          104
+       100: iconst_1
+       101: goto          105
+       104: iconst_0
+       105: ireturn
+       106: aload_1
+       107: aload         6
+       109: iload         4
+       111: invokevirtual #209                // Method java/lang/String.indexOf:(Ljava/lang/String;I)I
+       114: istore        7
+       116: iload         7
+       118: ifge          123
+       121: iconst_0
+       122: ireturn
+       123: iload         7
+       125: aload         6
+       127: invokevirtual #203                // Method java/lang/String.length:()I
+       130: iadd
+       131: istore        4
+       133: iload         5
+       135: istore_3
+       136: goto          37
+
+  private static int snapRange(int);
+    Code:
+         0: iload_0
+         1: iconst_m1
+         2: if_icmpeq     9
+         5: iload_0
+         6: ifne          13
+         9: iload_0
+        10: goto          28
+        13: iload_0
+        14: ifge          21
+        17: iconst_0
+        18: goto          28
+        21: getstatic     #219                // Field dev/diorama/Settings.RANGES:[I
+        24: iload_0
+        25: invokestatic  #223                // Method dev/diorama/Settings.nearest:([II)I
+        28: ireturn
+
+  static java.lang.String cleanMob(java.lang.String);
+    Code:
+         0: aload_0
+         1: ifnonnull     9
+         4: ldc           #228                // String
+         6: goto          19
+         9: aload_0
+        10: invokevirtual #231                // Method java/lang/String.trim:()Ljava/lang/String;
+        13: getstatic     #237                // Field java/util/Locale.ROOT:Ljava/util/Locale;
+        16: invokevirtual #241                // Method java/lang/String.toLowerCase:(Ljava/util/Locale;)Ljava/lang/String;
+        19: astore_1
+        20: aload_1
+        21: invokevirtual #242                // Method java/lang/String.isEmpty:()Z
+        24: ifeq          29
+        27: aconst_null
+        28: areturn
+        29: aload_1
+        30: bipush        58
+        32: invokevirtual #187                // Method java/lang/String.indexOf:(I)I
+        35: ifge          47
+        38: aload_1
+        39: invokedynamic #253,  0            // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        44: goto          48
+        47: aload_1
+        48: areturn
+
+  static void loaded(dev.diorama.Settings);
+    Code:
+         0: new           #85                 // class java/util/ArrayList
+         3: dup
+         4: invokespecial #258                // Method java/util/ArrayList."<init>":()V
+         7: astore_1
+         8: aload_0
+         9: getfield      #92                 // Field dev/diorama/Settings.radarCategories:Ljava/util/List;
+        12: ifnull        201
+        15: aload_0
+        16: getfield      #92                 // Field dev/diorama/Settings.radarCategories:Ljava/util/List;
+        19: invokeinterface #153,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        24: astore_2
+        25: aload_2
+        26: invokeinterface #160,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        31: ifeq          201
+        34: aload_2
+        35: invokeinterface #164,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        40: checkcast     #15                 // class dev/diorama/RadarCategories$Category
+        43: astore_3
+        44: aload_3
+        45: ifnonnull     51
+        48: goto          25
+        51: new           #85                 // class java/util/ArrayList
+        54: dup
+        55: invokespecial #258                // Method java/util/ArrayList."<init>":()V
+        58: astore        4
+        60: aload_3
+        61: getfield      #261                // Field dev/diorama/RadarCategories$Category.mobs:Ljava/util/List;
+        64: ifnull        137
+        67: aload_3
+        68: getfield      #261                // Field dev/diorama/RadarCategories$Category.mobs:Ljava/util/List;
+        71: invokeinterface #153,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        76: astore        5
+        78: aload         5
+        80: invokeinterface #160,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        85: ifeq          137
+        88: aload         5
+        90: invokeinterface #164,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        95: checkcast     #155                // class java/lang/String
+        98: astore        6
+       100: aload         6
+       102: invokestatic  #263                // Method cleanMob:(Ljava/lang/String;)Ljava/lang/String;
+       105: astore        7
+       107: aload         7
+       109: ifnull        134
+       112: aload         4
+       114: aload         7
+       116: invokeinterface #266,  2          // InterfaceMethod java/util/List.contains:(Ljava/lang/Object;)Z
+       121: ifne          134
+       124: aload         4
+       126: aload         7
+       128: invokeinterface #106,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       133: pop
+       134: goto          78
+       137: aload_3
+       138: aload         4
+       140: putfield      #261                // Field dev/diorama/RadarCategories$Category.mobs:Ljava/util/List;
+       143: aload_3
+       144: aload_3
+       145: getfield      #269                // Field dev/diorama/RadarCategories$Category.iconScale:I
+       148: ifgt          155
+       151: iconst_0
+       152: goto          162
+       155: aload_3
+       156: getfield      #269                // Field dev/diorama/RadarCategories$Category.iconScale:I
+       159: invokestatic  #272                // Method dev/diorama/Settings.snapScale:(I)I
+       162: putfield      #269                // Field dev/diorama/RadarCategories$Category.iconScale:I
+       165: aload_3
+       166: getfield      #276                // Field dev/diorama/RadarCategories$Category.names:Ldev/diorama/Settings$NameTags;
+       169: ifnonnull     179
+       172: aload_3
+       173: getstatic     #279                // Field dev/diorama/Settings$NameTags.NEVER:Ldev/diorama/Settings$NameTags;
+       176: putfield      #276                // Field dev/diorama/RadarCategories$Category.names:Ldev/diorama/Settings$NameTags;
+       179: aload_3
+       180: aload_3
+       181: getfield      #281                // Field dev/diorama/RadarCategories$Category.range:I
+       184: invokestatic  #283                // Method snapRange:(I)I
+       187: putfield      #281                // Field dev/diorama/RadarCategories$Category.range:I
+       190: aload_1
+       191: aload_3
+       192: invokeinterface #106,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       197: pop
+       198: goto          25
+       201: aload_0
+       202: aload_1
+       203: putfield      #92                 // Field dev/diorama/Settings.radarCategories:Ljava/util/List;
+       206: new           #285                // class java/util/TreeMap
+       209: dup
+       210: invokespecial #286                // Method java/util/TreeMap."<init>":()V
+       213: astore_2
+       214: aload_0
+       215: getfield      #289                // Field dev/diorama/Settings.radarKinds:Ljava/util/Map;
+       218: ifnull        357
+       221: invokestatic  #293                // Method dev/diorama/render/Radar$Kind.values:()[Ldev/diorama/render/Radar$Kind;
+       224: astore_3
+       225: aload_3
+       226: arraylength
+       227: istore        4
+       229: iconst_0
+       230: istore        5
+       232: iload         5
+       234: iload         4
+       236: if_icmpge     357
+       239: aload_3
+       240: iload         5
+       242: aaload
+       243: astore        6
+       245: aload_0
+       246: getfield      #289                // Field dev/diorama/Settings.radarKinds:Ljava/util/Map;
+       249: aload         6
+       251: invokevirtual #296                // Method dev/diorama/render/Radar$Kind.name:()Ljava/lang/String;
+       254: invokeinterface #137,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       259: checkcast     #13                 // class dev/diorama/RadarCategories$KindLook
+       262: astore        7
+       264: aload         7
+       266: ifnull        351
+       269: aload         7
+       271: aload         7
+       273: getfield      #297                // Field dev/diorama/RadarCategories$KindLook.iconScale:I
+       276: ifgt          283
+       279: iconst_0
+       280: goto          291
+       283: aload         7
+       285: getfield      #297                // Field dev/diorama/RadarCategories$KindLook.iconScale:I
+       288: invokestatic  #272                // Method dev/diorama/Settings.snapScale:(I)I
+       291: putfield      #297                // Field dev/diorama/RadarCategories$KindLook.iconScale:I
+       294: aload         7
+       296: getfield      #298                // Field dev/diorama/RadarCategories$KindLook.names:Ldev/diorama/Settings$NameTags;
+       299: ifnonnull     310
+       302: aload         7
+       304: getstatic     #279                // Field dev/diorama/Settings$NameTags.NEVER:Ldev/diorama/Settings$NameTags;
+       307: putfield      #298                // Field dev/diorama/RadarCategories$KindLook.names:Ldev/diorama/Settings$NameTags;
+       310: aload         7
+       312: getfield      #301                // Field dev/diorama/RadarCategories$KindLook.range:Ljava/lang/Integer;
+       315: ifnull        337
+       318: aload         7
+       320: aload         7
+       322: getfield      #301                // Field dev/diorama/RadarCategories$KindLook.range:Ljava/lang/Integer;
+       325: invokevirtual #306                // Method java/lang/Integer.intValue:()I
+       328: invokestatic  #283                // Method snapRange:(I)I
+       331: invokestatic  #310                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       334: putfield      #301                // Field dev/diorama/RadarCategories$KindLook.range:Ljava/lang/Integer;
+       337: aload_2
+       338: aload         6
+       340: invokevirtual #296                // Method dev/diorama/render/Radar$Kind.name:()Ljava/lang/String;
+       343: aload         7
+       345: invokeinterface #172,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       350: pop
+       351: iinc          5, 1
+       354: goto          232
+       357: aload_0
+       358: aload_2
+       359: putfield      #289                // Field dev/diorama/Settings.radarKinds:Ljava/util/Map;
+       362: aload_0
+       363: getfield      #314                // Field dev/diorama/Settings.radarPokemonAdded:Z
+       366: ifne          428
+       369: ldc_w         #316                // String cobblemon
+       372: invokestatic  #319                // Method installed:(Ljava/lang/String;)Z
+       375: ifne          387
+       378: ldc_w         #321                // String pixelmon
+       381: invokestatic  #319                // Method installed:(Ljava/lang/String;)Z
+       384: ifeq          428
+       387: aload_0
+       388: iconst_1
+       389: putfield      #314                // Field dev/diorama/Settings.radarPokemonAdded:Z
+       392: new           #15                 // class dev/diorama/RadarCategories$Category
+       395: dup
+       396: invokespecial #322                // Method dev/diorama/RadarCategories$Category."<init>":()V
+       399: astore_3
+       400: aload_3
+       401: ldc           #52                 // String pokemon
+       403: putfield      #325                // Field dev/diorama/RadarCategories$Category.builtIn:Ljava/lang/String;
+       406: aload_3
+       407: new           #85                 // class java/util/ArrayList
+       410: dup
+       411: getstatic     #327                // Field POKEMON_MOBS:Ljava/util/List;
+       414: invokespecial #95                 // Method java/util/ArrayList."<init>":(Ljava/util/Collection;)V
+       417: putfield      #261                // Field dev/diorama/RadarCategories$Category.mobs:Ljava/util/List;
+       420: aload_1
+       421: iconst_0
+       422: aload_3
+       423: invokeinterface #330,  3          // InterfaceMethod java/util/List.add:(ILjava/lang/Object;)V
+       428: invokestatic  #332                // Method changed:()V
+       431: return
+
+  public static java.util.List<dev.diorama.RadarCategories$Mob> mobs();
+    Code:
+         0: new           #85                 // class java/util/ArrayList
+         3: dup
+         4: invokespecial #258                // Method java/util/ArrayList."<init>":()V
+         7: astore_0
+         8: getstatic     #346                // Field net/minecraft/core/registries/BuiltInRegistries.f_256780_:Lnet/minecraft/core/DefaultedRegistry;
+        11: invokeinterface #349,  1          // InterfaceMethod net/minecraft/core/DefaultedRegistry.iterator:()Ljava/util/Iterator;
+        16: astore_1
+        17: aload_1
+        18: invokeinterface #160,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        23: ifeq          121
+        26: aload_1
+        27: invokeinterface #164,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        32: checkcast     #139                // class net/minecraft/world/entity/EntityType
+        35: astore_2
+        36: aload_2
+        37: invokestatic  #143                // Method net/minecraft/world/entity/EntityType.m_20613_:(Lnet/minecraft/world/entity/EntityType;)Lnet/minecraft/resources/ResourceLocation;
+        40: invokevirtual #149                // Method net/minecraft/resources/ResourceLocation.toString:()Ljava/lang/String;
+        43: astore_3
+        44: aload_2
+        45: invokestatic  #353                // Method hasAttributes:(Lnet/minecraft/world/entity/EntityType;)Z
+        48: ifeq          75
+        51: aload_3
+        52: ldc_w         #355                // String minecraft:player
+        55: invokevirtual #190                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+        58: ifne          75
+        61: aload_3
+        62: ldc_w         #357                // String minecraft:armor_stand
+        65: invokevirtual #190                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+        68: ifne          75
+        71: iconst_1
+        72: goto          76
+        75: iconst_0
+        76: istore        4
+        78: iload         4
+        80: ifne          99
+        83: aload_2
+        84: invokevirtual #361                // Method net/minecraft/world/entity/EntityType.m_204041_:()Lnet/minecraft/core/Holder$Reference;
+        87: getstatic     #365                // Field dev/diorama/render/Radar.RADAR_SHOWN:Lnet/minecraft/tags/TagKey;
+        90: invokevirtual #369                // Method net/minecraft/core/Holder$Reference.m_203656_:(Lnet/minecraft/tags/TagKey;)Z
+        93: ifne          99
+        96: goto          17
+        99: aload_0
+       100: new           #9                  // class dev/diorama/RadarCategories$Mob
+       103: dup
+       104: aload_3
+       105: aload_2
+       106: invokevirtual #373                // Method net/minecraft/world/entity/EntityType.m_20676_:()Lnet/minecraft/network/chat/Component;
+       109: invokespecial #376                // Method dev/diorama/RadarCategories$Mob."<init>":(Ljava/lang/String;Lnet/minecraft/network/chat/Component;)V
+       112: invokeinterface #106,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+       117: pop
+       118: goto          17
+       121: aload_0
+       122: invokedynamic #394,  0            // InvokeDynamic #1:apply:()Ljava/util/function/Function;
+       127: invokestatic  #400                // InterfaceMethod java/util/Comparator.comparing:(Ljava/util/function/Function;)Ljava/util/Comparator;
+       130: invokedynamic #404,  0            // InvokeDynamic #2:apply:()Ljava/util/function/Function;
+       135: invokeinterface #407,  2          // InterfaceMethod java/util/Comparator.thenComparing:(Ljava/util/function/Function;)Ljava/util/Comparator;
+       140: invokeinterface #411,  2          // InterfaceMethod java/util/List.sort:(Ljava/util/Comparator;)V
+       145: aload_0
+       146: areturn
+
+  private static boolean hasAttributes(net.minecraft.world.entity.EntityType<?>);
+    Code:
+         0: aload_0
+         1: invokestatic  #421                // Method net/minecraft/world/entity/ai/attributes/DefaultAttributes.m_22301_:(Lnet/minecraft/world/entity/EntityType;)Z
+         4: ireturn
+
+  public static java.util.Set<java.lang.String> mobMods(java.util.List<dev.diorama.RadarCategories$Mob>);
+    Code:
+         0: new           #426                // class java/util/TreeSet
+         3: dup
+         4: invokespecial #427                // Method java/util/TreeSet."<init>":()V
+         7: astore_1
+         8: aload_0
+         9: invokeinterface #153,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        14: astore_2
+        15: aload_2
+        16: invokeinterface #160,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        21: ifeq          76
+        24: aload_2
+        25: invokeinterface #164,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        30: checkcast     #9                  // class dev/diorama/RadarCategories$Mob
+        33: astore_3
+        34: aload_3
+        35: invokevirtual #402                // Method dev/diorama/RadarCategories$Mob.id:()Ljava/lang/String;
+        38: iconst_0
+        39: aload_3
+        40: invokevirtual #402                // Method dev/diorama/RadarCategories$Mob.id:()Ljava/lang/String;
+        43: bipush        58
+        45: invokevirtual #187                // Method java/lang/String.indexOf:(I)I
+        48: invokevirtual #194                // Method java/lang/String.substring:(II)Ljava/lang/String;
+        51: astore        4
+        53: aload         4
+        55: ldc_w         #431                // String minecraft
+        58: invokevirtual #190                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+        61: ifne          73
+        64: aload_1
+        65: aload         4
+        67: invokeinterface #432,  2          // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+        72: pop
+        73: goto          15
+        76: aload_1
+        77: areturn
+
+  public static java.lang.String modName(java.lang.String);
+    Code:
+         0: invokestatic  #443                // Method net/minecraftforge/fml/ModList.get:()Lnet/minecraftforge/fml/ModList;
+         3: aload_0
+         4: invokevirtual #447                // Method net/minecraftforge/fml/ModList.getModContainerById:(Ljava/lang/String;)Ljava/util/Optional;
+         7: invokedynamic #454,  0            // InvokeDynamic #3:apply:()Ljava/util/function/Function;
+        12: invokevirtual #460                // Method java/util/Optional.map:(Ljava/util/function/Function;)Ljava/util/Optional;
+        15: aload_0
+        16: invokevirtual #463                // Method java/util/Optional.orElse:(Ljava/lang/Object;)Ljava/lang/Object;
+        19: checkcast     #155                // class java/lang/String
+        22: areturn
+
+  private static boolean installed(java.lang.String);
+    Code:
+         0: invokestatic  #443                // Method net/minecraftforge/fml/ModList.get:()Lnet/minecraftforge/fml/ModList;
+         3: aload_0
+         4: invokevirtual #466                // Method net/minecraftforge/fml/ModList.isLoaded:(Ljava/lang/String;)Z
+         7: ireturn
+
+  private static java.lang.String lambda$modName$1(net.minecraftforge.fml.ModContainer);
+    Code:
+         0: aload_0
+         1: invokevirtual #473                // Method net/minecraftforge/fml/ModContainer.getModInfo:()Lnet/minecraftforge/forgespi/language/IModInfo;
+         4: invokeinterface #478,  1          // InterfaceMethod net/minecraftforge/forgespi/language/IModInfo.getDisplayName:()Ljava/lang/String;
+         9: areturn
+
+  private static java.lang.String lambda$mobs$0(dev.diorama.RadarCategories$Mob);
+    Code:
+         0: aload_0
+         1: invokevirtual #481                // Method dev/diorama/RadarCategories$Mob.name:()Lnet/minecraft/network/chat/Component;
+         4: invokeinterface #486,  1          // InterfaceMethod net/minecraft/network/chat/Component.getString:()Ljava/lang/String;
+         9: getstatic     #237                // Field java/util/Locale.ROOT:Ljava/util/Locale;
+        12: invokevirtual #241                // Method java/lang/String.toLowerCase:(Ljava/util/Locale;)Ljava/lang/String;
+        15: areturn
+
+  static {};
+    Code:
+         0: ldc_w         #489                // String cobblemon:pokemon
+         3: ldc_w         #491                // String pixelmon:pixelmon
+         6: invokestatic  #494                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+         9: putstatic     #327                // Field POKEMON_MOBS:Ljava/util/List;
+        12: invokestatic  #293                // Method dev/diorama/render/Radar$Kind.values:()[Ldev/diorama/render/Radar$Kind;
+        15: arraylength
+        16: anewarray     #17                 // class dev/diorama/RadarCategories$Entry
+        19: putstatic     #75                 // Field KINDS:[Ldev/diorama/RadarCategories$Entry;
+        22: iconst_5
+        23: anewarray     #20                 // class dev/diorama/render/Radar$Kind
+        26: dup
+        27: iconst_0
+        28: getstatic     #112                // Field dev/diorama/render/Radar$Kind.PLAYER:Ldev/diorama/render/Radar$Kind;
+        31: aastore
+        32: dup
+        33: iconst_1
+        34: getstatic     #497                // Field dev/diorama/render/Radar$Kind.HOSTILE:Ldev/diorama/render/Radar$Kind;
+        37: aastore
+        38: dup
+        39: iconst_2
+        40: getstatic     #500                // Field dev/diorama/render/Radar$Kind.NEUTRAL:Ldev/diorama/render/Radar$Kind;
+        43: aastore
+        44: dup
+        45: iconst_3
+        46: getstatic     #503                // Field dev/diorama/render/Radar$Kind.PASSIVE:Ldev/diorama/render/Radar$Kind;
+        49: aastore
+        50: dup
+        51: iconst_4
+        52: getstatic     #115                // Field dev/diorama/render/Radar$Kind.ITEM:Ldev/diorama/render/Radar$Kind;
+        55: aastore
+        56: putstatic     #97                 // Field LISTED:[Ldev/diorama/render/Radar$Kind;
+        59: invokestatic  #293                // Method dev/diorama/render/Radar$Kind.values:()[Ldev/diorama/render/Radar$Kind;
+        62: astore_0
+        63: aload_0
+        64: arraylength
+        65: istore_1
+        66: iconst_0
+        67: istore_2
+        68: iload_2
+        69: iload_1
+        70: if_icmpge     99
+        73: aload_0
+        74: iload_2
+        75: aaload
+        76: astore_3
+        77: getstatic     #75                 // Field KINDS:[Ldev/diorama/RadarCategories$Entry;
+        80: aload_3
+        81: invokevirtual #79                 // Method dev/diorama/render/Radar$Kind.ordinal:()I
+        84: new           #11                 // class dev/diorama/RadarCategories$KindEntry
+        87: dup
+        88: aload_3
+        89: invokespecial #506                // Method dev/diorama/RadarCategories$KindEntry."<init>":(Ldev/diorama/render/Radar$Kind;)V
+        92: aastore
+        93: iinc          2, 1
+        96: goto          68
+        99: new           #508                // class java/util/IdentityHashMap
+       102: dup
+       103: invokespecial #509                // Method java/util/IdentityHashMap."<init>":()V
+       106: putstatic     #123                // Field BY_TYPE:Ljava/util/Map;
+       109: return
+}
+######## dev/diorama/RadarCategories$Mob
+Compiled from "RadarCategories.java"
+public final class dev.diorama.RadarCategories$Mob extends java.lang.Record {
+  private final java.lang.String id;
+
+  private final net.minecraft.network.chat.Component name;
+
+  public dev.diorama.RadarCategories$Mob(java.lang.String, net.minecraft.network.chat.Component);
+    Code:
+         0: aload_0
+         1: invokespecial #22                 // Method java/lang/Record."<init>":()V
+         4: aload_0
+         5: aload_1
+         6: putfield      #24                 // Field id:Ljava/lang/String;
+         9: aload_0
+        10: aload_2
+        11: putfield      #26                 // Field name:Lnet/minecraft/network/chat/Component;
+        14: return
+
+  public final java.lang.String toString();
+    Code:
+         0: aload_0
+         1: invokedynamic #44,  0             // InvokeDynamic #0:toString:(Ldev/diorama/RadarCategories$Mob;)Ljava/lang/String;
+         6: areturn
+
+  public final int hashCode();
+    Code:
+         0: aload_0
+         1: invokedynamic #49,  0             // InvokeDynamic #0:hashCode:(Ldev/diorama/RadarCategories$Mob;)I
+         6: ireturn
+
+  public final boolean equals(java.lang.Object);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokedynamic #54,  0             // InvokeDynamic #0:equals:(Ldev/diorama/RadarCategories$Mob;Ljava/lang/Object;)Z
+         7: ireturn
+
+  public java.lang.String id();
+    Code:
+         0: aload_0
+         1: getfield      #24                 // Field id:Ljava/lang/String;
+         4: areturn
+
+  public net.minecraft.network.chat.Component name();
+    Code:
+         0: aload_0
+         1: getfield      #26                 // Field name:Lnet/minecraft/network/chat/Component;
+         4: areturn
+}
+Compiled from "MinimapHud.java"
+public final class dev.diorama.MinimapHud implements dev.diorama.compat.HudElement {
+  public static final int MARGIN;
+  private static final int HOTBAR_HALF_WIDTH;
+  private static final int HOTBAR_HEIGHT;
+  private static final int EFFECT_WIDTH;
+  private static final int EFFECT_ROW;
+  private static final int[] NO_EFFECTS;
+  private static final int BOSS_BAR_HALF_WIDTH;
+  private static final int BOSS_BAR_HEIGHT;
+  private static final int SMALLEST;
+  private static final long LAYER_HOLD_MS;
+  private static final long LAYER_FADE_MS;
+  private static final int INFO_COLOR;
+  private static final int BED_TIME_COLOR;
+  private static boolean effectIconsDrawn;
+  private static int bossBarsBottom;
+  private static int[] shown;
+  private static int heldSize;
+  private final dev.diorama.render.MapViewport viewport;
+  private final dev.diorama.render.MapViewport fading;
+  private int fadingLayer;
+  private long fadeStart;
+  private final dev.diorama.drawing.DrawingOverlay drawings;
+  private final dev.diorama.WorldBorderOverlay worldBorder;
+  private final dev.diorama.render.AddonOverlay addons;
+  private int shownLayer;
+  private boolean showing;
+  private long holdStart;
+  public dev.diorama.MinimapHud();
+  public void render(net.minecraft.client.gui.GuiGraphics, float);
+  public static int[] shown();
+  static void holdSize(int);
+  public void preview(net.minecraft.client.gui.GuiGraphics, float);
+  public void close();
+  private static boolean debugScreenOpen(net.minecraft.client.Minecraft);
+  private boolean canDraw(net.minecraft.client.Minecraft);
+  private int[] draw(net.minecraft.client.gui.GuiGraphics, float, dev.diorama.MinimapHud$Anchor, int[], int, int);
+  private int layerToShow(dev.diorama.render.MapLevel, dev.diorama.render.MapViewport$View);
+  private static double zoom(dev.diorama.render.MapLevel, int);
+  static int[] place(dev.diorama.MinimapHud$Anchor, int, boolean, int, int, int, int[], int);
+  private static int x(dev.diorama.MinimapHud$Anchor, int, int);
+  static float turn(float);
+  private void turnedCompass(net.minecraft.client.gui.GuiGraphics, net.minecraft.client.gui.Font, int, int, int, float, boolean, float);
+  private void compass(net.minecraft.client.gui.GuiGraphics, net.minecraft.client.gui.Font, int, int, int, float);
+  private java.util.List<dev.diorama.MinimapHud$InfoLine> infoLines(dev.diorama.Settings, net.minecraft.world.entity.Entity, net.minecraft.client.Minecraft);
+  public static java.lang.String gameTime(dev.diorama.Settings$GameTime, long);
+  public static void bossBarDrawn(int);
+  public static void effectIconsDrawn();
+  private static int[] effectCounts(net.minecraft.client.player.LocalPlayer);
+  private static void lambda$infoLines$2(java.util.List, net.minecraft.resources.ResourceKey);
+  private static boolean lambda$draw$1(net.minecraft.world.entity.Entity, dev.diorama.waypoint.Waypoint);
+  private static void lambda$draw$0(dev.diorama.MapSession, net.minecraft.client.gui.GuiGraphics, dev.diorama.render.MapViewport$View, float, float, dev.diorama.Settings);
+  static {};
+}

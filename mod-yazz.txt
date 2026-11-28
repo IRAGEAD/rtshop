@@ -1,0 +1,100 @@
+== packcache/Yazz's Dungeons The Sequel - 1.20.1 - 1.0.1.jar
+META-INF/mods.toml
+assets/ydtwo/lang/en_us.json
+data/minecraft/structures/
+data/minecraft/structures/ancient_city/
+data/minecraft/structures/ancient_city/city_center/
+data/minecraft/structures/ancient_city/city_center/city_center_arena.nbt
+data/minecraft/worldgen/
+data/minecraft/worldgen/template_pool/
+data/minecraft/worldgen/template_pool/ancient_city/
+data/minecraft/worldgen/template_pool/ancient_city/city_center.json
+data/ydtwo/loot_tables/entities/
+data/ydtwo/loot_tables/entities/excavator.json
+data/ydtwo/loot_tables/entities/excavator_backpack_bonus.json
+data/ydtwo/loot_tables/entities/twisted_warden.json
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="ydtwo"
+version="1.0.1"
+displayName="Yazz's Dungeons: The Sequel"
+logoFile="ydtwo.png"
+logoBlur=false
+authors="Yazz"
+description='''Adds content inspired by Minecraft Dungeons II.'''
+
+[[dependencies.ydtwo]]
+modId="forge"
+mandatory=true
+versionRange="[47,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.ydtwo]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.21)"
+ordering="NONE"
+side="BOTH"
+
+[[mixins]]
+config="ydtwo.mixins.json"
+{
+  "creativetab.ydtwo.ydtwo_tab": "Yazz's Dungeons II",
+  "item.ydtwo.dungeon_shard": "Dungeon Shard",
+  "block.ydtwo.dungeon_stone": "Dungeon Stone",
+  "block.ydtwo.soul_vomit": "Soul Vomit",
+  "entity.ydtwo.twisted_warden": "Twisted Warden",
+  "entity.ydtwo.wraithlight_soul": "Soul",
+  "block.ydtwo.twisted_shrieker": "Twisted Shrieker",
+  "entity.ydtwo.excavator": "Excavator",
+  "entity.ydtwo.flame_construct": "Flame Construct",
+  "item.ydtwo.flame_construct_spawn_egg": "Flame Construct Spawn Egg",
+  "item.ydtwo.excavator_spawn_egg": "Excavator Spawn Egg",
+  "message.ydtwo.twisted_shrieker.warden_active": "Its Twisted Warden is still present.",
+  "message.ydtwo.twisted_shrieker.ready": "The Twisted Shrieker is ready.",
+  "message.ydtwo.twisted_shrieker.lantern_empty": "The Wraithlight Lantern contains no usable souls.",
+  "message.ydtwo.twisted_shrieker.charged": "Twisted Shrieker souls: %s/%s",
+  "block.ydtwo.wraithlight_lantern": "Wraithlight Lantern",
+  "tooltip.ydtwo.wraithlight_lantern.souls": "Souls: %s/%s",
+  "message.ydtwo.wraithlight_lantern.full": "The Wraithlight Lantern is full.",
+  "message.ydtwo.wraithlight_lantern.captured": "Soul captured: %s/%s",
+  "death.attack.soul_vomit": "%1$s was consumed by soul fire",
+  "death.attack.soul_vomit.player": "%1$s was consumed by %2$s's soul fire",
+  "death.attack.twisted_warden_attack": "%1$s was slain by the Twisted Warden",
+  "death.attack.twisted_warden_attack.player": "%1$s was slain by %2$s",
+  "subtitles.ydtwo.twisted_warden.soul_wind": "Soul wind howls",
+  "subtitles.ydtwo.twisted_warden.soul_whispers": "Souls whisper",
+  "subtitles.ydtwo.twisted_warden.soul_echoes": "Souls echo",
+  "subtitles.ydtwo.twisted_warden.mouth_open": "Twisted Warden opens its maw",
+  "subtitles.ydtwo.twisted_warden.coming_up": "Twisted Warden digs upward",
+  "subtitles.ydtwo.twisted_warden.spin": "Twisted Warden spinning",
+  "item.ydtwo.twisted_warden_spawn_egg": "Twisted Warden Spawn Egg",
+
+  "block.ydtwo.deepslate_brazier": "Deepslate Brazier",
+  "block.ydtwo.soul_deepslate_brazier": "Soul Deepslate Brazier",
+
+  "advancements.ydtwo.root.title": "Yazz's Dungeons II",
+  "advancements.ydtwo.root.description": "Face what lurks beneath the surface.",
+
+  "advancements.ydtwo.peek_a_boom.title": "Peek-a-Boom!",
+  "advancements.ydtwo.peek_a_boom.description": "Get caught in a Warden's violent emergence.",
+
+  "advancements.ydtwo.shut_down.title": "Shut Down",
+  "advancements.ydtwo.shut_down.description": "Interrupt a Warden's Sonic Boom and stun it.",
+
+  "advancements.ydtwo.a_cruel_warden.title": "Against All Warnings",
+  "advancements.ydtwo.a_cruel_warden.description": "Defeat the Warden.",
+
+  "advancements.ydtwo.soul_searcher.title": "Soul Searcher",
+  "advancements.ydtwo.soul_searcher.description": "Collect a wandering soul.",
+
+  "advancements.ydtwo.uh_oh.title": "Uh-Oh...",
+  "advancements.ydtwo.uh_oh.description": "Trigger a Twisted Shrieker.",
+
+  "advancements.ydtwo.the_twist_ends_here.title": "The Twist Ends Here",
+  "advancements.ydtwo.the_twist_ends_here.description": "Defeat the Twisted Warden."
+}

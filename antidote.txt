@@ -1,0 +1,8 @@
+artifacts-forge-9.5.20.jar assets/artifacts/lang/en_us.json:   "artifacts.tooltip.item.antidote_vessel": "Greatly reduces the duration of negative effects",
+artifacts-forge-9.5.20.jar assets/artifacts/lang/en_us.json:   "gamerule.artifacts.antidoteVessel.enabled": "Artifacts: Antidote Vessel enabled",
+artifacts-forge-9.5.20.jar assets/artifacts/lang/en_us.json:   "gamerule.artifacts.antidoteVessel.maxEffectDuration": "Artifacts: Antidote Vessel maximum negative effect duration",
+artifacts-forge-9.5.20.jar assets/artifacts/lang/en_us.json:   "item.artifacts.antidote_vessel": "Antidote Vessel",
+artifacts-forge-9.5.20.jar assets/artifacts/lang/ko_kr.json:   "artifacts.tooltip.item.antidote_vessel": "해로운 효과의 지속시간을 대폭 줄여줍니다",
+artifacts-forge-9.5.20.jar assets/artifacts/lang/ko_kr.json:   "gamerule.artifacts.antidoteVessel.enabled": "아티팩트: 완화제 활성화",
+artifacts-forge-9.5.20.jar assets/artifacts/lang/ko_kr.json:   "gamerule.artifacts.antidoteVessel.maxEffectDuration": "아티팩트: 완화제의 해로운 효과 지속시간 감소 최대 레벨",
+artifacts-forge-9.5.20.jar assets/artifacts/lang/ko_kr.json:   "item.artifacts.antidote_vessel": "완화제",

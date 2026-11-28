@@ -1,0 +1,101 @@
+######## files
+./META-INF/MANIFEST.MF
+./META-INF/jarjar/metadata.json
+./META-INF/jarjar/mixinextras-forge-0.5.0.jar
+./META-INF/mods.toml
+./assets/cinematiccataclysm/lang/en_us.json
+./cinematiccataclysm.mixins.json
+./cinematiccataclysm.refmap.json
+./com/finderfeed/cataclysm_custscenes/CatCutClientEvents.class
+./com/finderfeed/cataclysm_custscenes/CatCutEvents.class
+./com/finderfeed/cataclysm_custscenes/CatCutMixinHandler.class
+./com/finderfeed/cataclysm_custscenes/CatCutModEvents.class
+./com/finderfeed/cataclysm_custscenes/CatCutUtil.class
+./com/finderfeed/cataclysm_custscenes/CataclysmCutscenes.class
+./com/finderfeed/cataclysm_custscenes/entities/ancient_remnant/AncientRemnantCutsceneEntity$Events.class
+./com/finderfeed/cataclysm_custscenes/entities/ancient_remnant/AncientRemnantCutsceneEntity.class
+./com/finderfeed/cataclysm_custscenes/entities/ancient_remnant/AncientRemnantCutsceneEntityRenderer.class
+./com/finderfeed/cataclysm_custscenes/entities/ignis/IgnisCutsceneEntity$Events.class
+./com/finderfeed/cataclysm_custscenes/entities/ignis/IgnisCutsceneEntity.class
+./com/finderfeed/cataclysm_custscenes/entities/ignis/IgnisCutsceneEntityRenderer.class
+./com/finderfeed/cataclysm_custscenes/entities/leviathan/LeviathanCutsceneEntity$Events.class
+./com/finderfeed/cataclysm_custscenes/entities/leviathan/LeviathanCutsceneEntity.class
+./com/finderfeed/cataclysm_custscenes/entities/leviathan/LeviathanCutsceneEntityRenderer.class
+./com/finderfeed/cataclysm_custscenes/entities/maledictus/MaledictusCutsceneEntity$Events.class
+./com/finderfeed/cataclysm_custscenes/entities/maledictus/MaledictusCutsceneEntity.class
+./com/finderfeed/cataclysm_custscenes/entities/maledictus/MaledictusCutsceneEntityRenderer.class
+./com/finderfeed/cataclysm_custscenes/entities/scylla/ScyllaCutsceneEntity$Events.class
+./com/finderfeed/cataclysm_custscenes/entities/scylla/ScyllaCutsceneEntity.class
+./com/finderfeed/cataclysm_custscenes/entities/scylla/ScyllaCutsceneRenderer.class
+./com/finderfeed/cataclysm_custscenes/items/CatCutDebugStick.class
+./com/finderfeed/cataclysm_custscenes/mixin/AltarOfAbyssBlockEntityMixin.class
+./com/finderfeed/cataclysm_custscenes/mixin/AltarOfFireBlockEntityMixin.class
+./com/finderfeed/cataclysm_custscenes/mixin/AncientRemnantMixin.class
+./com/finderfeed/cataclysm_custscenes/mixin/CursedTombstoneMixin.class
+./com/finderfeed/cataclysm_custscenes/mixin/MaledictusEntityMixin.class
+./com/finderfeed/cataclysm_custscenes/mixin/ScyllaEntityMixin.class
+./pack.mcmeta
+######## sizes
+0
+######## mods.toml
+modLoader="javafml" #mandatory
+
+loaderVersion="[47,)" #mandatory
+
+license="All Rights Reserved"
+
+[[mods]] #mandatory
+
+# The modid of the mod
+modId="cinematiccataclysm" #mandatory
+
+version="1.0.1" #mandatory
+
+displayName="Cinematic Cataclysm" #mandatory
+
+authors="FINDERFEED" #optional
+
+description='''Adds one-time intro cutscenes for some L_Enders_Cataclysm bosses'''
+
+[[mixins]]
+config="cinematiccataclysm.mixins.json"
+
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
+[[dependencies.cinematiccataclysm]] #optional
+modId="forge" #mandatory
+
+type="required" #mandatory
+
+versionRange="[47.1.1,)" #mandatory
+
+ordering="NONE"
+
+side="BOTH"
+
+mandatory = true
+
+[[dependencies.cinematiccataclysm]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
+    mandatory = true
+
+[[dependencies.cinematiccataclysm]]
+    modId="fdlib"
+    type="required"
+    versionRange="[1.0.2,2.0.0)"
+    ordering="NONE"
+    side="BOTH"
+    mandatory = true
+
+
+######## assets/cinematiccataclysm/lang/en_us.json
+{
+
+}
+
+find: ‘data’: No such file or directory

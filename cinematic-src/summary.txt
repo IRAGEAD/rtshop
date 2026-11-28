@@ -1,0 +1,18 @@
+Summary for /home/runner/work/rtshop/rtshop/packcache/Cinematic Interaction-Forge-1.20.1-0.18.30.jar
+Decompiled with CFR 0.152
+
+
+dev.dyslexic.cinematic.client.SceneScreen
+----------------------------
+
+m_88315_(net.minecraft.client.gui.GuiGraphics int int float )
+  Unable to fully structure code
+
+
+dev.dyslexic.cinematic.client.Showcase
+----------------------------
+
+lambda$spatialEditorScript$614(dev.dyslexic.cinematic.client.SpatialEditor java.lang.String dev.dyslexic.cinematic.station.StationKind )
+  Unable to fully structure code
+lambda$fieldGuideScript$241()
+  Unable to fully structure code

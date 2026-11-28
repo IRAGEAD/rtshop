@@ -1,0 +1,575 @@
+DH: packcache/DistantHorizons-3.3.3-1.20.1-fabric-forge.jar
+Chunky: packcache/Chunky-1.3.146.jar
+######## com/seibel/distanthorizons/forge/wrappers/modAccessor/ChunkyAccessor
+Compiled from "ChunkyAccessor.java"
+public class com.seibel.distanthorizons.forge.wrappers.modAccessor.ChunkyAccessor extends com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.AbstractChunkyAccessor {
+  public com.seibel.distanthorizons.forge.wrappers.modAccessor.ChunkyAccessor();
+    Code:
+         0: aload_0
+         1: invokespecial #14                 // Method com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/AbstractChunkyAccessor."<init>":()V
+         4: return
+
+  public java.lang.String getModName();
+    Code:
+         0: ldc           #20                 // String chunky
+         2: areturn
+
+  protected void bindOnGenerationProgressEvent();
+    Code:
+         0: invokestatic  #27                 // Method org/popcraft/chunky/ChunkyProvider.get:()Lorg/popcraft/chunky/Chunky;
+         3: invokevirtual #33                 // Method org/popcraft/chunky/Chunky.getApi:()Lorg/popcraft/chunky/api/ChunkyAPI;
+         6: aload_0
+         7: invokedynamic #52,  0             // InvokeDynamic #0:accept:(Lcom/seibel/distanthorizons/forge/wrappers/modAccessor/ChunkyAccessor;)Ljava/util/function/Consumer;
+        12: invokeinterface #58,  2           // InterfaceMethod org/popcraft/chunky/api/ChunkyAPI.onGenerationProgress:(Ljava/util/function/Consumer;)V
+        17: return
+
+  private void lambda$bindOnGenerationProgressEvent$0(org.popcraft.chunky.api.event.task.GenerationProgressEvent);
+    Code:
+         0: aload_0
+         1: invokevirtual #62                 // Method onGenEvent:()V
+         4: return
+}
+######## com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/AbstractChunkyAccessor
+Compiled from "AbstractChunkyAccessor.java"
+public abstract class com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.AbstractChunkyAccessor implements com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IChunkyAccessor {
+  protected static final com.seibel.distanthorizons.core.logging.DhLogger LOGGER;
+
+  private static final java.util.concurrent.ThreadPoolExecutor TIMEOUT_THREAD;
+
+  private static final long TIME_BETWEEN_RUNNING_CHECKS_MS;
+
+  private static final long CHUNKY_MIN_INACTIVE_TIME_MS;
+
+  private final java.util.concurrent.atomic.AtomicBoolean timeoutThreadRunningRef;
+
+  private final java.util.concurrent.atomic.AtomicLong lastChunkyRunMsRef;
+
+  private final java.util.concurrent.atomic.AtomicBoolean chunkyRunningRef;
+
+  private boolean listenerBound;
+
+  public com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.AbstractChunkyAccessor();
+    Code:
+         0: aload_0
+         1: invokespecial #42                 // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: new           #44                 // class java/util/concurrent/atomic/AtomicBoolean
+         8: dup
+         9: iconst_0
+        10: invokespecial #47                 // Method java/util/concurrent/atomic/AtomicBoolean."<init>":(Z)V
+        13: putfield      #49                 // Field timeoutThreadRunningRef:Ljava/util/concurrent/atomic/AtomicBoolean;
+        16: aload_0
+        17: new           #51                 // class java/util/concurrent/atomic/AtomicLong
+        20: dup
+        21: lconst_0
+        22: invokespecial #54                 // Method java/util/concurrent/atomic/AtomicLong."<init>":(J)V
+        25: putfield      #56                 // Field lastChunkyRunMsRef:Ljava/util/concurrent/atomic/AtomicLong;
+        28: aload_0
+        29: new           #44                 // class java/util/concurrent/atomic/AtomicBoolean
+        32: dup
+        33: iconst_0
+        34: invokespecial #47                 // Method java/util/concurrent/atomic/AtomicBoolean."<init>":(Z)V
+        37: putfield      #58                 // Field chunkyRunningRef:Ljava/util/concurrent/atomic/AtomicBoolean;
+        40: aload_0
+        41: iconst_0
+        42: putfield      #60                 // Field listenerBound:Z
+        45: return
+
+  protected abstract void bindOnGenerationProgressEvent();
+
+  public boolean isRunning();
+    Code:
+         0: aload_0
+         1: getfield      #58                 // Field chunkyRunningRef:Ljava/util/concurrent/atomic/AtomicBoolean;
+         4: invokevirtual #68                 // Method java/util/concurrent/atomic/AtomicBoolean.get:()Z
+         7: ireturn
+
+  public void tryRunFirstTimeSetup();
+    Code:
+         0: aload_0
+         1: getfield      #60                 // Field listenerBound:Z
+         4: ifeq          8
+         7: return
+         8: aload_0
+         9: iconst_1
+        10: putfield      #60                 // Field listenerBound:Z
+        13: aload_0
+        14: invokevirtual #71                 // Method bindOnGenerationProgressEvent:()V
+        17: return
+
+  protected void onGenEvent();
+    Code:
+         0: aload_0
+         1: getfield      #56                 // Field lastChunkyRunMsRef:Ljava/util/concurrent/atomic/AtomicLong;
+         4: invokestatic  #78                 // Method java/lang/System.currentTimeMillis:()J
+         7: invokevirtual #81                 // Method java/util/concurrent/atomic/AtomicLong.set:(J)V
+        10: getstatic     #85                 // Field com/seibel/distanthorizons/core/config/Config$Common$WorldGenerator.generatorPlan:Lcom/seibel/distanthorizons/core/config/types/ConfigEntry;
+        13: invokevirtual #91                 // Method com/seibel/distanthorizons/core/config/types/ConfigEntry.getApiValue:()Ljava/lang/Object;
+        16: ifnonnull     42
+        19: getstatic     #93                 // Field LOGGER:Lcom/seibel/distanthorizons/core/logging/DhLogger;
+        22: ldc           #95                 // String Chunky running. Disabling DH world gen...
+        24: iconst_0
+        25: anewarray     #4                  // class java/lang/Object
+        28: invokevirtual #101                // Method com/seibel/distanthorizons/core/logging/DhLogger.info:(Ljava/lang/String;[Ljava/lang/Object;)V
+        31: getstatic     #85                 // Field com/seibel/distanthorizons/core/config/Config$Common$WorldGenerator.generatorPlan:Lcom/seibel/distanthorizons/core/config/types/ConfigEntry;
+        34: getstatic     #107                // Field com/seibel/distanthorizons/api/enums/worldGeneration/EDhApiGeneratorPlan.DISABLED:Lcom/seibel/distanthorizons/api/enums/worldGeneration/EDhApiGeneratorPlan;
+        37: ldc           #109                // String Distant Horizons / Chunky
+        39: invokevirtual #113                // Method com/seibel/distanthorizons/core/config/types/ConfigEntry.setApiValue:(Ljava/lang/Object;Ljava/lang/String;)V
+        42: aload_0
+        43: getfield      #49                 // Field timeoutThreadRunningRef:Ljava/util/concurrent/atomic/AtomicBoolean;
+        46: iconst_1
+        47: invokevirtual #117                // Method java/util/concurrent/atomic/AtomicBoolean.getAndSet:(Z)Z
+        50: ifne          65
+        53: getstatic     #119                // Field TIMEOUT_THREAD:Ljava/util/concurrent/ThreadPoolExecutor;
+        56: aload_0
+        57: invokedynamic #135,  0            // InvokeDynamic #0:run:(Lcom/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/AbstractChunkyAccessor;)Ljava/lang/Runnable;
+        62: invokevirtual #141                // Method java/util/concurrent/ThreadPoolExecutor.execute:(Ljava/lang/Runnable;)V
+        65: return
+
+  private void lambda$onGenEvent$0();
+    Code:
+         0: lconst_0
+         1: lstore_3
+         2: lload_3
+         3: ldc2_w        #30                 // long 2000l
+         6: lcmp
+         7: ifge          38
+        10: ldc2_w        #27                 // long 1000l
+        13: invokestatic  #148                // Method java/lang/Thread.sleep:(J)V
+        16: goto          21
+        19: astore        5
+        21: aload_0
+        22: getfield      #56                 // Field lastChunkyRunMsRef:Ljava/util/concurrent/atomic/AtomicLong;
+        25: invokevirtual #150                // Method java/util/concurrent/atomic/AtomicLong.get:()J
+        28: lstore_1
+        29: invokestatic  #78                 // Method java/lang/System.currentTimeMillis:()J
+        32: lload_1
+        33: lsub
+        34: lstore_3
+        35: goto          2
+        38: getstatic     #93                 // Field LOGGER:Lcom/seibel/distanthorizons/core/logging/DhLogger;
+        41: ldc           #152                // String Chunky no longer running. Re-enabling DH world gen...
+        43: iconst_0
+        44: anewarray     #4                  // class java/lang/Object
+        47: invokevirtual #101                // Method com/seibel/distanthorizons/core/logging/DhLogger.info:(Ljava/lang/String;[Ljava/lang/Object;)V
+        50: getstatic     #85                 // Field com/seibel/distanthorizons/core/config/Config$Common$WorldGenerator.generatorPlan:Lcom/seibel/distanthorizons/core/config/types/ConfigEntry;
+        53: aconst_null
+        54: aconst_null
+        55: invokevirtual #113                // Method com/seibel/distanthorizons/core/config/types/ConfigEntry.setApiValue:(Ljava/lang/Object;Ljava/lang/String;)V
+        58: aload_0
+        59: getfield      #49                 // Field timeoutThreadRunningRef:Ljava/util/concurrent/atomic/AtomicBoolean;
+        62: iconst_0
+        63: invokevirtual #154                // Method java/util/concurrent/atomic/AtomicBoolean.set:(Z)V
+        66: goto          82
+        69: astore        6
+        71: aload_0
+        72: getfield      #49                 // Field timeoutThreadRunningRef:Ljava/util/concurrent/atomic/AtomicBoolean;
+        75: iconst_0
+        76: invokevirtual #154                // Method java/util/concurrent/atomic/AtomicBoolean.set:(Z)V
+        79: aload         6
+        81: athrow
+        82: return
+      Exception table:
+         from    to  target type
+            10    16    19   Class java/lang/InterruptedException
+             0    58    69   any
+            69    71    69   any
+
+  static {};
+    Code:
+         0: new           #161                // class com/seibel/distanthorizons/core/logging/DhLoggerBuilder
+         3: dup
+         4: invokespecial #162                // Method com/seibel/distanthorizons/core/logging/DhLoggerBuilder."<init>":()V
+         7: invokevirtual #166                // Method com/seibel/distanthorizons/core/logging/DhLoggerBuilder.build:()Lcom/seibel/distanthorizons/core/logging/DhLogger;
+        10: putstatic     #93                 // Field LOGGER:Lcom/seibel/distanthorizons/core/logging/DhLogger;
+        13: ldc           #168                // String Chunky Timeout Handler
+        15: invokestatic  #174                // Method com/seibel/distanthorizons/core/util/ThreadUtil.makeSingleDaemonThreadPool:(Ljava/lang/String;)Ljava/util/concurrent/ThreadPoolExecutor;
+        18: putstatic     #119                // Field TIMEOUT_THREAD:Ljava/util/concurrent/ThreadPoolExecutor;
+        21: return
+}
+== who calls tryRunFirstTimeSetup
+-- ./com/seibel/distanthorizons/common/AbstractModInitializer.class
+217-  protected <T extends com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModAccessor> void addModCompatAccessor(java.lang.Class<? super T>, java.util.function.Supplier<T>);
+222-         5: invokeinterface #279,  1          // InterfaceMethod java/util/function/Supplier.get:()Ljava/lang/Object;
+224-        13: invokevirtual #285                // Method com/seibel/distanthorizons/core/dependencyInjection/ModAccessorInjector.bind:(Ljava/lang/Class;Lcom/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/IModAccessor;)V
+227-  private void initConfig();
+229:         0: invokestatic  #323                // Method com/seibel/distanthorizons/core/config/ConfigHandler.tryRunFirstTimeSetup:()V
+230-         3: invokestatic  #326                // Method com/seibel/distanthorizons/core/config/Config.completeDelayedSetup:()V
+231-         6: invokestatic  #329                // Method com/seibel/distanthorizons/core/logging/DhLogger.runDelayedConfigSetup:()V
+-- ./com/seibel/distanthorizons/common/AbstractModInitializer_forge.class
+217-  protected <T extends com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModAccessor> void addModCompatAccessor(java.lang.Class<? super T>, java.util.function.Supplier<T>);
+222-         5: invokeinterface #285,  1          // InterfaceMethod java/util/function/Supplier.get:()Ljava/lang/Object;
+224-        13: invokevirtual #291                // Method com/seibel/distanthorizons/core/dependencyInjection/ModAccessorInjector.bind:(Ljava/lang/Class;Lcom/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/IModAccessor;)V
+227-  private void initConfig();
+229:         0: invokestatic  #326                // Method com/seibel/distanthorizons/core/config/ConfigHandler.tryRunFirstTimeSetup:()V
+230-         3: invokestatic  #329                // Method com/seibel/distanthorizons/core/config/Config.completeDelayedSetup:()V
+231-         6: invokestatic  #332                // Method com/seibel/distanthorizons/core/logging/DhLogger.runDelayedConfigSetup:()V
+-- ./com/seibel/distanthorizons/core/config/ConfigHandler.class
+32-        23: invokespecial #52                 // Method java/util/ArrayList."<init>":()V
+42:  public static void tryRunFirstTimeSetup();
+-- ./com/seibel/distanthorizons/core/api/internal/SharedApi.class
+165-        21: invokespecial #181                // Method com/seibel/distanthorizons/core/pos/DhChunkPos."<init>":(II)V
+166-        24: invokevirtual #172                // Method com/seibel/distanthorizons/core/api/internal/chunkUpdating/ChunkUpdateQueueManager.contains:(Lcom/seibel/distanthorizons/core/pos/DhChunkPos;)Z
+169-  public void applyChunkUpdate(com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper, com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper, boolean);
+174:         9: invokeinterface #194,  1          // InterfaceMethod com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/IChunkyAccessor.tryRunFirstTimeSetup:()V
+-- ./com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/AbstractChunkyAccessor.class
+46-  protected abstract void bindOnGenerationProgressEvent();
+48-  public boolean isRunning();
+52-         4: invokevirtual #68                 // Method java/util/concurrent/atomic/AtomicBoolean.get:()Z
+55:  public void tryRunFirstTimeSetup();
+-- ./com/seibel/distanthorizons/core/wrapperInterfaces/modAccessor/IChunkyAccessor.class
+3-  public abstract boolean isRunning();
+5:  public abstract void tryRunFirstTimeSetup();
+== classes
+./org/popcraft/chunky/ChunkyProvider.class
+./org/popcraft/chunky/command/suggestion/SuggestionProviders.class
+./org/popcraft/chunky/command/suggestion/TrimModeSuggestionProvider.class
+./org/popcraft/chunky/command/suggestion/ShapeSuggestionProvider.class
+./org/popcraft/chunky/command/suggestion/PatternSuggestionProvider.class
+./org/popcraft/chunky/platform/ForgeWorld.class
+./org/popcraft/chunky/platform/ForgePlayer.class
+./org/popcraft/chunky/platform/ForgeSender.class
+./org/popcraft/chunky/platform/ForgeBorder.class
+./org/popcraft/chunky/platform/ForgeServer.class
+./org/popcraft/chunky/Chunky.class
+./org/popcraft/chunky/ChunkyForge.class
+######## org/popcraft/chunky/ChunkyProvider
+Compiled from "ChunkyProvider.java"
+public final class org.popcraft.chunky.ChunkyProvider {
+  private static org.popcraft.chunky.Chunky instance;
+
+  private org.popcraft.chunky.ChunkyProvider();
+    Code:
+         0: aload_0
+         1: invokespecial #11                 // Method java/lang/Object."<init>":()V
+         4: new           #13                 // class java/lang/UnsupportedOperationException
+         7: dup
+         8: ldc           #15                 // String This class cannot be instantiated.
+        10: invokespecial #18                 // Method java/lang/UnsupportedOperationException."<init>":(Ljava/lang/String;)V
+        13: athrow
+
+  public static org.popcraft.chunky.Chunky get();
+    Code:
+         0: getstatic     #24                 // Field instance:Lorg/popcraft/chunky/Chunky;
+         3: ifnonnull     16
+         6: new           #26                 // class java/lang/IllegalStateException
+         9: dup
+        10: ldc           #28                 // String Chunky is not loaded.
+        12: invokespecial #29                 // Method java/lang/IllegalStateException."<init>":(Ljava/lang/String;)V
+        15: athrow
+        16: getstatic     #24                 // Field instance:Lorg/popcraft/chunky/Chunky;
+        19: areturn
+
+  static void register(org.popcraft.chunky.Chunky);
+    Code:
+         0: aload_0
+         1: putstatic     #24                 // Field instance:Lorg/popcraft/chunky/Chunky;
+         4: return
+
+  static void unregister();
+    Code:
+         0: aconst_null
+         1: putstatic     #24                 // Field instance:Lorg/popcraft/chunky/Chunky;
+         4: return
+}
+######## org/popcraft/chunky/ChunkyForge
+Compiled from "ChunkyForge.java"
+public class org.popcraft.chunky.ChunkyForge {
+  public static final java.lang.String MOD_ID;
+
+  private org.popcraft.chunky.Chunky chunky;
+
+  private final java.util.Map<net.minecraft.resources.ResourceLocation, net.minecraft.server.level.ServerBossEvent> bossBars;
+
+  public org.popcraft.chunky.ChunkyForge();
+    Code:
+         0: aload_0
+         1: invokespecial #24                 // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: new           #26                 // class java/util/concurrent/ConcurrentHashMap
+         8: dup
+         9: invokespecial #27                 // Method java/util/concurrent/ConcurrentHashMap."<init>":()V
+        12: putfield      #29                 // Field bossBars:Ljava/util/Map;
+        15: getstatic     #35                 // Field net/minecraftforge/common/MinecraftForge.EVENT_BUS:Lnet/minecraftforge/eventbus/api/IEventBus;
+        18: aload_0
+        19: invokeinterface #41,  2           // InterfaceMethod net/minecraftforge/eventbus/api/IEventBus.register:(Ljava/lang/Object;)V
+        24: return
+
+  public void onServerStarting(net.minecraftforge.event.server.ServerStartingEvent);
+    Code:
+         0: aload_1
+         1: invokevirtual #53                 // Method net/minecraftforge/event/server/ServerStartingEvent.getServer:()Lnet/minecraft/server/MinecraftServer;
+         4: astore_2
+         5: getstatic     #59                 // Field net/minecraftforge/fml/loading/FMLPaths.CONFIGDIR:Lnet/minecraftforge/fml/loading/FMLPaths;
+         8: invokevirtual #63                 // Method net/minecraftforge/fml/loading/FMLPaths.get:()Ljava/nio/file/Path;
+        11: ldc           #65                 // String chunky/config.json
+        13: invokeinterface #71,  2           // InterfaceMethod java/nio/file/Path.resolve:(Ljava/lang/String;)Ljava/nio/file/Path;
+        18: astore_3
+        19: aload_0
+        20: new           #73                 // class org/popcraft/chunky/Chunky
+        23: dup
+        24: new           #75                 // class org/popcraft/chunky/platform/ForgeServer
+        27: dup
+        28: aload_0
+        29: aload_2
+        30: invokespecial #78                 // Method org/popcraft/chunky/platform/ForgeServer."<init>":(Lorg/popcraft/chunky/ChunkyForge;Lnet/minecraft/server/MinecraftServer;)V
+        33: new           #80                 // class org/popcraft/chunky/platform/impl/GsonConfig
+        36: dup
+        37: aload_3
+        38: invokespecial #83                 // Method org/popcraft/chunky/platform/impl/GsonConfig."<init>":(Ljava/nio/file/Path;)V
+        41: invokespecial #86                 // Method org/popcraft/chunky/Chunky."<init>":(Lorg/popcraft/chunky/platform/Server;Lorg/popcraft/chunky/platform/Config;)V
+        44: putfield      #88                 // Field chunky:Lorg/popcraft/chunky/Chunky;
+        47: aload_0
+        48: getfield      #88                 // Field chunky:Lorg/popcraft/chunky/Chunky;
+        51: invokevirtual #92                 // Method org/popcraft/chunky/Chunky.getConfig:()Lorg/popcraft/chunky/platform/Config;
+        54: invokeinterface #98,  1           // InterfaceMethod org/popcraft/chunky/platform/Config.getContinueOnRestart:()Z
+        59: ifeq          99
+        62: aload_0
+        63: getfield      #88                 // Field chunky:Lorg/popcraft/chunky/Chunky;
+        66: invokevirtual #102                // Method org/popcraft/chunky/Chunky.getCommands:()Ljava/util/Map;
+        69: ldc           #104                // String continue
+        71: invokeinterface #109,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        76: checkcast     #111                // class org/popcraft/chunky/command/ChunkyCommand
+        79: aload_0
+        80: getfield      #88                 // Field chunky:Lorg/popcraft/chunky/Chunky;
+        83: invokevirtual #114                // Method org/popcraft/chunky/Chunky.getServer:()Lorg/popcraft/chunky/platform/Server;
+        86: invokeinterface #120,  1          // InterfaceMethod org/popcraft/chunky/platform/Server.getConsole:()Lorg/popcraft/chunky/platform/Sender;
+        91: invokestatic  #126                // Method org/popcraft/chunky/command/CommandArguments.empty:()Lorg/popcraft/chunky/command/CommandArguments;
+        94: invokeinterface #130,  3          // InterfaceMethod org/popcraft/chunky/command/ChunkyCommand.execute:(Lorg/popcraft/chunky/platform/Sender;Lorg/popcraft/chunky/command/CommandArguments;)V
+        99: aload_0
+       100: getfield      #88                 // Field chunky:Lorg/popcraft/chunky/Chunky;
+       103: invokevirtual #136                // Method org/popcraft/chunky/Chunky.getEventBus:()Lorg/popcraft/chunky/event/EventBus;
+       106: ldc           #138                // class org/popcraft/chunky/event/task/GenerationTaskUpdateEvent
+       108: new           #140                // class org/popcraft/chunky/listeners/bossbar/BossBarTaskUpdateListener
+       111: dup
+       112: aload_0
+       113: getfield      #29                 // Field bossBars:Ljava/util/Map;
+       116: invokespecial #143                // Method org/popcraft/chunky/listeners/bossbar/BossBarTaskUpdateListener."<init>":(Ljava/util/Map;)V
+       119: invokevirtual #149                // Method org/popcraft/chunky/event/EventBus.subscribe:(Ljava/lang/Class;Ljava/util/function/Consumer;)V
+       122: aload_0
+       123: getfield      #88                 // Field chunky:Lorg/popcraft/chunky/Chunky;
+       126: invokevirtual #136                // Method org/popcraft/chunky/Chunky.getEventBus:()Lorg/popcraft/chunky/event/EventBus;
+       129: ldc           #151                // class org/popcraft/chunky/event/task/GenerationTaskFinishEvent
+       131: new           #153                // class org/popcraft/chunky/listeners/bossbar/BossBarTaskFinishListener
+       134: dup
+       135: aload_0
+       136: getfield      #29                 // Field bossBars:Ljava/util/Map;
+       139: invokespecial #154                // Method org/popcraft/chunky/listeners/bossbar/BossBarTaskFinishListener."<init>":(Ljava/util/Map;)V
+       142: invokevirtual #149                // Method org/popcraft/chunky/event/EventBus.subscribe:(Ljava/lang/Class;Ljava/util/function/Consumer;)V
+       145: return
+
+  public void onRegisterCommands(net.minecraftforge.event.RegisterCommandsEvent);
+    Code:
+         0: ldc           #16                 // String chunky
+         2: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+         5: invokedynamic #186,  0            // InvokeDynamic #0:test:()Ljava/util/function/Predicate;
+        10: invokevirtual #192                // Method com/mojang/brigadier/builder/LiteralArgumentBuilder.requires:(Ljava/util/function/Predicate;)Lcom/mojang/brigadier/builder/ArgumentBuilder;
+        13: checkcast     #188                // class com/mojang/brigadier/builder/LiteralArgumentBuilder
+        16: aload_0
+        17: invokedynamic #202,  0            // InvokeDynamic #1:run:(Lorg/popcraft/chunky/ChunkyForge;)Lcom/mojang/brigadier/Command;
+        22: invokevirtual #206                // Method com/mojang/brigadier/builder/LiteralArgumentBuilder.executes:(Lcom/mojang/brigadier/Command;)Lcom/mojang/brigadier/builder/ArgumentBuilder;
+        25: checkcast     #188                // class com/mojang/brigadier/builder/LiteralArgumentBuilder
+        28: astore_2
+        29: aload_0
+        30: aload_2
+        31: iconst_2
+        32: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+        35: dup
+        36: iconst_0
+        37: ldc           #210                // String cancel
+        39: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+        42: aastore
+        43: dup
+        44: iconst_1
+        45: ldc           #212                // String world
+        47: invokestatic  #218                // Method net/minecraft/commands/arguments/DimensionArgument.m_88805_:()Lnet/minecraft/commands/arguments/DimensionArgument;
+        50: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+        53: aastore
+        54: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+        57: aload_0
+        58: aload_2
+        59: iconst_3
+        60: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+        63: dup
+        64: iconst_0
+        65: ldc           #228                // String center
+        67: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+        70: aastore
+        71: dup
+        72: iconst_1
+        73: ldc           #230                // String x
+        75: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+        78: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+        81: aastore
+        82: dup
+        83: iconst_2
+        84: ldc           #238                // String z
+        86: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+        89: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+        92: aastore
+        93: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+        96: aload_0
+        97: aload_2
+        98: iconst_1
+        99: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       102: dup
+       103: iconst_0
+       104: ldc           #240                // String confirm
+       106: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       109: aastore
+       110: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       113: aload_0
+       114: aload_2
+       115: iconst_2
+       116: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       119: dup
+       120: iconst_0
+       121: ldc           #104                // String continue
+       123: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       126: aastore
+       127: dup
+       128: iconst_1
+       129: ldc           #212                // String world
+       131: invokestatic  #218                // Method net/minecraft/commands/arguments/DimensionArgument.m_88805_:()Lnet/minecraft/commands/arguments/DimensionArgument;
+       134: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       137: aastore
+       138: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       141: aload_0
+       142: aload_2
+       143: iconst_5
+       144: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       147: dup
+       148: iconst_0
+       149: ldc           #242                // String corners
+       151: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       154: aastore
+       155: dup
+       156: iconst_1
+       157: ldc           #244                // String x1
+       159: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       162: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       165: aastore
+       166: dup
+       167: iconst_2
+       168: ldc           #246                // String z1
+       170: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       173: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       176: aastore
+       177: dup
+       178: iconst_3
+       179: ldc           #248                // String x2
+       181: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       184: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       187: aastore
+       188: dup
+       189: iconst_4
+       190: ldc           #250                // String z2
+       192: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       195: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       198: aastore
+       199: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       202: aload_0
+       203: aload_2
+       204: iconst_2
+       205: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       208: dup
+       209: iconst_0
+       210: ldc           #252                // String help
+       212: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       215: aastore
+       216: dup
+       217: iconst_1
+       218: ldc           #254                // String page
+       220: invokestatic  #260                // Method com/mojang/brigadier/arguments/IntegerArgumentType.integer:()Lcom/mojang/brigadier/arguments/IntegerArgumentType;
+       223: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       226: aastore
+       227: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       230: aload_0
+       231: aload_2
+       232: iconst_3
+       233: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       236: dup
+       237: iconst_0
+       238: ldc_w         #262                // String pattern
+       241: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       244: aastore
+       245: dup
+       246: iconst_1
+       247: ldc_w         #262                // String pattern
+       250: invokestatic  #265                // Method com/mojang/brigadier/arguments/StringArgumentType.string:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       253: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       256: getstatic     #271                // Field org/popcraft/chunky/command/suggestion/SuggestionProviders.PATTERNS:Lcom/mojang/brigadier/suggestion/SuggestionProvider;
+       259: invokevirtual #277                // Method com/mojang/brigadier/builder/RequiredArgumentBuilder.suggests:(Lcom/mojang/brigadier/suggestion/SuggestionProvider;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       262: aastore
+       263: dup
+       264: iconst_2
+       265: ldc_w         #278                // String value
+       268: invokestatic  #265                // Method com/mojang/brigadier/arguments/StringArgumentType.string:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       271: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       274: aastore
+       275: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       278: aload_0
+       279: aload_2
+       280: iconst_2
+       281: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       284: dup
+       285: iconst_0
+       286: ldc_w         #280                // String pause
+       289: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       292: aastore
+       293: dup
+       294: iconst_1
+       295: ldc           #212                // String world
+       297: invokestatic  #218                // Method net/minecraft/commands/arguments/DimensionArgument.m_88805_:()Lnet/minecraft/commands/arguments/DimensionArgument;
+       300: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       303: aastore
+       304: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       307: aload_0
+       308: aload_2
+       309: iconst_1
+       310: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       313: dup
+       314: iconst_0
+       315: ldc_w         #282                // String progress
+       318: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       321: aastore
+       322: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       325: aload_0
+       326: aload_2
+       327: iconst_2
+       328: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       331: dup
+       332: iconst_0
+       333: ldc_w         #284                // String quiet
+       336: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       339: aastore
+       340: dup
+       341: iconst_1
+       342: ldc_w         #286                // String interval
+       345: invokestatic  #260                // Method com/mojang/brigadier/arguments/IntegerArgumentType.integer:()Lcom/mojang/brigadier/arguments/IntegerArgumentType;
+       348: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       351: aastore
+       352: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       355: aload_0
+       356: aload_2
+       357: iconst_3
+       358: anewarray     #208                // class com/mojang/brigadier/builder/ArgumentBuilder
+       361: dup
+       362: iconst_0
+       363: ldc_w         #288                // String radius
+       366: invokestatic  #167                // Method net/minecraft/commands/Commands.m_82127_:(Ljava/lang/String;)Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;
+       369: aastore
+       370: dup
+       371: iconst_1
+       372: ldc_w         #288                // String radius
+       375: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       378: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       381: aastore
+       382: dup
+       383: iconst_2
+       384: ldc_w         #288                // String radius
+       387: invokestatic  #236                // Method com/mojang/brigadier/arguments/StringArgumentType.word:()Lcom/mojang/brigadier/arguments/StringArgumentType;
+       390: invokestatic  #222                // Method net/minecraft/commands/Commands.m_82129_:(Ljava/lang/String;Lcom/mojang/brigadier/arguments/ArgumentType;)Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;
+       393: aastore
+       394: invokevirtual #226                // Method registerArguments:(Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;[Lcom/mojang/brigadier/builder/ArgumentBuilder;)V
+       397: aload_0

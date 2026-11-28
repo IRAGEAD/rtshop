@@ -1,0 +1,2 @@
+packcache/WWOO-FABRIC+FORGE+QUILT-2.0.0.jar :: data/minecraft/worldgen/placed_feature/spring_lava.json
+packcache/WWOO-FABRIC+FORGE+QUILT-2.0.0.jar :: data/minecraft/worldgen/placed_feature/spring_lava_frozen.json

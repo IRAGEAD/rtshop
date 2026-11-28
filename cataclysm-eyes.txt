@@ -1,0 +1,26 @@
+== /home/runner/work/rtshop/rtshop/packcache/L_Enders_Cataclysm-3.31.jar
+---- data/cataclysm/recipes/abyss_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "#O#", "OEO", "#O#" ], "key": { "#": { "item": "minecraft:crying_obsidian" }, "O": { "item": "minecraft:obsidian" }, "E": { "item": "minecraft:ender_eye" } }, "result": { "item": "cataclysm:abyss_eye", "count": 1 }}
+
+---- data/cataclysm/recipes/cursed_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "gBg", "PEP", "gRg" ], "key": { "g": { "item": "minecraft:gold_ingot" }, "B": { "item": "minecraft:bone" }, "P": { "item": "minecraft:phantom_membrane" }, "E": { "item": "minecraft:ender_eye" }, "R": { "item": "minecraft:rotten_flesh" } }, "result": { "item": "cataclysm:cursed_eye", "count": 1 }}
+
+---- data/cataclysm/recipes/desert_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "gCE", "DOG", "RCB" ], "key": { "g": { "item": "minecraft:gold_ingot" }, "C": { "item": "minecraft:chiseled_sandstone" }, "E": { "item": "minecraft:emerald" }, "D": { "item": "minecraft:dead_bush" }, "O": { "item": "minecraft:ender_eye" }, "G": { "item": "minecraft:cactus" }, "R": { "item": "minecraft:rotten_flesh" }, "B": { "item": "minecraft:bone" } }, "result": { "item": "cataclysm:desert_eye", "count": 1 }}
+
+---- data/cataclysm/recipes/flame_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "###", "NEN", "SSS" ], "key": { "#": { "item": "minecraft:blaze_powder" }, "N": { "item": "minecraft:netherite_scrap" }, "E": { "item": "minecraft:ender_eye" }, "S": { "item": "minecraft:soul_sand" } }, "result": { "item": "cataclysm:flame_eye", "count": 1 }}
+
+---- data/cataclysm/recipes/mech_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "#i#", "iEi", "#i#" ], "key": { "#": { "item": "minecraft:redstone_block" }, "i": { "item": "minecraft:iron_ingot" }, "E": { "item": "minecraft:ender_eye" } }, "result": { "item": "cataclysm:mech_eye", "count": 1 }}
+
+---- data/cataclysm/recipes/monstrous_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "#N#", "GEG", "#N#" ], "key": { "#": { "item": "minecraft:lava_bucket" }, "N": { "item": "minecraft:netherite_scrap" }, "G": { "item": "minecraft:blackstone" }, "E": { "item": "minecraft:ender_eye" } }, "result": { "item": "cataclysm:monstrous_eye", "count": 1 }}
+
+---- data/cataclysm/recipes/storm_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "#L#", "EVE", "CWC" ], "key": { "#": { "item": "minecraft:prismarine_shard" }, "W": { "item": "minecraft:water_bucket" }, "E": { "item": "minecraft:diamond" }, "V": { "item": "minecraft:ender_eye" }, "C": { "item": "minecraft:prismarine_crystals" }, "L": { "item": "minecraft:lightning_rod" } }, "result": { "item": "cataclysm:storm_eye" }}
+
+---- data/cataclysm/recipes/void_eye.json
+{ "type": "minecraft:crafting_shaped", "pattern": [ "#S#", "EVE", "PSP" ], "key": { "#": { "item": "minecraft:purpur_pillar" }, "S": { "item": "minecraft:shulker_shell" }, "E": { "item": "minecraft:end_stone_bricks" }, "V": { "item": "minecraft:ender_eye" }, "P": { "item": "minecraft:purpur_block" } }, "result": { "item": "cataclysm:void_eye", "count": 1 }}
+
+== other jars that mention the eyes (recipes, loot)

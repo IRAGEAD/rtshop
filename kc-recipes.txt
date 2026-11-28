@@ -1,0 +1,280 @@
+jar: packcache/kaleidoscopecookery-1.7.0-forge-mc1.20.1.jar
+    117 data/kaleidoscope_cookery/recipes
+      1 data/kaleidoscope_cookery/recipes/bamboo_tray
+      6 data/kaleidoscope_cookery/recipes/bamboo_tray/drying
+     24 data/kaleidoscope_cookery/recipes/bamboo_tray/wetting
+     17 data/kaleidoscope_cookery/recipes/chopping_board
+     28 data/kaleidoscope_cookery/recipes/flex_pot
+     29 data/kaleidoscope_cookery/recipes/flex_stockpot
+     86 data/kaleidoscope_cookery/recipes/millstone
+    199 data/kaleidoscope_cookery/recipes/pot
+      5 data/kaleidoscope_cookery/recipes/steamer
+    123 data/kaleidoscope_cookery/recipes/stockpot
+      8 data/kaleidoscope_cookery/recipes/teapot
+######## pot/braised_beef
+{
+  "type": "kaleidoscope_cookery:pot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "ingredients": [
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "item": "kaleidoscope_cookery:red_chili"
+    },
+    {
+      "item": "kaleidoscope_cookery:red_chili"
+    },
+    {
+      "item": "kaleidoscope_cookery:red_chili"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:braised_beef"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## flex_pot/braised_beef
+{
+  "type": "kaleidoscope_cookery:flex_pot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "ingredients": [
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "tag": "forge:crops/chilipepper"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:braised_beef"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## stockpot/beef_noodle
+{
+  "type": "kaleidoscope_cookery:stockpot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "cooking_bubble_color": 16772291,
+  "cooking_texture": "kaleidoscope_cookery:stockpot/default_cooking",
+  "finished_bubble_color": 16034443,
+  "finished_texture": "kaleidoscope_cookery:stockpot/default_finished",
+  "ingredients": [
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "item": "kaleidoscope_cookery:raw_noodles"
+    },
+    {
+      "item": "kaleidoscope_cookery:raw_noodles"
+    },
+    {
+      "item": "kaleidoscope_cookery:raw_noodles"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:beef_noodle"
+  },
+  "soup_base": "minecraft:water",
+  "time": 300
+}
+######## flex_stockpot/beef_noodle
+{
+  "type": "kaleidoscope_cookery:flex_stockpot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "cooking_bubble_color": 16772291,
+  "cooking_texture": "kaleidoscope_cookery:stockpot/default_cooking",
+  "finished_bubble_color": 16034443,
+  "finished_texture": "kaleidoscope_cookery:stockpot/default_finished",
+  "ingredients": [
+    {
+      "tag": "forge:raw_beef"
+    },
+    {
+      "item": "kaleidoscope_cookery:raw_noodles"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:beef_noodle"
+  },
+  "soup_base": "minecraft:water",
+  "time": 300
+}
+######## pot/fondant_pie
+{
+  "type": "kaleidoscope_cookery:pot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:pumpkin_pie"
+    },
+    {
+      "item": "minecraft:pumpkin_pie"
+    },
+    {
+      "item": "minecraft:pumpkin_pie"
+    },
+    {
+      "item": "minecraft:pumpkin_pie"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:fondant_pie"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## flex_pot/fondant_pie
+{
+  "type": "kaleidoscope_cookery:flex_pot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:pumpkin_pie"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:fondant_pie"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## pot/candied_potato
+{
+  "type": "kaleidoscope_cookery:pot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:candied_potato"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## flex_pot/candied_potato
+{
+  "type": "kaleidoscope_cookery:flex_pot",
+  "carrier": {
+    "item": "minecraft:bowl"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:potato"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:candied_potato"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## classes with Flex in the name
+com/github/ysbbbbbb/kaleidoscopecookery/compat/emi/category/EmiFlexPotRecipe.class
+com/github/ysbbbbbb/kaleidoscopecookery/compat/emi/category/EmiFlexStockpotRecipe.class
+com/github/ysbbbbbb/kaleidoscopecookery/compat/jei/category/FlexPotRecipeCategory.class
+com/github/ysbbbbbb/kaleidoscopecookery/compat/jei/category/FlexStockpotRecipeCategory.class
+com/github/ysbbbbbb/kaleidoscopecookery/compat/rei/category/ReiFlexPotRecipeCategory$FlexPotRecipeDisplay.class
+com/github/ysbbbbbb/kaleidoscopecookery/compat/rei/category/ReiFlexPotRecipeCategory.class
+com/github/ysbbbbbb/kaleidoscopecookery/compat/rei/category/ReiFlexStockpotRecipeCategory$FlexStockpotRecipeDisplay.class
+com/github/ysbbbbbb/kaleidoscopecookery/compat/rei/category/ReiFlexStockpotRecipeCategory.class
+com/github/ysbbbbbb/kaleidoscopecookery/crafting/recipe/FlexPotRecipe.class
+com/github/ysbbbbbb/kaleidoscopecookery/crafting/recipe/FlexStockpotRecipe.class
+com/github/ysbbbbbb/kaleidoscopecookery/crafting/serializer/FlexPotRecipeSerializer.class
+com/github/ysbbbbbb/kaleidoscopecookery/crafting/serializer/FlexStockpotRecipeSerializer.class
+com/github/ysbbbbbb/kaleidoscopecookery/datagen/builder/FlexPotRecipeBuilder$FlexPotFinishedRecipe.class
+com/github/ysbbbbbb/kaleidoscopecookery/datagen/builder/FlexPotRecipeBuilder.class
+com/github/ysbbbbbb/kaleidoscopecookery/datagen/builder/FlexStockpotRecipeBuilder$FlexStockpotFinishedRecipe.class
+com/github/ysbbbbbb/kaleidoscopecookery/datagen/builder/FlexStockpotRecipeBuilder.class
+data/kaleidoscope_cookery/recipes/flex_pot/
+data/kaleidoscope_cookery/recipes/flex_pot/blaze_lamb_chop.json
+data/kaleidoscope_cookery/recipes/flex_pot/braised_beef.json
+data/kaleidoscope_cookery/recipes/flex_pot/braised_pork_ribs.json
+data/kaleidoscope_cookery/recipes/flex_pot/candied_potato.json
+data/kaleidoscope_cookery/recipes/flex_pot/chorus_fried_egg.json
+data/kaleidoscope_cookery/recipes/flex_pot/crystal_lamb_chop.json
+data/kaleidoscope_cookery/recipes/flex_pot/dongpo_pork.json
+data/kaleidoscope_cookery/recipes/flex_pot/donkey_burger.json
+data/kaleidoscope_cookery/recipes/flex_pot/egg_fried_rice.json
+data/kaleidoscope_cookery/recipes/flex_pot/fish_flavored_shredded_pork.json
+data/kaleidoscope_cookery/recipes/flex_pot/fondant_pie.json
+data/kaleidoscope_cookery/recipes/flex_pot/fondant_spider_eye.json
+data/kaleidoscope_cookery/recipes/flex_pot/fried_caterpillar.json
+data/kaleidoscope_cookery/recipes/flex_pot/fried_spring_roll.json
+data/kaleidoscope_cookery/recipes/flex_pot/frost_lamb_chop.json
+data/kaleidoscope_cookery/recipes/flex_pot/oil_splashed_fish.json
+data/kaleidoscope_cookery/recipes/flex_pot/pan_seared_knight_steak.json
+data/kaleidoscope_cookery/recipes/flex_pot/scramble_egg_with_tomatoes.json
+data/kaleidoscope_cookery/recipes/flex_pot/slime_ball_meal.json
+data/kaleidoscope_cookery/recipes/flex_pot/spicy_chicken.json
+data/kaleidoscope_cookery/recipes/flex_pot/spicy_rabbit_head.json
+data/kaleidoscope_cookery/recipes/flex_pot/stargazy_pie.json
+data/kaleidoscope_cookery/recipes/flex_pot/sticky_candy.json
+grep: write error: Broken pipe

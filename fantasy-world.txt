@@ -1,0 +1,576 @@
+######## com/bonfyre/fantasy/config/WorldFiles
+public final class com.bonfyre.fantasy.config.WorldFiles {
+  private static volatile java.nio.file.Path worldDir;
+  private com.bonfyre.fantasy.config.WorldFiles();
+         1: invokespecial #19                 // Method java/lang/Object."<init>":()V
+  public static <T> T during(net.minecraft.server.MinecraftServer, java.util.function.Supplier<T>);
+         0: getstatic     #30                 // Field com/bonfyre/fantasy/platform/Services.PLATFORM:Lcom/bonfyre/fantasy/platform/Platform;
+         4: invokeinterface #36,  2           // InterfaceMethod com/bonfyre/fantasy/platform/Platform.worldConfigDir:(Lnet/minecraft/server/MinecraftServer;)Ljava/nio/file/Path;
+         9: invokeinterface #42,  1           // InterfaceMethod java/nio/file/Path.toAbsolutePath:()Ljava/nio/file/Path;
+        14: invokeinterface #45,  1           // InterfaceMethod java/nio/file/Path.normalize:()Ljava/nio/file/Path;
+        19: putstatic     #47                 // Field worldDir:Ljava/nio/file/Path;
+        23: invokeinterface #53,  1           // InterfaceMethod java/util/function/Supplier.get:()Ljava/lang/Object;
+        30: putstatic     #47                 // Field worldDir:Ljava/nio/file/Path;
+        37: putstatic     #47                 // Field worldDir:Ljava/nio/file/Path;
+  public static void save(java.lang.String, java.lang.Runnable, java.util.function.Supplier<java.nio.file.Path>, com.bonfyre.fantasy.config.WorldFiles$Copy);
+         0: getstatic     #47                 // Field worldDir:Ljava/nio/file/Path;
+        15: invokeinterface #53,  1           // InterfaceMethod java/util/function/Supplier.get:()Ljava/lang/Object;
+        36: invokeinterface #74,  1           // InterfaceMethod java/lang/Runnable.run:()V
+        45: invokeinterface #78,  2           // InterfaceMethod java/nio/file/Path.resolve:(Ljava/lang/String;)Ljava/nio/file/Path;
+        50: invokeinterface #45,  1           // InterfaceMethod java/nio/file/Path.normalize:()Ljava/nio/file/Path;
+        59: invokeinterface #42,  1           // InterfaceMethod java/nio/file/Path.toAbsolutePath:()Ljava/nio/file/Path;
+        64: invokeinterface #45,  1           // InterfaceMethod java/nio/file/Path.normalize:()Ljava/nio/file/Path;
+        71: invokeinterface #82,  2           // InterfaceMethod java/nio/file/Path.equals:(Ljava/lang/Object;)Z
+        80: invokeinterface #74,  1           // InterfaceMethod java/lang/Runnable.run:()V
+        89: invokedynamic #94,  0             // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        94: invokeinterface #97,  2           // InterfaceMethod java/nio/file/Path.resolveSibling:(Ljava/lang/String;)Ljava/nio/file/Path;
+       103: invokeinterface #100,  1          // InterfaceMethod java/nio/file/Path.getParent:()Ljava/nio/file/Path;
+       112: invokestatic  #108                // Method java/nio/file/Files.createDirectories:(Ljava/nio/file/Path;[Ljava/nio/file/attribute/FileAttribute;)Ljava/nio/file/Path;
+       119: invokeinterface #112,  2          // InterfaceMethod com/bonfyre/fantasy/config/WorldFiles$Copy.write:(Ljava/nio/file/Path;)V
+       134: getstatic     #120                // Field java/nio/file/StandardCopyOption.ATOMIC_MOVE:Ljava/nio/file/StandardCopyOption;
+       140: getstatic     #123                // Field java/nio/file/StandardCopyOption.REPLACE_EXISTING:Ljava/nio/file/StandardCopyOption;
+       144: invokestatic  #127                // Method java/nio/file/Files.move:(Ljava/nio/file/Path;Ljava/nio/file/Path;[Ljava/nio/file/CopyOption;)Ljava/nio/file/Path;
+       163: getstatic     #123                // Field java/nio/file/StandardCopyOption.REPLACE_EXISTING:Ljava/nio/file/StandardCopyOption;
+       167: invokestatic  #127                // Method java/nio/file/Files.move:(Ljava/nio/file/Path;Ljava/nio/file/Path;[Ljava/nio/file/CopyOption;)Ljava/nio/file/Path;
+       178: invokestatic  #135                // Method java/nio/file/Files.deleteIfExists:(Ljava/nio/file/Path;)Z
+       187: getstatic     #141                // Field com/bonfyre/fantasy/Fantasy.LOGGER:Lorg/slf4j/Logger;
+       190: ldc           #143                // String Couldn\'t save this world\'s own {}: {}
+       195: invokevirtual #147                // Method java/lang/Exception.toString:()Ljava/lang/String;
+       198: invokeinterface #153,  4          // InterfaceMethod org/slf4j/Logger.error:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+       224: invokespecial #158                // Method java/io/UncheckedIOException."<init>":(Ljava/io/IOException;)V
+       256: invokespecial #163                // Method java/lang/IllegalStateException."<init>":(Ljava/lang/Throwable;)V
+######## com/bonfyre/fantasy/config/WorldSettings
+public final class com.bonfyre.fantasy.config.WorldSettings {
+  static final int MIN_TICKS_BETWEEN = 10;
+  private static final int LOGGED_IDS = 20;
+  private static final java.util.Map<java.util.UUID, java.lang.Integer> LAST_APPLY;
+  private com.bonfyre.fantasy.config.WorldSettings();
+         1: invokespecial #35                 // Method java/lang/Object."<init>":()V
+  public static void receive(net.minecraft.server.level.ServerPlayer, com.bonfyre.fantasy.network.MountNetwork$WorldSettingsPayload);
+         1: invokestatic  #45                 // Method com/bonfyre/fantasy/compat/Players.isHost:(Lnet/minecraft/server/level/ServerPlayer;)Z
+         7: getstatic     #51                 // Field com/bonfyre/fantasy/Fantasy.LOGGER:Lorg/slf4j/Logger;
+        10: ldc           #53                 // String Refused World Settings from {}: only the player hosting the world may change them
+        13: invokestatic  #57                 // Method com/bonfyre/fantasy/compat/Players.name:(Lnet/minecraft/world/entity/player/Player;)Ljava/lang/String;
+        16: invokeinterface #63,  3           // InterfaceMethod org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;)V
+        23: invokevirtual #67                 // Method com/bonfyre/fantasy/network/MountNetwork$WorldSettingsPayload.request:()I
+        31: invokestatic  #73                 // InterfaceMethod java/util/List.of:()Ljava/util/List;
+        34: invokestatic  #73                 // InterfaceMethod java/util/List.of:()Ljava/util/List;
+        37: invokespecial #76                 // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result."<init>":(Ljava/util/List;Ljava/util/List;)V
+        40: invokestatic  #80                 // Method reply:(Lnet/minecraft/server/level/ServerPlayer;IZLcom/bonfyre/fantasy/core/config/panel/PanelEdits$Result;)V
+        45: invokevirtual #86                 // Method net/minecraft/server/level/ServerPlayer.m_9236_:()Lnet/minecraft/world/level/Level;
+        48: invokevirtual #92                 // Method net/minecraft/world/level/Level.m_7654_:()Lnet/minecraft/server/MinecraftServer;
+        51: invokevirtual #97                 // Method net/minecraft/server/MinecraftServer.m_129921_:()I
+        55: getstatic     #99                 // Field LAST_APPLY:Ljava/util/Map;
+        59: invokevirtual #103                // Method net/minecraft/server/level/ServerPlayer.m_20148_:()Ljava/util/UUID;
+        62: invokeinterface #109,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        77: invokevirtual #114                // Method java/lang/Integer.intValue:()I
+        86: invokevirtual #114                // Method java/lang/Integer.intValue:()I
+        97: invokevirtual #67                 // Method com/bonfyre/fantasy/network/MountNetwork$WorldSettingsPayload.request:()I
+       105: invokestatic  #73                 // InterfaceMethod java/util/List.of:()Ljava/util/List;
+       108: invokestatic  #73                 // InterfaceMethod java/util/List.of:()Ljava/util/List;
+       111: invokespecial #76                 // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result."<init>":(Ljava/util/List;Ljava/util/List;)V
+       114: invokestatic  #80                 // Method reply:(Lnet/minecraft/server/level/ServerPlayer;IZLcom/bonfyre/fantasy/core/config/panel/PanelEdits$Result;)V
+       118: getstatic     #99                 // Field LAST_APPLY:Ljava/util/Map;
+       122: invokevirtual #103                // Method net/minecraft/server/level/ServerPlayer.m_20148_:()Ljava/util/UUID;
+       126: invokestatic  #118                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       129: invokeinterface #122,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       136: invokevirtual #86                 // Method net/minecraft/server/level/ServerPlayer.m_9236_:()Lnet/minecraft/world/level/Level;
+       139: invokevirtual #92                 // Method net/minecraft/world/level/Level.m_7654_:()Lnet/minecraft/server/MinecraftServer;
+       143: invokevirtual #126                // Method com/bonfyre/fantasy/network/MountNetwork$WorldSettingsPayload.data:()[B
+       146: invokestatic  #130                // Method apply:(Lnet/minecraft/server/MinecraftServer;[B)Lcom/bonfyre/fantasy/core/config/panel/PanelEdits$Result;
+       153: invokevirtual #133                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result.applied:()Ljava/util/List;
+       156: invokeinterface #137,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+       166: invokevirtual #133                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result.applied:()Ljava/util/List;
+       174: invokevirtual #133                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result.applied:()Ljava/util/List;
+       177: invokeinterface #140,  1          // InterfaceMethod java/util/List.size:()I
+       182: invokestatic  #146                // Method java/lang/Math.min:(II)I
+       185: invokeinterface #150,  3          // InterfaceMethod java/util/List.subList:(II)Ljava/util/List;
+       194: invokevirtual #133                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result.applied:()Ljava/util/List;
+       197: invokeinterface #140,  1          // InterfaceMethod java/util/List.size:()I
+       204: invokeinterface #140,  1          // InterfaceMethod java/util/List.size:()I
+       212: getstatic     #51                 // Field com/bonfyre/fantasy/Fantasy.LOGGER:Lorg/slf4j/Logger;
+       215: ldc           #152                // String {} changed {} world settings in the World Settings panel: {}{}
+       224: invokestatic  #57                 // Method com/bonfyre/fantasy/compat/Players.name:(Lnet/minecraft/world/entity/player/Player;)Ljava/lang/String;
+       232: invokevirtual #133                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result.applied:()Ljava/util/List;
+       235: invokeinterface #140,  1          // InterfaceMethod java/util/List.size:()I
+       240: invokestatic  #118                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       246: ldc           #154                // String ,
+       250: invokestatic  #160                // Method java/lang/String.join:(Ljava/lang/CharSequence;Ljava/lang/Iterable;)Ljava/lang/String;
+       263: invokedynamic #172,  0            // InvokeDynamic #0:makeConcatWithConstants:(I)Ljava/lang/String;
+       271: ldc           #176                // String
+       274: invokeinterface #180,  3          // InterfaceMethod org/slf4j/Logger.info:(Ljava/lang/String;[Ljava/lang/Object;)V
+       281: invokevirtual #67                 // Method com/bonfyre/fantasy/network/MountNetwork$WorldSettingsPayload.request:()I
+       287: invokestatic  #80                 // Method reply:(Lnet/minecraft/server/level/ServerPlayer;IZLcom/bonfyre/fantasy/core/config/panel/PanelEdits$Result;)V
+  private static com.bonfyre.fantasy.core.config.panel.PanelEdits$Result apply(byte[]);
+         0: invokestatic  #202                // Method com/bonfyre/fantasy/config/FantasyConfigs.panel:()Lcom/bonfyre/fantasy/core/config/panel/PanelCatalog;
+         3: invokestatic  #206                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits.schemas:(Lcom/bonfyre/fantasy/core/config/panel/PanelCatalog;)Ljava/util/List;
+         7: invokestatic  #212                // Method com/bonfyre/fantasy/core/config/SettingsSnapshot.decode:(Ljava/util/List;[B)Ljava/util/List;
+        15: getstatic     #51                 // Field com/bonfyre/fantasy/Fantasy.LOGGER:Lorg/slf4j/Logger;
+        18: ldc           #214                // String Ignoring World Settings that can\'t be read: {}
+        21: invokevirtual #218                // Method java/lang/IllegalArgumentException.getMessage:()Ljava/lang/String;
+        24: invokeinterface #63,  3           // InterfaceMethod org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;)V
+        33: invokestatic  #73                 // InterfaceMethod java/util/List.of:()Ljava/util/List;
+        36: invokestatic  #73                 // InterfaceMethod java/util/List.of:()Ljava/util/List;
+        39: invokespecial #76                 // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result."<init>":(Ljava/util/List;Ljava/util/List;)V
+        43: invokestatic  #202                // Method com/bonfyre/fantasy/config/FantasyConfigs.panel:()Lcom/bonfyre/fantasy/core/config/panel/PanelCatalog;
+        47: invokedynamic #235,  0            // InvokeDynamic #1:apply:()Ljava/util/function/Function;
+        52: invokestatic  #238                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits.apply:(Lcom/bonfyre/fantasy/core/config/panel/PanelCatalog;Ljava/util/List;Ljava/util/function/Function;)Lcom/bonfyre/fantasy/core/config/panel/PanelEdits$Result;
+  public static com.bonfyre.fantasy.core.config.panel.PanelEdits$Result apply(net.minecraft.server.MinecraftServer, byte[]);
+         2: invokedynamic #254,  0            // InvokeDynamic #2:get:([B)Ljava/util/function/Supplier;
+         7: invokestatic  #260                // Method com/bonfyre/fantasy/config/WorldFiles.during:(Lnet/minecraft/server/MinecraftServer;Ljava/util/function/Supplier;)Ljava/lang/Object;
+  private static void reply(net.minecraft.server.level.ServerPlayer, int, boolean, com.bonfyre.fantasy.core.config.panel.PanelEdits$Result);
+         0: getstatic     #268                // Field com/bonfyre/fantasy/platform/Services.PLATFORM:Lcom/bonfyre/fantasy/platform/Platform;
+         4: getstatic     #272                // Field com/bonfyre/fantasy/network/MountNetwork.WORLD_SETTINGS_RESULT:Lcom/bonfyre/fantasy/platform/PayloadType;
+        14: invokevirtual #133                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result.applied:()Ljava/util/List;
+        18: invokevirtual #275                // Method com/bonfyre/fantasy/core/config/panel/PanelEdits$Result.refused:()Ljava/util/List;
+        21: invokespecial #278                // Method com/bonfyre/fantasy/network/MountNetwork$WorldSettingsResultPayload."<init>":(IZLjava/util/List;Ljava/util/List;)V
+        24: invokeinterface #284,  4          // InterfaceMethod com/bonfyre/fantasy/platform/Platform.sendToPlayer:(Lnet/minecraft/server/level/ServerPlayer;Lcom/bonfyre/fantasy/platform/PayloadType;Ljava/lang/Object;)V
+  public static void onLogout(net.minecraft.server.level.ServerPlayer);
+         0: getstatic     #99                 // Field LAST_APPLY:Ljava/util/Map;
+         4: invokevirtual #103                // Method net/minecraft/server/level/ServerPlayer.m_20148_:()Ljava/util/UUID;
+         7: invokeinterface #292,  2          // InterfaceMethod java/util/Map.remove:(Ljava/lang/Object;)Ljava/lang/Object;
+  public static void onServerStopped();
+         0: getstatic     #99                 // Field LAST_APPLY:Ljava/util/Map;
+         3: invokeinterface #296,  1          // InterfaceMethod java/util/Map.clear:()V
+  private static com.bonfyre.fantasy.core.config.panel.PanelEdits$Result lambda$apply$0(byte[]);
+         1: invokestatic  #298                // Method apply:([B)Lcom/bonfyre/fantasy/core/config/panel/PanelEdits$Result;
+  static {};
+         4: invokespecial #302                // Method java/util/HashMap."<init>":()V
+         7: putstatic     #99                 // Field LAST_APPLY:Ljava/util/Map;
+######## com/bonfyre/fantasy/core/config/FantasySettings
+public final class com.bonfyre.fantasy.core.config.FantasySettings {
+  private com.bonfyre.fantasy.core.config.FantasySettings();
+         1: invokespecial #36                 // Method java/lang/Object."<init>":()V
+######## com/bonfyre/fantasy/core/config/FantasySettings$Server
+public final class com.bonfyre.fantasy.core.config.FantasySettings$Server {
+  public static final com.bonfyre.fantasy.core.config.ConfigSchema SCHEMA;
+  private static final java.util.List<java.lang.String> RIDING;
+  private static final java.util.List<java.lang.String> FLIGHT;
+  private static final java.util.List<java.lang.String> ABILITIES;
+  private static final java.util.List<java.lang.String> WHISTLE;
+  private static final java.util.List<java.lang.String> SHINY;
+  private static final java.util.List<java.lang.String> SEASONAL;
+  private static final java.util.List<java.lang.String> LURE;
+  private static final java.util.List<java.lang.String> PROGRESSION;
+  private static final java.util.List<java.lang.String> ENCYCLOPEDIA;
+  private static final java.util.List<java.lang.String> QUESTS;
+  private static final java.util.List<java.lang.String> EARN_MOUNTS;
+  private static final java.util.List<java.lang.String> TAMING;
+  private static final java.util.List<java.lang.String> REVIVAL;
+  private static final java.util.List<java.lang.String> REVIVAL_DOWNED_AT;
+  private static final java.util.List<java.lang.String> REVIVAL_SPIRIT_AT;
+  private static final java.util.List<java.lang.String> WILD;
+  private static final java.util.List<java.lang.String> UPDATES;
+  private static final java.util.List<java.lang.String> INTEGRATIONS;
+  private static final java.util.List<java.lang.String> MOUNTS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Choice<com.bonfyre.fantasy.core.seat.DrivePermission> RIDER_PERMISSION;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool TRUSTED_RIDERS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool NON_PLAYER_PASSENGERS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool FLIGHT_ENABLED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Strings FLIGHT_DIMENSIONS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Decimal FLIGHT_MAX_ALTITUDE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Decimal FLIGHT_MAX_SPEED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int FLIGHT_COMBAT_LOCKOUT;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool FLIGHT_FALL_ON_STALL;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int FLIGHT_DEATH_SLOW_FALL;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool ALLOW_BLOCK_DAMAGE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool ALLOW_PVP;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WEB_SHOT_PVP;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int GLOWING_VISION_RANGE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Choice<com.bonfyre.fantasy.core.ability.TemporaryBlockRule> TEMPORARY_BLOCKS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool MOUNT_LIGHT;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool PROGRESSION_ENABLED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Decimal PROGRESSION_XP_MULTIPLIER;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool PROGRESSION_LOCK_ABILITIES;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool PROGRESSION_STAT_GROWTH;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool PROGRESSION_SKILL_TREES;
+  public static final com.bonfyre.fantasy.core.config.Setting$Choice<com.bonfyre.fantasy.core.progression.SkillResetMode> PROGRESSION_SKILL_RESET_MODE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int PROGRESSION_RESPEC_COOLDOWN;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int ENCYCLOPEDIA_DISCOVERY_RANGE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool ENCYCLOPEDIA_REVEAL_ALL;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool ENCYCLOPEDIA_HINT;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool ENCYCLOPEDIA_SHOW_WORLD_SETTINGS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool QUESTS_ENABLED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool QUESTS_INTRODUCTION;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool QUESTS_ENCOUNTERS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool QUESTS_LOCK_ENCYCLOPEDIA;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool EARN_MOUNTS_ENABLED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool EARN_MOUNTS_RIDING;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool EARN_MOUNTS_BREEDING;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool EARN_MOUNTS_BOND_ITEMS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool TAMED_IMMORTAL;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool REVIVAL_DOWNED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_DOWNED_SECONDS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_DOWNED_HEALTH;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_DOWNED_MAX_HIT;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_DOWNED_GRACE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Decimal REVIVAL_DOWNED_REVIVE_SECONDS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_DOWNED_REVIVE_HEALTH;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool REVIVAL_DOWNED_TRUSTED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool REVIVAL_SPIRIT;
+  public static final com.bonfyre.fantasy.core.config.Setting$Choice<com.bonfyre.fantasy.core.revival.SpiritPlace> REVIVAL_SPIRIT_PLACE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_SPIRIT_MIN_DISTANCE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_SPIRIT_MAX_DISTANCE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_SPIRIT_WANDER;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool REVIVAL_SPIRIT_KEEP_GEAR;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool REVIVAL_SPIRIT_WHISTLE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_SPIRIT_XP_LOSS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_SPIRIT_SICKNESS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_SPIRIT_SLOWNESS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool REVIVAL_SPIRIT_MARKER;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int REVIVAL_SPIRIT_FORGET;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WILD_BEHAVIORS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WILD_BLOCK_CHANGES;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WILD_HUNTING;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WILD_FORAGE_FINDS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WILD_HOARDING;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WHISTLE_ALLOWED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WHISTLE_IMMUNE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Decimal WHISTLE_VOLUME;
+  public static final com.bonfyre.fantasy.core.config.Setting$Decimal WHISTLE_DISTANCE;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WHISTLE_TELEPORT;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool WHISTLE_RECALL;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int SHINY_ODDS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int SHINY_BREEDING_ODDS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int SHINY_PARENT_ODDS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool LURE_ENABLED;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int LURE_BITES;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int LURE_MIN_DELAY;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int LURE_MAX_DELAY;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int LURE_SHINY_BOOST;
+  public static final com.bonfyre.fantasy.core.config.Setting$Int LURE_SPACING;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool SEASONAL_ABILITY_TWISTS;
+  public static final com.bonfyre.fantasy.core.config.Setting$Text SEASONAL_TIME_ZONE;
+  private static final java.util.Map<com.bonfyre.fantasy.core.variant.Season, com.bonfyre.fantasy.core.config.FantasySettings$SeasonSettings> PER_SEASON;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool UPDATE_CHECK;
+  public static final com.bonfyre.fantasy.core.config.Setting$Bool INTEGRATIONS_ENABLED;
+  private static final java.util.Map<java.lang.String, com.bonfyre.fantasy.core.config.FantasySettings$IntegrationSettings> PER_INTEGRATION;
+  private static final java.util.Map<com.bonfyre.fantasy.core.catalog.MountType, com.bonfyre.fantasy.core.config.FantasySettings$MountSettings> PER_MOUNT;
+  private com.bonfyre.fantasy.core.config.FantasySettings$Server();
+         1: invokespecial #171                // Method java/lang/Object."<init>":()V
+  private static java.util.Map<java.lang.String, com.bonfyre.fantasy.core.config.FantasySettings$IntegrationSettings> buildPerIntegration();
+         4: invokespecial #179                // Method java/util/LinkedHashMap."<init>":()V
+         8: invokestatic  #185                // Method com/bonfyre/fantasy/core/integration/IntegrationCatalog.all:()Ljava/util/List;
+        11: invokeinterface #191,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        18: invokeinterface #199,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        27: invokeinterface #203,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        36: ldc           #207                // String integrations
+        39: invokevirtual #211                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.id:()Ljava/lang/String;
+        42: invokestatic  #215                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+        46: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        51: invokevirtual #220                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.name:()Ljava/lang/String;
+        55: invokevirtual #223                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.url:()Ljava/lang/String;
+        58: ldc           #225                // String ,
+        61: invokevirtual #228                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.minecraft:()Ljava/util/List;
+        64: invokestatic  #234                // Method java/lang/String.join:(Ljava/lang/CharSequence;Ljava/lang/Iterable;)Ljava/lang/String;
+        67: invokedynamic #246,  0            // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+        72: invokevirtual #252                // Method com/bonfyre/fantasy/core/config/ConfigSchema.section:(Ljava/util/List;Ljava/lang/String;)Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        78: invokevirtual #211                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.id:()Ljava/lang/String;
+        85: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        93: ldc           #254                // String enabled
+        96: invokevirtual #220                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.name:()Ljava/lang/String;
+        99: invokedynamic #259,  0            // InvokeDynamic #1:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       105: invokestatic  #265                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       108: invokespecial #268                // Method com/bonfyre/fantasy/core/config/Setting$Bool."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;)V
+       111: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       117: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+       125: ldc_w         #274                // String excludedMounts
+       129: invokevirtual #220                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.name:()Ljava/lang/String;
+       132: invokedynamic #277,  0            // InvokeDynamic #2:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       137: invokestatic  #279                // InterfaceMethod java/util/List.of:()Ljava/util/List;
+       140: invokespecial #282                // Method com/bonfyre/fantasy/core/config/Setting$Strings."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+       143: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       149: invokespecial #285                // Method com/bonfyre/fantasy/core/config/FantasySettings$IntegrationSettings."<init>":(Lcom/bonfyre/fantasy/core/config/Setting$Bool;Lcom/bonfyre/fantasy/core/config/Setting$Strings;)V
+       152: invokeinterface #289,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       162: invokestatic  #295                // Method java/util/Collections.unmodifiableMap:(Ljava/util/Map;)Ljava/util/Map;
+  public static com.bonfyre.fantasy.core.config.FantasySettings$IntegrationSettings integration(com.bonfyre.fantasy.core.integration.BiomeIntegration);
+         0: getstatic     #302                // Field PER_INTEGRATION:Ljava/util/Map;
+         4: invokevirtual #211                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.id:()Ljava/lang/String;
+         7: invokeinterface #306,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        25: invokevirtual #211                // Method com/bonfyre/fantasy/core/integration/BiomeIntegration.id:()Ljava/lang/String;
+        28: invokedynamic #311,  0            // InvokeDynamic #3:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        33: invokespecial #314                // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+  private static java.util.Map<com.bonfyre.fantasy.core.catalog.MountType, com.bonfyre.fantasy.core.config.FantasySettings$MountSettings> buildPerMount();
+         4: invokespecial #179                // Method java/util/LinkedHashMap."<init>":()V
+         8: invokestatic  #321                // Method com/bonfyre/fantasy/core/catalog/MountCatalog.all:()Ljava/util/List;
+        11: invokeinterface #191,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        18: invokeinterface #199,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        27: invokeinterface #203,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        36: ldc_w         #325                // String mounts
+        40: invokevirtual #326                // Method com/bonfyre/fantasy/core/catalog/MountType.name:()Ljava/lang/String;
+        43: invokestatic  #215                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+        47: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        52: invokevirtual #326                // Method com/bonfyre/fantasy/core/catalog/MountType.name:()Ljava/lang/String;
+        59: invokevirtual #330                // Method java/lang/String.replace:(CC)Ljava/lang/String;
+        62: invokedynamic #333,  0            // InvokeDynamic #4:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        67: invokevirtual #252                // Method com/bonfyre/fantasy/core/config/ConfigSchema.section:(Ljava/util/List;Ljava/lang/String;)Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        77: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        85: ldc           #254                // String enabled
+        87: ldc_w         #335                // String If false, this mount can\'t be spawned, tamed or ridden and doesn\'t spawn naturally.
+        91: invokestatic  #265                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+        94: invokespecial #268                // Method com/bonfyre/fantasy/core/config/Setting$Bool."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;)V
+        97: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       103: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+       111: ldc_w         #337                // String wildSpawns
+       114: ldc_w         #339                // String Allow natural spawns in the wild.
+       118: invokestatic  #265                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       121: invokespecial #268                // Method com/bonfyre/fantasy/core/config/Setting$Bool."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;)V
+       124: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       130: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+       138: ldc_w         #341                // String maxRiders
+       141: ldc_w         #343                // String Cap on riders (0 = as many seats as the mount has).
+       145: invokestatic  #348                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       151: invokespecial #351                // Method com/bonfyre/fantasy/core/config/Setting$Int."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;II)V
+       154: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       160: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+       168: ldc_w         #353                // String allowBreeding
+       171: ldc_w         #355                // String Allow breeding.
+       175: invokestatic  #265                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       178: invokespecial #268                // Method com/bonfyre/fantasy/core/config/Setting$Bool."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;)V
+       181: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       187: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+       195: ldc_w         #357                // String disabledAbilities
+       198: ldc_w         #359                // String Ability ids to switch off for this mount, e.g. [\"fantasy:frost_walk\"].
+       201: invokestatic  #279                // InterfaceMethod java/util/List.of:()Ljava/util/List;
+       204: invokespecial #282                // Method com/bonfyre/fantasy/core/config/Setting$Strings."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+       207: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       213: invokespecial #362                // Method com/bonfyre/fantasy/core/config/FantasySettings$MountSettings."<init>":(Lcom/bonfyre/fantasy/core/config/Setting$Bool;Lcom/bonfyre/fantasy/core/config/Setting$Bool;Lcom/bonfyre/fantasy/core/config/Setting$Int;Lcom/bonfyre/fantasy/core/config/Setting$Bool;Lcom/bonfyre/fantasy/core/config/Setting$Strings;)V
+       216: invokeinterface #289,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       226: invokestatic  #295                // Method java/util/Collections.unmodifiableMap:(Ljava/util/Map;)Ljava/util/Map;
+  private static java.util.List<java.lang.String> seasonPath(com.bonfyre.fantasy.core.variant.Season);
+         0: ldc_w         #369                // String seasonal
+         4: invokevirtual #370                // Method com/bonfyre/fantasy/core/variant/Season.id:()Ljava/lang/String;
+         7: invokestatic  #215                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+  private static java.util.Map<com.bonfyre.fantasy.core.variant.Season, com.bonfyre.fantasy.core.config.FantasySettings$SeasonSettings> buildPerSeason();
+         4: ldc           #35                 // class com/bonfyre/fantasy/core/variant/Season
+         6: invokespecial #379                // Method java/util/EnumMap."<init>":(Ljava/lang/Class;)V
+        10: invokestatic  #383                // Method com/bonfyre/fantasy/core/variant/Season.values:()[Lcom/bonfyre/fantasy/core/variant/Season;
+        31: invokestatic  #387                // Method seasonPath:(Lcom/bonfyre/fantasy/core/variant/Season;)Ljava/util/List;
+        38: invokevirtual #391                // Method com/bonfyre/fantasy/core/variant/Season.defaultWindow:()Lcom/bonfyre/fantasy/core/variant/SeasonWindow;
+        50: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        59: ldc_w         #393                // String mode
+        64: invokevirtual #370                // Method com/bonfyre/fantasy/core/variant/Season.id:()Ljava/lang/String;
+        67: invokedynamic #396,  0            // InvokeDynamic #5:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        72: getstatic     #399                // Field com/bonfyre/fantasy/core/variant/Season$Mode.SEASONAL:Lcom/bonfyre/fantasy/core/variant/Season$Mode;
+        75: ldc           #33                 // class com/bonfyre/fantasy/core/variant/Season$Mode
+        77: invokespecial #402                // Method com/bonfyre/fantasy/core/config/Setting$Choice."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Enum;Ljava/lang/Class;)V
+        80: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+        86: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        95: ldc_w         #404                // String start
+        98: ldc_w         #406                // String First day of the season, MM-DD (month-day).
+       103: invokevirtual #411                // Method com/bonfyre/fantasy/core/variant/SeasonWindow.start:()Ljava/time/MonthDay;
+       106: invokestatic  #415                // Method com/bonfyre/fantasy/core/variant/SeasonWindow.format:(Ljava/time/MonthDay;)Ljava/lang/String;
+       110: invokespecial #418                // Method com/bonfyre/fantasy/core/config/Setting$Text."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V
+       113: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       119: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+       128: ldc_w         #420                // String end
+       131: ldc_w         #422                // String Last day of the season, MM-DD, included. An end before the start runs over the new year. A date that isn\'t a day of the year uses the default.
+       136: invokevirtual #424                // Method com/bonfyre/fantasy/core/variant/SeasonWindow.end:()Ljava/time/MonthDay;
+       139: invokestatic  #415                // Method com/bonfyre/fantasy/core/variant/SeasonWindow.format:(Ljava/time/MonthDay;)Ljava/lang/String;
+       143: invokespecial #418                // Method com/bonfyre/fantasy/core/config/Setting$Text."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V
+       146: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       152: getstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+       161: ldc_w         #426                // String odds
+       166: invokevirtual #370                // Method com/bonfyre/fantasy/core/variant/Season.id:()Ljava/lang/String;
+       169: invokedynamic #429,  0            // InvokeDynamic #6:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       176: invokevirtual #433                // Method com/bonfyre/fantasy/core/variant/Season.defaultOdds:()I
+       179: invokestatic  #348                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       183: ldc_w         #434                // int 1000000
+       186: invokespecial #351                // Method com/bonfyre/fantasy/core/config/Setting$Int."<init>":(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;II)V
+       189: invokevirtual #272                // Method com/bonfyre/fantasy/core/config/ConfigSchema.add:(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+       195: invokespecial #437                // Method com/bonfyre/fantasy/core/config/FantasySettings$SeasonSettings."<init>":(Lcom/bonfyre/fantasy/core/config/Setting$Choice;Lcom/bonfyre/fantasy/core/config/Setting$Text;Lcom/bonfyre/fantasy/core/config/Setting$Text;Lcom/bonfyre/fantasy/core/config/Setting$Int;)V
+       198: invokeinterface #289,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       211: invokestatic  #295                // Method java/util/Collections.unmodifiableMap:(Ljava/util/Map;)Ljava/util/Map;
+  public static com.bonfyre.fantasy.core.config.FantasySettings$SeasonSettings season(com.bonfyre.fantasy.core.variant.Season);
+         0: getstatic     #442                // Field PER_SEASON:Ljava/util/Map;
+         4: invokeinterface #306,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+  public static com.bonfyre.fantasy.core.config.FantasySettings$MountSettings mount(com.bonfyre.fantasy.core.catalog.MountType);
+         0: getstatic     #446                // Field PER_MOUNT:Ljava/util/Map;
+         4: invokeinterface #306,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        22: invokevirtual #449                // Method com/bonfyre/fantasy/core/catalog/MountType.id:()Lcom/bonfyre/fantasy/core/Id;
+        25: invokestatic  #452                // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+        28: invokedynamic #455,  0            // InvokeDynamic #7:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        33: invokespecial #314                // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+  static {};
+         4: getstatic     #463                // Field com/bonfyre/fantasy/core/config/ConfigHistory.SERVER:Lcom/bonfyre/fantasy/core/config/ConfigMigrations;
+         7: invokespecial #466                // Method com/bonfyre/fantasy/core/config/ConfigSchema."<init>":(Lcom/bonfyre/fantasy/core/config/ConfigMigrations;)V
+        10: putstatic     #217                // Field SCHEMA:Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+        13: ldc_w         #468                // String riding
+        16: invokestatic  #471                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;)Ljava/util/List;
+        19: putstatic     #473                // Field RIDING:Ljava/util/List;
+        22: ldc_w         #475                // String flight
+        25: invokestatic  #471                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;)Ljava/util/List;
+        28: putstatic     #477                // Field FLIGHT:Ljava/util/List;
+        31: ldc_w         #479                // String abilities
+grep: write error: Broken pipe
+######## com/bonfyre/fantasy/core/config/panel/PanelFile
+public final class com.bonfyre.fantasy.core.config.panel.PanelFile extends java.lang.Enum<com.bonfyre.fantasy.core.config.panel.PanelFile> {
+  public static final com.bonfyre.fantasy.core.config.panel.PanelFile SERVER;
+  public static final com.bonfyre.fantasy.core.config.panel.PanelFile BALANCE;
+  public static final com.bonfyre.fantasy.core.config.panel.PanelFile SKILLS;
+  private final java.lang.String key;
+  private final java.lang.String fileName;
+  private static final com.bonfyre.fantasy.core.config.panel.PanelFile[] $VALUES;
+  public static com.bonfyre.fantasy.core.config.panel.PanelFile[] values();
+         0: getstatic     #19                 // Field $VALUES:[Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+         3: invokevirtual #24                 // Method "[Lcom/bonfyre/fantasy/core/config/panel/PanelFile;".clone:()Ljava/lang/Object;
+  public static com.bonfyre.fantasy.core.config.panel.PanelFile valueOf(java.lang.String);
+         0: ldc           #2                  // class com/bonfyre/fantasy/core/config/panel/PanelFile
+         3: invokestatic  #29                 // Method java/lang/Enum.valueOf:(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;
+  private com.bonfyre.fantasy.core.config.panel.PanelFile(java.lang.String, java.lang.String);
+         3: invokespecial #36                 // Method java/lang/Enum."<init>":(Ljava/lang/String;I)V
+         8: putfield      #38                 // Field key:Ljava/lang/String;
+        14: putfield      #40                 // Field fileName:Ljava/lang/String;
+  public java.lang.String key();
+         1: getfield      #38                 // Field key:Ljava/lang/String;
+  public java.lang.String fileName();
+         1: getfield      #40                 // Field fileName:Ljava/lang/String;
+  private static com.bonfyre.fantasy.core.config.panel.PanelFile[] $values();
+         6: getstatic     #45                 // Field SERVER:Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+        12: getstatic     #47                 // Field BALANCE:Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+        18: getstatic     #49                 // Field SKILLS:Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+  static {};
+         4: ldc           #52                 // String SERVER
+         7: ldc           #54                 // String server
+         9: ldc           #56                 // String fantasy-server.toml
+        11: invokespecial #58                 // Method "<init>":(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V
+        14: putstatic     #45                 // Field SERVER:Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+        21: ldc           #59                 // String BALANCE
+        24: ldc           #61                 // String balance
+        26: ldc           #63                 // String fantasy-balance.toml
+        28: invokespecial #58                 // Method "<init>":(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V
+        31: putstatic     #47                 // Field BALANCE:Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+        38: ldc           #64                 // String SKILLS
+        41: ldc           #66                 // String skills
+        43: ldc           #68                 // String fantasy-skills.toml
+        45: invokespecial #58                 // Method "<init>":(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V
+        48: putstatic     #49                 // Field SKILLS:Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+        51: invokestatic  #70                 // Method $values:()[Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+        54: putstatic     #19                 // Field $VALUES:[Lcom/bonfyre/fantasy/core/config/panel/PanelFile;
+######## com/bonfyre/fantasy/core/config/SettingsSource
+public interface com.bonfyre.fantasy.core.config.SettingsSource {
+  public static final com.bonfyre.fantasy.core.config.SettingsSource DEFAULTS;
+  public abstract <T> T get(com.bonfyre.fantasy.core.config.Setting<T>);
+  public default boolean loaded();
+  public default <T> boolean set(com.bonfyre.fantasy.core.config.Setting<T>, T);
+  public default java.util.Set<com.bonfyre.fantasy.core.config.Setting<?>> setAll(java.util.Map<com.bonfyre.fantasy.core.config.Setting<?>, ?>);
+         4: invokespecial #38                 // Method java/util/LinkedHashSet."<init>":()V
+        11: invokedynamic #58,  0             // InvokeDynamic #0:accept:(Lcom/bonfyre/fantasy/core/config/SettingsSource;Ljava/util/Set;)Ljava/util/function/BiConsumer;
+        16: invokeinterface #64,  2           // InterfaceMethod java/util/Map.forEach:(Ljava/util/function/BiConsumer;)V
+  private void lambda$setAll$0(java.util.Set, com.bonfyre.fantasy.core.config.Setting, java.lang.Object);
+         3: invokeinterface #72,  3           // InterfaceMethod set:(Lcom/bonfyre/fantasy/core/config/Setting;Ljava/lang/Object;)Z
+        13: invokeinterface #78,  2           // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+  static {};
+         4: invokespecial #80                 // Method com/bonfyre/fantasy/core/config/SettingsSource$1."<init>":()V
+         7: putstatic     #82                 // Field DEFAULTS:Lcom/bonfyre/fantasy/core/config/SettingsSource;
+######## FantasySettings$Server around quests
+571:        94: ldc_w         #505                // String quests
+572-        97: invokestatic  #471                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;)Ljava/util/List;
+573-       100: putstatic     #507                // Field QUESTS:Ljava/util/List;
+574:       103: ldc_w         #505                // String quests
+575-       106: ldc_w         #509                // String earnMounts
+576-       109: invokestatic  #215                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+577-       112: putstatic     #511                // Field EARN_MOUNTS:Ljava/util/List;
+578-       115: ldc_w         #513                // String taming
+579-       118: invokestatic  #471                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;)Ljava/util/List;
+580-       121: putstatic     #515                // Field TAMING:Ljava/util/List;
+581-       124: ldc_w         #517                // String revival
+582-       127: invokestatic  #471                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;)Ljava/util/List;
+583-       130: putstatic     #519                // Field REVIVAL:Ljava/util/List;
+584-       133: ldc_w         #517                // String revival
+585-       136: ldc_w         #521                // String downed
+586-       139: invokestatic  #215                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+587-       142: putstatic     #523                // Field REVIVAL_DOWNED_AT:Ljava/util/List;
+588-       145: ldc_w         #517                // String revival
+######## FantasyConfigs strings
+        21: ldc           #99                 // String fantasy-server.toml
+        38: ldc           #99                 // String fantasy-server.toml
+        41: invokestatic  #212                // Method register:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/platform/Platform$ConfigSide;Ljava/lang/String;I)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+        53: ldc           #102                // String fantasy-balance.toml
+        56: invokestatic  #212                // Method register:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/platform/Platform$ConfigSide;Ljava/lang/String;I)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+        71: ldc           #105                // String fantasy-skills.toml
+        74: invokestatic  #212                // Method register:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/platform/Platform$ConfigSide;Ljava/lang/String;I)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+        86: ldc           #108                // String fantasy-client.toml
+        89: invokestatic  #212                // Method register:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/platform/Platform$ConfigSide;Ljava/lang/String;I)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+         6: invokeinterface #235,  4          // InterfaceMethod com/bonfyre/fantasy/platform/Platform.registerConfig:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/platform/Platform$ConfigSide;Ljava/lang/String;)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+        12: invokestatic  #239                // Method overridable:(Lcom/bonfyre/fantasy/core/config/SettingsSource;I)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+         6: invokespecial #245                // Method com/bonfyre/fantasy/config/FantasyConfigs$1."<init>":(ILcom/bonfyre/fantasy/core/config/SettingsSource;)V
+        17: invokestatic  #254                // Method com/bonfyre/fantasy/core/config/panel/PanelCatalog.of:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/core/config/SkillSettings;)Lcom/bonfyre/fantasy/core/config/panel/PanelCatalog;
+         4: invokevirtual #267                // Method com/bonfyre/fantasy/core/config/panel/PanelFile.ordinal:()I
+        16: ldc2_w        #305                // long 1000000000l
+         6: invokestatic  #340                // Method com/bonfyre/fantasy/core/config/SettingsSnapshot.capture:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/core/config/SettingsSource;)Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;
+        15: invokestatic  #340                // Method com/bonfyre/fantasy/core/config/SettingsSnapshot.capture:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/core/config/SettingsSource;)Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;
+        27: invokestatic  #340                // Method com/bonfyre/fantasy/core/config/SettingsSnapshot.capture:(Lcom/bonfyre/fantasy/core/config/ConfigSchema;Lcom/bonfyre/fantasy/core/config/SettingsSource;)Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;
+         9: invokestatic  #376                // Method com/bonfyre/fantasy/core/config/FantasySettings$Balance.tuning:(Lcom/bonfyre/fantasy/core/config/SettingsSource;Lcom/bonfyre/fantasy/core/config/SkillSettings;Lcom/bonfyre/fantasy/core/config/SettingsSource;)Lcom/bonfyre/fantasy/core/progression/ProgressionTuning;
+         3: invokeinterface #380,  1          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.loaded:()Z
+        19: invokeinterface #380,  1          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.loaded:()Z
+         7: invokevirtual #390                // Method com/bonfyre/fantasy/core/progression/XpSource.ordinal:()I
+       109: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        11: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        35: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        27: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        26: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        10: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        10: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        20: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        38: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        56: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        74: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        92: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        10: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        10: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        10: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        10: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        11: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        29: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        47: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        66: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        85: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+       243: ldc_w         #657                // String fantasy
+        12: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        52: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        83: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        10: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+         6: invokeinterface #418,  2          // InterfaceMethod com/bonfyre/fantasy/core/config/SettingsSource.get:(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+        18: ldc2_w        #773                // long 20l
+######## classes mentioning quests
+com/bonfyre/fantasy/command/QuestCommands.class
+com/bonfyre/fantasy/data/MountData$Snapshot.class
+com/bonfyre/fantasy/data/MountData$RawFiles.class
+com/bonfyre/fantasy/data/MountData.class
+com/bonfyre/fantasy/quest/ClientQuests.class
+com/bonfyre/fantasy/quest/QuestStore.class
+com/bonfyre/fantasy/quest/QuestService.class
+com/bonfyre/fantasy/quest/EarnedMounts.class
+com/bonfyre/fantasy/quest/QuestEncounters.class
+com/bonfyre/fantasy/network/MountNetwork$QuestLogPayload.class
+com/bonfyre/fantasy/client/gui/QuestText.class
+com/bonfyre/fantasy/client/gui/QuestCatalogScreen.class
+com/bonfyre/fantasy/client/gui/QuestJournalScreen.class
+com/bonfyre/fantasy/entity/FantasyBeast.class
+com/bonfyre/fantasy/core/json/JsonObjectReader.class
+com/bonfyre/fantasy/core/config/panel/PanelCatalog.class
+com/bonfyre/fantasy/core/config/FantasySettings$Balance.class
+com/bonfyre/fantasy/core/config/FantasySettings$Server.class
+com/bonfyre/fantasy/core/config/FantasySettings$Client.class
+com/bonfyre/fantasy/core/quest/QuestBook$Chain.class
+com/bonfyre/fantasy/core/quest/QuestBook.class
+com/bonfyre/fantasy/core/quest/QuestLog.class
+com/bonfyre/fantasy/core/save/SaveMigrations$Builder.class
+com/bonfyre/fantasy/core/save/SaveMigrations.class

@@ -1,0 +1,2594 @@
+== packcache/fantasy-2.3.3-1.20.1-forge.jar
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+issueTrackerURL="https://github.com/BenDol/Fantasy-Mounts-Report/issues"
+
+[[mods]]
+modId="fantasymounts"
+version="2.3.3+1.20.1-forge"
+displayName="Fantasy Mounts"
+logoFile="logo.png"
+iconFile="logo.png"
+credits="Bonfyre"
+authors="Ben Dol"
+description='''
+A growing roster of fantasy mounts to find, tame, breed and ride, with new ones joining every month. It started with a unicorn my wife and I could ride together, and grew from there.
+
+On the ground: Unicorn, Polar Bear, Doom Horse, War Mammoth, Frost Sabrecat, Crystal Stag, Qilin (it leaps again in mid-air, on clouds), Kitsune, Moonwolf, Mossback Treant (three riders in its branches), Warhorn Rhino (archers in its howdah) and Jackalope.
+In the air: Pegasus, Griffin, Phoenix (its wings whip up a flame tornado), Luna Moth (only under the moon), Sky Whale (six riders on its deck), Emerald Dragonfly (the fastest flyer) and Nimbus Ram (it floats on a cloud and makes it rain).
+In water: Dragon Turtle and Tide Narwhal. Up walls: Giant Spider.
+
+Very rarely a mount is shiny: each one has a shiny form of its own, with new colours, glowing details, extra parts and a sparkling aura, and it greets you with a chime. Mounts carry one to six riders, each with their own seat, and have abilities such as frost walking, fire breath, rebirth, a war mammoth's archer seat, foxfire and moon dust. Saddles, armour and saddlebags, coat variants and markings, rolled stats and breeding, and a HUD for stamina and abilities.
+
+Mounts grow with you: a tamed mount levels up as you ride it, use its abilities, fight beside it and keep it near you, unlocking new abilities and growing stronger in its own way. Each level brings a skill point for its own skill tree, where branches lead to powerful capstones (some rule each other out, so choose), new abilities, or new ways to move, from climbing walls to gliding. A Renewal Tonic lets its owner reset the tree. Press K (or use the tab on its inventory) to see its stats, abilities and skills.
+
+Mount Whistle - register your mount, then call it to follow you.
+Diamond Carrot - tames a unicorn.
+Golden Carrot Stew - helps you find unicorns in the wild.
+Renewal Tonic - lets you reset your mount's skill tree.
+
+Mounts, spawns, stats, unlock levels and skill trees are data-driven and can be changed with data packs; server owners can cap flight, riders and abilities, and tune or switch off levelling, in the config.
+== files with quest/config/toml/json in the name
+META-INF/mods.toml
+assets/fantasy/textures/entity/quest_npc/
+assets/fantasy/textures/entity/quest_npc/gideon.png
+assets/fantasy/textures/entity/quest_npc/hazel.png
+assets/fantasy/textures/entity/quest_npc/kesi.png
+assets/fantasy/textures/entity/quest_npc/maren.png
+assets/fantasy/textures/entity/quest_npc/pip.png
+assets/fantasy/textures/entity/quest_npc/ren.png
+assets/fantasy/textures/entity/quest_npc/sigrun.png
+assets/fantasy/textures/entity/quest_npc/tamsin.png
+assets/fantasy/textures/entity/quest_npc/thornquill.png
+com/bonfyre/fantasy/client/QuestClient$1.class
+com/bonfyre/fantasy/client/QuestClient.class
+com/bonfyre/fantasy/client/SettingsCommand.class
+com/bonfyre/fantasy/client/WorldSettingsClient.class
+com/bonfyre/fantasy/client/gui/QuestCatalogScreen$1.class
+com/bonfyre/fantasy/client/gui/QuestCatalogScreen$PageDrawer.class
+com/bonfyre/fantasy/client/gui/QuestCatalogScreen$Row.class
+com/bonfyre/fantasy/client/gui/QuestCatalogScreen$TestChip.class
+com/bonfyre/fantasy/client/gui/QuestCatalogScreen$View.class
+com/bonfyre/fantasy/client/gui/QuestCatalogScreen.class
+com/bonfyre/fantasy/client/gui/QuestDialogueIcon$Held.class
+com/bonfyre/fantasy/client/gui/QuestDialogueIcon$Reason.class
+com/bonfyre/fantasy/client/gui/QuestDialogueIcon.class
+com/bonfyre/fantasy/client/gui/QuestDialogueScreen$Talk.class
+com/bonfyre/fantasy/client/gui/QuestDialogueScreen.class
+com/bonfyre/fantasy/client/gui/QuestJournalScreen$Hit.class
+com/bonfyre/fantasy/client/gui/QuestJournalScreen$Row.class
+com/bonfyre/fantasy/client/gui/QuestJournalScreen$Section.class
+com/bonfyre/fantasy/client/gui/QuestJournalScreen.class
+com/bonfyre/fantasy/client/gui/QuestMarks$1.class
+com/bonfyre/fantasy/client/gui/QuestMarks.class
+com/bonfyre/fantasy/client/gui/QuestPortraits.class
+com/bonfyre/fantasy/client/gui/QuestRibbon$1.class
+com/bonfyre/fantasy/client/gui/QuestRibbon$2.class
+com/bonfyre/fantasy/client/gui/QuestRibbon$Mark.class
+com/bonfyre/fantasy/client/gui/QuestRibbon.class
+com/bonfyre/fantasy/client/gui/QuestText$1.class
+com/bonfyre/fantasy/client/gui/QuestText.class
+com/bonfyre/fantasy/client/gui/QuestTrackerHud$1.class
+com/bonfyre/fantasy/client/gui/QuestTrackerHud$Mark.class
+com/bonfyre/fantasy/client/gui/QuestTrackerHud$Row.class
+com/bonfyre/fantasy/client/gui/QuestTrackerHud$View.class
+com/bonfyre/fantasy/client/gui/QuestTrackerHud$Way.class
+com/bonfyre/fantasy/client/gui/QuestTrackerHud.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$1.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$AbilityLine.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$Controls.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$Half.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$Head.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$Line.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$MountFilter.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$Note.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$PairHead.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$PairLine.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$Picker.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$Place.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$SettingLine.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$SideEntry.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen$View.class
+com/bonfyre/fantasy/client/gui/WorldSettingsScreen.class
+com/bonfyre/fantasy/client/render/QuestNpcRenderer.class
+com/bonfyre/fantasy/client/render/QuestTargetGlow.class
+com/bonfyre/fantasy/command/QuestCommands$Change.class
+com/bonfyre/fantasy/command/QuestCommands.class
+com/bonfyre/fantasy/compat/QuestMobs$1.class
+com/bonfyre/fantasy/compat/QuestMobs$OwnPlayers.class
+com/bonfyre/fantasy/compat/QuestMobs.class
+com/bonfyre/fantasy/config/SettingsSync.class
+com/bonfyre/fantasy/config/WorldSettings.class
+com/bonfyre/fantasy/core/config/FantasySettings$Balance.class
+com/bonfyre/fantasy/core/config/FantasySettings$Client.class
+com/bonfyre/fantasy/core/config/FantasySettings$HudPlace.class
+com/bonfyre/fantasy/core/config/FantasySettings$IntegrationBalance.class
+com/bonfyre/fantasy/core/config/FantasySettings$IntegrationSettings.class
+com/bonfyre/fantasy/core/config/FantasySettings$MountBalance.class
+com/bonfyre/fantasy/core/config/FantasySettings$MountSettings.class
+com/bonfyre/fantasy/core/config/FantasySettings$SeasonSettings.class
+com/bonfyre/fantasy/core/config/FantasySettings$Server.class
+com/bonfyre/fantasy/core/config/FantasySettings.class
+grep: write error: Broken pipe
+---- com/bonfyre/fantasy/config/FantasyConfigs$1.class
+.com/bonfyre/fantasy/core/config/SettingsSource
+FantasyConfigs.java
+c(Lcom/bonfyre/fantasy/core/config/SettingsSource;I)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+0Lcom/bonfyre/fantasy/core/config/SettingsSource;
+4(ILcom/bonfyre/fantasy/core/config/SettingsSource;)V
+=(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+I<T:Ljava/lang/Object;>(Lcom/bonfyre/fantasy/core/config/Setting<TT;>;)TT;
+0com/bonfyre/fantasy/core/config/SettingsSnapshot
+setting
+.Lcom/bonfyre/fantasy/core/config/Setting<TT;>;
+)Lcom/bonfyre/fantasy/core/config/Setting;
+DLjava/util/List<Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;>;
+>(Lcom/bonfyre/fantasy/core/config/Setting;Ljava/lang/Object;)Z
+J<T:Ljava/lang/Object;>(Lcom/bonfyre/fantasy/core/config/Setting<TT;>;TT;)Z
+}(Ljava/util/Map<Lcom/bonfyre/fantasy/core/config/Setting<*>;*>;)Ljava/util/Set<Lcom/bonfyre/fantasy/core/config/Setting<*>;>;
+>Ljava/util/Map<Lcom/bonfyre/fantasy/core/config/Setting<*>;*>;
+---- com/bonfyre/fantasy/config/FantasyConfigs$2.class
+FantasyConfigs.java
+6com/bonfyre/fantasy/core/config/FantasySettings$Server
+/com/bonfyre/fantasy/core/config/FantasySettings
+,com/bonfyre/fantasy/core/config/Setting$Bool
+'com/bonfyre/fantasy/core/config/Setting
+/com/bonfyre/fantasy/core/config/Setting$Strings
+/com/bonfyre/fantasy/core/config/Setting$Decimal
++com/bonfyre/fantasy/core/config/Setting$Int
+,com/bonfyre/fantasy/core/config/Setting$Text
+7com/bonfyre/fantasy/core/config/FantasySettings$Balance
+flightEnabled
+0Lcom/bonfyre/fantasy/core/config/SettingsSource;
+FLIGHT_ENABLED
+.Lcom/bonfyre/fantasy/core/config/Setting$Bool;
+.com/bonfyre/fantasy/core/config/SettingsSource
+=(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+1Lcom/bonfyre/fantasy/core/config/Setting$Strings;
+1Lcom/bonfyre/fantasy/core/config/Setting$Decimal;
+-Lcom/bonfyre/fantasy/core/config/Setting$Int;
+fantasy.today
+.(Ljava/lang/CharSequence;)Ljava/time/MonthDay;
+.Lcom/bonfyre/fantasy/core/config/Setting$Text;
+EIgnoring seasonal.timeZone={}: not a time zone; the seasons follow {}
+---- com/bonfyre/fantasy/config/FantasyConfigs$3.class
+FantasyConfigs.java
+---- com/bonfyre/fantasy/config/FantasyConfigs$CachedRules.class
+FantasyConfigs.java
+---- com/bonfyre/fantasy/config/FantasyConfigs$ClockDay.class
+FantasyConfigs.java
+---- com/bonfyre/fantasy/config/FantasyConfigs$ForcedDay.class
+FantasyConfigs.java
+---- com/bonfyre/fantasy/config/FantasyConfigs$SeasonZone.class
+FantasyConfigs.java
+---- com/bonfyre/fantasy/config/FantasyConfigs$TestOverrides.class
+FantasyConfigs.java
+OLjava/util/Map<Lcom/bonfyre/fantasy/core/config/Setting<*>;Ljava/lang/Object;>;
+S(Ljava/util/Map<Lcom/bonfyre/fantasy/core/config/Setting<*>;Ljava/lang/Object;>;J)V
+Q()Ljava/util/Map<Lcom/bonfyre/fantasy/core/config/Setting<*>;Ljava/lang/Object;>;
+---- com/bonfyre/fantasy/config/FantasyConfigs.class
+FantasyConfigs.java
+6com/bonfyre/fantasy/core/config/FantasySettings$Server
+/com/bonfyre/fantasy/core/config/FantasySettings
+7com/bonfyre/fantasy/core/config/FantasySettings$Balance
+6com/bonfyre/fantasy/core/config/FantasySettings$Client
+/com/bonfyre/fantasy/core/config/Setting$Decimal
+'com/bonfyre/fantasy/core/config/Setting
++com/bonfyre/fantasy/core/config/Setting$Int
+,com/bonfyre/fantasy/core/config/Setting$Bool
+<com/bonfyre/fantasy/core/config/FantasySettings$MountBalance
+.com/bonfyre/fantasy/core/config/Setting$Choice
+=com/bonfyre/fantasy/core/config/FantasySettings$MountSettings
+MountSettings
+Ccom/bonfyre/fantasy/core/config/FantasySettings$IntegrationSettings
+IntegrationSettings
+Bcom/bonfyre/fantasy/core/config/FantasySettings$IntegrationBalance
+>com/bonfyre/fantasy/core/integration/IntegrationRules$Settings
+Settings
+/com/bonfyre/fantasy/core/config/Setting$Strings
+>com/bonfyre/fantasy/core/config/FantasySettings$SeasonSettings
+SeasonSettings
+,com/bonfyre/fantasy/core/config/Setting$Text
+fantasy.today
+fantasy-server.toml
+fantasy-balance.toml
+fantasy-skills.toml
+fantasy-client.toml
+0Lcom/bonfyre/fantasy/core/config/SettingsSource;
+/Lcom/bonfyre/fantasy/core/config/SkillSettings;
+DLjava/util/List<Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;>;
+settings
+1()Lcom/bonfyre/fantasy/core/config/SkillSettings;
+.Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+-com/bonfyre/fantasy/core/config/SkillSettings
+c(Lcom/bonfyre/fantasy/core/config/SettingsSource;I)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+4(ILcom/bonfyre/fantasy/core/config/SettingsSource;)V
+world
+c(Lcom/bonfyre/fantasy/core/config/panel/PanelFile;)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+.com/bonfyre/fantasy/core/config/SettingsSource
+G(I)Ljava/util/List<Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;>;
+'com/bonfyre/fantasy/config/SettingsSync
+remoteSettingsHeld
+S(Ljava/util/Map<Lcom/bonfyre/fantasy/core/config/Setting<*>;Ljava/lang/Object;>;I)V
+OLjava/util/Map<Lcom/bonfyre/fantasy/core/config/Setting<*>;Ljava/lang/Object;>;
+F()Ljava/util/List<Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;>;
+0com/bonfyre/fantasy/core/config/SettingsSnapshot
+G(Ljava/util/List<Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;>;)V
+ settings files, not 
+2()Lcom/bonfyre/fantasy/core/config/SettingsSource;
+1Lcom/bonfyre/fantasy/core/config/Setting$Decimal;
+=(Lcom/bonfyre/fantasy/core/config/Setting;)Ljava/lang/Object;
+-Lcom/bonfyre/fantasy/core/config/Setting$Int;
+.Lcom/bonfyre/fantasy/core/config/Setting$Bool;
+l(Lcom/bonfyre/fantasy/core/catalog/MountType;)Lcom/bonfyre/fantasy/core/config/FantasySettings$MountBalance;
+3()Lcom/bonfyre/fantasy/core/config/Setting$Decimal;
+0Lcom/bonfyre/fantasy/core/config/Setting$Choice;
+enabled
+m(Lcom/bonfyre/fantasy/core/catalog/MountType;)Lcom/bonfyre/fantasy/core/config/FantasySettings$MountSettings;
+0()Lcom/bonfyre/fantasy/core/config/Setting$Bool;
+y(Lcom/bonfyre/fantasy/core/integration/BiomeIntegration;)Lcom/bonfyre/fantasy/core/integration/IntegrationRules$Settings;
+~(Lcom/bonfyre/fantasy/core/integration/BiomeIntegration;)Lcom/bonfyre/fantasy/core/config/FantasySettings$IntegrationSettings;
+}(Lcom/bonfyre/fantasy/core/integration/BiomeIntegration;)Lcom/bonfyre/fantasy/core/config/FantasySettings$IntegrationBalance;
+INTEGRATIONS_ENABLED
+3()Lcom/bonfyre/fantasy/core/config/Setting$Strings;
+ELcom/bonfyre/fantasy/core/config/FantasySettings$IntegrationSettings;
+DLcom/bonfyre/fantasy/core/config/FantasySettings$IntegrationBalance;
+/()Lcom/bonfyre/fantasy/core/config/Setting$Int;
+PROGRESSION_ENABLED
+.Ljava/util/Set<Lcom/bonfyre/fantasy/core/Id;>;
+k(Lcom/bonfyre/fantasy/core/variant/Season;)Lcom/bonfyre/fantasy/core/config/FantasySettings$SeasonSettings;
+2()Lcom/bonfyre/fantasy/core/config/Setting$Choice;
+.Lcom/bonfyre/fantasy/core/variant/Season$Mode;
+0()Lcom/bonfyre/fantasy/core/config/Setting$Text;
+@Lcom/bonfyre/fantasy/core/config/FantasySettings$SeasonSettings;
+^(Ljava/util/List;Ljava/util/function/Function;)Lcom/bonfyre/fantasy/core/config/SkillSettings;
+---- com/bonfyre/fantasy/config/SettingsSync.class
+'com/bonfyre/fantasy/config/SettingsSync
+SettingsSync.java
+8com/bonfyre/fantasy/network/MountNetwork$SettingsPayload
+SettingsPayload
+DLjava/util/List<Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;>;
+)Lcom/bonfyre/fantasy/config/SettingsSync;
+.(Lnet/minecraft/server/level/ServerPlayer;[B)V
+SETTINGS
+&com/bonfyre/fantasy/quest/QuestService
+onSettingsChanged
+0com/bonfyre/fantasy/core/config/SettingsSnapshot
+The server's settings can't be sent to players ({}): players online go on with what they were sent before, and players joining read their own files until the settings fit again
+Ignoring the server's settings
+---- com/bonfyre/fantasy/config/WorldFiles$Copy.class
+*com/bonfyre/fantasy/config/WorldFiles$Copy
+WorldFiles.java
+%com/bonfyre/fantasy/config/WorldFiles
+---- com/bonfyre/fantasy/config/WorldFiles.class
+%com/bonfyre/fantasy/config/WorldFiles
+WorldFiles.java
+*com/bonfyre/fantasy/config/WorldFiles$Copy
+worldDir
+'Lcom/bonfyre/fantasy/config/WorldFiles;
+worldConfigDir
+r(Ljava/lang/String;Ljava/lang/Runnable;Ljava/util/function/Supplier;Lcom/bonfyre/fantasy/config/WorldFiles$Copy;)V
+.partial
+%Couldn't save this world's own {}: {}
+,Lcom/bonfyre/fantasy/config/WorldFiles$Copy;
+---- com/bonfyre/fantasy/config/WorldSettings.class
+WorldSettings.java
+=com/bonfyre/fantasy/network/MountNetwork$WorldSettingsPayload
+WorldSettingsPayload
+Ccom/bonfyre/fantasy/network/MountNetwork$WorldSettingsResultPayload
+WorldSettingsResultPayload
+*Lcom/bonfyre/fantasy/config/WorldSettings;
+k(Lnet/minecraft/server/level/ServerPlayer;Lcom/bonfyre/fantasy/network/MountNetwork$WorldSettingsPayload;)V
+QRefused World Settings from {}: only the player hosting the world may change them
+>(Lnet/minecraft/world/entity/player/Player;)Ljava/lang/String;
+request
+#()Lnet/minecraft/world/level/Level;
+net/minecraft/world/level/Level
+>{} changed {} world settings in the World Settings panel: {}{}
+?Lcom/bonfyre/fantasy/network/MountNetwork$WorldSettingsPayload;
+0com/bonfyre/fantasy/core/config/SettingsSnapshot
+.Ignoring World Settings that can't be read: {}
+world
+c(Lcom/bonfyre/fantasy/core/config/panel/PanelFile;)Lcom/bonfyre/fantasy/core/config/SettingsSource;
+DLjava/util/List<Lcom/bonfyre/fantasy/core/config/SettingsSnapshot;>;
+%com/bonfyre/fantasy/config/WorldFiles
+WORLD_SETTINGS_RESULT
+---- com/bonfyre/fantasy/core/config/ConfigSchema.class
+ConfigSchema.java
++com/bonfyre/fantasy/core/config/Setting$Int
+'com/bonfyre/fantasy/core/config/Setting
+settings
+sLjava/util/Map<Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Lcom/bonfyre/fantasy/core/config/Setting<*>;>;>;
+.Lcom/bonfyre/fantasy/core/config/ConfigSchema;
+The file's format.
+versionSetting
+/()Lcom/bonfyre/fantasy/core/config/Setting$Int;
+T(Lcom/bonfyre/fantasy/core/config/Setting;)Lcom/bonfyre/fantasy/core/config/Setting;
+O<T:Ljava/lang/Object;S::Lcom/bonfyre/fantasy/core/config/Setting<TT;>;>(TS;)TS;
+Duplicate setting 
+,Lcom/bonfyre/fantasy/core/config/Setting<*>;
+)Lcom/bonfyre/fantasy/core/config/Setting;
+setting
+>Ljava/util/List<Lcom/bonfyre/fantasy/core/config/Setting<*>;>;
+---- com/bonfyre/fantasy/core/quest/Conversation$Line.class
+0com/bonfyre/fantasy/core/quest/Conversation$Line
+Conversation.java
++com/bonfyre/fantasy/core/quest/Conversation
+2Lcom/bonfyre/fantasy/core/quest/Conversation$Line;
+F(Lcom/bonfyre/fantasy/core/quest/Conversation$Line;)Ljava/lang/String;
+5(Lcom/bonfyre/fantasy/core/quest/Conversation$Line;)I
+G(Lcom/bonfyre/fantasy/core/quest/Conversation$Line;Ljava/lang/Object;)Z
+---- com/bonfyre/fantasy/core/quest/Conversation.class
++com/bonfyre/fantasy/core/quest/Conversation
+Conversation.java
+0com/bonfyre/fantasy/core/quest/Conversation$Line
+DLjava/util/List<Lcom/bonfyre/fantasy/core/quest/Conversation$Line;>;
+e(Lcom/bonfyre/fantasy/core/Id;Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/Conversation$Line;>;Z)V
+-Lcom/bonfyre/fantasy/core/quest/Conversation;
+s(Lcom/bonfyre/fantasy/core/json/JsonObjectReader;Ljava/util/Optional;)Lcom/bonfyre/fantasy/core/quest/Conversation;
+.com/bonfyre/fantasy/core/json/JsonObjectReader
+Pis required: no speaker narrates (a fantasy_quest_speaker with "narrator": true)
+Y(Ljava/lang/String;Ljava/lang/String;)Lcom/bonfyre/fantasy/core/json/DefinitionException;
+com/google/gson/JsonObject
+1(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+com/google/gson/JsonElement
+isJsonPrimitive
+getAsJsonPrimitive
+!()Lcom/google/gson/JsonPrimitive;
+com/google/gson/JsonPrimitive
+d(Lcom/bonfyre/fantasy/core/json/JsonObjectReader;)Lcom/bonfyre/fantasy/core/quest/Conversation$Line;
+0Lcom/bonfyre/fantasy/core/json/JsonObjectReader;
+M(Lcom/bonfyre/fantasy/core/Id;I)Lcom/bonfyre/fantasy/core/quest/Conversation;
+A(Lcom/bonfyre/fantasy/core/quest/Conversation;)Ljava/lang/String;
+0(Lcom/bonfyre/fantasy/core/quest/Conversation;)I
+B(Lcom/bonfyre/fantasy/core/quest/Conversation;Ljava/lang/Object;)Z
+F()Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/Conversation$Line;>;
+.M,
+---- com/bonfyre/fantasy/core/quest/EarnLetter.class
+)com/bonfyre/fantasy/core/quest/EarnLetter
+EarnLetter.java
+0com/bonfyre/fantasy/core/quest/Conversation$Line
++com/bonfyre/fantasy/core/quest/Conversation
+fantasy.quest.earn.letter.
++Lcom/bonfyre/fantasy/core/quest/EarnLetter;
+O(Ljava/util/Set<Lcom/bonfyre/fantasy/core/quest/QuestGate;>;)Ljava/lang/String;
+*Lcom/bonfyre/fantasy/core/quest/QuestGate;
+;Ljava/util/Set<Lcom/bonfyre/fantasy/core/quest/QuestGate;>;
+e(Ljava/lang/String;)Ljava/util/Optional<Ljava/util/Set<Lcom/bonfyre/fantasy/core/quest/QuestGate;>;>;
+@Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestGate;>;
+T(Ljava/lang/String;)Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestGate;>;
+-()[Lcom/bonfyre/fantasy/core/quest/QuestGate;
++[Lcom/bonfyre/fantasy/core/quest/QuestGate;
+U(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Ljava/util/Set;)Ljava/util/Optional;
+.com/bonfyre/fantasy/core/quest/QuestDefinition
+k(Ljava/util/Set;Lcom/bonfyre/fantasy/core/quest/Conversation;)Lcom/bonfyre/fantasy/core/quest/Conversation;
+.(Ljava/util/Set;)Ljava/util/function/Function;
+quest
+0Lcom/bonfyre/fantasy/core/quest/QuestDefinition;
+X(Ljava/lang/String;Ljava/lang/String;)Lcom/bonfyre/fantasy/core/quest/Conversation$Line;
+fantasy.quest.earn.letter.
+-Lcom/bonfyre/fantasy/core/quest/Conversation;
+DLjava/util/List<Lcom/bonfyre/fantasy/core/quest/Conversation$Line;>;
+---- com/bonfyre/fantasy/core/quest/FightWatch.class
+)com/bonfyre/fantasy/core/quest/FightWatch
+FightWatch.java
++Lcom/bonfyre/fantasy/core/quest/FightWatch;
+---- com/bonfyre/fantasy/core/quest/HandIns.class
+&com/bonfyre/fantasy/core/quest/HandIns
+HandIns.java
+.`+
+---- com/bonfyre/fantasy/core/quest/LeadWatch$Need.class
+-com/bonfyre/fantasy/core/quest/LeadWatch$Need
+quest
+/Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;
+&quest;stage;objective;biomes;dimension
+C(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;)Ljava/lang/String;
+2(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;)I
+D(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;Ljava/lang/Object;)Z
+---- com/bonfyre/fantasy/core/quest/LeadWatch$Search.class
+/com/bonfyre/fantasy/core/quest/LeadWatch$Search
+-com/bonfyre/fantasy/core/quest/LeadWatch$Need
+/Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;
+3(JLcom/bonfyre/fantasy/core/quest/LeadWatch$Need;)V
+1Lcom/bonfyre/fantasy/core/quest/LeadWatch$Search;
+E(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Search;)Ljava/lang/String;
+4(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Search;)I
+F(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Search;Ljava/lang/Object;)Z
+1()Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;
+---- com/bonfyre/fantasy/core/quest/LeadWatch.class
+/com/bonfyre/fantasy/core/quest/LeadWatch$Search
+-com/bonfyre/fantasy/core/quest/LeadWatch$Need
+ELjava/util/Optional<Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;>;
+@Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestLead;>;
+*Lcom/bonfyre/fantasy/core/quest/LeadWatch;
+B()Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestLead;>;
+H(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;DDJ)Ljava/util/Optional;
+{(Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;DDJ)Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/LeadWatch$Search;>;
+A(DDLcom/bonfyre/fantasy/core/quest/QuestLead;)Ljava/lang/Boolean;
+?(Lcom/bonfyre/fantasy/core/quest/QuestLead;)Ljava/lang/Boolean;
+K(Lcom/bonfyre/fantasy/core/quest/LeadWatch;DD)Ljava/util/function/Function;
+K(Lcom/bonfyre/fantasy/core/quest/LeadWatch;DD)Ljava/util/function/Supplier;
+3(JLcom/bonfyre/fantasy/core/quest/LeadWatch$Need;)V
+/Lcom/bonfyre/fantasy/core/quest/LeadWatch$Need;
+D(JLjava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestLead;>;)V
+>(Lcom/bonfyre/fantasy/core/quest/QuestLead;)Ljava/lang/Double;
+I(Lcom/bonfyre/fantasy/core/quest/LeadWatch;)Ljava/util/function/Function;
+C(Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestLead;>;)V
+,()Lcom/bonfyre/fantasy/core/quest/QuestSite;
+*Lcom/bonfyre/fantasy/core/quest/QuestLead;
+---- com/bonfyre/fantasy/core/quest/ObjectiveType.class
+,com/bonfyre/fantasy/core/quest/ObjectiveType
+@Ljava/lang/Enum<Lcom/bonfyre/fantasy/core/quest/ObjectiveType;>;
+ObjectiveType.java
+.Lcom/bonfyre/fantasy/core/quest/ObjectiveType;
+/[Lcom/bonfyre/fantasy/core/quest/ObjectiveType;
+1()[Lcom/bonfyre/fantasy/core/quest/ObjectiveType;
+B(Ljava/lang/String;)Lcom/bonfyre/fantasy/core/quest/ObjectiveType;
+2(Lcom/bonfyre/fantasy/core/quest/QuestObjective;)Z
+-com/bonfyre/fantasy/core/quest/QuestObjective
+/Lcom/bonfyre/fantasy/core/quest/QuestObjective;
+---- com/bonfyre/fantasy/core/quest/QuestBook$1.class
+*com/bonfyre/fantasy/core/quest/QuestBook$1
+QuestBook.java
+0com/bonfyre/fantasy/core/quest/QuestTrigger$Type
++com/bonfyre/fantasy/core/quest/QuestTrigger
+;$SwitchMap$com$bonfyre$fantasy$core$quest$QuestTrigger$Type
+3$SwitchMap$com$bonfyre$fantasy$core$quest$QuestGate
+-()[Lcom/bonfyre/fantasy/core/quest/QuestGate;
+*Lcom/bonfyre/fantasy/core/quest/QuestGate;
+5()[Lcom/bonfyre/fantasy/core/quest/QuestTrigger$Type;
+2Lcom/bonfyre/fantasy/core/quest/QuestTrigger$Type;
+QUEST
+---- com/bonfyre/fantasy/core/quest/QuestBook$Asks.class
+-com/bonfyre/fantasy/core/quest/QuestBook$Asks
+QuestBook.java
+b(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Lcom/bonfyre/fantasy/core/quest/QuestObjective;)Z
+---- com/bonfyre/fantasy/core/quest/QuestBook$Chain.class
+.com/bonfyre/fantasy/core/quest/QuestBook$Chain
+QuestBook.java
+quests
+BLjava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;
+c(Lcom/bonfyre/fantasy/core/Id;ZLjava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;)V
+0Lcom/bonfyre/fantasy/core/quest/QuestBook$Chain;
+.com/bonfyre/fantasy/core/quest/QuestDefinition
+quest
+id;named;quests
+D(Lcom/bonfyre/fantasy/core/quest/QuestBook$Chain;)Ljava/lang/String;
+3(Lcom/bonfyre/fantasy/core/quest/QuestBook$Chain;)I
+E(Lcom/bonfyre/fantasy/core/quest/QuestBook$Chain;Ljava/lang/Object;)Z
+D()Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;
+---- com/bonfyre/fantasy/core/quest/QuestBook$Result.class
+/com/bonfyre/fantasy/core/quest/QuestBook$Result
+QuestBook.java
+*Lcom/bonfyre/fantasy/core/quest/QuestBook;
+ELjava/util/List<Lcom/bonfyre/fantasy/core/json/DefinitionException;>;
+=(Lcom/bonfyre/fantasy/core/quest/QuestBook;Ljava/util/List;)V
+r(Lcom/bonfyre/fantasy/core/quest/QuestBook;Ljava/util/List<Lcom/bonfyre/fantasy/core/json/DefinitionException;>;)V
+1Lcom/bonfyre/fantasy/core/quest/QuestBook$Result;
+E(Lcom/bonfyre/fantasy/core/quest/QuestBook$Result;)Ljava/lang/String;
+4(Lcom/bonfyre/fantasy/core/quest/QuestBook$Result;)I
+F(Lcom/bonfyre/fantasy/core/quest/QuestBook$Result;Ljava/lang/Object;)Z
+,()Lcom/bonfyre/fantasy/core/quest/QuestBook;
+G()Ljava/util/List<Lcom/bonfyre/fantasy/core/json/DefinitionException;>;
+---- com/bonfyre/fantasy/core/quest/QuestBook.class
+QuestBook.java
+*com/bonfyre/fantasy/core/quest/QuestBook$1
+-com/bonfyre/fantasy/core/quest/QuestBook$Asks
+.com/bonfyre/fantasy/core/quest/QuestBook$Chain
+/com/bonfyre/fantasy/core/quest/QuestBook$Result
+0com/bonfyre/fantasy/core/quest/Conversation$Line
++com/bonfyre/fantasy/core/quest/Conversation
+2com/bonfyre/fantasy/core/quest/QuestWhere$MountRef
+)com/bonfyre/fantasy/core/quest/QuestWhere
+2com/bonfyre/fantasy/core/quest/QuestReward$MountXp
+*com/bonfyre/fantasy/core/quest/QuestReward
+3com/bonfyre/fantasy/core/quest/QuestReward$Delivery
+8com/bonfyre/fantasy/core/quest/QuestWhere$MountRef$Named
+0com/bonfyre/fantasy/core/quest/QuestTrigger$Type
++com/bonfyre/fantasy/core/quest/QuestTrigger
+*Lcom/bonfyre/fantasy/core/quest/QuestBook;
+HLjava/util/Comparator<Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;
+quests
+^Ljava/util/Map<Lcom/bonfyre/fantasy/core/Id;Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;
+CLjava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;>;
++com/bonfyre/fantasy/core/quest/QuestSpeaker
+0(Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;)Z
+.com/bonfyre/fantasy/core/quest/QuestDefinition
+quest
+0Lcom/bonfyre/fantasy/core/quest/QuestDefinition;
+BLjava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;
+!(Ljava/util/Map<Lcom/bonfyre/fantasy/core/Id;Lcom/google/gson/JsonElement;>;Ljava/util/Map<Lcom/bonfyre/fantasy/core/Id;Lcom/google/gson/JsonElement;>;Ljava/util/Set<Lcom/bonfyre/fantasy/core/Id;>;Lcom/bonfyre/fantasy/core/quest/QuestBook;)Lcom/bonfyre/fantasy/core/quest/QuestBook$Result;
+1com/bonfyre/fantasy/core/json/DefinitionException
+Z(Ljava/util/Map;Lcom/bonfyre/fantasy/core/quest/QuestBook;Ljava/util/List;)Ljava/util/Map;
+com/google/gson/JsonElement
+q(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Ljava/util/Set;)Lcom/bonfyre/fantasy/core/quest/QuestDefinition;
+q(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Ljava/util/Map;)Lcom/bonfyre/fantasy/core/quest/QuestDefinition;
+W(Ljava/util/Map;Ljava/util/Map$Entry;Lcom/bonfyre/fantasy/core/quest/QuestDefinition;)V
+3(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;)V
+!needs quest 
+=(Lcom/bonfyre/fantasy/core/quest/QuestBook;Ljava/util/List;)V
+3Lcom/bonfyre/fantasy/core/json/DefinitionException;
+QLjava/util/Map$Entry<Lcom/bonfyre/fantasy/core/Id;Lcom/google/gson/JsonElement;>;
+KLjava/util/Map<Lcom/bonfyre/fantasy/core/Id;Lcom/google/gson/JsonElement;>;
+.Ljava/util/Set<Lcom/bonfyre/fantasy/core/Id;>;
+ELjava/util/List<Lcom/bonfyre/fantasy/core/json/DefinitionException;>;
+i(Lcom/bonfyre/fantasy/core/Id;Lcom/google/gson/JsonElement;)Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;
+T(Ljava/util/Map;Ljava/util/Map$Entry;Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;)V
+0(Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;)V
+-Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;
+dialogue.
+.speaker
+.lines[
+.mood
+.(I)Lcom/bonfyre/fantasy/core/quest/QuestStage;
+)com/bonfyre/fantasy/core/quest/QuestStage
+].objectives[
+].npc
+-com/bonfyre/fantasy/core/quest/QuestObjective
+2Lcom/bonfyre/fantasy/core/quest/Conversation$Line;
+-Lcom/bonfyre/fantasy/core/quest/Conversation;
+VLjava/util/Map$Entry<Ljava/lang/String;Lcom/bonfyre/fantasy/core/quest/Conversation;>;
++Lcom/bonfyre/fantasy/core/quest/QuestStage;
+ (a fantasy_quest_speaker file)
+trigger.mount
+/()Lcom/bonfyre/fantasy/core/quest/QuestTrigger;
+6()Lcom/bonfyre/fantasy/core/quest/QuestWhere$MountRef;
+j(Ljava/lang/String;Ljava/lang/String;Lcom/bonfyre/fantasy/core/quest/QuestWhere$MountRef;Ljava/util/Set;)V
+].objectives[
+.mount
+-()Lcom/bonfyre/fantasy/core/quest/QuestWhere;
+j(Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Lcom/bonfyre/fantasy/core/quest/QuestWhere$MountRef;)V
+7(Lcom/bonfyre/fantasy/core/quest/QuestWhere$MountRef;)V
+7()Lcom/bonfyre/fantasy/core/quest/QuestReward$Delivery;
+5Lcom/bonfyre/fantasy/core/quest/QuestReward$Delivery;
+].mount
+/Lcom/bonfyre/fantasy/core/quest/QuestObjective;
+4Lcom/bonfyre/fantasy/core/quest/QuestReward$MountXp;
+:Lcom/bonfyre/fantasy/core/quest/QuestWhere$MountRef$Named;
+4Lcom/bonfyre/fantasy/core/quest/QuestWhere$MountRef;
+e(Lcom/bonfyre/fantasy/core/Id;)Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;
+b(Lcom/bonfyre/fantasy/core/Id;)Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;>;
+G()Ljava/util/Collection<Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;>;
+E()Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestSpeaker;>;
+F(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;)Ljava/util/Optional;
+---- com/bonfyre/fantasy/core/quest/QuestDefinition.class
+.com/bonfyre/fantasy/core/quest/QuestDefinition
+QuestDefinition.java
+0com/bonfyre/fantasy/core/quest/QuestWhere$Biomes
+)com/bonfyre/fantasy/core/quest/QuestWhere
+7com/bonfyre/fantasy/core/quest/QuestWhere$Biomes$Listed
+6com/bonfyre/fantasy/core/quest/QuestWhere$Biomes$Quest
+Quest
+0com/bonfyre/fantasy/core/quest/QuestTrigger$Type
++com/bonfyre/fantasy/core/quest/QuestTrigger
+2com/bonfyre/fantasy/core/quest/QuestWhere$MountRef
+8com/bonfyre/fantasy/core/quest/QuestWhere$MountRef$Giver
+-Lcom/bonfyre/fantasy/core/quest/QuestTrigger;
+2Lcom/bonfyre/fantasy/core/quest/QuestWhere$Biomes;
+=Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestStage;>;
+>Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestReward;>;
+PLjava/util/Map<Ljava/lang/String;Lcom/bonfyre/fantasy/core/quest/Conversation;>;
+a quest has at least one stage
+0Lcom/bonfyre/fantasy/core/quest/QuestDefinition;
+.(I)Lcom/bonfyre/fantasy/core/quest/QuestStage;
+)com/bonfyre/fantasy/core/quest/QuestStage
+W(Ljava/lang/String;)Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/Conversation;>;
+a(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Ljava/lang/String;)Ljava/util/function/Supplier;
++com/bonfyre/fantasy/core/quest/Conversation
+.(Ljava/util/Set;)Ljava/util/function/Consumer;
+9Lcom/bonfyre/fantasy/core/quest/QuestWhere$Biomes$Listed;
+quest
+.Ljava/util/Set<Lcom/bonfyre/fantasy/core/Id;>;
+l(Lcom/bonfyre/fantasy/core/Id;Lcom/google/gson/JsonElement;)Lcom/bonfyre/fantasy/core/quest/QuestDefinition;
+json
+.com/bonfyre/fantasy/core/json/JsonObjectReader
+a(Lcom/google/gson/JsonElement;Ljava/lang/String;)Lcom/bonfyre/fantasy/core/json/JsonObjectReader;
+Y(Ljava/lang/String;Ljava/lang/String;)Lcom/bonfyre/fantasy/core/json/DefinitionException;
+,the quest's id is longer than 128 characters
+_(Lcom/bonfyre/fantasy/core/json/JsonObjectReader;)Lcom/bonfyre/fantasy/core/quest/QuestTrigger;
+4()Lcom/bonfyre/fantasy/core/quest/QuestTrigger$Type;
+2Lcom/bonfyre/fantasy/core/quest/QuestTrigger$Type;
+6()Lcom/bonfyre/fantasy/core/quest/QuestWhere$MountRef;
+trigger.mount
+Inames the giver, but the quest has none (set giver, or a mount, or "any")
+a quest can't require itself
+com/google/gson/JsonElement
+QUEST
+](Lcom/bonfyre/fantasy/core/json/JsonObjectReader;)Lcom/bonfyre/fantasy/core/quest/QuestStage;
+].id
+*com/bonfyre/fantasy/core/quest/QuestReward
+^(Lcom/bonfyre/fantasy/core/json/JsonObjectReader;)Lcom/bonfyre/fantasy/core/quest/QuestReward;
+s(Ljava/util/Optional;Lcom/bonfyre/fantasy/core/json/JsonObjectReader;)Lcom/bonfyre/fantasy/core/quest/Conversation;
+_(Lcom/bonfyre/fantasy/core/json/JsonObjectReader;)Lcom/bonfyre/fantasy/core/quest/Conversation;
+dialogue.
+].dialogue
+0Lcom/bonfyre/fantasy/core/json/JsonObjectReader;
+V(Lcom/bonfyre/fantasy/core/json/JsonObjectReader;Ljava/lang/String;)Ljava/lang/String;
+D(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;)Ljava/lang/String;
+3(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;)I
+E(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Ljava/lang/Object;)Z
+/()Lcom/bonfyre/fantasy/core/quest/QuestTrigger;
+4()Lcom/bonfyre/fantasy/core/quest/QuestWhere$Biomes;
+?()Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestStage;>;
+@()Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestReward;>;
+R()Ljava/util/Map<Ljava/lang/String;Lcom/bonfyre/fantasy/core/quest/Conversation;>;
+s(Lcom/bonfyre/fantasy/core/json/JsonObjectReader;Ljava/util/Optional;)Lcom/bonfyre/fantasy/core/quest/Conversation;
+)com/bonfyre/fantasy/core/quest/EarnLetter
+O(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;)Ljava/util/function/Function;
+U(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Ljava/util/Set;)Ljava/util/Optional;
+---- com/bonfyre/fantasy/core/quest/QuestDialogue.class
+,com/bonfyre/fantasy/core/quest/QuestDialogue
+@Ljava/lang/Enum<Lcom/bonfyre/fantasy/core/quest/QuestDialogue;>;
+QuestDialogue.java
+.Lcom/bonfyre/fantasy/core/quest/QuestDialogue;
+/[Lcom/bonfyre/fantasy/core/quest/QuestDialogue;
+1()[Lcom/bonfyre/fantasy/core/quest/QuestDialogue;
+B(Ljava/lang/String;)Lcom/bonfyre/fantasy/core/quest/QuestDialogue;
+0()Lcom/bonfyre/fantasy/core/quest/QuestDialogue;
+---- com/bonfyre/fantasy/core/quest/QuestGate.class
+<Ljava/lang/Enum<Lcom/bonfyre/fantasy/core/quest/QuestGate;>;
+QuestGate.java
+*Lcom/bonfyre/fantasy/core/quest/QuestGate;
++[Lcom/bonfyre/fantasy/core/quest/QuestGate;
+-()[Lcom/bonfyre/fantasy/core/quest/QuestGate;
+>(Ljava/lang/String;)Lcom/bonfyre/fantasy/core/quest/QuestGate;
+---- com/bonfyre/fantasy/core/quest/QuestKeys.class
+QuestKeys.java
+0com/bonfyre/fantasy/core/quest/Conversation$Line
++com/bonfyre/fantasy/core/quest/Conversation
+*Lcom/bonfyre/fantasy/core/quest/QuestKeys;
+	quest.
+quest
+.title
+.summary
+.stage.
+.title
+.stage.
+.text
+.objective.
+.riddle
+.hint
+v(Lcom/bonfyre/fantasy/core/Id;Ljava/lang/String;ILcom/bonfyre/fantasy/core/quest/Conversation$Line;)Ljava/lang/String;
+.dialogue.
+2Lcom/bonfyre/fantasy/core/quest/Conversation$Line;
+quest_speaker.
+.call
+quest_chain.
+boss.
+---- com/bonfyre/fantasy/core/quest/QuestLead.class
+QuestLead.java
+quest
+*Lcom/bonfyre/fantasy/core/quest/QuestSite;
+i(Lcom/bonfyre/fantasy/core/Id;IILcom/bonfyre/fantasy/core/Id;Lcom/bonfyre/fantasy/core/quest/QuestSite;)V
+*Lcom/bonfyre/fantasy/core/quest/QuestLead;
+!quest;stage;objective;biome;place
+>(Lcom/bonfyre/fantasy/core/quest/QuestLead;)Ljava/lang/String;
+-(Lcom/bonfyre/fantasy/core/quest/QuestLead;)I
+?(Lcom/bonfyre/fantasy/core/quest/QuestLead;Ljava/lang/Object;)Z
+,()Lcom/bonfyre/fantasy/core/quest/QuestSite;
+---- com/bonfyre/fantasy/core/quest/QuestLog$Change.class
+.com/bonfyre/fantasy/core/quest/QuestLog$Change
+QuestLog.java
+'com/bonfyre/fantasy/core/quest/QuestLog
+.com/bonfyre/fantasy/core/quest/QuestLog$Letter
+quest
+BLjava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;>;
+0Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+7changed;quest;stagesFinished;completed;letters;released
+D(Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;)Ljava/lang/String;
+3(Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;)I
+E(Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;Ljava/lang/Object;)Z
+D()Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;>;
+---- com/bonfyre/fantasy/core/quest/QuestLog$Letter.class
+.com/bonfyre/fantasy/core/quest/QuestLog$Letter
+QuestLog.java
+'com/bonfyre/fantasy/core/quest/QuestLog
+quest
+0Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;
+quest;conversation
+D(Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;)Ljava/lang/String;
+3(Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;)I
+E(Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;Ljava/lang/Object;)Z
+---- com/bonfyre/fantasy/core/quest/QuestLog.class
+'com/bonfyre/fantasy/core/quest/QuestLog
+QuestLog.java
+.com/bonfyre/fantasy/core/quest/QuestLog$Change
+.com/bonfyre/fantasy/core/quest/QuestLog$Letter
+BLjava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;>;
+)Lcom/bonfyre/fantasy/core/quest/QuestLog;
+H()Ljava/util/Collection<Lcom/bonfyre/fantasy/core/quest/QuestProgress;>;
+.(Ljava/util/Collection;)Ljava/util/Collection;
+c(Lcom/bonfyre/fantasy/core/Id;)Ljava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestProgress;>;
+,com/bonfyre/fantasy/core/quest/QuestProgress
+quest
+D()Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;>;
+3(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;)Z
+.com/bonfyre/fantasy/core/quest/QuestDefinition
+0Lcom/bonfyre/fantasy/core/quest/QuestDefinition;
+x(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;JJLjava/util/Optional;)Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+0Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+.(I)Lcom/bonfyre/fantasy/core/quest/QuestStage;
+)com/bonfyre/fantasy/core/quest/QuestStage
+C(Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;Ljava/util/List;)V
+U(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;Ljava/util/List;Ljava/lang/String;)V
+.Lcom/bonfyre/fantasy/core/quest/QuestProgress;
+f(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;IIJJ)Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+-com/bonfyre/fantasy/core/quest/QuestObjective
++Lcom/bonfyre/fantasy/core/quest/QuestStage;
+d(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;JJ)Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+d(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;IJ)Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+c(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;J)Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+D(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;JLjava/util/List;)V
+v(Lcom/bonfyre/fantasy/core/quest/QuestDefinition;JLjava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;>;)V
+O(Lcom/bonfyre/fantasy/core/Id;)Lcom/bonfyre/fantasy/core/quest/QuestLog$Change;
+P(Lcom/bonfyre/fantasy/core/Id;Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;)Z
+3(Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;)Z
+0Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;
+u(Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;>;)V
+o(ZLjava/util/List;Ljava/util/Map;Ljava/util/Optional;Ljava/util/List;)Lcom/bonfyre/fantasy/core/quest/QuestLog;
+@Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestProgress;>;
+N(ZLjava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestProgress;>;Ljava/util/Map<Lcom/bonfyre/fantasy/core/Id;Ljava/lang/Long;>;Ljava/util/Optional<Lcom/bonfyre/fantasy/core/Id;>;Ljava/util/List<Lcom/bonfyre/fantasy/core/quest/QuestLog$Letter;>;Ljava/util/List<Lcom/bonfyre/fantasy/core/Id;>;)Lcom/bonfyre/fantasy/core/quest/QuestLog;
+-(Lcom/bonfyre/fantasy/core/quest/QuestBook;)Z
+.Lcom/bonfyre/fantasy/core/save/SaveMigrations;
+*Lcom/bonfyre/fantasy/core/quest/QuestBook;
+{(Lcom/bonfyre/fantasy/core/save/SaveMigrations;Lcom/bonfyre/fantasy/core/quest/QuestProgress;)Ljava/util/function/Function;
+FLjava/util/Optional<Lcom/bonfyre/fantasy/core/quest/QuestDefinition;>;
+M(Lcom/bonfyre/fantasy/core/Id;)Lcom/bonfyre/fantasy/core/quest/QuestProgress;
+fLjava/util/LinkedHashMap<Lcom/bonfyre/fantasy/core/Id;Lcom/bonfyre/fantasy/core/quest/QuestProgress;>;
+<(Lcom/bonfyre/fantasy/core/quest/QuestBook;)Ljava/util/List;
+N(Lcom/bonfyre/fantasy/core/quest/QuestBook;)Ljava/util/List<Ljava/util/UUID;>;
++()Lcom/bonfyre/fantasy/core/quest/QuestLog;
+0()Lcom/bonfyre/fantasy/core/quest/QuestProgress;
+*QuestLog[active=
+Ztwo finished quests are both %s now (one saved as %s): kept as finished on the earlier day
+---- com/bonfyre/fantasy/core/quest/QuestObjective$1.class
+/com/bonfyre/fantasy/core/quest/QuestObjective$1
+QuestObjective.java
+-com/bonfyre/fantasy/core/quest/QuestObjective
+7$SwitchMap$com$bonfyre$fantasy$core$quest$ObjectiveType
+,com/bonfyre/fantasy/core/quest/ObjectiveType
+1()[Lcom/bonfyre/fantasy/core/quest/ObjectiveType;
+.Lcom/bonfyre/fantasy/core/quest/ObjectiveType;
+---- com/bonfyre/fantasy/core/quest/QuestObjective$BarColor.class
+6com/bonfyre/fantasy/core/quest/QuestObjective$BarColor
+JLjava/lang/Enum<Lcom/bonfyre/fantasy/core/quest/QuestObjective$BarColor;>;
+QuestObjective.java
+-com/bonfyre/fantasy/core/quest/QuestObjective
+8Lcom/bonfyre/fantasy/core/quest/QuestObjective$BarColor;
+9[Lcom/bonfyre/fantasy/core/quest/QuestObjective$BarColor;
+;()[Lcom/bonfyre/fantasy/core/quest/QuestObjective$BarColor;
+.SY
+---- com/bonfyre/fantasy/core/quest/QuestObjective$Boss.class
+2com/bonfyre/fantasy/core/quest/QuestObjective$Boss
+QuestObjective.java
+-com/bonfyre/fantasy/core/quest/QuestObjective
+6com/bonfyre/fantasy/core/quest/QuestObjective$BarColor
+2com/bonfyre/fantasy/core/quest/QuestObjective$Slot
+bLjava/util/Map<Lcom/bonfyre/fantasy/core/quest/QuestObjective$Slot;Lcom/bonfyre/fantasy/core/Id;>;
+8Lcom/bonfyre/fantasy/core/quest/QuestObjective$BarColor;
+4Lcom/bonfyre/fantasy/core/quest/QuestObjective$Boss;
+H(Lcom/bonfyre/fantasy/core/quest/QuestObjective$Boss;)Ljava/lang/String;
+7(Lcom/bonfyre/fantasy/core/quest/QuestObjective$Boss;)I
+I(Lcom/bonfyre/fantasy/core/quest/QuestObjective$Boss;Ljava/lang/Object;)Z
+d()Ljava/util/Map<Lcom/bonfyre/fantasy/core/quest/QuestObjective$Slot;Lcom/bonfyre/fantasy/core/Id;>;
+:()Lcom/bonfyre/fantasy/core/quest/QuestObjective$BarColor;
+---- com/bonfyre/fantasy/core/quest/QuestObjective$Guard.class
+3com/bonfyre/fantasy/core/quest/QuestObjective$Guard
+QuestObjective.java
+-com/bonfyre/fantasy/core/quest/QuestObjective
+2com/bonfyre/fantasy/core/quest/QuestObjective$Slot
+bLjava/util/Map<Lcom/bonfyre/fantasy/core/quest/QuestObjective$Slot;Lcom/bonfyre/fantasy/core/Id;>;
+5Lcom/bonfyre/fantasy/core/quest/QuestObjective$Guard;
+I(Lcom/bonfyre/fantasy/core/quest/QuestObjective$Guard;)Ljava/lang/String;
+8(Lcom/bonfyre/fantasy/core/quest/QuestObjective$Guard;)I
+J(Lcom/bonfyre/fantasy/core/quest/QuestObjective$Guard;Ljava/lang/Object;)Z
+d()Ljava/util/Map<Lcom/bonfyre/fantasy/core/quest/QuestObjective$Slot;Lcom/bonfyre/fantasy/core/Id;>;
+---- META-INF/mods.toml
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+issueTrackerURL="https://github.com/BenDol/Fantasy-Mounts-Report/issues"
+
+[[mods]]
+modId="fantasymounts"
+version="2.3.3+1.20.1-forge"
+displayName="Fantasy Mounts"
+logoFile="logo.png"
+# NeoForge 26.2+ prefers iconFile (square) over logoFile; keeping both stays compatible with older loaders.
+iconFile="logo.png"
+credits="Bonfyre"
+authors="Ben Dol"
+description='''
+A growing roster of fantasy mounts to find, tame, breed and ride, with new ones joining every month. It started with a unicorn my wife and I could ride together, and grew from there.
+
+On the ground: Unicorn, Polar Bear, Doom Horse, War Mammoth, Frost Sabrecat, Crystal Stag, Qilin (it leaps again in mid-air, on clouds), Kitsune, Moonwolf, Mossback Treant (three riders in its branches), Warhorn Rhino (archers in its howdah) and Jackalope.
+In the air: Pegasus, Griffin, Phoenix (its wings whip up a flame tornado), Luna Moth (only under the moon), Sky Whale (six riders on its deck), Emerald Dragonfly (the fastest flyer) and Nimbus Ram (it floats on a cloud and makes it rain).
+In water: Dragon Turtle and Tide Narwhal. Up walls: Giant Spider.
+
+Very rarely a mount is shiny: each one has a shiny form of its own, with new colours, glowing details, extra parts and a sparkling aura, and it greets you with a chime. Mounts carry one to six riders, each with their own seat, and have abilities such as frost walking, fire breath, rebirth, a war mammoth's archer seat, foxfire and moon dust. Saddles, armour and saddlebags, coat variants and markings, rolled stats and breeding, and a HUD for stamina and abilities.
+
+Mounts grow with you: a tamed mount levels up as you ride it, use its abilities, fight beside it and keep it near you, unlocking new abilities and growing stronger in its own way. Each level brings a skill point for its own skill tree, where branches lead to powerful capstones (some rule each other out, so choose), new abilities, or new ways to move, from climbing walls to gliding. A Renewal Tonic lets its owner reset the tree. Press K (or use the tab on its inventory) to see its stats, abilities and skills.
+
+Mount Whistle - register your mount, then call it to follow you.
+Diamond Carrot - tames a unicorn.
+Golden Carrot Stew - helps you find unicorns in the wild.
+Renewal Tonic - lets you reset your mount's skill tree.
+
+Mounts, spawns, stats, unlock levels and skill trees are data-driven and can be changed with data packs; server owners can cap flight, riders and abilities, and tune or switch off levelling, in the config.
+'''
+
+
+
+[[dependencies.fantasymounts]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.0.14,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.fantasymounts]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.20.2)"
+    ordering="NONE"
+    side="BOTH"
+
+---- data/fantasy/fantasy_quest/crystal_stag/where_space_is_a_door.json
+{
+  "schema": 1,
+  "giver": "fantasy:crystal_stag",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:amethyst_shard",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "the_ringing_herd",
+      "objectives": [
+        {
+          "id": "watch_a_stag",
+          "type": "witness",
+          "habits": [
+            "crystal_song",
+            "blink_wander",
+            "antler_spar",
+            "chorus_graze"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chorus_for_the_herd",
+      "dialogue": "chorus",
+      "objectives": [
+        {
+          "id": "chorus",
+          "type": "deliver",
+          "items": [
+            "minecraft:chorus_fruit"
+          ],
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "the_tall_watchers",
+      "dialogue": "watchers",
+      "objectives": [
+        {
+          "id": "endermen",
+          "type": "kill",
+          "entities": [
+            "minecraft:enderman"
+          ],
+          "count": 8,
+          "where": {
+            "dimension": "minecraft:the_end"
+          }
+        }
+      ]
+    },
+    {
+      "id": "a_singing_stone",
+      "dialogue": "tame",
+      "objectives": [
+        {
+          "id": "tame_a_stag",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "among_the_islands",
+      "dialogue": "islands",
+      "objectives": [
+        {
+          "id": "ride_the_end",
+          "type": "ride",
+          "count": 400,
+          "where": {
+            "dimension": "minecraft:the_end"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 2500
+    },
+    {
+      "type": "item",
+      "item": "minecraft:shulker_shell",
+      "count": 2
+    },
+    {
+      "type": "experience",
+      "amount": 300
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "chorus": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "watchers": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "tame": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "islands": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+
+---- data/fantasy/fantasy_quest/doom_horse/hell_on_hooves.json
+{
+  "schema": 1,
+  "giver": "fantasy:doom_horse",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:soul_lantern",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "soulfire",
+      "objectives": [
+        {
+          "id": "watch_a_doom_horse",
+          "type": "witness",
+          "habits": [
+            "hellfire",
+            "lava_wade",
+            "war_cry",
+            "ember_shake",
+            "soul_graze"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fodder_for_fire",
+      "dialogue": "fodder",
+      "objectives": [
+        {
+          "id": "fungus",
+          "type": "deliver",
+          "items": [
+            "minecraft:crimson_fungus",
+            "minecraft:warped_fungus"
+          ],
+          "count": 8
+        },
+        {
+          "id": "magma_cream",
+          "type": "deliver",
+          "items": [
+            "minecraft:magma_cream"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "the_ashen_knight",
+      "dialogue": "knight",
+      "objectives": [
+        {
+          "id": "defeat_cinderhelm",
+          "type": "boss",
+          "boss": {
+            "entity": "minecraft:wither_skeleton",
+            "name": "fantasy:cinderhelm",
+            "health": 200,
+            "damage": 11,
+            "armor": 10,
+            "speed": 1.1,
+            "bar": "purple",
+            "equipment": {
+              "head": "minecraft:netherite_helmet",
+              "chest": "minecraft:iron_chestplate",
+              "mainhand": "minecraft:netherite_sword"
+            }
+          },
+          "where": {
+            "dimension": "minecraft:the_nether"
+          }
+        }
+      ]
+    },
+    {
+      "id": "break_it_in",
+      "dialogue": "tame",
+      "objectives": [
+        {
+          "id": "tame_a_doom_horse",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "across_the_fire",
+      "dialogue": "ride",
+      "objectives": [
+        {
+          "id": "ride_the_nether",
+          "type": "ride",
+          "count": 500,
+          "where": {
+            "dimension": "minecraft:the_nether"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 2000
+    },
+    {
+      "type": "item",
+      "item": "minecraft:magma_cream",
+      "count": 6
+    },
+    {
+      "type": "experience",
+      "amount": 250
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "fodder": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "knight": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "tame": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "ride": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+
+---- data/fantasy/fantasy_quest/dragon_turtle/the_island_that_swims.json
+{
+  "schema": 1,
+  "giver": "fantasy:dragon_turtle",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:turtle_egg",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "the_basking_shell",
+      "objectives": [
+        {
+          "id": "watch_a_turtle",
+          "type": "witness",
+          "habits": [
+            "sun_bask",
+            "sand_nest",
+            "seagrass_graze",
+            "deep_rest"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a_keepers_welcome",
+      "dialogue": "camp",
+      "objectives": [
+        {
+          "id": "kelp",
+          "type": "deliver",
+          "items": [
+            "minecraft:kelp"
+          ],
+          "count": 16,
+          "npc": "fantasy:maren",
+          "where": {
+            "biomes": [
+              "#minecraft:is_beach"
+            ]
+          }
+        },
+        {
+          "id": "sea_pickles",
+          "type": "deliver",
+          "items": [
+            "minecraft:sea_pickle"
+          ],
+          "count": 4,
+          "npc": "fantasy:maren",
+          "where": {
+            "biomes": [
+              "#minecraft:is_beach"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the_drowned_admiral",
+      "dialogue": "admiral",
+      "objectives": [
+        {
+          "id": "defeat_the_admiral",
+          "type": "boss",
+          "where": {
+            "biomes": [
+              "#minecraft:is_beach"
+            ]
+          },
+          "boss": {
+            "entity": "minecraft:drowned",
+            "name": "fantasy:drowned_admiral",
+            "health": 160,
+            "damage": 9,
+            "armor": 8,
+            "speed": 1.1,
+            "bar": "blue",
+            "equipment": {
+              "head": "minecraft:iron_helmet",
+              "chest": "minecraft:chainmail_chestplate",
+              "mainhand": "minecraft:trident"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "climb_aboard",
+      "dialogue": "tame",
+      "objectives": [
+        {
+          "id": "tame_a_turtle",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "the_long_crossing",
+      "dialogue": "crossing",
+      "objectives": [
+        {
+          "id": "ferry",
+          "type": "ride",
+          "count": 600
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 2000
+    },
+    {
+      "type": "item",
+      "item": "minecraft:turtle_helmet",
+      "count": 1
+    },
+    {
+      "type": "experience",
+      "amount": 200
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "camp": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "kelp": {
+      "speaker": "fantasy:maren",
+      "lines": [
+        {
+          "mood": "cheerful"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "sea_pickles": {
+      "speaker": "fantasy:maren",
+      "lines": [
+        {
+          "mood": "cheerful"
+        },
+        {
+          "mood": "worried"
+        }
+      ]
+    },
+    "admiral": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "tame": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "crossing": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+   
+---- data/fantasy/fantasy_quest/emerald_dragonfly/wings_like_stained_glass.json
+{
+  "schema": 1,
+  "giver": "fantasy:emerald_dragonfly",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:lily_pad",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "on_the_water",
+      "objectives": [
+        {
+          "id": "watch_a_dragonfly",
+          "type": "witness",
+          "habits": [
+            "river_skim",
+            "darting",
+            "reed_perch",
+            "sun_shimmer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "the_ferrywomans_riddle",
+      "dialogue": "riddle",
+      "objectives": [
+        {
+          "id": "green_boats",
+          "type": "deliver",
+          "items": [
+            "minecraft:lily_pad"
+          ],
+          "count": 3,
+          "npc": "fantasy:tamsin",
+          "hidden": true,
+          "hint_after": 180
+        },
+        {
+          "id": "berries",
+          "type": "deliver",
+          "items": [
+            "minecraft:sweet_berries",
+            "minecraft:glow_berries"
+          ],
+          "count": 6,
+          "npc": "fantasy:tamsin"
+        }
+      ]
+    },
+    {
+      "id": "witch_light",
+      "dialogue": "witches",
+      "objectives": [
+        {
+          "id": "drive_off_the_witches",
+          "type": "kill",
+          "entities": [
+            "minecraft:witch"
+          ],
+          "count": 3,
+          "where": {
+            "biomes": "quest"
+          }
+        }
+      ]
+    },
+    {
+      "id": "a_lily_pad_offering",
+      "dialogue": "offering",
+      "objectives": [
+        {
+          "id": "tame_a_dragonfly",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "faster_than_a_sneeze",
+      "dialogue": "faster",
+      "objectives": [
+        {
+          "id": "fly_far",
+          "type": "ride",
+          "count": 500
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 1500
+    },
+    {
+      "type": "item",
+      "item": "minecraft:glow_berries",
+      "count": 8
+    },
+    {
+      "type": "experience",
+      "amount": 120
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "riddle": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "green_boats": {
+      "speaker": "fantasy:tamsin",
+      "lines": [
+        {
+          "mood": "wry"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "berries": {
+      "speaker": "fantasy:tamsin",
+      "lines": [
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "wry"
+        }
+      ]
+    },
+    "witches": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "offering": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "faster": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+
+---- data/fantasy/fantasy_quest/frost_drake/ice_in_the_blood.json
+{
+  "schema": 1,
+  "giver": "fantasy:frost_drake",
+  "trigger": {
+    "type": "tame"
+  },
+  "icon": "minecraft:packed_ice",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "the_high_cold",
+      "objectives": [
+        {
+          "id": "to_the_summit",
+          "type": "visit",
+          "where": {
+            "biomes": "quest",
+            "min_y": 170,
+            "riding": "giver"
+          }
+        }
+      ]
+    },
+    {
+      "id": "the_frostbound",
+      "dialogue": "strays",
+      "objectives": [
+        {
+          "id": "strays",
+          "type": "kill",
+          "entities": [
+            "minecraft:stray"
+          ],
+          "count": 6,
+          "where": {
+            "biomes": "quest"
+          }
+        }
+      ]
+    },
+    {
+      "id": "the_chieftain",
+      "dialogue": "chieftain",
+      "objectives": [
+        {
+          "id": "defeat_hrimgar",
+          "type": "boss",
+          "boss": {
+            "entity": "minecraft:stray",
+            "name": "fantasy:hrimgar",
+            "health": 140,
+            "armor": 10,
+            "speed": 1.1,
+            "bar": "blue",
+            "equipment": {
+              "head": "minecraft:iron_helmet",
+              "chest": "minecraft:iron_chestplate",
+              "mainhand": "minecraft:bow"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "wings_of_winter",
+      "dialogue": "wings",
+      "objectives": [
+        {
+          "id": "grow",
+          "type": "level",
+          "level": 5
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 2500
+    },
+    {
+      "type": "item",
+      "item": "minecraft:packed_ice",
+      "count": 16
+    },
+    {
+      "type": "item",
+      "item": "minecraft:blue_ice",
+      "count": 4
+    },
+    {
+      "type": "experience",
+      "amount": 250
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "strays": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "chieftain": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "wings": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+
+---- data/fantasy/fantasy_quest/frost_sabrecat/fangs_like_icicles.json
+{
+  "schema": 1,
+  "giver": "fantasy:frost_sabrecat",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:snowball",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "the_silent_hunter",
+      "objectives": [
+        {
+          "id": "watch_a_sabrecat",
+          "type": "witness",
+          "habits": [
+            "snow_stalk",
+            "grooming",
+            "midday_nap",
+            "pacing_circles"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a_full_belly",
+      "dialogue": "belly",
+      "objectives": [
+        {
+          "id": "meat",
+          "type": "deliver",
+          "items": [
+            "minecraft:rabbit",
+            "minecraft:chicken",
+            "minecraft:mutton",
+            "minecraft:beef",
+            "minecraft:porkchop"
+          ],
+          "count": 6,
+          "npc": "fantasy:sigrun"
+        }
+      ]
+    },
+    {
+      "id": "among_the_spikes",
+      "dialogue": "spikes",
+      "objectives": [
+        {
+          "id": "walk_the_spikes",
+          "type": "visit",
+          "where": {
+            "biomes": [
+              "minecraft:ice_spikes"
+            ],
+            "time": "night"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cold_claws",
+      "dialogue": "claws",
+      "objectives": [
+        {
+          "id": "tame_a_sabrecat",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "the_hunt_together",
+      "dialogue": "hunt",
+      "objectives": [
+        {
+          "id": "hunt",
+          "type": "kill",
+          "entities": [
+            "minecraft:zombie",
+            "minecraft:skeleton",
+            "minecraft:stray",
+            "minecraft:spider",
+            "minecraft:creeper"
+          ],
+          "count": 6,
+          "where": {
+            "biomes": "quest",
+            "riding": "giver"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 1500
+    },
+    {
+      "type": "item",
+      "item": "minecraft:white_wool",
+      "count": 6
+    },
+    {
+      "type": "item",
+      "item": "minecraft:golden_carrot",
+      "count": 3
+    },
+    {
+      "type": "experience",
+      "amount": 150
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "belly": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "meat": {
+      "speaker": "fantasy:sigrun",
+      "lines": [
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "grateful"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "spikes": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "claws": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "hunt": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+
+---- data/fantasy/fantasy_quest/giant_spider/eight_legs_one_saddle.json
+{
+  "schema": 1,
+  "giver": "fantasy:giant_spider",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:spider_eye",
+  "sort": 10,
+  "biomes": [
+    "minecraft:dark_forest",
+    "minecraft:dripstone_caves",
+    "minecraft:lush_caves",
+    "minecraft:deep_dark"
+  ],
+  "stages": [
+    {
+      "id": "in_the_dark",
+      "objectives": [
+        {
+          "id": "watch_a_spider",
+          "type": "witness",
+          "habits": [
+            "web_weaving",
+            "ambush",
+            "clicking",
+            "day_rest"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spider_silk",
+      "dialogue": "silk",
+      "objectives": [
+        {
+          "id": "carry_string",
+          "type": "collect",
+          "items": [
+            "minecraft:string"
+          ],
+          "count": 12
+        }
+      ]
+    },
+    {
+      "id": "pip_in_the_web",
+      "dialogue": "pip_in_the_web",
+      "objectives": [
+        {
+          "id": "free_pip",
+          "type": "rescue",
+          "npc": "fantasy:pip",
+          "guards": [
+            {
+              "entity": "minecraft:cave_spider",
+              "count": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unarmoured_trust",
+      "dialogue": "trust",
+      "objectives": [
+        {
+          "id": "tame_a_spider",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "into_the_deep",
+      "dialogue": "deep",
+      "objectives": [
+        {
+          "id": "the_deep_caves",
+          "type": "visit",
+          "where": {
+            "biomes": "any",
+            "max_y": 0,
+            "riding": "giver",
+            "sky": false
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 1500
+    },
+    {
+      "type": "item",
+      "item": "minecraft:fermented_spider_eye",
+      "count": 4
+    },
+    {
+      "type": "experience",
+      "amount": 150
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "silk": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "pip_in_the_web": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "free_pip": {
+      "speaker": "fantasy:pip",
+      "lines": [
+        {
+          "mood": "frightened"
+        },
+        {
+          "mood": "grateful"
+        },
+        {
+          "mood": "grateful"
+        }
+      ]
+    },
+    "trust": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "deep": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+
+---- data/fantasy/fantasy_quest/griffin/king_of_the_high_peaks.json
+{
+  "schema": 1,
+  "giver": "fantasy:griffin",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:feather",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "the_king_surveys",
+      "objectives": [
+        {
+          "id": "watch_a_griffin",
+          "type": "witness",
+          "habits": [
+            "peak_perch",
+            "thermal_soar",
+            "stoop",
+            "preening"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "the_kings_tribute",
+      "dialogue": "tribute",
+      "objectives": [
+        {
+          "id": "mutton",
+          "type": "deliver",
+          "items": [
+            "minecraft:mutton"
+          ],
+          "count": 6,
+          "npc": "fantasy:gideon"
+        },
+        {
+          "id": "beef",
+          "type": "deliver",
+          "items": [
+            "minecraft:beef"
+          ],
+          "count": 4,
+          "npc": "fantasy:gideon"
+        }
+      ]
+    },
+    {
+      "id": "the_windbinder",
+      "dialogue": "windbinder",
+      "objectives": [
+        {
+          "id": "defeat_malgrave",
+          "type": "boss",
+          "boss": {
+            "entity": "minecraft:evoker",
+            "name": "fantasy:malgrave",
+            "health": 140,
+            "armor": 6,
+            "bar": "purple"
+          }
+        }
+      ]
+    },
+    {
+      "id": "a_crown_of_feathers",
+      "dialogue": "crown",
+      "objectives": [
+        {
+          "id": "tame_a_griffin",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "over_the_kingdom",
+      "dialogue": "kingdom",
+      "objectives": [
+        {
+          "id": "fly_high",
+          "type": "visit",
+          "where": {
+            "biomes": "quest",
+            "min_y": 220,
+            "riding": "giver",
+            "sky": true
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 2000
+    },
+    {
+      "type": "item",
+      "item": "minecraft:golden_apple",
+      "count": 1
+    },
+    {
+      "type": "item",
+      "item": "minecraft:mutton",
+      "count": 8
+    },
+    {
+      "type": "experience",
+      "amount": 200
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "tribute": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "mutton": {
+      "speaker": "fantasy:gideon",
+      "lines": [
+        {
+          "mood": "gruff"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "beef": {
+      "speaker": "fantasy:gideon",
+      "lines": [
+        {
+          "mood": "grinning"
+        },
+        {
+          "mood": "gruff"
+        }
+      ]
+    },
+    "windbinder": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "grave"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "crown": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "kingdom": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+
+---- data/fantasy/fantasy_quest/jackalope/a_tall_tale.json
+{
+  "schema": 1,
+  "giver": "fantasy:jackalope",
+  "trigger": {
+    "type": "discover"
+  },
+  "icon": "minecraft:carrot",
+  "sort": 10,
+  "stages": [
+    {
+      "id": "seeing_is_believing",
+      "objectives": [
+        {
+          "id": "watch_a_jackalope",
+          "type": "witness",
+          "habits": [
+            "binky",
+            "down_the_hole",
+            "carrot_dig"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pips_proof",
+      "dialogue": "camp",
+      "objectives": [
+        {
+          "id": "carrots",
+          "type": "deliver",
+          "items": [
+            "minecraft:carrot"
+          ],
+          "count": 8,
+          "npc": "fantasy:pip"
+        },
+        {
+          "id": "dandelions",
+          "type": "deliver",
+          "items": [
+            "minecraft:dandelion"
+          ],
+          "count": 4,
+          "npc": "fantasy:pip"
+        }
+      ]
+    },
+    {
+      "id": "a_hares_luck",
+      "dialogue": "luck",
+      "objectives": [
+        {
+          "id": "lucky_foot",
+          "type": "deliver",
+          "items": [
+            "minecraft:rabbit_foot"
+          ],
+          "count": 1,
+          "hidden": true,
+          "hint_after": 240
+        }
+      ]
+    },
+    {
+      "id": "spring_heels",
+      "dialogue": "heels",
+      "objectives": [
+        {
+          "id": "tame_a_jackalope",
+          "type": "tame"
+        }
+      ]
+    },
+    {
+      "id": "over_the_hedges",
+      "dialogue": "hedges",
+      "objectives": [
+        {
+          "id": "bound_away",
+          "type": "ride",
+          "count": 400
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "mount_xp",
+      "amount": 1250
+    },
+    {
+      "type": "item",
+      "item": "minecraft:golden_carrot",
+      "count": 4
+    },
+    {
+      "type": "experience",
+      "amount": 100
+    }
+  ],
+  "dialogue": {
+    "start": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "curious"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "camp": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "carrots": {
+      "speaker": "fantasy:pip",
+      "lines": [
+        {
+          "mood": "grateful"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "dandelions": {
+      "speaker": "fantasy:pip",
+      "lines": [
+        {
+          "mood": "grateful"
+        },
+        {
+          "mood": "grateful"
+        }
+      ]
+    },
+    "luck": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "heels": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        },
+        {
+          "mood": "curious"
+        }
+      ]
+    },
+    "hedges": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    },
+    "complete": {
+      "speaker": "fantasy:thornquill",
+      "lines": [
+        {
+          "mood": "delighted"
+        },
+        {
+          "mood": "neutral"
+        }
+      ]
+    }
+  }
+}
+

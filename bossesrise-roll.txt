@@ -1,0 +1,516 @@
+jar: packcache/block_factorys_bosses-2.1.2-forge-1.20.1.jar
+net/unusual/block_factorys_bosses/mixins/RollMixin
+net/unusual/block_factorys_bosses/mixins/accessor/AnimationControllerAccessor
+net/unusual/block_factorys_bosses/init/BossesRiseKeyMappings
+net/unusual/block_factorys_bosses/init/BossesRiseKeyMappings$KeyEventListener
+net/unusual/block_factorys_bosses/init/BossesRiseKeyMappings$1
+net/unusual/block_factorys_bosses/state/StateController
+net/unusual/block_factorys_bosses/geckolib/util/CustomKeyFramesAdapter
+net/unusual/block_factorys_bosses/geckolib/util/AutoPlayingSoundKeyframeHandler
+net/unusual/block_factorys_bosses/geckolib/util/SoundKeyframePlayer
+net/unusual/block_factorys_bosses/geckolib/item/UnderworldArenaKeyRenderer
+net/unusual/block_factorys_bosses/network/DodgeRollMessage
+net/unusual/block_factorys_bosses/item/UnderworldArenaKeyItem$UnderworldArenaKeyClientExtensions
+net/unusual/block_factorys_bosses/item/UnderworldArenaKeyItem
+net/unusual/block_factorys_bosses/capability/entity/RollCap$RollCapHandler$1
+net/unusual/block_factorys_bosses/capability/entity/RollCap$RollCapHandler
+net/unusual/block_factorys_bosses/capability/entity/RollCap$RollCapHandler$2
+net/unusual/block_factorys_bosses/capability/entity/RollCap$1
+net/unusual/block_factorys_bosses/capability/entity/RollCap$RollCapHandler$RollType
+net/unusual/block_factorys_bosses/capability/entity/RollCap
+net/unusual/block_factorys_bosses/client/camera/client/CinematicAnimationController$AnimationEndListener
+net/unusual/block_factorys_bosses/client/camera/client/CinematicAnimationController
+net/unusual/block_factorys_bosses/client/renderer/block/RopeRollBlockEntityRenderer
+net/unusual/block_factorys_bosses/block/RopeRollBlock
+net/unusual/block_factorys_bosses/block/entity/RopeRollBlockEntity
+net/unusual/block_factorys_bosses/configuration/ServerConfiguration
+net/unusual/block_factorys_bosses/configuration/ClientConfiguration$GUIAnchors
+net/unusual/block_factorys_bosses/configuration/ClientConfiguration
+== mods.toml
+modLoader="javafml" #mandatory
+loaderVersion="[4,)" #mandatory
+license="All Rights Reserved"
+[[mods]] #mandatory
+modId="block_factorys_bosses" #mandatory
+version="2.1.2" #mandatory
+displayName="Bosses'Rise" #mandatory
+displayURL="https://www.curseforge.com/minecraft/mc-mods/bossesrise" #optional
+credits="Developed by jodi, opl and Alice. Art by merfy and Fray. Sound Effects by Socks. Localization by Block Factory (English), Minedoll (Japanese), White (Russian), Oldazhai (Simplified Chinese)" #optional
+authors="Block Factory" #optional
+description='''The Minecraft Bosses'Rise introduces a variety of new world bosses to the game, each with unique special attacks, abilities, and drops. These bosses provide players with additional mid-end game content, enhancing the overall gameplay experience.'''
+[[mixins]]
+config="block_factorys_bosses.mixins.json"
+[[dependencies.block_factorys_bosses]] #optional
+modId="forge" #mandatory
+mandatory=true #mandatory
+versionRange="[0,)" #mandatory
+ordering="NONE"
+side="BOTH"
+[[dependencies.block_factorys_bosses]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1]"
+ordering="NONE"
+side="BOTH"
+[[dependencies.block_factorys_bosses]]
+modId="geckolib"
+mandatory=true
+versionRange="[4.8.3,5)"
+ordering="NONE"
+side="BOTH"
+######## net/unusual/block_factorys_bosses/mixins/RollMixin
+public class net.unusual.block_factorys_bosses.mixins.RollMixin {
+  public net.unusual.block_factorys_bosses.mixins.RollMixin();
+  private void freshNeverFrozen(int, org.spongepowered.asm.mixin.injection.callback.CallbackInfo);
+        21: invokestatic  #34                 // InterfaceMethod net/unusual/block_factorys_bosses/capability/entity/RollCap.isPlayerInvulnerable:(Lnet/minecraft/world/entity/player/Player;)Z
+######## net/unusual/block_factorys_bosses/mixins/accessor/AnimationControllerAccessor
+public interface net.unusual.block_factorys_bosses.mixins.accessor.AnimationControllerAccessor<T extends software.bernie.geckolib.core.animatable.GeoAnimatable> {
+  public abstract void setIsJustStarting(boolean);
+  public abstract java.util.function.Function<T, software.bernie.geckolib.core.animation.EasingType> getOverrideEasingTypeFunction();
+######## net/unusual/block_factorys_bosses/init/BossesRiseKeyMappings
+public class net.unusual.block_factorys_bosses.init.BossesRiseKeyMappings {
+  public static final net.minecraft.client.KeyMapping DODGE_ROLL;
+  public net.unusual.block_factorys_bosses.init.BossesRiseKeyMappings();
+  public static void registerKeyMappings(net.minecraftforge.client.event.RegisterKeyMappingsEvent);
+         1: getstatic     #40                 // Field DODGE_ROLL:Lnet/minecraft/client/KeyMapping;
+         4: invokevirtual #46                 // Method net/minecraftforge/client/event/RegisterKeyMappingsEvent.register:(Lnet/minecraft/client/KeyMapping;)V
+  static {};
+         4: ldc           #51                 // String key.block_factorys_bosses.dodge_roll
+         8: ldc           #53                 // String key.categories.movement
+######## net/unusual/block_factorys_bosses/state/StateController
+public class net.unusual.block_factorys_bosses.state.StateController<E extends net.minecraft.world.entity.Entity> {
+  private static final java.lang.String TAG_STATE_CONTROLLER = "state_controller";
+  private static final java.lang.String TAG_STATE_STACK = "state_stack";
+  private static final java.lang.String TAG_NAME = "name";
+  private static final java.lang.String TAG_TIMER = "timer";
+  private static final java.lang.String TAG_DATA = "data";
+  private final E entity;
+  private final java.util.function.Function<net.unusual.block_factorys_bosses.state.StateController<E>, net.unusual.block_factorys_bosses.state.StateRef<E>> defaultStateSupplier;
+  private final net.unusual.block_factorys_bosses.state.StateRegistry<E> registry;
+  private final java.util.Deque<net.unusual.block_factorys_bosses.state.ActiveState<E>> stateStack;
+  static final boolean $assertionsDisabled;
+  public net.unusual.block_factorys_bosses.state.StateController(E, net.unusual.block_factorys_bosses.state.StateRegistry<E>, java.util.function.Function<net.unusual.block_factorys_bosses.state.StateController<E>, net.unusual.block_factorys_bosses.state.StateRef<E>>);
+  public E getEntity();
+  public net.unusual.block_factorys_bosses.state.StateRegistry<E> getRegistry();
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> getActiveState();
+  public net.unusual.block_factorys_bosses.state.StateRef<E> getActiveStateRef();
+  public java.util.Deque<net.unusual.block_factorys_bosses.state.ActiveState<E>> getStateStack();
+  public boolean hasActiveState(java.util.function.Predicate<? super net.unusual.block_factorys_bosses.state.ActiveState<E>>);
+  public boolean hasActiveStateRef(net.unusual.block_factorys_bosses.state.StateRef<E>);
+  public boolean hasActiveStateRef(java.util.function.Predicate<? super net.unusual.block_factorys_bosses.state.StateRef<E>>);
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> findActiveState(java.util.function.Predicate<? super net.unusual.block_factorys_bosses.state.ActiveState<E>>);
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> findActiveStateByRef(net.unusual.block_factorys_bosses.state.StateRef<E>);
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> findActiveStateByRef(java.util.function.Predicate<? super net.unusual.block_factorys_bosses.state.StateRef<E>>);
+  public boolean isStateActive(net.unusual.block_factorys_bosses.state.StateRef<E>);
+  public net.unusual.block_factorys_bosses.state.State<E> getState();
+  private net.unusual.block_factorys_bosses.state.ActiveState<E> createInstance(net.unusual.block_factorys_bosses.state.StateRef<E>);
+         8: invokestatic  #217                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> push(net.unusual.block_factorys_bosses.state.StateRef<E>);
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> pushBefore(net.unusual.block_factorys_bosses.state.ActiveState<E>, net.unusual.block_factorys_bosses.state.StateRef<E>);
+        58: invokevirtual #263                // Method push:(Lnet/unusual/block_factorys_bosses/state/StateRef;)Lnet/unusual/block_factorys_bosses/state/ActiveState;
+       112: invokestatic  #280                // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> replaceActive(net.unusual.block_factorys_bosses.state.StateRef<E>);
+         7: invokevirtual #263                // Method push:(Lnet/unusual/block_factorys_bosses/state/StateRef;)Lnet/unusual/block_factorys_bosses/state/ActiveState;
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> replaceAll(net.unusual.block_factorys_bosses.state.StateRef<E>);
+         6: invokevirtual #263                // Method push:(Lnet/unusual/block_factorys_bosses/state/StateRef;)Lnet/unusual/block_factorys_bosses/state/ActiveState;
+  public net.unusual.block_factorys_bosses.state.ActiveState<E> endActive();
+  public void endDownTo(net.unusual.block_factorys_bosses.state.ActiveState<E>);
+  public void endAll();
+  public void tick();
+        38: invokevirtual #263                // Method push:(Lnet/unusual/block_factorys_bosses/state/StateRef;)Lnet/unusual/block_factorys_bosses/state/ActiveState;
+        48: getstatic     #333                // Field net/unusual/block_factorys_bosses/state/State$Result.END:Lnet/unusual/block_factorys_bosses/state/State$Result;
+        72: getstatic     #338                // Field $assertionsDisabled:Z
+  public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag);
+        60: ldc           #29                 // String name
+        75: ldc           #32                 // String timer
+       121: getstatic     #393                // Field net/minecraft/nbt/NbtOps.f_128958_:Lnet/minecraft/nbt/NbtOps;
+       144: ldc           #35                 // String data
+       163: ldc           #26                 // String state_stack
+       171: ldc           #23                 // String state_controller
+  public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag);
+         0: getstatic     #338                // Field $assertionsDisabled:Z
+        27: ldc           #23                 // String state_controller
+        37: ldc           #23                 // String state_controller
+        44: ldc           #26                 // String state_stack
+       101: ldc           #29                 // String name
+       109: invokestatic  #217                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+       126: invokestatic  #217                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+       151: ldc           #35                 // String data
+       168: getstatic     #393                // Field net/minecraft/nbt/NbtOps.f_128958_:Lnet/minecraft/nbt/NbtOps;
+       186: getstatic     #338                // Field $assertionsDisabled:Z
+       240: ldc           #32                 // String timer
+       252: ldc           #32                 // String timer
+  private static boolean lambda$findActiveStateByRef$2(java.util.function.Predicate, net.unusual.block_factorys_bosses.state.ActiveState);
+  private static boolean lambda$findActiveStateByRef$1(net.unusual.block_factorys_bosses.state.StateRef, net.unusual.block_factorys_bosses.state.ActiveState);
+  private static boolean lambda$hasActiveStateRef$0(net.unusual.block_factorys_bosses.state.StateRef, net.unusual.block_factorys_bosses.state.StateRef);
+  static {};
+         0: ldc           #2                  // class net/unusual/block_factorys_bosses/state/StateController
+######## net/unusual/block_factorys_bosses/network/DodgeRollMessage
+public final class net.unusual.block_factorys_bosses.network.DodgeRollMessage extends java.lang.Record {
+  private final int eventType;
+  private final float leftImpulse;
+  private final float forwardImpulse;
+  public net.unusual.block_factorys_bosses.network.DodgeRollMessage(int, float, float);
+  public static void encode(net.unusual.block_factorys_bosses.network.DodgeRollMessage, net.minecraft.network.FriendlyByteBuf);
+  public static net.unusual.block_factorys_bosses.network.DodgeRollMessage decode(net.minecraft.network.FriendlyByteBuf);
+  public static void handle(net.unusual.block_factorys_bosses.network.DodgeRollMessage, java.util.function.Supplier<net.minecraftforge.network.NetworkEvent$Context>);
+  public static void pressAction(net.minecraft.world.entity.player.Player, int, float, float);
+        22: getstatic     #170                // Field net/unusual/block_factorys_bosses/configuration/ServerConfiguration.CAN_USE_ROLL:Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+        45: invokestatic  #185                // InterfaceMethod net/unusual/block_factorys_bosses/capability/entity/RollCap.fromPlayer:(Lnet/minecraft/world/entity/player/Player;)Ljava/util/Optional;
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public int eventType();
+  public float leftImpulse();
+  public float forwardImpulse();
+  private static java.lang.Void lambda$handle$1(net.minecraftforge.network.NetworkEvent$Context, java.lang.Throwable);
+         0: getstatic     #245                // Field net/unusual/block_factorys_bosses/BossesRise.LOGGER:Lorg/apache/logging/log4j/Logger;
+        17: invokestatic  #266                // InterfaceMethod net/minecraft/network/chat/Component.m_237113_:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  private static void lambda$handle$0(net.minecraftforge.network.NetworkEvent$Context, net.unusual.block_factorys_bosses.network.DodgeRollMessage);
+         4: invokestatic  #283                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+        22: invokestatic  #285                // Method pressAction:(Lnet/minecraft/world/entity/player/Player;IFF)V
+######## net/unusual/block_factorys_bosses/capability/entity/RollCap
+public interface net.unusual.block_factorys_bosses.capability.entity.RollCap extends net.minecraftforge.common.util.INBTSerializable<net.minecraft.nbt.CompoundTag> {
+  public static final net.minecraft.resources.ResourceLocation ID;
+  public static java.util.Optional<net.unusual.block_factorys_bosses.capability.entity.RollCap> fromPlayer(net.minecraft.world.entity.player.Player);
+         1: getstatic     #32                 // Field net/unusual/block_factorys_bosses/capability/entity/RollCap$RollCapHandler.ROLL_CAP:Lnet/minecraftforge/common/capabilities/Capability;
+  public static boolean isPlayerInvulnerable(net.minecraft.world.entity.player.Player);
+         1: invokestatic  #50                 // InterfaceMethod fromPlayer:(Lnet/minecraft/world/entity/player/Player;)Ljava/util/Optional;
+  public abstract int rollCount();
+  public abstract float getCooldown(int);
+  public abstract void startCooldown(int);
+  public abstract int getRoll();
+  public abstract boolean isRolling();
+  public abstract boolean isInvulnerable();
+  public abstract int getRollDuration();
+  public abstract net.unusual.block_factorys_bosses.capability.entity.RollCap$RollCapHandler$RollType getDirection();
+  public abstract boolean startRoll(net.minecraft.world.entity.player.Player, float, float);
+  public abstract void tick(net.minecraft.world.entity.player.Player);
+  static {};
+         0: ldc           #81                 // String cap_roll
+         2: invokestatic  #87                 // Method net/unusual/block_factorys_bosses/BossesRise.prefix:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+######## net/unusual/block_factorys_bosses/client/camera/client/CinematicAnimationController
+public class net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController<T extends software.bernie.geckolib.core.animatable.GeoAnimatable> extends software.bernie.geckolib.core.animation.AnimationController<T> implements software.bernie.geckolib.core.animation.AnimationController$CustomKeyframeHandler<T> {
+  private software.bernie.geckolib.core.animation.AnimationController$CustomKeyframeHandler<T> customKeyframeHandler;
+  private net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController$AnimationEndListener<T> animationEndListener;
+  public net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController(T, software.bernie.geckolib.core.animation.AnimationController$AnimationStateHandler<T>);
+         2: ldc           #32                 // String base_controller
+  public net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController(T, java.lang.String, software.bernie.geckolib.core.animation.AnimationController$AnimationStateHandler<T>);
+  public net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController(T, int, software.bernie.geckolib.core.animation.AnimationController$AnimationStateHandler<T>);
+         2: ldc           #32                 // String base_controller
+  public net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController(T, java.lang.String, int, software.bernie.geckolib.core.animation.AnimationController$AnimationStateHandler<T>);
+  public net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController(T, java.lang.String, int, software.bernie.geckolib.core.animation.AnimationController$AnimationStateHandler<T>, net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController$AnimationEndListener<T>);
+  public net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController<T> setAnimationEndListener(net.unusual.block_factorys_bosses.client.camera.client.CinematicAnimationController$AnimationEndListener<T>);
+  public void process(software.bernie.geckolib.core.animatable.model.CoreGeoModel<T>, software.bernie.geckolib.core.animation.AnimationState<T>, java.util.Map<java.lang.String, software.bernie.geckolib.core.animatable.model.CoreGeoBone>, java.util.Map<java.lang.String, software.bernie.geckolib.core.state.BoneSnapshot>, double, boolean);
+  protected boolean stopTriggeredAnimation();
+  public software.bernie.geckolib.core.animation.AnimationController<T> setCustomInstructionKeyframeHandler(software.bernie.geckolib.core.animation.AnimationController$CustomKeyframeHandler<T>);
+  public void handle(software.bernie.geckolib.core.keyframe.event.CustomInstructionKeyframeEvent<T>);
+        14: ldc           #150                // String cinematic_
+        44: ldc           #160                // String ;
+        68: ldc           #171                // String end
+        83: invokestatic  #182                // Method net/unusual/block_factorys_bosses/client/camera/BossesRiseClientCinematicCamera.stopCinematicCamera:(Lnet/unusual/block_factorys_bosses/client/CinematicEntity;)V
+        90: ldc           #184                // String start
+       141: invokestatic  #188                // Method net/unusual/block_factorys_bosses/client/camera/BossesRiseClientCinematicCamera.startCinematicCamera:(Ljava/lang/String;Lnet/unusual/block_factorys_bosses/client/CinematicEntity;Ljava/lang/String;)V
+       156: invokestatic  #191                // Method net/unusual/block_factorys_bosses/client/camera/BossesRiseClientCinematicCamera.stopCinematicCamera:(Ljava/lang/String;Lnet/unusual/block_factorys_bosses/client/CinematicEntity;)V
+  private static void lambda$new$0(software.bernie.geckolib.core.animatable.GeoAnimatable, software.bernie.geckolib.core.animation.RawAnimation);
+######## net/unusual/block_factorys_bosses/client/renderer/block/RopeRollBlockEntityRenderer
+public class net.unusual.block_factorys_bosses.client.renderer.block.RopeRollBlockEntityRenderer extends software.bernie.geckolib.renderer.GeoBlockRenderer<net.unusual.block_factorys_bosses.block.entity.RopeRollBlockEntity> {
+  public net.unusual.block_factorys_bosses.client.renderer.block.RopeRollBlockEntityRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context);
+         5: ldc           #19                 // String rope_roll
+         7: invokestatic  #25                 // Method net/unusual/block_factorys_bosses/BossesRise.prefix:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+######## net/unusual/block_factorys_bosses/block/RopeRollBlock
+public class net.unusual.block_factorys_bosses.block.RopeRollBlock extends net.minecraft.world.level.block.Block implements net.minecraft.world.level.block.EntityBlock {
+  private static final net.minecraft.world.phys.shapes.VoxelShape FLOOR;
+  public net.unusual.block_factorys_bosses.block.RopeRollBlock();
+         1: invokestatic  #30                 // Method net/minecraft/world/level/block/state/BlockBehaviour$Properties.m_284310_:()Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+         4: getstatic     #36                 // Field net/minecraft/world/level/block/SoundType.f_56736_:Lnet/minecraft/world/level/block/SoundType;
+        11: ldc           #41                 // float 5.0f
+  public net.minecraft.world.level.block.RenderShape m_7514_(net.minecraft.world.level.block.state.BlockState);
+         0: getstatic     #85                 // Field net/minecraft/world/level/block/RenderShape.ENTITYBLOCK_ANIMATED:Lnet/minecraft/world/level/block/RenderShape;
+  public net.minecraft.world.phys.shapes.VoxelShape m_5940_(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.BlockGetter, net.minecraft.core.BlockPos, net.minecraft.world.phys.shapes.CollisionContext);
+         0: getstatic     #91                 // Field FLOOR:Lnet/minecraft/world/phys/shapes/VoxelShape;
+  public boolean m_7420_(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.BlockGetter, net.minecraft.core.BlockPos);
+  public int m_7753_(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.BlockGetter, net.minecraft.core.BlockPos);
+  public net.minecraft.world.level.block.entity.BlockEntity m_142194_(net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  private static boolean lambda$new$0(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.BlockGetter, net.minecraft.core.BlockPos);
+  static {};
+         3: ldc2_w        #115                // double 16.0d
+         6: ldc2_w        #117                // double 2.0d
+         9: ldc2_w        #115                // double 16.0d
+        12: invokestatic  #122                // Method m_49796_:(DDDDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;
+######## net/unusual/block_factorys_bosses/block/entity/RopeRollBlockEntity
+public class net.unusual.block_factorys_bosses.block.entity.RopeRollBlockEntity extends net.minecraft.world.level.block.entity.BlockEntity implements software.bernie.geckolib.animatable.GeoBlockEntity {
+  private final software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache cache;
+  public net.unusual.block_factorys_bosses.block.entity.RopeRollBlockEntity(net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+         1: getstatic     #24                 // Field net/unusual/block_factorys_bosses/init/BossesRiseBlockEntities.ROPE_ROLL:Lnet/minecraftforge/registries/RegistryObject;
+        17: invokestatic  #41                 // Method software/bernie/geckolib/util/GeckoLibUtil.createInstanceCache:(Lsoftware/bernie/geckolib/core/animatable/GeoAnimatable;)Lsoftware/bernie/geckolib/core/animatable/instance/AnimatableInstanceCache;
+        24: invokestatic  #49                 // InterfaceMethod software/bernie/geckolib/animatable/SingletonGeoAnimatable.registerSyncedAnimatable:(Lsoftware/bernie/geckolib/core/animatable/GeoAnimatable;)V
+  public void registerControllers(software.bernie.geckolib.core.animation.AnimatableManager$ControllerRegistrar);
+  public software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache getAnimatableInstanceCache();
+  public net.minecraft.world.phys.AABB getRenderBoundingBox();
+######## net/unusual/block_factorys_bosses/configuration/ServerConfiguration
+public class net.unusual.block_factorys_bosses.configuration.ServerConfiguration {
+  public static final net.minecraftforge.common.ForgeConfigSpec$Builder BUILDER;
+  public static final net.minecraftforge.common.ForgeConfigSpec SPEC;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> SANDWORM_HEALTH;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> YETI_HEALTH;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> DRAGON_HEALTH;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> KNIGHT_HEALTH;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> KRAKEN_HEALTH;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> SANDWORM_ARMOR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> YETI_ARMOR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> DRAGON_ARMOR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> KNIGHT_ARMOR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> KRAKEN_ARMOR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> SANDWORM_ATK;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> YETI_ATK;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> DRAGON_ATK;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> KNIGHT_ATK;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Double> KRAKEN_ATK;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Boolean> CAN_USE_ROLL;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Integer> DEFAULT_ROLL_COUNT;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Integer> ROLL_COOLDOWN;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Integer> ROLL_COOLDOWN_MORE;
+  public net.unusual.block_factorys_bosses.configuration.ServerConfiguration();
+  static {};
+        10: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        13: ldc           #55                 // String Boss Health
+        15: invokevirtual #59                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.push:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        19: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        22: ldc           #61                 // String Max Health : 1024
+        24: invokevirtual #64                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        27: ldc           #66                 // String Sandworm Health
+        29: ldc2_w        #67                 // double 200.0d
+        32: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+        35: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+        41: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        44: ldc           #82                 // String Yeti Health
+        46: ldc2_w        #83                 // double 250.0d
+        49: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+        52: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+        58: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        61: ldc           #88                 // String Dragon Health
+        63: ldc2_w        #83                 // double 250.0d
+        66: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+        69: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+        75: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        78: ldc           #92                 // String Knight Health
+        80: ldc2_w        #93                 // double 280.0d
+        83: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+        86: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+        92: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        95: ldc           #98                 // String Kraken Health
+        97: ldc2_w        #99                 // double 500.0d
+       100: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       103: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       109: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       116: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       119: ldc           #108                // String Boss Armor
+       121: invokevirtual #59                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.push:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       125: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       128: ldc           #110                // String Max Armor : 30
+       130: invokevirtual #64                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       133: ldc           #112                // String Sandworm Armor
+       135: ldc2_w        #113                // double 20.0d
+       138: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       141: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       147: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       150: ldc           #118                // String Yeti Armor
+       152: ldc2_w        #119                // double 5.0d
+       155: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       158: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       164: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       167: ldc           #124                // String Dragon Armor
+       169: ldc2_w        #125                // double 25.0d
+       172: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       175: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       181: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       184: ldc           #130                // String Knight Armor
+       186: ldc2_w        #131                // double 10.0d
+       189: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       192: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       198: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       201: ldc           #136                // String Kraken Armor
+       203: ldc2_w        #113                // double 20.0d
+       206: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       209: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       215: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       222: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       225: ldc           #140                // String Base Boss Damages
+       227: invokevirtual #59                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.push:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       231: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       234: ldc           #142                // String Not all damages sources depends on this variable !
+       236: invokevirtual #64                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       239: ldc           #144                // String Sandworm Damage
+       241: ldc2_w        #131                // double 10.0d
+       244: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       247: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       253: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       256: ldc           #148                // String Yeti Damage
+       258: ldc2_w        #149                // double 18.0d
+       261: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       264: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       270: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       273: ldc           #154                // String Dragon Damage
+       275: ldc2_w        #155                // double 15.0d
+       278: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       281: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       287: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       290: ldc           #160                // String Knight Damage
+       292: ldc2_w        #161                // double 13.0d
+       295: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       298: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       304: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       307: ldc           #166                // String Kraken Damage
+       309: ldc2_w        #131                // double 10.0d
+       312: invokestatic  #74                 // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       315: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       321: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       328: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       331: ldc           #170                // String Gameplay Changes
+       333: invokevirtual #59                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.push:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       337: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       340: ldc           #172                // String Can players use the Roll ability
+       343: invokevirtual #175                // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Z)Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+       349: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       352: ldc           #179                // String How many roll charges does the player have by default?
+       355: invokestatic  #184                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       358: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       364: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       367: ldc           #188                // String How many ticks does it take for a roll to cooldown? (20 ticks is 1 second)
+       371: invokestatic  #184                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       374: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       380: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       383: ldc           #192                // String How many additional ticks should each roll above 1 take to cooldown? (20 ticks is 1 second)
+       387: invokestatic  #184                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       390: invokevirtual #78                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       396: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       403: getstatic     #53                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+######## net/unusual/block_factorys_bosses/configuration/ClientConfiguration
+public class net.unusual.block_factorys_bosses.configuration.ClientConfiguration {
+  public static final net.minecraftforge.common.ForgeConfigSpec$Builder BUILDER;
+  public static final net.minecraftforge.common.ForgeConfigSpec SPEC;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarDefaultStyle> DEFAULT_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> WARDEN_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> ENDER_DRAGON_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> WITHER_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> YETI_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> DRAGON_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> SANDWORM_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> KNIGHT_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.util.BossHandling$HealthBarStyle> KRAKEN_BOSSBAR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Boolean> FIRST_PERSON_ROLL;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Boolean> ROLL_GUI;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<net.unusual.block_factorys_bosses.configuration.ClientConfiguration$GUIAnchors> ROLL_GUI_OFFSET_ANCHOR;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Integer> ROLL_GUI_OFFSET_X;
+  public static final net.minecraftforge.common.ForgeConfigSpec$ConfigValue<java.lang.Integer> ROLL_GUI_OFFSET_Y;
+  public net.unusual.block_factorys_bosses.configuration.ClientConfiguration();
+  static {};
+        10: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        13: ldc           #68                 // String Boss bars
+        15: invokevirtual #72                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.push:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        19: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        22: ldc           #74                 // String Our mod has the ability to modify how the healthbars of certain bosses appear. Pick the one that suits you most.
+        24: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        28: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        31: ldc           #79                 // String \"OFF\" : Disable the healthbar from rendering.
+        33: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        37: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        40: ldc           #81                 // String \"VANILLA\" : All healthbars will appear vanilla.
+        42: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        46: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        49: ldc           #83                 // String \"SIMPLE\" : Render the healthbar in a simple custom texture.
+        51: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        55: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        58: ldc           #85                 // String \"FANCY\" : Render the healthbar in a fancy custom texture.
+        60: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        64: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        67: ldc           #87                 // String Select the \"DEFAULT\" option on a boss to have the setting follow the default one.
+        69: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        73: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        76: ldc           #89                 // String What kind of healthbar should be used by default?
+        78: getstatic     #93                 // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarDefaultStyle.FANCY:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarDefaultStyle;
+        81: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+        87: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+        90: ldc           #101                // String What kind of healthbar should the Warden use?
+        92: getstatic     #105                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.OFF:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+        95: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       101: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       104: ldc           #109                // String What kind of healthbar should the Ender Dragon use?
+       106: getstatic     #112                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.DEFAULT:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+       109: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       115: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       118: ldc           #116                // String What kind of healthbar should the Wither use?
+       120: getstatic     #112                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.DEFAULT:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+       123: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       129: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       132: ldc           #120                // String What kind of healthbar should Skor, The Yeti use?
+       134: getstatic     #112                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.DEFAULT:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+       137: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       143: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       146: ldc           #124                // String What kind of healthbar should Ashlord, The Infernal Dragon use?
+       148: getstatic     #112                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.DEFAULT:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+       151: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       157: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       160: ldc           #128                // String What kind of healthbar should Sirok, The Sandworm use?
+       162: getstatic     #112                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.DEFAULT:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+       165: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       171: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       174: ldc           #132                // String What kind of healthbar should Helvar, the Underworld Knight use?
+       176: getstatic     #112                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.DEFAULT:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+       179: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       185: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       188: ldc           #136                // String What kind of healthbar should Volrak, the Kraken use?
+       190: getstatic     #112                // Field net/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle.DEFAULT:Lnet/unusual/block_factorys_bosses/util/BossHandling$HealthBarStyle;
+       193: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       199: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       206: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       209: ldc           #144                // String Rolling
+       211: invokevirtual #72                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.push:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       215: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       218: ldc           #146                // String Will the camera rotate when rolling while in first-person view
+       221: invokevirtual #150                // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Z)Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+       227: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       230: ldc           #154                // String Will there be a GUI element displaying current roll count
+       233: invokevirtual #150                // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Z)Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+       239: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       242: ldc           #158                // String GUI anchors are preset locations for the rolling GUI visual to appear. Pick the one that suits you most.
+       244: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       248: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       251: ldc           #160                // String \"HOTBAR_RIGHT\" : At the immediate right of your hotbar.
+       253: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       257: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       260: ldc           #162                // String \"HOTBAR_LEFT\" : At the immediate left of your hotbar.
+       262: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       266: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       269: ldc           #164                // String \"TOP_LEFT\" : In the top left corner of your screen.
+       271: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       275: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       278: ldc           #166                // String \"TOP_RIGHT\" : In the top right corner of your screen.
+       280: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       284: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       287: ldc           #168                // String \"BOTTOM_LEFT\" : In the bottom left corner of your screen.
+       289: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       293: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       296: ldc           #170                // String \"BOTTOM_RIGHT\" : In the bottom right corner of your screen.
+       298: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       302: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       305: ldc           #172                // String \"SCREEN_CENTER\" : At the exact middle of your screen?
+       307: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       311: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       314: ldc           #174                // String The GUI anchor will be
+       316: getstatic     #178                // Field net/unusual/block_factorys_bosses/configuration/ClientConfiguration$GUIAnchors.HOTBAR_RIGHT:Lnet/unusual/block_factorys_bosses/configuration/ClientConfiguration$GUIAnchors;
+       319: invokevirtual #97                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.defineEnum:(Ljava/lang/String;Ljava/lang/Enum;)Lnet/minecraftforge/common/ForgeConfigSpec$EnumValue;
+       325: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       328: ldc           #182                // String You can also additionally offset the GUI element with the use of the X and Y offset values.
+       330: invokevirtual #77                 // Method net/minecraftforge/common/ForgeConfigSpec$Builder.comment:(Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       334: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       337: ldc           #184                // String Roll GUI element X offset (Bigger number goes right, negative goes left)
+       340: invokestatic  #190                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       343: invokevirtual #193                // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       349: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       352: ldc           #197                // String Roll GUI element Y offset (Bigger number goes down, negative goes up)
+       355: invokestatic  #190                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       358: invokevirtual #193                // Method net/minecraftforge/common/ForgeConfigSpec$Builder.define:(Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+       364: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+       371: getstatic     #66                 // Field BUILDER:Lnet/minecraftforge/common/ForgeConfigSpec$Builder;

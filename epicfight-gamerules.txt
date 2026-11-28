@@ -1,0 +1,126 @@
+==== gamerule lang
+	"gamerule.allowVanillaMelee": "Enable Vanilla Melee Attacks",
+	"gamerule.hasFallAnimation": "Enable landing animation",
+	"gamerule.keepSkills": "Keep skills after death",
+	"gamerule.weightPenalty": "Weight Penalty applied to Attack Speed.",
+	"gamerule.disableEntityUI": "Turn off health bar and target indicator for all players",
+	"gamerule.globalStun": "Enable Global Hitstun",
+	"gamerule.canSwitchPlayerMode": "Enable switching between Vanilla/EpicFight mode",
+	"gamerule.noMobsInBossfight": "Disable mob spawn during Bossfight",
+	"gamerule.stiffComboAttacks": "Disable player movement while attacking",
+	"gamerule.initialMode": "Default player mode for newcomers",
+	"gamerule.initialMode.description": "0: Mining\n1: Combat",
+	"gamerule.epicDrop": "Enable the fancy drop effect of the boss loots",
+	"gamerule.skillReplaceCooldown": "Skill replace cooldown",
+	"gamerule.skillReplaceCooldown.description": "Cooldown ticks to replace skills again",
+	"epicfight.messages.mode_switching_disabled": "Switching vanilla/epicfight mode is disabled in this world. Enable the gamerule or ask for a server operator.",
+	"gamerule.doVanillaAttack": "바닐라 공격 활성화",
+	"gamerule.hasFallAnimation": "착지 모션 활성화",
+	"gamerule.keepSkills": "스킬 유지",
+	"gamerule.weightPenalty": "공격 속도에 적용되는 무게 패널티",
+	"gamerule.disableEntityUI": "모든 플레이어의 체력바와 타겟 알림표시 비활성화",
+	"gamerule.globalStun": "범용 스턴 시스템 활성화",
+	"gamerule.canSwitchCombat": "전투 모드/채광 모드의 스위칭을 활성화합니다.",
+	"gamerule.noMobsInBossfight": "보스전 도중 몬스터 스폰을 비활성화합니다",
+	"gamerule.stiffComboAttacks": "공격중에 플레이어 움직임을 비활성화합니다",
+==== /tmp/efgr/yesman/epicfight/world/gamerule/EpicFightGameRules$ConfigurableGameRule.class
+Compiled from "EpicFightGameRules.java"
+public class yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<Type, Config extends net.minecraftforge.common.ForgeConfigSpec$ConfigValue<Type>, RuleValue extends net.minecraft.world.level.GameRules$Value<RuleValue>> {
+  final java.lang.String ruleName;
+  final net.minecraft.world.level.GameRules$Category ruleCategory;
+  final com.google.common.base.Function<net.minecraftforge.common.ForgeConfigSpec$Builder, Config> configDefinition;
+  final yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType<Type, RuleValue> ruleType;
+  final boolean synchronize;
+  Config configValueHolder;
+  net.minecraft.world.level.GameRules$Key<RuleValue> gameRuleKey;
+  private yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule(java.lang.String, net.minecraft.world.level.GameRules$Category, com.google.common.base.Function<net.minecraftforge.common.ForgeConfigSpec$Builder, Config>, yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType<Type, RuleValue>, boolean);
+  public void registerGameRule();
+  public boolean shouldSync();
+  public yesman.epicfight.network.server.SPChangeGamerule<?, ?, ?> getSyncPacket(net.minecraft.server.level.ServerPlayer);
+  public void defineConfig(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  public java.lang.String getRuleName();
+  public yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType<Type, RuleValue> getRuleType();
+  public net.minecraft.world.level.GameRules$Key<RuleValue> getRuleKey();
+  public Config getConfigHolder();
+  public Type getRuleValue(net.minecraft.world.level.Level);
+  public void setRuleValue(net.minecraft.world.level.Level, Type);
+  private void lambda$registerGameRule$0(net.minecraft.server.MinecraftServer, net.minecraft.world.level.GameRules$Value);
+}
+==== /tmp/efgr/yesman/epicfight/world/gamerule/EpicFightGameRules.class
+Compiled from "EpicFightGameRules.java"
+public class yesman.epicfight.world.gamerule.EpicFightGameRules {
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> GLOBAL_STUN;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> KEEP_SKILLS;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> HAS_FALL_ANIMATION;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> DISABLE_ENTITY_UI;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> CAN_SWITCH_PLAYER_MODE;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> STIFF_COMBO_ATTACKS;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> NO_MOBS_IN_BOSSFIGHT;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Integer, net.minecraftforge.common.ForgeConfigSpec$IntValue, net.minecraft.world.level.GameRules$IntegerValue> INITIAL_PLAYER_MODE;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Integer, net.minecraftforge.common.ForgeConfigSpec$IntValue, net.minecraft.world.level.GameRules$IntegerValue> WEIGHT_PENALTY;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> EPIC_DROP;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Integer, net.minecraftforge.common.ForgeConfigSpec$IntValue, net.minecraft.world.level.GameRules$IntegerValue> SKILL_REPLACE_COOLDOWN;
+  public static final yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<java.lang.Boolean, net.minecraftforge.common.ForgeConfigSpec$BooleanValue, net.minecraft.world.level.GameRules$BooleanValue> ALLOW_VANILLA_MELEE;
+  public static final java.util.Map<java.lang.String, yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<?, ?, ?>> GAME_RULES;
+  public yesman.epicfight.world.gamerule.EpicFightGameRules();
+  public static void registerGameRules();
+  public static <Type, Config extends net.minecraftforge.common.ForgeConfigSpec$ConfigValue<Type>, RuleValue extends net.minecraft.world.level.GameRules$Value<RuleValue>> yesman.epicfight.world.gamerule.EpicFightGameRules$ConfigurableGameRule<Type, Config, RuleValue> create(java.lang.String, net.minecraft.world.level.GameRules$Category, com.google.common.base.Function<net.minecraftforge.common.ForgeConfigSpec$Builder, Config>, yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType<Type, RuleValue>, boolean);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$11(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$IntValue lambda$static$10(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$9(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$IntValue lambda$static$8(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$IntValue lambda$static$7(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$6(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$5(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$4(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$3(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$2(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$1(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  private static net.minecraftforge.common.ForgeConfigSpec$BooleanValue lambda$static$0(net.minecraftforge.common.ForgeConfigSpec$Builder);
+  static {};
+}
+==== /tmp/efgr/yesman/epicfight/world/gamerule/EpicFightGameRules$RuleType.class
+Compiled from "EpicFightGameRules.java"
+public final class yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType<Type, RuleValue extends net.minecraft.world.level.GameRules$Value<RuleValue>> extends java.lang.Record {
+  private final java.util.function.BiFunction<Type, java.util.function.BiConsumer<net.minecraft.server.MinecraftServer, RuleValue>, net.minecraft.world.level.GameRules$Type<RuleValue>> valueCreator;
+  private final com.google.common.base.Function<Type, net.minecraft.world.level.GameRules$Type<RuleValue>> valueCreatorUnsynchronized;
+  private final com.google.common.base.Function<RuleValue, Type> getRule;
+  private final java.util.function.BiConsumer<RuleValue, Type> setRule;
+  private final yesman.epicfight.api.utils.PacketBufferCodec<Type> bufferCodec;
+  private static final yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType<java.lang.Boolean, net.minecraft.world.level.GameRules$BooleanValue> BOOLEAN;
+  private static final yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType<java.lang.Integer, net.minecraft.world.level.GameRules$IntegerValue> INTEGER;
+  public yesman.epicfight.world.gamerule.EpicFightGameRules$RuleType(java.util.function.BiFunction<Type, java.util.function.BiConsumer<net.minecraft.server.MinecraftServer, RuleValue>, net.minecraft.world.level.GameRules$Type<RuleValue>>, com.google.common.base.Function<Type, net.minecraft.world.level.GameRules$Type<RuleValue>>, com.google.common.base.Function<RuleValue, Type>, java.util.function.BiConsumer<RuleValue, Type>, yesman.epicfight.api.utils.PacketBufferCodec<Type>);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public java.util.function.BiFunction<Type, java.util.function.BiConsumer<net.minecraft.server.MinecraftServer, RuleValue>, net.minecraft.world.level.GameRules$Type<RuleValue>> valueCreator();
+  public com.google.common.base.Function<Type, net.minecraft.world.level.GameRules$Type<RuleValue>> valueCreatorUnsynchronized();
+  public com.google.common.base.Function<RuleValue, Type> getRule();
+  public java.util.function.BiConsumer<RuleValue, Type> setRule();
+  public yesman.epicfight.api.utils.PacketBufferCodec<Type> bufferCodec();
+  private static void lambda$static$1(net.minecraft.world.level.GameRules$IntegerValue, java.lang.Integer);
+  private static void lambda$static$0(net.minecraft.world.level.GameRules$BooleanValue, java.lang.Boolean);
+  static {};
+}
+==== where skills are kept or dropped on death
+==== /tmp/efsk/yesman/epicfight/events/EntityEvents.class
+198:       298: getstatic     #360                // Field yesman/epicfight/world/gamerule/EpicFightGameRules.HAS_FALL_ANIMATION:Lyesman/epicfight/world/gamerule/EpicFightGameRules$ConfigurableGameRule;
+202:       308: invokevirtual #368                // Method yesman/epicfight/world/gamerule/EpicFightGameRules$ConfigurableGameRule.getRuleValue:(Lnet/minecraft/world/level/Level;)Ljava/lang/Object;
+==== /tmp/efsk/yesman/epicfight/events/PlayerEvents.class
+81:  public static void cloneEvent(net.minecraftforge.event.entity.player.PlayerEvent$Clone);
+84:         1: invokevirtual #200                // Method net/minecraftforge/event/entity/player/PlayerEvent$Clone.getOriginal:()Lnet/minecraft/world/entity/player/Player;
+87:         8: invokevirtual #200                // Method net/minecraftforge/event/entity/player/PlayerEvent$Clone.getOriginal:()Lnet/minecraft/world/entity/player/Player;
+91:        17: invokedynamic #213,  0            // InvokeDynamic #4:accept:(Lnet/minecraftforge/event/entity/player/PlayerEvent$Clone;)Ljava/util/function/Consumer;
+94:        26: invokevirtual #200                // Method net/minecraftforge/event/entity/player/PlayerEvent$Clone.getOriginal:()Lnet/minecraft/world/entity/player/Player;
+313:  private static void lambda$cloneEvent$5(net.minecraftforge.event.entity.player.PlayerEvent$Clone, yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch);
+316:         1: invokevirtual #503                // Method net/minecraftforge/event/entity/player/PlayerEvent$Clone.getEntity:()Lnet/minecraft/world/entity/player/Player;
+320:         9: invokedynamic #511,  0            // InvokeDynamic #12:accept:(Lnet/minecraftforge/event/entity/player/PlayerEvent$Clone;Lyesman/epicfight/world/capabilities/entitypatch/player/ServerPlayerPatch;)Ljava/util/function/Consumer;
+324:  private static void lambda$cloneEvent$4(net.minecraftforge.event.entity.player.PlayerEvent$Clone, yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch, yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch);
+327:         1: invokevirtual #515                // Method net/minecraftforge/event/entity/player/PlayerEvent$Clone.isWasDeath:()Z
+329:         7: getstatic     #519                // Field yesman/epicfight/world/gamerule/EpicFightGameRules.KEEP_SKILLS:Lyesman/epicfight/world/gamerule/EpicFightGameRules$ConfigurableGameRule;
+331:        11: invokevirtual #200                // Method net/minecraftforge/event/entity/player/PlayerEvent$Clone.getOriginal:()Lnet/minecraft/world/entity/player/Player;
+333:        17: invokevirtual #527                // Method yesman/epicfight/world/gamerule/EpicFightGameRules$ConfigurableGameRule.getRuleValue:(Lnet/minecraft/world/level/Level;)Ljava/lang/Object;
+340:        32: invokevirtual #515                // Method net/minecraftforge/event/entity/player/PlayerEvent$Clone.isWasDeath:()Z
+363:        28: getstatic     #576                // Field yesman/epicfight/world/gamerule/EpicFightGameRules.INITIAL_PLAYER_MODE:Lyesman/epicfight/world/gamerule/EpicFightGameRules$ConfigurableGameRule;
+367:        38: invokevirtual #527                // Method yesman/epicfight/world/gamerule/EpicFightGameRules$ConfigurableGameRule.getRuleValue:(Lnet/minecraft/world/level/Level;)Ljava/lang/Object;
+==== /tmp/efsk/yesman/epicfight/events/EntityEvents$1.class

@@ -1,0 +1,136 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.ChatFormatting
+ *  net.minecraft.network.chat.Component
+ *  net.minecraft.world.item.BlockItem
+ *  net.minecraft.world.item.CreativeModeTabs
+ *  net.minecraft.world.item.Item
+ *  net.minecraft.world.item.Item$Properties
+ *  net.minecraft.world.item.Rarity
+ *  net.minecraft.world.item.SpawnEggItem
+ *  net.minecraft.world.level.ItemLike
+ *  net.minecraft.world.level.block.Block
+ *  net.minecraftforge.common.ForgeSpawnEggItem
+ *  net.minecraftforge.event.BuildCreativeModeTabContentsEvent
+ *  net.minecraftforge.eventbus.api.SubscribeEvent
+ *  net.minecraftforge.fml.common.Mod$EventBusSubscriber
+ *  net.minecraftforge.fml.common.Mod$EventBusSubscriber$Bus
+ *  net.minecraftforge.registries.DeferredRegister
+ *  net.minecraftforge.registries.ForgeRegistries
+ *  net.minecraftforge.registries.IForgeRegistry
+ */
+package com.finderfeed.fdbosses.init;
+
+import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.entities.geburah.ExplosiveCrystalItem;
+import com.finderfeed.fdbosses.content.items.ArmorCoreItem;
+import com.finderfeed.fdbosses.content.items.ChesedTrophyItem;
+import com.finderfeed.fdbosses.content.items.CoreItem;
+import com.finderfeed.fdbosses.content.items.GeburahTrophyItem;
+import com.finderfeed.fdbosses.content.items.LocatorEye;
+import com.finderfeed.fdbosses.content.items.MalkuthTrophyItem;
+import com.finderfeed.fdbosses.content.items.QliphothicCodex;
+import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
+import com.finderfeed.fdbosses.content.items.chesed.PhaseSphere;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGearItem;
+import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFist;
+import com.finderfeed.fdbosses.debug.DebugStick;
+import com.finderfeed.fdbosses.init.BossBlocks;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossCreativeTabs;
+import com.finderfeed.fdbosses.init.BossEntities;
+import java.util.function.Supplier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
+
+public class BossItems {
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create((IForgeRegistry)ForgeRegistries.ITEMS, (String)"fdbosses");
+    public static final Supplier<Item> DEBUG_STICK = ITEMS.register("debug", () -> new DebugStick(new Item.Properties()));
+    public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_ICE = ITEMS.register("malkuth_cannon_repair_material_ice", () -> new Item(new Item.Properties()));
+    public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_FIRE = ITEMS.register("malkuth_cannon_repair_material_fire", () -> new Item(new Item.Properties()));
+    public static final Supplier<CoreItem> LIGHTNING_CORE = ITEMS.register("lightning_core", () -> new WeaponCoreItem(new Item.Properties().m_41487_(1), ItemCoreDataComponent.CoreType.LIGHTNING, false, () -> Component.m_237115_((String)"fdbosses.core_ability.lightning_core").m_130940_(ChatFormatting.AQUA)));
+    public static final Supplier<CoreItem> FIRE_AND_ICE_CORE = ITEMS.register("fire_and_ice_core", () -> new WeaponCoreItem(new Item.Properties().m_41487_(1), ItemCoreDataComponent.CoreType.FIRE_AND_ICE, false, () -> Component.m_237115_((String)"fdbosses.core_ability.fire_and_ice_core").m_130940_(ChatFormatting.GOLD)));
+    public static final Supplier<CoreItem> JUSTICE_CORE = ITEMS.register("justice_core", () -> new ArmorCoreItem(new Item.Properties().m_41487_(1), ItemCoreDataComponent.CoreType.JUSTICE_CORE, false, () -> Component.m_237110_((String)"fdbosses.core_ability.justice_core", (Object[])new Object[]{BossConfigs.BOSS_CONFIG.get().itemConfig.justiceCoreDamageReduction}).m_130940_(ChatFormatting.AQUA)));
+    public static final Supplier<LocatorEye<?>> EYE_OF_CHESED = ITEMS.register("eye_of_chesed", () -> new LocatorEye(BossUtil.StructureTags.EYE_OF_CHESED_LOCATED, BossEntities.EYE_OF_CHESED));
+    public static final Supplier<LocatorEye<?>> EYE_OF_MALKUTH = ITEMS.register("eye_of_malkuth", () -> new LocatorEye(BossUtil.StructureTags.EYE_OF_MALKUTH_LOCATED, BossEntities.EYE_OF_MALKUTH));
+    public static final Supplier<LocatorEye<?>> EYE_OF_GEBURAH = ITEMS.register("eye_of_geburah", () -> new LocatorEye(BossUtil.StructureTags.EYE_OF_GEBURAH_LOCATED, BossEntities.EYE_OF_GEBURAH));
+    public static final Supplier<SpawnEggItem> MALKUTH_FIRE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_fire_warrior_spawn_egg", () -> new ForgeSpawnEggItem(BossEntities.FIRE_MALKUTH_WARRIOR, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
+    public static final Supplier<SpawnEggItem> MALKUTH_ICE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_ice_warrior_spawn_egg", () -> new ForgeSpawnEggItem(BossEntities.ICE_MALKUTH_WARRIOR, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
+    public static final Supplier<Item> NO_ENTITY_SPAWN_BLOCK = ITEMS.register("no_entity_spawn_block", () -> new BlockItem(BossBlocks.NO_ENTITY_SPAWN_BLOCK.get(), new Item.Properties()));
+    public static final Supplier<Item> CHESED_TROPHY = ITEMS.register("chesed_trophy", () -> new ChesedTrophyItem((Block)BossBlocks.CHESED_TROPHY.get(), new Item.Properties().m_41487_(1)));
+    public static final Supplier<Item> MALKUTH_TROPHY = ITEMS.register("malkuth_trophy", () -> new MalkuthTrophyItem((Block)BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().m_41487_(1)));
+    public static final Supplier<Item> GEBURAH_TROPHY = ITEMS.register("geburah_trophy", () -> new GeburahTrophyItem((Block)BossBlocks.GEBURAH_TROPHY.get(), new Item.Properties().m_41487_(1)));
+    public static final Supplier<Item> JUSTICESTONE_BRICKS = ITEMS.register("justicestone_bricks", () -> new BlockItem(BossBlocks.JUSTICESTONE_BRICKS.get(), new Item.Properties()));
+    public static final Supplier<Item> CHISELED_JUSTICESTONE_BRICKS = ITEMS.register("chiseled_justicestone_bricks", () -> new BlockItem(BossBlocks.CHISELED_JUSTICESTONE_BRICKS.get(), new Item.Properties()));
+    public static final Supplier<Item> JUSTICESTONE_BEAM = ITEMS.register("justicestone_beam", () -> new BlockItem(BossBlocks.JUSTICESTONE_BEAM.get(), new Item.Properties()));
+    public static final Supplier<Item> JUSTICESTONE_COLUMN = ITEMS.register("justicestone_column", () -> new BlockItem(BossBlocks.JUSTICESTONE_COLUMN.get(), new Item.Properties()));
+    public static final Supplier<Item> JUSTICESTONE_WALL = ITEMS.register("justicestone_wall", () -> new BlockItem(BossBlocks.JUSTICESTONE_WALL.get(), new Item.Properties()));
+    public static final Supplier<Item> POLISHED_JUSTICESTONE = ITEMS.register("polished_justicestone", () -> new BlockItem(BossBlocks.POLISHED_JUSTICESTONE.get(), new Item.Properties()));
+    public static final Supplier<Item> JUSTICESTONE_COLUMN_WALL = ITEMS.register("justicestone_column_wall", () -> new BlockItem(BossBlocks.JUSTICESTONE_COLUMN_WALL.get(), new Item.Properties()));
+    public static final Supplier<Item> JUSTICESTONE_STAIRS = ITEMS.register("justicestone_stairs", () -> new BlockItem(BossBlocks.JUSTICESTONE_STAIRS.get(), new Item.Properties()));
+    public static final Supplier<Item> POLISHED_JUSTICESTONE_STAIRS = ITEMS.register("polished_justicestone_stairs", () -> new BlockItem(BossBlocks.POLISHED_JUSTICESTONE_STAIRS.get(), new Item.Properties()));
+    public static final Supplier<Item> POLISHED_JUSTICESTONE_SLAB = ITEMS.register("polished_justicestone_slab", () -> new BlockItem(BossBlocks.POLISHED_JUSTICESTONE_SLAB.get(), new Item.Properties()));
+    public static final Supplier<Item> JUSTICESTONE_BRICKS_SLAB = ITEMS.register("justicestone_bricks_slab", () -> new BlockItem(BossBlocks.JUSTICESTONE_BRICKS_SLAB.get(), new Item.Properties()));
+    public static final Supplier<Item> GEBURAH_RESPITE_POINT = ITEMS.register("geburah_respite_point", () -> new BlockItem(BossBlocks.GEBURAH_RESPAWN_POINT_SETTER.get(), new Item.Properties()));
+    public static final Supplier<Item> GEBURAH_EXPLOSIVE_CRYSTAL = ITEMS.register("geburah_explosive_crystal", () -> new ExplosiveCrystalItem(new Item.Properties()));
+    public static final Supplier<Item> PHASE_SPHERE = ITEMS.register("phase_sphere", () -> new PhaseSphere(new Item.Properties().m_41497_(Rarity.EPIC).m_41487_(1)));
+    public static final Supplier<Item> MALKUTH_FIST = ITEMS.register("malkuth_fist", () -> new MalkuthFist(new Item.Properties().m_41497_(Rarity.EPIC).m_41487_(1)));
+    public static final Supplier<Item> DIVINE_GEAR = ITEMS.register("divine_gear", () -> new DivineGearItem(new Item.Properties().m_41497_(Rarity.EPIC).m_41487_(1)));
+    public static final Supplier<Item> QLIPHOTHIC_CODEX = ITEMS.register("qliphothic_codex", () -> new QliphothicCodex(new Item.Properties().m_41497_(Rarity.EPIC).m_41487_(1)));
+
+    @Mod.EventBusSubscriber(modid="fdbosses", bus=Mod.EventBusSubscriber.Bus.MOD)
+    public static class AddToCreativeTabs {
+        @SubscribeEvent
+        public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTab().equals(BossCreativeTabs.MAIN.get())) {
+                event.m_246326_((ItemLike)QLIPHOTHIC_CODEX.get());
+                event.m_246326_((ItemLike)GEBURAH_EXPLOSIVE_CRYSTAL.get());
+                event.m_246326_((ItemLike)LIGHTNING_CORE.get());
+                event.m_246326_((ItemLike)FIRE_AND_ICE_CORE.get());
+                event.m_246326_((ItemLike)JUSTICE_CORE.get());
+                event.m_246326_((ItemLike)EYE_OF_CHESED.get());
+                event.m_246326_((ItemLike)EYE_OF_MALKUTH.get());
+                event.m_246326_((ItemLike)EYE_OF_GEBURAH.get());
+                event.m_246326_((ItemLike)CHESED_TROPHY.get());
+                event.m_246326_((ItemLike)PHASE_SPHERE.get());
+                event.m_246326_((ItemLike)MALKUTH_TROPHY.get());
+                event.m_246326_((ItemLike)MALKUTH_FIST.get());
+                event.m_246326_((ItemLike)GEBURAH_TROPHY.get());
+                event.m_246326_((ItemLike)DIVINE_GEAR.get());
+                event.m_246326_((ItemLike)JUSTICESTONE_BRICKS.get());
+                event.m_246326_((ItemLike)CHISELED_JUSTICESTONE_BRICKS.get());
+                event.m_246326_((ItemLike)JUSTICESTONE_BEAM.get());
+                event.m_246326_((ItemLike)JUSTICESTONE_COLUMN.get());
+                event.m_246326_((ItemLike)JUSTICESTONE_WALL.get());
+                event.m_246326_((ItemLike)JUSTICESTONE_COLUMN_WALL.get());
+                event.m_246326_((ItemLike)JUSTICESTONE_STAIRS.get());
+                event.m_246326_((ItemLike)POLISHED_JUSTICESTONE.get());
+                event.m_246326_((ItemLike)POLISHED_JUSTICESTONE_STAIRS.get());
+                event.m_246326_((ItemLike)POLISHED_JUSTICESTONE_SLAB.get());
+                event.m_246326_((ItemLike)JUSTICESTONE_BRICKS_SLAB.get());
+                event.m_246326_((ItemLike)GEBURAH_RESPITE_POINT.get());
+            } else if (event.getTabKey().equals(CreativeModeTabs.f_256731_)) {
+                event.m_246326_((ItemLike)MALKUTH_FIRE_WARRIOR_SPAWN_EGG.get());
+                event.m_246326_((ItemLike)MALKUTH_ICE_WARRIOR_SPAWN_EGG.get());
+            }
+        }
+    }
+}
+

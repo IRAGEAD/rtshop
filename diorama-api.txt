@@ -1,0 +1,1717 @@
+######## dev/diorama/NewWaypointsScreen
+Compiled from "NewWaypointsScreen.java"
+public final class dev.diorama.NewWaypointsScreen extends net.minecraft.client.gui.screens.Screen {
+  private static final int WIDTH;
+  private static final int ROW;
+  private final net.minecraft.client.gui.screens.Screen parent;
+  public dev.diorama.NewWaypointsScreen(net.minecraft.client.gui.screens.Screen);
+  protected void m_7856_();
+  private int place(int, int, java.lang.String, boolean, java.util.function.Consumer<java.lang.Boolean>);
+  public void m_88315_(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  public void m_7379_();
+  public boolean m_7043_();
+  private void lambda$init$3(net.minecraft.client.gui.components.Button);
+  private static void lambda$init$2(dev.diorama.Settings, java.lang.Boolean);
+  private static void lambda$init$1(dev.diorama.Settings, java.lang.Boolean);
+  private static void lambda$init$0(dev.diorama.Settings, java.lang.Boolean);
+}
+######## dev/diorama/addon/AddonWaypoints
+Compiled from "AddonWaypoints.java"
+final class dev.diorama.addon.AddonWaypoints implements dev.diorama.api.Waypoints {
+  private final dev.diorama.addon.Addon addon;
+  dev.diorama.addon.AddonWaypoints(dev.diorama.addon.Addon);
+  public java.util.List<dev.diorama.api.Waypoint> all();
+  public java.util.Optional<dev.diorama.api.Waypoint> get(java.util.UUID);
+  public long revision();
+  public dev.diorama.api.EditResult edit(dev.diorama.api.World, long, dev.diorama.api.WaypointBatch);
+  public java.lang.String toString();
+}
+######## dev/diorama/api/BlockCoord
+Compiled from "BlockCoord.java"
+public final class dev.diorama.api.BlockCoord extends java.lang.Record {
+  private final int x;
+  private final int y;
+  private final int z;
+  public dev.diorama.api.BlockCoord(int, int, int);
+  public static dev.diorama.api.BlockCoord of(int, int, int);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public int x();
+  public int y();
+  public int z();
+}
+######## dev/diorama/api/Checks
+Compiled from "Checks.java"
+final class dev.diorama.api.Checks {
+  static final int MAX_NAME;
+  static final int MAX_INITIALS;
+  static final int DEFAULT_RGB;
+  private dev.diorama.api.Checks();
+  static java.lang.String name(java.lang.String);
+  static java.lang.String initials(java.lang.String);
+  static int rgb(int);
+  static int rgb(java.lang.String, int);
+  static java.lang.String folder(java.lang.String);
+  static double horizontal(java.lang.String, double);
+  static double height(double);
+  static java.lang.String label(java.lang.String);
+  static dev.diorama.api.ResourceId icon(dev.diorama.api.ResourceId);
+  static boolean allowed(java.lang.String, boolean);
+}
+######## dev/diorama/api/DimensionId
+Compiled from "DimensionId.java"
+public final class dev.diorama.api.DimensionId {
+  public static final dev.diorama.api.DimensionId OVERWORLD;
+  public static final dev.diorama.api.DimensionId NETHER;
+  public static final dev.diorama.api.DimensionId END;
+  private final java.lang.String namespace;
+  private final java.lang.String path;
+  private final java.lang.String id;
+  private dev.diorama.api.DimensionId(java.lang.String, java.lang.String);
+  public static dev.diorama.api.DimensionId of(java.lang.String);
+  public static dev.diorama.api.DimensionId of(java.lang.String, java.lang.String);
+  public java.lang.String namespace();
+  public java.lang.String path();
+  public java.lang.String toString();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  static {};
+}
+######## dev/diorama/api/DioramaAddon
+Compiled from "DioramaAddon.java"
+public interface dev.diorama.api.DioramaAddon {
+  public abstract void onReady(dev.diorama.api.DioramaApi);
+}
+######## dev/diorama/api/DioramaApi
+Compiled from "DioramaApi.java"
+public interface dev.diorama.api.DioramaApi {
+  public abstract java.lang.String apiVersion();
+  public abstract java.lang.String modId();
+  public abstract dev.diorama.api.Hud hud();
+  public abstract java.util.Optional<dev.diorama.api.World> world();
+  public abstract dev.diorama.api.Waypoints waypoints();
+  public abstract dev.diorama.api.MapLayer openLayer(java.lang.String);
+  public abstract dev.diorama.api.MapView openView(java.util.Set<dev.diorama.api.MapView$Part>);
+}
+######## dev/diorama/api/DioramaEntrypoint
+Compiled from "DioramaEntrypoint.java"
+public interface dev.diorama.api.DioramaEntrypoint extends java.lang.annotation.Annotation {
+}
+######## dev/diorama/api/EditResult
+Compiled from "EditResult.java"
+public interface dev.diorama.api.EditResult {
+  public abstract boolean applied();
+  public abstract java.util.List<java.util.UUID> added();
+  public abstract boolean changed();
+  public abstract boolean saved();
+}
+######## dev/diorama/api/Handle
+Compiled from "Handle.java"
+public interface dev.diorama.api.Handle extends java.lang.AutoCloseable {
+  public abstract void close();
+  public abstract boolean isOpen();
+}
+######## dev/diorama/api/Hud
+Compiled from "Hud.java"
+public interface dev.diorama.api.Hud {
+  public abstract dev.diorama.api.Handle hide(java.util.Set<dev.diorama.api.Hud$Part>);
+}
+######## dev/diorama/api/LayerContent
+Compiled from "LayerContent.java"
+public final class dev.diorama.api.LayerContent {
+  public static final int MAX_MARKERS;
+  public static final int MAX_LINES;
+  public static final int MAX_LINE_POINTS;
+  public static final dev.diorama.api.LayerContent EMPTY;
+  private final java.util.List<dev.diorama.api.Marker> markers;
+  private final java.util.List<dev.diorama.api.MapLine> lines;
+  private dev.diorama.api.LayerContent(java.util.List<dev.diorama.api.Marker>, java.util.List<dev.diorama.api.MapLine>);
+  public static dev.diorama.api.LayerContent$Builder builder();
+  public java.util.List<dev.diorama.api.Marker> markers();
+  public java.util.List<dev.diorama.api.MapLine> lines();
+  public java.lang.String toString();
+  static {};
+}
+######## dev/diorama/api/MapId
+Compiled from "MapId.java"
+public final class dev.diorama.api.MapId {
+  public static final dev.diorama.api.MapId MAIN;
+  private final java.lang.String id;
+  private dev.diorama.api.MapId(java.lang.String);
+  public static dev.diorama.api.MapId of(java.lang.String);
+  public java.lang.String toString();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  static {};
+}
+######## dev/diorama/api/MapLayer
+Compiled from "MapLayer.java"
+public interface dev.diorama.api.MapLayer extends dev.diorama.api.Handle {
+  public static final int MAX_OPEN;
+  public static final int MAX_DRAWN_MARKERS;
+  public static final int MAX_DRAWN_LINE_PIECES;
+  public abstract java.lang.String name();
+  public abstract void replace(dev.diorama.api.LayerContent);
+}
+######## dev/diorama/api/MapLine
+Compiled from "MapLine.java"
+public final class dev.diorama.api.MapLine {
+  public static final int MAX_POINTS;
+  public static final int MIN_WIDTH;
+  public static final int MAX_WIDTH;
+  public static final int DEFAULT_WIDTH;
+  private final dev.diorama.api.DimensionId dimension;
+  private final double[] points;
+  private final int rgb;
+  private final int width;
+  private dev.diorama.api.MapLine(dev.diorama.api.MapLine$Builder);
+  public static dev.diorama.api.MapLine$Builder builder(dev.diorama.api.DimensionId);
+  public dev.diorama.api.DimensionId dimension();
+  public int pointCount();
+  public double x(int);
+  public double y(int);
+  public double z(int);
+  public int rgb();
+  public int width();
+  public java.lang.String toString();
+}
+######## dev/diorama/api/MapView
+Compiled from "MapView.java"
+public interface dev.diorama.api.MapView extends dev.diorama.api.Handle {
+  public static final int MAX_OPEN;
+  public static final int MAX_DRAWS_PER_FRAME;
+  public abstract java.util.Set<dev.diorama.api.MapView$Part> parts();
+  public abstract boolean render(java.lang.Object, dev.diorama.api.ViewPlace, float);
+  public abstract double zoom(dev.diorama.api.ViewPlace);
+  public abstract dev.diorama.api.ScreenPos project(dev.diorama.api.ViewPlace, double, double, double);
+  public abstract dev.diorama.api.WorldPos worldAt(dev.diorama.api.ViewPlace, double, double, double);
+}
+######## dev/diorama/api/Marker
+Compiled from "Marker.java"
+public final class dev.diorama.api.Marker {
+  public static final int MAX_LABEL_LENGTH;
+  public static final int MIN_SIZE;
+  public static final int MAX_SIZE;
+  public static final int DOT_SIZE;
+  public static final int ICON_SIZE;
+  public static final int MAX_COORDINATE;
+  public static final int MAX_HEIGHT;
+  private final dev.diorama.api.DimensionId dimension;
+  private final double x;
+  private final double y;
+  private final double z;
+  private final int rgb;
+  private final java.util.Optional<dev.diorama.api.ResourceId> icon;
+  private final java.lang.String label;
+  private final int size;
+  private dev.diorama.api.Marker(dev.diorama.api.Marker$Builder);
+  public static dev.diorama.api.Marker$Builder builder(dev.diorama.api.DimensionId, double, double, double);
+  public dev.diorama.api.DimensionId dimension();
+  public double x();
+  public double y();
+  public double z();
+  public int rgb();
+  public java.util.Optional<dev.diorama.api.ResourceId> icon();
+  public java.lang.String label();
+  public int size();
+  public java.lang.String toString();
+}
+######## dev/diorama/api/NewWaypoint
+Compiled from "NewWaypoint.java"
+public final class dev.diorama.api.NewWaypoint {
+  public static final int MAX_NAME_LENGTH;
+  public static final int MAX_INITIALS;
+  private final java.lang.String name;
+  private final dev.diorama.api.DimensionId dimension;
+  private final dev.diorama.api.BlockCoord pos;
+  private final java.lang.String initials;
+  private final dev.diorama.api.ResourceId icon;
+  private final int rgb;
+  private final boolean visible;
+  private final java.lang.String folder;
+  private dev.diorama.api.NewWaypoint(dev.diorama.api.NewWaypoint$Builder);
+  public static dev.diorama.api.NewWaypoint$Builder builder(java.lang.String, dev.diorama.api.DimensionId, dev.diorama.api.BlockCoord);
+  public java.lang.String name();
+  public dev.diorama.api.DimensionId dimension();
+  public dev.diorama.api.BlockCoord pos();
+  public java.lang.String initials();
+  public java.util.Optional<dev.diorama.api.ResourceId> icon();
+  public int rgb();
+  public boolean visible();
+  public java.lang.String folder();
+}
+######## dev/diorama/api/ResourceId
+Compiled from "ResourceId.java"
+public final class dev.diorama.api.ResourceId {
+  private final java.lang.String namespace;
+  private final java.lang.String path;
+  private final java.lang.String id;
+  private dev.diorama.api.ResourceId(java.lang.String, java.lang.String);
+  public static dev.diorama.api.ResourceId of(java.lang.String);
+  public static dev.diorama.api.ResourceId of(java.lang.String, java.lang.String);
+  public java.lang.String namespace();
+  public java.lang.String path();
+  public java.lang.String toString();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+######## dev/diorama/api/ScreenPos
+Compiled from "ScreenPos.java"
+public final class dev.diorama.api.ScreenPos extends java.lang.Record {
+  private final double x;
+  private final double y;
+  public dev.diorama.api.ScreenPos(double, double);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public double x();
+  public double y();
+}
+######## dev/diorama/api/ViewPlace
+Compiled from "ViewPlace.java"
+public final class dev.diorama.api.ViewPlace {
+  public static final int MAX_SIZE;
+  public static final double MAX_ZOOM;
+  public static final double MIN_ZOOM;
+  public static final double DEFAULT_ZOOM;
+  private final int x;
+  private final int y;
+  private final int width;
+  private final int height;
+  private final double centerX;
+  private final double centerY;
+  private final double centerZ;
+  private final double zoom;
+  private dev.diorama.api.ViewPlace(dev.diorama.api.ViewPlace$Builder);
+  public static dev.diorama.api.ViewPlace$Builder builder(int, int, int, int);
+  private static int edge(java.lang.String, int);
+  private static int size(java.lang.String, int);
+  public int x();
+  public int y();
+  public int width();
+  public int height();
+  public double centerX();
+  public double centerY();
+  public double centerZ();
+  public double zoom();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  public java.lang.String toString();
+}
+######## dev/diorama/api/Waypoint
+Compiled from "Waypoint.java"
+public interface dev.diorama.api.Waypoint {
+  public abstract java.util.UUID id();
+  public abstract java.lang.String name();
+  public abstract java.lang.String initials();
+  public abstract java.util.Optional<dev.diorama.api.ResourceId> icon();
+  public abstract dev.diorama.api.BlockCoord pos();
+  public abstract dev.diorama.api.DimensionId dimension();
+  public abstract int rgb();
+  public abstract boolean visible();
+  public abstract java.util.Optional<java.lang.String> folder();
+  public abstract dev.diorama.api.MapId mapId();
+  public abstract dev.diorama.api.Waypoint$Kind kind();
+  public abstract java.util.Optional<java.lang.String> addedBy();
+}
+######## dev/diorama/api/WaypointBatch
+Compiled from "WaypointBatch.java"
+public final class dev.diorama.api.WaypointBatch {
+  private static final dev.diorama.api.WaypointBatch EMPTY;
+  private final java.util.List<dev.diorama.api.WaypointBatch$Step> steps;
+  private dev.diorama.api.WaypointBatch(java.util.List<dev.diorama.api.WaypointBatch$Step>);
+  public static dev.diorama.api.WaypointBatch$Builder builder();
+  public static dev.diorama.api.WaypointBatch empty();
+  public java.util.List<dev.diorama.api.WaypointBatch$Step> steps();
+  public boolean isEmpty();
+  public java.lang.String toString();
+  static {};
+}
+######## dev/diorama/api/WaypointUpdate
+Compiled from "WaypointUpdate.java"
+public final class dev.diorama.api.WaypointUpdate {
+  private final java.lang.String name;
+  private final dev.diorama.api.DimensionId dimension;
+  private final dev.diorama.api.BlockCoord pos;
+  private final java.lang.String initials;
+  private final dev.diorama.api.ResourceId icon;
+  private final boolean removesIcon;
+  private final java.lang.Integer rgb;
+  private final java.lang.Boolean visible;
+  private final java.lang.String folder;
+  private dev.diorama.api.WaypointUpdate(dev.diorama.api.WaypointUpdate$Builder);
+  public static dev.diorama.api.WaypointUpdate$Builder builder();
+  public java.util.Optional<java.lang.String> name();
+  public java.util.Optional<dev.diorama.api.DimensionId> dimension();
+  public java.util.Optional<dev.diorama.api.BlockCoord> pos();
+  public java.util.Optional<java.lang.String> initials();
+  public java.util.Optional<dev.diorama.api.ResourceId> icon();
+  public boolean removesIcon();
+  public java.util.OptionalInt rgb();
+  public java.util.Optional<java.lang.Boolean> visible();
+  public java.util.Optional<java.lang.String> folder();
+}
+######## dev/diorama/api/Waypoints
+Compiled from "Waypoints.java"
+public interface dev.diorama.api.Waypoints {
+  public abstract java.util.List<dev.diorama.api.Waypoint> all();
+  public abstract java.util.Optional<dev.diorama.api.Waypoint> get(java.util.UUID);
+  public abstract long revision();
+  public abstract dev.diorama.api.EditResult edit(dev.diorama.api.World, long, dev.diorama.api.WaypointBatch);
+}
+######## dev/diorama/api/World
+Compiled from "World.java"
+public final class dev.diorama.api.World {
+  private final dev.diorama.api.WorldId worldId;
+  private final dev.diorama.api.DimensionId dimension;
+  private final java.util.Map<dev.diorama.api.DimensionId, dev.diorama.api.MapId> maps;
+  private final java.util.Map<dev.diorama.api.DimensionId, java.util.List<dev.diorama.api.MapId>> saved;
+  public dev.diorama.api.World(dev.diorama.api.WorldId, dev.diorama.api.DimensionId, java.util.Map<dev.diorama.api.DimensionId, dev.diorama.api.MapId>, java.util.Map<dev.diorama.api.DimensionId, java.util.List<dev.diorama.api.MapId>>);
+  public dev.diorama.api.WorldId worldId();
+  public dev.diorama.api.DimensionId dimension();
+  public dev.diorama.api.MapId mapId();
+  public dev.diorama.api.MapId mapId(dev.diorama.api.DimensionId);
+  public java.util.List<dev.diorama.api.MapId> mapIds(dev.diorama.api.DimensionId);
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  public java.lang.String toString();
+}
+######## dev/diorama/api/WorldId
+Compiled from "WorldId.java"
+public final class dev.diorama.api.WorldId {
+  private final java.lang.String id;
+  private dev.diorama.api.WorldId(java.lang.String);
+  public static dev.diorama.api.WorldId of(java.lang.String);
+  public java.lang.String toString();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}
+######## dev/diorama/api/WorldPos
+Compiled from "WorldPos.java"
+public final class dev.diorama.api.WorldPos extends java.lang.Record {
+  private final double x;
+  private final double y;
+  private final double z;
+  public dev.diorama.api.WorldPos(double, double, double);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public double x();
+  public double y();
+  public double z();
+}
+######## dev/diorama/api/package-info
+Compiled from "package-info.java"
+interface dev.diorama.api.package-info {
+}
+######## dev/diorama/bake/PinnedSource
+Compiled from "PinnedSource.java"
+public final class dev.diorama.bake.PinnedSource implements dev.diorama.bake.ChunkSource {
+  private final dev.diorama.bake.ChunkSource live;
+  private final java.util.Map<java.lang.Long, dev.diorama.data.ChunkSnapshot> chunks;
+  private final java.util.Map<dev.diorama.bake.PinnedSource$Top, java.lang.Integer> tops;
+  private final int topY;
+  public dev.diorama.bake.PinnedSource(dev.diorama.bake.ChunkSource);
+  public dev.diorama.data.ChunkSnapshot chunk(int, int);
+  public int topBelow(int, int, int);
+  public int minY();
+  public int maxY();
+  public int topY();
+  public int roof();
+  public boolean depthCaves();
+  public boolean isSeen(int, int, int);
+  private java.lang.Integer lambda$topBelow$0(int, int, int, dev.diorama.bake.PinnedSource$Top);
+}
+######## dev/diorama/data/TileLabel
+Compiled from "TileLabel.java"
+public final class dev.diorama.data.TileLabel extends java.lang.Record {
+  private final boolean underRoof;
+  private final long pitch;
+  private final boolean fog;
+  private final dev.diorama.Facing facing;
+  private static final long FIRST_PITCH;
+  private static final java.lang.String SURFACE;
+  private static final java.lang.String UNDER_ROOF;
+  private static final java.lang.String FOG;
+  public dev.diorama.data.TileLabel(boolean, long, boolean, dev.diorama.Facing);
+  public static java.lang.String onRoof(long, dev.diorama.Facing, boolean);
+  public java.lang.String folder();
+  public static dev.diorama.data.TileLabel parse(java.lang.String);
+  public boolean canShow(dev.diorama.data.TileLabel);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public boolean underRoof();
+  public long pitch();
+  public boolean fog();
+  public dev.diorama.Facing facing();
+}
+######## dev/diorama/mixin/ChunkMapInvoker
+Compiled from "ChunkMapInvoker.java"
+public interface dev.diorama.mixin.ChunkMapInvoker {
+  public abstract net.minecraft.nbt.CompoundTag diorama$upgrade(net.minecraft.nbt.CompoundTag);
+}
+######## dev/diorama/render/MapIcons
+Compiled from "MapIcons.java"
+public final class dev.diorama.render.MapIcons {
+  private static final int SIZE;
+  private static dev.diorama.render.gpu.MapTexture dot;
+  private static dev.diorama.render.gpu.MapTexture caret;
+  private dev.diorama.render.MapIcons();
+  public static void dot(dev.diorama.render.IconBatch, float, float, float, int);
+  public static void caret(dev.diorama.render.IconBatch, float, float, float, int, boolean);
+  private static void draw(dev.diorama.render.IconBatch, dev.diorama.render.gpu.MapTexture, float, float, float, int, boolean);
+  private static float circle(float, float);
+  private static float triangle(float, float);
+  private static dev.diorama.render.gpu.MapTexture create(java.lang.String, dev.diorama.render.MapIcons$Shape);
+}
+######## dev/diorama/render/MarkerAtlas
+Compiled from "MarkerAtlas.java"
+public final class dev.diorama.render.MarkerAtlas {
+  static final int SIZE;
+  private static final int CELL;
+  private static final int COLUMNS;
+  private static final int ROWS;
+  public static final int SLOTS;
+  static final int MAX_MISSING;
+  static final int LOOKUPS_PER_DRAW;
+  static final int SMALL_DOT;
+  static final int BIG_DOT;
+  private static final int SMALL_X;
+  private static final int DOTS_Y;
+  private static final int BIG_X;
+  static final int NONE;
+  private static dev.diorama.render.gpu.MapTexture texture;
+  private static final dev.diorama.api.ResourceId[] ICONS;
+  private static final long[] DRAWN;
+  private static final java.util.Map<dev.diorama.api.ResourceId, java.lang.Integer> TILES;
+  private static final java.util.Map<dev.diorama.api.ResourceId, java.lang.Boolean> MISSING;
+  private static int used;
+  private static long draw;
+  private static int lookups;
+  private static boolean noRoom;
+  private static boolean fullSaid;
+  private dev.diorama.render.MarkerAtlas();
+  static dev.diorama.render.gpu.MapTexture texture();
+  static void startDraw();
+  static int tile(dev.diorama.api.ResourceId);
+  static boolean missing(dev.diorama.api.ResourceId);
+  private static int free();
+  public static int[] counts();
+  static int tileX(int);
+  static int tileY(int);
+  static int dotX(float);
+  static int dotY();
+  static int dotSize(float);
+  public static void forget();
+  private static int[] dot(int);
+  static {};
+}
+######## dev/diorama/render/Markers
+Compiled from "Markers.java"
+public final class dev.diorama.render.Markers {
+  private static final int HEADINGS;
+  private static final int UPLOADS_PER_FRAME;
+  private static final java.util.concurrent.ExecutorService WORKER;
+  private static final java.util.Map<java.lang.Long, dev.diorama.render.gpu.MapTexture> ARROWS;
+  private static final java.util.Map<java.lang.Long, java.util.concurrent.CompletableFuture<int[]>> DRAWING;
+  private static final java.util.LinkedHashMap<java.lang.Long, java.lang.Boolean> STYLES;
+  private static final int STYLES_KEPT;
+  private dev.diorama.render.Markers();
+  public static float onMap(float);
+  public static void player(net.minecraft.client.gui.GuiGraphics, float, float, float, float);
+  private static dev.diorama.render.gpu.MapTexture arrow(int, float, int, int);
+  private static void forgetOldest();
+  private static void upload(long);
+  private static dev.diorama.render.gpu.MapTexture texture(int[]);
+  private static void flat(net.minecraft.client.gui.GuiGraphics, float, float, float, float, int);
+  private static void quad(net.minecraft.client.gui.GuiGraphics, float, float, double, double, float, int);
+  private static boolean lambda$forgetOldest$2(long, java.lang.Long);
+  private static int[] lambda$arrow$1(double, float, double, double, int);
+  private static java.lang.Thread lambda$static$0(java.lang.Runnable);
+  static {};
+}
+######## dev/diorama/render/PinArt
+Compiled from "PinArt.java"
+public final class dev.diorama.render.PinArt {
+  static final int INK;
+  static final int DEATH_FACE;
+  private static final float RIM_ALPHA;
+  private static final java.lang.String[] HEADSTONE;
+  private static final java.lang.String[] LARGE_PIN;
+  private static final java.lang.String[] SMALL_PIN;
+  private static final int STICKER_WHITE;
+  private static final int ICON_TIP;
+  private dev.diorama.render.PinArt();
+  public static dev.diorama.render.PinArt$Art standing(int, boolean, int, int);
+  public static int stretchFor(int, int);
+  private static java.lang.String[] stretched(java.lang.String[], int, int);
+  public static dev.diorama.render.PinArt$Art badge(int, boolean, int, int, double, int, dev.diorama.render.PinArt$Image);
+  private static float pillReach(float, float, float, float);
+  public static int iconHead(dev.diorama.render.PinArt$Image);
+  public static float iconHeadAbove(dev.diorama.render.PinArt$Image);
+  public static dev.diorama.render.PinArt$Art iconPin(dev.diorama.render.PinArt$Image, int);
+  private static void sticker(dev.diorama.render.PinArt$Image, dev.diorama.render.PinArt$Image, float, float);
+  public static dev.diorama.render.PinArt$Image fromArgb(int, int, int[]);
+  public static int standingHead(int);
+  public static int centred(int, int, int);
+  public static boolean light(int);
+  private static void face(dev.diorama.render.PinArt$Image, boolean[], int, int, int);
+  private static void headstone(dev.diorama.render.PinArt$Image, int, int, int, int);
+  static int mix(int, int, float);
+  private static boolean at(boolean[], int, int, int, int);
+  private static boolean[] disc(int, int, float, float, float);
+  private static boolean[] pill(int, int, float, float, float, float);
+  private static boolean[] ellipse(int, int, float, float, float, float);
+  private static boolean[] polygon(int, int, float[]);
+  static boolean inside(float[], float, float);
+  private static boolean[] outline(java.lang.String[], int, int);
+  private static boolean[] ring(boolean[], int, int);
+  private static boolean[] grow4(boolean[], int, int);
+  private static boolean[] dilate(boolean[], int, int);
+  static {};
+}
+######## dev/diorama/render/Pins
+Compiled from "Pins.java"
+public final class dev.diorama.render.Pins {
+  public static final int LARGE;
+  public static final int SMALL;
+  private static final int CARET_STEPS;
+  public static final int SHADOW;
+  private static final java.util.Map<java.lang.String, dev.diorama.render.Pins$Sprite> SPRITES;
+  private static final java.lang.String ICON;
+  private dev.diorama.render.Pins();
+  public static float scale(int);
+  public static int[] sizes();
+  public static void standing(net.minecraft.client.gui.GuiGraphics, dev.diorama.waypoint.Waypoint, float, float, int);
+  public static void standing(net.minecraft.client.gui.GuiGraphics, dev.diorama.waypoint.Waypoint, float, float, int, float);
+  public static void standing(net.minecraft.client.gui.GuiGraphics, dev.diorama.waypoint.Waypoint, float, float, int, float, float);
+  public static void badge(net.minecraft.client.gui.GuiGraphics, dev.diorama.waypoint.Waypoint, float, float, int);
+  public static void edge(net.minecraft.client.gui.GuiGraphics, dev.diorama.waypoint.Waypoint, float, float, int, double, float);
+  public static int badgeWidth(dev.diorama.waypoint.Waypoint, int);
+  public static float headAbove(dev.diorama.waypoint.Waypoint, int);
+  public static float reach(dev.diorama.waypoint.Waypoint, int);
+  public static float headAbove(int);
+  public static boolean fitsStanding(dev.diorama.waypoint.Waypoint, int, float, float, float, float, float, float, float);
+  public static boolean fitsStanding(dev.diorama.waypoint.Waypoint, int, float, float, float, dev.diorama.render.Circle);
+  private static float[] standingBox(dev.diorama.waypoint.Waypoint, int, float, float, float);
+  public static float edgeReach(dev.diorama.waypoint.Waypoint, int);
+  public static int stretch(dev.diorama.waypoint.Waypoint, int);
+  public static boolean showsIcon(dev.diorama.waypoint.Waypoint);
+  private static dev.diorama.render.PinArt$Image icon(dev.diorama.waypoint.Waypoint);
+  static void forgetIcons();
+  private static int rgb(dev.diorama.waypoint.Waypoint);
+  private static dev.diorama.render.Pins$Sprite sprite(java.lang.String, java.util.function.Supplier<dev.diorama.render.PinArt$Art>);
+  private static void draw(net.minecraft.client.gui.GuiGraphics, dev.diorama.render.Pins$Sprite, dev.diorama.waypoint.Waypoint, float, float, float, float);
+  private static void label(net.minecraft.client.gui.GuiGraphics, dev.diorama.waypoint.Waypoint, int, int, int, int, float);
+  public static int alpha(float);
+  private static int ink(net.minecraft.client.gui.Font, java.lang.String);
+  private static boolean lambda$forgetIcons$6(java.util.Map$Entry);
+  private static dev.diorama.render.PinArt$Art lambda$edge$5(dev.diorama.waypoint.Waypoint, boolean, int, double, int);
+  private static dev.diorama.render.PinArt$Art lambda$edge$4(dev.diorama.waypoint.Waypoint, dev.diorama.render.PinArt$Image, double);
+  private static dev.diorama.render.PinArt$Art lambda$badge$3(dev.diorama.waypoint.Waypoint, boolean, int);
+  private static dev.diorama.render.PinArt$Art lambda$badge$2(dev.diorama.waypoint.Waypoint, dev.diorama.render.PinArt$Image);
+  private static dev.diorama.render.PinArt$Art lambda$standing$1(dev.diorama.waypoint.Waypoint, boolean, int, int);
+  private static dev.diorama.render.PinArt$Art lambda$standing$0(dev.diorama.render.PinArt$Image, dev.diorama.waypoint.Waypoint);
+  static {};
+}
+######## dev/diorama/render/WaypointIcons
+Compiled from "WaypointIcons.java"
+public final class dev.diorama.render.WaypointIcons {
+  public static final int TILE;
+  public static final java.util.List<java.lang.String> OFFERED;
+  public static final java.lang.String BED;
+  public static final java.lang.String PORTAL;
+  private static final java.lang.String FOLDER;
+  static final int MAX_KEPT;
+  private static final java.util.Map<java.lang.String, java.util.Optional<dev.diorama.render.PinArt$Image>> IMAGES;
+  private dev.diorama.render.WaypointIcons();
+  public static dev.diorama.render.PinArt$Image image(java.lang.String);
+  public static int kept();
+  public static void reload();
+  public static java.util.List<java.lang.String> all();
+  private static dev.diorama.render.PinArt$Image load(java.lang.String, net.minecraft.server.packs.resources.ResourceManager);
+  private static dev.diorama.render.PinArt$Image cropped(com.mojang.blaze3d.platform.NativeImage);
+  static int argb(com.mojang.blaze3d.platform.NativeImage, int, int);
+  private static dev.diorama.render.PinArt$Image tiled(dev.diorama.render.PinArt$Image);
+  private static boolean lambda$all$0(net.minecraft.resources.ResourceLocation);
+  static {};
+}
+######## dev/diorama/waypoint/FolderMenu
+Compiled from "FolderMenu.java"
+public final class dev.diorama.waypoint.FolderMenu {
+  private static final int ROW;
+  private static final int PAD;
+  private static final int TEXT;
+  private static final int COUNT;
+  private static final int HIDDEN;
+  private static final int CURRENT;
+  private static final int SCROLLBAR;
+  private static final int HANDLE_MIN;
+  private static final int MAX_WIDTH;
+  private final java.util.List<dev.diorama.waypoint.FolderMenu$Entry> entries;
+  private final java.lang.String current;
+  private final net.minecraft.client.gui.Font font;
+  private final int x;
+  private final int y;
+  private final int width;
+  private final int shown;
+  private int scroll;
+  private int cursor;
+  private double held;
+  public dev.diorama.waypoint.FolderMenu(net.minecraft.client.gui.Font, java.util.List<dev.diorama.waypoint.FolderMenu$Entry>, java.lang.String, int, int, int, int, int, int);
+  private int height();
+  private boolean scrolls();
+  private static int countWidth(net.minecraft.client.gui.Font, dev.diorama.waypoint.FolderMenu$Entry);
+  private int room();
+  private int[] handle();
+  private boolean overScrollbar(double, double);
+  private void scrollTo(int);
+  public boolean press(double, double);
+  public boolean drag(double);
+  public void release();
+  public boolean contains(double, double);
+  public dev.diorama.waypoint.FolderMenu$Entry under(double, double);
+  public dev.diorama.waypoint.FolderMenu$Entry keyPressed(int);
+  public void scroll(double);
+  public void draw(net.minecraft.client.gui.GuiGraphics, int, int);
+  private java.lang.String fit(java.lang.String, int);
+  public float[] centreOf(java.lang.String);
+  public java.util.List<java.lang.String> labels();
+  public java.util.List<java.lang.String> names();
+  public java.util.List<java.lang.String> cutNames();
+  public int[] bounds();
+  public float[] handleCentre();
+  public int scrolled();
+  public int shown();
+  private boolean lambda$cutNames$1(dev.diorama.waypoint.FolderMenu$Entry);
+  private static java.lang.String lambda$labels$0(dev.diorama.waypoint.FolderMenu$Entry);
+}
+######## dev/diorama/waypoint/MapPiece
+Compiled from "MapPiece.java"
+final class dev.diorama.waypoint.MapPiece {
+  private static final double ZOOM;
+  private static final int FACE_TEXTURE;
+  private static final int TEXELS_PER_ROW;
+  private static final int OUTLINE;
+  private static final int SHADOW;
+  private static final int CAVE;
+  private static final int UNKNOWN;
+  private static final double SUN_AZIMUTH_Z;
+  private static final float FACE_SKY;
+  private static final float FACE_VARIATION;
+  private static final long FACE_REFRESH_MS;
+  private static final float[] SRGB_TO_LINEAR;
+  private final int width;
+  private final int depth;
+  private final int side;
+  private final dev.diorama.render.MapViewport viewport;
+  private final int[] facePixels;
+  private dev.diorama.render.gpu.MapTexture face;
+  private dev.diorama.waypoint.MapPiece$FaceKey faceKey;
+  private long faceBuilt;
+  private dev.diorama.waypoint.MapPiece$SavedMap saved;
+  dev.diorama.waypoint.MapPiece(int, int, int);
+  int outerWidth();
+  int outerHeight();
+  int tipX();
+  int tipY();
+  void draw(net.minecraft.client.gui.GuiGraphics, int, int);
+  void draw(net.minecraft.client.gui.GuiGraphics, int, int, dev.diorama.waypoint.MapPiece$Place);
+  private dev.diorama.render.gpu.MapTexture face(net.minecraft.client.multiplayer.ClientLevel, dev.diorama.bake.BlockLooks, dev.diorama.MapStyle, int, int, double, net.minecraft.core.BlockPos, boolean, dev.diorama.render.MapLevel);
+  private int texel(net.minecraft.client.multiplayer.ClientLevel, dev.diorama.bake.BlockLooks, dev.diorama.MapStyle, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.BlockPos, int, int);
+  private static int[] surface(net.minecraft.client.multiplayer.ClientLevel, dev.diorama.bake.BlockLooks, int, double);
+  private static int facing(int, int, boolean);
+  private static boolean ground(dev.diorama.bake.BlockLooks, net.minecraft.world.level.block.state.BlockState);
+  private static float[] albedo(dev.diorama.bake.BlockLooks, net.minecraft.client.multiplayer.ClientLevel, int, net.minecraft.core.BlockPos, boolean, boolean);
+  private static float[] faceLight(dev.diorama.MapStyle, int);
+  private static int grassTop(dev.diorama.bake.BlockLooks, net.minecraft.client.multiplayer.ClientLevel, net.minecraft.core.BlockPos, dev.diorama.MapStyle);
+  private static float[] grade(dev.diorama.MapStyle, float, float, float);
+  private static float srgb(float);
+  private static int toAbgr(float[]);
+  private static int closed(int);
+  private dev.diorama.render.MapLevel savedMap(java.lang.String);
+  void tick();
+  private void closeSaved();
+  private static int abgr(int);
+  private static int argb(int);
+  private static float blockNoise(int, int, int);
+  void close();
+  static {};
+}
+######## dev/diorama/waypoint/Portals
+Compiled from "Portals.java"
+public final class dev.diorama.waypoint.Portals {
+  private static final int SAME_PORTAL;
+  private static final int NETHER_COLOR;
+  private static final int END_COLOR;
+  private static final java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> PORTAL;
+  private static final java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> END_FRAME;
+  private static final int FOUND;
+  static final java.lang.String PLAIN_NAME;
+  private dev.diorama.waypoint.Portals();
+  public static boolean isPortal(net.minecraft.world.level.block.state.BlockState);
+  private static dev.diorama.waypoint.Waypoint$Kind kind(net.minecraft.world.level.block.Block);
+  public static java.util.List<dev.diorama.waypoint.Portals$Spot> find(dev.diorama.data.ChunkSnapshot, int);
+  private static boolean framed(dev.diorama.data.ChunkSnapshot, dev.diorama.waypoint.Waypoint$Kind, int, int, int);
+  private static boolean endFrame(net.minecraft.world.level.block.Block);
+  private static net.minecraft.world.level.block.Block block(dev.diorama.data.ChunkSnapshot, int, int, int);
+  private static net.minecraft.world.level.block.state.BlockState state(dev.diorama.data.ChunkSnapshot, int, int, int);
+  static java.util.List<dev.diorama.waypoint.Portals$Spot> unlit(dev.diorama.data.ChunkSnapshot);
+  private static boolean unlitAround(dev.diorama.data.ChunkSnapshot, int, int, int);
+  public static void playerAt(int, int, int, java.lang.String, dev.diorama.waypoint.WaypointStore, dev.diorama.bake.ChunkSource);
+  public static void chunkSeen(dev.diorama.data.ChunkSnapshot, java.lang.String, dev.diorama.waypoint.WaypointStore, dev.diorama.bake.ChunkSource);
+  private static boolean onPortal(dev.diorama.waypoint.Waypoint, dev.diorama.data.ChunkSnapshot);
+  public static void add(java.util.List<dev.diorama.waypoint.Portals$Spot>, java.lang.String, dev.diorama.waypoint.WaypointStore, int);
+  static net.minecraft.world.level.block.Block block(dev.diorama.waypoint.Waypoint$Kind);
+  static java.lang.String savedName(dev.diorama.waypoint.Waypoint$Kind);
+  private static java.lang.String savedName(dev.diorama.waypoint.Portals$Spot);
+  private static boolean automatic(dev.diorama.waypoint.Waypoint);
+  private static java.util.List lambda$find$1(dev.diorama.waypoint.Waypoint$Kind);
+  private static boolean lambda$static$0(net.minecraft.world.level.block.state.BlockState);
+  static {};
+}
+######## dev/diorama/waypoint/ScreenArt
+Compiled from "ScreenArt.java"
+public final class dev.diorama.waypoint.ScreenArt {
+  private static final net.minecraft.resources.ResourceLocation LIST_BACKGROUND;
+  static final net.minecraft.resources.ResourceLocation SEARCH;
+  public static final net.minecraft.resources.ResourceLocation TEXT_FIELD;
+  static final net.minecraft.resources.ResourceLocation TEXT_FIELD_FOCUSED;
+  static final net.minecraft.resources.ResourceLocation SCROLLER;
+  static final net.minecraft.resources.ResourceLocation SCROLLER_BACKGROUND;
+  private static final net.minecraft.resources.ResourceLocation SOCIAL_INTERACTIONS;
+  private static final int LIST_SHADE;
+  private static final int SEPARATOR_DARK;
+  private static final int SEPARATOR_LIGHT;
+  public static final int SCROLLBAR_WIDTH;
+  public static final int SCROLLER_MIN;
+  private dev.diorama.waypoint.ScreenArt();
+  public static void sprite(net.minecraft.client.gui.GuiGraphics, net.minecraft.resources.ResourceLocation, int, int, int, int);
+  public static void list(net.minecraft.client.gui.GuiGraphics, int, int, int, int);
+  public static void selection(net.minecraft.client.gui.GuiGraphics, int, int, int, int);
+  public static void scrollbar(net.minecraft.client.gui.GuiGraphics, int, int, int, int, int);
+  static {};
+}
+######## dev/diorama/waypoint/Waypoint
+Compiled from "Waypoint.java"
+public final class dev.diorama.waypoint.Waypoint {
+  public static final int[] PALETTE;
+  public static final java.lang.String BED_NAME;
+  private static final java.time.format.DateTimeFormatter DEATH_TIME;
+  private static final java.util.regex.Pattern DEATH_NAME;
+  private static final java.time.format.DateTimeFormatter DEATH_DATE;
+  public static final int MAX_INITIALS;
+  public java.util.UUID id;
+  public java.lang.String name;
+  public java.lang.String initials;
+  public java.lang.String icon;
+  public int x;
+  public int y;
+  public int z;
+  public java.lang.String dimension;
+  public int color;
+  public boolean visible;
+  public boolean showInWorld;
+  public boolean showOnMinimap;
+  public boolean showOnMap;
+  public java.lang.String folder;
+  public dev.diorama.waypoint.Waypoint$Kind kind;
+  public long created;
+  public java.lang.String map;
+  public boolean deleted;
+  public boolean edited;
+  public java.lang.String addedBy;
+  public transient dev.diorama.waypoint.Waypoint original;
+  public dev.diorama.waypoint.Waypoint();
+  public dev.diorama.waypoint.Waypoint(java.lang.String, int, int, int, java.lang.String, int);
+  public dev.diorama.waypoint.Waypoint source();
+  dev.diorama.waypoint.Waypoint scaled(double, dev.diorama.waypoint.Waypoint);
+  public boolean showsOn(dev.diorama.waypoint.Waypoint$Surface);
+  public void setShownOn(boolean, boolean, boolean);
+  public void showAsNew();
+  void normaliseShownOn();
+  public boolean editable();
+  public static java.lang.String deathName(java.time.LocalTime);
+  public static java.lang.String deathDate(long);
+  public java.lang.String shownName();
+  public java.lang.String label();
+  public double distanceTo(double, double, double);
+  public static java.lang.String initialsFor(java.lang.String);
+  static {};
+}
+######## dev/diorama/waypoint/WaypointBeams
+Compiled from "WaypointBeams.java"
+public final class dev.diorama.waypoint.WaypointBeams {
+  static final int HEIGHT;
+  private static final int TIP;
+  private static final float CORE;
+  private static final float EDGE;
+  private static final float CORE_MIN;
+  private static final float EDGE_MIN;
+  private static final float CORE_ALPHA;
+  private static final float EDGE_ALPHA;
+  private static final double GONE;
+  private static final double FULL;
+  private static final double DIM_FROM;
+  private static final double DIM_TO;
+  private static final float FAR_ALPHA;
+  private static final float MARGIN;
+  private static final float NEAR;
+  private static final int TEXTURE;
+  private static final float[] ACROSS;
+  private static final float SOFT;
+  private static final float[] DOWN;
+  private static final float CLEAR_V;
+  private static final float SOLID_V;
+  private static dev.diorama.render.gpu.MapTexture texture;
+  private static final int BLOCKS;
+  private static final int PER_BLOCK;
+  private static final int PARTS;
+  private static final float[] CLEAR;
+  private static final int ALONG_X;
+  private static final int ALONG_Z;
+  private static final float COVERS;
+  private static final int LOOK_MOST;
+  private static final long AGAIN_MOVING;
+  private static final long AGAIN_STILL;
+  private final java.util.Map<java.util.UUID, dev.diorama.waypoint.WaypointBeams$Sight> sights;
+  private final boolean[] hidden;
+  private final java.util.Map<net.minecraft.world.level.block.state.BlockState, float[]> blocking;
+  private final net.minecraft.core.BlockPos$MutableBlockPos pos;
+  private net.minecraft.client.multiplayer.ClientLevel level;
+  private java.lang.ref.WeakReference<net.minecraft.client.multiplayer.ClientLevel> seenIn;
+  private net.minecraft.world.phys.Vec3 eye;
+  private float width;
+  private float height;
+  private float z;
+  private long frame;
+  private long now;
+  private int blocks;
+  private double reach;
+  private int index;
+  private int resume;
+  private int next;
+  private final org.joml.Vector4f base;
+  private final org.joml.Vector4f top;
+  private float[] xyz;
+  private float[] uvs;
+  private int[] colors;
+  private float opacity;
+  private int quads;
+  public dev.diorama.waypoint.WaypointBeams();
+  static boolean has(dev.diorama.waypoint.Waypoint, dev.diorama.Settings$Beams);
+  void begin(net.minecraft.client.multiplayer.ClientLevel, net.minecraft.world.phys.Vec3, float, float, float, float);
+  void add(dev.diorama.waypoint.Waypoint);
+  private static float tipV(float);
+  private void look(dev.diorama.waypoint.WaypointBeams$Sight, double, double, double, double);
+  private float[] blocking(net.minecraft.world.level.block.state.BlockState);
+  private void piece(double, double, double, double, double, float, float, float, float, float, int, int);
+  void end();
+  void draw(net.minecraft.client.gui.GuiGraphics);
+  private static int alpha(float);
+  public static int coreColor(int);
+  private static int edgeColor(int);
+  private void quad(float, float, float, float, float, float, float, float, float, float, float, float, float, int);
+  private void corner(int, int, float, float, float, float, float);
+  private static void lambda$blocking$1(double, double, double[], double, double, double, double, double, double);
+  private boolean lambda$begin$0(dev.diorama.waypoint.WaypointBeams$Sight);
+  static {};
+}
+######## dev/diorama/waypoint/WaypointColours
+Compiled from "WaypointColours.java"
+public final class dev.diorama.waypoint.WaypointColours {
+  public static final int COLUMNS;
+  private static final java.lang.String[] CLASSIC_NAMES;
+  private static final int[] DYES;
+  private static final java.lang.String[] DYE_NAMES;
+  public static final java.util.List<dev.diorama.waypoint.WaypointColours$Swatch> ALL;
+  private dev.diorama.waypoint.WaypointColours();
+  public static int rows();
+  public static dev.diorama.waypoint.WaypointColours$Swatch named(int);
+  public static int random(int);
+  private static float hueDistance(float, float);
+  public static int rgb(float, float, float);
+  public static float[] hsv(int);
+  public static int shade(float, float);
+  public static float shadeOf(int);
+  public static java.lang.String hex(int);
+  public static java.lang.Integer parse(java.lang.String);
+  static {};
+}
+######## dev/diorama/waypoint/WaypointEditScreen
+Compiled from "WaypointEditScreen.java"
+public final class dev.diorama.waypoint.WaypointEditScreen extends net.minecraft.client.gui.screens.Screen {
+  private static final int WIDTH;
+  private static final int FORM;
+  private static final int PREVIEW_LEFT;
+  private static final int SLOT;
+  private static final int BAR_HEIGHT;
+  private static final int BAR_WIDTH;
+  private static final int BAR_GAP;
+  private static final int INVALID_TEXT;
+  private static final int LABEL;
+  private static final int MAX_NAME;
+  private static final int VISIBILITY_Y;
+  private final net.minecraft.client.gui.screens.Screen parent;
+  private final dev.diorama.waypoint.Waypoint waypoint;
+  private final boolean isNew;
+  private final dev.diorama.waypoint.Waypoint preview;
+  private final dev.diorama.waypoint.MapPiece piece;
+  private net.minecraft.client.gui.components.EditBox name;
+  private net.minecraft.client.gui.components.EditBox initials;
+  private net.minecraft.client.gui.components.EditBox x;
+  private net.minecraft.client.gui.components.EditBox y;
+  private net.minecraft.client.gui.components.EditBox z;
+  private net.minecraft.client.gui.components.Button save;
+  private net.minecraft.client.gui.components.Button share;
+  private net.minecraft.client.gui.components.Button teleport;
+  private int color;
+  private boolean inWorld;
+  private boolean onMinimap;
+  private boolean onMap;
+  private net.minecraft.client.gui.components.EditBox hex;
+  private int swatchX;
+  private int swatchY;
+  private float hue;
+  private float shade;
+  private int dragging;
+  private java.lang.String folder;
+  private net.minecraft.client.gui.components.Button folderButton;
+  private dev.diorama.waypoint.FolderMenu folderMenu;
+  private java.lang.String icon;
+  private net.minecraft.client.gui.components.Button iconButton;
+  private final dev.diorama.waypoint.WaypointEditScreen$Opened opened;
+  public dev.diorama.waypoint.WaypointEditScreen(net.minecraft.client.gui.screens.Screen, dev.diorama.waypoint.Waypoint, boolean);
+  private int left();
+  private int top();
+  protected void m_7856_();
+  private java.util.List<net.minecraft.client.gui.components.Checkbox> placeBoxes(int);
+  private net.minecraft.client.gui.components.Checkbox placeBox(java.lang.String, boolean, int, java.util.function.Consumer<java.lang.Boolean>);
+  private net.minecraft.network.chat.Component iconLabel();
+  private void pickIcon();
+  private int previewTop();
+  private int previewBottom();
+  private java.util.List<java.lang.String> folders();
+  private void openFolderMenu();
+  private void closeFolderMenu();
+  private void clickFolderMenu(double, double, int);
+  private void keyFolderMenu(int);
+  private void pickFolder(dev.diorama.waypoint.FolderMenu$Entry);
+  private net.minecraft.network.chat.Component folderLabel();
+  private static java.lang.String draft(net.minecraft.client.gui.components.EditBox, java.lang.String);
+  private void validate();
+  private net.minecraft.client.gui.components.EditBox field(int, int, int, java.lang.String, java.lang.String, int);
+  public void m_88315_(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  public boolean m_6050_(double, double, double);
+  private void drawSwatches(net.minecraft.client.gui.GuiGraphics, int, int);
+  private static void ring(net.minecraft.client.gui.GuiGraphics, int, int, int, int, int);
+  private static void marker(net.minecraft.client.gui.GuiGraphics, int, int);
+  private int barY();
+  private int hueX();
+  private int swatchAt(double, double);
+  private int barAt(double, double);
+  private void dragBar(int, double);
+  private void pick(int);
+  private void matchBars();
+  private void drawPreview(net.minecraft.client.gui.GuiGraphics);
+  public boolean m_7933_(int, int, int);
+  public boolean m_6375_(double, double, int);
+  public boolean m_7979_(double, double, int, double, double);
+  public boolean m_6348_(double, double, int);
+  private boolean clicked(double, double, int);
+  private boolean dragged(double, double);
+  private void released();
+  public dev.diorama.waypoint.FolderMenu folderMenu();
+  public net.minecraft.client.gui.components.Button folderButton();
+  public dev.diorama.waypoint.Waypoint waypoint();
+  private java.lang.String typedName();
+  private dev.diorama.waypoint.Waypoint shown();
+  private void share();
+  private void teleport();
+  private void save();
+  private boolean renamed();
+  private int typed(net.minecraft.client.gui.components.EditBox, int);
+  private java.lang.Integer coordinate(net.minecraft.client.gui.components.EditBox);
+  private java.lang.Integer here(net.minecraft.client.gui.components.EditBox);
+  private void hintHere();
+  private void hintHere(net.minecraft.client.gui.components.EditBox, java.lang.String);
+  private static java.lang.Integer parse(java.lang.String);
+  private boolean gone(dev.diorama.waypoint.WaypointStore);
+  public void m_86600_();
+  public void m_7861_();
+  public void m_7379_();
+  public boolean m_7043_();
+  private void lambda$pickIcon$14(java.lang.String);
+  private void lambda$placeBoxes$13(java.lang.Boolean);
+  private void lambda$placeBoxes$12(java.lang.Boolean);
+  private void lambda$placeBoxes$11(java.lang.Boolean);
+  private void lambda$init$10(net.minecraft.client.gui.components.Button);
+  private void lambda$init$9(net.minecraft.client.gui.components.Button);
+  private void lambda$init$8(net.minecraft.client.gui.components.Button);
+  private void lambda$init$7(net.minecraft.client.gui.components.Button);
+  private void lambda$init$6(net.minecraft.client.gui.components.Button);
+  private void lambda$init$5(net.minecraft.client.gui.components.Button);
+  private void lambda$init$4(java.lang.String);
+  private void lambda$init$3(java.lang.String);
+  private void lambda$init$2(java.lang.String);
+  private void lambda$init$1(java.lang.String);
+  private void lambda$init$0(net.minecraft.client.gui.components.Button);
+}
+######## dev/diorama/waypoint/WaypointEdits
+Compiled from "WaypointEdits.java"
+final class dev.diorama.waypoint.WaypointEdits {
+  static final dev.diorama.api.EditResult UNCHANGED;
+  static final dev.diorama.api.EditResult NOT_APPLIED;
+  private dev.diorama.waypoint.WaypointEdits();
+  static dev.diorama.waypoint.WaypointEdits$Applied apply(dev.diorama.waypoint.WaypointStore, java.lang.String, dev.diorama.api.WaypointBatch);
+  private static dev.diorama.waypoint.Waypoint made(dev.diorama.api.NewWaypoint, java.lang.String);
+  private static void update(dev.diorama.waypoint.WaypointStore, dev.diorama.waypoint.Waypoint, dev.diorama.api.WaypointUpdate);
+  private static void lambda$update$5(dev.diorama.waypoint.Waypoint, java.lang.String);
+  private static void lambda$update$4(dev.diorama.waypoint.Waypoint, java.lang.Boolean);
+  private static void lambda$update$3(dev.diorama.waypoint.Waypoint, dev.diorama.api.BlockCoord);
+  private static void lambda$update$2(dev.diorama.waypoint.Waypoint, dev.diorama.api.ResourceId);
+  private static void lambda$update$1(dev.diorama.waypoint.Waypoint, java.lang.String);
+  private static void lambda$update$0(dev.diorama.waypoint.Waypoint, java.lang.String);
+  static {};
+}
+######## dev/diorama/waypoint/WaypointExport
+Compiled from "WaypointExport.java"
+public final class dev.diorama.waypoint.WaypointExport {
+  private static final java.time.format.DateTimeFormatter NAME;
+  static final java.lang.String DEFAULT_SET;
+  private static final java.lang.String HEADER;
+  static final int NORMAL;
+  static final int DEATH;
+  static final int OLD_DEATH;
+  static final int LOCAL;
+  static final int GLOBAL;
+  static final int MAP_ONLY;
+  private static final java.lang.String OTHER_MAPS;
+  private dev.diorama.waypoint.WaypointExport();
+  public static boolean available();
+  public static dev.diorama.waypoint.WaypointExport$Told run();
+  public static dev.diorama.waypoint.WaypointExport$Told run(java.lang.String, boolean);
+  private static net.minecraft.network.chat.Component count(int);
+  private static dev.diorama.waypoint.WaypointExport$Result export(java.lang.String, boolean) throws java.io.IOException;
+  private static java.nio.file.Path partial(java.nio.file.Path);
+  private static void deleteQuietly(java.nio.file.Path);
+  public static java.nio.file.Path within(java.nio.file.Path, java.lang.String, java.lang.String) throws java.io.IOException;
+  public static dev.diorama.waypoint.WaypointExport$Result write(dev.diorama.waypoint.WaypointStore, dev.diorama.Maps, java.nio.file.Path, boolean) throws java.io.IOException;
+  private static java.lang.String unused(java.lang.String, java.util.Set<java.lang.String>);
+  static java.lang.String text(dev.diorama.waypoint.WaypointStore, java.util.List<dev.diorama.waypoint.Waypoint>, java.util.List<java.lang.String>);
+  static java.lang.String line(dev.diorama.waypoint.Waypoint, int, java.lang.String, boolean);
+  private static java.lang.String safe(java.lang.String);
+  static java.lang.String setName(java.lang.String);
+  static int colorIndex(int);
+  private static long distance(int, int);
+  static java.lang.String dimensionFolder(java.lang.String);
+  static java.lang.String fileName(java.lang.String);
+  static java.lang.String plain(java.lang.String);
+  private static java.lang.String ending(java.lang.String);
+  private static long lambda$text$4(dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$text$3(dev.diorama.waypoint.Waypoint);
+  private static java.util.List lambda$write$2(java.lang.String);
+  private static java.util.Map lambda$write$1(java.lang.String);
+  private static net.minecraft.network.chat.Style lambda$run$0(java.nio.file.Path, net.minecraft.network.chat.Style);
+  static {};
+}
+######## dev/diorama/waypoint/WaypointFolderScreen
+Compiled from "WaypointFolderScreen.java"
+public final class dev.diorama.waypoint.WaypointFolderScreen extends net.minecraft.client.gui.screens.Screen {
+  private static final int WIDTH;
+  private static final int LABEL;
+  private static final int RED;
+  private final dev.diorama.waypoint.WaypointListScreen parent;
+  private final java.lang.String existing;
+  private net.minecraft.client.gui.components.EditBox name;
+  private net.minecraft.client.gui.components.Button save;
+  private net.minecraft.network.chat.Component problem;
+  public dev.diorama.waypoint.WaypointFolderScreen(dev.diorama.waypoint.WaypointListScreen, java.lang.String);
+  private int left();
+  private int top();
+  protected void m_7856_();
+  private void validate();
+  private void save();
+  public void m_88315_(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  public void m_7379_();
+  public boolean m_7043_();
+  private void lambda$init$2(net.minecraft.client.gui.components.Button);
+  private void lambda$init$1(net.minecraft.client.gui.components.Button);
+  private void lambda$init$0(java.lang.String);
+}
+######## dev/diorama/waypoint/WaypointHud
+Compiled from "WaypointHud.java"
+public final class dev.diorama.waypoint.WaypointHud implements dev.diorama.compat.HudElement {
+  private static final float NAME_RADIUS;
+  private static final double NAME_DISTANCE;
+  private final dev.diorama.waypoint.WaypointBeams beams;
+  public dev.diorama.waypoint.WaypointHud();
+  public void render(net.minecraft.client.gui.GuiGraphics, float);
+}
+######## dev/diorama/waypoint/WaypointIconScreen
+Compiled from "WaypointIconScreen.java"
+public final class dev.diorama.waypoint.WaypointIconScreen extends net.minecraft.client.gui.screens.Screen {
+  private static final int CELL;
+  private static final int MIN_COLUMNS;
+  private static final int LABEL;
+  private final net.minecraft.client.gui.screens.Screen parent;
+  private final dev.diorama.waypoint.Waypoint sample;
+  private final java.lang.String current;
+  private final java.util.function.Consumer<java.lang.String> picked;
+  private final java.util.List<java.lang.String> icons;
+  public dev.diorama.waypoint.WaypointIconScreen(net.minecraft.client.gui.screens.Screen, dev.diorama.waypoint.Waypoint, java.lang.String, java.util.function.Consumer<java.lang.String>);
+  private int columns();
+  private int rows();
+  private int left();
+  private int top();
+  protected void m_7856_();
+  private int cellAt(double, double);
+  public float[] cellCentre(java.lang.String);
+  public void m_88315_(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  public static net.minecraft.network.chat.Component name(java.lang.String);
+  private boolean clicked(double, double, int);
+  public boolean m_6375_(double, double, int);
+  public void m_7379_();
+  public boolean m_7043_();
+  private void lambda$init$0(net.minecraft.client.gui.components.Button);
+}
+######## dev/diorama/waypoint/WaypointListScreen
+Compiled from "WaypointListScreen.java"
+public final class dev.diorama.waypoint.WaypointListScreen extends net.minecraft.client.gui.screens.Screen {
+  private static final int LIST_WIDTH;
+  private static final int ROW;
+  private static final int PITCH;
+  private static final int FOLDER_Y;
+  private static final int SEARCH_Y;
+  private static final int LIST_TOP;
+  private static final int ARROW;
+  private static final int FOLDER_NAME_WIDTH;
+  private static final int TEXT_LEFT;
+  private static final int ACTION_GAP;
+  private static final long DOUBLE_CLICK_MS;
+  private static final int RED;
+  private static final int DETAIL;
+  private static final int HIDDEN;
+  private static final int HINT;
+  private static final int SEARCH_HINT;
+  private final net.minecraft.client.gui.screens.Screen parent;
+  private final java.util.List<dev.diorama.waypoint.WaypointListScreen$Folder> folders;
+  private java.lang.String folderKey;
+  private java.lang.String shownDimension;
+  private boolean empty;
+  private final java.util.List<net.minecraft.client.gui.components.Button> folderActions;
+  private int folderNameWidth;
+  private net.minecraft.client.gui.components.Button nextFolder;
+  private dev.diorama.waypoint.FolderMenu folderMenu;
+  private boolean menuMoves;
+  private boolean folderArmed;
+  private final java.util.List<dev.diorama.waypoint.Waypoint> all;
+  private final java.util.List<dev.diorama.waypoint.Waypoint> others;
+  private final java.util.List<dev.diorama.waypoint.Waypoint> rows;
+  private int otherStart;
+  private int searchWidth;
+  private net.minecraft.client.gui.components.Button sortOrder;
+  private net.minecraft.client.gui.components.Button sortDirection;
+  private boolean sortReversed;
+  private final java.util.List<net.minecraft.client.gui.components.Button> actions;
+  private net.minecraft.client.gui.components.Button edit;
+  private net.minecraft.client.gui.components.Button teleport;
+  private net.minecraft.client.gui.components.Button delete;
+  private final dev.diorama.waypoint.MapPiece piece;
+  private final dev.diorama.waypoint.Waypoint spotHere;
+  private final dev.diorama.waypoint.Waypoint sample;
+  private net.minecraft.client.gui.components.EditBox search;
+  private dev.diorama.waypoint.Waypoint selected;
+  private final java.util.Set<dev.diorama.waypoint.Waypoint> marked;
+  private dev.diorama.waypoint.Waypoint anchor;
+  private boolean controlClick;
+  private boolean shiftClick;
+  private net.minecraft.client.gui.components.Button move;
+  private boolean armed;
+  private net.minecraft.client.gui.components.Button visibility;
+  private net.minecraft.client.gui.components.Button confirm;
+  private int scroll;
+  private int listBottom;
+  private int hintY;
+  private int visibleRows;
+  private boolean draggingScrollbar;
+  private long lastClick;
+  private dev.diorama.waypoint.Waypoint lastClicked;
+  private boolean canTeleport;
+  private int waystoneChanges;
+  private boolean hadWaystones;
+  private int storeRevision;
+  private boolean newWaypointPressed;
+  private boolean xaeroRead;
+  private dev.diorama.waypoint.XaeroImport$Found xaero;
+  private net.minecraft.network.chat.Component imported;
+  private net.minecraft.network.chat.Component exported;
+  private boolean exportFailed;
+  private int noticeY;
+  private int emptyTop;
+  private static final boolean MAC;
+  public dev.diorama.waypoint.WaypointListScreen(net.minecraft.client.gui.screens.Screen);
+  void showFolder(java.lang.String);
+  public void showDimension(java.lang.String);
+  private void collectFolders(dev.diorama.waypoint.WaypointStore, java.lang.String);
+  private dev.diorama.waypoint.WaypointListScreen$Folder folder();
+  private void openFolderMenu();
+  private void clickFolderMenu(double, double, int);
+  private void keyFolderMenu(int);
+  private void pickFolder(dev.diorama.waypoint.FolderMenu$Entry);
+  private java.util.List<dev.diorama.waypoint.Waypoint> movable();
+  private void openMoveMenu();
+  private void moveTo(java.lang.String);
+  private void stepFolder(int);
+  private static int folderNameLeft(int);
+  private static dev.diorama.waypoint.Waypoint again(dev.diorama.waypoint.Waypoint, java.util.Set<dev.diorama.waypoint.Waypoint>, java.util.Map<java.util.UUID, dev.diorama.waypoint.Waypoint>);
+  private java.util.List<dev.diorama.waypoint.Waypoint> deleting();
+  private static boolean sameWaypoints(java.util.List<dev.diorama.waypoint.Waypoint>, java.util.List<dev.diorama.waypoint.Waypoint>);
+  protected void m_7856_();
+  private void changeSort(boolean);
+  private void resort(dev.diorama.waypoint.WaypointStore);
+  private double distance(dev.diorama.waypoint.WaypointStore, java.lang.String, net.minecraft.world.entity.Entity, dev.diorama.waypoint.Waypoint);
+  private void labelSort(dev.diorama.waypoint.WaypointStore);
+  private java.lang.String sortDirectionKey();
+  private void drawSortCaret(net.minecraft.client.gui.GuiGraphics);
+  private void filter();
+  private java.lang.String query();
+  private java.lang.String folderName(java.lang.String);
+  private int lines();
+  private int lineOf(int);
+  private int rowOn(int);
+  private int maxScroll();
+  private void scrollTo(int);
+  private void select(dev.diorama.waypoint.Waypoint);
+  private void placeRowButtons();
+  private void placeFolderButtons();
+  private static void show(net.minecraft.client.gui.components.Button, boolean);
+  private net.minecraft.client.gui.components.Button action(net.minecraft.network.chat.Component, java.lang.Runnable);
+  private static int width(int);
+  private java.util.List<net.minecraft.client.gui.components.Button> rowActions();
+  private int actionsWidth();
+  private static float badgeX(dev.diorama.waypoint.Waypoint);
+  private int rowY(int);
+  private int rowAt(double, double);
+  public void m_88315_(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  private void drawBackground(net.minecraft.client.gui.GuiGraphics, int, int);
+  private void drawList(net.minecraft.client.gui.GuiGraphics, int, int);
+######## dev/diorama/waypoint/WaypointOverlay
+Compiled from "WaypointOverlay.java"
+public final class dev.diorama.waypoint.WaypointOverlay {
+  private dev.diorama.waypoint.WaypointOverlay();
+  public static java.util.List<dev.diorama.waypoint.WaypointOverlay$Pin> layout(dev.diorama.render.MapViewport$View, java.util.List<dev.diorama.waypoint.Waypoint>, boolean);
+  public static void draw(net.minecraft.client.gui.GuiGraphics, dev.diorama.render.MapViewport$View, java.util.List<dev.diorama.waypoint.WaypointOverlay$Pin>, boolean, dev.diorama.waypoint.WaypointOverlay$Pin);
+  public static dev.diorama.waypoint.WaypointOverlay$Pin under(java.util.List<dev.diorama.waypoint.WaypointOverlay$Pin>, double, double);
+  public static net.minecraft.network.chat.Component describe(dev.diorama.waypoint.Waypoint, net.minecraft.world.entity.Entity);
+}
+######## dev/diorama/waypoint/WaypointShare
+Compiled from "WaypointShare.java"
+public final class dev.diorama.waypoint.WaypointShare {
+  private static final java.util.regex.Pattern SHARED;
+  private static final int MAX_HORIZONTAL;
+  private static final int MAX_VERTICAL;
+  private static final int MAX_CHAT;
+  private static final int MAX_NAME;
+  private static final java.util.regex.Pattern DIMENSION_ID;
+  private static final java.lang.String ADD_COMMAND;
+  private dev.diorama.waypoint.WaypointShare();
+  public static java.util.Optional<java.lang.String> format(dev.diorama.waypoint.Waypoint);
+  public static boolean send(dev.diorama.waypoint.Waypoint);
+  static java.lang.String encode(java.lang.String);
+  static java.lang.String decode(java.lang.String);
+  static java.lang.String chatSafe(java.lang.String);
+  public static java.util.Optional<dev.diorama.waypoint.WaypointShare$Shared> parse(java.lang.String);
+  static java.lang.String cut(java.lang.String, int);
+  public static net.minecraft.network.chat.Component withAddLink(net.minecraft.network.chat.Component);
+  public static net.minecraft.network.chat.Component withAddLinkOnArrival(net.minecraft.network.chat.Component);
+  private static boolean hasAddLink(net.minecraft.network.chat.Component);
+  public static java.lang.String addCommand(dev.diorama.waypoint.WaypointShare$Shared, int);
+  private static net.minecraft.network.chat.Component addLink(dev.diorama.waypoint.WaypointShare$Shared, int);
+  public static <S> void register(com.mojang.brigadier.CommandDispatcher<S>);
+  private static <S> int list(com.mojang.brigadier.context.CommandContext<S>);
+  private static <S> int add(com.mojang.brigadier.context.CommandContext<S>);
+  static int colorIndex(int);
+  static int paletteColor(int);
+  static int chatColor(int);
+  static int nearestPaletteColor(int);
+  static java.lang.String xaeroDimension(java.lang.String);
+  static java.lang.String ourDimension(java.lang.String);
+  private static void lambda$add$4(net.minecraft.client.Minecraft, dev.diorama.waypoint.Waypoint);
+  private static void lambda$list$3(net.minecraft.client.Minecraft);
+  private static net.minecraft.network.chat.Style lambda$addLink$2(java.lang.String, dev.diorama.waypoint.WaypointShare$Shared, int, net.minecraft.network.chat.Style);
+  private static java.util.Optional lambda$hasAddLink$1(net.minecraft.network.chat.Style, java.lang.String);
+  private static boolean lambda$chatSafe$0(int);
+  static {};
+}
+######## dev/diorama/waypoint/WaypointSnapshots
+Compiled from "WaypointSnapshots.java"
+final class dev.diorama.waypoint.WaypointSnapshots {
+  private static final java.util.Map<java.lang.String, java.util.Optional<dev.diorama.api.DimensionId>> DIMENSIONS;
+  private static final java.util.Map<java.lang.String, java.util.Optional<dev.diorama.api.ResourceId>> ICONS;
+  private static final java.util.Map<java.lang.String, dev.diorama.api.MapId> MAPS;
+  private static final java.util.Set<java.lang.String> WARNED;
+  private static long revisions;
+  private final dev.diorama.waypoint.WaypointStore store;
+  private java.util.List<dev.diorama.api.Waypoint> list;
+  private java.util.Map<java.util.UUID, dev.diorama.waypoint.WaypointSnapshots$Snapshot> byId;
+  private long published;
+  private int revision;
+  private int waystoneChanges;
+  private boolean portalPins;
+  dev.diorama.waypoint.WaypointSnapshots(dev.diorama.waypoint.WaypointStore);
+  java.util.List<dev.diorama.api.Waypoint> all();
+  java.util.Optional<dev.diorama.api.Waypoint> get(java.util.UUID);
+  dev.diorama.waypoint.WaypointSnapshots$Snapshot snapshot(java.util.UUID);
+  long revision();
+  boolean pending();
+  void refresh();
+  private void rebuild();
+  private boolean sameAs(java.util.List<dev.diorama.waypoint.WaypointSnapshots$Snapshot>);
+  private static dev.diorama.api.DimensionId dimension(java.lang.String);
+  private static java.util.Optional<dev.diorama.api.ResourceId> icon(java.lang.String);
+  static dev.diorama.api.MapId mapId(java.lang.String);
+  private static java.lang.String hash(java.lang.String);
+  private static dev.diorama.api.Waypoint$Kind kind(dev.diorama.waypoint.Waypoint$Kind);
+  static {};
+}
+######## dev/diorama/waypoint/WaypointSort
+Compiled from "WaypointSort.java"
+public final class dev.diorama.waypoint.WaypointSort extends java.lang.Enum<dev.diorama.waypoint.WaypointSort> {
+  public static final dev.diorama.waypoint.WaypointSort DISTANCE;
+  public static final dev.diorama.waypoint.WaypointSort NAME;
+  public static final dev.diorama.waypoint.WaypointSort INITIALS;
+  public static final dev.diorama.waypoint.WaypointSort COLOUR;
+  private static final float HUE_START;
+  private final java.lang.String id;
+  private static final dev.diorama.waypoint.WaypointSort[] $VALUES;
+  public static dev.diorama.waypoint.WaypointSort[] values();
+  public static dev.diorama.waypoint.WaypointSort valueOf(java.lang.String);
+  private dev.diorama.waypoint.WaypointSort(java.lang.String);
+  public java.lang.String key();
+  public java.lang.String directionKey(boolean);
+  public dev.diorama.waypoint.WaypointSort next();
+  public static dev.diorama.waypoint.WaypointSort named(java.lang.String);
+  public java.util.Comparator<dev.diorama.waypoint.Waypoint> comparator(boolean, java.util.function.ToDoubleFunction<dev.diorama.waypoint.Waypoint>);
+  private static java.lang.String nameKey(dev.diorama.waypoint.Waypoint);
+  static double colourKey(int);
+  private static java.lang.Boolean lambda$comparator$5(dev.diorama.waypoint.Waypoint);
+  private static double lambda$comparator$4(dev.diorama.waypoint.Waypoint);
+  private static java.lang.String lambda$comparator$3(dev.diorama.waypoint.Waypoint);
+  private static java.lang.Boolean lambda$comparator$2(dev.diorama.waypoint.Waypoint);
+  private static java.lang.Boolean lambda$comparator$1(java.util.function.ToDoubleFunction, dev.diorama.waypoint.Waypoint);
+  private static double lambda$comparator$0(java.util.function.ToDoubleFunction, dev.diorama.waypoint.Waypoint);
+  private static dev.diorama.waypoint.WaypointSort[] $values();
+  static {};
+}
+######## dev/diorama/waypoint/WaypointStore
+Compiled from "WaypointStore.java"
+public final class dev.diorama.waypoint.WaypointStore {
+  public static final int DEATHS_KEPT;
+  private static final com.google.gson.Gson GSON;
+  private static dev.diorama.waypoint.WaypointStore current;
+  private static int saves;
+  private static int folderSaves;
+  private final java.lang.String worldKey;
+  private final java.nio.file.Path file;
+  private final java.util.List<dev.diorama.waypoint.Waypoint> waypoints;
+  private final java.util.List<dev.diorama.waypoint.Waypoint> elsewhere;
+  private final java.nio.file.Path foldersFile;
+  private dev.diorama.waypoint.WaypointStore$Folders folders;
+  private final java.util.Set<dev.diorama.waypoint.WaypointStore$ShownIn> shownIn;
+  private final java.util.Map<java.lang.String, java.lang.Double> scales;
+  private final java.util.Map<java.lang.String, java.util.Map<dev.diorama.waypoint.Waypoint, dev.diorama.waypoint.Waypoint>> copies;
+  private final dev.diorama.waypoint.WaypointSnapshots snapshots;
+  private int revision;
+  private boolean foldersOwed;
+  public static final java.lang.String WAYSTONES_KEY;
+  private dev.diorama.waypoint.WaypointStore(java.lang.String);
+  public static dev.diorama.waypoint.WaypointStore get();
+  public static void onLeave();
+  public static dev.diorama.waypoint.WaypointStore open(java.lang.String);
+  public static dev.diorama.waypoint.WaypointStore peek();
+  public static int saves();
+  public static int folderSaves();
+  public java.lang.String worldKey();
+  public int revision();
+  public boolean holds(dev.diorama.waypoint.Waypoint);
+  public static dev.diorama.api.MapId mapId(java.lang.String);
+  public static void mapChanged(java.lang.String);
+  public static void mapDeleted(java.lang.String, java.lang.String, java.lang.String);
+  public int count(java.lang.String, java.lang.String);
+  private static boolean hidden(dev.diorama.waypoint.Waypoint);
+  public java.util.List<dev.diorama.waypoint.Waypoint> all();
+  public java.util.List<dev.diorama.waypoint.Waypoint> kept();
+  java.util.List<dev.diorama.waypoint.Waypoint> withHidden(java.lang.String);
+  public java.util.List<dev.diorama.waypoint.Waypoint> in(java.lang.String);
+  public java.util.List<dev.diorama.waypoint.Waypoint> shownIn(java.lang.String);
+  public java.util.List<dev.diorama.waypoint.Waypoint> shownIn(java.lang.String, java.util.List<dev.diorama.waypoint.Waypoint>);
+  private void addShownIn(java.lang.String, java.util.List<dev.diorama.waypoint.Waypoint>);
+  public boolean showsIn(java.lang.String, java.lang.String);
+  public void setShownIn(java.lang.String, java.lang.String, boolean);
+  public double coordinateScale(java.lang.String);
+  private static double lookUpScale(net.minecraft.client.Minecraft, java.lang.String);
+  public java.util.List<dev.diorama.waypoint.Waypoint> waystones();
+  private dev.diorama.waypoint.Waypoint withVisibility(dev.diorama.waypoint.Waypoint);
+  public void setVisible(dev.diorama.waypoint.Waypoint, boolean);
+  public static java.lang.String dimensionKey(java.lang.String);
+  private static java.lang.String waystoneKey(java.util.UUID);
+  public static java.lang.String customKey(java.lang.String);
+  public java.lang.String folderKey(dev.diorama.waypoint.Waypoint);
+  public java.util.List<java.lang.String> customFolders();
+  public java.lang.String folderName(java.lang.String);
+  public boolean addFolder(java.lang.String);
+  public boolean renameFolder(java.lang.String, java.lang.String);
+  public void deleteFolder(java.lang.String);
+  public boolean folderHidden(java.lang.String);
+  public void setFolderHidden(java.lang.String, boolean);
+  public dev.diorama.waypoint.WaypointSort sort();
+  public boolean sortReversed();
+  public void setSort(dev.diorama.waypoint.WaypointSort, boolean);
+  public boolean shown(dev.diorama.waypoint.Waypoint);
+  public static boolean isShown(dev.diorama.waypoint.Waypoint);
+  public boolean shownOn(dev.diorama.waypoint.Waypoint, dev.diorama.waypoint.Waypoint$Surface);
+  public static boolean isShownOn(dev.diorama.waypoint.Waypoint, dev.diorama.waypoint.Waypoint$Surface);
+  public static boolean inWorld(dev.diorama.waypoint.Waypoint);
+  public static boolean isNear(dev.diorama.waypoint.Waypoint, net.minecraft.world.entity.Entity);
+  public void add(dev.diorama.waypoint.Waypoint);
+  public void addAll(java.util.List<dev.diorama.waypoint.Waypoint>);
+  void onMapInUse(dev.diorama.waypoint.Waypoint);
+  private java.util.List<dev.diorama.waypoint.Waypoint> everyWaypoint();
+  public void remove(dev.diorama.waypoint.Waypoint);
+  void forget(dev.diorama.waypoint.Waypoint);
+  public void changed();
+  private void committed();
+  java.util.List<dev.diorama.waypoint.Waypoint> listed();
+  dev.diorama.waypoint.WaypointSnapshots snapshots();
+  public java.util.List<dev.diorama.api.Waypoint> published();
+  public java.util.Optional<dev.diorama.api.Waypoint> published(java.util.UUID);
+  public long publishedRevision();
+  public static dev.diorama.api.EditResult notApplied();
+  public dev.diorama.api.EditResult apply(java.lang.String, dev.diorama.api.WaypointBatch);
+  java.util.Set<java.util.UUID> ids();
+  void addEdited(dev.diorama.waypoint.Waypoint);
+  void removeEdited(dev.diorama.waypoint.Waypoint);
+  boolean useFolder(dev.diorama.waypoint.Waypoint);
+  private void load();
+  private static dev.diorama.waypoint.Waypoint normalise(dev.diorama.waypoint.Waypoint);
+  private void loadFolders();
+  private boolean saveFolders();
+  private boolean save();
+  private boolean saveWaypoints();
+  private static boolean lambda$saveWaypoints$11(dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$loadFolders$10(java.lang.String, java.lang.String);
+  private static long lambda$add$9(dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$add$8(dev.diorama.waypoint.Waypoint);
+  private static java.lang.String lambda$customFolders$7(java.lang.String);
+  private static boolean lambda$withHidden$6(java.lang.String, dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$kept$5(dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$all$4(dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$mapDeleted$3(java.lang.String, java.lang.String, dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$mapChanged$2(java.lang.String, java.lang.String, dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$mapChanged$1(java.lang.String, java.lang.String, dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$mapChanged$0(java.lang.String, dev.diorama.waypoint.Waypoint);
+  static {};
+}
+######## dev/diorama/waypoint/Waypoints
+Compiled from "Waypoints.java"
+public final class dev.diorama.waypoint.Waypoints {
+  private static boolean wasSleeping;
+  public static final double DEATH_REACHED;
+  private static final long DEATH_GRACE_MS;
+  private dev.diorama.waypoint.Waypoints();
+  public static java.lang.String dimension();
+  public static dev.diorama.waypoint.Waypoint atPlayer();
+  public static dev.diorama.waypoint.Waypoint at(net.minecraft.core.BlockPos, java.lang.String);
+  public static net.minecraft.network.chat.Component dimensionName(java.lang.String);
+  public static void addTemporary(net.minecraft.core.BlockPos, java.lang.String);
+  public static boolean canTeleport();
+  public static boolean canTeleport(java.lang.String);
+  private static boolean mayUse(java.lang.String);
+  public static void teleport(java.lang.String, int, int, int);
+  public static void watchSleep(net.minecraft.client.Minecraft);
+  private static boolean slept(net.minecraft.core.BlockPos);
+  public static void watchDeaths(net.minecraft.client.Minecraft);
+  public static void died(net.minecraft.client.player.LocalPlayer);
+  private static boolean lambda$canTeleport$0(java.lang.String, net.minecraft.resources.ResourceKey);
+}
+######## dev/diorama/waypoint/Waystones
+Compiled from "Waystones.java"
+public final class dev.diorama.waypoint.Waystones {
+  private static final java.lang.String API;
+  private static final java.lang.String WAYSTONE;
+  private static final int COLOUR;
+  private static final java.util.Map<java.lang.String, java.lang.Integer> DYES;
+  private static final long CHECK_MS;
+  private static final java.util.Map<java.lang.String, java.util.Map<java.util.UUID, dev.diorama.waypoint.Waypoint>> KNOWN;
+  private static final java.util.Map<java.util.UUID, java.lang.String> PICKED_UP;
+  private static int changes;
+  private static final java.util.Map<java.lang.String, java.util.Optional<java.lang.reflect.Method>> METHODS;
+  private static boolean started;
+  private static volatile boolean failed;
+  private static java.lang.reflect.Method activated;
+  private static long nextCheck;
+  private static final java.util.Set<java.util.UUID> BLOCK_BACK_FOR_TESTS;
+  private dev.diorama.waypoint.Waystones();
+  public static void tick();
+  private static void start();
+  private static boolean installed();
+  private static void listen(java.lang.String, dev.diorama.waypoint.Waystones$Handler) throws java.lang.ReflectiveOperationException;
+  private static java.lang.reflect.Method one(java.lang.Class<?>, java.lang.String, int) throws java.lang.NoSuchMethodException;
+  private static void listReceived(java.lang.Object) throws java.lang.ReflectiveOperationException;
+  private static void received(java.lang.String, java.util.List<dev.diorama.waypoint.Waypoint>);
+  private static boolean same(dev.diorama.waypoint.Waypoint, dev.diorama.waypoint.Waypoint);
+  private static void updateReceived(java.lang.Object) throws java.lang.ReflectiveOperationException;
+  private static void removeReceived(java.lang.Object) throws java.lang.ReflectiveOperationException;
+  private static void removed(java.util.UUID, boolean);
+  private static boolean placed(dev.diorama.waypoint.Waypoint);
+  private static void rediscover();
+  private static dev.diorama.waypoint.Waypoint known(java.util.UUID);
+  public static boolean has(java.util.UUID);
+  private static boolean blockThere(dev.diorama.waypoint.Waypoint);
+  private static java.lang.String spot(dev.diorama.waypoint.Waypoint);
+  private static void onClient(java.lang.Runnable);
+  private static void forget(java.util.UUID);
+  private static boolean shown(java.lang.String);
+  private static java.lang.String kind(java.lang.Object) throws java.lang.ReflectiveOperationException;
+  private static dev.diorama.waypoint.Waypoint waypoint(java.lang.Object) throws java.lang.ReflectiveOperationException;
+  private static java.lang.Object get(java.lang.Object, java.lang.String...) throws java.lang.ReflectiveOperationException;
+  private static java.lang.reflect.Method publicMethod(java.lang.Class<?>, java.lang.String);
+  private static void fail(java.lang.Throwable);
+  static java.util.List<dev.diorama.waypoint.Waypoint> in(java.lang.String);
+  static java.util.List<dev.diorama.waypoint.Waypoint> all();
+  private static void check();
+  static int changes();
+  public static void clear();
+  public static void knownForTests(dev.diorama.waypoint.Waypoint);
+  public static void listForTests(java.lang.String, java.util.List<dev.diorama.waypoint.Waypoint>);
+  public static void pickedUpForTests(java.util.UUID, boolean);
+  private static java.util.Map lambda$knownForTests$6(java.lang.String);
+  private static java.util.Optional lambda$get$5(java.lang.Class, java.lang.String, java.lang.String);
+  private static void lambda$removeReceived$4(java.util.UUID, boolean);
+  private static void lambda$updateReceived$3(java.lang.String, java.util.UUID, dev.diorama.waypoint.Waypoint);
+  private static java.util.Map lambda$updateReceived$2(java.lang.String);
+  private static void lambda$listReceived$1(java.lang.String, java.util.List);
+  private static void lambda$listen$0(dev.diorama.waypoint.Waystones$Handler, java.lang.Object);
+  static {};
+}
+######## dev/diorama/waypoint/WorldProjection
+Compiled from "WorldProjection.java"
+public final class dev.diorama.waypoint.WorldProjection {
+  private static final org.joml.Matrix4f WORLD;
+  private static net.minecraft.world.phys.Vec3 camera;
+  private static float focal;
+  private dev.diorama.waypoint.WorldProjection();
+  public static void capture(org.joml.Matrix4fc, org.joml.Matrix4fc, net.minecraft.world.phys.Vec3);
+  static boolean clip(double, double, double, org.joml.Vector4f);
+  static float focal();
+  public static float[] project(double, double, double, float, float);
+  public static net.minecraft.world.phys.Vec3 camera();
+  static {};
+}
+######## dev/diorama/waypoint/XaeroImport
+Compiled from "XaeroImport.java"
+public final class dev.diorama.waypoint.XaeroImport {
+  private static final net.minecraft.world.item.DyeColor[] EXTRA_COLORS;
+  static final int COLORS;
+  private static final java.util.Map<java.lang.String, java.lang.String> XAERO_NAMES;
+  private static final int MAX_NAME;
+  private static final int MAX_HORIZONTAL;
+  private static final int MAX_VERTICAL;
+  private static final long MAX_FILE;
+  private static final java.lang.String SHARED_FOLDER;
+  private dev.diorama.waypoint.XaeroImport();
+  public static dev.diorama.waypoint.XaeroImport$Found find();
+  static java.util.List<java.lang.String> worldFolders(net.minecraft.client.Minecraft);
+  public static dev.diorama.waypoint.XaeroImport$Found find(java.nio.file.Path, java.util.List<java.lang.String>, boolean, java.lang.String, int) throws java.io.IOException;
+  private static dev.diorama.waypoint.XaeroImport$World merge(java.lang.String, java.util.List<dev.diorama.waypoint.XaeroImport$World>, boolean);
+  private static java.lang.String xaeroChoice(java.nio.file.Path, java.lang.String);
+  static java.lang.Boolean byAddress(java.nio.file.Path);
+  private static java.util.List<java.lang.String> read(java.nio.file.Path) throws java.io.IOException;
+  private static java.nio.file.Path existing(java.nio.file.Path, java.util.List<java.lang.String>) throws java.io.IOException;
+  public static java.util.List<java.lang.String> singleplayerFolders(java.lang.String);
+  public static java.util.List<java.lang.String> serverFolders(java.lang.String, java.lang.Boolean);
+  private static java.lang.String serverFolder(java.lang.String, int);
+  static java.lang.String dimension(java.lang.String);
+  static java.util.List<dev.diorama.waypoint.XaeroImport$Entry> parse(java.util.List<java.lang.String>, java.lang.String, int);
+  private static java.lang.String name(java.lang.String);
+  static int color(int);
+  public static java.util.List<dev.diorama.waypoint.Waypoint> missing(dev.diorama.waypoint.XaeroImport$World, dev.diorama.waypoint.WaypointStore);
+  private static java.lang.String key(dev.diorama.waypoint.Waypoint, boolean);
+  public static java.util.List<dev.diorama.waypoint.Waypoint> importInto(dev.diorama.waypoint.XaeroImport$World, dev.diorama.waypoint.WaypointStore);
+  private static dev.diorama.waypoint.Waypoint copy(dev.diorama.waypoint.Waypoint);
+  private static boolean lambda$existing$8(java.nio.file.Path);
+  private static boolean lambda$merge$7(java.lang.String);
+  private static java.util.stream.Stream lambda$merge$6(dev.diorama.waypoint.XaeroImport$World);
+  private static java.lang.Boolean lambda$find$5(dev.diorama.waypoint.XaeroImport$World);
+  private static boolean lambda$find$4(dev.diorama.waypoint.XaeroImport$World);
+  private static boolean lambda$find$3(java.lang.String);
+  private static java.util.List lambda$find$2(java.lang.String);
+  private static boolean lambda$find$1(java.nio.file.Path);
+  private static boolean lambda$find$0(java.nio.file.Path);
+  static {};
+}
+######## dev/diorama/waypoint/XaeroNotice
+Compiled from "XaeroNotice.java"
+public final class dev.diorama.waypoint.XaeroNotice {
+  private static final int DELAY_TICKS;
+  private static final java.lang.String SHOWN_FILE;
+  public static final java.lang.String COMMAND;
+  private static java.lang.String checked;
+  private static java.lang.String pending;
+  private static int ticks;
+  private dev.diorama.waypoint.XaeroNotice();
+  public static void tick(net.minecraft.client.Minecraft);
+  static net.minecraft.network.chat.Component message(dev.diorama.waypoint.XaeroImport$Found, dev.diorama.waypoint.WaypointStore);
+  private static net.minecraft.network.chat.Component link();
+  private static net.minecraft.network.chat.Style lambda$link$1(net.minecraft.network.chat.Style);
+  private static boolean lambda$message$0(dev.diorama.waypoint.WaypointStore, dev.diorama.waypoint.XaeroImport$World);
+}
+######## dev/diorama/waypoint/XaeroWorldScreen
+Compiled from "XaeroWorldScreen.java"
+final class dev.diorama.waypoint.XaeroWorldScreen extends net.minecraft.client.gui.screens.Screen {
+  private static final int ROW;
+  private static final int WIDTH;
+  private final dev.diorama.waypoint.WaypointListScreen parent;
+  private final java.util.List<dev.diorama.waypoint.XaeroImport$World> worlds;
+  private int scroll;
+  private int listTop;
+  private int visibleRows;
+  dev.diorama.waypoint.XaeroWorldScreen(dev.diorama.waypoint.WaypointListScreen, java.util.List<dev.diorama.waypoint.XaeroImport$World>);
+  protected void m_7856_();
+  public void m_88315_(net.minecraft.client.gui.GuiGraphics, int, int, float);
+  private static net.minecraft.network.chat.Component dimensionName(java.lang.String);
+  public boolean m_6050_(double, double, double);
+  public void m_7379_();
+  public boolean m_7043_();
+  private static java.lang.String lambda$render$2(dev.diorama.waypoint.XaeroImport$Entry);
+  private void lambda$init$1(net.minecraft.client.gui.components.Button);
+  private void lambda$init$0(dev.diorama.waypoint.XaeroImport$World, net.minecraft.client.gui.components.Button);
+}
+######## dev/diorama/web/WebMarkers
+Compiled from "WebMarkers.java"
+final class dev.diorama.web.WebMarkers {
+  static final java.lang.String FILE;
+  static final java.lang.String STORE;
+  static final int MOST;
+  static final int LONGEST_NAME;
+  private final java.nio.file.Path store;
+  private final java.nio.file.Path folder;
+  private final java.util.List<dev.diorama.web.WebMarkers$Marker> markers;
+  private boolean unreadable;
+  private volatile boolean published;
+  dev.diorama.web.WebMarkers(java.nio.file.Path, java.nio.file.Path);
+  boolean published();
+  synchronized java.util.List<dev.diorama.web.WebMarkers$Marker> all();
+  synchronized boolean writable();
+  synchronized dev.diorama.web.WebMarkers$Marker named(java.lang.String);
+  synchronized boolean put(dev.diorama.web.WebMarkers$Marker, java.util.function.Predicate<java.lang.String>);
+  synchronized boolean remove(dev.diorama.web.WebMarkers$Marker, java.util.function.Predicate<java.lang.String>);
+  private boolean saved(java.util.List<dev.diorama.web.WebMarkers$Marker>, java.util.function.Predicate<java.lang.String>);
+  synchronized void publish(java.util.function.Predicate<java.lang.String>);
+  private static void write(java.nio.file.Path, java.util.List<dev.diorama.web.WebMarkers$Marker>) throws java.io.IOException;
+  private static boolean lambda$publish$1(java.util.function.Predicate, dev.diorama.web.WebMarkers$Marker);
+  private static boolean lambda$put$0(dev.diorama.web.WebMarkers$Marker, dev.diorama.web.WebMarkers$Marker);
+}

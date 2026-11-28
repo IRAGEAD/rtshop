@@ -1,0 +1,346 @@
+######## FarmersDelight-1.20.1-1.3.4.jar | data/farmersdelight/recipes/cake_from_milk_bottle.json | minecraft:cake
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "cake",
+  "key": {
+    "e": {
+      "tag": "forge:eggs"
+    },
+    "m": {
+      "tag": "forge:milk"
+    },
+    "s": {
+      "item": "minecraft:sugar"
+    },
+    "w": {
+      "tag": "forge:crops/wheat"
+    }
+  },
+  "pattern": [
+    "mmm",
+    "ses",
+    "www"
+  ],
+  "result": {
+    "item": "minecraft:cake"
+  },
+  "show_notification": true
+}
+######## FarmersDelight-1.20.1-1.3.4.jar | data/farmersdelight/recipes/cake_from_slices.json | minecraft:cake
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "cake",
+  "ingredients": [
+    {
+      "item": "farmersdelight:cake_slice"
+    },
+    {
+      "item": "farmersdelight:cake_slice"
+    },
+    {
+      "item": "farmersdelight:cake_slice"
+    },
+    {
+      "item": "farmersdelight:cake_slice"
+    },
+    {
+      "item": "farmersdelight:cake_slice"
+    },
+    {
+      "item": "farmersdelight:cake_slice"
+    },
+    {
+      "item": "farmersdelight:cake_slice"
+    }
+  ],
+  "result": {
+    "item": "minecraft:cake"
+  }
+}
+######## FarmersDelight-1.20.1-1.3.4.jar | data/farmersdelight/recipes/cutting/cake.json | farmersdelight:cake_slice
+{
+  "type": "farmersdelight:cutting",
+  "ingredients": [
+    {
+      "item": "minecraft:cake"
+    }
+  ],
+  "result": [
+    {
+      "count": 7,
+      "item": "farmersdelight:cake_slice"
+    }
+  ],
+  "tool": [
+    {
+      "type": "farmersdelight:tool_action",
+      "action": "knife_dig"
+    },
+    {
+      "tag": "forge:tools/knives"
+    }
+  ]
+}
+######## FarmersDelight-1.20.1-1.3.4.jar | data/farmersdelight/recipes/milk_bucket_from_bottles.json | minecraft:milk_bucket
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "farmersdelight:milk_bottle"
+    },
+    {
+      "item": "farmersdelight:milk_bottle"
+    },
+    {
+      "item": "farmersdelight:milk_bottle"
+    },
+    {
+      "item": "farmersdelight:milk_bottle"
+    }
+  ],
+  "result": {
+    "item": "minecraft:milk_bucket"
+  }
+}
+######## better_farming_plus-forge-1.20.1-1.0.0.jar | data/better_farming_plus/recipes/sprinkler.json | better_farming_plus:sprinkler
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " c ",
+    "cbc",
+    " c "
+  ],
+  "key": {
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "b": {
+      "item": "minecraft:bucket"
+    }
+  },
+  "result": {
+    "item": "better_farming_plus:sprinkler",
+    "count": 1
+  }
+}
+
+######## create-1.20.1-6.0.8.jar | data/create/recipes/crafting/curiosities/cake.json | minecraft:cake
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": {
+      "tag": "forge:eggs"
+    },
+    "M": {
+      "item": "minecraft:milk_bucket"
+    },
+    "P": {
+      "tag": "forge:dough"
+    },
+    "S": {
+      "item": "minecraft:sugar"
+    }
+  },
+  "pattern": [
+    " M ",
+    "SES",
+    " P "
+  ],
+  "result": {
+    "item": "minecraft:cake"
+  },
+  "show_notification": true
+}
+######## irons_spellbooks-1.20.1-3.16.4.jar | data/irons_spellbooks/recipes/alchemist_cauldron/empty_water_bucket.json | minecraft:water_bucket
+{
+  "type": "irons_spellbooks:alchemist_cauldron_empty",
+  "fluid": {
+    "Amount": 1000,
+    "FluidName": "minecraft:water"
+  },
+  "input": {
+    "item": "minecraft:bucket"
+  },
+  "result": {
+    "count": 1,
+    "item": "minecraft:water_bucket"
+  },
+  "sound": "minecraft:item.bucket.fill"
+}
+######## irons_spellbooks-1.20.1-3.16.4.jar | data/irons_spellbooks/recipes/alchemist_cauldron/fill_water_bucket.json | minecraft:bucket
+{
+  "type": "irons_spellbooks:alchemist_cauldron_fill",
+  "fluid": {
+    "Amount": 1000,
+    "FluidName": "minecraft:water"
+  },
+  "input": {
+    "item": "minecraft:water_bucket"
+  },
+  "mustFitAll": false,
+  "result": {
+    "count": 1,
+    "item": "minecraft:bucket"
+  },
+  "sound": "minecraft:item.bucket.empty"
+}
+######## kaleidoscopecookery-1.7.0-forge-mc1.20.1.jar | data/kaleidoscope_cookery/recipes/enamel_basin.json | kaleidoscope_cookery:enamel_basin
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "I": {
+      "item": "minecraft:heavy_weighted_pressure_plate"
+    },
+    "O": {
+      "item": "minecraft:stone_button"
+    }
+  },
+  "pattern": [
+    "O",
+    "I",
+    "B"
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:enamel_basin"
+  },
+  "show_notification": true
+}
+######## kaleidoscopecookery-1.7.0-forge-mc1.20.1.jar | data/kaleidoscope_cookery/recipes/flex_pot/sticky_candy.json | kaleidoscope_cookery:sticky_candy
+{
+  "type": "kaleidoscope_cookery:flex_pot",
+  "ingredients": [
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:sticky_candy"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## kaleidoscopecookery-1.7.0-forge-mc1.20.1.jar | data/kaleidoscope_cookery/recipes/oil_pot.json | kaleidoscope_cookery:oil_pot
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "P": {
+      "item": "minecraft:heavy_weighted_pressure_plate"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "P ",
+    "BS"
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:oil_pot"
+  },
+  "show_notification": true
+}
+######## kaleidoscopecookery-1.7.0-forge-mc1.20.1.jar | data/kaleidoscope_cookery/recipes/pot/sticky_candy.json | kaleidoscope_cookery:sticky_candy
+{
+  "type": "kaleidoscope_cookery:pot",
+  "ingredients": [
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:sticky_candy"
+  },
+  "stir_fry_count": 3,
+  "time": 200
+}
+######## kaleidoscopecookery-1.7.0-forge-mc1.20.1.jar | data/kaleidoscope_cookery/recipes/teapot.json | kaleidoscope_cookery:teapot
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "I": {
+      "tag": "forge:ingots/copper"
+    }
+  },
+  "pattern": [
+    " I ",
+    "IBI",
+    "III"
+  ],
+  "result": {
+    "item": "kaleidoscope_cookery:teapot"
+  },
+  "show_notification": true
+}
+######## kaleidoscopetavern-1.2.0-forge+mc1.20.1.jar | data/kaleidoscope_tavern/recipes/barrel/rum.json | kaleidoscope_tavern:rum
+{
+  "type": "kaleidoscope_tavern:barrel",
+  "carrier": {
+    "item": "kaleidoscope_tavern:empty_bottle"
+  },
+  "fluid": "minecraft:water",
+  "ingredients": [
+    {
+      "item": "minecraft:sugar_cane"
+    }
+  ],
+  "result": {
+    "item": "kaleidoscope_tavern:rum"
+  },
+  "unit_time": 2400
+}
+######## kaleidoscopetavern-1.2.0-forge+mc1.20.1.jar | data/kaleidoscope_tavern/recipes/shaker.json | kaleidoscope_tavern:shaker
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "I": {
+      "tag": "forge:ingots/iron"
+    }
+  },
+  "pattern": [
+    "I",
+    "B"
+  ],
+  "result": {
+    "item": "kaleidoscope_tavern:shaker"
+  },
+  "show_notification": true
+}

@@ -1,0 +1,34 @@
+== packcache/enderdragonplus-1.20.1-forge-0.3.jar
+META-INF/mods.toml
+assets/enderdragonplus/lang/en_us.json
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="enderdragonplus"
+version="0.3"
+displayName="Ender Dragon Plus"
+authors="hp3081925122"
+description='''为末影龙增加更多技能与特效的增强模组。'''
+
+
+[[dependencies.enderdragonplus]]
+modId="forge"
+mandatory=true
+versionRange="[47,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.enderdragonplus]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,)"
+ordering="NONE"
+side="BOTH"
+{
+  "enderdragonplus.configuration.title": "Ender Dragon Plus Config",
+  "item.enderdragonplus.ending_crystal": "Ending Crystal",
+  "item.enderdragonplus.ending_crystal.desc": "Use it in the respawn ritual around the exit portal to summon the enhanced Ender Dragon",
+  "item.enderdragonplus.ending_crystal.always": "All Ender Dragons are enhanced under the current config"
+}

@@ -1,0 +1,72 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ */
+package com.finderfeed.fdbosses.content.entities.geburah.sins.attachment;
+
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
+import com.finderfeed.fdbosses.content.util.WorldBox;
+import com.finderfeed.fdbosses.init.BossRegistries;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+public class ActivePlayerSinInstance {
+    public static final NetworkCodec<ActivePlayerSinInstance> STREAM_CODEC = NetworkCodec.composite((NetworkCodec)NetworkCodec.registry(() -> BossRegistries.PLAYER_SINS.get()), v -> v.sin, WorldBox.STREAM_CODEC, v -> v.sinActiveBox, (NetworkCodec)NetworkCodec.INT, v -> v.activeSinTime, (NetworkCodec)NetworkCodec.INT, v -> v.customData, ActivePlayerSinInstance::new);
+    public static final Codec<ActivePlayerSinInstance> CODEC = RecordCodecBuilder.create(p -> p.group((App)BossRegistries.PLAYER_SINS.get().getCodec().fieldOf("sin").forGetter(v -> v.sin), (App)WorldBox.CODEC.fieldOf("worldBox").forGetter(v -> v.sinActiveBox), (App)Codec.INT.fieldOf("activeSinTime").fieldOf("activeSinTime").forGetter(v -> v.activeSinTime), (App)Codec.INT.fieldOf("customData").forGetter(v -> v.customData)).apply((Applicative)p, ActivePlayerSinInstance::new));
+    private PlayerSin sin;
+    private WorldBox sinActiveBox;
+    private int activeSinTime;
+    private int customData;
+
+    public ActivePlayerSinInstance(PlayerSin playerSin, WorldBox sinActiveBox, int customData) {
+        this.sin = playerSin;
+        this.activeSinTime = 0;
+        this.sinActiveBox = sinActiveBox;
+        this.customData = customData;
+    }
+
+    public ActivePlayerSinInstance(PlayerSin sin, WorldBox sinActiveBox, int activeSinTime, int customData) {
+        this.activeSinTime = activeSinTime;
+        this.sin = sin;
+        this.sinActiveBox = sinActiveBox;
+        this.customData = customData;
+    }
+
+    public int getActiveSinTime() {
+        return this.activeSinTime;
+    }
+
+    public PlayerSin getSin() {
+        return this.sin;
+    }
+
+    public void setActiveSinTime(int activeSinTime) {
+        this.activeSinTime = activeSinTime;
+    }
+
+    public void setSin(PlayerSin sin) {
+        this.sin = sin;
+    }
+
+    public int getCustomData() {
+        return this.customData;
+    }
+
+    public void setCustomData(int customData) {
+        this.customData = customData;
+    }
+
+    public WorldBox getSinActiveBox() {
+        return this.sinActiveBox;
+    }
+}
+

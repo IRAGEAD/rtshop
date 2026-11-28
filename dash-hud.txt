@@ -1,0 +1,247 @@
+== textures packcache/EpicFight Nightfall-3.4.2-all.jar
+assets/efn/textures/gui/crimson_moon/charge.png
+assets/efn/textures/gui/crimson_moon/charge_full.png
+assets/efn/textures/gui/skills/dodge/efn_dodge.png
+assets/efn/textures/gui/skills/dodge/efn_step.png
+assets/efn/textures/gui/skills/dodge/murasama_dodge.png
+assets/efn/textures/gui/skills/dodge/yamato_step.png
+assets/epicskills/textures/gui/widget/node/dodge/acquired.png
+assets/epicskills/textures/gui/widget/node/dodge/equipped.png
+assets/epicskills/textures/gui/widget/node/dodge/locked.png
+assets/epicskills/textures/gui/widget/node/dodge/unlockable.png
+== textures packcache/WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar
+assets/wom/textures/gui/skills/dodge/bull_charge.png
+assets/wom/textures/gui/skills/dodge/dodge_master.png
+assets/wom/textures/gui/skills/dodge/ender_obscuris.png
+assets/wom/textures/gui/skills/dodge/ender_step.png
+assets/wom/textures/gui/skills/dodge/precise_roll.png
+assets/wom/textures/gui/skills/dodge/punishment_kick.png
+assets/wom/textures/gui/skills/dodge/shadow_step.png
+assets/wom/textures/gui/skills/dodge/time_travel.png
+assets/wom/textures/gui/skills/mover/aqua_maneuvre.png
+assets/wom/textures/gui/skills/mover/natural_sprinter.png
+assets/wom/textures/gui/skills/mover/spider_techniques.png
+assets/wom/textures/gui/skills/passive/arrow_tenacity.png
+assets/wom/textures/gui/skills/weapon_innate/geistcharge.png
+assets/wom/textures/gui/skills/weapon_innate/geistcharge_background.png
+assets/wom/textures/gui/skills/weapon_innate/geistcharge_meter.png
+assets/wom/textures/gui/skills/weapon_innate/geistcharge_soulmeter.png
+assets/wom/textures/gui/skills/weapon_innate/rechargement.png
+== textures packcache/accessories-neoforge-1.0.0-beta.48+1.20.1.jar
+assets/accessories/textures/gui/sprites/scroll_bar.png
+assets/accessories/textures/gui/sprites/scroll_bar_patch.png
+== textures packcache/adorablehamsterpets-3.7.0-1.20.1+forge.jar
+assets/adorablehamsterpets/textures/gui/announcement_ui_scroll_bar.png
+== packcache/block_factorys_bosses-2.1.2-forge-1.20.1.jar assets/block_factorys_bosses/lang/en_us.json
+"key.block_factorys_bosses.dodge_roll": "Dodge Roll"
+== textures packcache/block_factorys_bosses-2.1.2-forge-1.20.1.jar
+assets/block_factorys_bosses/textures/gui/roll/dash_green.png
+assets/block_factorys_bosses/textures/gui/roll/dash_grey.png
+assets/block_factorys_bosses/textures/gui/roll/dash_orange.png
+assets/block_factorys_bosses/textures/gui/roll/dash_red.png
+assets/block_factorys_bosses/textures/gui/roll/dash_yellow.png
+== textures packcache/dodge_parry_reward-1.20.1forge-20.14.3.jar
+assets/dodge_parry_reward/textures/gui/skill_tree/background/passive.png
+assets/dodge_parry_reward/textures/gui/skill_tree/icon/passive.png
+== textures packcache/efs_iss-1.0.3.jar
+assets/efs_iss/textures/gui/skills/mover/hasty_casting.png
+== textures packcache/embeddium-0.3.31+mc1.20.1.jar
+assets/sodium/textures/gui/arrows.png
+== packcache/epic-fight-20.14.17-mc1.20.1-forge.jar assets/epicfight/lang/en_us.json
+"key.epicfight.dodge": "Dodge Skill"
+"key.epicfight.mover_skill": "Mobility Skill"
+"key.epicfight.dodge.description": "Performs a dodge maneuver to avoid attacks"
+"key.epicfight.mover_skill.description": "Uses a skill that enhances movement or mobility"
+== packcache/epic-fight-20.14.17-mc1.20.1-forge.jar assets/epicfight/lang/ko_kr.json
+"key.epicfight.dodge": "회피기"
+"key.epicfight.mover_skill": "이동기"
+== textures packcache/epic-fight-20.14.17-mc1.20.1-forge.jar
+assets/epicfight/textures/gui/scroll_arrow_down.png
+assets/epicfight/textures/gui/scroll_arrow_up.png
+assets/epicfight/textures/gui/skills/dodge/roll.png
+assets/epicfight/textures/gui/skills/dodge/step.png
+assets/epicfight/textures/gui/skills/mover/demolition_leap.png
+assets/epicfight/textures/gui/skills/mover/phantom_ascent.png
+assets/epicfight/textures/gui/skills/passive/stamina_pillager.png
+assets/epicfight/textures/item/skillbook_dodge.png
+assets/epicfight/textures/item/skillbook_mover.png
+packs/epicfight_legacy/assets/epicfight/textures/gui/skills/dodge/roll.png
+packs/epicfight_legacy/assets/epicfight/textures/gui/skills/dodge/step.png
+packs/epicfight_legacy/assets/epicfight/textures/gui/skills/mover/demolition_leap.png
+packs/epicfight_legacy/assets/epicfight/textures/gui/skills/mover/phantom_ascent.png
+packs/epicfight_legacy/assets/epicfight/textures/gui/skills/passive/stamina_pillager.png
+== packcache/fantasy-2.3.3-1.20.1-forge.jar assets/fantasy/lang/en_us.json
+"key.fantasy.seat_scroll": "Change seat (hold + mouse wheel)"
+"key.fantasy.seat_scroll.same_as_sprint": "Same as Sprint"
+"key.fantasy.seat_scroll.sprint_held": "Sprint (for changing seat)"
+== packcache/fantasy-2.3.3-1.20.1-forge.jar assets/fantasy/lang/ko_kr.json
+"key.fantasy.seat_scroll": "좌석 변경 (누른 채 마우스 휠)"
+"key.fantasy.seat_scroll.same_as_sprint": "달리기와 동일"
+"key.fantasy.seat_scroll.sprint_held": "달리기 (좌석 변경용)"
+== textures packcache/fdbosses-3.2-1.20.1.jar
+assets/fdbosses/textures/gui/scroller.png
+assets/fdbosses/textures/gui/skills/chesed/roll.png
+== textures packcache/ftb-quests-forge-2001.4.22.jar
+assets/ftbquests/textures/gui/arrow_right.png
+assets/ftbquests/textures/gui/arrow_expanded.png
+assets/ftbquests/textures/gui/arrow_left.png
+assets/ftbquests/textures/gui/arrow_collapsed.png
+== textures packcache/fzzy_config-0.7.7+1.20.1+forge.jar
+assets/fzzy_config/textures/gui/sprites/widget/dashed.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroll_down.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroll_down_highlighted.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroll_up.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroll_up_highlighted.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroller.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroller_background.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroller_highlighted.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroller_overlay.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/creative/scroller_overlay_highlighted.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/increment_down.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/increment_down_disabled.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/increment_down_highlighted.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/increment_up.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/increment_up_disabled.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/increment_up_highlighted.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/vanilla/scroll_down.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/vanilla/scroll_down_highlighted.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/vanilla/scroll_up.png
+assets/fzzy_config/textures/gui/sprites/widget/scroll/vanilla/scroll_up_highlighted.png
+== textures packcache/irons_lib-1.20.1-2.4.0.jar
+assets/irons_lib/textures/gui/sprites/transmog_table/scroller.png
+assets/irons_lib/textures/gui/sprites/transmog_table/scroller_disabled.png
+== packcache/irons_spellbooks-1.20.1-3.16.4.jar assets/irons_spellbooks/lang/en_us.json
+"key.irons_spellbooks.spell_bar_modifier": "Spell Bar Scroll Modifier"
+== textures packcache/irons_spellbooks-1.20.1-3.16.4.jar
+assets/irons_spellbooks/textures/gui/scroll_forge.png
+assets/irons_spellbooks/textures/gui/spell_icons/arrow_volley.png
+assets/irons_spellbooks/textures/gui/spell_icons/blood_step.png
+assets/irons_spellbooks/textures/gui/spell_icons/burning_dash.png
+assets/irons_spellbooks/textures/gui/spell_icons/charge.png
+assets/irons_spellbooks/textures/gui/spell_icons/fire_arrow.png
+assets/irons_spellbooks/textures/gui/spell_icons/frost_step.png
+assets/irons_spellbooks/textures/gui/spell_icons/magic_arrow.png
+assets/irons_spellbooks/textures/gui/spell_icons/poison_arrow.png
+== textures packcache/jei-1.20.1-forge-15.56.0.205.jar
+assets/jei/textures/jei/atlas/gui/brewing_stand_arrow.png
+assets/jei/textures/jei/atlas/gui/icons/arrow_next.png
+assets/jei/textures/jei/atlas/gui/icons/arrow_previous.png
+assets/jei/textures/jei/atlas/gui/recipe_arrow.png
+assets/jei/textures/jei/atlas/gui/recipe_arrow_filled.png
+assets/jei/textures/jei/atlas/gui/scrollbar_background.png
+assets/jei/textures/jei/atlas/gui/scrollbar_marker.png
+== textures packcache/lrtactical-forge-1.20.1-0.4.4.jar
+assets/lrtactical/textures/gui/arrow.png
+== textures packcache/skill_tree-forge-1.6.2+1.20.1.jar
+assets/skill_tree_rpgs/textures/mob_effect/side_step.png
+assets/skill_tree_rpgs/textures/mob_effect/supercharge.png
+assets/skill_tree_rpgs/textures/spell_effect/holy_charge.png
+== textures packcache/spell_engine-forge-1.10.10+1.20.1.jar
+assets/spell_engine/textures/gui/slot/spell_scroll.png
+assets/spell_engine/textures/gui/trinket_slot/spell_scroll.png
+== packcache/spmovesets-1.20.1-2.0-SU.jar assets/spmovesets/lang/en_us.json
+"key.spmovesets.dodge": "Dodge"
+== textures packcache/starcatcher-3.3.10-FORGE-1.20.1.jar
+assets/starcatcher/textures/gui/guide/arrow_index.png
+assets/starcatcher/textures/gui/guide/arrow_index_highlight.png
+assets/starcatcher/textures/gui/guide/arrow_index_pressed.png
+assets/starcatcher/textures/gui/guide/arrow_left.png
+assets/starcatcher/textures/gui/guide/arrow_left_highlight.png
+assets/starcatcher/textures/gui/guide/arrow_next.png
+assets/starcatcher/textures/gui/guide/arrow_next_highlight.png
+assets/starcatcher/textures/gui/guide/arrow_next_pressed.png
+assets/starcatcher/textures/gui/guide/arrow_previous.png
+assets/starcatcher/textures/gui/guide/arrow_previous_highlight.png
+assets/starcatcher/textures/gui/guide/arrow_previous_pressed.png
+assets/starcatcher/textures/gui/guide/arrow_right.png
+assets/starcatcher/textures/gui/guide/arrow_right_highlight.png
+assets/starcatcher/textures/gui/guide/settings/arrow_left.png
+assets/starcatcher/textures/gui/guide/settings/arrow_right.png
+assets/starcatcher/textures/gui/jemi/arrow.png
+assets/starcatcher/textures/gui/tournament/stand/arrow_index.png
+assets/starcatcher/textures/gui/tournament/stand/arrow_index_highlight.png
+assets/starcatcher/textures/gui/tournament/stand/arrow_left.png
+assets/starcatcher/textures/gui/tournament/stand/arrow_left_highlight.png
+== textures packcache/yet_another_config_lib_v3-3.6.6+1.20.1-forge.jar
+assets/yet_another_config_lib_v3/textures/gui/sprites/controller/colorpicker.png
+assets/yet_another_config_lib_v3/textures/gui/sprites/controller/transparent.png
+EpicFight Nightfall-3.4.2-all__assets_efn_textures_gui_crimson_moon_charge.png
+EpicFight Nightfall-3.4.2-all__assets_efn_textures_gui_crimson_moon_charge_full.png
+EpicFight Nightfall-3.4.2-all__assets_efn_textures_gui_skills_dodge_efn_dodge.png
+EpicFight Nightfall-3.4.2-all__assets_efn_textures_gui_skills_dodge_efn_step.png
+EpicFight Nightfall-3.4.2-all__assets_efn_textures_gui_skills_dodge_murasama_dodge.png
+EpicFight Nightfall-3.4.2-all__assets_efn_textures_gui_skills_dodge_yamato_step.png
+EpicFight Nightfall-3.4.2-all__assets_epicskills_textures_gui_widget_node_dodge_acquired.png
+EpicFight Nightfall-3.4.2-all__assets_epicskills_textures_gui_widget_node_dodge_equipped.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_bull_charge.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_dodge_master.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_ender_obscuris.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_ender_step.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_precise_roll.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_punishment_kick.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_shadow_step.png
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge__assets_wom_textures_gui_skills_dodge_time_travel.png
+accessories-neoforge-1.0.0-beta.48+1.20.1__assets_accessories_textures_gui_sprites_scroll_bar.png
+accessories-neoforge-1.0.0-beta.48+1.20.1__assets_accessories_textures_gui_sprites_scroll_bar_patch.png
+adorablehamsterpets-3.7.0-1.20.1+forge__assets_adorablehamsterpets_textures_gui_announcement_ui_scroll_bar.png
+block_factorys_bosses-2.1.2-forge-1.20.1__assets_block_factorys_bosses_textures_gui_roll_dash_green.png
+block_factorys_bosses-2.1.2-forge-1.20.1__assets_block_factorys_bosses_textures_gui_roll_dash_grey.png
+block_factorys_bosses-2.1.2-forge-1.20.1__assets_block_factorys_bosses_textures_gui_roll_dash_orange.png
+block_factorys_bosses-2.1.2-forge-1.20.1__assets_block_factorys_bosses_textures_gui_roll_dash_red.png
+block_factorys_bosses-2.1.2-forge-1.20.1__assets_block_factorys_bosses_textures_gui_roll_dash_yellow.png
+dodge_parry_reward-1.20.1forge-20.14.3__assets_dodge_parry_reward_textures_gui_skill_tree_background_passive.png
+dodge_parry_reward-1.20.1forge-20.14.3__assets_dodge_parry_reward_textures_gui_skill_tree_icon_passive.png
+efs_iss-1.0.3__assets_efs_iss_textures_gui_skills_mover_hasty_casting.png
+embeddium-0.3.31+mc1.20.1__assets_sodium_textures_gui_arrows.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_gui_scroll_arrow_down.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_gui_scroll_arrow_up.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_gui_skills_dodge_roll.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_gui_skills_dodge_step.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_gui_skills_mover_demolition_leap.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_gui_skills_mover_phantom_ascent.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_gui_skills_passive_stamina_pillager.png
+epic-fight-20.14.17-mc1.20.1-forge__assets_epicfight_textures_item_skillbook_dodge.png
+fdbosses-3.2-1.20.1__assets_fdbosses_textures_gui_scroller.png
+fdbosses-3.2-1.20.1__assets_fdbosses_textures_gui_skills_chesed_roll.png
+ftb-quests-forge-2001.4.22__assets_ftbquests_textures_gui_arrow_collapsed.png
+ftb-quests-forge-2001.4.22__assets_ftbquests_textures_gui_arrow_expanded.png
+ftb-quests-forge-2001.4.22__assets_ftbquests_textures_gui_arrow_left.png
+ftb-quests-forge-2001.4.22__assets_ftbquests_textures_gui_arrow_right.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_dashed.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_scroll_creative_scroll_down.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_scroll_creative_scroll_down_highlighted.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_scroll_creative_scroll_up.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_scroll_creative_scroll_up_highlighted.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_scroll_creative_scroller.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_scroll_creative_scroller_background.png
+fzzy_config-0.7.7+1.20.1+forge__assets_fzzy_config_textures_gui_sprites_widget_scroll_creative_scroller_highlighted.png
+irons_lib-1.20.1-2.4.0__assets_irons_lib_textures_gui_sprites_transmog_table_scroller.png
+irons_lib-1.20.1-2.4.0__assets_irons_lib_textures_gui_sprites_transmog_table_scroller_disabled.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_scroll_forge.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_spell_icons_arrow_volley.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_spell_icons_blood_step.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_spell_icons_burning_dash.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_spell_icons_charge.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_spell_icons_fire_arrow.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_spell_icons_frost_step.png
+irons_spellbooks-1.20.1-3.16.4__assets_irons_spellbooks_textures_gui_spell_icons_magic_arrow.png
+jei-1.20.1-forge-15.56.0.205__assets_jei_textures_jei_atlas_gui_brewing_stand_arrow.png
+jei-1.20.1-forge-15.56.0.205__assets_jei_textures_jei_atlas_gui_icons_arrow_next.png
+jei-1.20.1-forge-15.56.0.205__assets_jei_textures_jei_atlas_gui_icons_arrow_previous.png
+jei-1.20.1-forge-15.56.0.205__assets_jei_textures_jei_atlas_gui_recipe_arrow.png
+jei-1.20.1-forge-15.56.0.205__assets_jei_textures_jei_atlas_gui_recipe_arrow_filled.png
+jei-1.20.1-forge-15.56.0.205__assets_jei_textures_jei_atlas_gui_scrollbar_background.png
+jei-1.20.1-forge-15.56.0.205__assets_jei_textures_jei_atlas_gui_scrollbar_marker.png
+lrtactical-forge-1.20.1-0.4.4__assets_lrtactical_textures_gui_arrow.png
+skill_tree-forge-1.6.2+1.20.1__assets_skill_tree_rpgs_textures_mob_effect_side_step.png
+skill_tree-forge-1.6.2+1.20.1__assets_skill_tree_rpgs_textures_mob_effect_supercharge.png
+skill_tree-forge-1.6.2+1.20.1__assets_skill_tree_rpgs_textures_spell_effect_holy_charge.png
+spell_engine-forge-1.10.10+1.20.1__assets_spell_engine_textures_gui_slot_spell_scroll.png
+spell_engine-forge-1.10.10+1.20.1__assets_spell_engine_textures_gui_trinket_slot_spell_scroll.png
+starcatcher-3.3.10-FORGE-1.20.1__assets_starcatcher_textures_gui_guide_arrow_index.png
+starcatcher-3.3.10-FORGE-1.20.1__assets_starcatcher_textures_gui_guide_arrow_index_highlight.png
+starcatcher-3.3.10-FORGE-1.20.1__assets_starcatcher_textures_gui_guide_arrow_index_pressed.png
+starcatcher-3.3.10-FORGE-1.20.1__assets_starcatcher_textures_gui_guide_arrow_left.png
+starcatcher-3.3.10-FORGE-1.20.1__assets_starcatcher_textures_gui_guide_arrow_left_highlight.png
+starcatcher-3.3.10-FORGE-1.20.1__assets_starcatcher_textures_gui_guide_arrow_next.png
+starcatcher-3.3.10-FORGE-1.20.1__assets_starcatcher_textures_gui_guide_arrow_next_highlight.png

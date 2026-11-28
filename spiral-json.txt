@@ -1,0 +1,3149 @@
+---- data/minecraft/tags/blocks/dragon_immune.json
+{
+  "replace": false,
+  "values": [
+    "spiral_abyss:abyss_base_block",
+    "spiral_abyss:abyss_pillar",
+    "spiral_abyss:abyss_rune_1",
+    "spiral_abyss:abyss_rune_2",
+    "spiral_abyss:abyss_rune_3",
+    "spiral_abyss:abyss_rune_4",
+    "spiral_abyss:abyss_border_middle",
+    "spiral_abyss:abyss_border_outside"
+  ]
+}
+
+---- data/minecraft/tags/blocks/mineable/pickaxe.json
+{
+  "replace": false,
+  "values": [
+    "spiral_abyss:abyss_gate_vertical",
+    "spiral_abyss:abyss_gate_horizontal",
+    "spiral_abyss:abyss_gate_curve",
+    "spiral_abyss:abyss_gate_activate_block"
+  ]
+}
+
+---- data/minecraft/tags/blocks/slabs.json
+{
+  "replace": false,
+  "values": [
+    "spiral_abyss:abyss_gate_horizontal"
+  ]
+}
+
+---- data/minecraft/tags/blocks/wither_immune.json
+{
+  "replace": false,
+  "values": [
+    "spiral_abyss:abyss_base_block",
+    "spiral_abyss:abyss_pillar",
+    "spiral_abyss:abyss_rune_1",
+    "spiral_abyss:abyss_rune_2",
+    "spiral_abyss:abyss_rune_3",
+    "spiral_abyss:abyss_rune_4",
+    "spiral_abyss:abyss_border_middle",
+    "spiral_abyss:abyss_border_outside"
+  ]
+}
+
+---- data/minecraft/tags/items/slabs.json
+{
+  "replace": false,
+  "values": [
+    "spiral_abyss:abyss_gate_horizontal"
+  ]
+}
+
+---- data/spiral_abyss/dimension/spiral_abyss.json
+{
+  "type": "spiral_abyss:spiral_abyss",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "minecraft:the_void",
+      "lakes": false,
+      "features": false,
+      "structure_overrides": [],
+      "layers": [
+        {
+          "height": 1,
+          "block": "minecraft:air"
+        }
+      ]
+    }
+  }
+}
+
+---- data/spiral_abyss/dimension_type/spiral_abyss.json
+{
+  "ultrawarm": false,
+  "natural": false,
+  "coordinate_scale": 1.0,
+  "has_skylight": true,
+  "has_ceiling": false,
+  "ambient_light": 0.35,
+  "fixed_time": 18000,
+  "piglin_safe": false,
+  "bed_works": false,
+  "respawn_anchor_works": false,
+  "has_raids": false,
+  "min_y": 0,
+  "height": 256,
+  "logical_height": 256,
+  "infiniburn": "#minecraft:infiniburn_end",
+  "effects": "spiral_abyss:spiral_abyss",
+  "monster_spawn_block_light_limit": 0,
+  "monster_spawn_light_level": 0
+}
+
+---- data/spiral_abyss/floor_1/floor.json
+{
+  "challenge": {
+    "easy": ["time"],
+    "medium": ["time"],
+    "hard": ["time"]
+  },
+  "rewards": {
+    "rolls": 2,
+    "experience": 100,
+    "entries": [
+      {
+        "loot_table": "deeperdarker:chests/crystallized_amber",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {"loot_table": "iceandfire:chest/village_scribe", "weight": 1, "chance": 0.2},
+      {"loot_table": "iceandfire:chest/cyclops_cave", "weight": 1, "chance": 0.2},
+      {"loot_table": "rats:chest/plague_doctor_hut", "weight": 1, "chance": 0.2},
+      {
+        "loot_table": "twilightforest:chests/basement",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/hedge_maze",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/well",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "illagerinvasion:chests/illager_fort_ground",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "netherman:chests/mansion_ordinary_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "minecraft:chests/farm_drop",
+        "required_mod": "born_in_chaos_v1",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/shack_attic",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/sorcerous_keep_barrel",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/shack_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/priest_house",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "minecraft:chests/stronghold_library",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "minecraft:chests/abandoned_mineshaft",
+        "weight": 2,
+        "chance": 1
+      },
+      {
+        "loot_table": "minecraft:chests/igloo_chest",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_temple",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "aether:chests/dungeon/bronze/bronze_dungeon_trash",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "tofucraft:chests/tofu_village/tofu_village_chest",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "tofucraft:chests/tofu_castle/tofu_castle_food_container",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/overworld/livestock_chest",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/overworld/amethyst",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "divinerpg:chests/iceika/iceika_chest_hut",
+        "weight": 1,
+        "chance": 0.2
+      }
+    ]
+  }
+}
+
+---- data/spiral_abyss/floor_1/wave_1.json
+{
+  "wave_types": [
+    "weak_horde",
+    "melee_rush"
+  ]
+}
+
+---- data/spiral_abyss/floor_1/wave_2.json
+{
+  "wave_types": [
+    "medium_horde",
+    "ranged_formation",
+    "weak_horde"
+  ]
+}
+
+---- data/spiral_abyss/floor_1/wave_3.json
+{
+  "wave_types": [
+    "mixed_army",
+    "strong_squad",
+    "weak_elite"
+  ]
+}
+
+---- data/spiral_abyss/floor_2/floor.json
+{
+  "challenge": {
+    "easy": ["time"],
+    "medium": ["time"],
+    "hard": ["time"]
+  },
+  "rewards": {
+    "rolls": 2,
+    "experience": 200,
+    "entries": [
+      {
+        "loot_table": "deeperdarker:chests/ancient_temple_storage",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {"loot_table": "rats:chest/pet_shop", "weight": 1, "chance": 0.2},
+      {
+        "loot_table": "twilightforest:chests/hill_1",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/tower_room",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "illagerinvasion:chests/illusioner_tower_entrance",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "illagerinvasion:chests/labyrinth_map",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "netherman:chests/hospital_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "minecraft:chests/basic_chest",
+        "required_mod": "born_in_chaos_v1",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "savage_and_ravage:chests/enclosure",
+        "weight": 1,
+        "chance": 0.3
+      },
+      {
+        "loot_table": "goety:chests/spider_den_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/shack_potion",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/dark_manor_apothecary",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/dark_manor_clutter",
+        "weight": 1,
+        "chance": 0.3
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/mangrove_hut",
+        "weight": 1,
+        "chance": 0.35
+      },
+      {
+        "loot_table": "minecraft:chests/simple_dungeon",
+        "weight": 2,
+        "chance": 1.0
+      },
+      {
+        "loot_table": "minecraft:chests/abandoned_mineshaft",
+        "weight": 2,
+        "chance": 1
+      },
+      {
+        "loot_table": "minecraft:chests/igloo_chest",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_temple",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/jungle_temple",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "minecraft:chests/stronghold_library",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "aether:chests/ruined_portal",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "betterend:chests/end_village_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "tofucraft:chests/tofu_village/soyworker_chest",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/iceika/iceika_chest_dungeon",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/arcana/utility_hallway_loot",
+        "weight": 1,
+        "chance": 0.2
+      }
+    ]
+  }
+}
+
+---- data/spiral_abyss/floor_2/wave_1.json
+{
+  "wave_types": [
+    "medium_horde",
+    "ranged_formation",
+    "mixed_army"
+  ]
+}
+
+---- data/spiral_abyss/floor_2/wave_2.json
+{
+  "wave_types": [
+    "mixed_army",
+    "strong_squad",
+    "weak_elite"
+  ]
+}
+
+---- data/spiral_abyss/floor_2/wave_3.json
+{
+  "wave_types": [
+    "strong_squad",
+    "elite_squad",
+    "elite_minions"
+  ]
+}
+
+---- data/spiral_abyss/floor_3/floor.json
+{
+  "challenge": {
+    "easy": ["time"],
+    "medium": ["time"],
+    "hard": ["projectile", "explosion", "take_damage", "fishing", "totem", "trickshot", "ender_pearl_hit", "shield_block"]
+  },
+  "rewards": {
+    "rolls": 2,
+    "experience": 300,
+    "entries": [
+      {
+        "loot_table": "deeperdarker:chests/ancient_temple_fountain",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {"loot_table": "iceandfire:chest/graveyard", "weight": 1, "chance": 0.2},
+      {"loot_table": "rats:chest/pet_shop_upstairs", "weight": 1, "chance": 0.15},
+      {"loot_table": "eeeabsmobs:chests/coreforge_ruins_factory", "weight": 1, "chance": 0.25},
+      {
+        "loot_table": "twilightforest:chests/fancy_well",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/hill_2",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/labyrinth_dead_end",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/darktower_cache",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/tower_library",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "illagerinvasion:chests/illusioner_tower_stairs",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "netherman:chests/believer_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "minecraft:chests/chest_level_1",
+        "required_mod": "born_in_chaos_v1",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "soulsweapons:chests/cathedral_loot",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/ruined_monastery_clutter",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/shack_book",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/sorcerous_keep_treasure",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/sorcerous_keep_loot",
+        "weight": 1,
+        "chance": 0.35
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/pyromancer_tower/pyromancer_supplies",
+        "weight": 1,
+        "chance": 0.4
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/mountain_tower/mountain_tower",
+        "weight": 1,
+        "chance": 0.35
+      },
+      {
+        "loot_table": "minecraft:chests/simple_dungeon",
+        "weight": 2,
+        "chance": 1.0
+      },
+      {
+        "loot_table": "minecraft:chests/abandoned_mineshaft",
+        "weight": 2,
+        "chance": 1
+      },
+      {
+        "loot_table": "minecraft:chests/igloo_chest",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_temple",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/jungle_temple",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "minecraft:chests/stronghold_library",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "minecraft:chests/chest_level_2",
+        "required_mod": "born_in_chaos_v1",
+        "weight": 1,
+        "chance": 0.5
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_weaponsmith",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "aether:chests/dungeon/bronze/bronze_dungeon",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "tofucraft:chests/tofu_village/tofusmith_chest",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/iceika/groglin_chest",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/iceika/gruzzorlug_chest",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/arcana/banquet_hall_loot",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "divinerpg:chests/overworld/ancient_tomb",
+        "weight": 1,
+        "chance": 0.15
+      }
+    ]
+  }
+}
+
+---- data/spiral_abyss/floor_3/wave_1.json
+{
+  "wave_types": [
+    "mixed_army",
+    "strong_squad",
+    "weak_elite"
+  ]
+}
+
+---- data/spiral_abyss/floor_3/wave_2.json
+{
+  "wave_types": [
+    "elite_squad",
+    "elite_minions",
+    "strong_squad"
+  ]
+}
+
+---- data/spiral_abyss/floor_3/wave_3.json
+{
+  "wave_types": [
+    "heavy_elite",
+    "triple_elite",
+    "wave_room"
+  ]
+}
+
+---- data/spiral_abyss/floor_4/floor.json
+{
+  "challenge": {
+    "easy": ["time"],
+    "medium": ["projectile", "explosion", "take_damage", "fishing", "totem", "trickshot", "ender_pearl_hit", "shield_block"],
+    "hard": ["player_burning", "mob_burning", "player_effect", "mob_effect"]
+  },
+  "rewards": {
+    "rolls": 2,
+    "experience": 400,
+    "entries": [
+      {
+        "loot_table": "deeperdarker:chests/ancient_temple_secret",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {"loot_table": "iceandfire:chest/fire_dragon_roost", "weight": 1, "chance": 0.25},
+      {"loot_table": "iceandfire:chest/ice_dragon_roost", "weight": 1, "chance": 0.25},
+      {"loot_table": "iceandfire:chest/lightning_dragon_roost", "weight": 1, "chance": 0.25},
+      {
+        "loot_table": "twilightforest:chests/hill_3",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/labyrinth_room",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/stronghold_room",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/darktower_key",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/troll_vault",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "illagerinvasion:chests/sorcerer_hut",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "netherman:chests/blacksmith_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "minecraft:chests/firewell_d",
+        "required_mod": "born_in_chaos_v1",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "soulsweapons:chests/cathedral_good_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/graveyard_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/ruined_monastery_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/shrine_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/blacksmith_loot",
+        "weight": 1,
+        "chance": 0.35
+      },
+      {
+        "loot_table": "goety:chests/ruined_monastery_crypt",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/evoker_fort",
+        "weight": 1,
+        "chance": 0.4
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/catacombs/coffin_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "minecraft:chests/simple_dungeon",
+        "weight": 2,
+        "chance": 1.0
+      },
+      {
+        "loot_table": "minecraft:chests/abandoned_mineshaft",
+        "weight": 2,
+        "chance": 1
+      },
+      {
+        "loot_table": "minecraft:chests/igloo_chest",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_temple",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/jungle_temple",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_weaponsmith",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "minecraft:chests/buried_treasure",
+        "weight": 1,
+        "chance": 0.4
+      },
+      {
+        "loot_table": "minecraft:chests/stronghold_corridor",
+        "weight": 1,
+        "chance": 0.65
+      },
+      {
+        "loot_table": "aether:chests/dungeon/silver/silver_dungeon",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "betterend:chests/end_village_template_loot",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "tofucraft:chests/tofu_ruins_chest",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/twilight/eden/hut_chest",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/crypt_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/temple_loot_bottom",
+        "weight": 1,
+        "chance": 0.2
+      }
+    ]
+  }
+}
+
+---- data/spiral_abyss/floor_4/wave_1.json
+{
+  "wave_types": [
+    "elite_squad",
+    "elite_minions",
+    "strong_squad"
+  ]
+}
+
+---- data/spiral_abyss/floor_4/wave_2.json
+{
+  "wave_types": [
+    "heavy_elite",
+    "triple_elite",
+    "wave_room"
+  ]
+}
+
+---- data/spiral_abyss/floor_4/wave_3.json
+{
+  "wave_types": [
+    "elite_finale"
+  ]
+}
+
+---- data/spiral_abyss/floor_5/floor.json
+{
+  "challenge": {
+    "easy": ["time"],
+    "medium": ["weapon", "no_armor", "armor_enchantment", "weapon_enchantment"],
+    "hard": ["armor_enchantment", "weapon_enchantment"]
+  },
+  "rewards": {
+    "rolls": 2,
+    "experience": 500,
+    "entries": [
+      {
+        "loot_table": "deeperdarker:chests/ancient_temple_apex",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {"loot_table": "iceandfire:chest/hydra_cave", "weight": 1, "chance": 0.25},
+      {"loot_table": "iceandfire:chest/mausoleum_chest", "weight": 1, "chance": 0.2},
+      {
+        "loot_table": "twilightforest:chests/aurora_cache",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/graveyard",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/labyrinth_vault",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/stronghold_cache",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/tree_cache",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "twilightforest:chests/troll_garden",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "illagerinvasion:chests/illager_fort_tower",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "netherman:chests/maze_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "minecraft:chests/shater",
+        "required_mod": "born_in_chaos_v1",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "goety:chests/crypt_loot",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/shack_basement",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/assembly_treasure",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/graveyard_treasure",
+        "weight": 1,
+        "chance": 0.3
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/catacombs/coffin_loot",
+        "weight": 1,
+        "chance": 0.4
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/generic_magic_treasure",
+        "weight": 1,
+        "chance": 0.3
+      },
+      {
+        "loot_table": "minecraft:chests/simple_dungeon",
+        "weight": 2,
+        "chance": 1.0
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_temple",
+        "weight": 1,
+        "chance": 0.8
+      },
+      {
+        "loot_table": "minecraft:chests/desert_pyramid",
+        "weight": 1,
+        "chance": 0.65
+      },
+      {
+        "loot_table": "minecraft:chests/village/village_weaponsmith",
+        "weight": 1,
+        "chance": 0.75
+      },
+      {
+        "loot_table": "minecraft:chests/buried_treasure",
+        "weight": 1,
+        "chance": 0.4
+      },
+      {
+        "loot_table": "minecraft:chests/stronghold_corridor",
+        "weight": 1,
+        "chance": 0.65
+      },
+      {
+        "loot_table": "betterend:chests/common",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "betterend:chests/chorus_forest",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "tofucraft:chests/tofu_castle/tofu_castle_hidden_bridge",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "divinerpg:chests/twilight/wildwood/chest",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/temple_loot_middle",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/temple_loot_top",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/quadrotic_post_loot",
+        "weight": 1,
+        "chance": 0.15
+      }
+    ]
+  }
+}
+
+---- data/spiral_abyss/floor_5/wave_1.json
+{
+  "wave_types": [
+    "heavy_elite",
+    "triple_elite",
+    "wave_room"
+  ]
+}
+
+---- data/spiral_abyss/floor_5/wave_2.json
+{
+  "wave_types": [
+    "heavy_elite",
+    "triple_elite",
+    "wave_room"
+  ]
+}
+
+---- data/spiral_abyss/floor_5/wave_3.json
+{
+  "wave_types": [
+    "boss_minions",
+    "boss_vanguard",
+    "solo_boss"
+  ]
+}
+
+---- data/spiral_abyss/floor_6/floor.json
+{
+  "challenge": {
+    "easy": ["time"],
+    "medium": ["weapon", "no_armor"],
+    "hard": ["armor_enchantment", "weapon_enchantment"]
+  },
+  "rewards": {
+    "rolls": 2,
+    "experience": 600,
+    "entries": [
+      {
+        "loot_table": "deeperdarker:chests/ancient_temple_basement",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {"loot_table": "iceandfire:chest/fire_dragon_male_cave", "weight": 1, "chance": 0.2},
+      {"loot_table": "iceandfire:chest/ice_dragon_male_cave", "weight": 1, "chance": 0.2},
+      {"loot_table": "iceandfire:chest/lightning_dragon_male_cave", "weight": 1, "chance": 0.2},
+      {"loot_table": "eeeabsmobs:chests/coreforge_ruins_treasure", "weight": 1, "chance": 0.15},
+      {
+        "loot_table": "twilightforest:chests/aurora_room",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "twilightforest:chests/labyrinth_vault_jackpot",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "twilightforest:chests/troll_vault_with_lamp",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "illagerinvasion:chests/labyrinth",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "netherman:chests/mansion_rare_loot",
+        "weight": 1,
+        "chance": 0.2
+      },
+      {
+        "loot_table": "minecraft:chests/chest_level_3",
+        "required_mod": "born_in_chaos_v1",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/spider_den_treasure",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "goety:chests/crypt_tomb",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "goety:chests/shrine_treasure",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "goety:chests/shack_treasure",
+        "weight": 1,
+        "chance": 0.25
+      },
+      {
+        "loot_table": "goety:chests/blacksmith_treasure",
+        "weight": 1,
+        "chance": 0.3
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/generic_magic_treasure",
+        "weight": 1,
+        "chance": 0.5
+      },
+      {
+        "loot_table": "irons_spellbooks:chests/impaled_icebreaker/captain_quarters",
+        "weight": 1,
+        "chance": 0.35
+      },
+      {
+        "loot_table": "minecraft:chests/simple_dungeon",
+        "weight": 2,
+        "chance": 1.0
+      },
+      {
+        "loot_table": "minecraft:chests/desert_pyramid",
+        "weight": 1,
+        "chance": 0.65
+      },
+      {
+        "loot_table": "minecraft:chests/buried_treasure",
+        "weight": 1,
+        "chance": 0.4
+      },
+      {
+        "loot_table": "minecraft:chests/end_city_treasure",
+        "weight": 1,
+        "chance": 0.65
+      },
+      {
+        "loot_table": "minecraft:chests/bastion_treasure",
+        "weight": 1,
+        "chance": 0.35
+      },
+      {
+        "loot_table": "betterend:chests/end_village_bonus_loot",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "tofucraft:chests/tofu_castle/tofu_castle_chest",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "divinerpg:chests/twilight/skythern/chest",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/karos_madhouse_loot",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/raglok_chamber_loot",
+        "weight": 1,
+        "chance": 0.15
+      },
+      {
+        "loot_table": "divinerpg:chests/vethea/wreck_hall_loot",
+        "weight": 1,
+        "chance": 0.1
+      }
+    ]
+  }
+}
+
+---- data/spiral_abyss/floor_6/wave_1.json
+{
+  "wave_types": [
+    "heavy_elite",
+    "triple_elite",
+    "wave_room"
+  ]
+}
+
+---- data/spiral_abyss/floor_6/wave_2.json
+{
+  "wave_types": [
+    "boss_minions",
+    "boss_vanguard",
+    "solo_boss"
+  ]
+}
+
+---- data/spiral_abyss/floor_6/wave_3.json
+{
+  "wave_types": [
+    "dual_boss",
+    "final_wave_boss",
+    "final_escalation"
+  ]
+}
+
+---- data/spiral_abyss/loot_tables/blocks/abyss_gate_activate_block.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spiral_abyss:abyss_gate_activate_block"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/loot_tables/blocks/abyss_gate_curve.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spiral_abyss:abyss_gate_curve"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/loot_tables/blocks/abyss_gate_horizontal.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spiral_abyss:abyss_gate_horizontal",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 2,
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "spiral_abyss:abyss_gate_horizontal",
+                  "properties": {
+                    "type": "double"
+                  }
+                }
+              ]
+            },
+            {
+              "function": "minecraft:explosion_decay"
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/loot_tables/blocks/abyss_gate_vertical.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spiral_abyss:abyss_gate_vertical"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/loot_tables/ruined_portal.json
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "spiral_abyss:abyss_gate_vertical",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spiral_abyss:abyss_gate_horizontal",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "spiral_abyss:abyss_gate_curve",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:feather",
+          "weight": 40
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 18.0,
+                "min": 9.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:iron_nugget",
+          "weight": 40
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bone_meal",
+          "weight": 40
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:string",
+          "weight": 40
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:cake",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:iron_sword",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:iron_axe",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:iron_hoe",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:iron_shovel",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:iron_pickaxe",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:chainmail_boots",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:chainmail_chestplate",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:chainmail_helmet",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:chainmail_leggings",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 12.0,
+                "min": 4.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:cobweb",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_horse_armor",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:heavy_weighted_pressure_plate",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 12.0,
+                "min": 4.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:arrow",
+          "weight": 5
+        },
+        
+---- data/spiral_abyss/mob_pools/boss.json
+[
+  {"scaling": {
+    "5": {"health": {"type": "absolute", "value": 1000}, "damage": 2},
+    "6": {"health": {"type": "absolute", "value": 1500}, "damage": 2}
+  }},
+  [
+    "minecraft:wither",
+    {
+      "environment": ["minecraft:soul_sand", "minecraft:soul_soil"],
+      "decoration_environment": ["minecraft:soul_fire"],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.08
+    },
+    {
+      "item": "minecraft:nether_star"
+    }
+  ],
+  [
+    "minecraft:ender_dragon",
+    {
+      "environment": ["minecraft:end_stone"],
+      "decoration_environment": [],
+      "decoration_placement": "surface",
+      "decoration_chance": 0
+    },
+    {
+      "item": "minecraft:elytra",
+      "enchantment": {"minecraft:unbreaking": 5, "minecraft:mending": 5}
+    }
+  ],
+  [
+    "mowziesmobs:ferrous_wroughtnaut",
+    {
+      "environment": ["minecraft:stone_bricks", "minecraft:cracked_stone_bricks", "minecraft:mossy_stone_bricks"],
+      "decoration_environment": ["minecraft:cobweb", "minecraft:iron_bars"],
+      "decoration_placement": "flat_room",
+      "decoration_chance": 0.02
+    },
+    {
+      "item": "mowziesmobs:wrought_axe",
+      "enchantment": {"minecraft:sharpness": 5, "minecraft:smite": 3, "minecraft:looting": 3}
+    }
+  ],
+  [
+    "mowziesmobs:frostmaw",
+    {
+      "environment": ["minecraft:dirt"],
+      "decoration_environment": ["snow_dirt"],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.02
+    },
+    {
+      "item": "mowziesmobs:ice_crystal"
+    }
+  ],
+  [
+    "mowziesmobs:umvuthi",
+    {
+      "environment": ["minecraft:grass_block", "minecraft:dirt", "minecraft:coarse_dirt"],
+      "decoration_environment": ["minecraft:acacia_log", "minecraft:acacia_leaves", "minecraft:campfire"],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.04
+    },
+    {
+      "item": "mowziesmobs:grant_suns_blessing"
+    }
+  ],
+  [
+    "aquamirae:captain_cornelia",
+    {
+      "environment": ["minecraft:snow_block", "minecraft:packed_ice", "minecraft:blue_ice"],
+      "decoration_environment": ["aquamirae:wisteria_niveis"],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.02
+    },
+    {
+      "loot_table": "aquamirae:chests/frozen_chest",
+      "weight": 1,
+      "chance": 0.4
+    },
+    {
+      "item": "aquamirae:coral_lance",
+      "enchantment": {"minecraft:sharpness": 5, "minecraft:sweeping_edge": 3, "minecraft:mending": 1}
+    },
+    {
+      "item": "aquamirae:whisper_of_the_abyss",
+      "enchantment": {"minecraft:sharpness": 5, "minecraft:sweeping_edge": 3, "minecraft:mending": 1}
+    }
+  ],
+  [
+    "alexscaves:luxtructosaurus",
+    {
+      "environment": ["alexscaves:flood_basalt", "alexscaves:primal_magma", "minecraft:smooth_basalt"],
+      "decoration_environment": [],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.00
+    },
+    {
+      "loot_table": "alexscaves:chests/caveman_house",
+      "weight": 1,
+      "chance": 0.4
+    },
+    {
+      "item": "alexscaves:extinction_spear",
+      "enchantment": {"minecraft:unbreaking": 3, "minecraft:mending": 1, "alexscaves:chomping_spirit": 2, "alexscaves:herd_phalanx": 2, "alexscaves:plummeting_flight": 3}
+    }
+  ],
+  [
+    "alexscaves:forsaken",
+    {
+      "environment": ["minecraft:packed_mud", "minecraft:dirt"],
+      "decoration_environment": ["alexscaves:thornwood_log", "alexscaves:thornwood_fence", "alexscaves:thornwood_wood", "alexscaves:thornwood_branch", "alexscaves:guano_layer"],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.05
+    },
+    {
+      "loot_table": "alexscaves:chests/forlorn_ruins",
+      "weight": 1,
+      "chance": 0.4
+    },
+    {
+      "item": "alexscaves:desolate_dagger",
+      "enchantment": {"minecraft:sharpness": 5, "minecraft:mending": 1, "alexscaves:double_stab": 1, "alexscaves:sated_blade": 2, "minecraft:looting": 2}
+    },
+    {
+      "item": "alexscaves:dreadbow",
+      "enchantment": {"minecraft:unbreaking": 3, "minecraft:mending": 1, "alexscaves:twilight_perfection": 3, "alexscaves:relentless_darkness": 1}
+    },
+    {
+      "item": "alexscaves:dreadbow",
+      "enchantment": {"minecraft:unbreaking": 3, "minecraft:mending": 1, "alexscaves:dark_nock": 3, "alexscaves:precise_volley": 1}
+    }
+  ],
+  [
+    "alexscaves:licowitch",
+    {
+      "environment": ["alexscaves:block_of_frosted_chocolate", "alexscaves:rock_candy_purple", "alexscaves:rock_candy_white", "alexscaves:rock_candy_green"],
+      "decoration_environment": ["alexscaves:block_of_chocolate", "alexscaves:sweetberry_ice_cream", "alexscaves:vanilla_ice_cream", "alexscaves:chocolate_ice_cream", "alexscaves:candy_cane"],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.08
+    },
+    {
+      "loot_table": "alexscaves:chests/licowitch_tower_secret",
+      "weight": 1,
+      "chance": 0.4
+    },
+    {
+      "item": "alexscaves:sugar_staff",
+      "enchantment": {"minecraft:unbreaking": 3, "minecraft:mending": 1, "alexscaves:spell_lasting": 3, "alexscaves:humungous_hex": 2, "alexscaves:multiple_mint": 2, "alexscaves:seekcandy": 1}
+    }
+  ],
+  [
+    "alexscaves:tremorzilla",
+    {
+      "environment": ["alexscaves:radrock", "alexscaves:acidic_radrock", "minecraft:mud"],
+      "decoration_environment": ["alexscaves:waste_drum", "alexscaves:radrock_uranium_ore", "alexscaves:sulfur_cluster", "alexscaves:sulfur_bud_large", "alexscaves:sulfur_bud_medium", "alexscaves:sulfur_bud_small"],
+      "decoration_placement": "surface",
+      "decoration_chance": 0.03
+    },
+    {
+      "loot_table": "alexscaves:chests/toxic_ruins",
+      "weight": 1,
+      "chance": 0.4
+    },
+    {
+      "item": "alexscaves:raygun",
+      "enchantment": {"alexscaves:energy_efficiency": 3, "alexscaves:solar": 1, "alexscaves:x_ray": 1
+      }
+    },
+    {
+      "item": "alexscaves:r
+---- data/spiral_abyss/mob_pools/champion_mob.json
+[
+  {"scaling": {
+    "1": {"health": 1, "damage": 1}, "2": {"health": 1, "damage": 1},
+    "3": {"health": 1, "damage": 1}, "4": {"health": 1, "damage": 1},
+    "5": {"health": 2, "damage": 2}, "6": {"health": 2, "damage": 2}
+  }},
+  "minecraft:vindicator",
+  "minecraft:wither_skeleton",
+  "minecraft:hoglin",
+  "minecraft:ravager",
+  "minecraft:elder_guardian",
+  "minecraft:ghast",
+  "minecraft:shulker",
+  "mutantmonsters:mutant_snow_golem",
+  "mowziesmobs:foliaath",
+  "alexscaves:deep_one_knight",
+  "alexscaves:deep_one_mage",
+  "alexscaves:nucleeper",
+  "alexscaves:watcher",
+  "cataclysm:ignited_berserker",
+  "cataclysm:deepling_brute",
+  "cataclysm:deepling_priest",
+  "cataclysm:deepling_warlock",
+  "cataclysm:royal_draugr",
+  "cataclysm:elite_draugr",
+  "cataclysm:hippocamtus",
+  "cataclysm:cindaria",
+  "legendary_monsters:haunted_knight",
+  "legendary_monsters:haunted_guard",
+  "legendary_monsters:flameborn_guard",
+  "legendary_monsters:flameborn_warrior",
+  "legendary_monsters:hovering_hurricane",
+  "legendary_monsters:fractured_apostle",
+  "legendary_monsters:flame_drifter",
+  "legendary_monsters:chorusling",
+  "irons_spellbooks:citadel_keeper",
+  "irons_spellbooks:ice_spider",
+  "irons_spellbooks:necromancer",
+  "irons_spellbooks:archevoker",
+  "irons_spellbooks:cryomancer",
+  "irons_spellbooks:pyromancer",
+  "irons_spellbooks:apothecarist",
+  "irons_spellbooks:priest",
+  "goety:hostile_zombie_vindicator",
+  "goety:bone_spider",
+  "goety:reaper",
+  "goety:wraith",
+  "goety:border_wraith",
+  "goety:muck_wraith",
+  "goety:necromancer",
+  "goety:cairn_necromancer",
+  "goety:mossy_necromancer",
+  "goety:haunted_armor",
+  "goety:blastling",
+  "goety:armored_ravager",
+  "goety:piker",
+  "goety:crusher",
+  "goety:trampler",
+  "goety:sorcerer",
+  "goety:envioker",
+  "goety:inquillager",
+  "goety:storm_caster",
+  "goety:cryologer",
+  "goety:tormentor",
+  "savage_and_ravage:executioner",
+  "savage_and_ravage:iceologer",
+  "born_in_chaos_v1:bonescaller",
+  "born_in_chaos_v1:spirit_guide",
+  "born_in_chaos_v1:dark_vortex",
+  "born_in_chaos_v1:fallen_chaos_knight",
+  "born_in_chaos_v1:skeleton_thrasher",
+  "born_in_chaos_v1:seared_spirit",
+  "born_in_chaos_v1:scarlet_persecutor",
+  "born_in_chaos_v1:swarmer",
+  "born_in_chaos_v1:zombie_bruiser",
+  "born_in_chaos_v1:zombie_clown",
+  "born_in_chaos_v1:zombie_lumberjack",
+  "born_in_chaos_v1:senor_pumpkin",
+  "born_in_chaos_v1:mrs_pumpkin",
+  "netherman:statue_entity",
+  "soulsweapons:evil_forlorn",
+  "soulsweapons:dark_sorcerer",
+  "soulsweapons:frost_giant",
+  "soulsweapons:rime_spectre",
+  "born_in_chaos_v1:door_knight",
+  "twilightforest:pinch_beetle",
+  "twilightforest:blockchain_goblin",
+  "twilightforest:carminite_golem",
+  "twilightforest:carminite_ghastguard",
+  "twilightforest:giant_miner",
+  "twilightforest:armored_giant",
+  "illageandspillage:engineer",
+  "illageandspillage:crocofang",
+  "illagerinvasion:alchemist",
+  "illagerinvasion:archivist",
+  "illagerinvasion:sorcerer",
+  "illagerinvasion:firecaller",
+  "illagerinvasion:necromancer",
+  "iceandfire:dread_scuttler",
+  "iceandfire:dread_knight",
+  "iceandfire:dread_lich",
+  "iceandfire:cockatrice",
+  "rats:feral_ratlantean",
+  "rats:ratlantean_ratbot",
+  "eeeabsmobs:immortal_shaman",
+  "eeeabsmobs:relic_ripper",
+  "deeperdarker:shriek_worm",
+  "adventurez:piglin_beast",
+  "adventurez:necromancer",
+  "adventurez:blaze_guardian",
+  "adventurez:amethyst_golem",
+  "adventurez:desert_rhino",
+  "adventurez:shaman",
+  "adventurez:enderwarthog",
+  "aether:fire_minion",
+  "divinerpg:arid_warrior",
+  "divinerpg:caveclops",
+  "divinerpg:the_eye",
+  "divinerpg:the_grue",
+  "divinerpg:wildfire",
+  "divinerpg:scorcher",
+  "divinerpg:glacide",
+  "divinerpg:rollum",
+  "divinerpg:seng",
+  "divinerpg:dungeon_constructor",
+  "divinerpg:living_statue",
+  "divinerpg:enchanted_warrior",
+  "fdbosses:fire_malkuth_warrior",
+  "fdbosses:ice_malkuth_warrior",
+  "divinerpg:sun_archer",
+  "divinerpg:enchanted_archer",
+  "divinerpg:termid",
+  "divinerpg:verek",
+  "divinerpg:ent",
+  "divinerpg:dreamwrecker",
+  "divinerpg:gorgosion",
+  "divinerpg:bohemite"
+]
+
+---- data/spiral_abyss/mob_pools/common_mob.json
+[
+  {"scaling": {
+    "1": {"health": 1, "damage": 1}, "2": {"health": 1, "damage": 1},
+    "3": {"health": 1.5, "damage": 1.5}, "4": {"health": 1.5, "damage": 1.5},
+    "5": {"health": 2, "damage": 2}, "6": {"health": 2, "damage": 2}
+  }},
+  "minecraft:creeper",
+  "minecraft:spider",
+  "minecraft:pillager",
+  "minecraft:cave_spider",
+  "minecraft:blaze",
+  "minecraft:witch",
+  "alexscaves:boundroid",
+  "alexscaves:corrodent",
+  "alexscaves:candicorn",
+  "alexscaves:caniac",
+  "cataclysm:deepling",
+  "cataclysm:deepling_angler",
+  "cataclysm:the_watcher",
+  "cataclysm:drowned_host",
+  "block_factorys_bosses:soul_knight_wither_skeleton",
+  "block_factorys_bosses:flaming_skeleton_guard_sword",
+  "block_factorys_bosses:pirate_rook",
+  "block_factorys_bosses:dragon_guard_sword",
+  "block_factorys_bosses:flaming_skeleton_guard_fireball",
+  "block_factorys_bosses:crossbow_pirate",
+  "block_factorys_bosses:soul_skeleton",
+  "legendary_monsters:ambusher",
+  "legendary_monsters:fractured",
+  "legendary_monsters:wandering_eye",
+  "legendary_monsters:bomber",
+  "goety:web_spider",
+  "goety:icy_spider",
+  "goety:hostile_skeleton_pillager",
+  "goety:watchling",
+  "goety:snareling",
+  "goety:warlock",
+  "goety:heretic",
+  "goety:maverick",
+  "goety:reprobate",
+  "goety:conquillager",
+  "savage_and_ravage:creepie",
+  "savage_and_ravage:griefer",
+  "born_in_chaos_v1:bone_imp",
+  "born_in_chaos_v1:dread_hound",
+  "born_in_chaos_v1:diamond_termite",
+  "born_in_chaos_v1:firelight",
+  "born_in_chaos_v1:skeleton_demoman",
+  "born_in_chaos_v1:restless_spirit",
+  "born_in_chaos_v1:mr_pumpkin",
+  "born_in_chaos_v1:pumpkin_dunce",
+  "soulsweapons:remnant",
+  "born_in_chaos_v1:barrel_zombie",
+  "born_in_chaos_v1:bloody_gadfly",
+  "born_in_chaos_v1:zombie_fisherman",
+  "twilightforest:redcap",
+  "twilightforest:redcap_sapper",
+  "twilightforest:fire_beetle",
+  "twilightforest:slime_beetle",
+  "twilightforest:mosquito_swarm",
+  "twilightforest:mist_wolf",
+  "twilightforest:winter_wolf",
+  "twilightforest:wraith",
+  "twilightforest:death_tome",
+  "twilightforest:stable_ice_core",
+  "twilightforest:unstable_ice_core",
+  "twilightforest:minotaur",
+  "twilightforest:carminite_ghastling",
+  "twilightforest:yeti",
+  "twilightforest:adherent",
+  "twilightforest:towerwood_borer",
+  "twilightforest:maze_slime",
+  "twilightforest:swarm_spider",
+  "twilightforest:carminite_broodling",
+  "illageandspillage:igniter",
+  "illageandspillage:twittollager",
+  "illagerinvasion:basher",
+  "illagerinvasion:marauder",
+  "illagerinvasion:provoker",
+  "twilightforest:skeleton_druid",
+  "iceandfire:dread_beast",
+  "iceandfire:stymphalian_bird",
+  "iceandfire:ghost",
+  "rats:pied_piper",
+  "rats:plague_beast",
+  "rats:ghost_pirat",
+  "rats:ratlantean_spirit",
+  "eeeabsmobs:corpse",
+  "eeeabsmobs:corpse_villager",
+  "eeeabsmobs:immortal_skeleton",
+  "eeeabsmobs:immortal_archer",
+  "eeeabsmobs:immortal_mage",
+  "annoyingvillagers:low_herobrine_clone",
+  "annoyingvillagers:low_shadow_herobrine_clone",
+  "eeeabsmobs:relic_observer",
+  "eeeabsmobs:immortal_warrior",
+  "eeeabsmobs:immortal_knight",
+  "deeperdarker:shattered",
+  "deeperdarker:sludge",
+  "adventurez:mini_blackstone_golem",
+  "adventurez:skeleton_vanguard",
+  "adventurez:orc",
+  "adventurez:void_shade",
+  "betterend:end_slime",
+  "betterend:shadow_walker",
+  "aether:aechor_plant",
+  "aether:cockatrice",
+  "aether:mimic",
+  "tofucraft:tofucreeper",
+  "tofucraft:tofuspider",
+  "tofucraft:fukumame_thower",
+  "divinerpg:cave_crawler",
+  "divinerpg:desert_crawler",
+  "divinerpg:glacon",
+  "divinerpg:jungle_dramcryx",
+  "divinerpg:miner",
+  "divinerpg:rotatick",
+  "divinerpg:pale_archer",
+  "divinerpg:frost",
+  "divinerpg:fractite",
+  "divinerpg:alicanto",
+  "divinerpg:razorback",
+  "divinerpg:roamer",
+  "divinerpg:cymesoid",
+  "divinerpg:duo",
+  "divinerpg:shadahier"
+]
+
+---- data/spiral_abyss/mob_pools/fodder_mob.json
+[
+  {"scaling": {
+    "1": {"health": 1, "damage": 1}, "2": {"health": 1, "damage": 1},
+    "3": {"health": 1.2, "damage": 1.2}, "4": {"health": 1.2, "damage": 1.2},
+    "5": {"health": 2, "damage": 2}, "6": {"health": 2, "damage": 2}
+  }},
+  "minecraft:zombie",
+  "minecraft:skeleton",
+  "minecraft:husk",
+  "minecraft:stray",
+  "minecraft:zombie_villager",
+  "minecraft:drowned",
+  "aquamirae:tortured_soul",
+  "alexscaves:brainiac",
+  "alexscaves:deep_one",
+  "alexscaves:ferrouslime",
+  "alexscaves:mine_guardian",
+  "alexscaves:teletor",
+  "alexscaves:vallumraptor",
+  "cataclysm:koboleton",
+  "cataclysm:draugr",
+  "cataclysm:endermaptera",
+  "goety:frayed",
+  "goety:rattled",
+  "goety:hostile_black_wolf",
+  "goety:ripper",
+  "savage_and_ravage:skeleton_villager",
+  "born_in_chaos_v1:decrepit_skeleton",
+  "born_in_chaos_v1:baby_skeleton",
+  "born_in_chaos_v1:maggot",
+  "born_in_chaos_v1:corpse_fly",
+  "born_in_chaos_v1:baby_spider",
+  "twilightforest:kobold",
+  "twilightforest:hedge_spider",
+  "twilightforest:helmet_crab",
+  "twilightforest:hostile_wolf",
+  "iceandfire:dread_thrall",
+  "iceandfire:dread_ghoul",
+  "rats:demon_rat",
+  "deeperdarker:sculk_leech",
+  "deeperdarker:sculk_centipede",
+  "adventurez:wither_puppet",
+  "aether:blue_swet",
+  "aether:golden_swet",
+  "aether:zephyr",
+  "aether:sentry",
+  "tofucraft:tofuslime",
+  "tofucraft:zundamite",
+  "divinerpg:hive_soldier",
+  "divinerpg:hover_stinger"
+]
+
+---- data/spiral_abyss/mob_pools/mini_boss.json
+[
+  {"scaling": {
+    "1": {"health": 1, "damage": 1}, "2": {"health": 1, "damage": 1},
+    "3": {"health": 1, "damage": 1}, "4": {"health": 1, "damage": 1},
+    "5": {"health": 2, "damage": 2}, "6": {"health": 2, "damage": 2}
+  }},
+  "minecraft:evoker",
+  "minecraft:warden",
+  [
+    "mutantmonsters:mutant_creeper",
+    {
+      "suppress_spawned_entities": ["mutantmonsters:creeper_minion_egg"]
+    }
+  ],
+  [
+    "mutantmonsters:mutant_skeleton",
+    {
+      "suppress_spawned_entities": ["mutantmonsters:body_part"]
+    }
+  ],
+  "mutantmonsters:mutant_zombie",
+  [
+    "mutantmonsters:mutant_enderman",
+    {
+      "suppress_spawned_entities": ["mutantmonsters:endersoul_fragment"]
+    }
+  ],
+  "aquamirae:eel",
+  "cataclysm:kobolediator",
+  "cataclysm:ender_golem",
+  "cataclysm:amethyst_crab",
+  "cataclysm:coral_golem",
+  "cataclysm:coralssus",
+  "cataclysm:ignited_revenant",
+  "cataclysm:the_prowler",
+  "cataclysm:aptrgangr",
+  "cataclysm:clawdian",
+  "cataclysm:wadjet",
+  "legendary_monsters:warped_fungussus",
+  "legendary_monsters:beheaded_knight",
+  "legendary_monsters:resurrected_knight",
+  "legendary_monsters:annihilation_pursuer",
+  "goety:brood_mother",
+  "goety:crone",
+  "goety:heresiarch",
+  "goety:minister",
+  "goety:endersent",
+  [
+    "goety:wither_necromancer",
+    {
+      "suppress_death_blocks": {
+        "blocks": ["goety:lofty_chest"],
+        "radius": 0,
+        "height": 0,
+        "ticks": 1
+      }
+    }
+  ],
+  "goety:hostile_redstone_golem",
+  "goety:hostile_redstone_monstrosity",
+  "savage_and_ravage:trickster",
+  "born_in_chaos_v1:dire_hound_leader",
+  "born_in_chaos_v1:missioner",
+  "born_in_chaos_v1:pumpkin_bruiser",
+  [
+    "born_in_chaos_v1:mother_spider",
+    {
+      "suppress_death_blocks": {
+        "blocks": ["born_in_chaos_v1:cobweb_cover"],
+        "radius": 2,
+        "height": 2,
+        "ticks": 60
+      }
+    }
+  ],
+  "netherman:bell_guardian",
+  "soulsweapons:withered_demon",
+  "soulsweapons:soulmass",
+  "illageandspillage:absorber",
+  "illagerinvasion:inquisitor",
+  [
+    "twilightforest:minoshroom",
+    {
+      "suppress_death_blocks": {"blocks": ["twilightforest:mangrove_chest"], "radius": 0, "height": 0, "ticks": 20}
+    }
+  ],
+  "iceandfire:cyclops",
+  "iceandfire:gorgon",
+  "iceandfire:troll",
+  "eeeabsmobs:immortal_executioner",
+  "eeeabsmobs:relic_earthshaker",
+  "annoyingvillagers:herobrine_clone",
+  "annoyingvillagers:shadow_herobrine_clone",
+  "annoyingvillagers:herobrine_7",
+  "annoyingvillagers:armored_herobrine",
+  "eeeabsmobs:corpse_warlock",
+  "deeperdarker:stalker",
+  "adventurez:soul_reaper",
+  "adventurez:summoner",
+  "tofucraft:tofu_gandlem",
+  "tofucraft:shudofuspider",
+  "divinerpg:death_hound",
+  "divinerpg:deathcryx",
+  "divinerpg:hastreus",
+  "divinerpg:greenfeet",
+  "divinerpg:madivel",
+  "divinerpg:apalachia_golem",
+  "divinerpg:wildwood_golem",
+  "divinerpg:megalith",
+  "divinerpg:basilisk",
+  "divinerpg:skythern_golem",
+  "divinerpg:demon_of_darkness",
+  "divinerpg:soul_stealer",
+  "divinerpg:skythern_fiend",
+  "divinerpg:skythern_archer",
+  "divinerpg:twilight_archer",
+  "divinerpg:zone",
+  "divinerpg:kazrotic",
+  "divinerpg:zoragon"
+]
+
+---- data/spiral_abyss/mob_types/armor_mobs.json
+[
+  "minecraft:zombie",
+  "minecraft:husk",
+  "minecraft:zombie_villager",
+  "minecraft:drowned",
+  "minecraft:skeleton",
+  "minecraft:stray",
+  "minecraft:piglin",
+  "minecraft:piglin_brute",
+  "minecraft:wither_skeleton",
+  "cataclysm:drowned_host",
+  "goety:frayed",
+  "goety:rattled",
+  "goety:hostile_skeleton_pillager",
+  "goety:hostile_zombie_vindicator",
+  "savage_and_ravage:skeleton_villager",
+  "soulsweapons:remnant",
+  "twilightforest:redcap",
+  "twilightforest:redcap_sapper",
+  "iceandfire:dread_thrall",
+  "annoyingvillagers:low_herobrine_clone",
+  "annoyingvillagers:low_shadow_herobrine_clone",
+  "tofucraft:fukumame_thower"
+]
+
+---- data/spiral_abyss/mob_types/bow_users.json
+[
+  "minecraft:skeleton",
+  "minecraft:stray",
+  "goety:rattled",
+  "illagerinvasion:provoker",
+  "eeeabsmobs:immortal_archer"
+]
+
+---- data/spiral_abyss/mob_types/crossbow_users.json
+[
+  "minecraft:pillager",
+  "block_factorys_bosses:crossbow_pirate",
+  "goety:hostile_skeleton_pillager",
+  "goety:conquillager",
+  "savage_and_ravage:skeleton_villager"
+]
+
+---- data/spiral_abyss/mob_types/ghost_mobs.json
+[
+  "minecraft:vex",
+  "goety:tormentor",
+  "soulsweapons:night_shade",
+  "soulsweapons:rime_spectre",
+  "twilightforest:wraith",
+  "iceandfire:ghost",
+  "rats:dutchrat"
+]
+
+---- data/spiral_abyss/mob_types/melee_mobs.json
+[
+  "minecraft:zombie",
+  "minecraft:husk",
+  "minecraft:zombie_villager",
+  "minecraft:piglin",
+  "minecraft:piglin_brute",
+  "minecraft:wither_skeleton",
+  "minecraft:vindicator",
+  "aquamirae:tortured_soul",
+  "cataclysm:koboleton",
+  "cataclysm:draugr",
+  "cataclysm:royal_draugr",
+  "cataclysm:elite_draugr",
+  "cataclysm:deepling",
+  "cataclysm:deepling_brute",
+  "cataclysm:deepling_angler",
+  "cataclysm:deepling_priest",
+  "cataclysm:deepling_warlock",
+  "cataclysm:drowned_host",
+  "goety:frayed",
+  "goety:hostile_zombie_vindicator",
+  "soulsweapons:remnant",
+  "twilightforest:minotaur",
+  "iceandfire:dread_thrall",
+  "eeeabsmobs:immortal_skeleton",
+  "eeeabsmobs:immortal_warrior",
+  "annoyingvillagers:low_herobrine_clone",
+  "annoyingvillagers:low_shadow_herobrine_clone",
+  "betterend:shadow_walker",
+  "divinerpg:enchanted_warrior"
+]
+
+---- data/spiral_abyss/mob_types/ranged_mobs.json
+[
+  "minecraft:drowned",
+  "minecraft:blaze",
+  "minecraft:witch",
+  "minecraft:ghast",
+  "minecraft:shulker",
+  "minecraft:evoker",
+  "minecraft:wither",
+  "mutantmonsters:mutant_snow_golem",
+  "mutantmonsters:mutant_skeleton",
+  "alexscaves:deep_one_mage",
+  "alexscaves:licowitch",
+  "alexscaves:teletor",
+  "cataclysm:deepling",
+  "cataclysm:deepling_brute",
+  "cataclysm:deepling_warlock",
+  "cataclysm:elite_draugr",
+  "cataclysm:the_watcher",
+  "cataclysm:cindaria",
+  "cataclysm:the_prowler",
+  "cataclysm:wadjet",
+  "block_factorys_bosses:flaming_skeleton_guard_fireball",
+  "block_factorys_bosses:crossbow_pirate",
+  "legendary_monsters:fractured_apostle",
+  "legendary_monsters:resurrected_knight",
+  "legendary_monsters:hovering_hurricane",
+  "legendary_monsters:dune_sentinel",
+  "legendary_monsters:shulker_mimic",
+  "legendary_monsters:cloud_golem",
+  "legendary_monsters:the_obliterator",
+  "irons_spellbooks:necromancer",
+  "irons_spellbooks:archevoker",
+  "irons_spellbooks:cryomancer",
+  "irons_spellbooks:pyromancer",
+  "irons_spellbooks:apothecarist",
+  "irons_spellbooks:priest",
+  "goety:web_spider",
+  "goety:snareling",
+  "goety:warlock",
+  "goety:heretic",
+  "goety:reprobate",
+  "goety:bone_spider",
+  "goety:wraith",
+  "goety:border_wraith",
+  "goety:muck_wraith",
+  "goety:necromancer",
+  "goety:cairn_necromancer",
+  "goety:mossy_necromancer",
+  "goety:blastling",
+  "goety:sorcerer",
+  "goety:envioker",
+  "goety:inquillager",
+  "goety:storm_caster",
+  "goety:cryologer",
+  "goety:brood_mother",
+  "goety:crone",
+  "goety:heresiarch",
+  "goety:minister",
+  "goety:wither_necromancer",
+  "goety:vizier",
+  "goety:apostle",
+  "goety:ender_keeper",
+  "goety:hostile_redstone_monstrosity",
+  "savage_and_ravage:griefer",
+  "savage_and_ravage:iceologer",
+  "savage_and_ravage:trickster",
+  "born_in_chaos_v1:bonescaller",
+  "born_in_chaos_v1:dark_vortex",
+  "born_in_chaos_v1:mrs_pumpkin",
+  "born_in_chaos_v1:missioner",
+  "soulsweapons:dark_sorcerer",
+  "soulsweapons:soulmass",
+  "soulsweapons:chaos_monarch",
+  "soulsweapons:night_shade",
+  "netherman:azazel",
+  "netherman:azazel_human",
+  "twilightforest:skeleton_druid",
+  "twilightforest:fire_beetle",
+  "twilightforest:slime_beetle",
+  "twilightforest:winter_wolf",
+  "twilightforest:death_tome",
+  "twilightforest:stable_ice_core",
+  "twilightforest:adherent",
+  "twilightforest:carminite_ghastling",
+  "twilightforest:carminite_ghastguard",
+  "twilightforest:lich",
+  "twilightforest:hydra",
+  "twilightforest:alpha_yeti",
+  "twilightforest:snow_queen",
+  "illageandspillage:igniter",
+  "illageandspillage:magispeller",
+  "illageandspillage:spiritcaller",
+  "illageandspillage:freakager",
+  "illagerinvasion:provoker",
+  "illagerinvasion:marauder",
+  "illagerinvasion:alchemist",
+  "illagerinvasion:archivist",
+  "illagerinvasion:sorcerer",
+  "illagerinvasion:firecaller",
+  "illagerinvasion:necromancer",
+  "illagerinvasion:invoker",
+  "twilightforest:ur_ghast",
+  "iceandfire:fire_dragon",
+  "iceandfire:ice_dragon",
+  "iceandfire:lightning_dragon",
+  "iceandfire:stymphalian_bird",
+  "iceandfire:cockatrice",
+  "iceandfire:dread_lich",
+  "iceandfire:hydra",
+  "iceandfire:sea_serpent",
+  "rats:pied_piper",
+  "rats:ratlantean_spirit",
+  "rats:ratlantean_ratbot",
+  "rats:black_death",
+  "rats:rat_king",
+  "rats:ratlantean_automaton",
+  "rats:neo_ratlantean",
+  "rats:dutchrat",
+  "eeeabsmobs:immortal_mage",
+  "eeeabsmobs:immortal_knight",
+  "eeeabsmobs:immortal_shaman",
+  "eeeabsmobs:relic_observer",
+  "eeeabsmobs:relic_annihilator",
+  "eeeabsmobs:realm_warden",
+  "eeeabsmobs:corpse_warlock",
+  "eeeabsmobs:immortal",
+  "annoyingvillagers:null",
+  "annoyingvillagers:shadow_herobrine",
+  "annoyingvillagers:swordsman_herobrine",
+  "annoyingvillagers:glaive_herobrine",
+  "annoyingvillagers:reaper_herobrine",
+  "annoyingvillagers:aegis_herobrine",
+  "annoyingvillagers:sledgehammer_herobrine",
+  "annoyingvillagers:herobrine_clone",
+  "annoyingvillagers:shadow_herobrine_clone",
+  "annoyingvillagers:herobrine_7",
+  "annoyingvillagers:armored_herobrine",
+  "deeperdarker:stalker",
+  "adventurez:soul_reaper",
+  "adventurez:necromancer",
+  "adventurez:summoner",
+  "adventurez:blaze_guardian",
+  "adventurez:amethyst_golem",
+  "adventurez:shaman",
+  "adventurez:blackstone_golem",
+  "adventurez:the_eye",
+  "aether:aechor_plant",
+  "aether:cockatrice",
+  "aether:zephyr",
+  "aether:valkyrie_queen",
+  "aether:sun_spirit",
+  "tofucraft:fukumame_thower",
+  "tofucraft:tofu_gandlem",
+  "tofucraft:shudofuspider",
+  "divinerpg:pale_archer",
+  "divinerpg:frost",
+  "divinerpg:fractite",
+  "divinerpg:arid_warrior",
+  "divinerpg:caveclops",
+  "divinerpg:wildfire",
+  "divinerpg:scorcher",
+  "divinerpg:living_statue",
+  "divinerpg:king_of_scorchers",
+  "divinerpg:sunstorm",
+  "divinerpg:termasect",
+  "divinerpg:eternal_archer",
+  "divinerpg:experienced_cori",
+  "divinerpg:reyvor",
+  "divinerpg:soul_fiend",
+  "divinerpg:twilight_demon",
+  "divinerpg:quadro",
+  "divinerpg:raglok",
+  "monsterexpansion:skrythe",
+  "monsterexpansion:rhyza",
+  "monsterexpansion:ignathos",
+  "monsterexpansion:leivekilth",
+  "divinerpg:sun_archer",
+  "divinerpg:enchanted_archer",
+  "divinerpg:skythern_archer",
+  "divinerpg:twilight_archer",
+  "divinerpg:zone",
+  "divinerpg:kazrotic",
+  "divinerpg:zoragon"
+]
+
+---- data/spiral_abyss/mob_types/trident_users.json
+[
+  "minecraft:drowned"
+]
+
+---- data/spiral_abyss/recipes/abyss_gate_activate_block.json
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    " D ",
+    "DLD",
+    " D "
+  ],
+  "key": {
+    "D": { "item": "minecraft:diamond" },
+    "L": { "item": "minecraft:lodestone" }
+  },
+  "result": {
+    "item": "spiral_abyss:abyss_gate_activate_block",
+    "count": 1
+  }
+}
+
+---- data/spiral_abyss/tags/worldgen/biome/has_structure/ruined_portal.json
+{
+  "replace": false,
+  "values": [
+    "#minecraft:has_structure/ruined_portal_standard",
+    "#minecraft:has_structure/ruined_portal_desert",
+    "#minecraft:has_structure/ruined_portal_jungle",
+    "#minecraft:has_structure/ruined_portal_swamp",
+    "#minecraft:has_structure/ruined_portal_mountain",
+    "#minecraft:has_structure/ruined_portal_ocean"
+  ]
+}
+
+---- data/spiral_abyss/wave_types/boss_minions.json
+{
+  "tier": 6,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 6
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 4
+        },
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/boss_vanguard.json
+{
+  "tier": 6,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 4
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/dual_boss.json
+{
+  "tier": 7,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/elite_finale.json
+{
+  "tier": 6,
+  "sequence": [
+    {
+      "groups": [
+        { "category": "champion_mob", "role": "melee", "count": 4 },
+        { "category": "champion_mob", "role": "ranged", "count": 2 }
+      ]
+    },
+    {
+      "groups": [
+        { "category": "mini_boss", "role": "any", "count": 3 },
+        { "category": "champion_mob", "role": "melee", "count": 2 },
+        { "category": "champion_mob", "role": "ranged", "count": 1 }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/elite_minions.json
+{
+  "tier": 4,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 6
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 4
+        },
+        {
+          "category": "mini_boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/elite_squad.json
+{
+  "tier": 4,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 3
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 3
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 2
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/escalation.json
+{
+  "tier": 7,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 7
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "common_mob",
+          "role": "melee",
+          "count": 5
+        },
+        {
+          "category": "common_mob",
+          "role": "ranged",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 3
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "mini_boss",
+          "role": "any",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/final_escalation.json
+{
+  "tier": 7,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 4
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "mini_boss",
+          "role": "any",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/final_wave_boss.json
+{
+  "tier": 7,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 6
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 4
+        },
+        {
+          "category": "common_mob",
+          "role": "melee",
+          "count": 5
+        },
+        {
+          "category": "common_mob",
+          "role": "ranged",
+          "count": 3
+        },
+        {
+          "category": "champion_mob",
+          "role": "any",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 4
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 2
+        },
+        {
+          "category": "mini_boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/heavy_elite.json
+{
+  "tier": 5,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "mini_boss",
+          "role": "any",
+          "count": 2
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/medium_horde.json
+{
+  "tier": 2,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "common_mob",
+          "role": "melee",
+          "count": 12
+        },
+        {
+          "category": "common_mob",
+          "role": "ranged",
+          "count": 5
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/melee_rush.json
+{
+  "tier": 1,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 12
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/mixed_army.json
+{
+  "tier": 3,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 6
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 4
+        },
+        {
+          "category": "common_mob",
+          "role": "melee",
+          "count": 3
+        },
+        {
+          "category": "common_mob",
+          "role": "ranged",
+          "count": 1
+        },
+        {
+          "category": "champion_mob",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/ranged_formation.json
+{
+  "tier": 2,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "common_mob",
+          "role": "melee",
+          "count": 4
+        },
+        {
+          "category": "common_mob",
+          "role": "ranged",
+          "count": 7
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/solo_boss.json
+{
+  "tier": 6,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/strong_squad.json
+{
+  "tier": 3,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 5
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 3
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/triple_elite.json
+{
+  "tier": 5,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 2
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 1
+        },
+        {
+          "category": "mini_boss",
+          "role": "any",
+          "count": 3
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/wave_room.json
+{
+  "tier": 5,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 8
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "common_mob",
+          "role": "melee",
+          "count": 5
+        },
+        {
+          "category": "common_mob",
+          "role": "ranged",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "category": "champion_mob",
+          "role": "melee",
+          "count": 2
+        },
+        {
+          "category": "champion_mob",
+          "role": "ranged",
+          "count": 1
+        },
+        {
+          "category": "mini_boss",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/weak_elite.json
+{
+  "tier": 3,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 10
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 5
+        },
+        {
+          "category": "champion_mob",
+          "role": "any",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/wave_types/weak_horde.json
+{
+  "tier": 1,
+  "sequence": [
+    {
+      "groups": [
+        {
+          "category": "fodder_mob",
+          "role": "melee",
+          "count": 20
+        },
+        {
+          "category": "fodder_mob",
+          "role": "ranged",
+          "count": 8
+        }
+      ]
+    }
+  ]
+}
+
+---- data/spiral_abyss/worldgen/structure/ruined_portal.json
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#spiral_abyss:has_structure/ruined_portal",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin",
+  "start_pool": "spiral_abyss:ruined_portal",
+  "size": 1,
+  "start_height": {
+    "absolute": 0
+  },
+  "project_start_to_heightmap": "OCEAN_FLOOR_WG",
+  "max_distance_from_center": 80,
+  "use_expansion_hack": false
+}
+
+---- data/spiral_abyss/worldgen/structure_set/ruined_portal.json
+{
+  "structures": [
+    {
+      "structure": "spiral_abyss:ruined_portal",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 15,
+    "spread_type": "linear",
+    "frequency": 1.0,
+    "salt": 34222646
+  }
+}
+
+---- data/spiral_abyss/worldgen/template_pool/ruined_portal.json
+{
+  "name": "spiral_abyss:ruined_portal",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "spiral_abyss:ruined_abyss_gate_1",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "spiral_abyss:ruined_abyss_gate_2",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "spiral_abyss:ruined_abyss_gate_3",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "spiral_abyss:ruined_abyss_gate_4",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "spiral_abyss:ruined_abyss_gate_5",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "spiral_abyss:ruined_abyss_gate_6",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    }
+  ]
+}
+

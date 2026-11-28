@@ -1,0 +1,1761 @@
+AVJ=packcache/epic_fight_avalon-20.12.6.5.jar EFJ=packcache/epic-fight-20.14.17-mc1.20.1-forge.jar
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/air_tachi.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/broadblade.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/co_tachi.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/crescent_moon.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/crimson_moon.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/exsiliumgladius.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/fire_exsiliumgladius.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/flag_bearer.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/hf_blade.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/hf_murasama.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/kusabimaru.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/meen_spear.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/nf_claw.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/nf_dual_sword.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/nf_shortsword.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/nf_shortsword_2.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/ruinsgreatsword.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/sword_of_pioneer.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/thornwheel.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/yamato_dmc.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/yamato_dmc4.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/yamato_dmc4_in_sheath.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/item_skins/yamato_dmc_in_sheath.json
+Nightfall Enhance-1.1.6-all.jar: assets/efn_enhance/item_skins/kusabimaru.json
+Nightfall Enhance-1.1.6-all.jar: packs/efn_enhance_must/assets/efn/item_skins/kusabimaru.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/agony.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/antitheus.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/blackstar.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/diamond_greataxe.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/diamond_staff.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/ender_blaster.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/evil_tachi.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/gesetz.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/golden_greataxe.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/golden_staff.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/herrscher.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/hollow_longsword.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/iron_greataxe.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/iron_staff.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/moonless.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/napoleon.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/netherite_greataxe.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/netherite_staff.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/nova.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/orbit.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/ruine.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/satsujin.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/solar.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/stone_staff.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/tormented_mind.json
+WeaponsOfMiracles-2.0.171-mc1.20.1-forge.jar: assets/wom/item_skins/wooden_staff.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/diamond_dagger.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/diamond_greatsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/diamond_longsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/diamond_spear.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/diamond_tachi.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/glove.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/golden_dagger.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/golden_greatsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/golden_longsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/golden_spear.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/golden_tachi.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/iron_dagger.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/iron_greatsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/iron_longsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/iron_spear.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/iron_tachi.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/netherite_dagger.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/netherite_greatsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/netherite_longsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/netherite_spear.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/netherite_tachi.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/stone_dagger.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/stone_greatsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/stone_longsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/stone_spear.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/stone_tachi.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/uchigatana.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/wooden_dagger.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/wooden_greatsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/wooden_longsword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/wooden_spear.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/epicfight/item_skins/wooden_tachi.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/air.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/bow.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/crossbow.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/diamond_axe.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/diamond_sword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/filled_map.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/golden_axe.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/golden_sword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/iron_axe.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/iron_sword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/netherite_axe.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/netherite_sword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/shield.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/stone_axe.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/stone_sword.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/trident.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/wooden_axe.json
+epic-fight-20.14.17-mc1.20.1-forge.jar: assets/minecraft/item_skins/wooden_sword.json
+epic_fight_avalon-20.12.6.5.jar: assets/epic_fight_avalon/item_skins/merlin_gg.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/epicfight/item_skins/uchigatana.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/epicfightx/item_skins/efx_uchigatana.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/epicfightx/item_skins/eternal_night_scythe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/epicfightx/item_skins/great_tachi.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/epicfightx/item_skins/yoto.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/minecraft/item_skins/_bow.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/minecraft/item_skins/crossbow.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: assets/minecraft/item_skins/trident.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/bokken.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/diamond_dagger.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/diamond_greatsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/diamond_longsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/diamond_spear.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/diamond_tachi.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/glove.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/golden_dagger.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/golden_greatsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/golden_longsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/golden_spear.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/golden_tachi.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/iron_dagger.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/iron_greatsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/iron_longsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/iron_spear.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/iron_tachi.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/netherite_dagger.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/netherite_greatsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/netherite_longsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/netherite_spear.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/netherite_tachi.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/stone_dagger.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/stone_greatsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/stone_longsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/stone_spear.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/stone_tachi.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/uchigatana.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/wooden_dagger.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/wooden_greatsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/wooden_longsword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/wooden_spear.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/epicfight/item_skins/wooden_tachi.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/air.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/bow.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/diamond_axe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/diamond_hoe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/diamond_pickaxe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/diamond_shovel.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/diamond_sword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/filled_map.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/golden_axe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/golden_hoe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/golden_pickaxe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/golden_shovel.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/golden_sword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/iron_axe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/iron_hoe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/iron_pickaxe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/iron_shovel.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/iron_sword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/netherite_axe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/netherite_hoe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/netherite_pickaxe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/netherite_shovel.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/netherite_sword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/shield.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/stone_axe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/stone_hoe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/stone_pickaxe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/stone_shovel.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/stone_sword.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/trident.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/wooden_axe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/wooden_hoe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/wooden_pickaxe.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/wooden_shovel.json
+epicfight-extra-1.2.1-mc1.20.1-forge-all.jar: packs/efx_epicfight_resource_pack/assets/minecraft/item_skins/wooden_sword.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/astrape.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/ceraunus.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/cursed_bow.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/gauntlet_of_guard.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/infernal_forge.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/soul_render.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/the_annihilator.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/the_incinerator.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/tidal_claws.json
+p1nero_ec-20.14.0.9.jar: assets/cataclysm/item_skins/wrath_of_the_desert.json
+---- duskfire
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/animmodels/armor/duskfire_boots.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/animmodels/armor/duskfire_chestplate.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/animmodels/armor/duskfire_helmet.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/animmodels/armor/duskfire_leggings.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/models/item/duskfire_boots.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/models/item/duskfire_chestplate.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/models/item/duskfire_helmet.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/models/item/duskfire_ingot.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/models/item/duskfire_leggings.json
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/textures/armor/duskfirearmor.png
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/textures/item/duskfire_boots.png
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/textures/item/duskfire_chestplate.png
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/textures/item/duskfire_helmet.png
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/textures/item/duskfire_ingot.png
+EpicFight Nightfall-3.4.2-all.jar: assets/efn/textures/item/duskfire_leggings.png
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/event/DuskFireArmorEffectListener.class
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/event/DuskFireArmorHelper.class
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/item/custom/DuskFireArmorItem$1.class
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/item/custom/DuskFireArmorItem$Boots.class
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/item/custom/DuskFireArmorItem$Chestplate.class
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/item/custom/DuskFireArmorItem$Helmet.class
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/item/custom/DuskFireArmorItem$Leggings.class
+EpicFight Nightfall-3.4.2-all.jar: com/hm/efn/item/custom/DuskFireArmorItem.class
+EpicFight Nightfall-3.4.2-all.jar: data/efn/capabilities/armors/duskfire_boots.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/capabilities/armors/duskfire_chestplate.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/capabilities/armors/duskfire_helmet.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/capabilities/armors/duskfire_leggings.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/recipes/duskfire_boots.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/recipes/duskfire_chestplate.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/recipes/duskfire_helmet.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/recipes/duskfire_ingot.json
+EpicFight Nightfall-3.4.2-all.jar: data/efn/recipes/duskfire_leggings.json
+{
+    "parent": "item/generated",
+    "textures":
+    {
+        "layer0" : "efn:item/duskfire_boots"
+    }
+}
+{
+    "parent": "item/generated",
+    "textures":
+    {
+        "layer0" : "efn:item/duskfire_chestplate"
+    }
+}
+{
+    "parent": "item/generated",
+    "textures":
+    {
+        "layer0" : "efn:item/duskfire_helmet"
+    }
+}
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "efn:item/duskfire_ingot"
+  }
+}
+{
+    "parent": "item/generated",
+    "textures":
+    {
+        "layer0" : "efn:item/duskfire_leggings"
+    }
+}
+com/merlin204/avalon/util/AvalonAnimationUtils.class
+com/merlin204/avalon/util/AvalonParticleUtils.class
+com/merlin204/avalon/util/AvalonEventUtils.class
+com/merlin204/avalon/util/AvalonEventUtils$1.class
+com/merlin204/avalon/epicfight/AvalonFctions.class
+com/merlin204/avalon/epicfight/api/AnimationRenderEvent$SimpleEvent.class
+com/merlin204/avalon/epicfight/api/AnimationRenderEvent.class
+com/merlin204/avalon/epicfight/api/AnimationBeAttackEvent$SimpleEvent.class
+com/merlin204/avalon/epicfight/api/AnimationAttackResultEvent$SimpleEvent.class
+com/merlin204/avalon/epicfight/api/AnimationBeAttackEvent$InPeriodEvent$AttackHandler.class
+com/merlin204/avalon/epicfight/api/AnimationRenderEvent$SimpleEvent$RenderHandler.class
+com/merlin204/avalon/epicfight/api/AnimationAttackResultEvent$SimpleEvent$AttackHandler.class
+com/merlin204/avalon/epicfight/api/AnimationAttackEvent.class
+com/merlin204/avalon/epicfight/api/AnimationBeAttackEvent$SimpleEvent$AttackHandler.class
+com/merlin204/avalon/epicfight/api/AnimationAttackResultEvent.class
+com/merlin204/avalon/epicfight/api/AvalonAnimationProperty.class
+com/merlin204/avalon/epicfight/api/AnimationAttackEvent$SimpleEvent$AttackHandler.class
+com/merlin204/avalon/epicfight/api/AnimationBeAttackEvent.class
+com/merlin204/avalon/epicfight/api/AnimationBeAttackEvent$InPeriodEvent.class
+com/merlin204/avalon/epicfight/api/AnimationAttackEvent$SimpleEvent.class
+com/merlin204/avalon/epicfight/animations/AvalonAttackAnimation.class
+com/merlin204/avalon/epicfight/animations/AutoDiscardAttackAnimation.class
+com/merlin204/avalon/epicfight/animations/AvalonAttackAnimation$AvalonPhase.class
+com/merlin204/avalon/epicfight/animations/AvalonMovementAnimation.class
+com/merlin204/avalon/epicfight/animations/AutoDiscardActionAnimation.class
+com/merlin204/avalon/epicfight/AvalonAnimations.class
+com/merlin204/avalon/epicfight/gameassets/animations/VFXAnimations.class
+com/merlin204/avalon/epicfight/gameassets/AvalonCategories.class
+com/merlin204/avalon/event/AvalonEntityEventHandler.class
+com/merlin204/avalon/event/ForgeEvents.class
+com/merlin204/avalon/event/ClientModEvents.class
+com/merlin204/avalon/network/NetworkHandler.class
+com/merlin204/avalon/network/server/ShakeCameraPacket.class
+com/merlin204/avalon/avalon/vfx/AvalonVFXManagers.class
+com/merlin204/avalon/avalon/vfx/type/AnimationTextureAvalonVFXManager.class
+com/merlin204/avalon/avalon/vfx/type/StaticAvalonVFXManager.class
+com/merlin204/avalon/avalon/vfx/type/HumanoidAvalonVFXManager.class
+com/merlin204/avalon/item/MerlinSuperGG.class
+com/merlin204/avalon/item/animationitem/AvalonAnimationItemManager.class
+com/merlin204/avalon/item/animationitem/IAvalonAnimationItem.class
+com/merlin204/avalon/item/IChangeArmatureItem.class
+com/merlin204/avalon/item/AvalonItems.class
+com/merlin204/avalon/particle/AvalonParticles.class
+com/merlin204/avalon/api/AvalonAutoRegister.class
+com/merlin204/avalon/api/AvalonAPI.class
+com/merlin204/avalon/api/AvalonEntityRegistryManager.class
+com/merlin204/avalon/client/CameraShake.class
+com/merlin204/avalon/client/particle/AvalonInterpolationEntityAfterImageParticle.class
+com/merlin204/avalon/client/particle/AvalonEntityAfterImageParticle.class
+com/merlin204/avalon/client/particle/AvalonInterpolationEntityAfterImageParticle$Provider.class
+com/merlin204/avalon/client/particle/AvalonEntityAfterImageParticle$Provider.class
+com/merlin204/avalon/client/particle/AvalonAnimationTrailParticle$Provider.class
+com/merlin204/avalon/client/particle/AvalonAnimationTrailParticle.class
+com/merlin204/avalon/block/MeshBlock$MeshBlockEntityAnimator$MeshBlockEntityBaseLayer.class
+com/merlin204/avalon/block/testdoor/TestDoor$1.class
+com/merlin204/avalon/block/testdoor/TestDoor.class
+com/merlin204/avalon/block/MeshBlock$MeshBlockEntityPatch.class
+com/merlin204/avalon/block/MeshBlock$MeshBlockEntityAnimator$MeshBlockEntityLayer.class
+com/merlin204/avalon/block/client/MeshBlockEntityRender.class
+com/merlin204/avalon/block/MeshBlock$MeshBlockEntityAnimator$NoEntityAnimationPlayer.class
+com/merlin204/avalon/block/MeshBlock.class
+com/merlin204/avalon/block/MeshBlock$MeshBlockEntityAnimator.class
+com/merlin204/avalon/block/AvalonBlocks.class
+com/merlin204/avalon/block/MeshBlockEntity.class
+com/merlin204/avalon/main/AvalonMOD.class
+com/merlin204/avalon/mixin/PLivingEntityRendererMixin.class
+com/merlin204/avalon/mixin/LivingEntityPatchMixin.class
+com/merlin204/avalon/mixin/SkinnedMeshMixin.class
+com/merlin204/avalon/entity/AvalonEntities.class
+com/merlin204/avalon/entity/example/BOSSPatch.class
+com/merlin204/avalon/entity/example/BOSS.class
+com/merlin204/avalon/entity/projectile/AvalonProjectileEntity.class
+com/merlin204/avalon/entity/projectile/AvalonProjectilePatch.class
+com/merlin204/avalon/entity/condition/HurtPredictCondition.class
+com/merlin204/avalon/entity/condition/TargetInGirdCondition.class
+com/merlin204/avalon/entity/condition/AtkPredictCondition.class
+com/merlin204/avalon/entity/condition/TargetInGirdCondition$Rectangle.class
+com/merlin204/avalon/entity/api/patch/IAvalonPatch.class
+com/merlin204/avalon/entity/client/model/EmptyEntityModel.class
+com/merlin204/avalon/entity/client/renderer/EmptyRenderer.class
+com/merlin204/avalon/entity/client/renderer/patch/item/RenderAnimationItem.class
+com/merlin204/avalon/entity/client/renderer/patch/item/RenderMeshItem.class
+com/merlin204/avalon/entity/client/renderer/patch/item/AbstractRenderAnimationItem.class
+com/merlin204/avalon/entity/client/renderer/patch/item/RenderChangeMeshItem.class
+com/merlin204/avalon/entity/client/renderer/patch/entity/AvalonVFXRendererPatch.class
+com/merlin204/avalon/entity/client/renderer/patch/entity/AvalonRendererPatch.class
+com/merlin204/avalon/entity/vfx/VFXEntityPatch.class
+com/merlin204/avalon/entity/vfx/shakewave/ShakeWaveEntity.class
+com/merlin204/avalon/entity/vfx/AnimationTextureVFXEntity.class
+com/merlin204/avalon/entity/vfx/VFXEntity.class
+com/merlin204/avalon/entity/ai/AvalonCombatBehaviors$Behavior$Builder.class
+com/merlin204/avalon/entity/ai/AvalonCombatBehaviors$Builder.class
+com/merlin204/avalon/entity/ai/AvalonAnimatedAttackGoal.class
+com/merlin204/avalon/entity/ai/AvalonCombatBehaviors$BehaviorSeries$Builder.class
+com/merlin204/avalon/entity/ai/AvalonCombatBehaviors$Behavior.class
+com/merlin204/avalon/entity/ai/AvalonCombatBehaviors$BehaviorSeries.class
+com/merlin204/avalon/entity/ai/AvalonCombatBehaviors.class
+com/merlin204/avalon/entity/IAvalonMeshEntity.class
+======== /tmp/av/com/merlin204/avalon/event/AvalonEntityEventHandler.class
+  public com.merlin204.avalon.event.AvalonEntityEventHandler();
+         1: invokespecial #33                 // Method java/lang/Object."<init>":()V
+  public static void registerRenderers(yesman.epicfight.api.client.forgeevent.PatchedRenderersEvent$RegisterItemRenderer);
+         1: ldc           #43                 // String epic_fight_avalon
+         3: ldc           #45                 // String mesh_item
+         5: invokestatic  #51                 // Method net/minecraft/resources/ResourceLocation.fromNamespaceAndPath:(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+         8: invokedynamic #72,  0             // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+        13: invokevirtual #76                 // Method yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$RegisterItemRenderer.addItemRenderer:(Lnet/minecraft/resources/ResourceLocation;Ljava/util/function/Function;)V
+        17: ldc           #43                 // String epic_fight_avalon
+        19: ldc           #78                 // String change_mesh_item
+        21: invokestatic  #51                 // Method net/minecraft/resources/ResourceLocation.fromNamespaceAndPath:(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        24: invokedynamic #83,  0             // InvokeDynamic #1:apply:()Ljava/util/function/Function;
+        29: invokevirtual #76                 // Method yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$RegisterItemRenderer.addItemRenderer:(Lnet/minecraft/resources/ResourceLocation;Ljava/util/function/Function;)V
+        33: ldc           #43                 // String epic_fight_avalon
+        35: ldc           #85                 // String animation_item
+        37: invokestatic  #51                 // Method net/minecraft/resources/ResourceLocation.fromNamespaceAndPath:(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        40: invokedynamic #90,  0             // InvokeDynamic #2:apply:()Ljava/util/function/Function;
+        45: invokevirtual #76                 // Method yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$RegisterItemRenderer.addItemRenderer:(Lnet/minecraft/resources/ResourceLocation;Ljava/util/function/Function;)V
+# This is an example mods.toml file. It contains the data relating to the loading mods.
+# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
+# The overall format is standard TOML format, v0.5.0.
+# Note that there are a couple of TOML lists in this file.
+# Find more information on toml format here:  https://github.com/toml-lang/toml
+# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
+modLoader="javafml" #mandatory
+# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
+loaderVersion="[47,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+# The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
+# Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
+license="All Rights Reserved"
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+# If your mod is purely client-side and has no multiplayer functionality (be it dedicated servers or Open to LAN),
+# set this to true, and Forge will set the correct displayTest for you and skip loading your mod on dedicated servers.
+#clientSideOnly=true #optional - defaults to false if absent
+# A list of mods - how many allowed here is determined by the individual mod loader
+[[mods]] #mandatory
+# The modid of the mod
+modId="epic_fight_avalon" #mandatory
+# The version number of the mod
+version="20.12.6.5" #mandatory
+# A display name for the mod
+displayName="Epic fight - Avalon" #mandatory
+# A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+# A file name (in the root of the mod JAR) containing a logo for display
+#logoFile="examplemod.png" #optional
+# A text field displayed in the mod UI
+#credits="" #optional
+# A text field displayed in the mod UI
+authors="Merlin204" #optional
+# Display Test controls the display for your mod in the server connection screen
+# MATCH_VERSION means that your mod will cause a red X if the versions on client and server differ. This is the default behaviour and should be what you choose if you have server and client elements to your mod.
+# IGNORE_SERVER_VERSION means that your mod will not cause a red X if it's present on the server but not on the client. This is what you should use if you're a server only mod.
+# IGNORE_ALL_VERSION means that your mod will not cause a red X if it's present on the client or the server. This is a special case and should only be used if your mod has no server component.
+# NONE means that no display test is set on your mod. You need to do this yourself, see IExtensionPoint.DisplayTest for more information. You can define any scheme you wish with this value.
+# IMPORTANT NOTE: this is NOT an instruction as to which environments (CLIENT or DEDICATED SERVER) your mod loads on. Your mod should load (and maybe do nothing!) whereever it finds itself.
+#displayTest="MATCH_VERSION" # if nothing is specified, MATCH_VERSION is the default when clientSideOnly=false, otherwise IGNORE_ALL_VERSION when clientSideOnly=true (#optional)
+
+# The description text for the mod (multi line!) (#mandatory)
+description='''merlin's lib'''
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies.epic_fight_avalon]] #optional
+    # the modid of the dependency
+    modId="forge" #mandatory
+    # Does this dependency have to exist - if not, ordering below must be specified
+    mandatory=true #mandatory
+    # The version range of the dependency
+    versionRange="[47,)" #mandatory
+    # An ordering relationship for the dependency - BEFORE or AFTER required if the dependency is not mandatory
+    # BEFORE - This mod is loaded BEFORE the dependency
+    # AFTER - This mod is loaded AFTER the dependency
+    ordering="NONE"
+    # Side this dependency is applied on - BOTH, CLIENT, or SERVER
+    side="BOTH"
+# Here's another dependency
+[[dependencies.epic_fight_avalon]]
+    modId="minecraft"
+    mandatory=true
+    # This version range declares a minimum of the current minecraft version up to but not including the next major version
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.epic_fight_avalon]]
+modId="epicfight"
+mandatory=true
+versionRange="[20.12.8,)"
+ordering="AFTER"
+side="BOTH"
+== /tmp/av/epic_fight_avalon.mixins.json
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "package": "com.merlin204.avalon.mixin",
+  "mixins": [
+    "LivingEntityPatchMixin"
+  ],
+  "client": [
+    "PLivingEntityRendererMixin",
+    "SkinnedMeshMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "epic_fight_avalon.mixin-refmap.json"
+}== EF classes mentioning item_skins / RenderItemBase registry
+/tmp/efx/yesman/epicfight/api/client/model/ItemSkinsReloadListener.class
+/tmp/efx/yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent.class
+/tmp/efx/yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$RegisterItemRenderer.class
+/tmp/efx/yesman/epicfight/client/gui/datapack/screen/DatapackEditScreen$ItemCapabilityTab.class
+/tmp/efx/yesman/epicfight/client/events/engine/RenderEngine$Events.class
+/tmp/efx/yesman/epicfight/client/events/engine/RenderEngine.class
+/tmp/efx/yesman/epicfight/main/EpicFightMod$ClientModEvents.class
+======== AV com/merlin204/avalon/entity/client/renderer/patch/item/RenderMeshItem.class
+  private final net.minecraft.resources.ResourceLocation texture;
+  private final net.minecraft.resources.ResourceLocation texture_l;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh_main;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh_off;
+  public com.merlin204.avalon.entity.client.renderer.patch.item.RenderMeshItem(com.google.gson.JsonElement);
+         2: invokespecial #34                 // Method yesman/epicfight/client/renderer/patched/item/RenderItemBase."<init>":(Lcom/google/gson/JsonElement;)V
+         6: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+         9: ldc           #41                 // String texture
+        11: invokevirtual #47                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        19: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+        22: ldc           #41                 // String texture
+        24: invokevirtual #51                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+        27: invokevirtual #55                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+        30: invokestatic  #61                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        45: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+        48: ldc           #64                 // String texture_l
+        50: invokevirtual #47                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        58: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+        61: ldc           #64                 // String texture_l
+        63: invokevirtual #51                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+        66: invokevirtual #55                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+        69: invokestatic  #61                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        84: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+        87: ldc           #67                 // String mesh_main
+        89: invokevirtual #47                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        96: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+        99: ldc           #67                 // String mesh_main
+       101: invokevirtual #51                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       104: invokevirtual #55                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       109: invokestatic  #61                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       115: invokevirtual #70                 // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       119: invokevirtual #73                 // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       122: invokedynamic #92,  0             // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+       127: invokestatic  #96                 // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+       142: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+       145: ldc           #99                 // String mesh_off
+       147: invokevirtual #47                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       154: invokevirtual #40                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+       157: ldc           #99                 // String mesh_off
+       159: invokevirtual #51                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       162: invokevirtual #55                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       167: invokestatic  #61                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       173: invokevirtual #70                 // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       177: invokevirtual #73                 // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       180: invokedynamic #104,  0            // InvokeDynamic #1:apply:()Ljava/util/function/Function;
+       185: invokestatic  #96                 // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+  public void renderItemInHand(net.minecraft.world.item.ItemStack, yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, net.minecraft.world.InteractionHand, yesman.epicfight.api.utils.math.OpenMatrix4f[], net.minecraft.client.renderer.MultiBufferSource, com.mojang.blaze3d.vertex.PoseStack, int, float);
+         4: getstatic     #122                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+        11: getfield      #98                 // Field mesh_main:Lyesman/epicfight/api/asset/AssetAccessor;
+        14: invokeinterface #127,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+        28: getstatic     #132                // Field net/minecraft/world/InteractionHand.OFF_HAND:Lnet/minecraft/world/InteractionHand;
+        35: getfield      #106                // Field mesh_off:Lyesman/epicfight/api/asset/AssetAccessor;
+        38: invokeinterface #127,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+        49: invokevirtual #138                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getArmature:()Lyesman/epicfight/api/model/Armature;
+        56: invokevirtual #144                // Method com/mojang/blaze3d/vertex/PoseStack.m_85836_:()V
+        60: invokevirtual #150                // Method net/minecraft/world/item/ItemStack.m_41720_:()Lnet/minecraft/world/item/Item;
+        71: invokevirtual #155                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+        78: invokevirtual #161                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getAnimator:()Lyesman/epicfight/api/animation/Animator;
+        83: invokevirtual #167                // Method yesman/epicfight/api/animation/Animator.getPose:(F)Lyesman/epicfight/api/animation/Pose;
+        86: invokevirtual #171                // Method yesman/epicfight/api/model/Armature.setPose:(Lyesman/epicfight/api/animation/Pose;)V
+       101: getfield      #63                 // Field texture:Lnet/minecraft/resources/ResourceLocation;
+       104: invokestatic  #177                // Method net/minecraft/client/renderer/RenderType.m_110452_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+       113: getstatic     #183                // Field net/minecraft/client/renderer/texture/OverlayTexture.f_118083_:I
+       120: invokevirtual #187                // Method yesman/epicfight/api/model/Armature.getPoseMatrices:()[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       123: invokevirtual #191                // Method yesman/epicfight/api/client/model/SkinnedMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+       127: getfield      #66                 // Field texture_l:Lnet/minecraft/resources/ResourceLocation;
+       140: getfield      #66                 // Field texture_l:Lnet/minecraft/resources/ResourceLocation;
+       143: invokestatic  #194                // Method net/minecraft/client/renderer/RenderType.m_234338_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+       151: ldc           #195                // float 0.9f
+       153: getstatic     #183                // Field net/minecraft/client/renderer/texture/OverlayTexture.f_118083_:I
+       160: invokevirtual #187                // Method yesman/epicfight/api/model/Armature.getPoseMatrices:()[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       163: invokevirtual #191                // Method yesman/epicfight/api/client/model/SkinnedMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+       168: invokevirtual #155                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$1(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #226,  0            // InvokeDynamic #2:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #232                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$0(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #226,  0            // InvokeDynamic #2:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #232                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+======== AV com/merlin204/avalon/entity/client/renderer/patch/item/AbstractRenderAnimationItem.class
+  public com.merlin204.avalon.entity.client.renderer.patch.item.AbstractRenderAnimationItem(com.google.gson.JsonElement);
+         2: invokespecial #9                  // Method yesman/epicfight/client/renderer/patched/item/RenderItemBase."<init>":(Lcom/google/gson/JsonElement;)V
+  public void renderAnimationItem(yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, yesman.epicfight.api.utils.math.OpenMatrix4f[], net.minecraft.client.renderer.MultiBufferSource, com.mojang.blaze3d.vertex.PoseStack, int, float);
+  protected void setArmaturePose(yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, yesman.epicfight.api.model.Armature, float);
+         1: invokevirtual #38                 // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getAnimator:()Lyesman/epicfight/api/animation/Animator;
+         5: invokevirtual #44                 // Method yesman/epicfight/api/animation/Animator.getPose:(F)Lyesman/epicfight/api/animation/Pose;
+        13: invokevirtual #50                 // Method yesman/epicfight/api/model/Armature.setPose:(Lyesman/epicfight/api/animation/Pose;)V
+  public void renderItemInHand(net.minecraft.world.item.ItemStack, yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, net.minecraft.world.InteractionHand, yesman.epicfight.api.utils.math.OpenMatrix4f[], net.minecraft.client.renderer.MultiBufferSource, com.mojang.blaze3d.vertex.PoseStack, int, float);
+======== AV com/merlin204/avalon/mixin/SkinnedMeshMixin.class
+  public com.merlin204.avalon.mixin.SkinnedMeshMixin();
+         1: invokespecial #27                 // Method java/lang/Object."<init>":()V
+  private void avalon$draw(com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.MultiBufferSource, net.minecraft.client.renderer.RenderType, int, float, float, float, float, int, yesman.epicfight.api.model.Armature, yesman.epicfight.api.utils.math.OpenMatrix4f[], org.spongepowered.asm.mixin.injection.callback.CallbackInfo);
+         7: getstatic     #49                 // Field com/merlin204/avalon/main/AvalonMOD.beMerlin:Z
+        13: getstatic     #53                 // Field yesman/epicfight/api/client/model/Meshes.BIPED:Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+        16: invokevirtual #57                 // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.get:()Lyesman/epicfight/api/client/model/Mesh;
+        24: invokestatic  #61                 // Method isRenderingInThirdPerson:()Z
+        32: getfield      #65                 // Field yesman/epicfight/client/mesh/HumanoidMesh.head:Lyesman/epicfight/api/client/model/SkinnedMesh$SkinnedMeshPart;
+        36: invokevirtual #69                 // Method yesman/epicfight/api/client/model/SkinnedMesh$SkinnedMeshPart.setHidden:(Z)V
+        41: getfield      #72                 // Field yesman/epicfight/client/mesh/HumanoidMesh.hat:Lyesman/epicfight/api/client/model/SkinnedMesh$SkinnedMeshPart;
+        45: invokevirtual #69                 // Method yesman/epicfight/api/client/model/SkinnedMesh$SkinnedMeshPart.setHidden:(Z)V
+        52: ldc           #74                 // String epic_fight_avalon
+        54: ldc           #76                 // String textures/merlin.png
+        56: invokestatic  #82                 // Method net/minecraft/resources/ResourceLocation.fromNamespaceAndPath:(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        59: invokestatic  #88                 // Method net/minecraft/client/renderer/RenderType.m_110473_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+        62: getstatic     #92                 // Field yesman/epicfight/api/client/model/Mesh$DrawingFunction.NEW_ENTITY:Lyesman/epicfight/api/client/model/Mesh$DrawingFunction;
+        81: invokevirtual #96                 // Method yesman/epicfight/client/mesh/HumanoidMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;Lyesman/epicfight/api/client/model/Mesh$DrawingFunction;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+        88: ldc           #74                 // String epic_fight_avalon
+        90: ldc           #98                 // String textures/merlin_eyes.png
+        92: invokestatic  #82                 // Method net/minecraft/resources/ResourceLocation.fromNamespaceAndPath:(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        95: invokestatic  #101                // Method net/minecraft/client/renderer/RenderType.m_234338_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+        98: getstatic     #92                 // Field yesman/epicfight/api/client/model/Mesh$DrawingFunction.NEW_ENTITY:Lyesman/epicfight/api/client/model/Mesh$DrawingFunction;
+       117: invokevirtual #96                 // Method yesman/epicfight/client/mesh/HumanoidMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;Lyesman/epicfight/api/client/model/Mesh$DrawingFunction;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+       122: invokevirtual #106                // Method org/spongepowered/asm/mixin/injection/callback/CallbackInfo.cancel:()V
+  private static boolean isRenderingInThirdPerson();
+         0: invokestatic  #134                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+         3: getfield      #138                // Field net/minecraft/client/Minecraft.f_91066_:Lnet/minecraft/client/Options;
+         6: invokevirtual #144                // Method net/minecraft/client/Options.m_92176_:()Lnet/minecraft/client/CameraType;
+        11: invokevirtual #149                // Method net/minecraft/client/CameraType.m_90612_:()Z
+======== AV com/merlin204/avalon/event/ClientModEvents.class
+  public com.merlin204.avalon.event.ClientModEvents();
+         1: invokespecial #49                 // Method java/lang/Object."<init>":()V
+  public static void onParticleRegistry(net.minecraftforge.client.event.RegisterParticleProvidersEvent);
+         1: getstatic     #63                 // Field com/merlin204/avalon/particle/AvalonParticles.AVALON_TRAIL:Lnet/minecraftforge/registries/RegistryObject;
+         4: invokevirtual #69                 // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        14: invokespecial #72                 // Method com/merlin204/avalon/client/particle/AvalonAnimationTrailParticle$Provider."<init>":()V
+        17: invokevirtual #78                 // Method net/minecraftforge/client/event/RegisterParticleProvidersEvent.registerSpecial:(Lnet/minecraft/core/particles/ParticleType;Lnet/minecraft/client/particle/ParticleProvider;)V
+        21: getstatic     #81                 // Field com/merlin204/avalon/particle/AvalonParticles.AVALON_ENTITY_AFTER_IMAGE:Lnet/minecraftforge/registries/RegistryObject;
+        24: invokevirtual #69                 // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        34: invokespecial #82                 // Method com/merlin204/avalon/client/particle/AvalonEntityAfterImageParticle$Provider."<init>":()V
+        37: invokevirtual #78                 // Method net/minecraftforge/client/event/RegisterParticleProvidersEvent.registerSpecial:(Lnet/minecraft/core/particles/ParticleType;Lnet/minecraft/client/particle/ParticleProvider;)V
+        41: getstatic     #85                 // Field com/merlin204/avalon/particle/AvalonParticles.AVALON_INTERPOLATION_ENTITY_AFTER_IMAGE:Lnet/minecraftforge/registries/RegistryObject;
+        44: invokevirtual #69                 // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        54: invokespecial #86                 // Method com/merlin204/avalon/client/particle/AvalonInterpolationEntityAfterImageParticle$Provider."<init>":()V
+        57: invokevirtual #78                 // Method net/minecraftforge/client/event/RegisterParticleProvidersEvent.registerSpecial:(Lnet/minecraft/core/particles/ParticleType;Lnet/minecraft/client/particle/ParticleProvider;)V
+  public static void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent);
+         0: getstatic     #95                 // Field com/merlin204/avalon/block/AvalonBlocks.MESH_BLOCK_ENTITY:Lnet/minecraftforge/registries/RegistryObject;
+         3: invokevirtual #69                 // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+         9: invokedynamic #114,  0            // InvokeDynamic #0:m_173570_:()Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;
+        14: invokestatic  #120                // Method net/minecraft/client/renderer/blockentity/BlockEntityRenderers.m_173590_:(Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)V
+        17: getstatic     #123                // Field com/merlin204/avalon/block/AvalonBlocks.TEST_DOOR_ENTITY:Lnet/minecraftforge/registries/RegistryObject;
+        20: invokevirtual #69                 // Method net/minecraftforge/registries/RegistryObject.get:()Ljava/lang/Object;
+        26: invokedynamic #128,  0            // InvokeDynamic #1:m_173570_:()Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;
+        31: invokestatic  #120                // Method net/minecraft/client/renderer/blockentity/BlockEntityRenderers.m_173590_:(Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)V
+  private static net.minecraft.client.renderer.blockentity.BlockEntityRenderer lambda$onClientSetup$1(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context);
+         4: invokespecial #132                // Method com/merlin204/avalon/block/client/MeshBlockEntityRender."<init>":()V
+  private static net.minecraft.client.renderer.blockentity.BlockEntityRenderer lambda$onClientSetup$0(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context);
+         4: invokespecial #132                // Method com/merlin204/avalon/block/client/MeshBlockEntityRender."<init>":()V
+======== EF yesman/epicfight/api/client/model/ItemSkinsReloadListener.class
+  public static final yesman.epicfight.api.client.model.ItemSkinsReloadListener INSTANCE;
+  public yesman.epicfight.api.client.model.ItemSkinsReloadListener();
+         5: invokespecial #13                 // Method com/google/gson/GsonBuilder."<init>":()V
+         8: invokevirtual #17                 // Method com/google/gson/GsonBuilder.create:()Lcom/google/gson/Gson;
+        11: ldc           #19                 // String item_skins
+        13: invokespecial #22                 // Method net/minecraft/server/packs/resources/SimpleJsonResourceReloadListener."<init>":(Lcom/google/gson/Gson;Ljava/lang/String;)V
+  protected void apply(java.util.Map<net.minecraft.resources.ResourceLocation, com.google.gson.JsonElement>, net.minecraft.server.packs.resources.ResourceManager, net.minecraft.util.profiling.ProfilerFiller);
+         0: invokestatic  #32                 // Method yesman/epicfight/client/ClientEngine.getInstance:()Lyesman/epicfight/client/ClientEngine;
+         3: getfield      #36                 // Field yesman/epicfight/client/ClientEngine.renderEngine:Lyesman/epicfight/client/events/engine/RenderEngine;
+         7: invokevirtual #42                 // Method yesman/epicfight/client/events/engine/RenderEngine.reloadItemRenderers:(Ljava/util/Map;)V
+  protected void m_5787_(java.lang.Object, net.minecraft.server.packs.resources.ResourceManager, net.minecraft.util.profiling.ProfilerFiller);
+         7: invokevirtual #55                 // Method apply:(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V
+  static {};
+         4: invokespecial #57                 // Method "<init>":()V
+======== EF yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$RegisterItemRenderer.class
+  private final java.util.Map<net.minecraft.resources.ResourceLocation, java.util.function.Function<com.google.gson.JsonElement, yesman.epicfight.client.renderer.patched.item.RenderItemBase>> itemRenderers;
+  public yesman.epicfight.api.client.forgeevent.PatchedRenderersEvent$RegisterItemRenderer(java.util.Map<net.minecraft.resources.ResourceLocation, java.util.function.Function<com.google.gson.JsonElement, yesman.epicfight.client.renderer.patched.item.RenderItemBase>>);
+         1: invokespecial #20                 // Method yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent."<init>":()V
+  public void addItemRenderer(net.minecraft.resources.ResourceLocation, java.util.function.Function<com.google.gson.JsonElement, yesman.epicfight.client.renderer.patched.item.RenderItemBase>);
+         1: getfield      #22                 // Field itemRenderers:Ljava/util/Map;
+         5: invokeinterface #33,  2           // InterfaceMethod java/util/Map.containsKey:(Ljava/lang/Object;)Z
+        18: invokestatic  #41                 // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+        21: invokedynamic #53,  0             // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        26: invokespecial #56                 // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+        31: getfield      #22                 // Field itemRenderers:Ljava/util/Map;
+        36: invokeinterface #60,  3           // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+======== EF RenderEngine (item skin parts)
+  public final yesman.epicfight.client.gui.BattleModeGui battleModeUI;
+  public final yesman.epicfight.client.gui.VersionNotifier versionNotifier;
+  public final net.minecraft.client.Minecraft minecraft;
+  private final com.google.common.collect.BiMap<net.minecraft.world.entity.EntityType<?>, java.util.function.Function<net.minecraft.world.entity.EntityType<?>, yesman.epicfight.client.renderer.patched.entity.PatchedEntityRenderer>> entityRendererProvider;
+  private final java.util.Map<net.minecraft.world.entity.EntityType<?>, yesman.epicfight.client.renderer.patched.entity.PatchedEntityRenderer> entityRendererCache;
+  private final java.util.Map<net.minecraft.world.item.Item, yesman.epicfight.client.renderer.patched.item.RenderItemBase> itemRendererMapByInstance;
+  private final java.util.Map<java.lang.Class<?>, yesman.epicfight.client.renderer.patched.item.RenderItemBase> itemRendererMapByClass;
+  private final java.util.Map<java.util.UUID, yesman.epicfight.world.capabilities.entitypatch.boss.BossPatch> bossEventOwners;
+  private final yesman.epicfight.client.gui.screen.overlay.OverlayManager overlayManager;
+  private yesman.epicfight.client.renderer.FakeBlockRenderer fakeBlockRenderer;
+  private yesman.epicfight.client.renderer.FirstPersonRenderer firstPersonRenderer;
+  private yesman.epicfight.client.renderer.patched.entity.PHumanoidRenderer<?, ?, ?, ?, ?> basicHumanoidRenderer;
+  private int modelInitTimer;
+  public yesman.epicfight.client.events.engine.RenderEngine();
+        56: putfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        63: putfield      #136                // Field entityRendererCache:Ljava/util/Map;
+        70: putfield      #138                // Field itemRendererMapByInstance:Ljava/util/Map;
+        77: putfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+        92: new           #147                // class yesman/epicfight/client/renderer/VanillaFakeBlockRenderer
+        96: invokespecial #148                // Method yesman/epicfight/client/renderer/VanillaFakeBlockRenderer."<init>":()V
+        99: putfield      #150                // Field fakeBlockRenderer:Lyesman/epicfight/client/renderer/FakeBlockRenderer;
+  public void initialize();
+  public void reloadFakeBlockRenderer(yesman.epicfight.client.renderer.FakeBlockRenderer);
+         2: putfield      #150                // Field fakeBlockRenderer:Lyesman/epicfight/client/renderer/FakeBlockRenderer;
+  public void reloadEntityRenderers(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+         1: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        10: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        17: invokedynamic #190,  0            // InvokeDynamic #0:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+        29: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        36: invokedynamic #202,  0            // InvokeDynamic #1:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+        48: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        55: invokedynamic #210,  0            // InvokeDynamic #2:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+        67: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        74: invokedynamic #218,  0            // InvokeDynamic #3:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+        86: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        93: invokedynamic #226,  0            // InvokeDynamic #4:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       105: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       112: invokedynamic #234,  0            // InvokeDynamic #5:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       124: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       131: invokedynamic #242,  0            // InvokeDynamic #6:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       143: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       150: invokedynamic #250,  0            // InvokeDynamic #7:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       162: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       169: invokedynamic #258,  0            // InvokeDynamic #8:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       181: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       188: invokedynamic #266,  0            // InvokeDynamic #9:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       200: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       207: invokedynamic #274,  0            // InvokeDynamic #10:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       219: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       226: invokedynamic #282,  0            // InvokeDynamic #11:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       238: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       245: invokedynamic #290,  0            // InvokeDynamic #12:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       257: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       264: invokedynamic #298,  0            // InvokeDynamic #13:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       276: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       283: invokedynamic #306,  0            // InvokeDynamic #14:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       295: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       302: invokedynamic #314,  0            // InvokeDynamic #15:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       314: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       321: invokedynamic #322,  0            // InvokeDynamic #16:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       333: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       340: invokedynamic #330,  0            // InvokeDynamic #17:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       352: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       359: invokedynamic #338,  0            // InvokeDynamic #18:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       371: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       378: invokedynamic #346,  0            // InvokeDynamic #19:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       390: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       397: invokedynamic #354,  0            // InvokeDynamic #20:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       409: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       416: invokedynamic #362,  0            // InvokeDynamic #21:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       428: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       435: invokedynamic #370,  0            // InvokeDynamic #22:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       447: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       454: invokedynamic #378,  0            // InvokeDynamic #23:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       466: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       484: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       491: invokedynamic #396,  0            // InvokeDynamic #25:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       503: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       516: invokedynamic #413,  0            // InvokeDynamic #26:apply:(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)Ljava/util/function/Function;
+       528: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       552: new           #423                // class yesman/epicfight/client/renderer/FirstPersonRenderer
+       560: invokespecial #426                // Method yesman/epicfight/client/renderer/FirstPersonRenderer."<init>":(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;Lnet/minecraft/world/entity/EntityType;)V
+       563: putfield      #428                // Field firstPersonRenderer:Lyesman/epicfight/client/renderer/FirstPersonRenderer;
+       567: new           #430                // class yesman/epicfight/client/renderer/patched/entity/PHumanoidRenderer
+       578: invokespecial #437                // Method yesman/epicfight/client/renderer/patched/entity/PHumanoidRenderer."<init>":(Lyesman/epicfight/api/asset/AssetAccessor;Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;Lnet/minecraft/world/entity/EntityType;)V
+       581: putfield      #439                // Field basicHumanoidRenderer:Lyesman/epicfight/client/renderer/patched/entity/PHumanoidRenderer;
+       587: new           #20                 // class yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$Add
+       592: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       596: invokespecial #447                // Method yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$Add."<init>":(Ljava/util/Map;Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)V
+       603: invokevirtual #454                // Method resetRenderers:()V
+  public void reloadItemRenderers(java.util.Map<net.minecraft.resources.ResourceLocation, com.google.gson.JsonElement>);
+         1: getfield      #138                // Field itemRendererMapByInstance:Ljava/util/Map;
+        10: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       133: new           #25                 // class yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$RegisterItemRenderer
+       138: invokespecial #520                // Method yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$RegisterItemRenderer."<init>":(Ljava/util/Map;)V
+       269: ldc_w         #609                // String renderer
+       291: ldc_w         #609                // String renderer
+       384: checkcast     #470                // class yesman/epicfight/client/renderer/patched/item/RenderItemBase
+       390: getfield      #138                // Field itemRendererMapByInstance:Ljava/util/Map;
+       406: new           #470                // class yesman/epicfight/client/renderer/patched/item/RenderItemBase
+       417: invokespecial #473                // Method yesman/epicfight/client/renderer/patched/item/RenderItemBase."<init>":(Lcom/google/gson/JsonElement;)V
+       421: new           #482                // class yesman/epicfight/client/renderer/patched/item/RenderTwoHandedRangedWeapon
+       448: invokespecial #483                // Method yesman/epicfight/client/renderer/patched/item/RenderTwoHandedRangedWeapon."<init>":(Lcom/google/gson/JsonElement;)V
+       453: new           #482                // class yesman/epicfight/client/renderer/patched/item/RenderTwoHandedRangedWeapon
+       480: invokespecial #483                // Method yesman/epicfight/client/renderer/patched/item/RenderTwoHandedRangedWeapon."<init>":(Lcom/google/gson/JsonElement;)V
+       485: new           #503                // class yesman/epicfight/client/renderer/patched/item/RenderTrident
+       512: invokespecial #504                // Method yesman/epicfight/client/renderer/patched/item/RenderTrident."<init>":(Lcom/google/gson/JsonElement;)V
+       517: new           #489                // class yesman/epicfight/client/renderer/patched/item/RenderFilledMap
+       544: invokespecial #490                // Method yesman/epicfight/client/renderer/patched/item/RenderFilledMap."<init>":(Lcom/google/gson/JsonElement;)V
+       549: new           #496                // class yesman/epicfight/client/renderer/patched/item/RenderShield
+       576: invokespecial #497                // Method yesman/epicfight/client/renderer/patched/item/RenderShield."<init>":(Lcom/google/gson/JsonElement;)V
+       582: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       597: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       612: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       626: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       641: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       656: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       671: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       686: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       701: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+       716: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+  public void resetRenderers();
+         1: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+        10: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+        44: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+        79: checkcast     #708                // class yesman/epicfight/client/renderer/patched/entity/PatchedEntityRenderer
+        94: new           #33                 // class yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$Modify
+        99: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+       102: invokespecial #709                // Method yesman/epicfight/api/client/forgeevent/PatchedRenderersEvent$Modify."<init>":(Ljava/util/Map;)V
+  public void registerCustomEntityRenderer(net.minecraft.world.entity.EntityType<?>, java.lang.String, net.minecraft.nbt.CompoundTag);
+        12: invokevirtual #722                // Method net/minecraft/client/Minecraft.m_91290_:()Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;
+        17: new           #10                 // class net/minecraft/client/renderer/entity/EntityRendererProvider$Context
+        27: invokevirtual #726                // Method net/minecraft/client/Minecraft.m_91291_:()Lnet/minecraft/client/renderer/entity/ItemRenderer;
+        34: invokevirtual #730                // Method net/minecraft/client/Minecraft.m_91289_:()Lnet/minecraft/client/renderer/block/BlockRenderDispatcher;
+        39: invokevirtual #736                // Method net/minecraft/client/renderer/entity/EntityRenderDispatcher.m_234586_:()Lnet/minecraft/client/renderer/ItemInHandRenderer;
+        63: invokespecial #751                // Method net/minecraft/client/renderer/entity/EntityRendererProvider$Context."<init>":(Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;Lnet/minecraft/client/renderer/entity/ItemRenderer;Lnet/minecraft/client/renderer/block/BlockRenderDispatcher;Lnet/minecraft/client/renderer/ItemInHandRenderer;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/gui/Font;)V
+        79: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+        84: getfield      #439                // Field basicHumanoidRenderer:Lyesman/epicfight/client/renderer/patched/entity/PHumanoidRenderer;
+       117: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+       121: new           #767                // class yesman/epicfight/client/renderer/patched/entity/PCustomHumanoidEntityRenderer
+       146: invokespecial #784                // Method yesman/epicfight/client/renderer/patched/entity/PCustomHumanoidEntityRenderer."<init>":(Lyesman/epicfight/api/asset/AssetAccessor;Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;Lnet/minecraft/world/entity/EntityType;)V
+       159: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+       163: new           #786                // class yesman/epicfight/client/renderer/patched/entity/PCustomEntityRenderer
+       187: invokespecial #796                // Method yesman/epicfight/client/renderer/patched/entity/PCustomEntityRenderer."<init>":(Lyesman/epicfight/api/asset/AssetAccessor;Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;)V
+       217: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       231: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       250: checkcast     #708                // class yesman/epicfight/client/renderer/patched/entity/PatchedEntityRenderer
+       259: invokevirtual #722                // Method net/minecraft/client/Minecraft.m_91290_:()Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;
+       262: getfield      #804                // Field net/minecraft/client/renderer/entity/EntityRenderDispatcher.f_114362_:Ljava/util/Map;
+       271: instanceof    #806                // class net/minecraft/client/renderer/entity/LivingEntityRenderer
+       279: instanceof    #808                // class yesman/epicfight/client/renderer/patched/entity/PatchedLivingEntityRenderer
+       287: checkcast     #808                // class yesman/epicfight/client/renderer/patched/entity/PatchedLivingEntityRenderer
+       293: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+       297: new           #810                // class yesman/epicfight/client/renderer/patched/entity/PresetRenderer
+       306: invokevirtual #813                // Method net/minecraft/client/renderer/entity/EntityRendererProvider$Context.m_174022_:()Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;
+       309: getfield      #804                // Field net/minecraft/client/renderer/entity/EntityRenderDispatcher.f_114362_:Ljava/util/Map;
+       319: checkcast     #806                // class net/minecraft/client/renderer/entity/LivingEntityRenderer
+       324: invokevirtual #817                // Method yesman/epicfight/client/renderer/patched/entity/PatchedLivingEntityRenderer.getDefaultMesh:()Lyesman/epicfight/api/asset/AssetAccessor;
+       327: invokespecial #820                // Method yesman/epicfight/client/renderer/patched/entity/PresetRenderer."<init>":(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;Lyesman/epicfight/api/asset/AssetAccessor;)V
+       340: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+       345: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+       364: checkcast     #708                // class yesman/epicfight/client/renderer/patched/entity/PatchedEntityRenderer
+  public yesman.epicfight.client.renderer.patched.item.RenderItemBase getItemRenderer(net.minecraft.world.item.ItemStack);
+         1: getfield      #138                // Field itemRendererMapByInstance:Ljava/util/Map;
+        13: checkcast     #470                // class yesman/epicfight/client/renderer/patched/item/RenderItemBase
+        29: invokevirtual #853                // Method findMatchingRendererByClass:(Ljava/lang/Class;)Lyesman/epicfight/client/renderer/patched/item/RenderItemBase;
+        47: invokevirtual #853                // Method findMatchingRendererByClass:(Ljava/lang/Class;)Lyesman/epicfight/client/renderer/patched/item/RenderItemBase;
+        56: getfield      #138                // Field itemRendererMapByInstance:Ljava/util/Map;
+        67: checkcast     #470                // class yesman/epicfight/client/renderer/patched/item/RenderItemBase
+        72: getfield      #138                // Field itemRendererMapByInstance:Ljava/util/Map;
+  private yesman.epicfight.client.renderer.patched.item.RenderItemBase findMatchingRendererByClass(java.lang.Class<?>);
+        11: getfield      #140                // Field itemRendererMapByClass:Ljava/util/Map;
+        20: checkcast     #470                // class yesman/epicfight/client/renderer/patched/item/RenderItemBase
+  public void renderEntityArmatureModel(net.minecraft.world.entity.LivingEntity, yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, net.minecraft.client.renderer.entity.EntityRenderer<? extends net.minecraft.world.entity.Entity>, net.minecraft.client.renderer.MultiBufferSource, com.mojang.blaze3d.vertex.PoseStack, int, float);
+         2: invokevirtual #883                // Method getEntityRenderer:(Lnet/minecraft/world/entity/Entity;)Lyesman/epicfight/client/renderer/patched/entity/PatchedEntityRenderer;
+        16: invokevirtual #886                // Method yesman/epicfight/client/renderer/patched/entity/PatchedEntityRenderer.render:(Lnet/minecraft/world/entity/LivingEntity;Lyesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch;Lnet/minecraft/client/renderer/entity/EntityRenderer;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;IF)V
+  public yesman.epicfight.client.renderer.patched.entity.PatchedEntityRenderer getEntityRenderer(net.minecraft.world.entity.Entity);
+         5: invokevirtual #908                // Method getEntityRenderer:(Lnet/minecraft/world/entity/EntityType;)Lyesman/epicfight/client/renderer/patched/entity/PatchedEntityRenderer;
+  public yesman.epicfight.client.renderer.patched.entity.PatchedEntityRenderer getEntityRenderer(net.minecraft.world.entity.EntityType);
+         1: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+        10: checkcast     #708                // class yesman/epicfight/client/renderer/patched/entity/PatchedEntityRenderer
+  public boolean hasRendererFor(net.minecraft.world.entity.Entity);
+         1: getfield      #136                // Field entityRendererCache:Ljava/util/Map;
+  public java.util.Set<net.minecraft.resources.ResourceLocation> getRendererEntries();
+         1: getfield      #130                // Field entityRendererProvider:Lcom/google/common/collect/BiMap;
+  public void setModelInitializerTimer(int);
+  public yesman.epicfight.client.gui.screen.overlay.OverlayManager getOverlayManager();
+  public yesman.epicfight.client.renderer.FirstPersonRenderer getFirstPersonRenderer();
+         1: getfield      #428                // Field firstPersonRenderer:Lyesman/epicfight/client/renderer/FirstPersonRenderer;
+  public void upSlideSkillUI();
+  public void downSlideSkillUI();
+  public boolean shouldRenderVanillaModel();
+  public void addBossEventOwner(java.util.UUID, yesman.epicfight.world.capabilities.entitypatch.boss.BossPatch);
+  public void removeBossEventOwner(java.util.UUID, yesman.epicfight.world.capabilities.entitypatch.boss.BossPatch);
+  public void initHUD();
+  public void freeUnusedSources();
+        37: invokestatic  #1044               // Method yesman/epicfight/client/renderer/EpicFightRenderTypes.freeUnusedWorldRenderTypes:()V
+  public void clear();
+        35: invokevirtual #454                // Method resetRenderers:()V
+        38: invokestatic  #1062               // Method yesman/epicfight/client/renderer/EpicFightRenderTypes.clearWorldRenderTypes:()V
+grep: write error: Broken pipe
+======== EF RenderItemBase
+  protected static final java.util.Map<java.lang.String, yesman.epicfight.api.utils.math.OpenMatrix4f> GLOBAL_MAINHAND_ITEM_TRANSFORMS;
+  protected static final java.util.Map<java.lang.String, yesman.epicfight.api.utils.math.OpenMatrix4f> GLOBAL_OFFHAND_ITEM_TRANSFORMS;
+  protected static net.minecraft.client.renderer.entity.ItemRenderer itemRenderer;
+  protected static net.minecraft.client.renderer.ItemInHandRenderer itemInHandRenderer;
+  protected final java.util.Map<java.lang.String, yesman.epicfight.api.utils.math.OpenMatrix4f> mainhandCorrectionTransforms;
+  protected final java.util.Map<java.lang.String, yesman.epicfight.api.utils.math.OpenMatrix4f> offhandCorrectionTransforms;
+  private final yesman.epicfight.api.client.animation.property.TrailInfo trailInfo;
+  private final boolean alwaysInHand;
+  private final boolean forceVanillaFirstPerson;
+  private final boolean appearedInAfterimage;
+  public final yesman.epicfight.api.utils.math.OpenMatrix4f transformHolder;
+  public static void initItemRenderers(net.minecraft.client.Minecraft);
+         0: getstatic     #39                 // Field itemRenderer:Lnet/minecraft/client/renderer/entity/ItemRenderer;
+         6: getstatic     #41                 // Field itemInHandRenderer:Lnet/minecraft/client/renderer/ItemInHandRenderer;
+        18: invokespecial #49                 // Method java/lang/IllegalStateException."<init>":(Ljava/lang/String;)V
+        23: invokevirtual #55                 // Method net/minecraft/client/Minecraft.m_91291_:()Lnet/minecraft/client/renderer/entity/ItemRenderer;
+        30: getfield      #59                 // Field net/minecraft/client/Minecraft.f_91063_:Lnet/minecraft/client/renderer/GameRenderer;
+        33: getfield      #64                 // Field net/minecraft/client/renderer/GameRenderer.f_109055_:Lnet/minecraft/client/renderer/ItemInHandRenderer;
+  public yesman.epicfight.client.renderer.patched.item.RenderItemBase(com.google.gson.JsonElement);
+         1: invokespecial #70                 // Method java/lang/Object."<init>":()V
+         9: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        16: invokevirtual #81                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+        24: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        33: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+        36: invokestatic  #99                 // Method yesman/epicfight/api/client/animation/property/TrailInfo.deserialize:(Lcom/google/gson/JsonElement;)Lyesman/epicfight/api/client/animation/property/TrailInfo;
+        50: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        59: invokestatic  #109                // Method net/minecraft/util/GsonHelper.m_13912_:(Lcom/google/gson/JsonObject;Ljava/lang/String;)Z
+        77: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        86: invokestatic  #109                // Method net/minecraft/util/GsonHelper.m_13912_:(Lcom/google/gson/JsonObject;Ljava/lang/String;)Z
+       104: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       113: invokestatic  #109                // Method net/minecraft/util/GsonHelper.m_13912_:(Lcom/google/gson/JsonObject;Ljava/lang/String;)Z
+       126: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       133: getstatic     #122                // Field GLOBAL_MAINHAND_ITEM_TRANSFORMS:Ljava/util/Map;
+       140: getstatic     #126                // Field GLOBAL_OFFHAND_ITEM_TRANSFORMS:Ljava/util/Map;
+       152: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       155: invokevirtual #81                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+       162: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       168: invokestatic  #134                // Method com/google/common/collect/ImmutableMap.builder:()Lcom/google/common/collect/ImmutableMap$Builder;
+       176: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       179: invokevirtual #81                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+       182: invokevirtual #138                // Method com/google/gson/JsonObject.entrySet:()Ljava/util/Set;
+       185: invokeinterface #144,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+       194: invokeinterface #150,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       204: invokeinterface #154,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       216: invokeinterface #157,  1          // InterfaceMethod java/util/Map$Entry.getValue:()Ljava/lang/Object;
+       224: invokevirtual #81                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+       233: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+       242: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       252: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       255: invokevirtual #163                // Method com/google/gson/JsonElement.getAsJsonArray:()Lcom/google/gson/JsonArray;
+       265: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       268: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       274: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       277: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       283: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       286: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       289: invokevirtual #176                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.translate:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       297: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       307: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       310: invokevirtual #163                // Method com/google/gson/JsonElement.getAsJsonArray:()Lcom/google/gson/JsonArray;
+       320: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       323: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       326: getstatic     #184                // Field yesman/epicfight/api/utils/math/Vec3f.Z_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       329: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       338: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       341: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       344: getstatic     #191                // Field yesman/epicfight/api/utils/math/Vec3f.Y_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       347: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       356: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       359: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       362: getstatic     #194                // Field yesman/epicfight/api/utils/math/Vec3f.X_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       365: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       373: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       383: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       386: invokevirtual #163                // Method com/google/gson/JsonElement.getAsJsonArray:()Lcom/google/gson/JsonArray;
+       396: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       399: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       405: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       408: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       414: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       417: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       420: invokevirtual #198                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.scale:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       428: invokeinterface #201,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+       438: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       441: invokevirtual #211                // Method com/google/common/collect/ImmutableMap$Builder.put:(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;
+       451: invokevirtual #215                // Method com/google/common/collect/ImmutableMap$Builder.build:()Lcom/google/common/collect/ImmutableMap;
+       461: getstatic     #122                // Field GLOBAL_MAINHAND_ITEM_TRANSFORMS:Ljava/util/Map;
+       470: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       476: invokestatic  #134                // Method com/google/common/collect/ImmutableMap.builder:()Lcom/google/common/collect/ImmutableMap$Builder;
+       484: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       487: invokevirtual #81                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+       490: invokevirtual #138                // Method com/google/gson/JsonObject.entrySet:()Ljava/util/Set;
+       493: invokeinterface #144,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+       502: invokeinterface #150,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       512: invokeinterface #154,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       524: invokeinterface #157,  1          // InterfaceMethod java/util/Map$Entry.getValue:()Ljava/lang/Object;
+       532: invokevirtual #81                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+       541: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+       550: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       560: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       563: invokevirtual #163                // Method com/google/gson/JsonElement.getAsJsonArray:()Lcom/google/gson/JsonArray;
+       573: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       576: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       582: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       585: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       591: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       594: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       597: invokevirtual #176                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.translate:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       605: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       615: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       618: invokevirtual #163                // Method com/google/gson/JsonElement.getAsJsonArray:()Lcom/google/gson/JsonArray;
+       628: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       631: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       634: getstatic     #184                // Field yesman/epicfight/api/utils/math/Vec3f.Z_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       637: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       646: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       649: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       652: getstatic     #191                // Field yesman/epicfight/api/utils/math/Vec3f.Y_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       655: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       664: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       667: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       670: getstatic     #194                // Field yesman/epicfight/api/utils/math/Vec3f.X_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       673: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       681: invokevirtual #89                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       691: invokevirtual #93                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       694: invokevirtual #163                // Method com/google/gson/JsonElement.getAsJsonArray:()Lcom/google/gson/JsonArray;
+       704: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       707: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       713: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       716: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       722: invokevirtual #168                // Method com/google/gson/JsonArray.get:(I)Lcom/google/gson/JsonElement;
+       725: invokevirtual #172                // Method com/google/gson/JsonElement.getAsFloat:()F
+       728: invokevirtual #198                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.scale:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       736: invokeinterface #201,  1          // InterfaceMethod java/util/Map$Entry.getKey:()Ljava/lang/Object;
+       746: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       749: invokevirtual #211                // Method com/google/common/collect/ImmutableMap$Builder.put:(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;
+       759: invokevirtual #215                // Method com/google/common/collect/ImmutableMap$Builder.build:()Lcom/google/common/collect/ImmutableMap;
+       769: getstatic     #126                // Field GLOBAL_OFFHAND_ITEM_TRANSFORMS:Ljava/util/Map;
+  public void renderItemInHand(net.minecraft.world.item.ItemStack, yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, net.minecraft.world.InteractionHand, yesman.epicfight.api.utils.math.OpenMatrix4f[], net.minecraft.client.renderer.MultiBufferSource, com.mojang.blaze3d.vertex.PoseStack, int, float);
+         5: invokevirtual #242                // Method getCorrectionMatrix:(Lyesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch;Lnet/minecraft/world/InteractionHand;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        12: invokevirtual #247                // Method com/mojang/blaze3d/vertex/PoseStack.m_85836_:()V
+        19: invokestatic  #253                // Method yesman/epicfight/api/utils/math/MathUtils.mulStack:(Lcom/mojang/blaze3d/vertex/PoseStack;Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+        23: getstatic     #259                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+        29: getstatic     #265                // Field net/minecraft/world/item/ItemDisplayContext.THIRD_PERSON_RIGHT_HAND:Lnet/minecraft/world/item/ItemDisplayContext;
+        35: getstatic     #268                // Field net/minecraft/world/item/ItemDisplayContext.THIRD_PERSON_LEFT_HAND:Lnet/minecraft/world/item/ItemDisplayContext;
+        40: getstatic     #41                 // Field itemInHandRenderer:Lnet/minecraft/client/renderer/ItemInHandRenderer;
+        44: invokevirtual #274                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getOriginal:()Lnet/minecraft/world/entity/Entity;
+        54: getstatic     #279                // Field net/minecraft/world/InteractionHand.OFF_HAND:Lnet/minecraft/world/InteractionHand;
+        71: invokevirtual #291                // Method net/minecraft/client/renderer/ItemInHandRenderer.m_269530_:(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V
+        76: invokevirtual #294                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+  public yesman.epicfight.api.utils.math.OpenMatrix4f getCorrectionMatrix(yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, net.minecraft.world.InteractionHand, yesman.epicfight.api.utils.math.OpenMatrix4f[]);
+         4: getfield      #114                // Field alwaysInHand:Z
+        11: invokevirtual #316                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getArmature:()Lyesman/epicfight/api/model/Armature;
+        32: getstatic     #259                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+        40: invokeinterface #322,  1          // InterfaceMethod yesman/epicfight/model/armature/types/ToolHolderArmature.rightToolJoint:()Lyesman/epicfight/api/animation/Joint;
+        50: invokeinterface #327,  1          // InterfaceMethod yesman/epicfight/model/armature/types/ToolHolderArmature.leftToolJoint:()Lyesman/epicfight/api/animation/Joint;
+        63: invokevirtual #316                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getArmature:()Lyesman/epicfight/api/model/Armature;
+        66: getfield      #333                // Field yesman/epicfight/api/model/Armature.rootJoint:Lyesman/epicfight/api/animation/Joint;
+        76: invokevirtual #337                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getParentJointOfHand:(Lnet/minecraft/world/InteractionHand;)Lyesman/epicfight/api/animation/Joint;
+        81: getstatic     #341                // Field yesman/epicfight/client/renderer/patched/item/RenderItemBase$1.$SwitchMap$net$minecraft$world$InteractionHand:[I
+        85: invokevirtual #345                // Method net/minecraft/world/InteractionHand.ordinal:()I
+       117: getfield      #75                 // Field transformHolder:Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       121: getfield      #124                // Field mainhandCorrectionTransforms:Ljava/util/Map;
+       126: invokevirtual #349                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+       129: getstatic     #122                // Field GLOBAL_MAINHAND_ITEM_TRANSFORMS:Ljava/util/Map;
+       134: invokevirtual #349                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+       137: invokeinterface #352,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       145: invokeinterface #356,  3          // InterfaceMethod java/util/Map.getOrDefault:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       153: invokevirtual #360                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.load:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       161: getfield      #75                 // Field transformHolder:Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       165: getfield      #128                // Field offhandCorrectionTransforms:Ljava/util/Map;
+       170: invokevirtual #349                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+       173: getstatic     #126                // Field GLOBAL_OFFHAND_ITEM_TRANSFORMS:Ljava/util/Map;
+       178: invokevirtual #349                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+       181: invokeinterface #352,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       189: invokeinterface #356,  3          // InterfaceMethod java/util/Map.getOrDefault:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       197: invokevirtual #360                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.load:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       202: getfield      #75                 // Field transformHolder:Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       208: invokevirtual #363                // Method yesman/epicfight/api/animation/Joint.getId:()I
+       212: invokevirtual #366                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.mulFront:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       217: getfield      #75                 // Field transformHolder:Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  public yesman.epicfight.api.client.animation.property.TrailInfo trailInfo();
+         1: getfield      #101                // Field trailInfo:Lyesman/epicfight/api/client/animation/property/TrailInfo;
+  public boolean forceVanillaFirstPerson();
+         1: getfield      #111                // Field forceVanillaFirstPerson:Z
+  public boolean appearedInAfterimage();
+         1: getfield      #118                // Field appearedInAfterimage:Z
+  static {};
+         0: invokestatic  #134                // Method com/google/common/collect/ImmutableMap.builder:()Lcom/google/common/collect/ImmutableMap$Builder;
+        10: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        18: invokevirtual #176                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.translate:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        24: getstatic     #194                // Field yesman/epicfight/api/utils/math/Vec3f.X_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+        27: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        30: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        33: invokevirtual #211                // Method com/google/common/collect/ImmutableMap$Builder.put:(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;
+        43: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        51: invokevirtual #176                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.translate:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        57: getstatic     #194                // Field yesman/epicfight/api/utils/math/Vec3f.X_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+        60: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        63: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        66: invokevirtual #211                // Method com/google/common/collect/ImmutableMap$Builder.put:(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;
+       114: invokespecial #393                // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":(FFFFFFFFFFFFFFFF)V
+       117: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       120: invokevirtual #211                // Method com/google/common/collect/ImmutableMap$Builder.put:(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;
+       130: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+       133: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       136: invokevirtual #211                // Method com/google/common/collect/ImmutableMap$Builder.put:(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;
+       139: invokevirtual #215                // Method com/google/common/collect/ImmutableMap$Builder.build:()Lcom/google/common/collect/ImmutableMap;
+       145: invokestatic  #134                // Method com/google/common/collect/ImmutableMap.builder:()Lcom/google/common/collect/ImmutableMap$Builder;
+       155: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+       163: invokevirtual #176                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.translate:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       169: getstatic     #194                // Field yesman/epicfight/api/utils/math/Vec3f.X_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       172: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       175: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       178: invokevirtual #211                // Method com/google/common/collect/ImmutableMap$Builder.put:(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;
+       188: invokespecial #73                 // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+       196: invokevirtual #176                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.translate:(FFF)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       202: getstatic     #194                // Field yesman/epicfight/api/utils/math/Vec3f.X_AXIS:Lyesman/epicfight/api/utils/math/Vec3f;
+       205: invokevirtual #188                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.rotateDeg:(FLyesman/epicfight/api/utils/math/Vec3f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       208: invokevirtual #207                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.unmodifiable:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+======== EF Armature setPose/getPoseMatrices
+  private final java.lang.String name;
+  private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<yesman.epicfight.api.animation.Joint> jointById;
+  private final java.util.Map<java.lang.String, yesman.epicfight.api.animation.Joint> jointByName;
+  private final java.util.Map<java.lang.String, yesman.epicfight.api.animation.Joint$HierarchicalJointAccessor> pathIndexMap;
+  private final int jointCount;
+  private final yesman.epicfight.api.utils.math.OpenMatrix4f[] poseMatrices;
+  public final yesman.epicfight.api.animation.Joint rootJoint;
+  public yesman.epicfight.api.model.Armature(java.lang.String, int, yesman.epicfight.api.animation.Joint, java.util.Map<java.lang.String, yesman.epicfight.api.animation.Joint>);
+         1: invokespecial #48                 // Method java/lang/Object."<init>":()V
+         6: putfield      #50                 // Field name:Ljava/lang/String;
+        11: putfield      #52                 // Field jointCount:I
+        16: putfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        22: putfield      #56                 // Field jointByName:Ljava/util/Map;
+        30: invokespecial #59                 // Method it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap."<init>":()V
+        33: putfield      #61                 // Field jointById:Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+        37: invokestatic  #67                 // Method com/google/common/collect/Maps.newHashMap:()Ljava/util/HashMap;
+        40: putfield      #69                 // Field pathIndexMap:Ljava/util/Map;
+        44: getfield      #56                 // Field jointByName:Ljava/util/Map;
+        47: invokeinterface #75,  1           // InterfaceMethod java/util/Map.values:()Ljava/util/Collection;
+        53: invokedynamic #94,  0             // InvokeDynamic #0:accept:(Lyesman/epicfight/api/model/Armature;)Ljava/util/function/Consumer;
+        58: invokeinterface #100,  2          // InterfaceMethod java/util/Collection.forEach:(Ljava/util/function/Consumer;)V
+        65: getfield      #52                 // Field jointCount:I
+        68: invokestatic  #106                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.allocateMatrixArray:(I)[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        71: putfield      #108                // Field poseMatrices:[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  protected yesman.epicfight.api.animation.Joint getOrLogException(java.util.Map<java.lang.String, yesman.epicfight.api.animation.Joint>, java.lang.String);
+         2: invokeinterface #119,  2          // InterfaceMethod java/util/Map.containsKey:(Ljava/lang/Object;)Z
+        21: invokevirtual #135                // Method java/lang/Object.getClass:()Ljava/lang/Class;
+        24: invokevirtual #141                // Method java/lang/Class.getCanonicalName:()Ljava/lang/String;
+        27: invokedynamic #153,  0            // InvokeDynamic #1:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+        32: invokeinterface #159,  2          // InterfaceMethod org/apache/logging/log4j/Logger.debug:(Ljava/lang/String;)V
+        43: invokeinterface #166,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+  public void setPose(yesman.epicfight.api.animation.Pose);
+         2: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+         9: invokespecial #169                // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        14: getfield      #108                // Field poseMatrices:[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        18: invokevirtual #173                // Method getPoseTransform:(Lyesman/epicfight/api/animation/Joint;Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lyesman/epicfight/api/animation/Pose;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;Z)V
+  public void bakeOriginMatrices();
+         1: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+         8: invokespecial #169                // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        11: invokevirtual #180                // Method yesman/epicfight/api/animation/Joint.initOriginTransform:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+  public yesman.epicfight.api.utils.math.OpenMatrix4f[] getPoseMatrices();
+         1: getfield      #108                // Field poseMatrices:[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  public yesman.epicfight.api.utils.math.OpenMatrix4f[] getPoseAsTransformMatrix(yesman.epicfight.api.animation.Pose, boolean);
+         1: getfield      #52                 // Field jointCount:I
+        10: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        17: invokespecial #169                // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        23: invokevirtual #173                // Method getPoseTransform:(Lyesman/epicfight/api/animation/Joint;Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lyesman/epicfight/api/animation/Pose;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;Z)V
+  private void getPoseTransform(yesman.epicfight.api.animation.Joint, yesman.epicfight.api.utils.math.OpenMatrix4f, yesman.epicfight.api.animation.Pose, yesman.epicfight.api.utils.math.OpenMatrix4f[], boolean);
+         2: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+         5: invokevirtual #195                // Method yesman/epicfight/api/animation/Pose.orElseEmpty:(Ljava/lang/String;)Lyesman/epicfight/api/animation/JointTransform;
+        10: invokevirtual #201                // Method yesman/epicfight/api/animation/JointTransform.getAnimationBoundMatrix:(Lyesman/epicfight/api/animation/Joint;Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        18: invokevirtual #205                // Method yesman/epicfight/api/animation/Joint.getId:()I
+        25: invokevirtual #209                // Method yesman/epicfight/api/animation/Joint.getSubJoints:()Ljava/util/List;
+        28: invokeinterface #215,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        37: invokeinterface #221,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        47: invokeinterface #225,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        67: invokevirtual #173                // Method getPoseTransform:(Lyesman/epicfight/api/animation/Joint;Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lyesman/epicfight/api/animation/Pose;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;Z)V
+        81: invokevirtual #229                // Method yesman/epicfight/api/animation/Joint.getToOrigin:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        84: invokevirtual #233                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.mulBack:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  public yesman.epicfight.api.utils.math.OpenMatrix4f getBindedTransformFor(yesman.epicfight.api.animation.Pose, yesman.epicfight.api.animation.Joint);
+         4: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+         7: invokevirtual #249                // Method searchPathIndex:(Ljava/lang/String;)Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor;
+        11: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        14: invokevirtual #253                // Method yesman/epicfight/api/animation/Joint$HierarchicalJointAccessor.createAccessTicket:(Lyesman/epicfight/api/animation/Joint;)Lyesman/epicfight/api/animation/Joint$AccessTicket;
+        17: invokevirtual #257                // Method getBoundTransformByJointIndex:(Lyesman/epicfight/api/animation/Pose;Lyesman/epicfight/api/animation/Joint$AccessTicket;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  public yesman.epicfight.api.utils.math.OpenMatrix4f getBoundTransformFor(yesman.epicfight.api.animation.Pose, yesman.epicfight.api.animation.Joint);
+         4: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+         7: invokevirtual #249                // Method searchPathIndex:(Ljava/lang/String;)Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor;
+        11: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        14: invokevirtual #253                // Method yesman/epicfight/api/animation/Joint$HierarchicalJointAccessor.createAccessTicket:(Lyesman/epicfight/api/animation/Joint;)Lyesman/epicfight/api/animation/Joint$AccessTicket;
+        17: invokevirtual #257                // Method getBoundTransformByJointIndex:(Lyesman/epicfight/api/animation/Pose;Lyesman/epicfight/api/animation/Joint$AccessTicket;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  public yesman.epicfight.api.utils.math.OpenMatrix4f getBoundTransformByJointIndex(yesman.epicfight.api.animation.Pose, yesman.epicfight.api.animation.Joint$AccessTicket);
+         3: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        10: invokespecial #169                // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        14: invokevirtual #262                // Method getBoundJointTransformRecursively:(Lyesman/epicfight/api/animation/Pose;Lyesman/epicfight/api/animation/Joint;Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lyesman/epicfight/api/animation/Joint$AccessTicket;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  private yesman.epicfight.api.utils.math.OpenMatrix4f getBoundJointTransformRecursively(yesman.epicfight.api.animation.Pose, yesman.epicfight.api.animation.Joint, yesman.epicfight.api.utils.math.OpenMatrix4f, yesman.epicfight.api.animation.Joint$AccessTicket);
+         2: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+         5: invokevirtual #195                // Method yesman/epicfight/api/animation/Pose.orElseEmpty:(Ljava/lang/String;)Lyesman/epicfight/api/animation/JointTransform;
+        14: invokevirtual #201                // Method yesman/epicfight/api/animation/JointTransform.getAnimationBoundMatrix:(Lyesman/epicfight/api/animation/Joint;Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        21: invokevirtual #265                // Method yesman/epicfight/api/animation/Joint$AccessTicket.hasNext:()Z
+        31: invokevirtual #268                // Method yesman/epicfight/api/animation/Joint$AccessTicket.next:()Lyesman/epicfight/api/animation/Joint;
+        38: invokevirtual #262                // Method getBoundJointTransformRecursively:(Lyesman/epicfight/api/animation/Pose;Lyesman/epicfight/api/animation/Joint;Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lyesman/epicfight/api/animation/Joint$AccessTicket;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+  public boolean hasJoint(java.lang.String);
+         1: getfield      #56                 // Field jointByName:Ljava/util/Map;
+         5: invokeinterface #119,  2          // InterfaceMethod java/util/Map.containsKey:(Ljava/lang/Object;)Z
+  public yesman.epicfight.api.animation.Joint searchJointById(int);
+         1: getfield      #61                 // Field jointById:Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+         5: invokeinterface #277,  2          // InterfaceMethod it/unimi/dsi/fastutil/ints/Int2ObjectMap.get:(I)Ljava/lang/Object;
+  public yesman.epicfight.api.animation.Joint searchJointByName(java.lang.String);
+         1: getfield      #56                 // Field jointByName:Ljava/util/Map;
+         5: invokeinterface #166,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+  public yesman.epicfight.api.animation.Joint$HierarchicalJointAccessor searchPathIndex(java.lang.String);
+         2: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+         6: invokevirtual #283                // Method searchPathIndex:(Lyesman/epicfight/api/animation/Joint;Ljava/lang/String;)Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor;
+  public yesman.epicfight.api.animation.Joint$HierarchicalJointAccessor searchPathIndex(yesman.epicfight.api.animation.Joint, java.lang.String);
+         1: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+         5: invokedynamic #287,  0            // InvokeDynamic #2:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+        12: getfield      #69                 // Field pathIndexMap:Ljava/util/Map;
+        16: invokeinterface #119,  2          // InterfaceMethod java/util/Map.containsKey:(Ljava/lang/Object;)Z
+        25: getfield      #69                 // Field pathIndexMap:Ljava/util/Map;
+        29: invokeinterface #166,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+        39: invokestatic  #293                // Method yesman/epicfight/api/animation/Joint$HierarchicalJointAccessor.builder:()Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor$Builder;
+        43: invokevirtual #297                // Method yesman/epicfight/api/animation/Joint.searchPath:(Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor$Builder;Ljava/lang/String;)Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor$Builder;
+        58: invokedynamic #304,  0            // InvokeDynamic #3:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        63: invokespecial #306                // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+        69: invokevirtual #310                // Method yesman/epicfight/api/animation/Joint$HierarchicalJointAccessor$Builder.build:()Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor;
+        75: getfield      #69                 // Field pathIndexMap:Ljava/util/Map;
+        81: invokeinterface #314,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  public void gatherAllJointsInPathToTerminal(java.lang.String, java.util.Collection<java.lang.String>);
+         1: getfield      #56                 // Field jointByName:Ljava/util/Map;
+         5: invokeinterface #119,  2          // InterfaceMethod java/util/Map.containsKey:(Ljava/lang/Object;)Z
+        18: invokedynamic #328,  0            // InvokeDynamic #4:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+        23: invokespecial #329                // Method java/util/NoSuchElementException."<init>":(Ljava/lang/String;)V
+        29: invokevirtual #249                // Method searchPathIndex:(Ljava/lang/String;)Lyesman/epicfight/api/animation/Joint$HierarchicalJointAccessor;
+        35: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        38: invokevirtual #253                // Method yesman/epicfight/api/animation/Joint$HierarchicalJointAccessor.createAccessTicket:(Lyesman/epicfight/api/animation/Joint;)Lyesman/epicfight/api/animation/Joint$AccessTicket;
+        44: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        52: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+        55: invokeinterface #332,  2          // InterfaceMethod java/util/Collection.add:(Ljava/lang/Object;)Z
+        63: invokevirtual #265                // Method yesman/epicfight/api/animation/Joint$AccessTicket.hasNext:()Z
+        72: invokevirtual #268                // Method yesman/epicfight/api/animation/Joint$AccessTicket.next:()Lyesman/epicfight/api/animation/Joint;
+        75: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+        78: invokeinterface #332,  2          // InterfaceMethod java/util/Collection.add:(Ljava/lang/Object;)Z
+  public int getJointNumber();
+         1: getfield      #52                 // Field jointCount:I
+  public java.lang.String toString();
+         1: getfield      #50                 // Field name:Ljava/lang/String;
+  public yesman.epicfight.api.model.Armature deepCopy();
+         0: invokestatic  #67                 // Method com/google/common/collect/Maps.newHashMap:()Ljava/util/HashMap;
+        11: invokeinterface #314,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+        19: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        23: invokevirtual #356                // Method copyHierarchy:(Lyesman/epicfight/api/animation/Joint;Ljava/util/Map;)Lyesman/epicfight/api/animation/Joint;
+        32: invokespecial #169                // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":()V
+        35: invokevirtual #180                // Method yesman/epicfight/api/animation/Joint.initOriginTransform:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+        41: invokevirtual #135                // Method java/lang/Object.getClass:()Ljava/lang/Class;
+        70: invokevirtual #366                // Method java/lang/Class.getConstructor:([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
+        84: getfield      #50                 // Field name:Ljava/lang/String;
+        91: getfield      #52                 // Field jointCount:I
+        94: invokestatic  #370                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       106: invokevirtual #376                // Method java/lang/reflect/Constructor.newInstance:([Ljava/lang/Object;)Ljava/lang/Object;
+       124: invokestatic  #383                // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+       127: invokedynamic #386,  0            // InvokeDynamic #5:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       132: invokespecial #387                // Method java/lang/IllegalStateException."<init>":(Ljava/lang/String;)V
+  private yesman.epicfight.api.animation.Joint copyHierarchy(yesman.epicfight.api.animation.Joint, java.util.Map<java.lang.String, yesman.epicfight.api.animation.Joint>);
+        16: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+        20: invokevirtual #205                // Method yesman/epicfight/api/animation/Joint.getId:()I
+        24: invokevirtual #399                // Method yesman/epicfight/api/animation/Joint.getLocalTransform:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        27: invokespecial #402                // Method yesman/epicfight/api/animation/Joint."<init>":(Ljava/lang/String;ILyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+        33: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+        37: invokeinterface #314,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+        44: invokevirtual #209                // Method yesman/epicfight/api/animation/Joint.getSubJoints:()Ljava/util/List;
+        47: invokeinterface #215,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        56: invokeinterface #221,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        66: invokeinterface #225,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        87: invokevirtual #356                // Method copyHierarchy:(Lyesman/epicfight/api/animation/Joint;Ljava/util/Map;)Lyesman/epicfight/api/animation/Joint;
+        91: invokevirtual #406                // Method yesman/epicfight/api/animation/Joint.addSubJoints:([Lyesman/epicfight/api/animation/Joint;)V
+  public com.google.gson.JsonObject toJsonObject();
+         4: invokespecial #413                // Method com/google/gson/JsonObject."<init>":()V
+        12: invokespecial #413                // Method com/google/gson/JsonObject."<init>":()V
+        20: invokespecial #416                // Method com/google/gson/JsonArray."<init>":()V
+        28: invokespecial #416                // Method com/google/gson/JsonArray."<init>":()V
+        34: getfield      #61                 // Field jointById:Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+        37: invokeinterface #420,  1          // InterfaceMethod it/unimi/dsi/fastutil/ints/Int2ObjectMap.int2ObjectEntrySet:()Lit/unimi/dsi/fastutil/objects/ObjectSet;
+        42: invokeinterface #426,  1          // InterfaceMethod it/unimi/dsi/fastutil/objects/ObjectSet.stream:()Ljava/util/stream/Stream;
+        47: invokedynamic #438,  0            // InvokeDynamic #6:compare:()Ljava/util/Comparator;
+        52: invokeinterface #444,  2          // InterfaceMethod java/util/stream/Stream.sorted:(Ljava/util/Comparator;)Ljava/util/stream/Stream;
+        58: invokedynamic #454,  0            // InvokeDynamic #7:accept:(Lcom/google/gson/JsonArray;)Ljava/util/function/Consumer;
+        63: invokeinterface #455,  2          // InterfaceMethod java/util/stream/Stream.forEach:(Ljava/util/function/Consumer;)V
+        73: invokevirtual #459                // Method com/google/gson/JsonObject.add:(Ljava/lang/String;Lcom/google/gson/JsonElement;)V
+        82: invokevirtual #459                // Method com/google/gson/JsonObject.add:(Ljava/lang/String;Lcom/google/gson/JsonElement;)V
+        88: getfield      #54                 // Field rootJoint:Lyesman/epicfight/api/animation/Joint;
+        92: invokestatic  #465                // Method exportJoint:(Lcom/google/gson/JsonArray;Lyesman/epicfight/api/animation/Joint;Z)V
+       100: invokevirtual #459                // Method com/google/gson/JsonObject.add:(Ljava/lang/String;Lcom/google/gson/JsonElement;)V
+  private static void exportJoint(com.google.gson.JsonArray, yesman.epicfight.api.animation.Joint, boolean);
+         4: invokespecial #413                // Method com/google/gson/JsonObject."<init>":()V
+        13: invokevirtual #189                // Method yesman/epicfight/api/animation/Joint.getName:()Ljava/lang/String;
+        16: invokevirtual #477                // Method com/google/gson/JsonObject.addProperty:(Ljava/lang/String;Ljava/lang/String;)V
+        23: invokespecial #416                // Method com/google/gson/JsonArray."<init>":()V
+        33: invokevirtual #399                // Method yesman/epicfight/api/animation/Joint.getLocalTransform:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        36: invokespecial #479                // Method yesman/epicfight/api/utils/math/OpenMatrix4f."<init>":(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+        51: invokestatic  #488                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.invert:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        54: invokevirtual #491                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.mulFront:(Lyesman/epicfight/api/utils/math/OpenMatrix4f;)Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        60: invokevirtual #494                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.transpose:()Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+        66: invokevirtual #497                // Method yesman/epicfight/api/utils/math/OpenMatrix4f.toList:()Ljava/util/List;
+        72: invokestatic  #502                // Method java/util/Objects.requireNonNull:(Ljava/lang/Object;)Ljava/lang/Object;
+        76: invokedynamic #509,  0            // InvokeDynamic #8:accept:(Lcom/google/gson/JsonArray;)Ljava/util/function/Consumer;
+        81: invokeinterface #510,  2          // InterfaceMethod java/util/List.forEach:(Ljava/util/function/Consumer;)V
+        92: invokevirtual #459                // Method com/google/gson/JsonObject.add:(Ljava/lang/String;Lcom/google/gson/JsonElement;)V
+        97: invokevirtual #515                // Method com/google/gson/JsonArray.add:(Lcom/google/gson/JsonElement;)V
+       101: invokevirtual #209                // Method yesman/epicfight/api/animation/Joint.getSubJoints:()Ljava/util/List;
+       104: invokeinterface #518,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+       116: invokespecial #416                // Method com/google/gson/JsonArray."<init>":()V
+       127: invokevirtual #459                // Method com/google/gson/JsonObject.add:(Ljava/lang/String;Lcom/google/gson/JsonElement;)V
+       131: invokevirtual #209                // Method yesman/epicfight/api/animation/Joint.getSubJoints:()Ljava/util/List;
+       136: invokedynamic #526,  0            // InvokeDynamic #9:accept:(Lcom/google/gson/JsonArray;)Ljava/util/function/Consumer;
+       141: invokeinterface #510,  2          // InterfaceMethod java/util/List.forEach:(Ljava/util/function/Consumer;)V
+  private static void lambda$exportJoint$3(com.google.gson.JsonArray, yesman.epicfight.api.animation.Joint);
+         3: invokestatic  #465                // Method exportJoint:(Lcom/google/gson/JsonArray;Lyesman/epicfight/api/animation/Joint;Z)V
+  private static void lambda$toJsonObject$2(com.google.gson.JsonArray, it.unimi.dsi.fastutil.ints.Int2ObjectMap$Entry);
+         2: invokeinterface #534,  1          // InterfaceMethod it/unimi/dsi/fastutil/ints/Int2ObjectMap$Entry.getValue:()Ljava/lang/Object;
+======== efn RenderMortalBlade
+  private final net.minecraft.resources.ResourceLocation mesh1Texture;
+  private final net.minecraft.resources.ResourceLocation mesh1TextureL;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh1_main;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh1_off;
+  private final net.minecraft.resources.ResourceLocation mesh1SheathTexture;
+  private final net.minecraft.resources.ResourceLocation mesh1SheathTextureL;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh1_sheath;
+  private final net.minecraft.resources.ResourceLocation mesh2Texture;
+  private final net.minecraft.resources.ResourceLocation mesh2TextureL;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh2_main;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh2_off;
+  private final net.minecraft.resources.ResourceLocation mesh2SheathTexture;
+  private final net.minecraft.resources.ResourceLocation mesh2SheathTextureL;
+  private final yesman.epicfight.api.asset.AssetAccessor<? extends yesman.epicfight.api.client.model.SkinnedMesh> mesh2_sheath;
+  public com.hm.efn.client.renderer.RenderMortalBlade(com.google.gson.JsonElement);
+         2: invokespecial #48                 // Method com/merlin204/avalon/entity/client/renderer/patch/item/RenderAnimationItem."<init>":(Lcom/google/gson/JsonElement;)V
+         6: invokevirtual #54                 // Method com/google/gson/JsonElement.getAsJsonObject:()Lcom/google/gson/JsonObject;
+        13: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        23: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+        26: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+        29: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        46: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        56: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+        59: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+        62: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+        79: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+        89: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+        92: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+        95: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       106: getfield      #78                 // Field mesh1Texture:Lnet/minecraft/resources/ResourceLocation;
+       115: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       125: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       128: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       131: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       142: getfield      #82                 // Field mesh1TextureL:Lnet/minecraft/resources/ResourceLocation;
+       151: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       161: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       164: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       167: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       184: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       194: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       197: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       200: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       217: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       227: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       230: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       233: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       244: getfield      #94                 // Field mesh2Texture:Lnet/minecraft/resources/ResourceLocation;
+       253: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       263: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       266: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       269: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       280: getfield      #98                 // Field mesh2TextureL:Lnet/minecraft/resources/ResourceLocation;
+       289: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       298: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       301: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       306: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       314: invokevirtual #110                // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       319: invokevirtual #113                // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       322: invokedynamic #132,  0            // InvokeDynamic #0:apply:()Ljava/util/function/Function;
+       327: invokestatic  #136                // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+       344: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       353: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       356: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       361: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       369: invokevirtual #110                // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       374: invokevirtual #113                // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       377: invokedynamic #144,  0            // InvokeDynamic #1:apply:()Ljava/util/function/Function;
+       382: invokestatic  #136                // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+       399: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       408: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       411: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       416: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       424: invokevirtual #110                // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       429: invokevirtual #113                // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       432: invokedynamic #152,  0            // InvokeDynamic #2:apply:()Ljava/util/function/Function;
+       437: invokestatic  #136                // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+       454: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       463: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       466: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       471: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       479: invokevirtual #110                // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       484: invokevirtual #113                // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       487: invokedynamic #160,  0            // InvokeDynamic #3:apply:()Ljava/util/function/Function;
+       492: invokestatic  #136                // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+       509: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       518: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       521: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       526: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       534: invokevirtual #110                // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       539: invokevirtual #113                // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       542: invokedynamic #168,  0            // InvokeDynamic #4:apply:()Ljava/util/function/Function;
+       547: invokestatic  #136                // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+       564: invokevirtual #62                 // Method com/google/gson/JsonObject.has:(Ljava/lang/String;)Z
+       573: invokevirtual #66                 // Method com/google/gson/JsonObject.get:(Ljava/lang/String;)Lcom/google/gson/JsonElement;
+       576: invokevirtual #70                 // Method com/google/gson/JsonElement.getAsString:()Ljava/lang/String;
+       581: invokestatic  #76                 // Method net/minecraft/resources/ResourceLocation.parse:(Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+       589: invokevirtual #110                // Method net/minecraft/resources/ResourceLocation.m_135827_:()Ljava/lang/String;
+       594: invokevirtual #113                // Method net/minecraft/resources/ResourceLocation.m_135815_:()Ljava/lang/String;
+       597: invokedynamic #176,  0            // InvokeDynamic #5:apply:()Ljava/util/function/Function;
+       602: invokestatic  #136                // Method yesman/epicfight/api/client/model/Meshes$MeshAccessor.create:(Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Function;)Lyesman/epicfight/api/client/model/Meshes$MeshAccessor;
+  public yesman.epicfight.api.client.model.SkinnedMesh getCurrentMesh(boolean, net.minecraft.world.InteractionHand, boolean);
+         9: getfield      #178                // Field mesh2_sheath:Lyesman/epicfight/api/asset/AssetAccessor;
+        16: getfield      #178                // Field mesh2_sheath:Lyesman/epicfight/api/asset/AssetAccessor;
+        19: invokeinterface #194,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+        35: getfield      #154                // Field mesh1_sheath:Lyesman/epicfight/api/asset/AssetAccessor;
+        42: getfield      #154                // Field mesh1_sheath:Lyesman/epicfight/api/asset/AssetAccessor;
+        45: invokeinterface #194,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+        63: getstatic     #202                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+        70: getfield      #162                // Field mesh2_main:Lyesman/epicfight/api/asset/AssetAccessor;
+        77: getfield      #162                // Field mesh2_main:Lyesman/epicfight/api/asset/AssetAccessor;
+        80: invokeinterface #194,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+        96: getfield      #170                // Field mesh2_off:Lyesman/epicfight/api/asset/AssetAccessor;
+       103: getfield      #170                // Field mesh2_off:Lyesman/epicfight/api/asset/AssetAccessor;
+       106: invokeinterface #194,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+       120: getstatic     #202                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+       127: getfield      #138                // Field mesh1_main:Lyesman/epicfight/api/asset/AssetAccessor;
+       134: getfield      #138                // Field mesh1_main:Lyesman/epicfight/api/asset/AssetAccessor;
+       137: invokeinterface #194,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+       153: getfield      #146                // Field mesh1_off:Lyesman/epicfight/api/asset/AssetAccessor;
+       160: getfield      #146                // Field mesh1_off:Lyesman/epicfight/api/asset/AssetAccessor;
+       163: invokeinterface #194,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+  public net.minecraft.resources.ResourceLocation getCurrentTexture(boolean, boolean, boolean);
+        13: getfield      #106                // Field mesh2SheathTextureL:Lnet/minecraft/resources/ResourceLocation;
+        20: getfield      #102                // Field mesh2SheathTexture:Lnet/minecraft/resources/ResourceLocation;
+        29: getfield      #90                 // Field mesh1SheathTextureL:Lnet/minecraft/resources/ResourceLocation;
+        36: getfield      #86                 // Field mesh1SheathTexture:Lnet/minecraft/resources/ResourceLocation;
+        49: getfield      #98                 // Field mesh2TextureL:Lnet/minecraft/resources/ResourceLocation;
+        56: getfield      #94                 // Field mesh2Texture:Lnet/minecraft/resources/ResourceLocation;
+        65: getfield      #82                 // Field mesh1TextureL:Lnet/minecraft/resources/ResourceLocation;
+        72: getfield      #78                 // Field mesh1Texture:Lnet/minecraft/resources/ResourceLocation;
+  public boolean shouldUseMesh2(yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>);
+        24: getstatic     #220                // Field com/hm/efn/gameasset/EFNSkills.MORTAL_BLADE:Lyesman/epicfight/skill/Skill;
+        27: invokevirtual #224                // Method yesman/epicfight/world/capabilities/entitypatch/player/PlayerPatch.getSkill:(Lyesman/epicfight/skill/Skill;)Lyesman/epicfight/skill/SkillContainer;
+        36: invokevirtual #230                // Method yesman/epicfight/skill/SkillContainer.hasSkill:()Z
+  public void renderAnimationItem(yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, yesman.epicfight.api.utils.math.OpenMatrix4f[], net.minecraft.client.renderer.MultiBufferSource, com.mojang.blaze3d.vertex.PoseStack, int, float);
+         2: invokevirtual #243                // Method shouldUseMesh2:(Lyesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch;)Z
+        11: invokevirtual #249                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getOriginal:()Lnet/minecraft/world/entity/Entity;
+        17: invokevirtual #255                // Method net/minecraft/world/entity/LivingEntity.m_21205_:()Lnet/minecraft/world/item/ItemStack;
+        24: invokevirtual #261                // Method net/minecraft/world/item/ItemStack.m_41783_:()Lnet/minecraft/nbt/CompoundTag;
+        32: invokevirtual #261                // Method net/minecraft/world/item/ItemStack.m_41783_:()Lnet/minecraft/nbt/CompoundTag;
+        38: invokevirtual #269                // Method net/minecraft/nbt/CompoundTag.m_128451_:(Ljava/lang/String;)I
+        55: getstatic     #202                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+        60: invokevirtual #271                // Method getCurrentMesh:(ZLnet/minecraft/world/InteractionHand;Z)Lyesman/epicfight/api/client/model/SkinnedMesh;
+        71: invokevirtual #275                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getArmature:()Lyesman/epicfight/api/model/Armature;
+        82: invokevirtual #279                // Method setArmaturePose:(Lyesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch;Lyesman/epicfight/api/model/Armature;F)V
+        91: invokevirtual #281                // Method getCurrentTexture:(ZZZ)Lnet/minecraft/resources/ResourceLocation;
+       102: invokevirtual #281                // Method getCurrentTexture:(ZZZ)Lnet/minecraft/resources/ResourceLocation;
+       119: invokestatic  #287                // Method net/minecraft/client/renderer/RenderType.m_110473_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+       128: getstatic     #293                // Field net/minecraft/client/renderer/texture/OverlayTexture.f_118083_:I
+       135: invokevirtual #299                // Method yesman/epicfight/api/model/Armature.getPoseMatrices:()[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       138: invokevirtual #303                // Method yesman/epicfight/api/client/model/SkinnedMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+       153: invokestatic  #312                // Method net/minecraft/client/renderer/RenderType.m_234338_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+       162: getstatic     #293                // Field net/minecraft/client/renderer/texture/OverlayTexture.f_118083_:I
+       169: invokevirtual #299                // Method yesman/epicfight/api/model/Armature.getPoseMatrices:()[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       172: invokevirtual #303                // Method yesman/epicfight/api/client/model/SkinnedMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+  public yesman.epicfight.api.client.model.SkinnedMesh getMesh(boolean, net.minecraft.world.InteractionHand);
+         4: invokevirtual #271                // Method getCurrentMesh:(ZLnet/minecraft/world/InteractionHand;Z)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  public yesman.epicfight.api.client.model.SkinnedMesh getSheathMesh(boolean);
+         2: getstatic     #202                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+         6: invokevirtual #271                // Method getCurrentMesh:(ZLnet/minecraft/world/InteractionHand;Z)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  public net.minecraft.resources.ResourceLocation getTexture(boolean, boolean);
+         4: invokevirtual #281                // Method getCurrentTexture:(ZZZ)Lnet/minecraft/resources/ResourceLocation;
+  public net.minecraft.resources.ResourceLocation getSheathTexture(boolean, boolean);
+         4: invokevirtual #281                // Method getCurrentTexture:(ZZZ)Lnet/minecraft/resources/ResourceLocation;
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$5(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #348,  0            // InvokeDynamic #6:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #354                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$4(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #348,  0            // InvokeDynamic #6:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #354                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$3(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #348,  0            // InvokeDynamic #6:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #354                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$2(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #348,  0            // InvokeDynamic #6:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #354                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$1(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #348,  0            // InvokeDynamic #6:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #354                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+  private static yesman.epicfight.api.client.model.SkinnedMesh lambda$new$0(yesman.epicfight.api.asset.JsonAssetLoader);
+         1: invokedynamic #348,  0            // InvokeDynamic #6:invoke:()Lyesman/epicfight/api/client/model/Meshes$MeshContructor;
+         6: invokevirtual #354                // Method yesman/epicfight/api/asset/JsonAssetLoader.loadSkinnedMesh:(Lyesman/epicfight/api/client/model/Meshes$MeshContructor;)Lyesman/epicfight/api/client/model/SkinnedMesh;
+======== Avalon RenderMeshItem full renderItemInHand
+  public void renderItemInHand(net.minecraft.world.item.ItemStack, yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch<?>, net.minecraft.world.InteractionHand, yesman.epicfight.api.utils.math.OpenMatrix4f[], net.minecraft.client.renderer.MultiBufferSource, com.mojang.blaze3d.vertex.PoseStack, int, float);
+    Code:
+         0: aconst_null
+         1: astore        9
+         3: aload_3
+         4: getstatic     #122                // Field net/minecraft/world/InteractionHand.MAIN_HAND:Lnet/minecraft/world/InteractionHand;
+         7: if_acmpne     27
+        10: aload_0
+        11: getfield      #98                 // Field mesh_main:Lyesman/epicfight/api/asset/AssetAccessor;
+        14: invokeinterface #127,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+        19: checkcast     #129                // class yesman/epicfight/api/client/model/SkinnedMesh
+        22: astore        9
+        24: goto          48
+        27: aload_3
+        28: getstatic     #132                // Field net/minecraft/world/InteractionHand.OFF_HAND:Lnet/minecraft/world/InteractionHand;
+        31: if_acmpne     48
+        34: aload_0
+        35: getfield      #106                // Field mesh_off:Lyesman/epicfight/api/asset/AssetAccessor;
+        38: invokeinterface #127,  1          // InterfaceMethod yesman/epicfight/api/asset/AssetAccessor.get:()Ljava/lang/Object;
+        43: checkcast     #129                // class yesman/epicfight/api/client/model/SkinnedMesh
+        46: astore        9
+        48: aload_2
+        49: invokevirtual #138                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getArmature:()Lyesman/epicfight/api/model/Armature;
+        52: astore        10
+        54: aload         6
+        56: invokevirtual #144                // Method com/mojang/blaze3d/vertex/PoseStack.m_85836_:()V
+        59: aload_1
+        60: invokevirtual #150                // Method net/minecraft/world/item/ItemStack.m_41720_:()Lnet/minecraft/world/item/Item;
+        63: instanceof    #152                // class com/merlin204/avalon/item/animationitem/IAvalonAnimationItem
+        66: ifeq          75
+        69: aload         6
+        71: invokevirtual #155                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+        74: return
+        75: aload         10
+        77: aload_2
+        78: invokevirtual #161                // Method yesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch.getAnimator:()Lyesman/epicfight/api/animation/Animator;
+        81: fload         8
+        83: invokevirtual #167                // Method yesman/epicfight/api/animation/Animator.getPose:(F)Lyesman/epicfight/api/animation/Pose;
+        86: invokevirtual #171                // Method yesman/epicfight/api/model/Armature.setPose:(Lyesman/epicfight/api/animation/Pose;)V
+        89: aload         9
+        91: ifnull        166
+        94: aload         9
+        96: aload         6
+        98: aload         5
+       100: aload_0
+       101: getfield      #63                 // Field texture:Lnet/minecraft/resources/ResourceLocation;
+       104: invokestatic  #177                // Method net/minecraft/client/renderer/RenderType.m_110452_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+       107: iload         7
+       109: fconst_1
+       110: fconst_1
+       111: fconst_1
+       112: fconst_1
+       113: getstatic     #183                // Field net/minecraft/client/renderer/texture/OverlayTexture.f_118083_:I
+       116: aload         10
+       118: aload         10
+       120: invokevirtual #187                // Method yesman/epicfight/api/model/Armature.getPoseMatrices:()[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       123: invokevirtual #191                // Method yesman/epicfight/api/client/model/SkinnedMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+       126: aload_0
+       127: getfield      #66                 // Field texture_l:Lnet/minecraft/resources/ResourceLocation;
+       130: ifnull        166
+       133: aload         9
+       135: aload         6
+       137: aload         5
+       139: aload_0
+       140: getfield      #66                 // Field texture_l:Lnet/minecraft/resources/ResourceLocation;
+       143: invokestatic  #194                // Method net/minecraft/client/renderer/RenderType.m_234338_:(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+       146: iload         7
+       148: fconst_1
+       149: fconst_1
+       150: fconst_1
+       151: ldc           #195                // float 0.9f
+       153: getstatic     #183                // Field net/minecraft/client/renderer/texture/OverlayTexture.f_118083_:I
+       156: aload         10
+       158: aload         10
+       160: invokevirtual #187                // Method yesman/epicfight/api/model/Armature.getPoseMatrices:()[Lyesman/epicfight/api/utils/math/OpenMatrix4f;
+       163: invokevirtual #191                // Method yesman/epicfight/api/client/model/SkinnedMesh.draw:(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;IFFFFILyesman/epicfight/api/model/Armature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;)V
+       166: aload         6
+       168: invokevirtual #155                // Method com/mojang/blaze3d/vertex/PoseStack.m_85849_:()V
+       171: return
+
+======== EFX item skin related
+/tmp/exj/com/asanginxst/epicfightx/EpicFightExtraMod.class
+/tmp/exj/com/asanginxst/epicfightx/data/lang/EFXENLangGenerator.class
+/tmp/exj/com/asanginxst/epicfightx/data/lang/EFXZHLangGenerator.class
+/tmp/exj/com/asanginxst/epicfightx/client/events/ClientModBusEvent.class
+{
+  "pack": {
+    "pack_format": 15,
+    "description": "by asanginxst"
+  }
+}  public static final java.lang.String MOD_ID = "epicfightx";
+  public static final org.slf4j.Logger LOGGER;
+  private final net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext context;
+  private static final java.util.Collection<java.util.AbstractMap$SimpleEntry<java.lang.Runnable, java.lang.Integer>> workQueue;
+  public com.asanginxst.epicfightx.EpicFightExtraMod(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext);
+         1: invokespecial #46                 // Method java/lang/Object."<init>":()V
+        10: invokevirtual #54                 // Method net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext.getModEventBus:()Lnet/minecraftforge/eventbus/api/IEventBus;
+        22: invokevirtual #72                 // Method net/minecraftforge/registries/DeferredRegister.register:(Lnet/minecraftforge/eventbus/api/IEventBus;)V
+        29: invokevirtual #72                 // Method net/minecraftforge/registries/DeferredRegister.register:(Lnet/minecraftforge/eventbus/api/IEventBus;)V
+        37: invokedynamic #102,  0            // InvokeDynamic #0:accept:(Lcom/asanginxst/epicfightx/EpicFightExtraMod;)Ljava/util/function/Consumer;
+        42: invokeinterface #108,  3          // InterfaceMethod net/minecraftforge/eventbus/api/IEventBus.addListener:(Lnet/minecraftforge/eventbus/api/EventPriority;Ljava/util/function/Consumer;)V
+        49: invokeinterface #110,  2          // InterfaceMethod net/minecraftforge/eventbus/api/IEventBus.register:(Ljava/lang/Object;)V
+        57: invokevirtual #114                // Method initializeModules:(Lnet/minecraftforge/eventbus/api/IEventBus;Lnet/minecraftforge/eventbus/api/IEventBus;)V
+  private void initializeModules(net.minecraftforge.eventbus.api.IEventBus, net.minecraftforge.eventbus.api.IEventBus);
+         2: invokedynamic #125,  0            // InvokeDynamic #1:accept:(Lcom/asanginxst/epicfightx/EpicFightExtraMod;)Ljava/util/function/Consumer;
+         7: invokeinterface #128,  2          // InterfaceMethod net/minecraftforge/eventbus/api/IEventBus.addListener:(Ljava/util/function/Consumer;)V
+        14: invokedynamic #135,  0            // InvokeDynamic #2:accept:(Lcom/asanginxst/epicfightx/EpicFightExtraMod;)Ljava/util/function/Consumer;
+        19: invokeinterface #128,  2          // InterfaceMethod net/minecraftforge/eventbus/api/IEventBus.addListener:(Ljava/util/function/Consumer;)V
+        28: ldc           #137                // class yesman/epicfight/main/EpicFightExtensions
+        30: invokedynamic #149,  0            // InvokeDynamic #3:get:()Ljava/util/function/Supplier;
+        35: invokevirtual #153                // Method net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext.registerExtensionPoint:(Ljava/lang/Class;Ljava/util/function/Supplier;)V
+        40: invokevirtual #156                // Method registerRegistries:(Lnet/minecraftforge/eventbus/api/IEventBus;)V
+        43: invokestatic  #161                // Method com/asanginxst/epicfightx/network/EFXNetworkHandler.registerPackets:()V
+        46: invokestatic  #166                // Method net/minecraftforge/fml/ModLoadingContext.get:()Lnet/minecraftforge/fml/ModLoadingContext;
+        55: ldc           #178                // String efx-common.toml
+        57: invokevirtual #182                // Method net/minecraftforge/fml/ModLoadingContext.registerConfig:(Lnet/minecraftforge/fml/config/ModConfig$Type;Lnet/minecraftforge/fml/config/IConfigSpec;Ljava/lang/String;)V
+  private void commonSetup(net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent);
+         1: invokedynamic #191,  0            // InvokeDynamic #4:run:()Ljava/lang/Runnable;
+         6: invokevirtual #197                // Method net/minecraftforge/fml/event/lifecycle/FMLCommonSetupEvent.enqueueWork:(Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture;
+  private void onClientSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent);
+  private void registerRegistries(net.minecraftforge.eventbus.api.IEventBus);
+         1: invokestatic  #203                // Method com/asanginxst/epicfightx/registries/EFXItems.register:(Lnet/minecraftforge/eventbus/api/IEventBus;)V
+         8: invokevirtual #72                 // Method net/minecraftforge/registries/DeferredRegister.register:(Lnet/minecraftforge/eventbus/api/IEventBus;)V
+        15: invokevirtual #72                 // Method net/minecraftforge/registries/DeferredRegister.register:(Lnet/minecraftforge/eventbus/api/IEventBus;)V
+        22: invokevirtual #72                 // Method net/minecraftforge/registries/DeferredRegister.register:(Lnet/minecraftforge/eventbus/api/IEventBus;)V
+  private void addPackFindersEvent(net.minecraftforge.event.AddPackFindersEvent);
+         1: invokevirtual #222                // Method net/minecraftforge/event/AddPackFindersEvent.getPackType:()Lnet/minecraft/server/packs/PackType;
+        10: invokestatic  #233                // Method net/minecraftforge/fml/ModList.get:()Lnet/minecraftforge/fml/ModList;
+        13: ldc           #34                 // String epicfightx
+        15: invokevirtual #237                // Method net/minecraftforge/fml/ModList.getModFileById:(Ljava/lang/String;)Lnet/minecraftforge/forgespi/language/IModFileInfo;
+        18: invokeinterface #243,  1          // InterfaceMethod net/minecraftforge/forgespi/language/IModFileInfo.getFile:()Lnet/minecraftforge/forgespi/locating/IModFile;
+        29: ldc           #247                // String packs/efx_epicfight_resource_pack
+        32: invokeinterface #253,  2          // InterfaceMethod net/minecraftforge/forgespi/locating/IModFile.findResource:([Ljava/lang/String;)Ljava/nio/file/Path;
+        38: ldc           #255                // String Epic Fight Extra - Texture Pack
+        40: ldc_w         #257                // String pack.epicfightx.efx_epicfight_resource_pack.title
+        43: invokestatic  #263                // InterfaceMethod net/minecraft/network/chat/Component.m_237115_:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        48: invokedynamic #274,  0            // InvokeDynamic #5:m_247679_:(Ljava/nio/file/Path;)Lnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;
+        62: invokestatic  #288                // Method net/minecraft/server/packs/repository/Pack.m_245429_:(Ljava/lang/String;Lnet/minecraft/network/chat/Component;ZLnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;Lnet/minecraft/server/packs/PackType;Lnet/minecraft/server/packs/repository/Pack$Position;Lnet/minecraft/server/packs/repository/PackSource;)Lnet/minecraft/server/packs/repository/Pack;
+        68: invokedynamic #298,  0            // InvokeDynamic #6:m_7686_:(Lnet/minecraft/server/packs/repository/Pack;)Lnet/minecraft/server/packs/repository/RepositorySource;
+        73: invokevirtual #302                // Method net/minecraftforge/event/AddPackFindersEvent.addRepositorySource:(Lnet/minecraft/server/packs/repository/RepositorySource;)V
+  private static void lambda$addPackFindersEvent$3(net.minecraft.server.packs.repository.Pack, java.util.function.Consumer);
+         2: invokeinterface #311,  2          // InterfaceMethod java/util/function/Consumer.accept:(Ljava/lang/Object;)V
+  private static net.minecraft.server.packs.PackResources lambda$addPackFindersEvent$2(java.nio.file.Path, java.lang.String);
+         7: invokespecial #318                // Method net/minecraft/server/packs/PathPackResources."<init>":(Ljava/lang/String;Ljava/nio/file/Path;Z)V
+  private static void lambda$commonSetup$1();
+         0: invokestatic  #233                // Method net/minecraftforge/fml/ModList.get:()Lnet/minecraftforge/fml/ModList;
+         3: ldc_w         #321                // String epic_fight_avalon
+         6: invokevirtual #325                // Method net/minecraftforge/fml/ModList.isLoaded:(Ljava/lang/String;)Z
+  private static yesman.epicfight.main.EpicFightExtensions lambda$initializeModules$0();
+         7: invokespecial #338                // Method yesman/epicfight/main/EpicFightExtensions."<init>":(Lnet/minecraftforge/registries/RegistryObject;)V
+  static {};
+         0: invokestatic  #345                // Method com/mojang/logging/LogUtils.getLogger:()Lorg/slf4j/Logger;
+        10: invokespecial #350                // Method java/util/concurrent/ConcurrentLinkedQueue."<init>":()V
+  public com.asanginxst.epicfightx.data.lang.EFXENLangGenerator(net.minecraft.data.PackOutput);
+         2: ldc           #9                  // String en_us
+         4: invokespecial #12                 // Method com/asanginxst/epicfightx/data/lang/EFXLangProvider."<init>":(Lnet/minecraft/data/PackOutput;Ljava/lang/String;)V
+  protected void addTranslations();
+         1: ldc           #20                 // String pack.epicfightx.efx_epicfight_resource_pack.title
+         3: ldc           #22                 // String asanginxst\'s Epic Fight Resource Pack
+         5: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+         9: ldc           #28                 // String pack.epicfightx.efx_epicfight_assets_override.title
+        11: ldc           #30                 // String EFX Asset Override Pack
+        13: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        17: ldc           #32                 // String skill.epicfightx.step
+        19: ldc           #34                 // String Step
+        21: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        25: ldc           #36                 // String skill.epicfightx.roll
+        27: ldc           #38                 // String Roll
+        29: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        33: ldc           #40                 // String itemGroup.efx.items
+        35: ldc           #42                 // String Epic Fight - Extra Content
+        37: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        41: ldc           #44                 // String item.efx.scythe.description1
+        43: ldc           #46                 // String
+        45: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        49: ldc           #48                 // String item.epicfightx.eternal_night_scythe
+        51: ldc           #50                 // String Eternal Night Scythe
+        53: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        57: ldc           #52                 // String skill.epicfightx.combat_mastery_i
+        59: ldc           #54                 // String Combat Mastery I
+        61: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        65: ldc           #56                 // String skill.epicfightx.combat_mastery_ii
+        67: ldc           #58                 // String Combat Mastery II
+        69: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        73: ldc           #60                 // String skill.epicfight.combat_mastery_i
+        75: ldc           #54                 // String Combat Mastery I
+        77: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        81: ldc           #62                 // String skill.epicfight.combat_mastery_i.tooltip
+        83: ldc           #64                 // String You have grown more adept at seizing opportunities between offense and evasion. You can dodge while attacking, or follow up with an attack after dodging.
+        85: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        89: ldc           #66                 // String skill.epicfight.combat_mastery_ii
+        91: ldc           #58                 // String Combat Mastery II
+        93: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        97: ldc           #68                 // String skill.epicfight.combat_mastery_ii.tooltip
+        99: ldc           #70                 // String For a short time after dodging, sprinting will enter the [Dash] state. While in [Dash], stamina will be continuously consumed.
+       101: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       105: ldc           #72                 // String skill.epicfight.scythe_skill
+       107: ldc           #74                 // String Decapitate / Hymn of the Night
+       109: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       113: ldc           #76                 // String skill.epicfight.scythe_skill.tooltip
+       115: ldc           #78                 // String §8Attempt to grab a target in front of you. Upon success, you may follow up with:\n  §6Decapitate §a[Left Click]§8: Deals (3 × Weapon Damage + Target\'s Max HP) as damage.\n  §6Hymn of the Night §a[Right Click]§8: Slams the target down, dealing (8 × Weapon Damage × 0.1) Dark Magic damage and healing for the same amount.\n§8If the grab fails, a powerful slash is performed instead.
+       117: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       121: ldc           #80                 // String skill.epicfight.katana_skill
+       123: ldc           #82                 // String Stance Flow
+       125: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       129: ldc           #84                 // String skill.epicfight.katana_skill.tooltip
+       131: ldc           #86                 // String §8Attacks build stance stacks. Sweeping Edge increases the cap. Current weapon cap: §e%s§8.\n\n§8Idle Cast: Swap between §c[Unsheathed]§8 and §b[Sheathed]§8 stances for free.\n§8Attack Cast: §e[Flow]§8, granting invincibility frames.\n\n§c[Unsheathed Skill]§8: Consumes all stacks to deal multiplied damage based on the number of stacks.\n§b[Sheathed Skill]§8: Consumes all stacks to unleash (stacks - 1) extra dimensional slashes
+       133: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       137: ldc           #88                 // String effect.efx.efx_speed
+       139: ldc           #90                 // String Combat Mastery II: Speed Boost
+       141: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       148: ldc           #98                 // String Bleeding
+       150: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       157: ldc           #98                 // String Bleeding
+       159: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       166: ldc           #110                // String Flesh Slicing
+       168: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       175: ldc           #115                // String Life Drain
+       177: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       184: ldc           #120                // String Grab
+       186: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       193: ldc           #125                // String Feeding
+       195: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       202: ldc           #130                // String Casting
+       204: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       211: ldc           #135                // String Bloody Slash
+       213: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       220: ldc           #135                // String Bloody Slash
+       222: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+  public com.asanginxst.epicfightx.data.lang.EFXZHLangGenerator(net.minecraft.data.PackOutput);
+         2: ldc           #9                  // String zh_cn
+         4: invokespecial #12                 // Method com/asanginxst/epicfightx/data/lang/EFXLangProvider."<init>":(Lnet/minecraft/data/PackOutput;Ljava/lang/String;)V
+  protected void addTranslations();
+         1: ldc           #20                 // String pack.epicfightx.efx_epicfight_resource_pack.title
+         3: ldc           #22                 // String asanginxst的Epic Fight材质包
+         5: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+         9: ldc           #28                 // String pack.epicfightx.efx_epicfight_assets_override.title
+        11: ldc           #30                 // String EFX资源覆盖包
+        13: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        17: ldc           #32                 // String skill.epicfightx.step
+        19: ldc           #34                 // String 跨步
+        21: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        25: ldc           #36                 // String skill.epicfightx.roll
+        27: ldc           #38                 // String 翻滚
+        29: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        33: ldc           #40                 // String itemGroup.efx.items
+        35: ldc           #42                 // String 史诗战斗-额外内容
+        37: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        41: ldc           #44                 // String item.efx.scythe.description1
+        43: ldc           #46                 // String
+        45: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        49: ldc           #48                 // String item.epicfightx.eternal_night_scythe
+        51: ldc           #50                 // String 永夜礼镰
+        53: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        57: ldc           #52                 // String skill.epicfightx.combat_mastery_i
+        59: ldc           #54                 // String 战斗精通 I
+        61: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        65: ldc           #56                 // String skill.epicfightx.combat_mastery_ii
+        67: ldc           #58                 // String 战斗精通 II
+        69: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        73: ldc           #60                 // String skill.epicfight.combat_mastery_i
+        75: ldc           #54                 // String 战斗精通 I
+        77: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        81: ldc           #62                 // String skill.epicfight.combat_mastery_i.tooltip
+        83: ldc           #64                 // String 你愈发熟练于进攻与闪避的间隙中把握机会。你可以在攻击时闪避，也可以在闪避后衔接攻击。
+        85: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        89: ldc           #66                 // String skill.epicfight.combat_mastery_ii
+        91: ldc           #58                 // String 战斗精通 II
+        93: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+        97: ldc           #68                 // String skill.epicfight.combat_mastery_ii.tooltip
+        99: ldc           #70                 // String 闪避后的一段时间内，奔跑可以进入[疾行]状态，[疾行]状态会持续消耗精力。
+       101: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       105: ldc           #72                 // String skill.epicfight.scythe_skill
+       107: ldc           #74                 // String 枭首 / 黑夜礼赞
+       109: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       113: ldc           #76                 // String skill.epicfight.scythe_skill.tooltip
+       115: ldc           #78                 // String §8向前方抓取一名目标，若抓取成功可派生：\n  §6枭首 §a[左键]§8：造成(3×武器伤害 + 目标最大生命值)的伤害。\n  §6黑夜礼赞 §a[右键]§8：将目标砸向地面，造成(8×武器伤害×0.1)的暗魔法伤害并获得等额治疗。\n§8若目标不可抓取或未命中，则施放一次高威力斩击。
+       117: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       121: ldc           #80                 // String skill.epicfight.katana_skill
+       123: ldc           #82                 // String 架势流转
+       125: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       129: ldc           #84                 // String skill.epicfight.katana_skill.tooltip
+       131: ldc           #86                 // String §8进行攻击可积攒架势层数(横扫之刃附魔提升上限)，当前武器最高上限：§e%s§8层。\n§8常态待机时使用：在 §c[拔刀] §8与 §b[收刀] §8架势间无消耗切换。\n§8攻击后摇时使用：发动无敌闪避的斩击并 §e[切换架势]§8。\n§c[拔刀术技能]§8：消耗所有层数，造成基于层数倍率的终结伤害。\n§b[收刀术技能]§8：消耗所有层数，附加(层数-1)次空间斩。
+       133: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       137: ldc           #88                 // String effect.efx.efx_speed
+       139: ldc           #90                 // String 战斗精通II：速度提升
+       141: invokevirtual #26                 // Method add:(Ljava/lang/String;Ljava/lang/String;)V
+       148: ldc           #98                 // String 出血
+       150: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       157: ldc           #98                 // String 出血
+       159: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       166: ldc           #110                // String 切割血肉
+       168: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       175: ldc           #115                // String 血腥切割
+       177: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       184: ldc           #115                // String 血腥切割
+       186: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       193: ldc           #123                // String 生命汲取
+       195: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       202: ldc           #128                // String 抓取
+       204: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       211: ldc           #133                // String 进食
+       213: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V
+       220: ldc           #138                // String 施法
+       222: invokevirtual #102                // Method addSubtitle:(Lnet/minecraftforge/registries/RegistryObject;Ljava/lang/String;)V

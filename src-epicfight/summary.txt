@@ -1,0 +1,9 @@
+Summary for /home/runner/work/rtshop/rtshop/packcache/epic-fight-20.14.17-mc1.20.1-forge.jar
+Decompiled with CFR 0.152
+
+
+yesman.epicfight.skill.SkillContainer
+----------------------------
+
+sendCastRequest(yesman.epicfight.client.world.capabilites.entitypatch.player.LocalPlayerPatch yesman.epicfight.client.events.engine.ControlEngine )
+  Unable to fully structure code

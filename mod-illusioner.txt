@@ -1,0 +1,47 @@
+== packcache/the-illusioner-1.2.0-1.20.1-forge.jar
+META-INF/mods.toml
+assets/illusioner/lang/en_us.json
+data/illusioner/structures/
+data/illusioner/structures/mansion_basement.nbt
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "All Rights Reserved"
+
+[[mods]]
+modId = "illusioner"
+version = "1.2.0+1.20.1-forge"
+displayName = "The Illusioner"
+description = "A boss fight against The Illusioner, waiting beneath every woodland mansion."
+authors = "fqkeh"
+logoFile = "assets/illusioner/icon.png"
+
+[[dependencies.illusioner]]
+modId = "forge"
+mandatory = true
+versionRange = "[47.4.29,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.illusioner]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,1.20.2)"
+ordering = "NONE"
+side = "BOTH"
+{
+	"entity.illusioner.illusioner": "The Illusioner",
+	"entity.illusioner.illusioner_clone": "The Illusioner",
+	"entity.illusioner.ghosted_vindicator": "Ghosted Vindicator",
+	"entity.illusioner.ghosted_pillager": "Ghosted Pillager",
+	"illusioner.title.illusioner": "The Illusioner",
+	"illusioner.title.mirror": "The mirror breaks",
+	"illusioner.title.dispelled": "Illusion dispelled",
+	"options.illusioner.music": "Boss Music",
+	"options.illusioner.voice": "Boss Voice",
+	"item.illusioner.hallucinate_page": "Hallucinate Enchantment Page",
+	"item.illusioner.wingbeat_page": "Wingbeat Enchantment Page",
+	"item.illusioner.page.uses": "Uses left: %s/%s",
+	"enchantment.illusioner.hallucinate": "Hallucinate",
+	"enchantment.illusioner.wingbeat": "Wingbeat",
+	"entity.illusioner.hallucination": "Hallucination"
+}

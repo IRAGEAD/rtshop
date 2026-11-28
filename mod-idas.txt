@@ -1,0 +1,401 @@
+== packcache/idas_forge-1.13.0+1.20.1.jar
+modId="idas" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="Integrated Dungeons and Structures" #mandatory
+    modId="minecraft"
+    versionRange="[1.20.1]"
+    modId="forge"
+    versionRange="[47.0.0,)"
+    modId="quark"
+    versionRange="*"
+    modId="create"
+== data/minecraft files
+data/minecraft/
+data/minecraft/tags/
+data/minecraft/tags/items/
+data/minecraft/tags/items/music_discs.json
+== structure_set files of its own (first 40)
+---- data/idas/tags/worldgen/structure_set/common_avoid.json
+{
+  "replace": false,
+  "values": [
+    "minecraft:villages",
+    "idas:idas_ocean",
+    "idas:idas_rare",
+    "idas:idas_small",
+    "idas:idas_underground_rare"
+  ]
+}
+---- data/idas/tags/worldgen/structure_set/nether_avoid.json
+{
+  "replace": false,
+  "values": [
+    "minecraft:nether_complexes",
+    "idas:idas_small_nether"
+  ]
+}
+---- data/idas/tags/worldgen/structure_set/ocean_avoid.json
+{
+  "replace": false,
+  "values": [
+  ]
+}
+---- data/idas/tags/worldgen/structure_set/rare_avoid.json
+{
+  "replace": false,
+  "values": [
+    "minecraft:villages",
+    "idas:idas_small",
+    "idas:idas_underground",
+    "idas:idas_underground_rare"
+  ]
+}
+---- data/idas/tags/worldgen/structure_set/small_avoid.json
+{
+  "replace": false,
+  "values": [
+    "minecraft:villages"
+  ]
+}
+---- data/idas/tags/worldgen/structure_set/small_nether_avoid.json
+{
+  "replace": false,
+  "values": [
+    "minecraft:nether_complexes"
+  ]
+}
+---- data/idas/tags/worldgen/structure_set/underground_avoid.json
+{
+  "replace": false,
+  "values": [
+     "minecraft:villages",
+     "idas:idas_underground_rare"
+  ]
+}
+---- data/idas/tags/worldgen/structure_set/underground_rare_avoid.json
+{
+  "replace": false,
+  "values": [
+     "minecraft:villages"
+  ]
+}
+---- data/idas/worldgen/structure_set/idas_common.json
+{
+  "structures": [
+    {
+      "structure": "idas:abandonedhouse",
+      "weight": 5
+    },
+    {
+      "structure": "idas:bearclaw_inn",
+      "weight": 5
+    },
+    {
+      "structure": "idas:hermits_hollow",
+      "weight": 4
+    },
+    {
+      "structure": "idas:hunters_cabin",
+      "weight": 4
+    },
+    {
+      "structure": "idas:castle",
+      "weight": 7
+    },
+    {
+      "structure": "idas:brickhouse",
+      "weight": 5
+    },
+    {
+      "structure": "idas:enchantingtower",
+      "weight": 4
+    },
+    {
+      "structure": "idas:wizard_tower",
+      "weight": 4
+    },
+    {
+      "structure": "idas:redhorn_guild",
+      "weight": 3
+    },
+    {
+      "structure": "idas:beekeepers_house",
+      "weight": 5
+    },
+    {
+      "structure": "idas:farmhouse",
+      "weight": 5
+    },
+    {
+      "structure": "idas:dig_site/dig_site",
+      "weight": 5
+    },
+    {
+      "structure": "idas:dig_site/dig_site_desert",
+      "weight": 5
+    },
+    {
+      "structure": "idas:witches_treestump",
+      "weight": 3
+    },
+    {
+      "structure": "idas:fishermans_lodge",
+      "weight": 3
+    },
+    {
+      "structure": "idas:haunted_manor",
+      "weight": 1
+    },
+    {
+      "st
+---- data/idas/worldgen/structure_set/idas_nether.json
+{
+  "structures": [
+    {
+      "structure": "idas:ancient_portal/nether_ancient_portal",
+      "weight": 1
+    },
+    {
+      "structure": "idas:necromancers_spire",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "salt": 169481692,
+    "spacing": 35,
+    "separation": 20,
+    "type": "integrated_api:advanced_random_spread",
+    "super_exclusion_zone": {
+      "chunk_count": 2,
+      "other_set": "#idas:nether_avoid"
+    }
+  }
+}
+---- data/idas/worldgen/structure_set/idas_ocean.json
+{
+  "structures": [
+    {
+      "structure": "idas:sunken_ship/sunken_ship",
+      "weight": 1
+    },
+    {
+      "structure": "idas:sunken_ship/sunken_ship_coral",
+      "weight": 1
+    },
+    {
+      "structure": "idas:sunken_ship/sunken_ship_ruins",
+      "weight": 1
+    },
+    {
+      "structure": "idas:iceandfire/sirens_cove",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "salt": 169480681,
+    "spacing": 35,
+    "separation": 29,
+    "type": "integrated_api:advanced_random_spread",
+    "super_exclusion_zone": {
+      "chunk_count": 3,
+      "other_set": "#idas:ocean_avoid"
+    }
+  }
+}
+---- data/idas/worldgen/structure_set/idas_rare.json
+{
+  "structures": [
+    {
+      "structure": "idas:pillager_fortress",
+      "weight": 3
+    },
+    {
+      "structure": "idas:labyrinth",
+      "weight": 3
+    },
+    {
+      "structure": "idas:bazaar",
+      "weight": 3
+    },
+    {
+      "structure": "idas:ancient_mines",
+      "weight": 3
+    },
+    {
+      "structure": "idas:tinkers_workshop",
+      "weight": 3
+    },
+    {
+      "structure": "idas:ruins_of_the_deep",
+      "weight": 3
+    },
+    {
+      "structure": "idas:tree_of_wisdom",
+      "weight": 1
+    },
+    {
+      "structure": "idas:iceandfire/dread_citadel",
+      "weight": 3
+    },
+    {
+      "structure": "idas:tinkers_citadel",
+      "weight": 3
+    },
+    {
+      "structure": "idas:ars_nouveau/archmages_tower",
+      "weight": 3
+    },
+    {
+      "structure": "idas:desert_pyramid",
+      "weight": 3
+    },
+    {
+      "structure": "idas:collectors_museum",
+      "weight": 3
+    },
+    {
+      "structure": "idas:windswept_shrine",
+      "weight": 3
+    }
+  ],
+  "placement": {
+    "salt": 169480678,
+    "spacing": 45,
+    "separation": 20,
+    "type": "integrated_api:advanced_random_spread",
+    "super_exclusion_zone": {
+      "chunk_count": 2,
+      "other_set
+---- data/idas/worldgen/structure_set/idas_small.json
+{
+  "structures": [
+    {
+      "structure": "idas:cottage",
+      "weight": 3
+    },
+    {
+      "structure": "idas:animal_den/forest_den",
+      "weight": 3
+    },
+    {
+      "structure": "idas:animal_den/polar_bear_den",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_oak",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_spruce",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_birch",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_jungle",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_acacia",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_dark_oak",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_bygredwood",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_bopredwood",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_bygmahogany",
+      "weight": 3
+    },
+    {
+      "structure": "idas:lumber_camp/lumber_camp_bopmahogany",
+      "weight": 3
+    },
+    {
+      "structure": "idas:desert_camp/d
+---- data/idas/worldgen/structure_set/idas_small_nether.json
+{
+  "structures": [
+    {
+      "structure": "idas:animal_den/foxhound_den",
+      "weight": 1
+    },
+    {
+      "structure": "idas:nether_pump_camp",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "salt": 169263692,
+    "spacing": 30,
+    "separation": 25,
+    "type": "integrated_api:advanced_random_spread",
+    "super_exclusion_zone": {
+      "chunk_count": 3,
+      "other_set": "#idas:small_nether_avoid"
+    }
+  }
+}
+---- data/idas/worldgen/structure_set/idas_underground.json
+{
+  "structures": [
+    {
+      "structure": "idas:underground_camp/underground_camp",
+      "weight": 1
+    },
+    {
+      "structure": "idas:underground_camp/underground_camp_deep",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "salt": 18918169,
+    "spacing": 25,
+    "separation": 15,
+    "type": "integrated_api:advanced_random_spread",
+    "super_exclusion_zone": {
+      "chunk_count": 1,
+      "other_set": "#idas:underground_avoid"
+    }
+  }
+}
+---- data/idas/worldgen/structure_set/idas_underground_rare.json
+{
+  "structures": [
+    {
+      "structure": "idas:ancient_portal/ancient_portal",
+      "weight": 1
+    },
+    {
+      "structure": "idas:nexus",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "salt": 169481691,
+    "spacing": 60,
+    "separation": 40,
+    "type": "integrated_api:advanced_random_spread",
+    "super_exclusion_zone": {
+      "chunk_count": 2,
+      "other_set": "#idas:underground_rare_avoid"
+    }
+  }
+}
+== config classes
+com/craisinlord/idas/config/
+com/craisinlord/idas/config/ConfigGeneralForge.class
+com/craisinlord/idas/config/ConfigModule$General.class
+com/craisinlord/idas/config/ConfigModule.class
+com/craisinlord/idas/config/ConfigModuleForge.class
+com/craisinlord/idas/config/IDASConfigForge.class

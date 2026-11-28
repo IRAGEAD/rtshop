@@ -1,0 +1,445 @@
+######## ./dev/dyslexic/cinematic/station/MenuActions.class
+302-        18: ireturn
+303-        19: aload_0
+304-        20: invokevirtual #278                // Method dev/dyslexic/cinematic/station/Sessions$Session.addonId:()Lnet/minecraft/resources/ResourceLocation;
+305:        23: invokestatic  #282                // Method dev/dyslexic/cinematic/api/AddonStations.byId:(Lnet/minecraft/resources/ResourceLocation;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+306-        26: astore_2
+307-        27: aload_2
+308-        28: ifnull        43
+309-        31: aload_2
+310-        32: aload_1
+311:        33: invokevirtual #286                // Method dev/dyslexic/cinematic/api/AddonStations$Definition.accepts:(Lnet/minecraft/world/inventory/AbstractContainerMenu;)Z
+312-        36: ifeq          43
+313-        39: iconst_1
+314-        40: goto          44
+315-        43: iconst_0
+316-        44: ireturn
+317-
+318-  public static int inputs(dev.dyslexic.cinematic.station.StationKind);
+319-    Code:
+320-         0: getstatic     #244                // Field dev/dyslexic/cinematic/station/MenuActions$1.$SwitchMap$dev$dyslexic$cinematic$station$StationKind:[I
+321-         3: aload_0
+322-         4: invokevirtual #249                // Method dev/dyslexic/cinematic/station/StationKind.ordinal:()I
+323-         7: iaload
+324-         8: tableswitch   { // 2 to 10
+325-                       2: 60
+326-                       3: 60
+327-                       4: 64
+328-                       5: 68
+329-                       6: 64
+330-                       7: 60
+331-                       8: 72
+332-                       9: 76
+333-                      10: 68
+334-                 default: 76
+335-            }
+336-        60: iconst_2
+######## ./dev/dyslexic/cinematic/station/Sessions.class
+245-        32: getstatic     #232                // Field dev/dyslexic/cinematic/station/StationKind.ADDON:Ldev/dyslexic/cinematic/station/StationKind;
+246-        35: if_acmpne     46
+247-        38: aload         4
+248:        40: invokestatic  #236                // Method dev/dyslexic/cinematic/api/AddonStations.forBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+249-        43: goto          47
+250-        46: aconst_null
+251-        47: astore        5
+252-        49: aload_2
+253-        50: getstatic     #232                // Field dev/dyslexic/cinematic/station/StationKind.ADDON:Ldev/dyslexic/cinematic/station/StationKind;
+254-        53: if_acmpne     73
+255-        56: aload         5
+256-        58: ifnonnull     73
+257-        61: aload_0
+258-        62: new           #108                // class dev/dyslexic/cinematic/net/SessionClosePayload
+259-        65: dup
+260-        66: invokespecial #109                // Method dev/dyslexic/cinematic/net/SessionClosePayload."<init>":()V
+261-        69: invokestatic  #115                // Method dev/dyslexic/cinematic/net/Network.sendToPlayer:(Lnet/minecraft/server/level/ServerPlayer;Ldev/dyslexic/cinematic/net/Payload;)V
+262-        72: return
+263-        73: aload_2
+264-        74: aload         4
+265-        76: invokevirtual #240                // Method dev/dyslexic/cinematic/station/StationKind.sides:(Lnet/minecraft/world/level/block/state/BlockState;)Ljava/util/List;
+266-        79: astore        6
+267-        81: aload         6
+268-        83: invokeinterface #245,  1          // InterfaceMethod java/util/List.isEmpty:()Z
+269-        88: ifeq          103
+270-        91: aload_0
+271-        92: new           #108                // class dev/dyslexic/cinematic/net/SessionClosePayload
+272-        95: dup
+273-        96: invokespecial #109                // Method dev/dyslexic/cinematic/net/SessionClosePayload."<init>":()V
+--
+296-       148: aconst_null
+297-       149: goto          157
+298-       152: aload         5
+299:       154: invokevirtual #264                // Method dev/dyslexic/cinematic/api/AddonStations$Definition.id:()Lnet/minecraft/resources/ResourceLocation;
+300-       157: invokespecial #269                // Method dev/dyslexic/cinematic/station/Sessions$Session."<init>":(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Ldev/dyslexic/cinematic/station/StationKind;Lnet/minecraft/resources/ResourceLocation;)V
+301-       160: astore        7
+302-       162: aload_0
+303-       163: aload         7
+304-       165: iconst_0
+305-       166: invokestatic  #123                // Method valid:(Lnet/minecraft/server/level/ServerPlayer;Ldev/dyslexic/cinematic/station/Sessions$Session;Z)Z
+306-       169: ifeq          186
+307-       172: aload_2
+308-       173: aload_0
+309-       174: invokevirtual #217                // Method net/minecraft/server/level/ServerPlayer.m_9236_:()Lnet/minecraft/world/level/Level;
+310-       177: aload_1
+311-       178: aload         4
+312-       180: invokevirtual #273                // Method dev/dyslexic/cinematic/station/StationKind.usable:(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z
+313-       183: ifne          198
+314-       186: aload_0
+315-       187: new           #108                // class dev/dyslexic/cinematic/net/SessionClosePayload
+316-       190: dup
+317-       191: invokespecial #109                // Method dev/dyslexic/cinematic/net/SessionClosePayload."<init>":()V
+318-       194: invokestatic  #115                // Method dev/dyslexic/cinematic/net/Network.sendToPlayer:(Lnet/minecraft/server/level/ServerPlayer;Ldev/dyslexic/cinematic/net/Payload;)V
+319-       197: return
+320-       198: aload_0
+321-       199: invokestatic  #95                 // Method get:(Lnet/minecraft/server/level/ServerPlayer;)Ldev/dyslexic/cinematic/station/Sessions$Session;
+322-       202: ifnull        210
+323-       205: aload_0
+324-       206: iconst_0
+--
+675-        30: aload_1
+676-        31: invokevirtual #96                 // Method dev/dyslexic/cinematic/station/Sessions$Session.pos:()Lnet/minecraft/core/BlockPos;
+677-        34: invokevirtual #223                // Method net/minecraft/world/level/Level.m_8055_:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+678:        37: invokestatic  #236                // Method dev/dyslexic/cinematic/api/AddonStations.forBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+679-        40: goto          44
+680-        43: aconst_null
+681-        44: astore_3
+682-        45: aload_1
+683-        46: invokevirtual #103                // Method dev/dyslexic/cinematic/station/Sessions$Session.kind:()Ldev/dyslexic/cinematic/station/StationKind;
+684-        49: invokevirtual #199                // Method dev/dyslexic/cinematic/station/StationKind.usesMenu:()Z
+685-        52: ifeq          99
+686-        55: iload_2
+687-        56: ifeq          99
+688-        59: aload_1
+689-        60: aload_0
+690-        61: getfield      #444                // Field net/minecraft/server/level/ServerPlayer.f_36096_:Lnet/minecraft/world/inventory/AbstractContainerMenu;
+691-        64: invokestatic  #448                // Method dev/dyslexic/cinematic/station/MenuActions.isOpen:(Ldev/dyslexic/cinematic/station/Sessions$Session;Lnet/minecraft/world/inventory/AbstractContainerMenu;)Z
+692-        67: ifeq          95
+693-        70: aload_1
+694-        71: invokevirtual #103                // Method dev/dyslexic/cinematic/station/Sessions$Session.kind:()Ldev/dyslexic/cinematic/station/StationKind;
+695-        74: getstatic     #232                // Field dev/dyslexic/cinematic/station/StationKind.ADDON:Ldev/dyslexic/cinematic/station/StationKind;
+696-        77: if_acmpne     91
+697-        80: aload_0
+698-        81: getfield      #444                // Field net/minecraft/server/level/ServerPlayer.f_36096_:Lnet/minecraft/world/inventory/AbstractContainerMenu;
+699-        84: aload_0
+700-        85: invokevirtual #452                // Method net/minecraft/world/inventory/AbstractContainerMenu.m_6875_:(Lnet/minecraft/world/entity/player/Player;)Z
+701-        88: ifeq          95
+702-        91: iconst_1
+703-        92: goto          115
+--
+742-       181: aload_3
+743-       182: ifnull        221
+744-       185: aload_3
+745:       186: invokevirtual #264                // Method dev/dyslexic/cinematic/api/AddonStations$Definition.id:()Lnet/minecraft/resources/ResourceLocation;
+746-       189: aload_1
+747-       190: invokevirtual #461                // Method dev/dyslexic/cinematic/station/Sessions$Session.addonId:()Lnet/minecraft/resources/ResourceLocation;
+748-       193: invokevirtual #462                // Method net/minecraft/resources/ResourceLocation.equals:(Ljava/lang/Object;)Z
+749-       196: ifeq          221
+750-       199: aload_0
+751-       200: aload_1
+752-       201: invokevirtual #96                 // Method dev/dyslexic/cinematic/station/Sessions$Session.pos:()Lnet/minecraft/core/BlockPos;
+753-       204: invokevirtual #331                // Method net/minecraft/core/BlockPos.m_252807_:()Lnet/minecraft/world/phys/Vec3;
+754-       207: invokevirtual #335                // Method net/minecraft/server/level/ServerPlayer.m_20238_:(Lnet/minecraft/world/phys/Vec3;)D
+755-       210: ldc2_w        #26                 // double 36.0d
+756-       213: dcmpg
+757-       214: ifgt          221
+758-       217: iconst_1
+759-       218: goto          222
+760-       221: iconst_0
+761-       222: ireturn
+762-
+763-  static {};
+764-    Code:
+765-         0: new           #466                // class java/util/HashMap
+766-         3: dup
+767-         4: invokespecial #467                // Method java/util/HashMap."<init>":()V
+768-         7: putstatic     #38                 // Field SESSIONS:Ljava/util/Map;
+769-        10: return
+770-}
+######## ./dev/dyslexic/cinematic/station/StationKind.class
+168-       234: getstatic     #168                // Field CHISELED_BOOKSHELF:Ldev/dyslexic/cinematic/station/StationKind;
+169-       237: areturn
+170-       238: aload_0
+171:       239: invokestatic  #172                // Method dev/dyslexic/cinematic/api/AddonStations.forBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+172-       242: ifnonnull     249
+173-       245: aconst_null
+174-       246: goto          252
+175-       249: getstatic     #174                // Field ADDON:Ldev/dyslexic/cinematic/station/StationKind;
+176-       252: areturn
+177-
+178-  public boolean matches(net.minecraft.world.level.block.state.BlockState);
+179-    Code:
+180-         0: aload_1
+181-         1: invokestatic  #180                // Method of:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/station/StationKind;
+182-         4: aload_0
+183-         5: if_acmpne     12
+184-         8: iconst_1
+185-         9: goto          13
+186-        12: iconst_0
+187-        13: ireturn
+188-
+189-  public boolean isFurnace();
+190-    Code:
+191-         0: aload_0
+192-         1: getstatic     #86                 // Field FURNACE:Ldev/dyslexic/cinematic/station/StationKind;
+193-         4: if_acmpeq     21
+194-         7: aload_0
+195-         8: getstatic     #91                 // Field SMOKER:Ldev/dyslexic/cinematic/station/StationKind;
+196-        11: if_acmpeq     21
+--
+262-                 default: 252
+263-            }
+264-        84: aload_1
+265:        85: invokestatic  #172                // Method dev/dyslexic/cinematic/api/AddonStations.forBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+266-        88: astore_2
+267-        89: aload_2
+268-        90: ifnonnull     99
+269-        93: invokestatic  #200                // InterfaceMethod java/util/List.of:()Ljava/util/List;
+270-        96: goto          255
+271-        99: aload_2
+272-       100: aload_1
+273:       101: invokevirtual #203                // Method dev/dyslexic/cinematic/api/AddonStations$Definition.usableSides:(Lnet/minecraft/world/level/block/state/BlockState;)Ljava/util/List;
+274-       104: goto          255
+275-       107: aload_1
+276-       108: getstatic     #209                // Field net/minecraft/world/level/block/AbstractFurnaceBlock.f_48683_:Lnet/minecraft/world/level/block/state/properties/DirectionProperty;
+277-       111: invokevirtual #213                // Method net/minecraft/world/level/block/state/BlockState.m_61143_:(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;
+278-       114: checkcast     #17                 // class net/minecraft/core/Direction
+279-       117: invokestatic  #216                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;)Ljava/util/List;
+280-       120: goto          255
+281-       123: aload_1
+282-       124: getstatic     #221                // Field net/minecraft/world/level/block/AnvilBlock.f_48764_:Lnet/minecraft/world/level/block/state/properties/DirectionProperty;
+283-       127: invokevirtual #213                // Method net/minecraft/world/level/block/state/BlockState.m_61143_:(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;
+284-       130: checkcast     #17                 // class net/minecraft/core/Direction
+285-       133: astore_2
+286-       134: aload_2
+287-       135: invokevirtual #225                // Method net/minecraft/core/Direction.m_122427_:()Lnet/minecraft/core/Direction;
+288-       138: aload_2
+289-       139: invokevirtual #228                // Method net/minecraft/core/Direction.m_122428_:()Lnet/minecraft/core/Direction;
+290-       142: invokestatic  #231                // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+291-       145: goto          255
+292-       148: aload_1
+293-       149: getstatic     #236                // Field net/minecraft/world/level/block/GrindstoneBlock.f_54117_:Lnet/minecraft/world/level/block/state/properties/DirectionProperty;
+294-       152: invokevirtual #213                // Method net/minecraft/world/level/block/state/BlockState.m_61143_:(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;
+295-       155: checkcast     #17                 // class net/minecraft/core/Direction
+296-       158: astore_2
+297-       159: aload_2
+298-       160: aload_2
+######## ./dev/dyslexic/cinematic/client/Scene.class
+363-        72: getstatic     #328                // Field dev/dyslexic/cinematic/station/StationKind.ADDON:Ldev/dyslexic/cinematic/station/StationKind;
+364-        75: if_acmpne     86
+365-        78: aload         4
+366:        80: invokestatic  #332                // Method dev/dyslexic/cinematic/api/AddonStations.forBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+367-        83: goto          87
+368-        86: aconst_null
+369-        87: astore        5
+370-        89: aload_1
+371-        90: invokestatic  #338                // Method dev/dyslexic/cinematic/client/Settings.scene:(Ldev/dyslexic/cinematic/station/StationKind;)Z
+372-        93: ifeq          129
+373-        96: getstatic     #340                // Field OWN_WINDOW:Ljava/util/Set;
+374-        99: aload_1
+375-       100: invokeinterface #345,  2          // InterfaceMethod java/util/Set.contains:(Ljava/lang/Object;)Z
+376-       105: ifne          129
+377-       108: aload         5
+378-       110: ifnull        142
+379-       113: getstatic     #347                // Field OWN_ADDON_WINDOWS:Ljava/util/Set;
+380-       116: aload         5
+381:       118: invokevirtual #351                // Method dev/dyslexic/cinematic/api/AddonStations$Definition.id:()Lnet/minecraft/resources/ResourceLocation;
+382-       121: invokeinterface #345,  2          // InterfaceMethod java/util/Set.contains:(Ljava/lang/Object;)Z
+383-       126: ifeq          142
+384-       129: aload_1
+385-       130: getstatic     #354                // Field dev/dyslexic/cinematic/station/StationKind.CAMPFIRE:Ldev/dyslexic/cinematic/station/StationKind;
+386-       133: if_acmpeq     141
+387-       136: aload_0
+388-       137: aload_1
+389-       138: invokestatic  #357                // Method openWindow:(Lnet/minecraft/core/BlockPos;Ldev/dyslexic/cinematic/station/StationKind;)V
+390-       141: return
+391-       142: aload_1
+392-       143: getstatic     #328                // Field dev/dyslexic/cinematic/station/StationKind.ADDON:Ldev/dyslexic/cinematic/station/StationKind;
+393-       146: if_acmpne     163
+394-       149: aload         4
+395:       151: invokestatic  #363                // Method dev/dyslexic/cinematic/api/client/AddonScenes.available:(Lnet/minecraft/world/level/block/state/BlockState;)Z
+396-       154: ifne          163
+397-       157: aload_0
+398-       158: aload_1
+399-       159: invokestatic  #357                // Method openWindow:(Lnet/minecraft/core/BlockPos;Ldev/dyslexic/cinematic/station/StationKind;)V
+400-       162: return
+401-       163: aload_1
+402-       164: getstatic     #366                // Field dev/dyslexic/cinematic/station/StationKind.JUKEBOX:Ldev/dyslexic/cinematic/station/StationKind;
+403-       167: if_acmpne     179
+404-       170: aload_3
+405-       171: aload_0
+406-       172: invokestatic  #372                // Method dev/dyslexic/cinematic/client/JukeboxStation.worthIt:(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/core/BlockPos;)Z
+407-       175: ifne          179
+408-       178: return
+409-       179: aload_3
+410-       180: invokestatic  #376                // Method airborne:(Lnet/minecraft/client/player/LocalPlayer;)Z
+411-       183: ifeq          202
+412-       186: aload_0
+413-       187: invokevirtual #319                // Method net/minecraft/core/BlockPos.m_7949_:()Lnet/minecraft/core/BlockPos;
+414-       190: putstatic     #378                // Field landingPos:Lnet/minecraft/core/BlockPos;
+415-       193: aload_1
+416-       194: putstatic     #380                // Field landingKind:Ldev/dyslexic/cinematic/station/StationKind;
+417-       197: iconst_0
+418-       198: putstatic     #382                // Field landingTicks:I
+419-       201: return
+420-       202: aload_0
+--
+1010-       224: getstatic     #328                // Field dev/dyslexic/cinematic/station/StationKind.ADDON:Ldev/dyslexic/cinematic/station/StationKind;
+1011-       227: if_acmpne     239
+1012-       230: aload         4
+1013:       232: invokestatic  #363                // Method dev/dyslexic/cinematic/api/client/AddonScenes.available:(Lnet/minecraft/world/level/block/state/BlockState;)Z
+1014-       235: ifne          239
+1015-       238: return
+1016-       239: aload_3
+1017-       240: invokevirtual #752                // Method net/minecraft/world/phys/BlockHitResult.m_82425_:()Lnet/minecraft/core/BlockPos;
+1018-       243: invokevirtual #319                // Method net/minecraft/core/BlockPos.m_7949_:()Lnet/minecraft/core/BlockPos;
+1019-       246: putstatic     #659                // Field neighbor:Lnet/minecraft/core/BlockPos;
+1020-       249: aload         5
+1021-       251: putstatic     #696                // Field neighborKind:Ldev/dyslexic/cinematic/station/StationKind;
+1022-       254: return
+1023-
+1024-  public static void moveOver();
+1025-    Code:
+1026-         0: getstatic     #250                // Field clientOnly:Z
+1027-         3: ifeq          7
+1028-         6: return
+1029-         7: invokestatic  #180                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+1030-        10: astore_0
+1031-        11: aload_0
+1032-        12: getfield      #199                // Field net/minecraft/client/Minecraft.f_91074_:Lnet/minecraft/client/player/LocalPlayer;
+1033-        15: astore_1
+1034-        16: getstatic     #157                // Field phase:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1035-        19: getstatic     #167                // Field dev/dyslexic/cinematic/client/Scene$Phase.ACTIVE:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1036-        22: if_acmpne     50
+1037-        25: getstatic     #659                // Field neighbor:Lnet/minecraft/core/BlockPos;
+1038-        28: ifnull        50
+--
+1051-        61: getfield      #203                // Field net/minecraft/client/Minecraft.f_91073_:Lnet/minecraft/client/multiplayer/ClientLevel;
+1052-        64: getstatic     #659                // Field neighbor:Lnet/minecraft/core/BlockPos;
+1053-        67: invokevirtual #219                // Method net/minecraft/client/multiplayer/ClientLevel.m_8055_:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+1054:        70: invokestatic  #363                // Method dev/dyslexic/cinematic/api/client/AddonScenes.available:(Lnet/minecraft/world/level/block/state/BlockState;)Z
+1055-        73: ifne          77
+1056-        76: return
+1057-        77: getstatic     #659                // Field neighbor:Lnet/minecraft/core/BlockPos;
+1058-        80: getstatic     #696                // Field neighborKind:Ldev/dyslexic/cinematic/station/StationKind;
+1059-        83: aload_1
+1060-        84: invokestatic  #386                // Method choose:(Lnet/minecraft/core/BlockPos;Ldev/dyslexic/cinematic/station/StationKind;Lnet/minecraft/client/player/LocalPlayer;)Ldev/dyslexic/cinematic/client/Scene$Choice;
+1061-        87: astore_2
+1062-        88: aload_2
+1063-        89: invokevirtual #390                // Method dev/dyslexic/cinematic/client/Scene$Choice.plan:()Ldev/dyslexic/cinematic/client/Reach$Plan;
+1064-        92: invokevirtual #398                // Method dev/dyslexic/cinematic/client/Reach$Plan.scene:()Z
+1065-        95: ifne          166
+1066-        98: getstatic     #404                // Field dev/dyslexic/cinematic/Cinematic.LOGGER:Lorg/slf4j/Logger;
+1067-       101: ldc_w         #769                // String [Cinematic] {} at {}: cannot move over ({})
+1068-       104: iconst_3
+1069-       105: anewarray     #4                  // class java/lang/Object
+1070-       108: dup
+1071-       109: iconst_0
+1072-       110: getstatic     #696                // Field neighborKind:Ldev/dyslexic/cinematic/station/StationKind;
+1073-       113: aastore
+1074-       114: dup
+1075-       115: iconst_1
+1076-       116: getstatic     #659                // Field neighbor:Lnet/minecraft/core/BlockPos;
+1077-       119: invokevirtual #409                // Method net/minecraft/core/BlockPos.m_123344_:()Ljava/lang/String;
+1078-       122: aastore
+1079-       123: dup
+--
+1304-       309: aload_2
+1305-       310: aload_3
+1306-       311: aload         4
+1307:       313: invokestatic  #895                // Method dev/dyslexic/cinematic/api/client/AddonScenes.create:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/core/Direction;)Ldev/dyslexic/cinematic/client/ClientStation;
+1308-       316: areturn
+1309-
+1310-  public static void leave();
+1311-    Code:
+1312-         0: getstatic     #157                // Field phase:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1313-         3: getstatic     #256                // Field dev/dyslexic/cinematic/client/Scene$Phase.INTRO:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1314-         6: if_acmpeq     19
+1315-         9: getstatic     #157                // Field phase:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1316-        12: getstatic     #167                // Field dev/dyslexic/cinematic/client/Scene$Phase.ACTIVE:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1317-        15: if_acmpeq     19
+1318-        18: return
+1319-        19: getstatic     #162                // Field station:Ldev/dyslexic/cinematic/client/ClientStation;
+1320-        22: getfield      #213                // Field dev/dyslexic/cinematic/client/ClientStation.pos:Lnet/minecraft/core/BlockPos;
+1321-        25: putstatic     #440                // Field leftPos:Lnet/minecraft/core/BlockPos;
+1322-        28: getstatic     #153                // Field clock:D
+1323-        31: putstatic     #445                // Field leftAt:D
+1324-        34: aconst_null
+1325-        35: putstatic     #659                // Field neighbor:Lnet/minecraft/core/BlockPos;
+1326-        38: invokestatic  #778                // Method dev/dyslexic/cinematic/client/CameraRig.last:()Ldev/dyslexic/cinematic/client/CameraRig$Pose;
+1327-        41: ifnull        50
+1328-        44: invokestatic  #778                // Method dev/dyslexic/cinematic/client/CameraRig.last:()Ldev/dyslexic/cinematic/client/CameraRig$Pose;
+1329-        47: goto          56
+1330-        50: getstatic     #162                // Field station:Ldev/dyslexic/cinematic/client/ClientStation;
+1331-        53: invokevirtual #639                // Method dev/dyslexic/cinematic/client/ClientStation.view:()Ldev/dyslexic/cinematic/client/CameraRig$Pose;
+1332-        56: putstatic     #657                // Field outroFrom:Ldev/dyslexic/cinematic/client/CameraRig$Pose;
+--
+1445-        25: aload_0
+1446-        26: getfield      #213                // Field dev/dyslexic/cinematic/client/ClientStation.pos:Lnet/minecraft/core/BlockPos;
+1447-        29: invokevirtual #219                // Method net/minecraft/client/multiplayer/ClientLevel.m_8055_:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+1448:        32: invokestatic  #332                // Method dev/dyslexic/cinematic/api/AddonStations.forBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+1449-        35: astore_2
+1450-        36: aload_2
+1451-        37: ifnull        52
+1452-        40: aload_2
+1453-        41: aload_1
+1454:        42: invokevirtual #956                // Method dev/dyslexic/cinematic/api/AddonStations$Definition.accepts:(Lnet/minecraft/world/inventory/AbstractContainerMenu;)Z
+1455-        45: ifeq          52
+1456-        48: iconst_1
+1457-        49: goto          53
+1458-        52: iconst_0
+1459-        53: ireturn
+1460-        54: aload_0
+1461-        55: invokevirtual #229                // Method dev/dyslexic/cinematic/client/ClientStation.kind:()Ldev/dyslexic/cinematic/station/StationKind;
+1462-        58: invokevirtual #671                // Method dev/dyslexic/cinematic/station/StationKind.usesMenu:()Z
+1463-        61: ifeq          79
+1464-        64: aload_0
+1465-        65: invokevirtual #229                // Method dev/dyslexic/cinematic/client/ClientStation.kind:()Ldev/dyslexic/cinematic/station/StationKind;
+1466-        68: aload_1
+1467-        69: invokestatic  #962                // Method dev/dyslexic/cinematic/station/MenuActions.isOpen:(Ldev/dyslexic/cinematic/station/StationKind;Lnet/minecraft/world/inventory/AbstractContainerMenu;)Z
+1468-        72: ifeq          79
+1469-        75: iconst_1
+1470-        76: goto          80
+1471-        79: iconst_0
+1472-        80: ireturn
+1473-
+1474-  static void yieldToWindow();
+1475-    Code:
+1476-         0: getstatic     #157                // Field phase:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1477-         3: getstatic     #160                // Field dev/dyslexic/cinematic/client/Scene$Phase.NONE:Ldev/dyslexic/cinematic/client/Scene$Phase;
+1478-         6: if_acmpeq     15
+1479-         9: getstatic     #162                // Field station:Ldev/dyslexic/cinematic/client/ClientStation;
+--
+1491-        43: getstatic     #162                // Field station:Ldev/dyslexic/cinematic/client/ClientStation;
+1492-        46: getfield      #213                // Field dev/dyslexic/cinematic/client/ClientStation.pos:Lnet/minecraft/core/BlockPos;
+1493-        49: invokevirtual #219                // Method net/minecraft/client/multiplayer/ClientLevel.m_8055_:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+1494:        52: invokestatic  #332                // Method dev/dyslexic/cinematic/api/AddonStations.forBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Ldev/dyslexic/cinematic/api/AddonStations$Definition;
+1495-        55: astore_0
+1496-        56: aload_0
+1497-        57: ifnull        73
+1498-        60: getstatic     #347                // Field OWN_ADDON_WINDOWS:Ljava/util/Set;
+1499-        63: aload_0
+1500:        64: invokevirtual #351                // Method dev/dyslexic/cinematic/api/AddonStations$Definition.id:()Lnet/minecraft/resources/ResourceLocation;
+1501-        67: invokeinterface #967,  2          // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+1502-        72: pop
+1503-        73: goto          103
+1504-        76: getstatic     #162                // Field station:Ldev/dyslexic/cinematic/client/ClientStation;
+1505-        79: invokevirtual #229                // Method dev/dyslexic/cinematic/client/ClientStation.kind:()Ldev/dyslexic/cinematic/station/StationKind;
+1506-        82: getstatic     #970                // Field dev/dyslexic/cinematic/station/StationKind.LECTERN:Ldev/dyslexic/cinematic/station/StationKind;
+1507-        85: if_acmpeq     103
+1508-        88: getstatic     #340                // Field OWN_WINDOW:Ljava/util/Set;
+1509-        91: getstatic     #162                // Field station:Ldev/dyslexic/cinematic/client/ClientStation;
+1510-        94: invokevirtual #229                // Method dev/dyslexic/cinematic/client/ClientStation.kind:()Ldev/dyslexic/cinematic/station/StationKind;
+1511-        97: invokeinterface #967,  2          // InterfaceMethod java/util/Set.add:(Ljava/lang/Object;)Z
+1512-       102: pop
+1513-       103: getstatic     #404                // Field dev/dyslexic/cinematic/Cinematic.LOGGER:Lorg/slf4j/Logger;
+1514-       106: ldc_w         #972                // String [Cinematic] {} opened a menu of its own ({}): its window instead of the scene
+1515-       109: getstatic     #162                // Field station:Ldev/dyslexic/cinematic/client/ClientStation;
+1516-       112: invokevirtual #229                // Method dev/dyslexic/cinematic/client/ClientStation.kind:()Ldev/dyslexic/cinematic/station/StationKind;
+1517-       115: invokestatic  #180                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+1518-       118: getfield      #199                // Field net/minecraft/client/Minecraft.f_91074_:Lnet/minecraft/client/player/LocalPlayer;
+1519-       121: ifnonnull     130
+1520-       124: ldc_w         #974                // String -
+1521-       127: goto          145
+1522-       130: invokestatic  #180                // Method net/minecraft/client/Minecraft.m_91087_:()Lnet/minecraft/client/Minecraft;
+1523-       133: getfield      #199                // Field net/minecraft/client/Minecraft.f_91074_:Lnet/minecraft/client/player/LocalPlayer;
+1524-       136: getfield      #529                // Field net/minecraft/client/player/LocalPlayer.f_36096_:Lnet/minecraft/world/inventory/AbstractContainerMenu;
+1525-       139: invokevirtual #980                // Method java/lang/Object.getClass:()Ljava/lang/Class;

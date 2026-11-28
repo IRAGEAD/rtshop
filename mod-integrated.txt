@@ -1,0 +1,11 @@
+== packcache/integrated_api-forge-1.20.1-1.10.0.jar
+modId="integrated_api" #mandatory
+version="1.10.0" #mandatory
+displayName="Integrated API" #mandatory
+    modId="minecraft"
+    versionRange="[1.20,1.21)"
+    modId="forge"
+    versionRange="[46.0.1,)"
+== data/minecraft files
+== structure_set files of its own (first 40)
+== config classes

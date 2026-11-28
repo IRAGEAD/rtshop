@@ -1,0 +1,1020 @@
+S 5 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/arrow_dispenser.nbt
+S 13 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/controls.nbt
+S 12 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/crop_farming.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/dispensers_dont_fight.nbt
+S 8 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/dispensers_refill.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/elevator.nbt
+S 12 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/mounted_fluid_drain.nbt
+S 7 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/mounted_item_extract.nbt
+S 10 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/ploughing.nbt
+S 10 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/redstone_contacts.nbt
+S 12 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/roller_filling.nbt
+S 10 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/roller_paving_and_clearing.nbt
+S 12 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/train_observer.nbt
+S 4 create-1.20.1-6.0.8.jar data/create/structures/gametest/contraptions/vaults_protect_fuel.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/3_pipe_combine.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/3_pipe_split.nbt
+S 10 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/hose_pulley_transfer.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/in_world_pumping_in.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/in_world_pumping_out.nbt
+S 5 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/large_waterwheel.nbt
+S 11 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/open_pipes.nbt
+S 4 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/small_waterwheel.nbt
+S 11 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/smart_observer_pipes.nbt
+S 11 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/spouting.nbt
+S 13 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/steam_engine.nbt
+S 15 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/threshold_switch.nbt
+S 10 create-1.20.1-6.0.8.jar data/create/structures/gametest/fluids/waterwheel_materials.nbt
+S 8 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/andesite_tunnel_split.nbt
+S 8 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/arm_purgatory.nbt
+S 19 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/attribute_filters.nbt
+S 15 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/belt_coaster.nbt
+S 10 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/brass_tunnel_filtering.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/brass_tunnel_prefer_nearest.nbt
+S 8 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/brass_tunnel_round_robin.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/brass_tunnel_single_split.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/brass_tunnel_split.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/brass_tunnel_sync_input.nbt
+S 3 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/depot_comparator_output.nbt
+S 12 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/depot_display.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/fan_processing.nbt
+S 11 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/smart_observer_belt_and_funnel.nbt
+S 4 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/smart_observer_chutes.nbt
+S 8 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/smart_observer_counting.nbt
+S 3 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/smart_observer_filtered_storage.nbt
+S 3 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/smart_observer_storage.nbt
+S 8 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/storages.nbt
+S 2 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/threshold_switch.nbt
+S 5 create-1.20.1-6.0.8.jar data/create/structures/gametest/items/vault_comparator_output.nbt
+S 4 create-1.20.1-6.0.8.jar data/create/structures/gametest/misc/netherite_backtank.nbt
+S 3 create-1.20.1-6.0.8.jar data/create/structures/gametest/misc/schematicannon.nbt
+S 1 create-1.20.1-6.0.8.jar data/create/structures/gametest/misc/shearing.nbt
+S 2 create-1.20.1-6.0.8.jar data/create/structures/gametest/misc/smart_observer_blocks.nbt
+S 6 create-1.20.1-6.0.8.jar data/create/structures/gametest/misc/threshold_switch_pulley.nbt
+S 16 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/brass_mixing.nbt
+S 21 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/brass_mixing_2.nbt
+S 13 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/crushing_wheel_crafting.nbt
+S 9 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/iron_compacting.nbt
+S 16 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/precision_mechanism_crafting.nbt
+S 8 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/sand_washing.nbt
+S 13 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/stone_cobble_sand_crushing.nbt
+S 11 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/track_crafting.nbt
+S 16 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/water_filling_bottle.nbt
+S 7 create-1.20.1-6.0.8.jar data/create/structures/gametest/processing/wheat_milling.nbt
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/acacia_window.json "create:acacia_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/acacia_window_pane.json "create:acacia_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/adjustable_chain_gearshift.json "create:adjustable_chain_gearshift" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/analog_lever.json "create:analog_lever" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_alloy_block.json "create:andesite_alloy_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_bars.json "create:andesite_bars" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_belt_funnel.json "create:andesite_funnel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_casing.json "create:andesite_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_door.json "create:andesite_door" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_encased_cogwheel.json "create:cogwheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_encased_large_cogwheel.json "create:large_cogwheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_encased_shaft.json "create:shaft" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_funnel.json "create:andesite_funnel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_ladder.json "create:andesite_ladder" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_pillar.json "create:andesite_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_scaffolding.json "create:andesite_scaffolding" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_table_cloth.json "create:andesite_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/andesite_tunnel.json "create:andesite_tunnel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/asurine.json "create:asurine" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/asurine_pillar.json "create:asurine_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/bamboo_window.json "create:bamboo_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/bamboo_window_pane.json "create:bamboo_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/basin.json "create:basin" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/belt.json "create:belt_connector" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/birch_window.json "create:birch_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/birch_window_pane.json "create:birch_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/black_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/black_postbox.json "create:black_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/black_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/black_seat.json "create:black_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/black_table_cloth.json "create:black_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/black_toolbox.json "create:black_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/black_valve_handle.json "create:black_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blaze_burner.json "create:blaze_burner" "create:empty_blaze_burner" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blue_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blue_postbox.json "create:blue_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blue_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blue_seat.json "create:blue_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blue_table_cloth.json "create:blue_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blue_toolbox.json "create:blue_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/blue_valve_handle.json "create:blue_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/bound_cardboard_block.json "create:bound_cardboard_block" "create:cardboard_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_bars.json "create:brass_bars" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_belt_funnel.json "create:brass_funnel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_block.json "create:brass_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_casing.json "create:brass_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_door.json "create:brass_door" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_encased_cogwheel.json "create:cogwheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_encased_large_cogwheel.json "create:large_cogwheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_encased_shaft.json "create:shaft" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_funnel.json "create:brass_funnel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_ladder.json "create:brass_ladder" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_scaffolding.json "create:brass_scaffolding" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_table_cloth.json "create:brass_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brass_tunnel.json "create:brass_tunnel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brown_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brown_postbox.json "create:brown_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brown_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brown_seat.json "create:brown_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brown_table_cloth.json "create:brown_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brown_toolbox.json "create:brown_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/brown_valve_handle.json "create:brown_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/calcite_pillar.json "create:calcite_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cardboard_block.json "create:cardboard_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cart_assembler.json "create:cart_assembler" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/chain_conveyor.json "create:chain_conveyor" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cherry_window.json "create:cherry_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cherry_window_pane.json "create:cherry_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/chute.json "create:chute" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/clockwork_bearing.json "create:clockwork_bearing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/clutch.json "create:clutch" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cogwheel.json "create:cogwheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/content_observer.json "create:content_observer" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/contraption_controls.json "create:contraption_controls" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/controller_rail.json "create:controller_rail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/controls.json "create:controls" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_backtank.json "create:copper_backtank" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_bars.json "create:copper_bars" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_casing.json "create:copper_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_door.json "create:copper_door" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_ladder.json "create:copper_ladder" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_scaffolding.json "create:copper_scaffolding" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_shingle_slab.json "create:copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_shingle_stairs.json "create:copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_shingles.json "create:copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_table_cloth.json "create:copper_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_tile_slab.json "create:copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_tile_stairs.json "create:copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_tiles.json "create:copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copper_valve_handle.json "create:copper_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copycat_panel.json "create:copycat_panel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/copycat_step.json "create:copycat_step" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/creative_crate.json "create:creative_crate" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/creative_fluid_tank.json "create:creative_fluid_tank" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/creative_motor.json "create:creative_motor" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/crimsite.json "create:crimsite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/crimsite_pillar.json "create:crimsite_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/crimson_window.json "create:crimson_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/crimson_window_pane.json "create:crimson_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/crushing_wheel.json "create:crushing_wheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cuckoo_clock.json "create:cuckoo_clock" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite.json "create:cut_andesite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite_brick_slab.json "create:cut_andesite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite_brick_stairs.json "create:cut_andesite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite_brick_wall.json "create:cut_andesite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite_bricks.json "create:cut_andesite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite_slab.json "create:cut_andesite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite_stairs.json "create:cut_andesite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_andesite_wall.json "create:cut_andesite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine.json "create:cut_asurine" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine_brick_slab.json "create:cut_asurine_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine_brick_stairs.json "create:cut_asurine_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine_brick_wall.json "create:cut_asurine_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine_bricks.json "create:cut_asurine_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine_slab.json "create:cut_asurine_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine_stairs.json "create:cut_asurine_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_asurine_wall.json "create:cut_asurine_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite.json "create:cut_calcite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite_brick_slab.json "create:cut_calcite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite_brick_stairs.json "create:cut_calcite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite_brick_wall.json "create:cut_calcite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite_bricks.json "create:cut_calcite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite_slab.json "create:cut_calcite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite_stairs.json "create:cut_calcite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_calcite_wall.json "create:cut_calcite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite.json "create:cut_crimsite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite_brick_slab.json "create:cut_crimsite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite_brick_stairs.json "create:cut_crimsite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite_brick_wall.json "create:cut_crimsite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite_bricks.json "create:cut_crimsite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite_slab.json "create:cut_crimsite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite_stairs.json "create:cut_crimsite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_crimsite_wall.json "create:cut_crimsite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate.json "create:cut_deepslate" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate_brick_slab.json "create:cut_deepslate_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate_brick_stairs.json "create:cut_deepslate_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate_brick_wall.json "create:cut_deepslate_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate_bricks.json "create:cut_deepslate_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate_slab.json "create:cut_deepslate_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate_stairs.json "create:cut_deepslate_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_deepslate_wall.json "create:cut_deepslate_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite.json "create:cut_diorite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite_brick_slab.json "create:cut_diorite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite_brick_stairs.json "create:cut_diorite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite_brick_wall.json "create:cut_diorite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite_bricks.json "create:cut_diorite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite_slab.json "create:cut_diorite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite_stairs.json "create:cut_diorite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_diorite_wall.json "create:cut_diorite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone.json "create:cut_dripstone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone_brick_slab.json "create:cut_dripstone_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone_brick_stairs.json "create:cut_dripstone_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone_brick_wall.json "create:cut_dripstone_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone_bricks.json "create:cut_dripstone_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone_slab.json "create:cut_dripstone_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone_stairs.json "create:cut_dripstone_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_dripstone_wall.json "create:cut_dripstone_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite.json "create:cut_granite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite_brick_slab.json "create:cut_granite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite_brick_stairs.json "create:cut_granite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite_brick_wall.json "create:cut_granite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite_bricks.json "create:cut_granite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite_slab.json "create:cut_granite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite_stairs.json "create:cut_granite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_granite_wall.json "create:cut_granite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone.json "create:cut_limestone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone_brick_slab.json "create:cut_limestone_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone_brick_stairs.json "create:cut_limestone_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone_brick_wall.json "create:cut_limestone_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone_bricks.json "create:cut_limestone_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone_slab.json "create:cut_limestone_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone_stairs.json "create:cut_limestone_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_limestone_wall.json "create:cut_limestone_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum.json "create:cut_ochrum" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum_brick_slab.json "create:cut_ochrum_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum_brick_stairs.json "create:cut_ochrum_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum_brick_wall.json "create:cut_ochrum_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum_bricks.json "create:cut_ochrum_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum_slab.json "create:cut_ochrum_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum_stairs.json "create:cut_ochrum_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_ochrum_wall.json "create:cut_ochrum_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia.json "create:cut_scorchia" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia_brick_slab.json "create:cut_scorchia_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia_brick_stairs.json "create:cut_scorchia_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia_brick_wall.json "create:cut_scorchia_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia_bricks.json "create:cut_scorchia_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia_slab.json "create:cut_scorchia_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia_stairs.json "create:cut_scorchia_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scorchia_wall.json "create:cut_scorchia_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria.json "create:cut_scoria" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria_brick_slab.json "create:cut_scoria_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria_brick_stairs.json "create:cut_scoria_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria_brick_wall.json "create:cut_scoria_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria_bricks.json "create:cut_scoria_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria_slab.json "create:cut_scoria_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria_stairs.json "create:cut_scoria_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_scoria_wall.json "create:cut_scoria_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff.json "create:cut_tuff" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff_brick_slab.json "create:cut_tuff_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff_brick_stairs.json "create:cut_tuff_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff_brick_wall.json "create:cut_tuff_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff_bricks.json "create:cut_tuff_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff_slab.json "create:cut_tuff_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff_stairs.json "create:cut_tuff_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_tuff_wall.json "create:cut_tuff_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium.json "create:cut_veridium" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium_brick_slab.json "create:cut_veridium_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium_brick_stairs.json "create:cut_veridium_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium_brick_wall.json "create:cut_veridium_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium_bricks.json "create:cut_veridium_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium_slab.json "create:cut_veridium_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium_stairs.json "create:cut_veridium_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cut_veridium_wall.json "create:cut_veridium_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cyan_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cyan_postbox.json "create:cyan_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cyan_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cyan_seat.json "create:cyan_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cyan_table_cloth.json "create:cyan_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cyan_toolbox.json "create:cyan_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/cyan_valve_handle.json "create:cyan_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/dark_oak_window.json "create:dark_oak_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/dark_oak_window_pane.json "create:dark_oak_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/deepslate_pillar.json "create:deepslate_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/deepslate_zinc_ore.json "create:deepslate_zinc_ore" "create:raw_zinc" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/deployer.json "create:deployer" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/depot.json "create:depot" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/desk_bell.json "create:desk_bell" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/diorite_pillar.json "create:diorite_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/display_board.json "create:display_board" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/display_link.json "create:display_link" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/dripstone_pillar.json "create:dripstone_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/elevator_contact.json "create:redstone_contact" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/elevator_pulley.json "create:elevator_pulley" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/encased_chain_drive.json "create:encased_chain_drive" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/encased_fan.json "create:encased_fan" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/encased_fluid_pipe.json "create:fluid_pipe" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/experience_block.json "create:experience_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/exposed_copper_shingle_slab.json "create:exposed_copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/exposed_copper_shingle_stairs.json "create:exposed_copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/exposed_copper_shingles.json "create:exposed_copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/exposed_copper_tile_slab.json "create:exposed_copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/exposed_copper_tile_stairs.json "create:exposed_copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/exposed_copper_tiles.json "create:exposed_copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/factory_gauge.json "create:factory_gauge" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/fluid_pipe.json "create:fluid_pipe" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/fluid_tank.json "create:fluid_tank" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/fluid_valve.json "create:fluid_valve" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/flywheel.json "create:flywheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/framed_glass.json "create:framed_glass" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/framed_glass_door.json "create:framed_glass_door" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/framed_glass_pane.json "create:framed_glass_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/framed_glass_trapdoor.json "create:framed_glass_trapdoor" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gantry_carriage.json "create:gantry_carriage" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gantry_shaft.json "create:gantry_shaft" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gearbox.json "create:gearbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gearshift.json "create:gearshift" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/glass_fluid_pipe.json "create:fluid_pipe" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/granite_pillar.json "create:granite_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gray_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gray_postbox.json "create:gray_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gray_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gray_seat.json "create:gray_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gray_table_cloth.json "create:gray_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gray_toolbox.json "create:gray_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/gray_valve_handle.json "create:gray_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/green_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/green_postbox.json "create:green_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/green_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/green_seat.json "create:green_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/green_table_cloth.json "create:green_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/green_toolbox.json "create:green_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/green_valve_handle.json "create:green_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/hand_crank.json "create:hand_crank" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/haunted_bell.json "create:haunted_bell" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/horizontal_framed_glass.json "create:horizontal_framed_glass" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/horizontal_framed_glass_pane.json "create:horizontal_framed_glass_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/hose_pulley.json "create:hose_pulley" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/industrial_iron_block.json "create:industrial_iron_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/industrial_iron_window.json "create:industrial_iron_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/industrial_iron_window_pane.json "create:industrial_iron_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/item_drain.json "create:item_drain" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/item_hatch.json "create:item_hatch" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/item_vault.json "create:item_vault" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/jungle_window.json "create:jungle_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/jungle_window_pane.json "create:jungle_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/large_bogey.json "create:railway_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/large_cogwheel.json "create:large_cogwheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/large_water_wheel.json "create:large_water_wheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_andesite.json "create:layered_andesite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_asurine.json "create:layered_asurine" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_calcite.json "create:layered_calcite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_crimsite.json "create:layered_crimsite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_deepslate.json "create:layered_deepslate" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_diorite.json "create:layered_diorite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_dripstone.json "create:layered_dripstone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_granite.json "create:layered_granite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_limestone.json "create:layered_limestone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_ochrum.json "create:layered_ochrum" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_scorchia.json "create:layered_scorchia" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_scoria.json "create:layered_scoria" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_tuff.json "create:layered_tuff" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/layered_veridium.json "create:layered_veridium" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_blue_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_blue_postbox.json "create:light_blue_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_blue_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_blue_seat.json "create:light_blue_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_blue_table_cloth.json "create:light_blue_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_blue_toolbox.json "create:light_blue_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_blue_valve_handle.json "create:light_blue_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_gray_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_gray_postbox.json "create:light_gray_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_gray_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_gray_seat.json "create:light_gray_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_gray_table_cloth.json "create:light_gray_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_gray_toolbox.json "create:light_gray_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/light_gray_valve_handle.json "create:light_gray_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lime_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lime_postbox.json "create:lime_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lime_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lime_seat.json "create:lime_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lime_table_cloth.json "create:lime_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lime_toolbox.json "create:lime_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lime_valve_handle.json "create:lime_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/limestone.json "create:limestone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/limestone_pillar.json "create:limestone_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/linear_chassis.json "create:linear_chassis" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/lit_blaze_burner.json "create:empty_blaze_burner" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/magenta_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/magenta_postbox.json "create:magenta_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/magenta_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/magenta_seat.json "create:magenta_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/magenta_table_cloth.json "create:magenta_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/magenta_toolbox.json "create:magenta_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/magenta_valve_handle.json "create:magenta_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mangrove_window.json "create:mangrove_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mangrove_window_pane.json "create:mangrove_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_arm.json "create:mechanical_arm" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_bearing.json "create:mechanical_bearing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_crafter.json "create:mechanical_crafter" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_drill.json "create:mechanical_drill" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_harvester.json "create:mechanical_harvester" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_mixer.json "create:mechanical_mixer" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_piston.json "create:mechanical_piston" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_piston_head.json "create:piston_extension_pole" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_plough.json "create:mechanical_plough" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_press.json "create:mechanical_press" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_pump.json "create:mechanical_pump" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_roller.json "create:mechanical_roller" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mechanical_saw.json "create:mechanical_saw" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/metal_bracket.json "create:metal_bracket" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/metal_girder.json "create:metal_girder" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/metal_girder_encased_shaft.json "create:metal_girder" "create:shaft" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/millstone.json "create:millstone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/mysterious_cuckoo_clock.json "create:mysterious_cuckoo_clock" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/netherite_backtank.json "create:netherite_backtank" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/nozzle.json "create:nozzle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oak_window.json "create:oak_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oak_window_pane.json "create:oak_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/ochrum.json "create:ochrum" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/ochrum_pillar.json "create:ochrum_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/orange_postbox.json "create:orange_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/orange_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/orange_seat.json "create:orange_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/orange_table_cloth.json "create:orange_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/orange_toolbox.json "create:orange_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/orange_valve_handle.json "create:orange_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/ornate_iron_window.json "create:ornate_iron_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/ornate_iron_window_pane.json "create:ornate_iron_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oxidized_copper_shingle_slab.json "create:oxidized_copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oxidized_copper_shingle_stairs.json "create:oxidized_copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oxidized_copper_shingles.json "create:oxidized_copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oxidized_copper_tile_slab.json "create:oxidized_copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oxidized_copper_tile_stairs.json "create:oxidized_copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/oxidized_copper_tiles.json "create:oxidized_copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/package_frogport.json "create:package_frogport" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/packager.json "create:packager" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/peculiar_bell.json "create:peculiar_bell" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pink_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pink_postbox.json "create:pink_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pink_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pink_seat.json "create:pink_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pink_table_cloth.json "create:pink_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pink_toolbox.json "create:pink_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pink_valve_handle.json "create:pink_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/piston_extension_pole.json "create:piston_extension_pole" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/placard.json "create:placard" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_andesite.json "create:polished_cut_andesite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_andesite_slab.json "create:polished_cut_andesite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_andesite_stairs.json "create:polished_cut_andesite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_andesite_wall.json "create:polished_cut_andesite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_asurine.json "create:polished_cut_asurine" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_asurine_slab.json "create:polished_cut_asurine_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_asurine_stairs.json "create:polished_cut_asurine_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_asurine_wall.json "create:polished_cut_asurine_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_calcite.json "create:polished_cut_calcite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_calcite_slab.json "create:polished_cut_calcite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_calcite_stairs.json "create:polished_cut_calcite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_calcite_wall.json "create:polished_cut_calcite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_crimsite.json "create:polished_cut_crimsite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_crimsite_slab.json "create:polished_cut_crimsite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_crimsite_stairs.json "create:polished_cut_crimsite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_crimsite_wall.json "create:polished_cut_crimsite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_deepslate.json "create:polished_cut_deepslate" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_deepslate_slab.json "create:polished_cut_deepslate_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_deepslate_stairs.json "create:polished_cut_deepslate_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_deepslate_wall.json "create:polished_cut_deepslate_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_diorite.json "create:polished_cut_diorite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_diorite_slab.json "create:polished_cut_diorite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_diorite_stairs.json "create:polished_cut_diorite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_diorite_wall.json "create:polished_cut_diorite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_dripstone.json "create:polished_cut_dripstone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_dripstone_slab.json "create:polished_cut_dripstone_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_dripstone_stairs.json "create:polished_cut_dripstone_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_dripstone_wall.json "create:polished_cut_dripstone_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_granite.json "create:polished_cut_granite" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_granite_slab.json "create:polished_cut_granite_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_granite_stairs.json "create:polished_cut_granite_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_granite_wall.json "create:polished_cut_granite_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_limestone.json "create:polished_cut_limestone" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_limestone_slab.json "create:polished_cut_limestone_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_limestone_stairs.json "create:polished_cut_limestone_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_limestone_wall.json "create:polished_cut_limestone_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_ochrum.json "create:polished_cut_ochrum" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_ochrum_slab.json "create:polished_cut_ochrum_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_ochrum_stairs.json "create:polished_cut_ochrum_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_ochrum_wall.json "create:polished_cut_ochrum_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scorchia.json "create:polished_cut_scorchia" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scorchia_slab.json "create:polished_cut_scorchia_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scorchia_stairs.json "create:polished_cut_scorchia_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scorchia_wall.json "create:polished_cut_scorchia_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scoria.json "create:polished_cut_scoria" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scoria_slab.json "create:polished_cut_scoria_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scoria_stairs.json "create:polished_cut_scoria_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_scoria_wall.json "create:polished_cut_scoria_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_tuff.json "create:polished_cut_tuff" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_tuff_slab.json "create:polished_cut_tuff_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_tuff_stairs.json "create:polished_cut_tuff_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_tuff_wall.json "create:polished_cut_tuff_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_veridium.json "create:polished_cut_veridium" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_veridium_slab.json "create:polished_cut_veridium_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_veridium_stairs.json "create:polished_cut_veridium_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/polished_cut_veridium_wall.json "create:polished_cut_veridium_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/portable_fluid_interface.json "create:portable_fluid_interface" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/portable_storage_interface.json "create:portable_storage_interface" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/powered_latch.json "create:powered_latch" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/powered_shaft.json "create:shaft" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/powered_toggle_latch.json "create:powered_toggle_latch" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pulse_extender.json "create:pulse_extender" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pulse_repeater.json "create:pulse_repeater" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/pulse_timer.json "create:pulse_timer" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/purple_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/purple_postbox.json "create:purple_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/purple_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/purple_seat.json "create:purple_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/purple_table_cloth.json "create:purple_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/purple_toolbox.json "create:purple_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/purple_valve_handle.json "create:purple_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/radial_chassis.json "create:radial_chassis" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/railway_casing.json "create:railway_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/raw_zinc_block.json "create:raw_zinc_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/red_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/red_postbox.json "create:red_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/red_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/red_seat.json "create:red_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/red_table_cloth.json "create:red_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/red_toolbox.json "create:red_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/red_valve_handle.json "create:red_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/redstone_contact.json "create:redstone_contact" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/redstone_link.json "create:redstone_link" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/redstone_requester.json "create:redstone_requester" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/refined_radiance_casing.json "create:refined_radiance_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/repackager.json "create:repackager" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/rope_pulley.json "create:rope_pulley" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/rose_quartz_block.json "create:rose_quartz_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/rose_quartz_lamp.json "create:rose_quartz_lamp" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/rose_quartz_tiles.json "create:rose_quartz_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/rotation_speed_controller.json "create:rotation_speed_controller" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/sail_frame.json "create:sail_frame" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/schematic_table.json "create:schematic_table" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/schematicannon.json "create:schematicannon" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/scorchia.json "create:scorchia" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/scorchia_pillar.json "create:scorchia_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/scoria.json "create:scoria" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/scoria_pillar.json "create:scoria_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/secondary_linear_chassis.json "create:secondary_linear_chassis" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/sequenced_gearshift.json "create:sequenced_gearshift" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/shadow_steel_casing.json "create:shadow_steel_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/shaft.json "create:shaft" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_andesite_brick_slab.json "create:small_andesite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_andesite_brick_stairs.json "create:small_andesite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_andesite_brick_wall.json "create:small_andesite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_andesite_bricks.json "create:small_andesite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_asurine_brick_slab.json "create:small_asurine_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_asurine_brick_stairs.json "create:small_asurine_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_asurine_brick_wall.json "create:small_asurine_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_asurine_bricks.json "create:small_asurine_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_bogey.json "create:railway_casing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_calcite_brick_slab.json "create:small_calcite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_calcite_brick_stairs.json "create:small_calcite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_calcite_brick_wall.json "create:small_calcite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_calcite_bricks.json "create:small_calcite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_crimsite_brick_slab.json "create:small_crimsite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_crimsite_brick_stairs.json "create:small_crimsite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_crimsite_brick_wall.json "create:small_crimsite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_crimsite_bricks.json "create:small_crimsite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_deepslate_brick_slab.json "create:small_deepslate_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_deepslate_brick_stairs.json "create:small_deepslate_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_deepslate_brick_wall.json "create:small_deepslate_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_deepslate_bricks.json "create:small_deepslate_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_diorite_brick_slab.json "create:small_diorite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_diorite_brick_stairs.json "create:small_diorite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_diorite_brick_wall.json "create:small_diorite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_diorite_bricks.json "create:small_diorite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_dripstone_brick_slab.json "create:small_dripstone_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_dripstone_brick_stairs.json "create:small_dripstone_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_dripstone_brick_wall.json "create:small_dripstone_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_dripstone_bricks.json "create:small_dripstone_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_granite_brick_slab.json "create:small_granite_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_granite_brick_stairs.json "create:small_granite_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_granite_brick_wall.json "create:small_granite_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_granite_bricks.json "create:small_granite_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_limestone_brick_slab.json "create:small_limestone_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_limestone_brick_stairs.json "create:small_limestone_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_limestone_brick_wall.json "create:small_limestone_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_limestone_bricks.json "create:small_limestone_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_ochrum_brick_slab.json "create:small_ochrum_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_ochrum_brick_stairs.json "create:small_ochrum_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_ochrum_brick_wall.json "create:small_ochrum_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_ochrum_bricks.json "create:small_ochrum_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_rose_quartz_tiles.json "create:small_rose_quartz_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scorchia_brick_slab.json "create:small_scorchia_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scorchia_brick_stairs.json "create:small_scorchia_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scorchia_brick_wall.json "create:small_scorchia_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scorchia_bricks.json "create:small_scorchia_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scoria_brick_slab.json "create:small_scoria_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scoria_brick_stairs.json "create:small_scoria_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scoria_brick_wall.json "create:small_scoria_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_scoria_bricks.json "create:small_scoria_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_tuff_brick_slab.json "create:small_tuff_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_tuff_brick_stairs.json "create:small_tuff_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_tuff_brick_wall.json "create:small_tuff_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_tuff_bricks.json "create:small_tuff_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_veridium_brick_slab.json "create:small_veridium_brick_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_veridium_brick_stairs.json "create:small_veridium_brick_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_veridium_brick_wall.json "create:small_veridium_brick_wall" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/small_veridium_bricks.json "create:small_veridium_bricks" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/smart_chute.json "create:smart_chute" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/smart_fluid_pipe.json "create:smart_fluid_pipe" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/speedometer.json "create:speedometer" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/spout.json "create:spout" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/spruce_window.json "create:spruce_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/spruce_window_pane.json "create:spruce_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/steam_engine.json "create:steam_engine" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/steam_whistle.json "create:steam_whistle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/sticker.json "create:sticker" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/sticky_mechanical_piston.json "create:sticky_mechanical_piston" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/stock_link.json "create:stock_link" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/stock_ticker.json "create:stock_ticker" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/stockpile_switch.json "create:stockpile_switch" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/stressometer.json "create:stressometer" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/tiled_glass.json "create:tiled_glass" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/tiled_glass_pane.json "create:tiled_glass_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/track.json "create:track" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/track_observer.json "create:track_observer" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/track_signal.json "create:track_signal" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/track_station.json "create:track_station" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/train_door.json "create:train_door" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/train_trapdoor.json "create:train_trapdoor" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/tuff_pillar.json "create:tuff_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/turntable.json "create:turntable" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/veridium.json "create:veridium" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/veridium_pillar.json "create:veridium_pillar" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/vertical_framed_glass.json "create:vertical_framed_glass" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/vertical_framed_glass_pane.json "create:vertical_framed_glass_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/warped_window.json "create:warped_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/warped_window_pane.json "create:warped_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/water_wheel.json "create:water_wheel" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_copper_shingle_slab.json "create:waxed_copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_copper_shingle_stairs.json "create:waxed_copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_copper_shingles.json "create:waxed_copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_copper_tile_slab.json "create:waxed_copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_copper_tile_stairs.json "create:waxed_copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_copper_tiles.json "create:waxed_copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_exposed_copper_shingle_slab.json "create:waxed_exposed_copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_exposed_copper_shingle_stairs.json "create:waxed_exposed_copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_exposed_copper_shingles.json "create:waxed_exposed_copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_exposed_copper_tile_slab.json "create:waxed_exposed_copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_exposed_copper_tile_stairs.json "create:waxed_exposed_copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_exposed_copper_tiles.json "create:waxed_exposed_copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_oxidized_copper_shingle_slab.json "create:waxed_oxidized_copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_oxidized_copper_shingle_stairs.json "create:waxed_oxidized_copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_oxidized_copper_shingles.json "create:waxed_oxidized_copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_oxidized_copper_tile_slab.json "create:waxed_oxidized_copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_oxidized_copper_tile_stairs.json "create:waxed_oxidized_copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_oxidized_copper_tiles.json "create:waxed_oxidized_copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_weathered_copper_shingle_slab.json "create:waxed_weathered_copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_weathered_copper_shingle_stairs.json "create:waxed_weathered_copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_weathered_copper_shingles.json "create:waxed_weathered_copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_weathered_copper_tile_slab.json "create:waxed_weathered_copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_weathered_copper_tile_stairs.json "create:waxed_weathered_copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/waxed_weathered_copper_tiles.json "create:waxed_weathered_copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_copper_shingle_slab.json "create:weathered_copper_shingle_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_copper_shingle_stairs.json "create:weathered_copper_shingle_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_copper_shingles.json "create:weathered_copper_shingles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_copper_tile_slab.json "create:weathered_copper_tile_slab" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_copper_tile_stairs.json "create:weathered_copper_tile_stairs" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_copper_tiles.json "create:weathered_copper_tiles" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_iron_block.json "create:weathered_iron_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_iron_window.json "create:weathered_iron_window" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weathered_iron_window_pane.json "create:weathered_iron_window_pane" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/weighted_ejector.json "create:weighted_ejector" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/white_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/white_postbox.json "create:white_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/white_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/white_seat.json "create:white_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/white_table_cloth.json "create:white_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/white_toolbox.json "create:white_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/white_valve_handle.json "create:white_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/windmill_bearing.json "create:windmill_bearing" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/wooden_bracket.json "create:wooden_bracket" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/yellow_nixie_tube.json "create:nixie_tube" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/yellow_postbox.json "create:yellow_postbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/yellow_sail.json "create:white_sail" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/yellow_seat.json "create:yellow_seat" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/yellow_table_cloth.json "create:yellow_table_cloth" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/yellow_toolbox.json "create:yellow_toolbox" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/yellow_valve_handle.json "create:yellow_valve_handle" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/zinc_block.json "create:zinc_block" 
+L create-1.20.1-6.0.8.jar data/create/loot_tables/blocks/zinc_ore.json "create:raw_zinc" "create:zinc_ore" 
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/abandonedhouse/abandonedhouse.nbt
+S 16 idas_forge-1.13.0+1.20.1.jar data/idas/structures/abandonedhouse/abandonedhouse2.nbt
+S 10 idas_forge-1.13.0+1.20.1.jar data/idas/structures/abandoned_lighthouse/abandoned_lighthouse.nbt
+S 27 idas_forge-1.13.0+1.20.1.jar data/idas/structures/abandoned_vineyard/abandoned_vineyard.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/abandoned_vineyard/abandoned_vineyard_bottom.nbt
+S 23 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_entrance.nbt
+S 22 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall1.nbt
+S 33 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall2.nbt
+S 34 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall3.nbt
+S 22 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall4.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall5.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall6.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall7.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall8.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_hall9.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room1.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room2.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room3.nbt
+S 14 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room4.nbt
+S 11 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room5.nbt
+S 18 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room6.nbt
+S 14 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room7.nbt
+S 3 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room8.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_mines/ancient_mines_room9.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_portal/ancient_portal1.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_portal/ancient_portal2.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_statue/ancient_statue_desert.nbt
+S 11 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ancient_statue/ancient_statue_jungle.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/animal_den/wolf_den.nbt
+S 21 idas_forge-1.13.0+1.20.1.jar data/idas/structures/apothecary_abode/apothecary_abode1.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/apothecary_abode/apothecary_abode2.nbt
+S 10 idas_forge-1.13.0+1.20.1.jar data/idas/structures/archmages_tower/archmages_tower1.nbt
+S 3 idas_forge-1.13.0+1.20.1.jar data/idas/structures/archmages_tower/archmages_tower2.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar1.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar2.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar3.nbt
+S 3 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar4.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar5.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar7.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar8.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bazaar/bazaar9.nbt
+S 9 idas_forge-1.13.0+1.20.1.jar data/idas/structures/bearclaw_inn/bearclaw_inn_lodge.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/beekeepers_house/beekeepers_house.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/beekeepers_house/beekeepers_house2.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/botanist/botanist.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/brickhouse/brickhouse.nbt
+S 16 idas_forge-1.13.0+1.20.1.jar data/idas/structures/brickhouse/brickhouse_windmill.nbt
+S 20 idas_forge-1.13.0+1.20.1.jar data/idas/structures/castle/castle1.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/castle/castle1_bottom.nbt
+S 35 idas_forge-1.13.0+1.20.1.jar data/idas/structures/castle/castle2.nbt
+S 48 idas_forge-1.13.0+1.20.1.jar data/idas/structures/castle/castle3.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/castle/castle3_bottom.nbt
+S 139 idas_forge-1.13.0+1.20.1.jar data/idas/structures/collectors_museum/collectors_museum1.nbt
+S 61 idas_forge-1.13.0+1.20.1.jar data/idas/structures/collectors_museum/collectors_museum2.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/cottage/cottage2.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_camp/desert_camp.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_camp/desert_camp_black.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_camp/desert_camp_bygwindswept.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_camp/desert_camp_orange.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_camp/desert_camp_red.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_market/desert_market.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_market/desert_market_orange.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_market/desert_market_red.nbt
+S 10 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_cave1.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_cave2.nbt
+S 3 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_entrance1.nbt
+S 3 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_entrance1_bottom.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_entrance2.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_entrance2_bottom.nbt
+S 14 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_entrance3.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_intersection4.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_main.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_room2.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_room3.nbt
+S 3 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_room4.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_room5.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_pyramid/desert_pyramid_room7.nbt
+S 10 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_ruins/desert_ruins.nbt
+S 12 idas_forge-1.13.0+1.20.1.jar data/idas/structures/desert_ruins/desert_ruins_bottom.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/dig_site/dig_site.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/dig_site/dig_site_bottom.nbt
+S 44 idas_forge-1.13.0+1.20.1.jar data/idas/structures/dig_site/dig_site_desert.nbt
+S 11 idas_forge-1.13.0+1.20.1.jar data/idas/structures/dig_site/dig_site_desert_bottom.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/dig_site/dig_site_stables.nbt
+S 22 idas_forge-1.13.0+1.20.1.jar data/idas/structures/dread_citadel/dread_citadel.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/farmhouse/abandoned_farmhouse.nbt
+S 10 idas_forge-1.13.0+1.20.1.jar data/idas/structures/farmhouse/farmhouse.nbt
+S 21 idas_forge-1.13.0+1.20.1.jar data/idas/structures/fishermans_lodge/fishermans_lodge.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/frozen_crypt/frozen_crypt2.nbt
+S 38 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/haunted_manor1.nbt
+S 9 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/haunted_manor2.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/haunted_manor3.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/haunted_manor4.nbt
+S 38 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/if_haunted_manor1.nbt
+S 9 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/if_haunted_manor2.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/if_haunted_manor3.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/haunted_manor/if_haunted_manor4.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/hermits_hollow/hermits_hollow.nbt
+S 16 idas_forge-1.13.0+1.20.1.jar data/idas/structures/hunters_cabin/hunters_cabin.nbt
+S 31 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/bopfloor1.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/bopfloor2.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/boplabyrinth_entrance2.nbt
+S 43 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/floor1.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/floor2.nbt
+S 43 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/if_floor1.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/if_floor2.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/if_labyrinth_entrance.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/if_labyrinth_entrance2.nbt
+S 25 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/if_tomb.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/labyrinth_entrance.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/labyrinth_entrance2.nbt
+S 25 idas_forge-1.13.0+1.20.1.jar data/idas/structures/labyrinth/tomb.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_acacia.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_birch.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_bopmahogany.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_bopredwood.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_bygmahogany.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_bygredwood.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_dark_oak.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_jungle.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_oak.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/lumber_camp/lumber_camp_spruce.nbt
+S 37 idas_forge-1.13.0+1.20.1.jar data/idas/structures/mason_house/mason_house.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/necromancers_spire/necromancers_spire1.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/necromancers_spire/necromancers_spire2.nbt
+S 9 idas_forge-1.13.0+1.20.1.jar data/idas/structures/necromancers_spire/necromancers_spire3.nbt
+S 12 idas_forge-1.13.0+1.20.1.jar data/idas/structures/nether_pump_camp/nether_pump_camp.nbt
+S 17 idas_forge-1.13.0+1.20.1.jar data/idas/structures/nexus/nexus.nbt
+S 16 idas_forge-1.13.0+1.20.1.jar data/idas/structures/nexus/nexus_blue.nbt
+S 16 idas_forge-1.13.0+1.20.1.jar data/idas/structures/nexus/nexus_prismarine.nbt
+S 18 idas_forge-1.13.0+1.20.1.jar data/idas/structures/nexus/nexus_red.nbt
+S 18 idas_forge-1.13.0+1.20.1.jar data/idas/structures/nexus/nexus_sculk.nbt
+S 16 idas_forge-1.13.0+1.20.1.jar data/idas/structures/nexus/nexus_white.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_camp/pillager_camp1.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_camp/pillager_camp2.nbt
+S 28 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_fortress/pillager_fortress1.nbt
+S 14 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_fortress/pillager_fortress2.nbt
+S 31 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_fortress/pillager_fortress3.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_fortress/pillager_fortress4.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_fortress/pillager_fortress6.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/pillager_fortress/pillager_fortress7.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/redhorn_guild/redhorn_guild.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ruined_church/ruined_church.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ruined_fort/ruined_fort.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ruined_well/ruined_well.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ruined_well/ruined_well_bottom.nbt
+S 41 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ruins_of_the_deep/ruins_of_the_deep1.nbt
+S 9 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ruins_of_the_deep/ruins_of_the_deep2.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/ruins_of_the_deep/ruins_of_the_deep_entrance.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/snifferhenge/snifferhenge1.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/sunken_ship/sunken_ship.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/sunken_ship/sunken_ship2.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/sunken_ship/sunken_ship_coral.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/the_log/the_log.nbt
+S 135 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_citadel/tinkers_citadel1.nbt
+S 2 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_citadel/tinkers_citadel2.nbt
+S 45 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_citadel/tinkers_citadel3.nbt
+S 40 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_citadel/tinkers_citadel4.nbt
+S 14 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop1.nbt
+S 17 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop2.nbt
+S 25 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop3.nbt
+S 18 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop4.nbt
+S 21 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop5.nbt
+S 27 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop6.nbt
+S 16 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop7.nbt
+S 28 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tinkers_workshop/tinkers_workshop_entrance.nbt
+S 41 idas_forge-1.13.0+1.20.1.jar data/idas/structures/train_ruins/train_ruins.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/treetop_tavern/treetop_tavern1.nbt
+S 11 idas_forge-1.13.0+1.20.1.jar data/idas/structures/treetop_tavern/treetop_tavern2.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/treetop_tavern/treetop_tavern3.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/treetop_tavern/treetop_tavern4.nbt
+S 1 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tree_of_wisdom/tree_of_wisdom2.nbt
+S 22 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tudor_pub/tudor_pub.nbt
+S 12 idas_forge-1.13.0+1.20.1.jar data/idas/structures/tudor_pub/tudor_pub_bottom.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/underground_camp/underground_camp1.nbt
+S 6 idas_forge-1.13.0+1.20.1.jar data/idas/structures/underground_camp/underground_camp2.nbt
+S 8 idas_forge-1.13.0+1.20.1.jar data/idas/structures/underground_camp/underground_camp_deep1.nbt
+S 7 idas_forge-1.13.0+1.20.1.jar data/idas/structures/underground_camp/underground_camp_deep2.nbt
+S 20 idas_forge-1.13.0+1.20.1.jar data/idas/structures/wacky_wares/wacky_wares_general_store.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/washing_camp/washing_camp.nbt
+S 11 idas_forge-1.13.0+1.20.1.jar data/idas/structures/windswept_shrine/windswept_shrine1.nbt
+S 17 idas_forge-1.13.0+1.20.1.jar data/idas/structures/windswept_shrine/windswept_shrine1_bottom.nbt
+S 5 idas_forge-1.13.0+1.20.1.jar data/idas/structures/windswept_shrine/windswept_shrine2.nbt
+S 14 idas_forge-1.13.0+1.20.1.jar data/idas/structures/windswept_shrine/windswept_shrine3.nbt
+S 3 idas_forge-1.13.0+1.20.1.jar data/idas/structures/windswept_shrine/windswept_shrine3_bottom.nbt
+S 13 idas_forge-1.13.0+1.20.1.jar data/idas/structures/winter_wagon/winter_wagon.nbt
+S 4 idas_forge-1.13.0+1.20.1.jar data/idas/structures/witches_treestump/witches_treestump.nbt
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_gravel_desert_pyramid.json "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_gravel_dig_site.json "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_gravel_mining.json "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_gravel_snifferhenge.json "create:crushed_raw_copper" "create:crushed_raw_iron" "create:crushed_raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_gravel_surface.json "create:cinder_flour" "create:clipboard" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_gravel_train_ruins.json "create:brass_nugget" "create:cinder_flour" "create:clipboard" "create:golden_sheet" "create:iron_sheet" "create:metal_bracket" "create:rose_quartz" "create:steam_whistle" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_sand_desert_pyramid.json "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_sand_dig_site.json "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/archeology/suspicious_sand_labyrinth.json "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/abandonedhouse/abandonedhouse.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/abandonedhouse/abandonedhouse_create.json "create:andesite_alloy" "create:cogwheel" "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_iron" "create:crushed_raw_zinc" "create:experience_nugget" "create:gearbox" "create:goggles" "create:large_cogwheel" "create:minecart_coupling" "create:rose_quartz" "create:sand_paper" "create:shaft" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/abandonedhouse/abandonedhouse_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_mines/minesbasic.json "create:builders_tea" "create:controller_rail" "create:experience_nugget" "create:honeyed_apple" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_mines/minescreate.json "create:andesite_alloy" "create:cogwheel" "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_iron" "create:crushed_raw_zinc" "create:experience_nugget" "create:gearbox" "create:goggles" "create:large_cogwheel" "create:minecart_coupling" "create:rose_quartz" "create:sand_paper" "create:shaft" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_mines/mineshall.json "create:builders_tea" "create:controller_rail" "create:experience_nugget" "create:honeyed_apple" "create:raw_zinc" "create:raw_zinc_block" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_portal/ancient_portal_nether.json "create:powdered_obsidian" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_portal/ancient_portal_overworld.json "create:powdered_obsidian" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_statue/ancient_statue_jungle.json "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_statue/ancient_statue_treasure_jungle.json "create:experience_nugget" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ancient_statue/ancient_statue_treasure_plains.json "create:experience_nugget" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/apothecary_abode/apothecary_abode.json "create:crushed_raw_copper" "create:experience_nugget" "create:fluid_pipe" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/apothecary_abode/apothecary_abode_books.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/archmages_tower/archmages_tower.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/archmages_tower/archmages_tower_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/archmages_tower/archmages_tower_treasure.json "create:powdered_obsidian" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/bazaar/bazaar.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/bazaar/bazaar_food.json "create:builders_tea" "create:dough" "create:honey_bucket" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/bearclaw_inn/bearclaw_inn_bedroom.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/bearclaw_inn/bearclaw_inn_food.json "create:builders_tea" "create:dough" "create:honey_bucket" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/beekeepers_house/beekeepers_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/beekeepers_house/beekeepers_food.json "create:builders_tea" "create:dough" "create:honey_bucket" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/botanist/botanist.json "create:experience_nugget" "create:tree_fertilizer" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/botanist/botanist_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/botanist/botanist_food.json "create:builders_tea" "create:dough" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/brickhouse/brickhouse.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/brickhouse/brickhouse_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/brickhouse/brickhouse_windmill.json "create:dough" "create:experience_nugget" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/castle/castle.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/castle/castle_bedroom.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/castle/castle_food.json "create:builders_tea" "create:dough" "create:honey_bucket" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/castle/castle_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/castle/castle_throne.json "create:experience_nugget" "create:honeyed_apple" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_basic.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_farm.json "create:experience_nugget" "create:tree_fertilizer" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_food.json "create:builders_tea" "create:dough" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_jail.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_space.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/collectors_museum/museum_treasure.json "create:experience_nugget" "create:honeyed_apple" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/desert_pyramid/desert_pyramid_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/desert_pyramid/desert_pyramid_surface.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/desert_pyramid/desert_pyramid_tomb.json "create:experience_nugget" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/desert_pyramid/desert_pyramid_treasure.json "create:experience_nugget" "create:honeyed_apple" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/dig_site/dig_site.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/dig_site/dig_site_desert.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/dig_site/dig_site_tools.json "create:andesite_ladder" "create:brown_toolbox" "create:copper_ladder" "create:goggles" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/dig_site/dig_site_treasure.json "create:experience_nugget" "create:honeyed_apple" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/dread_citadel/dread_citadel.json "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/dread_citadel/dread_citadel_throne.json "create:zinc_block" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/enchantingtower/enchantingtower_basic.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/enchantingtower/enchantingtower_basic_ars.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/enchantingtower/enchantingtower_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/enchantingtower/enchantingtower_top.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/enchantingtower/enchantingtower_top_ars.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/farmhouse/farmhouse.json "create:experience_nugget" "create:tree_fertilizer" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/farmhouse/farmhouse_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/farmhouse/farmhouse_food.json "create:builders_tea" "create:dough" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/farmhouse/farmhouse_mill.json "create:dough" "create:experience_nugget" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/fishermans_lodge/fishermans_lodge.json "create:experience_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/frozen_crypt/frozen_crypt.json "create:experience_nugget" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/haunted_manor/haunted_manor_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/haunted_manor/haunted_manor_treasure.json "create:experience_nugget" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/hermits_hollow/hollow_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/hermits_hollow/hollow_food.json "create:builders_tea" "create:dough" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/hunters_cabin/hunters_cabin.json "create:experience_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/hunters_cabin/hunters_cabin_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/labyrinth/if_labyrinth_tomb.json "create:experience_nugget" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/labyrinth/labyrinth_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/labyrinth/labyrinth_tomb.json "create:experience_nugget" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/labyrinth/labyrinth_treasure.json "create:experience_nugget" "create:honeyed_apple" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/mason_house/mason_house.json "create:andesite_alloy" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/mason_house/mason_house_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/mason_house/mason_house_food.json "create:builders_tea" "create:dough" "create:honeyed_apple" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/necromancers_spire/necromancers_spire.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/nexus/nexus.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/pillager_camp/pillager_camp.json "create:experience_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/pillager_fortress/pillager_basic.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/pillager_fortress/pillager_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/pillager_fortress/pillager_jail.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/pillager_fortress/pillager_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/redhorn_guild/redhorn_guild.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/redhorn_guild/redhorn_guild_bedroom.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruined_church/ruined_church.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruined_fort/ruined_fort.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruins_of_the_deep/ruins_basic.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruins_of_the_deep/ruins_bedroom.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruins_of_the_deep/ruins_create.json "create:andesite_alloy" "create:andesite_ladder" "create:cogwheel" "create:copper_ladder" "create:copper_nugget" "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_iron" "create:crushed_raw_zinc" "create:experience_nugget" "create:fluid_pipe" "create:gearbox" "create:large_cogwheel" "create:rose_quartz" "create:sand_paper" "create:shaft" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruins_of_the_deep/ruins_food.json "create:builders_tea" "create:dough" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruins_of_the_deep/ruins_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruins_of_the_deep/ruins_ocean.json "create:experience_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/ruins_of_the_deep/ruins_treasure.json "create:experience_nugget" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/sirens_cove/sirens_cove.json "create:experience_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/sunken_ship/sunken_ship_supply.json "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/sunken_ship/sunken_ship_treasure.json "create:copper_nugget" "create:experience_nugget" "create:zinc_ingot" "create:zinc_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/the_log/the_log.json "create:experience_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_citadel/tinkers_citadel.json "create:brass_nugget" "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_citadel/tinkers_citadel_bedroom.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_citadel/tinkers_citadel_create.json "create:andesite_alloy" "create:andesite_ladder" "create:cogwheel" "create:copper_ladder" "create:copper_nugget" "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_iron" "create:crushed_raw_zinc" "create:experience_nugget" "create:fluid_pipe" "create:gearbox" "create:large_cogwheel" "create:rose_quartz" "create:sand_paper" "create:shaft" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_citadel/tinkers_citadel_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_citadel/tinkers_citadel_tools.json "create:andesite_ladder" "create:brown_toolbox" "create:copper_ladder" "create:goggles" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_citadel/tinkers_citadel_vault.json "create:brass_hand" "create:brass_ingot" "create:brass_ladder" "create:brass_nugget" "create:cogwheel" "create:experience_nugget" "create:gearbox" "create:large_cogwheel" "create:linked_controller" "create:rose_quartz" "create:shaft" "create:sturdy_sheet" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_workshop/tinkers_workshop.json "create:andesite_alloy" "create:andesite_ladder" "create:cogwheel" "create:copper_ladder" "create:copper_nugget" "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_iron" "create:crushed_raw_zinc" "create:experience_nugget" "create:fluid_pipe" "create:gearbox" "create:large_cogwheel" "create:rose_quartz" "create:sand_paper" "create:shaft" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_workshop/tinkers_workshop_basic.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_workshop/tinkers_workshop_bedroom.json "create:crafting_blueprint" "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_workshop/tinkers_workshop_tools.json "create:andesite_ladder" "create:brown_toolbox" "create:copper_ladder" "create:goggles" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tinkers_workshop/tinkers_workshop_vault.json "create:brass_hand" "create:brass_ingot" "create:brass_ladder" "create:brass_nugget" "create:cogwheel" "create:experience_nugget" "create:gearbox" "create:large_cogwheel" "create:linked_controller" "create:rose_quartz" "create:shaft" "create:sturdy_sheet" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/train_ruins/train_ruins.json "create:black_toolbox" "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" "create:steam_whistle" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/train_ruins/train_ruins_bedroom.json "create:crafting_blueprint" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/train_ruins/train_ruins_create.json "create:andesite_alloy" "create:cogwheel" "create:crushed_raw_copper" "create:crushed_raw_gold" "create:crushed_raw_iron" "create:crushed_raw_zinc" "create:experience_nugget" "create:gearbox" "create:goggles" "create:large_cogwheel" "create:minecart_coupling" "create:rose_quartz" "create:sand_paper" "create:shaft" "create:track" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/treetop_tavern/treetop_tavern.json "create:experience_nugget" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/treetop_tavern/treetop_tavern_bedroom.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/treetop_tavern/treetop_tavern_food.json "create:builders_tea" "create:dough" "create:wheat_flour" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tudor_pub/tudor_pub_bedroom.json "create:builders_tea" "create:clipboard" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tudor_pub/tudor_pub_kitchen.json "create:builders_tea" "create:dough" "create:pulp" "create:whisk" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tudor_pub/tudor_pub_storage.json "create:cardboard" "create:pulp" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/tudor_pub/tudor_pub_treasure.json "create:andesite_alloy" "create:cardboard" "create:clipboard" "create:experience_nugget" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wacky_wares/wacky_wares_create_machines.json "create:andesite_alloy" "create:andesite_casing" "create:clipboard" "create:cogwheel" "create:hand_crank" "create:large_cogwheel" "create:mechanical_saw" "create:millstone" "create:shaft" "create:whisk" "create:wrench" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wacky_wares/wacky_wares_furniture.json "create:red_seat" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wacky_wares/wacky_wares_kitchen.json "create:builders_tea" "create:whisk" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wacky_wares/wacky_wares_mining.json "create:raw_zinc" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wacky_wares/wacky_wares_misc.json "create:cardboard" "create:clipboard" "create:pulp" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wacky_wares/wacky_wares_storage.json "create:cardboard" "create:clipboard" "create:pulp" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/windswept_shrine/windswept_shrine.json "create:experience_nugget" "create:zinc_ingot" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/winter_wagon/winter_wagon.json "create:experience_nugget" "create:honeyed_apple" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/witches_treestump/witches_treestump.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wizardtower/wizardtower_basic.json "create:builders_tea" "create:experience_nugget" "create:raw_zinc" "create:rose_quartz" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wizardtower/wizardtower_library.json "create:crafting_blueprint" 
+L idas_forge-1.13.0+1.20.1.jar data/idas/loot_tables/chests/wizardtower/wizardtower_top.json "create:experience_nugget" "create:powdered_obsidian" "create:raw_zinc" "create:rose_quartz" 
+L spelunkery-1.20.1-0.3.16-forge.jar data/spelunkery/loot_tables/gameplay/grindstone_polishing/rose_quartz.json "create:polished_rose_quartz" 
