@@ -422,6 +422,29 @@ jobs:
             echo "== registry strings near EntityType"
             (cd /tmp/spm && for c in $(grep -rl -a "EntityType\$Builder" --include=*.class . | head -n 10); do echo "-- $c"; strings -n 3 "$c" | grep -E "^[a-z0-9_]{3,40}$" | head -n 80; done)
           } > /tmp/inspect/spmovesets-merchant.txt 2>&1 || true
+      - name: Inspect spmovesets cartographer trades (3.82)
+        run: |
+          # 3.82 (사용자 11-28 17:39): 지도 제작자의 원소 지도 거래가 어디서 어떻게 붙는지 (VillagerTrades 표에는 없었음)
+          mkdir -p /tmp/inspect /tmp/spm2
+          J="$PWD/$(ls packcache/*.jar | grep -i "spmovesets" | head -1)"
+          (cd /tmp/spm2 && unzip -q -o "$J" 2>/dev/null || true)
+          {
+            echo "== classes naming trade events or villager hooks"
+            (cd /tmp/spm2 && grep -rl -a -E 'VillagerTradesEvent|WandererTradesEvent|EntityInteract|EntityJoinLevelEvent|VillagerProfession|MerchantOffers|ArenaMapTrade|TradeManager' --include=*.class . | sort | head -n 80)
+            echo "== who names ArenaMapTrade / TradeManager"
+            (cd /tmp/spm2 && grep -rl -a -E 'ArenaMapTrade|trades/TradeManager' --include=*.class . | sort)
+            echo "== mixin configs"
+            (cd /tmp/spm2 && for m in $(ls *.json 2>/dev/null); do echo "-- $m"; head -c 3000 "$m"; echo; done)
+            (cd /tmp/spm2 && grep -rl -a -E 'org/spongepowered/asm/mixin/Mixin' --include=*.class . | sort | head -n 80)
+            echo "== lang: maps and keys"
+            for L in en_us es_es; do echo "-- $L"; unzip -p "$J" "assets/spmovesets/lang/$L.json" 2>/dev/null | grep -i -E 'mapa|"item[^"]*map|llave|"item[^"]*key|cart' | head -n 80; done
+            echo "== item models named map / key"
+            unzip -l "$J" | awk '{print $4}' | grep -i -E "models/item/.*(map|mapa|key|llave)" | head -n 60
+            echo "== bytecode of the trade classes"
+            (cd /tmp/spm2 && for c in spmovesets/spmovesets/survival/world/arena/ArenaMapTrade*.class spmovesets/spmovesets/trades/TradeManager*.class; do echo "######## $c"; javap -c -p "$c" 2>&1 | head -n 1800; done)
+            echo "== signatures of the map search and the gacha keys"
+            (cd /tmp/spm2 && for c in spmovesets/spmovesets/survival/ElementMapSearch.class $(ls spmovesets/spmovesets/Gacha/*.class 2>/dev/null | head -n 8); do echo "######## $c"; javap -p "$c" 2>&1 | head -n 70; done)
+          } > /tmp/inspect/spmovesets-trades.txt 2>&1 || true
       - name: Inspect
         env:
           SPIRAL_CALLS: '/(FloorController|FloorProgress|AbyssPlayers|AbyssEncounters|ArenaSession|AbyssCycle|AbyssParties|BossProgress|FloorSelectionScreen|AbyssPlayerLifecycle|ChallengeRewards|ChestPayout|AbyssNetwork|AbyssDimension|ForgeGameplayEvents|AbyssPlatformImpl|PersistentEntityData|AbyssBlockProtection|CommandInit)(\$[^/]*)?\.class$'
