@@ -2305,7 +2305,7 @@ final class ClientSelfTest2 {
                 fx /= len;
                 fz /= len;
                 net.minecraft.world.phys.Vec3 front = sp.position().add(fx * 3.2, 0, fz * 3.2);
-                String[] who = {"order_archivist", "bram", "order_elder"};
+                String[] who = {"order_archivist", "felix", "order_elder"};   // 3.83: 브람은 상점 NPC(장비 상인 브람)가 그 사람이라 따로 세우지 않는다
                 for (int i361 = 0; i361 < who.length; i361++) {
                     double side = (i361 - 1) * 1.6;
                     var v361 = com.rtshop.quest.QuestManager.spawnNpc(sp.serverLevel(), front.add(-fz * side, 0, fx * side), sp.getYRot() + 180, who[i361]);
