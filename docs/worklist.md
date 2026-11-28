@@ -698,6 +698,16 @@ B - 강화 성공의 확률을 미미한 수준으로 상향하고 고단계 강
   고칠 것: 스폰과 상관없이 이미 만들어진(디스크에 있는 full) 청크에서만 표지 블록을 확인해 자동 등록 (청크를 새로 만들지 않음), 못 찾으면 -2(다시 확인) ·
   install 명령도 같은 확인 · 마을 기준 자리가 없으면 귀환권 · 죽음은 부두로.
 - J-2. spmovesets 의 상인이 스폰되지 않게 (모드 jar 를 inspect 로 확인한 뒤 막음).
+- 한 일 (3.81.0, 가지 v5-next34):
+  J-1 ✔ CastlePlots: chunkExists (불러온 청크, 아니면 지역 파일이 있을 때만 chunkMap.read 로 저장된 기록을 읽어 LEVELCHUNK 인지 — 새로 만들지도, 빈 지역 파일을 만들지도 않음) ·
+  signatureSaved {맞음, 본 수} · worldMatches 는 스폰 자리와 상관없이 60% · autoInstall 은 castleInstalled 0 또는 RECHECK(-2) 일 때 보고, 못 찾으면 -2 (-1 = 운영자가 걷어 냄은 그대로) ·
+  install 명령 · status 도 같은 판정. TownSpawn.townPoint: 기준 자리가 없으면 아모노스 부두(dock), send · inNormalRange · 귀환권 · 리스폰이 그것을 씀, /rtshop spawn 이 부두를 알림 (rtshop.spawn.where_dock).
+  시험: 표지 3/5 맞음(청크 없는 표지는 건너뜀) · 2/5 는 아님 · 0 → 자동 등록 + 성 영역 보호 · -2 는 다시 봄 · -1 은 그대로 · 먼 청크와 지역 파일을 만들지 않음 · 기준 자리 없으면 부두 / 아모노스가 아니면 자리 없음.
+  J-2 ✔ inspect(ci-inspect/spmovesets-merchant.txt): 상인 = spmovesets:vendedor_nocturno 「Candil, the Night Peddler」(PathfinderMob + Merchant) + 수레 spmovesets:carro_vendedor.
+  VendedorAparicion.reloj 가 밤마다 probabilidad% 로 뽑고(gamerule 하나 · 벌 받은 밤 수 확인), montar 가 수레 → 상인 순으로 addFreshEntity — 하나라도 실패하면 null 이라 알림(anunciar)도 없음.
+  → MobRules 의 neverSpawn (mob_rules.json, 기본 두 ID, 옛 파일에 더해 씀) + EntityJoinLevelEvent HIGHEST 에서 취소 (저장돼 있던 것도 불러올 때 지움).
+  시험: 떠돌이 상인을 목록에 넣어 막히는지 · 소는 들어감 · 모드팩에서는 두 종류가 있고 세계에 못 들어감.
+  덤: 그 모드의 지도 제작자(주민)가 원소 지도 · 뽑기 열쇠를 판다는 설명이 있음 — 사용자에게 물어볼 것.
 
 ## 사용자 답 (11-28 13:35) → 3.80.0 (3.79.0 을 올린 다음)
 
