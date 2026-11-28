@@ -122,3 +122,21 @@
 
 - 돌리기: `gh workflow run build.yml --ref <v5-next 가지>` → `ci-fullpack-screenshots` 가지의 `log-summary.txt`.
 - 3.55.0 부터 요약에 "모드 이름으로 뭉친 오류 목록"(같은 모드의 같은 오류 수백 줄이 한 줄)과 "오류 바로 다음 줄(예외 이름)"이 함께 나옵니다. 주민 거래 Mixin 은 jar 안에 겹쳐 든 jar 까지 찾습니다 (`.github/scripts/mixin_scan.py`).
+
+## 팩 15 검토 (11-28, K-1 · K-2)
+
+사용자가 보낸 RT1 - 2-15 (14 와 내용이 같음). 매니페스트 160 · overrides/mods: Arcane Vortex · Dragon Bar · RT Shop 3.80.0 (compat zip 두 개는 데이터팩 — 사용자가 mods 에 잘못 넣음, 빼고 봄).
+
+| 11 → 15 | 무엇 |
+|---|---|
+| 더함 | Nightfall Enhance 1.1.6 (EFN 무기 연출 · 화면 효과, efn ≥3.0.6 · Fancy Trail ≥1.2.4 필요), P1nero's Epic Cataclysm 20.14.0.9 (카타클리즘 무기 14종에 EF 능력치 · 기술), Small Ships 2.0.2, VIX 1.3.6, Fancy Trail 1.2.7, Dragon Bar 1.2.0 (직접 넣은 jar: 엔더 드래곤 막대 + EF 의 드래곤 패치를 끔, All Rights Reserved — CI 에 없음) |
+| 뺌 | Farsight · Forgematica · dhcompat · Iron's Spells 3.16.3 덮어쓰기 jar |
+| 판 | Diorama 0.11.0 → 0.12.0 · GeckoLib 4.8.5 → 4.8.6 · ModernFix 5.28.8 → 5.28.9 · Hands-on Delight 1.7.0 → 1.7.1 · Show the Lyrics 2.1.4 → 2.1.5 · Iron's Spells 3.16.4 |
+| 설정 | Distant Horizons 선택 → 필수, ImmediatelyFast 빠른 버퍼 false → true, DH 설정은 11 그대로(실시간 256 · 비율 1.0 · SSAO · 구름 여러 겹), Bosses'Rise 구르기 표시 끔 |
+
+- 데이터팩: Cataclysm compat 은 P1nero 와 무기 4개(gauntlet_of_guard · infernal_forge · the_incinerator · tidal_claws)가 겹침 — 월드 데이터팩이 모드 데이터를 덮으므로 P1nero 의 기술이 사라질 수 있음 → 4개를 뺀 판을 줌.
+  Mowzie's compat 의 types/dual_greatsword.json 은 팩에 없는 giveme_a_efdg:earthquake 를 부름(쓰는 무기 없음) → 뺀 판을 줌.
+- 팩에 실린 개인 · 실행 중 파일: config/rtshop/talk_history.json(대화 기록 · 닉네임), compat_done.txt(PC 경로), map_marks_client.json, backup/, *.bak, showthelyrics/cache3 → 내보내기 전에 지우기 권함.
+  town_spawn.json(분수 광장 기준 자리)은 실려 있어 좋음.
+- KubeJS server_scripts/gamerules.js 가 켤 때마다 doFireTick true — RT Shop 은 불 번짐을 막지 않으므로 마을의 나무 건물이 탈 수 있음.
+- Small Ships: 배를 놓는 것(아이템 사용)은 성 영역에서도 막지 않음, 배는 보호되는 물건이 아님.
