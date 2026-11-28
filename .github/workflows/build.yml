@@ -392,6 +392,25 @@ jobs:
               done
             done | head -n 60
           } > /tmp/inspect/cataclysm-eyes.txt 2>&1 || true
+      - name: Inspect the mods new in pack 13 (EFN-Enhance, Epic X Cataclysm, Small Ships)
+        run: |
+          mkdir -p /tmp/inspect
+          {
+            for J in $(ls packcache/*.jar | grep -i -E "efn|enhance|epic_x|epicx|p1nero|cataclysm_ef|smallships|small_ships|small-ships"); do
+              echo "################ $J"
+              unzip -p "$J" META-INF/mods.toml 2>/dev/null | grep -v "^#" | head -n 60
+              echo "== mixins"
+              for m in $(unzip -l "$J" | awk '{print $4}' | grep -E "mixins?\.json$" | head -n 6); do echo "-- $m"; unzip -p "$J" "$m" | head -c 3000; echo; done
+              echo "== packages"
+              unzip -l "$J" | awk '{print $4}' | grep "\.class$" | awk -F/ 'NF>3{print $1"/"$2"/"$3"/"$4}' | sort | uniq -c | sort -rn | head -n 25
+              echo "== lang (en_us) sample"
+              for L in $(unzip -l "$J" | awk '{print $4}' | grep -E "lang/en_us\.json$" | head -n 2); do unzip -p "$J" "$L" | head -c 2500; echo; done
+              echo "== data folders"
+              unzip -l "$J" | awk '{print $4}' | grep -E "^data/[^/]+/[^/]+/" | awk -F/ '{print $1"/"$2"/"$3}' | sort | uniq -c | head -n 30
+              echo "== event subscribers / enhance words"
+              (mkdir -p /tmp/nm && cd /tmp/nm && rm -rf * && unzip -q -o "$J" '*.class' 2>/dev/null; grep -rl -a -E "SubscribeEvent" --include=*.class . | head -n 40; echo "-- enhance/upgrade/anvil/boss bar/spawn words"; grep -rh -a -o -E "(enhanc|upgrade|anvil|refine|bossbar|BossEvent|EntityJoinLevel|LivingSpawn|FinalizeSpawn|BreakEvent|ServerChatEvent|PlayerInteractEvent)[A-Za-z]*" --include=*.class . | sort | uniq -c | sort -rn | head -n 30)
+            done
+          } > /tmp/inspect/pack13-new-mods.txt 2>&1 || true
       - name: Inspect spmovesets merchant (3.81)
         run: |
           mkdir -p /tmp/inspect /tmp/spm
