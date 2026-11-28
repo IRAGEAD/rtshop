@@ -3746,6 +3746,72 @@ public final class SelfTest {
             com.rtshop.rules.ItemPolicy.prepare(server);
             com.rtshop.rules.ItemPolicy.afterShops(server, ShopServer.loaded());
         }
+        // 3.82 (사용자 11-28 17:39 "마을의 지도 제작자가 원소 지도와 열쇠를 판매하는 것도 막아줘"): 주민 거래의 tradeBan (기본 spmovesets 전부)
+        {
+            com.rtshop.rules.ItemPolicy.Config tp = com.rtshop.rules.ItemPolicy.Config.defaults();
+            boolean tradeDefaults = tp.tradeBan.contains("spmovesets:*") && com.rtshop.rules.ItemPolicy.Config.VERSION >= 8
+                    && tp.toJson().has("tradeBan");
+            tp.tradeBan.add("minecraft:compass");   // 모드가 없는 시험에서는 나침반으로 대신 본다
+            com.rtshop.rules.ItemPolicy.setForTest(tp);
+            net.minecraft.world.entity.npc.Villager vil = EntityType.VILLAGER.create(level);
+            try {
+                vil.moveTo(a.getX() + 3, a.getY(), a.getZ() + 3);
+                net.minecraft.world.item.trading.MerchantOffers vo = vil.getOffers();
+                vo.clear();
+                vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 3), new ItemStack(Items.COMPASS), 4, 1, 0.05f));
+                vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 3), new ItemStack(Items.COMPASS), new ItemStack(Items.MAP), 4, 1, 0.05f));
+                ItemStack tagged = new ItemStack(Items.FILLED_MAP);
+                tagged.getOrCreateTag().putString("rtshopTestMark", "spmovesets:mapa_pyro");
+                vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 3), tagged, 4, 1, 0.05f));
+                vo.add(new net.minecraft.world.item.trading.MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(Items.BREAD, 6), 16, 1, 0.05f));
+                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract(
+                        a, net.minecraft.world.InteractionHand.MAIN_HAND, vil));
+                boolean stripped = vil.getOffers().size() == 1 && vil.getOffers().get(0).getResult().is(Items.BREAD);
+                check("3.82 a villager's trades that sell or cost a tradeBan item (or an item whose NBT names a banned mod) are removed before the trade window opens; others stay; spmovesets is banned by default",
+                        tradeDefaults && stripped, tradeDefaults + " " + vil.getOffers().size());
+                if (net.minecraftforge.fml.ModList.get().isLoaded("spmovesets")) {
+                    // Forge 가 모드의 거래를 더한 지도 제작자의 거래 목록에서 spmovesets 의 것을 만들어 보고, 정리하면 남지 않는지
+                    int spListings = 0, spOffers = 0;
+                    StringBuilder spWhere = new StringBuilder();
+                    var trades = net.minecraft.world.entity.npc.VillagerTrades.TRADES.get(net.minecraft.world.entity.npc.VillagerProfession.CARTOGRAPHER);
+                    vil.setVillagerData(vil.getVillagerData().setProfession(net.minecraft.world.entity.npc.VillagerProfession.CARTOGRAPHER));
+                    vil.getOffers().clear();
+                    if (trades != null) {
+                        for (var lv : trades.int2ObjectEntrySet()) {
+                            for (net.minecraft.world.entity.npc.VillagerTrades.ItemListing li : lv.getValue()) {
+                                if (!li.getClass().getName().toLowerCase(java.util.Locale.ROOT).contains("spmovesets")) continue;   // 바닐라 지도(구조물 찾기)는 부르지 않음
+                                spListings++;
+                                spWhere.append(' ').append(lv.getIntKey()).append(':').append(li.getClass().getSimpleName());
+                                try {
+                                    for (int kk382 = 0; kk382 < 4; kk382++) {
+                                        net.minecraft.world.item.trading.MerchantOffer mo = li.getOffer(vil, level.getRandom());
+                                        if (mo != null) {
+                                            vil.getOffers().add(mo);
+                                            spOffers++;
+                                        }
+                                    }
+                                } catch (Throwable t) {
+                                    spWhere.append("(error ").append(t.getClass().getSimpleName()).append(')');
+                                }
+                            }
+                        }
+                    }
+                    com.rtshop.rules.ItemPolicy.reload();   // 진짜 규칙(spmovesets:*)으로
+                    int bannedBefore = 0;
+                    for (net.minecraft.world.item.trading.MerchantOffer mo : vil.getOffers()) if (com.rtshop.rules.TradeGuard.banned(mo)) bannedBefore++;
+                    int removed = com.rtshop.rules.TradeGuard.strip(vil);
+                    info("spmovesets cartographer listings: " + spListings + " offers " + spOffers + " banned " + bannedBefore + " removed " + removed + spWhere);
+                    check("3.82 in the pack the spmovesets trades a cartographer can get (element maps for emeralds and gacha keys) are all removed",
+                            removed == bannedBefore && vil.getOffers().stream().noneMatch(com.rtshop.rules.TradeGuard::banned),
+                            spListings + " listings, " + spOffers + " offers, " + bannedBefore + " banned, " + removed + " removed" + spWhere);
+                }
+            } finally {
+                vil.discard();
+                com.rtshop.rules.ItemPolicy.reload();
+                com.rtshop.rules.ItemPolicy.prepare(server);
+                com.rtshop.rules.ItemPolicy.afterShops(server, ShopServer.loaded());
+            }
+        }
         check("after the trial the real rules are back: the iron sword and TNT can be crafted again",
                 server.getRecipeManager().byKey(new ResourceLocation("minecraft:iron_sword")).isPresent() && server.getRecipeManager().byKey(tntRecipe).isPresent());
         {

@@ -67,7 +67,7 @@ public final class ItemPolicy {
          *  6 (3.78.0): spmovesets 의 모든 아이템 — NPC 상점 · 뽑기 · 조합법 · 전리품 · 몹/블록 드롭 금지 (사용자 "spmovesets 의 모든 아이템들을 상점에서 제거하고
          *     드랍과 조합과 같은 얻는 방식도 모두 금지"). 전리품은 2판부터 막혀 있었다.
          *  7 (3.80.0): 상점의 무기 · 장비 값 올리기 (gearRaise*) — 파일에 새 칸을 적는다. */
-        public static final int VERSION = 7;
+        public static final int VERSION = 8;
         /** 읽어 온 파일이 예전 판이라 고쳐 썼는가 (다시 저장한다). */
         transient boolean migrated;
         public boolean enabled = true;
@@ -88,6 +88,8 @@ public final class ItemPolicy {
         public final Set<String> gachaBan = new LinkedHashSet<>();
         public final Set<String> recipeBan = new LinkedHashSet<>();
         public final Set<String> recipeBanMods = new LinkedHashSet<>();
+        /** 3.82: 주민 · 떠돌이 상인의 거래에 오르면 안 되는 아이템 (파는 것 · 값 모두, "모드:*" 는 NBT 에 그 모드가 적힌 것도). */
+        public final Set<String> tradeBan = new LinkedHashSet<>();
         public boolean recipeBanStaffs = true;
         public final Set<String> staffWords = new LinkedHashSet<>();
         public boolean listStaffs = true;
@@ -133,6 +135,7 @@ public final class ItemPolicy {
                     "adorablehamsterpets:*", "crittersandcompanions:*", "rpg_companions_tiny_dragons:*", "fantasymounts:*",
                     "efn:*", "tacz:*", "lrtactical:*", "create:*", "betternether:*"));
             c.blockDropBan.addAll(List.of("create:*", "betternether:*", "spmovesets:*"));
+            c.tradeBan.add("spmovesets:*");   // 3.82: 지도 제작자의 원소 지도(값: 에메랄드 + 뽑기 열쇠) 등
             c.lootAllow.addAll(List.of("irons_spellbooks:*_ink", "irons_spellbooks:ink_*"));
             c.recipeBan.addAll(List.of("tacz:*", "lrtactical:*", "rtshop:enhance_anvil", "create:*", "betternether:*", "spmovesets:*"));
             c.recipeBanMods.addAll(List.of("tacz", "create", "betternether", "spmovesets"));
@@ -158,6 +161,7 @@ public final class ItemPolicy {
             help.add("gachaBan: 뽑기에 오르지 않는 것 — 무기·장신구·펫 묶음의 아이템 ID 와 마법 뽑기의 인챈트 ID (Create: 상점·뽑기 어디에서도 얻지 못하게). gacha.json 의 목록은 지우지 않고 건너뛰기만 한다.");
             help.add("recipeBan / recipeBanMods: 만들 수 없는 아이템 / 그 모드의 조합법 전부. recipeBanStaffs + staffWords: 지팡이는 만들 수 없고 상점에서 삼 (listStaffs: 팔지 않는 지팡이를 staffShop 에 올림).");
             help.add("extremeAttack / extremeArmor (3.65.0): 공격력이 이 값 이상이거나 갑옷 한 조각의 방어력이 이 값 이상인 터무니없는 장비는 전리품 · 몹과 보스의 드롭 · 조합법에서 뺀다 (keep · lootAllow 보다 먼저). 0 = 끔. 기본 25 / 20 (모드팩의 다른 장비는 17 / 13 이 가장 높다).");
+            help.add("tradeBan (3.82): 주민 · 떠돌이 상인의 거래에서 뺄 아이템 — 파는 것이든 값이든 이 아이템이 들어간 거래는 거래 창이 열리기 전에 빠진다. \"모드:*\" 는 NBT 에 그 모드가 적힌 물건(모드가 만든 지도 등)도. 기본: spmovesets 전부.");
             help.add("shopBannedKeepOwnWays: shopBan 에 적힌 모드의 장비는 '상점에서만' 규칙에서 빠진다 (조합법·전리품 그대로). 전리품까지 막으려면 lootBan 에도 적는다.");
             help.add("recipeBanListedGear: 상점·뽑기에 오른 무기·장비는 만들 수 없음. modGearShopOnly: 모드의 무기·방어구·도구·장신구는 상점(뽑기)에서만 — 조합법과 전리품에서 뺌. vanillaGearToo: 바닐라 장비에도 적용. keep: 예외로 둘 아이템.");
             help.add("gearRaise (3.80): 상점의 무기 · 활 · 지팡이 · 방패 · 방어구 · 장신구의 사는 값을 올린다 — 올리기 전 값이 gearRaiseMidFrom G 미만이면 gearRaiseLow 배, gearRaiseHighFrom G 미만이면 gearRaiseMid 배, 그 이상은 gearRaiseHigh 배. "
@@ -166,6 +170,7 @@ public final class ItemPolicy {
             o.addProperty("version", VERSION);
             o.addProperty("enabled", enabled);
             o.add("shopBan", arr(shopBan));
+            o.add("tradeBan", arr(tradeBan));
             o.addProperty("shopBanBossItems", shopBanBossItems);
             o.addProperty("shopBanGuns", shopBanGuns);
             o.add("gunWords", arr(gunWords));
@@ -214,6 +219,7 @@ public final class ItemPolicy {
             Config c = new Config();
             c.enabled = bool(o, "enabled", true);
             strings(o, "shopBan", c.shopBan, d.shopBan);
+            strings(o, "tradeBan", c.tradeBan, d.tradeBan);
             c.shopBanBossItems = bool(o, "shopBanBossItems", true);
             c.shopBanGuns = bool(o, "shopBanGuns", true);
             strings(o, "gunWords", c.gunWords, d.gunWords);
@@ -251,6 +257,10 @@ public final class ItemPolicy {
             c.gearRaiseHighFrom = (int) num(o, "gearRaiseHighFrom", d.gearRaiseHighFrom);
             c.gearRaiseStrongDps = num(o, "gearRaiseStrongDps", d.gearRaiseStrongDps);
             int v = v0(o);
+            if (v < 8) {   // 3.82.0: spmovesets 가 주민(지도 제작자)에게 붙인 거래를 뺀다 (운영자가 적은 다른 줄은 그대로)
+                c.tradeBan.add("spmovesets:*");
+                c.migrated = true;
+            }
             if (v < 7) c.migrated = true;   // 3.80.0: 무기 · 장비 값 올리기의 새 칸을 파일에 적는다 (켜짐)
             if (v < 6) {   // 3.78.0: spmovesets 의 아이템은 상점 · 뽑기에 오르지 않고, 만들거나 줍거나 캐서 얻지도 못한다 (운영자가 적은 다른 줄은 그대로)
                 c.shopBan.add("spmovesets:*");
@@ -372,7 +382,9 @@ public final class ItemPolicy {
     /** 한 번 읽은 규칙과 거기서 셈한 것. 바꿀 때는 통째로 갈아 끼운다 (전리품은 다른 스레드에서도 묻는다). */
     private static final class State {
         final Config c;
-        final Pat shopBan, bossItems, notBoss, lootBan, lootAllow, recipeBan, keep, blockDropBan, gachaBan;
+        final Pat shopBan, bossItems, notBoss, lootBan, lootAllow, recipeBan, keep, blockDropBan, gachaBan, tradeBan;
+        /** tradeBan 의 "모드:*" 에서 뽑은 "모드:" — NBT 글에 들어 있으면 그 모드의 물건으로 본다. */
+        final List<String> tradeBanTags = new ArrayList<>();
         final List<Map.Entry<Pat, Double>> factors = new ArrayList<>();
         volatile Set<Item> boss = Set.of();
         volatile Set<Item> listed = Set.of();
@@ -388,6 +400,11 @@ public final class ItemPolicy {
             lootAllow = new Pat(c.lootAllow);
             blockDropBan = new Pat(c.blockDropBan);
             gachaBan = new Pat(c.gachaBan);
+            tradeBan = new Pat(c.tradeBan);
+            for (String t : c.tradeBan) {
+                String v = t.trim().toLowerCase(Locale.ROOT);
+                if (v.endsWith(":*") && v.indexOf('*') == v.length() - 1) tradeBanTags.add(v.substring(0, v.length() - 1));
+            }
             recipeBan = new Pat(c.recipeBan);
             keep = new Pat(c.keep);
             for (Map.Entry<String, Double> e : c.priceFactor.entrySet()) factors.add(Map.entry(new Pat(List.of(e.getKey())), e.getValue()));
@@ -421,7 +438,7 @@ public final class ItemPolicy {
                 Config c = Config.fromJson(JsonParser.parseString(Files.readString(path(), StandardCharsets.UTF_8)).getAsJsonObject());
                 if (c.migrated) {
                     Files.writeString(path(), new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(c.toJson()), StandardCharsets.UTF_8);
-                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음, 5: Better Nether 의 조합법·전리품·드롭 금지, 6: spmovesets 의 상점·뽑기·조합법·전리품·드롭 금지).", Config.VERSION);
+                    RtShop.LOGGER.info("[rtshop] item_policy.json 을 새 판({})으로 고쳤습니다 (2: Better Nether 상점 금지 · 전리품 금지에 spmovesets, 3: Create 의 조합법·전리품·블록 드랍 금지, 4: Create 는 상점·뽑기에도 오르지 않음, 5: Better Nether 의 조합법·전리품·드롭 금지, 6: spmovesets 의 상점·뽑기·조합법·전리품·드롭 금지, 7: 무기 · 장비 값 올리기, 8: 주민 거래에서 spmovesets 뺌).", Config.VERSION);
                 }
                 return c;
             }
@@ -702,6 +719,19 @@ public final class ItemPolicy {
         if (!s.c.enabled || stack.isEmpty()) return false;
         ResourceLocation id = id(stack.getItem());
         return id != null && s.lootBan.hit(id) && !s.lootAllow.hit(id);
+    }
+
+    /** 주민 · 떠돌이 상인의 거래에 오르면 안 되는가 (tradeBan, 3.82): 아이템 ID, 또는 NBT 에 금지 모드가 적힌 물건. */
+    public static boolean tradeBanned(ItemStack stack) {
+        State s = st();
+        if (!s.c.enabled || stack == null || stack.isEmpty()) return false;
+        ResourceLocation id = id(stack.getItem());
+        if (id != null && s.tradeBan.hit(id)) return true;
+        if (!s.tradeBanTags.isEmpty() && stack.hasTag()) {
+            String tag = stack.getTag().toString().toLowerCase(Locale.ROOT);
+            for (String ns : s.tradeBanTags) if (tag.contains(ns)) return true;
+        }
+        return false;
     }
 
     /** 블록을 캤을 때 나오면 안 되는 아이템인가 (blockDropBan). */
