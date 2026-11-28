@@ -392,11 +392,11 @@ jobs:
               done
             done | head -n 60
           } > /tmp/inspect/cataclysm-eyes.txt 2>&1 || true
-      - name: Inspect the mods new in pack 13 (EFN-Enhance, Epic X Cataclysm, Small Ships)
+      - name: Inspect the mods new in packs 13-14 (EFN-Enhance, Epic X Cataclysm, Small Ships, GUHAO's VIX, Fancy Trail)
         run: |
           mkdir -p /tmp/inspect
           {
-            for J in $(ls packcache/*.jar | grep -i -E "efn|enhance|epic_x|epicx|p1nero|cataclysm_ef|smallships|small_ships|small-ships"); do
+            for J in $(ls packcache/*.jar | grep -i -E "efn|enhance|epic_x|epicx|p1nero|cataclysm_ef|smallships|small_ships|small-ships|vix|guhao|trail"); do
               echo "################ $J"
               unzip -p "$J" META-INF/mods.toml 2>/dev/null | grep -v "^#" | head -n 60
               echo "== mixins"
@@ -410,7 +410,7 @@ jobs:
               echo "== event subscribers / enhance words"
               (mkdir -p /tmp/nm && cd /tmp/nm && rm -rf * && unzip -q -o "$J" '*.class' 2>/dev/null; grep -rl -a -E "SubscribeEvent" --include=*.class . | head -n 40; echo "-- enhance/upgrade/anvil/boss bar/spawn words"; grep -rh -a -o -E "(enhanc|upgrade|anvil|refine|bossbar|BossEvent|EntityJoinLevel|LivingSpawn|FinalizeSpawn|BreakEvent|ServerChatEvent|PlayerInteractEvent)[A-Za-z]*" --include=*.class . | sort | uniq -c | sort -rn | head -n 30)
             done
-          } > /tmp/inspect/pack13-new-mods.txt 2>&1 || true
+          } > /tmp/inspect/pack14-new-mods.txt 2>&1 || true
       - name: Inspect spmovesets merchant (3.81)
         run: |
           mkdir -p /tmp/inspect /tmp/spm
